@@ -1,95 +1,27 @@
-// ===== Page background with honeycomb =====
+@use 'variables' as *;
+@use '../public-shared' as shared;
+
+@include shared.cta-section();
+@include shared.category-badge();
+
 :host {
-  display: block;
-  position: relative;
-  background: #f8fafc;
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    // background-image: $honeycomb-svg-light;
-    background-size: 56px 100px;
-    opacity: 0.06;
-    pointer-events: none;
-    z-index: 0;
-  }
+  --featured-article-height: 390px;
 }
 
-:host-context(.dark) {
-  background: #0f172a;
-
-  &::before {
-    // background-image: $honeycomb-svg;
-    opacity: 0.04;
-  }
-}
-
-// ===== Shared text classes =====
-.section-heading {
-  color: #0f172a;
-}
-:host-context(.dark) .section-heading {
-  color: #f8fafc;
-}
-
-.section-subtext {
-  color: #64748b;
-}
-:host-context(.dark) .section-subtext {
-  color: #94a3b8;
-}
-
-// ===== Shared honeycomb overlay for dark sections =====
-.honeycomb-bg-dark {
-  position: absolute;
-  inset: 0;
-  opacity: 0.06;
-  // background-image: $honeycomb-svg;
-  background-size: 56px 100px;
-  pointer-events: none;
-}
-
-// ===== Hero (always dark) =====
-.blog-hero-section {
+.hero-section {
   position: relative;
   overflow: hidden;
-  z-index: 1;
-  background: #0f172a;
-}
-
-// ===== Featured section: gradient from dark hero into page bg =====
-.featured-section {
-  position: relative;
-  z-index: 1;
-  background: linear-gradient(180deg, #0f172a 0%, transparent 12%);
-}
-
-:host-context(.dark) .featured-section {
-  background: linear-gradient(180deg, #0f172a 0%, transparent 14%);
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: calc(100dvh - var(--nav-height) - (var(--featured-article-height) / 2));
 }
 
 // ===== Posts grid section =====
 .posts-section {
   position: relative;
   z-index: 1;
-}
-
-// ===== Category Badge (on cards) =====
-.category-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 2rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--p-primary-700);
-  letter-spacing: 0.02em;
-}
-
-:host-context(.dark) .category-badge {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--p-primary-400);
 }
 
 // ===== Featured Card =====
@@ -100,8 +32,11 @@
   gap: 0;
   border-radius: 1.25rem;
   overflow: hidden;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid;
+
+  background: color-mix(in oklab, black 8%, transparent);
+  border-color: color-mix(in oklab, black 12%, transparent);
+
   text-decoration: none;
   transition: all 0.35s ease;
 
@@ -111,7 +46,7 @@
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 16px 48px color-mix(in oklab, black 10%, transparent);
 
     .featured-card__image {
       transform: scale(1.04);
@@ -120,11 +55,11 @@
 }
 
 :host-context(.dark) .featured-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: color-mix(in oklab, white 8%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
 
   &:hover {
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 16px 48px color-mix(in oklab, black 35%, transparent);
   }
 }
 
@@ -155,7 +90,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   background: var(--p-primary-500);
-  color: white;
+  color: var(--p-primary-contrast-color);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -164,7 +99,7 @@
   display: flex;
   flex-direction: column;
   padding: 2rem;
-  background: white;
+  background: color-mix(in oklab, black 8%, transparent);
 
   @media (min-width: 768px) {
     padding: 2.5rem;
@@ -172,7 +107,7 @@
 }
 
 :host-context(.dark) .featured-card__content {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in oklab, white 8%, transparent);
 }
 
 // ===== Read More Link =====
@@ -196,14 +131,15 @@
   flex-direction: column;
   border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid;
   text-decoration: none;
   transition: all 0.35s ease;
-  background: white;
+  background: color-mix(in oklab, black 8%, transparent);
+  border-color: color-mix(in oklab, black 12%, transparent);
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 40px color-mix(in oklab, black 8%, transparent);
 
     .blog-card__image {
       transform: scale(1.04);
@@ -217,11 +153,11 @@
 }
 
 :host-context(.dark) .blog-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: color-mix(in oklab, white 8%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
 
   &:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 40px color-mix(in oklab, black 30%, transparent);
   }
 }
 
@@ -244,12 +180,4 @@
   flex-direction: column;
   flex: 1;
   padding: 1.5rem;
-}
-
-// ===== CTA (always dark) =====
-.blog-cta {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-  background: #0f172a;
 }

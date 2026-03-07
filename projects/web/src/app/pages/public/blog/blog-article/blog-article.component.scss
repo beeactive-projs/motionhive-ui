@@ -1,89 +1,23 @@
-// ===== Page background with honeycomb =====
+@use 'variables' as *;
+@use '../../public-shared' as shared;
+
+@include shared.cta-section();
+@include shared.orb-base();
+@include shared.orb-colors();
+@include shared.category-badge();
+
 :host {
-  display: block;
-  position: relative;
-  background: #f8fafc;
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    // background-image: $honeycomb-svg-light;
-    background-size: 56px 100px;
-    opacity: 0.06;
-    pointer-events: none;
-    z-index: 0;
-  }
+  --featured-article-image: 390px;
 }
 
-:host-context(.dark) {
-  background: #0f172a;
-
-  &::before {
-    // background-image: $honeycomb-svg;
-    opacity: 0.04;
-  }
-}
-
-// ===== Shared honeycomb overlay for dark sections =====
-.honeycomb-bg-dark {
-  position: absolute;
-  inset: 0;
-  opacity: 0.06;
-  // background-image: $honeycomb-svg;
-  background-size: 56px 100px;
-  pointer-events: none;
-}
-
-// ===== Article Header (always dark) =====
-.article-header-section {
+.hero-section {
   position: relative;
   overflow: hidden;
-  z-index: 1;
-  background: #0f172a;
-}
-
-// ===== Content area =====
-.article-body {
-  position: relative;
-  z-index: 1;
-  background: linear-gradient(180deg, #0f172a 0%, transparent 8%);
-}
-
-:host-context(.dark) .article-body {
-  background: linear-gradient(180deg, #0f172a 0%, transparent 10%);
-}
-
-// ===== Back Link =====
-.back-link {
-  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--p-secondary-400);
-  text-decoration: none;
-  transition: color 0.2s ease;
-
-  &:hover { color: var(--p-primary-500); }
-
-  &:focus-visible {
-    outline: 2px solid var(--p-primary-500);
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
-}
-
-// ===== Category Badge =====
-.category-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 2rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--p-primary-400);
-  letter-spacing: 0.02em;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: calc(100dvh - var(--nav-height) - (var(--featured-article-image) / 2));
 }
 
 // ===== Cover Image =====
@@ -93,7 +27,7 @@
   object-fit: cover;
   border-radius: 1.25rem;
   display: block;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 40px color-mix(in oklab, black 10%, transparent);
 
   @media (min-width: 768px) {
     height: 480px;
@@ -101,7 +35,7 @@
 }
 
 :host-context(.dark) .article-cover-image {
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 40px color-mix(in oklab, black 30%, transparent);
 }
 
 // ===== Article Prose Content =====
@@ -109,13 +43,13 @@
   .article-content {
     font-size: 1.0625rem;
     line-height: 1.85;
-    color: #475569;
+    color: var(--p-secondary-500);
 
     h2 {
       font-family: var(--font-heading, inherit);
       font-size: 1.5rem;
       font-weight: 800;
-      color: #0f172a;
+      color: var(--p-secondary-900);
       margin-top: 2.5rem;
       margin-bottom: 0.875rem;
       line-height: 1.3;
@@ -125,7 +59,7 @@
       font-family: var(--font-heading, inherit);
       font-size: 1.25rem;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--p-secondary-900);
       margin-top: 2rem;
       margin-bottom: 0.75rem;
     }
@@ -135,7 +69,7 @@
 
       &:first-child {
         font-size: 1.125rem;
-        color: #64748b;
+        color: var(--p-secondary-500);
       }
     }
 
@@ -151,10 +85,16 @@
 }
 
 :host-context(.dark) :host::ng-deep .article-content {
-  color: #cbd5e1;
+  color: var(--p-secondary-200);
 
-  h2, h3 { color: white; }
-  p:first-child { color: #94a3b8; }
+  h2,
+  h3 {
+    color: var(--p-secondary-50);
+  }
+
+  p:first-child {
+    color: var(--p-secondary-400);
+  }
 }
 
 // ===== Tag Pills =====
@@ -164,14 +104,14 @@
   border-radius: 2rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--p-surface-100);
+  color: var(--p-secondary-500);
   letter-spacing: 0.01em;
 }
 
 :host-context(.dark) .tag-pill {
-  background: rgba(255, 255, 255, 0.06);
-  color: #94a3b8;
+  background: color-mix(in oklab, white 6%, transparent);
+  color: var(--p-secondary-400);
 }
 
 // ===== Author Bio =====
@@ -181,13 +121,13 @@
   gap: 1.25rem;
   padding: 1.75rem;
   border-radius: 1rem;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--p-surface-0);
+  border: 1px solid color-mix(in oklab, black 6%, transparent);
 }
 
 :host-context(.dark) .author-bio-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: color-mix(in oklab, white 8%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
 }
 
 // ===== Related Cards =====
@@ -201,14 +141,14 @@
   flex-direction: column;
   border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid color-mix(in oklab, black 6%, transparent);
   text-decoration: none;
   transition: all 0.3s ease;
-  background: white;
+  background: var(--p-surface-0);
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 32px color-mix(in oklab, black 8%, transparent);
 
     .related-card__image {
       transform: scale(1.04);
@@ -222,10 +162,12 @@
 }
 
 :host-context(.dark) .related-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: color-mix(in oklab, white 8%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
 
-  &:hover { box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3); }
+  &:hover {
+    box-shadow: 0 10px 32px color-mix(in oklab, black 30%, transparent);
+  }
 }
 
 .related-card__image-wrap {
@@ -247,10 +189,3 @@
   flex: 1;
 }
 
-// ===== CTA (always dark) =====
-.article-cta {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-  background: #0f172a;
-}

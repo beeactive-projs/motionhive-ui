@@ -90,7 +90,7 @@
 <!-- ===== Who It's For Section ===== -->
 <section class="who-section py-14 sm:py-20">
   <!-- <div class="who-bg"></div> -->
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-8">
       <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3">
         How will you <span class="text-brand">BeeActive</span>?
@@ -134,7 +134,7 @@
 </section>
 
 <!-- ===== What's Coming Section ===== -->
-<section class="coming-section py-14 sm:py-20">
+<section class="feature-section py-14 sm:py-20">
   <div class="honeycomb-bg"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-8">
@@ -152,8 +152,8 @@
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
       @for (item of roadmap; track item.title) {
-      <div class="coming-card">
-        <div class="coming-icon-wrap">
+      <div class="feature-card">
+        <div class="feature-icon-wrap">
           <i [class]="'pi ' + item.icon + ' text-lg'"></i>
         </div>
         <h3 class="section-heading text-lg font-heading font-bold mb-1">
@@ -163,28 +163,15 @@
           {{ item.description }}
         </p>
         @if (item.ready) {
-        <span class="coming-badge coming-badge-live">Live</span>
+        <span class="feature-badge feature-badge-live">Live</span>
         } @else {
-        <span class="coming-badge coming-badge-soon">Coming soon</span>
+        <span class="feature-badge feature-badge-soon">Coming soon</span>
         }
       </div>
       }
     </div>
   </div>
 </section>
-
-<!-- Hex Divider -->
-<!-- <div class="hex-divider" aria-hidden="true">
-  <div class="hex-divider__cell"></div>
-  <div class="hex-divider__cell"></div>
-  <div class="hex-divider__cell"></div>
-  <div class="hex-divider__cell--glow"></div>
-  <div class="hex-divider__cell--accent"></div>
-  <div class="hex-divider__cell--glow"></div>
-  <div class="hex-divider__cell"></div>
-  <div class="hex-divider__cell"></div>
-  <div class="hex-divider__cell"></div>
-</div> -->
 
 <!-- ===== CTA Section ===== -->
 <section class="cta-section">
@@ -200,8 +187,7 @@
       when it opens.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button label="Read the blog" icon="pi pi-arrow-right" iconPos="right" routerLink="/blog" severity="warn"
-        size="large" />
+      <p-button label="Read the blog" icon="pi pi-arrow-right" iconPos="right" routerLink="/blog" size="large" />
     </div>
   </div>
 </section>
