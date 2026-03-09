@@ -4,11 +4,18 @@ export interface BlogAuthor {
   role: string;
 }
 
-export interface BlogPost {
-  items: BlogPostData[];
-  total: number;
+export interface BlogPostMeta {
   page: number;
-  pageSize: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface BlogPost {
+  data: BlogPostData[];
+  meta: BlogPostMeta;
 }
 
 export interface BlogPostData {
