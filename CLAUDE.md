@@ -58,6 +58,20 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - Dark mode: CSS class strategy (`.dark` on `<html>`)
 - Custom colors: secondary (Midnight Navy), accent (Teal)
 - Fonts: Inter (body), Poppins (headings)
+- **Custom SCSS must use PrimeNG CSS design tokens — never hardcode colors, spacing, border-radius, or shadows:**
+  ```scss
+  // correct
+  color: var(--p-primary-color);
+  background: var(--p-surface-100);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-border-radius-md);
+  box-shadow: var(--p-overlay-shadow);
+
+  // wrong
+  color: #3b82f6;
+  background: #f8f9fa;
+  border-radius: 6px;
+  ```
 
 ## Coding Conventions
 
@@ -66,6 +80,8 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - File names: kebab-case, **no `.component` suffix** (`clients.ts`, `clients.html`)
 - Component classes: PascalCase, **no suffix** (`Clients`, `Dashboard`)
 - Selector prefix: `bee-` (`bee-clients`, `bee-dashboard`)
+- Private class members: `_` prefix (`private readonly _store = inject(...)`)
+- Observables / Subjects: `$` suffix (`reload$`, `destroy$`)
 
 ### Angular-Specific Rules
 
@@ -73,19 +89,32 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - `changeDetection: ChangeDetectionStrategy.OnPush` on every component
 - Use `inject()` function, not constructor injection
 - Use `input()` and `output()` functions, not `@Input`/`@Output` decorators
+- Use `model()` for two-way bindings, not `@Input` + `@Output XChange` pairs
+- Use `viewChild()` / `viewChildren()` instead of `@ViewChild` / `@ViewChildren`
 - Use `signal()`, `computed()`, `update()`, `set()` — never `mutate` on signals
+- Use `effect()` sparingly — only for side effects that truly depend on signals
+- Use `afterNextRender()` for DOM-dependent operations (replaces `AfterViewInit`); `ngOnInit` is fine for data init
 - Use native control flow (`@if`, `@for`, `@switch`), not `*ngIf`/`*ngFor`/`*ngSwitch`
 - Use `class` bindings, not `ngClass`; `style` bindings, not `ngStyle`
 - Use `host` object in decorator, not `@HostBinding`/`@HostListener`
 - Use `NgOptimizedImage` for all static images (not inline base64)
 - Reactive forms preferred over template-driven
 - Services: `providedIn: 'root'`, return `Observable` from HttpClient
+- Subscriptions: `takeUntilDestroyed(destroyRef)` for long-lived streams, `take(1)` for one-shot HTTP calls
 
 ### PrimeNG
 
 - Template references: `#header`, `#body`, `#footer` (not `pTemplate`)
 - Tables: `[lazy]="true"` + `(onLazyLoad)` with `#loadingbody` (p-skeleton) and `#emptymessage`
 - Forms: `isFieldInvalid()` / `getFieldError()` pattern, `p-message` for errors
+
+### Dialogs
+
+- **Complex dialogs**: create a child component that owns the `p-dialog`
+  - Use `model(false)` for visibility — enables `[(visible)]` from the parent with no boilerplate
+  - Use `input.required()` for data it needs, `output()` for `saved` / `closed` events
+  - Place in a subfolder next to the parent feature (e.g. `dialogs/`)
+- **Simple confirmations**: inline `p-dialog` directly in the parent template is acceptable
 
 ### Accessibility
 

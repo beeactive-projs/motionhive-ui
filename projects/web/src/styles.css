@@ -20,7 +20,7 @@
    */
   --breakpoint-3xl: 120rem;
   /* Secondary — Midnight Navy */
-  --color-secondary-50: #f8fafc;
+  /* --color-secondary-50: #f8fafc;
   --color-secondary-100: #f1f5f9;
   --color-secondary-200: #e2e8f0;
   --color-secondary-300: #cbd5e1;
@@ -30,7 +30,19 @@
   --color-secondary-700: #334155;
   --color-secondary-800: #1e293b;
   --color-secondary-900: #0f172a;
-  --color-secondary-950: #020617;
+  --color-secondary-950: #020617; */
+
+  --color-secondary-50: '#f0f4f8';
+  --color-secondary-100: '#d9e2ec';
+  --color-secondary-200: '#bcccdc';
+  --color-secondary-300: '#9fb3c8';
+  --color-secondary-400: '#829ab1';
+  --color-secondary-500: '#1e3a5f';
+  --color-secondary-600: '#1a3354';
+  --color-secondary-700: '#162b48';
+  --color-secondary-800: '#12233d';
+  --color-secondary-900: '#0e1b31';
+  --color-secondary-950: '#0a1323';
 
   /* Accent — Teal */
   --color-accent-50: #f0fdfa;
@@ -154,8 +166,13 @@ body {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--p-surface-50);
+  background-color: var(--p-surface-100);
   color: var(--p-surface-900);
+}
+
+.dark body {
+  background-color: var(--p-surface-800);
+  color: var(--p-surface-50);
 }
 
 h1,

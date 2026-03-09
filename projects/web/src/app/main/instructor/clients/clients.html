@@ -1,15 +1,14 @@
 <div class="h-full flex flex-col gap-4">
-
   <!-- Header -->
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
-      <p class="text-xs uppercase text-surface-700">Client Management</p>
-      <h1 class="font-heading font-semibold text-surface-900 text-xl md:text-2xl">Clients</h1>
-      <p class="text-sm text-surface-700">Manage your client relationships, invitations, and requests.</p>
+      <!-- <p class="text-xs uppercase text-surface-700 dark:text-surface-400">Client Management</p> -->
+      <h1 class="font-heading font-semibold text-xl md:text-2xl">Clients</h1>
+      <p class="text-sm text-surface-700 dark:text-surface-400">Manage your client relationships, invitations, and
+        requests.</p>
     </div>
-    <div class="flex flex-wrap gap-2">
-      <p-button label="Invite Client" icon="pi pi-user-plus" severity="primary" rounded
-        (onClick)="openInviteDialog()" />
+    <div class="flex flex-wrap">
+      <p-button label="Invite client" icon="pi pi-user-plus" rounded (onClick)="openInviteDialog()" />
     </div>
   </header>
 
@@ -55,7 +54,7 @@
   <div class="flex items-center gap-3">
     <span class="text-sm font-medium">Status:</span>
     @for (option of statusOptions; track option.label) {
-    <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'secondary'" size="small"
+    <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'contrast'" size="small"
       rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)" />
     }
   </div>
@@ -95,7 +94,7 @@
             @if (client.groupMemberships?.length) {
             <div class="flex flex-wrap gap-1">
               @for (group of client.groupMemberships; track group.groupId) {
-              <p-tag [value]="group.groupName" severity="info" styleClass="!text-xs" />
+              <p-tag [value]="group.groupName" severity="info" class="text-xs" />
               }
             </div>
             } @else {
@@ -104,7 +103,7 @@
           </td>
           <td>
             @if (client.notes) {
-            <span class="text-xs text-secondary-500 truncate max-w-[120px] inline-block" [pTooltip]="client.notes">
+            <span class="text-xs text-secondary-500 truncate max-w-10 inline-block" [pTooltip]="client.notes">
               {{ client.notes }}
             </span>
             } @else {
