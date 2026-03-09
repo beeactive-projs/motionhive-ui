@@ -79,25 +79,15 @@ export interface UpdateGroupPayload {
 }
 
 export interface GroupListResponse {
-  data: Group[];
-  meta: {
-    page: number;
-    limit: number;
-    totalItems: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+  items: Group[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface GroupMemberListResponse {
-  data: GroupMember[];
-  meta: {
-    page: number;
-    limit: number;
-    totalItems: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+  items: GroupMember[];
+  total: number;
+  page: number;
+  pageSize: number;
 }

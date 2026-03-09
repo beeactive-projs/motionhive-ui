@@ -25,7 +25,7 @@ export class BlogService {
   getAllPostData(): Observable<BlogPostData[]> {
     return this.http
       .get<BlogPost>(this.base)
-      .pipe(map((response) => response.data as BlogPostData[]));
+      .pipe(map((response) => response.items as BlogPostData[]));
   }
 
   getBySlug(slug: string): Observable<BlogPostData> {

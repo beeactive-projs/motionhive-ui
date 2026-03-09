@@ -73,13 +73,8 @@ export interface ClientListParams {
 }
 
 export interface ClientListResponse {
-  data: InstructorClient[];
-  meta: {
-    page: number;
-    limit: number;
-    totalItems: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+  items: InstructorClient[];
+  total: number;
+  page: number;
+  pageSize: number;
 }

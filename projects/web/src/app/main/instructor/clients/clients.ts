@@ -100,8 +100,8 @@ export class Clients implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          this.clients.set(response.data);
-          this.totalRecords.set(response.meta.totalItems);
+          this.clients.set(response.items);
+          this.totalRecords.set(response.total);
           this.loading.set(false);
         },
         error: () => {

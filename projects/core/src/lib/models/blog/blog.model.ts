@@ -5,8 +5,10 @@ export interface BlogAuthor {
 }
 
 export interface BlogPost {
-  data: BlogPostData[];
-  meta: BlogPostMeta;
+  items: BlogPostData[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface BlogPostData {
@@ -26,15 +28,6 @@ export interface BlogPostData {
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface BlogPostMeta {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
 }
 
 export interface CreateBlogPostRequest {

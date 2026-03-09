@@ -95,8 +95,8 @@ export class GroupDetail implements OnInit {
     this.membersLoading.set(true);
     this.groupService.getMembers(groupId).subscribe({
       next: (response) => {
-        this.members.set(response.data);
-        this.totalMembers.set(response.meta.totalItems);
+        this.members.set(response.items);
+        this.totalMembers.set(response.total);
         this.membersLoading.set(false);
       },
       error: () => {
