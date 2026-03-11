@@ -9,6 +9,7 @@ import { MessageModule } from 'primeng/message';
 
 // Core imports
 import { AuthService } from 'core';
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'bee-reset-password',
@@ -18,6 +19,7 @@ import { AuthService } from 'core';
     ButtonModule,
     InputTextModule,
     MessageModule,
+    ThemeToggleComponent,
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',

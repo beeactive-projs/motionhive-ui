@@ -31,6 +31,7 @@ import {
   GoogleAuthService,
   RegisterRequest,
 } from 'core';
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'bee-sign-up',
@@ -43,6 +44,7 @@ import {
     CheckboxModule,
     MessageModule,
     Divider,
+    ThemeToggleComponent,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',

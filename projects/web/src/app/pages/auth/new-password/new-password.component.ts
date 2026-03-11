@@ -15,6 +15,7 @@ import { MessageModule } from 'primeng/message';
 
 // Core imports
 import { AuthService } from 'core';
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'bee-new-password',
@@ -24,6 +25,7 @@ import { AuthService } from 'core';
     ButtonModule,
     PasswordModule,
     MessageModule,
+    ThemeToggleComponent,
   ],
   templateUrl: './new-password.component.html',
   styleUrl: './new-password.component.scss',

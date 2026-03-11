@@ -15,6 +15,8 @@ import { InputIconModule } from 'primeng/inputicon';
 // Core imports
 import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest } from 'core';
 import { Divider } from 'primeng/divider';
+import { ThemeService } from '../../../_core/services/theme.service';
+import { ThemeToggleComponent } from "../../../_shared/components/theme-toggle/theme-toggle.component";
 
 @Component({
   selector: 'bee-login',
@@ -30,7 +32,8 @@ import { Divider } from 'primeng/divider';
     IconFieldModule,
     InputIconModule,
     Divider,
-  ],
+    ThemeToggleComponent
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +45,7 @@ export class LoginComponent {
   private readonly googleAuthService = inject(GoogleAuthService);
   private readonly facebookAuthService = inject(FacebookAuthService);
   private readonly router = inject(Router);
+  private readonly _themeService = inject(ThemeService);
   readonly route = inject(ActivatedRoute);
 
   // Signals for component state
