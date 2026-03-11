@@ -1,4 +1,11 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  OnInit,
+  signal,
+  computed,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -13,15 +20,17 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ChipModule } from 'primeng/chip';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import {
-  GroupService,
-  Group,
-  CreateGroupPayload,
-  UpdateGroupPayload,
-  JoinPolicy,
-} from 'core';
+import { GroupService, Group, CreateGroupPayload, UpdateGroupPayload, JoinPolicy } from 'core';
 
-type TagSeverity = 'success' | 'warn' | 'danger' | 'secondary' | 'info' | 'contrast' | null | undefined;
+type TagSeverity =
+  | 'success'
+  | 'warn'
+  | 'danger'
+  | 'secondary'
+  | 'info'
+  | 'contrast'
+  | null
+  | undefined;
 
 interface JoinPolicyOption {
   label: string;
@@ -194,10 +203,16 @@ export class Groups implements OnInit {
   confirmDelete(event: Event, group: Group): void {
     event.stopPropagation();
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
       header: 'Delete Group',
-      icon: 'pi pi-exclamation-triangle',
+      message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
+
+      // icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary',
+      acceptLabel: 'Yes, delete',
+      rejectLabel: 'No',
+      acceptIcon: 'pi pi-trash',
+      rejectIcon: 'pi pi-times',
       accept: () => this.deleteGroup(group),
     });
   }

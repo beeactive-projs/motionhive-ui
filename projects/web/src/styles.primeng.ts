@@ -12,7 +12,20 @@ import {
 } from './theme-colors';
 
 export const BeeActiveLara = definePreset(Lara, {
+  primitive: {},
+
   semantic: {
+    formField: {
+      paddingX: '0.625rem',
+      paddingY: '0.5rem',
+      // lgFontSize: '1rem',
+      lgPaddingX: '0.75rem',
+      lgPaddingY: '0.625rem',
+      // smFontSize: '0.75rem',
+      smPaddingX: '0.5rem',
+      smPaddingY: '0.375rem',
+    },
+
     primary,
     success,
     info,
@@ -23,7 +36,7 @@ export const BeeActiveLara = definePreset(Lara, {
       light: {
         primary: {
           color: '{primary.500}',
-          contrastColor: '{secondary.800}',
+          contrastColor: '{secondary.500}',
           hoverColor: '{primary.600}',
           activeColor: '{primary.700}',
         },
@@ -34,12 +47,12 @@ export const BeeActiveLara = definePreset(Lara, {
           // color: '#1e3a5f', // secondary.800
           // focusColor: '#0f1720', // secondary.900
         },
-        surface: surfaceLight,
+        //surface: surfaceLight,
       },
       dark: {
         primary: {
           color: '{primary.500}',
-          contrastColor: '{secondary.800}',
+          contrastColor: '{secondary.500}',
           hoverColor: '{primary.600}',
           activeColor: '{primary.700}',
         },
@@ -50,7 +63,7 @@ export const BeeActiveLara = definePreset(Lara, {
           // color: '{primary.400}',
           // focusColor: '{primary.300}',
         },
-        surface: surfaceDark,
+        //surface: surfaceDark,
       },
     },
   },
@@ -62,11 +75,22 @@ export const BeeActiveLara = definePreset(Lara, {
             primary: {
               borderColor: '{primary.500}',
               color: '{primary.500}',
-              hoverBackground: 'color-mix(in srgb, {primary.500} 10%, transparent)',
-              activeBackground: 'color-mix(in srgb, {primary.500} 20%, transparent)',
+              hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
+            secondary: {
+              borderColor: '{secondary.500}',
+              color: '{secondary.500}',
+              hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
             },
           },
           text: {
+            primary: {
+              color: '{primary.500}',
+              hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
             secondary: {
               color: '{secondary.500}',
               hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
@@ -79,15 +103,26 @@ export const BeeActiveLara = definePreset(Lara, {
             primary: {
               borderColor: '{primary.500}',
               color: '{primary.500}',
-              hoverBackground: 'color-mix(in srgb, {primary.500} 10%, transparent)',
-              activeBackground: 'color-mix(in srgb, {primary.500} 20%, transparent)',
+              hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
+            secondary: {
+              borderColor: '{secondary.300}',
+              color: '{secondary.300}',
+              hoverBackground: 'color-mix(in srgb, {secondary.400} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.500} 40%, transparent)',
             },
           },
           text: {
+             primary: {
+              color: '{primary.500}',
+              hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
             secondary: {
-              color: '{secondary.500}',
-              hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
-              activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
+              color: '{secondary.300}',
+              hoverBackground: 'color-mix(in srgb, {secondary.400} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.500} 40%, transparent)',
             },
           },
         },

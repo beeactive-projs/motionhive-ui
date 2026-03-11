@@ -155,7 +155,7 @@
           <div>
             <dt class="text-xs uppercase tracking-wide text-secondary-500">Goals</dt>
             <dd class="mt-1">
-              @if (p.userProfile.goals?.length) {
+              @if (p.userProfile.goals) {
                 <div class="flex flex-wrap gap-1">
                   @for (goal of p.userProfile.goals; track goal) {
                     <p-tag [value]="goal" severity="secondary" styleClass="!text-xs" />
@@ -236,7 +236,7 @@
             <div>
               <dt class="text-xs uppercase tracking-wide text-secondary-500">Specializations</dt>
               <dd class="mt-1">
-                @if (ip.specializations?.length) {
+                @if (ip.specializations) {
                   <div class="flex flex-wrap gap-1">
                     @for (spec of ip.specializations; track spec) {
                       <p-tag [value]="spec" severity="info" styleClass="!text-xs" />
@@ -247,7 +247,7 @@
                 }
               </dd>
             </div>
-            @if (ip.certifications?.length) {
+            @if (ip.certifications) {
               <div class="sm:col-span-2">
                 <dt class="text-xs uppercase tracking-wide text-secondary-500 mb-2">Certifications</dt>
                 <dd>

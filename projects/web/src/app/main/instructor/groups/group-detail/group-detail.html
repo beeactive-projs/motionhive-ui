@@ -1,275 +1,221 @@
-<p-toast />
-<p-confirmDialog />
+<div class="h-full flex flex-col gap-4">
 
-<div class="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-6 md:px-10 md:py-8">
-  <!-- Loading State -->
   @if (loading()) {
-    <div class="flex flex-col gap-6">
-      <div class="flex animate-pulse items-center gap-3">
-        <div class="h-8 w-8 rounded bg-surface-200"></div>
-        <div class="h-7 w-48 rounded bg-surface-200"></div>
-      </div>
-      <div class="flex flex-col gap-3 rounded-lg bg-white p-6">
-        <div class="h-5 w-2/3 rounded bg-surface-200"></div>
-        <div class="h-4 w-1/2 rounded bg-surface-200"></div>
-        <div class="h-4 w-1/3 rounded bg-surface-200"></div>
+  <div class="flex flex-col gap-6">
+    <div class="flex animate-pulse items-center gap-3">
+      <div class="h-8 w-8 rounded bg-surface-200 dark:bg-surface-800"></div>
+      <div class="h-7 w-48 rounded bg-surface-200 dark:bg-surface-800"></div>
+    </div>
+    <div class="flex flex-col gap-3 rounded-lg bg-surface-100 dark:bg-surface-900 p-6">
+      <div class="h-5 w-2/3 rounded bg-surface-200 dark:bg-surface-800"></div>
+      <div class="h-4 w-1/2 rounded bg-surface-200 dark:bg-surface-800"></div>
+      <div class="h-4 w-1/3 rounded bg-surface-200 dark:bg-surface-800"></div>
+    </div>
+  </div>
+  }@else if (!loading() && group(); as group) {
+
+  <!-- Header -->
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="flex items-center gap-3">
+      <p-button icon="pi pi-arrow-left" rounded text severity="secondary" (onClick)="goBack()"
+        pTooltip="Back to Groups" />
+      <div class="space-y-1">
+        <p class="text-xs uppercase text-surface-700 dark:text-surface-400">Group details</p>
+        <h1 class="font-heading font-semibold text-xl md:text-2xl">{{group.name}}</h1>
       </div>
     </div>
-  }
 
-  @if (!loading() && group(); as group) {
-    <!-- Header -->
-    <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div class="flex items-center gap-3">
-        <p-button
-          icon="pi pi-arrow-left"
-          [rounded]="true"
-          [text]="true"
-          severity="secondary"
-          (onClick)="goBack()"
-          pTooltip="Back to Groups"
-        />
-        <div class="space-y-1">
-          <p class="text-xs uppercase tracking-[0.2em] text-secondary-500">Group Details</p>
-          <h1 class="font-heading text-2xl font-semibold text-secondary-900 md:text-3xl">{{ group.name }}</h1>
+    <!-- @if (isGroupOwner()) {
+    <div class="flex flex-wrap gap-2">
+      @if (hasActiveJoinToken()) {
+      <p-button label="Copy join link" icon="pi pi-copy" severity="secondary" text rounded
+        (onClick)="copyExistingLink()" />
+      <p-button label="Revoke link" icon="pi pi-ban" severity="danger" text rounded (onClick)="revokeJoinLink()" />
+      } @else {
+      <p-button label="Generate join link" icon="pi pi-link" severity="secondary" rounded [loading]="generatingLink()"
+        (onClick)="generateJoinLink()" />
+      }
+    </div>
+    } -->
+  </header>
+
+  <!-- Group Info -->
+  <p-card class="shadow-sm">
+    <div class="flex flex-col gap-4">
+      @if (group.description) {
+      <p class="text-sm  text-surface-600 dark:text-surface-500">{{ group.description }}</p>
+      }
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Join Policy -->
+        <div class="flex flex-col gap-1">
+          <span class="text-xs font-medium uppercase text-surface-700 dark:text-surface-400">Join Policy</span>
+          <div>
+            <p-tag [value]="joinPolicyLabel(group.joinPolicy)" [severity]="joinPolicySeverity(group.joinPolicy)" />
+          </div>
+        </div>
+
+        <!-- Members -->
+        <div class="flex flex-col gap-1">
+          <span class="text-xs font-medium uppercase text-surface-700 dark:text-surface-400">Members</span>
+          <span class="text-sm font-medium text-surface-900 dark:text-surface-100">{{ group.memberCount }}</span>
+        </div>
+
+        <!-- Visibility -->
+        <div class="flex flex-col gap-1">
+          <span class="text-xs font-medium uppercase text-surface-700 dark:text-surface-400">Visibility</span>
+          <span class="text-sm font-medium text-surface-900 dark:text-surface-100">{{ group.isPublic ? 'Public' :
+            'Private' }}</span>
+        </div>
+
+        <!-- Created -->
+        <div class="flex flex-col gap-1">
+          <span class="text-xs font-medium uppercase text-surface-700 dark:text-surface-400">Created</span>
+          <span class="text-sm font-medium text-surface-900 dark:text-surface-100">{{ group.createdAt | date:
+            'mediumDate' }}</span>
         </div>
       </div>
-      @if (isGroupOwner()) {
-        <div class="flex flex-wrap gap-2">
-          @if (hasActiveJoinToken()) {
-            <p-button
-              label="Copy Join Link"
-              icon="pi pi-copy"
-              severity="secondary"
-              styleClass="!rounded-full"
-              (onClick)="copyExistingLink()"
-            />
-            <p-button
-              label="Revoke Link"
-              icon="pi pi-ban"
-              severity="danger"
-              [text]="true"
-              styleClass="!rounded-full"
-              (onClick)="revokeJoinLink()"
-            />
-          } @else {
-            <p-button
-              label="Generate Join Link"
-              icon="pi pi-link"
-              severity="secondary"
-              styleClass="!rounded-full"
-              [loading]="generatingLink()"
-              (onClick)="generateJoinLink()"
-            />
+
+      <!-- Contact Info -->
+      @if (group.contactEmail || group.contactPhone || group.address) {
+      <div class="border-t border-surface-200 pt-4">
+        <span class="text-xs font-medium uppercase  text-surface-700 dark:text-surface-400">Contact Information</span>
+        <div class="mt-2 flex flex-wrap gap-4">
+          @if (group.contactEmail) {
+          <span class="flex items-center gap-1.5 text-sm text-surface-600">
+            <i class="pi pi-envelope text-xs"></i>
+            {{ group.contactEmail }}
+          </span>
+          }
+          @if (group.contactPhone) {
+          <span class="flex items-center gap-1.5 text-sm text-surface-600">
+            <i class="pi pi-phone text-xs"></i>
+            {{ group.contactPhone }}
+          </span>
+          }
+          @if (group.address) {
+          <span class="flex items-center gap-1.5 text-sm text-surface-600">
+            <i class="pi pi-map-marker text-xs"></i>
+            {{ group.address }}@if (group.city) {, {{ group.city }}}@if (group.country) {, {{ group.country }}}
+          </span>
           }
         </div>
+      </div>
       }
-    </header>
 
-    <!-- Group Info -->
-    <p-card styleClass="shadow-sm">
-      <div class="flex flex-col gap-4">
-        @if (group.description) {
-          <p class="text-sm text-secondary-600">{{ group.description }}</p>
-        }
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <!-- Join Policy -->
-          <div class="flex flex-col gap-1">
-            <span class="text-xs font-medium uppercase tracking-wider text-secondary-400">Join Policy</span>
-            <div>
-              <p-tag
-                [value]="joinPolicyLabel(group.joinPolicy)"
-                [severity]="joinPolicySeverity(group.joinPolicy)"
-              />
-            </div>
-          </div>
-
-          <!-- Members -->
-          <div class="flex flex-col gap-1">
-            <span class="text-xs font-medium uppercase tracking-wider text-secondary-400">Members</span>
-            <span class="text-sm font-medium text-secondary-900">{{ group.memberCount }}</span>
-          </div>
-
-          <!-- Visibility -->
-          <div class="flex flex-col gap-1">
-            <span class="text-xs font-medium uppercase tracking-wider text-secondary-400">Visibility</span>
-            <span class="text-sm font-medium text-secondary-900">{{ group.isPublic ? 'Public' : 'Private' }}</span>
-          </div>
-
-          <!-- Created -->
-          <div class="flex flex-col gap-1">
-            <span class="text-xs font-medium uppercase tracking-wider text-secondary-400">Created</span>
-            <span class="text-sm font-medium text-secondary-900">{{ group.createdAt | date: 'mediumDate' }}</span>
-          </div>
+      <!-- Tags -->
+      @if (group.tags && group.tags.length > 0) {
+      <div class="border-t border-surface-200 pt-4">
+        <span class="text-xs font-medium uppercase text-surface-700 dark:text-surface-400">Tags</span>
+        <div class="mt-2 flex flex-wrap gap-1">
+          @for (tag of group.tags; track tag) {
+          <p-tag [value]="tag" severity="contrast" class="text-xs" />
+          }
         </div>
-
-        <!-- Contact Info -->
-        @if (group.contactEmail || group.contactPhone || group.address) {
-          <div class="border-t border-surface-200 pt-4">
-            <span class="text-xs font-medium uppercase tracking-wider text-secondary-400">Contact Information</span>
-            <div class="mt-2 flex flex-wrap gap-4">
-              @if (group.contactEmail) {
-                <span class="flex items-center gap-1.5 text-sm text-secondary-600">
-                  <i class="pi pi-envelope text-xs"></i>
-                  {{ group.contactEmail }}
-                </span>
-              }
-              @if (group.contactPhone) {
-                <span class="flex items-center gap-1.5 text-sm text-secondary-600">
-                  <i class="pi pi-phone text-xs"></i>
-                  {{ group.contactPhone }}
-                </span>
-              }
-              @if (group.address) {
-                <span class="flex items-center gap-1.5 text-sm text-secondary-600">
-                  <i class="pi pi-map-marker text-xs"></i>
-                  {{ group.address }}@if (group.city) {, {{ group.city }}}@if (group.country) {, {{ group.country }}}
-                </span>
-              }
-            </div>
-          </div>
-        }
-
-        <!-- Tags -->
-        @if (group.tags && group.tags.length > 0) {
-          <div class="border-t border-surface-200 pt-4">
-            <span class="text-xs font-medium uppercase tracking-wider text-secondary-400">Tags</span>
-            <div class="mt-2 flex flex-wrap gap-1">
-              @for (tag of group.tags; track tag) {
-                <p-tag [value]="tag" severity="contrast" styleClass="!text-xs" />
-              }
-            </div>
-          </div>
-        }
       </div>
-    </p-card>
-
-    <!-- Members Section -->
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-secondary-900">Members ({{ totalMembers() }})</h2>
-      </div>
-
-      <p-table
-        [value]="members()"
-        [loading]="membersLoading()"
-        [rows]="memberRows"
-        [scrollable]="true"
-        scrollHeight="flex"
-        dataKey="id"
-      >
-        <ng-template #header>
-          <tr>
-            <th>Name</th>
-            @if (isGroupOwner()) {
-              <th>Email</th>
-            }
-            <th>Role</th>
-            <th>Joined</th>
-            @if (isGroupOwner()) {
-              <th class="w-24 text-center">Actions</th>
-            }
-          </tr>
-        </ng-template>
-
-        <ng-template #body let-member>
-          <tr>
-            <td>
-              <div class="flex items-center gap-3">
-                <p-avatar
-                  [label]="memberInitials(member)"
-                  shape="circle"
-                  styleClass="bg-primary-100 text-primary-700"
-                />
-                <span class="font-medium text-secondary-900">{{ memberName(member) }}</span>
-              </div>
-            </td>
-            @if (isGroupOwner()) {
-              <td>{{ member.user?.email || '—' }}</td>
-            }
-            <td>
-              @if (member.isOwner) {
-                <p-tag value="Owner" severity="warn" styleClass="!text-xs" />
-              } @else {
-                <span class="text-sm text-secondary-500">Member</span>
-              }
-            </td>
-            <td>{{ member.joinedAt | date: 'mediumDate' }}</td>
-            @if (isGroupOwner()) {
-              <td>
-                <div class="flex items-center justify-center">
-                  @if (!member.isOwner) {
-                    <p-button
-                      icon="pi pi-user-minus"
-                      [rounded]="true"
-                      [text]="true"
-                      severity="danger"
-                      pTooltip="Remove Member"
-                      (onClick)="confirmRemoveMember(member)"
-                    />
-                  }
-                </div>
-              </td>
-            }
-          </tr>
-        </ng-template>
-
-        <ng-template #loadingbody>
-          <tr>
-            <td>
-              <div class="flex items-center gap-3">
-                <p-skeleton shape="circle" size="2rem" />
-                <p-skeleton width="8rem" />
-              </div>
-            </td>
-            <td><p-skeleton width="12rem" /></td>
-            <td><p-skeleton width="4rem" /></td>
-            <td><p-skeleton width="6rem" /></td>
-            <td><p-skeleton width="3rem" /></td>
-          </tr>
-        </ng-template>
-
-        <ng-template #emptymessage>
-          <tr>
-            <td [attr.colspan]="isGroupOwner() ? 5 : 3">
-              <div class="flex flex-col items-center gap-3 py-8 text-center">
-                <i class="pi pi-users text-3xl text-secondary-300"></i>
-                <p class="text-sm text-secondary-500">No members in this group yet.</p>
-                @if (isGroupOwner() && !hasActiveJoinToken()) {
-                  <p-button
-                    label="Generate Join Link"
-                    icon="pi pi-link"
-                    severity="primary"
-                    size="small"
-                    styleClass="!rounded-full mt-1"
-                    [loading]="generatingLink()"
-                    (onClick)="generateJoinLink()"
-                  />
-                }
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      }
     </div>
-  }
+  </p-card>
 
+  <!-- Members Section -->
+  <div class="flex flex-col flex-1 gap-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100">Members ({{ totalMembers() }})</h2>
+    </div>
+
+    <p-table [value]="members()" [loading]="membersLoading()" [rows]="memberRows" [scrollable]="true"
+      scrollHeight="flex" dataKey="id">
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          @if (isGroupOwner()) {
+          <th>Email</th>
+          }
+          <th>Role</th>
+          <th>Joined</th>
+          @if (isGroupOwner()) {
+          <th class="w-24 text-center">Actions</th>
+          }
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-member>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-avatar [label]="memberInitials(member)" shape="circle" class="bg-primary-100 text-primary-700" />
+              <span class="font-medium text-surface-900 dark:text-surface-100">{{ memberName(member) }}</span>
+            </div>
+          </td>
+          @if (isGroupOwner()) {
+          <td>{{ member.user?.email || '—' }}</td>
+          }
+          <td>
+            @if (member.isOwner) {
+            <p-tag value="Owner" severity="warn" class="text-xs" />
+            } @else {
+            <span class="text-sm text-surface-500">Member</span>
+            }
+          </td>
+          <td>{{ member.joinedAt | date: 'mediumDate' }}</td>
+          @if (isGroupOwner()) {
+          <td>
+            <div class="flex items-center justify-center">
+              @if (!member.isOwner) {
+              <p-button icon="pi pi-user-minus" [rounded]="true" text severity="danger" pTooltip="Remove Member"
+                (onClick)="confirmRemoveMember(member)" />
+              }
+            </div>
+          </td>
+          }
+        </tr>
+      </ng-template>
+
+      <ng-template #loadingbody>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-skeleton shape="circle" size="2rem" />
+              <p-skeleton width="8rem" />
+            </div>
+          </td>
+          <td><p-skeleton width="12rem" /></td>
+          <td><p-skeleton width="4rem" /></td>
+          <td><p-skeleton width="6rem" /></td>
+          <td><p-skeleton width="3rem" /></td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td [attr.colspan]="isGroupOwner() ? 5 : 3">
+            <div class="flex flex-col items-center gap-3 py-8 text-center">
+              <i class="pi pi-users text-3xl text-surface-300"></i>
+              <p class="text-sm text-surface-500">No members in this group yet.</p>
+              @if (isGroupOwner() && !hasActiveJoinToken()) {
+              <p-button label="Generate Join Link" icon="pi pi-link" severity="primary" size="small"
+                styleClass="!rounded-full mt-1" [loading]="generatingLink()" (onClick)="generateJoinLink()" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  } @else if (!loading() && !group()) {
   <!-- Not Found State -->
-  @if (!loading() && !group()) {
-    <div class="flex flex-col items-center gap-4 py-16 text-center">
-      <div class="flex h-20 w-20 items-center justify-center rounded-full bg-surface-200">
-        <i class="pi pi-exclamation-triangle text-4xl text-secondary-300"></i>
-      </div>
-      <h2 class="text-lg font-semibold text-secondary-700">Group not found</h2>
-      <p class="text-sm text-secondary-500">The group you are looking for does not exist or has been deleted.</p>
-      <p-button
-        label="Back to Groups"
-        icon="pi pi-arrow-left"
-        severity="primary"
-        styleClass="!rounded-full mt-2"
-        (onClick)="goBack()"
-      />
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <div class="flex h-20 w-20 items-center justify-center rounded-full bg-surface-200">
+      <i class="pi pi-exclamation-triangle text-4xl text-surface-300"></i>
     </div>
+    <h2 class="text-lg font-semibold text-surface-700">Group not found</h2>
+    <p class="text-sm text-surface-500">The group you are looking for does not exist or has been deleted.</p>
+    <p-button label="Back to Groups" icon="pi pi-arrow-left" severity="primary" styleClass="!rounded-full mt-2"
+      (onClick)="goBack()" />
+  </div>
   }
 </div>
+
+<p-toast />
+<p-confirmDialog />

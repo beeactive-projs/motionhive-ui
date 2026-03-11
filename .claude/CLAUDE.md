@@ -26,7 +26,11 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 - Keep components small and focused on a single responsibility
 - Use `input()` and `output()` functions instead of decorators
+- Use `model()` for two-way bindings instead of `@Input` + `@Output XChange` pairs
+- Use `viewChild()` / `viewChildren()` instead of `@ViewChild` / `@ViewChildren`
 - Use `computed()` for derived state
+- Use `effect()` sparingly — only for side effects that truly depend on signals
+- Use `afterNextRender()` for one-time DOM-dependent operations (replaces `AfterViewInit`); `ngOnInit` is fine for data initialization
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
 - Prefer inline templates for small components
 - Prefer Reactive forms instead of Template-driven ones
@@ -54,3 +58,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## RxJS
+
+- Use `takeUntilDestroyed(destroyRef)` for long-lived subscriptions in components — no `ngOnDestroy` boilerplate
+- Use `take(1)` for one-shot HTTP subscriptions

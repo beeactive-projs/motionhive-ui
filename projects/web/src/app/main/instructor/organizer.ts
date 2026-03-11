@@ -15,6 +15,6 @@ export class Organizer {
     { label: 'Dashboard', icon: 'pi pi-objects-column', routerLink: '/app/dashboard' },
     { label: 'Clients', icon: 'pi pi-users', routerLink: '/app/clients' },
     { label: 'Groups', icon: 'pi pi-sitemap', routerLink: '/app/groups' },
-    { label: 'Profile', icon: 'pi pi-user', routerLink: '/app/profile' },
+    // { label: 'Profile', icon: 'pi pi-user', routerLink: '/app/profile' },
   ];
 }
