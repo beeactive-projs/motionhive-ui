@@ -1,21 +1,8 @@
-export interface BlogAuthor {
-  name: string;
-  initials: string;
-  role: string;
-}
-
-export interface BlogPostMeta {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
 export interface BlogPost {
-  data: BlogPostData[];
-  meta: BlogPostMeta;
+  items: BlogPostData[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface BlogPostData {
@@ -44,7 +31,9 @@ export interface CreateBlogPostRequest {
   content: string;
   category: string;
   coverImage: string;
-  author: BlogAuthor;
+  authorName: string;
+  authorInitials: string;
+  authorRole: string;
   readTime: number;
   tags: string[];
 }
