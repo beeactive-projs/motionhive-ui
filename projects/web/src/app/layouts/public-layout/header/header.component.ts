@@ -16,10 +16,10 @@ import { ThemeService } from '../../../_core/services/theme.service';
   },
 })
 export class PublicHeaderComponent {
-  private readonly themeService = inject(ThemeService);
+  private readonly _themeService = inject(ThemeService);
 
   readonly mobileMenuOpen = signal(false);
-  readonly isDark = this.themeService.isDark;
+  readonly isDark = this._themeService.isDark;
   readonly scrolled = signal(false);
 
   onScroll(): void {
@@ -39,7 +39,7 @@ export class PublicHeaderComponent {
   ];
 
   toggleTheme(): void {
-    this.themeService.toggle();
+    this._themeService.toggle();
   }
 
   toggleMobileMenu(): void {

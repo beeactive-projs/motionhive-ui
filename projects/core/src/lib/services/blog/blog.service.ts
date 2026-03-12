@@ -15,21 +15,21 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
-  private readonly http = inject(HttpClient);
-  private readonly base = `${environment.apiUrl}${API_ENDPOINTS.BLOG.BASE}`;
+  private readonly _http = inject(HttpClient);
+  private readonly _base = `${environment.apiUrl}${API_ENDPOINTS.BLOG.BASE}`;
 
   getAllPost(): Observable<BlogPost> {
-    return this.http.get<BlogPost>(this.base);
+    return this._http.get<BlogPost>(this._base);
   }
 
   getAllPostData(): Observable<BlogPostData[]> {
-    return this.http
-      .get<BlogPost>(this.base)
+    return this._http
+      .get<BlogPost>(this._base)
       .pipe(map((response) => response.items));
   }
 
   getBySlug(slug: string): Observable<BlogPostData> {
-    return this.http.get<BlogPostData>(`${this.base}/${slug}`);
+    return this._http.get<BlogPostData>(`${this._base}/${slug}`);
   }
 
   getRelatedPosts(currentSlug: string, category: string, limit = 3): Observable<BlogPostData[]> {
@@ -43,21 +43,21 @@ export class BlogService {
   }
 
   create(payload: CreateBlogPostRequest): Observable<BlogPostData> {
-    return this.http.post<BlogPostData>(this.base, payload);
+    return this._http.post<BlogPostData>(this._base, payload);
   }
 
   update(id: string, payload: UpdateBlogPostRequest): Observable<BlogPostData> {
-    return this.http.patch<BlogPostData>(`${this.base}/${id}`, payload);
+    return this._http.patch<BlogPostData>(`${this._base}/${id}`, payload);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/${id}`);
+    return this._http.delete<void>(`${this._base}/${id}`);
   }
 
   uploadImage(file: File): Observable<UploadImageResponse> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<UploadImageResponse>(
+    return this._http.post<UploadImageResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.BLOG.UPLOAD_IMAGE}`,
       formData,
     );

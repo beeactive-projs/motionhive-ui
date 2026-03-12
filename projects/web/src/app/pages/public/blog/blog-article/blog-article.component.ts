@@ -17,18 +17,18 @@ import { DatePipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogArticleComponent {
-  private readonly blogService = inject(BlogService);
-  private readonly router = inject(Router);
-  private readonly hostEl = inject(ElementRef<HTMLElement>);
+  private readonly _blogService = inject(BlogService);
+  private readonly _router = inject(Router);
+  private readonly _elementRef = inject(ElementRef<HTMLElement>);
   private readonly coverImage = viewChild<ElementRef<HTMLElement>>('coverImage');
 
-  private readonly post$ = inject(ActivatedRoute).paramMap.pipe(
+  private readonly _post$ = inject(ActivatedRoute).paramMap.pipe(
     map((p) => p.get('slug') ?? ''),
     filter((slug) => slug.length > 0),
     switchMap((slug) =>
-      this.blogService.getBySlug(slug).pipe(
+      this._blogService.getBySlug(slug).pipe(
         catchError(() => {
-          this.router.navigate(['/error/not-found']);
+          this._router.navigate(['/error/not-found']);
           return of(null as BlogPostData | null);
         }),
       ),
@@ -36,7 +36,7 @@ export class BlogArticleComponent {
     shareReplay(1),
   );
 
-  readonly post = toSignal<BlogPostData | null>(this.post$, { initialValue: null });
+  readonly post = toSignal<BlogPostData | null>(this._post$, { initialValue: null });
   readonly isLoading = computed(() => this.post() === null);
 
   constructor() {
@@ -47,7 +47,7 @@ export class BlogArticleComponent {
       const observer = new ResizeObserver((entries) => {
         const height = entries[0]?.contentRect.height;
         if (height != null) {
-          this.hostEl.nativeElement.style.setProperty('--featured-article-image', `${height}px`);
+          this._elementRef.nativeElement.style.setProperty('--featured-article-image', `${height}px`);
         }
       });
       observer.observe(el);
@@ -57,10 +57,10 @@ export class BlogArticleComponent {
   }
 
   readonly relatedPosts = toSignal(
-    this.post$.pipe(
+    this._post$.pipe(
       switchMap((post) => {
         if (!post) return of([] as BlogPostData[]);
-        return this.blogService
+        return this._blogService
           .getRelatedPosts(post.slug, post.category)
           .pipe(catchError(() => of([] as BlogPostData[])));
       }),

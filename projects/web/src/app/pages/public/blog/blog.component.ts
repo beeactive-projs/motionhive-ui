@@ -27,8 +27,8 @@ import { tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogComponent {
-  private readonly blogService = inject(BlogService);
-  private readonly hostEl = inject(ElementRef<HTMLElement>);
+  private readonly _blogService = inject(BlogService);
+  private readonly _elementRef = inject(ElementRef<HTMLElement>);
   private readonly featuredSection = viewChild<ElementRef<HTMLElement>>('featuredSection');
 
   private readonly _loaded = signal(false);
@@ -36,7 +36,7 @@ export class BlogComponent {
   readonly skeletonItems = [1, 2, 3];
 
   readonly allPosts = toSignal(
-    this.blogService.getAllPostData().pipe(tap(() => this._loaded.set(true))),
+    this._blogService.getAllPostData().pipe(tap(() => this._loaded.set(true))),
     { initialValue: [] as BlogPostData[] },
   );
   readonly selectedCategory = signal('All');
@@ -52,7 +52,7 @@ export class BlogComponent {
       const observer = new ResizeObserver((entries) => {
         const height = entries[0]?.contentRect.height;
         if (height != null) {
-          this.hostEl.nativeElement.style.setProperty('--featured-article-height', `${height}px`);
+          this._elementRef.nativeElement.style.setProperty('--featured-article-height', `${height}px`);
         }
       });
       observer.observe(el);

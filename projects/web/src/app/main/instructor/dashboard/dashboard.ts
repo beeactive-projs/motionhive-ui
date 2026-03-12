@@ -17,5 +17,5 @@ import { AuthStore } from 'core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
-  readonly authStore = inject(AuthStore);
+  protected readonly _authStore = inject(AuthStore);
 }

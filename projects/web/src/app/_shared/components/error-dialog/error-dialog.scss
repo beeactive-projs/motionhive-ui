@@ -1,0 +1,12 @@
+.error-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--p-border-radius-md);
+  background: color-mix(in oklab, var(--p-red-500) 12%, transparent);
+  color: var(--p-red-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+}

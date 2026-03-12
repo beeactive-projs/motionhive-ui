@@ -37,23 +37,23 @@ import { GroupService, AuthStore } from 'core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JoinGroup implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly groupService = inject(GroupService);
-  private readonly authStore = inject(AuthStore);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+  private readonly _groupService = inject(GroupService);
+  private readonly _authStore = inject(AuthStore);
 
   loading = signal(true);
   error = signal<string | null>(null);
 
   ngOnInit(): void {
-    const token = this.route.snapshot.paramMap.get('token');
+    const token = this._route.snapshot.paramMap.get('token');
     if (!token) {
       this.loading.set(false);
       this.error.set('Invalid join link. No token provided.');
       return;
     }
 
-    this.groupService.joinViaLink(token).subscribe({
+    this._groupService.joinViaLink(token).subscribe({
       next: () => {
         this.loading.set(false);
       },
@@ -66,10 +66,10 @@ export class JoinGroup implements OnInit {
   }
 
   goToDashboard(): void {
-    if (this.authStore.isParticipant()) {
-      this.router.navigate(['/app/client/dashboard']);
+    if (this._authStore.isParticipant()) {
+      this._router.navigate(['/app/client/dashboard']);
     } else {
-      this.router.navigate(['/app/dashboard']);
+      this._router.navigate(['/app/dashboard']);
     }
   }
 }

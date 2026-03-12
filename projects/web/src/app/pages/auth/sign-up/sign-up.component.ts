@@ -51,13 +51,13 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignUpComponent {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
-  private readonly authStore = inject(AuthStore);
-  private readonly googleAuthService = inject(GoogleAuthService);
-  private readonly facebookAuthService = inject(FacebookAuthService);
-  private readonly router = inject(Router);
-  readonly route = inject(ActivatedRoute);
+  private readonly _formBuilder = inject(FormBuilder);
+  private readonly _authService = inject(AuthService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _googleAuthService = inject(GoogleAuthService);
+  private readonly _facebookAuthService = inject(FacebookAuthService);
+  private readonly _router = inject(Router);
+  protected readonly _route = inject(ActivatedRoute);
 
   // Signals for component state
   isLoading = signal(false);
@@ -65,7 +65,7 @@ export class SignUpComponent {
   successMessage = signal<string | null>(null);
 
   // Reactive form
-  registerForm: FormGroup = this.fb.group(
+  registerForm: FormGroup = this._formBuilder.group(
     {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
@@ -98,7 +98,7 @@ export class SignUpComponent {
     afterNextRender(() => {
       const el = this.googleBtnContainer()?.nativeElement;
       if (el) {
-        this.googleAuthService.renderButton(
+        this._googleAuthService.renderButton(
           el,
           (idToken) => this.onGoogleCredential(idToken),
           (error) => this.errorMessage.set(error.message),
@@ -126,7 +126,7 @@ export class SignUpComponent {
       confirmPassword: this.registerForm.value.confirmPassword,
     };
 
-    this.authService.register(data).subscribe({
+    this._authService.register(data).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.navigateToDashboard();
@@ -142,7 +142,7 @@ export class SignUpComponent {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.authService.googleLogin({ idToken }).subscribe({
+    this._authService.googleLogin({ idToken }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.navigateToDashboard();
@@ -158,10 +158,10 @@ export class SignUpComponent {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.facebookAuthService
+    this._facebookAuthService
       .signIn()
       .then((accessToken: string) => {
-        this.authService.facebookLogin({ accessToken }).subscribe({
+        this._authService.facebookLogin({ accessToken }).subscribe({
           next: () => {
             this.isLoading.set(false);
             this.navigateToDashboard();
@@ -210,18 +210,18 @@ export class SignUpComponent {
   }
 
   private navigateToDashboard(): void {
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl');
     if (returnUrl) {
-      this.router.navigateByUrl(returnUrl);
+      this._router.navigateByUrl(returnUrl);
       return;
     }
 
-    if (this.authStore.isOrganizer()) {
-      this.router.navigate(['/app/dashboard']);
-    } else if (this.authStore.isParticipant()) {
-      this.router.navigate(['/app/client/dashboard/']);
+    if (this._authStore.isOrganizer()) {
+      this._router.navigate(['/app/dashboard']);
+    } else if (this._authStore.isParticipant()) {
+      this._router.navigate(['/app/client/dashboard/']);
     } else {
-      this.router.navigate(['/app/dashboard']);
+      this._router.navigate(['/app/dashboard']);
     }
   }
 

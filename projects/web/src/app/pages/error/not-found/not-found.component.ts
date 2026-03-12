@@ -12,14 +12,14 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotFoundComponent {
-  private readonly router = inject(Router);
-  private readonly location = inject(Location);
+  private readonly _router = inject(Router);
+  private readonly _location = inject(Location);
 
   goHome(): void {
-    this.router.navigate(['/']);
+    this._router.navigate(['/']);
   }
 
   goBack(): void {
-    this.location.back();
+    this._location.back();
   }
 }

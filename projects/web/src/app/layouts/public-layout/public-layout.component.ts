@@ -28,9 +28,9 @@ import { PublicFooterComponent } from './footer/footer.component';
   // },
 })
 export class PublicLayoutComponent {
-  private el = inject(ElementRef);
-  private zone = inject(NgZone);
-  private destroyRef = inject(DestroyRef);
+  private readonly _elementRef = inject(ElementRef);
+  private readonly _ngZone = inject(NgZone);
+  private readonly _destroyRef = inject(DestroyRef);
 
   // cursorX = signal('50%');
   // cursorY = signal('50%');

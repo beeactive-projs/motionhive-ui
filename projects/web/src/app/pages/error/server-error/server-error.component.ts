@@ -12,12 +12,12 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServerErrorComponent {
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
 
-  private readonly queryParams = toSignal(this.route.queryParams, { initialValue: {} as Params });
+  private readonly _queryParams = toSignal(this._route.queryParams, { initialValue: {} as Params });
 
-  readonly errorCode = computed(() => parseInt(this.queryParams()['code']) || 500);
+  readonly errorCode = computed(() => parseInt(this._queryParams()['code']) || 500);
 
   readonly errorTitle = computed(() => {
     switch (this.errorCode()) {
@@ -40,7 +40,7 @@ export class ServerErrorComponent {
   });
 
   goHome(): void {
-    this.router.navigate(['/']);
+    this._router.navigate(['/']);
   }
 
   retry(): void {

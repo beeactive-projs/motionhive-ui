@@ -17,34 +17,34 @@ import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
   providedIn: 'root',
 })
 export class ProfileService {
-  private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PROFILE.BASE}`;
+  private readonly _http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PROFILE.BASE}`;
 
   getFullProfile(): Observable<FullProfileResponse> {
-    return this.http.get<FullProfileResponse>(`${this.baseUrl}/me`);
+    return this._http.get<FullProfileResponse>(`${this.baseUrl}/me`);
   }
 
   updateFullProfile(payload: UpdateFullProfilePayload): Observable<FullProfileResponse> {
-    return this.http.patch<FullProfileResponse>(`${this.baseUrl}/me`, payload);
+    return this._http.patch<FullProfileResponse>(`${this.baseUrl}/me`, payload);
   }
 
   getUserProfile(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.baseUrl}/user-profile`);
+    return this._http.get<UserProfile>(`${this.baseUrl}/user-profile`);
   }
 
   updateUserProfile(payload: UpdateUserProfilePayload): Observable<UserProfile> {
-    return this.http.patch<UserProfile>(`${this.baseUrl}/user-profile`, payload);
+    return this._http.patch<UserProfile>(`${this.baseUrl}/user-profile`, payload);
   }
 
   createInstructorProfile(payload: CreateInstructorProfilePayload): Observable<InstructorProfile> {
-    return this.http.post<InstructorProfile>(`${this.baseUrl}/instructor`, payload);
+    return this._http.post<InstructorProfile>(`${this.baseUrl}/instructor`, payload);
   }
 
   getInstructorProfile(): Observable<InstructorProfile> {
-    return this.http.get<InstructorProfile>(`${this.baseUrl}/instructor`);
+    return this._http.get<InstructorProfile>(`${this.baseUrl}/instructor`);
   }
 
   updateInstructorProfile(payload: UpdateInstructorProfilePayload): Observable<InstructorProfile> {
-    return this.http.patch<InstructorProfile>(`${this.baseUrl}/instructor`, payload);
+    return this._http.patch<InstructorProfile>(`${this.baseUrl}/instructor`, payload);
   }
 }

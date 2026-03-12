@@ -32,10 +32,10 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewPasswordComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+  private readonly _formBuilder = inject(FormBuilder);
+  private readonly _authService = inject(AuthService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -43,7 +43,7 @@ export class NewPasswordComponent implements OnInit {
   hasToken = signal(false);
   private token = '';
 
-  newPasswordForm: FormGroup = this.fb.group(
+  newPasswordForm: FormGroup = this._formBuilder.group(
     {
       newPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
@@ -54,7 +54,7 @@ export class NewPasswordComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
+    this._route.queryParamMap.subscribe((params) => {
       this.token = params.get('token') ?? '';
       this.hasToken.set(!!this.token);
       if (!this.token) {
@@ -84,7 +84,7 @@ export class NewPasswordComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    this.authService
+    this._authService
       .resetPassword({
         token: this.token,
         newPassword: this.newPasswordForm.value.newPassword,
@@ -96,7 +96,7 @@ export class NewPasswordComponent implements OnInit {
             'Your password has been reset successfully. Redirecting to login...',
           );
           setTimeout(() => {
-            this.router.navigate(['/auth/login']);
+            this._router.navigate(['/auth/login']);
           }, 2000);
         },
         error: (error) => {

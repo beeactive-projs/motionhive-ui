@@ -54,12 +54,14 @@ export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
 export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';
+export * from './lib/services/error-dialog/error-dialog.service';
 
 // Stores
 export * from './lib/stores/auth.store';
 
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';
+export * from './lib/interceptors/error.interceptor';
 
 // Guards
 export * from './lib/guards/auth.guard';

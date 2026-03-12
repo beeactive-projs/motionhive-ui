@@ -41,12 +41,12 @@ type TagSeverity = 'success' | 'warn' | 'danger' | 'secondary' | 'info' | 'contr
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetail implements OnInit {
-  private groupService = inject(GroupService);
-  private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
-  private authStore = inject(AuthStore);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly _groupService = inject(GroupService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
 
   group = signal<Group | null>(null);
   members = signal<GroupMember[]>([]);
@@ -59,14 +59,14 @@ export class GroupDetail implements OnInit {
   groupName = computed(() => this.group()?.name ?? 'Group');
   isGroupOwner = computed(() => {
     const group = this.group();
-    const user = this.authStore.user();
+    const user = this._authStore.user();
     return !!group && !!user && group.instructorId === user.id;
   });
 
   readonly memberRows = 10;
 
   ngOnInit(): void {
-    const groupId = this.route.snapshot.paramMap.get('id');
+    const groupId = this._route.snapshot.paramMap.get('id');
     if (groupId) {
       this.loadGroup(groupId);
       this.loadMembers(groupId);
@@ -75,14 +75,14 @@ export class GroupDetail implements OnInit {
 
   loadGroup(groupId: string): void {
     this.loading.set(true);
-    this.groupService.getById(groupId).subscribe({
+    this._groupService.getById(groupId).subscribe({
       next: (group) => {
         this.group.set(group);
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load group details',
@@ -93,7 +93,7 @@ export class GroupDetail implements OnInit {
 
   loadMembers(groupId: string): void {
     this.membersLoading.set(true);
-    this.groupService.getMembers(groupId).subscribe({
+    this._groupService.getMembers(groupId).subscribe({
       next: (response) => {
         this.members.set(response.items);
         this.totalMembers.set(response.total);
@@ -101,7 +101,7 @@ export class GroupDetail implements OnInit {
       },
       error: () => {
         this.membersLoading.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load group members',
@@ -111,7 +111,7 @@ export class GroupDetail implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/app/groups']);
+    this._router.navigate(['/app/groups']);
   }
 
   generateJoinLink(): void {
@@ -119,13 +119,13 @@ export class GroupDetail implements OnInit {
     if (!group) return;
 
     this.generatingLink.set(true);
-    this.groupService.generateJoinLink(group.id).subscribe({
+    this._groupService.generateJoinLink(group.id).subscribe({
       next: (response) => {
         this.generatingLink.set(false);
         const link = `${window.location.origin}/app/join/${response.token}`;
         this.joinLink.set(link);
         this.copyToClipboard(link);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Join Link Generated',
           detail: 'Link has been copied to your clipboard',
@@ -133,7 +133,7 @@ export class GroupDetail implements OnInit {
       },
       error: () => {
         this.generatingLink.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to generate join link',
@@ -146,16 +146,16 @@ export class GroupDetail implements OnInit {
     const group = this.group();
     if (!group) return;
 
-    this.confirmationService.confirm({
+    this._confirmationService.confirm({
       message: 'Are you sure you want to revoke the current join link? Existing links will stop working.',
       header: 'Revoke Join Link',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.groupService.revokeJoinLink(group.id).subscribe({
+        this._groupService.revokeJoinLink(group.id).subscribe({
           next: () => {
             this.joinLink.set(null);
-            this.messageService.add({
+            this._messageService.add({
               severity: 'success',
               summary: 'Link Revoked',
               detail: 'The join link has been revoked',
@@ -163,7 +163,7 @@ export class GroupDetail implements OnInit {
             this.loadGroup(group.id);
           },
           error: () => {
-            this.messageService.add({
+            this._messageService.add({
               severity: 'error',
               summary: 'Error',
               detail: 'Failed to revoke join link',
@@ -178,13 +178,13 @@ export class GroupDetail implements OnInit {
     const link = this.joinLink();
     if (link) {
       this.copyToClipboard(link);
-      this.messageService.add({
+      this._messageService.add({
         severity: 'info',
         summary: 'Copied',
         detail: 'Join link copied to clipboard',
       });
     } else {
-      this.messageService.add({
+      this._messageService.add({
         severity: 'warn',
         summary: 'Link Unavailable',
         detail: 'Please generate a new join link to copy it.',
@@ -194,7 +194,7 @@ export class GroupDetail implements OnInit {
 
   confirmRemoveMember(member: GroupMember): void {
     const name = member.user ? `${member.user.firstName} ${member.user.lastName}` : 'this member';
-    this.confirmationService.confirm({
+    this._confirmationService.confirm({
       message: `Are you sure you want to remove ${name} from this group?`,
       header: 'Remove Member',
       icon: 'pi pi-exclamation-triangle',
@@ -207,9 +207,9 @@ export class GroupDetail implements OnInit {
     const group = this.group();
     if (!group) return;
 
-    this.groupService.removeMember(group.id, member.userId).subscribe({
+    this._groupService.removeMember(group.id, member.userId).subscribe({
       next: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Member Removed',
           detail: 'Member has been removed from the group',
@@ -218,7 +218,7 @@ export class GroupDetail implements OnInit {
         this.loadGroup(group.id);
       },
       error: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to remove member',

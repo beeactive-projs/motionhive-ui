@@ -26,8 +26,8 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
+  private readonly _formBuilder = inject(FormBuilder);
+  private readonly _authService = inject(AuthService);
 
   // Signals for component state
   isLoading = signal(false);
@@ -35,7 +35,7 @@ export class ResetPasswordComponent {
   successMessage = signal<string | null>(null);
 
   // Reactive form
-  forgotPasswordForm: FormGroup = this.fb.group({
+  forgotPasswordForm: FormGroup = this._formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
   });
 
@@ -51,7 +51,7 @@ export class ResetPasswordComponent {
 
     const email = this.forgotPasswordForm.value.email;
 
-    this.authService.forgotPassword({ email }).subscribe({
+    this._authService.forgotPassword({ email }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.successMessage.set(

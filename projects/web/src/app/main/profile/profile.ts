@@ -79,9 +79,9 @@ interface EditForm {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Profile implements OnInit {
-  private profileService = inject(ProfileService);
-  private authStore = inject(AuthStore);
-  private messageService = inject(MessageService);
+  private readonly _profileService = inject(ProfileService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _messageService = inject(MessageService);
 
   profile = signal<FullProfileResponse | null>(null);
   loading = signal(true);
@@ -176,14 +176,14 @@ export class Profile implements OnInit {
 
   loadProfile(): void {
     this.loading.set(true);
-    this.profileService.getFullProfile().subscribe({
+    this._profileService.getFullProfile().subscribe({
       next: (data) => {
         this.profile.set(data);
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load profile data',
@@ -307,7 +307,7 @@ export class Profile implements OnInit {
     // Check if anything changed
     if (!payload.user && !payload.userProfile && !payload.instructor) {
       this.showEditDialog.set(false);
-      this.messageService.add({
+      this._messageService.add({
         severity: 'info',
         summary: 'No Changes',
         detail: 'No changes were made to your profile',
@@ -316,11 +316,11 @@ export class Profile implements OnInit {
     }
 
     this.saving.set(true);
-    this.profileService.updateFullProfile(payload).subscribe({
+    this._profileService.updateFullProfile(payload).subscribe({
       next: () => {
         this.saving.set(false);
         this.showEditDialog.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Profile Updated',
           detail: 'Your profile has been updated successfully',
@@ -329,7 +329,7 @@ export class Profile implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: err.error?.message || 'Failed to update profile',

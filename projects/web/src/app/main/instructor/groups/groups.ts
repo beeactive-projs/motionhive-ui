@@ -59,10 +59,10 @@ interface JoinPolicyOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Groups implements OnInit {
-  private groupService = inject(GroupService);
-  private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
-  private router = inject(Router);
+  private readonly _groupService = inject(GroupService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _router = inject(Router);
 
   groups = signal<Group[]>([]);
   loading = signal(true);
@@ -95,14 +95,14 @@ export class Groups implements OnInit {
 
   loadGroups(): void {
     this.loading.set(true);
-    this.groupService.getMyGroups().subscribe({
+    this._groupService.getMyGroups().subscribe({
       next: (groups) => {
         this.groups.set(groups);
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load groups',
@@ -145,11 +145,11 @@ export class Groups implements OnInit {
         tags: this.formTags.length > 0 ? this.formTags : undefined,
       };
 
-      this.groupService.create(payload).subscribe({
+      this._groupService.create(payload).subscribe({
         next: () => {
           this.saving.set(false);
           this.showDialog.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'success',
             summary: 'Group Created',
             detail: 'Your new group has been created successfully',
@@ -158,7 +158,7 @@ export class Groups implements OnInit {
         },
         error: (err) => {
           this.saving.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: err.error?.message || 'Failed to create group',
@@ -177,11 +177,11 @@ export class Groups implements OnInit {
         tags: this.formTags,
       };
 
-      this.groupService.update(group.id, payload).subscribe({
+      this._groupService.update(group.id, payload).subscribe({
         next: () => {
           this.saving.set(false);
           this.showDialog.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'success',
             summary: 'Group Updated',
             detail: 'Group has been updated successfully',
@@ -190,7 +190,7 @@ export class Groups implements OnInit {
         },
         error: (err) => {
           this.saving.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: err.error?.message || 'Failed to update group',
@@ -202,7 +202,7 @@ export class Groups implements OnInit {
 
   confirmDelete(event: Event, group: Group): void {
     event.stopPropagation();
-    this.confirmationService.confirm({
+    this._confirmationService.confirm({
       header: 'Delete Group',
       message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
 
@@ -218,9 +218,9 @@ export class Groups implements OnInit {
   }
 
   private deleteGroup(group: Group): void {
-    this.groupService.delete(group.id).subscribe({
+    this._groupService.delete(group.id).subscribe({
       next: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Group Deleted',
           detail: `"${group.name}" has been deleted`,
@@ -228,7 +228,7 @@ export class Groups implements OnInit {
         this.loadGroups();
       },
       error: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to delete group',
@@ -238,7 +238,7 @@ export class Groups implements OnInit {
   }
 
   navigateToGroup(group: Group): void {
-    this.router.navigate(['/app/groups', group.id]);
+    this._router.navigate(['/app/groups', group.id]);
   }
 
   addTag(): void {

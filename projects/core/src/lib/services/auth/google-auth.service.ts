@@ -35,7 +35,7 @@ function getGoogleAccountsId(): GoogleAccountsId | undefined {
   providedIn: 'root',
 })
 export class GoogleAuthService {
-  private readonly ngZone = inject(NgZone);
+  private readonly _ngZone = inject(NgZone);
 
   /**
    * Initializes Google Identity Services and renders the sign-in button
@@ -58,7 +58,7 @@ export class GoogleAuthService {
     gsi.initialize({
       client_id: environment.googleClientId,
       callback: (response: CredentialResponse) => {
-        this.ngZone.run(() => {
+        this._ngZone.run(() => {
           if (response.credential) {
             onCredential(response.credential);
           } else {

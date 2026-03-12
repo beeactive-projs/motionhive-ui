@@ -42,7 +42,7 @@
         </h1>
         <p class="text-sm">
           Already have an account?
-          <a routerLink="/auth/login" [queryParams]="route.snapshot.queryParams"
+          <a routerLink="/auth/login" [queryParams]="_route.snapshot.queryParams"
             class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
             Sign in
           </a>
