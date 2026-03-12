@@ -65,14 +65,14 @@
           </li>
           }
           <li>
-            <p-button label="Share Feedback" [link]="true" class="footer-link p-0" (onClick)="openFeedback()" />
+            <p-button label="Share Feedback" [link]="true" class="footer-link" (onClick)="openFeedback()" />
           </li>
         </ul>
         <div class="md:hidden flex gap-5">
           @for (link of supportLinks; track link.label) {
           <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
           }
-          <p-button label="Share Feedback" [link]="true" styleClass="footer-link !p-0" (onClick)="openFeedback()" />
+          <p-button label="Share Feedback" [link]="true" class="footer-link" (onClick)="openFeedback()" />
         </div>
       </div>
 
