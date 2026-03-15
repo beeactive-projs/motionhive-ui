@@ -17,6 +17,27 @@
   </div>
 </section>
 
+<section class="featured-section">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+    <!-- ===== Filters Bar ===== -->
+    <div class="flex flex-col md:flex-row flex-1 justify-between gap-4">
+      @if (categories().length > 1) {
+      <div class="flex items-center gap-3">
+        @for (category of categoryOptions(); track category) {
+        <p-button [label]="category" [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small"
+          rounded [text]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" />
+        }
+      </div>
+      }
+      <p-iconfield class="w-full md:w-auto">
+        <p-inputicon class="pi pi-search" />
+        <input type="text" pInputText placeholder="Search" placeholder="Search articles..." [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)" fluid />
+      </p-iconfield>
+    </div>
+  </div>
+</section>
+
 <!-- ===== Featured Post ===== -->
 @if (isLoading() && isFirstPage() && !hasActiveFilters()) {
 <section class="featured-section" #featuredSection>
@@ -99,7 +120,7 @@
 
 <!-- ===== Posts Grid ===== -->
 @if (isLoading()) {
-<section class="posts-section py-12 sm:py-16" aria-busy="true" aria-label="Loading articles">
+<section class="posts-section" aria-busy="true" aria-label="Loading articles">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       @for (item of skeletonItems; track item) {
@@ -131,24 +152,8 @@
   </div>
 </section>
 } @else if (gridPosts().length > 0) {
-<section class="posts-section py-12 sm:py-16">
+<section class="posts-section">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- ===== Filters Bar ===== -->
-    <div class="flex flex-col md:flex-row flex-1 justify-between mb-4 gap-4">
-      @if (categories().length > 1) {
-      <div class="flex items-center gap-3">
-        @for (category of categoryOptions(); track category) {
-        <p-button [label]="category" [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small"
-          rounded [text]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" />
-        }
-      </div>
-      }
-      <p-iconfield class="w-full md:w-auto">
-        <p-inputicon class="pi pi-search" />
-        <input type="text" pInputText placeholder="Search" placeholder="Search articles..." [ngModel]="searchQuery()"
-          (ngModelChange)="onSearchInput($event)" fluid />
-      </p-iconfield>
-    </div>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       @for (post of gridPosts(); track post.id) {
       <a [routerLink]="['/blog', post.slug]" class="blog-card" [attr.aria-label]="'Read article: ' + post.title">
@@ -200,37 +205,18 @@
 <!-- Empty state -->
 <section class="posts-section py-16 sm:py-24">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-
-    <!-- ===== Filters Bar ===== -->
-    <div class="md:flex flex-1 justify-between mb-4">
-      @if (categories().length > 1) {
-      <div class="flex items-center gap-3">
-        @for (category of categoryOptions(); track category) {
-        <p-button [label]="category" [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small"
-          rounded [text]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" />
-        }
-      </div>
-      }
-      <p-iconfield>
-        <p-inputicon class="pi pi-search" />
-        <input type="text" pInputText placeholder="Search" placeholder="Search articles..." [ngModel]="searchQuery()"
-          (ngModelChange)="onSearchInput($event)" />
-      </p-iconfield>
-    </div>
-
     <i class="pi pi-search text-4xl section-subtext mb-4"></i>
     <h3 class="text-xl font-heading font-bold section-heading mb-2">No articles found</h3>
     <p class="section-subtext mb-6">Try adjusting your search or filter to find what you're looking for.</p>
     @if (hasActiveFilters()) {
-    <p-button label="Clear filters" icon="pi pi-filter-slash" [outlined]="true"
-      (click)="onSearchInput(''); onCategoryChange('All')" />
+    <p-button label="Clear filters" icon="pi pi-filter-slash" [outlined]="true" (onClick)="onClearFilter()" />
     }
   </div>
 </section>
 }
 
 <!-- ===== CTA Section ===== -->
-<section class="cta-section">
+<section class="cta-section pt-12 sm:pt-16">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
     <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3">
       Want to stay in the <span class="text-brand">loop</span>?

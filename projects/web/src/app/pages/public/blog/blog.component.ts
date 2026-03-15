@@ -20,14 +20,24 @@ import { InputText } from 'primeng/inputtext';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { Skeleton } from 'primeng/skeleton';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { IconField } from "primeng/iconfield";
-import { InputIcon } from "primeng/inputicon";
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 
 const PAGE_SIZE = 9;
 
 @Component({
   selector: 'bee-blog',
-  imports: [RouterLink, ButtonModule, FormsModule, DatePipe, Skeleton, InputText, Paginator, IconField, InputIcon],
+  imports: [
+    RouterLink,
+    ButtonModule,
+    FormsModule,
+    DatePipe,
+    Skeleton,
+    InputText,
+    Paginator,
+    IconField,
+    InputIcon,
+  ],
   templateUrl: './blog.component.html',
   styleUrl: './blog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,8 +61,9 @@ export class BlogComponent {
   readonly hasActiveFilters = computed(
     () => this.searchQuery() !== '' || this.selectedCategory() !== 'All',
   );
-  readonly featuredPost = computed(() => this.posts()[0] ?? null);
-  // !this.hasActiveFilters() && this.isFirstPage() ?
+  readonly featuredPost = computed(() =>
+    !this.hasActiveFilters() && this.isFirstPage() ? (this.posts()[0] ?? null) : null,
+  );
   readonly gridPosts = computed(() => (this.featuredPost() ? this.posts().slice(1) : this.posts()));
   readonly categoryOptions = computed(() => ['All', ...this.categories()]);
 
@@ -92,8 +103,14 @@ export class BlogComponent {
 
   onCategoryChange(category: string): void {
     this.selectedCategory.set(category);
-    this.currentPage.set(1);
     this._loadPosts();
+  }
+
+  onClearFilter() {
+    this.isLoading.set(true);
+    this.selectedCategory.set('All');
+    this.currentPage.set(1);
+    this.onSearchInput('');
   }
 
   onPageChange(event: PaginatorState): void {
