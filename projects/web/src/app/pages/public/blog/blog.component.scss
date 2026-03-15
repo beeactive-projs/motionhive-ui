@@ -19,6 +19,104 @@
   // height: calc(100dvh - var(--nav-height) - (var(--featured-article-height) / 2));
 }
 
+// ===== Filters Bar =====
+.filters-bar {
+  position: sticky;
+  top: var(--nav-height, 4rem);
+  z-index: 10;
+  padding: 1rem 0;
+  background: var(--p-surface-0);
+  border-bottom: 1px solid color-mix(in oklab, black 8%, transparent);
+}
+
+:host-context(.dark) .filters-bar {
+  background: var(--p-surface-ground);
+  border-bottom-color: color-mix(in oklab, white 8%, transparent);
+}
+
+.filters-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 639px) {
+    flex-direction: column;
+  }
+}
+
+// ===== Search Input =====
+.search-wrapper {
+  position: relative;
+  width: 16rem;
+  flex-shrink: 0;
+
+  @media (max-width: 639px) {
+    width: 100%;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 2.5rem !important;
+  border-radius: var(--p-border-radius-md) !important;
+  font-size: 0.875rem !important;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--p-text-muted-color);
+  pointer-events: none;
+  z-index: 1;
+  font-size: 0.875rem;
+}
+
+// ===== Category Filter Buttons =====
+.category-filter-btn {
+  padding: 0.375rem 1rem;
+  border-radius: 2rem;
+  border: 1px solid;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  border-color: color-mix(in oklab, black 12%, transparent);
+  color: var(--p-text-color);
+
+  &:hover {
+    background: color-mix(in oklab, black 6%, transparent);
+  }
+
+  &.active {
+    background: var(--p-primary-500);
+    border-color: var(--p-primary-500);
+    color: var(--p-primary-contrast-color);
+
+    &:hover {
+      background: var(--p-primary-600);
+      color: var(--p-primary-contrast-color);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-500);
+    outline-offset: 2px;
+  }
+}
+
+:host-context(.dark) .category-filter-btn {
+  border-color: color-mix(in oklab, white 12%, transparent);
+
+  &:hover {
+    background: color-mix(in oklab, white 8%, transparent);
+  }
+}
+
 // ===== Posts grid section =====
 .posts-section {
   position: relative;

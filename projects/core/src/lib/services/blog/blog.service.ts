@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
 import {
   BlogPost,
   BlogPostData,
+  BlogQueryParams,
   CreateBlogPostRequest,
   UpdateBlogPostRequest,
   UploadImageResponse,
@@ -17,6 +18,15 @@ import {
 export class BlogService {
   private readonly _http = inject(HttpClient);
   private readonly _base = `${environment.apiUrl}${API_ENDPOINTS.BLOG.BASE}`;
+
+  getPosts(query: BlogQueryParams = {}): Observable<BlogPost> {
+    let params = new HttpParams();
+    if (query.page) params = params.set('page', query.page);
+    if (query.limit) params = params.set('limit', query.limit);
+    if (query.category) params = params.set('category', query.category);
+    if (query.search) params = params.set('search', query.search);
+    return this._http.get<BlogPost>(this._base, { params });
+  }
 
   getAllPost(): Observable<BlogPost> {
     return this._http.get<BlogPost>(this._base);
