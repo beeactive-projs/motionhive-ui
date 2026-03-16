@@ -182,3 +182,60 @@
   flex: 1;
   padding: 1.5rem;
 }
+
+:host::ng-deep {
+  // Social icon buttons
+  .p-paginator {
+    background: transparent;
+
+    .p-paginator-pages {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    .p-paginator-page,
+    .p-paginator-next,
+    .p-paginator-last,
+    .p-paginator-first,
+    .p-paginator-prev {
+      background: color-mix(in oklab, black 8%, transparent);
+      border: 1px solid color-mix(in oklab, black 12%, transparent);
+      color: var(--p-surface-700);
+
+      &:hover {
+        color: var(--p-primary-500);
+        background: var(--p-button-primary-hover-background-color);
+        border-color: var(--p-button-primary-hover-border-color);
+      }
+    }
+
+    .p-paginator-page.p-paginator-page-selected {
+      background: var(--p-button-primary-background);
+      color: var(--p-button-primary-color);
+    }
+  }
+}
+
+:host-context(.dark) :host::ng-deep {
+  .p-paginator {
+    .p-paginator-page,
+    .p-paginator-next,
+    .p-paginator-last,
+    .p-paginator-first,
+    .p-paginator-prev {
+      color: var(--p-surface-300);
+      background: color-mix(in oklab, white 8%, transparent);
+      border-color: color-mix(in oklab, white 12%, transparent);
+      &:hover {
+        color: var(--p-primary-500);
+        background: var(--p-button-primary-hover-background-color);
+        border-color: var(--p-button-primary-hover-border-color);
+      }
+    }
+
+    .p-paginator-page.p-paginator-page-selected {
+      background: var(--p-button-primary-background);
+      color: var(--p-button-primary-color);
+    }
+  }
+}

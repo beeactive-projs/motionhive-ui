@@ -22,7 +22,11 @@ export class PublicFooterComponent {
     { icon: 'pi-facebook', href: 'https://facebook.com/beeactive.fit', label: 'Facebook' },
     // { icon: 'pi-twitter', href: 'https://twitter.com', label: 'X (Twitter)' },
     { icon: 'pi-instagram', href: 'https://instagram.com/beeactive.fit', label: 'Instagram' },
-    // { icon: 'pi-linkedin', href: 'https://linkedin.com', label: 'LinkedIn' },
+    {
+      icon: 'pi-linkedin',
+      href: 'https://www.linkedin.com/company/beeactivefit',
+      label: 'LinkedIn',
+    },
   ];
 
   readonly productLinks = [

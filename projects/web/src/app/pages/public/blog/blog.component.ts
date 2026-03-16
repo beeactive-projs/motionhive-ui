@@ -22,8 +22,10 @@ import { Skeleton } from 'primeng/skeleton';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
+import { Select } from 'primeng/select';
 
 const PAGE_SIZE = 9;
+const PAGE_SIZE_ALL = 10;
 
 @Component({
   selector: 'bee-blog',
@@ -37,6 +39,7 @@ const PAGE_SIZE = 9;
     Paginator,
     IconField,
     InputIcon,
+    Select,
   ],
   templateUrl: './blog.component.html',
   styleUrl: './blog.component.scss',
@@ -126,7 +129,7 @@ export class BlogComponent {
     this._blogService
       .getPosts({
         page: this.currentPage(),
-        limit: PAGE_SIZE,
+        limit: category === 'All' ? PAGE_SIZE_ALL : PAGE_SIZE,
         category: category === 'All' ? undefined : category,
         search: this.searchQuery() || undefined,
       })

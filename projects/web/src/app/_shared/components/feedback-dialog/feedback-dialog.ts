@@ -11,6 +11,7 @@ import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { FeedbackService, FeedbackCategory, AuthStore } from 'core';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 @Component({
   selector: 'bee-feedback-dialog',
@@ -22,6 +23,7 @@ import { FeedbackService, FeedbackCategory, AuthStore } from 'core';
     TextareaModule,
     MessageModule,
     ToastModule,
+    AutoFocusModule,
   ],
   providers: [MessageService],
   templateUrl: './feedback-dialog.html',

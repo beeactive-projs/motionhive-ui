@@ -1,7 +1,7 @@
 <p-toast position="top-right" />
 
 <p-dialog [visible]="visible()" (visibleChange)="visible.set($event)" [modal]="true" [draggable]="false"
-  [resizable]="false" [style]="{ width: '90vw', maxWidth: '28rem' }" (onHide)="onDialogHide()">
+  [resizable]="false" [style]="{ width: '90vw', maxWidth: '35rem' }" (onHide)="onDialogHide()">
 
   <ng-template #header>
     <div class="flex items-center gap-3">
@@ -24,9 +24,11 @@
       <p-button class="flex-1" [outlined]="form.controls.type.value === t.key"
         [outlined]="form.controls.type.value !== t.key"
         [severity]="form.controls.type.value === t.key ? t.severity : 'secondary'" size="small"
-        class="w-full justify-center gap-1.5" fluid (onClick)="form.controls.type.setValue(t.key)">
-        <span class="material-symbols-outlined" style="font-size: 1.1rem; line-height: 1;">{{ t.icon }}</span>
-        <span class="text-xs font-semibold">{{ t.label }}</span>
+        class="w-full justify-center" fluid (onClick)="form.controls.type.setValue(t.key)">
+        <span class="flex flex-col md:flex-row items-center gap-1">
+          <span class="material-symbols-outlined" style="font-size: 1.1rem; line-height: 1;">{{ t.icon }}</span>
+          <span class="text-xs font-semibold">{{ t.label }}</span>
+        </span>
       </p-button>
       }
     </div>
@@ -34,7 +36,8 @@
     <!-- Title -->
     <div class="flex flex-col gap-1.5">
       <label for="fb-title" class="text-xs font-semibold text-secondary-500">Title</label>
-      <input pInputText id="fb-title" formControlName="title" [placeholder]="placeholders().title" fluid />
+      <input pInputText id="fb-title" formControlName="title" [placeholder]="placeholders().title" fluid
+        [pAutoFocus]="true" />
       @if (form.controls.title.invalid && form.controls.title.touched) {
       <p-message variant="simple" severity="error" size="small">
         Please write at least 3 characters.
@@ -45,8 +48,8 @@
     <!-- Description -->
     <div class="flex flex-col gap-1.5">
       <label for="fb-message" class="text-xs font-semibold text-secondary-500">Description</label>
-      <textarea pInputTextarea id="fb-message" formControlName="message" rows="4"
-        [placeholder]="placeholders().message" fluid class="resize-none"></textarea>
+      <textarea pInputTextarea id="fb-message" formControlName="message" rows="4" [placeholder]="placeholders().message"
+        fluid class="resize-none"></textarea>
       @if (form.controls.message.invalid && form.controls.message.touched) {
       <p-message variant="simple" severity="error" size="small">
         Please write at least 10 characters.
@@ -60,8 +63,7 @@
       <label for="fb-email" class="text-xs font-semibold text-secondary-500">
         Email <span class="font-normal text-surface-400">(optional — to follow up on your feedback)</span>
       </label>
-      <input pInputText id="fb-email" type="email" formControlName="email"
-        placeholder="your@email.com" fluid />
+      <input pInputText id="fb-email" type="email" formControlName="email" placeholder="your@email.com" fluid />
       @if (form.controls.email.invalid && form.controls.email.touched) {
       <p-message variant="simple" severity="error" size="small">
         Please enter a valid email address.

@@ -22,11 +22,16 @@
     <!-- ===== Filters Bar ===== -->
     <div class="flex flex-col md:flex-row flex-1 justify-between gap-4">
       @if (categories().length > 1) {
-      <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-3">
         @for (category of categoryOptions(); track category) {
         <p-button [label]="category" [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small"
-          rounded [text]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" />
+          rounded [outlined]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" class="min-w-15"
+          fluid />
         }
+      </div>
+      <div class="md:hidden">
+        <p-select [options]="categoryOptions()" [ngModel]="selectedCategory()" scrollHeight="300px"
+          (ngModelChange)="onCategoryChange($event)" fluid></p-select>
       </div>
       }
       <p-iconfield class="w-full md:w-auto">

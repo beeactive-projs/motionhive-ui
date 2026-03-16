@@ -1,7 +1,7 @@
 <p-toast position="top-right" />
 
 <p-dialog [visible]="visible()" (visibleChange)="visible.set($event)" [modal]="true" [draggable]="false"
-  [resizable]="false" [style]="{ width: '90vw', maxWidth: '26rem' }" (onHide)="onDialogHide()">
+  [resizable]="false" [style]="{ width: '90vw', maxWidth: '35rem' }" (onHide)="onDialogHide()">
 
   <ng-template #header>
     <div class="flex items-center gap-3">
@@ -43,12 +43,8 @@
       <label class="text-xs font-semibold text-secondary-500">How will you BeeActive?</label>
       <div class="flex gap-2">
         @for (r of roles; track r.key) {
-        <p-button
-          class="flex-1"
-          [outlined]="form.controls.role.value !== r.key"
-          [severity]="form.controls.role.value === r.key ? 'primary' : 'secondary'"
-          size="small"
-          fluid
+        <p-button class="flex-1" [outlined]="form.controls.role.value !== r.key"
+          [severity]="form.controls.role.value === r.key ? 'primary' : 'secondary'" size="small" fluid
           (onClick)="form.controls.role.setValue(r.key)">
           <i [class]="r.icon + ' text-sm'"></i>
           <span class="text-xs font-semibold">{{ r.label }}</span>
@@ -72,8 +68,8 @@
   <ng-template #footer>
     @if (!submitted()) {
     <p-button label="Maybe later" [outlined]="true" (onClick)="onClose()" />
-    <p-button label="Notify me" icon="pi pi-bell" iconPos="right" (onClick)="onSubmit()"
-      [loading]="isLoading()" [disabled]="form.invalid || isLoading()" />
+    <p-button label="Notify me" icon="pi pi-bell" iconPos="right" (onClick)="onSubmit()" [loading]="isLoading()"
+      [disabled]="form.invalid || isLoading()" />
     } @else {
     <p-button label="Close" (onClick)="onClose()" />
     }
