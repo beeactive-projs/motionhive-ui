@@ -13,7 +13,7 @@ import { MessageModule } from 'primeng/message';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactComponent {
-  private readonly fb = inject(FormBuilder);
+  private readonly _formBuilder = inject(FormBuilder);
 
   readonly isLoading = signal(false);
   readonly successMessage = signal<string | null>(null);
@@ -43,7 +43,7 @@ export class ContactComponent {
     },
   ];
 
-  readonly contactForm = this.fb.group({
+  readonly contactForm = this._formBuilder.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     subject: ['', [Validators.required]],

@@ -7,8 +7,8 @@ const STORAGE_KEY = 'bee-active-theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly platformId = inject(PLATFORM_ID);
-  private readonly isBrowser = isPlatformBrowser(this.platformId);
+  private readonly _platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this._platformId);
 
   readonly theme = signal<Theme>(this.getInitialTheme());
 

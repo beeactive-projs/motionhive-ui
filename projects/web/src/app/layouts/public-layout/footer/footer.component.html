@@ -1,14 +1,14 @@
 <footer class="footer">
-  <div class="background-main">
+  <!-- <div class="background-main">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
     <div class="honeycomb-bg"></div>
-  </div>
+  </div> -->
   <!-- Gradient top border -->
   <div class="footer-top-border" aria-hidden="true"></div>
 
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
 
     <!-- Main grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -18,7 +18,7 @@
 
         <!-- Logo -->
         <a routerLink="/" class="logo-link" aria-label="BeeActive home">
-          <p-button icon="pi pi-bolt" size="small"></p-button>
+          <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
           <span class="font-heading text-xl sm:text-2xl font-extrabold">
             BeeActive
           </span>
@@ -64,11 +64,15 @@
             <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
           </li>
           }
+          <li>
+            <p-button label="Share Feedback" [link]="true" styleClass="footer-link p-0" (onClick)="openFeedback()" />
+          </li>
         </ul>
         <div class="md:hidden flex gap-5">
           @for (link of supportLinks; track link.label) {
           <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
           }
+          <p-button label="Share Feedback" [link]="true" styleClass="footer-link p-0" (onClick)="openFeedback()" />
         </div>
       </div>
 

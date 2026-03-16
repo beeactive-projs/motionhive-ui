@@ -4,9 +4,9 @@
 @include shared.cta-section();
 @include shared.category-badge();
 
-:host {
-  --featured-article-height: 390px;
-}
+// :host {
+//   --featured-article-height: 390px;
+// }
 
 .hero-section {
   position: relative;
@@ -15,7 +15,8 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
-  height: calc(100dvh - var(--nav-height) - (var(--featured-article-height) / 2));
+  height: 50dvh;
+  // height: calc(100dvh - var(--nav-height) - (var(--featured-article-height) / 2));
 }
 
 // ===== Posts grid section =====

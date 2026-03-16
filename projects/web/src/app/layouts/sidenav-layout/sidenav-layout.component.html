@@ -3,12 +3,12 @@
 
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
-    <div class="brand-logo">
-      <div class="brand-logo-icon bg-primary-500">
-        <i class="pi pi-bolt text-primary-contrast text-xl"></i>
-      </div>
-      <span class="font-heading text-2xl font-extrabold">{{ brandName() }}</span>
-    </div>
+
+    <a routerLink="/app/dashboard" class="brand-logo flex" aria-label="BeeActive home">
+      <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
+      <span class="font-heading text-2xl font-extrabold tracking-tight">Bee Active</span>
+    </a>
+
     <nav>
       <ul class="flex flex-col gap-2">
         @for (item of menuItems(); track item.label) {

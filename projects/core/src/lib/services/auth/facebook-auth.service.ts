@@ -21,7 +21,7 @@ function isFacebookOAuthMessage(data: unknown): data is FacebookOAuthMessage {
   providedIn: 'root',
 })
 export class FacebookAuthService {
-  private readonly ngZone = inject(NgZone);
+  private readonly _ngZone = inject(NgZone);
 
   private static readonly POPUP_WIDTH = 600;
   private static readonly POPUP_HEIGHT = 700;
@@ -61,13 +61,13 @@ export class FacebookAuthService {
 
         if (data.state !== state) {
           cleanup();
-          this.ngZone.run(() => reject(new Error('OAuth state mismatch')));
+          this._ngZone.run(() => reject(new Error('OAuth state mismatch')));
           return;
         }
 
         cleanup();
 
-        this.ngZone.run(() => {
+        this._ngZone.run(() => {
           if (data.accessToken) {
             resolve(data.accessToken);
           } else {
@@ -81,14 +81,14 @@ export class FacebookAuthService {
       pollId = setInterval(() => {
         if (popup.closed) {
           cleanup();
-          this.ngZone.run(() => reject(new Error('Facebook login was cancelled or failed')));
+          this._ngZone.run(() => reject(new Error('Facebook login was cancelled or failed')));
         }
       }, FacebookAuthService.POLL_INTERVAL_MS);
 
       timeoutId = setTimeout(() => {
         cleanup();
         if (!popup.closed) popup.close();
-        this.ngZone.run(() => reject(new Error('Facebook login timed out')));
+        this._ngZone.run(() => reject(new Error('Facebook login timed out')));
       }, FacebookAuthService.TIMEOUT_MS);
     });
   }

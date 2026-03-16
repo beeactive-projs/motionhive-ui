@@ -7,7 +7,7 @@ import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 
-import { AuthStore } from 'core';
+import { AuthStore, WaitlistService } from 'core';
 
 @Component({
   selector: 'bee-dashboard',
@@ -17,5 +17,10 @@ import { AuthStore } from 'core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
-  readonly authStore = inject(AuthStore);
+  protected readonly _authStore = inject(AuthStore);
+  private readonly _waitlistService = inject(WaitlistService);
+
+  openSubscribe(): void {
+    this._waitlistService.open('dashboard');
+  }
 }

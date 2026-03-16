@@ -1,61 +1,37 @@
-<div class="min-h-screen bg-secondary-50 dark:bg-secondary-950 flex items-center justify-center px-4 py-16">
-  <div class="w-full max-w-xl text-center">
+<div class="error-page">
+  <div class="honeycomb-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 
-    <!-- Icon -->
-    <div class="feature-icon-wrap mx-auto mb-6">
-      <i class="pi pi-exclamation-triangle text-xl"></i>
-    </div>
+  <bee-theme-toggle class="theme-toggle-btn"></bee-theme-toggle>
 
-    <!-- Badge with error code -->
-    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 dark:bg-accent-400/15 mb-6">
-      <span class="text-sm font-semibold text-accent-700 dark:text-accent-300">ERROR {{ errorCode() }}</span>
-    </div>
+  <div class="error-content text-center">
 
-    <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-secondary-900 dark:text-white mb-4">
+    <a routerLink="/" class="brand-logo mb-12" aria-label="BeeActive home">
+      <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
+      <span class="font-heading text-2xl font-extrabold tracking-tight">Bee Active</span>
+    </a>
+
+    <p class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 text-brand">
+      {{ errorCode() }}
+    </p>
+
+    <h1 class="font-heading text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-5">
       {{ errorTitle() }}
     </h1>
 
-    <p class="text-secondary-600 dark:text-secondary-400 text-base sm:text-lg max-w-md mx-auto leading-relaxed mb-10">
+    <p class="text-lg text-surface-600 dark:text-surface-400 leading-relaxed mb-10 max-w-sm mx-auto">
       {{ errorMessage() }}
     </p>
 
-    <!-- Tips Card -->
-    <div class="error-card mb-10 text-left">
-      <h2 class="text-lg font-heading font-semibold text-secondary-900 dark:text-white mb-4 flex items-center gap-2">
-        <i class="pi pi-lightbulb text-primary-500 dark:text-primary-400"></i>
-        What can you do?
-      </h2>
-      <ul class="flex flex-col gap-3">
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>Try refreshing the page or wait a moment before trying again</span>
-        </li>
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>Check your internet connection</span>
-        </li>
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>Return to the homepage and navigate back</span>
-        </li>
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>If the problem persists, contact our support team</span>
-        </li>
-      </ul>
+    <div class="flex flex-wrap justify-center gap-3 mb-10">
+      <p-button label="Go Home" icon="pi pi-home" (onClick)="goHome()" />
+      <p-button label="Try Again" icon="pi pi-refresh" (onClick)="retry()" />
+      <p-button outlined label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" />
     </div>
 
-    <!-- Action Buttons -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-      <p-button label="Go Home" icon="pi pi-home" (onClick)="goHome()" severity="warn" size="large" />
-      <p-button label="Try Again" icon="pi pi-refresh" (onClick)="retry()" [outlined]="true" size="large"
-        styleClass="error-outline-btn" />
-      <p-button label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" [outlined]="true" size="large"
-        styleClass="error-outline-btn" />
-    </div>
-
-    <!-- Support Info -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-secondary-500 dark:text-secondary-500">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-surface-500">
       <div class="flex items-center gap-2">
         <i class="pi pi-clock"></i>
         <span>24/7 Support Available</span>
@@ -64,9 +40,8 @@
       <div class="flex items-center gap-2">
         <i class="pi pi-envelope"></i>
         <a href="mailto:support@beeactive.com"
-          class="text-primary-600 dark:text-primary-400 hover:underline transition-colors">support&#64;beeactive.com</a>
+          class="text-primary-600 dark:text-primary-400 hover:underline transition-colors">support.beeactive&#64;gmail.com</a>
       </div>
     </div>
-
   </div>
 </div>

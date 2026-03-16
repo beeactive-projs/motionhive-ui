@@ -5,7 +5,6 @@
 @include shared.honeycomb-bg();
 @include shared.cta-section();
 @include shared.orb-base();
-@include shared.feature-section();
 @include shared.feature-cards();
 @include shared.orb-colors();
 
@@ -24,11 +23,11 @@ $hex-gap: 0.5rem;
   margin-bottom: 1rem;
   border: 1px solid var(--p-secondary-700);
   color: var(--p-secondary-700);
+}
 
-  :host-context(.dark) .fitness-platform {
-    border: 1px solid var(--p-primary-500);
-    color: var(--p-primary-500);
-  }
+:host-context(.dark) .fitness-platform {
+  border-color: var(--p-primary-500);
+  color: var(--p-primary-500);
 }
 
 // ===== Hero Visual — Hexagon Grid =====
@@ -120,7 +119,6 @@ $hex-gap: 0.5rem;
 
     .hero-hex-glow {
       box-shadow: 0 0 1.5rem color-mix(in oklab, $color 30%, transparent);
-      border-color: color-mix(in oklab, $color 30%, transparent);
     }
   }
 }
@@ -271,10 +269,6 @@ $hex-gap: 0.5rem;
 }
 
 // ===== Who It's For Section =====
-.who-section {
-  // background-color: var(--p-surface-100);
-}
-
 .who-grid {
   position: relative;
 }
@@ -288,21 +282,23 @@ $hex-gap: 0.5rem;
   box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-900) 6%, transparent);
 }
 
-:host-context(.dark) .who-column {
-  background: color-mix(in oklab, white 8%, transparent);
-  border-color: color-mix(in oklab, white 12%, transparent);
-  box-shadow: 0 12px 40px color-mix(in oklab, black 30%, transparent);
+:host-context(.dark) {
+  .who-column {
+    background: color-mix(in oklab, white 8%, transparent);
+    border-color: color-mix(in oklab, white 12%, transparent);
+    box-shadow: 0 12px 40px color-mix(in oklab, black 30%, transparent);
+  }
+
+  .who-column-right {
+    @media (min-width: 768px) {
+      border-left-color: color-mix(in oklab, var(--p-slate-400) 15%, transparent);
+    }
+  }
 }
 
 .who-column-right {
   @media (min-width: 768px) {
     border-left: 1px solid color-mix(in oklab, var(--p-slate-400) 30%, transparent);
-  }
-}
-
-:host-context(.dark) .who-column-right {
-  @media (min-width: 768px) {
-    border-left-color: color-mix(in oklab, var(--p-slate-400) 15%, transparent);
   }
 }
 

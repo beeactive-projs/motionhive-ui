@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
+import { FeedbackService } from 'core';
 
 @Component({
   selector: 'bee-public-footer',
@@ -10,6 +11,11 @@ import { Button } from 'primeng/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicFooterComponent {
+  private readonly _feedbackService = inject(FeedbackService);
+
+  protected openFeedback(): void {
+    this._feedbackService.open();
+  }
   readonly currentYear = new Date().getFullYear();
 
   readonly socialLinks = [

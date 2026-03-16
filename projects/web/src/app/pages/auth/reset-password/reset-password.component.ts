@@ -9,6 +9,7 @@ import { MessageModule } from 'primeng/message';
 
 // Core imports
 import { AuthService } from 'core';
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'bee-reset-password',
@@ -18,14 +19,15 @@ import { AuthService } from 'core';
     ButtonModule,
     InputTextModule,
     MessageModule,
+    ThemeToggleComponent,
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
+  private readonly _formBuilder = inject(FormBuilder);
+  private readonly _authService = inject(AuthService);
 
   // Signals for component state
   isLoading = signal(false);
@@ -33,7 +35,7 @@ export class ResetPasswordComponent {
   successMessage = signal<string | null>(null);
 
   // Reactive form
-  forgotPasswordForm: FormGroup = this.fb.group({
+  forgotPasswordForm: FormGroup = this._formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
   });
 
@@ -49,7 +51,7 @@ export class ResetPasswordComponent {
 
     const email = this.forgotPasswordForm.value.email;
 
-    this.authService.forgotPassword({ email }).subscribe({
+    this._authService.forgotPassword({ email }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.successMessage.set(

@@ -34,4 +34,10 @@ export const API_ENDPOINTS = {
     BASE: '/blog',
     UPLOAD_IMAGE: '/blog/upload-image',
   },
+  FEEDBACK: {
+    BASE: '/feedback',
+  },
+  WAITLIST: {
+    BASE: '/waitlist',
+  },
 } as const;

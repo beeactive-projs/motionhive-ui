@@ -1,0 +1,30 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="close()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '90vw', maxWidth: '26rem' }">
+
+  <ng-template #header>
+    <div class="flex items-center gap-3">
+      <div class="error-icon">
+        <i [class]="iconClass()"></i>
+      </div>
+      <div>
+        <p class="font-heading font-bold text-base leading-tight">{{ error()?.title }}</p>
+        @if (error()?.status) {
+          <p class="text-xs text-surface-400 mt-0.5">Error {{ error()?.status }}</p>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <p class="text-sm text-surface-600 dark:text-surface-300 leading-relaxed m-0">{{ error()?.message }}</p>
+
+  <ng-template #footer>
+    <p-button label="Close" (onClick)="close()" />
+  </ng-template>
+
+</p-dialog>

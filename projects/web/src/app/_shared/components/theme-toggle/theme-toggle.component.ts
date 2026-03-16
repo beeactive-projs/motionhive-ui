@@ -11,13 +11,13 @@ import { ThemeService } from '../../../_core/services/theme.service';
       rounded
       outlined
       size="small"
-      (onClick)="themeService.toggle()"
+      (onClick)="_themeService.toggle()"
       [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
     />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeToggleComponent {
-  protected readonly themeService = inject(ThemeService);
-  protected readonly isDark = this.themeService.isDark;
+  protected readonly _themeService = inject(ThemeService);
+  protected readonly isDark = this._themeService.isDark;
 }

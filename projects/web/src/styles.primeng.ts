@@ -68,6 +68,11 @@ export const BeeActiveLara = definePreset(Lara, {
     },
   },
   components: {
+    dialog: {
+      footer: {
+        padding: '{overlay.modal.padding}',
+      },
+    },
     button: {
       colorScheme: {
         light: {
@@ -114,7 +119,7 @@ export const BeeActiveLara = definePreset(Lara, {
             },
           },
           text: {
-             primary: {
+            primary: {
               color: '{primary.500}',
               hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
               activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',

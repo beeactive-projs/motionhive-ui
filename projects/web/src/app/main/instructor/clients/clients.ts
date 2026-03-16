@@ -47,9 +47,9 @@ type TagSeverity = 'success' | 'warn' | 'danger' | 'secondary' | 'info' | 'contr
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Clients implements OnInit {
-  private clientService = inject(ClientService);
-  private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private readonly _clientService = inject(ClientService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
 
   clients = signal<InstructorClient[]>([]);
   totalRecords = signal(0);
@@ -92,7 +92,7 @@ export class Clients implements OnInit {
     this.loading.set(true);
     const page = this.currentPage();
 
-    this.clientService
+    this._clientService
       .getClients({
         status: this.statusFilter(),
         page,
@@ -106,7 +106,7 @@ export class Clients implements OnInit {
         },
         error: () => {
           this.loading.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'Failed to load clients',
@@ -116,7 +116,7 @@ export class Clients implements OnInit {
   }
 
   loadPendingRequests(): void {
-    this.clientService.getPendingRequests().subscribe({
+    this._clientService.getPendingRequests().subscribe({
       next: (requests) => this.pendingRequests.set(requests),
       error: () => {},
     });
@@ -146,7 +146,7 @@ export class Clients implements OnInit {
     if (!this.inviteEmail.trim()) return;
 
     this.inviteLoading.set(true);
-    this.clientService
+    this._clientService
       .sendInvitation({
         email: this.inviteEmail.trim(),
         message: this.inviteMessage.trim() || undefined,
@@ -155,7 +155,7 @@ export class Clients implements OnInit {
         next: () => {
           this.inviteLoading.set(false);
           this.showInviteDialog.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'success',
             summary: 'Invitation Sent',
             detail: 'Client invitation has been sent successfully',
@@ -164,7 +164,7 @@ export class Clients implements OnInit {
         },
         error: (err) => {
           this.inviteLoading.set(false);
-          this.messageService.add({
+          this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: err.error?.message || 'Failed to send invitation',
@@ -185,11 +185,11 @@ export class Clients implements OnInit {
     if (!client) return;
 
     this.notesLoading.set(true);
-    this.clientService.updateClient(client.clientId, { notes: this.editNotes }).subscribe({
+    this._clientService.updateClient(client.clientId, { notes: this.editNotes }).subscribe({
       next: () => {
         this.notesLoading.set(false);
         this.showNotesDialog.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Notes Saved',
           detail: 'Client notes updated successfully',
@@ -198,7 +198,7 @@ export class Clients implements OnInit {
       },
       error: () => {
         this.notesLoading.set(false);
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to save notes',
@@ -210,7 +210,7 @@ export class Clients implements OnInit {
   // Archive
   confirmArchive(client: InstructorClient): void {
     const name = client.client ? `${client.client.firstName} ${client.client.lastName}` : 'this client';
-    this.confirmationService.confirm({
+    this._confirmationService.confirm({
       message: `Are you sure you want to archive ${name}?`,
       header: 'Archive Client',
       icon: 'pi pi-exclamation-triangle',
@@ -220,9 +220,9 @@ export class Clients implements OnInit {
   }
 
   private archiveClient(client: InstructorClient): void {
-    this.clientService.archiveClient(client.clientId).subscribe({
+    this._clientService.archiveClient(client.clientId).subscribe({
       next: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Client Archived',
           detail: 'Client relationship has been archived',
@@ -230,7 +230,7 @@ export class Clients implements OnInit {
         this.loadClients();
       },
       error: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to archive client',
@@ -241,9 +241,9 @@ export class Clients implements OnInit {
 
   // Pending requests actions
   acceptPendingRequest(request: ClientRequest): void {
-    this.clientService.acceptRequest(request.id).subscribe({
+    this._clientService.acceptRequest(request.id).subscribe({
       next: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'success',
           summary: 'Request Accepted',
           detail: 'Client request accepted successfully',
@@ -252,7 +252,7 @@ export class Clients implements OnInit {
         this.loadClients();
       },
       error: (err) => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: err.error?.message || 'Failed to accept request',
@@ -262,9 +262,9 @@ export class Clients implements OnInit {
   }
 
   declinePendingRequest(request: ClientRequest): void {
-    this.clientService.declineRequest(request.id).subscribe({
+    this._clientService.declineRequest(request.id).subscribe({
       next: () => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'info',
           summary: 'Request Declined',
           detail: 'Client request has been declined',
@@ -272,7 +272,7 @@ export class Clients implements OnInit {
         this.loadPendingRequests();
       },
       error: (err) => {
-        this.messageService.add({
+        this._messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: err.error?.message || 'Failed to decline request',

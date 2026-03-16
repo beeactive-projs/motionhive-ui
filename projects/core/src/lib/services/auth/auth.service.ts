@@ -21,10 +21,10 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private tokenService = inject(TokenService);
-  private authStore = inject(AuthStore);
+  private readonly _http = inject(HttpClient);
+  private readonly _router = inject(Router);
+  private readonly _tokenService = inject(TokenService);
+  private readonly _authStore = inject(AuthStore);
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -44,13 +44,13 @@ export class AuthService implements OnDestroy {
   }
 
   private checkAuthStatus(): void {
-    const token = this.tokenService.getAccessToken();
-    const user = this.tokenService.getUser();
+    const token = this._tokenService.getAccessToken();
+    const user = this._tokenService.getUser();
 
     if (token && user) {
       this.currentUserSubject.next(user);
       this.isAuthenticatedSubject.next(true);
-      this.authStore.setUser(user);
+      this._authStore.setUser(user);
       this.scheduleTokenRefresh(token);
 
       this.fetchAndStoreProfile().subscribe();
@@ -58,7 +58,7 @@ export class AuthService implements OnDestroy {
   }
 
   login(credentials: LoginRequest): Observable<User> {
-    return this.http
+    return this._http
       .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`, credentials)
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
@@ -67,7 +67,7 @@ export class AuthService implements OnDestroy {
   }
 
   register(data: RegisterRequest): Observable<User> {
-    return this.http
+    return this._http
       .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER}`, data)
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
@@ -78,13 +78,13 @@ export class AuthService implements OnDestroy {
   logout(): Observable<void> {
     this.clearAuthData();
     return new Observable<void>();
-    // return this.http
+    // return this._http
     //   .post<void>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGOUT}`, {})
     //   .pipe(tap(() => this.clearAuthData()));
   }
 
   googleLogin(request: GoogleLoginRequest): Observable<User> {
-    return this.http
+    return this._http
       .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.GOOGLE}`, request)
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
@@ -93,7 +93,7 @@ export class AuthService implements OnDestroy {
   }
 
   facebookLogin(request: FacebookLoginRequest): Observable<User> {
-    return this.http
+    return this._http
       .post<AuthResponse>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.FACEBOOK}`, request)
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
@@ -102,28 +102,28 @@ export class AuthService implements OnDestroy {
   }
 
   refreshToken(): Observable<{ accessToken: string }> {
-    const refreshToken = this.tokenService.getRefreshToken();
-    return this.http
+    const refreshToken = this._tokenService.getRefreshToken();
+    return this._http
       .post<{ accessToken: string }>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.REFRESH}`, {
         refreshToken,
       })
       .pipe(
         tap((response) => {
-          this.tokenService.setAccessToken(response.accessToken);
+          this._tokenService.setAccessToken(response.accessToken);
           this.scheduleTokenRefresh(response.accessToken);
         }),
       );
   }
 
   forgotPassword(data: ForgotPasswordRequest): Observable<PasswordResetResponse> {
-    return this.http.post<PasswordResetResponse>(
+    return this._http.post<PasswordResetResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.AUTH.FORGOT_PASSWORD}`,
       data,
     );
   }
 
   resetPassword(data: ResetPasswordRequest): Observable<PasswordResetResponse> {
-    return this.http.post<PasswordResetResponse>(
+    return this._http.post<PasswordResetResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.AUTH.RESET_PASSWORD}`,
       data,
     );
@@ -131,7 +131,7 @@ export class AuthService implements OnDestroy {
 
   clearAuthDataAndRedirect(): void {
     this.clearAuthData();
-    this.router.navigate(['/auth/login']);
+    this._router.navigate(['/auth/login']);
   }
 
   getCurrentUser(): User | null {
@@ -143,45 +143,45 @@ export class AuthService implements OnDestroy {
   }
 
   hasRole(role: string): boolean {
-    const roles = this.tokenService.getRoles();
+    const roles = this._tokenService.getRoles();
     return roles.includes(role);
   }
 
   hasPermission(permission: string): boolean {
-    const permissions = this.tokenService.getPermissions();
+    const permissions = this._tokenService.getPermissions();
     return permissions.includes(permission);
   }
 
   private fetchAndStoreProfile(): Observable<User> {
-    return this.http.get<User>(`${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`).pipe(
+    return this._http.get<User>(`${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`).pipe(
       tap((user) => {
-        this.tokenService.setUser(user);
+        this._tokenService.setUser(user);
         this.currentUserSubject.next(user);
-        this.authStore.setUser(user);
+        this._authStore.setUser(user);
       }),
     );
   }
 
   private handleAuthResponse(response: AuthResponse): void {
-    this.tokenService.setAccessToken(response.accessToken);
-    this.tokenService.setRefreshToken(response.refreshToken);
-    this.tokenService.setUser(response.user);
-    this.tokenService.setRoles(response.roles);
-    this.tokenService.setPermissions(response.permissions);
+    this._tokenService.setAccessToken(response.accessToken);
+    this._tokenService.setRefreshToken(response.refreshToken);
+    this._tokenService.setUser(response.user);
+    this._tokenService.setRoles(response.roles);
+    this._tokenService.setPermissions(response.permissions);
 
     this.currentUserSubject.next(response.user);
     this.isAuthenticatedSubject.next(true);
-    this.authStore.setUser(response.user);
+    this._authStore.setUser(response.user);
 
     this.scheduleTokenRefresh(response.accessToken);
   }
 
   private clearAuthData(): void {
     this.clearRefreshTimer();
-    this.tokenService.clearTokens();
+    this._tokenService.clearTokens();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
-    this.authStore.clearUser();
+    this._authStore.clearUser();
   }
 
   private scheduleTokenRefresh(accessToken: string): void {

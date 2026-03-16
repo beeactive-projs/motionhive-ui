@@ -2,23 +2,24 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'bee-not-found',
-  imports: [RouterLink, ButtonModule],
+  imports: [RouterLink, ButtonModule, ThemeToggleComponent],
   templateUrl: './not-found.component.html',
   styleUrl: './not-found.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotFoundComponent {
-  private readonly router = inject(Router);
-  private readonly location = inject(Location);
+  private readonly _router = inject(Router);
+  private readonly _location = inject(Location);
 
   goHome(): void {
-    this.router.navigate(['/']);
+    this._router.navigate(['/']);
   }
 
   goBack(): void {
-    this.location.back();
+    this._location.back();
   }
 }

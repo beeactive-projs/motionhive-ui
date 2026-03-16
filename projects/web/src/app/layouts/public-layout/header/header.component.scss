@@ -79,14 +79,12 @@
   padding: 1rem 0.5rem;
   border-radius: 0.5rem;
   border: 1px solid var(--p-surface-200);
-  // border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: color-mix(in oklab, white 95%, transparent);
+  background: var(--p-primary-50);
   animation: menuSlideDown 0.25s ease-out;
 }
 
 :host-context(.dark) .mobile-menu {
-  // border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: color-mix(in oklab, black 95%, transparent);
+  background: var(--p-secondary-900);
 }
 
 @keyframes menuSlideDown {

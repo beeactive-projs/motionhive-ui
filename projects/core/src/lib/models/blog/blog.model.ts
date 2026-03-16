@@ -40,6 +40,13 @@ export interface CreateBlogPostRequest {
 
 export type UpdateBlogPostRequest = Partial<CreateBlogPostRequest>;
 
+export interface BlogQueryParams {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+}
+
 export interface UploadImageResponse {
   url: string;
   publicId: string;

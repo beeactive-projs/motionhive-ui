@@ -9,9 +9,9 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class UserService {
-  private http = inject(HttpClient);
+  private readonly _http = inject(HttpClient);
 
   getMe(): Observable<User> {
-    return this.http.get<User>(`${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`);
+    return this._http.get<User>(`${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`);
   }
 }

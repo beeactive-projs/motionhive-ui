@@ -5,7 +5,7 @@
 
       <!-- Logo -->
       <a routerLink="/" class="logo-link" aria-label="BeeActive home">
-        <p-button icon="pi pi-bolt" size="small"></p-button>
+        <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
         <span class="font-heading text-xl sm:text-2xl font-extrabold">
           BeeActive
         </span>
@@ -26,7 +26,7 @@
           (onClick)="toggleTheme()" [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
           size="small" />
         <!-- <p-button label="Sign In" [text]="true" [disabled]="true" size="small" /> -->
-        <p-button label="Coming soon" icon="pi pi-clock" iconPos="right" size="small" />
+        <p-button label="Coming soon" icon="pi pi-clock" iconPos="right" size="small" (onClick)="openSubscribe()" />
       </div>
 
       <!-- Mobile controls -->
@@ -50,7 +50,7 @@
       <div class="mobile-menu-divider bg-surface-200"></div>
 
       <div class="flex gap-2 justify-end">
-        <p-button label="Coming soon" icon="pi pi-clock" iconPos="right" fluid />
+        <p-button label="Coming soon" icon="pi pi-clock" iconPos="right" fluid (onClick)="openSubscribe()" />
       </div>
     </div>
     }

@@ -5,19 +5,17 @@
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
-    <div class="brand-logo">
-      <div class="brand-logo-icon bg-primary-500">
-        <i class="pi pi-bolt text-white text-xl"></i>
-      </div>
-      <span class="font-heading text-2xl font-extrabold text-white tracking-tight">Logo</span>
-    </div>
+    <a routerLink="/" class="brand-logo flex" aria-label="BeeActive home">
+      <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
+      <span class="font-heading text-2xl font-extrabold tracking-tight">Bee Active</span>
+    </a>
 
-    <div class="brand-hero">
-      <h2 class="font-heading text-5xl font-extrabold text-white leading-none tracking-tight mb-5">
+    <div class="max-w-160">
+      <h1 class="text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
         Your fitness journey<br>
         starts <span class="text-brand">here.</span>
-      </h2>
-      <p class="text-secondary-400 text-base leading-relaxed max-w-100">
+      </h1>
+      <p class="text-base text-surface-600 dark:text-surface-400 leading-relaxed">
         Track workouts, connect with trainers, and crush your goals — all in one place built for
         people who move.
       </p>
@@ -26,25 +24,24 @@
     <div class="brand-stats"></div>
 
   </div>
-  <div class="form-panel bg-surface-100 w-1/2">
+  <div class="form-panel w-1/2">
     <div class="hex-decoration"></div>
+    <bee-theme-toggle class="theme-toggle-btn"></bee-theme-toggle>
 
-    <div class="mobile-logo flex lg:hidden w-full">
-      <div class="brand-logo-icon bg-primary-500">
-        <i class="pi pi-bolt text-primary-contrast text-xl"></i>
-      </div>
-      <span class="font-heading text-2xl font-extrabold">Bee Active</span>
-    </div>
-
+    <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" aria-label="BeeActive home">
+      <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
+      <span class="font-heading text-2xl font-extrabold tracking-tight">Bee Active</span>
+    </a>
 
     <div class="header w-full">
       <div class="mb-8 animate-slide-down">
         <h1 class="font-heading text-3xl font-bold mb-2">
           Welcome back
         </h1>
-        <p class="text-secondary-500 text-sm">
+        <p class="text-sm">
           Don't have an account?
-          <a routerLink="/auth/signup" [queryParams]="route.snapshot.queryParams" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
+          <a routerLink="/auth/signup" [queryParams]="_route.snapshot.queryParams"
+            class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
             Create one for free
           </a>
         </p>
@@ -55,7 +52,7 @@
       <!-- Error Message -->
       @if (errorMessage()) {
       <div class="mb-6">
-        <p-message severity="error" styleClass="w-full">
+        <p-message severity="error" class="w-full">
           {{errorMessage()}}
         </p-message>
       </div>
@@ -78,10 +75,10 @@
         </div>
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between text-xs font-semibold">
-            <label for="password" class=" text-secondary-500">
+            <label for="password" class="text-secondary-500">
               Password
             </label>
-            <a routerLink="/auth/reset-password" class=" text-primary-600 ">
+            <a routerLink="/auth/reset-password" class="text-primary-600">
               Forgot password?
             </a>
           </div>

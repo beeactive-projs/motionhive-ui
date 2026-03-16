@@ -85,8 +85,8 @@
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: color-mix(in oklab, black 4%, transparent);
-  border: 1px solid color-mix(in oklab, black 6%, transparent);
+  background: color-mix(in oklab, black 8%, transparent);
+  border: 1px solid color-mix(in oklab, black 12%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,16 +99,30 @@
     transform 0.2s ease;
 
   &:hover {
-    background: color-mix(in oklab, var(--p-primary-500) 12%, transparent);
-    border-color: color-mix(in oklab, var(--p-primary-500) 25%, transparent);
     color: var(--p-primary-500);
+    background: color-mix(
+      in oklab,
+      var(--p-button-primary-hover-background-color) 12%,
+      transparent
+    );
+    border-color: color-mix(in oklab, var(--p-button-primary-hover-border-color) 25%, transparent);
     transform: translateY(-2px);
   }
 }
 
 :host-context(.dark) .social-icon {
-  background: color-mix(in oklab, white 5%, transparent);
-  border-color: color-mix(in oklab, white 7%, transparent);
+  color: var(--p-surface-300);
+  background: color-mix(in oklab, white 8%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
+  &:hover {
+    color: var(--p-primary-500);
+    background: color-mix(
+      in oklab,
+      var(--p-button-primary-hover-background-color) 12%,
+      transparent
+    );
+    border-color: color-mix(in oklab, var(--p-button-primary-hover-border-color) 25%, transparent);
+  }
 }
 
 // Bottom bar
@@ -130,4 +144,24 @@
 
 :host-context(.dark) .footer-bottom {
   border-top: 1px solid color-mix(in oklab, var(--p-primary-500) 30%, transparent);
+}
+
+:host::ng-deep {
+  .footer-link .p-button-label {
+    font-size: 0.875rem;
+    font-weight: normal;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    color: var(--p-surface-700);
+
+    &:hover {
+      color: var(--p-primary-500);
+    }
+  }
+}
+
+:host-context(.dark) :host::ng-deep {
+  .footer-link .p-button-label {
+    color: var(--p-surface-300);
+  }
 }

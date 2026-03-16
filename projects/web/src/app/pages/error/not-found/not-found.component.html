@@ -1,75 +1,40 @@
-<div class="min-h-screen bg-secondary-50 dark:bg-secondary-950 flex items-center justify-center px-4 py-16">
-  <div class="w-full max-w-xl text-center">
+<div class="error-page">
+  <div class="honeycomb-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 
-    <!-- 404 Number -->
-    <p class="text-[6rem] sm:text-[8rem] font-heading font-extrabold text-brand leading-none mb-4">
-      404
-    </p>
+  <bee-theme-toggle class="theme-toggle-btn"></bee-theme-toggle>
 
-    <!-- Badge -->
-    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 dark:bg-accent-400/15 mb-6">
-      <i class="pi pi-search text-accent-600 dark:text-accent-300 text-sm"></i>
-      <span class="text-sm font-semibold text-accent-700 dark:text-accent-300">Page Not Found</span>
-    </div>
+  <div class="error-content text-center">
 
-    <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-secondary-900 dark:text-white mb-4">
-      Oops! This Page Doesn't Exist
+    <a routerLink="/" class="brand-logo mb-12" aria-label="BeeActive home">
+      <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
+      <span class="font-heading text-2xl font-extrabold tracking-tight">Bee Active</span>
+    </a>
+
+    <h1 class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6">
+      4<span class="text-brand">0</span>4
     </h1>
 
-    <p class="text-secondary-600 dark:text-secondary-400 text-base sm:text-lg max-w-md mx-auto leading-relaxed mb-10">
-      The page you're looking for may have been moved, deleted, or never existed in the first place.
+    <h1 class="font-heading text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-5">
+      Off the beaten track.
+    </h1>
+
+    <p class="text-lg text-surface-600 dark:text-surface-400 leading-relaxed mb-10 max-w-sm mx-auto">
+      This page doesn't exist — but your next workout does. Let's get you back on track.
     </p>
 
-    <!-- Tips Card -->
-    <div class="error-card mb-10 text-left">
-      <h2 class="text-lg font-heading font-semibold text-secondary-900 dark:text-white mb-4 flex items-center gap-2">
-        <i class="pi pi-compass text-primary-500 dark:text-primary-400"></i>
-        Where would you like to go?
-      </h2>
-      <ul class="flex flex-col gap-3">
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-angle-right text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>Check the URL for typos or errors</span>
-        </li>
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-angle-right text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>Return to the homepage and navigate from there</span>
-        </li>
-        <li class="flex items-start gap-3 text-sm text-secondary-600 dark:text-secondary-400">
-          <i class="pi pi-angle-right text-accent-500 dark:text-accent-400 shrink-0 mt-0.5"></i>
-          <span>Use the navigation menu to find what you need</span>
-        </li>
-      </ul>
-
-      <!-- Popular Pages -->
-      <div class="border-t border-secondary-200 dark:border-secondary-700/50 mt-6 pt-6">
-        <p class="text-sm font-semibold text-secondary-700 dark:text-secondary-300 mb-4">Popular Pages</p>
-        <div class="grid grid-cols-2 gap-3">
-          <a routerLink="/auth/login" class="quick-link">
-            <i class="pi pi-sign-in text-primary-500"></i>
-            <span>Sign In</span>
-          </a>
-          <a routerLink="/auth/signup" class="quick-link">
-            <i class="pi pi-user-plus text-primary-500"></i>
-            <span>Sign Up</span>
-          </a>
-          <!-- <a routerLink="/contact" class="quick-link">
-            <i class="pi pi-phone text-primary-500"></i>
-            <span>Contact Us</span>
-          </a>
-          <a routerLink="/services" class="quick-link">
-            <i class="pi pi-th-large text-primary-500"></i>
-            <span>Services</span>
-          </a> -->
-        </div>
-      </div>
+    <div class="flex flex-wrap justify-center gap-2 mb-10">
+      <p-button routerLink="/auth/login" icon="pi pi-sign-in" label="Sign In">
+      </p-button>
+      <p-button routerLink="/auth/signup" icon="pi pi-user-plus" label="Sign Up">
+      </p-button>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button label="Go to Homepage" icon="pi pi-home" (onClick)="goHome()" severity="warn" size="large" />
-      <p-button label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" [outlined]="true" size="large"
-        styleClass="error-outline-btn" />
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <p-button outlined label="Back to Homepage" icon="pi pi-home" (onClick)="goHome()" />
+      <p-button outlined label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" />
     </div>
 
   </div>

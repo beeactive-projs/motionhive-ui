@@ -24,32 +24,32 @@ import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/them
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidenavLayoutComponent {
-  private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly authService = inject(AuthService);
-  private readonly lgQuery = window.matchMedia('(min-width: 1024px)');
+  private readonly _router = inject(Router);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _authService = inject(AuthService);
+  private readonly _lgQuery = window.matchMedia('(min-width: 1024px)');
 
   readonly menuItems = input.required<ReadonlyArray<MenuItem>>();
   readonly brandName = input('Bee Active');
 
-  private readonly isDesktop = signal(this.lgQuery.matches);
+  private readonly _isDesktop = signal(this._lgQuery.matches);
 
-  sidebarOpen = signal(this.lgQuery.matches);
+  sidebarOpen = signal(this._lgQuery.matches);
   sidebarAnimating = signal(false);
-  readonly showBackdrop = computed(() => this.sidebarOpen() && !this.isDesktop());
+  readonly showBackdrop = computed(() => this.sidebarOpen() && !this._isDesktop());
 
   /** Close sidebar on navigation when in over mode (< lg). */
-  private readonly autoCloseOnNav = this.router.events
+  private readonly _autoCloseOnNav = this._router.events
     .pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      filter(() => !this.lgQuery.matches),
+      filter(() => !this._lgQuery.matches),
       takeUntilDestroyed(),
     )
     .subscribe(() => this.closeSidebar());
 
   constructor() {
     const onResize = (e: MediaQueryListEvent) => {
-      this.isDesktop.set(e.matches);
+      this._isDesktop.set(e.matches);
       if (e.matches) {
         this.sidebarAnimating.set(true);
         this.sidebarOpen.set(true);
@@ -58,8 +58,8 @@ export class SidenavLayoutComponent {
       }
     };
 
-    this.lgQuery.addEventListener('change', onResize);
-    this.destroyRef.onDestroy(() => this.lgQuery.removeEventListener('change', onResize));
+    this._lgQuery.addEventListener('change', onResize);
+    this._destroyRef.onDestroy(() => this._lgQuery.removeEventListener('change', onResize));
   }
 
   toggleSidebar(): void {
@@ -80,9 +80,9 @@ export class SidenavLayoutComponent {
   }
 
   signOut(): void {
-    this.authService.logout().subscribe(() => {
-      this.router.navigate(['/auth/login']);
+    this._authService.logout().subscribe(() => {
+      this._router.navigate(['/auth/login']);
     });
-    this.router.navigate(['/auth/login']);
+    this._router.navigate(['/auth/login']);
   }
 }
