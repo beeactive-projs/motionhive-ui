@@ -1,6 +1,6 @@
-
-﻿export const environment = {
+export const environment = {
   production: true,
+  appUrl: 'https://beeactive-dev.fit',
   apiUrl: 'https://beeactive-api-production.up.railway.app',
   // production: false,
   // apiUrl: 'http://localhost:3800',
