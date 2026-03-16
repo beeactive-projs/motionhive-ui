@@ -32,6 +32,9 @@ export * from './lib/models/blog/blog.model';
 // Models - Feedback
 export * from './lib/models/feedback/feedback.model';
 
+// Models - Waitlist
+export * from './lib/models/waitlist/waitlist.model';
+
 // Models - Social Auth
 export * from './lib/models/auth/social-login.model';
 
@@ -54,6 +57,7 @@ export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
 export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';
+export * from './lib/services/waitlist/waitlist.service';
 export * from './lib/services/error-dialog/error-dialog.service';
 
 // Stores

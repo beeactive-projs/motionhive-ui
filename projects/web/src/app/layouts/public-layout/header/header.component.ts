@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 import { ThemeService } from '../../../_core/services/theme.service';
+import { WaitlistService } from 'core';
 
 @Component({
   selector: 'bee-public-header',
@@ -17,6 +18,7 @@ import { ThemeService } from '../../../_core/services/theme.service';
 })
 export class PublicHeaderComponent {
   private readonly _themeService = inject(ThemeService);
+  private readonly _waitlistService = inject(WaitlistService);
 
   readonly mobileMenuOpen = signal(false);
   readonly isDark = this._themeService.isDark;
@@ -47,6 +49,11 @@ export class PublicHeaderComponent {
   }
 
   closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
+
+  openSubscribe(): void {
+    this._waitlistService.open('header');
     this.mobileMenuOpen.set(false);
   }
 }

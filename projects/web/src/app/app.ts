@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Meta } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { environment } from 'core';
-import { Feedback } from './_shared/components/feedback/feedback';
+import { FeedbackDialog } from './_shared/components/feedback-dialog/feedback-dialog';
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
+import { WaitlistDialog } from './_shared/components/waitlist-dialog/waitlist-dialog';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Feedback, ErrorDialog],
+  imports: [RouterOutlet, FeedbackDialog, ErrorDialog, WaitlistDialog],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

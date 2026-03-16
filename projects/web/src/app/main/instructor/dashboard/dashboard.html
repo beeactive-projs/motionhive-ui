@@ -74,8 +74,9 @@
   <div class="flex flex-col items-center justify-center py-8 text-center">
     <i class="pi pi-inbox text-4xl mb-3"></i>
     <p class="text-surface-900 dark:text-surface-50 m-0">Activity feed coming soon.</p>
-    <p class="text-surface-500 text-sm mt-1 mb-0">
+    <p class="text-surface-500 text-sm mt-1 mb-3">
       Your recent sessions, client updates, and group activity will appear here.
     </p>
+    <p-button label="Notify me" icon="pi pi-bell" iconPos="right" size="small" [outlined]="true" (onClick)="openSubscribe()" />
   </div>
 </p-card>

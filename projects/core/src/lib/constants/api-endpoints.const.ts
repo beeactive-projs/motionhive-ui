@@ -37,4 +37,7 @@ export const API_ENDPOINTS = {
   FEEDBACK: {
     BASE: '/feedback',
   },
+  WAITLIST: {
+    BASE: '/waitlist',
+  },
 } as const;

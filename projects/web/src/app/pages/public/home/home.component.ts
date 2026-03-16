@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { WaitlistService } from 'core';
 
 @Component({
   selector: 'bee-home',
@@ -10,6 +11,11 @@ import { ButtonModule } from 'primeng/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
+  private readonly _waitlistService = inject(WaitlistService);
+
+  openSubscribe(): void {
+    this._waitlistService.open('home');
+  }
   roadmap = [
     {
       icon: 'pi-users',

@@ -13,7 +13,7 @@ import { MessageService } from 'primeng/api';
 import { FeedbackService, FeedbackCategory, AuthStore } from 'core';
 
 @Component({
-  selector: 'bee-feedback',
+  selector: 'bee-feedback-dialog',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
@@ -24,11 +24,11 @@ import { FeedbackService, FeedbackCategory, AuthStore } from 'core';
     ToastModule,
   ],
   providers: [MessageService],
-  templateUrl: './feedback.html',
-  styleUrl: './feedback.scss',
+  templateUrl: './feedback-dialog.html',
+  styleUrl: './feedback-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Feedback {
+export class FeedbackDialog {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _messageService = inject(MessageService);
   private readonly _authStore = inject(AuthStore);
@@ -64,17 +64,19 @@ export class Feedback {
       case 'bug':
         return {
           title: 'e.g. Session attendance not saving correctly',
-          message: 'What were you doing when it happened? What did you expect vs. what actually occurred?',
+          message:
+            'What were you doing when it happened? What did you expect vs. what actually occurred?',
         };
       case 'suggestion':
         return {
           title: 'e.g. Show progress charts per client',
-          message: 'Describe the feature and how it would improve your workflow as a trainer or organizer...',
+          message:
+            'Describe the feature and how it would improve your workflow as a trainer or organizer...',
         };
       default:
         return {
           title: 'e.g. Question about managing group sessions',
-          message: 'What\'s on your mind? We\'re happy to help.',
+          message: "What's on your mind? We're happy to help.",
         };
     }
   });
@@ -100,13 +102,13 @@ export class Feedback {
         next: () => {
           this.isLoading.set(false);
           this.submitted.set(true);
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Feedback sent',
-            detail: 'Thank you for your feedback!',
-            life: 4000,
-          });
-          this.onClose();
+          // this._messageService.add({
+          //   severity: 'success',
+          //   summary: 'Feedback sent',
+          //   detail: 'Thank you for your feedback!',
+          //   life: 4000,
+          // });
+          // this.onClose();
         },
         error: () => {
           this.isLoading.set(false);
