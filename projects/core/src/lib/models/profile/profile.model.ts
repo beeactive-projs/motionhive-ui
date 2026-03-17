@@ -1,5 +1,19 @@
-export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
-export type FitnessLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+export const Genders = {
+  Male: 'MALE',
+  Female: 'FEMALE',
+  Other: 'OTHER',
+  PreferNotToSay: 'PREFER_NOT_TO_SAY',
+} as const;
+
+export type Gender = (typeof Genders)[keyof typeof Genders];
+
+export const FitnessLevels = {
+  Beginner: 'BEGINNER',
+  Intermediate: 'INTERMEDIATE',
+  Advanced: 'ADVANCED',
+} as const;
+
+export type FitnessLevel = (typeof FitnessLevels)[keyof typeof FitnessLevels];
 
 export interface UserProfile {
   id: string;

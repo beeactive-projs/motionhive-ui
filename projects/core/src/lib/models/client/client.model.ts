@@ -1,7 +1,33 @@
-export type InstructorClientStatus = 'PENDING' | 'ACTIVE' | 'ARCHIVED';
-export type InitiatedBy = 'INSTRUCTOR' | 'CLIENT';
-export type ClientRequestType = 'CLIENT_TO_INSTRUCTOR' | 'INSTRUCTOR_TO_CLIENT';
-export type ClientRequestStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED';
+export const InstructorClientStatuses = {
+  Pending: 'PENDING',
+  Active: 'ACTIVE',
+  Archived: 'ARCHIVED',
+} as const;
+
+export type InstructorClientStatus = (typeof InstructorClientStatuses)[keyof typeof InstructorClientStatuses];
+
+export const InitiatedByOptions = {
+  Instructor: 'INSTRUCTOR',
+  Client: 'CLIENT',
+} as const;
+
+export type InitiatedBy = (typeof InitiatedByOptions)[keyof typeof InitiatedByOptions];
+
+export const ClientRequestTypes = {
+  ClientToInstructor: 'CLIENT_TO_INSTRUCTOR',
+  InstructorToClient: 'INSTRUCTOR_TO_CLIENT',
+} as const;
+
+export type ClientRequestType = (typeof ClientRequestTypes)[keyof typeof ClientRequestTypes];
+
+export const ClientRequestStatuses = {
+  Pending: 'PENDING',
+  Accepted: 'ACCEPTED',
+  Declined: 'DECLINED',
+  Cancelled: 'CANCELLED',
+} as const;
+
+export type ClientRequestStatus = (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
 
 export interface ClientUser {
   id: string;

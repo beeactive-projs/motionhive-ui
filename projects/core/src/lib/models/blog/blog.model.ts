@@ -1,3 +1,12 @@
+export const BlogCategories = {
+  Guide: 'Guide',
+  Nutrition: 'Nutrition',
+  Science: 'Science',
+  Wellness: 'Wellness',
+} as const;
+
+export type BlogCategory = (typeof BlogCategories)[keyof typeof BlogCategories];
+
 export interface BlogPost {
   items: BlogPostData[];
   total: number;
@@ -10,7 +19,7 @@ export interface BlogPostData {
   slug: string;
   title: string;
   excerpt: string;
-  category: string;
+  category: BlogCategory;
   coverImage: string;
   content: string;
   authorName: string;
@@ -29,7 +38,7 @@ export interface CreateBlogPostRequest {
   slug: string;
   excerpt: string;
   content: string;
-  category: string;
+  category: BlogCategory;
   coverImage: string;
   authorName: string;
   authorInitials: string;

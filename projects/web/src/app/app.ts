@@ -19,7 +19,7 @@ export class App {
   private readonly _meta = inject(Meta);
 
   constructor() {
-    const imageUrl = `${environment.appUrl}/svg/logo-white.svg`;
+    const imageUrl = `${environment.appUrl}/svg/logo-navy.svg`;
     this._meta.addTags([
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: environment.appUrl },

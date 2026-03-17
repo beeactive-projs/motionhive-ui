@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import type { BlogPostData } from 'core';
-import { BlogService } from 'core';
+import { BlogCategories, BlogService } from 'core';
 import { ButtonModule } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Paginator, PaginatorState } from 'primeng/paginator';
@@ -58,7 +58,7 @@ export class BlogComponent {
   readonly currentPage = signal(1);
   readonly searchQuery = signal('');
   readonly selectedCategory = signal('All');
-  readonly categories = signal<string[]>([]);
+  readonly categoryOptions: string[] = ['All', ...(Object.values(BlogCategories) as string[])];
 
   readonly isFirstPage = computed(() => this.currentPage() === 1);
   readonly hasActiveFilters = computed(
@@ -68,7 +68,6 @@ export class BlogComponent {
     !this.hasActiveFilters() && this.isFirstPage() ? (this.posts()[0] ?? null) : null,
   );
   readonly gridPosts = computed(() => (this.featuredPost() ? this.posts().slice(1) : this.posts()));
-  readonly categoryOptions = computed(() => ['All', ...this.categories()]);
 
   private readonly _search$ = new Subject<string>();
 
@@ -82,7 +81,6 @@ export class BlogComponent {
       });
 
     this._loadPosts();
-    this._loadCategories();
 
     // afterRenderEffect(() => {
     //   const el = this.featuredSection()?.nativeElement;
@@ -141,13 +139,4 @@ export class BlogComponent {
       });
   }
 
-  private _loadCategories(): void {
-    this._blogService
-      .getAllPostData()
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((posts) => {
-        const cats = [...new Set(posts.map((p) => p.category))].sort();
-        this.categories.set(cats);
-      });
-  }
 }
