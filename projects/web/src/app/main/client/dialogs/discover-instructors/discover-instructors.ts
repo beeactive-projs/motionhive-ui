@@ -81,7 +81,7 @@ export class DiscoverInstructors {
           this._messageService.add({
             severity: 'success',
             summary: 'Request Sent',
-            detail: `Your request to join ${instructor.name} was sent successfully`,
+            detail: `Your request to join ${this.instructorName(instructor)} was sent successfully`,
           });
         },
         error: (err) => {
@@ -95,11 +95,16 @@ export class DiscoverInstructors {
       });
   }
 
-  initials(name: string): string {
+  instructorName(instructor: InstructorSearchResult): string {
+    return instructor.displayName || `${instructor.firstName} ${instructor.lastName}`.trim();
+  }
+
+  initials(instructor: InstructorSearchResult): string {
+    const name = this.instructorName(instructor);
     return name
       .split(' ')
       .slice(0, 2)
-      .map((w) => w.charAt(0))
+      .map((w) => w.charAt(0).toUpperCase())
       .join('');
   }
 
