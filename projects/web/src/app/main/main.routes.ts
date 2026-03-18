@@ -12,7 +12,7 @@ export const appRoutes: Routes = [
   },
   {
     path: '',
-    loadChildren: () => import('./instructor/organizer.routes').then((m) => m.organizerRoutes),
+    loadChildren: () => import('./instructor/instructor.routes').then((m) => m.instructorRoutes),
   },
   {
     path: '',

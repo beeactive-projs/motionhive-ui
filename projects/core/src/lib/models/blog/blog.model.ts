@@ -1,3 +1,5 @@
+import { PaginatedResponse } from '../common/pagination.model';
+
 export const BlogCategories = {
   Guide: 'Guide',
   Nutrition: 'Nutrition',
@@ -7,12 +9,7 @@ export const BlogCategories = {
 
 export type BlogCategory = (typeof BlogCategories)[keyof typeof BlogCategories];
 
-export interface BlogPost {
-  items: BlogPostData[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+export type BlogPost = PaginatedResponse<BlogPostData>;
 
 export interface BlogPostData {
   id: string;

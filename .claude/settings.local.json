@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:beeactive-api-production.up.railway.app)",
       "Bash(ls -la /Users/ionutbutnaru/Documents/mystuff/beeactive-ui/*.*)",
-      "Bash(npx ng build web)"
+      "Bash(npx ng build web)",
+      "Bash(npx ng:*)"
     ]
   }
 }

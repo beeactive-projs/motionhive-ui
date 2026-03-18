@@ -1,10 +1,13 @@
+import { PaginatedResponse } from '../common/pagination.model';
+
 export const InstructorClientStatuses = {
   Pending: 'PENDING',
   Active: 'ACTIVE',
   Archived: 'ARCHIVED',
 } as const;
 
-export type InstructorClientStatus = (typeof InstructorClientStatuses)[keyof typeof InstructorClientStatuses];
+export type InstructorClientStatus =
+  (typeof InstructorClientStatuses)[keyof typeof InstructorClientStatuses];
 
 export const InitiatedByOptions = {
   Instructor: 'INSTRUCTOR',
@@ -27,7 +30,8 @@ export const ClientRequestStatuses = {
   Cancelled: 'CANCELLED',
 } as const;
 
-export type ClientRequestStatus = (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
+export type ClientRequestStatus =
+  (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
 
 export interface ClientUser {
   id: string;
@@ -98,9 +102,4 @@ export interface ClientListParams {
   limit?: number;
 }
 
-export interface ClientListResponse {
-  items: InstructorClient[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+export type ClientListResponse = PaginatedResponse<InstructorClient>;

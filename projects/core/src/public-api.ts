@@ -18,6 +18,7 @@ export * from './lib/models/profile/profile.model';
 
 // Models - Client
 export * from './lib/models/client/client.model';
+export * from './lib/models/client/instructor.model';
 
 // Models - Group
 export * from './lib/models/group/group.model';
@@ -37,10 +38,6 @@ export * from './lib/models/waitlist/waitlist.model';
 
 // Models - Social Auth
 export * from './lib/models/auth/social-login.model';
-
-// Enums
-export * from './lib/enums/user-role.enum';
-export * from './lib/enums/session-status.enum';
 
 // Constants
 export * from './lib/constants/api-endpoints.const';

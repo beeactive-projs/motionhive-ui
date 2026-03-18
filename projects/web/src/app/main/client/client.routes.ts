@@ -11,6 +11,16 @@ export const clientRoutes: Routes = [
         title: 'Dashboard - BeeActive',
       },
       {
+        path: 'instructors',
+        loadComponent: () => import('./instructors/instructors').then((m) => m.Instructors),
+        title: 'My Instructors - BeeActive',
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('../profile/profile').then((m) => m.Profile),
+        title: 'My Profile - BeeActive',
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

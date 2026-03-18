@@ -1,0 +1,9 @@
+<bee-sidenav-layout [menuItems]="menuItems">
+  <div toolbarEnd>
+    <p-button label="Become an Instructor" icon="pi pi-graduation-cap" size="small"
+      (onClick)="becomeInstructorDialogVisible.set(true)" />
+  </div>
+  <router-outlet />
+</bee-sidenav-layout>
+
+<bee-become-instructor [(visible)]="becomeInstructorDialogVisible" />

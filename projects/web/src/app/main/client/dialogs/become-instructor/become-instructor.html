@@ -1,0 +1,205 @@
+<p-dialog [(visible)]="visible" header="Become an Instructor" [modal]="true" [draggable]="false" [resizable]="false"
+  styleClass="become-instructor-dialog" [contentStyle]="{ 'overflow-y': 'auto', 'height': '65vh' }">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    @if (errorMessage()) {
+    <p-message severity="error" class="mb-4 block">{{ errorMessage() }}</p-message>
+    }
+
+    <p-stepper [value]="activeStep()" (valueChange)="$event !== undefined && activeStep.set($event)" [linear]="false">
+      <p-step-list>
+        <p-step [value]="1">About You</p-step>
+        <p-step [value]="2">Location & Certifications</p-step>
+        <p-step [value]="3">Social</p-step>
+      </p-step-list>
+
+      <p-step-panels>
+
+        <!-- Step 1: About You -->
+        <p-step-panel [value]="1">
+          <ng-template #content>
+            <div class="flex flex-col gap-4 pt-4">
+
+              <div class="flex flex-col gap-2">
+                <label for="displayName" class="text-sm font-medium text-secondary-700">Display Name</label>
+                <input pInputText id="displayName" formControlName="displayName" placeholder="Name shown to clients"
+                  fluid />
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label for="bio" class="text-sm font-medium text-secondary-700">Bio</label>
+                <textarea pTextarea id="bio" formControlName="bio" rows="4"
+                  placeholder="Tell clients about yourself, your experience, and training style..."
+                  class="w-full"></textarea>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-2">
+                  <label class="text-sm font-medium text-secondary-700">Specializations</label>
+                  <p-autocomplete formControlName="specializations" [multiple]="true"
+                    [suggestions]="specializationSuggestions()" (completeMethod)="filterSpecializations($event)"
+                    placeholder="e.g. Yoga, HIIT, Pilates" fluid />
+                  <span class="text-xs text-secondary-400">Press Enter to add each one</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label for="yearsOfExperience" class="text-sm font-medium text-secondary-700">Years of
+                    Experience</label>
+                  <p-inputnumber inputId="yearsOfExperience" formControlName="yearsOfExperience" [min]="0" [max]="50"
+                    placeholder="e.g. 5" fluid />
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 rounded-lg p-4">
+                <p-toggleswitch formControlName="isAcceptingClients" inputId="isAcceptingClients" />
+                <div>
+                  <span class="text-sm font-medium text-secondary-900">Accepting New Clients</span>
+                  <p class="text-xs text-secondary-500">Allow clients to send you requests</p>
+                </div>
+              </div>
+
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- Step 2: Location & Certifications -->
+        <p-step-panel [value]="2">
+          <ng-template #content>
+            <div class="flex flex-col gap-5 pt-4">
+
+              <div class="flex flex-col gap-3">
+                <span class="text-sm font-semibold text-secondary-700">Location</span>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="flex flex-col gap-2">
+                    <label for="locationCity" class="text-sm font-medium text-secondary-700">City</label>
+                    <input pInputText id="locationCity" formControlName="locationCity" placeholder="e.g. New York"
+                      fluid />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label for="locationCountry" class="text-sm font-medium text-secondary-700">Country</label>
+                    <input pInputText id="locationCountry" formControlName="locationCountry"
+                      placeholder="e.g. United States" fluid />
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-semibold text-secondary-700">Certifications</span>
+                  <p-button label="Add" icon="pi pi-plus" size="small" outlined (onClick)="addCertification()" />
+                </div>
+
+                <div formArrayName="certifications" class="flex flex-col gap-3">
+                  @for (cert of certifications.controls; track $index) {
+                  <div [formGroupName]="$index" class="cert-item">
+                    <div class="grid grid-cols-[1fr_1fr_6rem] gap-3 flex-1">
+                      <div class="flex flex-col gap-2">
+                        <label class="text-sm font-medium text-secondary-700">Name</label>
+                        <input pInputText formControlName="name" placeholder="e.g. ACE CPT" fluid />
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-sm font-medium text-secondary-700">Issuer</label>
+                        <input pInputText formControlName="issuer" placeholder="e.g. ACE" fluid />
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-sm font-medium text-secondary-700">Year</label>
+                        <p-inputnumber formControlName="year" [min]="1900" [max]="currentYear" [useGrouping]="false"
+                          placeholder="2020" fluid />
+                      </div>
+                    </div>
+                    <p-button icon="pi pi-trash" severity="danger" text size="small"
+                      (onClick)="removeCertification($index)" ariaLabel="Remove" />
+                  </div>
+                  }
+                  @if (certifications.length === 0) {
+                  <p class="text-xs text-secondary-400 text-center py-2">No certifications added yet</p>
+                  }
+                </div>
+              </div>
+
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- Step 3: Visibility & Social -->
+        <p-step-panel [value]="3">
+          <ng-template #content>
+            <div class="flex flex-col gap-5 pt-4">
+
+              <div class="flex flex-col gap-3">
+                <span class="text-sm font-semibold text-secondary-700">Profile Visibility</span>
+                <div class="flex gap-2">
+                  <p-button class="flex-1" icon="pi pi-globe" label="Public" size="small" fluid
+                    [outlined]="form.controls.profileVisibility.value !== 'public'"
+                    [severity]="form.controls.profileVisibility.value === 'public' ? 'primary' : 'secondary'"
+                    (onClick)="form.controls.profileVisibility.setValue('public')" />
+                  <p-button class="flex-1" icon="pi pi-lock" label="Private" size="small" fluid
+                    [outlined]="form.controls.profileVisibility.value !== 'private'"
+                    [severity]="form.controls.profileVisibility.value === 'private' ? 'primary' : 'secondary'"
+                    (onClick)="form.controls.profileVisibility.setValue('private')" />
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <span class="text-sm font-semibold text-secondary-700">Show on Profile</span>
+                <div class="flex gap-6">
+                  <div class="flex items-center gap-2">
+                    <p-checkbox inputId="showEmail" formControlName="showEmail" [binary]="true" />
+                    <label for="showEmail" class="text-sm cursor-pointer">Email</label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <p-checkbox inputId="showPhone" formControlName="showPhone" [binary]="true" />
+                    <label for="showPhone" class="text-sm cursor-pointer">Phone</label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <p-checkbox inputId="showSocialLinks" formControlName="showSocialLinks" [binary]="true" />
+                    <label for="showSocialLinks" class="text-sm cursor-pointer">Social links</label>
+                  </div>
+                </div>
+              </div>
+
+              <div formGroupName="socialLinks" class="flex flex-col gap-3">
+                <span class="text-sm font-semibold text-secondary-700">Social Links</span>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="flex flex-col gap-2">
+                    <label for="instagram" class="text-sm font-medium text-secondary-700">Instagram</label>
+                    <input pInputText id="instagram" formControlName="instagram" placeholder="@username" fluid />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label for="facebook" class="text-sm font-medium text-secondary-700">Facebook</label>
+                    <input pInputText id="facebook" formControlName="facebook" placeholder="profile name" fluid />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label for="youtube" class="text-sm font-medium text-secondary-700">YouTube</label>
+                    <input pInputText id="youtube" formControlName="youtube" placeholder="channel name" fluid />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label for="linkedin" class="text-sm font-medium text-secondary-700">LinkedIn</label>
+                    <input pInputText id="linkedin" formControlName="linkedin" placeholder="profile name" fluid />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+      </p-step-panels>
+    </p-stepper>
+
+  </form>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" outlined (onClick)="cancel()" />
+    @if (activeStep() > 1) {
+    <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" outlined
+      (onClick)="activeStep.set(activeStep() - 1)" />
+    }
+    @if (activeStep()
+    < 3) { <p-button label="Next" icon="pi pi-arrow-right" iconPos="right"
+      (onClick)="activeStep.set(activeStep() + 1)" />
+    }
+    @if (activeStep() === 3) {
+    <p-button label="Become an Instructor" icon="pi pi-graduation-cap" [loading]="isLoading()" (onClick)="submit()" />
+    }
+  </ng-template>
+</p-dialog>

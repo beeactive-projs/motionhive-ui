@@ -115,6 +115,16 @@ export interface UpdateFullProfilePayload {
 
 export interface CreateInstructorProfilePayload {
   displayName: string;
+  isPublic?: boolean;
   bio?: string;
   specializations?: string[];
+  certifications?: InstructorCertification[];
+  yearsOfExperience?: number;
+  isAcceptingClients?: boolean;
+  socialLinks?: Record<string, string>;
+  showSocialLinks?: boolean;
+  showEmail?: boolean;
+  showPhone?: boolean;
+  locationCity?: string;
+  locationCountry?: string;
 }

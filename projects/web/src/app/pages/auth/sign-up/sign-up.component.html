@@ -23,7 +23,7 @@
     <div class="brand-stats"></div>
 
   </div>
-  <div class="form-panel w-1/2">
+  <div class="form-panel w-1/2 overflow-y-auto">
     <div class="hex-decoration"></div>
     <bee-theme-toggle class="theme-toggle-btn"></bee-theme-toggle>
     <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" aria-label="BeeActive home">
@@ -32,7 +32,7 @@
     </a>
 
     <div class="header w-full">
-      <div class="mb-8 animate-slide-down">
+      <div class="mb-4 animate-slide-down">
         <h1 class="font-heading text-3xl font-bold mb-2">
           Create your account
         </h1>
@@ -65,10 +65,10 @@
       </div>
       }
 
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-3">
         <!-- Name Fields -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="flex flex-col gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
             <label for="firstName" class="text-xs font-semibold text-secondary-500">
               First name
             </label>
@@ -83,7 +83,7 @@
             }
           </div>
 
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-1">
             <label for="lastName" class="text-xs font-semibold text-secondary-500">
               Last name
             </label>
@@ -100,7 +100,7 @@
         </div>
 
         <!-- Email Field -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
           <label for="email" class="text-xs font-semibold text-secondary-500">
             Email address
           </label>
@@ -116,7 +116,7 @@
         </div>
 
         <!-- Phone Field -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
           <label for="phone" class="text-xs font-semibold text-secondary-500">
             Phone number
             <span class="text-secondary-400 font-normal ml-1">(Optional)</span>
@@ -133,7 +133,7 @@
         </div>
 
         <!-- Password Field -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
           <label for="password" class="text-xs font-semibold text-secondary-500">
             Password
           </label>
@@ -146,6 +146,15 @@
             {{ getFieldError('password') }}
           </p-message>
           }
+        </div>
+
+        <!-- Instructor Role -->
+        <div class="flex items-center gap-3">
+          <p-checkbox inputId="isInstructor" formControlName="isInstructor" [binary]="true" />
+          <div class="flex flex-col gap-0.5">
+            <label for="isInstructor" class="text-sm font-medium cursor-pointer">Register as Instructor</label>
+            <span class="text-xs text-secondary-400">Instructors can create and manage sessions and clients</span>
+          </div>
         </div>
 
         <!-- Submit Button -->
@@ -165,7 +174,7 @@
           <p-button type="button" class="flex-1" styleClass="social-btn" label="Facebook" icon="pi pi-facebook" fluid
             size="large" (onClick)="onFacebookLogin()"></p-button>
         </div>
-        <div class="flex flex-col gap-3 text-center">
+        <div class="flex flex-col gap-2 text-center">
           <p class="text-xs text-secondary-400 leading-relaxed">
             By signing up, you agree to our
             <a routerLink="/legal/terms-of-service"

@@ -173,9 +173,9 @@ export class LoginComponent {
       return;
     }
 
-    if (this._authStore.isOrganizer()) {
+    if (this._authStore.isInstructor()) {
       this._router.navigate(['/app/dashboard']);
-    } else if (this._authStore.isParticipant()) {
+    } else if (this._authStore.isUser()) {
       this._router.navigate(['/app/client/dashboard/']);
     } else {
       this._router.navigate(['/app/dashboard']);

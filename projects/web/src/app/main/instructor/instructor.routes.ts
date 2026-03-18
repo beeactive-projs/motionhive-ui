@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 
-export const organizerRoutes: Routes = [
+export const instructorRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./organizer').then((m) => m.Organizer),
+    loadComponent: () => import('./instructor').then((m) => m.Instructor),
     children: [
       {
         path: 'dashboard',
@@ -22,7 +22,8 @@ export const organizerRoutes: Routes = [
       },
       {
         path: 'groups/:id',
-        loadComponent: () => import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
+        loadComponent: () =>
+          import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
         title: 'Group Details - BeeActive',
       },
       {

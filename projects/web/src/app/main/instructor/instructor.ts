@@ -6,15 +6,20 @@ import { SidenavLayoutComponent } from '../../layouts/sidenav-layout/sidenav-lay
 @Component({
   selector: 'bee-organizer',
   imports: [RouterOutlet, SidenavLayoutComponent],
-  templateUrl: './organizer.html',
-  styleUrl: './organizer.scss',
+  templateUrl: './instructor.html',
+  styleUrl: './instructor.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Organizer {
+export class Instructor {
   readonly menuItems: ReadonlyArray<MenuItem> = [
     { label: 'Dashboard', icon: 'pi pi-objects-column', routerLink: '/app/dashboard' },
     { label: 'Clients', icon: 'pi pi-users', routerLink: '/app/clients' },
     { label: 'Groups', icon: 'pi pi-sitemap', routerLink: '/app/groups' },
-    // { label: 'Profile', icon: 'pi pi-user', routerLink: '/app/profile' },
+    { label: 'Profile', icon: 'pi pi-user', routerLink: '/app/profile' },
+    // {
+    //   label: 'Dashboard client',
+    //   icon: 'pi pi-objects-column',
+    //   routerLink: '/app/client/dashboard',
+    // },
   ];
 }

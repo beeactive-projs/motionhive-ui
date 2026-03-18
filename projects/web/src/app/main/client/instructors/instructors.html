@@ -1,0 +1,128 @@
+<div class="h-full flex flex-col gap-4">
+  <!-- Header -->
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-1">
+      <h1 class="font-heading font-semibold text-xl md:text-2xl">My Instructors</h1>
+      <p class="text-sm text-surface-700 dark:text-surface-400">Manage your instructor relationships and requests.</p>
+    </div>
+    <div class="flex flex-wrap">
+      <p-button label="Discover Instructors" icon="pi pi-search" rounded (onClick)="discoverVisible.set(true)" />
+    </div>
+  </header>
+
+  <!-- Pending Outgoing Requests Banner -->
+  @if (pendingCount() > 0) {
+    <p-card class="shadow-sm border-l-4 border-l-yellow-400">
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-clock text-yellow-600"></i>
+          <h3 class="text-base font-semibold text-secondary-900">
+            Pending Requests ({{ pendingCount() }})
+          </h3>
+        </div>
+        <div class="space-y-3">
+          @for (request of pendingRequests(); track trackById($index, request)) {
+            <div class="flex items-center justify-between rounded-lg bg-surface-50 p-3">
+              <div class="flex items-center gap-3">
+                <p-avatar
+                  [label]="request.toUser ? request.toUser.firstName.charAt(0) + request.toUser.lastName.charAt(0) : '??'"
+                  shape="circle"
+                  class="bg-yellow-100 text-yellow-700"
+                />
+                <div>
+                  <span class="font-medium text-secondary-900">{{ requestToName(request) }}</span>
+                  <span class="text-sm text-secondary-500"> — request pending</span>
+                  @if (request.message) {
+                    <p class="mt-1 text-xs text-secondary-500 italic">"{{ request.message }}"</p>
+                  }
+                </div>
+              </div>
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [rounded]="true"
+                [text]="true"
+                pTooltip="Cancel Request"
+                (onClick)="confirmCancel(request)"
+              />
+            </div>
+          }
+        </div>
+      </div>
+    </p-card>
+  }
+
+  <!-- Instructors Table -->
+  <div class="flex-1" style="background-color: var(--p-datatable-row-background);">
+    <p-table
+      [value]="instructors()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="onPageChange($event)"
+      [scrollable]="true"
+      scrollHeight="flex"
+      dataKey="email"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-instructor>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-avatar [label]="initials(instructor)" shape="circle" class="bg-primary-100 text-primary-700" />
+              <span class="font-medium text-secondary-900">{{ instructor.name }}</span>
+            </div>
+          </td>
+          <td>{{ instructor.email }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template #loadingbody>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-skeleton shape="circle" size="2rem" />
+              <p-skeleton width="8rem" />
+            </div>
+          </td>
+          <td><p-skeleton width="12rem" /></td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="2">
+            <div class="flex flex-col items-center gap-3 py-12 text-center">
+              <i class="pi pi-users text-4xl text-secondary-300"></i>
+              <h2 class="text-lg font-semibold text-secondary-700">No instructors yet</h2>
+              <p class="text-sm text-secondary-500">
+                Find and connect with an instructor to get started.
+              </p>
+              <p-button
+                label="Discover Instructors"
+                icon="pi pi-search"
+                severity="primary"
+                styleClass="!rounded-full mt-2"
+                (onClick)="discoverVisible.set(true)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<bee-discover-instructors [(visible)]="discoverVisible" />
+
+<p-toast />
+<p-confirmDialog />

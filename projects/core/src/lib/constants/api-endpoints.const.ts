@@ -15,6 +15,8 @@ export const API_ENDPOINTS = {
   },
   PROFILE: {
     BASE: '/profile',
+    INSTRUCTORS: '/profile/instructors',
+    DISCOVER_INSTRUCTORS: '/profile/instructors/discover',
   },
   CLIENTS: {
     BASE: '/clients',

@@ -9,7 +9,7 @@ export const organizerGuard: CanActivateFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  if (authStore.isOrganizer()) {
+  if (authStore.isInstructor()) {
     return true;
   }
 
@@ -26,7 +26,7 @@ export const participantGuard: CanActivateFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  if (authStore.isParticipant()) {
+  if (authStore.isUser()) {
     return true;
   }
 

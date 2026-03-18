@@ -9,6 +9,7 @@ import {
   CreateClientInvitation,
   UpdateClientPayload,
 } from '../../models/client/client.model';
+import { InstructorListResponse } from '../../models/client/instructor.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
@@ -28,9 +29,11 @@ export class ClientService {
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }
 
-  getMyInstructors(): Observable<InstructorClient[]> {
-    return this._http.get<InstructorClient[]>(
+  getMyInstructors(page = 1, limit = 10): Observable<InstructorListResponse> {
+    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+    return this._http.get<InstructorListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.MY_INSTRUCTORS}`,
+      { params },
     );
   }
 
@@ -40,14 +43,19 @@ export class ClientService {
     );
   }
 
-  sendInvitation(dto: CreateClientInvitation): Observable<{ message: string; request: ClientRequest }> {
+  sendInvitation(
+    dto: CreateClientInvitation,
+  ): Observable<{ message: string; request: ClientRequest }> {
     return this._http.post<{ message: string; request: ClientRequest }>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE}`,
       dto,
     );
   }
 
-  requestToBeClient(instructorId: string, message?: string): Observable<{ message: string; request: ClientRequest }> {
+  requestToBeClient(
+    instructorId: string,
+    message?: string,
+  ): Observable<{ message: string; request: ClientRequest }> {
     return this._http.post<{ message: string; request: ClientRequest }>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.REQUEST}/${instructorId}`,
       { message },

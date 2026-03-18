@@ -1,0 +1,114 @@
+<p-dialog
+  header="Discover Instructors"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [style]="{ width: '36rem' }"
+  [closable]="true"
+  (onHide)="onHide()"
+>
+  <!-- Search bar -->
+  <div class="flex gap-2 mb-4">
+    <input
+      pInputText
+      type="text"
+      class="flex-1"
+      placeholder="Search by name, specialization, or city..."
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)"
+      (keyup.enter)="search()"
+    />
+    <p-button icon="pi pi-search" [loading]="searching()" (onClick)="search()" />
+  </div>
+
+  <!-- Results -->
+  @if (searching()) {
+    <div class="flex flex-col gap-3">
+      @for (_ of [1, 2, 3]; track $index) {
+        <div class="flex items-center gap-3 p-3 rounded-lg border border-surface-200">
+          <p-skeleton shape="circle" size="2.5rem" />
+          <div class="flex-1 flex flex-col gap-1">
+            <p-skeleton width="8rem" height="1rem" />
+            <p-skeleton width="12rem" height="0.75rem" />
+          </div>
+          <p-skeleton width="5rem" height="2rem" borderRadius="2rem" />
+        </div>
+      }
+    </div>
+  } @else if (searched() && results().length === 0) {
+    <div class="flex flex-col items-center gap-2 py-8 text-center">
+      <i class="pi pi-search text-3xl text-secondary-300"></i>
+      <p class="text-sm text-secondary-500">No instructors found. Try a different search.</p>
+    </div>
+  } @else if (results().length > 0) {
+    <div class="flex flex-col gap-2">
+      @for (instructor of results(); track instructor.id) {
+        <div class="flex items-center gap-3 p-3 rounded-lg border border-surface-200 hover:bg-surface-50 transition-colors">
+          <p-avatar [label]="initials(instructor)" shape="circle" class="bg-primary-100 text-primary-700 shrink-0" />
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-secondary-900 truncate">{{ instructorName(instructor) }}</p>
+            @if (instructor.specializations?.length) {
+              <p class="text-xs text-secondary-500 truncate">{{ instructor.specializations!.join(', ') }}</p>
+            }
+            @if (instructor.city) {
+              <p class="text-xs text-secondary-400 truncate">{{ instructor.city }}</p>
+            }
+          </div>
+          <p-button
+            label="Request"
+            icon="pi pi-send"
+            size="small"
+            [rounded]="true"
+            [loading]="requestingId() === instructor.id"
+            (onClick)="openRequestDialog(instructor)"
+          />
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col items-center gap-2 py-8 text-center">
+      <i class="pi pi-users text-3xl text-secondary-300"></i>
+      <p class="text-sm text-secondary-500">Search for instructors to get started.</p>
+    </div>
+  }
+</p-dialog>
+
+<!-- Request message dialog -->
+<p-dialog
+  header="Send Request"
+  [visible]="showRequestDialog()"
+  (visibleChange)="showRequestDialog.set($event)"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  [closable]="true"
+>
+  @if (selectedInstructor(); as instructor) {
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center gap-3 rounded-lg bg-surface-50 p-3">
+        <p-avatar [label]="initials(instructor)" shape="circle" class="bg-primary-100 text-primary-700" />
+        <span class="font-medium text-secondary-900">{{ instructorName(instructor) }}</span>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-secondary-700">Message (optional)</label>
+        <textarea
+          pTextarea
+          [rows]="3"
+          placeholder="Introduce yourself or explain why you'd like to train with this instructor..."
+          [ngModel]="requestMessage()"
+          (ngModelChange)="requestMessage.set($event)"
+        ></textarea>
+      </div>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="showRequestDialog.set(false)" />
+    <p-button
+      label="Send Request"
+      icon="pi pi-send"
+      [loading]="requestingId() !== null"
+      (onClick)="sendRequest()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-toast />

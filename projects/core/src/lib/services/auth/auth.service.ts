@@ -12,6 +12,7 @@ import {
   PasswordResetResponse,
 } from '../../models/auth/password-reset.model';
 import { User } from '../../models/user/user.model';
+import { UserRole } from '../../models/user/role.model';
 import { TokenService } from './token.service';
 import { AuthStore } from '../../stores/auth.store';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
@@ -142,7 +143,7 @@ export class AuthService implements OnDestroy {
     return this.isAuthenticatedSubject.value;
   }
 
-  hasRole(role: string): boolean {
+  hasRole(role: UserRole): boolean {
     const roles = this._tokenService.getRoles();
     return roles.includes(role);
   }

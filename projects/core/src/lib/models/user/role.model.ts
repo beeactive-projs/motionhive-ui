@@ -11,14 +11,15 @@ export interface Role {
   updatedAt: Date;
 }
 
-/**
- * System Roles Enum
- */
-export enum SystemRole {
-  SUPER_ADMIN = 'SUPER_ADMIN',
-  ORGANIZER = 'ORGANIZER',
-  PARTICIPANT = 'PARTICIPANT',
-}
+export const UserRoles = {
+  SuperAdmin: 'SUPER_ADMIN',
+  Admin: 'ADMIN',
+  Support: 'SUPPORT',
+  Instructor: 'INSTRUCTOR',
+  User: 'USER',
+} as const;
+
+export type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
 
 /**
  * User Role Assignment

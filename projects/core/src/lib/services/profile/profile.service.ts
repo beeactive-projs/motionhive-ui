@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   FullProfileResponse,
@@ -10,6 +10,7 @@ import {
   UpdateInstructorProfilePayload,
   CreateInstructorProfilePayload,
 } from '../../models/profile/profile.model';
+import { InstructorSearchResult } from '../../models/client/instructor.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
@@ -46,5 +47,13 @@ export class ProfileService {
 
   updateInstructorProfile(payload: UpdateInstructorProfilePayload): Observable<InstructorProfile> {
     return this._http.patch<InstructorProfile>(`${this.baseUrl}/instructor`, payload);
+  }
+
+  discoverInstructors(query?: string): Observable<InstructorSearchResult[]> {
+    const params = query ? new HttpParams().set('search', query) : undefined;
+    return this._http.get<InstructorSearchResult[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.DISCOVER_INSTRUCTORS}`,
+      { params },
+    );
   }
 }

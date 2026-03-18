@@ -65,31 +65,25 @@ export class SignUpComponent {
   successMessage = signal<string | null>(null);
 
   // Reactive form
-  registerForm: FormGroup = this._formBuilder.group(
-    {
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.pattern(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/)]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      // confirmPassword: ['', [Validators.required]],
-      // agreeToTerms: [false, [Validators.requiredTrue]],
-    },
-    {
-      validators: this.passwordMatchValidator,
-    },
-  );
+  registerForm: FormGroup = this._formBuilder.group({
+    firstName: ['', [Validators.required, Validators.minLength(2)]],
+    lastName: ['', [Validators.required, Validators.minLength(2)]],
+    email: ['', [Validators.required, Validators.email]],
+    phone: ['', [Validators.pattern(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/)]],
+    password: ['', [Validators.required, this.strongPasswordValidator]],
+    isInstructor: [false],
+  });
 
-  // Custom validator for password match
-  private passwordMatchValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    const password = control.get('password');
-    const confirmPassword = control.get('confirmPassword');
-
-    if (!password || !confirmPassword) {
-      return null;
-    }
-
-    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
+  private strongPasswordValidator(control: AbstractControl): { [key: string]: boolean } | null {
+    const value: string = control.value ?? '';
+    if (!value) return null;
+    const valid =
+      value.length >= 8 &&
+      /[A-Z]/.test(value) &&
+      /[a-z]/.test(value) &&
+      /[0-9]/.test(value) &&
+      /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?`~]/.test(value);
+    return valid ? null : { passwordStrength: true };
   }
 
   private readonly googleBtnContainer = viewChild<ElementRef>('googleBtn');
@@ -117,13 +111,15 @@ export class SignUpComponent {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
+    const { firstName, lastName, email, phone, password, isInstructor } = this.registerForm.value;
     const data: RegisterRequest = {
-      firstName: this.registerForm.value.firstName,
-      lastName: this.registerForm.value.lastName,
-      email: this.registerForm.value.email,
-      phone: this.registerForm.value.phone || undefined,
-      password: this.registerForm.value.password,
-      confirmPassword: this.registerForm.value.confirmPassword,
+      firstName,
+      lastName,
+      email,
+      phone: phone || undefined,
+      password,
+      confirmPassword: password,
+      isInstructor: isInstructor || undefined,
     };
 
     this._authService.register(data).subscribe({
@@ -202,6 +198,9 @@ export class SignUpComponent {
       const minLength = field.errors['minlength'].requiredLength;
       return `${this.capitalize(fieldName)} must be at least ${minLength} characters`;
     }
+    if (field.errors['passwordStrength']) {
+      return 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
+    }
     if (field.errors['pattern'] && fieldName === 'phone') {
       return 'Please enter a valid phone number';
     }
@@ -216,9 +215,9 @@ export class SignUpComponent {
       return;
     }
 
-    if (this._authStore.isOrganizer()) {
+    if (this._authStore.isInstructor()) {
       this._router.navigate(['/app/dashboard']);
-    } else if (this._authStore.isParticipant()) {
+    } else if (this._authStore.isUser()) {
       this._router.navigate(['/app/client/dashboard/']);
     } else {
       this._router.navigate(['/app/dashboard']);

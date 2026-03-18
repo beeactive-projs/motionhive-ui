@@ -1,3 +1,5 @@
+import { PaginatedResponse } from '../common/pagination.model';
+
 export const JoinPolicies = {
   Open: 'OPEN',
   Approval: 'APPROVAL',
@@ -84,16 +86,6 @@ export interface UpdateGroupPayload {
   country?: string;
 }
 
-export interface GroupListResponse {
-  items: Group[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+export type GroupListResponse = PaginatedResponse<Group>;
 
-export interface GroupMemberListResponse {
-  items: GroupMember[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+export type GroupMemberListResponse = PaginatedResponse<GroupMember>;

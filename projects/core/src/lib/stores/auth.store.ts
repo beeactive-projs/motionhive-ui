@@ -1,6 +1,7 @@
 // projects/core/src/lib/stores/auth.store.ts
 import { computed, Injectable, signal } from '@angular/core';
 import { User } from '../models/user/user.model';
+import { UserRole, UserRoles } from '../models/user/role.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,9 +18,11 @@ export class AuthStore {
   // Computed values (automatically update)
   readonly isAuthenticated = computed(() => this.user() !== null);
   readonly userRoles = computed(() => this.user()?.roles ?? []);
-  readonly isOrganizer = computed(() => this.userRoles().includes('ORGANIZER'));
-  readonly isParticipant = computed(() => this.userRoles().includes('PARTICIPANT'));
-  readonly isSuperAdmin = computed(() => this.userRoles().includes('SUPER_ADMIN'));
+  readonly isSuperAdmin = computed(() => this.userRoles().includes(UserRoles.SuperAdmin));
+  readonly isAdmin = computed(() => this.userRoles().includes(UserRoles.Admin));
+  readonly isSupport = computed(() => this.userRoles().includes(UserRoles.Support));
+  readonly isInstructor = computed(() => this.userRoles().includes(UserRoles.Instructor));
+  readonly isUser = computed(() => this.userRoles().includes(UserRoles.User));
   readonly userName = computed(() => {
     const user = this.user();
     return user ? `${user.firstName} ${user.lastName}` : '';
@@ -38,7 +41,7 @@ export class AuthStore {
     this.loadingSignal.set(loading);
   }
 
-  hasRole(role: string): boolean {
+  hasRole(role: UserRole): boolean {
     return this.userRoles().includes(role);
   }
 

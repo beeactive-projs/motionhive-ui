@@ -1,4 +1,6 @@
-﻿/**
+﻿import type { UserRole } from './role.model';
+
+/**
  * User Model
  */
 export interface User {
@@ -10,8 +12,8 @@ export interface User {
   avatarUrl?: string;
   isActive: boolean;
   isEmailVerified: boolean;
-  roles: string[]; // Array of role names: ["ORGANIZER", "PARTICIPANT"]
-  permissions: string[]; // Array of permission names: ["clients.create", "sessions.read"]
+  roles: UserRole[];
+  permissions: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -25,7 +27,7 @@ export interface CreateUserDto {
   firstName: string;
   lastName: string;
   phone?: string;
-  roles: string[];
+  roles: UserRole[];
 }
 
 /**
