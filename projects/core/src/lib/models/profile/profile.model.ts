@@ -23,8 +23,8 @@ export interface UserProfile {
   heightCm: number | null;
   weightKg: number | null;
   fitnessLevel: FitnessLevel | null;
-  goals: string[];
-  medicalConditions: string[];
+  goals: string[] | null;
+  medicalConditions: string[] | null;
   emergencyContactName: string | null;
   emergencyContactPhone: string | null;
   notes: string | null;
@@ -43,8 +43,8 @@ export interface InstructorProfile {
   userId: string;
   displayName: string | null;
   bio: string | null;
-  specializations: string[];
-  certifications: InstructorCertification[];
+  specializations: string[] | null;
+  certifications: InstructorCertification[] | null;
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
   socialLinks: Record<string, string>;
