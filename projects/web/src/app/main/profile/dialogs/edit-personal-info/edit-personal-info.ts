@@ -19,9 +19,10 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import {
   ProfileService,
-  FullProfileResponse,
-  UpdateFullProfilePayload,
+  MyProfile,
+  UpdateMyProfilePayload,
   Gender,
+  Genders,
   TIMEZONE_OPTIONS,
 } from 'core';
 
@@ -57,7 +58,7 @@ export class EditPersonalInfo {
   private readonly _messageService = inject(MessageService);
 
   readonly visible = model(false);
-  readonly profile = input.required<FullProfileResponse>();
+  readonly profile = input.required<MyProfile>();
   readonly saved = output<void>();
 
   readonly saving = signal(false);
@@ -77,25 +78,25 @@ export class EditPersonalInfo {
   });
 
   readonly genderOptions = [
-    { label: 'Male', value: 'MALE' as Gender },
-    { label: 'Female', value: 'FEMALE' as Gender },
-    { label: 'Other', value: 'OTHER' as Gender },
-    { label: 'Prefer not to say', value: 'PREFER_NOT_TO_SAY' as Gender },
+    { label: 'Male', value: Genders.Male },
+    { label: 'Female', value: Genders.Female },
+    { label: 'Other', value: Genders.Other },
+    { label: 'Prefer not to say', value: Genders.PreferNotToSay },
   ];
 
   private readonly _initEffect = effect(() => {
     if (this.visible()) {
       const p = this.profile();
-      const up = p.userProfile;
+      const fp = p.fitnessProfile;
       this.form.set({
-        firstName: p.user.firstName,
-        lastName: p.user.lastName,
-        phone: p.user.phone ?? '',
-        dateOfBirth: up?.dateOfBirth ? this._parseDate(up.dateOfBirth) : null,
-        gender: up?.gender ?? null,
-        timezone: p.user.timezone ?? null,
-        medicalConditions: up?.medicalConditions?.join(', ') ?? '',
-        notes: up?.notes ?? '',
+        firstName: p.account.firstName,
+        lastName: p.account.lastName,
+        phone: p.account.phone ?? '',
+        dateOfBirth: fp?.dateOfBirth ? this._parseDate(fp.dateOfBirth) : null,
+        gender: fp?.gender ?? null,
+        timezone: p.account.timezone ?? null,
+        medicalConditions: fp?.medicalConditions?.join(', ') ?? '',
+        notes: fp?.notes ?? '',
       });
     }
   });
@@ -106,34 +107,34 @@ export class EditPersonalInfo {
 
   save(): void {
     const p = this.profile();
-    const up = p.userProfile;
+    const fp = p.fitnessProfile;
     const f = this.form();
-    const payload: UpdateFullProfilePayload = {};
+    const payload: UpdateMyProfilePayload = {};
 
-    const userChanges: NonNullable<UpdateFullProfilePayload['user']> = {};
-    if (f.firstName !== p.user.firstName) userChanges.firstName = f.firstName;
-    if (f.lastName !== p.user.lastName) userChanges.lastName = f.lastName;
-    if (f.phone !== (p.user.phone ?? '')) userChanges.phone = f.phone;
-    if (f.timezone !== (p.user.timezone ?? null)) userChanges.timezone = f.timezone ?? undefined;
-    if (Object.keys(userChanges).length) payload.user = userChanges;
+    const accountChanges: NonNullable<UpdateMyProfilePayload['account']> = {};
+    if (f.firstName !== p.account.firstName) accountChanges.firstName = f.firstName;
+    if (f.lastName !== p.account.lastName) accountChanges.lastName = f.lastName;
+    if (f.phone !== (p.account.phone ?? '')) accountChanges.phone = f.phone;
+    if (f.timezone !== (p.account.timezone ?? null)) accountChanges.timezone = f.timezone ?? undefined;
+    if (Object.keys(accountChanges).length) payload.account = accountChanges;
 
-    const profileChanges: NonNullable<UpdateFullProfilePayload['userProfile']> = {};
+    const fitnessChanges: NonNullable<UpdateMyProfilePayload['fitnessProfile']> = {};
     const newDob = f.dateOfBirth ? this._formatDate(f.dateOfBirth) : '';
-    if (newDob !== (up?.dateOfBirth ?? '')) profileChanges.dateOfBirth = newDob || undefined;
-    if (f.gender !== (up?.gender ?? null)) profileChanges.gender = f.gender ?? undefined;
+    if (newDob !== (fp?.dateOfBirth ?? '')) fitnessChanges.dateOfBirth = newDob || undefined;
+    if (f.gender !== (fp?.gender ?? null)) fitnessChanges.gender = f.gender ?? undefined;
     const newMed = f.medicalConditions.split(',').map((m) => m.trim()).filter(Boolean);
-    if (JSON.stringify(newMed) !== JSON.stringify(up?.medicalConditions ?? [])) profileChanges.medicalConditions = newMed;
-    if (f.notes !== (up?.notes ?? '')) profileChanges.notes = f.notes || undefined;
-    if (Object.keys(profileChanges).length) payload.userProfile = profileChanges;
+    if (JSON.stringify(newMed) !== JSON.stringify(fp?.medicalConditions ?? [])) fitnessChanges.medicalConditions = newMed;
+    if (f.notes !== (fp?.notes ?? '')) fitnessChanges.notes = f.notes || undefined;
+    if (Object.keys(fitnessChanges).length) payload.fitnessProfile = fitnessChanges;
 
-    if (!payload.user && !payload.userProfile) {
+    if (!payload.account && !payload.fitnessProfile) {
       this.visible.set(false);
       this._messageService.add({ severity: 'info', summary: 'No changes', detail: 'No changes were made.' });
       return;
     }
 
     this.saving.set(true);
-    this._profileService.updateFullProfile(payload).subscribe({
+    this._profileService.updateMyProfile(payload).subscribe({
       next: () => {
         this.saving.set(false);
         this.visible.set(false);

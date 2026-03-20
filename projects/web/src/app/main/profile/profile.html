@@ -70,12 +70,12 @@
           [style]="{ 'background-color': 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
         <div class="flex flex-1 flex-col gap-1 text-center sm:text-left">
           <h3 class="text-lg font-semibold m-0">{{ fullName() }}</h3>
-          <p class="text-sm text-surface-500 m-0">{{ p.user.email }}</p>
+          <p class="text-sm text-surface-500 m-0">{{ p.account.email }}</p>
           <div class="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
             @for (role of p.roles; track role) {
               <p-tag [value]="role" [severity]="roleSeverity(role)" class="text-xs!" />
             }
-            @if (p.user.isEmailVerified) {
+            @if (p.account.isEmailVerified) {
               <p-tag value="Verified" severity="success" icon="pi pi-check" class="text-xs!" />
             } @else {
               <p-tag value="Unverified" severity="warn" icon="pi pi-exclamation-triangle" class="text-xs!" />
@@ -90,29 +90,29 @@
       <dl class="grid gap-4 sm:grid-cols-2 mt-4">
         <div>
           <dt class="text-xs uppercase tracking-wide text-surface-500">First name</dt>
-          <dd class="mt-1 text-sm font-medium">{{ p.user.firstName }}</dd>
+          <dd class="mt-1 text-sm font-medium">{{ p.account.firstName }}</dd>
         </div>
         <div>
           <dt class="text-xs uppercase tracking-wide text-surface-500">Last name</dt>
-          <dd class="mt-1 text-sm font-medium">{{ p.user.lastName }}</dd>
+          <dd class="mt-1 text-sm font-medium">{{ p.account.lastName }}</dd>
         </div>
         <div>
           <dt class="text-xs uppercase tracking-wide text-surface-500">Phone</dt>
-          <dd class="mt-1 text-sm font-medium">{{ p.user.phone || 'Not provided' }}</dd>
+          <dd class="mt-1 text-sm font-medium">{{ p.account.phone || 'Not provided' }}</dd>
         </div>
         <div>
           <dt class="text-xs uppercase tracking-wide text-surface-500">Status</dt>
           <dd class="mt-1">
             <p-tag
-              [value]="p.user.isActive ? 'Active' : 'Inactive'"
-              [severity]="p.user.isActive ? 'success' : 'danger'"
+              [value]="p.account.isActive ? 'Active' : 'Inactive'"
+              [severity]="p.account.isActive ? 'success' : 'danger'"
               class="text-xs!"
             />
           </dd>
         </div>
         <div>
           <dt class="text-xs uppercase tracking-wide text-surface-500">Member since</dt>
-          <dd class="mt-1 text-sm font-medium">{{ p.user.createdAt | date: 'mediumDate' }}</dd>
+          <dd class="mt-1 text-sm font-medium">{{ p.account.createdAt | date: 'mediumDate' }}</dd>
         </div>
       </dl>
     </p-card>
@@ -136,12 +136,12 @@
         </div>
         <p-divider />
       </ng-template>
-      @if (p.userProfile) {
+      @if (p.fitnessProfile) {
         <dl class="grid gap-4 sm:grid-cols-2">
           <div>
             <dt class="text-xs uppercase tracking-wide text-surface-500">Date of birth</dt>
             <dd class="mt-1 text-sm font-medium">
-              {{ p.userProfile.dateOfBirth ? (p.userProfile.dateOfBirth | date: 'mediumDate') : 'Not set' }}
+              {{ p.fitnessProfile.dateOfBirth ? (p.fitnessProfile.dateOfBirth | date: 'mediumDate') : 'Not set' }}
             </dd>
           </div>
           <div>
@@ -151,13 +151,13 @@
           <div>
             <dt class="text-xs uppercase tracking-wide text-surface-500">Height</dt>
             <dd class="mt-1 text-sm font-medium">
-              {{ p.userProfile.heightCm ? p.userProfile.heightCm + ' cm' : 'Not set' }}
+              {{ p.fitnessProfile.heightCm ? p.fitnessProfile.heightCm + ' cm' : 'Not set' }}
             </dd>
           </div>
           <div>
             <dt class="text-xs uppercase tracking-wide text-surface-500">Weight</dt>
             <dd class="mt-1 text-sm font-medium">
-              {{ p.userProfile.weightKg ? p.userProfile.weightKg + ' kg' : 'Not set' }}
+              {{ p.fitnessProfile.weightKg ? p.fitnessProfile.weightKg + ' kg' : 'Not set' }}
             </dd>
           </div>
           <div>
@@ -173,10 +173,10 @@
           <div>
             <dt class="text-xs uppercase tracking-wide text-surface-500">Goals</dt>
             <dd class="mt-1">
-              @if (p.userProfile.goals?.length) {
+              @if (p.fitnessProfile.goals.length) {
                 <div class="flex flex-wrap gap-1">
-                  @for (goal of p.userProfile.goals; track goal) {
-                    <p-tag [value]="goal" severity="secondary" class="text-xs!" />
+                  @for (goal of p.fitnessProfile.goals; track goal.id) {
+                    <p-tag [value]="goal.title" severity="secondary" class="text-xs!" />
                   }
                 </div>
               } @else {
@@ -185,17 +185,17 @@
             </dd>
           </div>
         </dl>
-        @if (p.userProfile.emergencyContactName || p.userProfile.emergencyContactPhone) {
+        @if (p.fitnessProfile.emergencyContactName || p.fitnessProfile.emergencyContactPhone) {
           <p-divider />
           <h4 class="text-xs uppercase tracking-wide text-surface-500 mb-3">Emergency contact</h4>
           <dl class="grid gap-4 sm:grid-cols-2">
             <div>
               <dt class="text-xs uppercase tracking-wide text-surface-500">Name</dt>
-              <dd class="mt-1 text-sm font-medium">{{ p.userProfile.emergencyContactName || 'Not provided' }}</dd>
+              <dd class="mt-1 text-sm font-medium">{{ p.fitnessProfile.emergencyContactName || 'Not provided' }}</dd>
             </div>
             <div>
               <dt class="text-xs uppercase tracking-wide text-surface-500">Phone</dt>
-              <dd class="mt-1 text-sm font-medium">{{ p.userProfile.emergencyContactPhone || 'Not provided' }}</dd>
+              <dd class="mt-1 text-sm font-medium">{{ p.fitnessProfile.emergencyContactPhone || 'Not provided' }}</dd>
             </div>
           </dl>
         }

@@ -84,7 +84,7 @@ When a type or constant is used in more than one place, define it once in the `c
 
 Never copy-paste the same `type` or `const` across multiple component files — extract it.
 
-Use the **const + type** pattern (same as `UserRoles`) so values are accessible at runtime:
+Use the **const + type** pattern (same as `UserRoles`) so values are accessible at runtime. **Always define these in a dedicated `*.enums.ts` file, separate from the `*.model.ts` interfaces** — they have different reasons to change and mixing them together clutters both files. Example: `profile.enums.ts` + `profile.model.ts`, both exported from `public-api.ts`.
 
 ```ts
 // core/src/lib/models/common/ui.model.ts

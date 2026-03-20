@@ -7,4 +7,4 @@ export const TagSeverity = {
   Contrast: 'contrast',
 } as const;
 
-export type TagSeverity = typeof TagSeverity[keyof typeof TagSeverity] | null | undefined;
+export type TagSeverity = (typeof TagSeverity)[keyof typeof TagSeverity] | null | undefined;

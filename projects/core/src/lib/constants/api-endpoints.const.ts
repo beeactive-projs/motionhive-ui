@@ -17,6 +17,9 @@ export const API_ENDPOINTS = {
     BASE: '/profile',
     INSTRUCTORS: '/profile/instructors',
     DISCOVER_INSTRUCTORS: '/profile/instructors/discover',
+    MEASUREMENTS: '/profile/measurements',
+    GOALS: '/profile/goals',
+    GOAL_BY_ID: (id: string) => `/profile/goals/${id}`,
   },
   CLIENTS: {
     BASE: '/clients',

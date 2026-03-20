@@ -1,12 +1,5 @@
+import type { JoinPolicy } from './group.enums';
 import { PaginatedResponse } from '../common/pagination.model';
-
-export const JoinPolicies = {
-  Open: 'OPEN',
-  Approval: 'APPROVAL',
-  InviteOnly: 'INVITE_ONLY',
-} as const;
-
-export type JoinPolicy = (typeof JoinPolicies)[keyof typeof JoinPolicies];
 
 export interface Group {
   id: string;
@@ -87,5 +80,4 @@ export interface UpdateGroupPayload {
 }
 
 export type GroupListResponse = PaginatedResponse<Group>;
-
 export type GroupMemberListResponse = PaginatedResponse<GroupMember>;

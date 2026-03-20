@@ -7,38 +7,44 @@ export * from './lib/models/auth/login.model';
 export * from './lib/models/auth/register.model';
 export * from './lib/models/auth/auth-response.model';
 export * from './lib/models/auth/password-reset.model';
+export * from './lib/models/auth/social-login.model';
 
 // Models - User
 export * from './lib/models/user/user.model';
+export * from './lib/models/user/role.enums';
 export * from './lib/models/user/role.model';
-export * from './lib/models/user/permission.model';
 
 // Models - Profile
+export * from './lib/models/profile/profile.enums';
+export * from './lib/models/profile/fitness-profile.model';
+export * from './lib/models/profile/instructor-profile.model';
 export * from './lib/models/profile/profile.model';
 
 // Models - Client
+export * from './lib/models/client/client.enums';
 export * from './lib/models/client/client.model';
 export * from './lib/models/client/instructor.model';
 
 // Models - Group
+export * from './lib/models/group/group.enums';
 export * from './lib/models/group/group.model';
 
 // Models - Common
 export * from './lib/models/common/api-response.model';
 export * from './lib/models/common/pagination.model';
-export * from './lib/models/common/ui.model';
+export * from './lib/models/common/ui.enums';
 
 // Models - Blog
+export * from './lib/models/blog/blog.enums';
 export * from './lib/models/blog/blog.model';
 
 // Models - Feedback
+export * from './lib/models/feedback/feedback.enums';
 export * from './lib/models/feedback/feedback.model';
 
 // Models - Waitlist
+export * from './lib/models/waitlist/waitlist.enums';
 export * from './lib/models/waitlist/waitlist.model';
-
-// Models - Social Auth
-export * from './lib/models/auth/social-login.model';
 
 // Constants
 export * from './lib/constants/api-endpoints.const';

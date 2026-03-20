@@ -5,7 +5,7 @@ import { catchError, of, shareReplay, switchMap } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import { Skeleton } from 'primeng/skeleton';
-import type { BlogPostData } from 'core';
+import type { BlogPost } from 'core';
 import { BlogService } from 'core';
 import { DatePipe } from '@angular/common';
 
@@ -29,14 +29,14 @@ export class BlogArticleComponent {
       this._blogService.getBySlug(slug).pipe(
         catchError(() => {
           this._router.navigate(['/error/not-found']);
-          return of(null as BlogPostData | null);
+          return of(null as BlogPost | null);
         }),
       ),
     ),
     shareReplay(1),
   );
 
-  readonly post = toSignal<BlogPostData | null>(this._post$, { initialValue: null });
+  readonly post = toSignal<BlogPost | null>(this._post$, { initialValue: null });
   readonly isLoading = computed(() => this.post() === null);
 
   constructor() {
@@ -59,12 +59,12 @@ export class BlogArticleComponent {
   readonly relatedPosts = toSignal(
     this._post$.pipe(
       switchMap((post) => {
-        if (!post) return of([] as BlogPostData[]);
+        if (!post) return of([] as BlogPost[]);
         return this._blogService
           .getRelatedPosts(post.slug, post.category)
-          .pipe(catchError(() => of([] as BlogPostData[])));
+          .pipe(catchError(() => of([] as BlogPost[])));
       }),
     ),
-    { initialValue: [] as BlogPostData[] },
+    { initialValue: [] as BlogPost[] },
   );
 }

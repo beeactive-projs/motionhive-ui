@@ -1,17 +1,7 @@
+import type { BlogCategory } from './blog.enums';
 import { PaginatedResponse } from '../common/pagination.model';
 
-export const BlogCategories = {
-  Guide: 'Guide',
-  Nutrition: 'Nutrition',
-  Science: 'Science',
-  Wellness: 'Wellness',
-} as const;
-
-export type BlogCategory = (typeof BlogCategories)[keyof typeof BlogCategories];
-
-export type BlogPost = PaginatedResponse<BlogPostData>;
-
-export interface BlogPostData {
+export interface BlogPost {
   id: string;
   slug: string;
   title: string;
@@ -30,7 +20,7 @@ export interface BlogPostData {
   updatedAt: string;
 }
 
-export interface CreateBlogPostRequest {
+export interface CreateBlogPostPayload {
   title: string;
   slug: string;
   excerpt: string;
@@ -44,7 +34,7 @@ export interface CreateBlogPostRequest {
   tags: string[];
 }
 
-export type UpdateBlogPostRequest = Partial<CreateBlogPostRequest>;
+export type UpdateBlogPostPayload = Partial<CreateBlogPostPayload>;
 
 export interface BlogQueryParams {
   page?: number;
@@ -57,3 +47,5 @@ export interface UploadImageResponse {
   url: string;
   publicId: string;
 }
+
+export type BlogListResponse = PaginatedResponse<BlogPost>;

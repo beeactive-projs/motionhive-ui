@@ -12,7 +12,7 @@ import {
   PasswordResetResponse,
 } from '../../models/auth/password-reset.model';
 import { User } from '../../models/user/user.model';
-import { UserRole } from '../../models/user/role.model';
+import { UserRole } from '../../models/user/role.enums';
 import { TokenService } from './token.service';
 import { AuthStore } from '../../stores/auth.store';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';

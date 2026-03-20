@@ -13,7 +13,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import type { BlogPostData } from 'core';
+import type { BlogPost } from 'core';
 import { BlogCategories, BlogService } from 'core';
 import { ButtonModule } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -53,7 +53,7 @@ export class BlogComponent {
 
   readonly isLoading = signal(true);
   readonly skeletonItems = [1, 2, 3, 4, 5, 6];
-  readonly posts = signal<BlogPostData[]>([]);
+  readonly posts = signal<BlogPost[]>([]);
   readonly totalRecords = signal(0);
   readonly currentPage = signal(1);
   readonly searchQuery = signal('');

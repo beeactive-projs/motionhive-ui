@@ -1,8 +1,5 @@
-﻿import type { UserRole } from './role.model';
+import type { UserRole } from './role.enums';
 
-/**
- * User Model
- */
 export interface User {
   id: string;
   email: string;
@@ -20,10 +17,7 @@ export interface User {
   updatedAt: string;
 }
 
-/**
- * Create User DTO
- */
-export interface CreateUserDto {
+export interface CreateUserPayload {
   email: string;
   password: string;
   firstName: string;
@@ -32,10 +26,7 @@ export interface CreateUserDto {
   roles: UserRole[];
 }
 
-/**
- * Update User DTO
- */
-export interface UpdateUserDto {
+export interface UpdateUserPayload {
   firstName?: string;
   lastName?: string;
   phone?: string;

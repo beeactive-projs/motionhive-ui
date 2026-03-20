@@ -18,16 +18,16 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import {
   ProfileService,
-  FullProfileResponse,
-  UpdateUserProfilePayload,
+  MyProfile,
+  UpdateFitnessProfilePayload,
   FitnessLevel,
+  FitnessLevels,
 } from 'core';
 
 interface FitnessForm {
   heightCm: number | null;
   weightKg: number | null;
   fitnessLevel: FitnessLevel | null;
-  goals: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
 }
@@ -52,7 +52,7 @@ export class EditFitnessProfile {
   private readonly _messageService = inject(MessageService);
 
   readonly visible = model(false);
-  readonly profile = input.required<FullProfileResponse>();
+  readonly profile = input.required<MyProfile>();
   readonly saved = output<void>();
 
   readonly saving = signal(false);
@@ -61,27 +61,25 @@ export class EditFitnessProfile {
     heightCm: null,
     weightKg: null,
     fitnessLevel: null,
-    goals: '',
     emergencyContactName: '',
     emergencyContactPhone: '',
   });
 
   readonly fitnessOptions = [
-    { label: 'Beginner', value: 'BEGINNER' as FitnessLevel },
-    { label: 'Intermediate', value: 'INTERMEDIATE' as FitnessLevel },
-    { label: 'Advanced', value: 'ADVANCED' as FitnessLevel },
+    { label: 'Beginner', value: FitnessLevels.Beginner },
+    { label: 'Intermediate', value: FitnessLevels.Intermediate },
+    { label: 'Advanced', value: FitnessLevels.Advanced },
   ];
 
   private readonly _initEffect = effect(() => {
     if (this.visible()) {
-      const up = this.profile().userProfile;
+      const fp = this.profile().fitnessProfile;
       this.form.set({
-        heightCm: up?.heightCm ?? null,
-        weightKg: up?.weightKg ?? null,
-        fitnessLevel: up?.fitnessLevel ?? null,
-        goals: up?.goals?.join(', ') ?? '',
-        emergencyContactName: up?.emergencyContactName ?? '',
-        emergencyContactPhone: up?.emergencyContactPhone ?? '',
+        heightCm: fp?.heightCm ?? null,
+        weightKg: fp?.weightKg ?? null,
+        fitnessLevel: fp?.fitnessLevel ?? null,
+        emergencyContactName: fp?.emergencyContactName ?? '',
+        emergencyContactPhone: fp?.emergencyContactPhone ?? '',
       });
     }
   });
@@ -91,17 +89,15 @@ export class EditFitnessProfile {
   }
 
   save(): void {
-    const up = this.profile().userProfile;
+    const fp = this.profile().fitnessProfile;
     const f = this.form();
-    const payload: UpdateUserProfilePayload = {};
+    const payload: UpdateFitnessProfilePayload = {};
 
-    if (f.heightCm !== (up?.heightCm ?? null)) payload.heightCm = f.heightCm ?? undefined;
-    if (f.weightKg !== (up?.weightKg ?? null)) payload.weightKg = f.weightKg ?? undefined;
-    if (f.fitnessLevel !== (up?.fitnessLevel ?? null)) payload.fitnessLevel = f.fitnessLevel ?? undefined;
-    const newGoals = f.goals.split(',').map((g) => g.trim()).filter(Boolean);
-    if (JSON.stringify(newGoals) !== JSON.stringify(up?.goals ?? [])) payload.goals = newGoals;
-    if (f.emergencyContactName !== (up?.emergencyContactName ?? '')) payload.emergencyContactName = f.emergencyContactName || undefined;
-    if (f.emergencyContactPhone !== (up?.emergencyContactPhone ?? '')) payload.emergencyContactPhone = f.emergencyContactPhone || undefined;
+    if (f.heightCm !== (fp?.heightCm ?? null)) payload.heightCm = f.heightCm ?? undefined;
+    if (f.weightKg !== (fp?.weightKg ?? null)) payload.weightKg = f.weightKg ?? undefined;
+    if (f.fitnessLevel !== (fp?.fitnessLevel ?? null)) payload.fitnessLevel = f.fitnessLevel ?? undefined;
+    if (f.emergencyContactName !== (fp?.emergencyContactName ?? '')) payload.emergencyContactName = f.emergencyContactName || undefined;
+    if (f.emergencyContactPhone !== (fp?.emergencyContactPhone ?? '')) payload.emergencyContactPhone = f.emergencyContactPhone || undefined;
 
     if (!Object.keys(payload).length) {
       this.visible.set(false);
@@ -110,7 +106,7 @@ export class EditFitnessProfile {
     }
 
     this.saving.set(true);
-    this._profileService.updateUserProfile(payload).subscribe({
+    this._profileService.updateFitnessProfile(payload).subscribe({
       next: () => {
         this.saving.set(false);
         this.visible.set(false);

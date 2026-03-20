@@ -1,5 +1,5 @@
 import { PaginatedResponse } from '../common/pagination.model';
-import { InstructorCertification } from '../profile/profile.model';
+import { InstructorCertification } from '../profile/instructor-profile.model';
 
 export interface MyInstructorUser {
   id: string;

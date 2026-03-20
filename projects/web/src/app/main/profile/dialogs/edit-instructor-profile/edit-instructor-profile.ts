@@ -16,7 +16,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { MessageService } from 'primeng/api';
-import { ProfileService, FullProfileResponse, UpdateFullProfilePayload } from 'core';
+import { ProfileService, MyProfile, UpdateInstructorProfilePayload } from 'core';
 
 interface InstructorForm {
   displayName: string;
@@ -48,7 +48,7 @@ export class EditInstructorProfile {
   private readonly _messageService = inject(MessageService);
 
   readonly visible = model(false);
-  readonly profile = input.required<FullProfileResponse>();
+  readonly profile = input.required<MyProfile>();
   readonly saved = output<void>();
 
   readonly saving = signal(false);
@@ -85,7 +85,7 @@ export class EditInstructorProfile {
   save(): void {
     const ip = this.profile().instructorProfile;
     const f = this.form();
-    const instrChanges: NonNullable<UpdateFullProfilePayload['instructor']> = {};
+    const instrChanges: UpdateInstructorProfilePayload = {};
 
     if (f.displayName !== (ip?.displayName ?? ''))
       instrChanges.displayName = f.displayName || undefined;
@@ -116,7 +116,7 @@ export class EditInstructorProfile {
     }
 
     this.saving.set(true);
-    this._profileService.updateFullProfile({ instructor: instrChanges }).subscribe({
+    this._profileService.updateInstructorProfile(instrChanges).subscribe({
       next: () => {
         this.saving.set(false);
         this.visible.set(false);
