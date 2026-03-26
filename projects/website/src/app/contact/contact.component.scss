@@ -1,0 +1,52 @@
+// ===== Contact Form Card =====
+.contact-form-card {
+  background: var(--p-gray-100);
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+
+  :host-context(.dark) & {
+    background: var(--p-gray-800);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+}
+
+// ===== Contact Info Cards =====
+.contact-info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--p-gray-100);
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.35s ease;
+
+  :host-context(.dark) & {
+    background: var(--p-gray-800);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+    :host-context(.dark) & {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+// ===== Feature Icon Wrap (mirrors home/about/services) =====
+.feature-icon-wrap {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background: var(--p-primary-500);
+  color: var(--p-primary-contrast-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+}

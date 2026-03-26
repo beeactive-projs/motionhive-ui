@@ -20,17 +20,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ChipModule } from 'primeng/chip';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { GroupService, Group, CreateGroupPayload, UpdateGroupPayload, JoinPolicy } from 'core';
-
-type TagSeverity =
-  | 'success'
-  | 'warn'
-  | 'danger'
-  | 'secondary'
-  | 'info'
-  | 'contrast'
-  | null
-  | undefined;
+import { GroupService, Group, CreateGroupPayload, UpdateGroupPayload, JoinPolicy, TagSeverity } from 'core';
 
 interface JoinPolicyOption {
   label: string;
@@ -268,11 +258,11 @@ export class Groups implements OnInit {
   joinPolicySeverity(policy: JoinPolicy): TagSeverity {
     switch (policy) {
       case 'OPEN':
-        return 'success';
+        return TagSeverity.Success;
       case 'APPROVAL':
-        return 'warn';
+        return TagSeverity.Warn;
       case 'INVITE_ONLY':
-        return 'info';
+        return TagSeverity.Info;
     }
   }
 

@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { ThemeService } from '../../../_core/services/theme.service';
+import { Button } from 'primeng/button';
+import { ThemeService } from 'core';
 
 @Component({
   selector: 'bee-theme-toggle',
-  imports: [ButtonModule],
+  imports: [Button],
   template: `
     <p-button
       [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"

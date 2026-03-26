@@ -1,37 +1,10 @@
+import type {
+  InstructorClientStatus,
+  InitiatedBy,
+  ClientRequestType,
+  ClientRequestStatus,
+} from './client.enums';
 import { PaginatedResponse } from '../common/pagination.model';
-
-export const InstructorClientStatuses = {
-  Pending: 'PENDING',
-  Active: 'ACTIVE',
-  Archived: 'ARCHIVED',
-} as const;
-
-export type InstructorClientStatus =
-  (typeof InstructorClientStatuses)[keyof typeof InstructorClientStatuses];
-
-export const InitiatedByOptions = {
-  Instructor: 'INSTRUCTOR',
-  Client: 'CLIENT',
-} as const;
-
-export type InitiatedBy = (typeof InitiatedByOptions)[keyof typeof InitiatedByOptions];
-
-export const ClientRequestTypes = {
-  ClientToInstructor: 'CLIENT_TO_INSTRUCTOR',
-  InstructorToClient: 'INSTRUCTOR_TO_CLIENT',
-} as const;
-
-export type ClientRequestType = (typeof ClientRequestTypes)[keyof typeof ClientRequestTypes];
-
-export const ClientRequestStatuses = {
-  Pending: 'PENDING',
-  Accepted: 'ACCEPTED',
-  Declined: 'DECLINED',
-  Cancelled: 'CANCELLED',
-} as const;
-
-export type ClientRequestStatus =
-  (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
 
 export interface ClientUser {
   id: string;
@@ -44,6 +17,15 @@ export interface ClientUser {
 export interface GroupMembership {
   groupId: string;
   groupName: string;
+}
+
+export interface InstructorProfileSummary {
+  userId: string;
+  displayName: string;
+  specializations: string[];
+  bio: string;
+  locationCity?: string;
+  locationCountry?: string;
 }
 
 export interface InstructorClient {
@@ -60,15 +42,6 @@ export interface InstructorClient {
   instructor?: ClientUser;
   instructorProfile?: InstructorProfileSummary | null;
   groupMemberships?: GroupMembership[];
-}
-
-export interface InstructorProfileSummary {
-  userId: string;
-  displayName: string;
-  specializations: string[];
-  bio: string;
-  locationCity?: string;
-  locationCountry?: string;
 }
 
 export interface ClientRequest {
@@ -93,7 +66,7 @@ export interface CreateClientInvitation {
 
 export interface UpdateClientPayload {
   notes?: string;
-  status?: 'ACTIVE' | 'ARCHIVED';
+  status?: InstructorClientStatus;
 }
 
 export interface ClientListParams {

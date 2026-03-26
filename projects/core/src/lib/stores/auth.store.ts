@@ -1,7 +1,7 @@
 // projects/core/src/lib/stores/auth.store.ts
 import { computed, Injectable, signal } from '@angular/core';
 import { User } from '../models/user/user.model';
-import { UserRole, UserRoles } from '../models/user/role.model';
+import { UserRole, UserRoles } from '../models/user/role.enums';
 
 @Injectable({
   providedIn: 'root',

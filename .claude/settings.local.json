@@ -4,7 +4,12 @@
       "WebFetch(domain:beeactive-api-production.up.railway.app)",
       "Bash(ls -la /Users/ionutbutnaru/Documents/mystuff/beeactive-ui/*.*)",
       "Bash(npx ng build web)",
-      "Bash(npx ng:*)"
+      "Bash(npx ng:*)",
+      "Bash(curl -s \"https://beeactive-api-production.up.railway.app/api/docs-json\")",
+      "Bash(python3:*)",
+      "Bash(curl -v \"https://beeactive-api-production.up.railway.app/api/docs-json\")",
+      "Bash(ng build:*)",
+      "WebFetch(domain:gemini.google.com)"
     ]
   }
 }

@@ -43,6 +43,7 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - Auth interceptor adds Bearer token and auto-refreshes on 401
 - Endpoints defined in `API_ENDPOINTS` constant
 - Import everything from `'core'`: `import { SomeService, SomeModel } from 'core';`
+- **API documentation (Swagger/OpenAPI)**: https://beeactive-api-production.up.railway.app/api/docs
 
 ### Auth & State
 
@@ -72,6 +73,39 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
   background: #f8f9fa;
   border-radius: 6px;
   ```
+
+## Shared types and constants
+
+When a type or constant is used in more than one place, define it once in the `core` library and import it from `'core'` everywhere:
+
+- **UI/component types** (e.g. PrimeNG tag severities): `projects/core/src/lib/models/common/ui.model.ts`
+- **Domain constants** (e.g. endpoint strings, storage keys): `projects/core/src/lib/constants/`
+- Always re-export the new entry from `projects/core/src/public-api.ts`
+
+Never copy-paste the same `type` or `const` across multiple component files — extract it.
+
+Use the **const + type** pattern (same as `UserRoles`) so values are accessible at runtime. **Always define these in a dedicated `*.enums.ts` file, separate from the `*.model.ts` interfaces** — they have different reasons to change and mixing them together clutters both files. Example: `profile.enums.ts` + `profile.model.ts`, both exported from `public-api.ts`.
+
+```ts
+// core/src/lib/models/common/ui.model.ts
+export const TagSeverity = {
+  Success: 'success',
+  Warn: 'warn',
+  Danger: 'danger',
+  Secondary: 'secondary',
+  Info: 'info',
+  Contrast: 'contrast',
+} as const;
+
+export type TagSeverity = typeof TagSeverity[keyof typeof TagSeverity] | null | undefined;
+
+// usage — same import works for both value and type
+import { TagSeverity } from 'core';
+
+method(): TagSeverity {
+  return TagSeverity.Success; // no magic strings
+}
+```
 
 ## Coding Conventions
 
@@ -161,6 +195,64 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 - Forms: `isFieldInvalid()` / `getFieldError()` pattern, `p-message` for errors
 - Style via `styleClass` prop, not wrapping divs
 
+#### Full-width inputs — use `fluid` instead of `class="w-full"`
+
+The following components support a `fluid` boolean input. Use it instead of adding `class="w-full"`:
+
+```html
+<p-button fluid />
+<input pInputText fluid />
+<p-password fluid />
+<p-textarea fluid />           <!-- [pTextarea] directive -->
+<p-multiselect fluid />
+<p-listbox fluid />
+<p-treeselect fluid />
+<p-cascadeselect fluid />
+<p-selectbutton fluid />
+<p-togglebutton fluid />
+```
+
+These components do **not** have a `fluid` input — use `class="w-full"` on them:
+
+```html
+<p-select class="w-full" />
+<p-datepicker class="w-full" />
+<p-autocomplete class="w-full" />
+<p-inputnumber class="w-full" />
+```
+
+#### PrimeNG 21 component names (v18+ renames — never use the old names)
+
+| Old (deprecated) | Current (v21+) |
+|------------------|----------------|
+| `p-dropdown`     | `p-select`     |
+| `p-calendar`     | `p-datepicker` |
+| `p-sidebar`      | `p-drawer`     |
+| `p-overlaypanel` | `p-popover`    |
+| `p-inputSwitch`  | `p-toggleswitch` |
+| `p-chips`        | `p-inputchips` |
+
+#### Overlay / popup components — always append to body
+
+Any PrimeNG component that opens a floating overlay (dropdown, calendar, popover, autocomplete, etc.) **must** have `[appendTo]="'body'"` to prevent the overlay from being clipped or triggering unwanted scroll inside its parent container:
+
+```html
+<p-select [appendTo]="'body'" ... />
+<p-datepicker [appendTo]="'body'" ... />
+<p-popover [appendTo]="'body'" ... />
+<p-autocomplete [appendTo]="'body'" ... />
+<p-multiselect [appendTo]="'body'" ... />
+```
+
+Components that are affected: `p-select`, `p-datepicker`, `p-popover`, `p-autocomplete`, `p-multiselect`, `p-cascadeselect`, `p-treeselect`, `p-colorpicker`.
+
+#### Deprecated properties to avoid
+
+- `pTemplate` — use named content projections (`#header`, `#body`, `#footer`, `#content`, `#footer`, `#item`, `#selectedItem`, etc.)
+- `appendTo="body"` (string binding) — use `[appendTo]="'body'"` (property binding) instead
+- `[styleClass]` on `p-column` — use `headerStyleClass` / `bodyStyleClass` / `footerStyleClass`
+- `[iconPos]` on `p-button` when using icon-only buttons — use `[icon]` with an empty or omitted `label`
+
 ### Dialogs
 
 - **Complex dialogs**: create a child component that owns the `p-dialog`
@@ -168,6 +260,14 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
   - Use `input.required()` for data it needs, `output()` for `saved` / `closed` events
   - Place in a subfolder next to the parent feature (e.g. `dialogs/`)
 - **Simple confirmations**: inline `p-dialog` directly in the parent template is acceptable
+
+### UI copy & text formatting
+
+- Use **sentence case** for all visible text — labels, headings, button labels, placeholders, dialog titles, menu items, tooltips, and error messages.
+  - Correct: "Instructor profile", "Save changes", "Add new client", "Are you sure you want to delete this?"
+  - Wrong: "Instructor Profile", "Save Changes", "Add New Client"
+- Proper nouns and acronyms remain capitalised as normal (e.g. "BeeActive", "PDF", "API").
+- Sentences must start with a capital letter and end with the appropriate punctuation when they form a full sentence.
 
 ### Accessibility
 

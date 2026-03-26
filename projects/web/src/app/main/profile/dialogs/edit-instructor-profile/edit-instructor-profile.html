@@ -1,0 +1,100 @@
+<p-dialog
+  header="Edit instructor profile"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  [closable]="true"
+>
+  <div class="flex flex-col gap-4 pt-2">
+    <div class="flex flex-col gap-2">
+      <label for="epDisplayName" class="text-sm font-medium">Display name</label>
+      <input
+        id="epDisplayName"
+        type="text"
+        pInputText
+        [ngModel]="form().displayName"
+        (ngModelChange)="updateField('displayName', $event)"
+        placeholder="Name shown to clients"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="epBio" class="text-sm font-medium">Bio</label>
+      <textarea
+        id="epBio"
+        pTextarea
+        [ngModel]="form().bio"
+        (ngModelChange)="updateField('bio', $event)"
+        [rows]="4"
+        placeholder="Tell clients about yourself..."
+      ></textarea>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <label for="epSpecializations" class="text-sm font-medium">Specializations</label>
+        <input
+          id="epSpecializations"
+          type="text"
+          pInputText
+          [ngModel]="form().specializations"
+          (ngModelChange)="updateField('specializations', $event)"
+          placeholder="e.g. Yoga, HIIT, Pilates"
+        />
+        <span class="text-xs text-surface-400">Separate with commas.</span>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="epYears" class="text-sm font-medium">Years of experience</label>
+        <p-inputnumber
+          inputId="epYears"
+          [ngModel]="form().yearsOfExperience"
+          (ngModelChange)="updateField('yearsOfExperience', $event)"
+          placeholder="e.g. 5"
+          [min]="0"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <label for="epCity" class="text-sm font-medium">City</label>
+        <input
+          id="epCity"
+          type="text"
+          pInputText
+          [ngModel]="form().locationCity"
+          (ngModelChange)="updateField('locationCity', $event)"
+          placeholder="e.g. New York"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="epCountry" class="text-sm font-medium">Country</label>
+        <input
+          id="epCountry"
+          type="text"
+          pInputText
+          [ngModel]="form().locationCountry"
+          (ngModelChange)="updateField('locationCountry', $event)"
+          placeholder="e.g. US"
+        />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 rounded-lg bg-surface-50 dark:bg-surface-800 p-4">
+      <p-toggleSwitch
+        [ngModel]="form().isAcceptingClients"
+        (ngModelChange)="updateField('isAcceptingClients', $event)"
+      />
+      <div>
+        <span class="text-sm font-medium">Accepting new clients</span>
+        <p class="text-xs text-surface-500 m-0">Allow clients to send you requests.</p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Save changes" icon="pi pi-check" [loading]="saving()" (onClick)="save()" />
+  </ng-template>
+</p-dialog>

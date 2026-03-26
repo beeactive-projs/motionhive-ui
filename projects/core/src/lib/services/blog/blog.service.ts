@@ -7,10 +7,10 @@ import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
 import {
   BlogPost,
-  BlogPostData,
+  BlogListResponse,
   BlogQueryParams,
-  CreateBlogPostRequest,
-  UpdateBlogPostRequest,
+  CreateBlogPostPayload,
+  UpdateBlogPostPayload,
   UploadImageResponse,
 } from '../../models/blog/blog.model';
 
@@ -19,30 +19,30 @@ export class BlogService {
   private readonly _http = inject(HttpClient);
   private readonly _base = `${environment.apiUrl}${API_ENDPOINTS.BLOG.BASE}`;
 
-  getPosts(query: BlogQueryParams = {}): Observable<BlogPost> {
+  getPosts(query: BlogQueryParams = {}): Observable<BlogListResponse> {
     let params = new HttpParams();
     if (query.page) params = params.set('page', query.page);
     if (query.limit) params = params.set('limit', query.limit);
     if (query.category) params = params.set('category', query.category);
     if (query.search) params = params.set('search', query.search);
-    return this._http.get<BlogPost>(this._base, { params });
+    return this._http.get<BlogListResponse>(this._base, { params });
   }
 
-  getAllPost(): Observable<BlogPost> {
-    return this._http.get<BlogPost>(this._base);
+  getAllPosts(): Observable<BlogListResponse> {
+    return this._http.get<BlogListResponse>(this._base);
   }
 
-  getAllPostData(): Observable<BlogPostData[]> {
+  getAllPostData(): Observable<BlogPost[]> {
     return this._http
-      .get<BlogPost>(this._base)
+      .get<BlogListResponse>(this._base)
       .pipe(map((response) => response.items));
   }
 
-  getBySlug(slug: string): Observable<BlogPostData> {
-    return this._http.get<BlogPostData>(`${this._base}/${slug}`);
+  getBySlug(slug: string): Observable<BlogPost> {
+    return this._http.get<BlogPost>(`${this._base}/${slug}`);
   }
 
-  getRelatedPosts(currentSlug: string, category: string, limit = 3): Observable<BlogPostData[]> {
+  getRelatedPosts(currentSlug: string, category: string, limit = 3): Observable<BlogPost[]> {
     return this.getAllPostData().pipe(
       map((posts) => {
         const sameCategory = posts.filter((p) => p.slug !== currentSlug && p.category === category);
@@ -52,12 +52,12 @@ export class BlogService {
     );
   }
 
-  create(payload: CreateBlogPostRequest): Observable<BlogPostData> {
-    return this._http.post<BlogPostData>(this._base, payload);
+  create(payload: CreateBlogPostPayload): Observable<BlogPost> {
+    return this._http.post<BlogPost>(this._base, payload);
   }
 
-  update(id: string, payload: UpdateBlogPostRequest): Observable<BlogPostData> {
-    return this._http.patch<BlogPostData>(`${this._base}/${id}`, payload);
+  update(id: string, payload: UpdateBlogPostPayload): Observable<BlogPost> {
+    return this._http.patch<BlogPost>(`${this._base}/${id}`, payload);
   }
 
   delete(id: string): Observable<void> {

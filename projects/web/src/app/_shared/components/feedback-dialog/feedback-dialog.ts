@@ -10,7 +10,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { FeedbackService, FeedbackCategory, AuthStore } from 'core';
+import { FeedbackService, FeedbackCategory, FeedbackCategories, AuthStore } from 'core';
 import { AutoFocusModule } from 'primeng/autofocus';
 
 @Component({
@@ -44,9 +44,9 @@ export class FeedbackDialog {
     icon: string;
     severity: ButtonSeverity;
   }[] = [
-    { key: 'bug', label: 'Bug Report', icon: 'bug_report', severity: 'danger' },
-    { key: 'suggestion', label: 'Suggestion', icon: 'lightbulb', severity: 'warn' },
-    { key: 'other', label: 'Other', icon: 'chat', severity: 'info' },
+    { key: FeedbackCategories.Bug, label: 'Bug report', icon: 'bug_report', severity: 'danger' },
+    { key: FeedbackCategories.Suggestion, label: 'Suggestion', icon: 'lightbulb', severity: 'warn' },
+    { key: FeedbackCategories.Other, label: 'Other', icon: 'chat', severity: 'info' },
   ];
 
   protected readonly form = new FormGroup({
@@ -63,13 +63,13 @@ export class FeedbackDialog {
   protected readonly placeholders = computed(() => {
     const type = this._selectedType();
     switch (type) {
-      case 'bug':
+      case FeedbackCategories.Bug:
         return {
           title: 'e.g. Session attendance not saving correctly',
           message:
             'What were you doing when it happened? What did you expect vs. what actually occurred?',
         };
-      case 'suggestion':
+      case FeedbackCategories.Suggestion:
         return {
           title: 'e.g. Show progress charts per client',
           message:
@@ -129,7 +129,7 @@ export class FeedbackDialog {
   }
 
   protected onDialogHide(): void {
-    this.form.reset({ type: this.types[0].key, title: '', message: '', email: '' });
+    this.form.reset({ type: FeedbackCategories.Bug, title: '', message: '', email: '' });
     this.submitted.set(false);
   }
 }

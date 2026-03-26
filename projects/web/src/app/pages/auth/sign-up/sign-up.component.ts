@@ -13,23 +13,23 @@ import {
   ReactiveFormsModule,
   Validators,
   AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-// PrimeNG imports
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
 import { Divider } from 'primeng/divider';
-
-// Core imports
 import {
   AuthService,
   AuthStore,
   FacebookAuthService,
   GoogleAuthService,
   RegisterRequest,
+  UserRoles,
+  UserService,
 } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
@@ -56,35 +56,25 @@ export class SignUpComponent {
   private readonly _authStore = inject(AuthStore);
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _facebookAuthService = inject(FacebookAuthService);
+  private readonly _userService = inject(UserService);
   private readonly _router = inject(Router);
   protected readonly _route = inject(ActivatedRoute);
 
-  // Signals for component state
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
 
-  // Reactive form
-  registerForm: FormGroup = this._formBuilder.group({
-    firstName: ['', [Validators.required, Validators.minLength(2)]],
-    lastName: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    phone: ['', [Validators.pattern(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/)]],
-    password: ['', [Validators.required, this.strongPasswordValidator]],
-    isInstructor: [false],
-  });
-
-  private strongPasswordValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    const value: string = control.value ?? '';
-    if (!value) return null;
-    const valid =
-      value.length >= 8 &&
-      /[A-Z]/.test(value) &&
-      /[a-z]/.test(value) &&
-      /[0-9]/.test(value) &&
-      /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?`~]/.test(value);
-    return valid ? null : { passwordStrength: true };
-  }
+  registerForm: FormGroup = this._formBuilder.group(
+    {
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.pattern(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/)]],
+      password: ['', [Validators.required, this.strongPasswordValidator]],
+      confirmPassword: ['', [Validators.required]],
+      isInstructor: [false],
+    },
+    { validators: this.passwordMatchValidator },
+  );
 
   private readonly googleBtnContainer = viewChild<ElementRef>('googleBtn');
 
@@ -109,23 +99,25 @@ export class SignUpComponent {
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.successMessage.set(null);
 
-    const { firstName, lastName, email, phone, password, isInstructor } = this.registerForm.value;
+    const { firstName, lastName, email, phone, password, confirmPassword, isInstructor } =
+      this.registerForm.value;
     const data: RegisterRequest = {
       firstName,
       lastName,
       email,
       phone: phone || undefined,
       password,
-      confirmPassword: password,
+      confirmPassword,
       isInstructor: isInstructor || undefined,
     };
 
     this._authService.register(data).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.navigateToDashboard();
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        this._userService.updateMe({ timezone }).subscribe({ error: () => {} });
+        this.navigateToApp();
       },
       error: (error) => {
         this.isLoading.set(false);
@@ -141,7 +133,7 @@ export class SignUpComponent {
     this._authService.googleLogin({ idToken }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.navigateToDashboard();
+        this.navigateToApp();
       },
       error: (error: { error?: { message?: string } }) => {
         this.isLoading.set(false);
@@ -160,7 +152,7 @@ export class SignUpComponent {
         this._authService.facebookLogin({ accessToken }).subscribe({
           next: () => {
             this.isLoading.set(false);
-            this.navigateToDashboard();
+            this.navigateToApp();
           },
           error: (error: { error?: { message?: string } }) => {
             this.isLoading.set(false);
@@ -175,17 +167,23 @@ export class SignUpComponent {
       });
   }
 
-  // Helper methods for validation
   isFieldInvalid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  hasPasswordMismatch(): boolean {
-    return !!(
-      this.registerForm.hasError('passwordMismatch') &&
-      this.registerForm.get('confirmPassword')?.touched
-    );
+  isConfirmPasswordInvalid(): boolean {
+    const field = this.registerForm.get('confirmPassword');
+    if (!field || !(field.dirty || field.touched)) return false;
+    return field.hasError('required') || this.registerForm.hasError('passwordMismatch');
+  }
+
+  getConfirmPasswordError(): string {
+    const field = this.registerForm.get('confirmPassword');
+    if (!field) return '';
+    if (field.hasError('required')) return 'Please confirm your password';
+    if (this.registerForm.hasError('passwordMismatch')) return 'Passwords do not match';
+    return '';
   }
 
   getFieldError(fieldName: string): string {
@@ -208,19 +206,38 @@ export class SignUpComponent {
     return '';
   }
 
-  private navigateToDashboard(): void {
+  private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    const value: string = control.value ?? '';
+    if (!value) return null;
+    const valid =
+      value.length >= 8 &&
+      /[A-Z]/.test(value) &&
+      /[a-z]/.test(value) &&
+      /[0-9]/.test(value) &&
+      /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?`~]/.test(value);
+    return valid ? null : { passwordStrength: true };
+  }
+
+  private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    if (confirmPassword && password !== confirmPassword) {
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
+
+  private navigateToApp(): void {
     const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl');
     if (returnUrl) {
       this._router.navigateByUrl(returnUrl);
       return;
     }
 
-    if (this._authStore.isInstructor()) {
-      this._router.navigate(['/app/dashboard']);
-    } else if (this._authStore.isUser()) {
-      this._router.navigate(['/app/client/dashboard/']);
+    if (this._authStore.hasRole(UserRoles.Instructor)) {
+      this._router.navigate(['/app/profile']);
     } else {
-      this._router.navigate(['/app/dashboard']);
+      this._router.navigate(['/app/client/profile']);
     }
   }
 

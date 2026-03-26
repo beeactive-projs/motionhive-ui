@@ -15,7 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Instructor, ClientRequest, ClientService } from 'core';
+import { MyInstructor, ClientRequest, ClientService } from 'core';
 import { DiscoverInstructors } from '../dialogs/discover-instructors/discover-instructors';
 
 @Component({
@@ -41,7 +41,7 @@ export class Instructors implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
 
-  readonly instructors = signal<Instructor[]>([]);
+  readonly instructors = signal<MyInstructor[]>([]);
   readonly totalRecords = signal(0);
   readonly loading = signal(true);
   readonly pendingRequests = signal<ClientRequest[]>([]);
@@ -124,10 +124,8 @@ export class Instructors implements OnInit {
     });
   }
 
-  initials(instructor: Instructor): string {
-    return instructor.name
-      .split(' ')
-      .slice(0, 2)
+  initials(item: MyInstructor): string {
+    return [item.instructor.firstName, item.instructor.lastName]
       .map((w) => w.charAt(0))
       .join('');
   }
@@ -137,6 +135,6 @@ export class Instructors implements OnInit {
     return `${request.toUser.firstName} ${request.toUser.lastName}`;
   }
 
-  trackByEmail = (_: number, item: Instructor) => item.email;
+  trackByEmail = (_: number, item: MyInstructor) => item.instructor.email;
   trackById = (_: number, item: { id: string }) => item.id;
 }

@@ -15,6 +15,11 @@ export const appRoutes: Routes = [
     loadChildren: () => import('./instructor/instructor.routes').then((m) => m.instructorRoutes),
   },
   {
+    path: 'profile',
+    loadComponent: () => import('./profile/profile').then((m) => m.Profile),
+    title: 'My Profile - BeeActive',
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',

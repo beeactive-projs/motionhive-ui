@@ -88,6 +88,7 @@ export class NewPasswordComponent implements OnInit {
       .resetPassword({
         token: this.token,
         newPassword: this.newPasswordForm.value.newPassword,
+        confirmPassword: this.newPasswordForm.value.confirmPassword,
       })
       .subscribe({
         next: () => {

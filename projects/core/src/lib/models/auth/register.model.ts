@@ -5,6 +5,5 @@
   firstName: string;
   lastName: string;
   phone?: string;
-  acceptTerms?: boolean;
   isInstructor?: boolean;
 }

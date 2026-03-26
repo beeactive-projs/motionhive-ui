@@ -1,0 +1,59 @@
+<header class="site-header" [class.scrolled]="scrolled()">
+
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <!-- Logo -->
+      <a routerLink="/" class="logo-link" aria-label="BeeActive home">
+        <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
+        <span class="font-heading text-xl sm:text-2xl font-extrabold">
+          BeeActive
+        </span>
+      </a>
+
+      <!-- Desktop nav links -->
+      <div class="hidden lg:flex items-center" role="navigation" aria-label="Main navigation">
+        @for (link of navLinks; track link.label) {
+        <a [routerLink]="link.path" routerLinkActive="nav-link--active" [routerLinkActiveOptions]="{exact: link.exact}"
+          class="nav-link">{{ link.label }}</a>
+        }
+      </div>
+
+      <!-- Desktop auth area -->
+      <div class="hidden lg:flex items-center gap-2">
+        <div class="nav-divider" aria-hidden="true"></div>
+        <p-button [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'" [rounded]="true" [text]="true"
+          (onClick)="toggleTheme()" [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+          size="small" />
+        <!-- <p-button label="Sign In" [text]="true" [disabled]="true" size="small" /> -->
+        <p-button label="Join the waitlist" icon="pi pi-bell" iconPos="right" size="small"
+          (onClick)="openJoinWaitlist()" />
+      </div>
+
+      <!-- Mobile controls -->
+      <div class="flex lg:hidden items-center gap-1">
+        <p-button [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'" [rounded]="true" [text]="true"
+          (onClick)="toggleTheme()" [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'" />
+        <p-button [icon]="mobileMenuOpen() ? 'pi pi-times' : 'pi pi-bars'" [rounded]="true" [text]="true"
+          (onClick)="toggleMobileMenu()" ariaLabel="Toggle navigation menu" [attr.aria-expanded]="mobileMenuOpen()" />
+      </div>
+    </div>
+
+    <!-- Mobile menu panel -->
+    @if (mobileMenuOpen()) {
+    <div class="mobile-menu" role="navigation" aria-label="Mobile navigation">
+      @for (link of navLinks; track link.label) {
+      <a [routerLink]="link.path" routerLinkActive="mobile-link--active" [routerLinkActiveOptions]="{exact: link.exact}"
+        (click)="closeMobileMenu()" class="mobile-link">{{
+        link.label }}</a>
+      }
+
+      <div class="mobile-menu-divider bg-surface-200"></div>
+
+      <div class="flex gap-2 justify-end">
+        <p-button label="Join the waitlist" icon="pi pi-bell" iconPos="right" fluid (onClick)="openJoinWaitlist()" />
+      </div>
+    </div>
+    }
+  </nav>
+</header>

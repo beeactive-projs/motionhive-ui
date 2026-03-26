@@ -109,6 +109,77 @@
           "builder": "@angular/build:unit-test"
         }
       }
+    },
+    "website": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/website",
+      "sourceRoot": "projects/website/src",
+      "prefix": "bee",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/website/src/main.ts",
+            "tsConfig": "projects/website/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/website/public"
+              }
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/website/public"]
+            },
+            "styles": [
+              "projects/website/src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "10MB",
+                  "maximumError": "100MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "400kB",
+                  "maximumError": "800kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "website:build:production"
+            },
+            "development": {
+              "buildTarget": "website:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
     }
   }
 }

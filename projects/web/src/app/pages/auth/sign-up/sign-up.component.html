@@ -47,15 +47,6 @@
     </div>
     <div class="form animate-fade-in w-full">
 
-      <!-- Success Message -->
-      @if (successMessage()) {
-      <div class="mb-6">
-        <p-message severity="success" class="w-full">
-          {{successMessage()}}
-        </p-message>
-      </div>
-      }
-
       <!-- Error Message -->
       @if (errorMessage()) {
       <div class="mb-6">
@@ -116,7 +107,7 @@
         </div>
 
         <!-- Phone Field -->
-        <div class="flex flex-col gap-1">
+        <!-- <div class="flex flex-col gap-1">
           <label for="phone" class="text-xs font-semibold text-secondary-500">
             Phone number
             <span class="text-secondary-400 font-normal ml-1">(Optional)</span>
@@ -130,7 +121,7 @@
             {{ getFieldError('phone') }}
           </p-message>
           }
-        </div>
+        </div> -->
 
         <!-- Password Field -->
         <div class="flex flex-col gap-1">
@@ -144,6 +135,22 @@
           @if (isFieldInvalid('password')) {
           <p-message variant="simple" severity="error" size="small">
             {{ getFieldError('password') }}
+          </p-message>
+          }
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="flex flex-col gap-1">
+          <label for="confirmPassword" class="text-xs font-semibold text-secondary-500">
+            Confirm password
+          </label>
+          <p-password formControlName="confirmPassword" inputId="confirmPassword" placeholder="Re-enter your password"
+            fluid size="large" [toggleMask]="true" [feedback]="false"
+            [class]="isConfirmPasswordInvalid() ? 'ng-invalid ng-dirty' : ''" autocomplete="new-password"
+            [attr.aria-required]="true" [attr.aria-invalid]="isConfirmPasswordInvalid()" />
+          @if (isConfirmPasswordInvalid()) {
+          <p-message variant="simple" severity="error" size="small">
+            {{ getConfirmPasswordError() }}
           </p-message>
           }
         </div>

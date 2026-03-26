@@ -21,17 +21,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
-import { InstructorClient, InstructorClientStatus, ClientRequest, ClientService } from 'core';
-
-type TagSeverity =
-  | 'success'
-  | 'warn'
-  | 'danger'
-  | 'secondary'
-  | 'info'
-  | 'contrast'
-  | null
-  | undefined;
+import { InstructorClient, InstructorClientStatus, ClientRequest, ClientService, TagSeverity } from 'core';
 
 @Component({
   selector: 'bee-clients',
@@ -297,11 +287,11 @@ export class Clients implements OnInit {
   statusSeverity(status: InstructorClientStatus): TagSeverity {
     switch (status) {
       case 'ACTIVE':
-        return 'success';
+        return TagSeverity.Success;
       case 'ARCHIVED':
-        return 'danger';
+        return TagSeverity.Danger;
       case 'PENDING':
-        return 'warn';
+        return TagSeverity.Warn;
     }
   }
 

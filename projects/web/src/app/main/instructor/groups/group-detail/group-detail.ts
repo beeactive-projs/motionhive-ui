@@ -17,9 +17,8 @@ import {
   GroupMember,
   JoinPolicy,
   AuthStore,
+  TagSeverity,
 } from 'core';
-
-type TagSeverity = 'success' | 'warn' | 'danger' | 'secondary' | 'info' | 'contrast' | null | undefined;
 
 @Component({
   selector: 'bee-group-detail',
@@ -230,11 +229,11 @@ export class GroupDetail implements OnInit {
   joinPolicySeverity(policy: JoinPolicy): TagSeverity {
     switch (policy) {
       case 'OPEN':
-        return 'success';
+        return TagSeverity.Success;
       case 'APPROVAL':
-        return 'warn';
+        return TagSeverity.Warn;
       case 'INVITE_ONLY':
-        return 'info';
+        return TagSeverity.Info;
     }
   }
 
