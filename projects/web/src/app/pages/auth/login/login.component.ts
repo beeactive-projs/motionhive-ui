@@ -15,7 +15,7 @@ import { InputIconModule } from 'primeng/inputicon';
 // Core imports
 import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest } from 'core';
 import { Divider } from 'primeng/divider';
-import { ThemeService } from '../../../_core/services/theme.service';
+import { ThemeService } from 'core';
 import { ThemeToggleComponent } from "../../../_shared/components/theme-toggle/theme-toggle.component";
 
 @Component({

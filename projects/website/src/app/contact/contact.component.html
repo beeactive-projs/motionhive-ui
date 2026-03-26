@@ -1,0 +1,164 @@
+<!-- ===== Hero Section ===== -->
+<section class="relative overflow-hidden py-20 sm:py-28">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fade-in">
+    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-400/15 mb-4">
+      <i class="pi pi-envelope text-accent-300 text-sm"></i>
+      <span class="text-sm font-semibold text-accent-300">Contact Us</span>
+    </div>
+
+    <h1
+      class="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white leading-[1.1] tracking-tight mb-6">
+      Get in
+      <span class="text-brand">Touch</span>
+    </h1>
+
+    <p class="text-lg sm:text-xl text-secondary-400 max-w-2xl mx-auto leading-relaxed">
+      Have a question or ready to start? Send us a message and we'll get back to you within one business day.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Contact Section ===== -->
+<section class="py-20 sm:py-28 bg-white dark:bg-secondary-900">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16">
+
+      <!-- ===== Form ===== -->
+      <div class="contact-form-card">
+        <h2 class="text-2xl font-heading font-extrabold text-secondary-900 dark:text-white mb-6">
+          Send us a Message
+        </h2>
+
+        @if (successMessage()) {
+        <div class="mb-6">
+          <p-message severity="success" styleClass="w-full">{{ successMessage() }}</p-message>
+        </div>
+        }
+
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+          <!-- Name -->
+          <div class="flex flex-col gap-1.5">
+            <label for="name" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300">
+              Full Name
+            </label>
+            <input
+              pInputText
+              id="name"
+              formControlName="name"
+              placeholder="Your name"
+              [invalid]="isFieldInvalid('name')"
+              class="w-full" />
+            @if (isFieldInvalid('name')) {
+            <small class="text-red-500 text-xs">Name is required (minimum 2 characters).</small>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="flex flex-col gap-1.5">
+            <label for="email" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300">
+              Email Address
+            </label>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="your@email.com"
+              [invalid]="isFieldInvalid('email')"
+              class="w-full" />
+            @if (isFieldInvalid('email')) {
+            <small class="text-red-500 text-xs">A valid email address is required.</small>
+            }
+          </div>
+
+          <!-- Subject -->
+          <div class="flex flex-col gap-1.5">
+            <label for="subject" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300">
+              Subject
+            </label>
+            <input
+              pInputText
+              id="subject"
+              formControlName="subject"
+              placeholder="What is this about?"
+              [invalid]="isFieldInvalid('subject')"
+              class="w-full" />
+            @if (isFieldInvalid('subject')) {
+            <small class="text-red-500 text-xs">Subject is required.</small>
+            }
+          </div>
+
+          <!-- Message -->
+          <div class="flex flex-col gap-1.5">
+            <label for="message" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300">
+              Message
+            </label>
+            <textarea
+              pInputTextarea
+              id="message"
+              formControlName="message"
+              rows="6"
+              placeholder="Tell us how we can help..."
+              [invalid]="isFieldInvalid('message')"
+              class="w-full"></textarea>
+            @if (isFieldInvalid('message')) {
+            <small class="text-red-500 text-xs">Message must be at least 10 characters.</small>
+            }
+          </div>
+
+          <!-- Submit -->
+          <p-button
+            type="submit"
+            label="Send Message"
+            icon="pi pi-send"
+            iconPos="right"
+            [loading]="isLoading()"
+            [disabled]="isLoading()"
+            severity="warn"
+            size="large"
+            styleClass="w-full" />
+        </form>
+      </div>
+
+      <!-- ===== Contact Info ===== -->
+      <div>
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 dark:bg-primary-400/15 mb-4">
+            <span class="text-sm font-semibold text-primary-700 dark:text-primary-300">Get in Touch</span>
+          </div>
+          <h2
+            class="text-2xl sm:text-3xl font-heading font-extrabold text-secondary-900 dark:text-white mb-3">
+            We're Here to Help
+          </h2>
+          <p class="text-secondary-500 dark:text-secondary-400 leading-relaxed">
+            Reach out through any channel below. Our team typically responds within one business day.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          @for (info of contactInfo; track info.label) {
+          <div class="contact-info-card">
+            <div class="feature-icon-wrap" aria-hidden="true">
+              <i [class]="'pi ' + info.icon + ' text-xl'"></i>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-secondary-900 dark:text-white mb-1">{{ info.label }}</p>
+              @if (info.href) {
+              <a [href]="info.href"
+                class="text-sm text-primary-500 dark:text-primary-400 hover:underline">{{ info.value }}</a>
+              } @else {
+              <p
+                class="text-sm text-secondary-500 dark:text-secondary-400 whitespace-pre-line leading-relaxed">
+                {{ info.value }}
+              </p>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

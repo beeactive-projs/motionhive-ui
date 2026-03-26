@@ -10,7 +10,9 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { FeedbackService, FeedbackCategory, FeedbackCategories, AuthStore } from 'core';
+import { FeedbackCategory, FeedbackCategories } from '../../models/feedback/feedback.enums';
+import { FeedbackService } from '../../services/feedback/feedback.service';
+import { AuthStore } from '../../stores/auth.store';
 import { AutoFocusModule } from 'primeng/autofocus';
 
 @Component({

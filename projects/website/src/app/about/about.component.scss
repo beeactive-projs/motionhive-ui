@@ -1,0 +1,11 @@
+@use 'variables' as *;
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 50dvh;
+}

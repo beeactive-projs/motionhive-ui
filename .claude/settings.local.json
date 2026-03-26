@@ -8,7 +8,8 @@
       "Bash(curl -s \"https://beeactive-api-production.up.railway.app/api/docs-json\")",
       "Bash(python3:*)",
       "Bash(curl -v \"https://beeactive-api-production.up.railway.app/api/docs-json\")",
-      "Bash(ng build:*)"
+      "Bash(ng build:*)",
+      "WebFetch(domain:gemini.google.com)"
     ]
   }
 }

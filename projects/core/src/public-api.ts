@@ -64,6 +64,7 @@ export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';
 export * from './lib/services/waitlist/waitlist.service';
 export * from './lib/services/error-dialog/error-dialog.service';
+export * from './lib/services/theme/theme.service';
 
 // Stores
 export * from './lib/stores/auth.store';
@@ -71,6 +72,10 @@ export * from './lib/stores/auth.store';
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';
 export * from './lib/interceptors/error.interceptor';
+
+// Components
+export * from './lib/components/waitlist-dialog/waitlist-dialog';
+export * from './lib/components/feedback-dialog/feedback-dialog';
 
 // Guards
 export * from './lib/guards/auth.guard';

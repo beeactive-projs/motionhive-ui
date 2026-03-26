@@ -1,0 +1,194 @@
+<section class="hero-section">
+  <div class="max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <!-- Hero Content -->
+      <div class="text-center lg:text-left animate-fade-in">
+        <div class="fitness-platform">
+          <i class="pi pi-sparkles"></i>
+          <span>Where active communities come together</span>
+        </div>
+        <h1 class="text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
+          Make staying <span class="text-brand">active together</span> feel easy.
+        </h1>
+
+        <p class="text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+          Whether you lead a group or just love showing up — this is your space to stay active, stay connected, and
+          find
+          <span class="text-brand">your people</span>.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <p-button label="Join the waitlist" icon="pi pi-bell" iconPos="right" size="large"
+            (onClick)="openJoinWaitlist()" />
+        </div>
+        <p class="mt-5 text-sm text-surface-400">
+          <span class="text-brand">Free to organise. Free to join. Always.</span> — we're building something good.
+        </p>
+      </div>
+
+      <!-- Hero Visual -->
+      <div class="relative animate-slide-up hidden lg:block">
+        <div class="hero-visual">
+          <div class="hero-hex hero-hex-1">
+            <div class="hero-hex-inner">
+              <div class="hero-hex-glow">
+                <i class="hero-hex-icon pi pi-compass"></i>
+              </div>
+              <!-- <div class="hero-hex-divider"></div> -->
+              <span class="hero-hex-label">Discover what moves you</span>
+            </div>
+          </div>
+          <div class="hero-hex hero-hex-2">
+            <div class="hero-hex-inner">
+              <div class="hero-hex-glow">
+                <i class="hero-hex-icon pi pi-wrench"></i>
+              </div>
+              <span class="hero-hex-label">Run it your way</span>
+            </div>
+          </div>
+          <div class="hero-hex hero-hex-3">
+            <div class="hero-hex-inner">
+              <div class="hero-hex-glow">
+                <i class="hero-hex-icon pi pi-user-plus"></i>
+              </div>
+              <span class="hero-hex-label">Grow your community</span>
+            </div>
+          </div>
+          <div class="hero-hex hero-hex-4">
+            <div class="hero-hex-inner">
+              <div class="hero-hex-glow">
+                <i class="hero-hex-icon pi pi-bolt"></i>
+              </div>
+              <span class="hero-hex-label">Keep the energy going</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating stat cards -->
+        <div class="floating-card floating-card-1">
+          <div class="floating-card-icon floating-card-icon--accent">
+            <i class="pi pi-chart-line"></i>
+          </div>
+          <div>
+            <p class="floating-card-title">Grow your <span class="text-brand">brand</span></p>
+            <p class="floating-card-desc">Bring your people together and keep them coming back.</p>
+          </div>
+        </div>
+
+        <div class="floating-card floating-card-2">
+          <div class="floating-card-icon floating-card-icon--primary">
+            <i class="pi pi-users"></i>
+          </div>
+          <div>
+            <p class="floating-card-title">Find your <span class="text-brand">circle</span></p>
+            <p class="floating-card-desc">Explore activities near you and show up with people who get it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Who It's For Section ===== -->
+<section class="who-section py-14 sm:py-20">
+  <!-- <div class="who-bg"></div> -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3">
+        How will you <span class="text-brand">BeeActive</span>?
+      </h2>
+      <p class="section-subtext text-lg">
+        One platform. Two ways in.
+      </p>
+    </div>
+
+    <div class="who-grid grid md:grid-cols-2 gap-10 items-stretch">
+      <div class="who-column who-column-left">
+        <div class="who-icon who-icon-instructors">
+          <i class="pi pi-flag"></i>
+        </div>
+        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-1">
+          You lead.
+        </h3>
+        <p class="section-subtext text-sm font-medium mb-4">Build your hive.</p>
+        <ul class="who-list">
+          <li>Run sessions and classes on your terms.</li>
+          <li>Keep your community in one place.</li>
+          <li>Share updates, not spreadsheets.</li>
+        </ul>
+      </div>
+      <div class="who-column who-column-right">
+        <div class="who-icon who-icon-movers">
+          <i class="pi pi-heart"></i>
+        </div>
+        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-1">
+          You show up.
+        </h3>
+        <p class="section-subtext text-sm font-medium mb-4">Join the hive.</p>
+        <ul class="who-list">
+          <li>Discover what's happening around you.</li>
+          <li>Stay connected to your favourite groups.</li>
+          <li>Show up, stay close, keep moving.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== What's Coming Section ===== -->
+<section class="feature-section py-14 sm:py-20">
+  <!-- <div class="honeycomb-bg"></div> -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 mb-4">
+        <i class="pi pi-wrench text-sm text-primary-500"></i>
+        <span class="text-sm font-semibold text-primary-500">In the making</span>
+      </div>
+      <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3">
+        The hive is <span class="text-brand">taking shape</span>.
+      </h2>
+      <p class="section-subtext text-lg max-w-2xl mx-auto">
+        We're building BeeActive piece by piece. Here's what's landing first.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (item of roadmap; track item.title) {
+      <div class="feature-card">
+        <div class="feature-icon-wrap">
+          <i [class]="'pi ' + item.icon + ' text-lg'"></i>
+        </div>
+        <h3 class="section-heading text-lg font-heading font-bold mb-1">
+          {{ item.title }}
+        </h3>
+        <p class="section-subtext text-sm leading-relaxed flex-1">
+          {{ item.description }}
+        </p>
+        @if (item.ready) {
+        <span class="feature-badge feature-badge-live">Live</span>
+        } @else {
+        <span class="feature-badge feature-badge-soon">Coming soon</span>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA Section ===== -->
+<section class="cta-section">
+  <!-- <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div> -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
+    <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3">
+      Get in <span class="text-brand">early</span>.
+    </h2>
+    <p class="section-subtext text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
+      BeeActive is just getting started. We're building the hive — follow along on our blog and be the first to know
+      when it opens.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <p-button label="Read the blog" icon="pi pi-arrow-right" iconPos="right" routerLink="/blog" size="large" />
+    </div>
+  </div>
+</section>

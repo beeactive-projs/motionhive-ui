@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { environment } from 'core';
-import { FeedbackDialog } from './_shared/components/feedback-dialog/feedback-dialog';
+import { environment, FeedbackDialog, WaitlistDialog } from 'core';
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
-import { WaitlistDialog } from './_shared/components/waitlist-dialog/waitlist-dialog';
 
 @Component({
   selector: 'app-root',
