@@ -228,7 +228,7 @@ export class Groups implements OnInit {
   }
 
   navigateToGroup(group: Group): void {
-    this._router.navigate(['/app/groups', group.id]);
+    this._router.navigate(['/groups', group.id]);
   }
 
   addTag(): void {

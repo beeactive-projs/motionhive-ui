@@ -143,7 +143,7 @@ export class BecomeInstructor {
       next: () => {
         this.isLoading.set(false);
         this.visible.set(false);
-        this._router.navigate(['/app/dashboard']);
+        this._router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.isLoading.set(false);

@@ -174,11 +174,11 @@ export class LoginComponent {
     }
 
     if (this._authStore.isInstructor()) {
-      this._router.navigate(['/app/dashboard']);
+      this._router.navigate(['/dashboard']);
     } else if (this._authStore.isUser()) {
-      this._router.navigate(['/app/client/dashboard/']);
+      this._router.navigate(['/client/dashboard/']);
     } else {
-      this._router.navigate(['/app/dashboard']);
+      this._router.navigate(['/dashboard']);
     }
   }
 

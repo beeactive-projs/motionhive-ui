@@ -235,9 +235,9 @@ export class SignUpComponent {
     }
 
     if (this._authStore.hasRole(UserRoles.Instructor)) {
-      this._router.navigate(['/app/profile']);
+      this._router.navigate(['/profile']);
     } else {
-      this._router.navigate(['/app/client/profile']);
+      this._router.navigate(['/client/profile']);
     }
   }
 

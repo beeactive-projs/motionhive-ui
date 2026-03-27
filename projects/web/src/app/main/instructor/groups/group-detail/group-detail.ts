@@ -110,7 +110,7 @@ export class GroupDetail implements OnInit {
   }
 
   goBack(): void {
-    this._router.navigate(['/app/groups']);
+    this._router.navigate(['/groups']);
   }
 
   generateJoinLink(): void {
@@ -121,7 +121,7 @@ export class GroupDetail implements OnInit {
     this._groupService.generateJoinLink(group.id).subscribe({
       next: (response) => {
         this.generatingLink.set(false);
-        const link = `${window.location.origin}/app/join/${response.token}`;
+        const link = `${window.location.origin}/join/${response.token}`;
         this.joinLink.set(link);
         this.copyToClipboard(link);
         this._messageService.add({

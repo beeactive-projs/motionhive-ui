@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { BeeActiveLara } from '../styles.primeng';
+import { MotionHiveLara } from '../styles.primeng';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     providePrimeNG({
       theme: {
-        preset: BeeActiveLara,
+        preset: MotionHiveLara,
         options: {
           darkModeSelector: '.dark',
           cssLayer: {

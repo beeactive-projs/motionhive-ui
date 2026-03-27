@@ -11,7 +11,7 @@ import {
   secondary,
 } from './theme-colors';
 
-export const BeeActiveLara = definePreset(Lara, {
+export const MotionHiveLara = definePreset(Lara, {
   primitive: {},
 
   semantic: {

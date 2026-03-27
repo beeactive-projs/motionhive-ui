@@ -1,8 +1,11 @@
 @use 'variables' as *;
 
-// :host {
-//   --featured-article-height: 390px;
-// }
+@use '../app' as app;
+
+@include app.cta-section();
+@include app.orb-base();
+@include app.orb-colors();
+@include app.category-badge();
 
 .hero-section {
   position: relative;

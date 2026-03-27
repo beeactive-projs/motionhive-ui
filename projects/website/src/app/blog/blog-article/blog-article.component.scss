@@ -1,4 +1,10 @@
 @use 'variables' as *;
+@use '../../app' as app;
+
+@include app.cta-section();
+@include app.orb-base();
+@include app.orb-colors();
+@include app.category-badge();
 
 :host {
   --featured-article-image: 390px;

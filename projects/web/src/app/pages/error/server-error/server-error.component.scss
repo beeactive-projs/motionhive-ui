@@ -1,8 +1,4 @@
 @use 'variables' as *;
-@use '../../public/public-shared' as shared;
-
-@include shared.orb-base();
-@include shared.orb-colors();
 
 .error-page {
   position: relative;

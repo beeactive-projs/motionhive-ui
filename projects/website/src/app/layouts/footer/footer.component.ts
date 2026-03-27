@@ -19,12 +19,12 @@ export class PublicFooterComponent {
   readonly currentYear = new Date().getFullYear();
 
   readonly socialLinks = [
-    { icon: 'pi-facebook', href: 'https://facebook.com/beeactive.fit', label: 'Facebook' },
+    { icon: 'pi-facebook', href: 'https://facebook.com/motionhive.fit', label: 'Facebook' },
     // { icon: 'pi-twitter', href: 'https://twitter.com', label: 'X (Twitter)' },
-    { icon: 'pi-instagram', href: 'https://instagram.com/beeactive.fit', label: 'Instagram' },
+    { icon: 'pi-instagram', href: 'https://instagram.com/motionhive.fit', label: 'Instagram' },
     {
       icon: 'pi-linkedin',
-      href: 'https://www.linkedin.com/company/beeactivefit',
+      href: 'https://www.linkedin.com/company/motionhivefit',
       label: 'LinkedIn',
     },
   ];
