@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
-  selector: 'bee-about',
+  selector: 'mh-about',
   imports: [RouterLink, ButtonModule],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',

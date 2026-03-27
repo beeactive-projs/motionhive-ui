@@ -21,13 +21,13 @@ export class App {
     this._meta.addTags([
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: environment.appUrl },
-      { property: 'og:title', content: 'BeeActive' },
+      { property: 'og:title', content: 'MotionHive' },
       { property: 'og:description', content: 'Where active communities come together' },
       { property: 'og:image', content: imageUrl },
       { property: 'og:image:width', content: '1200' },
       { property: 'og:image:height', content: '630' },
       { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: 'BeeActive' },
+      { name: 'twitter:title', content: 'MotionHive' },
       { name: 'twitter:description', content: 'Where active communities come together' },
       { name: 'twitter:image', content: imageUrl },
     ]);

@@ -1,4 +1,12 @@
-import { afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, viewChild } from '@angular/core';
+import {
+  afterRenderEffect,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { catchError, of, shareReplay, switchMap } from 'rxjs';
@@ -10,7 +18,7 @@ import { BlogService } from 'core';
 import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'bee-blog-article',
+  selector: 'mh-blog-article',
   imports: [RouterLink, ButtonModule, DatePipe, Skeleton],
   templateUrl: './blog-article.component.html',
   styleUrl: './blog-article.component.scss',
@@ -47,7 +55,10 @@ export class BlogArticleComponent {
       const observer = new ResizeObserver((entries) => {
         const height = entries[0]?.contentRect.height;
         if (height != null) {
-          this._elementRef.nativeElement.style.setProperty('--featured-article-image', `${height}px`);
+          this._elementRef.nativeElement.style.setProperty(
+            '--featured-article-image',
+            `${height}px`,
+          );
         }
       });
       observer.observe(el);

@@ -34,7 +34,7 @@ import {
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-sign-up',
+  selector: 'mh-sign-up',
   imports: [
     ReactiveFormsModule,
     RouterLink,

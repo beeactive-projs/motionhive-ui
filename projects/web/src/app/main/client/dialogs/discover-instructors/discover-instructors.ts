@@ -11,7 +11,7 @@ import { MessageService } from 'primeng/api';
 import { InstructorSearchResult, ClientService, ProfileService } from 'core';
 
 @Component({
-  selector: 'bee-discover-instructors',
+  selector: 'mh-discover-instructors',
   imports: [
     FormsModule,
     DialogModule,
@@ -56,7 +56,11 @@ export class DiscoverInstructors {
       error: () => {
         this.searching.set(false);
         this.searched.set(true);
-        this._messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to search instructors' });
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to search instructors',
+        });
       },
     });
   }

@@ -12,7 +12,7 @@ import { AuthService } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-reset-password',
+  selector: 'mh-reset-password',
   imports: [
     ReactiveFormsModule,
     RouterLink,

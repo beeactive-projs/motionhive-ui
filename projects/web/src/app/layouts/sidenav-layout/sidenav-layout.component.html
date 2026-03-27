@@ -4,9 +4,9 @@
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
 
-    <a routerLink="/dashboard" class="brand-logo flex" aria-label="BeeActive home">
-      <img src="svg/logo-navy.svg" alt="BeeActive logo" class="max-w-10">
-      <span class="font-heading text-2xl font-extrabold tracking-tight">Bee Active</span>
+    <a routerLink="/dashboard" class="brand-logo flex" aria-label="MotionHive home">
+      <img src="svg/logo-navy.svg" alt="MotionHive logo" class="max-w-10">
+      <span class="font-heading text-2xl font-extrabold tracking-tight">MotionHive</span>
     </a>
 
     <nav>
@@ -35,7 +35,7 @@
       <ng-template #end>
         <div class="flex gap-4">
           <ng-content select="[toolbarEnd]" />
-          <bee-theme-toggle />
+          <mh-theme-toggle />
           <p-button icon="pi pi-sign-out" rounded (onClick)="signOut()" ariaLabel="Sign out" outlined size="small" />
         </div>
       </ng-template>

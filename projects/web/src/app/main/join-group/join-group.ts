@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { GroupService, AuthStore } from 'core';
 
 @Component({
-  selector: 'bee-join-group',
+  selector: 'mh-join-group',
   imports: [ProgressSpinnerModule, ButtonModule, CardModule],
   template: `
     <div class="flex items-center justify-center min-h-screen">

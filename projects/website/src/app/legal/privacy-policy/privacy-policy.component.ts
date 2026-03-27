@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
-  selector: 'bee-privacy-policy',
+  selector: 'mh-privacy-policy',
   imports: [RouterLink, ButtonModule],
   templateUrl: './privacy-policy.component.html',
   styleUrl: './privacy-policy.component.scss',

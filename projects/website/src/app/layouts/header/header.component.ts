@@ -6,7 +6,7 @@ import { ThemeService } from 'core';
 import { WaitlistService } from 'core';
 
 @Component({
-  selector: 'bee-public-header',
+  selector: 'mh-public-header',
   imports: [RouterLink, RouterLinkActive, ButtonModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',

@@ -8,17 +8,17 @@ export const clientRoutes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - BeeActive',
+        title: 'Dashboard - MotionHive',
       },
       {
         path: 'instructors',
         loadComponent: () => import('./instructors/instructors').then((m) => m.Instructors),
-        title: 'My Instructors - BeeActive',
+        title: 'My Instructors - MotionHive',
       },
       {
         path: 'profile',
         loadComponent: () => import('../profile/profile').then((m) => m.Profile),
-        title: 'My Profile - BeeActive',
+        title: 'My Profile - MotionHive',
       },
       {
         path: '',

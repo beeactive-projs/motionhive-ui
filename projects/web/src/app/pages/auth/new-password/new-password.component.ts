@@ -18,7 +18,7 @@ import { AuthService } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-new-password',
+  selector: 'mh-new-password',
   imports: [
     ReactiveFormsModule,
     RouterLink,
@@ -58,7 +58,9 @@ export class NewPasswordComponent implements OnInit {
       this.token = params.get('token') ?? '';
       this.hasToken.set(!!this.token);
       if (!this.token) {
-        this.errorMessage.set('Invalid or missing reset token. Please request a new password reset link.');
+        this.errorMessage.set(
+          'Invalid or missing reset token. Please request a new password reset link.',
+        );
       }
     });
   }

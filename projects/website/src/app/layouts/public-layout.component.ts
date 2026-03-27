@@ -17,7 +17,7 @@ import { PublicHeaderComponent } from './header/header.component';
 import { PublicFooterComponent } from './footer/footer.component';
 
 @Component({
-  selector: 'bee-public-layout',
+  selector: 'mh-public-layout',
   imports: [RouterOutlet, PublicHeaderComponent, PublicFooterComponent],
   templateUrl: './public-layout.component.html',
   styleUrl: './public-layout.component.scss',

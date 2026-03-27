@@ -19,7 +19,7 @@ import { MyInstructor, ClientRequest, ClientService } from 'core';
 import { DiscoverInstructors } from '../dialogs/discover-instructors/discover-instructors';
 
 @Component({
-  selector: 'bee-instructors',
+  selector: 'mh-instructors',
   imports: [
     CardModule,
     ButtonModule,
@@ -125,9 +125,7 @@ export class Instructors implements OnInit {
   }
 
   initials(item: MyInstructor): string {
-    return [item.instructor.firstName, item.instructor.lastName]
-      .map((w) => w.charAt(0))
-      .join('');
+    return [item.instructor.firstName, item.instructor.lastName].map((w) => w.charAt(0)).join('');
   }
 
   requestToName(request: ClientRequest): string {

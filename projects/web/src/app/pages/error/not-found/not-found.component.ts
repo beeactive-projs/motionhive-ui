@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-not-found',
+  selector: 'mh-not-found',
   imports: [RouterLink, ButtonModule, ThemeToggleComponent],
   templateUrl: './not-found.component.html',
   styleUrl: './not-found.component.scss',

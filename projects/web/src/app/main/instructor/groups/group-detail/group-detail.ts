@@ -1,4 +1,11 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  OnInit,
+  signal,
+  computed,
+} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CardModule } from 'primeng/card';
@@ -11,17 +18,10 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import {
-  GroupService,
-  Group,
-  GroupMember,
-  JoinPolicy,
-  AuthStore,
-  TagSeverity,
-} from 'core';
+import { GroupService, Group, GroupMember, JoinPolicy, AuthStore, TagSeverity } from 'core';
 
 @Component({
-  selector: 'bee-group-detail',
+  selector: 'mh-group-detail',
   imports: [
     DatePipe,
     CardModule,
@@ -146,7 +146,8 @@ export class GroupDetail implements OnInit {
     if (!group) return;
 
     this._confirmationService.confirm({
-      message: 'Are you sure you want to revoke the current join link? Existing links will stop working.',
+      message:
+        'Are you sure you want to revoke the current join link? Existing links will stop working.',
       header: 'Revoke Join Link',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',

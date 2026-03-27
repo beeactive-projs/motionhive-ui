@@ -29,7 +29,7 @@ interface InstructorForm {
 }
 
 @Component({
-  selector: 'bee-edit-instructor-profile',
+  selector: 'mh-edit-instructor-profile',
   imports: [
     FormsModule,
     ButtonModule,

@@ -5,7 +5,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ErrorDialogService } from 'core';
 
 @Component({
-  selector: 'bee-error-dialog',
+  selector: 'mh-error-dialog',
   imports: [DialogModule, ButtonModule],
   templateUrl: './error-dialog.html',
   styleUrl: './error-dialog.scss',

@@ -1,15 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'bee-core',
+  selector: 'mh-core',
   imports: [],
-  template: `
-    <p>
-      core works!
-    </p>
-  `,
+  template: ` <p>core works!</p> `,
   styles: ``,
 })
-export class Core {
-
-}
+export class Core {}

@@ -4,7 +4,7 @@ import type { MenuItem } from 'primeng/api';
 import { SidenavLayoutComponent } from '../../layouts/sidenav-layout/sidenav-layout.component';
 
 @Component({
-  selector: 'bee-client',
+  selector: 'mh-client',
   imports: [RouterOutlet, SidenavLayoutComponent],
   templateUrl: './client.html',
   styleUrl: './client.scss',

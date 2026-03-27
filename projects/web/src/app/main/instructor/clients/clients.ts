@@ -21,10 +21,16 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
-import { InstructorClient, InstructorClientStatus, ClientRequest, ClientService, TagSeverity } from 'core';
+import {
+  InstructorClient,
+  InstructorClientStatus,
+  ClientRequest,
+  ClientService,
+  TagSeverity,
+} from 'core';
 
 @Component({
-  selector: 'bee-clients',
+  selector: 'mh-clients',
   imports: [
     DatePipe,
     FormsModule,

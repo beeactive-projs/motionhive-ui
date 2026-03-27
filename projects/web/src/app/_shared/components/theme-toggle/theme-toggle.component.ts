@@ -3,7 +3,7 @@ import { Button } from 'primeng/button';
 import { ThemeService } from 'core';
 
 @Component({
-  selector: 'bee-theme-toggle',
+  selector: 'mh-theme-toggle',
   imports: [Button],
   template: `
     <p-button

@@ -1,4 +1,12 @@
-import { Component, signal, inject, ChangeDetectionStrategy, afterNextRender, viewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  ChangeDetectionStrategy,
+  afterNextRender,
+  viewChild,
+  ElementRef,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -16,10 +24,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest } from 'core';
 import { Divider } from 'primeng/divider';
 import { ThemeService } from 'core';
-import { ThemeToggleComponent } from "../../../_shared/components/theme-toggle/theme-toggle.component";
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-login',
+  selector: 'mh-login',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -32,8 +40,8 @@ import { ThemeToggleComponent } from "../../../_shared/components/theme-toggle/t
     IconFieldModule,
     InputIconModule,
     Divider,
-    ThemeToggleComponent
-],
+    ThemeToggleComponent,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -115,9 +123,7 @@ export class LoginComponent {
       },
       error: (error: { error?: { message?: string } }) => {
         this.isLoading.set(false);
-        this.errorMessage.set(
-          error.error?.message || 'Google sign-in failed. Please try again.',
-        );
+        this.errorMessage.set(error.error?.message || 'Google sign-in failed. Please try again.');
       },
     });
   }

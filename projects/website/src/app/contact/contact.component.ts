@@ -6,7 +6,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 
 @Component({
-  selector: 'bee-contact',
+  selector: 'mh-contact',
   imports: [ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',

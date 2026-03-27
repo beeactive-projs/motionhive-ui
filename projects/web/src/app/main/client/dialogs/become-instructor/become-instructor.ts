@@ -14,7 +14,7 @@ import { StepperModule } from 'primeng/stepper';
 import { ProfileService, TokenService, CreateInstructorProfilePayload } from 'core';
 
 @Component({
-  selector: 'bee-become-instructor',
+  selector: 'mh-become-instructor',
   imports: [
     DialogModule,
     ButtonModule,
@@ -44,12 +44,30 @@ export class BecomeInstructor {
   readonly activeStep = signal(1);
   readonly currentYear = new Date().getFullYear();
   private readonly _allSpecializations = [
-    'HIIT', 'Yoga', 'Pilates', 'Strength Training', 'Cardio', 'CrossFit',
-    'Bodybuilding', 'Calisthenics', 'Cycling', 'Running', 'Swimming',
-    'Boxing', 'Kickboxing', 'Martial Arts', 'Stretching & Flexibility',
-    'Functional Training', 'Weight Loss', 'Nutrition Coaching',
-    'Rehabilitation', 'Senior Fitness', 'Pre/Postnatal Fitness',
-    'Sports Performance', 'Mobility & Stability', 'Mindfulness',
+    'HIIT',
+    'Yoga',
+    'Pilates',
+    'Strength Training',
+    'Cardio',
+    'CrossFit',
+    'Bodybuilding',
+    'Calisthenics',
+    'Cycling',
+    'Running',
+    'Swimming',
+    'Boxing',
+    'Kickboxing',
+    'Martial Arts',
+    'Stretching & Flexibility',
+    'Functional Training',
+    'Weight Loss',
+    'Nutrition Coaching',
+    'Rehabilitation',
+    'Senior Fitness',
+    'Pre/Postnatal Fitness',
+    'Sports Performance',
+    'Mobility & Stability',
+    'Mindfulness',
   ];
 
   readonly specializationSuggestions = signal<string[]>([]);
@@ -61,9 +79,7 @@ export class BecomeInstructor {
 
   filterSpecializations(event: { query: string }): void {
     const q = event.query.toLowerCase();
-    const filtered = this._allSpecializations.filter((s) =>
-      s.toLowerCase().includes(q),
-    );
+    const filtered = this._allSpecializations.filter((s) => s.toLowerCase().includes(q));
     this.specializationSuggestions.set(filtered.length ? filtered : [event.query]);
   }
 

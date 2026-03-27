@@ -4,7 +4,7 @@ import { Button } from 'primeng/button';
 import { FeedbackService } from 'core';
 
 @Component({
-  selector: 'bee-public-footer',
+  selector: 'mh-public-footer',
   imports: [RouterLink, Button],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',

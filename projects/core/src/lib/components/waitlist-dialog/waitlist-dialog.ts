@@ -11,7 +11,7 @@ import { WaitlistRole } from '../../models/waitlist/waitlist.enums';
 import { WaitlistService } from '../../services/waitlist/waitlist.service';
 
 @Component({
-  selector: 'bee-waitlist-dialog',
+  selector: 'mh-waitlist-dialog',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
