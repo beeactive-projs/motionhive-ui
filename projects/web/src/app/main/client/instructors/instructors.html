@@ -12,61 +12,43 @@
 
   <!-- Pending Outgoing Requests Banner -->
   @if (pendingCount() > 0) {
-    <p-card class="shadow-sm border-l-4 border-l-yellow-400">
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-2">
-          <i class="pi pi-clock text-yellow-600"></i>
-          <h3 class="text-base font-semibold text-secondary-900">
-            Pending Requests ({{ pendingCount() }})
-          </h3>
-        </div>
-        <div class="space-y-3">
-          @for (request of pendingRequests(); track trackById($index, request)) {
-            <div class="flex items-center justify-between rounded-lg bg-surface-50 p-3">
-              <div class="flex items-center gap-3">
-                <p-avatar
-                  [label]="request.toUser ? request.toUser.firstName.charAt(0) + request.toUser.lastName.charAt(0) : '??'"
-                  shape="circle"
-                  class="bg-yellow-100 text-yellow-700"
-                />
-                <div>
-                  <span class="font-medium text-secondary-900">{{ requestToName(request) }}</span>
-                  <span class="text-sm text-secondary-500"> — request pending</span>
-                  @if (request.message) {
-                    <p class="mt-1 text-xs text-secondary-500 italic">"{{ request.message }}"</p>
-                  }
-                </div>
-              </div>
-              <p-button
-                icon="pi pi-times"
-                severity="danger"
-                [rounded]="true"
-                [text]="true"
-                pTooltip="Cancel Request"
-                (onClick)="confirmCancel(request)"
-              />
-            </div>
-          }
-        </div>
+  <p-card class="shadow-sm border-l-4 border-l-yellow-400">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-2">
+        <i class="pi pi-clock text-yellow-600"></i>
+        <h3 class="text-base font-semibold text-secondary-900">
+          Pending Requests ({{ pendingCount() }})
+        </h3>
       </div>
-    </p-card>
+      <div class="space-y-3">
+        @for (request of pendingRequests(); track trackById($index, request)) {
+        <div class="flex items-center justify-between rounded-lg bg-surface-50 p-3">
+          <div class="flex items-center gap-3">
+            <p-avatar
+              [label]="request.toUser ? request.toUser.firstName.charAt(0) + request.toUser.lastName.charAt(0) : '??'"
+              shape="circle" class="bg-yellow-100 text-yellow-700" />
+            <div>
+              <span class="font-medium text-secondary-900">{{ requestToName(request) }}</span>
+              <span class="text-sm text-secondary-500"> — request pending</span>
+              @if (request.message) {
+              <p class="mt-1 text-xs text-secondary-500 italic">"{{ request.message }}"</p>
+              }
+            </div>
+          </div>
+          <p-button icon="pi pi-times" severity="danger" [rounded]="true" [text]="true" pTooltip="Cancel Request"
+            (onClick)="confirmCancel(request)" />
+        </div>
+        }
+      </div>
+    </div>
+  </p-card>
   }
 
   <!-- Instructors Table -->
   <div class="flex-1" style="background-color: var(--p-datatable-row-background);">
-    <p-table
-      [value]="instructors()"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [totalRecords]="totalRecords()"
-      [loading]="loading()"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      (onLazyLoad)="onPageChange($event)"
-      [scrollable]="true"
-      scrollHeight="flex"
-      dataKey="email"
-    >
+    <p-table [value]="instructors()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+      [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
+      scrollHeight="flex" dataKey="email">
       <ng-template #header>
         <tr>
           <th>Name</th>
@@ -107,13 +89,8 @@
               <p class="text-sm text-secondary-500">
                 Find and connect with an instructor to get started.
               </p>
-              <p-button
-                label="Discover Instructors"
-                icon="pi pi-search"
-                severity="primary"
-                styleClass="!rounded-full mt-2"
-                (onClick)="discoverVisible.set(true)"
-              />
+              <p-button label="Discover Instructors" icon="pi pi-search" severity="primary"
+                styleClass="!rounded-full mt-2" (onClick)="discoverVisible.set(true)" />
             </div>
           </td>
         </tr>
@@ -122,7 +99,7 @@
   </div>
 </div>
 
-<bee-discover-instructors [(visible)]="discoverVisible" />
+<mh-discover-instructors [(visible)]="discoverVisible" />
 
 <p-toast />
 <p-confirmDialog />

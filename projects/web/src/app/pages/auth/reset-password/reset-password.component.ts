@@ -8,11 +8,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 
 // Core imports
-import { AuthService } from 'core';
+import { AuthService, Logo } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-reset-password',
+  selector: 'mh-reset-password',
   imports: [
     ReactiveFormsModule,
     RouterLink,
@@ -20,6 +20,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     InputTextModule,
     MessageModule,
     ThemeToggleComponent,
+    Logo,
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',

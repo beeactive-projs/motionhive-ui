@@ -4,7 +4,7 @@ import type { MenuItem } from 'primeng/api';
 import { SidenavLayoutComponent } from '../../layouts/sidenav-layout/sidenav-layout.component';
 
 @Component({
-  selector: 'bee-client',
+  selector: 'mh-client',
   imports: [RouterOutlet, SidenavLayoutComponent],
   templateUrl: './client.html',
   styleUrl: './client.scss',
@@ -12,9 +12,9 @@ import { SidenavLayoutComponent } from '../../layouts/sidenav-layout/sidenav-lay
 })
 export class Client {
   readonly menuItems: ReadonlyArray<MenuItem> = [
-    { label: 'Dashboard', icon: 'pi pi-objects-column', routerLink: '/app/client/dashboard' },
-    { label: 'My Instructors', icon: 'pi pi-users', routerLink: '/app/client/instructors' },
-    { label: 'Groups', icon: 'pi pi pi-sitemap', routerLink: '/app/client/groups' },
-    { label: 'Profile', icon: 'pi pi-user', routerLink: '/app/client/profile' },
+    { label: 'Dashboard', icon: 'pi pi-objects-column', routerLink: '/client/dashboard' },
+    { label: 'My Instructors', icon: 'pi pi-users', routerLink: '/client/instructors' },
+    { label: 'Groups', icon: 'pi pi pi-sitemap', routerLink: '/client/groups' },
+    { label: 'Profile', icon: 'pi pi-user', routerLink: '/client/profile' },
   ];
 }

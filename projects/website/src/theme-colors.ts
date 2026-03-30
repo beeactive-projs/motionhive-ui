@@ -1,5 +1,5 @@
 // /**
-//  * Single source of truth for the BeeActive color palette.
+//  * Single source of truth for the MotionHive color palette.
 //  *
 //  * - Consumed by PrimeNG via `styles.primeng.ts`
 //  * - Bridged to Tailwind automatically through `tailwindcss-primeui`
@@ -143,13 +143,13 @@
 // };
 
 /**
- * Single source of truth for the BeeActive color palette.
+ * Single source of truth for the MotionHive color palette.
  *
  * - Consumed by PrimeNG via `styles.primeng.ts`
  * - Bridged to Tailwind automatically through `tailwindcss-primeui`
  * - Secondary (Navy) is Tailwind-only (defined in styles.css @theme)
  *
- * Palette derived from the Royal Hive design system (beeactive-dashboard-mockup.html).
+ * Palette derived from the Royal Hive design system (motionhive-dashboard-mockup.html).
  */
 
 export interface ColorScale {

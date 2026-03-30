@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { WaitlistService } from 'core';
 
 @Component({
-  selector: 'bee-home',
+  selector: 'mh-home',
   imports: [ButtonModule, RouterLink],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',

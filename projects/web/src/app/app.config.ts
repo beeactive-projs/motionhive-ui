@@ -6,7 +6,7 @@ import { providePrimeNG } from 'primeng/config';
 import { authInterceptor, errorInterceptor } from 'core';
 
 import { routes } from './app.routes';
-import { BeeActiveLara } from '../styles.primeng';
+import { MotionHiveLara } from '../styles.primeng';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     providePrimeNG({
       theme: {
-        preset: BeeActiveLara,
+        preset: MotionHiveLara,
         options: {
           darkModeSelector: '.dark',
           cssLayer: {

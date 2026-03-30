@@ -10,7 +10,7 @@ import { TagModule } from 'primeng/tag';
 import { AuthStore, WaitlistService } from 'core';
 
 @Component({
-  selector: 'bee-dashboard',
+  selector: 'mh-dashboard',
   imports: [RouterLink, AvatarModule, ButtonModule, CardModule, DividerModule, TagModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',

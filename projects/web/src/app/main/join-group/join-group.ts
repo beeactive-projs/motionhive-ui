@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { GroupService, AuthStore } from 'core';
 
 @Component({
-  selector: 'bee-join-group',
+  selector: 'mh-join-group',
   imports: [ProgressSpinnerModule, ButtonModule, CardModule],
   template: `
     <div class="flex items-center justify-center min-h-screen">
@@ -67,9 +67,9 @@ export class JoinGroup implements OnInit {
 
   goToDashboard(): void {
     if (this._authStore.isUser()) {
-      this._router.navigate(['/app/client/dashboard']);
+      this._router.navigate(['/client/dashboard']);
     } else {
-      this._router.navigate(['/app/dashboard']);
+      this._router.navigate(['/dashboard']);
     }
   }
 }

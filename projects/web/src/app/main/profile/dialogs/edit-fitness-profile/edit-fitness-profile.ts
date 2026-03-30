@@ -33,7 +33,7 @@ interface FitnessForm {
 }
 
 @Component({
-  selector: 'bee-edit-fitness-profile',
+  selector: 'mh-edit-fitness-profile',
   imports: [
     FormsModule,
     ButtonModule,
@@ -95,13 +95,20 @@ export class EditFitnessProfile {
 
     if (f.heightCm !== (fp?.heightCm ?? null)) payload.heightCm = f.heightCm ?? undefined;
     if (f.weightKg !== (fp?.weightKg ?? null)) payload.weightKg = f.weightKg ?? undefined;
-    if (f.fitnessLevel !== (fp?.fitnessLevel ?? null)) payload.fitnessLevel = f.fitnessLevel ?? undefined;
-    if (f.emergencyContactName !== (fp?.emergencyContactName ?? '')) payload.emergencyContactName = f.emergencyContactName || undefined;
-    if (f.emergencyContactPhone !== (fp?.emergencyContactPhone ?? '')) payload.emergencyContactPhone = f.emergencyContactPhone || undefined;
+    if (f.fitnessLevel !== (fp?.fitnessLevel ?? null))
+      payload.fitnessLevel = f.fitnessLevel ?? undefined;
+    if (f.emergencyContactName !== (fp?.emergencyContactName ?? ''))
+      payload.emergencyContactName = f.emergencyContactName || undefined;
+    if (f.emergencyContactPhone !== (fp?.emergencyContactPhone ?? ''))
+      payload.emergencyContactPhone = f.emergencyContactPhone || undefined;
 
     if (!Object.keys(payload).length) {
       this.visible.set(false);
-      this._messageService.add({ severity: 'info', summary: 'No changes', detail: 'No changes were made.' });
+      this._messageService.add({
+        severity: 'info',
+        summary: 'No changes',
+        detail: 'No changes were made.',
+      });
       return;
     }
 
@@ -110,12 +117,20 @@ export class EditFitnessProfile {
       next: () => {
         this.saving.set(false);
         this.visible.set(false);
-        this._messageService.add({ severity: 'success', summary: 'Profile updated', detail: 'Fitness profile updated successfully.' });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Profile updated',
+          detail: 'Fitness profile updated successfully.',
+        });
         this.saved.emit();
       },
       error: (err) => {
         this.saving.set(false);
-        this._messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to update fitness profile.' });
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.error?.message || 'Failed to update fitness profile.',
+        });
       },
     });
   }

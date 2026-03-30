@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
-  selector: 'bee-terms-of-service',
+  selector: 'mh-terms-of-service',
   imports: [RouterLink, ButtonModule],
   templateUrl: './terms-of-service.component.html',
   styleUrl: './terms-of-service.component.scss',

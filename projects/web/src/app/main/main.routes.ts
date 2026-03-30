@@ -4,7 +4,7 @@ export const appRoutes: Routes = [
   {
     path: 'join/:token',
     loadComponent: () => import('./join-group/join-group').then((m) => m.JoinGroup),
-    title: 'Join Group - BeeActive',
+    title: 'Join Group - MotionHive',
   },
   {
     path: 'client',
@@ -17,7 +17,7 @@ export const appRoutes: Routes = [
   {
     path: 'profile',
     loadComponent: () => import('./profile/profile').then((m) => m.Profile),
-    title: 'My Profile - BeeActive',
+    title: 'My Profile - MotionHive',
   },
   {
     path: '',

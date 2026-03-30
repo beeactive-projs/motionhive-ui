@@ -28,7 +28,7 @@ const PAGE_SIZE = 9;
 const PAGE_SIZE_ALL = 10;
 
 @Component({
-  selector: 'bee-blog',
+  selector: 'mh-blog',
   imports: [
     RouterLink,
     ButtonModule,
@@ -138,5 +138,4 @@ export class BlogComponent {
         this.isLoading.set(false);
       });
   }
-
 }

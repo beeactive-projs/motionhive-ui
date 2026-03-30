@@ -2,12 +2,11 @@ import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/cor
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
-import { ThemeService } from 'core';
-import { WaitlistService } from 'core';
+import { ThemeService, WaitlistService, Logo } from 'core';
 
 @Component({
-  selector: 'bee-public-header',
-  imports: [RouterLink, RouterLinkActive, ButtonModule],
+  selector: 'mh-public-header',
+  imports: [RouterLink, RouterLinkActive, ButtonModule, Logo],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

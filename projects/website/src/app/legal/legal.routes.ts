@@ -7,13 +7,13 @@ export const legalRoutes: Routes = [
       import('./terms-of-service/terms-of-service.component').then(
         (m) => m.TermsOfServiceComponent
       ),
-    title: 'Terms of Service - BeeActive',
+    title: 'Terms of Service - MotionHive',
   },
   {
     path: 'privacy-policy',
     loadComponent: () =>
       import('./privacy-policy/privacy-policy.component').then((m) => m.PrivacyPolicyComponent),
-    title: 'Privacy Policy - BeeActive',
+    title: 'Privacy Policy - MotionHive',
   },
   {
     path: '',

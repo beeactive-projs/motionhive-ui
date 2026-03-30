@@ -6,7 +6,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 
 @Component({
-  selector: 'bee-contact',
+  selector: 'mh-contact',
   imports: [ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
@@ -22,13 +22,13 @@ export class ContactComponent {
     {
       icon: 'pi-map-marker',
       label: 'Address',
-      value: '123 BeeActive Street, Tech City, TC 12345',
+      value: '123 MotionHive Street, Tech City, TC 12345',
     },
     {
       icon: 'pi-envelope',
       label: 'Email',
-      value: 'info@beeactive.com',
-      href: 'mailto:info@beeactive.com',
+      value: 'info@motionhive.com',
+      href: 'mailto:info@motionhive.com',
     },
     {
       icon: 'pi-phone',

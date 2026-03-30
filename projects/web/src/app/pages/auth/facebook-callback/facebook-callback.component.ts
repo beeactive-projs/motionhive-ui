@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'bee-facebook-callback',
+  selector: 'mh-facebook-callback',
   template: '<p>Signing in with Facebook...</p>',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

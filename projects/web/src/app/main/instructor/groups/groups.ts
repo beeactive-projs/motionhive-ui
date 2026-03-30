@@ -20,7 +20,14 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ChipModule } from 'primeng/chip';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { GroupService, Group, CreateGroupPayload, UpdateGroupPayload, JoinPolicy, TagSeverity } from 'core';
+import {
+  GroupService,
+  Group,
+  CreateGroupPayload,
+  UpdateGroupPayload,
+  JoinPolicy,
+  TagSeverity,
+} from 'core';
 
 interface JoinPolicyOption {
   label: string;
@@ -28,7 +35,7 @@ interface JoinPolicyOption {
 }
 
 @Component({
-  selector: 'bee-groups',
+  selector: 'mh-groups',
   imports: [
     FormsModule,
     CardModule,
@@ -228,7 +235,7 @@ export class Groups implements OnInit {
   }
 
   navigateToGroup(group: Group): void {
-    this._router.navigate(['/app/groups', group.id]);
+    this._router.navigate(['/groups', group.id]);
   }
 
   addTag(): void {

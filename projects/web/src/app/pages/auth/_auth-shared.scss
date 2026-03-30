@@ -1,9 +1,10 @@
 @use 'variables' as *;
-@use '../public/public-shared' as shared;
+@use '../../app.scss' as app;
 
 @mixin auth-layout() {
-  @include shared.orb-base();
-  @include shared.orb-colors();
+  // @include app.honeycomb-bg();
+  @include app.orb-base();
+  @include app.orb-colors();
 
   .brand-panel,
   .form-panel {

@@ -38,7 +38,7 @@ interface PersonalInfoForm {
 }
 
 @Component({
-  selector: 'bee-edit-personal-info',
+  selector: 'mh-edit-personal-info',
   imports: [
     FormsModule,
     ButtonModule,
@@ -115,21 +115,30 @@ export class EditPersonalInfo {
     if (f.firstName !== p.account.firstName) accountChanges.firstName = f.firstName;
     if (f.lastName !== p.account.lastName) accountChanges.lastName = f.lastName;
     if (f.phone !== (p.account.phone ?? '')) accountChanges.phone = f.phone;
-    if (f.timezone !== (p.account.timezone ?? null)) accountChanges.timezone = f.timezone ?? undefined;
+    if (f.timezone !== (p.account.timezone ?? null))
+      accountChanges.timezone = f.timezone ?? undefined;
     if (Object.keys(accountChanges).length) payload.account = accountChanges;
 
     const fitnessChanges: NonNullable<UpdateMyProfilePayload['fitnessProfile']> = {};
     const newDob = f.dateOfBirth ? this._formatDate(f.dateOfBirth) : '';
     if (newDob !== (fp?.dateOfBirth ?? '')) fitnessChanges.dateOfBirth = newDob || undefined;
     if (f.gender !== (fp?.gender ?? null)) fitnessChanges.gender = f.gender ?? undefined;
-    const newMed = f.medicalConditions.split(',').map((m) => m.trim()).filter(Boolean);
-    if (JSON.stringify(newMed) !== JSON.stringify(fp?.medicalConditions ?? [])) fitnessChanges.medicalConditions = newMed;
+    const newMed = f.medicalConditions
+      .split(',')
+      .map((m) => m.trim())
+      .filter(Boolean);
+    if (JSON.stringify(newMed) !== JSON.stringify(fp?.medicalConditions ?? []))
+      fitnessChanges.medicalConditions = newMed;
     if (f.notes !== (fp?.notes ?? '')) fitnessChanges.notes = f.notes || undefined;
     if (Object.keys(fitnessChanges).length) payload.fitnessProfile = fitnessChanges;
 
     if (!payload.account && !payload.fitnessProfile) {
       this.visible.set(false);
-      this._messageService.add({ severity: 'info', summary: 'No changes', detail: 'No changes were made.' });
+      this._messageService.add({
+        severity: 'info',
+        summary: 'No changes',
+        detail: 'No changes were made.',
+      });
       return;
     }
 
@@ -138,12 +147,20 @@ export class EditPersonalInfo {
       next: () => {
         this.saving.set(false);
         this.visible.set(false);
-        this._messageService.add({ severity: 'success', summary: 'Profile updated', detail: 'Personal information updated successfully.' });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Profile updated',
+          detail: 'Personal information updated successfully.',
+        });
         this.saved.emit();
       },
       error: (err) => {
         this.saving.set(false);
-        this._messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to update profile.' });
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.error?.message || 'Failed to update profile.',
+        });
       },
     });
   }

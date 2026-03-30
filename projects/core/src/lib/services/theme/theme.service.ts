@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 
 export type Theme = 'light' | 'dark';
 
-const STORAGE_KEY = 'bee-active-theme';
+const STORAGE_KEY = 'mh-active-theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -39,8 +39,6 @@ export class ThemeService {
       return stored;
     }
 
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    return 'dark';
   }
 }

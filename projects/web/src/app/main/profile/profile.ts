@@ -29,7 +29,7 @@ import { EditInstructorProfile } from './dialogs/edit-instructor-profile/edit-in
 import { BecomeInstructor } from '../client/dialogs/become-instructor/become-instructor';
 
 @Component({
-  selector: 'bee-profile',
+  selector: 'mh-profile',
   imports: [
     DatePipe,
     CardModule,

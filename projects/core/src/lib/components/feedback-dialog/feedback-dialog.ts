@@ -16,7 +16,7 @@ import { AuthStore } from '../../stores/auth.store';
 import { AutoFocusModule } from 'primeng/autofocus';
 
 @Component({
-  selector: 'bee-feedback-dialog',
+  selector: 'mh-feedback-dialog',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
@@ -47,7 +47,12 @@ export class FeedbackDialog {
     severity: ButtonSeverity;
   }[] = [
     { key: FeedbackCategories.Bug, label: 'Bug report', icon: 'bug_report', severity: 'danger' },
-    { key: FeedbackCategories.Suggestion, label: 'Suggestion', icon: 'lightbulb', severity: 'warn' },
+    {
+      key: FeedbackCategories.Suggestion,
+      label: 'Suggestion',
+      icon: 'lightbulb',
+      severity: 'warn',
+    },
     { key: FeedbackCategories.Other, label: 'Other', icon: 'chat', severity: 'info' },
   ];
 

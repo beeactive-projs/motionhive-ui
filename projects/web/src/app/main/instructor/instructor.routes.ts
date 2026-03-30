@@ -8,28 +8,28 @@ export const instructorRoutes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - BeeActive',
+        title: 'Dashboard - MotionHive',
       },
       {
         path: 'clients',
         loadComponent: () => import('./clients/clients').then((m) => m.Clients),
-        title: 'Clients - BeeActive',
+        title: 'Clients - MotionHive',
       },
       {
         path: 'groups',
         loadComponent: () => import('./groups/groups').then((m) => m.Groups),
-        title: 'Groups - BeeActive',
+        title: 'Groups - MotionHive',
       },
       {
         path: 'groups/:id',
         loadComponent: () =>
           import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
-        title: 'Group Details - BeeActive',
+        title: 'Group Details - MotionHive',
       },
       {
         path: 'profile',
         loadComponent: () => import('../profile/profile').then((m) => m.Profile),
-        title: 'My Profile - BeeActive',
+        title: 'My Profile - MotionHive',
       },
       {
         path: '',

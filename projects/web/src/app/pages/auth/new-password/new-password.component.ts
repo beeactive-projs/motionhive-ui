@@ -14,11 +14,11 @@ import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 
 // Core imports
-import { AuthService } from 'core';
+import { AuthService, Logo } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-new-password',
+  selector: 'mh-new-password',
   imports: [
     ReactiveFormsModule,
     RouterLink,
@@ -26,6 +26,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     PasswordModule,
     MessageModule,
     ThemeToggleComponent,
+    Logo,
   ],
   templateUrl: './new-password.component.html',
   styleUrl: './new-password.component.scss',
@@ -58,7 +59,9 @@ export class NewPasswordComponent implements OnInit {
       this.token = params.get('token') ?? '';
       this.hasToken.set(!!this.token);
       if (!this.token) {
-        this.errorMessage.set('Invalid or missing reset token. Please request a new password reset link.');
+        this.errorMessage.set(
+          'Invalid or missing reset token. Please request a new password reset link.',
+        );
       }
     });
   }

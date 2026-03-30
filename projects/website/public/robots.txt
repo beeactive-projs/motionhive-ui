@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /app/
 Disallow: /auth/
-Sitemap: https://beeactive-api-production.up.railway.app/blog/sitemap.xml
+Sitemap: https://motionhive-api-production.up.railway.app/blog/sitemap.xml

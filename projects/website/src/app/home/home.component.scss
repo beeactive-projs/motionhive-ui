@@ -1,4 +1,12 @@
 @use 'variables' as *;
+@use '../app' as app;
+
+@include app.hero-section();
+@include app.honeycomb-bg();
+@include app.cta-section();
+@include app.orb-base();
+@include app.feature-cards();
+@include app.orb-colors();
 
 $hex-size: 10rem;
 $hex-gap: 0.5rem;

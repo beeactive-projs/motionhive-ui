@@ -1,4 +1,12 @@
-import { Component, signal, inject, ChangeDetectionStrategy, afterNextRender, viewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  ChangeDetectionStrategy,
+  afterNextRender,
+  viewChild,
+  ElementRef,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,13 +21,12 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 // Core imports
-import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest } from 'core';
+import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest, Logo, ThemeService } from 'core';
 import { Divider } from 'primeng/divider';
-import { ThemeService } from 'core';
-import { ThemeToggleComponent } from "../../../_shared/components/theme-toggle/theme-toggle.component";
+import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-login',
+  selector: 'mh-login',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -32,8 +39,9 @@ import { ThemeToggleComponent } from "../../../_shared/components/theme-toggle/t
     IconFieldModule,
     InputIconModule,
     Divider,
-    ThemeToggleComponent
-],
+    ThemeToggleComponent,
+    Logo,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -115,9 +123,7 @@ export class LoginComponent {
       },
       error: (error: { error?: { message?: string } }) => {
         this.isLoading.set(false);
-        this.errorMessage.set(
-          error.error?.message || 'Google sign-in failed. Please try again.',
-        );
+        this.errorMessage.set(error.error?.message || 'Google sign-in failed. Please try again.');
       },
     });
   }
@@ -174,11 +180,11 @@ export class LoginComponent {
     }
 
     if (this._authStore.isInstructor()) {
-      this._router.navigate(['/app/dashboard']);
+      this._router.navigate(['/dashboard']);
     } else if (this._authStore.isUser()) {
-      this._router.navigate(['/app/client/dashboard/']);
+      this._router.navigate(['/client/dashboard/']);
     } else {
-      this._router.navigate(['/app/dashboard']);
+      this._router.navigate(['/dashboard']);
     }
   }
 

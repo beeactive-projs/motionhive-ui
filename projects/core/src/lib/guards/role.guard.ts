@@ -18,7 +18,7 @@ export const organizerGuard: CanActivateFn = () => {
     return router.createUrlTree(['/auth/login']);
   }
 
-  return router.createUrlTree(['/app/client/dashboard']);
+  return router.createUrlTree(['/client/dashboard']);
 };
 
 export const participantGuard: CanActivateFn = () => {
@@ -34,5 +34,5 @@ export const participantGuard: CanActivateFn = () => {
     return router.createUrlTree(['/auth/login']);
   }
 
-  return router.createUrlTree(['/app/dashboard']);
+  return router.createUrlTree(['/dashboard']);
 };

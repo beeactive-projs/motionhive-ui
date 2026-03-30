@@ -27,6 +27,7 @@ import {
   AuthStore,
   FacebookAuthService,
   GoogleAuthService,
+  Logo,
   RegisterRequest,
   UserRoles,
   UserService,
@@ -34,7 +35,7 @@ import {
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
-  selector: 'bee-sign-up',
+  selector: 'mh-sign-up',
   imports: [
     ReactiveFormsModule,
     RouterLink,
@@ -45,6 +46,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     MessageModule,
     Divider,
     ThemeToggleComponent,
+    Logo,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',
@@ -235,9 +237,9 @@ export class SignUpComponent {
     }
 
     if (this._authStore.hasRole(UserRoles.Instructor)) {
-      this._router.navigate(['/app/profile']);
+      this._router.navigate(['/profile']);
     } else {
-      this._router.navigate(['/app/client/profile']);
+      this._router.navigate(['/client/profile']);
     }
   }
 

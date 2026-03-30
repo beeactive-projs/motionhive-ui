@@ -1,4 +1,11 @@
 @use 'variables' as *;
+@use '../app' as app;
+
+@include app.honeycomb-bg();
+@include app.cta-section();
+@include app.orb-base();
+@include app.orb-colors();
+@include app.feature-cards();
 
 .hero-section {
   position: relative;

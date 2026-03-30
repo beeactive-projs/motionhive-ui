@@ -74,6 +74,7 @@ export * from './lib/interceptors/auth.interceptor';
 export * from './lib/interceptors/error.interceptor';
 
 // Components
+export * from './lib/components/logo/logo';
 export * from './lib/components/waitlist-dialog/waitlist-dialog';
 export * from './lib/components/feedback-dialog/feedback-dialog';
 
