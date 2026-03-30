@@ -1,11 +1,11 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
-import { FeedbackService } from 'core';
+import { FeedbackService, Logo } from 'core';
 
 @Component({
   selector: 'mh-public-footer',
-  imports: [RouterLink, Button],
+  imports: [RouterLink, Button, Logo],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

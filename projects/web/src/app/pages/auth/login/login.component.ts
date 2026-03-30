@@ -21,9 +21,8 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 // Core imports
-import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest } from 'core';
+import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest, Logo, ThemeService } from 'core';
 import { Divider } from 'primeng/divider';
-import { ThemeService } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
@@ -41,6 +40,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     InputIconModule,
     Divider,
     ThemeToggleComponent,
+    Logo,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

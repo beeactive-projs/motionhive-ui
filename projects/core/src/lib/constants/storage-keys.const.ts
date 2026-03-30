@@ -1,9 +1,9 @@
 ﻿export const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'beeactive_access_token',
-  REFRESH_TOKEN: 'beeactive_refresh_token',
-  USER: 'beeactive_user',
-  LANGUAGE: 'beeactive_language',
-  THEME: 'beeactive_theme',
-  PERMISSIONS: 'beeactive_permissions',
-  ROLES: 'beeactive_roles',
+  ACCESS_TOKEN: 'motionhive_access_token',
+  REFRESH_TOKEN: 'motionhive_refresh_token',
+  USER: 'motionhive_user',
+  LANGUAGE: 'motionhive_language',
+  THEME: 'motionhive_theme',
+  PERMISSIONS: 'motionhive_permissions',
+  ROLES: 'motionhive_roles',
 } as const;

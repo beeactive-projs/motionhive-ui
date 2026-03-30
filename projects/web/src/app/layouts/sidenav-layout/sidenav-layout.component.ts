@@ -13,12 +13,12 @@ import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import type { MenuItem } from 'primeng/api';
-import { AuthService } from 'core';
+import { AuthService, Logo } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'mh-sidenav-layout',
-  imports: [RouterLink, RouterLinkActive, ButtonModule, ToolbarModule, ThemeToggleComponent],
+  imports: [RouterLink, RouterLinkActive, ButtonModule, ToolbarModule, ThemeToggleComponent, Logo],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,7 +14,7 @@ import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 
 // Core imports
-import { AuthService } from 'core';
+import { AuthService, Logo } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
@@ -26,6 +26,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     PasswordModule,
     MessageModule,
     ThemeToggleComponent,
+    Logo,
   ],
   templateUrl: './new-password.component.html',
   styleUrl: './new-password.component.scss',
