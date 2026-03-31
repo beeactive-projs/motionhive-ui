@@ -123,7 +123,10 @@
       "sourceRoot": "projects/website/src",
       "prefix": "mh",
       "i18n": {
-        "sourceLocale": "en",
+        "sourceLocale": {
+          "code": "en",
+          "baseHref": "/"
+        },
         "locales": {
           "ro": {
             "translation": "projects/website/src/locale/messages.ro.xlf",

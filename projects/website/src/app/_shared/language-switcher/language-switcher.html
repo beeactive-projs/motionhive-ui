@@ -5,6 +5,7 @@
     [class.text-primary-500]="currentLocale() === locale.code"
     [class.font-bold]="currentLocale() === locale.code"
     [class.text-surface-500]="currentLocale() !== locale.code"
+    [class.cursor-pointer]="currentLocale() !== locale.code"
     [class.hover:text-surface-900]="currentLocale() !== locale.code"
     [class.dark:hover:text-surface-100]="currentLocale() !== locale.code"
     (click)="switchLocale(locale.code)"

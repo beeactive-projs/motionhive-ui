@@ -27,14 +27,9 @@ export class LanguageSwitcher {
     if (code === this.currentLocale()) return;
 
     const path = this._document.location.pathname;
+    // Strip any existing locale prefix (/en/ or /ro/)
+    const basePath = path.replace(/^\/(en|ro)(\/|$)/, '/') || '/';
 
-    if (code === 'ro') {
-      // Navigate to the /ro/ build (baseHref is /ro/ for that build)
-      this._document.location.href = '/ro' + path;
-    } else {
-      // Navigate to the EN build — strip the /ro prefix if present
-      const stripped = path.startsWith('/ro') ? path.slice(3) || '/' : path;
-      this._document.location.href = stripped;
-    }
+    this._document.location.href = code === 'en' ? basePath : '/ro' + basePath;
   }
 }
