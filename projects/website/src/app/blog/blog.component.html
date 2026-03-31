@@ -4,13 +4,14 @@
     <div
       class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-fuchsia-500/15 text-fuchsia-500 mb-4">
       <i class="pi pi-book text-sm"></i>
-      <span class="text-sm font-semibold">Blog</span>
+      <span class="text-sm font-semibold" i18n="@@blog.pill">Blog</span>
     </div>
-    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
+    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
+      i18n="@@blog.h1">
       Stories from the <span class="text-brand">hive</span>.
     </h1>
 
-    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto">
+    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto" i18n="@@blog.intro">
       What we're building, why we're building it, and everything we learn along the way.
     </p>
 
@@ -23,19 +24,22 @@
     <div class="flex flex-col md:flex-row flex-1 justify-between gap-4">
       <div class="hidden md:flex items-center gap-3">
         @for (category of categoryOptions; track category) {
-        <p-button [label]="category" [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small"
-          rounded [outlined]="selectedCategory() !== category" (onClick)="onCategoryChange(category)"
-          class="min-w-15 capitalize" fluid />
+        <p-button [label]="category | blogCategory" [severity]="selectedCategory() === category ? 'primary' : 'contrast'"
+          size="small" rounded [outlined]="selectedCategory() !== category"
+          (onClick)="onCategoryChange(category)" class="min-w-15" fluid />
         }
       </div>
       <div class="md:hidden">
-        <p-select [options]="categoryOptions" [ngModel]="selectedCategory()" scrollHeight="300px"
-          (ngModelChange)="onCategoryChange($event)" fluid></p-select>
+        <p-select [options]="categoryOptions" [ngModel]="selectedCategory()"
+          scrollHeight="300px" (ngModelChange)="onCategoryChange($event)" fluid>
+          <ng-template #selectedItem let-value>{{ value | blogCategory }}</ng-template>
+          <ng-template #item let-item>{{ item | blogCategory }}</ng-template>
+        </p-select>
       </div>
       <p-iconfield class="w-full md:w-auto">
         <p-inputicon class="pi pi-search" />
-        <input type="text" pInputText placeholder="Search" placeholder="Search articles..." [ngModel]="searchQuery()"
-          (ngModelChange)="onSearchInput($event)" fluid />
+        <input type="text" pInputText i18n-placeholder="@@blog.search" placeholder="Search articles..."
+          [ngModel]="searchQuery()" (ngModelChange)="onSearchInput($event)" fluid />
       </p-iconfield>
     </div>
   </div>
@@ -79,15 +83,16 @@
       <div class="featured-card__image-wrap">
         <img [src]="featured.coverImage" [alt]="featured.title" class="featured-card__image" loading="eager" width="800"
           height="450" />
-        <span class="featured-badge">Featured</span>
+        <span class="featured-badge" i18n="@@blog.featured">Featured</span>
       </div>
 
       <div class="featured-card__content">
         <div class="flex items-center gap-3 mb-4 flex-wrap">
-          <span class="category-badge">{{ featured.category }}</span>
+          <span class="category-badge">{{ featured.category | blogCategory }}</span>
           <span class="text-sm section-subtext">{{ featured.publishedAt | date: 'mediumDate'}}</span>
           <span class="text-sm section-subtext">
-            <i class="pi pi-clock mr-1"></i>{{ featured.readTime }} min read
+            <i class="pi pi-clock mr-1"></i>{{ featured.readTime }} <ng-container i18n="@@blog.minRead">min
+              read</ng-container>
           </span>
         </div>
 
@@ -112,7 +117,8 @@
           </div>
 
           <span class="read-more-link">
-            Read article <i class="pi pi-arrow-right ml-1 text-xs"></i>
+            <ng-container i18n="@@blog.readArticle">Read article</ng-container> <i
+              class="pi pi-arrow-right ml-1 text-xs"></i>
           </span>
         </div>
       </div>
@@ -123,7 +129,7 @@
 
 <!-- ===== Posts Grid ===== -->
 @if (isLoading()) {
-<section class="posts-section" aria-busy="true" aria-label="Loading articles">
+<section class="posts-section" aria-busy="true" i18n-aria-label="@@blog.loadingArticles" aria-label="Loading articles">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       @for (item of skeletonItems; track item) {
@@ -167,8 +173,9 @@
 
         <div class="blog-card__content">
           <div class="flex items-center gap-2 mb-3 flex-wrap">
-            <span class="category-badge">{{ post.category }}</span>
-            <span class="text-xs section-subtext">{{ post.readTime }} min read</span>
+            <span class="category-badge">{{ post.category | blogCategory }}</span>
+            <span class="text-xs section-subtext">{{ post.readTime }} <ng-container i18n="@@blog.minRead">min
+                read</ng-container></span>
           </div>
 
           <h3
@@ -209,10 +216,12 @@
 <section class="posts-section py-16 sm:py-24">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <i class="pi pi-search text-4xl section-subtext mb-4"></i>
-    <h3 class="text-xl font-heading font-bold section-heading mb-2">No articles found</h3>
-    <p class="section-subtext mb-6">Try adjusting your search or filter to find what you're looking for.</p>
+    <h3 class="text-xl font-heading font-bold section-heading mb-2" i18n="@@blog.empty.h3">No articles found</h3>
+    <p class="section-subtext mb-6" i18n="@@blog.empty.p">Try adjusting your search or filter to find what you're
+      looking for.</p>
     @if (hasActiveFilters()) {
-    <p-button label="Clear filters" icon="pi pi-filter-slash" [outlined]="true" (onClick)="onClearFilter()" />
+    <p-button i18n="@@blog.clearFilters" label="Clear filters" icon="pi pi-filter-slash" [outlined]="true"
+      (onClick)="onClearFilter()" />
     }
   </div>
 </section>
@@ -221,14 +230,15 @@
 <!-- ===== CTA Section ===== -->
 <section class="cta-section pt-12 sm:pt-16">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
-    <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3">
+    <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3" i18n="@@blog.cta.h2">
       Want to stay in the <span class="text-brand">loop</span>?
     </h2>
-    <p class="section-subtext text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
+    <p class="section-subtext text-lg sm:text-xl mb-8 max-w-2xl mx-auto" i18n="@@blog.cta.sub">
       We're building MotionHive in the open. Follow along and be the first to know when the hive opens.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button label="Back to Home" icon="pi pi-arrow-left" iconPos="left" routerLink="/" size="large" />
+      <p-button i18n-label="@@blog.cta.btn" label="Back to Home" icon="pi pi-arrow-left" iconPos="left" routerLink="/"
+        size="large" />
     </div>
   </div>
 </section>

@@ -23,6 +23,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { Select } from 'primeng/select';
+import { BlogCategoryPipe } from './blog-category.pipe';
 
 const PAGE_SIZE = 9;
 const PAGE_SIZE_ALL = 10;
@@ -40,6 +41,7 @@ const PAGE_SIZE_ALL = 10;
     IconField,
     InputIcon,
     Select,
+    BlogCategoryPipe,
   ],
   templateUrl: './blog.component.html',
   styleUrl: './blog.component.scss',

@@ -16,10 +16,11 @@ import { Skeleton } from 'primeng/skeleton';
 import type { BlogPost } from 'core';
 import { BlogService } from 'core';
 import { DatePipe } from '@angular/common';
+import { BlogCategoryPipe } from '../blog-category.pipe';
 
 @Component({
   selector: 'mh-blog-article',
-  imports: [RouterLink, ButtonModule, DatePipe, Skeleton],
+  imports: [RouterLink, ButtonModule, DatePipe, Skeleton, BlogCategoryPipe],
   templateUrl: './blog-article.component.html',
   styleUrl: './blog-article.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,1285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="ro" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="feedback.header.title" datatype="html">
+        <source>Share feedback</source>
+        <target state="translated">Trimite feedback</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">12,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.header.sub" datatype="html">
+        <source>Help us improve MotionHive</source>
+        <target state="translated">Ajută-ne să îmbunătățim MotionHive</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">13,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.title.label" datatype="html">
+        <source>Title</source>
+        <target state="translated">Titlu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">38,39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.title.error" datatype="html">
+        <source>Please write at least 3 characters.</source>
+        <target state="translated">Te rugăm să scrii cel puțin 3 caractere.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">43,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.desc.label" datatype="html">
+        <source>Description</source>
+        <target state="translated">Descriere</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.desc.error" datatype="html">
+        <source>Please write at least 10 characters.</source>
+        <target state="translated">Te rugăm să scrii cel puțin 10 caractere.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.email.label" datatype="html">
+        <source>Email</source>
+        <target state="translated">Email</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.email.label" datatype="html">
+        <source>Email</source>
+        <target state="translated">Email</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.email.placeholder" datatype="html">
+        <source>your@email.com</source>
+        <target state="translated">adresa@email.com</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">37,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.email.optional" datatype="html">
+        <source>(optional — to follow up on your feedback)</source>
+        <target state="translated">(opțional — pentru a da curs feedback-ului tău)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.email.placeholder" datatype="html">
+        <source>your@email.com</source>
+        <target state="translated">adresa@email.com</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">70,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.email.error" datatype="html">
+        <source>Please enter a valid email address.</source>
+        <target state="translated">Te rugăm să introduci o adresă de email validă.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">73,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.email.error" datatype="html">
+        <source>Please enter a valid email address.</source>
+        <target state="translated">Te rugăm să introduci o adresă de email validă.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.success.h4" datatype="html">
+        <source>Thank you!</source>
+        <target state="translated">Mulțumim!</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.success.p" datatype="html">
+        <source> Your feedback helps us make MotionHive better for everyone. </source>
+        <target state="translated"> Feedback-ul tău ne ajută să facem MotionHive mai bun pentru toată lumea. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.btn.cancel" datatype="html">
+        <source>Cancel</source>
+        <target state="translated">Anulează</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.btn.send" datatype="html">
+        <source>Send feedback</source>
+        <target state="translated">Trimite feedback</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.btn.close" datatype="html">
+        <source>Close</source>
+        <target state="translated">Închide</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.type.bug" datatype="html">
+        <source>Bug report</source>
+        <target state="translated">Raport de eroare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.type.suggestion" datatype="html">
+        <source>Suggestion</source>
+        <target state="translated">Sugestie</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.type.other" datatype="html">
+        <source>Other</source>
+        <target state="translated">Altele</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.placeholder.bug.title" datatype="html">
+        <source>e.g. Session attendance not saving correctly</source>
+        <target state="translated">ex. Prezența la sesiune nu se salvează corect</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.placeholder.bug.message" datatype="html">
+        <source>What were you doing when it happened? What did you expect vs. what actually occurred?</source>
+        <target state="translated">Ce făceai când s-a întâmplat? Ce te așteptai să se întâmple față de ce s-a întâmplat de fapt?</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.placeholder.suggestion.title" datatype="html">
+        <source>e.g. Show progress charts per client</source>
+        <target state="translated">ex. Afișează grafice de progres per client</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.placeholder.suggestion.message" datatype="html">
+        <source>Describe the feature and how it would improve your workflow as a trainer or organizer...</source>
+        <target state="translated">Descrie funcționalitatea și cum ar îmbunătăți fluxul tău de lucru ca antrenor sau organizator...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.placeholder.other.title" datatype="html">
+        <source>e.g. Question about managing group sessions</source>
+        <target state="translated">ex. Întrebare despre gestionarea sesiunilor de grup</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.placeholder.other.message" datatype="html">
+        <source>What's on your mind? We're happy to help.</source>
+        <target state="translated">Ce ai pe suflet? Suntem bucuroși să ajutăm.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.toast.error.summary" datatype="html">
+        <source>Something went wrong</source>
+        <target state="translated">Ceva a mers greșit</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feedback.toast.error.detail" datatype="html">
+        <source>Could not send feedback. Please try again.</source>
+        <target state="translated">Feedback-ul nu a putut fi trimis. Te rugăm să încerci din nou.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.pill" datatype="html">
+        <source>Our story</source>
+        <target>Povestea noastră</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.h1" datatype="html">
+        <source> Built for people who <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>show up<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target> Construit pentru oamenii care <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>apar<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.intro" datatype="html">
+        <source> MotionHive exists because staying active together shouldn't require five different apps. </source>
+        <target> MotionHive există pentru că a rămâne activ împreună nu ar trebui să necesite cinci aplicații diferite. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.problem.pill" datatype="html">
+        <source>The problem</source>
+        <target>Problema</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.problem.h2" datatype="html">
+        <source> Why this exists? </source>
+        <target> De ce există asta? </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.problem.p1" datatype="html">
+        <source> If you've ever organised a group activity — a class, a run, a weekly session — you know how it goes. WhatsApp for scheduling, spreadsheets for attendance, Instagram for updates, and half the group still out of the loop. </source>
+        <target> Dacă ai organizat vreodată o activitate de grup — o clasă, o alergare, o sesiune săptămânală — știi cum merge. WhatsApp pentru programare, foi de calcul pentru prezență, Instagram pentru actualizări și jumătate din grup tot în afara buclei. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.problem.p2" datatype="html">
+        <source> There's no single place where the person leading and the people showing up can just stay in sync. No noise, no switching between apps, no chaos. </source>
+        <target> Nu există un singur loc unde persoana care conduce și cei care participă pot rămâne sincronizați. Fără zgomot, fără comutare între aplicații, fără haos. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.problem.p3" datatype="html">
+        <source> That's what <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> is. One platform for active communities — whether you're running a yoga class, a hiking group, a martial arts club, or anything that gets people moving together. </source>
+        <target> Asta este <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>. O platformă pentru comunitățile active — fie că organizezi o clasă de yoga, un grup de drumeții, un club de arte marțiale sau orice altceva care îi face pe oameni să se miște împreună. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.problem.p4" datatype="html">
+        <source> It's early and we're building it in the open. No inflated numbers, no empty promises. Just the thing that should've existed a long time ago. </source>
+        <target> Suntem la început și construim în public. Fără cifre umflate, fără promisiuni goale. Doar lucrul care ar fi trebuit să existe de mult. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.pill" datatype="html">
+        <source>What drives us</source>
+        <target>Ce ne motivează</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.h2" datatype="html">
+        <source> What we believe. </source>
+        <target> Ce credem. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.sub" datatype="html">
+        <source> A few principles that shape everything we build. </source>
+        <target> Câteva principii care modelează tot ce construim. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c1.h" datatype="html">
+        <source>Community first.</source>
+        <target>Comunitatea pe primul loc.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c1.p" datatype="html">
+        <source> The best motivation isn't an app notification — it's the people you show up with. </source>
+        <target> Cea mai bună motivație nu este o notificare de aplicație — sunt oamenii alături de care participi. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c2.h" datatype="html">
+        <source>Keep it simple.</source>
+        <target>Simplu, oricând.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c2.p" datatype="html">
+        <source> If it takes more than a minute to figure out, we built it wrong. </source>
+        <target> Dacă durează mai mult de un minut să înțelegi cum funcționează, am construit-o greșit. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c3.h" datatype="html">
+        <source>Not just fitness.</source>
+        <target>Nu doar fitness.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c3.p" datatype="html">
+        <source> Yoga, hiking, martial arts, dance — if people come together to move, it belongs here. </source>
+        <target> Yoga, drumeții, arte marțiale, dans — dacă oamenii se adună să se miște, locul lor este aici. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c4.h" datatype="html">
+        <source>Build in the open.</source>
+        <target>Construim în public.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.believe.c4.p" datatype="html">
+        <source> No fake metrics. We share what's ready, what's next, and what we're learning along the way. </source>
+        <target> Fără valori false. Împărtășim ce este gata, ce urmează și ce învățăm pe parcurs. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.cta.h2" datatype="html">
+        <source> Follow the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>journey<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target> Urmărește <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>călătoria<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.cta.sub" datatype="html">
+        <source> We write about what we're building, the decisions we make, and what's coming next. </source>
+        <target> Scriem despre ce construim, deciziile pe care le luăm și ce urmează. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.cta.btn" datatype="html">
+        <source>Read the blog</source>
+        <target state="translated">Citește blogul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.pill" datatype="html">
+        <source>Blog</source>
+        <target>Blog</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.h1" datatype="html">
+        <source> Stories from the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>hive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target> Povești din <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>stup<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.intro" datatype="html">
+        <source> What we're building, why we're building it, and everything we learn along the way. </source>
+        <target> Ce construim, de ce construim și tot ce învățăm pe parcurs. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.search" datatype="html">
+        <source>Search articles...</source>
+        <target>Caută articole...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.featured" datatype="html">
+        <source>Featured</source>
+        <target>Recomandat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.minRead" datatype="html">
+        <source>min read</source>
+        <target>min citire</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.readArticle" datatype="html">
+        <source>Read article</source>
+        <target>Citește articolul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.loadingArticles" datatype="html">
+        <source>Loading articles</source>
+        <target>Se încarcă articolele</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.empty.h3" datatype="html">
+        <source>No articles found</source>
+        <target>Nu s-au găsit articole</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">219</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.empty.p" datatype="html">
+        <source>Try adjusting your search or filter to find what you're looking for.</source>
+        <target>Încearcă să ajustezi căutarea sau filtrul pentru a găsi ce cauți.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">220</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.cta.h2" datatype="html">
+        <source> Want to stay in the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>loop<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>? </source>
+        <target> Vrei să fii la <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>curent<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>? </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">234</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.cta.sub" datatype="html">
+        <source> We're building MotionHive in the open. Follow along and be the first to know when the hive opens. </source>
+        <target> Construim MotionHive în public. Urmărește-ne și fii primul care află când stupul se deschide. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">237</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.cta.btn" datatype="html">
+        <source>Back to Home</source>
+        <target state="translated">Înapoi la pagina principală</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
+          <context context-type="linenumber">240</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.category.all" datatype="html">
+        <source>All</source>
+        <target state="translated">Toate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-category.pipe.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.category.guide" datatype="html">
+        <source>Guide</source>
+        <target state="translated">Ghid</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-category.pipe.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.category.nutrition" datatype="html">
+        <source>Nutrition</source>
+        <target state="translated">Nutriție</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-category.pipe.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.category.science" datatype="html">
+        <source>Science</source>
+        <target state="translated">Știință</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-category.pipe.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.category.wellness" datatype="html">
+        <source>Wellness</source>
+        <target state="translated">Wellness</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-category.pipe.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.ariaLoading" datatype="html">
+        <source>Loading article</source>
+        <target state="translated">Se încarcă articolul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.backToBlog" datatype="html">
+        <source>Back to Blog</source>
+        <target state="translated">Înapoi la Blog</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.contentAriaLabel" datatype="html">
+        <source>Article content</source>
+        <target state="translated">Conținutul articolului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.writtenBy" datatype="html">
+        <source>Written by</source>
+        <target state="translated">Scris de</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.relatedH2" datatype="html">
+        <source> Related Articles </source>
+        <target state="translated">Articole similare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.cta.h2" datatype="html">
+        <source> Follow the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>journey<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target state="translated">Urmărește <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>călătoria<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.article.cta.sub" datatype="html">
+        <source> We're building MotionHive in the open. Check out more stories from the hive. </source>
+        <target state="translated">Construim MotionHive în public. Descoperă mai multe povești din stup.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
+          <context context-type="linenumber">162</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.pill" datatype="html">
+        <source>Where active communities come together</source>
+        <target>Unde comunitățile active se întâlnesc</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hero.h1" datatype="html">
+        <source> Make staying <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>active together<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> feel easy. </source>
+        <target> Fă din <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>activitatea comună<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> ceva simplu. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hero.p" datatype="html">
+        <source> Whether you lead a group or just love showing up — this is your space to stay active, stay connected, and find <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>your people<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target> Indiferent dacă conduci un grup sau pur și simplu îți place să participi — acesta este spațiul tău pentru a rămâne activ, conectat și a găsi <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>oamenii tăi<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hero.cta" datatype="html">
+        <source>Join the waitlist</source>
+        <target>Înscrie-te</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hero.disclaimer" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Free to organise. Free to join. Always.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — we're building something good. </source>
+        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Gratuit de organizat. Gratuit de alăturat. Mereu.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — construim ceva bun. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hex1" datatype="html">
+        <source>Discover what moves you</source>
+        <target>Descoperă ce te mișcă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hex2" datatype="html">
+        <source>Run it your way</source>
+        <target>Organizează cum vrei tu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hex3" datatype="html">
+        <source>Grow your community</source>
+        <target>Crește-ți comunitatea</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.hex4" datatype="html">
+        <source>Keep the energy going</source>
+        <target>Menține energia</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.floatCard1.title" datatype="html">
+        <source>Grow your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span
+                class=&quot;text-brand&quot;>"/>brand<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target>Crește-ți <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>brandul<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.floatCard1.desc" datatype="html">
+        <source>Bring your people together and keep them coming back.</source>
+        <target>Adună-ți oamenii și fă-i să revină.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.floatCard2.title" datatype="html">
+        <source>Find your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span
+                class=&quot;text-brand&quot;>"/>circle<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target>Găsește-ți <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>cercul<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.floatCard2.desc" datatype="html">
+        <source>Explore activities near you and show up with people who get it.</source>
+        <target>Explorează activitățile din apropierea ta și participă alături de oameni care înțeleg.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.who.h2" datatype="html">
+        <source> How will you <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>? </source>
+        <target> Cum vei folosi <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>? </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.who.sub" datatype="html">
+        <source> One platform. Two ways in. </source>
+        <target> O platformă. Două moduri de acces. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.lead.h3" datatype="html">
+        <source> You lead. </source>
+        <target> Tu conduci. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.lead.sub" datatype="html">
+        <source>Build your hive.</source>
+        <target>Construiește-ți stupul.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.lead.li1" datatype="html">
+        <source>Run sessions and classes on your terms.</source>
+        <target>Organizează sesiuni și clase după regulile tale.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.lead.li2" datatype="html">
+        <source>Keep your community in one place.</source>
+        <target>Ține-ți comunitatea într-un singur loc.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.lead.li3" datatype="html">
+        <source>Share updates, not spreadsheets.</source>
+        <target>Împărtășește actualizări, nu foi de calcul.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.join.h3" datatype="html">
+        <source> You show up. </source>
+        <target> Tu participi. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.join.sub" datatype="html">
+        <source>Join the hive.</source>
+        <target>Alătură-te stupului.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.join.li1" datatype="html">
+        <source>Discover what's happening around you.</source>
+        <target>Descoperă ce se întâmplă în jurul tău.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.join.li2" datatype="html">
+        <source>Stay connected to your favourite groups.</source>
+        <target>Rămâi conectat la grupurile tale preferate.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.join.li3" datatype="html">
+        <source>Show up, stay close, keep moving.</source>
+        <target>Participă, rămâi aproape, continuă să te miști.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.coming.pill" datatype="html">
+        <source>In the making</source>
+        <target>În construcție</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.coming.h2" datatype="html">
+        <source> The hive is <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>taking shape<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target> Stupul <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>prinde formă<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">150</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.coming.sub" datatype="html">
+        <source> We're building MotionHive piece by piece. Here's what's landing first. </source>
+        <target> Construim MotionHive bucată cu bucată. Iată ce apare primul. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.roadmap.live" datatype="html">
+        <source>Live</source>
+        <target>Disponibil</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.roadmap.soon" datatype="html">
+        <source>Coming soon</source>
+        <target>În curând</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.cta.h2" datatype="html">
+        <source> Get in <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>early<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <target> Fii printre <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>primii<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">184</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.cta.sub" datatype="html">
+        <source> MotionHive is just getting started. We're building the hive — follow along on our blog and be the first to know when it opens. </source>
+        <target> MotionHive abia începe. Construim stupul — urmărește-ne pe blog și fii primul care știe când se deschide. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">187</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.cta.btn" datatype="html">
+        <source>Read the blog</source>
+        <target state="translated">Citește blogul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2957321873158512727" datatype="html">
+        <source>Hubs &amp; Groups</source>
+        <target>Hub-uri și grupuri</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3980440814114963929" datatype="html">
+        <source>Create your space, invite your people, and organise everything in one place.</source>
+        <target>Creează-ți spațiul, invită-ți oamenii și organizează totul într-un singur loc.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8868705486375512107" datatype="html">
+        <source>Sessions &amp; Scheduling</source>
+        <target>Sesiuni și programare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7901202935282750144" datatype="html">
+        <source>Plan activities, set recurring sessions, and let people join with one tap.</source>
+        <target>Planifică activități, setează sesiuni recurente și lasă-i pe oameni să se alăture cu un singur tap.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7106004835409999057" datatype="html">
+        <source>Blog &amp; Updates</source>
+        <target>Blog și actualizări</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6608974367238707663" datatype="html">
+        <source>Share stories, tips, and news to keep your community in the loop.</source>
+        <target>Împărtășește povești, sfaturi și știri pentru a-ți ține comunitatea la curent.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1748972213745441743" datatype="html">
+        <source>Profiles</source>
+        <target>Profiluri</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3497367109937514037" datatype="html">
+        <source>A home for every organiser and participant — your activity, your way.</source>
+        <target>Un loc pentru fiecare organizator și participant — activitatea ta, cum vrei tu.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.ariaHome" datatype="html">
+        <source>MotionHive home</source>
+        <target>Pagina principală MotionHive</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.tagline" datatype="html">
+        <source> Where active communities come together. One place to lead, join, and stay moving. </source>
+        <target> Unde comunitățile active se întâlnesc. Un loc pentru a conduce, a te alătura și a rămâne în mișcare. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.product" datatype="html">
+        <source>Product</source>
+        <target>Produs</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.support" datatype="html">
+        <source>Support</source>
+        <target>Suport</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.shareFeedback" datatype="html">
+        <source>Share feedback</source>
+        <target state="translated">Trimite feedback</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.getInTouch" datatype="html">
+        <source>Get in Touch</source>
+        <target>Contactează-ne</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.allRightsReserved" datatype="html">
+        <source>All rights reserved.</source>
+        <target>Toate drepturile rezervate.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.terms" datatype="html">
+        <source>Terms</source>
+        <target>Termeni</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.privacy" datatype="html">
+        <source>Privacy</source>
+        <target>Confidențialitate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2821179408673282599" datatype="html">
+        <source>Home</source>
+        <target>Acasă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7751010942038334793" datatype="html">
+        <source>Blog</source>
+        <target>Blog</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2029980907058777630" datatype="html">
+        <source>Terms of Service</source>
+        <target>Termeni și condiții</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8439955599488894226" datatype="html">
+        <source>Privacy Policy</source>
+        <target>Politică de confidențialitate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.ariaHome" datatype="html">
+        <source>MotionHive home</source>
+        <target>Pagina principală MotionHive</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.ariaMain" datatype="html">
+        <source>Main navigation</source>
+        <target>Navigare principală</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.joinWaitlist" datatype="html">
+        <source>Join the waitlist</source>
+        <target>Înscrie-te</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.toggleNav" datatype="html">
+        <source>Toggle navigation menu</source>
+        <target>Comutare meniu de navigare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.ariaMobile" datatype="html">
+        <source>Mobile navigation</source>
+        <target>Navigare mobilă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4608015944298801142" datatype="html">
+        <source>Switch to light mode</source>
+        <target>Comută la modul luminos</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="803131845720356706" datatype="html">
+        <source>Switch to dark mode</source>
+        <target>Comută la modul întunecat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1726363342938046830" datatype="html">
+        <source>About</source>
+        <target>Despre</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="langSwitcher.aria" datatype="html">
+        <source>Language selection</source>
+        <target>Selectare limbă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/language-switcher/language-switcher.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.header.title" datatype="html">
+        <source>Stay in the loop</source>
+        <target state="translated">Rămâi la curent</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">12,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.header.sub" datatype="html">
+        <source>Be the first to know when MotionHive launches</source>
+        <target state="translated">Fii primul care află când lansăm MotionHive</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">13,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.desc" datatype="html">
+        <source> We're building something special. Drop your email and we'll notify you the moment we're live. </source>
+        <target state="translated"> Construim ceva special. Lasă-ne emailul și te vom anunța în momentul în care suntem live. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.name.label" datatype="html">
+        <source>Name</source>
+        <target state="translated">Nume</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.optional" datatype="html">
+        <source>(optional)</source>
+        <target state="translated">(opțional)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.name.placeholder" datatype="html">
+        <source>Your name</source>
+        <target state="translated">Numele tău</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.role.label" datatype="html">
+        <source>How will you MotionHive?</source>
+        <target state="translated">Cum vei folosi MotionHive?</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.success.h4" datatype="html">
+        <source>You're in!</source>
+        <target state="translated">Ești înscris!</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.success.p" datatype="html">
+        <source> We'll reach out as soon as MotionHive is ready. Thanks for believing in what we're building. </source>
+        <target state="translated"> Te vom contacta imediat ce MotionHive este gata. Mulțumim că crezi în ceea ce construim. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.btn.later" datatype="html">
+        <source>Maybe later</source>
+        <target state="translated">Mai târziu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.btn.notify" datatype="html">
+        <source>Notify me</source>
+        <target state="translated">Notifică-mă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.role.lead" datatype="html">
+        <source>I lead activities</source>
+        <target state="translated">Conduc activități</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.role.join" datatype="html">
+        <source>I join activities</source>
+        <target state="translated">Particip la activități</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="waitlist.toast.error.detail" datatype="html">
+        <source>Could not join the waitlist. Please try again.</source>
+        <target state="translated">Nu te-ai putut înscrie pe lista de așteptare. Te rugăm să încerci din nou.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

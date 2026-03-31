@@ -3,10 +3,11 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
 import { ThemeService, WaitlistService, Logo } from 'core';
+import { LanguageSwitcher } from '../../_shared/language-switcher/language-switcher';
 
 @Component({
   selector: 'mh-public-header',
-  imports: [RouterLink, RouterLinkActive, ButtonModule, Logo],
+  imports: [RouterLink, RouterLinkActive, ButtonModule, Logo, LanguageSwitcher],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +24,15 @@ export class PublicHeaderComponent {
   readonly isDark = this._themeService.isDark;
   readonly scrolled = signal(false);
 
+  readonly switchLightLabel = $localize`Switch to light mode`;
+  readonly switchDarkLabel = $localize`Switch to dark mode`;
+
+  readonly navLinks = [
+    { label: $localize`Home`, path: '/', exact: true },
+    { label: $localize`About`, path: '/about', exact: true },
+    { label: $localize`Blog`, path: '/blog', exact: false },
+  ];
+
   onScroll(): void {
     this.scrolled.set(window.scrollY > 5);
   }
@@ -32,12 +42,6 @@ export class PublicHeaderComponent {
       this.mobileMenuOpen.set(false);
     }
   }
-
-  readonly navLinks = [
-    { label: 'Home', path: '/', exact: true },
-    { label: 'About', path: '/about', exact: true },
-    { label: 'Blog', path: '/blog', exact: false },
-  ];
 
   toggleTheme(): void {
     this._themeService.toggle();
