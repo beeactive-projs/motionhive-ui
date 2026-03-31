@@ -1,11 +1,28 @@
 {
   "redirects": [
-    { "source": "/en", "destination": "/", "permanent": true },
-    { "source": "/en/:path*", "destination": "/:path*", "permanent": true }
+    {
+      "source": "/en",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/en/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/ro/:path*", "destination": "/ro/index.html" },
-    { "source": "/:path*", "destination": "/en/:path*", "check": true },
-    { "source": "/:path*", "destination": "/en/index.html" }
+    {
+      "source": "/ro/:path*",
+      "destination": "/ro/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/en/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/en/index.html"
+    }
   ]
 }
