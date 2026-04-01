@@ -1280,6 +1280,934 @@
           <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="privacy.pill" datatype="html">
+        <source>Read</source>
+        <target state="translated">Citește</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">6,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.h1" datatype="html">
+        <source> Privacy Policy. </source>
+        <target state="translated"> Politica de confidențialitate. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.lastUpdated" datatype="html">
+        <source> Last updated: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() }}"/>. </source>
+        <target state="translated"> Ultima actualizare: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() }}"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">15,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s1.h2" datatype="html">
+        <source>1. Introduction</source>
+        <target state="translated">1. Introducere</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">25,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s1.p" datatype="html">
+        <source> At MotionHive, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. Please read this policy carefully to understand our practices regarding your personal data. </source>
+        <target state="translated"> La MotionHive, luăm confidențialitatea ta în serios. Această Politică de confidențialitate explică modul în care colectăm, utilizăm, dezvăluim și protejăm informațiile tale atunci când utilizezi Serviciul nostru. Te rugăm să citești cu atenție această politică pentru a înțelege practicile noastre privind datele tale personale. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">27,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.h2" datatype="html">
+        <source>2. Information We Collect</source>
+        <target state="translated">2. Informațiile pe care le colectăm</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">35,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.h3" datatype="html">
+        <source>2.1 Personal Information</source>
+        <target state="translated">2.1 Informații personale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">37,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.intro" datatype="html">
+        <source>We may collect the following personal information:</source>
+        <target state="translated">Putem colecta următoarele informații personale:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">38,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.li1" datatype="html">
+        <source>Name and contact information (email, phone number)</source>
+        <target state="translated">Nume și date de contact (email, număr de telefon)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">40,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.li2" datatype="html">
+        <source>Account credentials (username, password)</source>
+        <target state="translated">Date de autentificare (nume de utilizator, parolă)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.li3" datatype="html">
+        <source>Profile information (age, gender, fitness goals)</source>
+        <target state="translated">Informații de profil (vârstă, gen, obiective de fitness)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">42,43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.li4" datatype="html">
+        <source>Payment information (processed securely by third-party payment processors)</source>
+        <target state="translated">Informații de plată (procesate în siguranță de procesatori de plăți terți)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">43,44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s21.li5" datatype="html">
+        <source>Communication preferences</source>
+        <target state="translated">Preferințe de comunicare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">44,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s22.h3" datatype="html">
+        <source>2.2 Usage Information</source>
+        <target state="translated">2.2 Informații de utilizare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">47,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s22.li1" datatype="html">
+        <source>Device information (IP address, browser type, operating system)</source>
+        <target state="translated">Informații despre dispozitiv (adresă IP, tip de browser, sistem de operare)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">49,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s22.li2" datatype="html">
+        <source>Usage data (pages visited, features used, time spent)</source>
+        <target state="translated">Date de utilizare (pagini vizitate, funcționalități folosite, timp petrecut)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">50,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s22.li3" datatype="html">
+        <source>Location data (with your permission)</source>
+        <target state="translated">Date de locație (cu permisiunea ta)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">51,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s22.li4" datatype="html">
+        <source>Cookies and similar tracking technologies</source>
+        <target state="translated">Cookie-uri și tehnologii similare de urmărire</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">52,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s23.h3" datatype="html">
+        <source>2.3 Health Information</source>
+        <target state="translated">2.3 Informații de sănătate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">55,56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s23.li1" datatype="html">
+        <source>Fitness activities and workout history</source>
+        <target state="translated">Activități de fitness și istoricul antrenamentelor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">57,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s23.li2" datatype="html">
+        <source>Health metrics (if you choose to provide them)</source>
+        <target state="translated">Metrici de sănătate (dacă alegi să le furnizezi)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">58,59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s2.s23.li3" datatype="html">
+        <source>Progress tracking data</source>
+        <target state="translated">Date de urmărire a progresului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">59,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.h2" datatype="html">
+        <source>3. How We Use Your Information</source>
+        <target state="translated">3. Cum utilizăm informațiile tale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.intro" datatype="html">
+        <source>We use your information to:</source>
+        <target state="translated">Utilizăm informațiile tale pentru:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">66,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li1" datatype="html">
+        <source>Provide, maintain, and improve our Service</source>
+        <target state="translated">A oferi, menține și îmbunătăți Serviciul nostru</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">68,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li2" datatype="html">
+        <source>Process your transactions and manage your account</source>
+        <target state="translated">A procesa tranzacțiile tale și a gestiona contul tău</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">69,70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li3" datatype="html">
+        <source>Send you updates, newsletters, and marketing communications (with your consent)</source>
+        <target state="translated">A-ți trimite actualizări, newslettere și comunicări de marketing (cu consimțământul tău)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">70,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li4" datatype="html">
+        <source>Respond to your inquiries and provide customer support</source>
+        <target state="translated">A răspunde la întrebările tale și a oferi suport clienților</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">71,72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li5" datatype="html">
+        <source>Personalize your experience and deliver relevant content</source>
+        <target state="translated">A personaliza experiența ta și a furniza conținut relevant</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">72,73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li6" datatype="html">
+        <source>Monitor and analyze usage patterns and trends</source>
+        <target state="translated">A monitoriza și analiza tipare și tendințe de utilizare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">73,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li7" datatype="html">
+        <source>Detect, prevent, and address technical issues and security threats</source>
+        <target state="translated">A detecta, preveni și aborda probleme tehnice și amenințări de securitate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s3.li8" datatype="html">
+        <source>Comply with legal obligations</source>
+        <target state="translated">A respecta obligațiile legale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">75,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s4.h2" datatype="html">
+        <source>4. Information Sharing</source>
+        <target state="translated">4. Partajarea informațiilor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">81,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s4.intro" datatype="html">
+        <source>We do not sell your personal information. We may share your information with:</source>
+        <target state="translated">Nu vindem informațiile tale personale. Putem partaja informațiile tale cu:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">82,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s4.li1" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Service Providers:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Third parties who help us operate our Service</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Furnizori de servicii:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> terțe părți care ne ajută să operăm Serviciul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">84,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s4.li2" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Business Partners:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> With your consent, for joint offerings</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Parteneri de afaceri:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> cu consimțământul tău, pentru oferte comune</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">85,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s4.li3" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Legal Requirements:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> When required by law or to protect our rights</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Cerințe legale:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> când este cerut de lege sau pentru a ne proteja drepturile</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">86,87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s4.li4" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Business Transfers:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> In connection with a merger, acquisition, or sale of assets</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Transferuri de afaceri:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> în legătură cu o fuziune, achiziție sau vânzare de active</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">87,89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s5.h2" datatype="html">
+        <source>5. Data Security</source>
+        <target state="translated">5. Securitatea datelor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">93,94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s5.p" datatype="html">
+        <source> We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include: </source>
+        <target state="translated"> Implementăm măsuri tehnice și organizatorice adecvate pentru a proteja informațiile tale personale împotriva accesului neautorizat, modificării, dezvăluirii sau distrugerii. Aceste măsuri includ: </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">95,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s5.li1" datatype="html">
+        <source>Encryption of data in transit and at rest</source>
+        <target state="translated">Criptarea datelor în tranzit și în repaus</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">99,100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s5.li2" datatype="html">
+        <source>Regular security assessments and audits</source>
+        <target state="translated">Evaluări și audituri de securitate periodice</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">100,101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s5.li3" datatype="html">
+        <source>Access controls and authentication mechanisms</source>
+        <target state="translated">Controale de acces și mecanisme de autentificare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">101,102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s5.li4" datatype="html">
+        <source>Employee training on data protection</source>
+        <target state="translated">Instruirea angajaților privind protecția datelor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">102,104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.h2" datatype="html">
+        <source>6. Your Rights</source>
+        <target state="translated">6. Drepturile tale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">108,109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.intro" datatype="html">
+        <source>You have the right to:</source>
+        <target state="translated">Ai dreptul de a:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">109,110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.li1" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Access:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Request a copy of your personal information</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Acces:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> solicita o copie a informațiilor tale personale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">111,112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.li2" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Correction:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Update or correct inaccurate information</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Rectificare:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> actualiza sau corecta informații inexacte</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">112,113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.li3" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Deletion:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Request deletion of your personal information</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Ștergere:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> solicita ștergerea informațiilor tale personale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">113,114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.li4" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Portability:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Receive your data in a machine-readable format</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Portabilitate:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> primi datele tale într-un format lizibil automat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">114,115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.li5" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Opt-out:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Unsubscribe from marketing communications</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Dezabonare:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> te dezabona de la comunicările de marketing</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">115,116</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s6.li6" datatype="html">
+        <source><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Object:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> Object to certain processing of your data</source>
+        <target state="translated"><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Opoziție:<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/> te opune anumitor procesări ale datelor tale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">116,118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s7.h2" datatype="html">
+        <source>7. Cookies and Tracking</source>
+        <target state="translated">7. Cookie-uri și urmărire</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">122,123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s7.p" datatype="html">
+        <source> We use cookies and similar tracking technologies to improve your experience. You can control cookies through your browser settings. However, disabling cookies may affect certain features of our Service. </source>
+        <target state="translated"> Utilizăm cookie-uri și tehnologii similare de urmărire pentru a îmbunătăți experiența ta. Poți controla cookie-urile prin setările browserului tău. Cu toate acestea, dezactivarea cookie-urilor poate afecta anumite funcționalități ale Serviciului nostru. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">124,127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s8.h2" datatype="html">
+        <source>8. Children&apos;s Privacy</source>
+        <target state="translated">8. Confidențialitatea copiilor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">131,132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s8.p" datatype="html">
+        <source> Our Service is not intended for children under 18 years of age. We do not knowingly collect personal information from children. If you believe we have collected information from a child, please contact us immediately. </source>
+        <target state="translated"> Serviciul nostru nu este destinat copiilor cu vârsta sub 18 ani. Nu colectăm cu bună știință informații personale de la copii. Dacă crezi că am colectat informații de la un copil, te rugăm să ne contactezi imediat. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">133,136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s9.h2" datatype="html">
+        <source>9. International Data Transfers</source>
+        <target state="translated">9. Transferuri internaționale de date</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">141,142</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s9.p" datatype="html">
+        <source> Your information may be transferred to and maintained on servers located outside your jurisdiction. By using our Service, you consent to such transfers. We ensure appropriate safeguards are in place to protect your data. </source>
+        <target state="translated"> Informațiile tale pot fi transferate și menținute pe servere situate în afara jurisdicției tale. Prin utilizarea Serviciului nostru, îți dai consimțământul pentru astfel de transferuri. Ne asigurăm că există garanții adecvate pentru a proteja datele tale. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">143,146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s10.h2" datatype="html">
+        <source>10. Data Retention</source>
+        <target state="translated">10. Retenția datelor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">151,152</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s10.p" datatype="html">
+        <source> We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law. When we no longer need your information, we will securely delete or anonymize it. </source>
+        <target state="translated"> Păstrăm informațiile tale personale atât timp cât este necesar pentru a îndeplini scopurile descrise în această Politică de confidențialitate, cu excepția cazului în care o perioadă mai lungă de retenție este cerută de lege. Când nu mai avem nevoie de informațiile tale, le vom șterge în siguranță sau le vom anonimiza. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">153,156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s11.h2" datatype="html">
+        <source>11. Changes to This Privacy Policy</source>
+        <target state="translated">11. Modificări ale acestei Politici de confidențialitate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">161,162</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s11.p" datatype="html">
+        <source> We may update this Privacy Policy from time to time. We will notify you of material changes by posting the new Privacy Policy on this page and updating the &quot;Last Updated&quot; date. We encourage you to review this policy periodically. </source>
+        <target state="translated"> Putem actualiza această Politică de confidențialitate periodic. Te vom notifica cu privire la modificările semnificative prin publicarea noii Politici de confidențialitate pe această pagină și actualizarea datei &quot;Ultima actualizare&quot;. Te încurajăm să revizuiești această politică periodic. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">163,166</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s12.h2" datatype="html">
+        <source>12. Contact Us</source>
+        <target state="translated">12. Contactează-ne</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">171,172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s12.intro" datatype="html">
+        <source>If you have questions or concerns about this Privacy Policy, please contact us:</source>
+        <target state="translated">Dacă ai întrebări sau nelămuriri cu privire la această Politică de confidențialitate, te rugăm să ne contactezi:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">172,173</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s12.email.label" datatype="html">
+        <source>Email:</source>
+        <target state="translated">Email:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">177,178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s12.dpo.label" datatype="html">
+        <source>Data Protection Officer:</source>
+        <target state="translated">Responsabil cu protecția datelor:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">185,186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s12.address.label" datatype="html">
+        <source>Address:</source>
+        <target state="translated">Adresă:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">193,194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.s12.address.value" datatype="html">
+        <source>123 MotionHive Street, Tech City, TC 12345</source>
+        <target state="translated">123 MotionHive Street, Tech City, TC 12345</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">194,196</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.footer.also" datatype="html">
+        <source> Also read our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/terms-of-service&quot; class=&quot;text-brand hover:underline font-medium&quot;&gt;"/>Terms of Service<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <target state="translated"> Citește și <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/terms-of-service&quot; class=&quot;text-brand hover:underline font-medium&quot;&gt;"/>Termenii și condițiile<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> noastre</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">208,211</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.footer.goToHome" datatype="html">
+        <source>Go to Home</source>
+        <target state="translated">Mergi acasă</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">212</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.footer.scrollToTop" datatype="html">
+        <source>Scroll to Top</source>
+        <target state="translated">Înapoi sus</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
+          <context context-type="linenumber">213</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">165</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.pill" datatype="html">
+        <source>Read</source>
+        <target state="translated">Citește</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">5,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.h1" datatype="html">
+        <source> Terms of Service. </source>
+        <target state="translated"> Termeni și condiții. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">9,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.lastUpdated" datatype="html">
+        <source> Last updated: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() }}"/>. </source>
+        <target state="translated"> Ultima actualizare: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() }}"/>. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">14,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s1.h2" datatype="html">
+        <source>1. Introduction</source>
+        <target state="translated">1. Introducere</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">23,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s1.p1" datatype="html">
+        <source> Welcome to MotionHive. These Terms of Service (&quot;Terms&quot;) govern your access to and use of our website, mobile application, and services (collectively, the &quot;Service&quot;). By accessing or using the Service, you agree to be bound by these Terms. </source>
+        <target state="translated"> Bine ai venit la MotionHive. Acești Termeni și condiții (&quot;Termeni&quot;) guvernează accesul tău la și utilizarea site-ului nostru web, a aplicației mobile și a serviciilor (denumite colectiv &quot;Serviciul&quot;). Prin accesarea sau utilizarea Serviciului, ești de acord să respecți acești Termeni. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">25,28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s1.p2" datatype="html">
+        <source> If you do not agree to these Terms, please do not use our Service. </source>
+        <target state="translated"> Dacă nu ești de acord cu acești Termeni, te rugăm să nu utilizezi Serviciul nostru. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">30,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s2.h2" datatype="html">
+        <source>2. Acceptance of Terms</source>
+        <target state="translated">2. Acceptarea termenilor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s2.p" datatype="html">
+        <source> By creating an account or using MotionHive, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If you are using the Service on behalf of an organization, you represent that you have the authority to bind that organization to these Terms. </source>
+        <target state="translated"> Prin crearea unui cont sau utilizarea MotionHive, recunoști că ai citit, înțeles și ești de acord să respecți acești Termeni și Politica noastră de confidențialitate. Dacă utilizezi Serviciul în numele unei organizații, declari că ai autoritatea de a obliga acea organizație să respecte acești Termeni. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">38,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s3.h2" datatype="html">
+        <source>3. Account Registration</source>
+        <target state="translated">3. Înregistrarea contului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">46,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s3.li1" datatype="html">
+        <source>You must be at least 18 years old to create an account</source>
+        <target state="translated">Trebuie să ai cel puțin 18 ani pentru a crea un cont</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">48,49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s3.li2" datatype="html">
+        <source>You must provide accurate and complete information during registration</source>
+        <target state="translated">Trebuie să furnizezi informații exacte și complete la înregistrare</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">49,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s3.li3" datatype="html">
+        <source>You are responsible for maintaining the security of your account credentials</source>
+        <target state="translated">Ești responsabil pentru menținerea securității datelor de autentificare ale contului tău</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">50,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s3.li4" datatype="html">
+        <source>You must notify us immediately of any unauthorized access to your account</source>
+        <target state="translated">Trebuie să ne anunți imediat cu privire la orice acces neautorizat la contul tău</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">51,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s3.li5" datatype="html">
+        <source>You are responsible for all activities that occur under your account</source>
+        <target state="translated">Ești responsabil pentru toate activitățile care au loc în contul tău</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">52,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.h2" datatype="html">
+        <source>4. User Responsibilities</source>
+        <target state="translated">4. Responsabilitățile utilizatorului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">58,59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.intro" datatype="html">
+        <source>You agree to:</source>
+        <target state="translated">Ești de acord să:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">59,60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.li1" datatype="html">
+        <source>Use the Service only for lawful purposes</source>
+        <target state="translated">Utilizezi Serviciul numai în scopuri legale</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">61,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.li2" datatype="html">
+        <source>Not interfere with or disrupt the Service or servers</source>
+        <target state="translated">Nu interferezi cu sau perturbezi Serviciul sau serverele</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">62,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.li3" datatype="html">
+        <source>Not attempt to gain unauthorized access to any part of the Service</source>
+        <target state="translated">Nu încerci să obții acces neautorizat la nicio parte a Serviciului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">63,64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.li4" datatype="html">
+        <source>Not transmit viruses, malware, or other malicious code</source>
+        <target state="translated">Nu transmiți viruși, malware sau alt cod malițios</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">64,65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.li5" datatype="html">
+        <source>Not impersonate any person or entity</source>
+        <target state="translated">Nu te dai drept altă persoană sau entitate</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s4.li6" datatype="html">
+        <source>Respect the intellectual property rights of MotionHive and others</source>
+        <target state="translated">Respecți drepturile de proprietate intelectuală ale MotionHive și ale altora</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">66,68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s5.h2" datatype="html">
+        <source>5. Service Availability</source>
+        <target state="translated">5. Disponibilitatea serviciului</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">72,73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s5.p" datatype="html">
+        <source> While we strive to provide continuous access to the Service, we do not guarantee that the Service will be available at all times. We may suspend, withdraw, or restrict the availability of all or any part of the Service for business or operational reasons. </source>
+        <target state="translated"> Deși ne străduim să oferim acces continuu la Serviciu, nu garantăm că Serviciul va fi disponibil în orice moment. Putem suspenda, retrage sau restricționa disponibilitatea întregului Serviciu sau a oricărei părți din acesta din motive comerciale sau operaționale. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">74,76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s6.h2" datatype="html">
+        <source>6. Subscription and Payment</source>
+        <target state="translated">6. Abonament și plată</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">82,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s6.intro" datatype="html">
+        <source>Some features of the Service may require a paid subscription:</source>
+        <target state="translated">Unele funcționalități ale Serviciului pot necesita un abonament plătit:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">83,84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s6.li1" datatype="html">
+        <source>Subscription fees are billed in advance on a recurring basis</source>
+        <target state="translated">Tarifele de abonament sunt facturate în avans pe baze recurente</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">85,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s6.li2" datatype="html">
+        <source>All fees are non-refundable unless otherwise stated</source>
+        <target state="translated">Toate tarifele sunt nerambursabile dacă nu se specifică altfel</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">86,87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s6.li3" datatype="html">
+        <source>You can cancel your subscription at any time</source>
+        <target state="translated">Poți anula abonamentul tău oricând</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">87,88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s6.li4" datatype="html">
+        <source>We reserve the right to change our pricing with 30 days notice</source>
+        <target state="translated">Ne rezervăm dreptul de a modifica prețurile cu un preaviz de 30 de zile</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">88,90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s7.h2" datatype="html">
+        <source>7. Intellectual Property</source>
+        <target state="translated">7. Proprietate intelectuală</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">94,95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s7.p" datatype="html">
+        <source> The Service and its original content, features, and functionality are owned by MotionHive and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. </source>
+        <target state="translated"> Serviciul și conținutul, funcționalitățile și funcțiile sale originale sunt deținute de MotionHive și sunt protejate de drepturile internaționale de autor, mărci comerciale, brevete, secrete comerciale și alte legi privind proprietatea intelectuală. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">96,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s8.h2" datatype="html">
+        <source>8. Termination</source>
+        <target state="translated">8. Reziliere</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">103,104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s8.p" datatype="html">
+        <source> We may terminate or suspend your account and access to the Service immediately, without prior notice or liability, for any reason, including breach of these Terms. Upon termination, your right to use the Service will immediately cease. </source>
+        <target state="translated"> Putem rezilia sau suspenda contul tău și accesul la Serviciu imediat, fără notificare prealabilă sau răspundere, din orice motiv, inclusiv încălcarea acestor Termeni. La reziliere, dreptul tău de a utiliza Serviciul va înceta imediat. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">105,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s9.h2" datatype="html">
+        <source>9. Limitation of Liability</source>
+        <target state="translated">9. Limitarea răspunderii</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">113,114</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s9.p" datatype="html">
+        <source> To the maximum extent permitted by law, MotionHive shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses. </source>
+        <target state="translated"> În măsura maximă permisă de lege, MotionHive nu va fi răspunzătoare pentru nicio daună indirectă, incidentală, specială, consecventă sau punitivă, sau orice pierdere de profituri sau venituri, indiferent dacă este suportată direct sau indirect, sau orice pierdere de date, utilizare, fond comercial sau alte pierderi intangibile. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">115,117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s10.h2" datatype="html">
+        <source>10. Changes to Terms</source>
+        <target state="translated">10. Modificări ale termenilor</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">123,124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s10.p" datatype="html">
+        <source> We reserve the right to modify these Terms at any time. We will notify users of any material changes by posting the new Terms on this page and updating the &quot;Last Updated&quot; date. Your continued use of the Service after such changes constitutes acceptance of the new Terms. </source>
+        <target state="translated"> Ne rezervăm dreptul de a modifica acești Termeni oricând. Vom notifica utilizatorii cu privire la orice modificări semnificative prin publicarea noilor Termeni pe această pagină și actualizarea datei &quot;Ultima actualizare&quot;. Utilizarea continuă a Serviciului după astfel de modificări constituie acceptarea noilor Termeni. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">125,128</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s11.h2" datatype="html">
+        <source>11. Contact Us</source>
+        <target state="translated">11. Contactează-ne</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">133,134</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s11.intro" datatype="html">
+        <source>If you have any questions about these Terms, please contact us:</source>
+        <target state="translated">Dacă ai întrebări despre acești Termeni, te rugăm să ne contactezi:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">134,135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s11.email.label" datatype="html">
+        <source>Email:</source>
+        <target state="translated">Email:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">139,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s11.address.label" datatype="html">
+        <source>Address:</source>
+        <target state="translated">Adresă:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">146,147</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.s11.address.value" datatype="html">
+        <source>Cluj-Napoca, Cluj, Romania</source>
+        <target state="translated">Cluj-Napoca, Cluj, România</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">147,149</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="tos.footer.also" datatype="html">
+        <source> Also read our <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/privacy-policy&quot; class=&quot;text-brand hover:underline font-medium&quot;&gt;"/>Privacy Policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <target state="translated"> Citește și <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/legal/privacy-policy&quot; class=&quot;text-brand hover:underline font-medium&quot;&gt;"/>Politica de confidențialitate<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> noastră</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
+          <context context-type="linenumber">160,163</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>
