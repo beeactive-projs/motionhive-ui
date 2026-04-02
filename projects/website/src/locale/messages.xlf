@@ -479,6 +479,31 @@
           <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="7773544315865542977" datatype="html">
+        <source>MotionHive — Where active communities come together</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6541183069530121501" datatype="html">
+        <source>About - MotionHive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3097447979653612646" datatype="html">
+        <source>Blog - MotionHive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="blog.article.ariaLoading" datatype="html">
         <source>Loading article</source>
         <context-group purpose="location">
@@ -1084,32 +1109,32 @@
         <source>Main navigation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
-          <context context-type="linenumber">16,17</context>
+          <context context-type="linenumber">13,14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.joinWaitlist" datatype="html">
         <source>Join the waitlist</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.toggleNav" datatype="html">
         <source>Toggle navigation menu</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
-          <context context-type="linenumber">39,40</context>
+          <context context-type="linenumber">36,37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.ariaMobile" datatype="html">
         <source>Mobile navigation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
-          <context context-type="linenumber">46,47</context>
+          <context context-type="linenumber">43,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4608015944298801142" datatype="html">
@@ -1596,7 +1621,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s12.address.value" datatype="html">
-        <source>123 MotionHive Street, Tech City, TC 12345</source>
+        <source>Cluj-Napoca, Cluj, Romania</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
           <context context-type="linenumber">194,196</context>

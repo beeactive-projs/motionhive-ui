@@ -9,23 +9,23 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./home/home.component').then((m) => m.HomeComponent),
-        title: 'MotionHive — Where active communities come together',
+        title: $localize`MotionHive — Where active communities come together`,
       },
       {
         path: 'about',
         loadComponent: () => import('./about/about.component').then((m) => m.AboutComponent),
-        title: 'About - MotionHive',
+        title: $localize`About - MotionHive`,
       },
       {
         path: 'blog',
         loadComponent: () => import('./blog/blog.component').then((m) => m.BlogComponent),
-        title: 'Blog - MotionHive',
+        title: $localize`Blog - MotionHive`,
       },
       {
         path: 'blog/:slug',
         loadComponent: () =>
           import('./blog/blog-article/blog-article.component').then((m) => m.BlogArticleComponent),
-        title: 'MotionHive Blog',
+        title: $localize`Blog - MotionHive`,
       },
       {
         path: 'legal',
