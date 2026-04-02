@@ -76,7 +76,7 @@
       </trans-unit>
       <trans-unit id="feedback.email.optional" datatype="html">
         <source>(optional — to follow up on your feedback)</source>
-        <target state="translated">(opțional — pentru a da curs feedback-ului tău)</target>
+        <target state="translated">(opțional — ca să putem reveni cu un răspuns)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.html</context>
           <context context-type="linenumber">66</context>
@@ -252,7 +252,7 @@
       </trans-unit>
       <trans-unit id="about.h1" datatype="html">
         <source> Built for people who <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>show up<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-        <target> Construit pentru oamenii care <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>apar<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <target> Construit pentru oamenii care <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>vin<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">11</context>
@@ -260,7 +260,7 @@
       </trans-unit>
       <trans-unit id="about.intro" datatype="html">
         <source> MotionHive exists because staying active together shouldn't require five different apps. </source>
-        <target> MotionHive există pentru că a rămâne activ împreună nu ar trebui să necesite cinci aplicații diferite. </target>
+        <target> MotionHive există pentru că n-ar trebui să ai nevoie de cinci aplicații diferite ca să rămâi activ împreună. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">16</context>
@@ -284,7 +284,7 @@
       </trans-unit>
       <trans-unit id="about.problem.p1" datatype="html">
         <source> If you've ever organised a group activity — a class, a run, a weekly session — you know how it goes. WhatsApp for scheduling, spreadsheets for attendance, Instagram for updates, and half the group still out of the loop. </source>
-        <target> Dacă ai organizat vreodată o activitate de grup — o clasă, o alergare, o sesiune săptămânală — știi cum merge. WhatsApp pentru programare, foi de calcul pentru prezență, Instagram pentru actualizări și jumătate din grup tot în afara buclei. </target>
+        <target> Dacă ai organizat vreodată o activitate de grup — o clasă, o alergare, o sesiune săptămânală — știi cum merge. WhatsApp pentru programare, foi de calcul pentru prezență, Instagram pentru actualizări și jumătate din grup tot nu știe ce se întâmplă. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">33</context>
@@ -292,7 +292,7 @@
       </trans-unit>
       <trans-unit id="about.problem.p2" datatype="html">
         <source> There's no single place where the person leading and the people showing up can just stay in sync. No noise, no switching between apps, no chaos. </source>
-        <target> Nu există un singur loc unde persoana care conduce și cei care participă pot rămâne sincronizați. Fără zgomot, fără comutare între aplicații, fără haos. </target>
+        <target> Nu există un singur loc unde persoana care conduce și cei care participă pot rămâne sincronizați. Fără gălăgie, fără să sari de la o aplicație la alta, fără haos. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">38</context>
@@ -348,7 +348,7 @@
       </trans-unit>
       <trans-unit id="about.believe.c1.p" datatype="html">
         <source> The best motivation isn't an app notification — it's the people you show up with. </source>
-        <target> Cea mai bună motivație nu este o notificare de aplicație — sunt oamenii alături de care participi. </target>
+        <target> Cea mai bună motivație nu este o notificare de aplicație — sunt oamenii cu care vii. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">78</context>
@@ -496,7 +496,7 @@
       </trans-unit>
       <trans-unit id="blog.minRead" datatype="html">
         <source>min read</source>
-        <target>min citire</target>
+        <target>min de citit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
           <context context-type="linenumber">57</context>
@@ -556,7 +556,7 @@
       </trans-unit>
       <trans-unit id="blog.cta.sub" datatype="html">
         <source> We're building MotionHive in the open. Follow along and be the first to know when the hive opens. </source>
-        <target> Construim MotionHive în public. Urmărește-ne și fii primul care află când stupul se deschide. </target>
+        <target> Construim MotionHive în public. Urmărește-ne și fii printre primii care află când stupul se deschide. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
           <context context-type="linenumber">237</context>
@@ -688,7 +688,7 @@
       </trans-unit>
       <trans-unit id="home.hero.p" datatype="html">
         <source> Whether you lead a group or just love showing up — this is your space to stay active, stay connected, and find <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>your people<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-        <target> Indiferent dacă conduci un grup sau pur și simplu îți place să participi — acesta este spațiul tău pentru a rămâne activ, conectat și a găsi <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>oamenii tăi<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <target> Fie că organizezi un grup, fie că vii pur și simplu — acesta e locul tău să rămâi activ, conectat și să-ți găsești <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>oamenii<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">16</context>
@@ -704,7 +704,7 @@
       </trans-unit>
       <trans-unit id="home.hero.disclaimer" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Free to organise. Free to join. Always.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — we're building something good. </source>
-        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Gratuit de organizat. Gratuit de alăturat. Mereu.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — construim ceva bun. </target>
+        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Gratuit să organizezi. Gratuit să participi. Mereu.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — construim ceva bun. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">24</context>
@@ -770,7 +770,7 @@
       </trans-unit>
       <trans-unit id="home.floatCard2.desc" datatype="html">
         <source>Explore activities near you and show up with people who get it.</source>
-        <target>Explorează activitățile din apropierea ta și participă alături de oameni care înțeleg.</target>
+        <target>Explorează activitățile din apropierea ta și participă alături de oameni ca tine.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">85</context>
@@ -890,7 +890,7 @@
       </trans-unit>
       <trans-unit id="home.coming.sub" datatype="html">
         <source> We're building MotionHive piece by piece. Here's what's landing first. </source>
-        <target> Construim MotionHive bucată cu bucată. Iată ce apare primul. </target>
+        <target> Construim MotionHive bucată cu bucată. Iată ce lansăm mai întâi. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">153</context>
@@ -1214,7 +1214,7 @@
       </trans-unit>
       <trans-unit id="waitlist.desc" datatype="html">
         <source> We're building something special. Drop your email and we'll notify you the moment we're live. </source>
-        <target state="translated"> Construim ceva special. Lasă-ne emailul și te vom anunța în momentul în care suntem live. </target>
+        <target state="translated"> Construim ceva special. Lasă-ne emailul și îți dăm de știre imediat ce lansăm. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_shared/waitlist-dialog/waitlist-dialog.html</context>
           <context context-type="linenumber">22</context>
