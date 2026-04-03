@@ -152,7 +152,7 @@
       </trans-unit>
       <trans-unit id="feedback.type.bug" datatype="html">
         <source>Bug report</source>
-        <target state="translated">Raport de eroare</target>
+        <target state="translated">Eroare</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_shared/feedback-dialog/feedback-dialog.ts</context>
           <context context-type="linenumber">49</context>

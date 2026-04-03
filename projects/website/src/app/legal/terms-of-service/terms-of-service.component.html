@@ -9,8 +9,7 @@
       Terms of Service.
     </h1>
 
-    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto"
-      i18n="@@tos.lastUpdated">
+    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto" i18n="@@tos.lastUpdated">
       Last updated: {{ lastUpdated() }}.
     </p>
   </div>
@@ -131,13 +130,14 @@
     <!-- Contact -->
     <section class="legal-section">
       <h2 class="legal-heading" i18n="@@tos.s11.h2">11. Contact Us</h2>
-      <p class="legal-body mb-4" i18n="@@tos.s11.intro">If you have any questions about these Terms, please contact us:</p>
+      <p class="legal-body mb-4" i18n="@@tos.s11.intro">If you have any questions about these Terms, please contact us:
+      </p>
       <div class="legal-contact-card">
         <div class="flex items-center gap-3">
           <i class="pi pi-envelope text-brand"></i>
           <span class="">
             <strong i18n="@@tos.s11.email.label">Email:</strong>
-            <a href="mailto:legal@motionhive.fit" class="text-brand hover:underline ml-1">legal&#64;motionhive.com</a>
+            <a href="mailto:legal@motionhive.fit" class="text-brand hover:underline ml-1">legal&#64;motionhive.fit</a>
           </span>
         </div>
         <div class="flex items-center gap-3">
@@ -162,7 +162,8 @@
       </div>
       <div class="flex gap-3">
         <p-button i18n-label="@@legal.footer.goToHome" label="Go to Home" icon="pi pi-home" outlined routerLink="/" />
-        <p-button i18n-label="@@legal.footer.scrollToTop" label="Scroll to Top" icon="pi pi-arrow-up" (onClick)="scrollToTop()" />
+        <p-button i18n-label="@@legal.footer.scrollToTop" label="Scroll to Top" icon="pi pi-arrow-up"
+          (onClick)="scrollToTop()" />
       </div>
     </div>
   </div>
