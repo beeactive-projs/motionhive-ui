@@ -27,8 +27,8 @@ export class ContactComponent {
     {
       icon: 'pi-envelope',
       label: 'Email',
-      value: 'info@motionhive.com',
-      href: 'mailto:info@motionhive.com',
+      value: 'info@motionhive.fit',
+      href: 'mailto:info@motionhive.fit',
     },
     {
       icon: 'pi-phone',
