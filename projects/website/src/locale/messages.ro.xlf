@@ -711,7 +711,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex1" datatype="html">
-        <source>Discover what moves you</source>
+        <source>Find groups near you</source>
         <target>Descoperă ce te mișcă</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -719,7 +719,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex2" datatype="html">
-        <source>Run it your way</source>
+        <source>Schedule & manage sessions</source>
         <target>Organizează cum vrei tu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -735,7 +735,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex4" datatype="html">
-        <source>Keep the energy going</source>
+        <source>Track attendance & activity</source>
         <target>Menține energia</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -752,7 +752,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.floatCard1.desc" datatype="html">
-        <source>Bring your people together and keep them coming back.</source>
+        <source>One place to schedule sessions, manage members, and stay organised.</source>
         <target>Adună-ți oamenii și fă-i să revină.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -769,7 +769,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.floatCard2.desc" datatype="html">
-        <source>Explore activities near you and show up with people who get it.</source>
+        <source>Browse local fitness groups and book your spot in one tap.</source>
         <target>Explorează activitățile din apropierea ta și participă alături de oameni ca tine.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -865,7 +865,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.li3" datatype="html">
-        <source>Show up, stay close, keep moving.</source>
+        <source>Browse sessions nearby and jump in.</source>
         <target>Participă, rămâi aproape, continuă să te miști.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -993,7 +993,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="3497367109937514037" datatype="html">
-        <source>A home for every organiser and participant — your activity, your way.</source>
+        <source>Your public profile, upcoming sessions, and activity history — all in one place.</source>
         <target>Un loc pentru fiecare organizator și participant — activitatea ta, cum vrei tu.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>

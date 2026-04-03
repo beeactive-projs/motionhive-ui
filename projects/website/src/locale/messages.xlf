@@ -731,14 +731,14 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex1" datatype="html">
-        <source>Discover what moves you</source>
+        <source>Find groups near you</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">36,37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex2" datatype="html">
-        <source>Run it your way</source>
+        <source>Schedule & manage sessions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">44,45</context>
@@ -752,7 +752,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex4" datatype="html">
-        <source>Keep the energy going</source>
+        <source>Track attendance & activity</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">60,61</context>
@@ -767,7 +767,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.floatCard1.desc" datatype="html">
-        <source>Bring your people together and keep them coming back.</source>
+        <source>One place to schedule sessions, manage members, and stay organised.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">73,75</context>
@@ -782,7 +782,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.floatCard2.desc" datatype="html">
-        <source>Explore activities near you and show up with people who get it.</source>
+        <source>Browse local fitness groups and book your spot in one tap.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">85,87</context>
@@ -866,7 +866,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.li3" datatype="html">
-        <source>Show up, stay close, keep moving.</source>
+        <source>Browse sessions nearby and jump in.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">133,135</context>
@@ -978,7 +978,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="3497367109937514037" datatype="html">
-        <source>A home for every organiser and participant — your activity, your way.</source>
+        <source>Your public profile, upcoming sessions, and activity history — all in one place.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">42</context>

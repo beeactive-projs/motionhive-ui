@@ -39,7 +39,7 @@ export class HomeComponent {
     {
       icon: 'pi-user',
       title: $localize`Profiles`,
-      description: $localize`A home for every organiser and participant — your activity, your way.`,
+      description: $localize`Your public profile, upcoming sessions, and activity history — all in one place.`,
       ready: false,
     },
   ];
