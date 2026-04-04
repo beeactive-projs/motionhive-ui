@@ -917,7 +917,7 @@
       </trans-unit>
       <trans-unit id="home.cta.sub" datatype="html">
         <source> MotionHive is just getting started. We're building the hive — follow along on our blog and be the first to know when it opens. </source>
-        <target> MotionHive abia începe. Construim stupul — urmărește-ne pe blog și fii primul care știe când se deschide. </target>
+        <target> MotionHive e la început de drum. Construim stupul — stai aproape și citește blogul — lansăm în curând. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">187</context>
