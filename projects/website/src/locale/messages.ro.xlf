@@ -252,7 +252,8 @@
       </trans-unit>
       <trans-unit id="about.h1" datatype="html">
         <source> Built for people who <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>show up<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-<target> Construit pentru oamenii care aleg să <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>nu renunțe.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> </target>        <context-group purpose="location">
+        <target> Construit pentru oamenii care aleg să <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>nu renunțe.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> </target>
+        <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
@@ -679,14 +680,16 @@
       </trans-unit>
       <trans-unit id="home.hero.h1" datatype="html">
         <source> Make staying <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>active together<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> feel easy. </source>
-        <target> Găsește <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>oamenii potriviți<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. Rămâi activ. </target>        <context-group purpose="location">
+        <target> Găsește <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>oamenii potriviți<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. Rămâi activ. </target>
+        <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.hero.p" datatype="html">
         <source> Whether you lead a group or just love showing up — this is your space to stay active, stay connected, and find <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>your people<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-<target> Pentru cei care organizează și pentru cei care vor să se alăture. Comunitatea ta, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>într-un singur loc<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>        <context-group purpose="location">
+        <target> Pentru cei care organizează și pentru cei care vor să se alăture. Comunitatea ta, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>într-un singur loc<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
@@ -716,7 +719,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex2" datatype="html">
-        <source>Schedule & manage sessions</source>
+        <source>Schedule &amp; manage sessions</source>
         <target>Programează și gestionează sesiuni</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -732,7 +735,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hex4" datatype="html">
-        <source>Track attendance & activity</source>
+        <source>Track attendance &amp; activity</source>
         <target>Gestionează prezența membrilor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -759,9 +762,10 @@
       <trans-unit id="home.floatCard2.title" datatype="html">
         <source>Find your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span
                 class=&quot;text-brand&quot;>"/>circle<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-<target>Descoperă <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>comunitatea<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>        <context-group purpose="location">
+        <target>Descoperă <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>comunitatea<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.floatCard2.desc" datatype="html">
@@ -769,7 +773,7 @@
         <target>Găsește activități în zona ta și Înscrie-te pe listă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.who.h2" datatype="html">
@@ -777,7 +781,7 @@
         <target> Cum vei folosi <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>? </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.who.sub" datatype="html">
@@ -785,7 +789,7 @@
         <target> O platformă. Două perspective. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.lead.h3" datatype="html">
@@ -793,7 +797,7 @@
         <target> Tu organizezi. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.lead.sub" datatype="html">
@@ -801,7 +805,7 @@
         <target>Construiește comunitatea ta.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.lead.li1" datatype="html">
@@ -809,7 +813,7 @@
         <target>Organizează sesiuni și clase după regulile tale.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.lead.li2" datatype="html">
@@ -817,7 +821,7 @@
         <target>Ține-ți comunitatea într-un singur loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.lead.li3" datatype="html">
@@ -825,7 +829,7 @@
         <target>Împărtășește actualizări, nu Excel.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.h3" datatype="html">
@@ -833,7 +837,7 @@
         <target> Tu participi. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.sub" datatype="html">
@@ -841,7 +845,7 @@
         <target>Intră în comunitate.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.li1" datatype="html">
@@ -849,7 +853,7 @@
         <target>Descoperă ce se întâmplă în jurul tău.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.li2" datatype="html">
@@ -857,7 +861,7 @@
         <target>Rămâi conectat la grupurile tale preferate.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.join.li3" datatype="html">
@@ -865,7 +869,7 @@
         <target>Găsește sesiuni în zona ta și Înscrie-te pe listă rapid.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coming.pill" datatype="html">
@@ -873,14 +877,15 @@
         <target>În construcție</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">144</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coming.h2" datatype="html">
         <source> The hive is <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>taking shape<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-<target> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> prinde formă. </target>        <context-group purpose="location">
+        <target> <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> prinde formă. </target>
+        <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coming.sub" datatype="html">
@@ -888,7 +893,7 @@
         <target> Construim pas cu pas. Iată ce lansăm mai întâi. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.roadmap.live" datatype="html">
@@ -896,7 +901,7 @@
         <target>Disponibil</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.roadmap.soon" datatype="html">
@@ -904,7 +909,7 @@
         <target>În curând</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.h2" datatype="html">
@@ -912,7 +917,7 @@
         <target> Fii printre <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>primii<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">182</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.sub" datatype="html">
@@ -920,7 +925,7 @@
         <target> MotionHive e la început de drum. Construim stupul — stai aproape și citește blogul — lansăm în curând. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">185</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.btn" datatype="html">
@@ -928,7 +933,7 @@
         <target state="translated">Citește blogul</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2957321873158512727" datatype="html">
@@ -987,7 +992,7 @@
           <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3497367109937514037" datatype="html">
+      <trans-unit id="1568222817650248057" datatype="html">
         <source>Your public profile, upcoming sessions, and activity history — all in one place.</source>
         <target>Un loc pentru fiecare organizator și participant — activitatea ta, cum vrei tu.</target>
         <context-group purpose="location">
@@ -1008,7 +1013,7 @@
         <target> Acolo unde oamenii activi se regăsesc. Un loc pentru a organiza, a te alătura și a rămâne în mișcare. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.product" datatype="html">
@@ -1016,7 +1021,7 @@
         <target>Produs</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.support" datatype="html">
@@ -1024,7 +1029,7 @@
         <target>Suport</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.shareFeedback" datatype="html">
@@ -1032,11 +1037,11 @@
         <target state="translated">Trimite feedback</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.getInTouch" datatype="html">
@@ -1044,7 +1049,7 @@
         <target>Contactează-ne</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.allRightsReserved" datatype="html">
@@ -1052,7 +1057,7 @@
         <target>Toate drepturile rezervate.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.terms" datatype="html">
@@ -1060,7 +1065,7 @@
         <target>Termeni</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.privacy" datatype="html">
@@ -1068,7 +1073,7 @@
         <target>Confidențialitate</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/footer/footer.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2821179408673282599" datatype="html">
@@ -1900,7 +1905,7 @@
         <target state="translated"> Ultima actualizare: <x id="INTERPOLATION" equiv-text="{{ lastUpdated() }}"/>. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">14,16</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s1.h2" datatype="html">
@@ -1908,7 +1913,7 @@
         <target state="translated">1. Introducere</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">23,24</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s1.p1" datatype="html">
@@ -1916,7 +1921,7 @@
         <target state="translated"> Bine ai venit la MotionHive. Acești Termeni și condiții ("Termeni") guvernează accesul tău la și utilizarea site-ului nostru web, a aplicației mobile și a serviciilor (denumite colectiv "Serviciul"). Prin accesarea sau utilizarea Serviciului, ești de acord să respecți acești Termeni. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">25,28</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s1.p2" datatype="html">
@@ -1924,7 +1929,7 @@
         <target state="translated"> Dacă nu ești de acord cu acești Termeni, te rugăm să nu utilizezi Serviciul nostru. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">30,32</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s2.h2" datatype="html">
@@ -1932,7 +1937,7 @@
         <target state="translated">2. Acceptarea termenilor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">36,37</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s2.p" datatype="html">
@@ -1940,7 +1945,7 @@
         <target state="translated"> Prin crearea unui cont sau utilizarea MotionHive, recunoști că ai citit, înțeles și ești de acord să respecți acești Termeni și Politica noastră de confidențialitate. Dacă utilizezi Serviciul în numele unei organizații, declari că ai autoritatea de a obliga acea organizație să respecte acești Termeni. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">38,40</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s3.h2" datatype="html">
@@ -1948,7 +1953,7 @@
         <target state="translated">3. Înregistrarea contului</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">46,47</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s3.li1" datatype="html">
@@ -1956,7 +1961,7 @@
         <target state="translated">Trebuie să ai cel puțin 18 ani pentru a crea un cont</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">48,49</context>
+          <context context-type="linenumber">47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s3.li2" datatype="html">
@@ -1964,7 +1969,7 @@
         <target state="translated">Trebuie să furnizezi informații exacte și complete la înregistrare</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">49,50</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s3.li3" datatype="html">
@@ -1972,7 +1977,7 @@
         <target state="translated">Ești responsabil pentru menținerea securității datelor de autentificare ale contului tău</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">50,51</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s3.li4" datatype="html">
@@ -1980,7 +1985,7 @@
         <target state="translated">Trebuie să ne anunți imediat cu privire la orice acces neautorizat la contul tău</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">51,52</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s3.li5" datatype="html">
@@ -1988,7 +1993,7 @@
         <target state="translated">Ești responsabil pentru toate activitățile care au loc în contul tău</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">52,54</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.h2" datatype="html">
@@ -1996,7 +2001,7 @@
         <target state="translated">4. Responsabilitățile utilizatorului</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">58,59</context>
+          <context context-type="linenumber">57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.intro" datatype="html">
@@ -2004,7 +2009,7 @@
         <target state="translated">Ești de acord să:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">59,60</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.li1" datatype="html">
@@ -2012,7 +2017,7 @@
         <target state="translated">Utilizezi Serviciul numai în scopuri legale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">61,62</context>
+          <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.li2" datatype="html">
@@ -2020,7 +2025,7 @@
         <target state="translated">Nu interferezi cu sau perturbezi Serviciul sau serverele</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">62,63</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.li3" datatype="html">
@@ -2028,7 +2033,7 @@
         <target state="translated">Nu încerci să obții acces neautorizat la nicio parte a Serviciului</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">63,64</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.li4" datatype="html">
@@ -2036,7 +2041,7 @@
         <target state="translated">Nu transmiți viruși, malware sau alt cod malițios</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">64,65</context>
+          <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.li5" datatype="html">
@@ -2044,7 +2049,7 @@
         <target state="translated">Nu te dai drept altă persoană sau entitate</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">65,66</context>
+          <context context-type="linenumber">64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s4.li6" datatype="html">
@@ -2052,7 +2057,7 @@
         <target state="translated">Respecți drepturile de proprietate intelectuală ale MotionHive și ale altora</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">66,68</context>
+          <context context-type="linenumber">65</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s5.h2" datatype="html">
@@ -2060,7 +2065,7 @@
         <target state="translated">5. Disponibilitatea serviciului</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">72,73</context>
+          <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s5.p" datatype="html">
@@ -2068,7 +2073,7 @@
         <target state="translated"> Deși ne străduim să oferim acces continuu la Serviciu, nu garantăm că Serviciul va fi disponibil în orice moment. Putem suspenda, retrage sau restricționa disponibilitatea întregului Serviciu sau a oricărei părți din acesta din motive comerciale sau operaționale. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">74,76</context>
+          <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s6.h2" datatype="html">
@@ -2076,7 +2081,7 @@
         <target state="translated">6. Abonament și plată</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">82,83</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s6.intro" datatype="html">
@@ -2084,7 +2089,7 @@
         <target state="translated">Unele funcționalități ale Serviciului pot necesita un abonament plătit:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">83,84</context>
+          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s6.li1" datatype="html">
@@ -2092,7 +2097,7 @@
         <target state="translated">Tarifele de abonament sunt facturate în avans pe baze recurente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">85,86</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s6.li2" datatype="html">
@@ -2100,7 +2105,7 @@
         <target state="translated">Toate tarifele sunt nerambursabile dacă nu se specifică altfel</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">86,87</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s6.li3" datatype="html">
@@ -2108,7 +2113,7 @@
         <target state="translated">Poți anula abonamentul tău oricând</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">87,88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s6.li4" datatype="html">
@@ -2116,7 +2121,7 @@
         <target state="translated">Ne rezervăm dreptul de a modifica prețurile cu un preaviz de 30 de zile</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">88,90</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s7.h2" datatype="html">
@@ -2124,7 +2129,7 @@
         <target state="translated">7. Proprietate intelectuală</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">94,95</context>
+          <context context-type="linenumber">93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s7.p" datatype="html">
@@ -2132,7 +2137,7 @@
         <target state="translated"> Serviciul și conținutul, funcționalitățile și funcțiile sale originale sunt deținute de MotionHive și sunt protejate de drepturile internaționale de autor, mărci comerciale, brevete, secrete comerciale și alte legi privind proprietatea intelectuală. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">96,98</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s8.h2" datatype="html">
@@ -2140,7 +2145,7 @@
         <target state="translated">8. Reziliere</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">103,104</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s8.p" datatype="html">
@@ -2148,7 +2153,7 @@
         <target state="translated"> Putem rezilia sau suspenda contul tău și accesul la Serviciu imediat, fără notificare prealabilă sau răspundere, din orice motiv, inclusiv încălcarea acestor Termeni. La reziliere, dreptul tău de a utiliza Serviciul va înceta imediat. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">105,107</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s9.h2" datatype="html">
@@ -2156,7 +2161,7 @@
         <target state="translated">9. Limitarea răspunderii</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">113,114</context>
+          <context context-type="linenumber">112</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s9.p" datatype="html">
@@ -2164,7 +2169,7 @@
         <target state="translated"> În măsura maximă permisă de lege, MotionHive nu va fi răspunzătoare pentru nicio daună indirectă, incidentală, specială, consecventă sau punitivă, sau orice pierdere de profituri sau venituri, indiferent dacă este suportată direct sau indirect, sau orice pierdere de date, utilizare, fond comercial sau alte pierderi intangibile. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">115,117</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s10.h2" datatype="html">
@@ -2172,7 +2177,7 @@
         <target state="translated">10. Modificări ale termenilor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">123,124</context>
+          <context context-type="linenumber">122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s10.p" datatype="html">
@@ -2180,7 +2185,7 @@
         <target state="translated"> Ne rezervăm dreptul de a modifica acești Termeni oricând. Vom notifica utilizatorii cu privire la orice modificări semnificative prin publicarea noilor Termeni pe această pagină și actualizarea datei "Ultima actualizare". Utilizarea continuă a Serviciului după astfel de modificări constituie acceptarea noilor Termeni. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">125,128</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s11.h2" datatype="html">
@@ -2188,15 +2193,15 @@
         <target state="translated">11. Contactează-ne</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">133,134</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s11.intro" datatype="html">
-        <source>If you have any questions about these Terms, please contact us:</source>
+        <source>If you have any questions about these Terms, please contact us: </source>
         <target state="translated">Dacă ai întrebări despre acești Termeni, te rugăm să ne contactezi:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
-          <context context-type="linenumber">134,135</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tos.s11.email.label" datatype="html">
