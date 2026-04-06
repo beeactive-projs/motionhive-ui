@@ -16,11 +16,11 @@ export class PublicFooterComponent {
   protected openFeedback(): void {
     this._feedbackService.open();
   }
+
   readonly currentYear = new Date().getFullYear();
 
   readonly socialLinks = [
     { icon: 'pi-facebook', href: 'https://facebook.com/motionhive.fit', label: 'Facebook' },
-    // { icon: 'pi-twitter', href: 'https://twitter.com', label: 'X (Twitter)' },
     { icon: 'pi-instagram', href: 'https://instagram.com/motionhive.fit', label: 'Instagram' },
     {
       icon: 'pi-linkedin',
@@ -30,15 +30,13 @@ export class PublicFooterComponent {
   ];
 
   readonly productLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'About Us', path: '/about' },
-    { label: 'Blog', path: '/blog' },
+    { label: $localize`Home`, path: '/' },
+    { label: $localize`About`, path: '/about' },
+    { label: $localize`Blog`, path: '/blog' },
   ];
 
   readonly supportLinks = [
-    // { label: 'Help Center', path: '#' },
-    // { label: 'FAQ', path: '#' },
-    { label: 'Terms of Service', path: '/legal/terms-of-service' },
-    { label: 'Privacy Policy', path: '/legal/privacy-policy' },
+    { label: $localize`Terms of Service`, path: '/legal/terms-of-service' },
+    { label: $localize`Privacy Policy`, path: '/legal/privacy-policy' },
   ];
 }

@@ -1,3 +1,10 @@
 :host {
   display: contents;
 }
+
+.title-color {
+  color: var(--p-secondary-500);
+}
+:host-context(.dark) .title-color {
+  color: var(--p-primary-500);
+}

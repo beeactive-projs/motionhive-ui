@@ -57,7 +57,9 @@
               }
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["projects/web/public"]
+              "includePaths": [
+                "projects/web/public"
+              ]
             },
             "styles": [
               "projects/web/src/styles.css"
@@ -120,11 +122,26 @@
       "root": "projects/website",
       "sourceRoot": "projects/website/src",
       "prefix": "mh",
+      "i18n": {
+        "sourceLocale": {
+          "code": "en",
+          "baseHref": "/"
+        },
+        "locales": {
+          "ro": {
+            "translation": "projects/website/src/locale/messages.ro.xlf",
+            "baseHref": "/ro/"
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
             "browser": "projects/website/src/main.ts",
+            "polyfills": [
+              "@angular/localize/init"
+            ],
             "tsConfig": "projects/website/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -134,7 +151,9 @@
               }
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["projects/website/public"]
+              "includePaths": [
+                "projects/website/public"
+              ]
             },
             "styles": [
               "projects/website/src/styles.css"
@@ -142,6 +161,7 @@
           },
           "configurations": {
             "production": {
+              "localize": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -160,6 +180,14 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "development-ro": {
+              "localize": [
+                "ro"
+              ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
@@ -172,9 +200,21 @@
             },
             "development": {
               "buildTarget": "website:build:development"
+            },
+            "development-ro": {
+              "buildTarget": "website:build:development-ro"
             }
           },
           "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n",
+          "options": {
+            "buildTarget": "website:build",
+            "outputPath": "projects/website/src/locale",
+            "outFile": "messages.xlf",
+            "format": "xlf"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

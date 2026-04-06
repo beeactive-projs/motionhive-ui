@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, DOCUMENT } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -17,10 +17,15 @@ import {
 @Injectable({ providedIn: 'root' })
 export class BlogService {
   private readonly _http = inject(HttpClient);
+  private readonly _document = inject(DOCUMENT);
   private readonly _base = `${environment.apiUrl}${API_ENDPOINTS.BLOG.BASE}`;
 
+  private get _locale(): string {
+    return (this._document.documentElement.lang || 'en').split('-')[0];
+  }
+
   getPosts(query: BlogQueryParams = {}): Observable<BlogListResponse> {
-    let params = new HttpParams();
+    let params = new HttpParams().set('locale', this._locale);
     if (query.page) params = params.set('page', query.page);
     if (query.limit) params = params.set('limit', query.limit);
     if (query.category) params = params.set('category', query.category);
@@ -29,17 +34,17 @@ export class BlogService {
   }
 
   getAllPosts(): Observable<BlogListResponse> {
-    return this._http.get<BlogListResponse>(this._base);
+    const params = new HttpParams().set('locale', this._locale);
+    return this._http.get<BlogListResponse>(this._base, { params });
   }
 
   getAllPostData(): Observable<BlogPost[]> {
-    return this._http
-      .get<BlogListResponse>(this._base)
-      .pipe(map((response) => response.items));
+    return this.getAllPosts().pipe(map((response) => response.items));
   }
 
   getBySlug(slug: string): Observable<BlogPost> {
-    return this._http.get<BlogPost>(`${this._base}/${slug}`);
+    const params = new HttpParams().set('locale', this._locale);
+    return this._http.get<BlogPost>(`${this._base}/${slug}`, { params });
   }
 
   getRelatedPosts(currentSlug: string, category: string, limit = 3): Observable<BlogPost[]> {

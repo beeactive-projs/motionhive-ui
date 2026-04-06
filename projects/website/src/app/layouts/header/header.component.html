@@ -4,15 +4,13 @@
     <div class="flex items-center justify-between h-16 lg:h-20">
 
       <!-- Logo -->
-      <a routerLink="/" class="logo-link" aria-label="MotionHive home">
+      <a routerLink="/" class="logo-link" i18n-aria-label="@@header.ariaHome" aria-label="MotionHive home">
         <mh-logo />
-        <span class="font-heading text-xl sm:text-2xl font-extrabold">
-          MotionHive
-        </span>
       </a>
 
       <!-- Desktop nav links -->
-      <div class="hidden lg:flex items-center" role="navigation" aria-label="Main navigation">
+      <div class="hidden lg:flex items-center" role="navigation" i18n-aria-label="@@header.ariaMain"
+        aria-label="Main navigation">
         @for (link of navLinks; track link.label) {
         <a [routerLink]="link.path" routerLinkActive="nav-link--active" [routerLinkActiveOptions]="{exact: link.exact}"
           class="nav-link">{{ link.label }}</a>
@@ -21,37 +19,38 @@
 
       <!-- Desktop auth area -->
       <div class="hidden lg:flex items-center gap-2">
+        <mh-language-switcher />
         <div class="nav-divider" aria-hidden="true"></div>
         <p-button [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'" [rounded]="true" [text]="true"
-          (onClick)="toggleTheme()" [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
-          size="small" />
-        <!-- <p-button label="Sign In" [text]="true" [disabled]="true" size="small" /> -->
-        <p-button label="Join the waitlist" icon="pi pi-bell" iconPos="right" size="small"
-          (onClick)="openJoinWaitlist()" />
+          (onClick)="toggleTheme()" [ariaLabel]="isDark() ? switchLightLabel : switchDarkLabel" size="small" />
+        <p-button i18n-label="@@header.joinWaitlist" label="Join the waitlist" icon="pi pi-bell" iconPos="right"
+          size="small" (onClick)="openJoinWaitlist()" />
       </div>
 
       <!-- Mobile controls -->
       <div class="flex lg:hidden items-center gap-1">
+        <mh-language-switcher />
         <p-button [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'" [rounded]="true" [text]="true"
-          (onClick)="toggleTheme()" [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'" />
+          (onClick)="toggleTheme()" [ariaLabel]="isDark() ? switchLightLabel : switchDarkLabel" />
         <p-button [icon]="mobileMenuOpen() ? 'pi pi-times' : 'pi pi-bars'" [rounded]="true" [text]="true"
-          (onClick)="toggleMobileMenu()" ariaLabel="Toggle navigation menu" [attr.aria-expanded]="mobileMenuOpen()" />
+          (onClick)="toggleMobileMenu()" i18n-ariaLabel="@@header.toggleNav" ariaLabel="Toggle navigation menu"
+          [attr.aria-expanded]="mobileMenuOpen()" />
       </div>
     </div>
 
     <!-- Mobile menu panel -->
     @if (mobileMenuOpen()) {
-    <div class="mobile-menu" role="navigation" aria-label="Mobile navigation">
+    <div class="mobile-menu" role="navigation" i18n-aria-label="@@header.ariaMobile" aria-label="Mobile navigation">
       @for (link of navLinks; track link.label) {
       <a [routerLink]="link.path" routerLinkActive="mobile-link--active" [routerLinkActiveOptions]="{exact: link.exact}"
-        (click)="closeMobileMenu()" class="mobile-link">{{
-        link.label }}</a>
+        (click)="closeMobileMenu()" class="mobile-link">{{ link.label }}</a>
       }
 
       <div class="mobile-menu-divider bg-surface-200"></div>
 
       <div class="flex gap-2 justify-end">
-        <p-button label="Join the waitlist" icon="pi pi-bell" iconPos="right" fluid (onClick)="openJoinWaitlist()" />
+        <p-button i18n-label="@@header.joinWaitlist" label="Join the waitlist" icon="pi pi-bell" iconPos="right" fluid
+          (onClick)="openJoinWaitlist()" />
       </div>
     </div>
     }

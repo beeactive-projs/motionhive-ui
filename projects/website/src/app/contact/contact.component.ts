@@ -16,32 +16,7 @@ export class ContactComponent {
   private readonly _formBuilder = inject(FormBuilder);
 
   readonly isLoading = signal(false);
-  readonly successMessage = signal<string | null>(null);
-
-  readonly contactInfo: { icon: string; label: string; value: string; href?: string }[] = [
-    {
-      icon: 'pi-map-marker',
-      label: 'Address',
-      value: '123 MotionHive Street, Tech City, TC 12345',
-    },
-    {
-      icon: 'pi-envelope',
-      label: 'Email',
-      value: 'info@motionhive.fit',
-      href: 'mailto:info@motionhive.fit',
-    },
-    {
-      icon: 'pi-phone',
-      label: 'Phone',
-      value: '+1 (234) 567-890',
-      href: 'tel:+12345678900',
-    },
-    {
-      icon: 'pi-clock',
-      label: 'Business Hours',
-      value: 'Mon–Fri: 9:00 AM – 6:00 PM\nWeekends: Closed',
-    },
-  ];
+  readonly submitSuccess = signal(false);
 
   readonly contactForm = this._formBuilder.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -57,11 +32,10 @@ export class ContactComponent {
     }
 
     this.isLoading.set(true);
-    this.successMessage.set(null);
 
     setTimeout(() => {
       this.isLoading.set(false);
-      this.successMessage.set("Thank you! We'll get back to you within one business day.");
+      this.submitSuccess.set(true);
       this.contactForm.reset();
     }, 1500);
   }

@@ -2,13 +2,14 @@
   <div class="max-w-7xl text-center px-4 sm:px-6 lg:px-8">
     <div class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/15 text-red-500 mb-4">
       <i class="pi pi-file-edit text-sm"></i>
-      <span class="text-sm font-semibold">Read</span>
+      <span class="text-sm font-semibold" i18n="@@tos.pill">Read</span>
     </div>
-    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
+    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
+      i18n="@@tos.h1">
       Terms of Service.
     </h1>
 
-    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto">
+    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto" i18n="@@tos.lastUpdated">
       Last updated: {{ lastUpdated() }}.
     </p>
   </div>
@@ -18,21 +19,21 @@
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Introduction -->
     <section class="legal-section">
-      <h2 class="legal-heading">1. Introduction</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s1.h2">1. Introduction</h2>
+      <p class="legal-body" i18n="@@tos.s1.p1">
         Welcome to MotionHive. These Terms of Service ("Terms") govern your access to and use of our website, mobile
         application, and services (collectively, the "Service"). By accessing or using the Service, you agree to be
         bound by these Terms.
       </p>
-      <p class="legal-body mt-3">
+      <p class="legal-body mt-3" i18n="@@tos.s1.p2">
         If you do not agree to these Terms, please do not use our Service.
       </p>
     </section>
 
     <!-- Acceptance of Terms -->
     <section class="legal-section">
-      <h2 class="legal-heading">2. Acceptance of Terms</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s2.h2">2. Acceptance of Terms</h2>
+      <p class="legal-body" i18n="@@tos.s2.p">
         By creating an account or using MotionHive, you acknowledge that you have read, understood, and agree to be
         bound by these Terms and our Privacy Policy. If you are using the Service on behalf of an organization, you
         represent that you have the authority to bind that organization to these Terms.
@@ -41,34 +42,34 @@
 
     <!-- Account Registration -->
     <section class="legal-section">
-      <h2 class="legal-heading">3. Account Registration</h2>
+      <h2 class="legal-heading" i18n="@@tos.s3.h2">3. Account Registration</h2>
       <ul class="legal-list">
-        <li>You must be at least 18 years old to create an account</li>
-        <li>You must provide accurate and complete information during registration</li>
-        <li>You are responsible for maintaining the security of your account credentials</li>
-        <li>You must notify us immediately of any unauthorized access to your account</li>
-        <li>You are responsible for all activities that occur under your account</li>
+        <li i18n="@@tos.s3.li1">You must be at least 18 years old to create an account</li>
+        <li i18n="@@tos.s3.li2">You must provide accurate and complete information during registration</li>
+        <li i18n="@@tos.s3.li3">You are responsible for maintaining the security of your account credentials</li>
+        <li i18n="@@tos.s3.li4">You must notify us immediately of any unauthorized access to your account</li>
+        <li i18n="@@tos.s3.li5">You are responsible for all activities that occur under your account</li>
       </ul>
     </section>
 
     <!-- User Responsibilities -->
     <section class="legal-section">
-      <h2 class="legal-heading">4. User Responsibilities</h2>
-      <p class="legal-body mb-3">You agree to:</p>
+      <h2 class="legal-heading" i18n="@@tos.s4.h2">4. User Responsibilities</h2>
+      <p class="legal-body mb-3" i18n="@@tos.s4.intro">You agree to:</p>
       <ul class="legal-list">
-        <li>Use the Service only for lawful purposes</li>
-        <li>Not interfere with or disrupt the Service or servers</li>
-        <li>Not attempt to gain unauthorized access to any part of the Service</li>
-        <li>Not transmit viruses, malware, or other malicious code</li>
-        <li>Not impersonate any person or entity</li>
-        <li>Respect the intellectual property rights of MotionHive and others</li>
+        <li i18n="@@tos.s4.li1">Use the Service only for lawful purposes</li>
+        <li i18n="@@tos.s4.li2">Not interfere with or disrupt the Service or servers</li>
+        <li i18n="@@tos.s4.li3">Not attempt to gain unauthorized access to any part of the Service</li>
+        <li i18n="@@tos.s4.li4">Not transmit viruses, malware, or other malicious code</li>
+        <li i18n="@@tos.s4.li5">Not impersonate any person or entity</li>
+        <li i18n="@@tos.s4.li6">Respect the intellectual property rights of MotionHive and others</li>
       </ul>
     </section>
 
     <!-- Service Availability -->
     <section class="legal-section">
-      <h2 class="legal-heading">5. Service Availability</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s5.h2">5. Service Availability</h2>
+      <p class="legal-body" i18n="@@tos.s5.p">
         While we strive to provide continuous access to the Service, we do not guarantee that the Service will be
         available at all times. We may suspend, withdraw, or restrict the availability of all or any part of the
         Service for business or operational reasons.
@@ -77,20 +78,20 @@
 
     <!-- Subscription and Payment -->
     <section class="legal-section">
-      <h2 class="legal-heading">6. Subscription and Payment</h2>
-      <p class="legal-body mb-3">Some features of the Service may require a paid subscription:</p>
+      <h2 class="legal-heading" i18n="@@tos.s6.h2">6. Subscription and Payment</h2>
+      <p class="legal-body mb-3" i18n="@@tos.s6.intro">Some features of the Service may require a paid subscription:</p>
       <ul class="legal-list">
-        <li>Subscription fees are billed in advance on a recurring basis</li>
-        <li>All fees are non-refundable unless otherwise stated</li>
-        <li>You can cancel your subscription at any time</li>
-        <li>We reserve the right to change our pricing with 30 days notice</li>
+        <li i18n="@@tos.s6.li1">Subscription fees are billed in advance on a recurring basis</li>
+        <li i18n="@@tos.s6.li2">All fees are non-refundable unless otherwise stated</li>
+        <li i18n="@@tos.s6.li3">You can cancel your subscription at any time</li>
+        <li i18n="@@tos.s6.li4">We reserve the right to change our pricing with 30 days notice</li>
       </ul>
     </section>
 
     <!-- Intellectual Property -->
     <section class="legal-section">
-      <h2 class="legal-heading">7. Intellectual Property</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s7.h2">7. Intellectual Property</h2>
+      <p class="legal-body" i18n="@@tos.s7.p">
         The Service and its original content, features, and functionality are owned by MotionHive and are protected by
         international copyright, trademark, patent, trade secret, and other intellectual property laws.
       </p>
@@ -98,8 +99,8 @@
 
     <!-- Termination -->
     <section class="legal-section">
-      <h2 class="legal-heading">8. Termination</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s8.h2">8. Termination</h2>
+      <p class="legal-body" i18n="@@tos.s8.p">
         We may terminate or suspend your account and access to the Service immediately, without prior notice or
         liability, for any reason, including breach of these Terms. Upon termination, your right to use the Service
         will immediately cease.
@@ -108,8 +109,8 @@
 
     <!-- Limitation of Liability -->
     <section class="legal-section">
-      <h2 class="legal-heading">9. Limitation of Liability</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s9.h2">9. Limitation of Liability</h2>
+      <p class="legal-body" i18n="@@tos.s9.p">
         To the maximum extent permitted by law, MotionHive shall not be liable for any indirect, incidental, special,
         consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or
         indirectly, or any loss of data, use, goodwill, or other intangible losses.
@@ -118,8 +119,8 @@
 
     <!-- Changes to Terms -->
     <section class="legal-section">
-      <h2 class="legal-heading">10. Changes to Terms</h2>
-      <p class="legal-body">
+      <h2 class="legal-heading" i18n="@@tos.s10.h2">10. Changes to Terms</h2>
+      <p class="legal-body" i18n="@@tos.s10.p">
         We reserve the right to modify these Terms at any time. We will notify users of any material changes by
         posting the new Terms on this page and updating the "Last Updated" date. Your continued use of the Service
         after such changes constitutes acceptance of the new Terms.
@@ -128,21 +129,22 @@
 
     <!-- Contact -->
     <section class="legal-section">
-      <h2 class="legal-heading">11. Contact Us</h2>
-      <p class="legal-body mb-4">If you have any questions about these Terms, please contact us:</p>
+      <h2 class="legal-heading" i18n="@@tos.s11.h2">11. Contact Us</h2>
+      <p class="legal-body mb-4" i18n="@@tos.s11.intro">If you have any questions about these Terms, please contact us:
+      </p>
       <div class="legal-contact-card">
         <div class="flex items-center gap-3">
           <i class="pi pi-envelope text-brand"></i>
           <span class="">
-            <strong>Email:</strong>
+            <strong i18n="@@tos.s11.email.label">Email:</strong>
             <a href="mailto:legal@motionhive.fit" class="text-brand hover:underline ml-1">legal&#64;motionhive.fit</a>
           </span>
         </div>
         <div class="flex items-center gap-3">
           <i class="pi pi-map-marker text-brand"></i>
           <span class="">
-            <strong>Address:</strong>
-            <span class="ml-1">Cluj-Napoca, Cluj, Romania</span>
+            <strong i18n="@@tos.s11.address.label">Address:</strong>
+            <span class="ml-1" i18n="@@tos.s11.address.value">Cluj-Napoca, Cluj, Romania</span>
           </span>
         </div>
       </div>
@@ -154,13 +156,14 @@
 <section class="footer-section py-7 sm:py-10">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="text-sm">
+      <div class="text-sm" i18n="@@tos.footer.also">
         Also read our
         <a routerLink="/legal/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</a>
       </div>
       <div class="flex gap-3">
-        <p-button label="Go to Home" icon="pi pi-home" outlined routerLink="/" />
-        <p-button label="Scroll to Top" icon="pi pi-arrow-up" (onClick)="scrollToTop()" />
+        <p-button i18n-label="@@legal.footer.goToHome" label="Go to Home" icon="pi pi-home" outlined routerLink="/" />
+        <p-button i18n-label="@@legal.footer.scrollToTop" label="Scroll to Top" icon="pi pi-arrow-up"
+          (onClick)="scrollToTop()" />
       </div>
     </div>
   </div>

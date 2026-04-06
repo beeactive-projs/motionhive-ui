@@ -16,29 +16,30 @@ export class HomeComponent {
   openJoinWaitlist(): void {
     this._waitlistService.open('home');
   }
-  roadmap = [
+
+  readonly roadmap = [
     {
       icon: 'pi-users',
-      title: 'Hubs & Groups',
-      description: 'Create your space, invite your people, and organise everything in one place.',
+      title: $localize`Hubs & Groups`,
+      description: $localize`Create your space, invite your people, and organise everything in one place.`,
       ready: false,
     },
     {
       icon: 'pi-calendar',
-      title: 'Sessions & Scheduling',
-      description: 'Plan activities, set recurring sessions, and let people join with one tap.',
+      title: $localize`Sessions & Scheduling`,
+      description: $localize`Plan activities, set recurring sessions, and let people join with one tap.`,
       ready: false,
     },
     {
       icon: 'pi-pen-to-square',
-      title: 'Blog & Updates',
-      description: 'Share stories, tips, and news to keep your community in the loop.',
+      title: $localize`Blog & Updates`,
+      description: $localize`Share stories, tips, and news to keep your community in the loop.`,
       ready: true,
     },
     {
       icon: 'pi-user',
-      title: 'Profiles',
-      description: 'A home for every organiser and participant — your activity, your way.',
+      title: $localize`Profiles`,
+      description: $localize`Your public profile, upcoming sessions, and activity history — all in one place.`,
       ready: false,
     },
   ];

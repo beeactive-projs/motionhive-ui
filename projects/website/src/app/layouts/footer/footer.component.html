@@ -1,10 +1,4 @@
 <footer class="footer">
-  <!-- <div class="background-main">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="honeycomb-bg"></div>
-  </div> -->
   <!-- Gradient top border -->
   <div class="footer-top-border" aria-hidden="true"></div>
 
@@ -17,14 +11,12 @@
       <div class="sm:col-span-2 lg:col-span-1">
 
         <!-- Logo -->
-        <a routerLink="/" class="logo-link" aria-label="MotionHive home">
+        <a routerLink="/" class="logo-link" i18n-aria-label="@@footer.ariaHome" aria-label="MotionHive home">
           <mh-logo />
-          <span class="font-heading text-xl sm:text-2xl font-extrabold">
-            MotionHive
-          </span>
         </a>
 
-        <p class="text-sm leading-relaxed my-6 max-w-xs">
+        <p class="text-sm leading-relaxed my-6 max-w-xs"
+          i18n="@@footer.tagline">
           Where active communities come together. One place to lead, join, and stay moving.
         </p>
 
@@ -40,7 +32,7 @@
 
       <!-- Product links -->
       <div>
-        <h3 class="footer-heading">Product</h3>
+        <h3 class="footer-heading" i18n="@@footer.product">Product</h3>
         <ul class="space-y-3 hidden md:block">
           @for (link of productLinks; track link.label) {
           <li>
@@ -57,7 +49,7 @@
 
       <!-- Support links -->
       <div>
-        <h3 class="footer-heading">Support</h3>
+        <h3 class="footer-heading" i18n="@@footer.support">Support</h3>
         <ul class="space-y-3 hidden md:block">
           @for (link of supportLinks; track link.label) {
           <li>
@@ -65,37 +57,29 @@
           </li>
           }
           <li>
-            <p-button label="Share Feedback" [link]="true" styleClass="footer-link p-0" (onClick)="openFeedback()" />
+            <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true" styleClass="footer-link p-0"
+              (onClick)="openFeedback()" />
           </li>
         </ul>
         <div class="md:hidden flex gap-5">
           @for (link of supportLinks; track link.label) {
           <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
           }
-          <p-button label="Share Feedback" [link]="true" styleClass="footer-link p-0" (onClick)="openFeedback()" />
+          <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true" styleClass="footer-link p-0"
+            (onClick)="openFeedback()" />
         </div>
       </div>
 
       <!-- Contact column -->
       <div>
-        <h3 class="footer-heading">Get in Touch</h3>
+        <h3 class="footer-heading" i18n="@@footer.getInTouch">Get in Touch</h3>
         <ul class="space-y-4">
-          <!-- <li class="flex items-start gap-3 text-sm text-secondary-400">
-            <i class="pi pi-map-marker text-primary-500 mt-0.5 shrink-0" aria-hidden="true"></i>
-            <span>123 MotionHive Street<br />Tech City, TC 12345</span>
-          </li> -->
           <li class="flex items-center gap-3 text-sm">
             <i class="pi pi-envelope text-primary-500 shrink-0" aria-hidden="true"></i>
             <a href="mailto:support@motionhive.fit" class="footer-link">
               support&#64;motionhive.fit
             </a>
           </li>
-          <!-- <li class="flex items-center gap-3 text-sm">
-            <i class="pi pi-phone text-primary-500 shrink-0" aria-hidden="true"></i>
-            <a href="tel:+1234567890" class="footer-link">
-              +1 (234) 567-890
-            </a>
-          </li> -->
         </ul>
       </div>
     </div>
@@ -103,12 +87,11 @@
     <!-- Bottom bar -->
     <div class="footer-bottom">
       <p class="text-surface-500 text-sm">
-        &copy; {{ currentYear }} MotionHive. All rights reserved.
+        &copy; {{ currentYear }} MotionHive. <ng-container i18n="@@footer.allRightsReserved">All rights reserved.</ng-container>
       </p>
       <div class="flex items-center gap-6 text-sm">
-        <a routerLink="/legal/terms-of-service" class="footer-link">Terms</a>
-        <a routerLink="/legal/privacy-policy" class="footer-link">Privacy</a>
-        <!-- <a href="#" class="footer-link">Cookies</a> -->
+        <a routerLink="/legal/terms-of-service" class="footer-link" i18n="@@footer.terms">Terms</a>
+        <a routerLink="/legal/privacy-policy" class="footer-link" i18n="@@footer.privacy">Privacy</a>
       </div>
     </div>
 
