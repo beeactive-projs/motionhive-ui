@@ -13,12 +13,21 @@ import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import type { MenuItem } from 'primeng/api';
-import { AuthService, Logo } from 'core';
+import { FeedbackService, Logo } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
+import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
 
 @Component({
   selector: 'mh-sidenav-layout',
-  imports: [RouterLink, RouterLinkActive, ButtonModule, ToolbarModule, ThemeToggleComponent, Logo],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    ButtonModule,
+    ToolbarModule,
+    ThemeToggleComponent,
+    Logo,
+    ProfileMenu,
+  ],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,7 +35,7 @@ import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/them
 export class SidenavLayoutComponent {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _authService = inject(AuthService);
+  private readonly _feedbackService = inject(FeedbackService);
   private readonly _lgQuery = window.matchMedia('(min-width: 1024px)');
 
   readonly menuItems = input.required<ReadonlyArray<MenuItem>>();
@@ -62,6 +71,10 @@ export class SidenavLayoutComponent {
     this._destroyRef.onDestroy(() => this._lgQuery.removeEventListener('change', onResize));
   }
 
+  openFeedback(): void {
+    this._feedbackService.open();
+  }
+
   toggleSidebar(): void {
     this.sidebarAnimating.set(true);
     this.sidebarOpen.update((open) => !open);
@@ -77,12 +90,5 @@ export class SidenavLayoutComponent {
     if (event.propertyName === 'transform') {
       this.sidebarAnimating.set(false);
     }
-  }
-
-  signOut(): void {
-    this._authService.logout().subscribe(() => {
-      this._router.navigate(['/auth/login']);
-    });
-    this._router.navigate(['/auth/login']);
   }
 }

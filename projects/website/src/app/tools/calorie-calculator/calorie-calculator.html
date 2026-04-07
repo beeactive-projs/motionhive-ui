@@ -1,0 +1,326 @@
+<!-- ===== Page header ===== -->
+<section class="hero-section">
+  <div class="max-w-7xl text-center px-4 sm:px-6 lg:px-8">
+    <div
+      class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/15 text-accent-500 mb-4">
+      <i class="pi pi-calculator text-sm"></i>
+      <span class="text-sm font-semibold" i18n="@@calorie.calculator.pill">Calculating daily calorie intake</span>
+    </div>
+    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
+      i18n="@@calorie.calculator.h1">
+      Powered by the <span class="text-brand">Mifflin-St Jeor equation</span>.
+    </h1>
+
+    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto"
+      i18n="@@calorie.calculator.intro">
+      Calculate your daily calorie needs based on your personal information and activity level.
+    </p>
+  </div>
+</section>
+
+
+<!-- ===== Calculator ===== -->
+<section class="calculator-section py-14 sm:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch">
+
+      <!-- ===== Left: Inputs + Results ===== -->
+      <div class="lg:col-span-2 flex flex-col gap-6 calculator-column">
+
+        <!-- Input card -->
+        <div class="flex flex-col gap-6">
+          <h2 class="font-heading font-bold text-xl" i18n="@@calorie.inputs.h2">Your details</h2>
+
+          <!-- Unit + Gender -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
+                i18n="@@calorie.unit.label">Unit system</label>
+              <p-selectbutton [options]="unitOptions" [ngModel]="unit()" (ngModelChange)="unit.set($event)"
+                optionLabel="label" optionValue="value" fluid />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
+                i18n="@@calorie.gender.label">Gender</label>
+              <p-selectbutton [options]="genderOptions" [ngModel]="gender()" (ngModelChange)="gender.set($event)"
+                optionLabel="label" optionValue="value" fluid />
+            </div>
+          </div>
+
+          <!-- Age / Weight / Height -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400" i18n="@@calorie.age.label">Age
+                (years)</label>
+              <p-inputnumber [ngModel]="age()" (ngModelChange)="age.set($event ?? 10)" [min]="10" [max]="100"
+                [showButtons]="true" fluid />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-medium  text-surface-500  dark:text-surface-400"
+                i18n="@@calorie.weight.label">Weight ({{ weightLabel() }})</label>
+              <p-inputnumber [ngModel]="weight()" (ngModelChange)="weight.set($event ?? weightMin())"
+                [min]="weightMin()" [max]="weightMax()" [showButtons]="true" fluid />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
+                i18n="@@calorie.height.label">Height ({{ heightLabel() }})</label>
+              <p-inputnumber [ngModel]="height()" (ngModelChange)="height.set($event ?? heightMin())"
+                [min]="heightMin()" [max]="heightMax()" [showButtons]="true" fluid />
+            </div>
+          </div>
+
+          <!-- Activity level -->
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
+              i18n="@@calorie.activity.label">Activity level</label>
+            <p-select [options]="activityOptions" [ngModel]="activityLevel()" scrollHeight="300px"
+              (ngModelChange)="activityLevel.set($event)" optionLabel="label" optionValue="value" class="w-full"
+              [appendTo]="'body'" />
+          </div>
+
+          <!-- Goal -->
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
+              i18n="@@calorie.goal.label">Goal</label>
+            <p-selectbutton [options]="goalOptions" [ngModel]="goal()" (ngModelChange)="goal.set($event)"
+              optionLabel="label" optionValue="value" fluid />
+          </div>
+        </div>
+
+        <!-- Results card -->
+        <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-6 flex flex-col gap-5">
+          <div>
+            <h2 class="font-heading font-bold text-xl" i18n="@@calorie.results.h2">Daily calorie target</h2>
+            <p class="text-sm  text-surface-500 dark:text-surface-400 mt-1">{{ goalDescription() }}</p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-8">
+
+            <!-- Donut chart -->
+            <div class="relative shrink-0">
+              <p-chart type="doughnut" [data]="macroChartData()" [options]="macroChartOptions" class="w-55" />
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-xs  text-surface-500 dark:text-surface-400" i18n="@@calorie.results.kcal">kcal</span>
+                <span class="font-heading font-extrabold text-xl leading-tight">{{ displayCalories() | number:'1.0-0'
+                  }}</span>
+              </div>
+            </div>
+
+            <!-- Macro breakdown -->
+            <div class="flex flex-col gap-4 flex-1 w-full">
+              <div class="flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full shrink-0" style="background: var(--p-emerald-500)"></span>
+                <span class="text-sm flex-1" i18n="@@calorie.macro.proteins">Proteins</span>
+                <span class="font-bold">{{ proteinGrams() }} g</span>
+                <span class="text-xs text-surface-400 w-20 text-right" i18n="@@calorie.macro.protein.pct">30% of
+                  kcal</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full shrink-0" style="background: var(--p-amber-500)"></span>
+                <span class="text-sm flex-1" i18n="@@calorie.macro.carbs">Carbohydrates</span>
+                <span class="font-bold">{{ carbsGrams() }} g</span>
+                <span class="text-xs text-surface-400 w-20 text-right" i18n="@@calorie.macro.carbs.pct">40% of
+                  kcal</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full shrink-0" style="background: var(--p-purple-500)"></span>
+                <span class="text-sm flex-1" i18n="@@calorie.macro.fats">Fats</span>
+                <span class="font-bold">{{ fatGrams() }} g</span>
+                <span class="text-xs text-surface-400 w-20 text-right" i18n="@@calorie.macro.fats.pct">30% of
+                  kcal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TDEE breakdown -->
+          <div class="grid grid-cols-3 gap-3 pt-4 border-t border-surface-200 dark:border-surface-700 text-center">
+            <div>
+              <p class="text-xs  text-surface-500 dark:text-surface-400 mb-1" i18n="@@calorie.tdee.bmr">BMR</p>
+              <p class="font-bold">{{ bmr() | number:'1.0-0' }} kcal</p>
+            </div>
+            <div class="border-x border-surface-200 dark:border-surface-700">
+              <p class="text-xs  text-surface-500 dark:text-surface-400 mb-1" i18n="@@calorie.tdee.maintenance">
+                Maintenance (TDEE)</p>
+              <p class="font-bold">{{ tdee() | number:'1.0-0' }} kcal</p>
+            </div>
+            <div>
+              <p class="text-xs  text-surface-500 dark:text-surface-400 mb-1" i18n="@@calorie.tdee.target">Target</p>
+              <p class="font-bold text-primary-500">{{ displayCalories() | number:'1.0-0' }} kcal</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Right: Body fat + Water ===== -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Body fat card -->
+        <div class="calculator-column flex flex-col gap-6">
+          <div>
+            <h2 class="font-heading font-bold text-xl" i18n="@@calorie.bodyfat.h2">Body fat estimate</h2>
+            <p class="text-sm  text-surface-500 dark:text-surface-400 mt-1" i18n="@@calorie.bodyfat.sub">US Navy method
+              ({{ measLabel() }})</p>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
+                i18n="@@calorie.bodyfat.waist">Waist</label>
+              <p-inputnumber [ngModel]="waist()" (ngModelChange)="waist.set($event ?? measMin())" [min]="measMin()"
+                [max]="waistMax()" [showButtons]="true" fluid />
+            </div>
+            @if (gender() === 'female') {
+            <div class="flex items-center gap-3">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
+                i18n="@@calorie.bodyfat.hips">Hips</label>
+              <p-inputnumber [ngModel]="hips()" (ngModelChange)="hips.set($event ?? measMin())" [min]="measMin()"
+                [max]="hipsMax()" [showButtons]="true" fluid />
+            </div>
+            }
+            <div class="flex items-center gap-3">
+              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
+                i18n="@@calorie.bodyfat.neck">Neck</label>
+              <p-inputnumber [ngModel]="neck()" (ngModelChange)="neck.set($event ?? measMin())" [min]="measMin()"
+                [max]="neckMax()" [showButtons]="true" fluid />
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-surface-200 dark:border-surface-700">
+            @if (bodyFatValid()) {
+            <div class="flex flex-col items-center gap-3">
+              <!-- SVG semicircle gauge -->
+              <svg viewBox="0 0 200 110" class="w-44" aria-hidden="true">
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--p-surface-200)" stroke-width="16"
+                  stroke-linecap="round" />
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" [attr.stroke]="bodyFatCategory().color"
+                  stroke-width="16" stroke-linecap="round" [attr.stroke-dasharray]="gaugeArcLength"
+                  [attr.stroke-dashoffset]="gaugeOffset()" />
+                <text x="100" y="94" text-anchor="middle" font-size="22" font-weight="bold" fill="currentColor">
+                  {{ bodyFatPct() }}%
+                </text>
+              </svg>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background]="bodyFatCategory().color"></span>
+                <span class="text-sm font-semibold">{{ bodyFatCategory().label }}</span>
+                <span class="text-xs text-surface-400">({{ bodyFatCategory().range }})</span>
+              </div>
+            </div>
+            } @else {
+            <p class="text-sm text-surface-400 text-center" i18n="@@calorie.bodyfat.empty">
+              Enter valid measurements to see your body fat estimate.
+            </p>
+            }
+          </div>
+        </div>
+
+        <!-- Water intake card -->
+        <div class="calculator-column flex flex-col gap-6">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-500/10">
+              <span class="material-symbols-outlined text-lg text-primary-500">
+                water_bottle
+              </span>
+            </span>
+            <div>
+              <h2 class="font-heading font-bold text-lg" i18n="@@calorie.water.h2">Daily water intake</h2>
+              <p class="text-xs  text-surface-500 dark:text-surface-400" i18n="@@calorie.water.sub">35 ml per kg of body
+                weight</p>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span class="font-heading font-extrabold text-4xl text-primary-500">{{ waterIntakeMl() | number:'1.0-0'
+              }}</span>
+            <span class=" text-surface-500 dark:text-surface-400 text-lg">ml</span>
+            <span class="text-surface-400 text-sm ml-1">/ {{ (waterIntakeMl() / 1000) | number:'1.1-1' }} L</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===== Educational content ===== -->
+<section class="who-section py-14 sm:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 mb-4">
+        <span class="material-symbols-outlined text-sm text-red-500">
+          mode_heat
+        </span>
+        <span class="text-sm font-semibold text-red-500" i18n="@@calorie.educational.pill">Fueling the fire</span>
+      </div>
+      <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
+        i18n="@@calorie.educational.h2">
+        The science of <span class="text-brand">sustained performance</span>
+      </h2>
+      <p class="section-subtext text-lg" i18n="@@calorie.educational.sub">
+        Master your metabolism and macronutrient ratios.
+      </p>
+    </div>
+
+    <div class="who-grid grid md:grid-cols-2 gap-10 items-stretch">
+      <div class="who-column who-column-left">
+        <div class="who-icon who-icon-instructors">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-3" i18n="@@calorie.edu.tdee.h3">
+          Understanding TDEE for active individuals
+        </h3>
+        <p class="section-subtext text-sm leading-relaxed flex-1" i18n="@@calorie.edu.tdee.body">
+          Total Daily Energy Expenditure (TDEE) represents the cumulative calories your body burns in a 24-hour period.
+          For active individuals, TDEE varies significantly depending on daily exertion levels. While the Mifflin-St
+          Jeor equation serves as the primary benchmark for estimation, you should refine your target by 100–200 kcal
+          after two weeks based on real-world weight data.
+        </p>
+
+      </div>
+      <div class="who-column who-column-right">
+        <div class="who-icon who-icon-movers">
+          <i class="pi pi-sync"></i>
+        </div>
+        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-3"
+          i18n="@@calorie.edu.macros.h3">
+          Why macros matter for recovery
+        </h3>
+        <p class="section-subtext text-sm leading-relaxed flex-1" i18n="@@calorie.edu.macros.body">
+          Hitting your calorie target is the first lever — but the macro split determines whether those
+          calories rebuild muscle, replenish glycogen, or support hormonal balance. A 40 / 30 / 30
+          distribution (carbs / protein / fat) works well for most group fitness athletes. Adjust towards
+          more protein (up to 35–40%) if your primary goal is body recomposition.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="feature-section py-14 sm:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 mb-4">
+        <i class="pi pi-question-circle text-sm text-primary-500"></i>
+        <span class="text-sm font-semibold text-primary-500" i18n="@@calorie.faq.pill">F.A.Q</span>
+      </div>
+      <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
+        i18n="@@calorie.faq.h2">
+        Frequently asked <span class="text-brand">questions</span>.
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      @for (item of faqItems; track item.value) {
+      <div class="feature-card">
+        <div class="feature-icon-wrap">
+          <i [class]="'pi '+item.icon+' text-lg'"></i>
+        </div>
+        <h3 class="section-heading text-lg font-heading font-bold mb-3">
+          {{ item.question }}
+        </h3>
+        <p class="section-subtext text-sm leading-relaxed flex-1">
+          {{ item.answer }}
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+</section>

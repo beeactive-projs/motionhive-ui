@@ -21,7 +21,16 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 // Core imports
-import { AuthService, AuthStore, FacebookAuthService, GoogleAuthService, LoginRequest, Logo, ThemeService } from 'core';
+import {
+  AuthService,
+  AuthStore,
+  FacebookAuthService,
+  GoogleAuthService,
+  LoginRequest,
+  Logo,
+  ThemeService,
+  UserRoles,
+} from 'core';
 import { Divider } from 'primeng/divider';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
@@ -179,13 +188,17 @@ export class LoginComponent {
       return;
     }
 
-    if (this._authStore.isInstructor()) {
-      this._router.navigate(['/dashboard']);
-    } else if (this._authStore.isUser()) {
-      this._router.navigate(['/client/dashboard/']);
-    } else {
-      this._router.navigate(['/dashboard']);
-    }
+    const roleRoutes: Partial<Record<string, string>> = {
+      [UserRoles.SuperAdmin]: '/super-admin/dashboard',
+      [UserRoles.Admin]: '/dashboard',
+      [UserRoles.Support]: '/dashboard',
+      [UserRoles.Instructor]: '/dashboard',
+      [UserRoles.User]: '/client/dashboard',
+    };
+
+    const roles = this._authStore.userRoles();
+    const route = roles.map((r) => roleRoutes[r]).find(Boolean) ?? '/dashboard';
+    this._router.navigate([route]);
   }
 
   private capitalize(str: string): string {

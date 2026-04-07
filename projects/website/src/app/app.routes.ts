@@ -28,6 +28,12 @@ export const routes: Routes = [
         title: $localize`Blog - MotionHive`,
       },
       {
+        path: 'tools/calorie-calculator',
+        loadComponent: () =>
+          import('./tools/calorie-calculator/calorie-calculator').then((m) => m.CalorieCalculator),
+        title: $localize`Free TDEE & macro calculator - MotionHive`,
+      },
+      {
         path: 'legal',
         loadChildren: () => import('./legal/legal.routes').then((m) => m.legalRoutes),
       },

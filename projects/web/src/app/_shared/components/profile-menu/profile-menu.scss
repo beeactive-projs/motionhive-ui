@@ -1,0 +1,16 @@
+:host {
+  .p-avatar {
+    width: var(--p-button-sm-icon-only-width);
+    height: var(--p-button-sm-icon-only-width);
+    background: var(--p-primary-500);
+    color: var(--p-secondary-500);
+    // color: var(--p-primary-color);
+  }
+}
+
+// :host-context(.dark) {
+//   .p-avatar {
+//     background: var(--p-primary-color);
+//     color: var(--p-secondary-500);
+//   }
+// }
