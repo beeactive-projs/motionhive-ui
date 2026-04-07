@@ -32,7 +32,7 @@
           <h2 class="font-heading font-bold text-xl" i18n="@@calorie.inputs.h2">Your details</h2>
 
           <!-- Unit + Gender -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col gap-2">
               <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
                 i18n="@@calorie.unit.label">Unit system</label>
@@ -52,20 +52,20 @@
             <div class="flex flex-col gap-2">
               <label class="text-sm font-medium  text-surface-500 dark:text-surface-400" i18n="@@calorie.age.label">Age
                 (years)</label>
-              <p-inputnumber [ngModel]="age()" (ngModelChange)="age.set($event ?? 10)" [min]="10" [max]="100"
+              <p-inputnumber [ngModel]="age()" (ngModelChange)="age.set($event)" [min]="10" [max]="100"
                 [showButtons]="true" fluid />
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-sm font-medium  text-surface-500  dark:text-surface-400"
                 i18n="@@calorie.weight.label">Weight ({{ weightLabel() }})</label>
-              <p-inputnumber [ngModel]="weight()" (ngModelChange)="weight.set($event ?? weightMin())"
-                [min]="weightMin()" [max]="weightMax()" [showButtons]="true" fluid />
+              <p-inputnumber [ngModel]="weight()" (ngModelChange)="weight.set($event)" [min]="weightMin()"
+                [max]="weightMax()" [showButtons]="true" fluid />
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
                 i18n="@@calorie.height.label">Height ({{ heightLabel() }})</label>
-              <p-inputnumber [ngModel]="height()" (ngModelChange)="height.set($event ?? heightMin())"
-                [min]="heightMin()" [max]="heightMax()" [showButtons]="true" fluid />
+              <p-inputnumber [ngModel]="height()" (ngModelChange)="height.set($event)" [min]="heightMin()"
+                [max]="heightMax()" [showButtons]="true" fluid />
             </div>
           </div>
 
@@ -82,8 +82,12 @@
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium  text-surface-500 dark:text-surface-400"
               i18n="@@calorie.goal.label">Goal</label>
+
+            <p-select [options]="goalOptions" [ngModel]="goal()" scrollHeight="300px" (ngModelChange)="goal.set($event)"
+              optionLabel="label" optionValue="value" class="w-full" [appendTo]="'body'" class="md:hidden" />
+
             <p-selectbutton [options]="goalOptions" [ngModel]="goal()" (ngModelChange)="goal.set($event)"
-              optionLabel="label" optionValue="value" fluid />
+              optionLabel="label" optionValue="value" fluid class="hidden md:flex" />
           </div>
         </div>
 
@@ -166,22 +170,22 @@
             <div class="flex items-center gap-3">
               <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
                 i18n="@@calorie.bodyfat.waist">Waist</label>
-              <p-inputnumber [ngModel]="waist()" (ngModelChange)="waist.set($event ?? measMin())" [min]="measMin()"
+              <p-inputnumber [ngModel]="waist()" (ngModelChange)="waist.set($event)" [min]="measMin()"
                 [max]="waistMax()" [showButtons]="true" fluid />
             </div>
             @if (gender() === 'female') {
             <div class="flex items-center gap-3">
               <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
                 i18n="@@calorie.bodyfat.hips">Hips</label>
-              <p-inputnumber [ngModel]="hips()" (ngModelChange)="hips.set($event ?? measMin())" [min]="measMin()"
-                [max]="hipsMax()" [showButtons]="true" fluid />
+              <p-inputnumber [ngModel]="hips()" (ngModelChange)="hips.set($event)" [min]="measMin()" [max]="hipsMax()"
+                [showButtons]="true" fluid />
             </div>
             }
             <div class="flex items-center gap-3">
               <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
                 i18n="@@calorie.bodyfat.neck">Neck</label>
-              <p-inputnumber [ngModel]="neck()" (ngModelChange)="neck.set($event ?? measMin())" [min]="measMin()"
-                [max]="neckMax()" [showButtons]="true" fluid />
+              <p-inputnumber [ngModel]="neck()" (ngModelChange)="neck.set($event)" [min]="measMin()" [max]="neckMax()"
+                [showButtons]="true" fluid />
             </div>
           </div>
 
