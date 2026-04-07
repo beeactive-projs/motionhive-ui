@@ -1,12 +1,27 @@
 {
-  "buildCommand": "./node_modules/.bin/ng build website --configuration production && node scripts/patch-ro-index.mjs && cp -r dist/website/browser/en/. dist/website/browser/ && rm -rf dist/website/browser/en",
+  "installCommand": "npm install",
+  "buildCommand": "ng build website --configuration production && node scripts/patch-ro-index.mjs && cp -r dist/website/browser/en/. dist/website/browser/ && rm -rf dist/website/browser/en",
   "outputDirectory": "dist/website/browser",
   "redirects": [
-    { "source": "/en", "destination": "/", "permanent": true },
-    { "source": "/en/:path*", "destination": "/:path*", "permanent": true }
+    {
+      "source": "/en",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/en/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/ro/:path*", "destination": "/ro/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/ro/:path*",
+      "destination": "/ro/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
