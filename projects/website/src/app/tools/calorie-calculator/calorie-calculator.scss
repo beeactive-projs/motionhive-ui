@@ -3,25 +3,31 @@
 
 @include app.feature-cards();
 
-// @include app.hero-section();
+@include app.hero-section();
 
-.hero-section {
-  position: relative;
-  overflow: hidden;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  height: 50dvh;
-}
+// .hero-section {
+//   position: relative;
+//   overflow: hidden;
+//   align-items: center;
+//   display: flex;
+//   justify-content: center;
+//   flex-direction: column;
+//   height: 50dvh;
+// }
 
 .calculator-column {
   position: relative;
-  border-radius: 1.25rem;
+  // border-radius: 1.25rem;
   padding: 2.25rem 1.75rem;
-  background: var(--p-surface-0);
-  border: 1px solid color-mix(in oklab, black 6%, transparent);
-  box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-900) 6%, transparent);
+  // background: var(--p-surface-0);
+  // border: 1px solid color-mix(in oklab, black 6%, transparent);
+  // box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-900) 6%, transparent);
+
+  border-radius: var(--p-dialog-border-radius);
+  box-shadow: var(--p-dialog-shadow);
+  background: var(--p-dialog-background);
+  border: 1px solid var(--p-dialog-border-color);
+  color: var(--p-dialog-color);
 }
 
 :host-context(.dark) {
@@ -29,9 +35,14 @@
     // background: color-mix(in oklab, var(--p-surface-800) 50%, transparent);
     // border-color: color-mix(in oklab, var(--p-surface-800) 80%, transparent);
     // box-shadow: 0 12px 40px color-mix(in oklab, black 30%, transparent);
-    background: var(--p-surface-800);
-    border: 1px solid color-mix(in oklab, white 6%, transparent);
-    box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-0) 6%, transparent);
+    // background: var(--p-surface-800);
+    // border: 1px solid color-mix(in oklab, white 6%, transparent);
+    // box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-0) 6%, transparent);
+    // border-radius: var(--p-dialog-border-radius);
+    // box-shadow: var(--p-dialog-shadow);
+    // background: var(--p-dialog-background);
+    // border: 1px solid var(--p-dialog-border-color);
+    // color: var(--p-dialog-color);
   }
 }
 

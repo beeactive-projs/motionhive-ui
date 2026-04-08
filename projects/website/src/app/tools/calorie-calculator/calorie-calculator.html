@@ -4,28 +4,29 @@
     <div
       class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/15 text-accent-500 mb-4">
       <i class="pi pi-calculator text-sm"></i>
-      <span class="text-sm font-semibold" i18n="@@calorie.calculator.pill">Calculating daily calorie intake</span>
+      <span class="text-sm font-semibold" i18n="@@calorie.calculator.pill">Calorie intake tool</span>
     </div>
     <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
       i18n="@@calorie.calculator.h1">
-      Powered by the <span class="text-brand">Mifflin-St Jeor equation</span>.
+      Powered by the <span class="text-brand">Mifflin-St Jeor Equation</span> .
     </h1>
 
     <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto"
       i18n="@@calorie.calculator.intro">
-      Calculate your daily calorie needs based on your personal information and activity level.
+      Discover your daily calorie needs based on your unique body and activity level.
     </p>
+    <p-button i18n-label="@@calorie.calculator.cta" label="Find my number"
+      (onClick)="calculatorSection.scrollIntoView({ behavior: 'smooth' })"></p-button>
   </div>
 </section>
 
 
 <!-- ===== Calculator ===== -->
-<section class="calculator-section py-14 sm:py-20">
+<section class="calculator-section py-14 sm:py-20" #calculatorSection>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
 
-      <!-- ===== Left: Inputs + Results ===== -->
-      <div class="lg:col-span-2 flex flex-col gap-6 calculator-column">
+      <div class="flex flex-col gap-6 calculator-column">
 
         <!-- Input card -->
         <div class="flex flex-col gap-6">
@@ -89,16 +90,84 @@
             <p-selectbutton [options]="goalOptions" [ngModel]="goal()" (ngModelChange)="goal.set($event)"
               optionLabel="label" optionValue="value" fluid class="hidden md:flex" />
           </div>
+
+          <p-divider />
+
+          <!-- Body fat card -->
+          <div class="flex flex-col gap-4">
+            <div>
+              <h2 class="font-heading font-bold text-xl" i18n="@@calorie.bodyfat.h2">Body fat estimate</h2>
+              <p class="text-sm  text-surface-500 dark:text-surface-400 mt-1" i18n="@@calorie.bodyfat.sub">US Navy
+                method
+                ({{ measLabel() }})</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4" [class.sm:grid-cols-3]="gender() === 'female'"
+              [class.sm:grid-cols-2]="gender() !== 'female'">
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
+                  i18n="@@calorie.bodyfat.waist">Waist</label>
+                <p-inputnumber [ngModel]="waist()" (ngModelChange)="waist.set($event)" [min]="measMin()"
+                  [max]="waistMax()" [showButtons]="true" fluid />
+              </div>
+              @if (gender() === 'female') {
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
+                  i18n="@@calorie.bodyfat.hips">Hips</label>
+                <p-inputnumber [ngModel]="hips()" (ngModelChange)="hips.set($event)" [min]="measMin()" [max]="hipsMax()"
+                  [showButtons]="true" fluid />
+              </div>
+              }
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
+                  i18n="@@calorie.bodyfat.neck">Neck</label>
+                <p-inputnumber [ngModel]="neck()" (ngModelChange)="neck.set($event)" [min]="measMin()" [max]="neckMax()"
+                  [showButtons]="true" fluid />
+              </div>
+            </div>
+
+            <div class="pt-4">
+              @if (bodyFatValid()) {
+              <div class="flex flex-col items-center gap-3">
+                <!-- SVG semicircle gauge -->
+                <svg viewBox="0 0 200 110" class="w-44" aria-hidden="true">
+                  <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--p-surface-200)" stroke-width="16"
+                    stroke-linecap="round" />
+                  <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" [attr.stroke]="bodyFatCategory().color"
+                    stroke-width="16" stroke-linecap="round" [attr.stroke-dasharray]="gaugeArcLength"
+                    [attr.stroke-dashoffset]="gaugeOffset()" />
+                  <text x="100" y="94" text-anchor="middle" font-size="22" font-weight="bold" fill="currentColor">
+                    {{ bodyFatPct() }}%
+                  </text>
+                </svg>
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background]="bodyFatCategory().color"></span>
+                  <span class="text-sm font-semibold">{{ bodyFatCategory().label }}</span>
+                  <span class="text-xs text-surface-400">({{ bodyFatCategory().range }})</span>
+                </div>
+              </div>
+              } @else {
+              <p class="text-sm text-surface-400 text-center" i18n="@@calorie.bodyfat.empty">
+                Enter valid measurements to see your body fat estimate.
+              </p>
+              }
+            </div>
+          </div>
+
         </div>
 
+      </div>
+
+      <div class="flex flex-col gap-6">
+
         <!-- Results card -->
-        <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-6 flex flex-col gap-5">
+        <div class="calculator-column flex flex-col gap-6">
           <div>
             <h2 class="font-heading font-bold text-xl" i18n="@@calorie.results.h2">Daily calorie target</h2>
             <p class="text-sm  text-surface-500 dark:text-surface-400 mt-1">{{ goalDescription() }}</p>
           </div>
 
-          <div class="flex flex-col sm:flex-row items-center gap-8">
+          <div class="flex flex-col md:flex-row lg:flex-col xl:flex-row items-center gap-8">
 
             <!-- Donut chart -->
             <div class="relative shrink-0">
@@ -138,84 +207,26 @@
 
           <!-- TDEE breakdown -->
           <div class="grid grid-cols-3 gap-3 pt-4 border-t border-surface-200 dark:border-surface-700 text-center">
-            <div>
-              <p class="text-xs  text-surface-500 dark:text-surface-400 mb-1" i18n="@@calorie.tdee.bmr">BMR</p>
-              <p class="font-bold">{{ bmr() | number:'1.0-0' }} kcal</p>
+            <div class="flex flex-col">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1 flex-1" i18n="@@calorie.tdee.bmr">BMR</p>
+              <p class="text-xs sm:text-base font-bold">{{ bmr() | number:'1.0-0' }} kcal</p>
             </div>
-            <div class="border-x border-surface-200 dark:border-surface-700">
-              <p class="text-xs  text-surface-500 dark:text-surface-400 mb-1" i18n="@@calorie.tdee.maintenance">
+            <div class="border-x border-surface-200 dark:border-surface-700 flex flex-col">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1 flex-1" i18n="@@calorie.tdee.maintenance">
                 Maintenance (TDEE)</p>
-              <p class="font-bold">{{ tdee() | number:'1.0-0' }} kcal</p>
+              <p class="text-xs sm:text-base font-bold">{{ tdee() | number:'1.0-0' }} kcal</p>
             </div>
-            <div>
-              <p class="text-xs  text-surface-500 dark:text-surface-400 mb-1" i18n="@@calorie.tdee.target">Target</p>
-              <p class="font-bold text-primary-500">{{ displayCalories() | number:'1.0-0' }} kcal</p>
+            <div class="flex flex-col">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1 flex-1" i18n="@@calorie.tdee.target">Target
+              </p>
+              <p class="text-xs sm:text-base font-bold text-primary-500">{{ displayCalories() | number:'1.0-0' }} kcal
+              </p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ===== Right: Body fat + Water ===== -->
-      <div class="flex flex-col gap-6">
 
-        <!-- Body fat card -->
-        <div class="calculator-column flex flex-col gap-6">
-          <div>
-            <h2 class="font-heading font-bold text-xl" i18n="@@calorie.bodyfat.h2">Body fat estimate</h2>
-            <p class="text-sm  text-surface-500 dark:text-surface-400 mt-1" i18n="@@calorie.bodyfat.sub">US Navy method
-              ({{ measLabel() }})</p>
-          </div>
 
-          <div class="flex flex-col gap-3">
-            <div class="flex items-center gap-3">
-              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
-                i18n="@@calorie.bodyfat.waist">Waist</label>
-              <p-inputnumber [ngModel]="waist()" (ngModelChange)="waist.set($event)" [min]="measMin()"
-                [max]="waistMax()" [showButtons]="true" fluid />
-            </div>
-            @if (gender() === 'female') {
-            <div class="flex items-center gap-3">
-              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
-                i18n="@@calorie.bodyfat.hips">Hips</label>
-              <p-inputnumber [ngModel]="hips()" (ngModelChange)="hips.set($event)" [min]="measMin()" [max]="hipsMax()"
-                [showButtons]="true" fluid />
-            </div>
-            }
-            <div class="flex items-center gap-3">
-              <label class="text-sm font-medium  text-surface-500 dark:text-surface-400 w-12 shrink-0"
-                i18n="@@calorie.bodyfat.neck">Neck</label>
-              <p-inputnumber [ngModel]="neck()" (ngModelChange)="neck.set($event)" [min]="measMin()" [max]="neckMax()"
-                [showButtons]="true" fluid />
-            </div>
-          </div>
-
-          <div class="pt-4 border-t border-surface-200 dark:border-surface-700">
-            @if (bodyFatValid()) {
-            <div class="flex flex-col items-center gap-3">
-              <!-- SVG semicircle gauge -->
-              <svg viewBox="0 0 200 110" class="w-44" aria-hidden="true">
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--p-surface-200)" stroke-width="16"
-                  stroke-linecap="round" />
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" [attr.stroke]="bodyFatCategory().color"
-                  stroke-width="16" stroke-linecap="round" [attr.stroke-dasharray]="gaugeArcLength"
-                  [attr.stroke-dashoffset]="gaugeOffset()" />
-                <text x="100" y="94" text-anchor="middle" font-size="22" font-weight="bold" fill="currentColor">
-                  {{ bodyFatPct() }}%
-                </text>
-              </svg>
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background]="bodyFatCategory().color"></span>
-                <span class="text-sm font-semibold">{{ bodyFatCategory().label }}</span>
-                <span class="text-xs text-surface-400">({{ bodyFatCategory().range }})</span>
-              </div>
-            </div>
-            } @else {
-            <p class="text-sm text-surface-400 text-center" i18n="@@calorie.bodyfat.empty">
-              Enter valid measurements to see your body fat estimate.
-            </p>
-            }
-          </div>
-        </div>
 
         <!-- Water intake card -->
         <div class="calculator-column flex flex-col gap-6">

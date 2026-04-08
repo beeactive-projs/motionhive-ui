@@ -13,6 +13,8 @@ import { UIChart } from 'primeng/chart';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
+import { Divider } from 'primeng/divider';
+import { Button } from 'primeng/button';
 
 type UnitSystem = 'metric' | 'imperial';
 type Gender = 'male' | 'female';
@@ -26,7 +28,7 @@ interface BodyFatCategory {
 
 @Component({
   selector: 'mh-calorie-calculator',
-  imports: [DecimalPipe, FormsModule, SelectButton, Select, InputNumber, UIChart],
+  imports: [DecimalPipe, FormsModule, SelectButton, Select, InputNumber, UIChart, Divider, Button],
   templateUrl: './calorie-calculator.html',
   styleUrl: './calorie-calculator.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

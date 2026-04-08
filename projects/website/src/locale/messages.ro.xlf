@@ -712,7 +712,7 @@
       </trans-unit>
       <trans-unit id="home.hero.disclaimer" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Free to organise. Free to join. Always.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — we're building something good. </source>
-        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Organizezi gratuit. Participi gratuit. Mereu.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — construim ceva care contează. </target>
+        <target><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Organizezi gratuit. Participi gratuit. Întotdeauna.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> — construim ceva care contează. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">24</context>
@@ -778,7 +778,7 @@
       </trans-unit>
       <trans-unit id="home.floatCard2.desc" datatype="html">
         <source>Browse local fitness groups and book your spot in one tap.</source>
-        <target>Găsește activități în zona ta și Înscrie-te pe listă.</target>
+        <target>Găsește activități în zona ta și înscrie-te pe listă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">84</context>
@@ -874,7 +874,7 @@
       </trans-unit>
       <trans-unit id="home.join.li3" datatype="html">
         <source>Browse sessions nearby and jump in.</source>
-        <target>Găsește sesiuni în zona ta și Înscrie-te pe listă rapid.</target>
+        <target>Găsește sesiuni în zona ta și înscrie-te pe listă rapid.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">131</context>
@@ -2261,27 +2261,35 @@
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.calculator.pill" datatype="html">
-        <source>Calculating daily calorie intake</source>
-        <target state="translated">Calcularea aportului caloric zilnic</target>
+        <source>Calorie intake tool</source>
+        <target state="translated">Calculator aport caloric</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.calculator.h1" datatype="html">
-        <source> Powered by the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Mifflin-St Jeor equation<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-        <target state="translated">Bazat pe ecuația <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Mifflin-St Jeor<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
+        <source> Powered by the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Mifflin-St Jeor Equation<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> . </source>
+        <target state="translated">Bazat pe <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Ecuația Mifflin-St Jeor<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.calculator.intro" datatype="html">
-        <source> Calculate your daily calorie needs based on your personal information and activity level. </source>
-        <target state="translated">Calculează-ți necesarul zilnic de calorii pe baza informațiilor personale și a nivelului de activitate.</target>
+        <source> Discover your daily calorie needs based on your unique body and activity level. </source>
+        <target state="translated">Află necesarul tău caloric zilnic în funcție de corpul tău și nivelul de activitate.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
           <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="calorie.calculator.cta" datatype="html">
+        <source>Find my number</source>
+        <target state="translated">Află rezultatul</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
+          <context context-type="linenumber">18,19</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.inputs.h2" datatype="html">
@@ -2289,7 +2297,7 @@
         <target state="translated">Detaliile tale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.unit.label" datatype="html">
@@ -2297,7 +2305,7 @@
         <target state="translated">Sistem de unități</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.gender.label" datatype="html">
@@ -2305,7 +2313,7 @@
         <target state="translated">Gen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.age.label" datatype="html">
@@ -2313,7 +2321,7 @@
         <target state="translated">Vârstă (ani)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.weight.label" datatype="html">
@@ -2321,7 +2329,7 @@
         <target state="translated">Greutate (<x id="INTERPOLATION" equiv-text="{{ weightLabel() }}"/>)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.height.label" datatype="html">
@@ -2329,7 +2337,7 @@
         <target state="translated">Înălțime (<x id="INTERPOLATION" equiv-text="{{ heightLabel() }}"/>)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.label" datatype="html">
@@ -2337,7 +2345,7 @@
         <target state="translated">Nivel de activitate</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.label" datatype="html">
@@ -2345,7 +2353,7 @@
         <target state="translated">Obiectiv</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.results.h2" datatype="html">
@@ -2353,7 +2361,7 @@
         <target state="translated">Ținta calorică zilnică</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.results.kcal" datatype="html">
@@ -2361,7 +2369,7 @@
         <target state="translated">kcal</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.macro.proteins" datatype="html">
@@ -2369,7 +2377,7 @@
         <target state="translated">Proteine</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.macro.protein.pct" datatype="html">
@@ -2377,7 +2385,7 @@
         <target state="translated">30% din kcal</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.macro.carbs" datatype="html">
@@ -2385,7 +2393,7 @@
         <target state="translated">Carbohidrați</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.macro.carbs.pct" datatype="html">
@@ -2393,7 +2401,7 @@
         <target state="translated">40% din kcal</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.macro.fats" datatype="html">
@@ -2401,7 +2409,7 @@
         <target state="translated">Grăsimi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.macro.fats.pct" datatype="html">
@@ -2409,7 +2417,7 @@
         <target state="translated">30% din kcal</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.tdee.bmr" datatype="html">
@@ -2417,23 +2425,23 @@
         <target state="translated">BMR</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">212</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.tdee.maintenance" datatype="html">
         <source> Maintenance (TDEE)</source>
-        <target state="translated">Mentenanță (TDEE)</target>
+        <target state="translated">Menținere (TDEE)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">216</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.tdee.target" datatype="html">
-        <source>Target</source>
+        <source>Target </source>
         <target state="translated">Țintă</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">221</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.h2" datatype="html">
@@ -2441,7 +2449,7 @@
         <target state="translated">Estimare procent grăsime</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.sub" datatype="html">
@@ -2449,7 +2457,7 @@
         <target state="translated">Metoda US Navy (<x id="INTERPOLATION" equiv-text="{{ measLabel() }}"/>)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.waist" datatype="html">
@@ -2457,7 +2465,7 @@
         <target state="translated">Talie</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.hips" datatype="html">
@@ -2465,7 +2473,7 @@
         <target state="translated">Șolduri</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.neck" datatype="html">
@@ -2473,7 +2481,7 @@
         <target state="translated">Gât</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.empty" datatype="html">
@@ -2481,7 +2489,7 @@
         <target state="translated">Introduceți măsurători valide pentru a vedea estimarea procentului de grăsime corporală.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.water.h2" datatype="html">
@@ -2489,7 +2497,7 @@
         <target state="translated">Aport zilnic de apă</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">240</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.water.sub" datatype="html">
@@ -2497,7 +2505,7 @@
         <target state="translated">35 ml per kg greutate corporală</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">241</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.educational.pill" datatype="html">
@@ -2505,7 +2513,7 @@
         <target state="translated">Alimentând focul</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">265</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.educational.h2" datatype="html">
@@ -2513,7 +2521,7 @@
         <target state="translated">Știința <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>performanței susținute<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">269</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.educational.sub" datatype="html">
@@ -2521,7 +2529,7 @@
         <target state="translated">Stăpânește-ți metabolismul și ratele de macronutrienți.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">257</context>
+          <context context-type="linenumber">272</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.tdee.h3" datatype="html">
@@ -2529,7 +2537,7 @@
         <target state="translated">Ce înseamnă TDEE pentru persoanele active?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">282</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.tdee.body" datatype="html">
@@ -2537,7 +2545,7 @@
         <target state="translated">Consumul Energetic Zilnic Total (TDEE) reprezintă numărul total de calorii pe care corpul tău le arde în decurs de 24 de ore. Pentru persoanele active, TDEE variază considerabil între zilele de odihnă și cele cu activitate fizică intensă. Ecuația Mifflin-St Jeor este standardul de referință pentru estimarea TDEE; ulterior, ajustează valoarea cu 100–200 kcal după primele două săptămâni, în funcție de evoluția greutății tale.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">285</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.macros.h3" datatype="html">
@@ -2545,7 +2553,7 @@
         <target state="translated">De ce contează macronutrienții pentru recuperare?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">298</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.macros.body" datatype="html">
@@ -2553,7 +2561,7 @@
         <target state="translated">Atingerea obiectivului caloric este prima pârghie – însă raportul macronutrienților determină dacă acele calorii sunt folosite pentru refacerea musculară, refacerea rezervelor de glicogen sau susținerea echilibrului hormonal. O distribuție de 40 / 30 / 30 (carbohidrați / proteine / grăsimi) funcționează bine pentru majoritatea celor care practică fitness de grup. Suplimentează aportul de proteine (până la 35–40%) dacă obiectivul tău principal este recompoziția corporală.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">286</context>
+          <context context-type="linenumber">301</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.pill" datatype="html">
@@ -2561,7 +2569,7 @@
         <target state="translated">F.A.Q</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">317</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.h2" datatype="html">
@@ -2569,7 +2577,7 @@
         <target state="translated">Întrebări <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>frecvente<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">321</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.description" datatype="html">
@@ -2577,7 +2585,7 @@
         <target state="translated">Calculează-ți gratuit TDEE și macronutrienții. Creat special pentru cei care practică fitness de grup, utilizând ecuația Mifflin-St Jeor.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.keywords" datatype="html">
@@ -2585,7 +2593,7 @@
         <target state="translated">Calculator TDEE, calculator calorii, calculator macronutrienți, calculator grăsime corporală, fitness de grup, scădere în greutate, masă musculară, Mifflin-St Jeor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.og.title" datatype="html">
@@ -2593,7 +2601,7 @@
         <target state="translated">alculator gratuit TDEE și macronutrienți - MotionHive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.og.description" datatype="html">
@@ -2601,7 +2609,7 @@
         <target state="translated">Află-ți caloriile de menținere, raportul macronutrienților și procentul de grăsime corporală — gratuit, instantaneu și fără cont necesar.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.unit.metric" datatype="html">
@@ -2609,7 +2617,7 @@
         <target state="translated">Metric</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.unit.imperial" datatype="html">
@@ -2617,7 +2625,7 @@
         <target state="translated">Imperial</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.gender.male" datatype="html">
@@ -2625,7 +2633,7 @@
         <target state="translated">Masculin</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.gender.female" datatype="html">
@@ -2633,7 +2641,7 @@
         <target state="translated">Feminin</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.cut" datatype="html">
@@ -2641,7 +2649,7 @@
         <target state="translated">Slăbire</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.maintain" datatype="html">
@@ -2649,7 +2657,7 @@
         <target state="translated">Menținere</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.bulk" datatype="html">
@@ -2657,7 +2665,7 @@
         <target state="translated">Masă musculară</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.sedentary" datatype="html">
@@ -2665,7 +2673,7 @@
         <target state="translated">Sedentar (puțin sau deloc exercițiu)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.light" datatype="html">
@@ -2673,7 +2681,7 @@
         <target state="translated">Ușor activ (1–3 zile/săptămână)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.moderate" datatype="html">
@@ -2681,7 +2689,7 @@
         <target state="translated">Moderat activ (3–5 zile/săptămână)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.very" datatype="html">
@@ -2689,7 +2697,7 @@
         <target state="translated">Foarte activ (6–7 zile/săptămână)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.extra" datatype="html">
@@ -2697,23 +2705,23 @@
         <target state="translated">Extrem de activ (exerciții foarte intense)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.desc.cut" datatype="html">
         <source>500 kcal below maintenance</source>
-        <target state="translated">500 kcal sub mentenanță</target>
+        <target state="translated">500 kcal sub menținere</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.desc.bulk" datatype="html">
         <source>300 kcal above maintenance</source>
-        <target state="translated">300 kcal peste mentenanță</target>
+        <target state="translated">300 kcal peste menținere</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.desc.maintain" datatype="html">
@@ -2721,7 +2729,7 @@
         <target state="translated">Corespunde consumului tău de energie</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.essential" datatype="html">
@@ -2729,11 +2737,11 @@
         <target state="translated">Esențial</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">231</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.athletic" datatype="html">
@@ -2741,11 +2749,11 @@
         <target state="translated">Athletic</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">237</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.fitness" datatype="html">
@@ -2753,11 +2761,11 @@
         <target state="translated">Fitness</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">243</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.average" datatype="html">
@@ -2765,11 +2773,11 @@
         <target state="translated">Mediu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">217</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">247</context>
+          <context context-type="linenumber">249</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.obese" datatype="html">
@@ -2777,11 +2785,11 @@
         <target state="translated">Obezitate</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">224</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">254</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.chart.proteins" datatype="html">
@@ -2789,7 +2797,7 @@
         <target state="translated">Proteine</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">282</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.chart.carbs" datatype="html">
@@ -2797,7 +2805,7 @@
         <target state="translated">Carbohidrați</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">283</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.chart.fats" datatype="html">
@@ -2805,7 +2813,7 @@
         <target state="translated">Grăsimi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">284</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.q1" datatype="html">
@@ -2813,7 +2821,7 @@
         <target state="translated">Cât de precis este acest calculator de calorii?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">315</context>
+          <context context-type="linenumber">317</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.a1" datatype="html">
@@ -2821,7 +2829,7 @@
         <target state="translated">Acest calculator utilizează ecuația Mifflin-St Jeor, considerată cea mai exactă formulă pentru estimarea Ratei Metabolice Bazale (BMR) în cazul majorității persoanelor. Studiile indică o marjă de eroare de aproximativ ±10%. Pentru o precizie sporită, poți opta pentru o scanare DEXA sau pentru un test clinic de determinare a ratei metabolice în repaus.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">316</context>
+          <context context-type="linenumber">318</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.q2" datatype="html">
@@ -2829,7 +2837,7 @@
         <target state="translated">Ar trebui să mănânc mai mult în zilele cu antrenamente HIIT?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">321</context>
+          <context context-type="linenumber">323</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.a2" datatype="html">
@@ -2837,7 +2845,7 @@
         <target state="translated">Da — antrenamentele pe intervale de mare intensitate cresc semnificativ consumul caloric. În zilele cu efort intens, poți beneficia de un aport suplimentar de 200–400 de calorii. Prioritizează carbohidrații complecși înainte de antrenament și alimentele bogate în proteine în primele 30 de minute după finalizarea acestuia, pentru a susține performanța și recuperarea musculară.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">322</context>
+          <context context-type="linenumber">324</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.q3" datatype="html">
@@ -2845,7 +2853,7 @@
         <target state="translated">Care este un deficit caloric sigur pentru scăderea în greutate?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">329</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.a3" datatype="html">
@@ -2853,7 +2861,7 @@
         <target state="translated">Un deficit de 300–500 de calorii pe zi este considerat, în general, sigur și sustenabil, ducând la o scădere de aproximativ 0,3–0,5 kg de grăsime pe săptămână. Deficitele care depășesc 1.000 de calorii pe zi prezintă riscul de pierdere a masei musculare, carențe nutriționale și o adaptare metabolică ce poate bloca progresul.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">328</context>
+          <context context-type="linenumber">330</context>
         </context-group>
       </trans-unit>
     </body>
