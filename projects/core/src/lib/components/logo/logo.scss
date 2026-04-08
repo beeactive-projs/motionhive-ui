@@ -1,5 +1,7 @@
-:host {
-  display: contents;
+.container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .title-color {

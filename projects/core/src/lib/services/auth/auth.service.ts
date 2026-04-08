@@ -77,11 +77,11 @@ export class AuthService implements OnDestroy {
   }
 
   logout(): Observable<void> {
-    this.clearAuthData();
-    return new Observable<void>();
-    // return this._http
-    //   .post<void>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGOUT}`, {})
-    //   .pipe(tap(() => this.clearAuthData()));
+    return this._http
+      .post<void>(`${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGOUT}`, {
+        refreshToken: this._tokenService.getRefreshToken(),
+      })
+      .pipe(tap(() => this.clearAuthData()));
   }
 
   googleLogin(request: GoogleLoginRequest): Observable<User> {

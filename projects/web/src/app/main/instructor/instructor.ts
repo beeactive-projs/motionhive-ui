@@ -4,7 +4,7 @@ import type { MenuItem } from 'primeng/api';
 import { SidenavLayoutComponent } from '../../layouts/sidenav-layout/sidenav-layout.component';
 
 @Component({
-  selector: 'mh-organizer',
+  selector: 'mh-instructor',
   imports: [RouterOutlet, SidenavLayoutComponent],
   templateUrl: './instructor.html',
   styleUrl: './instructor.scss',

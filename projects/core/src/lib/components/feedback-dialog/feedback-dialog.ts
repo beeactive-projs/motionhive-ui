@@ -46,13 +46,14 @@ export class FeedbackDialog {
     icon: string;
     severity: ButtonSeverity;
   }[] = [
-    { key: FeedbackCategories.Bug, label: 'Bug report', icon: 'bug_report', severity: 'danger' },
     {
       key: FeedbackCategories.Suggestion,
       label: 'Suggestion',
       icon: 'lightbulb',
       severity: 'warn',
     },
+    { key: FeedbackCategories.Bug, label: 'Bug report', icon: 'bug_report', severity: 'danger' },
+
     { key: FeedbackCategories.Other, label: 'Other', icon: 'chat', severity: 'info' },
   ];
 
@@ -64,7 +65,7 @@ export class FeedbackDialog {
   });
 
   private readonly _selectedType = toSignal(this.form.controls.type.valueChanges, {
-    initialValue: this.types[0].key,
+    initialValue: FeedbackCategories.Suggestion,
   });
 
   protected readonly placeholders = computed(() => {
@@ -136,7 +137,7 @@ export class FeedbackDialog {
   }
 
   protected onDialogHide(): void {
-    this.form.reset({ type: FeedbackCategories.Bug, title: '', message: '', email: '' });
+    this.form.reset({ type: FeedbackCategories.Suggestion, title: '', message: '', email: '' });
     this.submitted.set(false);
   }
 }

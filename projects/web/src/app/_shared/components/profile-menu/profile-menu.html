@@ -1,0 +1,41 @@
+<p-button text rounded [ariaLabel]="'Open profile menu for ' + userName()" (onClick)="toggle($event)" styleClass="p-0">
+  <p-avatar [image]="user()?.avatarUrl ?? undefined" [label]="user()?.avatarUrl ? undefined : initials()"
+    shape="circle" />
+</p-button>
+
+<p-popover #popover [appendTo]="'body'">
+  <div class="min-w-52">
+    <div class="flex items-center gap-3 py-1">
+      <p-avatar [image]="user()?.avatarUrl ?? undefined" [label]="user()?.avatarUrl ? undefined : initials()"
+        shape="circle" size="large" />
+      <div class="flex flex-col overflow-hidden">
+        <span class="font-semibold text-sm truncate">{{ userName() }}</span>
+        <span class="text-xs truncate text-muted-color">{{ user()?.email }}</span>
+      </div>
+    </div>
+
+    <p-divider />
+
+    <ul class="flex flex-col gap-2">
+      @for (item of menuItems(); track item.label) {
+      <li>
+        <a [routerLink]="item.routerLink" routerLinkActive="bg-primary-500 text-primary-contrast font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+            transition-colors hover:bg-surface-300 hover:text-surface-800">
+          <i [class]="item.icon + ' text-base'"></i>
+          {{ item.label }}
+        </a>
+      </li>
+      }
+    </ul>
+    <p-divider />
+
+    <p-button label="Share feedback" icon="pi pi-comment" text fluid styleClass="justify-start"
+      (onClick)="openFeedback()" />
+
+
+    <p-divider />
+
+    <p-button label="Log out" icon="pi pi-sign-out" text fluid severity="danger" styleClass="justify-start"
+      (onClick)="signOut()" />
+  </div>
+</p-popover>

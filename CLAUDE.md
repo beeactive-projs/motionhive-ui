@@ -115,8 +115,10 @@ method(): TagSeverity {
 2. **Tailwind utility classes** — for layout and spacing before writing any custom CSS
 3. **Custom SCSS** — only as a last resort when PrimeNG + Tailwind cannot achieve the result
 
-Never use plain HTML form/interactive elements when a PrimeNG equivalent exists:
-`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `p-textarea`
+Do not add custom CSS for things Tailwind can handle (flex, gap, padding, font-size, font-weight, overflow, text-overflow, whitespace, cursor, width, transitions, etc.). Keep `.scss` files minimal — only add rules that genuinely cannot be expressed with utility classes.
+
+**Never use plain HTML interactive elements when a PrimeNG equivalent exists — no exceptions, even when wrapping other components or building custom UI:**
+`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `p-textarea`, `<a>` (interactive) → `p-button` with `routerLink`
 
 ### File & Naming
 
@@ -163,7 +165,7 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
   private readonly _toast = inject(MessageService);     // ✗ (purpose alias)
   private readonly _fb = inject(FormBuilder);           // ✗ (abbreviation)
   ```
-- **Private state/derived fields**: `_` prefix + `readonly` (`private readonly _base = '...'`, `private readonly _lgQuery = ...`)
+- **Private state/derived fields**: `_` prefix + `readonly` (`private readonly _base = '...'`, `private readonly _lgQuery = ...`), including `viewChild` / `viewChildren` refs — never access `_`-prefixed members from the template; expose a public method instead
 - **Public signals exposed from a service**: no prefix, no suffix (`readonly isOpen = signal(false)`)
 - **Public observables**: `$` suffix (`currentUser$`, `reload$`)
 - **Private Subjects** (backing a public observable): camelCase + `Subject` suffix, no `_` (`private currentUserSubject = new BehaviorSubject(...)`)

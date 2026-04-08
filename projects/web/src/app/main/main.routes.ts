@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { instructorGuard, superAdminGuard } from 'core';
 
 export const appRoutes: Routes = [
   {
@@ -12,13 +13,19 @@ export const appRoutes: Routes = [
   },
   {
     path: '',
+    canActivate: [instructorGuard],
     loadChildren: () => import('./instructor/instructor.routes').then((m) => m.instructorRoutes),
   },
   {
-    path: 'profile',
-    loadComponent: () => import('./profile/profile').then((m) => m.Profile),
-    title: 'My Profile - MotionHive',
+    path: 'super-admin',
+    canActivate: [superAdminGuard],
+    loadChildren: () => import('./super-admin/super-admin.routes').then((m) => m.superAdminRoutes),
   },
+  // {
+  //   path: 'profile',
+  //   loadComponent: () => import('./profile/profile').then((m) => m.Profile),
+  //   title: 'My Profile - MotionHive',
+  // },
   {
     path: '',
     redirectTo: 'dashboard',

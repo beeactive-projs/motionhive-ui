@@ -4,11 +4,11 @@
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
 
-    <a routerLink="/dashboard" class="brand-logo flex" aria-label="MotionHive home">
+    <a routerLink="/dashboard" aria-label="MotionHive home">
       <mh-logo />
     </a>
 
-    <nav>
+    <nav class="flex-1">
       <ul class="flex flex-col gap-2">
         @for (item of menuItems(); track item.label) {
         <li>
@@ -21,6 +21,10 @@
         }
       </ul>
     </nav>
+
+    <p-button label="Share feedback" icon="pi pi-comment" text fluid styleClass="justify-start"
+      (onClick)="openFeedback()" />
+
   </aside>
 
   <div class="content" [class.sidebar-open]="sidebarOpen()">
@@ -32,10 +36,10 @@
         <ng-content select="[toolbarCenter]" />
       </ng-template>
       <ng-template #end>
-        <div class="flex gap-4">
+        <div class="flex items-center gap-4">
           <ng-content select="[toolbarEnd]" />
           <mh-theme-toggle />
-          <p-button icon="pi pi-sign-out" rounded (onClick)="signOut()" ariaLabel="Sign out" outlined size="small" />
+          <mh-profile-menu />
         </div>
       </ng-template>
     </p-toolbar>
