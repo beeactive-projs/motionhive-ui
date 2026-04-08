@@ -2269,7 +2269,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.calculator.h1" datatype="html">
-        <source> Powered by the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Mifflin-St Jeor Equation<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> . </source>
+        <source> Powered by the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Mifflin-St Jeor Equation<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
         <target state="translated">Bazat pe <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Ecuația Mifflin-St Jeor<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
