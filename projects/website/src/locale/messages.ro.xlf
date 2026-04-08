@@ -2268,30 +2268,31 @@
           <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="calorie.calculator.h1" datatype="html">
-        <source> Powered by the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Mifflin-St Jeor Equation<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-        <target state="translated">Bazat pe <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Ecuația Mifflin-St Jeor<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">11</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="calorie.calculator.intro" datatype="html">
-        <source> Discover your daily calorie needs based on your unique body and activity level. </source>
-        <target state="translated">Află necesarul tău caloric zilnic în funcție de corpul tău și nivelul de activitate.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="calorie.calculator.cta" datatype="html">
-        <source>Find my number</source>
-        <target state="translated">Află rezultatul</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">18,19</context>
-        </context-group>
-      </trans-unit>
+<trans-unit id="calorie.calculator.h1" datatype="html">
+  <source> Find your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>daily calorie target<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>. </source>
+<target state="translated">Află <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>câte calorii<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> ai nevoie zilnic.</target>  <context-group purpose="location">
+    <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
+    <context context-type="linenumber">11</context>
+  </context-group>
+</trans-unit>
+
+<trans-unit id="calorie.calculator.intro" datatype="html">
+  <source> Enter your details and get your exact number — broken down by goal, macros, and activity level. </source>
+  <target state="translated">Completează detaliile și primești numărul exact — cu macronutrienți, obiectiv și nivel de activitate.</target>
+  <context-group purpose="location">
+    <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
+    <context context-type="linenumber">16</context>
+  </context-group>
+</trans-unit>
+
+<trans-unit id="calorie.calculator.cta" datatype="html">
+  <source>Calculate my calories ↓</source>
+  <target state="translated">Calculează acum ↓</target>
+  <context-group purpose="location">
+    <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
+    <context context-type="linenumber">18,19</context>
+  </context-group>
+</trans-unit>
       <trans-unit id="calorie.inputs.h2" datatype="html">
         <source>Your details</source>
         <target state="translated">Detaliile tale</target>
@@ -2510,7 +2511,7 @@
       </trans-unit>
       <trans-unit id="calorie.educational.pill" datatype="html">
         <source>Fueling the fire</source>
-        <target state="translated">Alimentând focul</target>
+        <target state="translated">Energia din spatele mișcării</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
           <context context-type="linenumber">265</context>
@@ -2862,6 +2863,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
           <context context-type="linenumber">330</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="calorie.calculator.trust" datatype="html">
+        <source> Powered by the Mifflin-St Jeor equation — the most validated formula for estimating calorie needs. </source>
+        <target state="translated"> Calculat folosind ecuația Mifflin-St Jeor — cea mai validată formulă pentru estimarea necesarului caloric. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
+          <context context-type="linenumber">26,29</context>
         </context-group>
       </trans-unit>
     </body>

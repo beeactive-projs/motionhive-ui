@@ -1,22 +1,38 @@
 <!-- ===== Page header ===== -->
 <section class="hero-section">
   <div class="max-w-6xl text-center px-4 sm:px-6 lg:px-8">
-    <div
-      class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/15 text-accent-500 mb-4">
+    
+    <!-- pill badge -->
+    <div class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/15 text-accent-500 mb-4">
       <i class="pi pi-calculator text-sm"></i>
       <span class="text-sm font-semibold" i18n="@@calorie.calculator.pill">Calorie intake tool</span>
     </div>
-    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
+
+    <!-- main headline — benefit first -->
+    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-4"
       i18n="@@calorie.calculator.h1">
-      Powered by the <span class="text-brand">Mifflin-St Jeor Equation</span>.
+      Find your <span class="text-brand">daily calorie target</span>.
     </h1>
 
-    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto"
+    <!-- subtitle — what it does -->
+    <p class="animate-fade-in text-lg sm:text-xl mb-4 leading-relaxed max-w-xl mx-auto"
       i18n="@@calorie.calculator.intro">
-      Discover your daily calorie needs based on your unique body and activity level.
+      Enter your details and get your exact number — broken down by goal, macros, and activity level.
     </p>
-    <p-button i18n-label="@@calorie.calculator.cta" label="Find my number"
-      (onClick)="calculatorSection.scrollIntoView({ behavior: 'smooth' })"></p-button>
+
+    <!-- trust line — equation as credibility, not headline -->
+    <p class="animate-fade-in text-sm text-secondary-400 mb-8"
+      i18n="@@calorie.calculator.trust">
+      Powered by the Mifflin-St Jeor equation — the most validated formula for estimating calorie needs.
+    </p>
+
+    <!-- button — clearer action -->
+    <p-button 
+      i18n-label="@@calorie.calculator.cta" 
+      label="Calculate my calories ↓"
+      (onClick)="calculatorSection.scrollIntoView({ behavior: 'smooth' })">
+    </p-button>
+
   </div>
 </section>
 
