@@ -26,7 +26,7 @@ import {
 import { EditPersonalInfo } from './dialogs/edit-personal-info/edit-personal-info';
 import { EditFitnessProfile } from './dialogs/edit-fitness-profile/edit-fitness-profile';
 import { EditInstructorProfile } from './dialogs/edit-instructor-profile/edit-instructor-profile';
-import { BecomeInstructor } from '../client/dialogs/become-instructor/become-instructor';
+import { BecomeInstructor } from '../user/dialogs/become-instructor/become-instructor';
 
 @Component({
   selector: 'mh-profile',

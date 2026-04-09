@@ -236,11 +236,7 @@ export class SignUpComponent {
       return;
     }
 
-    if (this._authStore.hasRole(UserRoles.Instructor)) {
-      this._router.navigate(['/profile']);
-    } else {
-      this._router.navigate(['/client/profile']);
-    }
+    this._router.navigate(['/profile']);
   }
 
   private capitalize(str: string): string {
