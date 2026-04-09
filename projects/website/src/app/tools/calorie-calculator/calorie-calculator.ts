@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   linkedSignal,
   signal,
@@ -35,6 +36,7 @@ interface BodyFatCategory {
 })
 export class CalorieCalculator {
   private readonly _meta = inject(Meta);
+  private readonly _storageKey = 'mh-calorie-calculator';
 
   constructor() {
     this._meta.updateTag({
@@ -52,6 +54,44 @@ export class CalorieCalculator {
     this._meta.updateTag({
       property: 'og:description',
       content: $localize`:@@calorie.og.description:Find your maintenance calories, macro split, and body fat percentage — free, instant, no sign-up required.`,
+    });
+
+    try {
+      const raw = localStorage.getItem(this._storageKey);
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s.unit) this.unit.set(s.unit);
+        if (s.gender) this.gender.set(s.gender);
+        if (s.age) this.age.set(s.age);
+        if (s.activityLevel) this.activityLevel.set(s.activityLevel);
+        if (s.goal) this.goal.set(s.goal);
+        // linkedSignals reset when unit changes, so set them after unit
+        if (s.weight) this.weight.set(s.weight);
+        if (s.height) this.height.set(s.height);
+        if (s.waist) this.waist.set(s.waist);
+        if (s.hips) this.hips.set(s.hips);
+        if (s.neck) this.neck.set(s.neck);
+      }
+    } catch { /* SSR or corrupt storage */ }
+
+    effect(() => {
+      try {
+        localStorage.setItem(
+          this._storageKey,
+          JSON.stringify({
+            unit: this.unit(),
+            gender: this.gender(),
+            age: this.age(),
+            activityLevel: this.activityLevel(),
+            goal: this.goal(),
+            weight: this.weight(),
+            height: this.height(),
+            waist: this.waist(),
+            hips: this.hips(),
+            neck: this.neck(),
+          }),
+        );
+      } catch { /* SSR or storage quota exceeded */ }
     });
   }
 
