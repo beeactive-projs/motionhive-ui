@@ -62,7 +62,7 @@
     @if (isGuest()) {
     <div class="flex flex-col gap-1.5">
       <label for="fb-email" class="text-xs font-semibold text-secondary-500">
-        <ng-container i18n="@@feedback.email.label">Email</ng-container>
+        <span i18n="@@feedback.email.label">Email</span>
         <span i18n="@@feedback.email.optional" class="font-normal text-surface-400">(optional — to follow up on your
           feedback)</span>
       </label>
@@ -91,9 +91,13 @@
 
   <ng-template #footer>
     @if (!submitted()) {
-    <p-button label="Cancel" i18n-label="@@feedback.btn.cancel" [outlined]="true" (onClick)="onClose()" />
-    <p-button label="Send feedback" i18n-label="@@feedback.btn.send" icon="pi pi-send" iconPos="right"
-      (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()" />
+    <div class="flex flex-col sm:flex-row sm:justify-end gap-4 sm:gap-2 grow">
+      <p-button label="Send feedback" i18n-label="@@feedback.btn.send" icon="pi pi-send" iconPos="right"
+        (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()"
+        class="order-1 sm:order-2 w-full sm:w-auto" fluid />
+      <p-button label="Cancel" i18n-label="@@feedback.btn.cancel" [outlined]="true" (onClick)="onClose()"
+        class="order-2 sm:order-1 w-full sm:w-auto" fluid />
+    </div>
     } @else {
     <p-button label="Close" i18n-label="@@waitlist.btn.close" (onClick)="onClose()" />
     }

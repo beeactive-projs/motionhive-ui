@@ -24,7 +24,7 @@
 
     <div class="flex flex-col gap-1.5">
       <label for="wl-name" class="text-xs font-semibold text-secondary-500">
-        <ng-container i18n="@@waitlist.name.label">Name</ng-container>
+        <span i18n="@@waitlist.name.label">Name</span>
         <span i18n="@@waitlist.optional" class="font-normal text-surface-400">(optional)</span>
       </label>
       <input pInputText id="wl-name" formControlName="name" i18n-placeholder="@@waitlist.name.placeholder"
@@ -71,9 +71,13 @@
 
   <ng-template #footer>
     @if (!submitted()) {
-    <p-button label="Maybe later" i18n-label="@@waitlist.btn.later" [outlined]="true" (onClick)="onClose()" />
-    <p-button label="Notify me" i18n-label="@@waitlist.btn.notify" icon="pi pi-bell" iconPos="right"
-      (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()" />
+    <div class="flex flex-col sm:flex-row sm:justify-end gap-4 sm:gap-2 grow">
+      <p-button label="Notify me" i18n-label="@@waitlist.btn.notify" icon="pi pi-bell" iconPos="right"
+        (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()"
+        class="order-1 sm:order-2 w-full sm:w-auto" fluid />
+      <p-button label="Maybe later" i18n-label="@@waitlist.btn.later" [outlined]="true" (onClick)="onClose()"
+        class="order-2 sm:order-1 w-full sm:w-auto" fluid />
+    </div>
     } @else {
     <p-button label="Close" i18n-label="@@waitlist.btn.close" (onClick)="onClose()" />
     }

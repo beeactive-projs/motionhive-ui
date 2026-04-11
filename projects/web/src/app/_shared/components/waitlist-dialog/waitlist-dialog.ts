@@ -7,8 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { WaitlistRole } from '../../models/waitlist/waitlist.enums';
-import { WaitlistService } from '../../services/waitlist/waitlist.service';
+import { WaitlistService, WaitlistRole } from 'core';
 
 @Component({
   selector: 'mh-waitlist-dialog',

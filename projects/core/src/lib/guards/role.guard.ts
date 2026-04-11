@@ -3,6 +3,18 @@ import { inject } from '@angular/core';
 import { AuthStore } from '../stores/auth.store';
 import { AuthService } from '../services/auth/auth.service';
 
+export const roleRedirectGuard: CanActivateFn = () => {
+  inject(AuthService);
+  const authStore = inject(AuthStore);
+  const router = inject(Router);
+
+  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
+  if (authStore.isUser()) return router.createUrlTree(['/user/dashboard']);
+  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
+
+  return router.createUrlTree(['/auth/login']);
+};
+
 export const superAdminGuard: CanActivateFn = () => {
   // Ensure AuthService is constructed so checkAuthStatus() populates the store
   inject(AuthService);
@@ -13,12 +25,12 @@ export const superAdminGuard: CanActivateFn = () => {
     return true;
   }
 
-  // Only redirect if we know the user's role; if no user loaded, go to login
   if (!authStore.isAuthenticated()) {
     return router.createUrlTree(['/auth/login']);
   }
 
-  return router.createUrlTree(['/client/dashboard']);
+  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
+  return router.createUrlTree(['/user/dashboard']);
 };
 
 export const instructorGuard: CanActivateFn = () => {
@@ -31,12 +43,12 @@ export const instructorGuard: CanActivateFn = () => {
     return true;
   }
 
-  // Only redirect if we know the user's role; if no user loaded, go to login
   if (!authStore.isAuthenticated()) {
     return router.createUrlTree(['/auth/login']);
   }
 
-  return router.createUrlTree(['/client/dashboard']);
+  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
+  return router.createUrlTree(['/user/dashboard']);
 };
 
 export const participantGuard: CanActivateFn = () => {
@@ -52,5 +64,7 @@ export const participantGuard: CanActivateFn = () => {
     return router.createUrlTree(['/auth/login']);
   }
 
+  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
+  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
   return router.createUrlTree(['/dashboard']);
 };

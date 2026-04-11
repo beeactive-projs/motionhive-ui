@@ -29,6 +29,7 @@ import {
   LoginRequest,
   Logo,
   ThemeService,
+  UserRole,
   UserRoles,
 } from 'core';
 import { Divider } from 'primeng/divider';
@@ -193,11 +194,11 @@ export class LoginComponent {
       [UserRoles.Admin]: '/dashboard',
       [UserRoles.Support]: '/dashboard',
       [UserRoles.Instructor]: '/dashboard',
-      [UserRoles.User]: '/client/dashboard',
+      [UserRoles.User]: '/user/dashboard',
     };
 
-    const roles = this._authStore.userRoles();
-    const route = roles.map((r) => roleRoutes[r]).find(Boolean) ?? '/dashboard';
+    const roles = new Set(this._authStore.userRoles());
+    const route = Object.entries(roleRoutes).find(([role]) => roles.has(role as UserRole))?.[1] ?? '/dashboard';
     this._router.navigate([route]);
   }
 

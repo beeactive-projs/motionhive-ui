@@ -67,7 +67,7 @@ export class JoinGroup implements OnInit {
 
   goToDashboard(): void {
     if (this._authStore.isUser()) {
-      this._router.navigate(['/client/dashboard']);
+      this._router.navigate(['/user/dashboard']);
     } else {
       this._router.navigate(['/dashboard']);
     }

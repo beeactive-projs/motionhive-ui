@@ -4,6 +4,10 @@
 @include app.feature-cards();
 @include app.hero-section();
 
+.hero-section {
+  min-height: 20rem;
+}
+
 .calculator-column {
   position: relative;
   padding: 2.25rem 1.75rem;
@@ -13,7 +17,6 @@
   border: 1px solid var(--p-dialog-border-color);
   color: var(--p-dialog-color);
 }
-
 
 // ===== Who It's For Section =====
 .who-grid {
