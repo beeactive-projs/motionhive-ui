@@ -1,5 +1,11 @@
 import { Routes } from '@angular/router';
-import { instructorGuard, participantGuard, roleRedirectGuard, superAdminGuard } from 'core';
+import {
+  writerGuard,
+  instructorGuard,
+  participantGuard,
+  roleRedirectGuard,
+  superAdminGuard,
+} from 'core';
 
 export const mainRoutes: Routes = [
   {
@@ -57,6 +63,28 @@ export const mainRoutes: Routes = [
         canActivate: [participantGuard],
         loadComponent: () => import('./user/instructors/instructors').then((m) => m.Instructors),
         title: 'My Instructors - MotionHive',
+      },
+
+      // Writer section
+      {
+        path: 'writer/posts',
+        canActivate: [writerGuard],
+        loadComponent: () => import('./writer/posts/posts').then((m) => m.Posts),
+        title: 'Posts - MotionHive',
+      },
+      {
+        path: 'writer/posts/new',
+        canActivate: [writerGuard],
+        loadComponent: () =>
+          import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
+        title: 'New Post - MotionHive',
+      },
+      {
+        path: 'writer/posts/:slug',
+        canActivate: [writerGuard],
+        loadComponent: () =>
+          import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
+        title: 'Edit Post - MotionHive',
       },
 
       // Super-admin section

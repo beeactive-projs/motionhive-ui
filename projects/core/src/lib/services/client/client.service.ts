@@ -7,6 +7,7 @@ import {
   InstructorClient,
   ClientRequest,
   CreateClientInvitation,
+  InvitationDetails,
   UpdateClientPayload,
 } from '../../models/client/client.model';
 import { InstructorListResponse } from '../../models/client/instructor.model';
@@ -49,6 +50,19 @@ export class ClientService {
     return this._http.post<{ message: string; request: ClientRequest }>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE}`,
       dto,
+    );
+  }
+
+  getInvitationByToken(token: string): Observable<InvitationDetails> {
+    return this._http.get<InvitationDetails>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE_BY_TOKEN(token)}`,
+    );
+  }
+
+  acceptByToken(token: string): Observable<{ message: string }> {
+    return this._http.post<{ message: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.ACCEPT_BY_TOKEN}`,
+      { token },
     );
   }
 

@@ -15,9 +15,10 @@ export class Main {
 
   readonly menuItems = computed<ReadonlyArray<MenuItem>>(() => {
     const isSuperAdmin = this._authStore.isSuperAdmin();
+    const isWriter = this._authStore.isWriter();
     const isInstructor = this._authStore.isInstructor();
     const isUser = this._authStore.isUser();
-    const multiRole = [isSuperAdmin, isInstructor, isUser].filter(Boolean).length > 1;
+    const multiRole = [isSuperAdmin, isWriter, isInstructor, isUser].filter(Boolean).length > 1;
 
     const items: MenuItem[] = [];
 
@@ -28,6 +29,11 @@ export class Main {
         { label: 'Users', icon: 'pi pi-users', routerLink: '/super-admin/users' },
         { label: 'Groups', icon: 'pi pi-sitemap', routerLink: '/super-admin/groups' },
       );
+    }
+
+    if (isWriter) {
+      if (multiRole) items.push({ label: 'Writer', separator: true });
+      items.push({ label: 'Posts', icon: 'pi pi-book', routerLink: '/writer/posts' });
     }
 
     if (isInstructor) {

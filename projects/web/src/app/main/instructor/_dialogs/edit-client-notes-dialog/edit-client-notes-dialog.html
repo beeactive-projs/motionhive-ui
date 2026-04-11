@@ -1,0 +1,21 @@
+<p-dialog header="Edit client notes" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }"
+  [closable]="true">
+  <div class="flex flex-col gap-4">
+    @if (client(); as c) {
+    <div class="flex items-center gap-3 rounded-lg bg-surface-50 p-3">
+      <p-avatar [label]="initials(c)" shape="circle" styleClass="bg-primary-100 text-primary-700" />
+      <span class="font-medium text-secondary-900">{{ clientName(c) }}</span>
+    </div>
+    }
+    <div class="flex flex-col gap-2">
+      <label for="editNotes" class="text-sm font-medium text-secondary-700">Notes</label>
+      <textarea pTextarea id="editNotes" fluid [(ngModel)]="editNotes" [rows]="5"
+        placeholder="Add private notes about this client..."></textarea>
+    </div>
+  </div>
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Save notes" icon="pi pi-check" severity="primary" [loading]="notesLoading()"
+      (onClick)="saveNotes()" />
+  </ng-template>
+</p-dialog>

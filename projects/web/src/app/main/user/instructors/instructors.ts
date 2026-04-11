@@ -16,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { MyInstructor, ClientRequest, ClientService } from 'core';
-import { DiscoverInstructors } from '../dialogs/discover-instructors/discover-instructors';
+import { DiscoverInstructors } from '../_dialogs/discover-instructors/discover-instructors';
 
 @Component({
   selector: 'mh-instructors',

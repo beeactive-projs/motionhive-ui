@@ -1,6 +1,7 @@
 import {
   Component,
   signal,
+  computed,
   inject,
   ChangeDetectionStrategy,
   afterNextRender,
@@ -25,8 +26,10 @@ import { Divider } from 'primeng/divider';
 import {
   AuthService,
   AuthStore,
+  ClientService,
   FacebookAuthService,
   GoogleAuthService,
+  InvitationDetails,
   Logo,
   RegisterRequest,
   UserRoles,
@@ -56,11 +59,19 @@ export class SignUpComponent {
   private readonly _formBuilder = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _clientService = inject(ClientService);
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _facebookAuthService = inject(FacebookAuthService);
   private readonly _userService = inject(UserService);
   private readonly _router = inject(Router);
   protected readonly _route = inject(ActivatedRoute);
+
+  private readonly _invitationToken = signal<string | null>(null);
+  readonly invitationDetails = signal<{
+    invitedEmail: string;
+    instructor: { firstName: string; lastName: string };
+  } | null>(null);
+  readonly hasInvitation = computed(() => !!this._invitationToken());
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -81,6 +92,21 @@ export class SignUpComponent {
   private readonly googleBtnContainer = viewChild<ElementRef>('googleBtn');
 
   constructor() {
+    const token = this._route.snapshot.queryParamMap.get('token');
+    if (token) {
+      this._invitationToken.set(token);
+      this._clientService.getInvitationByToken(token).subscribe({
+        next: (details: InvitationDetails) => {
+          this.invitationDetails.set(details);
+          this.registerForm.patchValue({ email: details.invitedEmail });
+          this.registerForm.get('email')?.disable();
+        },
+        error: () => {
+          this.errorMessage.set('This invitation link is invalid or has expired.');
+        },
+      });
+    }
+
     afterNextRender(() => {
       const el = this.googleBtnContainer()?.nativeElement;
       if (el) {
@@ -103,7 +129,7 @@ export class SignUpComponent {
     this.errorMessage.set(null);
 
     const { firstName, lastName, email, phone, password, confirmPassword, isInstructor } =
-      this.registerForm.value;
+      this.registerForm.getRawValue();
     const data: RegisterRequest = {
       firstName,
       lastName,
@@ -111,7 +137,7 @@ export class SignUpComponent {
       phone: phone || undefined,
       password,
       confirmPassword,
-      isInstructor: isInstructor || undefined,
+      isInstructor: this.hasInvitation() ? false : isInstructor || undefined,
     };
 
     this._authService.register(data).subscribe({
@@ -119,7 +145,15 @@ export class SignUpComponent {
         this.isLoading.set(false);
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         this._userService.updateMe({ timezone }).subscribe({ error: () => {} });
-        this.navigateToApp();
+        const invitationToken = this._invitationToken();
+        if (invitationToken) {
+          this._clientService.acceptByToken(invitationToken).subscribe({
+            next: () => this.navigateToApp(),
+            error: () => this.navigateToApp(),
+          });
+        } else {
+          this.navigateToApp();
+        }
       },
       error: (error) => {
         this.isLoading.set(false);

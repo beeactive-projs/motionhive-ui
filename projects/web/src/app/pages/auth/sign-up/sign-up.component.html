@@ -45,6 +45,19 @@
     </div>
     <div class="form animate-fade-in w-full">
 
+      <!-- Invitation banner -->
+      @if (hasInvitation()) {
+      <div class="mb-4">
+        <p-message severity="info" class="w-full">
+          @if (invitationDetails()) {
+            You've been invited by <strong>{{ invitationDetails()!.instructor.firstName }} {{ invitationDetails()!.instructor.lastName }}</strong> to join as a client. Complete the form below to accept.
+          } @else {
+            You've been invited to join as a client. Complete the form below to accept.
+          }
+        </p-message>
+      </div>
+      }
+
       <!-- Error Message -->
       @if (errorMessage()) {
       <div class="mb-6">
@@ -153,14 +166,16 @@
           }
         </div>
 
-        <!-- Instructor Role -->
+        <!-- Instructor Role (hidden when accepting an invitation) -->
+        @if (!hasInvitation()) {
         <div class="flex items-center gap-3">
           <p-checkbox inputId="isInstructor" formControlName="isInstructor" [binary]="true" />
           <div class="flex flex-col gap-0.5">
-            <label for="isInstructor" class="text-sm font-medium cursor-pointer">Register as Instructor</label>
+            <label for="isInstructor" class="text-sm font-medium cursor-pointer">Register as instructor</label>
             <span class="text-xs text-secondary-400">Instructors can create and manage sessions and clients</span>
           </div>
         </div>
+        }
 
         <!-- Submit Button -->
         <div class="flex flex-col">

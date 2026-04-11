@@ -1,4 +1,4 @@
-import type { BlogCategory } from './blog.enums';
+import type { BlogCategory, BlogLanguage } from './blog.enums';
 import { PaginatedResponse } from '../common/pagination.model';
 
 export interface BlogPost {
@@ -14,6 +14,7 @@ export interface BlogPost {
   authorRole: string;
   readTime: number;
   tags: string[];
+  language: BlogLanguage;
   isPublished: boolean;
   publishedAt: string;
   createdAt: string;

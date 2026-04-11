@@ -42,6 +42,10 @@ export class BlogService {
     return this.getAllPosts().pipe(map((response) => response.items));
   }
 
+  getById(id: string): Observable<BlogPost> {
+    return this._http.get<BlogPost>(`${this._base}/${id}`);
+  }
+
   getBySlug(slug: string): Observable<BlogPost> {
     const params = new HttpParams().set('locale', this._locale);
     return this._http.get<BlogPost>(`${this._base}/${slug}`, { params });

@@ -1,54 +1,73 @@
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthStore } from '../stores/auth.store';
 import { AuthService } from '../services/auth/auth.service';
+
+function redirectByRole(authStore: AuthStore, router: Router): UrlTree {
+  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
+  if (authStore.isAdmin()) return router.createUrlTree(['/admin/dashboard']);
+  if (authStore.isSupport()) return router.createUrlTree(['/support/dashboard']);
+  if (authStore.isWriter()) return router.createUrlTree(['/writer/dashboard']);
+  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
+  if (authStore.isUser()) return router.createUrlTree(['/user/dashboard']);
+  return router.createUrlTree(['/auth/login']);
+}
 
 export const roleRedirectGuard: CanActivateFn = () => {
   inject(AuthService);
   const authStore = inject(AuthStore);
   const router = inject(Router);
-
-  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
-  if (authStore.isUser()) return router.createUrlTree(['/user/dashboard']);
-  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
-
-  return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
 };
 
 export const superAdminGuard: CanActivateFn = () => {
-  // Ensure AuthService is constructed so checkAuthStatus() populates the store
   inject(AuthService);
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  if (authStore.isSuperAdmin()) {
-    return true;
-  }
+  if (authStore.isSuperAdmin()) return true;
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
+};
 
-  if (!authStore.isAuthenticated()) {
-    return router.createUrlTree(['/auth/login']);
-  }
+export const adminGuard: CanActivateFn = () => {
+  inject(AuthService);
+  const authStore = inject(AuthStore);
+  const router = inject(Router);
 
-  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
-  return router.createUrlTree(['/user/dashboard']);
+  if (authStore.isAdmin()) return true;
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
+};
+
+export const supportGuard: CanActivateFn = () => {
+  inject(AuthService);
+  const authStore = inject(AuthStore);
+  const router = inject(Router);
+
+  if (authStore.isSupport()) return true;
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
+};
+
+export const writerGuard: CanActivateFn = () => {
+  inject(AuthService);
+  const authStore = inject(AuthStore);
+  const router = inject(Router);
+
+  if (authStore.isWriter()) return true;
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
 };
 
 export const instructorGuard: CanActivateFn = () => {
-  // Ensure AuthService is constructed so checkAuthStatus() populates the store
   inject(AuthService);
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  if (authStore.isInstructor()) {
-    return true;
-  }
-
-  if (!authStore.isAuthenticated()) {
-    return router.createUrlTree(['/auth/login']);
-  }
-
-  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
-  return router.createUrlTree(['/user/dashboard']);
+  if (authStore.isInstructor()) return true;
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
 };
 
 export const participantGuard: CanActivateFn = () => {
@@ -56,15 +75,7 @@ export const participantGuard: CanActivateFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  if (authStore.isUser()) {
-    return true;
-  }
-
-  if (!authStore.isAuthenticated()) {
-    return router.createUrlTree(['/auth/login']);
-  }
-
-  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
-  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
-  return router.createUrlTree(['/dashboard']);
+  if (authStore.isUser()) return true;
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return redirectByRole(authStore, router);
 };

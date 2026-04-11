@@ -118,7 +118,7 @@ method(): TagSeverity {
 Do not add custom CSS for things Tailwind can handle (flex, gap, padding, font-size, font-weight, overflow, text-overflow, whitespace, cursor, width, transitions, etc.). Keep `.scss` files minimal — only add rules that genuinely cannot be expressed with utility classes.
 
 **Never use plain HTML interactive elements when a PrimeNG equivalent exists — no exceptions, even when wrapping other components or building custom UI:**
-`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `p-textarea`, `<a>` (interactive) → `p-button` with `routerLink`
+`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `<textarea pTextArea>`, `<a>` (interactive) → `p-button` with `routerLink`
 
 ### File & Naming
 
@@ -192,9 +192,26 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 
 ### PrimeNG
 
+#### Imports — standalone components over modules
+
+Prefer the **standalone component** export over the `*Module` barrel. Fall back to the module only when no standalone export exists.
+
+```ts
+// preferred
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { Dialog } from 'primeng/dialog';
+
+// fallback — only when no standalone export is available
+import { ButtonModule } from 'primeng/button';
+```
+
 - Template references: `#header`, `#body`, `#footer` (not `pTemplate`)
 - Tables: `[lazy]="true"` + `(onLazyLoad)` with `#loadingbody` (p-skeleton) and `#emptymessage`
-- Forms: `isFieldInvalid()` / `getFieldError()` pattern, `p-message` for errors
+- Forms: `isFieldInvalid()` / `getFieldError()` pattern; render errors with:
+  ```html
+  <p-message severity="error" size="small" variant="simple">{{ getFieldError('field') }}</p-message>
+  ```
 - Style via `styleClass` prop, not wrapping divs
 
 #### Full-width inputs — use `fluid` instead of `class="w-full"`
@@ -205,7 +222,7 @@ The following components support a `fluid` boolean input. Use it instead of addi
 <p-button fluid />
 <input pInputText fluid />
 <p-password fluid />
-<p-textarea fluid />           <!-- [pTextarea] directive -->
+<textarea pTextarea fluid></textarea>
 <p-multiselect fluid />
 <p-listbox fluid />
 <p-treeselect fluid />

@@ -1,0 +1,49 @@
+<p-dialog header="Invite client" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
+
+  @if (!invitationSent()) {
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <label for="inviteEmail" class="text-sm font-medium">Email address</label>
+      <input id="inviteEmail" type="email" pInputText fluid formControlName="email"
+        placeholder="Enter the client's email address" [class.ng-invalid]="isFieldInvalid('email')"
+        [class.ng-dirty]="isFieldInvalid('email')" />
+      @if (isFieldInvalid('email')) {
+      <p-message severity="error" size="small" variant="simple">{{ getFieldError('email') }}</p-message>
+      }
+    </div>
+    <div class="flex flex-col gap-2">
+      <label for="inviteMessage" class="text-sm font-medium">Message (optional)</label>
+      <textarea pTextarea id="inviteMessage" fluid formControlName="message" [rows]="3"
+        placeholder="Add a personal message..."></textarea>
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Send invitation" icon="pi pi-send" severity="primary" [loading]="inviteLoading()"
+      (onClick)="sendInvitation()" />
+  </ng-template>
+  } @else {
+  <div class="flex flex-col gap-4">
+    <p-message severity="success" variant="simple">
+      Invitation sent! Share the link below with your client.
+    </p-message>
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Referral link</label>
+      <div class="flex gap-2">
+        <input pInputText fluid [value]="referralLink()" [readonly]="true" class="text-xs" />
+        <p-button
+          [icon]="linkCopied() ? 'pi pi-check' : 'pi pi-copy'"
+          [severity]="linkCopied() ? 'success' : 'secondary'"
+          [outlined]="true"
+          (onClick)="copyLink()"
+          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'"
+          tooltipPosition="top" />
+      </div>
+    </div>
+  </div>
+  <ng-template #footer>
+    <p-button label="Done" severity="primary" (onClick)="visible.set(false)" />
+  </ng-template>
+  }
+
+</p-dialog>

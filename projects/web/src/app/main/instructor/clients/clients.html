@@ -112,7 +112,7 @@
           </td>
           <td>
             <div class="flex items-center justify-center gap-1">
-              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit Notes"
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit notes"
                 (onClick)="openNotesDialog(client)" />
               @if (client.status === 'ACTIVE') {
               <p-button icon="pi pi-inbox" [rounded]="true" [text]="true" severity="danger" pTooltip="Archive"
@@ -149,7 +149,7 @@
               <p class="text-sm text-secondary-500">
                 Start by inviting clients to build your client base.
               </p>
-              <p-button label="Invite Your First Client" icon="pi pi-user-plus" severity="primary"
+              <p-button label="Invite your first client" icon="pi pi-user-plus" severity="primary"
                 styleClass="!rounded-full mt-2" (onClick)="openInviteDialog()" />
             </div>
           </td>
@@ -158,52 +158,10 @@
     </p-table>
   </div>
 </div>
-<!-- Invite Dialog -->
-<p-dialog header="Invite client" [visible]="showInviteDialog()" (visibleChange)="showInviteDialog.set($event)"
-  [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
-  <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-2">
-      <label for="inviteEmail" class="text-sm font-medium text-secondary-700">Email Address</label>
-      <input id="inviteEmail" type="email" pInputText [(ngModel)]="inviteEmail"
-        placeholder="Enter the client's email address" />
-      <span class="text-xs text-secondary-400">The client will receive an email invitation</span>
-    </div>
-    <div class="flex flex-col gap-2">
-      <label for="inviteMessage" class="text-sm font-medium text-secondary-700">Message (optional)</label>
-      <textarea id="inviteMessage" pTextarea [(ngModel)]="inviteMessage" [rows]="3"
-        placeholder="Add a personal message..."></textarea>
-    </div>
-  </div>
-  <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="showInviteDialog.set(false)" />
-    <p-button label="Send Invitation" icon="pi pi-send" severity="primary" [loading]="inviteLoading()"
-      [disabled]="!inviteEmail.trim()" (onClick)="sendInvitation()" />
-  </ng-template>
-</p-dialog>
 
-<!-- Notes Dialog -->
-<p-dialog header="Edit Client Notes" [visible]="showNotesDialog()" (visibleChange)="showNotesDialog.set($event)"
-  [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
-  <div class="flex flex-col gap-4">
-    @if (editingClient(); as client) {
-    <div class="flex items-center gap-3 rounded-lg bg-surface-50 p-3">
-      <p-avatar [label]="initials(client)" shape="circle" styleClass="bg-primary-100 text-primary-700" />
-      <span class="font-medium text-secondary-900">{{ clientName(client) }}</span>
-    </div>
-    }
-    <div class="flex flex-col gap-2">
-      <label for="editNotes" class="text-sm font-medium text-secondary-700">Notes</label>
-      <textarea id="editNotes" pTextarea [(ngModel)]="editNotes" [rows]="5"
-        placeholder="Add private notes about this client..."></textarea>
-    </div>
-  </div>
-  <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="showNotesDialog.set(false)" />
-    <p-button label="Save Notes" icon="pi pi-check" severity="primary" [loading]="notesLoading()"
-      (onClick)="saveNotes()" />
-  </ng-template>
-</p-dialog>
+<mh-invite-client-dialog [(visible)]="showInviteDialog" (saved)="loadClients()" />
 
+<mh-edit-client-notes-dialog [(visible)]="showNotesDialog" [client]="editingClient()" (saved)="loadClients()" />
 
 <p-toast />
 <p-confirmDialog />

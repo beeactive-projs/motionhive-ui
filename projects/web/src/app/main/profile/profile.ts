@@ -23,10 +23,10 @@ import {
   UserRoles,
   TagSeverity,
 } from 'core';
-import { EditPersonalInfo } from './dialogs/edit-personal-info/edit-personal-info';
-import { EditFitnessProfile } from './dialogs/edit-fitness-profile/edit-fitness-profile';
-import { EditInstructorProfile } from './dialogs/edit-instructor-profile/edit-instructor-profile';
-import { BecomeInstructor } from '../user/dialogs/become-instructor/become-instructor';
+import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
+import { EditFitnessProfile } from './_dialogs/edit-fitness-profile/edit-fitness-profile';
+import { EditInstructorProfile } from './_dialogs/edit-instructor-profile/edit-instructor-profile';
+import { BecomeInstructor } from '../user/_dialogs/become-instructor/become-instructor';
 
 @Component({
   selector: 'mh-profile',

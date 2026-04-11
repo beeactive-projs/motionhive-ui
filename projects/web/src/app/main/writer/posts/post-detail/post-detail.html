@@ -1,0 +1,234 @@
+<div class="h-full flex flex-col gap-4">
+
+  @if (loading()) {
+  <!-- Loading skeleton -->
+  <div class="flex flex-col gap-6 animate-pulse">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 rounded-full bg-surface-200 dark:bg-surface-800"></div>
+      <div class="h-7 w-56 rounded bg-surface-200 dark:bg-surface-800"></div>
+    </div>
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div class="lg:col-span-2 flex flex-col gap-4">
+        <div class="h-12 w-full rounded bg-surface-200 dark:bg-surface-800"></div>
+        <div class="h-10 w-full rounded bg-surface-200 dark:bg-surface-800"></div>
+        <div class="h-28 w-full rounded bg-surface-200 dark:bg-surface-800"></div>
+        <div class="h-64 w-full rounded bg-surface-200 dark:bg-surface-800"></div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <div class="h-36 w-full rounded bg-surface-200 dark:bg-surface-800"></div>
+        <div class="h-28 w-full rounded bg-surface-200 dark:bg-surface-800"></div>
+      </div>
+    </div>
+  </div>
+  } @else {
+
+  <!-- Header -->
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="flex items-center gap-3">
+      <p-button icon="pi pi-arrow-left" rounded text severity="secondary" (onClick)="goBack()"
+        pTooltip="Back to posts" />
+      <div class="space-y-1">
+        <p class="text-xs uppercase text-surface-700 dark:text-surface-400">
+          {{ mode() === 'create' ? 'New post' : 'Edit post' }}
+        </p>
+        <h1 class="font-heading font-semibold text-xl md:text-2xl">
+          {{ mode() === 'create' ? 'Create post' : postTitle() }}
+        </h1>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <p-button label="Save" icon="pi pi-save" [loading]="saving()" (onClick)="save()" rounded />
+    </div>
+  </header>
+
+  <!-- Form -->
+  <form [formGroup]="form" class="flex-1 grid grid-cols-1 gap-4 lg:grid-cols-3 content-start">
+
+    <!-- Main column -->
+    <div class="lg:col-span-2 flex flex-col gap-4">
+
+      <!-- Title -->
+      <p-card>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label for="title" class="text-sm font-medium">Title <span class="text-red-500">*</span></label>
+            <input pInputText id="title" formControlName="title" fluid placeholder="Enter post title..."
+              [class.ng-invalid]="isFieldInvalid('title')" [class.ng-dirty]="isFieldInvalid('title')" />
+            @if (isFieldInvalid('title')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('title') }}</p-message>
+            }
+          </div>
+
+          <!-- Slug -->
+          <div class="flex flex-col gap-1.5">
+            <label for="slug" class="text-sm font-medium">Slug <span class="text-red-500">*</span></label>
+            <input pInputText id="slug" formControlName="slug" fluid placeholder="post-url-slug" (input)="onSlugInput()"
+              [class.ng-invalid]="isFieldInvalid('slug')" [class.ng-dirty]="isFieldInvalid('slug')" />
+            @if (isFieldInvalid('slug')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('slug') }}</p-message>
+            }
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Excerpt -->
+      <p-card>
+        <div class="flex flex-col gap-1.5">
+          <label for="excerpt" class="text-sm font-medium">Excerpt <span class="text-red-500">*</span></label>
+          <textarea pTextarea id="excerpt" formControlName="excerpt" fluid [rows]="3"
+            placeholder="A short summary shown in post listings..." [class.ng-invalid]="isFieldInvalid('excerpt')"
+            [class.ng-dirty]="isFieldInvalid('excerpt')"></textarea>
+          @if (isFieldInvalid('excerpt')) {
+          <p-message severity="error" size="small" variant="simple">{{ getFieldError('excerpt') }}</p-message>
+          }
+        </div>
+      </p-card>
+
+      <!-- Content -->
+      <p-card class="flex-1">
+        <div class="flex flex-col gap-1.5 h-full">
+          <label for="content" class="text-sm font-medium">Content <span class="text-red-500">*</span></label>
+
+          <p-editor id="content" formControlName="content" [invalid]="isFieldInvalid('content')"
+            placeholder="Write your post content here..." />
+          <!-- <textarea pTextarea id="content" formControlName="content" fluid [rows]="20"
+            placeholder="Write your post content here..." [class.ng-invalid]="isFieldInvalid('content')"
+            [class.ng-dirty]="isFieldInvalid('content')"></textarea> -->
+          @if (isFieldInvalid('content')) {
+          <p-message severity="error" size="small" variant="simple">{{ getFieldError('content') }}</p-message>
+          }
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Meta -->
+      <p-card header="Post settings">
+        <div class="flex flex-col gap-4">
+          <!-- Category -->
+          <div class="flex flex-col gap-1.5">
+            <label for="category" class="text-sm font-medium">Category <span class="text-red-500">*</span></label>
+            <p-select id="category" formControlName="category" [options]="categoryOptions" optionLabel="label"
+              optionValue="value" placeholder="Select a category" class="w-full" [appendTo]="'body'"
+              [class.ng-invalid]="isFieldInvalid('category')" [class.ng-dirty]="isFieldInvalid('category')" />
+            @if (isFieldInvalid('category')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('category') }}</p-message>
+            }
+          </div>
+
+          <!-- Read time -->
+          <div class="flex flex-col gap-1.5">
+            <label for="readTime" class="text-sm font-medium">Read time (minutes) <span
+                class="text-red-500">*</span></label>
+            <p-inputnumber id="readTime" formControlName="readTime" class="w-full" [min]="1" [max]="120"
+              [showButtons]="true" [class.ng-invalid]="isFieldInvalid('readTime')"
+              [class.ng-dirty]="isFieldInvalid('readTime')" />
+            @if (isFieldInvalid('readTime')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('readTime') }}</p-message>
+            }
+          </div>
+
+          <!-- Language -->
+          <div class="flex flex-col gap-1.5">
+            <label for="language" class="text-sm font-medium">Language <span class="text-red-500">*</span></label>
+            <p-select id="language" formControlName="language" [options]="languageOptions" optionLabel="label"
+              optionValue="value" placeholder="Select a language" class="w-full" [appendTo]="'body'"
+              [class.ng-invalid]="isFieldInvalid('language')" [class.ng-dirty]="isFieldInvalid('language')" />
+            @if (isFieldInvalid('language')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('language') }}</p-message>
+            }
+          </div>
+
+          <!-- Tags -->
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium">Tags</label>
+            <div class="flex gap-2">
+              <input pInputText fluid [(ngModel)]="formTagInput" [ngModelOptions]="{standalone: true}"
+                placeholder="Add a tag and press Enter" (keydown)="onTagKeydown($event)" />
+              <p-button icon="pi pi-plus" severity="secondary" [disabled]="!formTagInput.trim()" (onClick)="addTag()" />
+            </div>
+            @if (formTags().length > 0) {
+            <div class="flex flex-wrap gap-1">
+              @for (tag of formTags(); track tag) {
+              <p-chip [label]="tag" [removable]="true" (onRemove)="removeTag(tag)" rounded />
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Cover image -->
+      <p-card header="Cover image">
+        <div class="flex flex-col gap-3">
+          @if (form.controls.coverImage.value) {
+          <img [src]="form.controls.coverImage.value" alt="Cover image preview"
+            class="w-full h-40 object-cover rounded" />
+          }
+
+          <div class="flex flex-col gap-1.5">
+            <label for="coverImage" class="text-sm font-medium">Image URL <span class="text-red-500">*</span></label>
+            <input pInputText id="coverImage" formControlName="coverImage" fluid placeholder="https://..."
+              [class.ng-invalid]="isFieldInvalid('coverImage')" [class.ng-dirty]="isFieldInvalid('coverImage')" />
+            @if (isFieldInvalid('coverImage')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('coverImage') }}</p-message>
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-surface-500">or</span>
+            <label>
+              <input #fileInput type="file" accept="image/*" class="hidden" (change)="onImageUpload($event)" />
+              <p-button label="Upload image" icon="pi pi-upload" severity="secondary" size="small"
+                [loading]="uploading()" (onClick)="fileInput.click()" />
+            </label>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Author info -->
+      <p-card header="Author">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label for="authorName" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
+            <input pInputText id="authorName" formControlName="authorName" fluid placeholder="Author full name"
+              [class.ng-invalid]="isFieldInvalid('authorName')" [class.ng-dirty]="isFieldInvalid('authorName')" />
+            @if (isFieldInvalid('authorName')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('authorName') }}</p-message>
+            }
+          </div>
+
+          <div class="flex gap-3">
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label for="authorInitials" class="text-sm font-medium">Initials <span
+                  class="text-red-500">*</span></label>
+              <input pInputText id="authorInitials" formControlName="authorInitials" fluid placeholder="AB"
+                maxlength="3" [class.ng-invalid]="isFieldInvalid('authorInitials')"
+                [class.ng-dirty]="isFieldInvalid('authorInitials')" />
+              @if (isFieldInvalid('authorInitials')) {
+              <p-message severity="error" size="small" variant="simple">{{ getFieldError('authorInitials')
+                }}</p-message>
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="authorRole" class="text-sm font-medium">Role <span class="text-red-500">*</span></label>
+            <input pInputText id="authorRole" formControlName="authorRole" fluid placeholder="e.g. Fitness Coach"
+              [class.ng-invalid]="isFieldInvalid('authorRole')" [class.ng-dirty]="isFieldInvalid('authorRole')" />
+            @if (isFieldInvalid('authorRole')) {
+            <p-message severity="error" size="small" variant="simple">{{ getFieldError('authorRole') }}</p-message>
+            }
+          </div>
+        </div>
+      </p-card>
+
+    </div>
+  </form>
+
+  }
+</div>
+
+<p-toast />

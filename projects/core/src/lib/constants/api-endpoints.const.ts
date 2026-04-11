@@ -26,6 +26,8 @@ export const API_ENDPOINTS = {
     MY_INSTRUCTORS: '/clients/my-instructors',
     PENDING_REQUESTS: '/clients/requests/pending',
     INVITE: '/clients/invite',
+    INVITE_BY_TOKEN: (token: string) => `/clients/invite/${token}`,
+    ACCEPT_BY_TOKEN: '/clients/requests/accept-by-token',
     REQUEST: '/clients/request',
     REQUESTS: '/clients/requests',
   },

@@ -7,16 +7,12 @@ import {
   computed,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
 import { SkeletonModule } from 'primeng/skeleton';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -28,24 +24,24 @@ import {
   ClientService,
   TagSeverity,
 } from 'core';
+import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
+import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit-client-notes-dialog';
 
 @Component({
   selector: 'mh-clients',
   imports: [
     DatePipe,
-    FormsModule,
     CardModule,
     ButtonModule,
     TableModule,
     TagModule,
     AvatarModule,
     SkeletonModule,
-    DialogModule,
-    InputTextModule,
-    TextareaModule,
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    InviteClientDialog,
+    EditClientNotesDialog,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',
@@ -74,17 +70,10 @@ export class Clients implements OnInit {
     { label: 'Archived', value: 'ARCHIVED' as InstructorClientStatus },
   ];
 
-  // Invite dialog
+  // Dialog visibility
   showInviteDialog = signal(false);
-  inviteEmail = '';
-  inviteMessage = '';
-  inviteLoading = signal(false);
-
-  // Notes dialog
   showNotesDialog = signal(false);
   editingClient = signal<InstructorClient | null>(null);
-  editNotes = '';
-  notesLoading = signal(false);
 
   // Pending requests count
   pendingCount = computed(() => this.pendingRequests().length);
@@ -141,76 +130,13 @@ export class Clients implements OnInit {
     this.loadClients();
   }
 
-  // Invite
   openInviteDialog(): void {
-    this.inviteEmail = '';
-    this.inviteMessage = '';
     this.showInviteDialog.set(true);
   }
 
-  sendInvitation(): void {
-    if (!this.inviteEmail.trim()) return;
-
-    this.inviteLoading.set(true);
-    this._clientService
-      .sendInvitation({
-        email: this.inviteEmail.trim(),
-        message: this.inviteMessage.trim() || undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.inviteLoading.set(false);
-          this.showInviteDialog.set(false);
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Invitation Sent',
-            detail: 'Client invitation has been sent successfully',
-          });
-          this.loadClients();
-        },
-        error: (err) => {
-          this.inviteLoading.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to send invitation',
-          });
-        },
-      });
-  }
-
-  // Notes
   openNotesDialog(client: InstructorClient): void {
     this.editingClient.set(client);
-    this.editNotes = client.notes || '';
     this.showNotesDialog.set(true);
-  }
-
-  saveNotes(): void {
-    const client = this.editingClient();
-    if (!client) return;
-
-    this.notesLoading.set(true);
-    this._clientService.updateClient(client.clientId, { notes: this.editNotes }).subscribe({
-      next: () => {
-        this.notesLoading.set(false);
-        this.showNotesDialog.set(false);
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Notes Saved',
-          detail: 'Client notes updated successfully',
-        });
-        this.loadClients();
-      },
-      error: () => {
-        this.notesLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save notes',
-        });
-      },
-    });
   }
 
   // Archive
@@ -220,7 +146,7 @@ export class Clients implements OnInit {
       : 'this client';
     this._confirmationService.confirm({
       message: `Are you sure you want to archive ${name}?`,
-      header: 'Archive Client',
+      header: 'Archive client',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.archiveClient(client),
@@ -232,7 +158,7 @@ export class Clients implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Client Archived',
+          summary: 'Client archived',
           detail: 'Client relationship has been archived',
         });
         this.loadClients();
@@ -253,7 +179,7 @@ export class Clients implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Request Accepted',
+          summary: 'Request accepted',
           detail: 'Client request accepted successfully',
         });
         this.loadPendingRequests();
@@ -274,7 +200,7 @@ export class Clients implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'info',
-          summary: 'Request Declined',
+          summary: 'Request declined',
           detail: 'Client request has been declined',
         });
         this.loadPendingRequests();

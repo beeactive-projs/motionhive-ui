@@ -64,6 +64,13 @@ export interface CreateClientInvitation {
   message?: string;
 }
 
+export interface InvitationDetails {
+  token: string;
+  invitedEmail: string;
+  instructor: { firstName: string; lastName: string };
+  expiresAt: string;
+}
+
 export interface UpdateClientPayload {
   notes?: string;
   status?: InstructorClientStatus;
