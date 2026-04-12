@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { MyProfile, UpdateMyProfilePayload } from '../../models/profile/profile.model';
 import {
   FitnessProfile,
@@ -28,7 +28,12 @@ export class ProfileService {
   private readonly _baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PROFILE.BASE}`;
 
   getMyProfile(): Observable<MyProfile> {
-    return this._http.get<MyProfile>(`${this._baseUrl}/me`);
+    // return this._http.get<MyProfile>(`${this._baseUrl}/me`);
+    return this._http.get<any>(`${this._baseUrl}/me`).pipe(
+      map((data) => {
+        return { account: data.user, roles: data.roles, instructorProfile: data.instructor };
+      }),
+    );
   }
 
   updateMyProfile(payload: UpdateMyProfilePayload): Observable<MyProfile> {
@@ -65,15 +70,22 @@ export class ProfileService {
 
   // Measurements
   getMeasurements(): Observable<BodyMeasurement[]> {
-    return this._http.get<BodyMeasurement[]>(`${environment.apiUrl}${API_ENDPOINTS.PROFILE.MEASUREMENTS}`);
+    return this._http.get<BodyMeasurement[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.MEASUREMENTS}`,
+    );
   }
 
   addMeasurement(payload: CreateBodyMeasurementPayload): Observable<BodyMeasurement> {
-    return this._http.post<BodyMeasurement>(`${environment.apiUrl}${API_ENDPOINTS.PROFILE.MEASUREMENTS}`, payload);
+    return this._http.post<BodyMeasurement>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.MEASUREMENTS}`,
+      payload,
+    );
   }
 
   deleteMeasurement(id: string): Observable<void> {
-    return this._http.delete<void>(`${environment.apiUrl}${API_ENDPOINTS.PROFILE.MEASUREMENTS}/${id}`);
+    return this._http.delete<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.MEASUREMENTS}/${id}`,
+    );
   }
 
   // Goals
@@ -82,11 +94,17 @@ export class ProfileService {
   }
 
   createGoal(payload: CreateFitnessGoalPayload): Observable<FitnessGoal> {
-    return this._http.post<FitnessGoal>(`${environment.apiUrl}${API_ENDPOINTS.PROFILE.GOALS}`, payload);
+    return this._http.post<FitnessGoal>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.GOALS}`,
+      payload,
+    );
   }
 
   updateGoal(id: string, payload: UpdateFitnessGoalPayload): Observable<FitnessGoal> {
-    return this._http.patch<FitnessGoal>(`${environment.apiUrl}${API_ENDPOINTS.PROFILE.GOAL_BY_ID(id)}`, payload);
+    return this._http.patch<FitnessGoal>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.GOAL_BY_ID(id)}`,
+      payload,
+    );
   }
 
   deleteGoal(id: string): Observable<void> {

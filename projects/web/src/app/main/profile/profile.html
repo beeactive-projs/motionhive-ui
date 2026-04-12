@@ -109,7 +109,7 @@
   </p-card>
 
   <!-- Fitness Profile -->
-  <p-card>
+  <!-- <p-card>
     <ng-template #header>
       <div class="flex items-center justify-between px-4 pt-4">
         <div class="flex items-center gap-2">
@@ -190,111 +190,112 @@
       <p class="text-sm text-surface-500 m-0">No fitness data yet. Click the edit button to add your details.</p>
     </div>
     }
-  </p-card>
+  </p-card>-->
 </div>
 
 <!-- Instructor Profile -->
-@if (isInstructor() && hasInstructorProfile()) {
-<p-card class="mb-4">
-  <ng-template #header>
-    <div class="flex items-center justify-between px-4 pt-4">
-      <div class="flex items-center gap-2">
-        <i class="pi pi-star text-primary-600"></i>
-        <h2 class="text-base font-semibold m-0">Instructor profile</h2>
-        @if (p.instructorProfile?.isAcceptingClients) {
-        <p-tag value="Accepting clients" severity="success" icon="pi pi-check" class="text-xs!" />
-        } @else {
-        <p-tag value="Not accepting" severity="secondary" class="text-xs!" />
-        }
+<!--  @if (isInstructor() && hasInstructorProfile()) {
+  <p-card class="mb-4">
+    <ng-template #header>
+      <div class="flex items-center justify-between px-4 pt-4">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-star text-primary-600"></i>
+          <h2 class="text-base font-semibold m-0">Instructor profile</h2>
+          @if (p.instructorProfile?.isAcceptingClients) {
+          <p-tag value="Accepting clients" severity="success" icon="pi pi-check" class="text-xs!" />
+          } @else {
+          <p-tag value="Not accepting" severity="secondary" class="text-xs!" />
+          }
+        </div>
+        <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" severity="secondary"
+          (onClick)="showEditInstructor.set(true)" />
       </div>
-      <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" severity="secondary"
-        (onClick)="showEditInstructor.set(true)" />
-    </div>
-    <p-divider />
-  </ng-template>
-  @if (p.instructorProfile; as ip) {
-  <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div>
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Display name</dt>
-      <dd class="mt-1 text-sm font-medium">{{ ip.displayName || 'Not set' }}</dd>
-    </div>
-    <div>
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Years of experience</dt>
-      <dd class="mt-1 text-sm font-medium">
-        {{ ip.yearsOfExperience != null ? ip.yearsOfExperience + ' years' : 'Not set' }}
-      </dd>
-    </div>
-    <div>
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
-      <dd class="mt-1 text-sm font-medium">
-        @if (ip.locationCity || ip.locationCountry) {
-        {{ ip.locationCity }}{{ ip.locationCity && ip.locationCountry ? ', ' : '' }}{{ ip.locationCountry }}
-        } @else {
-        Not set
-        }
-      </dd>
-    </div>
-    <div class="sm:col-span-2 lg:col-span-3">
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Bio</dt>
-      <dd class="mt-1 text-sm font-medium whitespace-pre-line">{{ ip.bio || 'No bio added yet.' }}</dd>
-    </div>
-    <div class="sm:col-span-2 lg:col-span-3">
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Specializations</dt>
-      <dd class="mt-1">
-        @if (ip.specializations?.length) {
-        <div class="flex flex-wrap gap-1">
-          @for (spec of ip.specializations; track spec) {
-          <p-tag [value]="spec" severity="info" class="text-xs!" />
+      <p-divider />
+    </ng-template>
+    @if (p.instructorProfile; as ip) {
+    <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Display name</dt>
+        <dd class="mt-1 text-sm font-medium">{{ ip.displayName || 'Not set' }}</dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Years of experience</dt>
+        <dd class="mt-1 text-sm font-medium">
+          {{ ip.yearsOfExperience != null ? ip.yearsOfExperience + ' years' : 'Not set' }}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
+        <dd class="mt-1 text-sm font-medium">
+          @if (ip.locationCity || ip.locationCountry) {
+          {{ ip.locationCity }}{{ ip.locationCity && ip.locationCountry ? ', ' : '' }}{{ ip.locationCountry }}
+          } @else {
+          Not set
           }
-        </div>
-        } @else {
-        <span class="text-sm font-medium">Not set</span>
-        }
-      </dd>
-    </div>
-    @if (ip.certifications?.length) {
-    <div class="sm:col-span-2 lg:col-span-3">
-      <dt class="text-xs uppercase tracking-wide text-surface-500 mb-2">Certifications</dt>
-      <dd>
-        <div class="flex flex-wrap gap-2">
-          @for (cert of ip.certifications; track cert.name) {
-          <div class="rounded-lg bg-surface-50 dark:bg-surface-800 px-3 py-2">
-            <span class="text-sm font-medium">{{ cert.name }}</span>
-            <span class="text-xs text-surface-500"> — {{ cert.issuer }} ({{ cert.year }})</span>
+        </dd>
+      </div>
+      <div class="sm:col-span-2 lg:col-span-3">
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Bio</dt>
+        <dd class="mt-1 text-sm font-medium whitespace-pre-line">{{ ip.bio || 'No bio added yet.' }}</dd>
+      </div>
+      <div class="sm:col-span-2 lg:col-span-3">
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Specializations</dt>
+        <dd class="mt-1">
+          @if (ip.specializations?.length) {
+          <div class="flex flex-wrap gap-1">
+            @for (spec of ip.specializations; track spec) {
+            <p-tag [value]="spec" severity="info" class="text-xs!" />
+            }
           </div>
+          } @else {
+          <span class="text-sm font-medium">Not set</span>
           }
-        </div>
-      </dd>
-    </div>
+        </dd>
+      </div>
+      @if (ip.certifications?.length) {
+      <div class="sm:col-span-2 lg:col-span-3">
+        <dt class="text-xs uppercase tracking-wide text-surface-500 mb-2">Certifications</dt>
+        <dd>
+          <div class="flex flex-wrap gap-2">
+            @for (cert of ip.certifications; track cert.name) {
+            <div class="rounded-lg bg-surface-50 dark:bg-surface-800 px-3 py-2">
+              <span class="text-sm font-medium">{{ cert.name }}</span>
+              <span class="text-xs text-surface-500"> — {{ cert.issuer }} ({{ cert.year }})</span>
+            </div>
+            }
+          </div>
+        </dd>
+      </div>
+      }
+    </dl>
     }
-  </dl>
-  }
-</p-card>
-}
+  </p-card>
+  }-->
 
 <!-- Become an Instructor CTA -->
-@if (!hasInstructorProfile()) {
-<p-card>
-  <ng-template #header>
-    <div class="flex items-center gap-2 px-4 pt-4">
-      <i class="pi pi-graduation-cap text-primary-600"></i>
-      <h2 class="text-base font-semibold m-0">Instructor profile</h2>
+<!--  @if (!hasInstructorProfile()) {
+  <p-card>
+    <ng-template #header>
+      <div class="flex items-center gap-2 px-4 pt-4">
+        <i class="pi pi-graduation-cap text-primary-600"></i>
+        <h2 class="text-base font-semibold m-0">Instructor profile</h2>
+      </div>
+      <p-divider />
+    </ng-template>
+    <div class="flex flex-col items-center gap-4 py-4 text-center">
+      <p-avatar icon="pi pi-graduation-cap" size="large" shape="circle"
+        [style]="{ 'background-color': 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
+      <div>
+        <h3 class="text-lg font-semibold m-0">Become an instructor</h3>
+        <p class="text-surface-500 text-sm mt-1 mb-0">
+          Share your expertise and start training clients on MotionHive.
+        </p>
+      </div>
+      <p-button label="Become an instructor" icon="pi pi-graduation-cap"
+        (onClick)="becomeInstructorVisible.set(true)" />
     </div>
-    <p-divider />
-  </ng-template>
-  <div class="flex flex-col items-center gap-4 py-4 text-center">
-    <p-avatar icon="pi pi-graduation-cap" size="large" shape="circle"
-      [style]="{ 'background-color': 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
-    <div>
-      <h3 class="text-lg font-semibold m-0">Become an instructor</h3>
-      <p class="text-surface-500 text-sm mt-1 mb-0">
-        Share your expertise and start training clients on MotionHive.
-      </p>
-    </div>
-    <p-button label="Become an instructor" icon="pi pi-graduation-cap" (onClick)="becomeInstructorVisible.set(true)" />
-  </div>
-</p-card>
-}
+  </p-card>
+  }-->
 
 } @else {
 <!-- Error / No Profile -->
@@ -310,8 +311,6 @@
 
 <!-- Dialogs -->
 @if (profile(); as p) {
-<mh-edit-personal-info [(visible)]="showEditPersonalInfo" [profile]="p" (saved)="loadProfile()" />
-<mh-edit-fitness-profile [(visible)]="showEditFitnessProfile" [profile]="p" (saved)="loadProfile()" />
 @if (isInstructor() && hasInstructorProfile()) {
 <mh-edit-instructor-profile [(visible)]="showEditInstructor" [profile]="p" (saved)="loadProfile()" />
 }

@@ -23,7 +23,7 @@ export class Main {
     const items: MenuItem[] = [];
 
     if (isSuperAdmin) {
-      if (multiRole) items.push({ label: 'Admin', separator: true });
+      if (multiRole) items.push({ label: 'Super admin', separator: true });
       items.push(
         { label: 'Dashboard', icon: 'pi pi-objects-column', routerLink: '/super-admin/dashboard' },
         { label: 'Users', icon: 'pi pi-users', routerLink: '/super-admin/users' },
@@ -31,7 +31,7 @@ export class Main {
       );
     }
 
-    if (isWriter) {
+    if (isSuperAdmin || isWriter) {
       if (multiRole) items.push({ label: 'Writer', separator: true });
       items.push({ label: 'Posts', icon: 'pi pi-book', routerLink: '/writer/posts' });
     }
@@ -45,7 +45,7 @@ export class Main {
       );
     }
 
-    if (isUser) {
+    if (isSuperAdmin || isUser) {
       if (multiRole) items.push({ label: 'User', separator: true });
       items.push(
         { label: 'Dashboard', icon: 'pi pi-objects-column', routerLink: '/user/dashboard' },

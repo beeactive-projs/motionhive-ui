@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
 import {
-  writerGuard,
+  rolesGuard,
   instructorGuard,
   participantGuard,
   roleRedirectGuard,
   superAdminGuard,
+  UserRoles,
 } from 'core';
 
 export const mainRoutes: Routes = [
@@ -54,13 +55,13 @@ export const mainRoutes: Routes = [
       // User section
       {
         path: 'user/dashboard',
-        canActivate: [participantGuard],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.User)],
         loadComponent: () => import('./user/dashboard/dashboard').then((m) => m.Dashboard),
         title: 'Dashboard - MotionHive',
       },
       {
         path: 'user/instructors',
-        canActivate: [participantGuard],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.User)],
         loadComponent: () => import('./user/instructors/instructors').then((m) => m.Instructors),
         title: 'My Instructors - MotionHive',
       },
@@ -68,20 +69,20 @@ export const mainRoutes: Routes = [
       // Writer section
       {
         path: 'writer/posts',
-        canActivate: [writerGuard],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Writer)],
         loadComponent: () => import('./writer/posts/posts').then((m) => m.Posts),
         title: 'Posts - MotionHive',
       },
       {
         path: 'writer/posts/new',
-        canActivate: [writerGuard],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Writer)],
         loadComponent: () =>
           import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
         title: 'New Post - MotionHive',
       },
       {
         path: 'writer/posts/:slug',
-        canActivate: [writerGuard],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Writer)],
         loadComponent: () =>
           import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
         title: 'Edit Post - MotionHive',
