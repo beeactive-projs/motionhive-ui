@@ -1,4 +1,4 @@
-<p-dialog header="Create invoice" [(visible)]="visible" [modal]="true" [style]="{ width: '36rem' }">
+<p-dialog header="Create invoice" [(visible)]="visible" [modal]="true" [style]="{ width: '44rem' }">
   <form [formGroup]="form" class="flex flex-col gap-4">
 
     <!-- Recipient mode switch -->
@@ -51,30 +51,90 @@
     }
 
     <!-- Line items -->
-    <div class="flex flex-col gap-2" formArrayName="lineItems">
+    <div class="flex flex-col gap-3" formArrayName="lineItems">
       <label class="text-sm font-medium">Line items</label>
+
       @for (item of lineItems.controls; track $index; let i = $index) {
-        <div class="grid grid-cols-12 gap-2 items-start" [formGroupName]="i">
-          <div class="col-span-12 sm:col-span-6">
-            <input pInputText formControlName="description" placeholder="Description" class="w-full" />
-          </div>
-          <div class="col-span-6 sm:col-span-3">
-            <p-inputNumber formControlName="amountCents" mode="currency" currency="RON" locale="ro-RO"
-              [minFractionDigits]="2" [min]="0.01" placeholder="Amount" styleClass="w-full" [inputStyleClass]="'w-full'" />
-          </div>
-          <div class="col-span-5 sm:col-span-2">
-            <p-inputNumber formControlName="quantity" [min]="1" [showButtons]="false"
-              placeholder="Qty" styleClass="w-full" [inputStyleClass]="'w-full'" />
-          </div>
-          <div class="col-span-1 flex justify-end">
+        <div class="flex flex-col gap-3 p-3 rounded-lg border border-surface-700 bg-surface-900/40"
+          [formGroupName]="i">
+
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wide text-surface-400">Item {{ i + 1 }}</span>
             @if (lineItems.length > 1) {
               <p-button type="button" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
                 (onClick)="removeLineItem(i)" />
             }
           </div>
+
+          @if (productOptions().length > 0) {
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-surface-400">Pick from pricing (optional)</label>
+              <p-select
+                formControlName="productId"
+                [options]="productOptions()"
+                optionLabel="label"
+                optionValue="value"
+                [filter]="true"
+                filterPlaceholder="Search pricings..."
+                placeholder="Select a pricing or type custom below"
+                [showClear]="true"
+                appendTo="body"
+                class="w-full"
+                (onChange)="onProductSelect(i, $any($event).value)" />
+            </div>
+          }
+
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-surface-400">Name</label>
+            <input pInputText formControlName="name" placeholder="e.g. Single PT Session" class="w-full" />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-surface-400">Description (optional)</label>
+            <textarea pTextarea formControlName="description" rows="2"
+              placeholder="Longer details shown on the invoice"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-surface-400">Unit price (RON)</label>
+              <p-inputNumber formControlName="amount" mode="currency" currency="RON" locale="ro-RO"
+                [minFractionDigits]="2" [min]="0.5" [allowEmpty]="true" placeholder="0,00 RON"
+                (onInput)="onAmountInput(i, $event)"
+                styleClass="w-full" [inputStyleClass]="'w-full'" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-surface-400">Quantity</label>
+              <div class="flex items-center gap-1">
+                <p-button type="button" icon="pi pi-minus" [rounded]="true" [text]="true" size="small"
+                  (onClick)="decQuantity(i)" />
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  class="flex-1 text-center px-2 py-2 rounded-md bg-surface-900 border border-surface-700 text-sm tabular-nums focus:outline-none focus:border-primary-500"
+                  [value]="item.get('quantity')?.value ?? 1"
+                  (input)="onQuantityChange(i, +($any($event.target).value))" />
+                <p-button type="button" icon="pi pi-plus" [rounded]="true" [text]="true" size="small"
+                  (onClick)="incQuantity(i)" />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-surface-700/50">
+            <span class="text-xs text-surface-400">Subtotal</span>
+            <span class="text-sm font-medium tabular-nums">{{ (lineSubtotalCents(i) / 100).toFixed(2) }} RON</span>
+          </div>
         </div>
       }
+
       <p-button type="button" label="Add line item" icon="pi pi-plus" [text]="true" size="small" (onClick)="addLineItem()" />
+
+      <!-- Prominent total row -->
+      <div class="flex justify-end items-center gap-3 pt-3 mt-1 border-t border-surface-700">
+        <span class="text-sm text-surface-400">Invoice total</span>
+        <span class="text-2xl font-semibold tabular-nums">{{ (totalCents() / 100).toFixed(2) }} RON</span>
+      </div>
     </div>
 
     <!-- Due date -->
@@ -87,7 +147,7 @@
     <!-- Description -->
     <div class="flex flex-col gap-1">
       <label class="text-sm font-medium">Notes</label>
-      <textarea pTextarea formControlName="description" rows="2" placeholder="Optional notes for the client"></textarea>
+      <textarea pTextarea formControlName="notes" rows="2" placeholder="Optional notes for the client"></textarea>
     </div>
 
     <!-- Send immediately -->
@@ -100,7 +160,7 @@
   <ng-template #footer>
     <div class="flex justify-between items-center">
       <span class="text-sm text-surface-500">
-        Total: <strong>{{ (totalCents / 100).toFixed(2) }} RON</strong>
+        Total: <strong>{{ (totalCents() / 100).toFixed(2) }} RON</strong>
       </span>
       <div class="flex gap-2">
         <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="visible.set(false)" />
