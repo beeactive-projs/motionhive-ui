@@ -59,7 +59,7 @@
   <ng-template #body let-invoice>
     <tr>
       <td>
-        <a [routerLink]="['/app/coaching/invoices', invoice.id]" class="text-primary-500 hover:underline font-medium">
+        <a [routerLink]="['/coaching/invoices', invoice.id]" class="text-primary-500 hover:underline font-medium">
           {{ invoice.number || '—' }}
         </a>
       </td>

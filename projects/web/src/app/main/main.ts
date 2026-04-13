@@ -23,8 +23,8 @@ export class Main {
       {
         label: '',
         items: [
-          { label: 'Home', route: '/app/home', icon: 'pi pi-home' },
-          { label: 'Explore', route: '/app/explore', icon: 'pi pi-search' },
+          { label: 'Home', route: '/home', icon: 'pi pi-home' },
+          { label: 'Explore', route: '/explore', icon: 'pi pi-search' },
         ],
       },
     ];
@@ -35,20 +35,20 @@ export class Main {
           label: 'My coaching',
           roleRequired: 'INSTRUCTOR',
           items: [
-            { label: 'Overview', route: '/app/coaching/overview', icon: 'pi pi-th-large' },
-            { label: 'Clients', route: '/app/coaching/clients', icon: 'pi pi-users' },
-            { label: 'Sessions', route: '/app/coaching/sessions', icon: 'pi pi-calendar' },
-            { label: 'Groups', route: '/app/coaching/groups', icon: 'pi pi-sitemap' },
+            { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-th-large' },
+            { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
+            { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
+            { label: 'Groups', route: '/coaching/groups', icon: 'pi pi-sitemap' },
           ],
         },
         {
           label: 'Revenue',
           roleRequired: 'INSTRUCTOR',
           items: [
-            { label: 'Earnings', route: '/app/coaching/earnings', icon: 'pi pi-chart-line' },
-            { label: 'Invoices', route: '/app/coaching/invoices', icon: 'pi pi-file' },
-            { label: 'Pricing', route: '/app/coaching/pricing', icon: 'pi pi-tag' },
-            { label: 'Subscriptions', route: '/app/coaching/subscriptions', icon: 'pi pi-refresh' },
+            { label: 'Earnings', route: '/coaching/earnings', icon: 'pi pi-chart-line' },
+            { label: 'Invoices', route: '/coaching/invoices', icon: 'pi pi-file' },
+            { label: 'Pricing', route: '/coaching/pricing', icon: 'pi pi-tag' },
+            { label: 'Subscriptions', route: '/coaching/subscriptions', icon: 'pi pi-refresh' },
           ],
         },
       );
@@ -57,10 +57,10 @@ export class Main {
     sections.push({
       label: 'My activity',
       items: [
-        { label: 'Schedule', route: '/app/activity/schedule', icon: 'pi pi-calendar-clock' },
-        { label: 'Progress', route: '/app/activity/progress', icon: 'pi pi-chart-bar' },
-        { label: 'My invoices', route: '/app/activity/invoices', icon: 'pi pi-receipt' },
-        { label: 'My subscriptions', route: '/app/activity/subscriptions', icon: 'pi pi-sync' },
+        { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
+        { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
+        { label: 'My invoices', route: '/activity/invoices', icon: 'pi pi-receipt' },
+        { label: 'My subscriptions', route: '/activity/subscriptions', icon: 'pi pi-sync' },
       ],
     });
 
@@ -68,8 +68,8 @@ export class Main {
       sections.push({
         label: 'My space',
         items: [
-          { label: 'Dashboard', route: '/app/user/dashboard', icon: 'pi pi-objects-column' },
-          { label: 'Instructors', route: '/app/user/instructors', icon: 'pi pi-users' },
+          { label: 'Dashboard', route: '/user/dashboard', icon: 'pi pi-objects-column' },
+          { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-users' },
         ],
       });
     }
@@ -78,9 +78,9 @@ export class Main {
       sections.push({
         label: 'Admin',
         items: [
-          { label: 'Dashboard', route: '/app/super-admin/dashboard', icon: 'pi pi-objects-column' },
-          { label: 'Users', route: '/app/super-admin/users', icon: 'pi pi-users' },
-          { label: 'Groups', route: '/app/super-admin/groups', icon: 'pi pi-sitemap' },
+          { label: 'Dashboard', route: '/super-admin/dashboard', icon: 'pi pi-objects-column' },
+          { label: 'Users', route: '/super-admin/users', icon: 'pi pi-users' },
+          { label: 'Groups', route: '/super-admin/groups', icon: 'pi pi-sitemap' },
         ],
       });
     }
@@ -89,7 +89,7 @@ export class Main {
       sections.push({
         label: 'Writer',
         items: [
-          { label: 'Posts', route: '/app/writer/posts', icon: 'pi pi-book' },
+          { label: 'Posts', route: '/writer/posts', icon: 'pi pi-book' },
         ],
       });
     }

@@ -20,7 +20,7 @@ export class ProfileMenu {
   private readonly _router = inject(Router);
 
   readonly menuItems = computed(() => [
-    { label: 'Profile', icon: 'pi pi-user', routerLink: '/app/profile' },
+    { label: 'Profile', icon: 'pi pi-user', routerLink: '/profile' },
   ]);
 
   private readonly _popover = viewChild.required<Popover>('popover');

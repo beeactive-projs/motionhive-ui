@@ -86,13 +86,15 @@
 
           <div class="flex flex-col gap-1">
             <label class="text-xs text-surface-400">Name</label>
-            <input pInputText formControlName="name" placeholder="e.g. Single PT Session" class="w-full" />
+            <input type="text" formControlName="name" placeholder="e.g. Single PT Session"
+              class="p-inputtext w-full" />
           </div>
 
           <div class="flex flex-col gap-1">
             <label class="text-xs text-surface-400">Description (optional)</label>
-            <textarea pTextarea formControlName="description" rows="2"
-              placeholder="Longer details shown on the invoice"></textarea>
+            <textarea formControlName="description" rows="2"
+              placeholder="Longer details shown on the invoice"
+              class="p-inputtext w-full"></textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-3">

@@ -4,7 +4,7 @@
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
 
-    <a routerLink="/app/home" aria-label="MotionHive home">
+    <a routerLink="/home" aria-label="MotionHive home">
       <mh-logo />
     </a>
 
@@ -54,7 +54,7 @@
             severity="secondary"
             [outlined]="true"
             size="small"
-            routerLink="/app/profile"
+            routerLink="/profile"
             [queryParams]="{ tab: 'instructor' }" />
         </div>
       }

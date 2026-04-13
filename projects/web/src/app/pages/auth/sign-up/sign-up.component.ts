@@ -270,7 +270,7 @@ export class SignUpComponent {
       return;
     }
 
-    this._router.navigate(['/app/profile']);
+    this._router.navigate(['/profile']);
   }
 
   private capitalize(str: string): string {

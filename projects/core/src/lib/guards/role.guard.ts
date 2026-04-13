@@ -6,7 +6,7 @@ import { UserRole } from '../models/user/role.enums';
 
 function redirectByRole(authStore: AuthStore, router: Router): UrlTree {
   if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
-  return router.createUrlTree(['/app/home']);
+  return router.createUrlTree(['/home']);
 }
 
 export const roleRedirectGuard: CanActivateFn = () => {

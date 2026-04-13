@@ -187,7 +187,7 @@ export class LoginComponent {
       return;
     }
 
-    this._router.navigate(['/app/home']);
+    this._router.navigate(['/home']);
   }
 
   private capitalize(str: string): string {
