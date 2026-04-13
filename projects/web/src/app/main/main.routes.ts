@@ -13,6 +13,8 @@ export const mainRoutes: Routes = [
     loadComponent: () => import('./main').then((m) => m.Main),
     children: [
       // Shared — accessible to all authenticated users
+      { path: 'home', loadComponent: () => import('./home/home').then((m) => m.Home), title: 'Home - MotionHive' },
+      { path: 'explore', loadComponent: () => import('./explore/explore').then((m) => m.Explore), title: 'Explore - MotionHive' },
       {
         path: 'join/:token',
         loadComponent: () => import('./join-group/join-group').then((m) => m.JoinGroup),
@@ -24,45 +26,139 @@ export const mainRoutes: Routes = [
         title: 'My Profile - MotionHive',
       },
 
-      // Instructor section
+      // Instructor — Coaching
       {
-        path: 'dashboard',
+        path: 'coaching/overview',
         canActivate: [instructorGuard],
-        loadComponent: () => import('./instructor/dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - MotionHive',
+        loadComponent: () =>
+          import('./instructor/coaching-overview/coaching-overview').then((m) => m.CoachingOverview),
+        title: 'Coaching Overview - MotionHive',
       },
       {
-        path: 'clients',
+        path: 'coaching/clients',
         canActivate: [instructorGuard],
         loadComponent: () => import('./instructor/clients/clients').then((m) => m.Clients),
         title: 'Clients - MotionHive',
       },
       {
-        path: 'groups',
+        path: 'coaching/sessions',
+        canActivate: [instructorGuard],
+        loadComponent: () => import('./instructor/sessions/sessions').then((m) => m.Sessions),
+        title: 'Sessions - MotionHive',
+      },
+      {
+        path: 'coaching/groups',
         canActivate: [instructorGuard],
         loadComponent: () => import('./instructor/groups/groups').then((m) => m.Groups),
         title: 'Groups - MotionHive',
       },
       {
-        path: 'groups/:id',
+        path: 'coaching/groups/:id',
         canActivate: [instructorGuard],
         loadComponent: () =>
           import('./instructor/groups/group-detail/group-detail').then((m) => m.GroupDetail),
         title: 'Group Details - MotionHive',
       },
 
-      // User section
+      // Instructor — Revenue
       {
-        path: 'user/dashboard',
-        canActivate: [participantGuard],
-        loadComponent: () => import('./user/dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - MotionHive',
+        path: 'coaching/earnings',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/earnings/earnings').then((m) => m.Earnings),
+        title: 'Earnings - MotionHive',
       },
       {
-        path: 'user/instructors',
-        canActivate: [participantGuard],
-        loadComponent: () => import('./user/instructors/instructors').then((m) => m.Instructors),
-        title: 'My Instructors - MotionHive',
+        path: 'coaching/invoices',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/invoices/invoices').then((m) => m.Invoices),
+        title: 'Invoices - MotionHive',
+      },
+      {
+        path: 'coaching/invoices/:id',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/invoices/invoice-detail/invoice-detail').then(
+            (m) => m.InvoiceDetail,
+          ),
+        title: 'Invoice Details - MotionHive',
+      },
+      {
+        path: 'coaching/pricing',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/products/products').then((m) => m.Products),
+        title: 'Pricing - MotionHive',
+      },
+      {
+        path: 'coaching/subscriptions',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/subscriptions/subscriptions').then(
+            (m) => m.Subscriptions,
+          ),
+        title: 'Subscriptions - MotionHive',
+      },
+      {
+        path: 'coaching/onboarding/return',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/onboarding-return/onboarding-return').then(
+            (m) => m.OnboardingReturn,
+          ),
+        title: 'Onboarding - MotionHive',
+      },
+      {
+        path: 'coaching/onboarding/refresh',
+        canActivate: [instructorGuard],
+        loadComponent: () =>
+          import('./instructor/payments/onboarding-refresh/onboarding-refresh').then(
+            (m) => m.OnboardingRefresh,
+          ),
+        title: 'Onboarding - MotionHive',
+      },
+
+      // Activity (any authenticated user)
+      {
+        path: 'activity/schedule',
+        loadComponent: () => import('./user/schedule/schedule').then((m) => m.Schedule),
+        title: 'My Schedule - MotionHive',
+      },
+      {
+        path: 'activity/progress',
+        loadComponent: () => import('./user/progress/progress').then((m) => m.Progress),
+        title: 'My Progress - MotionHive',
+      },
+      {
+        path: 'activity/invoices',
+        loadComponent: () =>
+          import('./user/payments/my-invoices/my-invoices').then((m) => m.MyInvoices),
+        title: 'My Invoices - MotionHive',
+      },
+      {
+        path: 'activity/invoices/:id',
+        loadComponent: () =>
+          import('./user/payments/invoice-detail/invoice-detail').then(
+            (m) => m.UserInvoiceDetail,
+          ),
+        title: 'Invoice - MotionHive',
+      },
+      {
+        path: 'activity/subscriptions',
+        loadComponent: () =>
+          import('./user/payments/my-subscriptions/my-subscriptions').then(
+            (m) => m.MySubscriptions,
+          ),
+        title: 'My Subscriptions - MotionHive',
+      },
+      {
+        path: 'activity/checkout/return',
+        loadComponent: () =>
+          import('./user/payments/checkout-return/checkout-return').then(
+            (m) => m.CheckoutReturn,
+          ),
+        title: 'Payment - MotionHive',
       },
 
       // Writer section

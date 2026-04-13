@@ -1,0 +1,163 @@
+@if (!stripeOnboarded()) {
+  <p-message severity="warn" styleClass="w-full mb-4">
+    <div class="flex items-center gap-3">
+      <span>Set up payouts to start receiving money.</span>
+      <p-button label="Connect Stripe" icon="pi pi-external-link" severity="warn" [text]="true" size="small" (onClick)="startOnboarding()" />
+    </div>
+  </p-message>
+}
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+  <h1 class="font-heading font-semibold text-xl md:text-2xl m-0">Earnings</h1>
+  <p-button
+    label="Open Stripe Dashboard"
+    icon="pi pi-external-link"
+    iconPos="right"
+    severity="secondary"
+    [text]="true"
+    size="small"
+    [loading]="dashboardLoading()"
+    (onClick)="openStripeDashboard()"
+  />
+</div>
+
+<!-- KPI Cards -->
+@if (summaryLoading()) {
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    @for (_ of [1,2,3,4]; track $index) {
+      <p-card>
+        <p-skeleton width="60%" height="1rem" styleClass="mb-2" />
+        <p-skeleton width="40%" height="1.5rem" />
+      </p-card>
+    }
+  </div>
+} @else if (summary(); as s) {
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    <p-card>
+      <div class="text-sm text-surface-500 mb-1">Month to date</div>
+      <div class="font-semibold text-xl text-primary-600">{{ s.monthToDateRevenueCents | currencyRon:s.currency }}</div>
+    </p-card>
+    <p-card>
+      <div class="text-sm text-surface-500 mb-1">Available balance</div>
+      <div class="font-semibold text-xl">{{ s.availableBalanceCents | currencyRon:s.currency }}</div>
+    </p-card>
+    <p-card>
+      <div class="text-sm text-surface-500 mb-1">Pending balance</div>
+      <div class="font-semibold text-xl">{{ s.pendingBalanceCents | currencyRon:s.currency }}</div>
+    </p-card>
+    <p-card>
+      <div class="text-sm text-surface-500 mb-1">Outstanding invoices</div>
+      <div class="font-semibold text-xl text-orange-500">{{ s.outstandingInvoicesCents | currencyRon:s.currency }}</div>
+    </p-card>
+  </div>
+
+  <!-- Next payout + Top clients -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <!-- Next payout -->
+    <p-card>
+      <div class="flex items-center gap-3">
+        <i class="pi pi-calendar text-2xl text-primary-500"></i>
+        <div>
+          <div class="text-sm text-surface-500">Next payout</div>
+          <div class="font-semibold">
+            @if (s.nextPayoutDate) {
+              {{ s.nextPayoutDate | date:'dd MMM yyyy' }}
+            } @else {
+              No payout scheduled
+            }
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Top clients -->
+    <p-card>
+      <div class="text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">Top clients</div>
+      @if (s.topClients.length === 0) {
+        <p class="text-sm text-surface-500">No payments yet</p>
+      } @else {
+        <div class="flex flex-col gap-2">
+          @for (client of s.topClients; track client.clientId) {
+            <div class="flex items-center justify-between">
+              <span class="text-sm">
+                @if (client.firstName) {
+                  {{ client.firstName }} {{ client.lastName }}
+                } @else {
+                  {{ client.email }}
+                }
+              </span>
+              <span class="font-medium text-sm">{{ client.totalPaidCents | currencyRon:s.currency }}</span>
+            </div>
+          }
+        </div>
+      }
+    </p-card>
+  </div>
+}
+
+<!-- Recent payments table -->
+<h2 class="font-heading font-semibold text-lg mb-3">Payment history</h2>
+
+<p-table [value]="payments()" [lazy]="true" [paginator]="true" [rows]="paymentsRows"
+  [totalRecords]="paymentsTotalRecords()" [loading]="paymentsLoading()"
+  (onLazyLoad)="onPaymentsPageChange($event)" [rowTrackBy]="trackById"
+  styleClass="p-datatable-sm" [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} payments">
+
+  <ng-template #header>
+    <tr>
+      <th>Date</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Method</th>
+      <th>Fee</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-payment>
+    <tr>
+      <td>{{ payment.paidAt ? (payment.paidAt | date:'dd MMM yyyy, HH:mm') : (payment.createdAt | date:'dd MMM yyyy, HH:mm') }}</td>
+      <td class="font-medium">{{ payment.amountCents | currencyRon:payment.currency }}</td>
+      <td>
+        <p-tag [value]="payment.status" [severity]="paymentStatusSeverity(payment.status)" />
+        @if (payment.refundedAmountCents > 0) {
+          <span class="text-xs text-surface-500 ml-1">
+            ({{ payment.refundedAmountCents | currencyRon:payment.currency }} refunded)
+          </span>
+        }
+      </td>
+      <td class="text-sm">{{ payment.paymentMethodType || '—' }}</td>
+      <td class="text-sm text-surface-500">
+        @if (payment.applicationFeeCents > 0) {
+          {{ payment.applicationFeeCents | currencyRon:payment.currency }}
+        } @else {
+          —
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #loadingbody>
+    @for (_ of [1,2,3,4,5]; track $index) {
+      <tr>
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <td><p-skeleton width="100%" height="1rem" /></td>
+        }
+      </tr>
+    }
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="5" class="text-center py-8">
+        <div class="text-surface-500">
+          <i class="pi pi-wallet text-3xl mb-2"></i>
+          <p class="mt-2">No payments yet</p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-toast />

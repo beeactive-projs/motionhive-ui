@@ -1,0 +1,151 @@
+@if (!stripeOnboarded()) {
+  <p-message severity="warn" styleClass="w-full mb-4">
+    <div class="flex items-center gap-3">
+      <span>Set up payouts to start receiving money.</span>
+      <p-button label="Connect Stripe" icon="pi pi-external-link" severity="warn" [text]="true" size="small" (onClick)="startOnboarding()" />
+    </div>
+  </p-message>
+}
+
+<header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+  <div class="space-y-1">
+    <h1 class="font-heading font-semibold text-xl md:text-2xl">Invoices</h1>
+    <p class="text-sm text-surface-700 dark:text-surface-400">
+      Create, send, and manage invoices for your clients.
+    </p>
+  </div>
+  <p-button label="Create invoice" icon="pi pi-plus" [disabled]="!stripeOnboarded()" pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="showCreateDialog.set(true)" />
+</header>
+
+<!-- Status filter -->
+<div class="flex gap-2 mb-4">
+  @for (opt of statusOptions; track opt.label) {
+    <p-button
+      [label]="opt.label"
+      [outlined]="statusFilter() !== opt.value"
+      [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'"
+      size="small"
+      (onClick)="onStatusFilterChange(opt.value)"
+    />
+  }
+</div>
+
+<!-- Table -->
+<p-table
+  [value]="invoices()"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="rows"
+  [totalRecords]="totalRecords()"
+  [loading]="loading()"
+  [rowsPerPageOptions]="[10, 20, 50]"
+  (onLazyLoad)="onPageChange($event)"
+  [scrollable]="true"
+  scrollHeight="flex"
+  dataKey="id"
+>
+  <ng-template #header>
+    <tr>
+      <th>Invoice #</th>
+      <th>Client</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Due Date</th>
+      <th>Paid</th>
+      <th class="w-40">Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-invoice>
+    <tr>
+      <td>
+        <a [routerLink]="['/app/coaching/invoices', invoice.id]" class="text-primary-500 hover:underline font-medium">
+          {{ invoice.number || '—' }}
+        </a>
+      </td>
+      <td>
+        <div>
+          <span class="font-medium">{{ clientDisplay(invoice) }}</span>
+          @if (invoice.client?.email) {
+            <p class="text-xs text-surface-500 mt-0.5 mb-0">{{ invoice.client.email }}</p>
+          }
+        </div>
+      </td>
+      <td>{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
+      <td>
+        <p-tag [value]="invoice.status" [severity]="statusSeverity(invoice.status)" />
+        @if (invoice.paidOutOfBand) {
+          <span class="text-xs text-surface-500 ml-1">(manual)</span>
+        }
+      </td>
+      <td>{{ invoice.dueDate ? (invoice.dueDate | date:'dd/MM/yyyy') : '—' }}</td>
+      <td>{{ invoice.paidAt ? (invoice.paidAt | date:'dd/MM/yyyy') : '—' }}</td>
+      <td>
+        <div class="flex gap-1">
+          @switch (invoice.status) {
+            @case (Statuses.Draft) {
+              <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small"
+                pTooltip="Send" (onClick)="sendInvoice(invoice)" />
+              <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small"
+                severity="danger" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
+            }
+            @case (Statuses.Open) {
+              <p-button icon="pi pi-check" [rounded]="true" [text]="true" size="small"
+                severity="success" pTooltip="Mark paid" (onClick)="confirmMarkPaid(invoice)" />
+              <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small"
+                severity="danger" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
+            }
+            @case (Statuses.Paid) {
+              @if (invoice.invoicePdf) {
+                <a [href]="invoice.invoicePdf" target="_blank" rel="noopener">
+                  <p-button icon="pi pi-download" [rounded]="true" [text]="true" size="small"
+                    pTooltip="Download PDF" />
+                </a>
+              }
+            }
+          }
+          @if (invoice.hostedInvoiceUrl) {
+            <a [href]="invoice.hostedInvoiceUrl" target="_blank" rel="noopener">
+              <p-button icon="pi pi-external-link" [rounded]="true" [text]="true" size="small"
+                pTooltip="View hosted page" />
+            </a>
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #loadingbody>
+    @for (_ of [1, 2, 3, 4, 5]; track $index) {
+      <tr>
+        <td><p-skeleton width="60px" /></td>
+        <td><p-skeleton width="70%" /></td>
+        <td><p-skeleton width="80px" /></td>
+        <td><p-skeleton width="60px" height="1.5rem" /></td>
+        <td><p-skeleton width="80px" /></td>
+        <td><p-skeleton width="80px" /></td>
+        <td><p-skeleton width="80px" /></td>
+      </tr>
+    }
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="7">
+        <div class="flex flex-col items-center justify-center py-8 text-center">
+          <i class="pi pi-file text-4xl mb-3 text-surface-400"></i>
+          <p class="text-surface-900 dark:text-surface-50 m-0 font-medium">No invoices yet</p>
+          <p class="text-surface-500 text-sm mt-1 mb-3">
+            Create your first invoice to start billing clients.
+          </p>
+          <p-button label="Create invoice" icon="pi pi-plus" size="small" (onClick)="showCreateDialog.set(true)" />
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="loadInvoices()" />
+
+<p-toast />
+<p-confirmDialog />

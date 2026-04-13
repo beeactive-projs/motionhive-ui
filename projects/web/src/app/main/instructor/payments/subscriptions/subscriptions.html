@@ -1,0 +1,104 @@
+@if (!stripeOnboarded()) {
+  <p-message severity="warn" styleClass="w-full mb-4">
+    <div class="flex items-center gap-3">
+      <span>Set up payouts to start receiving money.</span>
+      <p-button label="Connect Stripe" icon="pi pi-external-link" severity="warn" [text]="true" size="small" (onClick)="startOnboarding()" />
+    </div>
+  </p-message>
+}
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+  <h1 class="font-heading font-semibold text-xl md:text-2xl m-0">Subscriptions</h1>
+  <p-button label="New subscription" icon="pi pi-plus" size="small"
+    [disabled]="!stripeOnboarded()" pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()"
+    (onClick)="showCreateDialog.set(true)" />
+</div>
+
+<!-- Status filter -->
+<div class="flex gap-2 mb-4 flex-wrap">
+  @for (opt of statusOptions; track opt.value) {
+    <p-button [label]="opt.label" size="small"
+      [outlined]="statusFilter() !== opt.value"
+      [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'"
+      (onClick)="onStatusFilterChange(opt.value)" />
+  }
+</div>
+
+<!-- Table -->
+<p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows"
+  [totalRecords]="totalRecords()" [loading]="loading()" (onLazyLoad)="onPageChange($event)"
+  [rowTrackBy]="trackById" styleClass="p-datatable-sm" [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} subscriptions">
+
+  <ng-template #header>
+    <tr>
+      <th>Client</th>
+      <th>Plan</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Current period</th>
+      <th>Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-sub>
+    <tr>
+      <td>{{ sub.clientId || '—' }}</td>
+      <td>{{ sub.productId }}</td>
+      <td>{{ sub.amountCents | currencyRon:sub.currency }}</td>
+      <td>
+        <p-tag [value]="statusLabel(sub.status)" [severity]="statusSeverity(sub.status)" />
+        @if (sub.cancelAt) {
+          <span class="text-xs text-surface-500 ml-1">cancels {{ sub.cancelAt | date:'dd MMM' }}</span>
+        }
+      </td>
+      <td>
+        <span class="text-sm">
+          {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+        </span>
+        @if (sub.trialEnd) {
+          <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
+        }
+      </td>
+      <td>
+        @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
+          <div class="flex gap-1">
+            <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
+              pTooltip="Cancel at period end" tooltipPosition="top"
+              (onClick)="confirmCancel(sub)" />
+            <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true"
+              pTooltip="Cancel immediately" tooltipPosition="top"
+              (onClick)="confirmCancelImmediately(sub)" />
+          </div>
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #loadingbody>
+    @for (_ of [1,2,3,4,5]; track $index) {
+      <tr>
+        @for (_ of [1,2,3,4,5,6]; track $index) {
+          <td><p-skeleton width="100%" height="1rem" /></td>
+        }
+      </tr>
+    }
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="6" class="text-center py-8">
+        <div class="text-surface-500">
+          <i class="pi pi-sync text-3xl mb-2"></i>
+          <p class="mt-2">No subscriptions found</p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<mh-create-subscription-dialog [(visible)]="showCreateDialog" (saved)="loadSubscriptions()" />
+
+<p-toast />
+<p-confirmDialog />

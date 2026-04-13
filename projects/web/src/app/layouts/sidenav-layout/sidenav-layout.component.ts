@@ -4,6 +4,7 @@ import {
   signal,
   computed,
   input,
+  output,
   inject,
   DestroyRef,
 } from '@angular/core';
@@ -12,8 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
-import type { MenuItem } from 'primeng/api';
-import { FeedbackService, Logo } from 'core';
+import { FeedbackService, Logo, NavItem, NavSection } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
 
@@ -38,8 +38,11 @@ export class SidenavLayoutComponent {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _lgQuery = window.matchMedia('(min-width: 1024px)');
 
-  readonly menuItems = input.required<ReadonlyArray<MenuItem>>();
+  readonly navSections = input.required<ReadonlyArray<NavSection>>();
+  readonly isInstructor = input<boolean>(false);
   readonly brandName = input('MotionHive');
+
+  readonly stripeDashboardClick = output<void>();
 
   private readonly _isDesktop = signal(this._lgQuery.matches);
 
@@ -73,6 +76,13 @@ export class SidenavLayoutComponent {
 
   openFeedback(): void {
     this._feedbackService.open();
+  }
+
+  onNavItemClick(item: NavItem, event: Event): void {
+    if (item.action === 'stripe-dashboard') {
+      event.preventDefault();
+      this.stripeDashboardClick.emit();
+    }
   }
 
   toggleSidebar(): void {

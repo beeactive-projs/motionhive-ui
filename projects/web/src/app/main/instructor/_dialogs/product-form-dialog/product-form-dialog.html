@@ -1,0 +1,67 @@
+<p-dialog [header]="dialogHeader" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }">
+  <div class="flex flex-col gap-4">
+    <!-- Name -->
+    <div class="flex flex-col gap-1">
+      <label for="productName" class="text-sm font-medium">Name</label>
+      <input id="productName" pInputText [(ngModel)]="formName" placeholder="e.g. Single PT Session" />
+    </div>
+
+    <!-- Description -->
+    <div class="flex flex-col gap-1">
+      <label for="productDesc" class="text-sm font-medium">Description</label>
+      <textarea id="productDesc" pTextarea [(ngModel)]="formDescription" rows="2"
+        placeholder="Optional description"></textarea>
+    </div>
+
+    @if (!isEditing) {
+      <!-- Type -->
+      <div class="flex flex-col gap-1">
+        <label for="productType" class="text-sm font-medium">Type</label>
+        <p-select id="productType" [(ngModel)]="formType" [options]="typeOptions"
+          optionLabel="label" optionValue="value" class="w-full" />
+      </div>
+
+      <!-- Amount -->
+      <div class="flex flex-col gap-1">
+        <label for="productAmount" class="text-sm font-medium">Price</label>
+        <p-inputNumber id="productAmount" [(ngModel)]="formAmountCents" mode="currency"
+          currency="RON" locale="ro-RO" [minFractionDigits]="2" [min]="0.01" class="w-full" />
+      </div>
+
+      @if (isSubscription) {
+        <!-- Billing interval -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label for="productInterval" class="text-sm font-medium">Billing interval</label>
+            <p-select id="productInterval" [(ngModel)]="formInterval" [options]="intervalOptions"
+              optionLabel="label" optionValue="value" class="w-full" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="productIntervalCount" class="text-sm font-medium">Every</label>
+            <p-inputNumber id="productIntervalCount" [(ngModel)]="formIntervalCount"
+              [min]="1" [max]="12" [showButtons]="true" class="w-full" />
+          </div>
+        </div>
+      }
+    } @else {
+      <!-- Edit mode: show type & price as read-only info -->
+      <p-message severity="info" variant="simple" size="small">
+        Price and type cannot be changed after creation. To change the price, deactivate this product and create a new one.
+      </p-message>
+
+      <!-- Active toggle -->
+      <div class="flex items-center gap-3">
+        <p-toggleSwitch [(ngModel)]="formIsActive" />
+        <label class="text-sm font-medium">{{ formIsActive ? 'Active' : 'Inactive' }}</label>
+      </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="visible.set(false)" />
+      <p-button [label]="isEditing ? 'Save changes' : 'Create'" icon="pi pi-check"
+        [loading]="saving()" (onClick)="save()" />
+    </div>
+  </ng-template>
+</p-dialog>

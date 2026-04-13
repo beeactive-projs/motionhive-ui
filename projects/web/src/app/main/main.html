@@ -1,3 +1,6 @@
-<mh-sidenav-layout [menuItems]="menuItems()">
+<mh-sidenav-layout
+  [navSections]="navSections()"
+  [isInstructor]="isInstructor()"
+  (stripeDashboardClick)="openStripeDashboard()">
   <router-outlet />
 </mh-sidenav-layout>

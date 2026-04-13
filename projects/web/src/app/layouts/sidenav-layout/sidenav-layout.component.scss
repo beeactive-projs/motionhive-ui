@@ -96,6 +96,30 @@ $lg: 1024px;
   }
 }
 
+// --- Become a coach CTA ---
+.become-coach-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.75rem 0.5rem 0.25rem;
+  padding: 0.75rem;
+  background: var(--p-surface-100);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-border-radius-md, 0.5rem);
+
+  &__text {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+:host-context(.dark) {
+  .become-coach-cta {
+    background: color-mix(in oklab, var(--p-secondary-800) 60%, transparent);
+  }
+}
+
 //Toolbar
 .p-toolbar {
   border-radius: 0;

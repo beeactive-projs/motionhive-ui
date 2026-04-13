@@ -1,0 +1,82 @@
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+  <h1 class="font-heading font-semibold text-xl md:text-2xl m-0">My subscriptions</h1>
+  <p-button label="Manage billing" icon="pi pi-cog" size="small" [outlined]="true"
+    [loading]="portalLoading()" (onClick)="openCustomerPortal()" />
+</div>
+
+<!-- Info card -->
+<p-card class="mb-4">
+  <div class="flex items-start gap-3">
+    <i class="pi pi-info-circle text-xl text-primary-500"></i>
+    <div class="text-sm text-surface-600 dark:text-surface-300">
+      Use <strong>Manage billing</strong> to update your payment method, view payment history, or cancel a subscription.
+    </div>
+  </div>
+</p-card>
+
+<!-- Table -->
+<p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows"
+  [totalRecords]="totalRecords()" [loading]="loading()" (onLazyLoad)="onPageChange($event)"
+  [rowTrackBy]="trackById" styleClass="p-datatable-sm" [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} subscriptions">
+
+  <ng-template #header>
+    <tr>
+      <th>Plan</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Current period</th>
+      <th>Renews</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-sub>
+    <tr>
+      <td>{{ sub.productId }}</td>
+      <td class="font-medium">{{ sub.amountCents | currencyRon:sub.currency }}</td>
+      <td>
+        <p-tag [value]="statusLabel(sub.status)" [severity]="statusSeverity(sub.status)" />
+        @if (sub.cancelAt) {
+          <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM yyyy' }}</div>
+        }
+      </td>
+      <td class="text-sm">
+        {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+        @if (sub.trialEnd) {
+          <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
+        }
+      </td>
+      <td class="text-sm">
+        @if (!sub.cancelAt) {
+          {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+        } @else {
+          —
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #loadingbody>
+    @for (_ of [1,2,3]; track $index) {
+      <tr>
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <td><p-skeleton width="100%" height="1rem" /></td>
+        }
+      </tr>
+    }
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="5" class="text-center py-8">
+        <div class="text-surface-500">
+          <i class="pi pi-sync text-3xl mb-2"></i>
+          <p class="mt-2">No subscriptions</p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-toast />

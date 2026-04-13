@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build web",
+    "build:core": "ng build core",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && xliffmerge --profile xliffmerge.json"

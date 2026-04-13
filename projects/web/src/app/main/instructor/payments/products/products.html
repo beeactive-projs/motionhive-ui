@@ -1,0 +1,122 @@
+<header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+  <div class="space-y-1">
+    <h1 class="font-heading font-semibold text-xl md:text-2xl">Pricing</h1>
+    <p class="text-sm text-surface-700 dark:text-surface-400">
+      Manage your price list — one-off services and subscription plans.
+    </p>
+  </div>
+  <p-button label="Create product" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+</header>
+
+<!-- Type filter -->
+<div class="flex gap-2 mb-4">
+  @for (opt of typeOptions; track opt.label) {
+    <p-button
+      [label]="opt.label"
+      [outlined]="typeFilter() !== opt.value"
+      [severity]="typeFilter() === opt.value ? 'primary' : 'secondary'"
+      size="small"
+      (onClick)="onTypeFilterChange(opt.value)"
+    />
+  }
+</div>
+
+<!-- Table -->
+<p-table
+  [value]="products()"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="rows"
+  [totalRecords]="totalRecords()"
+  [loading]="loading()"
+  [rowsPerPageOptions]="[10, 20, 50]"
+  (onLazyLoad)="onPageChange($event)"
+  [scrollable]="true"
+  scrollHeight="flex"
+  dataKey="id"
+>
+  <ng-template #header>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Price</th>
+      <th>Billing</th>
+      <th>Status</th>
+      <th class="w-32">Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-product>
+    <tr>
+      <td>
+        <div>
+          <span class="font-medium">{{ product.name }}</span>
+          @if (product.description) {
+            <p class="text-xs text-surface-500 mt-0.5 mb-0">{{ product.description }}</p>
+          }
+        </div>
+      </td>
+      <td>
+        <p-tag [value]="typeLabel(product.type)" [severity]="typeSeverity(product.type)" />
+      </td>
+      <td>{{ product.amountCents | currencyRon:product.currency }}</td>
+      <td>
+        @if (product.interval) {
+          {{ intervalLabel(product) }}
+        } @else {
+          <span class="text-surface-400">—</span>
+        }
+      </td>
+      <td>
+        <p-tag [value]="product.isActive ? 'Active' : 'Inactive'" [severity]="activeSeverity(product.isActive)" />
+      </td>
+      <td>
+        <div class="flex gap-1">
+          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small"
+            pTooltip="Edit" (onClick)="openEditDialog(product)" />
+          @if (product.isActive) {
+            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small"
+              severity="danger" pTooltip="Deactivate" (onClick)="confirmDeactivate(product)" />
+          }
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #loadingbody>
+    @for (_ of [1, 2, 3, 4, 5]; track $index) {
+      <tr>
+        <td><p-skeleton width="70%" /></td>
+        <td><p-skeleton width="60px" height="1.5rem" /></td>
+        <td><p-skeleton width="80px" /></td>
+        <td><p-skeleton width="60px" /></td>
+        <td><p-skeleton width="60px" height="1.5rem" /></td>
+        <td><p-skeleton width="60px" /></td>
+      </tr>
+    }
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="6">
+        <div class="flex flex-col items-center justify-center py-8 text-center">
+          <i class="pi pi-box text-4xl mb-3 text-surface-400"></i>
+          <p class="text-surface-900 dark:text-surface-50 m-0 font-medium">No products yet</p>
+          <p class="text-surface-500 text-sm mt-1 mb-3">
+            Create your first product to start sending invoices.
+          </p>
+          <p-button label="Create product" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()" />
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<mh-product-form-dialog
+  [(visible)]="showProductFormDialog"
+  [product]="editingProduct()"
+  (saved)="loadProducts()"
+/>
+
+<p-toast />
+<p-confirmDialog />

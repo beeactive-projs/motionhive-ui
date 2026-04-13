@@ -4,13 +4,8 @@ import { AuthStore } from '../stores/auth.store';
 import { AuthService } from '../services/auth/auth.service';
 
 function redirectByRole(authStore: AuthStore, router: Router): UrlTree {
-  if (authStore.isSuperAdmin()) return router.createUrlTree(['/super-admin/dashboard']);
-  if (authStore.isAdmin()) return router.createUrlTree(['/admin/dashboard']);
-  if (authStore.isSupport()) return router.createUrlTree(['/support/dashboard']);
-  if (authStore.isWriter()) return router.createUrlTree(['/writer/dashboard']);
-  if (authStore.isInstructor()) return router.createUrlTree(['/dashboard']);
-  if (authStore.isUser()) return router.createUrlTree(['/user/dashboard']);
-  return router.createUrlTree(['/auth/login']);
+  if (!authStore.isAuthenticated()) return router.createUrlTree(['/auth/login']);
+  return router.createUrlTree(['/app/home']);
 }
 
 export const roleRedirectGuard: CanActivateFn = () => {

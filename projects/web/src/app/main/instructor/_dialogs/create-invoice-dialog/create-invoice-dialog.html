@@ -1,0 +1,111 @@
+<p-dialog header="Create invoice" [(visible)]="visible" [modal]="true" [style]="{ width: '36rem' }">
+  <form [formGroup]="form" class="flex flex-col gap-4">
+
+    <!-- Recipient mode switch -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Bill to</label>
+      <div class="flex gap-2">
+        <p-button
+          type="button"
+          label="Existing client"
+          icon="pi pi-users"
+          size="small"
+          [outlined]="useManualEmail()"
+          (onClick)="onRecipientModeChange(false)" />
+        <p-button
+          type="button"
+          label="New recipient"
+          icon="pi pi-user-plus"
+          size="small"
+          [outlined]="!useManualEmail()"
+          (onClick)="onRecipientModeChange(true)" />
+      </div>
+    </div>
+
+    <!-- Existing client picker -->
+    @if (!useManualEmail()) {
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium">Client</label>
+        <p-select formControlName="clientUserId" [options]="clientOptions()" optionLabel="label"
+          optionValue="value" [filter]="true" filterPlaceholder="Search clients..."
+          placeholder="Select a client" [loading]="clientsLoading()" class="w-full" />
+      </div>
+    } @else {
+      <!-- New recipient fields -->
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium">Email</label>
+          <input pInputText formControlName="guestEmail" placeholder="client@example.com" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium">First name</label>
+            <input pInputText formControlName="guestFirstName" placeholder="First name" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium">Last name</label>
+            <input pInputText formControlName="guestLastName" placeholder="Last name (optional)" />
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Line items -->
+    <div class="flex flex-col gap-2" formArrayName="lineItems">
+      <label class="text-sm font-medium">Line items</label>
+      @for (item of lineItems.controls; track $index; let i = $index) {
+        <div class="grid grid-cols-12 gap-2 items-start" [formGroupName]="i">
+          <div class="col-span-12 sm:col-span-6">
+            <input pInputText formControlName="description" placeholder="Description" class="w-full" />
+          </div>
+          <div class="col-span-6 sm:col-span-3">
+            <p-inputNumber formControlName="amountCents" mode="currency" currency="RON" locale="ro-RO"
+              [minFractionDigits]="2" [min]="0.01" placeholder="Amount" styleClass="w-full" [inputStyleClass]="'w-full'" />
+          </div>
+          <div class="col-span-5 sm:col-span-2">
+            <p-inputNumber formControlName="quantity" [min]="1" [showButtons]="false"
+              placeholder="Qty" styleClass="w-full" [inputStyleClass]="'w-full'" />
+          </div>
+          <div class="col-span-1 flex justify-end">
+            @if (lineItems.length > 1) {
+              <p-button type="button" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+                (onClick)="removeLineItem(i)" />
+            }
+          </div>
+        </div>
+      }
+      <p-button type="button" label="Add line item" icon="pi pi-plus" [text]="true" size="small" (onClick)="addLineItem()" />
+    </div>
+
+    <!-- Due date -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium">Due date</label>
+      <p-datepicker formControlName="dueDate" [showIcon]="true" appendTo="body" class="w-full"
+        placeholder="Select due date" dateFormat="dd/mm/yy" />
+    </div>
+
+    <!-- Description -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium">Notes</label>
+      <textarea pTextarea formControlName="description" rows="2" placeholder="Optional notes for the client"></textarea>
+    </div>
+
+    <!-- Send immediately -->
+    <div class="flex items-center gap-2">
+      <p-checkbox formControlName="sendImmediately" [binary]="true" inputId="sendImm" />
+      <label for="sendImm" class="text-sm">Send invoice immediately after creation</label>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="flex justify-between items-center">
+      <span class="text-sm text-surface-500">
+        Total: <strong>{{ (totalCents / 100).toFixed(2) }} RON</strong>
+      </span>
+      <div class="flex gap-2">
+        <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="visible.set(false)" />
+        <p-button label="Create invoice" icon="pi pi-check" [loading]="saving()" (onClick)="submit()" />
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

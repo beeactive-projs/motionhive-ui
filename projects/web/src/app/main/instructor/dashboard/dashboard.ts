@@ -8,10 +8,11 @@ import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 
 import { AuthStore, WaitlistService } from 'core';
+import { StripeOnboardingCard } from '../payments/shared/stripe-onboarding-card/stripe-onboarding-card';
 
 @Component({
   selector: 'mh-dashboard',
-  imports: [RouterLink, AvatarModule, ButtonModule, CardModule, DividerModule, TagModule],
+  imports: [RouterLink, AvatarModule, ButtonModule, CardModule, DividerModule, TagModule, StripeOnboardingCard],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

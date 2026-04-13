@@ -1,0 +1,45 @@
+<p-dialog header="Create subscription" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }">
+  <div class="flex flex-col gap-4">
+    <!-- Client -->
+    <div class="flex flex-col gap-1">
+      <label for="subClient" class="text-sm font-medium">Client</label>
+      <p-select id="subClient" [(ngModel)]="formClientUserId" [options]="clientOptions()"
+        optionLabel="label" optionValue="value" placeholder="Select a client"
+        [filter]="true" filterPlaceholder="Search clients..." class="w-full" />
+    </div>
+
+    <!-- Product (subscription plans only) -->
+    <div class="flex flex-col gap-1">
+      <label for="subProduct" class="text-sm font-medium">Plan</label>
+      <p-select id="subProduct" [(ngModel)]="formProductId" [options]="productOptions()"
+        optionLabel="label" optionValue="value" placeholder="Select a subscription plan"
+        (onChange)="onProductChange($event.value)" class="w-full" />
+    </div>
+
+    @if (selectedProduct(); as prod) {
+      <div class="bg-surface-100 dark:bg-surface-800 rounded-lg p-3">
+        <div class="text-sm text-surface-500 mb-1">Plan details</div>
+        <div class="font-semibold text-lg">{{ prod.amountCents | currencyRon:prod.currency }}</div>
+        <div class="text-sm text-surface-500">
+          Billed every {{ prod.intervalCount === 1 ? '' : prod.intervalCount + ' ' }}{{ prod.interval }}{{ (prod.intervalCount ?? 1) > 1 ? 's' : '' }}
+        </div>
+      </div>
+    }
+
+    <!-- Trial days (optional) -->
+    <div class="flex flex-col gap-1">
+      <label for="subTrial" class="text-sm font-medium">Trial period (optional)</label>
+      <p-inputNumber id="subTrial" [(ngModel)]="formTrialDays" [min]="0" [max]="90"
+        suffix=" days" placeholder="No trial" class="w-full" />
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="visible.set(false)" />
+      <p-button label="Create subscription" icon="pi pi-check"
+        [loading]="saving()" [disabled]="!formClientUserId || !formProductId"
+        (onClick)="submit()" />
+    </div>
+  </ng-template>
+</p-dialog>

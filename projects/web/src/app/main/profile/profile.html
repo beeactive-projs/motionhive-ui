@@ -158,7 +158,7 @@
       <div>
         <dt class="text-xs uppercase tracking-wide text-surface-500">Goals</dt>
         <dd class="mt-1">
-          @if (p.fitnessProfile.goals.length) {
+          @if (p.fitnessProfile.goals?.length) {
           <div class="flex flex-wrap gap-1">
             @for (goal of p.fitnessProfile.goals; track goal.id) {
             <p-tag [value]="goal.title" severity="secondary" class="text-xs!" />
