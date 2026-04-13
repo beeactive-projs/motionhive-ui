@@ -90,7 +90,7 @@
           <label for="content" class="text-sm font-medium">Content <span class="text-red-500">*</span></label>
 
           <p-editor id="content" formControlName="content" [invalid]="isFieldInvalid('content')"
-            placeholder="Write your post content here..." />
+            placeholder="Write your post content here..." [style]="{ 'min-height': '320px', height: '100%' }" />
           <!-- <textarea pTextarea id="content" formControlName="content" fluid [rows]="20"
             placeholder="Write your post content here..." [class.ng-invalid]="isFieldInvalid('content')"
             [class.ng-dirty]="isFieldInvalid('content')"></textarea> -->
@@ -111,7 +111,7 @@
           <div class="flex flex-col gap-1.5">
             <label for="category" class="text-sm font-medium">Category <span class="text-red-500">*</span></label>
             <p-select id="category" formControlName="category" [options]="categoryOptions" optionLabel="label"
-              optionValue="value" placeholder="Select a category" class="w-full" [appendTo]="'body'"
+              optionValue="value" placeholder="Select a category" fluid [appendTo]="'body'"
               [class.ng-invalid]="isFieldInvalid('category')" [class.ng-dirty]="isFieldInvalid('category')" />
             @if (isFieldInvalid('category')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('category') }}</p-message>
@@ -122,9 +122,8 @@
           <div class="flex flex-col gap-1.5">
             <label for="readTime" class="text-sm font-medium">Read time (minutes) <span
                 class="text-red-500">*</span></label>
-            <p-inputnumber id="readTime" formControlName="readTime" class="w-full" [min]="1" [max]="120"
-              [showButtons]="true" [class.ng-invalid]="isFieldInvalid('readTime')"
-              [class.ng-dirty]="isFieldInvalid('readTime')" />
+            <p-inputnumber id="readTime" formControlName="readTime" fluid [min]="1" [max]="120" [showButtons]="true"
+              [class.ng-invalid]="isFieldInvalid('readTime')" [class.ng-dirty]="isFieldInvalid('readTime')" />
             @if (isFieldInvalid('readTime')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('readTime') }}</p-message>
             }
@@ -134,7 +133,7 @@
           <div class="flex flex-col gap-1.5">
             <label for="language" class="text-sm font-medium">Language <span class="text-red-500">*</span></label>
             <p-select id="language" formControlName="language" [options]="languageOptions" optionLabel="label"
-              optionValue="value" placeholder="Select a language" class="w-full" [appendTo]="'body'"
+              optionValue="value" placeholder="Select a language" fluid [appendTo]="'body'"
               [class.ng-invalid]="isFieldInvalid('language')" [class.ng-dirty]="isFieldInvalid('language')" />
             @if (isFieldInvalid('language')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('language') }}</p-message>

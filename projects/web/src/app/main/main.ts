@@ -16,6 +16,7 @@ export class Main {
   readonly isInstructor = this._authStore.isInstructor;
   readonly isSuperAdmin = this._authStore.isSuperAdmin;
   readonly isWriter = this._authStore.isWriter;
+  readonly isUser = this._authStore.isUser;
 
   readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
     const sections: NavSection[] = [
@@ -62,6 +63,16 @@ export class Main {
         { label: 'My subscriptions', route: '/app/activity/subscriptions', icon: 'pi pi-sync' },
       ],
     });
+
+    if (this.isSuperAdmin() || this.isUser()) {
+      sections.push({
+        label: 'My space',
+        items: [
+          { label: 'Dashboard', route: '/app/user/dashboard', icon: 'pi pi-objects-column' },
+          { label: 'Instructors', route: '/app/user/instructors', icon: 'pi pi-users' },
+        ],
+      });
+    }
 
     if (this.isSuperAdmin()) {
       sections.push({

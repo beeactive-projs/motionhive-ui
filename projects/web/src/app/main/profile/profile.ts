@@ -1,32 +1,23 @@
+import { DatePipe } from '@angular/common';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   computed,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { AvatarModule } from 'primeng/avatar';
-import { TagModule } from 'primeng/tag';
-import { DividerModule } from 'primeng/divider';
-import { ButtonModule } from 'primeng/button';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
+import { MyProfile, ProfileService, TagSeverity, UserRoles } from 'core';
 import { MessageService } from 'primeng/api';
-import {
-  ProfileService,
-  MyProfile,
-  GenderLabels,
-  FitnessLevelLabels,
-  UserRoles,
-  TagSeverity,
-} from 'core';
-import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
-import { EditFitnessProfile } from './_dialogs/edit-fitness-profile/edit-fitness-profile';
-import { EditInstructorProfile } from './_dialogs/edit-instructor-profile/edit-instructor-profile';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
 import { BecomeInstructor } from '../user/_dialogs/become-instructor/become-instructor';
+import { EditInstructorProfile } from './_dialogs/edit-instructor-profile/edit-instructor-profile';
 
 @Component({
   selector: 'mh-profile',
@@ -39,8 +30,6 @@ import { BecomeInstructor } from '../user/_dialogs/become-instructor/become-inst
     ButtonModule,
     SkeletonModule,
     ToastModule,
-    EditPersonalInfo,
-    EditFitnessProfile,
     EditInstructorProfile,
     BecomeInstructor,
   ],
@@ -79,15 +68,15 @@ export class Profile implements OnInit {
 
   readonly hasInstructorProfile = computed(() => this.profile()?.instructorProfile != null);
 
-  readonly formattedGender = computed(() => {
-    const gender = this.profile()?.fitnessProfile?.gender;
-    return gender ? GenderLabels[gender] : null;
-  });
+  // readonly formattedGender = computed(() => {
+  //   const gender = this.profile()?.fitnessProfile?.gender;
+  //   return gender ? GenderLabels[gender] : null;
+  // });
 
-  readonly formattedFitnessLevel = computed(() => {
-    const level = this.profile()?.fitnessProfile?.fitnessLevel;
-    return level ? FitnessLevelLabels[level] : null;
-  });
+  // readonly formattedFitnessLevel = computed(() => {
+  //   const level = this.profile()?.fitnessProfile?.fitnessLevel;
+  //   return level ? FitnessLevelLabels[level] : null;
+  // });
 
   ngOnInit(): void {
     this.loadProfile();

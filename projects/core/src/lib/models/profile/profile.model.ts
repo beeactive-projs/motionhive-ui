@@ -18,8 +18,8 @@ export interface AccountInfo {
 export interface MyProfile {
   account: AccountInfo;
   roles: string[];
-  hasInstructorProfile: boolean;
-  fitnessProfile: FitnessProfile | null;
+  // hasInstructorProfile: boolean;
+  // fitnessProfile: FitnessProfile | null;
   instructorProfile: InstructorProfile | null;
 }
 
