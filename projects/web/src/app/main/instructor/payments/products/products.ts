@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -64,7 +58,7 @@ export class Products implements OnInit {
   editingProduct = signal<Product | null>(null);
 
   ngOnInit(): void {
-    this.loadProducts();
+    // this.loadProducts();
   }
 
   loadProducts(): void {

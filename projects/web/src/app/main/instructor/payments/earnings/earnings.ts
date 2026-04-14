@@ -66,7 +66,7 @@ export class Earnings implements OnInit {
   ngOnInit(): void {
     this.loadOnboardingStatus();
     this.loadSummary();
-    this.loadPayments();
+    // this.loadPayments();
   }
 
   private loadOnboardingStatus(): void {

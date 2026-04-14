@@ -6,18 +6,15 @@
 <!-- Status filter -->
 <div class="flex gap-2 mb-4 flex-wrap">
   @for (opt of statusOptions; track opt.value) {
-    <p-button [label]="opt.label" size="small"
-      [outlined]="statusFilter() !== opt.value"
-      [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'"
-      (onClick)="onStatusFilterChange(opt.value)" />
+  <p-button [label]="opt.label" size="small" [outlined]="statusFilter() !== opt.value"
+    [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'" (onClick)="onStatusFilterChange(opt.value)" />
   }
 </div>
 
 <!-- Table -->
-<p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows"
-  [totalRecords]="totalRecords()" [loading]="loading()" (onLazyLoad)="onPageChange($event)"
-  [rowTrackBy]="trackById" styleClass="p-datatable-sm" [showCurrentPageReport]="true"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices">
+<p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+  [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowTrackBy]="trackById" size="small"
+  [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices">
 
   <ng-template #header>
     <tr>
@@ -51,11 +48,11 @@
 
   <ng-template #loadingbody>
     @for (_ of [1,2,3,4,5]; track $index) {
-      <tr>
-        @for (_ of [1,2,3,4,5,6]; track $index) {
-          <td><p-skeleton width="100%" height="1rem" /></td>
-        }
-      </tr>
+    <tr>
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+      <td><p-skeleton width="100%" height="1rem" /></td>
+      }
+    </tr>
     }
   </ng-template>
 

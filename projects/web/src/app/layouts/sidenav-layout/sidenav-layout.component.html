@@ -10,54 +10,45 @@
 
     <nav class="flex-1">
       @for (section of navSections(); track section.label) {
-        @if (section.label) {
-          <div class="nav-section-label px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-surface-400">
-            {{ section.label }}
-          </div>
-        }
-        <ul class="flex flex-col gap-1 mb-2">
-          @for (item of section.items; track item.label) {
-            <li>
-              @if (item.action === 'stripe-dashboard') {
-                <a href="#" (click)="onNavItemClick(item, $event)" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+      @if (section.label) {
+      <div class="nav-section-label px-3 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-surface-400">
+        {{ section.label }}
+      </div>
+      }
+      <ul class="flex flex-col gap-1 mb-2">
+        @for (item of section.items; track item.label) {
+        <li>
+          @if (item.action === 'stripe-dashboard') {
+          <a href="#" (click)="onNavItemClick(item, $event)" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
-                  <i [class]="item.icon + ' text-base'"></i>
-                  <span class="flex-1">{{ item.label }}</span>
-                </a>
-              } @else if (item.external) {
-                <a [href]="item.route" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+            <i [class]="item.icon + ' text-base'"></i>
+            <span class="flex-1">{{ item.label }}</span>
+          </a>
+          } @else if (item.external) {
+          <a [href]="item.route" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
-                  <i [class]="item.icon + ' text-base'"></i>
-                  <span class="flex-1">{{ item.label }}</span>
-                </a>
-              } @else {
-                <a [routerLink]="item.route"
-                  routerLinkActive="bg-primary-500 text-primary-contrast font-semibold"
-                  class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+            <i [class]="item.icon + ' text-base'"></i>
+            <span class="flex-1">{{ item.label }}</span>
+          </a>
+          } @else {
+          <a [routerLink]="item.route" routerLinkActive="bg-primary-500 text-primary-contrast font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
-                  <i [class]="item.icon + ' text-base'"></i>
-                  {{ item.label }}
-                </a>
-              }
-            </li>
+            <i [class]="item.icon + ' text-base'"></i>
+            {{ item.label }}
+          </a>
           }
-        </ul>
+        </li>
+        }
+      </ul>
       }
 
-      @if (!isInstructor()) {
-        <div class="become-coach-cta">
-          <p class="become-coach-cta__text">Start coaching on MotionHive</p>
-          <p-button
-            label="Become a coach"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            severity="secondary"
-            [outlined]="true"
-            size="small"
-            routerLink="/profile"
-            [queryParams]="{ tab: 'instructor' }" />
-        </div>
-      }
+      <!-- @if (!isInstructor()) {
+      <div class="become-coach-cta">
+        <p class="become-coach-cta__text">Start coaching on MotionHive</p>
+        <p-button label="Become a coach" icon="pi pi-arrow-right" iconPos="right" severity="secondary" [outlined]="true"
+          size="small" routerLink="/profile" [queryParams]="{ tab: 'instructor' }" />
+      </div>
+      } -->
     </nav>
 
     <p-button label="Share feedback" icon="pi pi-comment" text fluid styleClass="justify-start"

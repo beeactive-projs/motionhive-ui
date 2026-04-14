@@ -11,5 +11,4 @@ export interface NavItem {
 export interface NavSection {
   label: string;
   items: NavItem[];
-  roleRequired?: UserRole;
 }

@@ -54,7 +54,7 @@ export class Posts implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadPosts();
+    // this.loadPosts();
   }
 
   loadPosts(): void {

@@ -1,8 +1,8 @@
 <!-- Header -->
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
   <h1 class="font-heading font-semibold text-xl md:text-2xl m-0">My subscriptions</h1>
-  <p-button label="Manage billing" icon="pi pi-cog" size="small" [outlined]="true"
-    [loading]="portalLoading()" (onClick)="openCustomerPortal()" />
+  <p-button label="Manage billing" icon="pi pi-cog" size="small" [outlined]="true" [loading]="portalLoading()"
+    (onClick)="openCustomerPortal()" />
 </div>
 
 <!-- Info card -->
@@ -16,10 +16,9 @@
 </p-card>
 
 <!-- Table -->
-<p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows"
-  [totalRecords]="totalRecords()" [loading]="loading()" (onLazyLoad)="onPageChange($event)"
-  [rowTrackBy]="trackById" styleClass="p-datatable-sm" [showCurrentPageReport]="true"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} subscriptions">
+<p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+  [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowTrackBy]="trackById" size="small"
+  [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} subscriptions">
 
   <ng-template #header>
     <tr>
@@ -38,20 +37,20 @@
       <td>
         <p-tag [value]="statusLabel(sub.status)" [severity]="statusSeverity(sub.status)" />
         @if (sub.cancelAt) {
-          <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM yyyy' }}</div>
+        <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM yyyy' }}</div>
         }
       </td>
       <td class="text-sm">
         {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
         @if (sub.trialEnd) {
-          <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
+        <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
         }
       </td>
       <td class="text-sm">
         @if (!sub.cancelAt) {
-          {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+        {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
         } @else {
-          —
+        —
         }
       </td>
     </tr>
@@ -59,11 +58,11 @@
 
   <ng-template #loadingbody>
     @for (_ of [1,2,3]; track $index) {
-      <tr>
-        @for (_ of [1,2,3,4,5]; track $index) {
-          <td><p-skeleton width="100%" height="1rem" /></td>
-        }
-      </tr>
+    <tr>
+      @for (_ of [1,2,3,4,5]; track $index) {
+      <td><p-skeleton width="100%" height="1rem" /></td>
+      }
+    </tr>
     }
   </ng-template>
 

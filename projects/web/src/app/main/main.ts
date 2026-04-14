@@ -33,7 +33,6 @@ export class Main {
       sections.push(
         {
           label: 'My coaching',
-          roleRequired: 'INSTRUCTOR',
           items: [
             { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-th-large' },
             { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
@@ -43,7 +42,6 @@ export class Main {
         },
         {
           label: 'Revenue',
-          roleRequired: 'INSTRUCTOR',
           items: [
             { label: 'Earnings', route: '/coaching/earnings', icon: 'pi pi-chart-line' },
             { label: 'Invoices', route: '/coaching/invoices', icon: 'pi pi-file' },
@@ -64,15 +62,13 @@ export class Main {
       ],
     });
 
-    if (this.isSuperAdmin() || this.isUser()) {
-      sections.push({
-        label: 'My space',
-        items: [
-          { label: 'Dashboard', route: '/user/dashboard', icon: 'pi pi-objects-column' },
-          { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-users' },
-        ],
-      });
-    }
+    sections.push({
+      label: 'My space',
+      items: [
+        { label: 'Dashboard', route: '/user/dashboard', icon: 'pi pi-objects-column' },
+        { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-users' },
+      ],
+    });
 
     if (this.isSuperAdmin()) {
       sections.push({
@@ -88,9 +84,7 @@ export class Main {
     if (this.isWriter()) {
       sections.push({
         label: 'Writer',
-        items: [
-          { label: 'Posts', route: '/writer/posts', icon: 'pi pi-book' },
-        ],
+        items: [{ label: 'Posts', route: '/writer/posts', icon: 'pi pi-book' }],
       });
     }
 
