@@ -351,31 +351,57 @@ export const surfaceLight: SurfaceScale = {
 
 /* ─────────────────────────────────────────────
    Surface — Dark
-   Derived from the dark dashboard:
-     0    → deepest background — content area (#0b1017)
-     50   → sidebar / topbar background (#0f1720)
-     100  → card / stat-card background (#111c2a)
-     200  → schedule item / input background (#162030)
-     300  → border / divider (#1c2a3a)
-     400  → chart-bar-bg / progress-bg (#1c2a3a — same as 300; distinct slot)
-     500  → muted icon / placeholder (#4a5e75)
-     600  → table-head / sub text (#5a6e84)
-     700  → sidebar nav default text (#7a8a9e)
-     800  → table row text / hover text (#c8d5e2)
-     900  → card title / heading text (#e2e8f0)
-     950  → brightest text — logo / stat values (#f0f4f8)
+   Derived from the secondary (Royal Navy) palette
+   so dark-mode surfaces feel on-brand.
+   PrimeNG dark mode flips the scale: 0 is the
+   lightest (text) and 950 is the darkest (bg).
+     0    → brightest text (#f0f4f8  = secondary.50)
+     50   → heading text  (#d9e2ec  = secondary.100)
+     100  → body text     (#bcccdc  = secondary.200)
+     200  → muted text    (#9fb3c8  = secondary.300)
+     300  → placeholder   (#829ab1  = secondary.400)
+     400  → mid-tone      (#2d4e72  = between 400/500)
+     500  → dark mid-tone (#1e3a5f  = secondary.500)
+     600  → input bg      (#1a3354  = secondary.600)
+     700  → card bg       (#162b48  = secondary.700)
+     800  → sidebar bg    (#12233d  = secondary.800)
+     900  → page bg       (#0e1b31  = secondary.900)
+     950  → deepest bg    (#0a1323  = secondary.950)
    ───────────────────────────────────────────── */
 export const surfaceDark: SurfaceScale = {
   0: '#f0f4f8',
-  50: '#e2e8f0',
-  100: '#c8d5e2',
-  200: '#7a8a9e',
-  300: '#5a6e84',
-  400: '#4a5e75',
-  500: '#293548',
-  600: '#1c2a3a',
-  700: '#162030',
-  800: '#111c2a',
-  900: '#0f1720',
-  950: '#0b1017',
+  // 50: '#e2e8f0',
+  // 100: '#c8d5e2',
+  // 200: '#7a8a9e',
+  // 300: '#5a6e84',
+  // 400: '#4a5e75',
+  // 500: '#293548',
+  // 600: '#1c2a3a',
+  // 700: '#162030',
+  // 800: '#111c2a',
+  // 900: '#0f1720',
+  // 950: '#0b1017',
+
+  // 50: '#d9e2ec',
+  // 100: '#bcccdc',
+  // 200: '#9fb3c8',
+  // 300: '#829ab1',
+  // 400: '#2d4e72',
+  // 500: '#1e3a5f',
+  // 600: '#1a3354',
+  // 700: '#162b48',
+  // 800: '#12233d',
+  // 900: '#0e1b31',
+  // 950: '#0a1323',
+  50: ' #f8fafc', //'#eef4fa',
+  100: ' #f1f5f9', //'#dce9f5',
+  200: ' #e2e8f0', //'#b5d2ec',
+  300: ' #cbd5e1', //'#88b3dd',
+  400: ' #94a3b8', //'#5a92cc',
+  500: ' #64748b', //'#3672b4',
+  600: ' #475569', //'#2e5d96',
+  700: ' #334155', //'#264b7a',
+  800: ' #1e293b', //'#1e3a5f',
+  900: ' #0f172a', //'#0f1720',
+  950: ' #020617', //'#080e16',
 };

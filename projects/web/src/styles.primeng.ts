@@ -6,7 +6,6 @@ import {
   info,
   warning,
   danger,
-  surfaceLight,
   surfaceDark,
   secondary,
 } from './theme-colors';
@@ -68,7 +67,7 @@ export const MotionHiveLara = definePreset(Lara, {
           // color: '{primary.400}',
           // focusColor: '{primary.300}',
         },
-        //surface: surfaceDark,
+        surface: surfaceDark,
       },
     },
   },

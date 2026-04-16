@@ -77,7 +77,7 @@ export class Subscriptions implements OnInit {
 
   ngOnInit(): void {
     this.loadOnboardingStatus();
-    this.loadSubscriptions();
+    // this.loadSubscriptions();
   }
 
   private loadOnboardingStatus(): void {

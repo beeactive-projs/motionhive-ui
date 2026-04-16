@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -78,7 +72,7 @@ export class Invoices implements OnInit {
 
   ngOnInit(): void {
     this.loadOnboardingStatus();
-    this.loadInvoices();
+    // this.loadInvoices();
   }
 
   private loadOnboardingStatus(): void {

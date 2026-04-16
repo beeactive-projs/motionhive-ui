@@ -1,15 +1,6 @@
 import Lara from '@primeuix/themes/lara';
 import { definePreset } from '@primeuix/themes';
-import {
-  primary,
-  success,
-  info,
-  warning,
-  danger,
-  surfaceLight,
-  surfaceDark,
-  secondary,
-} from './theme-colors';
+import { primary, success, info, warning, danger, surfaceDark, secondary } from './theme-colors';
 
 export const MotionHiveLara = definePreset(Lara, {
   primitive: {},
@@ -68,7 +59,7 @@ export const MotionHiveLara = definePreset(Lara, {
           // color: '{primary.400}',
           // focusColor: '{primary.300}',
         },
-        //surface: surfaceDark,
+        surface: surfaceDark,
       },
     },
   },
