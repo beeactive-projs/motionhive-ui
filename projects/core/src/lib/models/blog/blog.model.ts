@@ -12,6 +12,7 @@ export interface BlogPost {
   authorName: string;
   authorInitials: string;
   authorRole: string;
+  authorUserId: string | null;
   readTime: number;
   tags: string[];
   language: BlogLanguage;
@@ -33,6 +34,8 @@ export interface CreateBlogPostPayload {
   authorRole: string;
   readTime: number;
   tags: string[];
+  language: BlogLanguage;
+  isPublished?: boolean;
 }
 
 export type UpdateBlogPostPayload = Partial<CreateBlogPostPayload>;

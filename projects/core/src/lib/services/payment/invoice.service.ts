@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
   CreateInvoicePayload,
   Invoice,
+  InvoiceLineItemDetail,
   InvoiceListParams,
   InvoiceListResponse,
 } from '../../models/payment/invoice.model';
@@ -54,6 +55,12 @@ export class InvoiceService {
     return this._http.post<Invoice>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.INVOICE_MARK_PAID(id)}`,
       {},
+    );
+  }
+
+  getLineItems(id: string): Observable<InvoiceLineItemDetail[]> {
+    return this._http.get<InvoiceLineItemDetail[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.INVOICE_LINE_ITEMS(id)}`,
     );
   }
 }

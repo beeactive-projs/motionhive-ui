@@ -177,20 +177,20 @@ export const mainRoutes: Routes = [
       // Writer section
       {
         path: 'writer/posts',
-        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Writer)],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Admin, UserRoles.Writer)],
         loadComponent: () => import('./writer/posts/posts').then((m) => m.Posts),
         title: 'Posts - MotionHive',
       },
       {
         path: 'writer/posts/new',
-        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Writer)],
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Admin, UserRoles.Writer)],
         loadComponent: () =>
           import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
         title: 'New Post - MotionHive',
       },
       {
-        path: 'writer/posts/:slug',
-        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Writer)],
+        path: 'writer/posts/:id',
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Admin, UserRoles.Writer)],
         loadComponent: () =>
           import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
         title: 'Edit Post - MotionHive',

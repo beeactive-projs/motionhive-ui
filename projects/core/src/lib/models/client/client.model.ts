@@ -47,7 +47,8 @@ export interface InstructorClient {
 export interface ClientRequest {
   id: string;
   fromUserId: string;
-  toUserId: string;
+  toUserId: string | null;
+  invitedEmail: string | null;
   type: ClientRequestType;
   message: string | null;
   status: ClientRequestStatus;

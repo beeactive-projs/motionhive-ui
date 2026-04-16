@@ -44,6 +44,12 @@ export class ClientService {
     );
   }
 
+  getSentInvites(): Observable<ClientRequest[]> {
+    return this._http.get<ClientRequest[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.SENT_INVITES}`,
+    );
+  }
+
   sendInvitation(
     dto: CreateClientInvitation,
   ): Observable<{ message: string; request: ClientRequest }> {

@@ -11,17 +11,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  AuthStore,
   BLOG_CATEGORY_OPTIONS,
   BLOG_LANGUAGE_OPTIONS,
-  BlogCategories,
   BlogCategory,
   BlogLanguage,
-  BlogLanguages,
   BlogPost,
   BlogService,
   CreateBlogPostPayload,
 } from 'core';
 import { MessageService } from 'primeng/api';
+import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Chip } from 'primeng/chip';
@@ -31,8 +31,17 @@ import { Message } from 'primeng/message';
 import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Tooltip } from 'primeng/tooltip';
 import { EditorModule } from 'primeng/editor';
+
+const SUGGESTED_TAGS = [
+  'fitness', 'wellness', 'nutrition', 'workout', 'health',
+  'strength', 'cardio', 'yoga', 'pilates', 'running',
+  'mental health', 'recovery', 'stretching', 'mobility',
+  'weight loss', 'muscle building', 'beginners', 'tips',
+  'community', 'motivation', 'coaching', 'habits',
+];
 
 @Component({
   selector: 'mh-post-detail',
@@ -47,9 +56,11 @@ import { EditorModule } from 'primeng/editor';
     InputNumber,
     Select,
     Toast,
+    ToggleSwitch,
     Tooltip,
     Chip,
     EditorModule,
+    AutoComplete,
   ],
   providers: [MessageService],
   templateUrl: './post-detail.html',
@@ -59,6 +70,7 @@ import { EditorModule } from 'primeng/editor';
 export class PostDetail implements OnInit {
   private readonly _blogService = inject(BlogService);
   private readonly _messageService = inject(MessageService);
+  private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _formBuilder = inject(FormBuilder);
@@ -67,6 +79,7 @@ export class PostDetail implements OnInit {
   loading = signal(true);
   saving = signal(false);
   uploading = signal(false);
+  showSlug = signal(false);
 
   private _postId = signal<string | null>(null);
   mode = computed<'create' | 'edit'>(() => (this._postId() ? 'edit' : 'create'));
@@ -76,30 +89,34 @@ export class PostDetail implements OnInit {
 
   formTagInput = '';
   formTags = signal<string[]>([]);
+  filteredTagSuggestions = signal<string[]>([]);
 
-  readonly categoryOptions = BLOG_CATEGORY_OPTIONS;
-  readonly languageOptions =  BLOG_LANGUAGE_OPTIONS;
+  categorySuggestions = signal<string[]>([]);
+  private readonly _allCategories = BLOG_CATEGORY_OPTIONS.map((o) => o.value as string);
+
+  readonly languageOptions = BLOG_LANGUAGE_OPTIONS;
 
   form = this._formBuilder.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
     excerpt: ['', [Validators.required, Validators.maxLength(500)]],
     content: ['', [Validators.required]],
-    category: [null as BlogCategory | null, [Validators.required]],
+    category: ['' as string, [Validators.required]],
     language: [null as BlogLanguage | null, [Validators.required]],
     coverImage: ['', [Validators.required]],
     authorName: ['', [Validators.required]],
     authorInitials: ['', [Validators.required, Validators.maxLength(3)]],
     authorRole: ['', [Validators.required]],
     readTime: [5, [Validators.required, Validators.min(1)]],
+    isPublished: [false],
   });
 
   ngOnInit(): void {
-    const slug = this._route.snapshot.paramMap.get('slug');
-    if (slug) {
-      // this._postId.set(slug);
-      this.loadPost(slug);
+    const id = this._route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadPost(id);
     } else {
+      this.prefillAuthor();
       this.loading.set(false);
     }
 
@@ -112,25 +129,63 @@ export class PostDetail implements OnInit {
       });
   }
 
+  private prefillAuthor(): void {
+    const firstName = this._authStore.user()?.firstName ?? '';
+    const lastName = this._authStore.user()?.lastName ?? '';
+    const name = `${firstName} ${lastName}`.trim();
+    const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+
+    if (name) this.form.controls.authorName.setValue(name);
+    if (initials.length > 0) this.form.controls.authorInitials.setValue(initials);
+  }
+
+  toggleSlug(): void {
+    this.showSlug.update((v) => !v);
+  }
+
   onSlugInput(): void {
     this._slugTouched = true;
   }
 
-  private loadPost(slug: string): void {
-    this._blogService.getBySlug(slug).subscribe({
+  onCategorySearch(event: AutoCompleteCompleteEvent): void {
+    const query = (event.query ?? '').toLowerCase();
+    this.categorySuggestions.set(
+      this._allCategories.filter((c) => c.toLowerCase().includes(query)),
+    );
+  }
+
+  onTagSearch(event: AutoCompleteCompleteEvent): void {
+    const query = (event.query ?? '').toLowerCase();
+    const existing = this.formTags();
+    this.filteredTagSuggestions.set(
+      SUGGESTED_TAGS.filter((t) => t.includes(query) && !existing.includes(t)),
+    );
+  }
+
+  onTagSelect(event: { value: string }): void {
+    const tag = (event.value ?? '').trim();
+    if (tag && !this.formTags().includes(tag)) {
+      this.formTags.update((tags) => [...tags, tag]);
+    }
+    this.formTagInput = '';
+  }
+
+  private loadPost(id: string): void {
+    this._blogService.getForEdit(id).subscribe({
       next: (post) => {
         this._postId.set(post.id);
         this.postTitle.set(post.title);
+        this.showSlug.set(true);
         this.patchForm(post);
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load post',
-        });
+        const detail =
+          err?.status === 403
+            ? 'You can only edit your own posts'
+            : 'Failed to load post';
+        this._messageService.add({ severity: 'error', summary: 'Error', detail });
       },
     });
   }
@@ -149,6 +204,7 @@ export class PostDetail implements OnInit {
       authorInitials: post.authorInitials,
       authorRole: post.authorRole,
       readTime: post.readTime,
+      isPublished: post.isPublished,
     });
     this.formTags.set(post.tags ?? []);
   }
@@ -165,13 +221,15 @@ export class PostDetail implements OnInit {
       slug: raw.slug!,
       excerpt: raw.excerpt!,
       content: raw.content!,
-      category: raw.category!,
+      category: raw.category! as BlogCategory,
+      language: raw.language!,
       coverImage: raw.coverImage!,
       authorName: raw.authorName!,
       authorInitials: raw.authorInitials!,
       authorRole: raw.authorRole!,
       readTime: raw.readTime!,
       tags: this.formTags(),
+      isPublished: raw.isPublished ?? false,
     };
 
     this.saving.set(true);
@@ -191,19 +249,19 @@ export class PostDetail implements OnInit {
               : 'Your post has been updated successfully',
         });
         if (this.mode() === 'create') {
+          this._postId.set(post.id);
           this._router.navigate(['/writer/posts', post.id]);
         } else {
           this.postTitle.set(post.title);
-          this._postId.set(post.id);
         }
       },
-      error: () => {
+      error: (err) => {
         this.saving.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save post',
-        });
+        const detail =
+          err?.status === 403
+            ? 'You can only edit your own posts'
+            : 'Failed to save post';
+        this._messageService.add({ severity: 'error', summary: 'Error', detail });
       },
     });
   }
@@ -245,6 +303,17 @@ export class PostDetail implements OnInit {
 
   removeTag(tag: string): void {
     this.formTags.update((tags) => tags.filter((t) => t !== tag));
+  }
+
+  addSuggestedTag(tag: string): void {
+    if (!this.formTags().includes(tag)) {
+      this.formTags.update((tags) => [...tags, tag]);
+    }
+  }
+
+  get availableSuggestions(): string[] {
+    const existing = this.formTags();
+    return SUGGESTED_TAGS.filter((t) => !existing.includes(t)).slice(0, 8);
   }
 
   goBack(): void {

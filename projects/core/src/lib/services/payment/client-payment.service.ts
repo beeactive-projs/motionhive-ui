@@ -5,15 +5,12 @@ import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
   Invoice,
+  InvoiceLineItemDetail,
   InvoiceListParams,
   InvoiceListResponse,
   PayInvoiceConsent,
   PayInvoiceResponse,
 } from '../../models/payment/invoice.model';
-import {
-  PaymentListParams,
-  PaymentListResponse,
-} from '../../models/payment/payment.model';
 import {
   SubscriptionListParams,
   SubscriptionListResponse,
@@ -39,8 +36,9 @@ export class ClientPaymentService {
   }
 
   getPortalLink(): Observable<CustomerPortalLinkResponse> {
-    return this._http.get<CustomerPortalLinkResponse>(
+    return this._http.post<CustomerPortalLinkResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.CUSTOMER_PORTAL_LINK}`,
+      {},
     );
   }
 
@@ -70,6 +68,12 @@ export class ClientPaymentService {
     );
   }
 
+  getMyInvoiceLineItems(id: string): Observable<InvoiceLineItemDetail[]> {
+    return this._http.get<InvoiceLineItemDetail[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_INVOICE_LINE_ITEMS(id)}`,
+    );
+  }
+
   getMySubscriptions(
     params: SubscriptionListParams = {},
   ): Observable<SubscriptionListResponse> {
@@ -83,16 +87,4 @@ export class ClientPaymentService {
     );
   }
 
-  getMyPaymentHistory(params: PaymentListParams = {}): Observable<PaymentListResponse> {
-    let httpParams = new HttpParams();
-    if (params.status) httpParams = httpParams.set('status', params.status);
-    if (params.fromDate) httpParams = httpParams.set('fromDate', params.fromDate);
-    if (params.toDate) httpParams = httpParams.set('toDate', params.toDate);
-    if (params.page) httpParams = httpParams.set('page', params.page.toString());
-    if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    return this._http.get<PaymentListResponse>(
-      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_PAYMENT_HISTORY}`,
-      { params: httpParams },
-    );
-  }
 }

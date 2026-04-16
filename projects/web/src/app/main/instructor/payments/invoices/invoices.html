@@ -90,6 +90,8 @@
                 severity="danger" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
             }
             @case (Statuses.Open) {
+              <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small"
+                pTooltip="Resend email" (onClick)="sendInvoice(invoice)" />
               <p-button icon="pi pi-check" [rounded]="true" [text]="true" size="small"
                 severity="success" pTooltip="Mark paid" (onClick)="confirmMarkPaid(invoice)" />
               <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small"

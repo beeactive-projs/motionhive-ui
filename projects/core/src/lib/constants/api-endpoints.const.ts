@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
     MY_INSTRUCTORS: '/clients/my-instructors',
     PENDING_REQUESTS: '/clients/requests/pending',
     INVITE: '/clients/invite',
+    SENT_INVITES: '/clients/invites',
     INVITE_BY_TOKEN: (token: string) => `/clients/invite/${token}`,
     ACCEPT_BY_TOKEN: '/clients/requests/accept-by-token',
     REQUEST: '/clients/request',
@@ -39,6 +40,9 @@ export const API_ENDPOINTS = {
   },
   BLOG: {
     BASE: '/blog',
+    ADMIN_LIST: '/blog/admin',
+    ADMIN_BY_ID: (id: string) => `/blog/admin/${id}`,
+    BY_ID: (id: string) => `/blog/${id}`,
     UPLOAD_IMAGE: '/blog/upload-image',
   },
   FEEDBACK: {
@@ -63,6 +67,7 @@ export const API_ENDPOINTS = {
     INVOICE_SEND: (id: string) => `/payments/invoices/${id}/send`,
     INVOICE_VOID: (id: string) => `/payments/invoices/${id}/void`,
     INVOICE_MARK_PAID: (id: string) => `/payments/invoices/${id}/mark-paid`,
+    INVOICE_LINE_ITEMS: (id: string) => `/payments/invoices/${id}/line-items`,
 
     // Instructor — subscriptions
     SUBSCRIPTIONS: '/payments/subscriptions',
@@ -75,12 +80,12 @@ export const API_ENDPOINTS = {
     PAYMENTS_LIST: '/payments/payments',
 
     // Client — self-service
-    CUSTOMER_SETUP_INTENT: '/payments/customers/setup-intent',
-    CUSTOMER_PORTAL_LINK: '/payments/customers/portal-link',
+    CUSTOMER_SETUP_INTENT: '/payments/my/setup-intent',
+    CUSTOMER_PORTAL_LINK: '/payments/my/portal-link',
     MY_INVOICES: '/payments/my/invoices',
     MY_INVOICE_BY_ID: (id: string) => `/payments/my/invoices/${id}`,
     MY_INVOICE_PAY: (id: string) => `/payments/my/invoices/${id}/pay`,
+    MY_INVOICE_LINE_ITEMS: (id: string) => `/payments/my/invoices/${id}/line-items`,
     MY_SUBSCRIPTIONS: '/payments/my/subscriptions',
-    MY_PAYMENT_HISTORY: '/payments/my/payment-history',
   },
 } as const;

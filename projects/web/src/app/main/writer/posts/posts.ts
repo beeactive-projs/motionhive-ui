@@ -10,7 +10,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { BlogService, BlogPost, BlogCategory, TagSeverity, BlogCategories } from 'core';
+import { BlogService, BlogPost, BlogCategory, TagSeverity, BLOG_CATEGORY_OPTIONS } from 'core';
+import { SelectItem } from 'primeng/api';
 
 @Component({
   selector: 'mh-posts',
@@ -45,12 +46,9 @@ export class Posts implements OnInit {
   searchQuery = signal('');
   categoryFilter = signal<BlogCategory | undefined>(undefined);
 
-  readonly categoryOptions: Array<{ label: string; value: BlogCategory | undefined }> = [
+  readonly categoryOptions: SelectItem<BlogCategory | undefined>[] = [
     { label: 'All', value: undefined },
-    { label: 'Guide', value: 'Guide' },
-    { label: 'Nutrition', value: 'Nutrition' },
-    { label: 'Science', value: 'Science' },
-    { label: 'Wellness', value: 'Wellness' },
+    ...BLOG_CATEGORY_OPTIONS,
   ];
 
   ngOnInit(): void {
@@ -60,7 +58,7 @@ export class Posts implements OnInit {
   loadPosts(): void {
     this.loading.set(true);
     this._blogService
-      .getPosts({
+      .getPostsForAdmin({
         page: this.currentPage(),
         limit: this.rows,
         category: this.categoryFilter(),
@@ -107,7 +105,7 @@ export class Posts implements OnInit {
   }
 
   navigateToEdit(post: BlogPost): void {
-    this._router.navigate(['/writer/posts', post.slug]);
+    this._router.navigate(['/writer/posts', post.id]);
   }
 
   confirmDelete(post: BlogPost): void {

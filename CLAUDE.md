@@ -1,38 +1,67 @@
-# CLAUDE.md
+# MotionHive UI — CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **Naming note:** The product is **MotionHive**. The repo directory is still `beeactive-ui` (historical, not renamed). Angular selector prefix is `mh-`. Any `bee-`/`beeactive` references in existing code are historical leftovers — leave them alone unless explicitly renaming.
 
 ## Project Overview
 
-Fitness platform frontend. Angular monorepo with a shared `core` library and `web` application.
+MotionHive fitness platform frontend. Angular monorepo with three projects:
+
+- **`core`** — shared library (models, services, stores, guards, interceptors, constants, enums, environment config). Imported as `'core'`. Everything re-exported from `public-api.ts`.
+- **`web`** — authenticated application (dashboard, instructor/user/super-admin/writer areas, payments, groups, sessions). Uses `SidenavLayout` + `authGuard`.
+- **`website`** — public marketing site (home, about, blog, contact, legal pages, tools like calorie calculator, feedback/waitlist dialogs). Uses `PublicLayout`. **Separate Angular application**, not a section of `web`.
+- **Future: Ionic mobile app** — planned, not yet scaffolded. When it lands, anything shared across web + website + mobile belongs in `core`.
 
 **Tech Stack**: Angular 21, PrimeNG 21 (Lara preset), Tailwind CSS 4 + PrimeUI, ngx-translate, Vitest
 
 ## Commands
 
 ```bash
-ng serve web               # Dev server (port 4200)
-ng build web               # Production build
-ng build core              # Build core library
+ng serve web               # Authenticated app dev server
+ng serve website           # Marketing site dev server
+ng build web               # Production build — authenticated app
+ng build website           # Production build — marketing site
+ng build core              # Build core library (required before building web/website locally)
 ng test                    # Run tests (Vitest)
 ```
 
-Package manager is **npm**. Prettier config is inline in `package.json`.
+Package manager is **npm**. Prettier config is inline in `package.json`. Angular selector prefix is `mh` (see `angular.json`).
 
 ## Architecture
 
-### Monorepo Structure
+### Monorepo Structure — what goes where
 
-- `projects/core/` — Shared library imported as `'core'`. Contains models, services, stores, guards, interceptors, constants, enums, and environment config. Everything is re-exported from `public-api.ts`.
-- `projects/web/` — Main Angular application with pages, layouts, and protected routes.
+- **`projects/core/`** — anything imported by more than one app. Models, HTTP services, stores (signals), guards, interceptors, constants (endpoints, storage keys), enums, UI types (e.g. `TagSeverity`), environment config. **When you find yourself copy-pasting a type/const between `web` and `website`, stop and move it to core.**
+- **`projects/web/`** — authenticated app. Structure:
+  - `app/main/<role>/*` — role-scoped pages (`instructor`, `user`, `super-admin`, `writer`)
+  - `app/main/<role>/_dialogs/*` — dialog components owned by that role
+  - `app/_shared/components/*` — cross-role components (theme toggle, profile menu, error dialog)
+  - `app/layouts/sidenav-layout/*` — the authenticated shell
+  - `app/pages/auth/*` — login/signup/reset/OAuth callbacks
+  - `app/pages/error/*` — 404, 500
+- **`projects/website/`** — public marketing site. Structure:
+  - `app/home`, `app/about`, `app/contact`, `app/blog`, `app/legal/*`, `app/tools/*`
+  - `app/_shared/*` — website-only shared components (waitlist dialog, language switcher, feedback dialog)
+  - `app/layouts/public-layout`, `app/layouts/header`, `app/layouts/footer`
 
 ### Routing
 
+**`web` app** (authenticated):
 ```
-/           → Public pages (home, about, blog) via PublicLayout
-/auth/*     → Login, signup, password reset
+/auth/*     → login, signup, password reset, OAuth callbacks
 /app/*      → Protected (authGuard) via SidenavLayout
-  /app/dashboard, /app/clients, /app/groups, /app/profile, /app/client/*
+  /app/main/instructor/*    → INSTRUCTOR role
+  /app/main/user/*          → USER role
+  /app/main/super-admin/*   → SUPER_ADMIN role
+  /app/main/writer/*        → WRITER role (blog authoring)
+  /app/main/profile/*       → shared
+```
+
+**`website` app** (public):
+```
+/           → home
+/about, /contact, /blog, /blog/:slug
+/legal/privacy-policy, /legal/terms-of-service
+/tools/calorie-calculator
 ```
 
 All routes use `loadComponent()` / `loadChildren()` for code splitting.
@@ -146,7 +175,7 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 | Guard          | `<name>Guard` (fn) | `authGuard`     |
 | Interceptor    | `<name>Interceptor` (fn) | `authInterceptor` |
 
-- Selector prefix: `bee-` (`bee-clients`, `bee-dashboard`, `bee-user-profile`)
+- Selector prefix: `mh-` (`mh-clients`, `mh-dashboard`, `mh-user-profile`) — set in `angular.json` for all three projects
 - Always separate files: `.html` and `.scss` alongside `.ts` — no inline templates or styles
 
 ### Member Naming
@@ -285,7 +314,7 @@ Components that are affected: `p-select`, `p-datepicker`, `p-popover`, `p-autoco
 - Use **sentence case** for all visible text — labels, headings, button labels, placeholders, dialog titles, menu items, tooltips, and error messages.
   - Correct: "Instructor profile", "Save changes", "Add new client", "Are you sure you want to delete this?"
   - Wrong: "Instructor Profile", "Save Changes", "Add New Client"
-- Proper nouns and acronyms remain capitalised as normal (e.g. "BeeActive", "PDF", "API").
+- Proper nouns and acronyms remain capitalised as normal (e.g. "MotionHive", "PDF", "API").
 - Sentences must start with a capital letter and end with the appropriate punctuation when they form a full sentence.
 
 ### Accessibility

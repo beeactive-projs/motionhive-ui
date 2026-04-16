@@ -5,14 +5,17 @@ export interface Subscription {
   id: string;
   instructorId: string;
   clientId: string | null;
-  productId: string;
+  productId: string | null;
+  stripeCustomerId: string;
   stripeSubscriptionId: string;
   stripePriceId: string;
   status: SubscriptionStatus;
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
+  currentPeriodStart: string | null;
+  currentPeriodEnd: string | null;
   cancelAt: string | null;
   canceledAt: string | null;
+  cancelAtPeriodEnd: boolean;
+  trialStart: string | null;
   trialEnd: string | null;
   amountCents: number;
   currency: string;
@@ -24,7 +27,6 @@ export interface CreateSubscriptionPayload {
   clientUserId: string;
   productId: string;
   trialDays?: number;
-  startAt?: string;
 }
 
 export interface CancelSubscriptionPayload {

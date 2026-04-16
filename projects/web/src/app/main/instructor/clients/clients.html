@@ -2,7 +2,6 @@
   <!-- Header -->
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
-      <!-- <p class="text-xs uppercase text-surface-700 dark:text-surface-400">Client Management</p> -->
       <h1 class="font-heading font-semibold text-xl md:text-2xl">Clients</h1>
       <p class="text-sm text-surface-700 dark:text-surface-400">Manage your client relationships, invitations, and
         requests.</p>
@@ -11,44 +10,6 @@
       <p-button label="Invite client" icon="pi pi-user-plus" rounded (onClick)="openInviteDialog()" />
     </div>
   </header>
-
-  <!-- Pending Requests Banner -->
-  @if (pendingCount() > 0) {
-  <p-card class="shadow-sm border-l-4 border-l-yellow-400">
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-2">
-        <i class="pi pi-bell text-yellow-600"></i>
-        <h3 class="text-base font-semibold text-secondary-900">
-          Pending Requests ({{ pendingCount() }})
-        </h3>
-      </div>
-      <div class="space-y-3">
-        @for (request of pendingRequests(); track trackById($index, request)) {
-        <div class="flex items-center justify-between rounded-lg bg-surface-50 p-3">
-          <div class="flex items-center gap-3">
-            <p-avatar
-              [label]="request.fromUser ? request.fromUser.firstName.charAt(0) + request.fromUser.lastName.charAt(0) : '??'"
-              shape="circle" styleClass="bg-yellow-100 text-yellow-700" />
-            <div>
-              <span class="font-medium text-secondary-900">{{ requestFromName(request) }}</span>
-              <span class="text-sm text-secondary-500"> wants to become your client</span>
-              @if (request.message) {
-              <p class="mt-1 text-xs text-secondary-500 italic">"{{ request.message }}"</p>
-              }
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true" pTooltip="Accept"
-              (onClick)="acceptPendingRequest(request)" />
-            <p-button icon="pi pi-times" severity="danger" [rounded]="true" [text]="true" pTooltip="Decline"
-              (onClick)="declinePendingRequest(request)" />
-          </div>
-        </div>
-        }
-      </div>
-    </div>
-  </p-card>
-  }
 
   <!-- Filters -->
   <div class="flex items-center gap-3">
@@ -60,7 +21,7 @@
   </div>
 
   <!-- Clients Table -->
-  <div class="flex-1 " style="background-color: var(--p-datatable-row-background);">
+  <div class="flex-1" style="background-color: var(--p-datatable-row-background);">
 
     <p-table [value]="clients()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
       [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
@@ -81,13 +42,13 @@
         <tr>
           <td>
             <div class="flex items-center gap-3">
-              <p-avatar [label]="initials(client)" shape="circle" styleClass="bg-primary-100 text-primary-700" />
+              <p-avatar [label]="initials(client)" shape="circle" />
               <span class="font-medium text-secondary-900">{{ clientName(client) }}</span>
             </div>
           </td>
-          <td>{{ client.client?.email || '—' }}</td>
+          <td>{{ clientEmail(client) }}</td>
           <td>
-            <p-tag [value]="client.status" [severity]="statusSeverity(client.status)" />
+            <p-tag [value]="clientStatusLabel(client)" [severity]="statusSeverity(client.status)" />
           </td>
           <td>{{ client.startedAt ? (client.startedAt | date: 'mediumDate') : '—' }}</td>
           <td>
@@ -112,11 +73,19 @@
           </td>
           <td>
             <div class="flex items-center justify-center gap-1">
+              @if (client.status === 'PENDING' && client.requestType === 'CLIENT_TO_INSTRUCTOR') {
+              <!-- Incoming request: accept / decline -->
+              <p-button icon="pi pi-check" [rounded]="true" [text]="true" severity="success" pTooltip="Accept"
+                (onClick)="acceptPendingRequest(client)" />
+              <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" pTooltip="Decline"
+                (onClick)="declinePendingRequest(client)" />
+              } @else if (client.status === 'ACTIVE') {
               <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit notes"
                 (onClick)="openNotesDialog(client)" />
-              @if (client.status === 'ACTIVE') {
               <p-button icon="pi pi-inbox" [rounded]="true" [text]="true" severity="danger" pTooltip="Archive"
                 (onClick)="confirmArchive(client)" />
+              } @else if (client.status === 'PENDING' && client.requestType === 'INSTRUCTOR_TO_CLIENT') {
+              <span class="text-xs text-surface-500">Waiting for response</span>
               }
             </div>
           </td>

@@ -91,10 +91,13 @@ export class SignUpComponent {
 
   private readonly googleBtnContainer = viewChild<ElementRef>('googleBtn');
 
+  private static readonly INVITE_TOKEN_KEY = 'mh_client_invite_token';
+
   constructor() {
     const token = this._route.snapshot.queryParamMap.get('token');
     if (token) {
       this._invitationToken.set(token);
+      localStorage.setItem(SignUpComponent.INVITE_TOKEN_KEY, token);
       this._clientService.getInvitationByToken(token).subscribe({
         next: (details: InvitationDetails) => {
           this.invitationDetails.set(details);
@@ -103,8 +106,15 @@ export class SignUpComponent {
         },
         error: () => {
           this.errorMessage.set('This invitation link is invalid or has expired.');
+          localStorage.removeItem(SignUpComponent.INVITE_TOKEN_KEY);
         },
       });
+    } else {
+      // Recover token from localStorage (survives OAuth redirects)
+      const storedToken = localStorage.getItem(SignUpComponent.INVITE_TOKEN_KEY);
+      if (storedToken) {
+        this._invitationToken.set(storedToken);
+      }
     }
 
     afterNextRender(() => {
@@ -145,15 +155,7 @@ export class SignUpComponent {
         this.isLoading.set(false);
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         this._userService.updateMe({ timezone }).subscribe({ error: () => {} });
-        const invitationToken = this._invitationToken();
-        if (invitationToken) {
-          this._clientService.acceptByToken(invitationToken).subscribe({
-            next: () => this.navigateToApp(),
-            error: () => this.navigateToApp(),
-          });
-        } else {
-          this.navigateToApp();
-        }
+        this.acceptInvitationAndNavigate();
       },
       error: (error) => {
         this.isLoading.set(false);
@@ -169,7 +171,7 @@ export class SignUpComponent {
     this._authService.googleLogin({ idToken }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.navigateToApp();
+        this.acceptInvitationAndNavigate();
       },
       error: (error: { error?: { message?: string } }) => {
         this.isLoading.set(false);
@@ -188,7 +190,7 @@ export class SignUpComponent {
         this._authService.facebookLogin({ accessToken }).subscribe({
           next: () => {
             this.isLoading.set(false);
-            this.navigateToApp();
+            this.acceptInvitationAndNavigate();
           },
           error: (error: { error?: { message?: string } }) => {
             this.isLoading.set(false);
@@ -261,6 +263,19 @@ export class SignUpComponent {
       return { passwordMismatch: true };
     }
     return null;
+  }
+
+  private acceptInvitationAndNavigate(): void {
+    const token = this._invitationToken() || localStorage.getItem(SignUpComponent.INVITE_TOKEN_KEY);
+    if (token) {
+      localStorage.removeItem(SignUpComponent.INVITE_TOKEN_KEY);
+      this._clientService.acceptByToken(token).subscribe({
+        next: () => this.navigateToApp(),
+        error: () => this.navigateToApp(),
+      });
+    } else {
+      this.navigateToApp();
+    }
   }
 
   private navigateToApp(): void {

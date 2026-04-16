@@ -24,13 +24,22 @@ export class BlogService {
     return (this._document.documentElement.lang || 'en').split('-')[0];
   }
 
-  getPosts(query: BlogQueryParams = {}): Observable<BlogListResponse> {
-    let params = new HttpParams().set('locale', this._locale);
+  private buildListParams(query: BlogQueryParams, withLocale: boolean): HttpParams {
+    let params = new HttpParams();
+    if (withLocale) params = params.set('locale', this._locale);
     if (query.page) params = params.set('page', query.page);
     if (query.limit) params = params.set('limit', query.limit);
     if (query.category) params = params.set('category', query.category);
     if (query.search) params = params.set('search', query.search);
-    return this._http.get<BlogListResponse>(this._base, { params });
+    return params;
+  }
+
+  // ---------- Public (published only) ----------
+
+  getPosts(query: BlogQueryParams = {}): Observable<BlogListResponse> {
+    return this._http.get<BlogListResponse>(this._base, {
+      params: this.buildListParams(query, true),
+    });
   }
 
   getAllPosts(): Observable<BlogListResponse> {
@@ -40,10 +49,6 @@ export class BlogService {
 
   getAllPostData(): Observable<BlogPost[]> {
     return this.getAllPosts().pipe(map((response) => response.items));
-  }
-
-  getById(id: string): Observable<BlogPost> {
-    return this._http.get<BlogPost>(`${this._base}/${id}`);
   }
 
   getBySlug(slug: string): Observable<BlogPost> {
@@ -58,6 +63,29 @@ export class BlogService {
         const others = posts.filter((p) => p.slug !== currentSlug && p.category !== category);
         return [...sameCategory, ...others].slice(0, limit);
       }),
+    );
+  }
+
+  // ---------- Authoring (drafts + published, auth required) ----------
+
+  /**
+   * Admin/writer list — includes drafts. WRITER is scoped server-side to
+   * their own posts; ADMIN/SUPER_ADMIN see everything.
+   */
+  getPostsForAdmin(query: BlogQueryParams = {}): Observable<BlogListResponse> {
+    return this._http.get<BlogListResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.BLOG.ADMIN_LIST}`,
+      { params: this.buildListParams(query, false) },
+    );
+  }
+
+  /**
+   * Load a post for editing by id. Returns drafts; enforces owner-or-admin
+   * on the server.
+   */
+  getForEdit(id: string): Observable<BlogPost> {
+    return this._http.get<BlogPost>(
+      `${environment.apiUrl}${API_ENDPOINTS.BLOG.ADMIN_BY_ID(id)}`,
     );
   }
 

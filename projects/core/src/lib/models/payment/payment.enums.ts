@@ -43,6 +43,7 @@ export const SubscriptionStatuses = {
   Unpaid: 'unpaid',
   Incomplete: 'incomplete',
   IncompleteExpired: 'incomplete_expired',
+  IncompletePaymentFailed: 'incomplete_payment_failed',
   Paused: 'paused',
 } as const;
 

@@ -7,6 +7,15 @@ export interface InvoiceLineItem {
   quantity: number;
 }
 
+export interface InvoiceLineItemDetail {
+  id: string;
+  description: string | null;
+  quantity: number;
+  unitAmountCents: number;
+  amountCents: number;
+  currency: string;
+}
+
 export interface InvoiceClientSummary {
   id: string | null;
   email: string;
@@ -41,14 +50,14 @@ export interface Invoice {
 
 export interface CreateInvoicePayload {
   clientUserId?: string;
-  clientEmail?: string;
-  clientFirstName?: string;
-  clientLastName?: string;
+  guestEmail?: string;
+  guestName?: string;
   lineItems: InvoiceLineItem[];
   dueDate?: string;
   description?: string;
   currency?: string;
   sendImmediately?: boolean;
+  requiresImmediateAccessWaiver?: boolean;
 }
 
 export interface InvoiceListParams {
@@ -68,5 +77,5 @@ export interface PayInvoiceConsent {
 }
 
 export interface PayInvoiceResponse {
-  checkoutUrl: string;
+  url: string;
 }

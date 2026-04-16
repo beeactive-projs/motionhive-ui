@@ -11,6 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
@@ -21,8 +22,8 @@ import {
   ConsentTypes,
   TagSeverity,
   CurrencyRonPipe,
-  StripeIframeDirective,
   type Invoice,
+  type InvoiceLineItemDetail,
   type InvoiceStatus,
 } from 'core';
 
@@ -36,10 +37,10 @@ import {
     CardModule,
     TagModule,
     SkeletonModule,
+    TableModule,
     ToastModule,
     CheckboxModule,
     CurrencyRonPipe,
-    StripeIframeDirective,
   ],
   providers: [MessageService],
   templateUrl: './invoice-detail.html',
@@ -53,6 +54,8 @@ export class UserInvoiceDetail implements OnInit {
   private readonly _messageService = inject(MessageService);
 
   readonly invoice = signal<Invoice | null>(null);
+  readonly lineItems = signal<InvoiceLineItemDetail[]>([]);
+  readonly lineItemsLoading = signal(false);
   readonly loading = signal(true);
   readonly payLoading = signal(false);
 
@@ -70,6 +73,21 @@ export class UserInvoiceDetail implements OnInit {
       return;
     }
     this.loadInvoice(id);
+    this.loadLineItems(id);
+  }
+
+  private loadLineItems(id: string): void {
+    this.lineItemsLoading.set(true);
+    this._clientPaymentService.getMyInvoiceLineItems(id).subscribe({
+      next: (items) => {
+        this.lineItems.set(items);
+        this.lineItemsLoading.set(false);
+      },
+      error: () => {
+        this.lineItems.set([]);
+        this.lineItemsLoading.set(false);
+      },
+    });
   }
 
   private loadInvoice(id: string): void {
@@ -103,7 +121,7 @@ export class UserInvoiceDetail implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          window.location.href = res.checkoutUrl;
+          window.location.href = res.url;
         },
         error: (err) => {
           this.payLoading.set(false);

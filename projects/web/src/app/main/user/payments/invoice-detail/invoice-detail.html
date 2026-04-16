@@ -31,11 +31,18 @@
       </p>
     </div>
 
-    @if (inv.invoicePdf) {
-      <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
-        <p-button label="Download PDF" icon="pi pi-download" size="small" [outlined]="true" />
-      </a>
-    }
+    <div class="flex flex-wrap gap-2">
+      @if (inv.hostedInvoiceUrl) {
+        <a [href]="inv.hostedInvoiceUrl" target="_blank" rel="noopener">
+          <p-button label="Open hosted page" icon="pi pi-external-link" size="small" [outlined]="true" />
+        </a>
+      }
+      @if (inv.invoicePdf) {
+        <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
+          <p-button label="PDF" icon="pi pi-download" size="small" [outlined]="true" />
+        </a>
+      }
+    </div>
   </header>
 
   <!-- Summary card -->
@@ -77,23 +84,54 @@
     </p-card>
   }
 
-  <!-- Stripe hosted invoice iframe -->
-  @if (inv.hostedInvoiceUrl) {
+  <!-- Line items -->
+  <p-card class="mb-4">
+    <ng-template #header>
+      <div class="flex items-center justify-between px-4 pt-3">
+        <span class="text-sm font-medium text-surface-700 dark:text-surface-300">Line items</span>
+      </div>
+    </ng-template>
+    @if (lineItemsLoading()) {
+      <div class="flex flex-col gap-2 py-2">
+        <p-skeleton width="100%" height="2rem" />
+        <p-skeleton width="100%" height="2rem" />
+      </div>
+    } @else if (lineItems().length) {
+      <p-table [value]="lineItems()">
+        <ng-template #header>
+          <tr>
+            <th>Description</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Unit price</th>
+            <th class="text-right">Amount</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-item>
+          <tr>
+            <td>{{ item.description || '—' }}</td>
+            <td class="text-right">{{ item.quantity }}</td>
+            <td class="text-right">{{ item.unitAmountCents | currencyRon:item.currency }}</td>
+            <td class="text-right font-medium">{{ item.amountCents | currencyRon:item.currency }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #footer>
+          <tr>
+            <td colspan="3" class="text-right font-semibold">Total</td>
+            <td class="text-right font-semibold">{{ inv.amountDueCents | currencyRon:inv.currency }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    } @else {
+      <div class="py-6 text-center text-sm text-surface-500">
+        No line items available.
+      </div>
+    }
+  </p-card>
+
+  @if (inv.description) {
     <p-card>
-      <ng-template #header>
-        <div class="flex items-center justify-between px-4 pt-3">
-          <span class="text-sm font-medium text-surface-700 dark:text-surface-300">Invoice preview</span>
-          <a [href]="inv.hostedInvoiceUrl" target="_blank" rel="noopener" class="text-sm text-primary-500 hover:underline">
-            Open in new tab <i class="pi pi-external-link text-xs"></i>
-          </a>
-        </div>
-      </ng-template>
-      <iframe
-        [mhStripeIframe]="inv.hostedInvoiceUrl"
-        class="w-full border-0 rounded"
-        style="height: 600px;"
-        title="Stripe hosted invoice"
-      ></iframe>
+      <div class="text-sm text-surface-500 mb-1">Notes</div>
+      <p class="m-0 whitespace-pre-wrap">{{ inv.description }}</p>
     </p-card>
   }
 }

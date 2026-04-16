@@ -121,9 +121,9 @@
       <td class="font-medium">{{ payment.amountCents | currencyRon:payment.currency }}</td>
       <td>
         <p-tag [value]="payment.status" [severity]="paymentStatusSeverity(payment.status)" />
-        @if (payment.refundedAmountCents > 0) {
+        @if (payment.amountRefundedCents > 0) {
           <span class="text-xs text-surface-500 ml-1">
-            ({{ payment.refundedAmountCents | currencyRon:payment.currency }} refunded)
+            ({{ payment.amountRefundedCents | currencyRon:payment.currency }} refunded)
           </span>
         }
       </td>

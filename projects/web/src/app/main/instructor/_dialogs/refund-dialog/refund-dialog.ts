@@ -53,7 +53,7 @@ export class RefundDialog {
   get maxRefundable(): number {
     const p = this.payment();
     if (!p) return 0;
-    return (p.amountCents - p.refundedAmountCents) / 100;
+    return (p.amountCents - p.amountRefundedCents) / 100;
   }
 
   private readonly _syncFormEffect = effect(() => {

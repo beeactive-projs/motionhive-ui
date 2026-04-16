@@ -7,14 +7,17 @@ export interface Payment {
   instructorId: string;
   clientId: string | null;
   stripePaymentIntentId: string;
+  stripeChargeId: string | null;
   amountCents: number;
+  amountRefundedCents: number;
   currency: string;
   applicationFeeCents: number;
   status: PaymentStatus;
   paymentMethodType: string | null;
-  failureReason: string | null;
+  failureCode: string | null;
+  failureMessage: string | null;
   paidAt: string | null;
-  refundedAmountCents: number;
+  refundedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

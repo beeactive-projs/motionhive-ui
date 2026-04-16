@@ -22,12 +22,8 @@ export class StripeIframeDirective {
   constructor() {
     effect(() => {
       const raw = this.url();
-      if (!raw) {
-        this.renderer.removeAttribute(this.el.nativeElement, 'src');
-        return;
-      }
-      if (!this.isTrustedStripeHost(raw)) {
-        this.renderer.removeAttribute(this.el.nativeElement, 'src');
+      if (!raw || !this.isTrustedStripeHost(raw)) {
+        this.renderer.setProperty(this.el.nativeElement, 'src', 'about:blank');
         return;
       }
       const safe: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(raw);

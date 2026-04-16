@@ -4,7 +4,6 @@ import {
   inject,
   OnInit,
   signal,
-  computed,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { CardModule } from 'primeng/card';
@@ -20,7 +19,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import {
   InstructorClient,
   InstructorClientStatus,
-  ClientRequest,
   ClientService,
   TagSeverity,
 } from 'core';
@@ -53,15 +51,13 @@ export class Clients implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
 
-  clients = signal<InstructorClient[]>([]);
+  clients = signal<any[]>([]);
   totalRecords = signal(0);
   loading = signal(true);
-  pendingRequests = signal<ClientRequest[]>([]);
 
   readonly rows = 10;
   currentPage = signal(1);
 
-  // Status filter
   statusFilter = signal<InstructorClientStatus | undefined>(undefined);
   readonly statusOptions = [
     { label: 'All', value: undefined },
@@ -70,27 +66,20 @@ export class Clients implements OnInit {
     { label: 'Archived', value: 'ARCHIVED' as InstructorClientStatus },
   ];
 
-  // Dialog visibility
   showInviteDialog = signal(false);
   showNotesDialog = signal(false);
   editingClient = signal<InstructorClient | null>(null);
 
-  // Pending requests count
-  pendingCount = computed(() => this.pendingRequests().length);
-
   ngOnInit(): void {
-    // this.loadClients();
-    this.loadPendingRequests();
+    this.loadClients();
   }
 
   loadClients(): void {
     this.loading.set(true);
-    const page = this.currentPage();
-
     this._clientService
       .getClients({
         status: this.statusFilter(),
-        page,
+        page: this.currentPage(),
         limit: this.rows,
       })
       .subscribe({
@@ -108,13 +97,6 @@ export class Clients implements OnInit {
           });
         },
       });
-  }
-
-  loadPendingRequests(): void {
-    this._clientService.getPendingRequests().subscribe({
-      next: (requests) => this.pendingRequests.set(requests),
-      error: () => {},
-    });
   }
 
   onPageChange(event: { first?: number | null; rows?: number | null }): void {
@@ -139,8 +121,7 @@ export class Clients implements OnInit {
     this.showNotesDialog.set(true);
   }
 
-  // Archive
-  confirmArchive(client: InstructorClient): void {
+  confirmArchive(client: any): void {
     const name = client.client
       ? `${client.client.firstName} ${client.client.lastName}`
       : 'this client';
@@ -153,7 +134,7 @@ export class Clients implements OnInit {
     });
   }
 
-  private archiveClient(client: InstructorClient): void {
+  private archiveClient(client: any): void {
     this._clientService.archiveClient(client.clientId).subscribe({
       next: () => {
         this._messageService.add({
@@ -173,16 +154,14 @@ export class Clients implements OnInit {
     });
   }
 
-  // Pending requests actions
-  acceptPendingRequest(request: ClientRequest): void {
-    this._clientService.acceptRequest(request.id).subscribe({
+  acceptPendingRequest(client: any): void {
+    this._clientService.acceptRequest(client.id).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'success',
           summary: 'Request accepted',
           detail: 'Client request accepted successfully',
         });
-        this.loadPendingRequests();
         this.loadClients();
       },
       error: (err) => {
@@ -195,15 +174,15 @@ export class Clients implements OnInit {
     });
   }
 
-  declinePendingRequest(request: ClientRequest): void {
-    this._clientService.declineRequest(request.id).subscribe({
+  declinePendingRequest(client: any): void {
+    this._clientService.declineRequest(client.id).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'info',
           summary: 'Request declined',
           detail: 'Client request has been declined',
         });
-        this.loadPendingRequests();
+        this.loadClients();
       },
       error: (err) => {
         this._messageService.add({
@@ -215,7 +194,42 @@ export class Clients implements OnInit {
     });
   }
 
-  // Helpers
+  // --- Display helpers ---
+
+  clientName(client: any): string {
+    if (client.client) {
+      return `${client.client.firstName} ${client.client.lastName}`;
+    }
+    if (client.invitedEmail) {
+      return client.invitedEmail;
+    }
+    return 'Unknown';
+  }
+
+  clientEmail(client: any): string {
+    return client.client?.email || client.invitedEmail || '—';
+  }
+
+  initials(client: any): string {
+    if (client.client) {
+      return (
+        client.client.firstName.charAt(0) + client.client.lastName.charAt(0)
+      );
+    }
+    if (client.invitedEmail) {
+      return client.invitedEmail.charAt(0).toUpperCase();
+    }
+    return '??';
+  }
+
+  clientStatusLabel(client: any): string {
+    if (client.status !== 'PENDING') return client.status;
+    if (client.requestType === 'INSTRUCTOR_TO_CLIENT') {
+      return client.client ? 'Invited' : 'Email sent';
+    }
+    return 'Request';
+  }
+
   statusSeverity(status: InstructorClientStatus): TagSeverity {
     switch (status) {
       case 'ACTIVE':
@@ -225,21 +239,6 @@ export class Clients implements OnInit {
       case 'PENDING':
         return TagSeverity.Warn;
     }
-  }
-
-  initials(client: InstructorClient): string {
-    if (!client.client) return '??';
-    return client.client.firstName.charAt(0) + client.client.lastName.charAt(0);
-  }
-
-  clientName(client: InstructorClient): string {
-    if (!client.client) return 'Unknown';
-    return `${client.client.firstName} ${client.client.lastName}`;
-  }
-
-  requestFromName(request: ClientRequest): string {
-    if (!request.fromUser) return 'Unknown';
-    return `${request.fromUser.firstName} ${request.fromUser.lastName}`;
   }
 
   trackById = (_: number, item: { id: string }) => item.id;

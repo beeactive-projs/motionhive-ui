@@ -95,9 +95,17 @@ export class CreateInvoiceDialog {
   private readonly _resetOnOpenEffect = effect(() => {
     const visible = this.visible();
     if (visible && !this._wasVisible) {
-      this.form.reset({ sendImmediately: false, quantity: 1 } as never);
       this.lineItems.clear();
       this.lineItems.push(this.createLineItemGroup());
+      this.form.reset({
+        clientUserId: '',
+        guestEmail: '',
+        guestFirstName: '',
+        guestLastName: '',
+        notes: '',
+        dueDate: null,
+        sendImmediately: false,
+      });
       this.useManualEmail.set(false);
       if (!this._clientsLoaded) this.loadClients();
       if (!this._productsLoaded) this.loadProducts();
@@ -117,7 +125,7 @@ export class CreateInvoiceDialog {
   createLineItemGroup(): FormGroup {
     return this._fb.group({
       productId: [null as string | null],
-      name: ['', [Validators.required]],
+      name: [''],
       description: [''],
       amount: [null as number | null, [Validators.required, Validators.min(0.5)]],
       quantity: [1 as number | null, [Validators.required, Validators.min(1)]],
@@ -287,10 +295,8 @@ export class CreateInvoiceDialog {
     if (this.lineItems.invalid) {
       const details: string[] = [];
       this.lineItems.controls.forEach((group, idx) => {
-        const name = group.get('name');
         const amt = group.get('amount');
         const qty = group.get('quantity');
-        if (name?.invalid) details.push(`Line ${idx + 1}: name required`);
         if (amt?.invalid) details.push(`Line ${idx + 1}: amount must be ≥ 0.50 RON`);
         if (qty?.invalid) details.push(`Line ${idx + 1}: quantity must be ≥ 1`);
       });
@@ -308,7 +314,7 @@ export class CreateInvoiceDialog {
     const lineItems = raw.lineItems.map((li: Record<string, unknown>) => {
       const name = ((li['name'] as string) || '').trim();
       const desc = ((li['description'] as string) || '').trim();
-      const combined = desc ? `${name} — ${desc}` : name;
+      const combined = name && desc ? `${name} — ${desc}` : name || desc || 'Item';
       return {
         description: combined.slice(0, 255),
         amountCents: Math.round(((li['amount'] as number) ?? 0) * 100),
