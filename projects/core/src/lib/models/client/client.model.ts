@@ -38,9 +38,12 @@ export interface InstructorClient {
   startedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  invitedEmail: string | null;
+  requestType: ClientRequestType;
+  expiresAt: string | null;
+  // instructor?: ClientUser;
+  // instructorProfile?: InstructorProfileSummary | null;
   client?: ClientUser;
-  instructor?: ClientUser;
-  instructorProfile?: InstructorProfileSummary | null;
   groupMemberships?: GroupMembership[];
 }
 

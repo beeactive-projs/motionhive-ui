@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -17,14 +11,7 @@ import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog
 
 @Component({
   selector: 'mh-groups',
-  imports: [
-    CardModule,
-    ButtonModule,
-    TagModule,
-    ToastModule,
-    ConfirmDialogModule,
-    GroupFormDialog,
-  ],
+  imports: [CardModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule, GroupFormDialog],
   providers: [MessageService, ConfirmationService],
   templateUrl: './groups.html',
   styleUrl: './groups.scss',
@@ -49,7 +36,7 @@ export class Groups implements OnInit {
 
   loadGroups(): void {
     this.loading.set(true);
-    this._groupService.getMyGroups().subscribe({
+    this._groupService.getInstructorsGroups().subscribe({
       next: (groups) => {
         this.groups.set(groups);
         this.loading.set(false);
@@ -112,7 +99,7 @@ export class Groups implements OnInit {
   }
 
   navigateToGroup(group: Group): void {
-    this._router.navigate(['/groups', group.id]);
+    this._router.navigate(['coaching/groups', group.id]);
   }
 
   descriptionExcerpt(description: string | null): string {

@@ -113,6 +113,19 @@ When a type or constant is used in more than one place, define it once in the `c
 
 Never copy-paste the same `type` or `const` across multiple component files — extract it.
 
+**Never compare against enum string values directly in templates or component logic.** Always expose the enum object as a readonly class member and use it in comparisons. Inline string literals like `=== 'PENDING'` or `=== 'INSTRUCTOR_TO_CLIENT'` are undetectable by the compiler when the enum value changes and must be avoided. Pattern:
+
+```ts
+// component .ts
+readonly Statuses = InstructorClientStatuses;
+readonly RequestTypes = ClientRequestTypes;
+```
+
+```html
+<!-- template .html -->
+@if (item.status === Statuses.Pending && item.requestType === RequestTypes.InstructorToClient) { ... }
+```
+
 Use the **const + type** pattern (same as `UserRoles`) so values are accessible at runtime. **Always define these in a dedicated `*.enums.ts` file, separate from the `*.model.ts` interfaces** — they have different reasons to change and mixing them together clutters both files. Example: `profile.enums.ts` + `profile.model.ts`, both exported from `public-api.ts`.
 
 ```ts

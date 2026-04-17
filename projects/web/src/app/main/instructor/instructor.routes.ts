@@ -4,7 +4,8 @@ export const instructorRoutes: Routes = [
   // Coaching
   {
     path: 'overview',
-    loadComponent: () => import('./coaching-overview/coaching-overview').then((m) => m.CoachingOverview),
+    loadComponent: () =>
+      import('./coaching-overview/coaching-overview').then((m) => m.CoachingOverview),
     title: 'Coaching Overview - MotionHive',
   },
   {

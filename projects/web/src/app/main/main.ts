@@ -18,13 +18,65 @@ export class Main {
   readonly isWriter = this._authStore.isWriter;
   readonly isUser = this._authStore.isUser;
 
+  // readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
+  //   const sections: NavSection[] = [];
+
+  //   // 1. DASHBOARD & DISCOVERY (Core navigation)
+  //   sections.push({
+  //     label: '',
+  //     items: [
+  //       { label: 'Home', route: '/home', icon: 'pi pi-home' },
+  //       { label: 'Explore', route: '/explore', icon: 'pi pi-compass' },
+  //     ],
+  //   });
+
+  //   // 2. COACHING (The "Work" section - Visible only if Instructor)
+  //   if (this.isInstructor()) {
+  //     sections.push({
+  //       label: 'Coach Workspace',
+  //       items: [
+  //         { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
+  //         { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
+  //         { label: 'Groups', route: '/coaching/groups', icon: 'pi pi-sitemap' },
+  //         { label: 'Earnings', route: '/coaching/earnings', icon: 'pi pi-chart-line' },
+  //       ],
+  //     });
+  //   }
+
+  //   // 3. PERSONAL FITNESS (The "Consumer" section)
+  //   sections.push({
+  //     label: 'My Activity',
+  //     items: [
+  //       { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
+  //       { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-star' },
+  //     ],
+  //   });
+
+  //   // 4. MANAGEMENT (Merged Finance & Settings)
+  //   // Hide specific invoice/subscription links here and point to a master page
+  //   sections.push({
+  //     label: 'Management',
+  //     items: [
+  //       { label: 'Billing & Account', route: '/billing', icon: 'pi pi-wallet' },
+  //       ...(this.isSuperAdmin()
+  //         ? [{ label: 'Admin Portal', route: '/super-admin/dashboard', icon: 'pi pi-shield' }]
+  //         : []),
+  //       ...(this.isWriter()
+  //         ? [{ label: 'Content Lab', route: '/writer/posts', icon: 'pi pi-pencil' }]
+  //         : []),
+  //     ],
+  //   });
+
+  //   return sections;
+  // });
+
   readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
     const sections: NavSection[] = [
       {
         label: '',
         items: [
           { label: 'Home', route: '/home', icon: 'pi pi-home' },
-          { label: 'Explore', route: '/explore', icon: 'pi pi-search' },
+          { label: 'Explore', route: '/explore', icon: 'pi pi-compass' },
         ],
       },
     ];
@@ -32,9 +84,9 @@ export class Main {
     if (this.isInstructor()) {
       sections.push(
         {
-          label: 'My coaching',
+          label: 'Coaching',
           items: [
-            { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-th-large' },
+            { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-gauge' },
             { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
             { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
             { label: 'Groups', route: '/coaching/groups', icon: 'pi pi-sitemap' },
@@ -52,23 +104,24 @@ export class Main {
       );
     }
 
-    sections.push({
-      label: 'My activity',
-      items: [
-        { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
-        { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
-        { label: 'My invoices', route: '/activity/invoices', icon: 'pi pi-receipt' },
-        { label: 'My subscriptions', route: '/activity/subscriptions', icon: 'pi pi-sync' },
-      ],
-    });
-
-    sections.push({
-      label: 'My space',
-      items: [
-        { label: 'Dashboard', route: '/user/dashboard', icon: 'pi pi-objects-column' },
-        { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-users' },
-      ],
-    });
+    sections.push(
+      {
+        label: 'Fitness',
+        items: [
+          { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
+          { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
+          { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
+          { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-star' },
+        ],
+      },
+      {
+        label: 'Billing',
+        items: [
+          { label: 'Invoices', route: '/activity/invoices', icon: 'pi pi-receipt' },
+          { label: 'Subscriptions', route: '/activity/subscriptions', icon: 'pi pi-sync' },
+        ],
+      },
+    );
 
     if (this.isSuperAdmin()) {
       sections.push({
@@ -83,7 +136,7 @@ export class Main {
 
     if (this.isWriter()) {
       sections.push({
-        label: 'Writer',
+        label: 'Content',
         items: [{ label: 'Posts', route: '/writer/posts', icon: 'pi pi-book' }],
       });
     }
