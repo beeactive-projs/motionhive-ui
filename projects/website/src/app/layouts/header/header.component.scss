@@ -9,23 +9,23 @@
   &.scrolled {
     background: var(--p-primary-50);
     :host-context(.dark) .site-header.scrolled {
-      background-color: var(--p-secondary-900);
+      background-color: var(--p-primary-900);
     }
   }
 }
 
 // ===== Logo =====
-.logo-link {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  text-decoration: none;
+// .logo-link {
+//   display: flex;
+//   align-items: center;
+//   gap: 1rem;
+//   text-decoration: none;
 
-  &:hover .logo-icon {
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
-    transform: scale(1.05);
-  }
-}
+//   &:hover .logo-icon {
+//     box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+//     transform: scale(1.05);
+//   }
+// }
 
 // ===== Desktop nav links =====
 .nav-link {
@@ -41,8 +41,8 @@
     background 0.2s ease;
 
   &:hover {
-    background: var(--p-button-primary-hover-background);
-    color: var(--p-button-primary-hover-color);
+    background: var(--p-button-secondary-hover-background);
+    color: var(--p-button-secondary-hover-color);
   }
 
   &::after {
@@ -103,8 +103,8 @@
     background 0.2s ease;
 
   &:hover {
-    background: var(--p-button-primary-hover-background);
-    color: var(--p-button-primary-hover-color);
+    background: var(--p-button-secondary-hover-background);
+    color: var(--p-button-secondary-hover-color);
   }
 
   &--active {
@@ -123,13 +123,13 @@
   gap: 0.125rem;
   padding: 1rem 0.5rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--p-surface-200);
-  background: var(--p-primary-50);
+  border: 1px solid var(--p-surface-800);
+  background: var(--p-secondary-50);
   animation: menuSlideDown 0.25s ease-out;
 }
 
 :host-context(.dark) .mobile-menu {
-  background: var(--p-secondary-900);
+  background: var(--p-primary-900);
 }
 
 @keyframes menuSlideDown {
@@ -156,13 +156,13 @@
     background 0.2s ease;
 
   &:hover {
-    background: var(--p-button-primary-hover-background);
-    color: var(--p-button-primary-hover-color);
+    background: var(--p-button-secondary-hover-background);
+    color: var(--p-button-secondary-hover-color);
   }
 
   &--active {
-    background: var(--p-button-primary-background);
-    color: var(--p-button-primary-color);
+    background: var(--p-button-secondary-background);
+    color: var(--p-button-secondary-color);
     font-weight: 600;
 
     &::after {

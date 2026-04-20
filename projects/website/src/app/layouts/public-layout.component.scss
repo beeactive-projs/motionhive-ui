@@ -15,7 +15,7 @@
 }
 
 :host-context(.dark) .background-main {
-  background-color: var(--p-secondary-900);
+  background-color: var(--p-primary-900);
 }
 
 .honeycomb-bg {
@@ -28,7 +28,7 @@
 }
 
 :host-context(.dark) .honeycomb-bg {
-  background-image: $honeycomb-svg-primary;
+  background-image: $honeycomb-svg-secondary;
 }
 
 // Gradient orbs
@@ -46,7 +46,7 @@
   right: -150px;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--p-primary-500) 35%, transparent) 0%,
+    color-mix(in oklab, var(--p-secondary-500) 35%, transparent) 0%,
     transparent 70%
   );
 }
@@ -71,7 +71,7 @@
   left: 30%;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--p-primary-400) 22%, transparent) 0%,
+    color-mix(in oklab, var(--p-secondary-400) 22%, transparent) 0%,
     transparent 70%
   );
   animation-delay: -6s;
