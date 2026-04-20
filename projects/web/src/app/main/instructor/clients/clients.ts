@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +13,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import {
   InstructorClient,
   InstructorClientStatus,
+  InstructorClientStatuses,
+  ClientRequestTypes,
+  ClientStatusLabels,
+  PendingClientLabels,
   ClientService,
   TagSeverity,
 } from 'core';
@@ -50,6 +48,9 @@ export class Clients implements OnInit {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+
+  readonly Statuses = InstructorClientStatuses;
+  readonly RequestTypes = ClientRequestTypes;
 
   clients = signal<any[]>([]);
   totalRecords = signal(0);
@@ -121,7 +122,49 @@ export class Clients implements OnInit {
     this.showNotesDialog.set(true);
   }
 
-  confirmArchive(client: any): void {
+  cancelInvitation(client: InstructorClient): void {
+    const name = client.client
+      ? `${client.client.firstName} ${client.client.lastName}`
+      : 'this client';
+    this._confirmationService.confirm({
+      message: `Are you sure you want to cancel the invitation to ${name}?`,
+      header: 'Cancel invitation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.cancelInvitationRequest(client),
+    });
+  }
+
+  resendInvitation(client: InstructorClient): void {
+    const target = client.client
+      ? `${client.client.firstName} ${client.client.lastName}`
+      : client.invitedEmail ?? 'this client';
+    this._confirmationService.confirm({
+      message: `Resend the invitation to ${target}?`,
+      header: 'Resend invitation',
+      icon: 'pi pi-send',
+      accept: () => {
+        this._clientService.resendInvitation(client.id).subscribe({
+          next: () => {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Invitation resent',
+              detail: 'The invitation has been resent successfully',
+            });
+          },
+          error: (err) => {
+            this._messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: err.error?.message || 'Failed to resend invitation',
+            });
+          },
+        });
+      },
+    });
+  }
+
+  confirmArchive(client: InstructorClient): void {
     const name = client.client
       ? `${client.client.firstName} ${client.client.lastName}`
       : 'this client';
@@ -134,7 +177,26 @@ export class Clients implements OnInit {
     });
   }
 
-  private archiveClient(client: any): void {
+  private cancelInvitationRequest(client: InstructorClient): void {
+    // this._clientService.archiveClient(client.clientId).subscribe({
+    //   next: () => {
+    //     this._messageService.add({
+    //       severity: 'success',
+    //       summary: 'Client archived',
+    //       detail: 'Client relationship has been archived',
+    //     });
+    //     this.loadClients();
+    //   },
+    //   error: () => {
+    //     this._messageService.add({
+    //       severity: 'error',
+    //       summary: 'Error',
+    //       detail: 'Failed to archive client',
+    //     });
+    //   },
+    // });
+  }
+  private archiveClient(client: InstructorClient): void {
     this._clientService.archiveClient(client.clientId).subscribe({
       next: () => {
         this._messageService.add({
@@ -154,7 +216,39 @@ export class Clients implements OnInit {
     });
   }
 
-  acceptPendingRequest(client: any): void {
+  confirmUnarchive(client: InstructorClient): void {
+    const name = client.client
+      ? `${client.client.firstName} ${client.client.lastName}`
+      : 'this client';
+    this._confirmationService.confirm({
+      message: `Are you sure you want to unarchive ${name}?`,
+      header: 'Unarchive client',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => this.unarchiveClient(client),
+    });
+  }
+
+  private unarchiveClient(client: InstructorClient): void {
+    this._clientService.unarchiveClient(client.clientId).subscribe({
+      next: () => {
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Client unarchived',
+          detail: 'Client relationship has been restored',
+        });
+        this.loadClients();
+      },
+      error: () => {
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to unarchive client',
+        });
+      },
+    });
+  }
+
+  acceptPendingRequest(client: InstructorClient): void {
     this._clientService.acceptRequest(client.id).subscribe({
       next: () => {
         this._messageService.add({
@@ -174,7 +268,7 @@ export class Clients implements OnInit {
     });
   }
 
-  declinePendingRequest(client: any): void {
+  declinePendingRequest(client: InstructorClient): void {
     this._clientService.declineRequest(client.id).subscribe({
       next: () => {
         this._messageService.add({
@@ -196,7 +290,7 @@ export class Clients implements OnInit {
 
   // --- Display helpers ---
 
-  clientName(client: any): string {
+  clientName(client: InstructorClient): string {
     if (client.client) {
       return `${client.client.firstName} ${client.client.lastName}`;
     }
@@ -206,15 +300,13 @@ export class Clients implements OnInit {
     return 'Unknown';
   }
 
-  clientEmail(client: any): string {
+  clientEmail(client: InstructorClient): string {
     return client.client?.email || client.invitedEmail || '—';
   }
 
-  initials(client: any): string {
+  initials(client: InstructorClient): string {
     if (client.client) {
-      return (
-        client.client.firstName.charAt(0) + client.client.lastName.charAt(0)
-      );
+      return client.client.firstName.charAt(0) + client.client.lastName.charAt(0);
     }
     if (client.invitedEmail) {
       return client.invitedEmail.charAt(0).toUpperCase();
@@ -222,12 +314,13 @@ export class Clients implements OnInit {
     return '??';
   }
 
-  clientStatusLabel(client: any): string {
-    if (client.status !== 'PENDING') return client.status;
-    if (client.requestType === 'INSTRUCTOR_TO_CLIENT') {
-      return client.client ? 'Invited' : 'Email sent';
+  clientStatusLabel(client: InstructorClient): string {
+    if (client.status !== InstructorClientStatuses.Pending)
+      return ClientStatusLabels[client.status];
+    if (client.requestType === ClientRequestTypes.InstructorToClient) {
+      return client.client ? PendingClientLabels.Invited : PendingClientLabels.EmailSent;
     }
-    return 'Request';
+    return PendingClientLabels.Request;
   }
 
   statusSeverity(status: InstructorClientStatus): TagSeverity {

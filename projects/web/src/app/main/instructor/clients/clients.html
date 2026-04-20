@@ -16,7 +16,8 @@
     <span class="text-sm font-medium">Status:</span>
     @for (option of statusOptions; track option.label) {
     <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'contrast'" size="small"
-      rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)" />
+      rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
+      styleClass="py-0.5 min-w-10" />
     }
   </div>
 
@@ -25,14 +26,14 @@
 
     <p-table [value]="clients()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
       [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
-      scrollHeight="flex" dataKey="id">
+      scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true">
       <ng-template #header>
         <tr>
           <th>Name</th>
           <th>Email</th>
-          <th>Status</th>
-          <th>Started</th>
-          <th>Groups</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Started</th>
+          <!-- <th>Groups</th> -->
           <th>Notes</th>
           <th class="w-32 text-center">Actions</th>
         </tr>
@@ -43,15 +44,16 @@
           <td>
             <div class="flex items-center gap-3">
               <p-avatar [label]="initials(client)" shape="circle" />
-              <span class="font-medium text-secondary-900">{{ clientName(client) }}</span>
+              <span>{{ clientName(client) }}</span>
             </div>
           </td>
           <td>{{ clientEmail(client) }}</td>
-          <td>
-            <p-tag [value]="clientStatusLabel(client)" [severity]="statusSeverity(client.status)" />
+          <td class="text-center">
+            <p-tag [value]="clientStatusLabel(client)" [severity]="statusSeverity(client.status)" class="w-full"
+              rounded />
           </td>
-          <td>{{ client.startedAt ? (client.startedAt | date: 'mediumDate') : '—' }}</td>
-          <td>
+          <td class="text-center">{{ client.startedAt ? (client.startedAt | date: 'dd MMM yyyy') : '—' }}</td>
+          <!-- <td>
             @if (client.groupMemberships?.length) {
             <div class="flex flex-wrap gap-1">
               @for (group of client.groupMemberships; track group.groupId) {
@@ -61,10 +63,10 @@
             } @else {
             <span class="text-secondary-400">—</span>
             }
-          </td>
+          </td> -->
           <td>
             @if (client.notes) {
-            <span class="text-xs text-secondary-500 truncate max-w-10 inline-block" [pTooltip]="client.notes">
+            <span class="text-xs text-secondary-500 truncate max-w-20 inline-block" [pTooltip]="client.notes">
               {{ client.notes }}
             </span>
             } @else {
@@ -72,20 +74,26 @@
             }
           </td>
           <td>
-            <div class="flex items-center justify-center gap-1">
-              @if (client.status === 'PENDING' && client.requestType === 'CLIENT_TO_INSTRUCTOR') {
-              <!-- Incoming request: accept / decline -->
-              <p-button icon="pi pi-check" [rounded]="true" [text]="true" severity="success" pTooltip="Accept"
+            <div class="flex items-center justify-end gap-1">
+              @if (client.status === Statuses.Pending && client.requestType === RequestTypes.ClientToInstructor) {
+              <p-button icon="pi pi-check" rounded text severity="success" tooltipPosition="left" pTooltip="Accept"
                 (onClick)="acceptPendingRequest(client)" />
-              <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" pTooltip="Decline"
+              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left" pTooltip="Decline"
                 (onClick)="declinePendingRequest(client)" />
-              } @else if (client.status === 'ACTIVE') {
-              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit notes"
-                (onClick)="openNotesDialog(client)" />
-              <p-button icon="pi pi-inbox" [rounded]="true" [text]="true" severity="danger" pTooltip="Archive"
+              } @else if (client.status === Statuses.Active) {
+              <p-button icon="pi pi-pencil" rounded text severity="secondary" tooltipPosition="left"
+                pTooltip="Edit notes" (onClick)="openNotesDialog(client)" />
+              <p-button icon="pi pi-inbox" rounded text severity="danger" tooltipPosition="left" pTooltip="Archive"
                 (onClick)="confirmArchive(client)" />
-              } @else if (client.status === 'PENDING' && client.requestType === 'INSTRUCTOR_TO_CLIENT') {
-              <span class="text-xs text-surface-500">Waiting for response</span>
+              } @else if (client.status === Statuses.Pending && client.requestType === RequestTypes.InstructorToClient)
+              {
+              <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
+                pTooltip="Resend invitation" (onClick)="resendInvitation(client)" />
+              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left"
+                pTooltip="Cancel invitation" (onClick)="cancelInvitation(client)" />
+              } @else if (client.status === Statuses.Archived) {
+              <p-button icon="pi pi-inbox" rounded text severity="success" tooltipPosition="left" pTooltip="Unarchive"
+                (onClick)="confirmUnarchive(client)" />
               }
             </div>
           </td>

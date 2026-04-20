@@ -1,14 +1,6 @@
 import Lara from '@primeuix/themes/lara';
 import { definePreset } from '@primeuix/themes';
-import {
-  primary,
-  success,
-  info,
-  warning,
-  danger,
-  surfaceDark,
-  secondary,
-} from './theme-colors';
+import { primary, success, info, warning, danger, surfaceDark, secondary } from './theme-colors';
 
 export const MotionHiveLara = definePreset(Lara, {
   primitive: {},
@@ -17,12 +9,14 @@ export const MotionHiveLara = definePreset(Lara, {
     formField: {
       paddingX: '0.625rem',
       paddingY: '0.5rem',
-      // lgFontSize: '1rem',
-      lgPaddingX: '0.75rem',
-      lgPaddingY: '0.625rem',
-      // smFontSize: '0.75rem',
-      smPaddingX: '0.5rem',
-      smPaddingY: '0.375rem',
+      sm: {
+        paddingX: '0.5rem',
+        paddingY: '0.375rem',
+      },
+      lg: {
+        paddingX: '0.75rem',
+        paddingY: '0.625rem',
+      },
     },
     list: {
       header: {
@@ -44,14 +38,7 @@ export const MotionHiveLara = definePreset(Lara, {
           hoverColor: '{primary.600}',
           activeColor: '{primary.700}',
         },
-        highlight: {
-          // Tinted navy wash for selected rows, focus rings, chips.
-          // background: '#eef4fa', // secondary.50
-          // focusBackground: '#dce9f5', // secondary.100
-          // color: '#1e3a5f', // secondary.800
-          // focusColor: '#0f1720', // secondary.900
-        },
-        //surface: surfaceLight,
+        highlight: {},
       },
       dark: {
         primary: {
@@ -60,13 +47,7 @@ export const MotionHiveLara = definePreset(Lara, {
           hoverColor: '{primary.600}',
           activeColor: '{primary.700}',
         },
-        highlight: {
-          // Warm gold wash — matches the rgba used for badge-paused in dark.
-          // background: 'rgba(245, 158, 11, 0.16)',
-          // focusBackground: 'rgba(245, 158, 11, 0.24)',
-          // color: '{primary.400}',
-          // focusColor: '{primary.300}',
-        },
+        highlight: {},
         surface: surfaceDark,
       },
     },
@@ -77,14 +58,12 @@ export const MotionHiveLara = definePreset(Lara, {
         padding: '{overlay.modal.padding}',
       },
     },
-    // select: {
-    //   list: {
-    //     header: {
-    //       padding: '',
-    //     },
-    //   },
-    // },
     button: {
+      root: {
+        label: {
+          fontWeight: '500',
+        },
+      },
       colorScheme: {
         light: {
           outlined: {
@@ -142,6 +121,12 @@ export const MotionHiveLara = definePreset(Lara, {
             },
           },
         },
+      },
+    },
+    tag: {
+      root: {
+        fontWeight: 'normal',
+        roundedBorderRadius: '50rem',
       },
     },
   },

@@ -59,6 +59,13 @@ export class ClientService {
     );
   }
 
+  resendInvitation(requestId: string): Observable<{ message: string; request: ClientRequest }> {
+    return this._http.post<{ message: string; request: ClientRequest }>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE}/${requestId}/resend`,
+      null,
+    );
+  }
+
   getInvitationByToken(token: string): Observable<InvitationDetails> {
     return this._http.get<InvitationDetails>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE_BY_TOKEN(token)}`,
@@ -109,5 +116,9 @@ export class ClientService {
 
   archiveClient(clientId: string): Observable<InstructorClient> {
     return this._http.delete<InstructorClient>(`${this.baseUrl}/${clientId}`);
+  }
+
+  unarchiveClient(clientId: string): Observable<InstructorClient> {
+    return this._http.patch<InstructorClient>(`${this.baseUrl}/${clientId}`, { status: 'ACTIVE' });
   }
 }

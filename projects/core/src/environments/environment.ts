@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
   appUrl: 'https://beeactive-dev.fit',
-  //apiUrl: 'http://localhost:3800',
-  apiUrl: 'https://beeactive-api-production.up.railway.app',
+  apiUrl: 'http://localhost:3800',
+  //apiUrl: 'https://beeactive-api-production.up.railway.app',
   // production: false,
 
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',

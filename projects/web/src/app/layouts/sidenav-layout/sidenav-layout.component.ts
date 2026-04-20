@@ -8,6 +8,7 @@ import {
   inject,
   DestroyRef,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
@@ -16,6 +17,9 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { FeedbackService, Logo, NavItem, NavSection } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
+import { InputIcon } from 'primeng/inputicon';
+import { IconField } from 'primeng/iconfield';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
   selector: 'mh-sidenav-layout',
@@ -27,6 +31,10 @@ import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu'
     ThemeToggleComponent,
     Logo,
     ProfileMenu,
+    InputIcon,
+    IconField,
+    FormsModule,
+    InputText,
   ],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',
@@ -50,6 +58,8 @@ export class SidenavLayoutComponent {
   sidebarAnimating = signal(false);
   readonly showBackdrop = computed(() => this.sidebarOpen() && !this._isDesktop());
 
+  readonly keyword = signal('');
+
   /** Close sidebar on navigation when in over mode (< lg). */
   private readonly _autoCloseOnNav = this._router.events
     .pipe(
@@ -72,6 +82,12 @@ export class SidenavLayoutComponent {
 
     this._lgQuery.addEventListener('change', onResize);
     this._destroyRef.onDestroy(() => this._lgQuery.removeEventListener('change', onResize));
+  }
+
+  searchByKeyword(): void {}
+
+  onKeywordClear(): void {
+    this.keyword.set('');
   }
 
   openFeedback(): void {

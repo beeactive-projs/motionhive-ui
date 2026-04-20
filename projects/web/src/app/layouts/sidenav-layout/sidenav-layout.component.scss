@@ -38,9 +38,9 @@ $lg: 1024px;
   flex-direction: column;
   width: $sidebar-width;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1rem 0;
   border-right: 1px solid color-mix(in oklab, var(--p-secondary-500) 30%, transparent);
-  background-color: var(--p-primary-50);
+  background-color: var(--p-secondary-100);
   // color: var(--p-slate-50);
 
   transform: translate3d(-100%, 0, 0);
@@ -67,25 +67,6 @@ $lg: 1024px;
     position: absolute;
     z-index: 2;
   }
-
-  // .brand-logo {
-  //   position: relative;
-  //   z-index: 2;
-  //   display: flex;
-  //   align-items: center;
-  //   gap: 1rem;
-
-  //   .brand-logo-icon {
-  //     width: 3rem;
-  //     height: 3rem;
-  //     border-radius: 1rem;
-  //     display: flex;
-  //     align-items: center;
-  //     justify-content: center;
-  //     box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
-  //     flex-shrink: 0;
-  //   }
-  // }
 }
 
 :host-context(.dark) {
@@ -97,34 +78,35 @@ $lg: 1024px;
 }
 
 // --- Become a coach CTA ---
-.become-coach-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin: 0.75rem 0.5rem 0.25rem;
-  padding: 0.75rem;
-  background: var(--p-surface-100);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: var(--p-border-radius-md, 0.5rem);
+// .become-coach-cta {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 0.5rem;
+//   margin: 0.75rem 0.5rem 0.25rem;
+//   padding: 0.75rem;
+//   background: var(--p-surface-100);
+//   border: 1px solid var(--p-content-border-color);
+//   border-radius: var(--p-border-radius-md, 0.5rem);
 
-  &__text {
-    margin: 0;
-    font-size: 0.8125rem;
-    color: var(--p-text-muted-color);
-  }
-}
+//   &__text {
+//     margin: 0;
+//     font-size: 0.8125rem;
+//     color: var(--p-text-muted-color);
+//   }
+// }
 
-:host-context(.dark) {
-  .become-coach-cta {
-    background: color-mix(in oklab, var(--p-secondary-800) 60%, transparent);
-  }
-}
+// :host-context(.dark) {
+//   .become-coach-cta {
+//     background: color-mix(in oklab, var(--p-secondary-800) 60%, transparent);
+//   }
+// }
 
 //Toolbar
 .p-toolbar {
   border-radius: 0;
-  // border-bottom: 1px var(--p-surface-500);
-  // background-color: var(--p-surface-200);
+  // border-bottom: 1px solid color-mix(in oklab, var(--p-secondary-500) 20%, transparent);
+  //border-bottom: 1px solid var(--p-surface-200);
+  //background-color: var(--p-surface-100);
   // color: var(--p-slate-50);
 }
 
