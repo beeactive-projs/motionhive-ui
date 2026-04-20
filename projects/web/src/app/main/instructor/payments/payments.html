@@ -1,0 +1,46 @@
+<div class="h-full flex flex-col gap-4">
+  <!-- Header -->
+  <header class="flex flex-col gap-1">
+    <h1 class="font-heading font-semibold text-xl md:text-2xl">Payments</h1>
+    <p class="text-sm text-surface-700 dark:text-surface-400">
+      Manage your earnings, invoices, memberships, and pricing.
+    </p>
+  </header>
+
+  <!-- Tabs -->
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="flex-1 min-h-0 flex flex-col">
+    <p-tablist>
+      <p-tab [value]="Tabs.Overview">
+        <i class="pi pi-chart-line"></i>
+        <span class="ml-2">Overview</span>
+      </p-tab>
+      <p-tab [value]="Tabs.Invoices">
+        <i class="pi pi-file"></i>
+        <span class="ml-2">Invoices</span>
+      </p-tab>
+      <p-tab [value]="Tabs.Memberships">
+        <i class="pi pi-refresh"></i>
+        <span class="ml-2">Memberships</span>
+      </p-tab>
+      <p-tab [value]="Tabs.Pricing">
+        <i class="pi pi-tag"></i>
+        <span class="ml-2">Pricing</span>
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels class="flex-1 min-h-0">
+      <p-tabpanel [value]="Tabs.Overview">
+        @if (activeTab() === Tabs.Overview) { <mh-earnings /> }
+      </p-tabpanel>
+      <p-tabpanel [value]="Tabs.Invoices">
+        @if (activeTab() === Tabs.Invoices) { <mh-invoices /> }
+      </p-tabpanel>
+      <p-tabpanel [value]="Tabs.Memberships">
+        @if (activeTab() === Tabs.Memberships) { <mh-subscriptions /> }
+      </p-tabpanel>
+      <p-tabpanel [value]="Tabs.Pricing">
+        @if (activeTab() === Tabs.Pricing) { <mh-products /> }
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

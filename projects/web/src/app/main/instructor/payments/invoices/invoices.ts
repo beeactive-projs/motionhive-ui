@@ -72,7 +72,7 @@ export class Invoices implements OnInit {
 
   ngOnInit(): void {
     this.loadOnboardingStatus();
-    // this.loadInvoices();
+    this.loadInvoices();
   }
 
   private loadOnboardingStatus(): void {

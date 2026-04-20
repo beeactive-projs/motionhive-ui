@@ -58,7 +58,7 @@ export class Products implements OnInit {
   editingProduct = signal<Product | null>(null);
 
   ngOnInit(): void {
-    // this.loadProducts();
+    this.loadProducts();
   }
 
   loadProducts(): void {

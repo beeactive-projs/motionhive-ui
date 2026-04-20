@@ -7,13 +7,7 @@
   </p-message>
 }
 
-<header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-  <div class="space-y-1">
-    <h1 class="font-heading font-semibold text-xl md:text-2xl">Invoices</h1>
-    <p class="text-sm text-surface-700 dark:text-surface-400">
-      Create, send, and manage invoices for your clients.
-    </p>
-  </div>
+<header class="flex justify-end gap-4 mb-4">
   <p-button label="Create invoice" icon="pi pi-plus" [disabled]="!stripeOnboarded()" pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="showCreateDialog.set(true)" />
 </header>
 

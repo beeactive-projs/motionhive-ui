@@ -95,10 +95,7 @@ export class Main {
         {
           label: 'Revenue',
           items: [
-            { label: 'Earnings', route: '/coaching/earnings', icon: 'pi pi-chart-line' },
-            { label: 'Invoices', route: '/coaching/invoices', icon: 'pi pi-file' },
-            { label: 'Pricing', route: '/coaching/pricing', icon: 'pi pi-tag' },
-            { label: 'Subscriptions', route: '/coaching/subscriptions', icon: 'pi pi-refresh' },
+            { label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' },
           ],
         },
       );
