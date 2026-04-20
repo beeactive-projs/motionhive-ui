@@ -21,13 +21,13 @@ $hex-gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 1rem;
-  border: 1px solid var(--p-secondary-700);
-  color: var(--p-secondary-700);
+  border: 1px solid var(--p-primary-500);
+  color: var(--p-primary-500);
 }
 
 :host-context(.dark) .fitness-platform {
-  border-color: var(--p-primary-500);
-  color: var(--p-primary-500);
+  border-color: var(--p-secondary-500);
+  color: var(--p-secondary-500);
 }
 
 // ===== Hero Visual — Hexagon Grid =====
@@ -213,10 +213,10 @@ $hex-gap: 0.5rem;
   box-shadow: 0 0 16px color-mix(in oklab, var(--p-teal-500) 10%, transparent);
 }
 
-.floating-card-icon--primary {
-  background: color-mix(in oklab, var(--p-primary-500) 15%, transparent);
-  color: var(--p-primary-500);
-  box-shadow: 0 0 16px color-mix(in oklab, var(--p-primary-500) 10%, transparent);
+.floating-card-icon--secondary {
+  background: color-mix(in oklab, var(--p-secondary-500) 15%, transparent);
+  color: var(--p-secondary-500);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--p-secondary-500) 10%, transparent);
 }
 
 .floating-card-title {
@@ -245,7 +245,7 @@ $hex-gap: 0.5rem;
   top: -10px;
   right: -55px;
   animation: cardFloat2 5s ease-in-out 1s infinite;
-  @include card-color(var(--p-primary-500));
+  @include card-color(var(--p-secondary-500));
 }
 
 @keyframes cardFloat1 {
@@ -314,7 +314,7 @@ $hex-gap: 0.5rem;
 }
 
 .who-icon-instructors {
-  background: var(--p-primary-500);
+  background: var(--p-secondary-500);
 }
 
 .who-icon-movers {
@@ -348,7 +348,7 @@ $hex-gap: 0.5rem;
   width: 1.125rem;
   height: 1.125rem;
   clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
-  background: var(--p-primary-500);
+  background: var(--p-secondary-500);
   color: white;
   font-size: 0.55rem;
   font-weight: 700;
