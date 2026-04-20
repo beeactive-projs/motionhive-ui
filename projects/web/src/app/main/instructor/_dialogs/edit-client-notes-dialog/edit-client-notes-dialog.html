@@ -14,7 +14,7 @@
     </div>
   </div>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
     <p-button label="Save notes" icon="pi pi-check" severity="primary" [loading]="notesLoading()"
       (onClick)="saveNotes()" />
   </ng-template>

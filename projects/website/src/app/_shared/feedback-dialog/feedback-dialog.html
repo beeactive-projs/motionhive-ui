@@ -95,7 +95,7 @@
       <p-button label="Send feedback" i18n-label="@@feedback.btn.send" icon="pi pi-send" iconPos="right"
         (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()"
         class="order-1 sm:order-2 w-full sm:w-auto" fluid />
-      <p-button label="Cancel" i18n-label="@@feedback.btn.cancel" [outlined]="true" (onClick)="onClose()"
+      <p-button label="Cancel" i18n-label="@@feedback.btn.cancel" text severity="contrast" (onClick)="onClose()"
         class="order-2 sm:order-1 w-full sm:w-auto" fluid />
     </div>
     } @else {

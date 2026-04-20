@@ -5,49 +5,39 @@
     <div class="flex flex-col gap-2">
       <label class="text-sm font-medium">Bill to</label>
       <div class="flex gap-2">
-        <p-button
-          type="button"
-          label="Existing client"
-          icon="pi pi-users"
-          size="small"
-          [outlined]="useManualEmail()"
+        <p-button type="button" label="Existing client" icon="pi pi-users" size="small" [outlined]="useManualEmail()"
           (onClick)="onRecipientModeChange(false)" />
-        <p-button
-          type="button"
-          label="New recipient"
-          icon="pi pi-user-plus"
-          size="small"
-          [outlined]="!useManualEmail()"
+        <p-button type="button" label="New recipient" icon="pi pi-user-plus" size="small" [outlined]="!useManualEmail()"
           (onClick)="onRecipientModeChange(true)" />
       </div>
     </div>
 
     <!-- Existing client picker -->
     @if (!useManualEmail()) {
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium">Client</label>
-        <p-select formControlName="clientUserId" [options]="clientOptions()" optionLabel="label"
-          optionValue="value" [filter]="true" filterPlaceholder="Search clients..."
-          placeholder="Select a client" [loading]="clientsLoading()" class="w-full" />
-      </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium">Client</label>
+      <p-select formControlName="clientUserId" [options]="clientOptions()" optionLabel="label" optionValue="value"
+        [filter]="true" filterPlaceholder="Search clients..." placeholder="Select a client" [loading]="clientsLoading()"
+        class="w-full" />
+    </div>
     } @else {
-      <!-- New recipient fields -->
-      <div class="flex flex-col gap-3">
+    <!-- New recipient fields -->
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium">Email</label>
+        <input pInputText formControlName="guestEmail" placeholder="client@example.com" />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium">Email</label>
-          <input pInputText formControlName="guestEmail" placeholder="client@example.com" />
+          <label class="text-sm font-medium">First name</label>
+          <input pInputText formControlName="guestFirstName" placeholder="First name" />
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">First name</label>
-            <input pInputText formControlName="guestFirstName" placeholder="First name" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Last name</label>
-            <input pInputText formControlName="guestLastName" placeholder="Last name (optional)" />
-          </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium">Last name</label>
+          <input pInputText formControlName="guestLastName" placeholder="Last name (optional)" />
         </div>
       </div>
+    </div>
     }
 
     <!-- Line items -->
@@ -55,82 +45,67 @@
       <label class="text-sm font-medium">Line items</label>
 
       @for (item of lineItems.controls; track $index; let i = $index) {
-        <div class="flex flex-col gap-3 p-3 rounded-lg border border-surface-700 bg-surface-900/40"
-          [formGroupName]="i">
+      <div class="flex flex-col gap-3 p-3 rounded-lg border border-surface-700 bg-surface-900/40" [formGroupName]="i">
 
-          <div class="flex items-center justify-between">
-            <span class="text-xs uppercase tracking-wide text-surface-400">Item {{ i + 1 }}</span>
-            @if (lineItems.length > 1) {
-              <p-button type="button" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
-                (onClick)="removeLineItem(i)" />
-            }
-          </div>
-
-          @if (productOptions().length > 0) {
-            <div class="flex flex-col gap-1">
-              <label class="text-xs text-surface-400">Pick from pricing (optional)</label>
-              <p-select
-                formControlName="productId"
-                [options]="productOptions()"
-                optionLabel="label"
-                optionValue="value"
-                [filter]="true"
-                filterPlaceholder="Search pricings..."
-                placeholder="Select a pricing or type custom below"
-                [showClear]="true"
-                appendTo="body"
-                class="w-full"
-                (onChange)="onProductSelect(i, $any($event).value)" />
-            </div>
+        <div class="flex items-center justify-between">
+          <span class="text-xs uppercase tracking-wide text-surface-400">Item {{ i + 1 }}</span>
+          @if (lineItems.length > 1) {
+          <p-button type="button" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+            (onClick)="removeLineItem(i)" />
           }
+        </div>
 
+        @if (productOptions().length > 0) {
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-surface-400">Pick from pricing (optional)</label>
+          <p-select formControlName="productId" [options]="productOptions()" optionLabel="label" optionValue="value"
+            [filter]="true" filterPlaceholder="Search pricings..." placeholder="Select a pricing or type custom below"
+            [showClear]="true" appendTo="body" class="w-full" (onChange)="onProductSelect(i, $any($event).value)" />
+        </div>
+        }
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-surface-400">Name</label>
+          <input type="text" formControlName="name" placeholder="e.g. Single PT Session" class="p-inputtext w-full" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-surface-400">Description (optional)</label>
+          <textarea formControlName="description" rows="2" placeholder="Longer details shown on the invoice"
+            class="p-inputtext w-full"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-surface-400">Name</label>
-            <input type="text" formControlName="name" placeholder="e.g. Single PT Session"
-              class="p-inputtext w-full" />
+            <label class="text-xs text-surface-400">Unit price (RON)</label>
+            <p-inputNumber formControlName="amount" mode="currency" currency="RON" locale="ro-RO"
+              [minFractionDigits]="2" [min]="0.5" [allowEmpty]="true" placeholder="0,00 RON"
+              (onInput)="onAmountInput(i, $event)" styleClass="w-full" [inputStyleClass]="'w-full'" />
           </div>
-
           <div class="flex flex-col gap-1">
-            <label class="text-xs text-surface-400">Description (optional)</label>
-            <textarea formControlName="description" rows="2"
-              placeholder="Longer details shown on the invoice"
-              class="p-inputtext w-full"></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div class="flex flex-col gap-1">
-              <label class="text-xs text-surface-400">Unit price (RON)</label>
-              <p-inputNumber formControlName="amount" mode="currency" currency="RON" locale="ro-RO"
-                [minFractionDigits]="2" [min]="0.5" [allowEmpty]="true" placeholder="0,00 RON"
-                (onInput)="onAmountInput(i, $event)"
-                styleClass="w-full" [inputStyleClass]="'w-full'" />
+            <label class="text-xs text-surface-400">Quantity</label>
+            <div class="flex items-center gap-1">
+              <p-button type="button" icon="pi pi-minus" [rounded]="true" [text]="true" size="small"
+                (onClick)="decQuantity(i)" />
+              <input type="number" min="1" step="1"
+                class="flex-1 text-center px-2 py-2 rounded-md bg-surface-900 border border-surface-700 text-sm tabular-nums focus:outline-none focus:border-primary-500"
+                [value]="item.get('quantity')?.value ?? 1"
+                (input)="onQuantityChange(i, +($any($event.target).value))" />
+              <p-button type="button" icon="pi pi-plus" [rounded]="true" [text]="true" size="small"
+                (onClick)="incQuantity(i)" />
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs text-surface-400">Quantity</label>
-              <div class="flex items-center gap-1">
-                <p-button type="button" icon="pi pi-minus" [rounded]="true" [text]="true" size="small"
-                  (onClick)="decQuantity(i)" />
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  class="flex-1 text-center px-2 py-2 rounded-md bg-surface-900 border border-surface-700 text-sm tabular-nums focus:outline-none focus:border-primary-500"
-                  [value]="item.get('quantity')?.value ?? 1"
-                  (input)="onQuantityChange(i, +($any($event.target).value))" />
-                <p-button type="button" icon="pi pi-plus" [rounded]="true" [text]="true" size="small"
-                  (onClick)="incQuantity(i)" />
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center pt-2 border-t border-surface-700/50">
-            <span class="text-xs text-surface-400">Subtotal</span>
-            <span class="text-sm font-medium tabular-nums">{{ (lineSubtotalCents(i) / 100).toFixed(2) }} RON</span>
           </div>
         </div>
+
+        <div class="flex justify-between items-center pt-2 border-t border-surface-700/50">
+          <span class="text-xs text-surface-400">Subtotal</span>
+          <span class="text-sm font-medium tabular-nums">{{ (lineSubtotalCents(i) / 100).toFixed(2) }} RON</span>
+        </div>
+      </div>
       }
 
-      <p-button type="button" label="Add line item" icon="pi pi-plus" [text]="true" size="small" (onClick)="addLineItem()" />
+      <p-button type="button" label="Add line item" icon="pi pi-plus" [text]="true" size="small"
+        (onClick)="addLineItem()" />
 
       <!-- Prominent total row -->
       <div class="flex justify-end items-center gap-3 pt-3 mt-1 border-t border-surface-700">
@@ -165,7 +140,7 @@
         Total: <strong>{{ (totalCents() / 100).toFixed(2) }} RON</strong>
       </span>
       <div class="flex gap-2">
-        <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="visible.set(false)" />
+        <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
         <p-button label="Create invoice" icon="pi pi-check" [loading]="saving()" (onClick)="submit()" />
       </div>
     </div>
