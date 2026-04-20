@@ -24,14 +24,14 @@
     <div class="flex flex-col md:flex-row flex-1 justify-between gap-4">
       <div class="hidden md:flex items-center gap-3">
         @for (category of categoryOptions; track category) {
-        <p-button [label]="category | blogCategory" [severity]="selectedCategory() === category ? 'primary' : 'contrast'"
-          size="small" rounded [outlined]="selectedCategory() !== category"
-          (onClick)="onCategoryChange(category)" class="min-w-15" fluid />
+        <p-button [label]="category | blogCategory"
+          [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small" rounded
+          [outlined]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" class="min-w-15" fluid />
         }
       </div>
       <div class="md:hidden">
-        <p-select [options]="categoryOptions" [ngModel]="selectedCategory()"
-          scrollHeight="300px" (ngModelChange)="onCategoryChange($event)" fluid>
+        <p-select [options]="categoryOptions" [ngModel]="selectedCategory()" scrollHeight="300px"
+          (ngModelChange)="onCategoryChange($event)" fluid>
           <ng-template #selectedItem let-value>{{ value | blogCategory }}</ng-template>
           <ng-template #item let-item>{{ item | blogCategory }}</ng-template>
         </p-select>
@@ -107,7 +107,7 @@
 
         <div class="flex items-center justify-between mt-auto">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center font-bold text-xs"
+            <div class="w-9 h-9 rounded-full bg-secondary-500 flex items-center justify-center font-bold text-xs"
               aria-hidden="true">
               {{ featured.authorInitials }}
             </div>
@@ -187,9 +187,8 @@
             {{ post.excerpt }}
           </p>
 
-          <div class="flex items-center gap-2 mt-auto pt-4 border-t border-secondary-100 dark:border-secondary-700/40">
-            <div
-              class="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold text-xs"
+          <div class="flex items-center gap-2 mt-auto pt-4 border-t border-primary-100 dark:border-primary-700/40">
+            <div class="w-7 h-7 rounded-full bg-secondary-500 flex items-center justify-center font-bold text-xs"
               aria-hidden="true">
               {{ post.authorInitials }}
             </div>

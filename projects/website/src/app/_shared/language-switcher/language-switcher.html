@@ -1,16 +1,14 @@
-<div class="flex items-center gap-0.5" role="group" i18n-aria-label="@@langSwitcher.aria" aria-label="Language selection">
+<div class="flex items-center gap-0.5" role="group" i18n-aria-label="@@langSwitcher.aria"
+  aria-label="Language selection">
   @for (locale of locales; track locale.code) {
-  <button
-    class="px-2 py-1 text-xs font-semibold rounded transition-colors"
+  <button class="px-2 py-1 text-xs font-semibold rounded transition-colors"
     [class.text-primary-500]="currentLocale() === locale.code"
-    [class.font-bold]="currentLocale() === locale.code"
-    [class.text-surface-500]="currentLocale() !== locale.code"
+    [class.dark:text-secondary-500]="currentLocale() === locale.code"
+    [class.font-bold]="currentLocale() === locale.code" [class.text-surface-500]="currentLocale() !== locale.code"
     [class.cursor-pointer]="currentLocale() !== locale.code"
     [class.hover:text-surface-900]="currentLocale() !== locale.code"
-    [class.dark:hover:text-surface-100]="currentLocale() !== locale.code"
-    (click)="switchLocale(locale.code)"
-    [attr.aria-pressed]="currentLocale() === locale.code"
-    type="button">
+    [class.dark:hover:text-surface-100]="currentLocale() !== locale.code" (click)="switchLocale(locale.code)"
+    [attr.aria-pressed]="currentLocale() === locale.code" type="button">
     {{ locale.label }}
   </button>
   @if (!$last) {

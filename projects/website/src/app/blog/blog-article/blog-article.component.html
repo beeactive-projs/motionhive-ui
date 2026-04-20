@@ -1,6 +1,7 @@
 @if (isLoading()) {
 <!-- ===== Article Skeleton ===== -->
-<section class="hero-section" aria-busy="true" i18n-aria-label="@@blog.article.ariaLoading" aria-label="Loading article">
+<section class="hero-section" aria-busy="true" i18n-aria-label="@@blog.article.ariaLoading"
+  aria-label="Loading article">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10">
     <p-skeleton width="7rem" height="1.25rem" class="mb-6" />
     <div class="flex items-center gap-3 mb-5 flex-wrap">
@@ -46,15 +47,16 @@
 <section class="hero-section">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
     <!-- Back link -->
-    <p-button i18n-label="@@blog.article.backToBlog" label="Back to Blog" icon="pi pi-arrow-left" iconPos="left" routerLink="/blog" size="small" outlined
-      rounded />
+    <p-button i18n-label="@@blog.article.backToBlog" label="Back to Blog" icon="pi pi-arrow-left" iconPos="left"
+      routerLink="/blog" size="small" outlined rounded />
 
     <!-- Meta -->
     <div class="flex items-center gap-3 flex-wrap mt-6 mb-5">
       <span class="category-badge">{{ article.category | blogCategory }}</span>
       <span class="text-sm ">{{ article.publishedAt | date: 'mediumDate' }}</span>
       <span class="text-sm ">
-        <i class="pi pi-clock mr-1 text-xs"></i>{{ article.readTime }} <ng-container i18n="@@blog.minRead">min read</ng-container>
+        <i class="pi pi-clock mr-1 text-xs"></i>{{ article.readTime }} <ng-container i18n="@@blog.minRead">min
+          read</ng-container>
       </span>
     </div>
 
@@ -68,7 +70,8 @@
 
     <!-- Author -->
     <div class="flex items-center gap-3">
-      <div class="w-11 h-11 rounded-full bg-primary-500 flex items-center justify-center font-bold text-sm"
+      <div
+        class="w-11 h-11 rounded-full bg-secondary-500 text-primary-500 flex items-center justify-center font-bold text-sm"
         aria-hidden="true">
         {{ article.authorInitials }}
       </div>
@@ -88,11 +91,12 @@
   </div>
 
   <!-- Article Content -->
-  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-12" i18n-aria-label="@@blog.article.contentAriaLabel" aria-label="Article content">
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-12" i18n-aria-label="@@blog.article.contentAriaLabel"
+    aria-label="Article content">
     <div class="article-content" [innerHTML]="article.content"></div>
 
     <!-- Tags -->
-    <div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-secondary-200 dark:border-secondary-700/50">
+    <div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-primary-200 dark:border-primary-700/50">
       @for (tag of article.tags; track tag) {
       <span class="tag-pill">#{{ tag }}</span>
       }
@@ -103,12 +107,13 @@
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
     <div class="author-bio-card">
       <div
-        class="w-16 h-16 rounded-full bg-primary-500 flex items-center justify-center font-extrabold text-xl shrink-0"
+        class="w-16 h-16 rounded-full bg-secondary-500 flex items-center justify-center font-extrabold text-xl shrink-0"
         aria-hidden="true">
         {{ article.authorInitials }}
       </div>
       <div>
-        <p class="text-xs font-semibold uppercase tracking-widest section-subtext mb-1" i18n="@@blog.article.writtenBy">Written by</p>
+        <p class="text-xs font-semibold uppercase tracking-widest section-subtext mb-1" i18n="@@blog.article.writtenBy">
+          Written by</p>
         <p class="text-lg font-heading font-bold section-heading">{{ article.authorName }}</p>
       </div>
     </div>
@@ -119,7 +124,8 @@
 @if (relatedPosts().length > 0) {
 <section class="related-section py-16" aria-labelledby="related-heading">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 id="related-heading" class="text-2xl sm:text-3xl font-heading font-extrabold section-heading mb-8" i18n="@@blog.article.relatedH2">
+    <h2 id="related-heading" class="text-2xl sm:text-3xl font-heading font-extrabold section-heading mb-8"
+      i18n="@@blog.article.relatedH2">
       Related Articles
     </h2>
 
@@ -134,7 +140,8 @@
         <div class="related-card__content">
           <div class="flex items-center gap-2 mb-2">
             <span class="category-badge">{{ related.category | blogCategory }}</span>
-            <span class="text-xs section-subtext">{{ related.readTime }} <ng-container i18n="@@blog.minRead">min read</ng-container></span>
+            <span class="text-xs section-subtext">{{ related.readTime }} <ng-container i18n="@@blog.minRead">min
+                read</ng-container></span>
           </div>
           <h3
             class="text-base font-heading font-bold section-heading leading-snug mb-2 group-hover:text-brand transition-colors line-clamp-2">
@@ -162,7 +169,8 @@
       We're building MotionHive in the open. Check out more stories from the hive.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button i18n-label="@@blog.article.backToBlog" label="Back to Blog" icon="pi pi-arrow-left" iconPos="left" routerLink="/blog" size="large" />
+      <p-button i18n-label="@@blog.article.backToBlog" label="Back to Blog" icon="pi pi-arrow-left" iconPos="left"
+        routerLink="/blog" size="large" />
     </div>
   </div>
 </section>

@@ -15,8 +15,7 @@
           <mh-logo />
         </a>
 
-        <p class="text-sm leading-relaxed my-6 max-w-xs"
-          i18n="@@footer.tagline">
+        <p class="text-sm leading-relaxed my-6 max-w-xs" i18n="@@footer.tagline">
           Where active communities come together. One place to lead, join, and stay moving.
         </p>
 
@@ -57,16 +56,16 @@
           </li>
           }
           <li>
-            <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true" styleClass="footer-link p-0"
-              (onClick)="openFeedback()" />
+            <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true"
+              styleClass="footer-link p-0" (onClick)="openFeedback()" />
           </li>
         </ul>
         <div class="md:hidden flex gap-5">
           @for (link of supportLinks; track link.label) {
           <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
           }
-          <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true" styleClass="footer-link p-0"
-            (onClick)="openFeedback()" />
+          <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true"
+            styleClass="footer-link p-0" (onClick)="openFeedback()" />
         </div>
       </div>
 
@@ -75,7 +74,7 @@
         <h3 class="footer-heading" i18n="@@footer.getInTouch">Get in Touch</h3>
         <ul class="space-y-4">
           <li class="flex items-center gap-3 text-sm">
-            <i class="pi pi-envelope text-primary-500 shrink-0" aria-hidden="true"></i>
+            <i class="pi pi-envelope shrink-0" aria-hidden="true"></i>
             <a href="mailto:support@motionhive.fit" class="footer-link">
               support&#64;motionhive.fit
             </a>
@@ -87,7 +86,8 @@
     <!-- Bottom bar -->
     <div class="footer-bottom">
       <p class="text-surface-500 text-sm">
-        &copy; {{ currentYear }} MotionHive. <ng-container i18n="@@footer.allRightsReserved">All rights reserved.</ng-container>
+        &copy; {{ currentYear }} MotionHive. <ng-container i18n="@@footer.allRightsReserved">All rights
+          reserved.</ng-container>
       </p>
       <div class="flex items-center gap-6 text-sm">
         <a routerLink="/legal/terms-of-service" class="footer-link" i18n="@@footer.terms">Terms</a>
