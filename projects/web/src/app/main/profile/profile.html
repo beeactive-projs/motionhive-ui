@@ -95,12 +95,14 @@
     <div>
       <dt class="text-xs uppercase tracking-wide">Location</dt>
       <dd class="mt-1 text-sm font-medium">
-        @if (p.account.locationName || p.account.locationCity || p.account.locationCountry) {
-          @if (p.account.locationName) {
-            {{ p.account.locationName }}@if (p.account.locationCity) {, {{ p.account.locationCity }}}
-          } @else {
-            {{ p.account.locationCity }}{{ p.account.locationCity && p.account.locationCountry ? ', ' : '' }}{{ p.account.locationCountry }}
-          }
+        @if (p.account.location?.name || p.account.location?.city || p.account.location?.country) {
+        @if (p.account.location?.name) {
+        {{ p.account.location?.name }}@if (p.account.location?.city || p.account.location?.country) {, {{
+        p.account.location?.city }}}
+        } @else {
+        {{ p.account.location?.city }}{{ p.account.location?.city && p.account.location?.country ? ', ' : '' }}{{
+        p.account.location?.country }}
+        }
         } @else {
         Not provided
         }
