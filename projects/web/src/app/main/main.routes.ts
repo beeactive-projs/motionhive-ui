@@ -27,6 +27,14 @@ export const mainRoutes: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.Profile),
         title: 'My Profile - MotionHive',
       },
+      {
+        path: 'profile/invoices/:id',
+        loadComponent: () =>
+          import('./user/payments/invoice-detail/invoice-detail').then(
+            (m) => m.UserInvoiceDetail,
+          ),
+        title: 'Invoice - MotionHive',
+      },
 
       // Instructor
       {

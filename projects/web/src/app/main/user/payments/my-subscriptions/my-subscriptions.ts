@@ -52,7 +52,7 @@ export class MySubscriptions implements OnInit {
   currentPage = signal(1);
 
   ngOnInit(): void {
-    // this.loadSubscriptions();
+    this.loadSubscriptions();
   }
 
   loadSubscriptions(): void {

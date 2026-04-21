@@ -55,7 +55,7 @@ export const instructorRoutes: Routes = [
   },
 
   // Legacy redirects — simple path redirects to the hub.
-  // The hub defaults to the Overview tab. Query-param redirects
+  // The hub defaults to the Invoices tab. Query-param redirects
   // aren't supported by Angular router, so bookmarks go to the
   // hub root and users pick the tab from there.
   { path: 'earnings', redirectTo: 'payments', pathMatch: 'full' },

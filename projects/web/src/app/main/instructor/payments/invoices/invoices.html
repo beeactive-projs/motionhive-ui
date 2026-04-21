@@ -1,18 +1,5 @@
-@if (!stripeOnboarded()) {
-  <p-message severity="warn" styleClass="w-full mb-4">
-    <div class="flex items-center gap-3">
-      <span>Set up payouts to start receiving money.</span>
-      <p-button label="Connect Stripe" icon="pi pi-external-link" severity="warn" [text]="true" size="small" (onClick)="startOnboarding()" />
-    </div>
-  </p-message>
-}
-
-<header class="flex justify-end gap-4 mb-4">
-  <p-button label="Create invoice" icon="pi pi-plus" [disabled]="!stripeOnboarded()" pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="showCreateDialog.set(true)" />
-</header>
-
 <!-- Status filter -->
-<div class="flex gap-2 mb-4">
+<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
   @for (opt of statusOptions; track opt.label) {
     <p-button
       [label]="opt.label"
@@ -24,7 +11,7 @@
   }
 </div>
 
-<!-- Table -->
+<!-- Desktop: data table (hidden on mobile) -->
 <p-table
   [value]="invoices()"
   [lazy]="true"
@@ -37,6 +24,7 @@
   [scrollable]="true"
   scrollHeight="flex"
   dataKey="id"
+  styleClass="hidden md:block"
 >
   <ng-template #header>
     <tr>
@@ -53,8 +41,8 @@
   <ng-template #body let-invoice>
     <tr>
       <td>
-        <a [routerLink]="['/coaching/invoices', invoice.id]" class="text-primary-500 hover:underline font-medium">
-          {{ invoice.number || '—' }}
+        <a [routerLink]="['/coaching/invoices', invoice.id]" class="text-primary-500 hover:underline font-medium tabular-nums">
+          {{ invoiceDisplayNumber(invoice) }}
         </a>
       </td>
       <td>
@@ -72,7 +60,15 @@
           <span class="text-xs text-surface-500 ml-1">(manual)</span>
         }
       </td>
-      <td>{{ invoice.dueDate ? (invoice.dueDate | date:'dd/MM/yyyy') : '—' }}</td>
+      <td>
+        @if (invoice.dueDate) {
+          <span [class.text-red-500]="isOverdue(invoice)">
+            {{ invoice.dueDate | date:'dd/MM/yyyy' }}
+          </span>
+        } @else {
+          —
+        }
+      </td>
       <td>{{ invoice.paidAt ? (invoice.paidAt | date:'dd/MM/yyyy') : '—' }}</td>
       <td>
         <div class="flex gap-1">
@@ -140,6 +136,80 @@
     </tr>
   </ng-template>
 </p-table>
+
+<!-- Mobile: card list (hidden on desktop) -->
+<div class="md:hidden flex flex-col gap-3">
+  @if (loading()) {
+    @for (_ of [1,2,3]; track $index) {
+      <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+        <p-skeleton width="30%" height="1.25rem" />
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 flex-1">
+            <p-skeleton shape="circle" size="2.25rem" />
+            <div class="flex flex-col gap-1 flex-1">
+              <p-skeleton width="60%" height="0.875rem" />
+              <p-skeleton width="40%" height="0.75rem" />
+            </div>
+          </div>
+          <p-skeleton width="4rem" height="1rem" />
+        </div>
+      </div>
+    }
+  } @else if (invoices().length === 0) {
+    <div class="rounded-lg border border-surface-200 dark:border-surface-700 flex flex-col items-center justify-center py-8 text-center gap-2">
+      <i class="pi pi-file text-4xl text-surface-400"></i>
+      <p class="m-0 font-medium">No invoices yet</p>
+      <p class="text-surface-500 text-sm m-0">
+        Create your first invoice to start billing clients.
+      </p>
+      <p-button
+        label="Create invoice"
+        icon="pi pi-plus"
+        size="small"
+        class="mt-2"
+        (onClick)="showCreateDialog.set(true)"
+      />
+    </div>
+  } @else {
+    @for (invoice of invoices(); track trackById($index, invoice)) {
+      <a
+        [routerLink]="['/coaching/invoices', invoice.id]"
+        class="no-underline text-inherit"
+      >
+        <mh-list-card
+          [status]="isOverdue(invoice) ? 'overdue' : invoice.status"
+          [statusSeverity]="isOverdue(invoice) ? 'danger' : statusSeverity(invoice.status)"
+          [avatarInitials]="clientInitials(invoice)"
+          [title]="clientDisplay(invoice)"
+          [subtitle]="invoiceDisplayNumber(invoice) +
+            (invoice.status === Statuses.Paid && invoice.paidAt
+              ? (' · Paid')
+              : invoice.dueDate ? ' · Due' : '')"
+          [clickable]="true"
+          [accent]="cardAccent(invoice)"
+        >
+          <div amount class="flex flex-col items-end">
+            <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
+              {{ invoice.amountDueCents | currencyRon:invoice.currency }}
+            </span>
+          </div>
+          <div meta class="flex items-center gap-2 text-xs text-surface-500 flex-wrap">
+            @if (invoice.status === Statuses.Paid && invoice.paidAt) {
+              <span>{{ invoice.paidAt | date:'dd MMM' }}</span>
+            } @else if (invoice.dueDate) {
+              <span [class.text-red-500]="isOverdue(invoice)">
+                {{ invoice.dueDate | date:'dd MMM' }}
+              </span>
+            }
+            @if (invoice.paidOutOfBand) {
+              <span>· manual</span>
+            }
+          </div>
+        </mh-list-card>
+      </a>
+    }
+  }
+</div>
 
 <mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="loadInvoices()" />
 

@@ -25,6 +25,7 @@ import {
   type SubscriptionStatus,
 } from 'core';
 import { CreateSubscriptionDialog } from '../../_dialogs/create-subscription-dialog/create-subscription-dialog';
+import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
 @Component({
   selector: 'mh-subscriptions',
@@ -40,6 +41,7 @@ import { CreateSubscriptionDialog } from '../../_dialogs/create-subscription-dia
     MessageModule,
     CurrencyRonPipe,
     CreateSubscriptionDialog,
+    ListCard,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './subscriptions.html',
@@ -200,6 +202,30 @@ export class Subscriptions implements OnInit {
 
   statusLabel(status: SubscriptionStatus): string {
     return status.replace('_', ' ');
+  }
+
+  /** Mobile card client line — falls back to a short id hash when the
+   *  model only has a foreign key (Subscription doesn't embed client). */
+  clientDisplay(sub: Subscription): string {
+    if (!sub.clientId) return 'Unknown client';
+    return `Client #${sub.clientId.slice(0, 8).toUpperCase()}`;
+  }
+
+  /** Mobile card subtitle — product label with the period-end hint. */
+  planDisplay(sub: Subscription): string {
+    const planId = sub.productId
+      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
+      : 'Plan';
+    return planId;
+  }
+
+  /** Left-border accent to pull the eye to attention-worthy rows. */
+  cardAccent(sub: Subscription): 'none' | 'primary' | 'danger' | 'success' {
+    if (sub.status === SubscriptionStatuses.PastDue) return 'danger';
+    if (sub.cancelAt) return 'danger';
+    if (sub.status === SubscriptionStatuses.Trialing) return 'primary';
+    if (sub.status === SubscriptionStatuses.Active) return 'success';
+    return 'none';
   }
 
   trackById = (_: number, item: { id: string }) => item.id;

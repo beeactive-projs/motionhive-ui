@@ -105,8 +105,8 @@
       <!-- Hub tiles -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <a
-          routerLink="/payments/invoices"
-          [queryParams]="{ new: 1 }"
+          routerLink="/coaching/payments"
+          [queryParams]="{ tab: 'invoices', new: 1 }"
           class="block no-underline"
         >
           <p-card styleClass="h-full hover:shadow-md transition-shadow cursor-pointer">
@@ -124,7 +124,7 @@
           </p-card>
         </a>
 
-        <a routerLink="/payments/products" class="block no-underline">
+        <a routerLink="/coaching/payments" [queryParams]="{ tab: 'pricing' }" class="block no-underline">
           <p-card styleClass="h-full hover:shadow-md transition-shadow cursor-pointer">
             <div class="flex flex-col items-center text-center gap-3 py-4">
               <i class="pi pi-tag text-4xl" style="color: var(--p-primary-500)"></i>
@@ -140,7 +140,7 @@
           </p-card>
         </a>
 
-        <a routerLink="/payments/subscriptions" class="block no-underline">
+        <a routerLink="/coaching/payments" [queryParams]="{ tab: 'memberships' }" class="block no-underline">
           <p-card styleClass="h-full hover:shadow-md transition-shadow cursor-pointer">
             <div class="flex flex-col items-center text-center gap-3 py-4">
               <i class="pi pi-sync text-4xl" style="color: var(--p-primary-500)"></i>
@@ -156,7 +156,7 @@
           </p-card>
         </a>
 
-        <a routerLink="/payments/earnings" class="block no-underline">
+        <a routerLink="/coaching/payments" class="block no-underline">
           <p-card styleClass="h-full hover:shadow-md transition-shadow cursor-pointer">
             <div class="flex flex-col items-center text-center gap-3 py-4">
               <i class="pi pi-chart-line text-4xl" style="color: var(--p-primary-500)"></i>

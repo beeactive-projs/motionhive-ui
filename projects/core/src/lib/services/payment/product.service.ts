@@ -47,4 +47,14 @@ export class ProductService {
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.PRODUCT_BY_ID(id)}`,
     );
   }
+
+  /**
+   * Public — no auth. Lists products the instructor has opted to show
+   * on their public profile (showOnProfile=true, isActive=true).
+   */
+  listPublicForInstructor(instructorId: string): Observable<Product[]> {
+    return this._http.get<Product[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.PUBLIC_INSTRUCTOR_PRODUCTS(instructorId)}`,
+    );
+  }
 }

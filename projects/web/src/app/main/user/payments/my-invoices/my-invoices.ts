@@ -59,7 +59,7 @@ export class MyInvoices implements OnInit {
   ];
 
   ngOnInit(): void {
-    // this.loadInvoices();
+    this.loadInvoices();
   }
 
   loadInvoices(): void {

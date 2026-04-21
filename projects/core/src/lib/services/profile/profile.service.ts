@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { MyProfile, UpdateMyProfilePayload } from '../../models/profile/profile.model';
 import {
   FitnessProfile,
@@ -28,12 +28,7 @@ export class ProfileService {
   private readonly _baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PROFILE.BASE}`;
 
   getMyProfile(): Observable<MyProfile> {
-    // return this._http.get<MyProfile>(`${this._baseUrl}/me`);
-    return this._http.get<any>(`${this._baseUrl}/me`).pipe(
-      map((data) => {
-        return { account: data.user, roles: data.roles, instructorProfile: data.instructor };
-      }),
-    );
+    return this._http.get<MyProfile>(`${this._baseUrl}/me`);
   }
 
   updateMyProfile(payload: UpdateMyProfilePayload): Observable<MyProfile> {

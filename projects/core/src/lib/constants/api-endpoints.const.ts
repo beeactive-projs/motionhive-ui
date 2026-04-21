@@ -87,5 +87,10 @@ export const API_ENDPOINTS = {
     MY_INVOICE_PAY: (id: string) => `/payments/my/invoices/${id}/pay`,
     MY_INVOICE_LINE_ITEMS: (id: string) => `/payments/my/invoices/${id}/line-items`,
     MY_SUBSCRIPTIONS: '/payments/my/subscriptions',
+    MY_COUNTS: '/payments/my/counts',
+
+    // Public — no auth
+    PUBLIC_INSTRUCTOR_PRODUCTS: (id: string) =>
+      `/payments/public/instructors/${id}/products`,
   },
 } as const;

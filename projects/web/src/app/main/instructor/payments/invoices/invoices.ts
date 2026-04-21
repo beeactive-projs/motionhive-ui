@@ -20,6 +20,7 @@ import {
   type InvoiceStatus,
 } from 'core';
 import { CreateInvoiceDialog } from '../../_dialogs/create-invoice-dialog/create-invoice-dialog';
+import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
 @Component({
   selector: 'mh-invoices',
@@ -36,6 +37,7 @@ import { CreateInvoiceDialog } from '../../_dialogs/create-invoice-dialog/create
     MessageModule,
     CurrencyRonPipe,
     CreateInvoiceDialog,
+    ListCard,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './invoices.html',
@@ -235,6 +237,39 @@ export class Invoices implements OnInit {
       return `${invoice.client.firstName} ${invoice.client.lastName}`;
     }
     return invoice.clientEmail ?? 'Unknown';
+  }
+
+  /** Two-letter initials for the client avatar. Falls back to "?"
+   *  when the invoice has no client name AND no email. */
+  clientInitials(invoice: Invoice): string {
+    if (invoice.client?.firstName && invoice.client?.lastName) {
+      return (
+        invoice.client.firstName.charAt(0) + invoice.client.lastName.charAt(0)
+      ).toUpperCase();
+    }
+    if (invoice.clientEmail) {
+      return invoice.clientEmail.charAt(0).toUpperCase();
+    }
+    return '?';
+  }
+
+  /** Short identifier shown on list rows (Stripe-assigned `number`
+   *  or a deterministic prefix of the local UUID for drafts). */
+  invoiceDisplayNumber(invoice: Invoice): string {
+    return invoice.number ?? `#${invoice.id.slice(0, 8).toUpperCase()}`;
+  }
+
+  isOverdue(invoice: Invoice): boolean {
+    if (invoice.status !== InvoiceStatuses.Open) return false;
+    if (!invoice.dueDate) return false;
+    return new Date(invoice.dueDate).getTime() < Date.now();
+  }
+
+  /** Mobile accent strip on the card to call out attention-needed rows. */
+  cardAccent(invoice: Invoice): 'none' | 'primary' | 'danger' | 'success' {
+    if (this.isOverdue(invoice)) return 'danger';
+    if (invoice.status === InvoiceStatuses.Paid) return 'success';
+    return 'none';
   }
 
   trackById = (_: number, item: { id: string }) => item.id;

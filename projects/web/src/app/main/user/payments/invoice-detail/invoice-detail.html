@@ -1,6 +1,6 @@
 <!-- Back link -->
 <div class="mb-4">
-  <a routerLink="/user/invoices" class="text-sm text-primary-500 hover:underline">
+  <a routerLink="/profile" [queryParams]="{ tab: 'invoices' }" class="text-sm text-primary-500 hover:underline">
     <i class="pi pi-arrow-left mr-1"></i> Back to invoices
   </a>
 </div>

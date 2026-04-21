@@ -3,7 +3,7 @@
 </header>
 
 <!-- Type filter -->
-<div class="flex gap-2 mb-4">
+<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
   @for (opt of typeOptions; track opt.label) {
     <p-button
       [label]="opt.label"
@@ -15,7 +15,7 @@
   }
 </div>
 
-<!-- Table -->
+<!-- Desktop: data table (hidden on mobile) -->
 <p-table
   [value]="products()"
   [lazy]="true"
@@ -28,6 +28,7 @@
   [scrollable]="true"
   scrollHeight="flex"
   dataKey="id"
+  styleClass="hidden md:block"
 >
   <ng-template #header>
     <tr>
@@ -36,6 +37,7 @@
       <th>Price</th>
       <th>Billing</th>
       <th>Status</th>
+      <th>On profile</th>
       <th class="w-32">Actions</th>
     </tr>
   </ng-template>
@@ -56,13 +58,19 @@
       <td>{{ product.amountCents | currencyRon:product.currency }}</td>
       <td>
         @if (product.interval) {
-          {{ intervalLabel(product) }}
+          {{ billingLabel(product) }}
         } @else {
           <span class="text-surface-400">—</span>
         }
       </td>
       <td>
         <p-tag [value]="product.isActive ? 'Active' : 'Inactive'" [severity]="activeSeverity(product.isActive)" />
+      </td>
+      <td>
+        <p-toggleSwitch
+          [ngModel]="product.showOnProfile"
+          [disabled]="togglingProfileIds().has(product.id)"
+          (ngModelChange)="toggleShowOnProfile(product, $event)" />
       </td>
       <td>
         <div class="flex gap-1">
@@ -85,6 +93,7 @@
         <td><p-skeleton width="80px" /></td>
         <td><p-skeleton width="60px" /></td>
         <td><p-skeleton width="60px" height="1.5rem" /></td>
+        <td><p-skeleton width="40px" height="1.5rem" /></td>
         <td><p-skeleton width="60px" /></td>
       </tr>
     }
@@ -92,7 +101,7 @@
 
   <ng-template #emptymessage>
     <tr>
-      <td colspan="6">
+      <td colspan="7">
         <div class="flex flex-col items-center justify-center py-8 text-center">
           <i class="pi pi-box text-4xl mb-3 text-surface-400"></i>
           <p class="text-surface-900 dark:text-surface-50 m-0 font-medium">No products yet</p>
@@ -105,6 +114,97 @@
     </tr>
   </ng-template>
 </p-table>
+
+<!-- Mobile: card list (hidden on desktop) -->
+<div class="md:hidden flex flex-col gap-3">
+  @if (loading()) {
+    @for (_ of [1,2,3]; track $index) {
+      <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+        <p-skeleton width="30%" height="1.25rem" />
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 flex-1">
+            <p-skeleton shape="circle" size="2.25rem" />
+            <div class="flex flex-col gap-1 flex-1">
+              <p-skeleton width="60%" height="0.875rem" />
+              <p-skeleton width="40%" height="0.75rem" />
+            </div>
+          </div>
+          <p-skeleton width="4rem" height="1rem" />
+        </div>
+      </div>
+    }
+  } @else if (products().length === 0) {
+    <div class="rounded-lg border border-surface-200 dark:border-surface-700 flex flex-col items-center justify-center py-8 text-center gap-2">
+      <i class="pi pi-box text-4xl text-surface-400"></i>
+      <p class="m-0 font-medium">No products yet</p>
+      <p class="text-surface-500 text-sm m-0">
+        Create your first product to start sending invoices.
+      </p>
+      <p-button
+        label="Create product"
+        icon="pi pi-plus"
+        size="small"
+        class="mt-2"
+        (onClick)="openCreateDialog()"
+      />
+    </div>
+  } @else {
+    @for (product of products(); track trackById($index, product)) {
+      <mh-list-card
+        [status]="typeLabel(product.type)"
+        [statusSeverity]="typeSeverity(product.type)"
+        [avatarIcon]="productIcon(product)"
+        [title]="product.name"
+        [subtitle]="product.description ?? subtitleFor(product)"
+        [accent]="cardAccent(product)"
+      >
+        <div badges class="flex items-center gap-2">
+          @if (!product.isActive) {
+            <p-tag value="Inactive" severity="danger" class="text-xs!" />
+          }
+        </div>
+        <div amount class="flex flex-col items-end">
+          <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
+            {{ product.amountCents | currencyRon:product.currency }}
+          </span>
+          @if (product.interval) {
+            <span class="text-xs text-surface-500">{{ billingLabel(product) }}</span>
+          }
+        </div>
+        <div meta class="flex items-center justify-between gap-2 text-xs text-surface-500">
+          <div class="flex items-center gap-2">
+            <i class="pi" [class.pi-eye]="product.showOnProfile" [class.pi-eye-slash]="!product.showOnProfile"></i>
+            <span>{{ product.showOnProfile ? 'On profile' : 'Hidden' }}</span>
+          </div>
+          <p-toggleSwitch
+            [ngModel]="product.showOnProfile"
+            [disabled]="togglingProfileIds().has(product.id)"
+            (ngModelChange)="toggleShowOnProfile(product, $event)"
+          />
+        </div>
+        <div actions class="flex gap-2 pt-1">
+          <p-button
+            label="Edit"
+            icon="pi pi-pencil"
+            size="small"
+            [outlined]="true"
+            (onClick)="openEditDialog(product)"
+          />
+          @if (product.isActive) {
+            <p-button
+              icon="pi pi-ban"
+              size="small"
+              severity="danger"
+              [text]="true"
+              pTooltip="Deactivate"
+              (onClick)="confirmDeactivate(product)"
+            />
+          }
+        </div>
+      </mh-list-card>
+    }
+  }
+</div>
 
 <mh-product-form-dialog
   [(visible)]="showProductFormDialog"

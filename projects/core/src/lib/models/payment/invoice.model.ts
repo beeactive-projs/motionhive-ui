@@ -37,7 +37,9 @@ export interface Invoice {
   currency: string;
   applicationFeeCents: number;
   dueDate: string | null;
+  finalizedAt: string | null;
   paidAt: string | null;
+  voidedAt: string | null;
   hostedInvoiceUrl: string | null;
   invoicePdf: string | null;
   paidOutOfBand: boolean;

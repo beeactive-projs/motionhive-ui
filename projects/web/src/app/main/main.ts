@@ -111,13 +111,6 @@ export class Main {
           { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-star' },
         ],
       },
-      {
-        label: 'Billing',
-        items: [
-          { label: 'Invoices', route: '/activity/invoices', icon: 'pi pi-receipt' },
-          { label: 'Subscriptions', route: '/activity/subscriptions', icon: 'pi pi-sync' },
-        ],
-      },
     );
 
     if (this.isSuperAdmin()) {
