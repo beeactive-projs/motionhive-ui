@@ -41,8 +41,8 @@
     background 0.2s ease;
 
   &:hover {
-    background: var(--p-button-secondary-hover-background);
-    color: var(--p-button-secondary-hover-color);
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
   }
 
   &::after {
@@ -112,8 +112,8 @@
     background 0.2s ease;
 
   &:hover {
-    background: var(--p-button-secondary-hover-background);
-    color: var(--p-button-secondary-hover-color);
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
   }
 
   &--active {
@@ -170,8 +170,8 @@
     background 0.2s ease;
 
   &:hover {
-    background: var(--p-button-secondary-hover-background);
-    color: var(--p-button-secondary-hover-color);
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
   }
 
   &--active {
