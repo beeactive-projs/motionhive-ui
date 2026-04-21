@@ -12,7 +12,7 @@ $hex-size: 10rem;
 $hex-gap: 0.5rem;
 
 // ===== Hero Badge =====
-.fitness-platform {
+.tag-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -23,11 +23,12 @@ $hex-gap: 0.5rem;
   margin-bottom: 1rem;
   border: 1px solid var(--p-primary-500);
   color: var(--p-primary-500);
+  background-color: color-mix(in oklab, var(--p-primary-color) 15%, transparent);
 }
 
-:host-context(.dark) .fitness-platform {
-  border-color: var(--p-secondary-500);
-  color: var(--p-secondary-500);
+:host-context(.dark) .tag-pill {
+  border: 1px solid var(--p-primary-500);
+  color: var(--p-primary-500);
 }
 
 // ===== Hero Visual — Hexagon Grid =====
@@ -213,10 +214,10 @@ $hex-gap: 0.5rem;
   box-shadow: 0 0 16px color-mix(in oklab, var(--p-teal-500) 10%, transparent);
 }
 
-.floating-card-icon--secondary {
-  background: color-mix(in oklab, var(--p-secondary-500) 15%, transparent);
-  color: var(--p-secondary-500);
-  box-shadow: 0 0 16px color-mix(in oklab, var(--p-secondary-500) 10%, transparent);
+.floating-card-icon--navy {
+  background: color-mix(in oklab, var(--p-fuchsia-500) 15%, transparent);
+  color: var(--p-fuchsia-400);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--p-fuchsia-500) 10%, transparent);
 }
 
 .floating-card-title {
@@ -245,7 +246,7 @@ $hex-gap: 0.5rem;
   top: -10px;
   right: -55px;
   animation: cardFloat2 5s ease-in-out 1s infinite;
-  @include card-color(var(--p-secondary-500));
+  @include card-color(var(--color-navy-500));
 }
 
 @keyframes cardFloat1 {
@@ -302,24 +303,24 @@ $hex-gap: 0.5rem;
   }
 }
 
-.who-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 999px;
-  margin-bottom: 1rem;
-  color: white;
-}
+// .who-icon {
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 2.5rem;
+//   height: 2.5rem;
+//   border-radius: 999px;
+//   margin-bottom: 1rem;
+//   color: white;
+// }
 
-.who-icon-instructors {
-  background: var(--p-secondary-500);
-}
+// .who-icon-instructors {
+//   background: var(--color-navy-500);
+// }
 
-.who-icon-movers {
-  background: var(--p-sky-500);
-}
+// .who-icon-movers {
+//   background: var(--p-sky-500);
+// }
 
 .who-list {
   list-style: none;
@@ -348,7 +349,7 @@ $hex-gap: 0.5rem;
   width: 1.125rem;
   height: 1.125rem;
   clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
-  background: var(--p-secondary-500);
+  background: var(--p-primary-500);
   color: white;
   font-size: 0.55rem;
   font-weight: 700;

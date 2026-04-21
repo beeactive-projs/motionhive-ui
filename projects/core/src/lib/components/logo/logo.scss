@@ -5,8 +5,8 @@
 }
 
 .title-color {
-  color: var(--p-primary-500);
+  color: var(--color-navy-500);
 }
 :host-context(.dark) .title-color {
-  color: var(--p-secondary-500);
+  color: var(--p-primary-color);
 }

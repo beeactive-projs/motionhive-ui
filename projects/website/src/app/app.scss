@@ -25,7 +25,7 @@
   }
 
   :host-context(.dark) .honeycomb-bg {
-    background-image: $honeycomb-svg-secondary;
+    background-image: $honeycomb-svg-navy;
   }
 }
 
@@ -88,8 +88,9 @@
     width: 2.75rem;
     height: 2.75rem;
     clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
-    background: var(--p-secondary-500);
-    color: var(--p-primary-500);
+    color: var(--p-button-primary-color);
+    background: var(--p-button-primary-background);
+    border: 1px solid var(--p-button-primary-border-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,19 +110,26 @@
   .feature-badge-live {
     background: color-mix(in oklab, var(--p-green-500) 20%, transparent);
     color: var(--p-green-600);
+    border: 1px solid color-mix(in oklab, var(--p-green-500) 20%, transparent);
   }
 
   :host-context(.dark) .feature-badge-live {
+    background: color-mix(in oklab, var(--p-green-400) 20%, transparent);
     color: var(--p-green-400);
+    border: 1px solid color-mix(in oklab, var(--p-green-400) 20%, transparent);
   }
 
+  /* "Coming soon" is muted — amber is earned */
   .feature-badge-soon {
-    background: color-mix(in oklab, var(--p-secondary-500) 20%, transparent);
-    color: var(--p-secondary-600);
+    background: color-mix(in oklab, var(--color-navy-500) 20%, transparent);
+    color: var(--color-navy-600);
+    border: 1px solid color-mix(in oklab, var(--color-navy-500) 20%, transparent);
   }
 
   :host-context(.dark) .feature-badge-soon {
-    color: var(--p-secondary-400);
+    background: color-mix(in oklab, var(--color-navy-400) 20%, transparent);
+    color: var(--color-navy-400);
+    border: 1px solid color-mix(in oklab, var(--color-navy-400) 20%, transparent);
   }
 }
 
@@ -146,7 +154,7 @@
     left: -100px;
     background: radial-gradient(
       circle,
-      color-mix(in oklab, var(--p-secondary-500) 30%, transparent) 0%,
+      color-mix(in oklab, var(--color-navy-500) 30%, transparent) 0%,
       transparent 70%
     );
     animation-delay: -3s;
@@ -174,13 +182,13 @@
     border-radius: 2rem;
     font-size: 0.75rem;
     font-weight: 600;
-    background: color-mix(in oklab, var(--p-secondary-500) 10%, transparent);
-    color: var(--p-secondary-700);
+    background: color-mix(in oklab, var(--p-primary-500) 10%, transparent);
+    color: var(--p-primary-700);
     letter-spacing: 0.02em;
   }
 
   :host-context(.dark) .category-badge {
-    background: color-mix(in oklab, var(--p-secondary-500) 15%, transparent);
-    color: var(--p-secondary-400);
+    background: color-mix(in oklab, var(--p-primary-500) 15%, transparent);
+    color: var(--p-primary-400);
   }
 }

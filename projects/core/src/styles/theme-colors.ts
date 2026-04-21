@@ -3,9 +3,7 @@
  *
  * - Consumed by PrimeNG via `styles.primeng.ts`
  * - Bridged to Tailwind automatically through `tailwindcss-primeui`
- * - Secondary (Navy) is Tailwind-only (defined in styles.css @theme)
- *
- * Palette derived from the Royal Hive design system (motionhive-dashboard-mockup.html).
+ * - Navy is Tailwind-only (defined in theme.css @theme as --color-navy-*)
  */
 
 export interface ColorScale {
@@ -38,67 +36,22 @@ export interface SurfaceScale {
 }
 
 /* ─────────────────────────────────────────────
-   Primary — Honey Gold
-   Used for: active nav items (dark), CTAs,
+   Primary — Honey Amber
+   Used for: CTAs, active nav items (dark),
    highlight accents, notification dots, badges
    ───────────────────────────────────────────── */
 export const primary: ColorScale = {
-  // 50: '#fffbeb',
-  // 100: '#fef3c7',
-  // 200: '#fde68a',
-  // 300: '#fcd34d',
-  // 400: '#fbbf24',
-  // 500: '#f59e0b',
-  // 600: '#d97706',
-  // 700: '#b45309',
-  // 800: '#92400e',
-  // 900: '#78350f',
-  // 950: '#451a03',
-
-  50: '#f0f4f8',
-  100: '#d9e2ec',
-  200: '#bcccdc',
-  300: '#9fb3c8',
-  400: '#829ab1',
-  500: '#1e3a5f',
-  600: '#1a3354',
-  700: '#162b48',
-  800: '#12233d',
-  900: '#0e1b31',
-  950: '#0a1323',
-};
-
-/* ─────────────────────────────────────────────
-   Secondary — Royal Navy
-   Tailwind-only (@theme in styles.css).
-   Used for: sidebar background (light), active
-   nav items (light), chart bars, avatars,
-   primary action buttons (light mode)
-   ───────────────────────────────────────────── */
-export const secondary: ColorScale = {
-  // 50: '#f0f4f8',
-  // 100: '#d9e2ec',
-  // 200: '#bcccdc',
-  // 300: '#9fb3c8',
-  // 400: '#829ab1',
-  // 500: '#1e3a5f',
-  // 600: '#1a3354',
-  // 700: '#162b48',
-  // 800: '#12233d',
-  // 900: '#0e1b31',
-  // 950: '#0a1323',
-
-  50: '#fffbeb',
-  100: '#fef3c7',
-  200: '#fde68a',
-  300: '#fcd34d',
-  400: '#fbbf24',
-  500: '#f59e0b',
-  600: '#d97706',
-  700: '#b45309',
-  800: '#92400e',
-  900: '#78350f',
-  950: '#451a03',
+  50: '#FFF8EB',
+  100: '#FEEDC7',
+  200: '#FDD98A',
+  300: '#FCC254',
+  400: '#FBAE2C',
+  500: '#F59E0B',
+  600: '#D97706',
+  700: '#B45309',
+  800: '#92400E',
+  900: '#78350F',
+  950: '#451A03',
 };
 
 /* ─────────────────────────────────────────────
@@ -193,49 +146,72 @@ export const danger: ColorScale = {
    ───────────────────────────────────────────── */
 export const surfaceLight: SurfaceScale = {
   0: '#ffffff',
-  50: '#f6f8fb',
-  100: '#f1f5f9',
-  200: '#e5e9ef',
-  300: '#cbd5e1',
-  400: '#94a3b8',
-  500: '#6b7280',
-  600: '#9ca3af',
-  700: '#334155',
-  800: '#1e293b',
-  900: '#0f172a',
-  950: '#020617',
+  // 50: '#f6f8fb',
+  // 100: '#f1f5f9',
+  // 200: '#e5e9ef',
+  // 300: '#cbd5e1',
+  // 400: '#94a3b8',
+  // 500: '#6b7280',
+  // 600: '#9ca3af',
+  // 700: '#334155',
+  // 800: '#1e293b',
+  // 900: '#0f172a',
+  // 950: '#020617',
+
+  50: '#f0f4f8',
+  100: '#d9e2ec',
+  200: '#bcccdc',
+  300: '#9fb3c8',
+  400: '#829ab1',
+  500: '#1e3a5f',
+  600: '#1a3354',
+  700: '#162b48',
+  800: '#12233d',
+  900: '#0e1b31',
+  950: '#0a1323',
 };
 
 /* ─────────────────────────────────────────────
    Surface — Dark
-   Derived from the secondary (Royal Navy) palette
-   so dark-mode surfaces feel on-brand.
-   PrimeNG dark mode flips the scale: 0 is the
-   lightest (text) and 950 is the darkest (bg).
-     0    → brightest text (#f0f4f8  = secondary.50)
-     50   → heading text  (#d9e2ec  = secondary.100)
-     100  → body text     (#bcccdc  = secondary.200)
-     200  → muted text    (#9fb3c8  = secondary.300)
-     300  → placeholder   (#829ab1  = secondary.400)
-     400  → mid-tone      (#2d4e72  = between 400/500)
-     500  → dark mid-tone (#1e3a5f  = secondary.500)
-     600  → input bg      (#1a3354  = secondary.600)
-     700  → card bg       (#162b48  = secondary.700)
-     800  → sidebar bg    (#12233d  = secondary.800)
-     900  → page bg       (#0e1b31  = secondary.900)
-     950  → deepest bg    (#0a1323  = secondary.950)
+   Derived from the Navy palette so dark-mode
+   surfaces feel on-brand.
+   PrimeNG dark mode: 0 = lightest (text), 950 = deepest (bg).
+     0    → brightest text  (#F4F6FA = navy-50)
+     50   → heading text    (#E0E5EE = navy-100)
+     100  → body text       (#CBD2E0 = navy-200)
+     200  → muted text      (#A0A8B8 = navy-300)
+     300  → placeholder     (#757E90 = navy-400)
+     400  → mid-tone        (#4A5368 = navy-500)
+     500  → dark mid-tone   (#3A4256 = navy-600)
+     600  → input bg        (#2A3245 = navy-700)
+     700  → card bg         (#1A2133 = navy-800)
+     800  → page bg         (#131827 = navy-900)  ← .dark body bg
+     900  → hero/sidebar bg (#0B0F1C = navy-950)
+     950  → deepest bg      (#07090F)
    ───────────────────────────────────────────── */
 export const surfaceDark: SurfaceScale = {
-  0: '#f0f4f8',
-  50: ' #f8fafc',
-  100: ' #f1f5f9',
-  200: ' #e2e8f0',
-  300: ' #cbd5e1',
-  400: ' #94a3b8',
-  500: ' #64748b',
-  600: ' #475569',
-  700: ' #334155',
-  800: ' #1e293b',
-  900: ' #0f172a',
-  950: ' #020617',
+  0: '#F4F6FA',
+  // 50: '#F4F6FA',
+  // 100: '#CBD2E0',
+  // 200: '#CBD2E0',
+  // 300: '#6B7690',
+  // 400: '#4A5368',
+  // 500: '#4A5368',
+  // 600: '#232B3D',
+  // 700: '#1A2133',
+  // 800: '#1A2133',
+  // 900: '#131827',
+  // 950: '#0B0F1C',
+
+  50: '#f0f4f8',
+  100: '#d9e2ec',
+  200: '#bcccdc',
+  300: '#9fb3c8',
+  400: '#829ab1',
+  500: '#1e3a5f',
+  600: '#1a3354',
+  700: '#162b48',
+  800: '#12233d',
+  900: '#0e1b31',
+  950: '#0a1323',
 };

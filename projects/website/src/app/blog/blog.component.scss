@@ -89,8 +89,9 @@
   border-radius: 2rem;
   font-size: 0.75rem;
   font-weight: 700;
-  background: var(--p-secondary-500);
-  color: var(--p-primary-500);
+  color: var(--p-button-primary-color);
+  background: var(--p-button-primary-background);
+  border: 1px solid var(--p-button-primary-border-color);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -116,12 +117,12 @@
   align-items: center;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--p-secondary-500);
+  // color: var(--color-navy-500);
   transition: color 0.2s ease;
   white-space: nowrap;
 
   .featured-card:hover & {
-    color: var(--p-secondary-600);
+    // color: var(--p-primary-color);
   }
 }
 
@@ -147,7 +148,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid var(--p-secondary-500);
+    outline: 2px solid var(--color-navy-500);
     outline-offset: 2px;
   }
 }
@@ -182,59 +183,61 @@
   padding: 1.5rem;
 }
 
-:host::ng-deep {
-  // Social icon buttons
-  .p-paginator {
-    background: transparent;
+// :host::ng-deep {
+//   // Social icon buttons
+//   .p-paginator {
+//     background: transparent;
 
-    .p-paginator-pages {
-      margin-left: 1rem;
-      margin-right: 1rem;
-    }
+//     .p-paginator-pages {
+//       margin-left: 1rem;
+//       margin-right: 1rem;
+//     }
 
-    .p-paginator-page,
-    .p-paginator-next,
-    .p-paginator-last,
-    .p-paginator-first,
-    .p-paginator-prev {
-      background: color-mix(in oklab, black 8%, transparent);
-      border: 1px solid color-mix(in oklab, black 12%, transparent);
-      color: var(--p-surface-700);
+//     .p-paginator-page,
+//     .p-paginator-next,
+//     .p-paginator-last,
+//     .p-paginator-first,
+//     .p-paginator-prev {
+//       background: color-mix(in oklab, black 8%, transparent);
+//       border: 1px solid color-mix(in oklab, black 12%, transparent);
+//       // color: var(--p-surface-700);
 
-      &:hover {
-        color: var(--p-primary-500);
-        background: var(--p-button-primary-hover-background-color);
-        border-color: var(--p-button-primary-hover-border-color);
-      }
-    }
+//       &:hover {
+//         // color: var(--p-primary-contrast-color);
+//         background: var(--p-button-primary-hover-background-color);
+//         //border-color: var(--p-button-primary-hover-border-color);
+//       }
+//     }
 
-    .p-paginator-page.p-paginator-page-selected {
-      background: var(--p-button-primary-background);
-      color: var(--p-button-primary-color);
-    }
-  }
-}
+//     .p-paginator-page.p-paginator-page-selected {
+//       background: var(--p-button-primary-background);
+//       color: var(--p-button-primary-color);
+//     }
+//   }
+// }
 
-:host-context(.dark) :host::ng-deep {
-  .p-paginator {
-    .p-paginator-page,
-    .p-paginator-next,
-    .p-paginator-last,
-    .p-paginator-first,
-    .p-paginator-prev {
-      color: var(--p-surface-300);
-      background: color-mix(in oklab, white 8%, transparent);
-      border-color: color-mix(in oklab, white 12%, transparent);
-      &:hover {
-        color: var(--p-secondary-500);
-        background: var(--p-button-primary-hover-background-color);
-        border-color: var(--p-button-primary-hover-border-color);
-      }
-    }
+// :host-context(.dark) :host::ng-deep {
+//   .p-paginator {
+//     .p-paginator-page,
+//     .p-paginator-next,
+//     .p-paginator-last,
+//     .p-paginator-first,
+//     .p-paginator-prev {
+//       color: var(--p-surface-300);
+//       background: color-mix(in oklab, white 8%, transparent);
+//       border-color: color-mix(in oklab, white 12%, transparent);
+//       &:hover {
+//         // color: var(--p-button-primary-hover-color);
+//         // color: var(--p-primary-contrast-color);
 
-    .p-paginator-page.p-paginator-page-selected {
-      background: var(--p-button-primary-background);
-      color: var(--p-button-primary-color);
-    }
-  }
-}
+//         background: var(--p-button-primary-hover-background-color);
+//         // border-color: var(--p-button-primary-border-color);
+//       }
+//     }
+
+//     .p-paginator-page.p-paginator-page-selected {
+//       background: var(--p-button-primary-background);
+//       color: var(--p-button-primary-color);
+//     }
+//   }
+// }

@@ -59,7 +59,8 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/web/public"
+                "projects/web/public",
+                "projects/core/src/styles"
               ]
             },
             "styles": [
@@ -153,7 +154,8 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/website/public"
+                "projects/website/public",
+                "projects/core/src/styles"
               ]
             },
             "styles": [

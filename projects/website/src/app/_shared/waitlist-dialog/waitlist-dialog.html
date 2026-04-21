@@ -10,7 +10,7 @@
       </div>
       <div>
         <p i18n="@@waitlist.header.title" class="font-heading font-bold text-base leading-tight">Stay in the loop</p>
-        <p i18n="@@waitlist.header.sub" class="text-xs text-surface-500 mt-0.5">Be the first to know when MotionHive
+        <p i18n="@@waitlist.header.sub" class="text-xs  mt-0.5">Be the first to know when MotionHive
           launches</p>
       </div>
     </div>
@@ -18,12 +18,12 @@
 
   @if (!submitted()) {
   <form [formGroup]="form" class="flex flex-col gap-4">
-    <p i18n="@@waitlist.desc" class="text-sm text-surface-500 leading-relaxed m-0">
+    <p i18n="@@waitlist.desc" class="text-sm  leading-relaxed m-0">
       We're building something special. Drop your email and we'll notify you the moment we're live.
     </p>
 
     <div class="flex flex-col gap-1.5">
-      <label for="wl-name" class="text-xs font-semibold text-secondary-500">
+      <label for="wl-name" class="text-xs font-semibold">
         <span i18n="@@waitlist.name.label">Name</span>
         <span i18n="@@waitlist.optional" class="font-normal text-surface-400">(optional)</span>
       </label>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <label i18n="@@waitlist.email.label" for="wl-email" class="text-xs font-semibold text-secondary-500">Email</label>
+      <label i18n="@@waitlist.email.label" for="wl-email" class="text-xs font-semibold">Email</label>
       <input pInputText id="wl-email" type="email" formControlName="email"
         i18n-placeholder="@@waitlist.email.placeholder" placeholder="your@email.com" fluid />
       @if (form.controls.email.invalid && form.controls.email.touched) {
@@ -43,12 +43,12 @@
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <label i18n="@@waitlist.role.label" class="text-xs font-semibold text-secondary-500">How will you
+      <label i18n="@@waitlist.role.label" class="text-xs font-semibold">How will you
         MotionHive?</label>
       <div class="flex gap-2">
         @for (r of roles; track r.key) {
         <p-button class="flex-1" [outlined]="form.controls.role.value !== r.key"
-          [severity]="form.controls.role.value === r.key ? 'primary' : 'secondary'" size="small" fluid
+          [severity]="form.controls.role.value === r.key ? 'primary' : 'contrast'" size="small" fluid
           (onClick)="form.controls.role.setValue(r.key)">
           <i [class]="r.icon + ' text-sm'"></i>
           <span class="text-xs font-semibold">{{ r.label }}</span>
@@ -63,7 +63,7 @@
       <i class="pi pi-check text-2xl"></i>
     </div>
     <h4 i18n="@@waitlist.success.h4" class="font-heading font-bold text-xl mb-2">You're in!</h4>
-    <p i18n="@@waitlist.success.p" class="text-surface-500 text-sm leading-relaxed">
+    <p i18n="@@waitlist.success.p" class=" text-sm leading-relaxed">
       We'll reach out as soon as MotionHive is ready. Thanks for believing in what we're building.
     </p>
   </div>
