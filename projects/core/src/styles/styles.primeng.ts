@@ -79,64 +79,64 @@ export const MotionHiveLara = definePreset(Lara, {
           fontWeight: '500',
         },
       },
-      // colorScheme: {
-      //   light: {
-      //     outlined: {
-      //       primary: {
-      //         borderColor: '{primary.500}',
-      //         color: '{primary.500}',
-      //         hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
-      //       },
-      //       secondary: {
-      //         borderColor: '{secondary.500}',
-      //         color: '{secondary.500}',
-      //         hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
-      //       },
-      //     },
-      //     text: {
-      //       primary: {
-      //         color: '{primary.500}',
-      //         hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
-      //       },
-      //       secondary: {
-      //         color: '{secondary.500}',
-      //         hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
-      //       },
-      //     },
-      //   },
-      //   dark: {
-      //     outlined: {
-      //       primary: {
-      //         borderColor: '{primary.500}',
-      //         color: '{primary.500}',
-      //         hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
-      //       },
-      //       secondary: {
-      //         borderColor: '{secondary.300}',
-      //         color: '{secondary.300}',
-      //         hoverBackground: 'color-mix(in srgb, {secondary.400} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {secondary.500} 40%, transparent)',
-      //       },
-      //     },
-      //     text: {
-      //       primary: {
-      //         color: '{primary.500}',
-      //         hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
-      //       },
-      //       secondary: {
-      //         color: '{secondary.300}',
-      //         hoverBackground: 'color-mix(in srgb, {secondary.400} 30%, transparent)',
-      //         activeBackground: 'color-mix(in srgb, {secondary.500} 40%, transparent)',
-      //       },
-      //     },
-      //   },
-      // },
+      colorScheme: {
+        light: {
+          outlined: {
+            primary: {
+              borderColor: '{primary.500}',
+              color: '{primary.500}',
+              hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
+            secondary: {
+              borderColor: '{secondary.500}',
+              color: '{secondary.500}',
+              hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
+            },
+          },
+          text: {
+            primary: {
+              color: '{primary.500}',
+              hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
+            secondary: {
+              color: '{secondary.500}',
+              hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
+            },
+          },
+        },
+        dark: {
+          outlined: {
+            primary: {
+              borderColor: '{secondary.500}',
+              color: '{secondary.500}',
+              hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
+            },
+            secondary: {
+              borderColor: '{primary.300}',
+              color: '{primary.300}',
+              hoverBackground: 'color-mix(in srgb, {primary.400} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.500} 40%, transparent)',
+            },
+          },
+          text: {
+            primary: {
+              color: '{secondary.500}',
+              hoverBackground: 'color-mix(in srgb, {secondary.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {secondary.700} 40%, transparent)',
+            },
+            secondary: {
+              color: '{primary.300}',
+              hoverBackground: 'color-mix(in srgb, {primary.400} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {primary.500} 40%, transparent)',
+            },
+          },
+        },
+      },
     },
     tag: {
       root: {

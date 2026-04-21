@@ -7,7 +7,7 @@
         requests.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="Invite client" icon="pi pi-user-plus" rounded (onClick)="openInviteDialog()" />
+      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
     </div>
   </header>
 
@@ -66,11 +66,11 @@
           </td> -->
           <td>
             @if (client.notes) {
-            <span class="text-xs text-secondary-500 truncate max-w-20 inline-block" [pTooltip]="client.notes">
+            <span class="text-xs truncate max-w-20 inline-block" [pTooltip]="client.notes">
               {{ client.notes }}
             </span>
             } @else {
-            <span class="text-secondary-400">—</span>
+            <span class="text-surface-400">—</span>
             }
           </td>
           <td>
@@ -126,8 +126,8 @@
               <p class="text-sm text-secondary-500">
                 Start by inviting clients to build your client base.
               </p>
-              <p-button label="Invite your first client" icon="pi pi-user-plus" severity="primary"
-                styleClass="!rounded-full mt-2" (onClick)="openInviteDialog()" />
+              <p-button label="Invite your first client" icon="pi pi-user-plus" severity="primary" styleClass="mt-2"
+                (onClick)="openInviteDialog()" />
             </div>
           </td>
         </tr>

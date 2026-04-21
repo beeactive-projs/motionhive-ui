@@ -8,13 +8,13 @@
 
   <div class="error-content text-center">
 
-    <a routerLink="/" class="brand-logo mb-12" aria-label="MotionHive home">
-      <mh-logo />
+    <a routerLink="/" aria-label="MotionHive home">
+      <mh-logo styleClass="ms-auto max-w-10" />
     </a>
 
-    <p class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 text-brand">
+    <h1 class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 mt-12">
       {{ errorCode() }}
-    </p>
+    </h1>
 
     <h1 class="font-heading text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-5">
       {{ errorTitle() }}

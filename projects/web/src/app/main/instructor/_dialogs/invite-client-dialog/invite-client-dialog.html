@@ -18,7 +18,7 @@
     </div>
   </form>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
     <p-button label="Send invitation" icon="pi pi-send" severity="primary" [loading]="inviteLoading()"
       (onClick)="sendInvitation()" />
   </ng-template>
@@ -31,13 +31,9 @@
       <label class="text-sm font-medium">Referral link</label>
       <div class="flex gap-2">
         <input pInputText fluid [value]="referralLink()" [readonly]="true" class="text-xs" />
-        <p-button
-          [icon]="linkCopied() ? 'pi pi-check' : 'pi pi-copy'"
-          [severity]="linkCopied() ? 'success' : 'secondary'"
-          [outlined]="true"
-          (onClick)="copyLink()"
-          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'"
-          tooltipPosition="top" />
+        <p-button [icon]="linkCopied() ? 'pi pi-check' : 'pi pi-copy'"
+          [severity]="linkCopied() ? 'success' : 'secondary'" [outlined]="true" (onClick)="copyLink()"
+          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'" tooltipPosition="top" />
       </div>
     </div>
   </div>

@@ -48,7 +48,7 @@
   </div>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
     <p-button [label]="group() ? 'Save changes' : 'Create group'" icon="pi pi-check" severity="primary"
       [loading]="saving()" [disabled]="!formName.trim()" (onClick)="saveGroup()" />
   </ng-template>

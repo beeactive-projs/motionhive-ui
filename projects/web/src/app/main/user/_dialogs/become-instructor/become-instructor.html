@@ -189,7 +189,7 @@
   </form>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" outlined (onClick)="cancel()" />
+    <p-button label="Cancel" severity="contrast" text (onClick)="cancel()" />
     @if (activeStep() > 1) {
     <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" outlined
       (onClick)="activeStep.set(activeStep() - 1)" />

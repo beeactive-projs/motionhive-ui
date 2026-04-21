@@ -8,7 +8,7 @@
         communication.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="New group" icon="pi pi-plus" rounded (onClick)="openCreateDialog()" />
+      <p-button label="New group" icon="pi pi-plus" (onClick)="openCreateDialog()" />
     </div>
   </header>
 
@@ -35,10 +35,10 @@
   @if (!loading() && groups().length === 0) {
   <div class="flex flex-col items-center gap-4 py-16 text-center">
     <div class="flex h-20 w-20 items-center justify-center rounded-full bg-surface-200">
-      <i class="pi pi-sitemap text-4xl text-secondary-300"></i>
+      <i class="pi pi-sitemap text-4xl text-primary-300"></i>
     </div>
-    <h2 class="text-lg font-semibold text-secondary-700">No groups yet</h2>
-    <p class="max-w-sm text-sm text-secondary-500">
+    <h2 class="text-lg font-semibold text-primary-700">No groups yet</h2>
+    <p class="max-w-sm text-sm text-primary-500">
       Create your first group to start organizing clients and scheduling sessions.
     </p>
     <p-button label="Create your first group" icon="pi pi-plus" severity="primary" styleClass="!rounded-full mt-2"
@@ -55,11 +55,10 @@
         <!-- Card Header -->
         <div class="flex items-start justify-between">
           <div class="min-w-0 flex-1">
-            <h3 class="truncate text-base font-semibold text-secondary-900">{{ group.name }}</h3>
+            <h3 class="truncate text-base font-semibold">{{ group.name }}</h3>
           </div>
           <div class="ml-2 flex shrink-0 gap-3">
-            <p-button icon="pi pi-pencil" rounded outlined severity="secondary" size="small"
-              (onClick)="openEditDialog($event, group)" />
+            <p-button icon="pi pi-pencil" rounded outlined size="small" (onClick)="openEditDialog($event, group)" />
             <p-button icon="pi pi-trash" rounded outlined severity="danger" size="small"
               (onClick)="confirmDelete($event, group)" />
           </div>
@@ -67,19 +66,19 @@
 
         <!-- Member Count & Join Policy -->
         <div class="flex items-center gap-2">
-          <span class="flex items-center gap-1 text-sm text-secondary-500">
+          <span class="flex items-center gap-1 text-sm">
             <i class="pi pi-users text-xs"></i>
             {{ group.memberCount }} {{ group.memberCount === 1 ? 'member' : 'members' }}
           </span>
           <p-tag [value]="joinPolicyLabel(group.joinPolicy)" [severity]="joinPolicySeverity(group.joinPolicy)"
             class="text-xs" rounded />
           @if (!group.isPublic) {
-          <p-tag value="Private" severity="secondary" rounded class="text-xs" />
+          <p-tag value="Private" rounded class="text-xs" />
           }
         </div>
 
         <!-- Description -->
-        <p class="text-sm text-secondary-500 line-clamp-2">
+        <p class="text-sm line-clamp-2">
           {{ descriptionExcerpt(group.description) }}
         </p>
 
