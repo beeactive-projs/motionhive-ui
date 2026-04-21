@@ -20,6 +20,14 @@ import { InstructorSearchResult } from '../../models/client/instructor.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
+function mapProfile(data: any): MyProfile {
+  return {
+    account: data.account ?? data.user ?? data,
+    roles: data.roles ?? [],
+    instructorProfile: data.instructorProfile ?? data.instructor ?? null,
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -28,16 +36,11 @@ export class ProfileService {
   private readonly _baseUrl = `${environment.apiUrl}${API_ENDPOINTS.PROFILE.BASE}`;
 
   getMyProfile(): Observable<MyProfile> {
-    // return this._http.get<MyProfile>(`${this._baseUrl}/me`);
-    return this._http.get<any>(`${this._baseUrl}/me`).pipe(
-      map((data) => {
-        return { account: data.user, roles: data.roles, instructorProfile: data.instructor };
-      }),
-    );
+    return this._http.get<any>(`${this._baseUrl}/me`).pipe(map(mapProfile));
   }
 
   updateMyProfile(payload: UpdateMyProfilePayload): Observable<MyProfile> {
-    return this._http.patch<MyProfile>(`${this._baseUrl}/me`, payload);
+    return this._http.patch<any>(`${this._baseUrl}/me`, payload).pipe(map(mapProfile));
   }
 
   getFitnessProfile(): Observable<FitnessProfile> {

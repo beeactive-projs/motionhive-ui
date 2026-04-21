@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, model, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, effect, model, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -8,7 +8,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
-import { InstructorSearchResult, ClientService, ProfileService } from 'core';
+import { AuthStore, InstructorSearchResult, ClientService, ProfileService } from 'core';
 
 @Component({
   selector: 'mh-discover-instructors',
@@ -31,8 +31,19 @@ export class DiscoverInstructors {
   private readonly _profileService = inject(ProfileService);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
+  private readonly _authStore = inject(AuthStore);
 
   readonly visible = model(false);
+
+  private readonly _autoSearchEffect = effect(() => {
+    if (this.visible()) {
+      const city = this._authStore.user()?.location?.city;
+      if (city) {
+        this.searchQuery.set(city);
+        this.search();
+      }
+    }
+  });
 
   readonly searchQuery = signal('');
   readonly results = signal<InstructorSearchResult[]>([]);

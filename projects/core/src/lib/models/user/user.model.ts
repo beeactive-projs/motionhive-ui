@@ -13,6 +13,7 @@ export interface User {
   permissions: string[];
   language?: string | null;
   timezone?: string | null;
+  location?: UserLocation | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,4 +34,11 @@ export interface UpdateUserPayload {
   avatarUrl?: string;
   language?: string;
   timezone?: string;
+}
+
+export interface UserLocation {
+  name: string | null;
+  address: string | null;
+  city: string | null;
+  country: string | null;
 }

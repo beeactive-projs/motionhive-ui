@@ -18,6 +18,7 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { BecomeInstructor } from '../user/_dialogs/become-instructor/become-instructor';
 import { EditInstructorProfile } from './_dialogs/edit-instructor-profile/edit-instructor-profile';
+import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
 
 @Component({
   selector: 'mh-profile',
@@ -31,6 +32,7 @@ import { EditInstructorProfile } from './_dialogs/edit-instructor-profile/edit-i
     SkeletonModule,
     ToastModule,
     EditInstructorProfile,
+    EditPersonalInfo,
     BecomeInstructor,
   ],
   providers: [MessageService],
