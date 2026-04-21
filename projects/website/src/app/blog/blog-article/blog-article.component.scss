@@ -49,13 +49,13 @@
   .article-content {
     font-size: 1.0625rem;
     line-height: 1.85;
-    color: var(--p-primary-500);
+    color: var(--p-surface-500);
 
     h2 {
       font-family: var(--font-heading, inherit);
       font-size: 1.5rem;
       font-weight: 800;
-      color: var(--p-primary-900);
+      color: var(--p-surface-900);
       margin-top: 2.5rem;
       margin-bottom: 0.875rem;
       line-height: 1.3;
@@ -65,7 +65,7 @@
       font-family: var(--font-heading, inherit);
       font-size: 1.25rem;
       font-weight: 700;
-      color: var(--p-primary-900);
+      color: var(--p-surface-900);
       margin-top: 2rem;
       margin-bottom: 0.75rem;
     }
@@ -75,7 +75,7 @@
 
       &:first-child {
         font-size: 1.125rem;
-        color: var(--p-primary-500);
+        color: var(--p-surface-500);
       }
     }
 
@@ -84,22 +84,22 @@
       padding-left: 1rem;
 
       li::marker {
-        color: var(--p-secondary-500);
+        color: var(--p-primary-color);
       }
     }
   }
 }
 
 :host-context(.dark) :host::ng-deep .article-content {
-  color: var(--p-primary-200);
+  color: var(--p-surface-200);
 
   h2,
   h3 {
-    color: var(--p-primary-200);
+    color: var(--p-surface-200);
   }
 
   p:first-child {
-    color: var(--p-primary-400);
+    color: var(--p-surface-400);
   }
 }
 
@@ -162,7 +162,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid var(--p-secondary-500);
+    outline: 2px solid var(--p-primary-color);
     outline-offset: 2px;
   }
 }

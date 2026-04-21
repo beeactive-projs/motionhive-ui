@@ -1,4 +1,4 @@
-@use 'variables' as *;
+@use 'variables.scss' as *;
 
 .error-page {
   position: relative;
@@ -7,12 +7,12 @@
   align-items: center;
   justify-content: center;
   padding: 3rem 1.5rem;
-  background-color: var(--p-secondary-50);
+  background-color: var(--color-navy-50);
   overflow: hidden;
 }
 
 :host-context(.dark) .error-page {
-  background-color: var(--p-primary-900);
+  background-color: var(--color-navy-900);
 }
 
 .honeycomb-bg {
@@ -26,7 +26,7 @@
 }
 
 :host-context(.dark) .honeycomb-bg {
-  background-image: $honeycomb-svg-secondary;
+  background-image: $honeycomb-svg-navy;
 }
 
 @keyframes honeycombDrift {

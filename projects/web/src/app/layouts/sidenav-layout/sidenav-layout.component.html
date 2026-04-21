@@ -3,7 +3,7 @@
 
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
-
+    <div class="honeycomb-bg"></div>
     <a routerLink="/home" aria-label="MotionHive home" class="mx-4">
       <mh-logo />
     </a>
@@ -32,8 +32,7 @@
           </a>
           } @else {
           <a [routerLink]="item.route"
-            routerLinkActive="bg-primary-500 text-primary-contrast dark:bg-secondary-500 dark:text-primary-500 font-semibold"
-            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
             {{ item.label }}
