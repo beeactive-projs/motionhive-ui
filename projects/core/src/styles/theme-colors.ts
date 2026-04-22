@@ -20,20 +20,20 @@ export interface ColorScale {
   950: string;
 }
 
-export interface SurfaceScale {
-  0: string;
-  50: string;
-  100: string;
-  200: string;
-  300: string;
-  400: string;
-  500: string;
-  600: string;
-  700: string;
-  800: string;
-  900: string;
-  950: string;
-}
+// export interface SurfaceScale {
+//   0: string;
+//   50: string;
+//   100: string;
+//   200: string;
+//   300: string;
+//   400: string;
+//   500: string;
+//   600: string;
+//   700: string;
+//   800: string;
+//   900: string;
+//   950: string;
+// }
 
 /* ─────────────────────────────────────────────
    Primary — Honey Amber
@@ -41,11 +41,11 @@ export interface SurfaceScale {
    highlight accents, notification dots, badges
    ───────────────────────────────────────────── */
 export const primary: ColorScale = {
-  50: '#FFF8EB',
-  100: '#FEEDC7',
-  200: '#FDD98A',
-  300: '#FCC254',
-  400: '#FBAE2C',
+  50: '#FFF7ED',
+  100: '#FFEDD5',
+  200: '#FED7AA',
+  300: '#FDBA74',
+  400: '#FB923C',
   500: '#F59E0B',
   600: '#D97706',
   700: '#B45309',
@@ -128,6 +128,20 @@ export const danger: ColorScale = {
   950: '#450a0a',
 };
 
+export const navy: ColorScale = {
+  50: '#f0f4f8',
+  100: '#d9e2ec',
+  200: '#bcccdc',
+  300: '#9fb3c8',
+  400: '#829ab1',
+  500: '#1e3a5f',
+  600: '#1a3354',
+  700: '#162b48',
+  800: '#12233d',
+  900: '#0e1b31',
+  950: '#0a1323',
+};
+
 /* ─────────────────────────────────────────────
    Surface — Light
    Derived from the light dashboard:
@@ -144,32 +158,32 @@ export const danger: ColorScale = {
      900  → darkest text — navy-900 (#0f1720 → #0f172a)
      950  → deepest shade (#020617)
    ───────────────────────────────────────────── */
-export const surfaceLight: SurfaceScale = {
-  0: '#ffffff',
-  // 50: '#f6f8fb',
-  // 100: '#f1f5f9',
-  // 200: '#e5e9ef',
-  // 300: '#cbd5e1',
-  // 400: '#94a3b8',
-  // 500: '#6b7280',
-  // 600: '#9ca3af',
-  // 700: '#334155',
-  // 800: '#1e293b',
-  // 900: '#0f172a',
-  // 950: '#020617',
+// export const surfaceLight: SurfaceScale = {
+//   0: '#ffffff',
+//   // 50: '#f6f8fb',
+//   // 100: '#f1f5f9',
+//   // 200: '#e5e9ef',
+//   // 300: '#cbd5e1',
+//   // 400: '#94a3b8',
+//   // 500: '#6b7280',
+//   // 600: '#9ca3af',
+//   // 700: '#334155',
+//   // 800: '#1e293b',
+//   // 900: '#0f172a',
+//   // 950: '#020617',
 
-  50: '#f0f4f8',
-  100: '#d9e2ec',
-  200: '#bcccdc',
-  300: '#9fb3c8',
-  400: '#829ab1',
-  500: '#1e3a5f',
-  600: '#1a3354',
-  700: '#162b48',
-  800: '#12233d',
-  900: '#0e1b31',
-  950: '#0a1323',
-};
+//   50: '#f0f4f8',
+//   100: '#d9e2ec',
+//   200: '#bcccdc',
+//   300: '#9fb3c8',
+//   400: '#829ab1',
+//   500: '#1e3a5f',
+//   600: '#1a3354',
+//   700: '#162b48',
+//   800: '#12233d',
+//   900: '#0e1b31',
+//   950: '#0a1323',
+// };
 
 /* ─────────────────────────────────────────────
    Surface — Dark
@@ -189,29 +203,29 @@ export const surfaceLight: SurfaceScale = {
      900  → hero/sidebar bg (#0B0F1C = navy-950)
      950  → deepest bg      (#07090F)
    ───────────────────────────────────────────── */
-export const surfaceDark: SurfaceScale = {
-  0: '#F4F6FA',
-  // 50: '#F4F6FA',
-  // 100: '#CBD2E0',
-  // 200: '#CBD2E0',
-  // 300: '#6B7690',
-  // 400: '#4A5368',
-  // 500: '#4A5368',
-  // 600: '#232B3D',
-  // 700: '#1A2133',
-  // 800: '#1A2133',
-  // 900: '#131827',
-  // 950: '#0B0F1C',
+// export const surfaceDark: SurfaceScale = {
+//   0: '#F4F6FA',
+//   // 50: '#F4F6FA',
+//   // 100: '#CBD2E0',
+//   // 200: '#CBD2E0',
+//   // 300: '#6B7690',
+//   // 400: '#4A5368',
+//   // 500: '#4A5368',
+//   // 600: '#232B3D',
+//   // 700: '#1A2133',
+//   // 800: '#1A2133',
+//   // 900: '#131827',
+//   // 950: '#0B0F1C',
 
-  50: '#f0f4f8',
-  100: '#d9e2ec',
-  200: '#bcccdc',
-  300: '#9fb3c8',
-  400: '#829ab1',
-  500: '#1e3a5f',
-  600: '#1a3354',
-  700: '#162b48',
-  800: '#12233d',
-  900: '#0e1b31',
-  950: '#0a1323',
-};
+//   50: '#f0f4f8',
+//   100: '#d9e2ec',
+//   200: '#bcccdc',
+//   300: '#9fb3c8',
+//   400: '#829ab1',
+//   500: '#1e3a5f',
+//   600: '#1a3354',
+//   700: '#162b48',
+//   800: '#12233d',
+//   900: '#0e1b31',
+//   950: '#0a1323',
+// };

@@ -1,6 +1,6 @@
-import Lara from '@primeuix/themes/lara';
 import { definePreset } from '@primeuix/themes';
-import { primary, success, info, warning, danger, surfaceDark, surfaceLight } from './theme-colors';
+import Lara from '@primeuix/themes/lara';
+import { danger, info, navy, primary, success, warning } from './theme-colors';
 
 export const MotionHiveLara = definePreset(Lara, {
   primitive: {},
@@ -29,26 +29,23 @@ export const MotionHiveLara = definePreset(Lara, {
     info,
     warning,
     danger,
+    navy,
     colorScheme: {
       light: {
         primary: {
           color: '{primary.500}',
           contrastColor: '{surface.900}',
-          hoverColor: '{primary.600}',
-          activeColor: '{primary.700}',
+          hoverColor: '{primary.400}',
+          activeColor: '{primary.600}',
         },
-        highlight: {},
-        surface: surfaceLight,
       },
       dark: {
         primary: {
           color: '{primary.500}',
           contrastColor: '{surface.900}',
-          hoverColor: '{primary.600}',
-          activeColor: '{primary.700}',
+          hoverColor: '{primary.400}',
+          activeColor: '{primary.600}',
         },
-        highlight: {},
-        surface: surfaceDark,
       },
     },
   },

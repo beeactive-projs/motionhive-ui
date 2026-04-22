@@ -7,25 +7,12 @@
     box-shadow 0.3s ease;
 
   &.scrolled {
-    background: var(--p-surface-50);
+    background: var(--p-navy-50);
     :host-context(.dark) .site-header.scrolled {
-      background-color: var(--p-surface-900);
+      background-color: var(--p-navy-900);
     }
   }
 }
-
-// ===== Logo =====
-// .logo-link {
-//   display: flex;
-//   align-items: center;
-//   gap: 1rem;
-//   text-decoration: none;
-
-//   &:hover .logo-icon {
-//     box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
-//     transform: scale(1.05);
-//   }
-// }
 
 // ===== Desktop nav links =====
 .nav-link {
@@ -64,18 +51,9 @@
 
     &::after {
       transform: translateX(-50%) scaleX(1);
-      // background: var(--p-primary-600);
     }
   }
 }
-
-// :host-context(.dark) .nav-link--active {
-//   color: var(--p-primary-500);
-
-//   &::after {
-//     background: var(--p-primary-500);
-//   }
-// }
 
 // ===== Desktop dropdown =====
 .nav-link--dropdown {
@@ -122,10 +100,6 @@
   }
 }
 
-// :host-context(.dark) .nav-dropdown__item--active {
-//   color: var(--p-primary-500);
-// }
-
 // ===== Mobile menu =====
 .mobile-menu {
   position: absolute;
@@ -136,14 +110,14 @@
   gap: 0.125rem;
   padding: 1rem 0.5rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--p-surface-100);
-  background: var(--p-surface-100);
+  border: 1px solid var(--p-navy-200);
+  background: var(--p-navy-50);
   animation: menuSlideDown 0.25s ease-out;
 }
 
 :host-context(.dark) .mobile-menu {
-  background: var(--p-surface-700);
-  border: 1px solid var(--p-surface-700);
+  background: var(--p-navy-800);
+  border: 1px solid var(--p-navy-900);
 }
 
 @keyframes menuSlideDown {
@@ -175,8 +149,6 @@
   }
 
   &--active {
-    // background: var(--p-primary-100);
-    // color: var(--p-primary-700);
     color: var(--p-button-link-active-color);
     font-weight: 600;
 
@@ -185,18 +157,6 @@
     }
   }
 }
-
-// :host-context(.dark) .mobile-link--active {
-//   background: color-mix(in srgb, var(--p-primary-500) 12%, transparent);
-//   color: var(--p-primary-400);
-// }
-
-// :host-context(.dark) .mobile-link {
-//   &--active {
-//     background: var(--p-button-primary-background);
-//     color: var(--p-button-primary-color);
-//   }
-// }
 
 .mobile-section-label {
   padding: 0.5rem 1rem 0.25rem;

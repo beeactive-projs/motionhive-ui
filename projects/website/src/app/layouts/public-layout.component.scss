@@ -8,14 +8,14 @@
   top: 0;
   left: 0;
   z-index: -1;
-  background-color: var(--p-surface-50);
+  background-color: var(--p-navy-50);
   @media screen and (min-height: 440px) {
     height: 100vh;
   }
 }
 
 :host-context(.dark) .background-main {
-  background-color: var(--p-surface-900);
+  background-color: var(--p-navy-900);
 }
 
 .honeycomb-bg {
