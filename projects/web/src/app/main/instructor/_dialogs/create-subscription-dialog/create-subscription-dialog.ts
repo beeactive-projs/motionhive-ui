@@ -76,7 +76,7 @@ export class CreateSubscriptionDialog implements OnInit {
   }
 
   private loadClients(): void {
-    this._clientService.getClients({ status: 'ACTIVE', limit: 999 }).subscribe({
+    this._clientService.getClients({ status: 'ACTIVE', limit: 100 }).subscribe({
       next: (res) => {
         this.clientOptions.set(
           res.items
@@ -92,7 +92,7 @@ export class CreateSubscriptionDialog implements OnInit {
 
   private loadProducts(): void {
     this._productService
-      .list({ type: ProductTypes.Subscription, isActive: true, limit: 999 })
+      .list({ type: ProductTypes.Subscription, isActive: true, limit: 100 })
       .subscribe({
         next: (res) => {
           this.productOptions.set(
