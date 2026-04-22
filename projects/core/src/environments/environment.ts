@@ -5,5 +5,4 @@ export const environment = {
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
   facebookAppId: '888056193830836',
   // facebookAppId: '888056056193830836',
-  googleMapsApiKey: 'AIzaSyAUKuz76bx07LM_EQLYXRTng1VCBOXSMQo',
 };

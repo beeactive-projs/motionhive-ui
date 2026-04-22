@@ -5,7 +5,6 @@
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
     "rootDir": "../..",
-    "types": ["google.maps"],
     "paths": {
       "core": ["../../projects/core/src/public-api"]
     }

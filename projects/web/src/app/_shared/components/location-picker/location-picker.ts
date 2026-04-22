@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, model, NgZone, signal } from '@angular/core';
-import { environment, UserLocation } from 'core';
-import { importLibrary, setOptions } from '@googlemaps/js-api-loader';
-import { Button } from 'primeng/button';
+import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpClient } from '@angular/common/http';
+import { UserLocation } from 'core';
+import { Subject, debounceTime, switchMap, catchError, of } from 'rxjs';
 import {
   AutoComplete,
   AutoCompleteCompleteEvent,
@@ -10,76 +11,95 @@ import {
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 
-interface PlaceSuggestion {
+interface NominatimResult {
+  display_name: string;
+  address: {
+    leisure?: string;
+    road?: string;
+    suburb?: string;
+    city?: string;
+    town?: string;
+    village?: string;
+    county?: string;
+    country?: string;
+  };
+}
+
+interface LocationSuggestion {
   label: string;
   mainText: string;
   secondaryText: string;
-  prediction: google.maps.places.PlacePrediction;
+  result: NominatimResult;
 }
+
+const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+const NOMINATIM_EMAIL = 'beeactivedev@gmail.com';
 
 @Component({
   selector: 'mh-location-picker',
-  imports: [Button, AutoComplete, IconField, InputIcon],
+  imports: [AutoComplete, IconField, InputIcon],
   templateUrl: './location-picker.html',
   styleUrl: './location-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LocationPicker {
-  private readonly _ngZone = inject(NgZone);
+  private readonly _http = inject(HttpClient);
 
   readonly location = model<UserLocation | null>(null);
-  readonly suggestions = signal<PlaceSuggestion[]>([]);
+  readonly suggestions = signal<LocationSuggestion[]>([]);
 
-  async search(event: AutoCompleteCompleteEvent): Promise<void> {
-    const query = event.query;
-    if (!query || query.length < 2) {
-      this.suggestions.set([]);
-      return;
-    }
+  private readonly _search$ = new Subject<string>();
 
-    setOptions({ key: environment.googleMapsApiKey });
-    await importLibrary('places');
-
-    const { suggestions } =
-      await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-        input: query,
-      });
-
-    this._ngZone.run(() => {
-      this.suggestions.set(
-        suggestions
-          .filter((s) => s.placePrediction !== null)
-          .map((s) => ({
-            label: s.placePrediction!.text.toString(),
-            mainText: s.placePrediction!.mainText?.toString() ?? s.placePrediction!.text.toString(),
-            secondaryText: s.placePrediction!.secondaryText?.toString() ?? '',
-            prediction: s.placePrediction!,
+  constructor() {
+    this._search$
+      .pipe(
+        debounceTime(500),
+        switchMap((query) =>
+          query.length < 2
+            ? of([])
+            : this._http
+                .get<NominatimResult[]>(NOMINATIM_URL, {
+                  params: {
+                    q: query,
+                    format: 'json',
+                    addressdetails: '1',
+                    limit: '5',
+                    email: NOMINATIM_EMAIL,
+                  },
+                })
+                .pipe(catchError(() => of([]))),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((results) => {
+        console.log('Nominatim results:', results);
+        this.suggestions.set(
+          results.map((r) => ({
+            label: r.display_name,
+            mainText:
+              `${r.address.leisure || ''} ${r.address.suburb || ''} ${r.address.road?.split(' ').slice(1).join(' ')} ${r.address.city}`.trim(),
+            secondaryText:
+              `${r.address.road || ''}, ${r.address.city || ''}, ${r.address.country || ''}`.trim(),
+            result: r,
           })),
-      );
-    });
+        );
+      });
   }
 
-  async selectPlace(event: AutoCompleteSelectEvent): Promise<void> {
-    const suggestion = event.value as PlaceSuggestion;
-    const place = suggestion.prediction.toPlace();
-    await place.fetchFields({ fields: ['addressComponents', 'displayName', 'formattedAddress'] });
+  search(event: AutoCompleteCompleteEvent): void {
+    this._search$.next(event.query);
+  }
 
-    this._ngZone.run(() => {
-      const components: google.maps.places.AddressComponent[] =
-        place.addressComponents ?? [];
-      const name = place.displayName ?? null;
-      const address = place.formattedAddress ?? null;
-      const city =
-        components.find(
-          (c: google.maps.places.AddressComponent) =>
-            c.types.includes('locality') || c.types.includes('postal_town'),
-        )?.longText ?? null;
-      const country =
-        components.find((c: google.maps.places.AddressComponent) =>
-          c.types.includes('country'),
-        )?.longText ?? null;
-      this.location.set({ name, address, city, country });
+  selectPlace(event: AutoCompleteSelectEvent): void {
+    const suggestion = event.value as LocationSuggestion;
+    const { display_name, address } = suggestion.result;
+    this.location.set({
+      name: display_name.split(',').slice(0, 2).join(',').trim(),
+      address: display_name,
+      city: address.city ?? address.town ?? address.village ?? address.county ?? null,
+      country: address.country ?? null,
     });
+    this.suggestions.set([]);
   }
 
   clear(): void {
