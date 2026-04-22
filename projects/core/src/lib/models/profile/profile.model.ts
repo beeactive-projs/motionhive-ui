@@ -1,3 +1,4 @@
+import { UserLocation } from '../user/user.model';
 import type { FitnessProfile, UpdateFitnessProfilePayload } from './fitness-profile.model';
 import type { InstructorProfile, UpdateInstructorProfilePayload } from './instructor-profile.model';
 
@@ -13,6 +14,7 @@ export interface AccountInfo {
   isEmailVerified: boolean;
   language: string | null;
   timezone: string | null;
+  location?: UserLocation | null;
   createdAt: string;
 }
 
@@ -32,6 +34,10 @@ export interface UpdateMyProfilePayload {
     avatarId?: string;
     language?: string;
     timezone?: string;
+    locationName?: string | null;
+    locationAddress?: string | null;
+    locationCity?: string | null;
+    locationCountry?: string | null;
   };
   fitnessProfile?: UpdateFitnessProfilePayload;
   instructorProfile?: UpdateInstructorProfilePayload;

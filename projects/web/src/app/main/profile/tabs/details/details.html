@@ -10,7 +10,8 @@
           <h2 class="text-base font-semibold m-0">Personal information</h2>
         </div>
         <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" severity="secondary"
-          pTooltip="Coming soon" tooltipPosition="left" disabled />
+          pTooltip="Edit personal info" tooltipPosition="left"
+          (onClick)="showEditPersonalInfo.set(true)" />
       </div>
       <p-divider />
     </ng-template>
@@ -82,6 +83,12 @@
       <div>
         <dt class="text-xs uppercase tracking-wide text-surface-500">Phone</dt>
         <dd class="mt-1 text-sm font-medium">{{ profile().account.phone || 'Not provided' }}</dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
+        <dd class="mt-1 text-sm font-medium">
+          {{ locationDisplay() || 'Not set' }}
+        </dd>
       </div>
       <div>
         <dt class="text-xs uppercase tracking-wide text-surface-500">Status</dt>
@@ -235,6 +242,11 @@
 </div>
 
 <!-- Dialogs -->
+<mh-edit-personal-info
+  [(visible)]="showEditPersonalInfo"
+  [profile]="profile()"
+  (saved)="refresh.emit()"
+/>
 @if (isInstructor() && hasInstructorProfile()) {
   <mh-edit-instructor-profile [(visible)]="showEditInstructor" [profile]="profile()" (saved)="onInstructorSaved()" />
 }

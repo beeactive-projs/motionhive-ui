@@ -31,6 +31,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { EditInstructorProfile } from '../../_dialogs/edit-instructor-profile/edit-instructor-profile';
+import { EditPersonalInfo } from '../../_dialogs/edit-personal-info/edit-personal-info';
 import { BecomeInstructor } from '../../../user/_dialogs/become-instructor/become-instructor';
 
 @Component({
@@ -49,6 +50,7 @@ import { BecomeInstructor } from '../../../user/_dialogs/become-instructor/becom
     ToggleSwitch,
     CurrencyRonPipe,
     EditInstructorProfile,
+    EditPersonalInfo,
     BecomeInstructor,
   ],
   providers: [MessageService],
@@ -65,6 +67,7 @@ export class Details implements OnInit {
   readonly refresh = output<void>();
 
   readonly showEditInstructor = signal(false);
+  readonly showEditPersonalInfo = signal(false);
   readonly becomeInstructorVisible = signal(false);
 
   readonly coachingProducts = signal<Product[]>([]);
@@ -76,6 +79,18 @@ export class Details implements OnInit {
    *  between the successful upload response and the parent reloading
    *  the profile via (refresh). Null until the user uploads one. */
   readonly _pendingAvatarUrl = signal<string | null>(null);
+
+  /** Human-readable rendering of the user's saved location. Falls back
+   *  to an empty string when no location is set so the template can
+   *  show its own "Not set" placeholder. */
+  readonly locationDisplay = computed<string>(() => {
+    const loc = this.profile().account.location;
+    if (!loc) return '';
+    const parts = [loc.name, loc.city, loc.country].filter(
+      (x): x is string => !!x,
+    );
+    return parts.join(', ');
+  });
 
   readonly fullName = computed(() => {
     const p = this.profile();
