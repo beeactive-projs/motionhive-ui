@@ -366,6 +366,7 @@
             appendTo="body"
             dateFormat="dd/mm/yy"
             placeholder="Pick a date"
+            [minDate]="today()"
             class="w-full"
           />
         }
@@ -391,15 +392,15 @@
         </div>
       </section>
 
-      <!-- On send -->
+      <!-- Delivery -->
       <section class="flex flex-col gap-2">
-        <span class="text-xs uppercase tracking-wide text-surface-500">On send</span>
+        <span class="text-xs uppercase tracking-wide text-surface-500">Delivery</span>
         <label class="flex items-center gap-2 cursor-pointer select-none">
           <p-checkbox formControlName="sendImmediately" [binary]="true" inputId="sendImm" />
-          <span class="text-sm">Send invoice to client immediately</span>
+          <span class="text-sm">Email the invoice to the client now</span>
         </label>
         <p class="text-xs text-surface-500 m-0">
-          If unchecked, the invoice is saved as a draft.
+          Leave unchecked to keep it as a draft — you can review it and send it from the list later.
         </p>
       </section>
     </aside>

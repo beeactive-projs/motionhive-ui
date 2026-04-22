@@ -9,7 +9,7 @@
   <!-- Top row: status pill + optional badges -->
   <div class="flex items-center gap-2 flex-wrap">
     @if (status(); as s) {
-      <p-tag [value]="s" [severity]="statusSeverity()" class="text-xs!" />
+      <p-tag [value]="s | statusLabel" [severity]="statusSeverity()" class="text-xs!" />
     }
     <ng-content select="[badges]" />
   </div>

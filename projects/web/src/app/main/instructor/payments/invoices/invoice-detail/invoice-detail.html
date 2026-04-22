@@ -1,5 +1,10 @@
 <p-toast />
 <p-confirmDialog />
+<mh-send-invoice-email-dialog
+  [(visible)]="showSendDialog"
+  [invoice]="invoice()"
+  (sent)="onSent()"
+/>
 
 <div class="flex flex-col gap-4">
 
@@ -34,9 +39,9 @@
       <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div class="flex flex-col gap-2 min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
-            <p-tag [value]="inv.status" [severity]="statusSeverity(inv.status)" />
+            <p-tag [value]="inv.status | statusLabel" [severity]="statusSeverity(inv.status)" />
             @if (inv.paidOutOfBand) {
-              <p-tag value="Paid out of band" severity="secondary" />
+              <p-tag value="PAID OUT OF BAND" severity="secondary" />
             }
             <span class="text-sm text-surface-500 tabular-nums">
               {{ displayNumber() }}
@@ -76,7 +81,7 @@
                 icon="pi pi-send"
                 size="small"
                 [loading]="actionLoading()"
-                (onClick)="sendInvoice()"
+                (onClick)="openSendDialog()"
               />
               <p-button
                 label="Void"
@@ -89,6 +94,14 @@
               />
             }
             @case (Statuses.Open) {
+              <p-button
+                label="Resend email"
+                icon="pi pi-send"
+                severity="secondary"
+                [outlined]="true"
+                size="small"
+                (onClick)="openSendDialog()"
+              />
               <p-button
                 label="Copy payment link"
                 icon="pi pi-link"
@@ -120,7 +133,7 @@
               @if (inv.invoicePdf) {
                 <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
                   <p-button
-                    label="Download receipt"
+                    label="Download invoice PDF"
                     icon="pi pi-download"
                     severity="secondary"
                     [outlined]="true"

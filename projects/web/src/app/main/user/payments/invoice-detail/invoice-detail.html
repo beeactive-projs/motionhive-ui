@@ -1,139 +1,275 @@
-<!-- Back link -->
-<div class="mb-4">
-  <a routerLink="/profile" [queryParams]="{ tab: 'invoices' }" class="text-sm text-primary-500 hover:underline">
-    <i class="pi pi-arrow-left mr-1"></i> Back to invoices
-  </a>
-</div>
-
-@if (loading()) {
-  <p-card>
-    <div class="flex flex-col gap-4 py-4">
-      <p-skeleton width="40%" height="1.5rem" />
-      <p-skeleton width="60%" height="1rem" />
-      <p-skeleton width="100%" height="400px" />
-    </div>
-  </p-card>
-} @else if (invoice(); as inv) {
-  <!-- Header -->
-  <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-    <div class="space-y-1">
-      <div class="flex items-center gap-3">
-        <h1 class="font-heading font-semibold text-xl md:text-2xl m-0">
-          Invoice {{ inv.number || '' }}
-        </h1>
-        <p-tag [value]="inv.status" [severity]="statusSeverity(inv.status)" />
-      </div>
-      <p class="text-sm text-surface-500">
-        Created {{ inv.createdAt | date:'dd MMM yyyy, HH:mm' }}
-        @if (inv.dueDate) {
-          &middot; Due {{ inv.dueDate | date:'dd MMM yyyy' }}
-        }
-      </p>
-    </div>
-
-    <div class="flex flex-wrap gap-2">
-      @if (inv.hostedInvoiceUrl) {
-        <a [href]="inv.hostedInvoiceUrl" target="_blank" rel="noopener">
-          <p-button label="Open hosted page" icon="pi pi-external-link" size="small" [outlined]="true" />
-        </a>
-      }
-      @if (inv.invoicePdf) {
-        <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
-          <p-button label="PDF" icon="pi pi-download" size="small" [outlined]="true" />
-        </a>
-      }
-    </div>
-  </header>
-
-  <!-- Summary card -->
-  <p-card class="mb-4">
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      <div>
-        <div class="text-sm text-surface-500">Amount due</div>
-        <div class="font-semibold text-lg">{{ inv.amountDueCents | currencyRon:inv.currency }}</div>
-      </div>
-      <div>
-        <div class="text-sm text-surface-500">Amount paid</div>
-        <div class="font-semibold text-lg">{{ inv.amountPaidCents | currencyRon:inv.currency }}</div>
-      </div>
-      <div>
-        <div class="text-sm text-surface-500">Paid at</div>
-        <div class="font-medium">{{ inv.paidAt ? (inv.paidAt | date:'dd MMM yyyy') : '—' }}</div>
-      </div>
-    </div>
-  </p-card>
-
-  <!-- Pay section (only if invoice is open) -->
-  @if (inv.status === Statuses.Open) {
-    <p-card class="mb-4">
-      <div class="flex flex-col gap-4">
-        <div class="text-base font-medium">Pay this invoice</div>
-
-        <!-- EU consent checkbox (OUG 34/2014) -->
-        <div class="flex items-start gap-2">
-          <p-checkbox [(ngModel)]="consentChecked" [binary]="true" inputId="payConsent" />
-          <label for="payConsent" class="text-sm leading-relaxed">{{ consentText }}</label>
-        </div>
-
-        <div class="flex justify-end">
-          <p-button label="Pay now" icon="pi pi-credit-card"
-            [loading]="payLoading()" [disabled]="!consentChecked"
-            (onClick)="payInvoice()" />
-        </div>
-      </div>
-    </p-card>
-  }
-
-  <!-- Line items -->
-  <p-card class="mb-4">
-    <ng-template #header>
-      <div class="flex items-center justify-between px-4 pt-3">
-        <span class="text-sm font-medium text-surface-700 dark:text-surface-300">Line items</span>
-      </div>
-    </ng-template>
-    @if (lineItemsLoading()) {
-      <div class="flex flex-col gap-2 py-2">
-        <p-skeleton width="100%" height="2rem" />
-        <p-skeleton width="100%" height="2rem" />
-      </div>
-    } @else if (lineItems().length) {
-      <p-table [value]="lineItems()">
-        <ng-template #header>
-          <tr>
-            <th>Description</th>
-            <th class="text-right">Qty</th>
-            <th class="text-right">Unit price</th>
-            <th class="text-right">Amount</th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-item>
-          <tr>
-            <td>{{ item.description || '—' }}</td>
-            <td class="text-right">{{ item.quantity }}</td>
-            <td class="text-right">{{ item.unitAmountCents | currencyRon:item.currency }}</td>
-            <td class="text-right font-medium">{{ item.amountCents | currencyRon:item.currency }}</td>
-          </tr>
-        </ng-template>
-        <ng-template #footer>
-          <tr>
-            <td colspan="3" class="text-right font-semibold">Total</td>
-            <td class="text-right font-semibold">{{ inv.amountDueCents | currencyRon:inv.currency }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    } @else {
-      <div class="py-6 text-center text-sm text-surface-500">
-        No line items available.
-      </div>
-    }
-  </p-card>
-
-  @if (inv.description) {
-    <p-card>
-      <div class="text-sm text-surface-500 mb-1">Notes</div>
-      <p class="m-0 whitespace-pre-wrap">{{ inv.description }}</p>
-    </p-card>
-  }
-}
-
 <p-toast />
+
+<div class="flex flex-col gap-4">
+
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-surface-500">
+    <a routerLink="/profile" [queryParams]="{ tab: 'invoices' }"
+      class="hover:text-surface-700 dark:hover:text-surface-300 transition-colors">
+      Invoices
+    </a>
+    <span>/</span>
+    <span class="text-surface-700 dark:text-surface-300 tabular-nums">
+      {{ displayNumber() }}
+    </span>
+  </nav>
+
+  @if (loading()) {
+    <div class="flex flex-col gap-4">
+      <p-skeleton width="40%" height="1.5rem" />
+      <p-skeleton width="100%" height="8rem" />
+      <p-skeleton width="100%" height="16rem" />
+    </div>
+  } @else if (invoice(); as inv) {
+
+    <!-- Hero card -->
+    <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-5 flex flex-col gap-4">
+
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div class="flex flex-col gap-2 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p-tag [value]="inv.status | statusLabel" [severity]="statusSeverity(inv.status)" />
+            @if (inv.paidOutOfBand) {
+              <p-tag value="PAID OUT OF BAND" severity="secondary" />
+            }
+            <span class="text-sm text-surface-500 tabular-nums">
+              {{ displayNumber() }}
+              · Issued {{ inv.createdAt | date: 'dd MMM yyyy' }}
+              @if (inv.dueDate) {
+                · Due {{ inv.dueDate | date: 'dd MMM yyyy' }}
+              }
+            </span>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <span class="text-xs uppercase tracking-wide text-surface-500">
+              @switch (inv.status) {
+                @case (Statuses.Paid) { Paid in full }
+                @case (Statuses.Void) { Voided }
+                @case (Statuses.Open) { Amount due }
+                @default { Amount due }
+              }
+            </span>
+            <span class="font-heading text-3xl md:text-4xl font-semibold text-primary-500 tabular-nums">
+              {{ inv.amountDueCents | currencyRon : inv.currency }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Top-right actions: PDF is the only one clients need -->
+        <div class="flex flex-wrap gap-2">
+          @if (inv.invoicePdf) {
+            <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
+              <p-button
+                label="Download invoice PDF"
+                icon="pi pi-download"
+                severity="secondary"
+                [outlined]="true"
+                size="small"
+              />
+            </a>
+          }
+        </div>
+      </div>
+
+      <!-- 3-step tracker -->
+      <div class="pt-2">
+        <ol class="flex items-center gap-1 sm:gap-3 w-full m-0 p-0 list-none">
+          @for (step of tracker(); track step.key; let first = $first) {
+            @if (!first) {
+              <li class="flex-1 h-px"
+                [class.bg-primary-500]="step.state === 'done' || step.state === 'current'"
+                [class.bg-surface-200]="step.state === 'pending'"
+                [class.dark:bg-surface-700]="step.state === 'pending'"
+                aria-hidden="true"></li>
+            }
+            <li class="flex items-center gap-2">
+              <span
+                class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold tabular-nums"
+                [class.bg-primary-500]="step.state === 'done'"
+                [class.text-white]="step.state === 'done'"
+                [class.border]="step.state !== 'done'"
+                [class.border-primary-500]="step.state === 'current'"
+                [class.text-primary-500]="step.state === 'current'"
+                [class.border-surface-300]="step.state === 'pending'"
+                [class.dark:border-surface-600]="step.state === 'pending'"
+                [class.text-surface-400]="step.state === 'pending'"
+                aria-hidden="true"
+              >
+                @if (step.state === 'done') {
+                  <i class="pi pi-check" style="font-size: 0.7rem;"></i>
+                } @else {
+                  {{ $index + 1 }}
+                }
+              </span>
+              <div class="flex flex-col leading-tight">
+                <span
+                  class="text-sm"
+                  [class.font-semibold]="step.state !== 'pending'"
+                  [class.text-surface-400]="step.state === 'pending'"
+                >{{ step.label }}</span>
+                <span class="text-xs text-surface-500">
+                  @if (step.date) {
+                    {{ step.date | date: 'dd MMM' }}
+                  } @else {
+                    pending
+                  }
+                </span>
+              </div>
+            </li>
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- Two-column body: line items (left) + sidebar (right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4">
+
+      <!-- Left column: line items + notes -->
+      <div class="flex flex-col gap-4">
+
+        <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 overflow-hidden">
+          <header class="px-4 py-3 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
+            <span class="text-sm font-medium">Line items</span>
+            <span class="text-xs text-surface-500">
+              {{ lineItems().length }} {{ lineItems().length === 1 ? 'item' : 'items' }}
+            </span>
+          </header>
+
+          @if (lineItemsLoading()) {
+            <div class="flex flex-col gap-2 p-4">
+              <p-skeleton width="100%" height="2rem" />
+              <p-skeleton width="100%" height="2rem" />
+            </div>
+          } @else if (lineItems().length) {
+            <table class="w-full text-sm">
+              <thead class="text-xs uppercase tracking-wide text-surface-500">
+                <tr>
+                  <th class="text-left px-4 py-2 font-medium">Description</th>
+                  <th class="text-right px-4 py-2 font-medium w-16">Qty</th>
+                  <th class="text-right px-4 py-2 font-medium w-28">Unit</th>
+                  <th class="text-right px-4 py-2 font-medium w-28">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of lineItems(); track item.id) {
+                  <tr class="border-t border-surface-200 dark:border-surface-700/50">
+                    <td class="px-4 py-2.5">{{ item.description || '—' }}</td>
+                    <td class="px-4 py-2.5 text-right tabular-nums">{{ item.quantity }}</td>
+                    <td class="px-4 py-2.5 text-right tabular-nums">{{ item.unitAmountCents | currencyRon : item.currency }}</td>
+                    <td class="px-4 py-2.5 text-right font-medium tabular-nums">{{ item.amountCents | currencyRon : item.currency }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="border-t border-surface-200 dark:border-surface-700">
+                  <td colspan="3" class="px-4 py-3 text-right text-xs uppercase tracking-wide text-surface-500">Subtotal</td>
+                  <td class="px-4 py-3 text-right tabular-nums">{{ inv.amountDueCents | currencyRon : inv.currency }}</td>
+                </tr>
+                <tr class="border-t border-surface-200 dark:border-surface-700/50">
+                  <td colspan="3" class="px-4 py-3 text-right text-xs uppercase tracking-wide text-surface-500">Total</td>
+                  <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ inv.amountDueCents | currencyRon : inv.currency }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          } @else {
+            <div class="py-6 text-center text-sm text-surface-500">
+              No line items available.
+            </div>
+          }
+        </section>
+
+        <!-- Notes from the instructor (read-only on the client side) -->
+        @if (inv.description) {
+          <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-4 flex flex-col gap-2">
+            <span class="text-xs uppercase tracking-wide text-surface-500">Notes</span>
+            <p class="m-0 text-sm whitespace-pre-wrap">{{ inv.description }}</p>
+          </section>
+        }
+      </div>
+
+      <!-- Right column: pay card (if open) + payment details + activity -->
+      <aside class="flex flex-col gap-4">
+
+        <!-- Pay this invoice — only when open, client-specific -->
+        @if (inv.status === Statuses.Open) {
+          <section class="rounded-lg border border-primary-300/40 bg-primary-50/50 dark:bg-primary-900/10 p-4 flex flex-col gap-3">
+            <span class="text-xs uppercase tracking-wide text-primary-700 dark:text-primary-400 font-semibold">
+              Pay this invoice
+            </span>
+
+            <!-- EU cooling-off waiver (OUG 34/2014) -->
+            <label class="flex items-start gap-2 cursor-pointer select-none">
+              <p-checkbox
+                [(ngModel)]="consentChecked"
+                [binary]="true"
+                inputId="payConsent"
+              />
+              <span class="text-xs leading-relaxed text-surface-700 dark:text-surface-300">
+                {{ consentText }}
+              </span>
+            </label>
+
+            <p-button
+              label="Pay now"
+              icon="pi pi-credit-card"
+              size="small"
+              [loading]="payLoading()"
+              [disabled]="!consentChecked"
+              (onClick)="payInvoice()"
+              styleClass="w-full"
+            />
+          </section>
+        }
+
+        <!-- Payment details shown once the invoice has been paid -->
+        @if (inv.status === Statuses.Paid) {
+          <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-4 flex flex-col gap-2">
+            <span class="text-xs uppercase tracking-wide text-surface-500">Payment</span>
+            @if (inv.paidAt) {
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-surface-500">Paid</span>
+                <span class="tabular-nums">{{ inv.paidAt | date: 'dd MMM, HH:mm' }}</span>
+              </div>
+            }
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-surface-500">Amount</span>
+              <span class="font-medium tabular-nums">{{ inv.amountPaidCents | currencyRon : inv.currency }}</span>
+            </div>
+            @if (inv.paidOutOfBand) {
+              <span class="text-xs text-surface-500">
+                Settled directly with your instructor (cash or bank transfer).
+              </span>
+            }
+          </section>
+        }
+
+        <!-- Activity log -->
+        <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-4 flex flex-col gap-3">
+          <span class="text-xs uppercase tracking-wide text-surface-500">Activity</span>
+          @if (activity().length) {
+            <ol class="flex flex-col gap-2.5 m-0 p-0 list-none">
+              @for (e of activity(); track e.at + e.label) {
+                <li class="flex items-start gap-2.5">
+                  <span
+                    class="mt-1.5 inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    [class.bg-green-500]="e.kind === 'success'"
+                    [class.bg-amber-500]="e.kind === 'warn'"
+                    [class.bg-red-500]="e.kind === 'danger'"
+                    [class.bg-surface-400]="e.kind === 'neutral'"
+                  ></span>
+                  <div class="flex flex-col leading-tight">
+                    <span class="text-sm">{{ e.label }}</span>
+                    <span class="text-xs text-surface-500 tabular-nums">
+                      {{ e.at | date: 'dd MMM yyyy, HH:mm' }}
+                    </span>
+                  </div>
+                </li>
+              }
+            </ol>
+          }
+        </section>
+      </aside>
+    </div>
+  }
+</div>

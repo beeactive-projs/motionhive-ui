@@ -53,7 +53,7 @@
         </div>
       </td>
       <td>
-        <p-tag [value]="typeLabel(product.type)" [severity]="typeSeverity(product.type)" />
+        <p-tag [value]="typeLabel(product.type) | statusLabel" [severity]="typeSeverity(product.type)" />
       </td>
       <td>{{ product.amountCents | currencyRon:product.currency }}</td>
       <td>
@@ -64,7 +64,7 @@
         }
       </td>
       <td>
-        <p-tag [value]="product.isActive ? 'Active' : 'Inactive'" [severity]="activeSeverity(product.isActive)" />
+        <p-tag [value]="(product.isActive ? 'Active' : 'Inactive') | statusLabel" [severity]="activeSeverity(product.isActive)" />
       </td>
       <td>
         <p-toggleSwitch
@@ -150,17 +150,23 @@
     </div>
   } @else {
     @for (product of products(); track trackById($index, product)) {
+      <!-- Whole card taps open the edit dialog — matches the invoices
+           mobile pattern (actions live on the secondary surface, the
+           list row is a clean row). The inline toggle stops propagation
+           so tapping it doesn't also open the dialog. -->
       <mh-list-card
         [status]="typeLabel(product.type)"
         [statusSeverity]="typeSeverity(product.type)"
         [avatarIcon]="productIcon(product)"
         [title]="product.name"
         [subtitle]="product.description ?? subtitleFor(product)"
+        [clickable]="true"
         [accent]="cardAccent(product)"
+        (click)="openEditDialog(product)"
       >
         <div badges class="flex items-center gap-2">
           @if (!product.isActive) {
-            <p-tag value="Inactive" severity="danger" class="text-xs!" />
+            <p-tag value="INACTIVE" severity="danger" class="text-xs!" />
           }
         </div>
         <div amount class="flex flex-col items-end">
@@ -171,7 +177,8 @@
             <span class="text-xs text-surface-500">{{ billingLabel(product) }}</span>
           }
         </div>
-        <div meta class="flex items-center justify-between gap-2 text-xs text-surface-500">
+        <div meta class="flex items-center justify-between gap-2 text-xs text-surface-500"
+          (click)="$event.stopPropagation()">
           <div class="flex items-center gap-2">
             <i class="pi" [class.pi-eye]="product.showOnProfile" [class.pi-eye-slash]="!product.showOnProfile"></i>
             <span>{{ product.showOnProfile ? 'On profile' : 'Hidden' }}</span>
@@ -182,26 +189,24 @@
             (ngModelChange)="toggleShowOnProfile(product, $event)"
           />
         </div>
-        <div actions class="flex gap-2 pt-1">
-          <p-button
-            label="Edit"
-            icon="pi pi-pencil"
-            size="small"
-            [outlined]="true"
-            (onClick)="openEditDialog(product)"
-          />
-          @if (product.isActive) {
-            <p-button
-              icon="pi pi-ban"
-              size="small"
-              severity="danger"
-              [text]="true"
-              pTooltip="Deactivate"
-              (onClick)="confirmDeactivate(product)"
-            />
-          }
-        </div>
       </mh-list-card>
+    }
+
+    @if (hasMore()) {
+      <div class="flex flex-col items-center gap-2 pt-2">
+        <p-button
+          label="Load more"
+          icon="pi pi-chevron-down"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [loading]="loadingMore()"
+          (onClick)="loadMore()"
+        />
+        <span class="text-xs text-surface-500">
+          Showing {{ products().length }} of {{ totalRecords() }}
+        </span>
+      </div>
     }
   }
 </div>

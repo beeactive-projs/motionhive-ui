@@ -1,0 +1,64 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!sending()"
+  [closeOnEscape]="!sending()"
+  [dismissableMask]="!sending()"
+  header="Send invoice"
+  styleClass="w-full max-w-md"
+>
+  <div class="flex flex-col gap-4 p-1">
+    <p class="text-sm text-surface-700 dark:text-surface-300 m-0">
+      We'll email the invoice to this address. Leave the on-file email to send through Stripe,
+      or type a different one to send a copy elsewhere (e.g. an accountant, a parent, a second contact).
+    </p>
+
+    <label class="flex flex-col gap-2">
+      <span class="text-xs uppercase tracking-wide text-surface-500">Send to</span>
+      <input
+        pInputText
+        type="email"
+        autocomplete="email"
+        [ngModel]="email()"
+        (ngModelChange)="onEmailChange($event)"
+        [disabled]="sending()"
+        placeholder="name@example.com"
+        class="w-full"
+      />
+      @if (onFileEmail(); as onFile) {
+        <span class="text-xs text-surface-500">
+          On file: <span class="font-medium">{{ onFile }}</span>
+        </span>
+      }
+    </label>
+
+    @if (isOverride()) {
+      <p-message severity="info" [closable]="false" styleClass="w-full">
+        <span class="text-xs">
+          This copy will be sent from MotionHive to the address above. The customer's on-file email won't be notified.
+        </span>
+      </p-message>
+    }
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-end gap-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        [disabled]="sending()"
+        (onClick)="visible.set(false)"
+      />
+      <p-button
+        icon="pi pi-send"
+        label="Send"
+        size="small"
+        [loading]="sending()"
+        [disabled]="!emailLooksValid() || sending()"
+        (onClick)="send()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

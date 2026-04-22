@@ -1,4 +1,4 @@
-import type { ConsentType, InvoiceStatus } from './payment.enums';
+import type { InvoiceStatus } from './payment.enums';
 import type { PaginatedResponse } from '../common/pagination.model';
 
 export interface InvoiceLineItem {
@@ -73,9 +73,15 @@ export interface InvoiceListParams {
 
 export type InvoiceListResponse = PaginatedResponse<Invoice>;
 
-export interface PayInvoiceConsent {
-  consentType: ConsentType;
-  consentText: string;
+/**
+ * Body for `POST /payments/my/invoices/:id/pay`.
+ *
+ * The server owns the canonical consent record — we just confirm the
+ * waiver was ticked. The backend refuses to pay the invoice if the
+ * flag is missing when the invoice requires the 14-day waiver.
+ */
+export interface PayInvoicePayload {
+  immediateAccessWaiverAccepted?: boolean;
 }
 
 export interface PayInvoiceResponse {

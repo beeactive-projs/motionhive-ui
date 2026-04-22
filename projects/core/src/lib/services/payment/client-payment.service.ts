@@ -8,7 +8,7 @@ import {
   InvoiceLineItemDetail,
   InvoiceListParams,
   InvoiceListResponse,
-  PayInvoiceConsent,
+  PayInvoicePayload,
   PayInvoiceResponse,
 } from '../../models/payment/invoice.model';
 import {
@@ -66,10 +66,16 @@ export class ClientPaymentService {
     );
   }
 
-  payInvoice(id: string, consent: PayInvoiceConsent): Observable<PayInvoiceResponse> {
+  /**
+   * Start the pay-invoice flow. When the invoice requires the EU 14-day
+   * waiver, the client MUST pass `immediateAccessWaiverAccepted: true`
+   * or the API returns 400. The canonical consent text is recorded by
+   * the server.
+   */
+  payInvoice(id: string, payload: PayInvoicePayload = {}): Observable<PayInvoiceResponse> {
     return this._http.post<PayInvoiceResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_INVOICE_PAY(id)}`,
-      consent,
+      payload,
     );
   }
 

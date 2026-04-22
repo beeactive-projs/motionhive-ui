@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -14,6 +14,7 @@ import {
   ProductTypes,
   TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
   getProductBillingLabel,
   type Product,
   type ProductType,
@@ -34,6 +35,7 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
     TooltipModule,
     ToggleSwitch,
     CurrencyRonPipe,
+    StatusLabelPipe,
     ProductFormDialog,
     ListCard,
   ],
@@ -50,9 +52,16 @@ export class Products implements OnInit {
   products = signal<Product[]>([]);
   totalRecords = signal(0);
   loading = signal(true);
+  loadingMore = signal(false);
 
   readonly rows = 10;
   currentPage = signal(1);
+
+  /** Drives the mobile "Load more" button. Hidden when the accumulated
+   *  list already contains every server-side row. */
+  readonly hasMore = computed(
+    () => this.products().length < this.totalRecords(),
+  );
 
   typeFilter = signal<ProductType | undefined>(undefined);
   readonly typeOptions = [
@@ -82,13 +91,43 @@ export class Products implements OnInit {
           this.products.set(response.items);
           this.totalRecords.set(response.total);
           this.loading.set(false);
+          this.loadingMore.set(false);
         },
         error: () => {
           this.loading.set(false);
+          this.loadingMore.set(false);
           this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'Failed to load products',
+          });
+        },
+      });
+  }
+
+  /** Mobile "Load more": appends the next page to the current list. */
+  loadMore(): void {
+    if (this.loadingMore() || !this.hasMore()) return;
+    this.loadingMore.set(true);
+    this._productService
+      .list({
+        type: this.typeFilter(),
+        page: this.currentPage() + 1,
+        limit: this.rows,
+      })
+      .subscribe({
+        next: (response) => {
+          this.products.update((list) => [...list, ...response.items]);
+          this.totalRecords.set(response.total);
+          this.currentPage.update((p) => p + 1);
+          this.loadingMore.set(false);
+        },
+        error: () => {
+          this.loadingMore.set(false);
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load more products',
           });
         },
       });

@@ -16,8 +16,9 @@ import { MessageService } from 'primeng/api';
 import {
   ClientPaymentService,
   InvoiceStatuses,
-  TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
+  getInvoiceStatusSeverity,
   type Invoice,
   type InvoiceStatus,
 } from 'core';
@@ -33,6 +34,7 @@ import {
     SkeletonModule,
     ToastModule,
     CurrencyRonPipe,
+    StatusLabelPipe,
   ],
   providers: [MessageService],
   templateUrl: './my-invoices.html',
@@ -100,19 +102,7 @@ export class MyInvoices implements OnInit {
     this.loadInvoices();
   }
 
-  statusSeverity(status: InvoiceStatus): TagSeverity {
-    switch (status) {
-      case InvoiceStatuses.Paid:
-        return TagSeverity.Success;
-      case InvoiceStatuses.Open:
-        return TagSeverity.Warn;
-      case InvoiceStatuses.Void:
-      case InvoiceStatuses.Uncollectible:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
+  readonly statusSeverity = getInvoiceStatusSeverity;
 
   trackById = (_: number, item: { id: string }) => item.id;
 }

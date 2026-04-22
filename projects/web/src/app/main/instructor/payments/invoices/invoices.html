@@ -55,7 +55,7 @@
       </td>
       <td>{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
       <td>
-        <p-tag [value]="invoice.status" [severity]="statusSeverity(invoice.status)" />
+        <p-tag [value]="invoice.status | statusLabel" [severity]="statusSeverity(invoice.status)" />
         @if (invoice.paidOutOfBand) {
           <span class="text-xs text-surface-500 ml-1">(manual)</span>
         }
@@ -75,13 +75,13 @@
           @switch (invoice.status) {
             @case (Statuses.Draft) {
               <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small"
-                pTooltip="Send" (onClick)="sendInvoice(invoice)" />
+                pTooltip="Send" (onClick)="openSendDialog(invoice)" />
               <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small"
                 severity="danger" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
             }
             @case (Statuses.Open) {
               <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small"
-                pTooltip="Resend email" (onClick)="sendInvoice(invoice)" />
+                pTooltip="Resend email" (onClick)="openSendDialog(invoice)" />
               <p-button icon="pi pi-check" [rounded]="true" [text]="true" size="small"
                 severity="success" pTooltip="Mark paid" (onClick)="confirmMarkPaid(invoice)" />
               <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small"
@@ -208,10 +208,33 @@
         </mh-list-card>
       </a>
     }
+
+    @if (hasMore()) {
+      <div class="flex flex-col items-center gap-2 pt-2">
+        <p-button
+          label="Load more"
+          icon="pi pi-chevron-down"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [loading]="loadingMore()"
+          (onClick)="loadMore()"
+        />
+        <span class="text-xs text-surface-500">
+          Showing {{ invoices().length }} of {{ totalRecords() }}
+        </span>
+      </div>
+    }
   }
 </div>
 
 <mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="loadInvoices()" />
+
+<mh-send-invoice-email-dialog
+  [(visible)]="showSendDialog"
+  [invoice]="sendDialogInvoice()"
+  (sent)="loadInvoices()"
+/>
 
 <p-toast />
 <p-confirmDialog />

@@ -15,11 +15,10 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import {
   ClientPaymentService,
-  SubscriptionStatuses,
-  TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
+  getSubscriptionStatusSeverity,
   type Subscription,
-  type SubscriptionStatus,
 } from 'core';
 
 @Component({
@@ -33,6 +32,7 @@ import {
     SkeletonModule,
     ToastModule,
     CurrencyRonPipe,
+    StatusLabelPipe,
   ],
   providers: [MessageService],
   templateUrl: './my-subscriptions.html',
@@ -103,25 +103,7 @@ export class MySubscriptions implements OnInit {
     });
   }
 
-  statusSeverity(status: SubscriptionStatus): TagSeverity {
-    switch (status) {
-      case SubscriptionStatuses.Active:
-        return TagSeverity.Success;
-      case SubscriptionStatuses.Trialing:
-        return TagSeverity.Info;
-      case SubscriptionStatuses.PastDue:
-        return TagSeverity.Warn;
-      case SubscriptionStatuses.Canceled:
-      case SubscriptionStatuses.Unpaid:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
-
-  statusLabel(status: SubscriptionStatus): string {
-    return status.replace('_', ' ');
-  }
+  readonly statusSeverity = getSubscriptionStatusSeverity;
 
   trackById = (_: number, item: { id: string }) => item.id;
 }

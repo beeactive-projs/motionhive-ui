@@ -8,6 +8,7 @@ export interface AccountInfo {
   lastName: string;
   phone: string | null;
   avatarId: string | null;
+  avatarUrl: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   language: string | null;

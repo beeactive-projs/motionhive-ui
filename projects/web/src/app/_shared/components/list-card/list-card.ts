@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { AvatarModule } from 'primeng/avatar';
 import { TagModule } from 'primeng/tag';
-import { TagSeverity } from 'core';
+import { StatusLabelPipe, TagSeverity } from 'core';
 
 /**
  * Presentational list-card used by mobile variants of instructor-facing
@@ -26,7 +26,7 @@ import { TagSeverity } from 'core';
  */
 @Component({
   selector: 'mh-list-card',
-  imports: [AvatarModule, TagModule],
+  imports: [AvatarModule, TagModule, StatusLabelPipe],
   templateUrl: './list-card.html',
   styleUrl: './list-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

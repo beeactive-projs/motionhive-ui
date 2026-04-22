@@ -20,12 +20,13 @@ import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
 import {
   InvoiceService as PaymentInvoiceService,
   InvoiceStatuses,
-  TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
+  getInvoiceStatusSeverity,
   type Invoice,
   type InvoiceLineItemDetail,
-  type InvoiceStatus,
 } from 'core';
+import { SendInvoiceEmailDialog } from '../../../_dialogs/send-invoice-email-dialog/send-invoice-email-dialog';
 
 /**
  * One step in the invoice lifecycle tracker. Tracker is 3 steps:
@@ -61,6 +62,8 @@ interface ActivityEntry {
     Tooltip,
     Menu,
     CurrencyRonPipe,
+    StatusLabelPipe,
+    SendInvoiceEmailDialog,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './invoice-detail.html',
@@ -79,6 +82,7 @@ export class InvoiceDetail implements OnInit {
   readonly lineItemsLoading = signal(false);
   readonly loading = signal(true);
   readonly actionLoading = signal(false);
+  readonly showSendDialog = signal(false);
 
   readonly Statuses = InvoiceStatuses;
 
@@ -232,28 +236,20 @@ export class InvoiceDetail implements OnInit {
     });
   }
 
-  sendInvoice(): void {
+  /** Opens the send-email popup so the instructor can confirm/override
+   *  the recipient before finalizing and sending. */
+  openSendDialog(): void {
+    if (!this.invoice()) return;
+    this.showSendDialog.set(true);
+  }
+
+  /** Callback for when the send popup finishes — re-fetch so the hero
+   *  tracker + activity feed reflect the new Open state. */
+  onSent(): void {
     const inv = this.invoice();
     if (!inv) return;
-    this.actionLoading.set(true);
-    this._invoiceService.send(inv.id).subscribe({
-      next: (updated) => {
-        this.invoice.set(updated);
-        this.actionLoading.set(false);
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Invoice sent',
-          detail: 'Invoice has been finalized and sent',
-        });
-      },
-      error: (err) => {
-        this.actionLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to send invoice',
-        });
-      },
+    this._invoiceService.get(inv.id).subscribe({
+      next: (updated) => this.invoice.set(updated),
     });
   }
 
@@ -341,19 +337,5 @@ export class InvoiceDetail implements OnInit {
     );
   }
 
-  statusSeverity(status: InvoiceStatus): TagSeverity {
-    switch (status) {
-      case InvoiceStatuses.Paid:
-        return TagSeverity.Success;
-      case InvoiceStatuses.Open:
-        return TagSeverity.Warn;
-      case InvoiceStatuses.Draft:
-        return TagSeverity.Secondary;
-      case InvoiceStatuses.Void:
-      case InvoiceStatuses.Uncollectible:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
+  readonly statusSeverity = getInvoiceStatusSeverity;
 }

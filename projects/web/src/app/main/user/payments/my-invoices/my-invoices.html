@@ -30,7 +30,7 @@
         </a>
       </td>
       <td class="font-medium">{{ inv.amountDueCents | currencyRon:inv.currency }}</td>
-      <td><p-tag [value]="inv.status" [severity]="statusSeverity(inv.status)" /></td>
+      <td><p-tag [value]="inv.status | statusLabel" [severity]="statusSeverity(inv.status)" /></td>
       <td>{{ inv.createdAt | date:'dd MMM yyyy' }}</td>
       <td>{{ inv.dueDate ? (inv.dueDate | date:'dd MMM yyyy') : '—' }}</td>
       <td>

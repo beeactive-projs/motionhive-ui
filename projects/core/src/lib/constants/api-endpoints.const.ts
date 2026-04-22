@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   USERS: {
     BASE: '/users',
     ME: '/users/me',
+    ME_AVATAR: '/users/me/avatar',
   },
   PROFILE: {
     BASE: '/profile',

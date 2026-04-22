@@ -18,6 +18,7 @@ import {
   ProductService,
   TagSeverity,
   UserRoles,
+  UserService,
   getProductBillingLabel,
 } from 'core';
 import { AvatarModule } from 'primeng/avatar';
@@ -57,6 +58,7 @@ import { BecomeInstructor } from '../../../user/_dialogs/become-instructor/becom
 })
 export class Details implements OnInit {
   private readonly _productService = inject(ProductService);
+  private readonly _userService = inject(UserService);
   private readonly _messageService = inject(MessageService);
 
   readonly profile = input.required<MyProfile>();
@@ -69,6 +71,12 @@ export class Details implements OnInit {
   readonly coachingProductsLoading = signal(false);
   private readonly _togglingProductIds = signal<Set<string>>(new Set());
 
+  readonly uploadingAvatar = signal(false);
+  /** Optimistic avatar URL — wins over `profile().account.avatarUrl`
+   *  between the successful upload response and the parent reloading
+   *  the profile via (refresh). Null until the user uploads one. */
+  readonly _pendingAvatarUrl = signal<string | null>(null);
+
   readonly fullName = computed(() => {
     const p = this.profile();
     return `${p.account.firstName} ${p.account.lastName}`;
@@ -77,6 +85,12 @@ export class Details implements OnInit {
   readonly initials = computed(() => {
     const p = this.profile();
     return `${p.account.firstName.charAt(0)}${p.account.lastName.charAt(0)}`.toUpperCase();
+  });
+
+  /** Avatar URL to render — optimistic local value wins so the new
+   *  picture is visible immediately after upload. */
+  readonly avatarUrl = computed<string | null>(() => {
+    return this._pendingAvatarUrl() ?? this.profile().account.avatarUrl ?? null;
   });
 
   readonly isInstructor = computed(() => {
@@ -179,5 +193,58 @@ export class Details implements OnInit {
   onInstructorSaved(): void {
     this.refresh.emit();
     this.loadCoachingProducts();
+  }
+
+  /**
+   * File picker handler. Validates client-side (type + size) so we don't
+   * round-trip obviously-bad files, then posts to the backend. The
+   * response drives an optimistic avatar swap; `refresh.emit()` tells
+   * the parent to reload the full profile so everything stays in sync.
+   */
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    // Reset the input so picking the same file twice still fires change.
+    input.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'Wrong file type',
+        detail: 'Pick a PNG, JPG or WEBP image.',
+      });
+      return;
+    }
+    const MAX_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'File too large',
+        detail: 'Profile pictures must be under 5 MB.',
+      });
+      return;
+    }
+
+    this.uploadingAvatar.set(true);
+    this._userService.uploadAvatar(file).subscribe({
+      next: ({ avatarUrl }) => {
+        this._pendingAvatarUrl.set(avatarUrl);
+        this.uploadingAvatar.set(false);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Profile picture updated',
+        });
+        this.refresh.emit();
+      },
+      error: (err) => {
+        this.uploadingAvatar.set(false);
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Upload failed',
+          detail: err?.error?.message || 'Could not upload the picture.',
+        });
+      },
+    });
   }
 }

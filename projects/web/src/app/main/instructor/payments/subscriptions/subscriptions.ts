@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  computed,
   inject,
   OnInit,
   signal,
@@ -14,13 +15,15 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageModule } from 'primeng/message';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
 import {
   SubscriptionService,
   SubscriptionStatuses,
   StripeOnboardingService,
-  TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
+  getSubscriptionStatusSeverity,
   type Subscription,
   type SubscriptionStatus,
 } from 'core';
@@ -40,8 +43,10 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
     TooltipModule,
     MessageModule,
     CurrencyRonPipe,
+    StatusLabelPipe,
     CreateSubscriptionDialog,
     ListCard,
+    Menu,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './subscriptions.html',
@@ -59,9 +64,16 @@ export class Subscriptions implements OnInit {
   subscriptions = signal<Subscription[]>([]);
   totalRecords = signal(0);
   loading = signal(true);
+  loadingMore = signal(false);
 
   readonly rows = 10;
   currentPage = signal(1);
+
+  /** Drives the mobile "Load more" button. Hidden once every server-side
+   *  row is present in the accumulated list. */
+  readonly hasMore = computed(
+    () => this.subscriptions().length < this.totalRecords(),
+  );
 
   statusFilter = signal<SubscriptionStatus | undefined>(undefined);
   readonly statusOptions: { label: string; value: SubscriptionStatus | undefined }[] = [
@@ -74,6 +86,37 @@ export class Subscriptions implements OnInit {
   ];
 
   showCreateDialog = signal(false);
+
+  /** Active subscription for the mobile action menu — tapping a
+   *  card stashes its row here so the menu items can target the
+   *  right subscription when invoked. Null when the menu is closed. */
+  readonly actionMenuTarget = signal<Subscription | null>(null);
+
+  /** Menu items derived from the active target. Empty list = no menu
+   *  (e.g. already-canceled subscriptions aren't actionable). */
+  readonly actionMenuItems = computed<MenuItem[]>(() => {
+    const sub = this.actionMenuTarget();
+    if (!sub) return [];
+    if (
+      sub.status !== SubscriptionStatuses.Active &&
+      sub.status !== SubscriptionStatuses.Trialing
+    ) {
+      return [];
+    }
+    return [
+      {
+        label: 'Cancel at period end',
+        icon: 'pi pi-times',
+        command: () => this.confirmCancel(sub),
+      },
+      {
+        label: 'Cancel immediately',
+        icon: 'pi pi-trash',
+        styleClass: 'text-red-500',
+        command: () => this.confirmCancelImmediately(sub),
+      },
+    ];
+  });
 
   readonly Statuses = SubscriptionStatuses;
 
@@ -117,13 +160,43 @@ export class Subscriptions implements OnInit {
           this.subscriptions.set(response.items);
           this.totalRecords.set(response.total);
           this.loading.set(false);
+          this.loadingMore.set(false);
         },
         error: () => {
           this.loading.set(false);
+          this.loadingMore.set(false);
           this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'Failed to load subscriptions',
+          });
+        },
+      });
+  }
+
+  /** Mobile "Load more": appends the next page to the current list. */
+  loadMore(): void {
+    if (this.loadingMore() || !this.hasMore()) return;
+    this.loadingMore.set(true);
+    this._subscriptionService
+      .list({
+        status: this.statusFilter(),
+        page: this.currentPage() + 1,
+        limit: this.rows,
+      })
+      .subscribe({
+        next: (response) => {
+          this.subscriptions.update((list) => [...list, ...response.items]);
+          this.totalRecords.set(response.total);
+          this.currentPage.update((p) => p + 1);
+          this.loadingMore.set(false);
+        },
+        error: () => {
+          this.loadingMore.set(false);
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load more memberships',
           });
         },
       });
@@ -140,6 +213,14 @@ export class Subscriptions implements OnInit {
     this.statusFilter.set(status);
     this.currentPage.set(1);
     this.loadSubscriptions();
+  }
+
+  /** Mobile card tap → opens the action menu anchored at the card.
+   *  Must be called with a template reference to the `p-menu` so we
+   *  can toggle it positionally. */
+  openActionMenu(sub: Subscription, event: MouseEvent, menu: Menu): void {
+    this.actionMenuTarget.set(sub);
+    menu.toggle(event);
   }
 
   confirmCancel(sub: Subscription): void {
@@ -184,25 +265,7 @@ export class Subscriptions implements OnInit {
     });
   }
 
-  statusSeverity(status: SubscriptionStatus): TagSeverity {
-    switch (status) {
-      case SubscriptionStatuses.Active:
-        return TagSeverity.Success;
-      case SubscriptionStatuses.Trialing:
-        return TagSeverity.Info;
-      case SubscriptionStatuses.PastDue:
-        return TagSeverity.Warn;
-      case SubscriptionStatuses.Canceled:
-      case SubscriptionStatuses.Unpaid:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
-
-  statusLabel(status: SubscriptionStatus): string {
-    return status.replace('_', ' ');
-  }
+  readonly statusSeverity = getSubscriptionStatusSeverity;
 
   /** Mobile card client line — falls back to a short id hash when the
    *  model only has a foreign key (Subscription doesn't embed client). */
