@@ -55,6 +55,7 @@ export * from './lib/models/payment/invoice.model';
 export * from './lib/models/payment/subscription.model';
 export * from './lib/models/payment/payment.model';
 export * from './lib/models/payment/earnings.model';
+export * from './lib/models/payment/status-severity';
 
 // Constants
 export * from './lib/constants/api-endpoints.const';
@@ -85,6 +86,7 @@ export * from './lib/services/payment/client-payment.service';
 
 // Pipes
 export * from './lib/pipes/currency-ron.pipe';
+export * from './lib/pipes/status-label.pipe';
 
 // Directives
 export * from './lib/directives/stripe-iframe.directive';

@@ -8,7 +8,7 @@ import {
   InvoiceLineItemDetail,
   InvoiceListParams,
   InvoiceListResponse,
-  PayInvoiceConsent,
+  PayInvoicePayload,
   PayInvoiceResponse,
 } from '../../models/payment/invoice.model';
 import {
@@ -22,6 +22,11 @@ export interface SetupIntentResponse {
 
 export interface CustomerPortalLinkResponse {
   url: string;
+}
+
+export interface MyBillingCounts {
+  invoices: { total: number; open: number };
+  memberships: { total: number; active: number };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -61,10 +66,16 @@ export class ClientPaymentService {
     );
   }
 
-  payInvoice(id: string, consent: PayInvoiceConsent): Observable<PayInvoiceResponse> {
+  /**
+   * Start the pay-invoice flow. When the invoice requires the EU 14-day
+   * waiver, the client MUST pass `immediateAccessWaiverAccepted: true`
+   * or the API returns 400. The canonical consent text is recorded by
+   * the server.
+   */
+  payInvoice(id: string, payload: PayInvoicePayload = {}): Observable<PayInvoiceResponse> {
     return this._http.post<PayInvoiceResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_INVOICE_PAY(id)}`,
-      consent,
+      payload,
     );
   }
 
@@ -87,4 +98,14 @@ export class ClientPaymentService {
     );
   }
 
+  /**
+   * Lightweight count-only lookup used by the profile tabs to decide
+   * which tabs to render and what badge values to show. Never loads
+   * the full lists — one call returns all counts.
+   */
+  getMyCounts(): Observable<MyBillingCounts> {
+    return this._http.get<MyBillingCounts>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_COUNTS}`,
+    );
+  }
 }

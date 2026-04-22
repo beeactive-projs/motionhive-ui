@@ -95,10 +95,7 @@ export class Main {
         {
           label: 'Revenue',
           items: [
-            { label: 'Earnings', route: '/coaching/earnings', icon: 'pi pi-chart-line' },
-            { label: 'Invoices', route: '/coaching/invoices', icon: 'pi pi-file' },
-            { label: 'Pricing', route: '/coaching/pricing', icon: 'pi pi-tag' },
-            { label: 'Subscriptions', route: '/coaching/subscriptions', icon: 'pi pi-refresh' },
+            { label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' },
           ],
         },
       );
@@ -112,13 +109,6 @@ export class Main {
           { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
           { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
           { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-star' },
-        ],
-      },
-      {
-        label: 'Billing',
-        items: [
-          { label: 'Invoices', route: '/activity/invoices', icon: 'pi pi-receipt' },
-          { label: 'Subscriptions', route: '/activity/subscriptions', icon: 'pi pi-sync' },
         ],
       },
     );

@@ -1,6 +1,5 @@
 <!-- Header -->
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-  <h1 class="font-heading font-semibold text-xl md:text-2xl m-0">My subscriptions</h1>
+<div class="flex justify-end mb-4">
   <p-button label="Manage billing" icon="pi pi-cog" size="small" [outlined]="true" [loading]="portalLoading()"
     (onClick)="openCustomerPortal()" />
 </div>
@@ -35,7 +34,7 @@
       <td>{{ sub.productId }}</td>
       <td class="font-medium">{{ sub.amountCents | currencyRon:sub.currency }}</td>
       <td>
-        <p-tag [value]="statusLabel(sub.status)" [severity]="statusSeverity(sub.status)" />
+        <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" />
         @if (sub.cancelAt) {
         <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM yyyy' }}</div>
         }

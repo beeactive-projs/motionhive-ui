@@ -29,33 +29,17 @@ export const instructorRoutes: Routes = [
     title: 'Group Details - MotionHive',
   },
 
-  // Revenue
+  // Payments hub — tabbed view at /coaching/payments?tab=...
   {
-    path: 'earnings',
-    loadComponent: () => import('./payments/earnings/earnings').then((m) => m.Earnings),
-    title: 'Earnings - MotionHive',
-  },
-  {
-    path: 'invoices',
-    loadComponent: () => import('./payments/invoices/invoices').then((m) => m.Invoices),
-    title: 'Invoices - MotionHive',
+    path: 'payments',
+    loadComponent: () => import('./payments/payments').then((m) => m.Payments),
+    title: 'Payments - MotionHive',
   },
   {
     path: 'invoices/:id',
     loadComponent: () =>
       import('./payments/invoices/invoice-detail/invoice-detail').then((m) => m.InvoiceDetail),
     title: 'Invoice Details - MotionHive',
-  },
-  {
-    path: 'pricing',
-    loadComponent: () => import('./payments/products/products').then((m) => m.Products),
-    title: 'Pricing - MotionHive',
-  },
-  {
-    path: 'subscriptions',
-    loadComponent: () =>
-      import('./payments/subscriptions/subscriptions').then((m) => m.Subscriptions),
-    title: 'Subscriptions - MotionHive',
   },
   {
     path: 'onboarding/return',
@@ -69,4 +53,13 @@ export const instructorRoutes: Routes = [
       import('./payments/onboarding-refresh/onboarding-refresh').then((m) => m.OnboardingRefresh),
     title: 'Onboarding - MotionHive',
   },
+
+  // Legacy redirects — simple path redirects to the hub.
+  // The hub defaults to the Invoices tab. Query-param redirects
+  // aren't supported by Angular router, so bookmarks go to the
+  // hub root and users pick the tab from there.
+  { path: 'earnings', redirectTo: 'payments', pathMatch: 'full' },
+  { path: 'invoices', redirectTo: 'payments', pathMatch: 'full' },
+  { path: 'pricing', redirectTo: 'payments', pathMatch: 'full' },
+  { path: 'subscriptions', redirectTo: 'payments', pathMatch: 'full' },
 ];

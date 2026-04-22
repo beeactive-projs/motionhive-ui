@@ -18,4 +18,19 @@ export class UserService {
   updateMe(payload: UpdateUserPayload): Observable<User> {
     return this._http.patch<User>(`${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`, payload);
   }
+
+  /**
+   * Upload a new profile picture. Backend accepts multipart/form-data
+   * with a single `file` field. Returns the new Cloudinary URL so the
+   * caller can swap the avatar in place without refetching the whole
+   * profile.
+   */
+  uploadAvatar(file: File): Observable<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this._http.post<{ avatarUrl: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.USERS.ME_AVATAR}`,
+      formData,
+    );
+  }
 }

@@ -62,6 +62,7 @@ export class ProductFormDialog {
   formInterval: BillingInterval = BillingIntervals.Month;
   formIntervalCount = 1;
   formIsActive = true;
+  formShowOnProfile = false;
 
   readonly typeOptions = [
     { label: 'One-off', value: ProductTypes.OneOff },
@@ -98,6 +99,7 @@ export class ProductFormDialog {
         this.formInterval = p.interval ?? BillingIntervals.Month;
         this.formIntervalCount = p.intervalCount ?? 1;
         this.formIsActive = p.isActive;
+        this.formShowOnProfile = p.showOnProfile;
       } else {
         this.formName = '';
         this.formDescription = '';
@@ -106,6 +108,7 @@ export class ProductFormDialog {
         this.formInterval = BillingIntervals.Month;
         this.formIntervalCount = 1;
         this.formIsActive = true;
+        this.formShowOnProfile = false;
       }
     }
   });
@@ -123,6 +126,7 @@ export class ProductFormDialog {
           name: this.formName.trim(),
           description: this.formDescription.trim() || undefined,
           isActive: this.formIsActive,
+          showOnProfile: this.formShowOnProfile,
         })
         .subscribe({
           next: () => {
@@ -151,6 +155,7 @@ export class ProductFormDialog {
           description: this.formDescription.trim() || undefined,
           type: this.formType,
           amountCents: Math.round(this.formAmountCents * 100),
+          showOnProfile: this.formShowOnProfile,
           ...(this.isSubscription && {
             interval: this.formInterval,
             intervalCount: this.formIntervalCount,

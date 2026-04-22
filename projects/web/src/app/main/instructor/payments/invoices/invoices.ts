@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -14,12 +14,15 @@ import {
   InvoiceService as PaymentInvoiceService,
   InvoiceStatuses,
   StripeOnboardingService,
-  TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
+  getInvoiceStatusSeverity,
   type Invoice,
   type InvoiceStatus,
 } from 'core';
 import { CreateInvoiceDialog } from '../../_dialogs/create-invoice-dialog/create-invoice-dialog';
+import { SendInvoiceEmailDialog } from '../../_dialogs/send-invoice-email-dialog/send-invoice-email-dialog';
+import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
 @Component({
   selector: 'mh-invoices',
@@ -35,7 +38,10 @@ import { CreateInvoiceDialog } from '../../_dialogs/create-invoice-dialog/create
     TooltipModule,
     MessageModule,
     CurrencyRonPipe,
+    StatusLabelPipe,
     CreateInvoiceDialog,
+    SendInvoiceEmailDialog,
+    ListCard,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './invoices.html',
@@ -53,9 +59,16 @@ export class Invoices implements OnInit {
   invoices = signal<Invoice[]>([]);
   totalRecords = signal(0);
   loading = signal(true);
+  loadingMore = signal(false);
 
   readonly rows = 10;
   currentPage = signal(1);
+
+  /** True when the accumulated mobile list has more server-side rows
+   *  available — drives the "Load more" button visibility. */
+  readonly hasMore = computed(
+    () => this.invoices().length < this.totalRecords(),
+  );
 
   statusFilter = signal<InvoiceStatus | undefined>(undefined);
   readonly statusOptions = [
@@ -67,12 +80,14 @@ export class Invoices implements OnInit {
   ];
 
   showCreateDialog = signal(false);
+  showSendDialog = signal(false);
+  sendDialogInvoice = signal<Invoice | null>(null);
 
   readonly Statuses = InvoiceStatuses;
 
   ngOnInit(): void {
     this.loadOnboardingStatus();
-    // this.loadInvoices();
+    this.loadInvoices();
   }
 
   private loadOnboardingStatus(): void {
@@ -110,9 +125,11 @@ export class Invoices implements OnInit {
           this.invoices.set(response.items);
           this.totalRecords.set(response.total);
           this.loading.set(false);
+          this.loadingMore.set(false);
         },
         error: () => {
           this.loading.set(false);
+          this.loadingMore.set(false);
           this._messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -135,24 +152,40 @@ export class Invoices implements OnInit {
     this.loadInvoices();
   }
 
-  sendInvoice(invoice: Invoice): void {
-    this._invoiceService.send(invoice.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Invoice sent',
-          detail: `Invoice ${invoice.number ?? ''} has been sent`,
-        });
-        this.loadInvoices();
-      },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to send invoice',
-        });
-      },
-    });
+  /** Mobile card list "Load more": appends the next page to the existing
+   *  list instead of replacing it. Desktop still uses the paginator. */
+  loadMore(): void {
+    if (this.loadingMore() || !this.hasMore()) return;
+    this.loadingMore.set(true);
+    this._invoiceService
+      .list({
+        status: this.statusFilter(),
+        page: this.currentPage() + 1,
+        limit: this.rows,
+      })
+      .subscribe({
+        next: (response) => {
+          this.invoices.update((list) => [...list, ...response.items]);
+          this.totalRecords.set(response.total);
+          this.currentPage.update((p) => p + 1);
+          this.loadingMore.set(false);
+        },
+        error: () => {
+          this.loadingMore.set(false);
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load more invoices',
+          });
+        },
+      });
+  }
+
+  /** Opens the send-email confirmation popup — pre-fills the on-file
+   *  email and lets the instructor override it for this send only. */
+  openSendDialog(invoice: Invoice): void {
+    this.sendDialogInvoice.set(invoice);
+    this.showSendDialog.set(true);
   }
 
   confirmVoid(invoice: Invoice): void {
@@ -214,27 +247,46 @@ export class Invoices implements OnInit {
     });
   }
 
-  statusSeverity(status: InvoiceStatus): TagSeverity {
-    switch (status) {
-      case InvoiceStatuses.Paid:
-        return TagSeverity.Success;
-      case InvoiceStatuses.Open:
-        return TagSeverity.Warn;
-      case InvoiceStatuses.Draft:
-        return TagSeverity.Secondary;
-      case InvoiceStatuses.Void:
-      case InvoiceStatuses.Uncollectible:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
+  readonly statusSeverity = getInvoiceStatusSeverity;
 
   clientDisplay(invoice: Invoice): string {
     if (invoice.client?.firstName && invoice.client?.lastName) {
       return `${invoice.client.firstName} ${invoice.client.lastName}`;
     }
     return invoice.clientEmail ?? 'Unknown';
+  }
+
+  /** Two-letter initials for the client avatar. Falls back to "?"
+   *  when the invoice has no client name AND no email. */
+  clientInitials(invoice: Invoice): string {
+    if (invoice.client?.firstName && invoice.client?.lastName) {
+      return (
+        invoice.client.firstName.charAt(0) + invoice.client.lastName.charAt(0)
+      ).toUpperCase();
+    }
+    if (invoice.clientEmail) {
+      return invoice.clientEmail.charAt(0).toUpperCase();
+    }
+    return '?';
+  }
+
+  /** Short identifier shown on list rows (Stripe-assigned `number`
+   *  or a deterministic prefix of the local UUID for drafts). */
+  invoiceDisplayNumber(invoice: Invoice): string {
+    return invoice.number ?? `#${invoice.id.slice(0, 8).toUpperCase()}`;
+  }
+
+  isOverdue(invoice: Invoice): boolean {
+    if (invoice.status !== InvoiceStatuses.Open) return false;
+    if (!invoice.dueDate) return false;
+    return new Date(invoice.dueDate).getTime() < Date.now();
+  }
+
+  /** Mobile accent strip on the card to call out attention-needed rows. */
+  cardAccent(invoice: Invoice): 'none' | 'primary' | 'danger' | 'success' {
+    if (this.isOverdue(invoice)) return 'danger';
+    if (invoice.status === InvoiceStatuses.Paid) return 'success';
+    return 'none';
   }
 
   trackById = (_: number, item: { id: string }) => item.id;

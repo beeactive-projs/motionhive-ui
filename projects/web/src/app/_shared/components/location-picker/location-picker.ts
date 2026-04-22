@@ -65,13 +65,19 @@ export class LocationPicker {
     await place.fetchFields({ fields: ['addressComponents', 'displayName', 'formattedAddress'] });
 
     this._ngZone.run(() => {
-      const components = place.addressComponents ?? [];
+      const components: google.maps.places.AddressComponent[] =
+        place.addressComponents ?? [];
       const name = place.displayName ?? null;
       const address = place.formattedAddress ?? null;
       const city =
-        components.find((c) => c.types.includes('locality') || c.types.includes('postal_town'))
-          ?.longText ?? null;
-      const country = components.find((c) => c.types.includes('country'))?.longText ?? null;
+        components.find(
+          (c: google.maps.places.AddressComponent) =>
+            c.types.includes('locality') || c.types.includes('postal_town'),
+        )?.longText ?? null;
+      const country =
+        components.find((c: google.maps.places.AddressComponent) =>
+          c.types.includes('country'),
+        )?.longText ?? null;
       this.location.set({ name, address, city, country });
     });
   }

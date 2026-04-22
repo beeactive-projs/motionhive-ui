@@ -217,3 +217,12 @@ h6 {
 .animate-slide-up {
   animation: slideUp 0.8s ease-out 0.2s both;
 }
+
+/* Hide scrollbars on horizontal chip strips (mobile filter rows). */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

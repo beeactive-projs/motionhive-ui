@@ -13,5 +13,7 @@ export interface EarningsSummary {
   nextPayoutDate: string | null;
   monthToDateRevenueCents: number;
   outstandingInvoicesCents: number;
+  openInvoiceCount: number;
+  overdueInvoiceCount: number;
   topClients: TopClient[];
 }

@@ -37,10 +37,18 @@ export class InvoiceService {
     return this._http.post<Invoice>(this.baseUrl, payload);
   }
 
-  send(id: string): Observable<Invoice> {
+  /**
+   * Trigger the send flow for a draft or open invoice.
+   *
+   * When `overrideEmail` is supplied AND it's different from the email on
+   * file, the API routes delivery through our transport (Resend) to that
+   * address; otherwise Stripe sends the email natively. Leave empty to
+   * use the recipient recorded on the invoice.
+   */
+  send(id: string, overrideEmail?: string): Observable<Invoice> {
     return this._http.post<Invoice>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.INVOICE_SEND(id)}`,
-      {},
+      overrideEmail ? { overrideEmail } : {},
     );
   }
 
