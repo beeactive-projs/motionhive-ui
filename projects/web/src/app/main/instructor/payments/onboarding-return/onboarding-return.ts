@@ -43,7 +43,7 @@ export class OnboardingReturn implements OnInit, OnDestroy {
             this.ready.set(true);
             if (this._pollTimer) clearInterval(this._pollTimer);
             // Auto-redirect to the payments dashboard after a brief success pause
-            setTimeout(() => this._router.navigate(['/payments']), 2500);
+            setTimeout(() => this._router.navigate(['/coaching/payments']), 2500);
           } else if (this._pollCount >= 7) {
             // After ~10.5s, stop polling and show pending state
             this.checking.set(false);
@@ -63,6 +63,6 @@ export class OnboardingReturn implements OnInit, OnDestroy {
   }
 
   goToPayments(): void {
-    this._router.navigate(['/payments']);
+    this._router.navigate(['/coaching/payments']);
   }
 }
