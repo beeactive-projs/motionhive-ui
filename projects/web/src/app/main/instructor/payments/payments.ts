@@ -1,13 +1,14 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   CurrencyRonPipe,
@@ -26,6 +27,7 @@ import { CreateInvoiceDialog } from '../_dialogs/create-invoice-dialog/create-in
 import { Invoices } from './invoices/invoices';
 import { Products } from './products/products';
 import { Subscriptions } from './subscriptions/subscriptions';
+import { catchError, EMPTY, merge, of, Subject, switchMap, tap } from 'rxjs';
 
 export const PaymentTabs = {
   Invoices: 'invoices',
@@ -56,6 +58,7 @@ const VALID_TABS = new Set<string>(Object.values(PaymentTabs));
     Products,
     CreateInvoiceDialog,
     NgTemplateOutlet,
+    AsyncPipe,
   ],
   providers: [MessageService],
   templateUrl: './payments.html',
@@ -65,16 +68,20 @@ const VALID_TABS = new Set<string>(Object.values(PaymentTabs));
 export class Payments implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _destroyRef = inject(DestroyRef);
   private readonly _earningsService = inject(EarningsService);
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _messageService = inject(MessageService);
 
+  private readonly _reloadOnboarding$ = new Subject<void>();
+
   readonly Tabs = PaymentTabs;
 
   readonly summary = signal<EarningsSummary | null>(null);
+  readonly pageLoaded = signal(false);
   readonly summaryLoading = signal(true);
   readonly dashboardLoading = signal(false);
-  readonly onboardingLoading = signal(true);
+  readonly onboardingStatusLoading = signal(true);
   readonly stripeOnboarded = signal(false);
   readonly showCreateDialog = signal(false);
 
@@ -87,35 +94,48 @@ export class Payments implements OnInit {
     return tab && VALID_TABS.has(tab) ? (tab as PaymentTab) : PaymentTabs.Invoices;
   });
 
+  onboardingStatus$ = this._onboardingService.getStatus().pipe(
+    tap((data) => {
+      this.stripeOnboarded.set(!!data.account?.chargesEnabled);
+      this.onboardingStatusLoading.set(false);
+    }),
+    catchError(() => {
+      this.stripeOnboarded.set(false);
+      this.onboardingStatusLoading.set(false);
+      return EMPTY;
+    }),
+  );
+
+  summary$ = this._earningsService.getSummary().pipe(
+    tap((data) => {
+      this.summary.set(data);
+    }),
+    catchError(() => {
+      return EMPTY;
+    }),
+  );
+
+  //  this._earningsService.getSummary().subscribe({
+  //     next: (data) => {
+  //       this.summaryLoading.set(false);
+  //     },
+  //     error: () => {
+  //       this.summaryLoading.set(false);
+  //     },
+  //   });
+
   ngOnInit(): void {
-    this.loadOnboardingStatus();
-    this.loadSummary();
-  }
+    merge(this.onboardingStatus$, this.summary$)
+      .pipe(
+        tap(() => {
+          this.pageLoaded.set(true);
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe();
 
-  private loadOnboardingStatus(): void {
-    this._onboardingService.getStatus().subscribe({
-      next: (res) => {
-        this.stripeOnboarded.set(!!res.account?.chargesEnabled);
-        this.onboardingLoading.set(false);
-      },
-      error: () => {
-        this.stripeOnboarded.set(false);
-        this.onboardingLoading.set(false);
-      },
-    });
-  }
-
-  loadSummary(): void {
-    this.summaryLoading.set(true);
-    this._earningsService.getSummary().subscribe({
-      next: (data) => {
-        this.summary.set(data);
-        this.summaryLoading.set(false);
-      },
-      error: () => {
-        this.summaryLoading.set(false);
-      },
-    });
+    // this.loadOnboardingStatus();
+    // this.loadSummary();
   }
 
   openStripeOnboarding(): void {
@@ -144,7 +164,7 @@ export class Payments implements OnInit {
     // Refresh KPI cards + the active tab content (Invoices listens via its
     // own ngOnInit; forcing a re-load keeps the table in sync if the user
     // is already on the Invoices tab).
-    this.loadSummary();
+    //this.loadSummary();
   }
 
   onTabChange(value: string | number | undefined): void {

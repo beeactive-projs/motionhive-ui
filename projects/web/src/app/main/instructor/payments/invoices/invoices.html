@@ -12,7 +12,7 @@
 <!-- Desktop: data table (hidden on mobile) -->
 <div class="md:block hidden flex-1">
   <p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-    [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
+    [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]" [scrollable]="true"
     scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
@@ -93,21 +93,36 @@
           </div>
         </td>
       </tr>
+
     </ng-template>
 
-    <!-- <ng-template #loadingbody>
+    <ng-template #loadingbody>
       @for (_ of [1, 2, 3, 4, 5]; track $index) {
       <tr>
-        <td><p-skeleton width="60px" /></td>
-        <td><p-skeleton width="70%" /></td>
-        <td><p-skeleton width="80px" /></td>
-        <td><p-skeleton width="60px" height="1.5rem" /></td>
-        <td><p-skeleton width="80px" /></td>
-        <td><p-skeleton width="80px" /></td>
-        <td><p-skeleton width="80px" /></td>
+        <td style="width: 20%;">
+          <p-skeleton width="60%" height="2rem" />
+        </td>
+        <td>
+          <p-skeleton width="60%" height="1.25rem" />
+          <p-skeleton width="45%" height="1rem" class="mt-2" />
+        </td>
+        <td class="text-end" style="width: 1%;">
+          <p-skeleton width="100%" height="2rem" />
+        </td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 1%;">
+          <div class="flex gap-3 justify-end">
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+          </div>
+        </td>
       </tr>
       }
-    </ng-template> -->
+    </ng-template>
 
     <ng-template #emptymessage>
       @if(invoices().length==0) {

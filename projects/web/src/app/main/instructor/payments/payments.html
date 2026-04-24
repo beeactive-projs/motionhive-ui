@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="flex gap-3 md:felx-end">
-      @if (onboardingLoading()) {
+      @if (onboardingStatusLoading()){
       <p-skeleton width="7.5rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       <p-skeleton width="8rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       } @else {
@@ -26,25 +26,16 @@
     </div>
   </header>
 
-
+  @if(pageLoaded()) {
   @if(stripeOnboarded()) {
   <!-- KPI cards -->
   <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-    @if (summaryLoading()) {
-    @for (_ of [1,2,3]; track $index) {
-    <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-4">
-      <p-skeleton width="40%" height="0.75rem" />
-      <div class="mt-2"><p-skeleton width="60%" height="1.75rem" /></div>
-      <div class="mt-2"><p-skeleton width="50%" height="0.75rem" /></div>
-    </div>
-    }
-    } @else if (summary(); as summary) {
-    <!-- Outstanding -->
+    @if (summary$ | async; as summary) {
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Outstanding</span>
         <div class="flex items-baseline gap-2">
-          <span class="font-heading text-2xl font-semibold tabular-nums">
+          <span class="font-heading text-xl font-semibold tabular-nums">
             {{ summary.outstandingInvoicesCents | currencyRon : summary.currency }}
           </span>
         </div>
@@ -57,27 +48,42 @@
       </div>
     </p-card>
 
-    <!-- Available -->
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Available</span>
-        <span class="font-heading text-2xl font-semibold tabular-nums">
+        <span class="font-heading text-xl font-semibold tabular-nums">
           {{ summary.availableBalanceCents | currencyRon : summary.currency }}
         </span>
         <span class="text-xs text-muted-color">Ready to withdraw</span>
       </div>
     </p-card>
 
-    <!-- Pending -->
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Pending</span>
-        <span class="font-heading text-2xl font-semibold tabular-nums">
+        <span class="font-heading text-xl font-semibold tabular-nums">
           {{ summary.pendingBalanceCents | currencyRon : summary.currency }}
         </span>
         <span class="text-xs text-muted-color">In transit · 2–3 days</span>
       </div>
     </p-card>
+    }
+    @else {
+    @for (_ of [1,2,3]; track $index) {
+    <p-card>
+      <div class="flex flex-col gap-1">
+        <span class="text-xs uppercase tracking-wide text-muted-color">
+          <p-skeleton width="30%" height="1rem" />
+        </span>
+        <span class="font-heading text-xl font-semibold tabular-nums">
+          <p-skeleton width="60%" height="1.75rem" />
+        </span>
+        <span class="text-xs text-muted-color">
+          <p-skeleton width="30%" height="1rem" />
+        </span>
+      </div>
+    </p-card>
+    }
     }
   </section>
   }
@@ -102,36 +108,56 @@
       <p-tabpanels class="flex-1 min-h-0">
         <p-tabpanel [value]="Tabs.Invoices">
           @if (activeTab() === Tabs.Invoices) {
+          @if(onboardingStatusLoading()) {
+          <p-skeleton width="100%" height="100%" class="rounded-md" />
+          } @else {
           @if(stripeOnboarded() === false) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
             title: 'Connect Stripe to start invoicing',
             description: 'Connect your Stripe account to start sending invoices, tracking outstanding balances, and collecting payments directly from your clients.'
           }"></ng-container>
           } @else {
-          <mh-invoices /> }}
+          <mh-invoices />
+          }
+          }
+          }
         </p-tabpanel>
         <p-tabpanel [value]="Tabs.Memberships">
-          @if (activeTab() === Tabs.Memberships) { @if(stripeOnboarded() === false) {
+          @if (activeTab() === Tabs.Memberships) {
+          @if(onboardingStatusLoading()) {
+          <p-skeleton width="100%" height="100%" class="rounded-md" />
+          } @else {
+          @if(stripeOnboarded() === false) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
             title: 'Set up payments to offer memberships',
             description: 'Membership plans and recurring subscriptions are powered by Stripe. Complete your onboarding to offer flexible billing cycles and automate client renewals.'
           }"></ng-container>
           } @else {<mh-subscriptions /> }}
+          }
         </p-tabpanel>
         <p-tabpanel [value]="Tabs.Pricing">
-          @if (activeTab() === Tabs.Pricing) {@if(stripeOnboarded() === false) {
+          @if (activeTab() === Tabs.Pricing) {
+          @if(onboardingStatusLoading()) {
+          <p-skeleton width="100%" height="100%" class="rounded-md" />
+          } @else {
+          @if(stripeOnboarded() === false) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
             title: 'Your plans are ready — finish Stripe setup',
             description: 'Define your service packages and set your rates — once your Stripe account is connected, clients will be able to browse and purchase your plans directly.'
           }"></ng-container>
-          } @else { <mh-products /> }}
+          } @else { <mh-products /> }}}
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   </div>
+  }
+  @else {
+  <p-skeleton width="100%" height="100%"></p-skeleton>
+  }
+
 </div>
 
-<mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="onInvoiceCreated()" />
+<!-- <mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="onInvoiceCreated()" /> -->
 
 <ng-template #onboarding let-title="title" let-description="description">
   <p-card class="bg-yellow-500/74 text-yellow-800 dark:bg-yellow-500/16 dark:text-yellow-500">
