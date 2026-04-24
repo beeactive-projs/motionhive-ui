@@ -1,7 +1,19 @@
-import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { DataView } from 'primeng/dataview';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -39,6 +51,7 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
     MessageModule,
     CurrencyRonPipe,
     StatusLabelPipe,
+    DataView,
     CreateInvoiceDialog,
     SendInvoiceEmailDialog,
     ListCard,
@@ -53,6 +66,28 @@ export class Invoices implements OnInit {
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _destroyRef = inject(DestroyRef);
+
+  private readonly _scrollSentinel = viewChild<ElementRef>('scrollSentinel');
+  private _observer?: IntersectionObserver;
+
+  constructor() {
+    effect(() => {
+      const el = this._scrollSentinel()?.nativeElement;
+      this._observer?.disconnect();
+      if (!el) return;
+      this._observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
+            this.loadMore();
+          }
+        },
+        { threshold: 0.1 },
+      );
+      this._observer.observe(el);
+    });
+    this._destroyRef.onDestroy(() => this._observer?.disconnect());
+  }
 
   readonly stripeOnboarded = signal(false);
 
@@ -66,9 +101,7 @@ export class Invoices implements OnInit {
 
   /** True when the accumulated mobile list has more server-side rows
    *  available — drives the "Load more" button visibility. */
-  readonly hasMore = computed(
-    () => this.invoices().length < this.totalRecords(),
-  );
+  readonly hasMore = computed(() => this.invoices().length < this.totalRecords());
 
   statusFilter = signal<InvoiceStatus | undefined>(undefined);
   readonly statusOptions = [
@@ -87,7 +120,7 @@ export class Invoices implements OnInit {
 
   ngOnInit(): void {
     this.loadOnboardingStatus();
-    this.loadInvoices();
+    // this.loadInvoices();
   }
 
   private loadOnboardingStatus(): void {
@@ -260,9 +293,7 @@ export class Invoices implements OnInit {
    *  when the invoice has no client name AND no email. */
   clientInitials(invoice: Invoice): string {
     if (invoice.client?.firstName && invoice.client?.lastName) {
-      return (
-        invoice.client.firstName.charAt(0) + invoice.client.lastName.charAt(0)
-      ).toUpperCase();
+      return (invoice.client.firstName.charAt(0) + invoice.client.lastName.charAt(0)).toUpperCase();
     }
     if (invoice.clientEmail) {
       return invoice.clientEmail.charAt(0).toUpperCase();

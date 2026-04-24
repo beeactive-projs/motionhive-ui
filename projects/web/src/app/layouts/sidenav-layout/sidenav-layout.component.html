@@ -61,7 +61,7 @@
     <p-toolbar>
       <ng-template #start>
         <p-button icon="pi pi-bars" class="mr-3" size="small" text rounded (onClick)="toggleSidebar()" />
-        <p-iconfield class="sm:w-80">
+        <p-iconfield class="hidden sm:flex sm:w-80">
           <p-inputicon class="pi pi-search" />
           <input pInputText type="text" placeholder="Search instructors, groups, sessions..." pSize="small" fluid
             [ngModel]="keyword()" (ngModelChange)="keyword.set($event); searchByKeyword()" />

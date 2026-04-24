@@ -11,13 +11,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { debounceTime, Subject, Subscription, startWith } from 'rxjs';
-import {
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { Button } from 'primeng/button';
@@ -170,10 +164,9 @@ export class CreateInvoiceDialog {
   // `_formValue` depends on `form`, so it MUST be declared below it.
   // `selectedClient` and every other `computed` that touches form state
   // must be declared AFTER `_formValue`.
-  private readonly _formValue = toSignal(
-    this.form.valueChanges.pipe(startWith(this.form.value)),
-    { initialValue: this.form.value },
-  );
+  private readonly _formValue = toSignal(this.form.valueChanges.pipe(startWith(this.form.value)), {
+    initialValue: this.form.value,
+  });
 
   /** Currently selected client (derived from `clientUserId` + options). */
   readonly selectedClient = computed<ClientOption | null>(() => {
@@ -189,9 +182,7 @@ export class CreateInvoiceDialog {
       .subscribe(() => this.persistDraft());
 
     // Trigger an auto-save on every form change.
-    this.form.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => this._autoSave$.next());
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this._autoSave$.next());
   }
 
   private readonly _resetOnOpenEffect = effect(() => {
@@ -226,11 +217,9 @@ export class CreateInvoiceDialog {
     // When the product is picked, pre-fill name/description/amount.
     // We also wire the template `(onChange)` to the same helper as a
     // belt-and-suspenders against PrimeNG timing quirks.
-    const sub = group
-      .get('productId')!
-      .valueChanges.subscribe((productId: string | null) => {
-        this.applyProductToGroup(group, productId);
-      });
+    const sub = group.get('productId')!.valueChanges.subscribe((productId: string | null) => {
+      this.applyProductToGroup(group, productId);
+    });
     this._lineItemSubs.set(group, sub);
     return group;
   }
@@ -256,9 +245,7 @@ export class CreateInvoiceDialog {
   /** The ProductOption (if any) linked to the line — used to render
    *  the "From pricing" chip with the product name. */
   linkedProduct(index: number): ProductOption | null {
-    const id = this.lineItems.at(index).get('productId')?.value as
-      | string
-      | null;
+    const id = this.lineItems.at(index).get('productId')?.value as string | null;
     if (!id) return null;
     return this.productOptions().find((o) => o.value === id) ?? null;
   }
@@ -284,10 +271,7 @@ export class CreateInvoiceDialog {
    * interacts with it. setValue per-control + a deferred tick forces
    * the CVA writeValue to run cleanly.
    */
-  private applyProductToGroup(
-    group: FormGroup,
-    productId: string | null,
-  ): void {
+  private applyProductToGroup(group: FormGroup, productId: string | null): void {
     if (!productId) return;
     const opt = this.productOptions().find((o) => o.value === productId);
     if (!opt) return;
@@ -405,14 +389,12 @@ export class CreateInvoiceDialog {
   }
 
   incQuantity(index: number): void {
-    const current =
-      (this.lineItems.at(index).get('quantity')?.value as number) ?? 1;
+    const current = (this.lineItems.at(index).get('quantity')?.value as number) ?? 1;
     this.onQuantityChange(index, current + 1);
   }
 
   decQuantity(index: number): void {
-    const current =
-      (this.lineItems.at(index).get('quantity')?.value as number) ?? 1;
+    const current = (this.lineItems.at(index).get('quantity')?.value as number) ?? 1;
     this.onQuantityChange(index, current - 1);
   }
 
@@ -421,23 +403,21 @@ export class CreateInvoiceDialog {
   // ---------------------------------------------------------------
 
   private loadProducts(): void {
-    this._productService
-      .list({ type: ProductTypes.OneOff, isActive: true, limit: 100 })
-      .subscribe({
-        next: (response) => {
-          this.productOptions.set(
-            response.items.map((p) => ({
-              label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} RON`,
-              value: p.id,
-              product: p,
-            })),
-          );
-          this._productsLoaded = true;
-        },
-        error: () => {
-          this._productsLoaded = true;
-        },
-      });
+    this._productService.list({ type: ProductTypes.OneOff, isActive: true, limit: 100 }).subscribe({
+      next: (response) => {
+        this.productOptions.set(
+          response.items.map((p) => ({
+            label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} RON`,
+            value: p.id,
+            product: p,
+          })),
+        );
+        this._productsLoaded = true;
+      },
+      error: () => {
+        this._productsLoaded = true;
+      },
+    });
   }
 
   private loadClients(): void {
@@ -480,9 +460,7 @@ export class CreateInvoiceDialog {
         guestLastName: raw.guestLastName ?? '',
         notes: raw.notes ?? '',
         duePreset: this.duePreset(),
-        customDueDate: raw.customDueDate
-          ? (raw.customDueDate as Date).toISOString()
-          : null,
+        customDueDate: raw.customDueDate ? (raw.customDueDate as Date).toISOString() : null,
         sendImmediately: raw.sendImmediately ?? false,
         lineItems: raw.lineItems.map((li) => {
           const row = li as Record<string, unknown>;
@@ -683,9 +661,7 @@ export class CreateInvoiceDialog {
         this._messageService.add({
           severity: 'success',
           summary: raw.sendImmediately ? 'Invoice sent' : 'Draft saved',
-          detail: raw.sendImmediately
-            ? 'Invoice created and sent'
-            : 'Invoice saved as draft',
+          detail: raw.sendImmediately ? 'Invoice created and sent' : 'Invoice saved as draft',
         });
       },
       error: (err) => {

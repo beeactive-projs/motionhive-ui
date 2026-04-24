@@ -3,141 +3,147 @@
 <div class="h-full flex flex-col gap-5">
 
   <!-- Header -->
-  <header class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
     <div class="flex flex-col gap-1">
-      <h1 class="font-heading font-semibold text-xl md:text-2xl">Payments</h1>
-      <p class="text-sm text-surface-700 dark:text-surface-400 m-0">
+      <div class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Payments</div>
+      <div class="text-xs md:text-sm text-muted-color">
         Invoices, memberships, and pricing.
-      </p>
+      </div>
     </div>
-    <div class="flex gap-2">
-      <!-- Mobile: icon-only -->
-      <p-button
-        icon="pi pi-external-link"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [loading]="dashboardLoading()"
-        pTooltip="Open Stripe"
-        styleClass="inline-flex sm:hidden"
-        (onClick)="openStripeDashboard()"
-      />
-      <p-button
-        icon="pi pi-plus"
-        size="small"
-        [disabled]="!stripeOnboarded()"
-        [pTooltip]="stripeOnboarded() ? 'Create invoice' : 'Complete Stripe setup first'"
-        styleClass="inline-flex sm:hidden"
-        (onClick)="openCreateInvoice()"
-      />
-      <!-- Desktop: full label -->
-      <p-button
-        label="Open Stripe"
-        icon="pi pi-external-link"
-        iconPos="right"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [loading]="dashboardLoading()"
-        styleClass="hidden sm:inline-flex"
-        (onClick)="openStripeDashboard()"
-      />
-      <p-button
-        label="Create invoice"
-        icon="pi pi-plus"
-        size="small"
-        [disabled]="!stripeOnboarded()"
-        pTooltip="Complete Stripe setup first"
-        [tooltipDisabled]="stripeOnboarded()"
-        styleClass="hidden sm:inline-flex"
-        (onClick)="openCreateInvoice()"
-      />
+    <div class="flex gap-3 md:felx-end">
+      @if (onboardingLoading()) {
+      <p-skeleton width="7.5rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
+      <p-skeleton width="8rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
+      } @else {
+      <p-button label="Open Stripe" icon="pi pi-external-link" severity="contrast" outlined size="small"
+        [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
+      @if(stripeOnboarded()) {
+      <p-button label="Create invoice" icon="pi pi-plus" size="small" [disabled]="!stripeOnboarded()"
+        pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="openCreateInvoice()"
+        fluid class="w-1/2 sm:w-auto" />
+      }
+      }
     </div>
   </header>
 
+
+  @if(stripeOnboarded()) {
   <!-- KPI cards -->
   <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
     @if (summaryLoading()) {
-      @for (_ of [1,2,3]; track $index) {
-        <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-4">
-          <p-skeleton width="40%" height="0.75rem" />
-          <div class="mt-2"><p-skeleton width="60%" height="1.75rem" /></div>
-          <div class="mt-2"><p-skeleton width="50%" height="0.75rem" /></div>
-        </div>
-      }
-    } @else if (summary(); as s) {
-      <!-- Outstanding -->
-      <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-4 flex flex-col gap-1">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Outstanding</span>
+    @for (_ of [1,2,3]; track $index) {
+    <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-4">
+      <p-skeleton width="40%" height="0.75rem" />
+      <div class="mt-2"><p-skeleton width="60%" height="1.75rem" /></div>
+      <div class="mt-2"><p-skeleton width="50%" height="0.75rem" /></div>
+    </div>
+    }
+    } @else if (summary(); as summary) {
+    <!-- Outstanding -->
+    <p-card>
+      <div class="flex flex-col gap-1">
+        <span class="text-xs uppercase tracking-wide text-muted-color">Outstanding</span>
         <div class="flex items-baseline gap-2">
           <span class="font-heading text-2xl font-semibold tabular-nums">
-            {{ s.outstandingInvoicesCents | currencyRon : s.currency }}
+            {{ summary.outstandingInvoicesCents | currencyRon : summary.currency }}
           </span>
         </div>
-        <span class="text-xs text-surface-500">
-          {{ s.openInvoiceCount }} open {{ s.openInvoiceCount === 1 ? 'invoice' : 'invoices' }}
-          @if (s.overdueInvoiceCount > 0) {
-            · <span class="text-red-500">{{ s.overdueInvoiceCount }} overdue</span>
+        <span class="text-xs text-muted-color">
+          {{ summary.openInvoiceCount }} open {{ summary.openInvoiceCount === 1 ? 'invoice' : 'invoices' }}
+          @if (summary.overdueInvoiceCount > 0) {
+          · <span class="text-red-500">{{ summary.overdueInvoiceCount }} overdue</span>
           }
         </span>
       </div>
+    </p-card>
 
-      <!-- Available -->
-      <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-4 flex flex-col gap-1">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Available</span>
+    <!-- Available -->
+    <p-card>
+      <div class="flex flex-col gap-1">
+        <span class="text-xs uppercase tracking-wide text-muted-color">Available</span>
         <span class="font-heading text-2xl font-semibold tabular-nums">
-          {{ s.availableBalanceCents | currencyRon : s.currency }}
+          {{ summary.availableBalanceCents | currencyRon : summary.currency }}
         </span>
-        <span class="text-xs text-surface-500">Ready to withdraw</span>
+        <span class="text-xs text-muted-color">Ready to withdraw</span>
       </div>
+    </p-card>
 
-      <!-- Pending -->
-      <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-4 flex flex-col gap-1">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Pending</span>
+    <!-- Pending -->
+    <p-card>
+      <div class="flex flex-col gap-1">
+        <span class="text-xs uppercase tracking-wide text-muted-color">Pending</span>
         <span class="font-heading text-2xl font-semibold tabular-nums">
-          {{ s.pendingBalanceCents | currencyRon : s.currency }}
+          {{ summary.pendingBalanceCents | currencyRon : summary.currency }}
         </span>
-        <span class="text-xs text-surface-500">In transit · 2–3 days</span>
+        <span class="text-xs text-muted-color">In transit · 2–3 days</span>
       </div>
+    </p-card>
     }
   </section>
-
+  }
   <!-- Tabs -->
-  <p-tabs
-    [value]="activeTab()"
-    (valueChange)="onTabChange($event)"
-    class="flex-1 min-h-0 flex flex-col"
-  >
-    <p-tablist>
-      <p-tab [value]="Tabs.Invoices">
-        <i class="pi pi-file"></i>
-        <span class="ml-2">Invoices</span>
-      </p-tab>
-      <p-tab [value]="Tabs.Memberships">
-        <i class="pi pi-refresh"></i>
-        <span class="ml-2">Memberships</span>
-      </p-tab>
-      <p-tab [value]="Tabs.Pricing">
-        <i class="pi pi-tag"></i>
-        <span class="ml-2">Pricing</span>
-      </p-tab>
-    </p-tablist>
+  <div class="flex-1 min-h-0 flex flex-col">
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="flex-1">
+      <p-tablist>
+        <p-tab [value]="Tabs.Invoices">
+          <i class="pi pi-file"></i>
+          <span class="ml-2">Invoices</span>
+        </p-tab>
+        <p-tab [value]="Tabs.Memberships">
+          <i class="pi pi-refresh"></i>
+          <span class="ml-2">Memberships</span>
+        </p-tab>
+        <p-tab [value]="Tabs.Pricing">
+          <i class="pi pi-tag"></i>
+          <span class="ml-2">Pricing</span>
+        </p-tab>
+      </p-tablist>
 
-    <p-tabpanels class="flex-1 min-h-0">
-      <p-tabpanel [value]="Tabs.Invoices">
-        @if (activeTab() === Tabs.Invoices) { <mh-invoices /> }
-      </p-tabpanel>
-      <p-tabpanel [value]="Tabs.Memberships">
-        @if (activeTab() === Tabs.Memberships) { <mh-subscriptions /> }
-      </p-tabpanel>
-      <p-tabpanel [value]="Tabs.Pricing">
-        @if (activeTab() === Tabs.Pricing) { <mh-products /> }
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
+      <p-tabpanels class="flex-1 min-h-0">
+        <p-tabpanel [value]="Tabs.Invoices">
+          @if (activeTab() === Tabs.Invoices) {
+          @if(stripeOnboarded() === false) {
+          <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
+            title: 'Connect Stripe to start invoicing',
+            description: 'Connect your Stripe account to start sending invoices, tracking outstanding balances, and collecting payments directly from your clients.'
+          }"></ng-container>
+          } @else {
+          <mh-invoices /> }}
+        </p-tabpanel>
+        <p-tabpanel [value]="Tabs.Memberships">
+          @if (activeTab() === Tabs.Memberships) { @if(stripeOnboarded() === false) {
+          <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
+            title: 'Set up payments to offer memberships',
+            description: 'Membership plans and recurring subscriptions are powered by Stripe. Complete your onboarding to offer flexible billing cycles and automate client renewals.'
+          }"></ng-container>
+          } @else {<mh-subscriptions /> }}
+        </p-tabpanel>
+        <p-tabpanel [value]="Tabs.Pricing">
+          @if (activeTab() === Tabs.Pricing) {@if(stripeOnboarded() === false) {
+          <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
+            title: 'Your plans are ready — finish Stripe setup',
+            description: 'Define your service packages and set your rates — once your Stripe account is connected, clients will be able to browse and purchase your plans directly.'
+          }"></ng-container>
+          } @else { <mh-products /> }}
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
 </div>
 
-<mh-create-invoice-dialog
-  [(visible)]="showCreateDialog"
-  (saved)="onInvoiceCreated()"
-/>
+<mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="onInvoiceCreated()" />
+
+<ng-template #onboarding let-title="title" let-description="description">
+  <p-card class="bg-yellow-500/74 text-yellow-800 dark:bg-yellow-500/16 dark:text-yellow-500">
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div>
+          <span class="font-semibold">{{ title }}</span>
+          <p class="text-sm mt-1">{{ description }}</p>
+        </div>
+      </div>
+      <p-button label="Complete onboarding" icon="pi pi-arrow-right" severity="warn" (onClick)="openStripeOnboarding()"
+        class="ml-auto" />
+    </div>
+  </p-card>
+</ng-template>

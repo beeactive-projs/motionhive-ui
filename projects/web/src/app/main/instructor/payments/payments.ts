@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,14 +17,15 @@ import {
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Card } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
-import { Invoices } from './invoices/invoices';
-import { Subscriptions } from './subscriptions/subscriptions';
-import { Products } from './products/products';
 import { CreateInvoiceDialog } from '../_dialogs/create-invoice-dialog/create-invoice-dialog';
+import { Invoices } from './invoices/invoices';
+import { Products } from './products/products';
+import { Subscriptions } from './subscriptions/subscriptions';
 
 export const PaymentTabs = {
   Invoices: 'invoices',
@@ -44,6 +46,7 @@ const VALID_TABS = new Set<string>(Object.values(PaymentTabs));
     TabPanels,
     TabPanel,
     Button,
+    Card,
     SkeletonModule,
     ToastModule,
     Tooltip,
@@ -52,6 +55,7 @@ const VALID_TABS = new Set<string>(Object.values(PaymentTabs));
     Subscriptions,
     Products,
     CreateInvoiceDialog,
+    NgTemplateOutlet,
   ],
   providers: [MessageService],
   templateUrl: './payments.html',
@@ -70,6 +74,7 @@ export class Payments implements OnInit {
   readonly summary = signal<EarningsSummary | null>(null);
   readonly summaryLoading = signal(true);
   readonly dashboardLoading = signal(false);
+  readonly onboardingLoading = signal(true);
   readonly stripeOnboarded = signal(false);
   readonly showCreateDialog = signal(false);
 
@@ -89,8 +94,14 @@ export class Payments implements OnInit {
 
   private loadOnboardingStatus(): void {
     this._onboardingService.getStatus().subscribe({
-      next: (res) => this.stripeOnboarded.set(!!res.account?.chargesEnabled),
-      error: () => this.stripeOnboarded.set(false),
+      next: (res) => {
+        this.stripeOnboarded.set(!!res.account?.chargesEnabled);
+        this.onboardingLoading.set(false);
+      },
+      error: () => {
+        this.stripeOnboarded.set(false);
+        this.onboardingLoading.set(false);
+      },
     });
   }
 
@@ -107,7 +118,7 @@ export class Payments implements OnInit {
     });
   }
 
-  openStripeDashboard(): void {
+  openStripeOnboarding(): void {
     this.dashboardLoading.set(true);
     this._onboardingService.getDashboardLink().subscribe({
       next: (res) => {
@@ -137,10 +148,7 @@ export class Payments implements OnInit {
   }
 
   onTabChange(value: string | number | undefined): void {
-    const tab =
-      typeof value === 'string' && VALID_TABS.has(value)
-        ? value
-        : PaymentTabs.Invoices;
+    const tab = typeof value === 'string' && VALID_TABS.has(value) ? value : PaymentTabs.Invoices;
     if (tab === this.activeTab()) return;
     this._router.navigate([], {
       relativeTo: this._route,

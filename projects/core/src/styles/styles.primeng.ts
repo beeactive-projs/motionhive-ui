@@ -104,6 +104,11 @@ export const MotionHiveLara = definePreset(Lara, {
         background: 'transparent',
       },
     },
+    tabs: {
+      tablist: {
+        background: 'transparent',
+      },
+    },
     tag: {
       root: {
         fontWeight: 'normal',
