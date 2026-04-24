@@ -1,202 +1,197 @@
-@if (!stripeOnboarded()) {
-<p-message severity="warn" styleClass="w-full mb-4">
-  <div class="flex items-center gap-3">
-    <span>Set up payouts to start receiving money.</span>
-    <p-button label="Connect Stripe" icon="pi pi-external-link" severity="warn" [text]="true" size="small"
-      (onClick)="startOnboarding()" />
+<header class="flex items-center justify-between gap-4 mb-4">
+  <!-- Filters -->
+  <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
+    @for (opt of statusOptions; track opt.value) {
+    <p-button [label]="opt.label" [severity]="statusFilter() === opt.value ? 'primary' : 'contrast'" size="small"
+      rounded [text]="statusFilter() !== opt.value" (onClick)="onStatusFilterChange(opt.value)"
+      styleClass="py-0.5 min-w-10" />
+    }
   </div>
-</p-message>
-}
 
-<!-- Actions -->
-<div class="flex justify-end mb-4">
-  <p-button label="New membership" icon="pi pi-plus" size="small" [disabled]="!stripeOnboarded()"
-    pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()"
-    (onClick)="showCreateDialog.set(true)" />
-</div>
+  <p-button label="New membership" icon="pi pi-plus" size="small" (onClick)="showCreateDialog.set(true)" />
+</header>
 
-<!-- Status filter -->
-<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
-  @for (opt of statusOptions; track opt.value) {
-    <p-button [label]="opt.label" size="small" [outlined]="statusFilter() !== opt.value"
-      [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'" (onClick)="onStatusFilterChange(opt.value)" />
-  }
-</div>
 
 <!-- Desktop: data table (hidden on mobile) -->
-<p-table
-  [value]="subscriptions()"
-  [lazy]="true"
-  [paginator]="true"
-  [rows]="rows"
-  [totalRecords]="totalRecords()"
-  [loading]="loading()"
-  (onLazyLoad)="onPageChange($event)"
-  [rowTrackBy]="trackById"
-  size="small"
-  [showCurrentPageReport]="true"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} memberships"
-  styleClass="hidden md:block"
->
-  <ng-template #header>
-    <tr>
-      <th>Client</th>
-      <th>Plan</th>
-      <th>Amount</th>
-      <th>Status</th>
-      <th>Current period</th>
-      <th>Actions</th>
-    </tr>
-  </ng-template>
+<div class="md:block hidden flex-1">
+  <p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+    [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]" [scrollable]="true"
+    scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
+    <ng-template #header>
+      <tr>
+        <th style="width: 1%;">Client</th>
+        <th style="width: 1%;">Plan</th>
+        <th class="text-center" style="width: 1%;">Amount</th>
+        <th class="text-center" style="width: 10%;">Status</th>
+        <th class="text-center" style="width: 20%;">Current period</th>
+        <th class="text-center" style="width: 1%;">Actions</th>
+      </tr>
+    </ng-template>
 
-  <ng-template #body let-sub>
-    <tr>
-      <td>{{ sub.clientId || '—' }}</td>
-      <td>{{ sub.productId }}</td>
-      <td>{{ sub.amountCents | currencyRon:sub.currency }}</td>
-      <td>
-        <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" />
-        @if (sub.cancelAt) {
+    <ng-template #body let-sub>
+      <tr>
+        <td>{{ sub.clientId || '—' }}</td>
+        <td>{{ sub.productId }}</td>
+        <td>{{ sub.amountCents | currencyRon:sub.currency }}</td>
+        <td>
+          <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" />
+          @if (sub.cancelAt) {
           <span class="text-xs text-surface-500 ml-1">cancels {{ sub.cancelAt | date:'dd MMM' }}</span>
-        }
-      </td>
-      <td>
-        <span class="text-sm">
-          {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
-        </span>
-        @if (sub.trialEnd) {
+          }
+        </td>
+        <td>
+          <span class="text-sm">
+            {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+          </span>
+          @if (sub.trialEnd) {
           <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
-        }
-      </td>
-      <td>
-        @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
+          }
+        </td>
+        <td>
+          @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
           <div class="flex gap-1">
-            <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true" pTooltip="Cancel at period end"
-              tooltipPosition="top" (onClick)="confirmCancel(sub)" />
+            <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
+              pTooltip="Cancel at period end" tooltipPosition="top" (onClick)="confirmCancel(sub)" />
             <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"
               tooltipPosition="top" (onClick)="confirmCancelImmediately(sub)" />
           </div>
-        }
-      </td>
-    </tr>
-  </ng-template>
-
-  <ng-template #loadingbody>
-    @for (_ of [1,2,3,4,5]; track $index) {
-      <tr>
-        @for (_ of [1,2,3,4,5,6]; track $index) {
-          <td><p-skeleton width="100%" height="1rem" /></td>
-        }
+          }
+        </td>
       </tr>
-    }
-  </ng-template>
+    </ng-template>
 
-  <ng-template #emptymessage>
-    <tr>
-      <td colspan="6" class="text-center py-8">
-        <div class="text-surface-500">
-          <i class="pi pi-sync text-3xl mb-2"></i>
-          <p class="mt-2">No memberships found</p>
-        </div>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+    <ng-template #loadingbody>
+      @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
+      <tr>
+        <td style="width: 20%;">
+          <p-skeleton width="60%" height="2rem" />
+        </td>
+        <td>
+          <p-skeleton width="60%" height="1.25rem" />
+          <p-skeleton width="45%" height="1rem" class="mt-2" />
+        </td>
+        <td class="text-end" style="width: 1%;">
+          <p-skeleton width="100%" height="2rem" />
+        </td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 1%;">
+          <div class="flex gap-3 justify-end">
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+          </div>
+        </td>
+      </tr>
+      }
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6" class="text-center py-8">
+          <div class="flex flex-col items-center justify-center gap-2 text-surface-500">
+            <i class="pi pi-sync text-4xl"></i>
+            <p class="m-0">No memberships found</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #paginatorleft let-state>
+      <p-tag [rounded]="true">
+        View {{ state.first + 1 }} -
+        {{ state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows }} of
+        {{ state.totalRecords }}
+      </p-tag>
+    </ng-template>
+  </p-table>
+</div>
 
 <!-- Mobile: card list (hidden on desktop) -->
-<div class="md:hidden flex flex-col gap-3">
+<div class="md:hidden">
   @if (loading()) {
+  <div class="flex flex-col gap-3">
     @for (_ of [1,2,3]; track $index) {
-      <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
-        <p-skeleton width="30%" height="1.25rem" />
-        <div class="flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3 flex-1">
-            <p-skeleton shape="circle" size="2.25rem" />
-            <div class="flex flex-col gap-1 flex-1">
-              <p-skeleton width="60%" height="0.875rem" />
-              <p-skeleton width="40%" height="0.75rem" />
-            </div>
+    <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+      <p-skeleton width="30%" height="1.25rem" />
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 flex-1">
+          <p-skeleton shape="circle" size="2.25rem" />
+          <div class="flex flex-col gap-1 flex-1">
+            <p-skeleton width="60%" height="0.875rem" />
+            <p-skeleton width="40%" height="0.75rem" />
           </div>
-          <p-skeleton width="4rem" height="1rem" />
         </div>
+        <p-skeleton width="4rem" height="1rem" />
       </div>
-    }
-  } @else if (subscriptions().length === 0) {
-    <div class="rounded-lg border border-surface-200 dark:border-surface-700 flex flex-col items-center justify-center py-8 text-center gap-2">
-      <i class="pi pi-sync text-4xl text-surface-400"></i>
-      <p class="m-0 font-medium">No memberships yet</p>
-      <p class="text-surface-500 text-sm m-0">
-        Subscribe clients to recurring plans to get started.
-      </p>
-      <p-button
-        label="New membership"
-        icon="pi pi-plus"
-        size="small"
-        class="mt-2"
-        [disabled]="!stripeOnboarded()"
-        pTooltip="Complete Stripe setup first"
-        [tooltipDisabled]="stripeOnboarded()"
-        (onClick)="showCreateDialog.set(true)"
-      />
     </div>
+    }
+  </div>
   } @else {
-    @for (sub of subscriptions(); track trackById($index, sub)) {
-      @let actionable = sub.status === Statuses.Active || sub.status === Statuses.Trialing;
-      <!-- Whole-card tap opens an action popup for active/trialing rows
-           (Cancel at period end / Cancel immediately). Rows in a
-           terminal status are non-interactive, matching the invoices
-           mobile pattern. -->
-      <mh-list-card
-        [status]="sub.status"
-        [statusSeverity]="statusSeverity(sub.status)"
-        avatarIcon="pi pi-user"
-        [title]="clientDisplay(sub)"
-        [subtitle]="planDisplay(sub)"
-        [accent]="cardAccent(sub)"
-        [clickable]="actionable"
-        (click)="actionable ? openActionMenu(sub, $event, actionMenu) : null"
-      >
-        <div amount class="flex flex-col items-end">
-          <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
-            {{ sub.amountCents | currencyRon:sub.currency }}
-          </span>
-          <span class="text-xs text-surface-500">per cycle</span>
-        </div>
-        <div meta class="flex items-center gap-2 text-xs text-surface-500 flex-wrap">
-          @if (sub.currentPeriodEnd) {
+  <p-menu #actionMenu [model]="actionMenuItems()" [popup]="true" [appendTo]="'body'" />
+  <p-dataview [value]="subscriptions()">
+    <ng-template #list let-items>
+      <div class="flex flex-col gap-3 pt-1">
+        @for (sub of items; track trackById($index, sub)) {
+        @let actionable = sub.status === Statuses.Active || sub.status === Statuses.Trialing;
+        <mh-list-card [status]="sub.status" [statusSeverity]="statusSeverity(sub.status)" avatarIcon="pi pi-user"
+          [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)" [accent]="cardAccent(sub)" [clickable]="actionable"
+          (click)="actionable ? openActionMenu(sub, $event, actionMenu) : null">
+          <div amount class="flex flex-col items-end">
+            <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
+              {{ sub.amountCents | currencyRon:sub.currency }}
+            </span>
+            <span class="text-xs text-surface-500">per cycle</span>
+          </div>
+          <div meta class="flex items-center gap-2 text-xs text-surface-500 flex-wrap">
+            @if (sub.currentPeriodEnd) {
             <span>Renews {{ sub.currentPeriodEnd | date:'dd MMM' }}</span>
-          }
-          @if (sub.trialEnd) {
+            }
+            @if (sub.trialEnd) {
             <span>· Trial ends {{ sub.trialEnd | date:'dd MMM' }}</span>
-          }
-          @if (sub.cancelAt) {
+            }
+            @if (sub.cancelAt) {
             <span class="text-red-500">· Cancels {{ sub.cancelAt | date:'dd MMM' }}</span>
-          }
+            }
+          </div>
+        </mh-list-card>
+        }
+        @if (loadingMore()) {
+        <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+          <p-skeleton width="30%" height="1.25rem" />
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 flex-1">
+              <p-skeleton shape="circle" size="2.25rem" />
+              <div class="flex flex-col gap-1 flex-1">
+                <p-skeleton width="60%" height="0.875rem" />
+                <p-skeleton width="40%" height="0.75rem" />
+              </div>
+            </div>
+            <p-skeleton width="4rem" height="1rem" />
+          </div>
         </div>
-      </mh-list-card>
-    }
-
-    <!-- Shared popup menu anchored at whichever card was last tapped.
-         The active target lives in actionMenuTarget() so the item
-         commands know which subscription to act on. -->
-    <p-menu #actionMenu [model]="actionMenuItems()" [popup]="true" appendTo="body" />
-
-    @if (hasMore()) {
-      <div class="flex flex-col items-center gap-2 pt-2">
-        <p-button
-          label="Load more"
-          icon="pi pi-chevron-down"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          [loading]="loadingMore()"
-          (onClick)="loadMore()"
-        />
-        <span class="text-xs text-surface-500">
-          Showing {{ subscriptions().length }} of {{ totalRecords() }}
-        </span>
+        }
       </div>
-    }
+    </ng-template>
+    <ng-template #empty>
+      <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+        <i class="pi pi-sync text-4xl text-surface-400"></i>
+        <p class="m-0 font-medium">No memberships yet</p>
+        <p class="text-surface-500 text-sm m-0">Subscribe clients to recurring plans to get started.</p>
+        <p-button label="New membership" icon="pi pi-plus" size="small" class="mt-2"
+          (onClick)="showCreateDialog.set(true)" />
+      </div>
+    </ng-template>
+  </p-dataview>
+  @if (hasMore()) {
+  <div class="flex flex-col items-center gap-2 pt-2">
+    <p-button label="Load more" icon="pi pi-chevron-down" severity="secondary" [outlined]="true" size="small"
+      [loading]="loadingMore()" (onClick)="loadMore()" />
+    <span class="text-xs text-surface-500">Showing {{ subscriptions().length }} of {{ totalRecords() }}</span>
+  </div>
+  }
   }
 </div>
 

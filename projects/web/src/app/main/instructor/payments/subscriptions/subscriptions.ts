@@ -7,20 +7,19 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
+import { Tag } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { MessageModule } from 'primeng/message';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Tooltip } from 'primeng/tooltip';
 import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
+import { DataView } from 'primeng/dataview';
 import { Menu } from 'primeng/menu';
 import {
   SubscriptionService,
   SubscriptionStatuses,
-  StripeOnboardingService,
   CurrencyRonPipe,
   StatusLabelPipe,
   getSubscriptionStatusSeverity,
@@ -34,16 +33,16 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
   selector: 'mh-subscriptions',
   imports: [
     DatePipe,
-    ButtonModule,
+    Button,
     TableModule,
-    TagModule,
+    Tag,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
-    TooltipModule,
-    MessageModule,
+    ConfirmDialog,
+    Tooltip,
     CurrencyRonPipe,
     StatusLabelPipe,
+    DataView,
     CreateSubscriptionDialog,
     ListCard,
     Menu,
@@ -55,27 +54,20 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
 })
 export class Subscriptions implements OnInit {
   private readonly _subscriptionService = inject(SubscriptionService);
-  private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
 
-  readonly stripeOnboarded = signal(false);
-
-  subscriptions = signal<Subscription[]>([]);
-  totalRecords = signal(0);
-  loading = signal(true);
-  loadingMore = signal(false);
+  readonly subscriptions = signal<Subscription[]>([]);
+  readonly totalRecords = signal(0);
+  readonly loading = signal(true);
+  readonly loadingMore = signal(false);
 
   readonly rows = 10;
-  currentPage = signal(1);
+  readonly currentPage = signal(1);
 
-  /** Drives the mobile "Load more" button. Hidden once every server-side
-   *  row is present in the accumulated list. */
-  readonly hasMore = computed(
-    () => this.subscriptions().length < this.totalRecords(),
-  );
+  readonly hasMore = computed(() => this.subscriptions().length < this.totalRecords());
 
-  statusFilter = signal<SubscriptionStatus | undefined>(undefined);
+  readonly statusFilter = signal<SubscriptionStatus | undefined>(undefined);
   readonly statusOptions: { label: string; value: SubscriptionStatus | undefined }[] = [
     { label: 'All', value: undefined },
     { label: 'Active', value: SubscriptionStatuses.Active },
@@ -85,15 +77,9 @@ export class Subscriptions implements OnInit {
     { label: 'Paused', value: SubscriptionStatuses.Paused },
   ];
 
-  showCreateDialog = signal(false);
-
-  /** Active subscription for the mobile action menu — tapping a
-   *  card stashes its row here so the menu items can target the
-   *  right subscription when invoked. Null when the menu is closed. */
+  readonly showCreateDialog = signal(false);
   readonly actionMenuTarget = signal<Subscription | null>(null);
 
-  /** Menu items derived from the active target. Empty list = no menu
-   *  (e.g. already-canceled subscriptions aren't actionable). */
   readonly actionMenuItems = computed<MenuItem[]>(() => {
     const sub = this.actionMenuTarget();
     if (!sub) return [];
@@ -121,30 +107,7 @@ export class Subscriptions implements OnInit {
   readonly Statuses = SubscriptionStatuses;
 
   ngOnInit(): void {
-    this.loadOnboardingStatus();
     this.loadSubscriptions();
-  }
-
-  private loadOnboardingStatus(): void {
-    this._onboardingService.getStatus().subscribe({
-      next: (res) => this.stripeOnboarded.set(!!res.account?.chargesEnabled),
-      error: () => this.stripeOnboarded.set(false),
-    });
-  }
-
-  startOnboarding(): void {
-    this._onboardingService.start().subscribe({
-      next: (res) => {
-        window.location.href = res.url;
-      },
-      error: () => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to start Stripe onboarding',
-        });
-      },
-    });
   }
 
   loadSubscriptions(): void {
@@ -174,7 +137,6 @@ export class Subscriptions implements OnInit {
       });
   }
 
-  /** Mobile "Load more": appends the next page to the current list. */
   loadMore(): void {
     if (this.loadingMore() || !this.hasMore()) return;
     this.loadingMore.set(true);
@@ -215,9 +177,6 @@ export class Subscriptions implements OnInit {
     this.loadSubscriptions();
   }
 
-  /** Mobile card tap → opens the action menu anchored at the card.
-   *  Must be called with a template reference to the `p-menu` so we
-   *  can toggle it positionally. */
   openActionMenu(sub: Subscription, event: MouseEvent, menu: Menu): void {
     this.actionMenuTarget.set(sub);
     menu.toggle(event);
@@ -267,22 +226,15 @@ export class Subscriptions implements OnInit {
 
   readonly statusSeverity = getSubscriptionStatusSeverity;
 
-  /** Mobile card client line — falls back to a short id hash when the
-   *  model only has a foreign key (Subscription doesn't embed client). */
   clientDisplay(sub: Subscription): string {
     if (!sub.clientId) return 'Unknown client';
     return `Client #${sub.clientId.slice(0, 8).toUpperCase()}`;
   }
 
-  /** Mobile card subtitle — product label with the period-end hint. */
   planDisplay(sub: Subscription): string {
-    const planId = sub.productId
-      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
-      : 'Plan';
-    return planId;
+    return sub.productId ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}` : 'Plan';
   }
 
-  /** Left-border accent to pull the eye to attention-worthy rows. */
   cardAccent(sub: Subscription): 'none' | 'primary' | 'danger' | 'success' {
     if (sub.status === SubscriptionStatuses.PastDue) return 'danger';
     if (sub.cancelAt) return 'danger';

@@ -10,7 +10,7 @@
         Invoices, memberships, and pricing.
       </div>
     </div>
-    <div class="flex gap-3 md:felx-end">
+    <div class="flex gap-3">
       @if (onboardingStatusLoading()){
       <p-skeleton width="7.5rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       <p-skeleton width="8rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
@@ -19,7 +19,7 @@
         [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
       @if(stripeOnboarded()) {
       <p-button label="Create invoice" icon="pi pi-plus" size="small" [disabled]="!stripeOnboarded()"
-        pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="openCreateInvoice()"
+        pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="showCreateDialog.set(true)"
         fluid class="w-1/2 sm:w-auto" />
       }
       }
@@ -30,7 +30,7 @@
   @if(stripeOnboarded()) {
   <!-- KPI cards -->
   <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-    @if (summary$ | async; as summary) {
+    @if (summary(); as summary) {
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Outstanding</span>
@@ -111,7 +111,7 @@
           @if(onboardingStatusLoading()) {
           <p-skeleton width="100%" height="100%" class="rounded-md" />
           } @else {
-          @if(stripeOnboarded() === false) {
+          @if(!stripeOnboarded()) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
             title: 'Connect Stripe to start invoicing',
             description: 'Connect your Stripe account to start sending invoices, tracking outstanding balances, and collecting payments directly from your clients.'
@@ -127,7 +127,7 @@
           @if(onboardingStatusLoading()) {
           <p-skeleton width="100%" height="100%" class="rounded-md" />
           } @else {
-          @if(stripeOnboarded() === false) {
+          @if(!stripeOnboarded()) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
             title: 'Set up payments to offer memberships',
             description: 'Membership plans and recurring subscriptions are powered by Stripe. Complete your onboarding to offer flexible billing cycles and automate client renewals.'
@@ -140,7 +140,7 @@
           @if(onboardingStatusLoading()) {
           <p-skeleton width="100%" height="100%" class="rounded-md" />
           } @else {
-          @if(stripeOnboarded() === false) {
+          @if(!stripeOnboarded()) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
             title: 'Your plans are ready — finish Stripe setup',
             description: 'Define your service packages and set your rates — once your Stripe account is connected, clients will be able to browse and purchase your plans directly.'

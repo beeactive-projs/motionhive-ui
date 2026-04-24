@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
+import { Tag } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Tooltip } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import {
@@ -19,6 +19,7 @@ import {
   type Product,
   type ProductType,
 } from 'core';
+import { DataView } from 'primeng/dataview';
 import { ProductFormDialog } from '../../_dialogs/product-form-dialog/product-form-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
@@ -26,16 +27,17 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
   selector: 'mh-products',
   imports: [
     FormsModule,
-    ButtonModule,
+    Button,
     TableModule,
-    TagModule,
+    Tag,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
-    TooltipModule,
+    ConfirmDialog,
+    Tooltip,
     ToggleSwitch,
     CurrencyRonPipe,
     StatusLabelPipe,
+    DataView,
     ProductFormDialog,
     ListCard,
   ],
@@ -49,29 +51,25 @@ export class Products implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
 
-  products = signal<Product[]>([]);
-  totalRecords = signal(0);
-  loading = signal(true);
-  loadingMore = signal(false);
+  readonly products = signal<Product[]>([]);
+  readonly totalRecords = signal(0);
+  readonly loading = signal(true);
+  readonly loadingMore = signal(false);
 
   readonly rows = 10;
-  currentPage = signal(1);
+  readonly currentPage = signal(1);
 
-  /** Drives the mobile "Load more" button. Hidden when the accumulated
-   *  list already contains every server-side row. */
-  readonly hasMore = computed(
-    () => this.products().length < this.totalRecords(),
-  );
+  readonly hasMore = computed(() => this.products().length < this.totalRecords());
 
-  typeFilter = signal<ProductType | undefined>(undefined);
+  readonly typeFilter = signal<ProductType | undefined>(undefined);
   readonly typeOptions = [
     { label: 'All', value: undefined },
     { label: 'One-off', value: ProductTypes.OneOff as ProductType },
     { label: 'Subscription', value: ProductTypes.Subscription as ProductType },
   ];
 
-  showProductFormDialog = signal(false);
-  editingProduct = signal<Product | null>(null);
+  readonly showProductFormDialog = signal(false);
+  readonly editingProduct = signal<Product | null>(null);
   readonly togglingProfileIds = signal<Set<string>>(new Set());
 
   ngOnInit(): void {
@@ -105,7 +103,6 @@ export class Products implements OnInit {
       });
   }
 
-  /** Mobile "Load more": appends the next page to the current list. */
   loadMore(): void {
     if (this.loadingMore() || !this.hasMore()) return;
     this.loadingMore.set(true);
@@ -157,7 +154,6 @@ export class Products implements OnInit {
   }
 
   toggleShowOnProfile(product: Product, nextValue: boolean): void {
-    // Optimistic: flip locally now, reconcile or revert on server reply.
     const previousValue = product.showOnProfile;
     this._patchLocalProduct(product.id, { showOnProfile: nextValue });
 
@@ -167,8 +163,6 @@ export class Products implements OnInit {
 
     this._productService.update(product.id, { showOnProfile: nextValue }).subscribe({
       next: (updated) => {
-        // Server is source of truth — replace the whole product object
-        // in case other fields changed as a side effect.
         this.products.update((list) =>
           list.map((p) => (p.id === updated.id ? updated : p)),
         );
@@ -182,7 +176,6 @@ export class Products implements OnInit {
         });
       },
       error: (err) => {
-        // Revert the optimistic flip.
         this._patchLocalProduct(product.id, { showOnProfile: previousValue });
         this._clearTogglingProfileId(product.id);
         this._messageService.add({
@@ -250,20 +243,14 @@ export class Products implements OnInit {
 
   readonly billingLabel = getProductBillingLabel;
 
-  /** Avatar icon that hints at product type on the mobile card. */
   productIcon(product: Product): string {
-    return product.type === ProductTypes.Subscription
-      ? 'pi pi-sync'
-      : 'pi pi-box';
+    return product.type === ProductTypes.Subscription ? 'pi pi-sync' : 'pi pi-box';
   }
 
-  /** Fallback subtitle used when a product has no description — keeps
-   *  the mobile card visually balanced. */
   subtitleFor(product: Product): string {
     return product.interval ? this.billingLabel(product) : 'One-off product';
   }
 
-  /** Mobile accent strip to surface inactive products. */
   cardAccent(product: Product): 'none' | 'primary' | 'danger' | 'success' {
     if (!product.isActive) return 'danger';
     if (product.showOnProfile) return 'primary';

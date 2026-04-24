@@ -12,20 +12,18 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { DataView } from 'primeng/dataview';
 import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
+import { Tag } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { MessageModule } from 'primeng/message';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Tooltip } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import {
   InvoiceService as PaymentInvoiceService,
   InvoiceStatuses,
-  StripeOnboardingService,
   CurrencyRonPipe,
   StatusLabelPipe,
   getInvoiceStatusSeverity,
@@ -41,14 +39,13 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
   imports: [
     DatePipe,
     RouterLink,
-    ButtonModule,
+    Button,
     TableModule,
-    TagModule,
+    Tag,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
-    TooltipModule,
-    MessageModule,
+    ConfirmDialog,
+    Tooltip,
     CurrencyRonPipe,
     StatusLabelPipe,
     DataView,
@@ -63,7 +60,6 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
 })
 export class Invoices implements OnInit {
   private readonly _invoiceService = inject(PaymentInvoiceService);
-  private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _destroyRef = inject(DestroyRef);
@@ -89,21 +85,17 @@ export class Invoices implements OnInit {
     this._destroyRef.onDestroy(() => this._observer?.disconnect());
   }
 
-  readonly stripeOnboarded = signal(false);
-
-  invoices = signal<Invoice[]>([]);
-  totalRecords = signal(0);
-  loading = signal(true);
-  loadingMore = signal(false);
+  readonly invoices = signal<Invoice[]>([]);
+  readonly totalRecords = signal(0);
+  readonly loading = signal(true);
+  readonly loadingMore = signal(false);
 
   readonly rows = 10;
-  currentPage = signal(1);
+  readonly currentPage = signal(1);
 
-  /** True when the accumulated mobile list has more server-side rows
-   *  available — drives the "Load more" button visibility. */
   readonly hasMore = computed(() => this.invoices().length < this.totalRecords());
 
-  statusFilter = signal<InvoiceStatus | undefined>(undefined);
+  readonly statusFilter = signal<InvoiceStatus | undefined>(undefined);
   readonly statusOptions = [
     { label: 'All', value: undefined },
     { label: 'Draft', value: InvoiceStatuses.Draft as InvoiceStatus },
@@ -112,37 +104,14 @@ export class Invoices implements OnInit {
     { label: 'Void', value: InvoiceStatuses.Void as InvoiceStatus },
   ];
 
-  showCreateDialog = signal(false);
-  showSendDialog = signal(false);
-  sendDialogInvoice = signal<Invoice | null>(null);
+  readonly showCreateDialog = signal(false);
+  readonly showSendDialog = signal(false);
+  readonly sendDialogInvoice = signal<Invoice | null>(null);
 
   readonly Statuses = InvoiceStatuses;
 
   ngOnInit(): void {
-    this.loadOnboardingStatus();
-    // this.loadInvoices();
-  }
-
-  private loadOnboardingStatus(): void {
-    this._onboardingService.getStatus().subscribe({
-      next: (res) => this.stripeOnboarded.set(!!res.account?.chargesEnabled),
-      error: () => this.stripeOnboarded.set(false),
-    });
-  }
-
-  startOnboarding(): void {
-    this._onboardingService.start().subscribe({
-      next: (res) => {
-        window.location.href = res.url;
-      },
-      error: () => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to start Stripe onboarding',
-        });
-      },
-    });
+    this.loadInvoices();
   }
 
   loadInvoices(): void {
@@ -185,8 +154,6 @@ export class Invoices implements OnInit {
     this.loadInvoices();
   }
 
-  /** Mobile card list "Load more": appends the next page to the existing
-   *  list instead of replacing it. Desktop still uses the paginator. */
   loadMore(): void {
     if (this.loadingMore() || !this.hasMore()) return;
     this.loadingMore.set(true);
@@ -214,8 +181,6 @@ export class Invoices implements OnInit {
       });
   }
 
-  /** Opens the send-email confirmation popup — pre-fills the on-file
-   *  email and lets the instructor override it for this send only. */
   openSendDialog(invoice: Invoice): void {
     this.sendDialogInvoice.set(invoice);
     this.showSendDialog.set(true);
@@ -289,8 +254,6 @@ export class Invoices implements OnInit {
     return invoice.clientEmail ?? 'Unknown';
   }
 
-  /** Two-letter initials for the client avatar. Falls back to "?"
-   *  when the invoice has no client name AND no email. */
   clientInitials(invoice: Invoice): string {
     if (invoice.client?.firstName && invoice.client?.lastName) {
       return (invoice.client.firstName.charAt(0) + invoice.client.lastName.charAt(0)).toUpperCase();
@@ -301,8 +264,6 @@ export class Invoices implements OnInit {
     return '?';
   }
 
-  /** Short identifier shown on list rows (Stripe-assigned `number`
-   *  or a deterministic prefix of the local UUID for drafts). */
   invoiceDisplayNumber(invoice: Invoice): string {
     return invoice.number ?? `#${invoice.id.slice(0, 8).toUpperCase()}`;
   }
@@ -313,7 +274,6 @@ export class Invoices implements OnInit {
     return new Date(invoice.dueDate).getTime() < Date.now();
   }
 
-  /** Mobile accent strip on the card to call out attention-needed rows. */
   cardAccent(invoice: Invoice): 'none' | 'primary' | 'danger' | 'success' {
     if (this.isOverdue(invoice)) return 'danger';
     if (invoice.status === InvoiceStatuses.Paid) return 'success';
