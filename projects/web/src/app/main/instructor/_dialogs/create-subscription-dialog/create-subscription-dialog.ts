@@ -4,7 +4,6 @@ import {
   effect,
   inject,
   model,
-  OnInit,
   output,
   signal,
 } from '@angular/core';
@@ -20,6 +19,7 @@ import {
   ClientService,
   ProductTypes,
   CurrencyRonPipe,
+  showApiError,
   type Product,
   type InstructorClient,
 } from 'core';
@@ -42,7 +42,7 @@ interface ProductOption {
   styleUrl: './create-subscription-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CreateSubscriptionDialog implements OnInit {
+export class CreateSubscriptionDialog {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _productService = inject(ProductService);
   private readonly _clientService = inject(ClientService);
@@ -61,19 +61,22 @@ export class CreateSubscriptionDialog implements OnInit {
 
   selectedProduct = signal<Product | null>(null);
 
+  /**
+   * Reset the form AND refresh the client/product lists every time
+   * the dialog opens. Reloading on open (rather than once on init)
+   * means newly added clients or pricing plans appear without a hard
+   * page reload.
+   */
   private readonly _syncFormEffect = effect(() => {
     if (this.visible()) {
       this.formClientUserId = undefined;
       this.formProductId = undefined;
       this.formTrialDays = undefined;
       this.selectedProduct.set(null);
+      this.loadClients();
+      this.loadProducts();
     }
   });
-
-  ngOnInit(): void {
-    this.loadClients();
-    this.loadProducts();
-  }
 
   private loadClients(): void {
     this._clientService.getClients({ status: 'ACTIVE', limit: 100 }).subscribe({
@@ -122,23 +125,40 @@ export class CreateSubscriptionDialog implements OnInit {
         trialDays: this.formTrialDays,
       })
       .subscribe({
-        next: () => {
+        next: (sub) => {
           this.saving.set(false);
           this.visible.set(false);
           this.saved.emit();
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Subscription created',
-            detail: 'The subscription has been created successfully',
-          });
+          // Push-model setup: when the client has no card on file the
+          // backend returns the subscription in INCOMPLETE state plus a
+          // hosted setup URL. Surface it in the success toast so the
+          // instructor sees right away that the client needs to act,
+          // and can copy/share the link without diving into the detail
+          // page.
+          if (sub.pendingConfirmationUrl) {
+            this._messageService.add({
+              severity: 'info',
+              summary: 'Membership pending client confirmation',
+              detail:
+                "We emailed the client a link to confirm and start their membership. They'll see the plan, amount, and cycle, then pay with a saved or new card. Nothing is charged until they confirm.",
+              life: 9000,
+            });
+          } else {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Subscription created',
+              detail: 'The subscription has been created successfully',
+            });
+          }
         },
-        error: (err) => {
+        error: (err: unknown) => {
           this.saving.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to create subscription',
-          });
+          showApiError(
+            this._messageService,
+            'Could not create subscription',
+            'Please try again.',
+            err,
+          );
         },
       });
   }

@@ -57,23 +57,6 @@
       }
     </div>
 
-    <!-- Email (guests only) -->
-    @if (isGuest()) {
-    <div class="flex flex-col gap-1.5">
-      <label for="fb-email" class="text-xs font-semibold">
-        Email
-        <span class="font-normal text-surface-400 ms-1">(optional — to follow up on your
-          feedback)</span>
-      </label>
-      <input pInputText id="fb-email" type="email" formControlName="email" placeholder="your@email.com" fluid />
-      @if (form.controls.email.invalid && form.controls.email.touched) {
-      <p-message variant="simple" severity="error" size="small">
-        Please enter a valid email address.
-      </p-message>
-      }
-    </div>
-    }
-
   </form>
   } @else {
   <div class="success-state">

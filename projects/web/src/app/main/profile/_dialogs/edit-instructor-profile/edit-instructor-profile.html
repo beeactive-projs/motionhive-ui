@@ -27,17 +27,10 @@
       </div>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2">
-      <div class="flex flex-col gap-2">
-        <label for="epCity" class="text-sm font-medium">City</label>
-        <input id="epCity" type="text" pInputText [ngModel]="form().locationCity"
-          (ngModelChange)="updateField('locationCity', $event)" placeholder="e.g. New York" />
-      </div>
-      <div class="flex flex-col gap-2">
-        <label for="epCountry" class="text-sm font-medium">Country</label>
-        <input id="epCountry" type="text" pInputText [ngModel]="form().locationCountry"
-          (ngModelChange)="updateField('locationCountry', $event)" placeholder="e.g. US" />
-      </div>
+    <div class="rounded-lg border border-dashed border-surface-300 dark:border-surface-700 p-3 text-xs text-surface-500">
+      Your country and city live on your personal information — edit them from the
+      <strong>Edit personal information</strong> dialog. Where you actually hold sessions (gyms, parks, online) is managed from the
+      <strong>Venues</strong> section on your profile.
     </div>
 
     <div class="flex items-center gap-3 rounded-lg bg-surface-50 dark:bg-surface-800 p-4">

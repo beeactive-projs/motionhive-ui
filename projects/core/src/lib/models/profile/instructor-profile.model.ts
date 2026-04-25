@@ -26,8 +26,6 @@ export interface InstructorProfile {
   showSocialLinks: boolean;
   showEmail: boolean;
   showPhone: boolean;
-  locationCity: string | null;
-  locationCountry: string | null;
   isPublic: boolean;
   createdAt: string;
   updatedAt: string;
@@ -50,8 +48,6 @@ export interface UpdateInstructorProfilePayload {
   showSocialLinks?: boolean;
   showEmail?: boolean;
   showPhone?: boolean;
-  locationCity?: string;
-  locationCountry?: string;
 }
 
 export interface CreateInstructorProfilePayload {
@@ -72,6 +68,4 @@ export interface CreateInstructorProfilePayload {
   showSocialLinks?: boolean;
   showEmail?: boolean;
   showPhone?: boolean;
-  locationCity?: string;
-  locationCountry?: string;
 }

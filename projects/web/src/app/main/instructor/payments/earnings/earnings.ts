@@ -17,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import {
   EarningsService,
   StripeOnboardingService,
+  StripeOnboardingStore,
   PaymentStatuses,
   TagSeverity,
   CurrencyRonPipe,
@@ -46,10 +47,13 @@ import {
 export class Earnings implements OnInit {
   private readonly _earningsService = inject(EarningsService);
   private readonly _onboardingService = inject(StripeOnboardingService);
+  private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
 
   readonly dashboardLoading = signal(false);
-  readonly stripeOnboarded = signal(false);
+  // Read directly from the shared store — no per-page fetch needed.
+  readonly stripeOnboarded = this._onboardingStore.canIssueInvoices;
+  readonly hasStripeAccount = this._onboardingStore.hasAccount;
 
   summary = signal<EarningsSummary | null>(null);
   summaryLoading = signal(true);
@@ -64,16 +68,9 @@ export class Earnings implements OnInit {
   readonly Statuses = PaymentStatuses;
 
   ngOnInit(): void {
-    this.loadOnboardingStatus();
+    this._onboardingStore.ensureLoaded();
     this.loadSummary();
     this.loadPayments();
-  }
-
-  private loadOnboardingStatus(): void {
-    this._onboardingService.getStatus().subscribe({
-      next: (res) => this.stripeOnboarded.set(!!res.account?.chargesEnabled),
-      error: () => this.stripeOnboarded.set(false),
-    });
   }
 
   startOnboarding(): void {

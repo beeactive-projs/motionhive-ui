@@ -1,4 +1,11 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -71,8 +78,30 @@ export class Clients implements OnInit {
   showNotesDialog = signal(false);
   editingClient = signal<InstructorClient | null>(null);
 
+  incomingRequestsCount = signal(0);
+  readonly showIncomingBanner = computed(
+    () =>
+      this.incomingRequestsCount() > 0 &&
+      this.statusFilter() !== this.Statuses.Pending,
+  );
+
   ngOnInit(): void {
     this.loadClients();
+    this.loadIncomingCount();
+  }
+
+  private loadIncomingCount(): void {
+    this._clientService.getPendingRequests().subscribe({
+      next: (requests) =>
+        this.incomingRequestsCount.set(
+          requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR').length,
+        ),
+      error: () => this.incomingRequestsCount.set(0),
+    });
+  }
+
+  jumpToIncomingRequests(): void {
+    this.onStatusFilterChange(this.Statuses.Pending);
   }
 
   loadClients(): void {
@@ -257,6 +286,7 @@ export class Clients implements OnInit {
           detail: 'Client request accepted successfully',
         });
         this.loadClients();
+        this.loadIncomingCount();
       },
       error: (err) => {
         this._messageService.add({
@@ -277,6 +307,7 @@ export class Clients implements OnInit {
           detail: 'Client request has been declined',
         });
         this.loadClients();
+        this.loadIncomingCount();
       },
       error: (err) => {
         this._messageService.add({

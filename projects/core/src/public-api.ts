@@ -16,9 +16,12 @@ export * from './lib/models/user/role.model';
 
 // Models - Profile
 export * from './lib/models/profile/profile.enums';
-export * from './lib/models/profile/fitness-profile.model';
 export * from './lib/models/profile/instructor-profile.model';
 export * from './lib/models/profile/profile.model';
+
+// Models - Venue
+export * from './lib/models/venue/venue.enums';
+export * from './lib/models/venue/venue.model';
 
 // Models - Client
 export * from './lib/models/client/client.enums';
@@ -61,6 +64,11 @@ export * from './lib/models/payment/status-severity';
 export * from './lib/constants/api-endpoints.const';
 export * from './lib/constants/storage-keys.const';
 export * from './lib/constants/timezones.const';
+export * from './lib/constants/countries.const';
+
+// Utils
+export * from './lib/utils/url.utils';
+export * from './lib/utils/api-error.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';
@@ -83,6 +91,7 @@ export * from './lib/services/payment/subscription.service';
 export * from './lib/services/payment/refund.service';
 export * from './lib/services/payment/earnings.service';
 export * from './lib/services/payment/client-payment.service';
+export * from './lib/services/venue/venue.service';
 
 // Pipes
 export * from './lib/pipes/currency-ron.pipe';
@@ -93,6 +102,7 @@ export * from './lib/directives/stripe-iframe.directive';
 
 // Stores
 export * from './lib/stores/auth.store';
+export * from './lib/stores/stripe-onboarding.store';
 
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';

@@ -13,6 +13,14 @@ export const paymentsRoutes: Routes = [
     title: 'Invoice Details - MotionHive',
   },
   {
+    path: 'subscriptions/:id',
+    loadComponent: () =>
+      import('./subscriptions/subscription-detail/subscription-detail').then(
+        (m) => m.SubscriptionDetail,
+      ),
+    title: 'Membership Details - MotionHive',
+  },
+  {
     path: 'onboarding/return',
     loadComponent: () =>
       import('./onboarding-return/onboarding-return').then((m) => m.OnboardingReturn),

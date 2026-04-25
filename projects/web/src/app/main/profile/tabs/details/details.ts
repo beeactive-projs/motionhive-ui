@@ -12,6 +12,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
+  AuthService,
   CurrencyRonPipe,
   MyProfile,
   Product,
@@ -19,7 +20,10 @@ import {
   TagSeverity,
   UserRoles,
   UserService,
+  apiErrorMessage,
+  countryNameFromCode,
   getProductBillingLabel,
+  showApiError,
 } from 'core';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
@@ -33,6 +37,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { EditInstructorProfile } from '../../_dialogs/edit-instructor-profile/edit-instructor-profile';
 import { EditPersonalInfo } from '../../_dialogs/edit-personal-info/edit-personal-info';
 import { BecomeInstructor } from '../../../user/_dialogs/become-instructor/become-instructor';
+import { VenuesSection } from './venues-section/venues-section';
 
 @Component({
   selector: 'mh-profile-details',
@@ -52,6 +57,7 @@ import { BecomeInstructor } from '../../../user/_dialogs/become-instructor/becom
     EditInstructorProfile,
     EditPersonalInfo,
     BecomeInstructor,
+    VenuesSection,
   ],
   providers: [MessageService],
   templateUrl: './details.html',
@@ -61,6 +67,7 @@ import { BecomeInstructor } from '../../../user/_dialogs/become-instructor/becom
 export class Details implements OnInit {
   private readonly _productService = inject(ProductService);
   private readonly _userService = inject(UserService);
+  private readonly _authService = inject(AuthService);
   private readonly _messageService = inject(MessageService);
 
   readonly profile = input.required<MyProfile>();
@@ -75,6 +82,7 @@ export class Details implements OnInit {
   private readonly _togglingProductIds = signal<Set<string>>(new Set());
 
   readonly uploadingAvatar = signal(false);
+  readonly resendingVerification = signal(false);
   /** Optimistic avatar URL — wins over `profile().account.avatarUrl`
    *  between the successful upload response and the parent reloading
    *  the profile via (refresh). Null until the user uploads one. */
@@ -84,9 +92,8 @@ export class Details implements OnInit {
    *  to an empty string when no location is set so the template can
    *  show its own "Not set" placeholder. */
   readonly locationDisplay = computed<string>(() => {
-    const loc = this.profile().account.location;
-    if (!loc) return '';
-    const parts = [loc.name, loc.city, loc.country].filter(
+    const a = this.profile().account;
+    const parts = [a.city, countryNameFromCode(a.countryCode)].filter(
       (x): x is string => !!x,
     );
     return parts.join(', ');
@@ -163,15 +170,16 @@ export class Details implements OnInit {
             : `"${product.name}" is hidden from your public profile.`,
         });
       },
-      error: (err) => {
+      error: (err: unknown) => {
         // Revert the optimistic flip.
         this._patchLocalProduct(product.id, { showOnProfile: previousValue });
         this._clearToggling(product.id);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.error?.message || 'Failed to update visibility.',
-        });
+        showApiError(
+          this._messageService,
+          'Error',
+          'Failed to update visibility.',
+          err,
+        );
       },
     });
   }
@@ -190,24 +198,82 @@ export class Details implements OnInit {
 
   readonly billingLabel = getProductBillingLabel;
 
-  roleSeverity(role: string): TagSeverity {
-    switch (role) {
-      case UserRoles.SuperAdmin:
-        return TagSeverity.Danger;
-      case UserRoles.Admin:
-        return TagSeverity.Warn;
-      case UserRoles.Instructor:
-        return TagSeverity.Info;
-      case UserRoles.Support:
-        return TagSeverity.Contrast;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
+  /**
+   * Curated identity pills shown in the profile header.
+   *
+   * - USER is filtered out: every account has it, surfacing it as a
+   *   tag is noise and means nothing to the user.
+   * - The remaining roles get user-friendly labels (e.g. INSTRUCTOR →
+   *   "Coach") so the header doesn't leak our internal RBAC strings.
+   * - We sort by importance: staff roles first (so an admin sees
+   *   "Admin" prominently before any other identity), then the user's
+   *   public-facing identity (Coach, Writer).
+   *
+   * Returned as a frozen list of `{label, severity}` so the template
+   * stays trivial and doesn't repeat the lookup.
+   */
+  readonly displayBadges = computed<{ label: string; severity: TagSeverity }[]>(
+    () => {
+      const roles = new Set(this.profile().roles);
+      const out: { label: string; severity: TagSeverity }[] = [];
+
+      // Staff first — highest blast-radius identity, surface it on top
+      // so the user is reminded they're operating in that capacity.
+      if (roles.has(UserRoles.SuperAdmin)) {
+        out.push({ label: 'Super admin', severity: TagSeverity.Danger });
+      } else if (roles.has(UserRoles.Admin)) {
+        out.push({ label: 'Admin', severity: TagSeverity.Warn });
+      } else if (roles.has(UserRoles.Support)) {
+        out.push({ label: 'Support', severity: TagSeverity.Contrast });
+      }
+
+      if (roles.has(UserRoles.Writer)) {
+        out.push({ label: 'Writer', severity: TagSeverity.Info });
+      }
+      if (roles.has(UserRoles.Instructor)) {
+        out.push({ label: 'Coach', severity: TagSeverity.Info });
+      }
+
+      return out;
+    },
+  );
 
   onInstructorSaved(): void {
     this.refresh.emit();
     this.loadCoachingProducts();
+  }
+
+  /**
+   * Re-sends the email-verification link. Backend is rate-limited and
+   * idempotent, so we surface any rejection as an info toast rather
+   * than an error. The button disables itself while in flight to
+   * prevent accidental double-clicks.
+   */
+  resendVerification(): void {
+    if (this.resendingVerification()) return;
+    const email = this.profile().account.email;
+    this.resendingVerification.set(true);
+    this._authService.resendVerification(email).subscribe({
+      next: () => {
+        this.resendingVerification.set(false);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Verification email sent',
+          detail: `Check ${email}.`,
+        });
+      },
+      error: (err: unknown) => {
+        this.resendingVerification.set(false);
+        this._messageService.add({
+          severity: 'info',
+          summary: 'Could not resend',
+          detail: apiErrorMessage(
+            err,
+            'If the email is already verified or you recently asked, please try again later.',
+          ),
+        });
+      },
+    });
   }
 
   /**
@@ -252,13 +318,14 @@ export class Details implements OnInit {
         });
         this.refresh.emit();
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.uploadingAvatar.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Upload failed',
-          detail: err?.error?.message || 'Could not upload the picture.',
-        });
+        showApiError(
+          this._messageService,
+          'Upload failed',
+          'Could not upload the picture.',
+          err,
+        );
       },
     });
   }

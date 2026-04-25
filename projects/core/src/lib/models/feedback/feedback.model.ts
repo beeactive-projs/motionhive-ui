@@ -4,6 +4,6 @@ export interface FeedbackPayload {
   type: FeedbackCategory;
   title: string;
   message: string;
-  userId?: string;
+  /** Optional contact email — the confirmation mail (if any) is sent here. */
   email?: string;
 }

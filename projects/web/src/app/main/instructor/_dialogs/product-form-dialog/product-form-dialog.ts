@@ -22,6 +22,7 @@ import {
   ProductService,
   ProductTypes,
   BillingIntervals,
+  StripeOnboardingStore,
   type Product,
   type ProductType,
   type BillingInterval,
@@ -46,6 +47,7 @@ import {
 })
 export class ProductFormDialog {
   private readonly _productService = inject(ProductService);
+  private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
 
   readonly visible = model(false);
@@ -53,6 +55,14 @@ export class ProductFormDialog {
   readonly saved = output<void>();
 
   readonly saving = signal(false);
+  /**
+   * Currency used purely for display in the price input (uppercase
+   * ISO 4217). Derived from the instructor's Stripe account default
+   * currency. Falls back to 'USD' when the account isn't loaded yet.
+   * The server ignores the client's currency hint on create and
+   * always uses the account's settlement currency.
+   */
+  readonly displayCurrency = signal<string>('USD');
 
   // Form fields
   formName = '';
@@ -100,6 +110,8 @@ export class ProductFormDialog {
         this.formIntervalCount = p.intervalCount ?? 1;
         this.formIsActive = p.isActive;
         this.formShowOnProfile = p.showOnProfile;
+        // Editing an existing product: its currency is fixed.
+        this.displayCurrency.set(p.currency?.toUpperCase() || 'USD');
       } else {
         this.formName = '';
         this.formDescription = '';
@@ -109,6 +121,14 @@ export class ProductFormDialog {
         this.formIntervalCount = 1;
         this.formIsActive = true;
         this.formShowOnProfile = false;
+        // Pull the instructor's default currency from the shared
+        // onboarding cache. ensureLoaded() is a no-op once warmed,
+        // and the BE picks the real currency from the Stripe account
+        // anyway — this is purely the input symbol rendered in the
+        // price field.
+        this._onboardingStore.ensureLoaded();
+        const cur = this._onboardingStore.defaultCurrency();
+        this.displayCurrency.set(cur ? cur.toUpperCase() : 'USD');
       }
     }
   });

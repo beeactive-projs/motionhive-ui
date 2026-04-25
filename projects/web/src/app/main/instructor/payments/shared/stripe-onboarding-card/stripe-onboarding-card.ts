@@ -60,10 +60,13 @@ export class StripeOnboardingCard implements OnInit {
   startOnboarding(): void {
     this.actionLoading.set(true);
     const origin = window.location.origin;
+    // Onboarding landing pages live under the instructor module at
+    // /coaching/onboarding/*. Pointing Stripe at /payments/... 404s
+    // after the hosted form because that route doesn't exist.
     this._onboardingService
       .start({
-        returnUrl: `${origin}/payments/onboarding/return`,
-        refreshUrl: `${origin}/payments/onboarding/refresh`,
+        returnUrl: `${origin}/coaching/onboarding/return`,
+        refreshUrl: `${origin}/coaching/onboarding/refresh`,
       })
       .subscribe({
       next: (res) => {

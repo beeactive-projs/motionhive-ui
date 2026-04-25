@@ -62,6 +62,18 @@ export interface CreateInvoicePayload {
   requiresImmediateAccessWaiver?: boolean;
 }
 
+/**
+ * Edit an existing DRAFT invoice. Only fields that can change after
+ * creation are present — bill-to, currency, and the waiver flag are
+ * locked. The API rejects an update on any non-DRAFT invoice. At least
+ * one of the three fields must be supplied or the API returns 400.
+ */
+export interface UpdateInvoicePayload {
+  lineItems?: InvoiceLineItem[];
+  dueDate?: string;
+  description?: string;
+}
+
 export interface InvoiceListParams {
   status?: InvoiceStatus;
   clientId?: string;

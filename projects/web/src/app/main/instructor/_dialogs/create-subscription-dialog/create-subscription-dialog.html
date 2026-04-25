@@ -27,10 +27,18 @@
     }
 
     <!-- Trial days (optional) -->
-    <div class="flex flex-col gap-1">
-      <label for="subTrial" class="text-sm font-medium">Trial period (optional)</label>
+    <div class="flex flex-col gap-2">
+      <label for="subTrial" class="text-sm font-medium">Free trial (optional)</label>
       <p-inputNumber id="subTrial" [(ngModel)]="formTrialDays" [min]="0" [max]="90" suffix=" days"
-        placeholder="No trial" fluid />
+        placeholder="No free trial" fluid />
+      <span class="text-xs text-surface-500">
+        Number of days the client can use the plan before being charged. Leave empty to bill immediately.
+        @if (formTrialDays && formTrialDays > 0) {
+          The first charge happens
+          <strong>{{ formTrialDays }} day{{ formTrialDays === 1 ? '' : 's' }}</strong>
+          from now.
+        }
+      </span>
     </div>
   </div>
 

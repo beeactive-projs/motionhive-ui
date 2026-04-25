@@ -59,10 +59,10 @@ export class Instructors implements OnInit {
 
   loadInstructors(): void {
     this.loading.set(true);
-    this._clientService.getMyInstructors(this.currentPage(), this.rows).subscribe({
-      next: (response) => {
-        this.instructors.set(response.items);
-        this.totalRecords.set(response.total);
+    this._clientService.getMyInstructors().subscribe({
+      next: (items) => {
+        this.instructors.set(items);
+        this.totalRecords.set(items.length);
         this.loading.set(false);
       },
       error: () => {

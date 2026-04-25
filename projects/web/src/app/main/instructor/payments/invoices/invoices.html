@@ -26,11 +26,14 @@
     </ng-template>
 
     <ng-template #body let-invoice>
-      <tr>
+      <tr [class.opacity-60]="invoice.status === Statuses.Draft">
         <td>
           <a [routerLink]="['/coaching/invoices', invoice.id]"
             class="text-primary-500 hover:underline font-medium tabular-nums">
             {{ invoiceDisplayNumber(invoice) }}
+            @if (invoice.status === Statuses.Draft) {
+              <span class="text-xs font-normal text-surface-500">(draft)</span>
+            }
           </a>
         </td>
         <td>
@@ -61,6 +64,8 @@
           <div class="flex gap-3 justify-end">
             @switch (invoice.status) {
             @case (Statuses.Draft) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
+              pTooltip="Edit" (onClick)="openEdit(invoice)" />
             <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
               pTooltip="Send" (onClick)="openSendDialog(invoice)" />
             <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
@@ -231,7 +236,11 @@
   }
 </div>
 
-<mh-create-invoice-dialog [(visible)]="showCreateDialog" (saved)="loadInvoices()" />
+<mh-create-invoice-dialog
+  [visible]="showCreateDialog()"
+  (visibleChange)="onCreateDialogVisibleChange($event)"
+  [editingInvoiceId]="editingInvoiceId()"
+  (saved)="onSavedFromDialog()" />
 
 <mh-send-invoice-email-dialog [(visible)]="showSendDialog" [invoice]="sendDialogInvoice()" (sent)="loadInvoices()" />
 

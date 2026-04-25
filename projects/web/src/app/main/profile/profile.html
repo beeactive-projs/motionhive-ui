@@ -40,6 +40,16 @@
           <span class="ml-2">Profile details</span>
         </p-tab>
 
+        <p-tab [value]="Tabs.Coaches">
+          <i class="pi pi-star"></i>
+          <span class="ml-2">
+            Coaches
+            @if (incomingRequestsCount() > 0) {
+              <span class="ml-1 text-xs text-primary-600 font-semibold">· {{ incomingRequestsCount() }} new</span>
+            }
+          </span>
+        </p-tab>
+
         @if (showInvoicesTab()) {
           <p-tab [value]="Tabs.Invoices">
             <i class="pi pi-receipt"></i>
@@ -69,6 +79,12 @@
         <p-tabpanel [value]="Tabs.Details">
           @if (activeTab() === Tabs.Details) {
             <mh-profile-details [profile]="p" (refresh)="loadProfile()" />
+          }
+        </p-tabpanel>
+
+        <p-tabpanel [value]="Tabs.Coaches">
+          @if (activeTab() === Tabs.Coaches) {
+            <mh-profile-coaches [active]="true" />
           }
         </p-tabpanel>
 

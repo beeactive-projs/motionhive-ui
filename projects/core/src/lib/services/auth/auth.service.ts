@@ -130,6 +130,18 @@ export class AuthService implements OnDestroy {
     );
   }
 
+  /**
+   * Resend the email-verification link. Used by the profile page when
+   * the user still has an unverified email. Safe to call repeatedly —
+   * the backend is idempotent and rate-limited.
+   */
+  resendVerification(email: string): Observable<{ message: string }> {
+    return this._http.post<{ message: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.AUTH.RESEND_VERIFICATION}`,
+      { email },
+    );
+  }
+
   clearAuthDataAndRedirect(): void {
     this.clearAuthData();
     this._router.navigate(['/auth/login']);

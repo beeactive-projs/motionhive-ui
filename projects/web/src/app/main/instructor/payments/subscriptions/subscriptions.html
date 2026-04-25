@@ -19,42 +19,70 @@
     scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
-        <th style="width: 1%;">Client</th>
-        <th style="width: 1%;">Plan</th>
-        <th class="text-center" style="width: 1%;">Amount</th>
-        <th class="text-center" style="width: 10%;">Status</th>
-        <th class="text-center" style="width: 20%;">Current period</th>
-        <th class="text-center" style="width: 1%;">Actions</th>
+        <th style="width: 22%;">Client</th>
+        <th style="width: 28%;">Plan</th>
+        <th class="text-end" style="width: 12%;">Amount</th>
+        <th class="text-center" style="width: 12%;">Status</th>
+        <th class="text-center" style="width: 18%;">Current period</th>
+        <th class="text-end" style="width: 8%;">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-sub>
-      <tr>
-        <td>{{ sub.clientId || '—' }}</td>
-        <td>{{ sub.productId }}</td>
-        <td>{{ sub.amountCents | currencyRon:sub.currency }}</td>
+      <tr class="cursor-pointer" (click)="openDetail(sub)">
         <td>
+          <div class="flex flex-col min-w-0">
+            <span class="font-medium truncate">{{ clientDisplay(sub) }}</span>
+            @if (clientEmail(sub); as email) {
+              <span class="text-xs text-surface-500 truncate">{{ email }}</span>
+            }
+          </div>
+        </td>
+        <td>
+          <!-- 2-line layout: name on top (clamped to 1 line), cycle as
+               smaller subtitle. Long product names get an ellipsis +
+               tooltip so the column stays predictable. -->
+          <div class="flex flex-col min-w-0" [pTooltip]="planDisplay(sub)" tooltipPosition="top">
+            <span class="font-medium truncate">{{ planName(sub) }}</span>
+            @if (planCycle(sub); as cycle) {
+              <span class="text-xs text-surface-500 truncate">{{ cycle }}</span>
+            }
+          </div>
+        </td>
+        <td class="text-end tabular-nums">{{ sub.amountCents | currencyRon:sub.currency }}</td>
+        <td class="text-center">
           <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" />
           @if (sub.cancelAt) {
-          <span class="text-xs text-surface-500 ml-1">cancels {{ sub.cancelAt | date:'dd MMM' }}</span>
+            <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM' }}</div>
           }
         </td>
-        <td>
-          <span class="text-sm">
-            {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
-          </span>
+        <td class="text-center">
+          @if (sub.currentPeriodStart && sub.currentPeriodEnd) {
+            <span class="text-sm whitespace-nowrap">
+              {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+            </span>
+          } @else {
+            <span class="text-sm text-surface-500">—</span>
+          }
           @if (sub.trialEnd) {
-          <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
+            <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
           }
         </td>
-        <td>
+        <td class="text-end">
+          <!-- Stop click bubbling so the row navigation doesn't fire
+               when the user actually wants to cancel. -->
           @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
-          <div class="flex gap-1">
-            <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
-              pTooltip="Cancel at period end" tooltipPosition="top" (onClick)="confirmCancel(sub)" />
-            <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"
-              tooltipPosition="top" (onClick)="confirmCancelImmediately(sub)" />
-          </div>
+            <div class="flex gap-1 justify-end" (click)="$event.stopPropagation()">
+              <!-- Hide "Cancel at period end" once it's already
+                   scheduled (cancelAt is set); only "Cancel immediately"
+                   stays meaningful. -->
+              @if (!sub.cancelAt) {
+                <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
+                  pTooltip="Cancel at period end" tooltipPosition="top" (onClick)="confirmCancel(sub)" />
+              }
+              <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"
+                tooltipPosition="top" (onClick)="confirmCancelImmediately(sub)" />
+            </div>
           }
         </td>
       </tr>
@@ -135,10 +163,9 @@
     <ng-template #list let-items>
       <div class="flex flex-col gap-3 pt-1">
         @for (sub of items; track trackById($index, sub)) {
-        @let actionable = sub.status === Statuses.Active || sub.status === Statuses.Trialing;
         <mh-list-card [status]="sub.status" [statusSeverity]="statusSeverity(sub.status)" avatarIcon="pi pi-user"
-          [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)" [accent]="cardAccent(sub)" [clickable]="actionable"
-          (click)="actionable ? openActionMenu(sub, $event, actionMenu) : null">
+          [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)" [accent]="cardAccent(sub)" [clickable]="true"
+          (click)="openActionMenu(sub, $event, actionMenu)">
           <div amount class="flex flex-col items-end">
             <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
               {{ sub.amountCents | currencyRon:sub.currency }}

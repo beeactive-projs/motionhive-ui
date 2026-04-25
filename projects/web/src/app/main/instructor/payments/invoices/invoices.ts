@@ -108,6 +108,47 @@ export class Invoices implements OnInit {
   readonly showSendDialog = signal(false);
   readonly sendDialogInvoice = signal<Invoice | null>(null);
 
+  /**
+   * Non-null when the create-invoice dialog should open in EDIT mode for
+   * a specific draft. Cleared on dialog close so the next "Create"
+   * click reopens the new-invoice flow cleanly.
+   */
+  readonly editingInvoiceId = signal<string | null>(null);
+
+  openEdit(invoice: Invoice): void {
+    this.editingInvoiceId.set(invoice.id);
+    this.showCreateDialog.set(true);
+  }
+
+  onCreateDialogVisibleChange(open: boolean): void {
+    this.showCreateDialog.set(open);
+    if (!open) {
+      // Reset edit context when the dialog closes so the NEXT "Create
+      // invoice" click goes through the create flow, not edit.
+      this.editingInvoiceId.set(null);
+      // Safety net: refresh the list whenever the dialog closes. The
+      // dialog also emits (saved) on success which independently
+      // triggers onSavedFromDialog(), so this is mostly belt-and-braces
+      // for the case where another tab created/edited an invoice while
+      // this dialog was open.
+      this.loadInvoices();
+    }
+  }
+
+  /**
+   * Called when the create-invoice dialog reports a successful save.
+   * Resets pagination to page 1 so the freshly-created row is visible
+   * even if the user was paging through results when they opened the
+   * dialog. The filter chip is left as-is — overriding the user's
+   * intent feels disrespectful, and they can clear it themselves if
+   * they don't see the new row (a Send-immediately invoice goes to
+   * OPEN, not DRAFT, so a "Draft" filter would hide it).
+   */
+  onSavedFromDialog(): void {
+    this.currentPage.set(1);
+    this.loadInvoices();
+  }
+
   readonly Statuses = InvoiceStatuses;
 
   ngOnInit(): void {

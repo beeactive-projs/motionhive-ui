@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes, UrlTree } from '@angular/router';
 
 export const userRoutes: Routes = [
   {
@@ -7,8 +8,12 @@ export const userRoutes: Routes = [
     title: 'Dashboard - MotionHive',
   },
   {
+    // Legacy path. Coaches now live in the profile "Coaches" tab.
     path: 'instructors',
-    loadComponent: () => import('./instructors/instructors').then((m) => m.Instructors),
-    title: 'My Instructors - MotionHive',
+    canActivate: [
+      (): UrlTree =>
+        inject(Router).createUrlTree(['/profile'], { queryParams: { tab: 'coaches' } }),
+    ],
+    children: [],
   },
 ];

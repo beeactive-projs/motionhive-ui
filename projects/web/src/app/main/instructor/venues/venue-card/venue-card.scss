@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+// PrimeNG tooltips default to single-line; let the venue tooltip
+// wrap onto multiple lines for the full details preview.
+:host ::ng-deep .venue-tooltip .p-tooltip-text {
+  white-space: pre-line;
+  max-width: 20rem;
+}

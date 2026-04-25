@@ -56,13 +56,30 @@
         <h3 class="text-lg font-semibold m-0">{{ fullName() }}</h3>
         <p class="text-sm text-surface-500 m-0">{{ profile().account.email }}</p>
         <div class="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
-          @for (role of profile().roles; track role) {
-            <p-tag [value]="role" [severity]="roleSeverity(role)" class="text-xs!" />
+          <!-- Curated identity pills via displayBadges(): drops USER
+               (every account has it, signalling nothing) and remaps
+               INSTRUCTOR → "Coach" so we don't leak our RBAC names. -->
+          @for (badge of displayBadges(); track badge.label) {
+            <p-tag [value]="badge.label" [severity]="badge.severity" class="text-xs!" />
           }
           @if (profile().account.isEmailVerified) {
             <p-tag value="Verified" severity="success" icon="pi pi-check" class="text-xs!" />
           } @else {
-            <p-tag value="Unverified" severity="warn" icon="pi pi-exclamation-triangle" class="text-xs!" />
+            <span class="inline-flex items-center gap-1">
+              <p-tag value="Unverified" severity="warn" icon="pi pi-exclamation-triangle" class="text-xs!" />
+              <p-button
+                icon="pi pi-refresh"
+                severity="warn"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                [loading]="resendingVerification()"
+                pTooltip="Resend verification email"
+                tooltipPosition="top"
+                aria-label="Resend verification email"
+                (onClick)="resendVerification()"
+              />
+            </span>
           }
         </div>
       </div>
@@ -90,13 +107,10 @@
           {{ locationDisplay() || 'Not set' }}
         </dd>
       </div>
-      <div>
-        <dt class="text-xs uppercase tracking-wide text-surface-500">Status</dt>
-        <dd class="mt-1">
-          <p-tag [value]="profile().account.isActive ? 'Active' : 'Inactive'"
-            [severity]="profile().account.isActive ? 'success' : 'danger'" class="text-xs!" />
-        </dd>
-      </div>
+      <!-- Email verification status used to live here as a duplicate
+           of the header pill; removed to avoid showing the same
+           Verified/Unverified info twice. The header pill is the
+           actionable one (carries the resend button). -->
       <div>
         <dt class="text-xs uppercase tracking-wide text-surface-500">Member since</dt>
         <dd class="mt-1 text-sm font-medium">{{ profile().account.createdAt | date: 'mediumDate' }}</dd>
@@ -139,11 +153,7 @@
           <div>
             <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
             <dd class="mt-1 text-sm font-medium">
-              @if (ip.locationCity || ip.locationCountry) {
-                {{ ip.locationCity }}{{ ip.locationCity && ip.locationCountry ? ', ' : '' }}{{ ip.locationCountry }}
-              } @else {
-                Not set
-              }
+              {{ locationDisplay() || 'Not set' }}
             </dd>
           </div>
           <div class="sm:col-span-2 lg:col-span-3">
@@ -212,6 +222,10 @@
           </div>
         }
       </div>
+
+      <p-divider />
+
+      <mh-venues-section />
     </p-card>
   }
 

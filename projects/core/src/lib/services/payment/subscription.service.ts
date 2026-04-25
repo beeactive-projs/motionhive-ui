@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
   CancelSubscriptionPayload,
   CreateSubscriptionPayload,
+  SetupLinkResponse,
   Subscription,
   SubscriptionListParams,
   SubscriptionListResponse,
@@ -39,6 +40,19 @@ export class SubscriptionService {
     return this._http.post<Subscription>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.SUBSCRIPTION_CANCEL(id)}`,
       payload,
+    );
+  }
+
+  /**
+   * Mint a fresh Stripe Checkout setup URL for an INCOMPLETE
+   * subscription (so the client can save their card). The backend
+   * returns `{ url: null }` when the subscription is no longer
+   * INCOMPLETE — the UI should hide the action in that case.
+   */
+  getSetupLink(id: string): Observable<SetupLinkResponse> {
+    return this._http.post<SetupLinkResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.SUBSCRIPTION_SETUP_LINK(id)}`,
+      {},
     );
   }
 }

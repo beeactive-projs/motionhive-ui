@@ -108,7 +108,6 @@ export class Main {
           { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
           { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
           { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
-          { label: 'Instructors', route: '/user/instructors', icon: 'pi pi-star' },
         ],
       },
     );

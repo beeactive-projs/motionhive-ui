@@ -24,8 +24,6 @@ export interface InstructorProfileSummary {
   displayName: string;
   specializations: string[];
   bio: string;
-  locationCity?: string;
-  locationCountry?: string;
 }
 
 export interface InstructorClient {
@@ -63,10 +61,9 @@ export interface ClientRequest {
   toUser?: ClientUser;
 }
 
-export interface CreateClientInvitation {
-  email: string;
-  message?: string;
-}
+export type CreateClientInvitation =
+  | { userId: string; email?: never; message?: string }
+  | { email: string; userId?: never; message?: string };
 
 export interface InvitationDetails {
   token: string;

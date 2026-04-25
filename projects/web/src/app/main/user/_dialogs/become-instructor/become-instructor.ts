@@ -11,7 +11,13 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { MessageModule } from 'primeng/message';
 import { StepperModule } from 'primeng/stepper';
-import { ProfileService, TokenService, CreateInstructorProfilePayload } from 'core';
+import {
+  AuthStore,
+  CreateInstructorProfilePayload,
+  ProfileService,
+  TokenService,
+  UserRoles,
+} from 'core';
 
 @Component({
   selector: 'mh-become-instructor',
@@ -36,6 +42,7 @@ export class BecomeInstructor {
   private readonly _formBuilder = inject(FormBuilder);
   private readonly _profileService = inject(ProfileService);
   private readonly _tokenService = inject(TokenService);
+  private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
 
   readonly visible = model(false);
@@ -89,8 +96,6 @@ export class BecomeInstructor {
     specializations: [[] as string[]],
     yearsOfExperience: [null as number | null],
     isAcceptingClients: [true],
-    locationCity: [''],
-    locationCountry: [''],
     profileVisibility: ['public', Validators.required],
     showEmail: [false],
     showPhone: [false],
@@ -148,8 +153,6 @@ export class BecomeInstructor {
       showPhone: v.showPhone ?? undefined,
       showSocialLinks: v.showSocialLinks ?? undefined,
       socialLinks: Object.keys(socialLinks).length ? socialLinks : undefined,
-      locationCity: v.locationCity || undefined,
-      locationCountry: v.locationCountry || undefined,
     };
 
     this.isLoading.set(true);
@@ -157,9 +160,19 @@ export class BecomeInstructor {
 
     this._profileService.createInstructorProfile(payload).subscribe({
       next: () => {
+        // Keep AuthStore in sync so guards downstream (e.g.
+        // `instructorGuard` on /coaching/**) see the new role
+        // without needing a page reload.
+        const current = this._authStore.user();
+        if (current && !current.roles.includes(UserRoles.Instructor)) {
+          this._authStore.setUser({
+            ...current,
+            roles: [...current.roles, UserRoles.Instructor],
+          });
+        }
         this.isLoading.set(false);
         this.visible.set(false);
-        this._router.navigate(['/dashboard']);
+        this._router.navigate(['/coaching/overview']);
       },
       error: (err) => {
         this.isLoading.set(false);

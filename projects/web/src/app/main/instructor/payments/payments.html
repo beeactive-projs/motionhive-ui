@@ -15,8 +15,29 @@
       <p-skeleton width="7.5rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       <p-skeleton width="8rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       } @else {
-      <p-button label="Open Stripe" icon="pi pi-external-link" severity="contrast" outlined size="small"
-        [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
+      <p-button
+        [label]="
+          !hasStripeAccount()
+            ? 'Set up payments'
+            : needsOnboardingFinish()
+              ? 'Finish setup'
+              : 'Open Stripe'
+        "
+        [icon]="
+          !hasStripeAccount()
+            ? 'pi pi-plus'
+            : needsOnboardingFinish()
+              ? 'pi pi-arrow-right'
+              : 'pi pi-external-link'
+        "
+        [severity]="needsOnboardingFinish() ? 'warn' : hasStripeAccount() ? 'contrast' : 'primary'"
+        [outlined]="hasStripeAccount() && !needsOnboardingFinish()"
+        size="small"
+        [loading]="dashboardLoading()"
+        (onClick)="openStripeOnboarding()"
+        fluid
+        class="w-1/2 sm:w-auto"
+      />
       @if(stripeOnboarded()) {
       <p-button label="Create invoice" icon="pi pi-plus" size="small" [disabled]="!stripeOnboarded()"
         pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="showCreateDialog.set(true)"
@@ -168,8 +189,26 @@
           <p class="text-sm mt-1">{{ description }}</p>
         </div>
       </div>
-      <p-button label="Complete onboarding" icon="pi pi-arrow-right" severity="warn" (onClick)="openStripeOnboarding()"
-        class="ml-auto" />
+      <p-button
+        [label]="
+          !hasStripeAccount()
+            ? 'Set up payments'
+            : needsOnboardingFinish()
+              ? 'Finish setup'
+              : 'Open Stripe'
+        "
+        [icon]="
+          !hasStripeAccount()
+            ? 'pi pi-plus'
+            : needsOnboardingFinish()
+              ? 'pi pi-arrow-right'
+              : 'pi pi-external-link'
+        "
+        severity="warn"
+        [loading]="dashboardLoading()"
+        (onClick)="openStripeOnboarding()"
+        class="ml-auto"
+      />
     </div>
   </p-card>
 </ng-template>

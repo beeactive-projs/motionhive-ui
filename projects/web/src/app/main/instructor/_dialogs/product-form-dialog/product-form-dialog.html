@@ -24,23 +24,27 @@
     <!-- Amount -->
     <div class="flex flex-col gap-1">
       <label for="productAmount" class="text-sm font-medium">Price</label>
-      <p-inputNumber id="productAmount" [(ngModel)]="formAmountCents" mode="currency" currency="RON" locale="ro-RO"
-        [minFractionDigits]="2" [min]="0.01" class="w-full" />
+      <p-inputNumber id="productAmount" [(ngModel)]="formAmountCents" mode="currency"
+        [currency]="displayCurrency()" [minFractionDigits]="2" [min]="0.01" fluid />
     </div>
 
     @if (isSubscription) {
-    <!-- Billing interval -->
-    <div class="grid grid-cols-2 gap-3">
-      <div class="flex flex-col gap-1">
-        <label for="productInterval" class="text-sm font-medium">Billing interval</label>
-        <p-select id="productInterval" [(ngModel)]="formInterval" [options]="intervalOptions" optionLabel="label"
-          optionValue="value" class="w-full" />
+    <!-- Billing cadence — read as: "Bill every <N> <interval>". The
+         "every N" lives on the left, the interval on the right; both
+         use `fluid` so they share the row equally without overflowing. -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium">Billing cadence</label>
+      <div class="grid grid-cols-[5rem_1fr] gap-2">
+        <p-inputNumber id="productIntervalCount" [(ngModel)]="formIntervalCount"
+          [min]="1" [max]="12" fluid />
+        <p-select id="productInterval" [(ngModel)]="formInterval"
+          [options]="intervalOptions" optionLabel="label" optionValue="value"
+          appendTo="body" fluid />
       </div>
-      <div class="flex flex-col gap-1">
-        <label for="productIntervalCount" class="text-sm font-medium">Every</label>
-        <p-inputNumber id="productIntervalCount" [(ngModel)]="formIntervalCount" [min]="1" [max]="12"
-          [showButtons]="true" class="w-full" />
-      </div>
+      <span class="text-xs text-surface-500">
+        Clients are charged every {{ formIntervalCount === 1 ? '' : formIntervalCount + ' ' }}{{ formInterval }}{{
+        formIntervalCount === 1 ? '' : 's' }}.
+      </span>
     </div>
     }
     } @else {

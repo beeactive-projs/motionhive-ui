@@ -9,6 +9,7 @@ import {
   InvoiceLineItemDetail,
   InvoiceListParams,
   InvoiceListResponse,
+  UpdateInvoicePayload,
 } from '../../models/payment/invoice.model';
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +36,18 @@ export class InvoiceService {
 
   create(payload: CreateInvoicePayload): Observable<Invoice> {
     return this._http.post<Invoice>(this.baseUrl, payload);
+  }
+
+  /**
+   * Edit a draft invoice in place. The API rejects edits on any
+   * non-DRAFT status; the UI should hide the Edit action accordingly so
+   * users don't get a 400 they can't recover from.
+   */
+  update(id: string, payload: UpdateInvoicePayload): Observable<Invoice> {
+    return this._http.patch<Invoice>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.INVOICE_UPDATE(id)}`,
+      payload,
+    );
   }
 
   /**

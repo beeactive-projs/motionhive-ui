@@ -28,10 +28,13 @@ export class OnboardingRefresh implements OnInit {
 
   private startOnboarding(): void {
     const origin = window.location.origin;
+    // Instructor payment routes are mounted at /coaching/onboarding/*;
+    // /payments/onboarding/* doesn't exist as a route and would 404
+    // after Stripe redirects back.
     this._onboardingService
       .start({
-        returnUrl: `${origin}/payments/onboarding/return`,
-        refreshUrl: `${origin}/payments/onboarding/refresh`,
+        returnUrl: `${origin}/coaching/onboarding/return`,
+        refreshUrl: `${origin}/coaching/onboarding/refresh`,
       })
       .subscribe({
         next: (res) => {

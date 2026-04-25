@@ -1,0 +1,64 @@
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-semibold uppercase tracking-wide text-surface-500 m-0">
+      Venues
+    </h3>
+    <button
+      type="button"
+      class="text-sm text-primary-600 hover:underline inline-flex items-center gap-1"
+      (click)="openVenueCreate()"
+    >
+      <i class="pi pi-plus text-xs"></i>Add venue
+    </button>
+  </div>
+
+  @if (venuesLoading()) {
+    <div class="flex flex-col gap-2">
+      <p-skeleton height="3.5rem" />
+      <p-skeleton height="3.5rem" />
+    </div>
+  } @else if (venues().length === 0) {
+    <p class="text-sm text-surface-500 m-0">
+      Gyms, parks, online or client locations where you hold sessions. Add one
+      to get started.
+    </p>
+  } @else {
+    @if (activeVenues().length > 0) {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        @for (v of activeVenues(); track v.id) {
+          <mh-venue-card
+            [venue]="v"
+            (edit)="openVenueEdit($event)"
+            (archive)="confirmVenueArchive($event)"
+            (remove)="confirmVenueRemove($event)"
+          />
+        }
+      </div>
+    }
+    @if (archivedVenues().length > 0) {
+      <div class="flex flex-col gap-2 mt-2">
+        <span class="text-xs font-semibold text-surface-500 uppercase tracking-wide">
+          Archived
+        </span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          @for (v of archivedVenues(); track v.id) {
+            <mh-venue-card
+              [venue]="v"
+              (edit)="openVenueEdit($event)"
+              (restore)="confirmVenueRestore($event)"
+              (remove)="confirmVenueRemove($event)"
+            />
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<mh-venue-form-dialog
+  [(visible)]="venueDialogVisible"
+  [venue]="editingVenue()"
+  (saved)="onVenueSaved($event)"
+/>
+
+<p-confirmDialog />

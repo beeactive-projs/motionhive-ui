@@ -16,7 +16,12 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { MessageService } from 'primeng/api';
-import { ProfileService, MyProfile, UpdateInstructorProfilePayload } from 'core';
+import {
+  MyProfile,
+  ProfileService,
+  UpdateInstructorProfilePayload,
+  showApiError,
+} from 'core';
 
 interface InstructorForm {
   displayName: string;
@@ -24,8 +29,6 @@ interface InstructorForm {
   specializations: string;
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
-  locationCity: string;
-  locationCountry: string;
 }
 
 @Component({
@@ -59,8 +62,6 @@ export class EditInstructorProfile {
     specializations: '',
     yearsOfExperience: null,
     isAcceptingClients: false,
-    locationCity: '',
-    locationCountry: '',
   });
 
   private readonly _initEffect = effect(() => {
@@ -72,8 +73,6 @@ export class EditInstructorProfile {
         specializations: ip?.specializations?.join(', ') ?? '',
         yearsOfExperience: ip?.yearsOfExperience ?? null,
         isAcceptingClients: ip?.isAcceptingClients ?? false,
-        locationCity: ip?.locationCity ?? '',
-        locationCountry: ip?.locationCountry ?? '',
       });
     }
   });
@@ -100,10 +99,6 @@ export class EditInstructorProfile {
       instrChanges.yearsOfExperience = f.yearsOfExperience ?? undefined;
     if (f.isAcceptingClients !== (ip?.isAcceptingClients ?? false))
       instrChanges.isAcceptingClients = f.isAcceptingClients;
-    if (f.locationCity !== (ip?.locationCity ?? ''))
-      instrChanges.locationCity = f.locationCity || undefined;
-    if (f.locationCountry !== (ip?.locationCountry ?? ''))
-      instrChanges.locationCountry = f.locationCountry || undefined;
 
     if (!Object.keys(instrChanges).length) {
       this.visible.set(false);
@@ -127,13 +122,14 @@ export class EditInstructorProfile {
         });
         this.saved.emit();
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.saving.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to update instructor profile.',
-        });
+        showApiError(
+          this._messageService,
+          'Error',
+          'Failed to update instructor profile.',
+          err,
+        );
       },
     });
   }

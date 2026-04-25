@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
@@ -56,6 +57,33 @@ export class Subscriptions implements OnInit {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _router = inject(Router);
+
+  /** Navigate to the membership detail page. Triggered by row click. */
+  openDetail(sub: Subscription): void {
+    this._router.navigate(['/coaching/subscriptions', sub.id]);
+  }
+
+  /**
+   * Plan name only — for the truncated first row of the Plan cell.
+   * Falls back to a short product-id stub if the join didn't return a
+   * product (legacy rows from before the snapshot was added).
+   */
+  planName(sub: Subscription): string {
+    if (sub.product?.name) return sub.product.name;
+    return sub.productId
+      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
+      : 'Plan';
+  }
+
+  /** Cadence subtitle for the Plan cell, e.g. "every 2 months" or "monthly". */
+  planCycle(sub: Subscription): string | null {
+    const p = sub.product;
+    if (!p?.interval) return null;
+    return p.intervalCount && p.intervalCount > 1
+      ? `every ${p.intervalCount} ${p.interval}s`
+      : `${p.interval}ly`;
+  }
 
   readonly subscriptions = signal<Subscription[]>([]);
   readonly totalRecords = signal(0);
@@ -72,6 +100,10 @@ export class Subscriptions implements OnInit {
     { label: 'All', value: undefined },
     { label: 'Active', value: SubscriptionStatuses.Active },
     { label: 'Trialing', value: SubscriptionStatuses.Trialing },
+    // Awaiting client confirmation — shown so instructors can find
+    // subscriptions where the client hasn't yet confirmed and paid the
+    // first invoice.
+    { label: 'Awaiting confirmation', value: SubscriptionStatuses.Incomplete },
     { label: 'Past due', value: SubscriptionStatuses.PastDue },
     { label: 'Canceled', value: SubscriptionStatuses.Canceled },
     { label: 'Paused', value: SubscriptionStatuses.Paused },
@@ -83,25 +115,35 @@ export class Subscriptions implements OnInit {
   readonly actionMenuItems = computed<MenuItem[]>(() => {
     const sub = this.actionMenuTarget();
     if (!sub) return [];
-    if (
-      sub.status !== SubscriptionStatuses.Active &&
-      sub.status !== SubscriptionStatuses.Trialing
-    ) {
-      return [];
-    }
-    return [
+    const items: MenuItem[] = [
       {
-        label: 'Cancel at period end',
-        icon: 'pi pi-times',
-        command: () => this.confirmCancel(sub),
+        label: 'View details',
+        icon: 'pi pi-arrow-right',
+        command: () => this.openDetail(sub),
       },
-      {
+    ];
+    if (
+      sub.status === SubscriptionStatuses.Active ||
+      sub.status === SubscriptionStatuses.Trialing
+    ) {
+      items.push({ separator: true });
+      // Same gating as the desktop action buttons: skip the
+      // "schedule" entry when it's already scheduled.
+      if (!sub.cancelAt) {
+        items.push({
+          label: 'Cancel at period end',
+          icon: 'pi pi-times',
+          command: () => this.confirmCancel(sub),
+        });
+      }
+      items.push({
         label: 'Cancel immediately',
         icon: 'pi pi-trash',
         styleClass: 'text-red-500',
         command: () => this.confirmCancelImmediately(sub),
-      },
-    ];
+      });
+    }
+    return items;
   });
 
   readonly Statuses = SubscriptionStatuses;
@@ -226,13 +268,43 @@ export class Subscriptions implements OnInit {
 
   readonly statusSeverity = getSubscriptionStatusSeverity;
 
+  /**
+   * Friendly client label: "First Last" if names are present, else
+   * the email, else the legacy ID-prefix fallback for old rows that
+   * predate the eager-load enrichment.
+   */
   clientDisplay(sub: Subscription): string {
+    const c = sub.client;
+    if (c) {
+      const fullName = `${c.firstName ?? ''} ${c.lastName ?? ''}`.trim();
+      return fullName || c.email;
+    }
     if (!sub.clientId) return 'Unknown client';
     return `Client #${sub.clientId.slice(0, 8).toUpperCase()}`;
   }
 
+  clientEmail(sub: Subscription): string | null {
+    return sub.client?.email ?? null;
+  }
+
+  /**
+   * Friendly plan label: the product name, with a small billing
+   * cadence suffix (e.g. "Premium · monthly"). Falls back to the
+   * legacy ID-prefix when the row pre-dates the join.
+   */
   planDisplay(sub: Subscription): string {
-    return sub.productId ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}` : 'Plan';
+    const p = sub.product;
+    if (p?.name) {
+      const cadence = p.interval
+        ? p.intervalCount && p.intervalCount > 1
+          ? ` · every ${p.intervalCount} ${p.interval}s`
+          : ` · ${p.interval}ly`
+        : '';
+      return `${p.name}${cadence}`;
+    }
+    return sub.productId
+      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
+      : 'Plan';
   }
 
   cardAccent(sub: Subscription): 'none' | 'primary' | 'danger' | 'success' {

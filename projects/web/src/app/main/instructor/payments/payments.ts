@@ -8,7 +8,12 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CurrencyRonPipe, EarningsService, StripeOnboardingService } from 'core';
+import {
+  CurrencyRonPipe,
+  EarningsService,
+  StripeOnboardingService,
+  StripeOnboardingStore,
+} from 'core';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -62,6 +67,7 @@ export class Payments {
   private readonly _router = inject(Router);
   private readonly _earningsService = inject(EarningsService);
   private readonly _onboardingService = inject(StripeOnboardingService);
+  private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
 
   private readonly _reloadSummary$ = new Subject<void>();
@@ -79,12 +85,15 @@ export class Payments {
     return tab && VALID_TABS.has(tab) ? (tab as PaymentTab) : PaymentTabs.Invoices;
   });
 
-  private readonly _onboardingStatus = toSignal(
-    this._onboardingService.getStatus().pipe(catchError(() => of(null))),
+  // Status comes from the shared store — single fetch across the
+  // whole app, refreshed only on demand. ensureLoaded() warms the
+  // cache the first time the page is visited.
+  readonly onboardingStatusLoading = computed(
+    () => this._onboardingStore.status() === undefined,
   );
-
-  readonly onboardingStatusLoading = computed(() => this._onboardingStatus() === undefined);
-  readonly stripeOnboarded = computed(() => !!this._onboardingStatus()?.account?.chargesEnabled);
+  readonly stripeOnboarded = this._onboardingStore.canIssueInvoices;
+  readonly hasStripeAccount = this._onboardingStore.hasAccount;
+  readonly needsOnboardingFinish = this._onboardingStore.needsOnboardingFinish;
 
   readonly summary = toSignal(
     this._reloadSummary$.pipe(
@@ -94,10 +103,54 @@ export class Payments {
     { initialValue: null },
   );
 
-  readonly pageLoaded = computed(() => this._onboardingStatus() !== undefined);
+  readonly pageLoaded = computed(
+    () => this._onboardingStore.status() !== undefined,
+  );
+
+  constructor() {
+    this._onboardingStore.ensureLoaded();
+  }
+
+  /**
+   * Force a live pull from Stripe via the shared store. Useful after
+   * the user returned from hosted onboarding when the webhook hasn't
+   * arrived yet (localhost dev especially). Every consumer reading
+   * the store's signals re-renders automatically.
+   */
+  refreshStatus(): void {
+    this._onboardingStore.refresh();
+  }
 
   openStripeOnboarding(): void {
     this.dashboardLoading.set(true);
+    // Route to Stripe-hosted onboarding when either:
+    //   - no account exists yet (create one), OR
+    //   - account exists but form isn't submitted (resume). Stripe's
+    //     Account Links API is idempotent per-account so resuming
+    //     continues the same KYC flow — no new account is created.
+    if (!this.hasStripeAccount() || this.needsOnboardingFinish()) {
+      const origin = window.location.origin;
+      this._onboardingService
+        .start({
+          returnUrl: `${origin}/coaching/onboarding/return`,
+          refreshUrl: `${origin}/coaching/onboarding/refresh`,
+        })
+        .subscribe({
+          next: (res) => {
+            window.location.href = res.url;
+          },
+          error: (err) => {
+            this.dashboardLoading.set(false);
+            this._messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: err.error?.message || 'Failed to start onboarding',
+            });
+          },
+        });
+      return;
+    }
+
     this._onboardingService.getDashboardLink().subscribe({
       next: (res) => {
         this.dashboardLoading.set(false);

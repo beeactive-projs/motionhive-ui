@@ -1,13 +1,16 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   effect,
   inject,
+  input,
   model,
   output,
   signal,
 } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { debounceTime, Subject, Subscription, startWith } from 'rxjs';
@@ -29,6 +32,7 @@ import {
   InvoiceService as PaymentInvoiceService,
   ProductService,
   ProductTypes,
+  StripeOnboardingStore,
   type InstructorClient,
   type Product,
 } from 'core';
@@ -103,13 +107,41 @@ export class CreateInvoiceDialog {
   private readonly _invoiceService = inject(PaymentInvoiceService);
   private readonly _clientService = inject(ClientService);
   private readonly _productService = inject(ProductService);
+  private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
   private readonly _fb = inject(FormBuilder);
+  // Needed to nudge OnPush change detection after the async `loadForEdit`
+  // hydrates the form with `emitEvent: false`. Without this, the
+  // template stays bound to the empty initial state.
+  private readonly _cdr = inject(ChangeDetectorRef);
 
   readonly visible = model(false);
   readonly saved = output<void>();
 
+  /**
+   * When set, the dialog opens in EDIT mode for an existing DRAFT
+   * invoice instead of CREATE mode. The recipient picker and "send
+   * immediately" controls are hidden — only editable fields (line items,
+   * due date, notes) are exposed. On submit we call the PATCH endpoint
+   * and the localStorage draft is left untouched (it belongs to the
+   * separate "new invoice" flow).
+   */
+  readonly editingInvoiceId = input<string | null>(null);
+
   readonly saving = signal(false);
+  readonly loadingForEdit = signal(false);
+  /** True when the dialog was opened with an `editingInvoiceId`. */
+  readonly isEditMode = computed(() => !!this.editingInvoiceId());
+  /**
+   * Locked recipient summary shown in edit mode, sourced from the
+   * loaded invoice (NOT the client picker). The dialog hides the
+   * picker in edit mode because the bill-to is fixed once the invoice
+   * exists on Stripe; this signal lets us render a small read-only
+   * "Bill to: <name>" header instead of leaving the section empty.
+   */
+  readonly _editRecipient = signal<{ name: string; email: string | null } | null>(
+    null,
+  );
   readonly clientOptions = signal<ClientOption[]>([]);
   readonly clientsLoading = signal(false);
   readonly productOptions = signal<ProductOption[]>([]);
@@ -117,6 +149,10 @@ export class CreateInvoiceDialog {
   readonly duePreset = signal<DuePreset>(14);
   readonly draftSavedAt = signal<Date | null>(null);
   readonly today = signal(new Date());
+  /** Uppercase ISO 4217 currency used in the amount inputs. Sourced
+   *  from the instructor's Stripe account; falls back to USD on error.
+   *  BE picks the real currency from the account, this is cosmetic. */
+  readonly displayCurrency = signal<string>('USD');
 
   readonly dueChipOptions: { label: string; value: DuePreset }[] = [
     { label: 'On receipt', value: 0 },
@@ -175,6 +211,20 @@ export class CreateInvoiceDialog {
     return this.clientOptions().find((c) => c.value === id) ?? null;
   });
 
+  /**
+   * Format the bill-to display name from an invoice's loaded client.
+   * Handles the four shapes we see: registered user with both names,
+   * with first name only, guest with name from stripe_customer, and
+   * email-only as a last resort.
+   */
+  private formatRecipientName(
+    client: { firstName: string | null; lastName: string | null; email: string } | null | undefined,
+  ): string {
+    if (!client) return 'Recipient';
+    const full = [client.firstName, client.lastName].filter((s): s is string => !!s).join(' ');
+    return full || client.email || 'Recipient';
+  }
+
   constructor() {
     // Debounced auto-save to localStorage — survives page refresh.
     this._autoSave$
@@ -187,13 +237,33 @@ export class CreateInvoiceDialog {
 
   private readonly _resetOnOpenEffect = effect(() => {
     const visible = this.visible();
+    const editId = this.editingInvoiceId();
     if (visible && !this._wasVisible) {
-      this.resetFromDraft();
-      if (!this._clientsLoaded) this.loadClients();
+      if (editId) {
+        // Edit mode: hydrate from the live invoice, do not touch
+        // localStorage draft (belongs to the new-invoice flow).
+        this.loadForEdit(editId);
+      } else {
+        this.resetFromDraft();
+      }
       if (!this._productsLoaded) this.loadProducts();
+      // Skip loading clients in edit mode — recipient is locked.
+      if (!editId && !this._clientsLoaded) this.loadClients();
+      this.loadDisplayCurrency();
     }
     this._wasVisible = visible;
   });
+
+  /**
+   * Pull the instructor's Stripe account default currency from the
+   * shared onboarding cache so the amount inputs render with the
+   * correct symbol. ensureLoaded() is a no-op once warmed.
+   */
+  private loadDisplayCurrency(): void {
+    this._onboardingStore.ensureLoaded();
+    const cur = this._onboardingStore.defaultCurrency();
+    this.displayCurrency.set(cur ? cur.toUpperCase() : 'USD');
+  }
 
   // ---------------------------------------------------------------
   // Form helpers
@@ -445,11 +515,109 @@ export class CreateInvoiceDialog {
   }
 
   // ---------------------------------------------------------------
+  // Edit-mode hydration
+  // ---------------------------------------------------------------
+
+  /**
+   * Hydrate the form from an existing draft invoice. We pull the
+   * invoice + its line items in parallel; line items live on Stripe so
+   * they're a separate fetch. On error we close the dialog because the
+   * user can't usefully edit something we can't load.
+   */
+  private loadForEdit(invoiceId: string): void {
+    this.loadingForEdit.set(true);
+    forkJoin({
+      invoice: this._invoiceService.get(invoiceId),
+      lineItems: this._invoiceService.getLineItems(invoiceId),
+    }).subscribe({
+      next: ({ invoice, lineItems }) => {
+        // ORDER MATTERS: reset() on a FormGroup wipes children that
+        // aren't named in the value object — including FormArrays. So
+        // we MUST reset the scalar fields FIRST and rebuild the
+        // line-items array AFTER, otherwise the lines we push get
+        // immediately erased by the reset.
+        const due = invoice.dueDate ? new Date(invoice.dueDate) : null;
+        this.duePreset.set(due ? 'custom' : 14);
+
+        this.form.reset(
+          {
+            clientUserId: invoice.clientId ?? '',
+            guestEmail: invoice.client?.email ?? '',
+            guestFirstName: invoice.client?.firstName ?? '',
+            guestLastName: invoice.client?.lastName ?? '',
+            notes: invoice.description ?? '',
+            customDueDate: due,
+            sendImmediately: false,
+          },
+          { emitEvent: false },
+        );
+
+        // Now wipe the FormArray and rebuild from server line items.
+        // The server returns description/quantity/amount per item; we
+        // can't infer productId (Stripe doesn't track that link in
+        // line items), so the lines come in as "manual" — fine because
+        // edit lets the user re-pick a product if they want.
+        for (const control of this.lineItems.controls) {
+          this._lineItemSubs.get(control as FormGroup)?.unsubscribe();
+          this._lineItemSubs.delete(control as FormGroup);
+        }
+        this.lineItems.clear({ emitEvent: false });
+
+        const items =
+          lineItems.length > 0
+            ? lineItems
+            : [{ description: '', quantity: 1, unitAmountCents: 0 } as never];
+        items.forEach((li) =>
+          this.lineItems.push(
+            this.createLineItemGroup({
+              productId: null,
+              name: li.description ?? '',
+              description: '',
+              amount: li.unitAmountCents / 100,
+              quantity: li.quantity,
+            }),
+            { emitEvent: false },
+          ),
+        );
+
+        // Keep the recipient picker hidden; edit mode locks it.
+        this.useManualEmail.set(!invoice.clientId);
+        this.draftSavedAt.set(null);
+        // Stash the recipient name so the locked summary in edit mode
+        // can render it without re-fetching the client list.
+        this._editRecipient.set({
+          name: this.formatRecipientName(invoice.client),
+          email: invoice.client?.email ?? null,
+        });
+        this.loadingForEdit.set(false);
+        // OnPush: every push above used `emitEvent: false` to avoid
+        // triggering the autosave observable. That also means change
+        // detection didn't run — without this nudge the template stays
+        // bound to the empty initial form values from when the dialog
+        // opened. One markForCheck rebinds everything in one pass.
+        this._cdr.markForCheck();
+      },
+      error: (err) => {
+        this.loadingForEdit.set(false);
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Could not load invoice',
+          detail: err?.error?.message || 'Try again in a moment.',
+        });
+        this.visible.set(false);
+      },
+    });
+  }
+
+  // ---------------------------------------------------------------
   // Draft persistence (localStorage)
   // ---------------------------------------------------------------
 
   private persistDraft(): void {
     if (this._suspendAutoSave) return;
+    // Edit mode never writes to the localStorage "new invoice" draft —
+    // that store is exclusively for the create flow.
+    if (this.editingInvoiceId()) return;
     try {
       const raw = this.form.getRawValue();
       const draft: StoredDraft = {
@@ -556,34 +724,43 @@ export class CreateInvoiceDialog {
   // ---------------------------------------------------------------
 
   submit(): void {
+    // Re-entrancy guard. Buttons in the template are disabled while
+    // saving() is true; this is the same check at the function level
+    // so an external caller (e.g. saveAsDraft -> submit chain) can't
+    // bypass the UI gate and double-fire a Stripe call.
+    if (this.saving()) return;
     this.form.markAllAsTouched();
 
-    if (this.useManualEmail()) {
-      const email = this.form.value.guestEmail?.trim();
-      const firstName = this.form.value.guestFirstName?.trim();
-      if (!email || this.form.get('guestEmail')?.invalid) {
+    // Recipient validation only matters in CREATE mode — in EDIT mode
+    // the recipient is locked and unchanged by the patch.
+    if (!this.isEditMode()) {
+      if (this.useManualEmail()) {
+        const email = this.form.value.guestEmail?.trim();
+        const firstName = this.form.value.guestFirstName?.trim();
+        if (!email || this.form.get('guestEmail')?.invalid) {
+          this._messageService.add({
+            severity: 'warn',
+            summary: 'Email required',
+            detail: 'Please enter a valid email address for the recipient.',
+          });
+          return;
+        }
+        if (!firstName) {
+          this._messageService.add({
+            severity: 'warn',
+            summary: 'Name required',
+            detail: 'Please enter at least a first name for the recipient.',
+          });
+          return;
+        }
+      } else if (!this.form.value.clientUserId) {
         this._messageService.add({
           severity: 'warn',
-          summary: 'Email required',
-          detail: 'Please enter a valid email address for the recipient.',
+          summary: 'Client required',
+          detail: 'Please select a client or enter an email address.',
         });
         return;
       }
-      if (!firstName) {
-        this._messageService.add({
-          severity: 'warn',
-          summary: 'Name required',
-          detail: 'Please enter at least a first name for the recipient.',
-        });
-        return;
-      }
-    } else if (!this.form.value.clientUserId) {
-      this._messageService.add({
-        severity: 'warn',
-        summary: 'Client required',
-        detail: 'Please select a client or enter an email address.',
-      });
-      return;
     }
 
     if (this.lineItems.invalid) {
@@ -634,6 +811,42 @@ export class CreateInvoiceDialog {
     const dueDate = this.resolvedDueDate();
     if (dueDate) {
       payload['dueDate'] = dueDate.toISOString().split('T')[0];
+    }
+
+    if (this.isEditMode()) {
+      // PATCH only ever sends editable fields. Bill-to, currency, and
+      // sendImmediately don't apply on the update endpoint.
+      const editId = this.editingInvoiceId()!;
+      const updatePayload: Record<string, unknown> = {
+        lineItems,
+        description: raw.notes?.trim() || undefined,
+      };
+      if (dueDate) updatePayload['dueDate'] = dueDate.toISOString().split('T')[0];
+
+      this._suspendAutoSave = true;
+      this._invoiceService.update(editId, updatePayload as never).subscribe({
+        next: () => {
+          this.saving.set(false);
+          this._suspendAutoSave = false;
+          this.visible.set(false);
+          this.saved.emit();
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Draft updated',
+            detail: 'Invoice changes saved.',
+          });
+        },
+        error: (err) => {
+          this.saving.set(false);
+          this._suspendAutoSave = false;
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: err.error?.message || 'Failed to update invoice',
+          });
+        },
+      });
+      return;
     }
 
     if (this.useManualEmail()) {

@@ -37,7 +37,7 @@ export class DiscoverInstructors {
 
   private readonly _autoSearchEffect = effect(() => {
     if (this.visible()) {
-      const city = this._authStore.user()?.location?.city;
+      const city = this._authStore.user()?.city;
       if (city) {
         this.searchQuery.set(city);
         this.search();
@@ -86,9 +86,9 @@ export class DiscoverInstructors {
     const instructor = this.selectedInstructor();
     if (!instructor) return;
 
-    this.requestingId.set(instructor.id);
+    this.requestingId.set(instructor.userId);
     this._clientService
-      .requestToBeClient(instructor.id, this.requestMessage() || undefined)
+      .requestToBeClient(instructor.userId, this.requestMessage() || undefined)
       .subscribe({
         next: () => {
           this.requestingId.set(null);

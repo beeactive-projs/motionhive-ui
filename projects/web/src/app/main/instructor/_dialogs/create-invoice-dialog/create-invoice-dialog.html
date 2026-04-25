@@ -1,5 +1,5 @@
 <p-dialog
-  header="Create invoice"
+  [header]="isEditMode() ? 'Edit draft invoice' : 'Create invoice'"
   [(visible)]="visible"
   [modal]="true"
   [style]="{ width: '68rem', maxWidth: '95vw' }"
@@ -13,7 +13,29 @@
     <!-- ================================================================ -->
     <div class="flex flex-col gap-5">
 
-      <!-- Bill to segmented control -->
+      <!-- Bill to: in EDIT mode the recipient is fixed (Stripe locks
+           it once the invoice exists), so show a read-only summary
+           instead of the picker. In CREATE mode show the full picker. -->
+      @if (isEditMode()) {
+        <section class="flex flex-col gap-2">
+          <span class="text-xs uppercase tracking-wide text-surface-500">Bill to</span>
+          @if (_editRecipient(); as r) {
+            <div class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/40 px-3 py-2.5">
+              <i class="pi pi-user text-surface-500"></i>
+              <div class="flex flex-col min-w-0">
+                <span class="text-sm font-medium truncate">{{ r.name }}</span>
+                @if (r.email) {
+                  <span class="text-xs text-surface-500 truncate">{{ r.email }}</span>
+                }
+              </div>
+              <span class="ml-auto text-[10px] uppercase tracking-wide text-surface-500 shrink-0">Locked</span>
+            </div>
+          } @else {
+            <div class="text-sm text-surface-500">Loading recipient…</div>
+          }
+        </section>
+      }
+      @if (!isEditMode()) {
       <section class="flex flex-col gap-2">
         <span class="text-xs uppercase tracking-wide text-surface-500">Bill to</span>
         <div class="inline-flex rounded-md bg-surface-100 dark:bg-surface-800 p-1 w-fit">
@@ -101,6 +123,7 @@
           </div>
         }
       </section>
+      }
 
       <!-- Line items -->
       <section class="flex flex-col gap-3">
@@ -188,13 +211,27 @@
                       />
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    class="text-xs text-surface-500 hover:text-surface-900 dark:hover:text-surface-100 underline underline-offset-2 self-start"
-                    (click)="unlinkPricing(i)"
-                  >
-                    Use custom entry instead
-                  </button>
+                  <!-- Discoverable swap-out: outlined button + helper
+                       text. The previous underlined link blended into
+                       the body copy, so trainers couldn't find the
+                       escape hatch when they wanted to tweak a single
+                       invoice without changing the catalog item. -->
+                  <div class="flex items-center justify-between gap-3 pt-2 border-t border-surface-200 dark:border-surface-700/50">
+                    <span class="text-xs text-surface-500 leading-tight">
+                      Need a one-off price or description for this invoice?
+                    </span>
+                    <p-button
+                      type="button"
+                      icon="pi pi-pencil"
+                      label="Edit as custom"
+                      severity="secondary"
+                      [outlined]="true"
+                      size="small"
+                      pTooltip="Unlock all fields. The pricing item stays untouched."
+                      tooltipPosition="top"
+                      (onClick)="unlinkPricing(i)"
+                    />
+                  </div>
                 </div>
               } @else {
                 <!-- Custom state: freeform fields + link to pricing catalog -->
@@ -248,12 +285,11 @@
                     <p-inputNumber
                       formControlName="amount"
                       mode="currency"
-                      currency="RON"
-                      locale="ro-RO"
+                      [currency]="displayCurrency()"
                       [minFractionDigits]="2"
                       [min]="0.5"
                       [allowEmpty]="true"
-                      placeholder="0,00 RON"
+                      placeholder="0.00"
                       (onInput)="onAmountInput(i, $event)"
                       styleClass="w-full"
                       [inputStyleClass]="'w-full'"
@@ -296,7 +332,7 @@
 
               <div class="flex justify-between items-center pt-2 border-t border-surface-200 dark:border-surface-700/50">
                 <span class="text-xs text-surface-500">Line subtotal</span>
-                <span class="text-sm font-semibold tabular-nums">{{ (lineSubtotalCents(i) / 100).toFixed(2) }} RON</span>
+                <span class="text-sm font-semibold tabular-nums">{{ (lineSubtotalCents(i) / 100).toFixed(2) }} {{ displayCurrency() }}</span>
               </div>
             </div>
           }
@@ -381,18 +417,19 @@
       <section class="rounded-lg border border-surface-200 dark:border-surface-700 p-4 bg-surface-50 dark:bg-surface-900/60">
         <div class="flex items-center justify-between py-1 text-sm text-surface-600 dark:text-surface-400">
           <span>Subtotal</span>
-          <span class="tabular-nums">{{ (subtotalCents() / 100).toFixed(2) }} RON</span>
+          <span class="tabular-nums">{{ (subtotalCents() / 100).toFixed(2) }} {{ displayCurrency() }}</span>
         </div>
         <div class="h-px bg-surface-200 dark:bg-surface-700 my-2"></div>
         <div class="flex items-center justify-between py-1">
           <span class="text-xs uppercase tracking-wide text-surface-500">Total</span>
           <span class="font-heading text-2xl font-semibold text-primary-500 tabular-nums">
-            {{ (totalCents() / 100).toFixed(2) }} RON
+            {{ (totalCents() / 100).toFixed(2) }} {{ displayCurrency() }}
           </span>
         </div>
       </section>
 
-      <!-- Delivery -->
+      <!-- Delivery — hidden in edit mode (use the "Send" action on the list) -->
+      @if (!isEditMode()) {
       <section class="flex flex-col gap-2">
         <span class="text-xs uppercase tracking-wide text-surface-500">Delivery</span>
         <label class="flex items-center gap-2 cursor-pointer select-none">
@@ -403,6 +440,7 @@
           Leave unchecked to keep it as a draft — you can review it and send it from the list later.
         </p>
       </section>
+      }
     </aside>
   </form>
 
@@ -418,68 +456,98 @@
         }
       </div>
 
-      <!-- Action row: on mobile, Send is full-width at the bottom with the
-           two secondaries stacked above it. On desktop it's a single row. -->
+      <!-- Action row -->
       <div class="flex items-center gap-2 justify-end">
-        <p-button
-          type="button"
-          label="Close"
-          severity="secondary"
-          [text]="true"
-          size="small"
-          pTooltip="Changes are kept as a draft"
-          tooltipPosition="top"
-          (onClick)="visible.set(false)"
-        />
-        <!-- Save-as-draft: full label on desktop, short on mobile.
-             We render two buttons conditionally on breakpoint because
-             p-button's `label` input accepts a static string — we can't
-             reactively swap the label inside the same instance. -->
-        <p-button
-          type="button"
-          icon="pi pi-save"
-          label="Save as draft"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          styleClass="hidden sm:inline-flex"
-          [loading]="saving() && !form.controls.sendImmediately.value"
-          (onClick)="saveAsDraft()"
-        />
-        <p-button
-          type="button"
-          icon="pi pi-save"
-          label="Draft"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          styleClass="sm:hidden"
-          pTooltip="Save as draft"
-          tooltipPosition="top"
-          [loading]="saving() && !form.controls.sendImmediately.value"
-          (onClick)="saveAsDraft()"
-        />
-        <!-- Send: full label with amount on desktop, short on mobile -->
-        <p-button
-          type="button"
-          icon="pi pi-send"
-          [label]="form.controls.sendImmediately.value
-            ? 'Send invoice · ' + ((totalCents() / 100).toFixed(2)) + ' RON'
-            : 'Create invoice'"
-          size="small"
-          styleClass="hidden sm:inline-flex"
-          [loading]="saving() && !!form.controls.sendImmediately.value"
-          (onClick)="submit()"
-        />
-        <p-button
-          type="button"
-          icon="pi pi-send"
-          [label]="form.controls.sendImmediately.value ? 'Send' : 'Create'"
-          size="small"
-          styleClass="sm:hidden"
-          [loading]="saving() && !!form.controls.sendImmediately.value"
-          (onClick)="submit()"
-        />
+        @if (isEditMode()) {
+          <p-button
+            type="button"
+            label="Cancel"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            (onClick)="visible.set(false)"
+          />
+          <p-button
+            type="button"
+            icon="pi pi-check"
+            label="Save changes"
+            size="small"
+            [loading]="saving()"
+            [disabled]="loadingForEdit()"
+            (onClick)="submit()"
+          />
+        } @else {
+          <!-- All action buttons are disabled while saving() is true.
+               Without this, a fast user can click "Save as draft" then
+               "Send invoice" before the first request resolves and we'd
+               create TWO invoices in Stripe + DB. The button-level
+               re-entrancy guard in submit() catches it server-side too,
+               but disabling them here is the friendly UX. -->
+          <p-button
+            type="button"
+            label="Close"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            pTooltip="Changes are kept as a draft"
+            tooltipPosition="top"
+            [disabled]="saving()"
+            (onClick)="visible.set(false)"
+          />
+          <!-- Save-as-draft: full label on desktop, short on mobile.
+               We render two buttons conditionally on breakpoint because
+               p-button's `label` input accepts a static string — we can't
+               reactively swap the label inside the same instance. -->
+          <p-button
+            type="button"
+            icon="pi pi-save"
+            label="Save as draft"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            styleClass="hidden sm:inline-flex"
+            [loading]="saving() && !form.controls.sendImmediately.value"
+            [disabled]="saving()"
+            (onClick)="saveAsDraft()"
+          />
+          <p-button
+            type="button"
+            icon="pi pi-save"
+            label="Draft"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            styleClass="sm:hidden"
+            pTooltip="Save as draft"
+            tooltipPosition="top"
+            [loading]="saving() && !form.controls.sendImmediately.value"
+            [disabled]="saving()"
+            (onClick)="saveAsDraft()"
+          />
+          <!-- Send: full label with amount on desktop, short on mobile -->
+          <p-button
+            type="button"
+            icon="pi pi-send"
+            [label]="form.controls.sendImmediately.value
+              ? 'Send invoice · ' + ((totalCents() / 100).toFixed(2)) + ' ' + displayCurrency()
+              : 'Create invoice'"
+            size="small"
+            styleClass="hidden sm:inline-flex"
+            [loading]="saving() && !!form.controls.sendImmediately.value"
+            [disabled]="saving()"
+            (onClick)="submit()"
+          />
+          <p-button
+            type="button"
+            icon="pi pi-send"
+            [label]="form.controls.sendImmediately.value ? 'Send' : 'Create'"
+            size="small"
+            styleClass="sm:hidden"
+            [loading]="saving() && !!form.controls.sendImmediately.value"
+            [disabled]="saving()"
+            (onClick)="submit()"
+          />
+        }
       </div>
     </div>
   </ng-template>

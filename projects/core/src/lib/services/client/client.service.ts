@@ -30,11 +30,15 @@ export class ClientService {
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }
 
-  getMyInstructors(page = 1, limit = 10): Observable<InstructorListResponse> {
-    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+  getMyInstructors(): Observable<InstructorListResponse> {
     return this._http.get<InstructorListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.MY_INSTRUCTORS}`,
-      { params },
+    );
+  }
+
+  leaveInstructor(instructorId: string): Observable<InstructorClient> {
+    return this._http.delete<InstructorClient>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.LEAVE_INSTRUCTOR(instructorId)}`,
     );
   }
 

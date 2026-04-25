@@ -12,6 +12,7 @@ import {
   PayInvoiceResponse,
 } from '../../models/payment/invoice.model';
 import {
+  Subscription,
   SubscriptionListParams,
   SubscriptionListResponse,
 } from '../../models/payment/subscription.model';
@@ -95,6 +96,18 @@ export class ClientPaymentService {
     return this._http.get<SubscriptionListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_SUBSCRIPTIONS}`,
       { params: httpParams },
+    );
+  }
+
+  /**
+   * Cancel one of MY subscriptions. Always at-period-end on the
+   * server: the client keeps access through the rest of the cycle
+   * they already paid for.
+   */
+  cancelMySubscription(id: string): Observable<Subscription> {
+    return this._http.post<Subscription>(
+      `${environment.apiUrl}${API_ENDPOINTS.PAYMENTS.MY_SUBSCRIPTION_CANCEL(id)}`,
+      {},
     );
   }
 

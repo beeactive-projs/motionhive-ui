@@ -17,15 +17,25 @@
 
     <div class="flex flex-col gap-2">
       <label for="epiPhone" class="text-sm font-medium">Phone</label>
-      <input id="epiPhone" type="text" pInputText fluid [ngModel]="form().phone"
-        (ngModelChange)="updateField('phone', $event)" placeholder="+1 555 000 0000" />
+      <mh-phone-input
+        inputId="epiPhone"
+        [value]="form().phone"
+        (valueChange)="updateField('phone', $event)"
+      />
     </div>
 
     <div class="flex flex-col gap-2">
       <label class="text-sm font-medium">Location</label>
       <mh-location-picker [location]="form().location"
         (locationChange)="updateField('location', $event)" />
-      <span class="text-xs text-surface-400">Used to suggest nearby instructors.</span>
+      @if (countryLocked()) {
+        <span class="text-xs text-surface-400">
+          You can update your city, but your country is locked because payments
+          are set up on your account. Contact support if you need to migrate.
+        </span>
+      } @else {
+        <span class="text-xs text-surface-400">Used to suggest nearby instructors.</span>
+      }
     </div>
 
   </div>

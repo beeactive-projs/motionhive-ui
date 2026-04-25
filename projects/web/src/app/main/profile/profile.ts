@@ -10,6 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClientPaymentService,
+  ClientService,
   MyBillingCounts,
   MyProfile,
   ProfileService,
@@ -21,11 +22,13 @@ import { CardModule } from 'primeng/card';
 import { Button } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { Details } from './tabs/details/details';
+import { ProfileCoaches } from './tabs/coaches/coaches';
 import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
 
 export const ProfileTabs = {
   Details: 'details',
+  Coaches: 'coaches',
   Invoices: 'invoices',
   Memberships: 'memberships',
 } as const;
@@ -47,6 +50,7 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
     Button,
     ToastModule,
     Details,
+    ProfileCoaches,
     MyInvoices,
     MySubscriptions,
   ],
@@ -58,6 +62,7 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
 export class Profile implements OnInit {
   private readonly _profileService = inject(ProfileService);
   private readonly _clientPaymentService = inject(ClientPaymentService);
+  private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
@@ -67,6 +72,7 @@ export class Profile implements OnInit {
   readonly profile = signal<MyProfile | null>(null);
   readonly loading = signal(true);
   readonly counts = signal<MyBillingCounts | null>(null);
+  readonly incomingRequestsCount = signal(0);
 
   private readonly _queryParams = toSignal(this._route.queryParamMap, {
     initialValue: this._route.snapshot.queryParamMap,
@@ -90,6 +96,7 @@ export class Profile implements OnInit {
   ngOnInit(): void {
     this.loadProfile();
     this.loadCounts();
+    this.loadIncomingRequestsCount();
   }
 
   loadProfile(): void {
@@ -117,6 +124,16 @@ export class Profile implements OnInit {
         // Counts are non-critical; tabs fall back to Details-only.
         this.counts.set(null);
       },
+    });
+  }
+
+  private loadIncomingRequestsCount(): void {
+    this._clientService.getPendingRequests().subscribe({
+      next: (requests) =>
+        this.incomingRequestsCount.set(
+          requests.filter((r) => r.type === 'INSTRUCTOR_TO_CLIENT').length,
+        ),
+      error: () => this.incomingRequestsCount.set(0),
     });
   }
 

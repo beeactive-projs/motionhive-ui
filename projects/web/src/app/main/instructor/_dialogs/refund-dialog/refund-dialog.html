@@ -15,7 +15,8 @@
     <!-- Amount -->
     <div class="flex flex-col gap-1">
       <label for="refundAmount" class="text-sm font-medium">Refund amount</label>
-      <p-inputNumber id="refundAmount" [(ngModel)]="formAmount" mode="currency" currency="RON" locale="ro-RO"
+      <p-inputNumber id="refundAmount" [(ngModel)]="formAmount" mode="currency"
+        [currency]="p.currency.toUpperCase()"
         [minFractionDigits]="2" [min]="0.01" [max]="maxRefundable" class="w-full" />
     </div>
 
