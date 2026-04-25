@@ -46,6 +46,9 @@ export * from './lib/models/blog/blog.model';
 export * from './lib/models/feedback/feedback.enums';
 export * from './lib/models/feedback/feedback.model';
 
+// Models - Search
+export * from './lib/models/search/search.model';
+
 // Models - Waitlist
 export * from './lib/models/waitlist/waitlist.enums';
 export * from './lib/models/waitlist/waitlist.model';
@@ -81,6 +84,8 @@ export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
 export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';
+export * from './lib/services/invitation/invitation.service';
+export * from './lib/services/search/search.service';
 export * from './lib/services/waitlist/waitlist.service';
 export * from './lib/services/error-dialog/error-dialog.service';
 export * from './lib/services/theme/theme.service';
@@ -102,6 +107,7 @@ export * from './lib/directives/stripe-iframe.directive';
 
 // Stores
 export * from './lib/stores/auth.store';
+export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
 
 // Interceptors

@@ -8,7 +8,6 @@ import {
   inject,
   DestroyRef,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
@@ -17,9 +16,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { FeedbackService, Logo, NavItem, NavSection } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
-import { InputIcon } from 'primeng/inputicon';
-import { IconField } from 'primeng/iconfield';
-import { InputText } from 'primeng/inputtext';
+import { SearchModal } from '../../_shared/components/search-modal/search-modal';
+import { SearchTriggerService } from '../../_shared/components/search-modal/search-trigger.service';
 
 @Component({
   selector: 'mh-sidenav-layout',
@@ -31,10 +29,7 @@ import { InputText } from 'primeng/inputtext';
     ThemeToggleComponent,
     Logo,
     ProfileMenu,
-    InputIcon,
-    IconField,
-    FormsModule,
-    InputText,
+    SearchModal,
   ],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',
@@ -44,6 +39,7 @@ export class SidenavLayoutComponent {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _searchTrigger = inject(SearchTriggerService);
   private readonly _lgQuery = window.matchMedia('(min-width: 1024px)');
 
   readonly navSections = input.required<ReadonlyArray<NavSection>>();
@@ -57,8 +53,6 @@ export class SidenavLayoutComponent {
   sidebarOpen = signal(this._lgQuery.matches);
   sidebarAnimating = signal(false);
   readonly showBackdrop = computed(() => this.sidebarOpen() && !this._isDesktop());
-
-  readonly keyword = signal('');
 
   /** Close sidebar on navigation when in over mode (< lg). */
   private readonly _autoCloseOnNav = this._router.events
@@ -82,12 +76,20 @@ export class SidenavLayoutComponent {
 
     this._lgQuery.addEventListener('change', onResize);
     this._destroyRef.onDestroy(() => this._lgQuery.removeEventListener('change', onResize));
+
+    // Global Cmd/Ctrl-K opens the search modal — Slack/GitHub/Linear pattern.
+    const onKeydown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        this._searchTrigger.toggle();
+      }
+    };
+    window.addEventListener('keydown', onKeydown);
+    this._destroyRef.onDestroy(() => window.removeEventListener('keydown', onKeydown));
   }
 
-  searchByKeyword(): void {}
-
-  onKeywordClear(): void {
-    this.keyword.set('');
+  openSearch(): void {
+    this._searchTrigger.open();
   }
 
   openFeedback(): void {

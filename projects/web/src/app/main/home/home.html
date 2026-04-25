@@ -1,0 +1,297 @@
+<div class="home">
+  <!-- 1. Founding banner — hero -->
+  <section class="hero">
+    <div class="hero__honeycomb" aria-hidden="true"></div>
+
+    <div class="hero__brand" aria-hidden="true">
+      <div class="hero__brand-hex"></div>
+      <img class="hero__brand-mark" src="svg/logo-honey.svg" alt="" />
+    </div>
+
+    <div class="hero__content">
+      <p class="hero__eyebrow">
+        <span class="hero__dot"></span> Founding member
+      </p>
+      <h1 class="hero__title">
+        Welcome to the start of MotionHive, {{ firstName() }}.
+      </h1>
+      <p class="hero__body">
+        We're brand new — a few instructors, a handful of sessions, and a community that's just
+        starting to form. The hive grows with everyone who joins.
+      </p>
+      <div class="hero__actions">
+        <p-button
+          label="Invite a friend"
+          icon="pi pi-user-plus"
+          severity="warn"
+          (onClick)="onInviteFriend()"
+        />
+        <p-button
+          label="Read founders' note"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          text
+          severity="warn"
+          (onClick)="onReadFoundersNote()"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. This week's buzz — moved up so the page has a pulse straight after the hero -->
+  <section class="home-section">
+    <mh-section-header
+      eyebrow="This week"
+      title="What's happening in the hive"
+      subtitle="Fresh moves from the platform — every join, every session, every milestone."
+    />
+    <!-- TODO: replace with a real recent-activity stream once the notification module ships. -->
+    <ul class="buzz-list">
+      @for (b of buzz(); track b.text; let i = $index) {
+        <li class="buzz-list__item">
+          <mh-hex [tone]="b.tone" size="md">
+            <i class="pi" [class.pi-bolt]="i % 2 === 0" [class.pi-star]="i % 2 === 1"></i>
+          </mh-hex>
+          <span class="buzz-list__text">{{ b.text }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- 3. Instructors carousel -->
+  <section class="home-section">
+    <mh-section-header
+      eyebrow="Coaches"
+      title="Meet the coaches building MotionHive"
+      [subtitle]="hasInstructorsCarousel() ? 'Swipe through the people teaching here.' : 'They\'re on the way — be one of the first to follow.'"
+    />
+
+    @if (instructorsLoading()) {
+      <div class="loading-row">
+        <p-progressspinner class="w-8! h-8!" strokeWidth="3" />
+      </div>
+    } @else if (!hasInstructorsCarousel()) {
+      <article class="growth-card">
+        <mh-hex tone="honey-soft" size="xl"><i class="pi pi-users"></i></mh-hex>
+        <div class="growth-card__text">
+          <h3 class="growth-card__title">
+            @if (instructors().length === 0) {
+              We're picking the first instructors right now
+            } @else {
+              The hive is growing — slowly, on purpose
+            }
+          </h3>
+          <p class="growth-card__body">
+            Every coach here is someone we've trained with. Know one we should reach out to? Send
+            them our way.
+          </p>
+        </div>
+        <div class="growth-card__actions">
+          <p-button
+            label="Suggest a coach"
+            icon="pi pi-user-plus"
+            severity="warn"
+            (onClick)="onSuggestSomeone()"
+          />
+        </div>
+      </article>
+    } @else {
+      <p-carousel
+        [value]="instructors()"
+        [numVisible]="4"
+        [numScroll]="1"
+        [responsiveOptions]="carouselResponsive"
+        [showIndicators]="false"
+        [circular]="true"
+        [autoplayInterval]="autoplayInterval"
+        class="hive-carousel"
+      >
+        <ng-template let-ins #item>
+          <div class="hive-carousel__cell">
+            <mh-instructor-card [instructor]="ins" (followClick)="onFollowInstructor($event)" />
+          </div>
+        </ng-template>
+      </p-carousel>
+    }
+  </section>
+
+  <!-- 4. Groups carousel -->
+  <section class="home-section">
+    <mh-section-header
+      eyebrow="Groups"
+      title="Fresh from the hive"
+      [subtitle]="hasGroupsCarousel() ? (isInstructor() ? 'The groups you run.' : 'Groups you\'re part of.') : 'When we hit two groups, they\'ll show up here.'"
+    />
+
+    @if (groupsLoading()) {
+      <div class="loading-row">
+        <p-progressspinner class="w-8! h-8!" strokeWidth="3" />
+      </div>
+    } @else if (!hasGroupsCarousel()) {
+      <article class="growth-card">
+        <mh-hex tone="teal-soft" size="xl"><i class="pi pi-sitemap"></i></mh-hex>
+        <div class="growth-card__text">
+          <h3 class="growth-card__title">
+            @if (groups().length === 0) {
+              No groups yet — but the first ones are forming
+            } @else {
+              One group so far. Two and it's a row.
+            }
+          </h3>
+          <p class="growth-card__body">
+            Groups start because two people want one to exist. Tell us what you'd train for and
+            we'll help spin it up.
+          </p>
+        </div>
+        <div class="growth-card__actions">
+          <p-button
+            label="Suggest a group"
+            icon="pi pi-plus"
+            severity="warn"
+            (onClick)="onSuggestGroup()"
+          />
+        </div>
+      </article>
+    } @else {
+      <p-carousel
+        [value]="groups()"
+        [numVisible]="4"
+        [numScroll]="1"
+        [responsiveOptions]="carouselResponsive"
+        [showIndicators]="false"
+        [circular]="true"
+        [autoplayInterval]="autoplayInterval"
+        class="hive-carousel"
+      >
+        <ng-template let-g #item>
+          <div class="hive-carousel__cell">
+            <mh-group-card
+              [group]="g"
+              [joined]="!isInstructor()"
+              (action)="onGroupAction($event)"
+            />
+          </div>
+        </ng-template>
+      </p-carousel>
+    }
+  </section>
+
+  <!-- 4b. Blog carousel -->
+  <section class="home-section">
+    <mh-section-header
+      eyebrow="From the journal"
+      title="Reads from the hive"
+      [subtitle]="hasPostsCarousel() ? 'Training notes, founder updates, and stories from the platform.' : 'Articles are coming — we\'re writing the first ones now.'"
+      actionLabel="Read all"
+      (actionClick)="onReadAllPosts()"
+    />
+
+    @if (postsLoading()) {
+      <div class="loading-row">
+        <p-progressspinner class="w-8! h-8!" strokeWidth="3" />
+      </div>
+    } @else if (!hasPostsCarousel()) {
+      <article class="growth-card">
+        <mh-hex tone="navy-soft" size="xl"><i class="pi pi-book"></i></mh-hex>
+        <div class="growth-card__text">
+          <h3 class="growth-card__title">No articles published yet</h3>
+          <p class="growth-card__body">
+            We're working on the first wave — training tips, founder notes, and stories from
+            instructors. Check the journal soon.
+          </p>
+        </div>
+        <div class="growth-card__actions">
+          <p-button
+            label="Visit the journal"
+            icon="pi pi-external-link"
+            iconPos="right"
+            severity="warn"
+            (onClick)="onReadAllPosts()"
+          />
+        </div>
+      </article>
+    } @else {
+      <p-carousel
+        [value]="posts()"
+        [numVisible]="3"
+        [numScroll]="1"
+        [responsiveOptions]="carouselResponsive"
+        [showIndicators]="false"
+        [circular]="true"
+        [autoplayInterval]="autoplayInterval"
+        class="hive-carousel"
+      >
+        <ng-template let-post #item>
+          <div class="hive-carousel__cell">
+            <mh-blog-card [post]="post" (readClick)="onReadPost($event)" />
+          </div>
+        </ng-template>
+      </p-carousel>
+    }
+  </section>
+
+  <!-- 5. Help build the hive -->
+  <section class="home-section">
+    <mh-section-header
+      eyebrow="Help out"
+      title="Help build the hive"
+      subtitle="MotionHive is small on purpose. These three things make it bigger — in the right way."
+    />
+    <div class="contrib-grid">
+      <mh-contrib-card
+        icon="pi pi-users"
+        tone="honey"
+        title="Invite a friend"
+        body="Bring someone you'd actually train with. Their first session is on us, yours too."
+        cta="Send invite"
+        (ctaClick)="onInviteFriend()"
+      />
+      <mh-contrib-card
+        icon="pi pi-megaphone"
+        tone="coral"
+        title="Suggest an instructor"
+        body="Know a great coach? We'll reach out and see if they want to teach here."
+        cta="Suggest someone"
+        (ctaClick)="onSuggestSomeone()"
+      />
+      <mh-contrib-card
+        icon="pi pi-bolt"
+        tone="teal"
+        title="Tell us what's missing"
+        body="Vote on what we build next, or write us a feature request — we read every one."
+        cta="Share an idea"
+        (ctaClick)="onShareIdea()"
+      />
+    </div>
+  </section>
+
+  <!-- 6. Roadmap -->
+  <section class="home-section">
+    <article class="roadmap">
+      <header class="roadmap__head">
+        <div class="roadmap__head-text">
+          <p class="roadmap__eyebrow">Honest roadmap</p>
+          <h2 class="roadmap__title">What we're building next</h2>
+          <p class="roadmap__sub">
+            No marketing, no maybes. The four things on the workbench right now.
+          </p>
+        </div>
+        <span class="roadmap__version">v0.4</span>
+      </header>
+      <div class="roadmap__list">
+        @for (r of roadmap(); track r.title) {
+          <mh-roadmap-row
+            [when]="r.when"
+            [active]="r.active"
+            [title]="r.title"
+            [sub]="r.sub"
+            [status]="r.status"
+          />
+        }
+      </div>
+    </article>
+  </section>
+</div>
+
+<mh-invite-friend-dialog [(visible)]="inviteOpen" />
+<mh-suggest-instructor-dialog [(visible)]="suggestInstructorOpen" />

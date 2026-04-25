@@ -80,6 +80,28 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - Components read store values via `store.value()` in templates
 - No NgRx or BehaviorSubject — signals only
 
+### Stores in `core`
+
+- **`AuthStore`** — current user, roles, isAuthenticated. `setUser`/`clearUser`. Patched in-place when a role changes mid-session (e.g. become-instructor) so guards downstream see the new role without a hard reload.
+- **`StripeOnboardingStore`** — single source of truth for the instructor's Stripe Connect status across the app. Replaces 6+ places that each hit `/payments/onboarding/status`. Signals: `status`, `loading`, `hasAccount`, `canIssueInvoices`, `needsOnboardingFinish`, `defaultCurrency`. Methods: `ensureLoaded()` (idempotent), `refresh()` (force live pull from Stripe), `reset()` (logout). Components read the signals and call `ensureLoaded()` on mount.
+
+### Shared utilities (`core/lib/utils/`)
+
+- **`api-error.utils`** — `apiErrorMessage(err, fallback)` and `showApiError(messageService, summary, fallback, err)`. Replaces 25+ copies of `err.error?.message || 'Failed to X'`. Use `showApiError` for error toasts; `apiErrorMessage` when severity isn't error or you need just the string.
+- **`url.utils`** — `normalizeUrl(input)` accepts `zoom.us/j/123` or `https://zoom.us/j/123` and returns canonical `https://…` (or `null` if it can't be coerced safely). Rejects `javascript:`, `data:`, etc. `isValidUrl` predicate variant. `detectMeetingProvider(url)` returns `'ZOOM' | 'GOOGLE_MEET' | 'TEAMS' | null` from the hostname.
+
+### Shared components (`web/src/app/_shared/components/`)
+
+- **`mh-location-picker`** — Nominatim autocomplete returning `PickedLocation` (line1, city, region, postalCode, countryCode, country, lat, lng, displayName). Two-way `[(location)]`. Optional `disabled` for read-only state.
+- **`mh-phone-input`** — country flag + calling code dropdown + national number input. Emits **E.164** (`+40712345678`) via `[(value)]`. Country list: `STRIPE_CONNECT_COUNTRIES` from core. Validation debounced 400ms; sanitizes letters at the source. The country trigger is centered; the SCSS overrides PrimeNG's `.p-select-label` to align with the adjacent input.
+- **`mh-user-search-autocomplete`** — async user lookup with avatar + name display.
+- **Venue components** live under `web/src/app/main/instructor/venues/`: `VenueCard` (compact list item, edit/archive/restore/remove actions), `VenueFormDialog` (kind-driven form, ONLINE auto-detects provider from URL), and the parent `VenuesSection` mounted inside the profile Coaching card.
+
+### Constants in `core` (`lib/constants/`)
+
+- **`countries.const`** — `STRIPE_CONNECT_COUNTRIES` (46 ISO 3166-1 alpha-2 codes Stripe Connect supports), `isStripeSupportedCountry()`, `countryNameFromCode()`, `countryFlagEmoji()` (derives 🇷🇴 from `'RO'` via Regional Indicator Symbols — zero assets).
+- **`api-endpoints.const`** — endpoint string constants. Includes `VENUES`, `PAYMENTS.ONBOARDING_REFRESH_STATUS`, `AUTH.RESEND_VERIFICATION`.
+
 ### Styling
 
 - Tailwind utility classes in templates (primary)

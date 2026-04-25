@@ -1,0 +1,143 @@
+<p-toast position="bottom-center" />
+
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [appendTo]="'body'"
+  [style]="{ width: '92vw', maxWidth: '480px' }"
+  (onHide)="onDialogHide()"
+  header=" "
+>
+  <div class="invite-friend">
+    <div class="invite-friend__hero">
+      <span class="invite-friend__bee">🐝</span>
+    </div>
+
+    <h2 class="invite-friend__title">Bring a friend, train together.</h2>
+    <p class="invite-friend__body">
+      Their first session is on us — yours too.
+    </p>
+
+    <p-tabs value="link">
+      <p-tablist>
+        <p-tab value="link">
+          <i class="pi pi-link"></i>
+          <span>Get a link</span>
+        </p-tab>
+        <p-tab value="email">
+          <i class="pi pi-envelope"></i>
+          <span>Send an email</span>
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="link">
+          <div class="invite-friend__panel">
+            <p class="invite-friend__hint">
+              Share this link anywhere — WhatsApp, Slack, a text message.
+            </p>
+            <input
+              pInputText
+              type="text"
+              readonly
+              [value]="inviteLink()"
+              fluid
+              class="invite-friend__link-input"
+              (focus)="onLinkFocus($event)"
+            />
+            <div class="invite-friend__actions">
+              <p-button
+                label="Copy link"
+                icon="pi pi-copy"
+                severity="warn"
+                fluid
+                (onClick)="onCopy()"
+              />
+              @if (canShare()) {
+                <p-button
+                  label="Share"
+                  icon="pi pi-share-alt"
+                  severity="secondary"
+                  [outlined]="true"
+                  fluid
+                  (onClick)="onShare()"
+                />
+              }
+            </div>
+            <p class="invite-friend__footnote">
+              We'll know they came from you when they sign up.
+            </p>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="email">
+          <div class="invite-friend__panel">
+            @if (!emailSent()) {
+              <p class="invite-friend__hint">
+                We'll send them a friendly note with your invite link.
+              </p>
+              <form [formGroup]="form" (ngSubmit)="onSendEmail()">
+                <div class="invite-friend__field">
+                  <label for="friend-email" class="invite-friend__label">Their email</label>
+                  <input
+                    id="friend-email"
+                    pInputText
+                    type="email"
+                    formControlName="email"
+                    placeholder="friend@example.com"
+                    fluid
+                    autocomplete="off"
+                  />
+                  @if (isEmailInvalid()) {
+                    <p-message severity="error" size="small" variant="simple">{{ emailError() }}</p-message>
+                  }
+                </div>
+
+                <div class="invite-friend__field">
+                  <label for="friend-msg" class="invite-friend__label">
+                    Personal message <span class="invite-friend__optional">(optional)</span>
+                  </label>
+                  <textarea
+                    id="friend-msg"
+                    pTextarea
+                    rows="3"
+                    formControlName="personalMessage"
+                    placeholder="Hey — come train with me on MotionHive."
+                    fluid
+                  ></textarea>
+                </div>
+
+                <p-button
+                  label="Send invite"
+                  icon="pi pi-send"
+                  iconPos="right"
+                  type="submit"
+                  severity="warn"
+                  fluid
+                  [loading]="isSending()"
+                  [disabled]="form.invalid || isSending()"
+                />
+              </form>
+            } @else {
+              <div class="invite-friend__success">
+                <div class="invite-friend__success-hex">
+                  <i class="pi pi-check"></i>
+                </div>
+                <h3 class="invite-friend__success-title">On its way.</h3>
+                <p class="invite-friend__success-body">
+                  We'll email them and let them know you sent the invite.
+                </p>
+                <p-button label="Done" severity="warn" fluid (onClick)="onClose()" />
+              </div>
+            }
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</p-dialog>

@@ -1,0 +1,195 @@
+<p-toast position="bottom-center" />
+
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [appendTo]="'body'"
+  [style]="{ width: '92vw', maxWidth: '500px' }"
+  (onHide)="onDialogHide()"
+  header=" "
+>
+  <div class="suggest-instructor">
+    @if (sent() === null) {
+      <div class="suggest-instructor__hero">
+        <i class="pi pi-megaphone"></i>
+      </div>
+      <h2 class="suggest-instructor__title">Know a great coach?</h2>
+      <p class="suggest-instructor__body">
+        Email them directly, or tell us about them and we'll reach out for you.
+      </p>
+
+      <p-tabs value="direct">
+        <p-tablist>
+          <p-tab value="direct">
+            <i class="pi pi-envelope"></i>
+            <span>Email the coach</span>
+          </p-tab>
+          <p-tab value="team">
+            <i class="pi pi-users"></i>
+            <span>Tell us about them</span>
+          </p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="direct">
+            <div class="suggest-instructor__panel">
+              <p class="suggest-instructor__hint">
+                We'll send them a friendly invite — and let them know you sent it.
+              </p>
+              <form [formGroup]="directForm" (ngSubmit)="onSendDirect()">
+                <div class="suggest-instructor__field">
+                  <label for="direct-name" class="suggest-instructor__label">Their name</label>
+                  <input
+                    id="direct-name"
+                    pInputText
+                    type="text"
+                    formControlName="coachName"
+                    placeholder="e.g. Mia Petrescu"
+                    fluid
+                    autocomplete="off"
+                  />
+                  @if (isFieldInvalid(directForm, 'coachName')) {
+                    <p-message severity="error" size="small" variant="simple">Their name helps us address the email.</p-message>
+                  }
+                </div>
+
+                <div class="suggest-instructor__field">
+                  <label for="direct-email" class="suggest-instructor__label">Their email</label>
+                  <input
+                    id="direct-email"
+                    pInputText
+                    type="email"
+                    formControlName="email"
+                    placeholder="coach@example.com"
+                    fluid
+                    autocomplete="off"
+                  />
+                  @if (isFieldInvalid(directForm, 'email')) {
+                    <p-message severity="error" size="small" variant="simple">We need a valid email to reach them.</p-message>
+                  }
+                </div>
+
+                <div class="suggest-instructor__field">
+                  <label for="direct-note" class="suggest-instructor__label">
+                    A line about you <span class="suggest-instructor__optional">(optional)</span>
+                  </label>
+                  <textarea
+                    id="direct-note"
+                    pTextarea
+                    rows="3"
+                    formControlName="note"
+                    placeholder="Hey Mia — your spin classes are the best, you'd love this platform."
+                    fluid
+                  ></textarea>
+                </div>
+
+                <p-button
+                  label="Send invite"
+                  icon="pi pi-send"
+                  iconPos="right"
+                  type="submit"
+                  severity="warn"
+                  fluid
+                  [loading]="isSending()"
+                  [disabled]="directForm.invalid || isSending()"
+                />
+              </form>
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="team">
+            <div class="suggest-instructor__panel">
+              <p class="suggest-instructor__hint">
+                Don't have their email? Send us anything — Instagram, phone, a name. We'll find them.
+              </p>
+              <form [formGroup]="tellTeamForm" (ngSubmit)="onSendToTeam()">
+                <div class="suggest-instructor__field">
+                  <label for="team-name" class="suggest-instructor__label">Their name</label>
+                  <input
+                    id="team-name"
+                    pInputText
+                    type="text"
+                    formControlName="coachName"
+                    placeholder="e.g. Mia Petrescu"
+                    fluid
+                    autocomplete="off"
+                  />
+                  @if (isFieldInvalid(tellTeamForm, 'coachName')) {
+                    <p-message severity="error" size="small" variant="simple">Their name helps us find them.</p-message>
+                  }
+                </div>
+
+                <div class="suggest-instructor__field">
+                  <label for="team-contact" class="suggest-instructor__label">How to reach them</label>
+                  <input
+                    id="team-contact"
+                    pInputText
+                    type="text"
+                    formControlName="contact"
+                    placeholder="email, Instagram handle, phone…"
+                    fluid
+                    autocomplete="off"
+                  />
+                  @if (isFieldInvalid(tellTeamForm, 'contact')) {
+                    <p-message severity="error" size="small" variant="simple">A bit more detail, please.</p-message>
+                  }
+                </div>
+
+                <div class="suggest-instructor__field">
+                  <label for="team-note" class="suggest-instructor__label">
+                    What makes them great? <span class="suggest-instructor__optional">(optional)</span>
+                  </label>
+                  <textarea
+                    id="team-note"
+                    pTextarea
+                    rows="3"
+                    formControlName="note"
+                    placeholder="A line or two — we'll mention you when we reach out."
+                    fluid
+                  ></textarea>
+                </div>
+
+                <p-button
+                  label="Send suggestion"
+                  icon="pi pi-send"
+                  iconPos="right"
+                  type="submit"
+                  severity="warn"
+                  fluid
+                  [loading]="isSending()"
+                  [disabled]="tellTeamForm.invalid || isSending()"
+                />
+              </form>
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    } @else {
+      <div class="suggest-instructor__success">
+        <div class="suggest-instructor__success-hex">
+          <i class="pi pi-check"></i>
+        </div>
+        <h2 class="suggest-instructor__title">
+          @if (sent() === 'direct') {
+            On its way to them.
+          } @else {
+            Thanks — we'll take it from here.
+          }
+        </h2>
+        <p class="suggest-instructor__body">
+          @if (sent() === 'direct') {
+            We've emailed them with your name on it. Suggest as many as you like.
+          } @else {
+            We'll reach out and let you know what they say. Suggest as many as you like.
+          }
+        </p>
+        <p-button label="Done" severity="warn" (onClick)="onClose()" fluid />
+      </div>
+    }
+  </div>
+</p-dialog>

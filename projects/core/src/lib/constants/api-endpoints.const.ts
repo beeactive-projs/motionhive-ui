@@ -58,6 +58,13 @@ export const API_ENDPOINTS = {
   WAITLIST: {
     BASE: '/waitlist',
   },
+  INVITATIONS: {
+    // Used by the home page invite dialogs. Endpoints don't exist on
+    // the API yet — see InvitationService for the graceful-fallback
+    // behaviour while we wait for the jobs/notifications module.
+    FRIEND_EMAIL: '/invitations/friend',
+    INSTRUCTOR_EMAIL: '/invitations/instructor',
+  },
   PAYMENTS: {
     // Instructor — onboarding
     ONBOARDING_START: '/payments/onboarding/start',

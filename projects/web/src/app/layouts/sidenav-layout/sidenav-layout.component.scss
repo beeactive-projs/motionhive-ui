@@ -82,6 +82,49 @@ $lg: 1024px;
   border-width: 0 0 1px 0;
 }
 
+// Search trigger — looks like an input but is a button that opens the modal.
+.search-trigger {
+  align-items: center;
+  gap: 10px;
+  width: 20rem;
+  padding: 6px 10px 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--p-content-border-color);
+  background: var(--p-surface-100);
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.search-trigger:hover {
+  background: var(--p-surface-200, var(--p-surface-100));
+  border-color: var(--color-primary-300, var(--p-content-border-color));
+}
+
+.search-trigger__icon {
+  font-size: 14px;
+}
+
+.search-trigger__placeholder {
+  flex: 1;
+  text-align: left;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-trigger__kbd {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  color: var(--p-text-muted-color);
+}
+
 // --- Content ---
 .content {
   display: flex;

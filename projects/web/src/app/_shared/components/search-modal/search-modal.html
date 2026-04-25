@@ -1,0 +1,175 @@
+<p-dialog
+  [visible]="isOpen()"
+  (visibleChange)="onDialogVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [appendTo]="'body'"
+  [showHeader]="false"
+  styleClass="search-modal-dialog"
+>
+  <div class="search-modal">
+    <!-- ─────────── Search input ─────────── -->
+    <div class="search-modal__input-row">
+      <i class="pi pi-search search-modal__icon"></i>
+      <input
+        #searchInput
+        pInputText
+        type="text"
+        class="search-modal__input"
+        placeholder="Search instructors, groups, sessions, tags…"
+        [value]="query()"
+        (input)="onQueryInput($any($event.target).value)"
+        (keydown.escape)="close()"
+        autocomplete="off"
+        spellcheck="false"
+        fluid
+      />
+      @if (query().length > 0) {
+        <p-button
+          icon="pi pi-times"
+          severity="secondary"
+          text
+          rounded
+          size="small"
+          (onClick)="onClear()"
+          ariaLabel="Clear search"
+        />
+      }
+      <kbd class="search-modal__esc">Esc</kbd>
+    </div>
+
+    <!-- ─────────── Category tabs ─────────── -->
+    <div class="search-modal__tabs" role="tablist">
+      @for (cat of categories; track cat.key) {
+        <button
+          type="button"
+          role="tab"
+          class="search-modal__tab"
+          [class.search-modal__tab--active]="activeCategory() === cat.key"
+          [attr.aria-selected]="activeCategory() === cat.key"
+          (click)="onSelectCategory(cat.key)"
+        >
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+
+    <!-- ─────────── Body ─────────── -->
+    <div class="search-modal__body">
+      @if (!hasQuery()) {
+        <!-- Idle state: recents + trending + suggested -->
+        @if (recents().length > 0) {
+          <div class="search-modal__section">
+            <header class="search-modal__section-head">
+              <span>Recent</span>
+              <button type="button" class="search-modal__link" (click)="onClearRecents()">
+                Clear
+              </button>
+            </header>
+            <div class="search-modal__pills">
+              @for (r of recents(); track r) {
+                <button type="button" class="search-modal__pill" (click)="onSelectRecent(r)">
+                  <i class="pi pi-history"></i>
+                  <span>{{ r }}</span>
+                  <i
+                    class="pi pi-times search-modal__pill-x"
+                    role="button"
+                    aria-label="Remove"
+                    (click)="onRemoveRecent(r, $event)"
+                  ></i>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="search-modal__section">
+          <header class="search-modal__section-head">
+            <span>Trending</span>
+          </header>
+          <div class="search-modal__pills">
+            @for (t of trending; track t.label) {
+              <button type="button" class="search-modal__pill search-modal__pill--trending" (click)="onSelectTrending(t)">
+                <i [class]="t.icon"></i>
+                <span>{{ t.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      } @else if (isLoading()) {
+        <div class="search-modal__loading">
+          <p-progressspinner class="w-6! h-6!" strokeWidth="3" />
+        </div>
+      } @else if (visibleCategoryCount() === 0) {
+        <div class="search-modal__empty">
+          <i class="pi pi-search search-modal__empty-icon"></i>
+          <h3 class="search-modal__empty-title">No matches for "{{ query() }}"</h3>
+          <p class="search-modal__empty-body">
+            Try a different word, fewer letters, or a category filter.
+          </p>
+        </div>
+      } @else {
+        @for (entry of visibleCategories(); track entry.config.key) {
+          <div class="search-modal__section">
+            <header class="search-modal__section-head">
+              <span>{{ categoryLabel(entry.config.bucket!) }}</span>
+              @if (entry.bucket.total > entry.bucket.items.length) {
+                <button
+                  type="button"
+                  class="search-modal__link"
+                  (click)="onSeeAll(entry.config)"
+                >
+                  See all {{ entry.bucket.total }}
+                </button>
+              }
+            </header>
+            <ul class="search-modal__results">
+              @for (item of entry.bucket.items; track item.id) {
+                <li
+                  class="search-modal__result"
+                  tabindex="0"
+                  (click)="onSelectResult(item)"
+                  (keydown.enter)="onSelectResult(item)"
+                >
+                  <div class="search-modal__result-avatar" [attr.data-type]="item.type">
+                    @if (item.avatarUrl) {
+                      <img [src]="item.avatarUrl" alt="" />
+                    } @else {
+                      <span>{{ resultInitials(item) }}</span>
+                    }
+                  </div>
+                  <div class="search-modal__result-text">
+                    <h4 class="search-modal__result-title">{{ item.title }}</h4>
+                    @if (item.subtitle) {
+                      <p class="search-modal__result-subtitle">{{ item.subtitle }}</p>
+                    }
+                  </div>
+                  <i [class]="resultIcon(item.type) + ' search-modal__result-arrow'"></i>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- ─────────── Footer hints ─────────── -->
+    <footer class="search-modal__footer">
+      <div class="search-modal__hints">
+        <span class="search-modal__hint"><kbd>↑↓</kbd> Navigate</span>
+        <span class="search-modal__hint"><kbd>↵</kbd> Open</span>
+        <span class="search-modal__hint"><kbd>Esc</kbd> Close</span>
+      </div>
+      @if (hasQuery() && !isLoading()) {
+        <span class="search-modal__count">
+          {{ visibleCategoryCount() }} {{ visibleCategoryCount() === 1 ? 'category' : 'categories' }} ·
+          {{ totalResults() }} {{ totalResults() === 1 ? 'result' : 'results' }}
+        </span>
+      }
+    </footer>
+  </div>
+</p-dialog>

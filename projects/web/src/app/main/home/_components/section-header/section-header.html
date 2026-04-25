@@ -1,0 +1,22 @@
+<header class="section-header" [class.section-header--dense]="dense()">
+  <div class="section-header__text">
+    @if (eyebrow()) {
+      <p class="section-header__eyebrow">{{ eyebrow() }}</p>
+    }
+    <h2 class="section-header__title">{{ title() }}</h2>
+    @if (subtitle()) {
+      <p class="section-header__subtitle">{{ subtitle() }}</p>
+    }
+  </div>
+  @if (actionLabel()) {
+    <p-button
+      [label]="actionLabel()!"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      size="small"
+      severity="warn"
+      text
+      (onClick)="actionClick.emit()"
+    />
+  }
+</header>

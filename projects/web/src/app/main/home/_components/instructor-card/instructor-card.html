@@ -1,0 +1,25 @@
+<article class="instructor-card">
+  <div class="instructor-card__top">
+    <mh-hex [tone]="resolvedTone()" size="lg">{{ initials() }}</mh-hex>
+    <div class="instructor-card__id">
+      <h3 class="instructor-card__name">{{ displayName() }}</h3>
+      <p class="instructor-card__role">{{ role() }}</p>
+      @if (tags().length > 0) {
+        <div class="instructor-card__tags">
+          @for (tag of tags(); track tag) {
+            <p-tag [value]="tag" severity="secondary" rounded styleClass="instructor-card__chip" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <p-button
+    label="Follow"
+    icon="pi pi-plus"
+    size="small"
+    severity="secondary"
+    [outlined]="true"
+    fluid
+    (onClick)="onFollow()"
+  />
+</article>
