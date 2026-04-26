@@ -81,8 +81,8 @@
     <a [routerLink]="['/blog', featured.slug]" class="featured-card"
       [attr.aria-label]="'Read featured article: ' + featured.title">
       <div class="featured-card__image-wrap">
-        <img [src]="featured.coverImage" [alt]="featured.title" class="featured-card__image" loading="eager" width="800"
-          height="450" />
+        <img [src]="featuredCoverUrl(featured.coverImage)" [alt]="featured.title" class="featured-card__image"
+          loading="eager" width="800" height="450" />
         <span class="featured-badge" i18n="@@blog.featured">Featured</span>
       </div>
 
@@ -167,8 +167,8 @@
       @for (post of gridPosts(); track post.id) {
       <a [routerLink]="['/blog', post.slug]" class="blog-card" [attr.aria-label]="'Read article: ' + post.title">
         <div class="blog-card__image-wrap">
-          <img [src]="post.coverImage" [alt]="post.title" class="blog-card__image" loading="lazy" width="800"
-            height="450" />
+          <img [src]="gridCoverUrl(post.coverImage)" [alt]="post.title" class="blog-card__image" loading="lazy"
+            width="800" height="450" />
         </div>
 
         <div class="blog-card__content">

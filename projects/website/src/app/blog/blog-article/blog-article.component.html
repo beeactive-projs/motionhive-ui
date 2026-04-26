@@ -86,8 +86,8 @@
 <section class="article-body">
   <!-- Cover Image -->
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-    <img #coverImage [src]="article.coverImage" [alt]="article.title" class="article-cover-image" loading="eager"
-      height="675" />
+    <img #coverImage [src]="heroCoverUrl(article.coverImage)" [alt]="article.title" class="article-cover-image"
+      loading="eager" height="675" />
   </div>
 
   <!-- Article Content -->
@@ -134,8 +134,8 @@
       <a [routerLink]="['/blog', related.slug]" class="related-card"
         [attr.aria-label]="'Read article: ' + related.title">
         <div class="related-card__image-wrap">
-          <img [src]="related.coverImage" [alt]="related.title" class="related-card__image" loading="lazy" width="800"
-            height="450" />
+          <img [src]="relatedCoverUrl(related.coverImage)" [alt]="related.title" class="related-card__image"
+            loading="lazy" width="800" height="450" />
         </div>
         <div class="related-card__content">
           <div class="flex items-center gap-2 mb-2">

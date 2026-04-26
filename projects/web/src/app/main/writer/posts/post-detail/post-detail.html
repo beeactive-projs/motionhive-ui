@@ -198,8 +198,11 @@
       <p-card header="Cover image">
         <div class="flex flex-col gap-3">
           @if (form.controls.coverImage.value) {
-          <img [src]="form.controls.coverImage.value" alt="Cover image preview"
-            class="w-full h-40 object-cover rounded" />
+          <!-- Aspect-locked preview matches what readers actually see in carousels and the article hero. -->
+          <div class="w-full aspect-video rounded overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
+            <img [src]="coverPreviewUrl(form.controls.coverImage.value)" alt="Cover image preview"
+              class="absolute inset-0 w-full h-full object-cover" />
+          </div>
           }
 
           <div class="flex flex-col gap-1.5">
@@ -218,6 +221,18 @@
               <p-button label="Upload image" icon="pi pi-upload" severity="secondary" size="small"
                 [loading]="uploading()" (onClick)="fileInput.click()" />
             </label>
+          </div>
+
+          <!-- Writer guidance — what to upload for best results. -->
+          <div class="rounded-md border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 p-3 text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
+            <p class="font-medium text-surface-800 dark:text-surface-100 mb-1">Image tips</p>
+            <ul class="list-disc list-inside space-y-0.5">
+              <li>Use a <span class="font-medium">landscape</span> photo (wider than tall).</li>
+              <li>Recommended: <span class="font-medium">1600 × 900px (16:9)</span> for sharpest results.</li>
+              <li>Minimum: 1200 × 675px. Smaller images look soft on retina screens.</li>
+              <li>Tall portrait photos will be center-cropped — the top and bottom won't show.</li>
+              <li>JPG for photos, PNG only for graphics with hard edges or transparency.</li>
+            </ul>
           </div>
         </div>
       </p-card>

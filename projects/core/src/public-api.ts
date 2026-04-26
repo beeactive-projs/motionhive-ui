@@ -72,6 +72,7 @@ export * from './lib/constants/countries.const';
 // Utils
 export * from './lib/utils/url.utils';
 export * from './lib/utils/api-error.utils';
+export * from './lib/utils/cloudinary.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';

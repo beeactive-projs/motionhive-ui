@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { BlogPost } from 'core';
+import { BLOG_COVER_PRESETS, BlogPost, withCloudinaryTransform } from 'core';
 
 /**
  * Compact blog-post card for the home carousel. Shows the cover image,
@@ -24,6 +24,13 @@ export class BlogCard {
     const r = this.post().readTime ?? 0;
     return r > 0 ? `${r} min read` : 'Quick read';
   });
+
+  /** Cover URL piped through Cloudinary so a tall portrait upload
+   *  comes back as a 16:9 cropped, ~800px-wide JPG/WebP — guarantees
+   *  the carousel cell renders correctly regardless of source size. */
+  readonly coverUrl = computed(() =>
+    withCloudinaryTransform(this.post().coverImage, BLOG_COVER_PRESETS.homeCarousel),
+  );
 
   onRead(): void {
     this.readClick.emit(this.post());

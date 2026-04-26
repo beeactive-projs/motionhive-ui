@@ -1,7 +1,7 @@
 <article class="blog-card" (click)="onRead()" tabindex="0" (keydown.enter)="onRead()">
   <div class="blog-card__cover">
-    @if (post().coverImage) {
-      <img [src]="post().coverImage" [alt]="post().title" loading="lazy" />
+    @if (coverUrl()) {
+      <img [src]="coverUrl()" [alt]="post().title" loading="lazy" />
     } @else {
       <div class="blog-card__cover-fallback">
         <i class="pi pi-book"></i>
