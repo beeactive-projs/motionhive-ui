@@ -15,33 +15,25 @@
       <p-skeleton width="7.5rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       <p-skeleton width="8rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
       } @else {
-      <p-button
-        [label]="
+      <p-button [label]="
           !hasStripeAccount()
             ? 'Set up payments'
             : needsOnboardingFinish()
               ? 'Finish setup'
               : 'Open Stripe'
-        "
-        [icon]="
+        " [icon]="
           !hasStripeAccount()
             ? 'pi pi-plus'
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        "
-        [severity]="needsOnboardingFinish() ? 'warn' : hasStripeAccount() ? 'contrast' : 'primary'"
-        [outlined]="hasStripeAccount() && !needsOnboardingFinish()"
-        size="small"
-        [loading]="dashboardLoading()"
-        (onClick)="openStripeOnboarding()"
-        fluid
-        class="w-1/2 sm:w-auto"
-      />
+        " [severity]="needsOnboardingFinish() ? 'warn' : hasStripeAccount() ? 'contrast' : 'primary'"
+        [outlined]="hasStripeAccount() && !needsOnboardingFinish()" size="small" [loading]="dashboardLoading()"
+        (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
       @if(stripeOnboarded()) {
       <p-button label="Create invoice" icon="pi pi-plus" size="small" [disabled]="!stripeOnboarded()"
-        pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()" (onClick)="showCreateDialog.set(true)"
-        fluid class="w-1/2 sm:w-auto" />
+        pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()"
+        (onClick)="showCreateDialog.set(true)" fluid class="w-1/2 sm:w-auto" />
       }
       }
     </div>
@@ -50,17 +42,17 @@
   @if(pageLoaded()) {
   @if(stripeOnboarded()) {
   <!-- KPI cards -->
-  <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+  <section class="hidden md:grid grid-cols-3 gap-3">
     @if (summary(); as summary) {
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Outstanding</span>
         <div class="flex items-baseline gap-2">
-          <span class="font-heading text-xl font-semibold tabular-nums">
+          <span class="font-heading text-sm md:text-xl font-semibold tabular-nums">
             {{ summary.outstandingInvoicesCents | currencyRon : summary.currency }}
           </span>
         </div>
-        <span class="text-xs text-muted-color">
+        <span class="text-xs text-muted-color hidden sm:inline-flex">
           {{ summary.openInvoiceCount }} open {{ summary.openInvoiceCount === 1 ? 'invoice' : 'invoices' }}
           @if (summary.overdueInvoiceCount > 0) {
           · <span class="text-red-500">{{ summary.overdueInvoiceCount }} overdue</span>
@@ -72,20 +64,20 @@
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Available</span>
-        <span class="font-heading text-xl font-semibold tabular-nums">
+        <span class="font-heading md:text-xl font-semibold tabular-nums">
           {{ summary.availableBalanceCents | currencyRon : summary.currency }}
         </span>
-        <span class="text-xs text-muted-color">Ready to withdraw</span>
+        <span class="text-xs text-muted-color hidden sm:inline-flex">Ready to withdraw</span>
       </div>
     </p-card>
 
     <p-card>
       <div class="flex flex-col gap-1">
         <span class="text-xs uppercase tracking-wide text-muted-color">Pending</span>
-        <span class="font-heading text-xl font-semibold tabular-nums">
+        <span class="font-heading md:text-xl font-semibold tabular-nums">
           {{ summary.pendingBalanceCents | currencyRon : summary.currency }}
         </span>
-        <span class="text-xs text-muted-color">In transit · 2–3 days</span>
+        <span class="text-xs text-muted-color hidden sm:inline-flex">In transit · 2–3 days</span>
       </div>
     </p-card>
     }
@@ -113,7 +105,7 @@
     <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="flex-1">
       <p-tablist>
         <p-tab [value]="Tabs.Invoices">
-          <i class="pi pi-file"></i>
+          <i class="pi pi-receipt"></i>
           <span class="ml-2">Invoices</span>
         </p-tab>
         <p-tab [value]="Tabs.Memberships">
@@ -126,7 +118,7 @@
         </p-tab>
       </p-tablist>
 
-      <p-tabpanels class="flex-1 min-h-0">
+      <p-tabpanels class="flex-1 md:basis-0 min-h-0">
         <p-tabpanel [value]="Tabs.Invoices">
           @if (activeTab() === Tabs.Invoices) {
           @if(onboardingStatusLoading()) {
@@ -189,26 +181,19 @@
           <p class="text-sm mt-1">{{ description }}</p>
         </div>
       </div>
-      <p-button
-        [label]="
+      <p-button [label]="
           !hasStripeAccount()
             ? 'Set up payments'
             : needsOnboardingFinish()
               ? 'Finish setup'
               : 'Open Stripe'
-        "
-        [icon]="
+        " [icon]="
           !hasStripeAccount()
             ? 'pi pi-plus'
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        "
-        severity="warn"
-        [loading]="dashboardLoading()"
-        (onClick)="openStripeOnboarding()"
-        class="ml-auto"
-      />
+        " severity="warn" [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" class="ml-auto" />
     </div>
   </p-card>
 </ng-template>

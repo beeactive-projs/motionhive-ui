@@ -1,4 +1,15 @@
-import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -9,6 +20,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Tooltip } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { DataView } from 'primeng/dataview';
 import {
   ProductService,
   ProductTypes,
@@ -16,10 +28,11 @@ import {
   CurrencyRonPipe,
   StatusLabelPipe,
   getProductBillingLabel,
+  showApiError,
   type Product,
   type ProductType,
 } from 'core';
-import { DataView } from 'primeng/dataview';
+import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { ProductFormDialog } from '../../_dialogs/product-form-dialog/product-form-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
@@ -46,10 +59,16 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
   styleUrl: './products.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Products implements OnInit {
+export class Products {
   private readonly _productService = inject(ProductService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _destroyRef = inject(DestroyRef);
+
+  private readonly _scrollSentinel = viewChild<ElementRef>('scrollSentinel');
+  private _observer?: IntersectionObserver;
+
+  private readonly _reload$ = new Subject<void>();
 
   readonly products = signal<Product[]>([]);
   readonly totalRecords = signal(0);
@@ -72,35 +91,60 @@ export class Products implements OnInit {
   readonly editingProduct = signal<Product | null>(null);
   readonly togglingProfileIds = signal<Set<string>>(new Set());
 
-  ngOnInit(): void {
-    this.loadProducts();
-  }
-
-  loadProducts(): void {
-    this.loading.set(true);
-    this._productService
-      .list({
-        type: this.typeFilter(),
-        page: this.currentPage(),
-        limit: this.rows,
-      })
-      .subscribe({
-        next: (response) => {
+  constructor() {
+    this._reload$
+      .pipe(
+        startWith(undefined),
+        switchMap(() => {
+          this.loading.set(true);
+          return this._productService
+            .list({
+              type: this.typeFilter(),
+              page: this.currentPage(),
+              limit: this.rows,
+            })
+            .pipe(
+              catchError((err) => {
+                showApiError(this._messageService, 'Error', 'Failed to load products', err);
+                return of(null);
+              }),
+            );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((response) => {
+        if (response) {
           this.products.set(response.items);
           this.totalRecords.set(response.total);
-          this.loading.set(false);
-          this.loadingMore.set(false);
-        },
-        error: () => {
-          this.loading.set(false);
-          this.loadingMore.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load products',
-          });
-        },
+        }
+        this.loading.set(false);
+        this.loadingMore.set(false);
       });
+
+    effect(() => {
+      const el = this._scrollSentinel()?.nativeElement;
+      this._observer?.disconnect();
+      if (!el) return;
+      this._observer = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            this.hasMore() &&
+            !this.loadingMore() &&
+            !this.loading()
+          ) {
+            this.loadMore();
+          }
+        },
+        { threshold: 0.1 },
+      );
+      this._observer.observe(el);
+    });
+    this._destroyRef.onDestroy(() => this._observer?.disconnect());
+  }
+
+  reload(): void {
+    this._reload$.next();
   }
 
   loadMore(): void {
@@ -112,6 +156,7 @@ export class Products implements OnInit {
         page: this.currentPage() + 1,
         limit: this.rows,
       })
+      .pipe(take(1))
       .subscribe({
         next: (response) => {
           this.products.update((list) => [...list, ...response.items]);
@@ -119,13 +164,9 @@ export class Products implements OnInit {
           this.currentPage.update((p) => p + 1);
           this.loadingMore.set(false);
         },
-        error: () => {
+        error: (err) => {
           this.loadingMore.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load more products',
-          });
+          showApiError(this._messageService, 'Error', 'Failed to load more products', err);
         },
       });
   }
@@ -134,13 +175,13 @@ export class Products implements OnInit {
     const first = event.first ?? 0;
     const rows = event.rows ?? this.rows;
     this.currentPage.set(Math.floor(first / rows) + 1);
-    this.loadProducts();
+    this.reload();
   }
 
   onTypeFilterChange(type: ProductType | undefined): void {
     this.typeFilter.set(type);
     this.currentPage.set(1);
-    this.loadProducts();
+    this.reload();
   }
 
   openCreateDialog(): void {
@@ -161,30 +202,29 @@ export class Products implements OnInit {
     pending.add(product.id);
     this.togglingProfileIds.set(pending);
 
-    this._productService.update(product.id, { showOnProfile: nextValue }).subscribe({
-      next: (updated) => {
-        this.products.update((list) =>
-          list.map((p) => (p.id === updated.id ? updated : p)),
-        );
-        this._clearTogglingProfileId(product.id);
-        this._messageService.add({
-          severity: 'success',
-          summary: nextValue ? 'Showing on profile' : 'Hidden from profile',
-          detail: nextValue
-            ? `"${product.name}" now shows on your public profile.`
-            : `"${product.name}" is hidden from your public profile.`,
-        });
-      },
-      error: (err) => {
-        this._patchLocalProduct(product.id, { showOnProfile: previousValue });
-        this._clearTogglingProfileId(product.id);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.error?.message || 'Failed to update visibility',
-        });
-      },
-    });
+    this._productService
+      .update(product.id, { showOnProfile: nextValue })
+      .pipe(take(1))
+      .subscribe({
+        next: (updated) => {
+          this.products.update((list) =>
+            list.map((p) => (p.id === updated.id ? updated : p)),
+          );
+          this._clearTogglingProfileId(product.id);
+          this._messageService.add({
+            severity: 'success',
+            summary: nextValue ? 'Showing on profile' : 'Hidden from profile',
+            detail: nextValue
+              ? `"${product.name}" now shows on your public profile.`
+              : `"${product.name}" is hidden from your public profile.`,
+          });
+        },
+        error: (err) => {
+          this._patchLocalProduct(product.id, { showOnProfile: previousValue });
+          this._clearTogglingProfileId(product.id);
+          showApiError(this._messageService, 'Error', 'Failed to update visibility', err);
+        },
+      });
   }
 
   private _patchLocalProduct(id: string, patch: Partial<Product>): void {
@@ -210,23 +250,22 @@ export class Products implements OnInit {
   }
 
   private deactivateProduct(product: Product): void {
-    this._productService.deactivate(product.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Product deactivated',
-          detail: `"${product.name}" has been deactivated`,
-        });
-        this.loadProducts();
-      },
-      error: () => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to deactivate product',
-        });
-      },
-    });
+    this._productService
+      .deactivate(product.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Product deactivated',
+            detail: `"${product.name}" has been deactivated`,
+          });
+          this.reload();
+        },
+        error: (err) => {
+          showApiError(this._messageService, 'Error', 'Failed to deactivate product', err);
+        },
+      });
   }
 
   typeSeverity(type: ProductType): TagSeverity {

@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,33 +7,34 @@ import {
   effect,
   ElementRef,
   inject,
-  OnInit,
   signal,
   viewChild,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
-import { DataView } from 'primeng/dataview';
-import { TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Tooltip } from 'primeng/tooltip';
-import { MessageService, ConfirmationService } from 'primeng/api';
 import {
-  InvoiceService as PaymentInvoiceService,
-  InvoiceStatuses,
   CurrencyRonPipe,
-  StatusLabelPipe,
   getInvoiceStatusSeverity,
+  InvoiceStatuses,
+  InvoiceService as PaymentInvoiceService,
+  showApiError,
+  StatusLabelPipe,
   type Invoice,
   type InvoiceStatus,
 } from 'core';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { Button } from 'primeng/button';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { DataView } from 'primeng/dataview';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
+import { Tag } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { Tooltip } from 'primeng/tooltip';
+import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
+import { ListCard } from '../../../../_shared/components/list-card/list-card';
 import { CreateInvoiceDialog } from '../../_dialogs/create-invoice-dialog/create-invoice-dialog';
 import { SendInvoiceEmailDialog } from '../../_dialogs/send-invoice-email-dialog/send-invoice-email-dialog';
-import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
 @Component({
   selector: 'mh-invoices',
@@ -58,7 +60,7 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
   styleUrl: './invoices.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Invoices implements OnInit {
+export class Invoices {
   private readonly _invoiceService = inject(PaymentInvoiceService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
@@ -67,23 +69,7 @@ export class Invoices implements OnInit {
   private readonly _scrollSentinel = viewChild<ElementRef>('scrollSentinel');
   private _observer?: IntersectionObserver;
 
-  constructor() {
-    effect(() => {
-      const el = this._scrollSentinel()?.nativeElement;
-      this._observer?.disconnect();
-      if (!el) return;
-      this._observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
-            this.loadMore();
-          }
-        },
-        { threshold: 0.1 },
-      );
-      this._observer.observe(el);
-    });
-    this._destroyRef.onDestroy(() => this._observer?.disconnect());
-  }
+  private readonly _reload$ = new Subject<void>();
 
   readonly invoices = signal<Invoice[]>([]);
   readonly totalRecords = signal(0);
@@ -115,6 +101,64 @@ export class Invoices implements OnInit {
    */
   readonly editingInvoiceId = signal<string | null>(null);
 
+  readonly Statuses = InvoiceStatuses;
+
+  constructor() {
+    this._reload$
+      .pipe(
+        startWith(undefined),
+        switchMap(() => {
+          this.loading.set(true);
+          return this._invoiceService
+            .list({
+              status: this.statusFilter(),
+              page: this.currentPage(),
+              limit: this.rows,
+            })
+            .pipe(
+              catchError((err) => {
+                showApiError(this._messageService, 'Error', 'Failed to load invoices', err);
+                return of(null);
+              }),
+            );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.invoices.set(response.items);
+          this.totalRecords.set(response.total);
+        }
+        this.loading.set(false);
+        this.loadingMore.set(false);
+      });
+
+    effect(() => {
+      const el = this._scrollSentinel()?.nativeElement;
+      this._observer?.disconnect();
+      if (!el) return;
+      this._observer = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            this.hasMore() &&
+            !this.loadingMore() &&
+            !this.loading()
+          ) {
+            this.loadMore();
+          }
+        },
+        { threshold: 0.1 },
+      );
+      this._observer.observe(el);
+    });
+    this._destroyRef.onDestroy(() => this._observer?.disconnect());
+  }
+
+  reload(): void {
+    this._reload$.next();
+  }
+
   openEdit(invoice: Invoice): void {
     this.editingInvoiceId.set(invoice.id);
     this.showCreateDialog.set(true);
@@ -131,7 +175,7 @@ export class Invoices implements OnInit {
       // triggers onSavedFromDialog(), so this is mostly belt-and-braces
       // for the case where another tab created/edited an invoice while
       // this dialog was open.
-      this.loadInvoices();
+      this.reload();
     }
   }
 
@@ -146,53 +190,20 @@ export class Invoices implements OnInit {
    */
   onSavedFromDialog(): void {
     this.currentPage.set(1);
-    this.loadInvoices();
-  }
-
-  readonly Statuses = InvoiceStatuses;
-
-  ngOnInit(): void {
-    this.loadInvoices();
-  }
-
-  loadInvoices(): void {
-    this.loading.set(true);
-    this._invoiceService
-      .list({
-        status: this.statusFilter(),
-        page: this.currentPage(),
-        limit: this.rows,
-      })
-      .subscribe({
-        next: (response) => {
-          this.invoices.set(response.items);
-          this.totalRecords.set(response.total);
-          this.loading.set(false);
-          this.loadingMore.set(false);
-        },
-        error: () => {
-          this.loading.set(false);
-          this.loadingMore.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load invoices',
-          });
-        },
-      });
+    this.reload();
   }
 
   onPageChange(event: { first?: number | null; rows?: number | null }): void {
     const first = event.first ?? 0;
     const rows = event.rows ?? this.rows;
     this.currentPage.set(Math.floor(first / rows) + 1);
-    this.loadInvoices();
+    this.reload();
   }
 
   onStatusFilterChange(status: InvoiceStatus | undefined): void {
     this.statusFilter.set(status);
     this.currentPage.set(1);
-    this.loadInvoices();
+    this.reload();
   }
 
   loadMore(): void {
@@ -204,6 +215,7 @@ export class Invoices implements OnInit {
         page: this.currentPage() + 1,
         limit: this.rows,
       })
+      .pipe(take(1))
       .subscribe({
         next: (response) => {
           this.invoices.update((list) => [...list, ...response.items]);
@@ -211,13 +223,9 @@ export class Invoices implements OnInit {
           this.currentPage.update((p) => p + 1);
           this.loadingMore.set(false);
         },
-        error: () => {
+        error: (err) => {
           this.loadingMore.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load more invoices',
-          });
+          showApiError(this._messageService, 'Error', 'Failed to load more invoices', err);
         },
       });
   }
@@ -238,23 +246,22 @@ export class Invoices implements OnInit {
   }
 
   private voidInvoice(invoice: Invoice): void {
-    this._invoiceService.void(invoice.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Invoice voided',
-          detail: `Invoice ${invoice.number ?? ''} has been voided`,
-        });
-        this.loadInvoices();
-      },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to void invoice',
-        });
-      },
-    });
+    this._invoiceService
+      .void(invoice.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Invoice voided',
+            detail: `Invoice ${invoice.number ?? ''} has been voided`,
+          });
+          this.reload();
+        },
+        error: (err) => {
+          showApiError(this._messageService, 'Error', 'Failed to void invoice', err);
+        },
+      });
   }
 
   confirmMarkPaid(invoice: Invoice): void {
@@ -267,23 +274,22 @@ export class Invoices implements OnInit {
   }
 
   private markPaid(invoice: Invoice): void {
-    this._invoiceService.markPaid(invoice.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Invoice marked paid',
-          detail: 'Invoice has been marked as paid (out of band)',
-        });
-        this.loadInvoices();
-      },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to mark invoice as paid',
-        });
-      },
-    });
+    this._invoiceService
+      .markPaid(invoice.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Invoice marked paid',
+            detail: 'Invoice has been marked as paid (out of band)',
+          });
+          this.reload();
+        },
+        error: (err) => {
+          showApiError(this._messageService, 'Error', 'Failed to mark invoice as paid', err);
+        },
+      });
   }
 
   readonly statusSeverity = getInvoiceStatusSeverity;
