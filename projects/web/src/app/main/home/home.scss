@@ -32,13 +32,16 @@
   gap: 20px;
   padding: 28px 24px;
   border-radius: 24px;
+  overflow: hidden;
+  isolation: isolate;
+
+  /* Default (light) — warm honey wash */
   background:
     radial-gradient(120% 90% at 0% 0%, var(--color-primary-200, #fed7aa) 0%, transparent 60%),
     linear-gradient(140deg, var(--color-primary-100, #ffedd5) 0%, var(--color-primary-50, #fff7ed) 50%, #fffaf2 100%);
-  overflow: hidden;
-  isolation: isolate;
   border: 1px solid rgba(245, 158, 11, 0.15);
 }
+
 
 .hero__honeycomb {
   position: absolute;
@@ -453,26 +456,139 @@
 
 /* ─────────────────────────────────────────────────────────────────
    Dark mode adjustments
+   ─────────────────────────────────────────────────────────────────
+   Light-mode surfaces below the hero are already on var(--p-content-*)
+   tokens, so they flip automatically. The hero, eyebrows, invite card,
+   buzz card and growth card are the ones that hardcode honey/light
+   surfaces — they need explicit dark variants.
+
+   Selector: `:host-context(.dark)` is the only form Angular's view
+   encapsulation handles correctly when the class lives on a non-host
+   ancestor (here, <html>). Plain `html.dark` selectors get rewritten
+   to `html.dark[_ngcontent-…]` and never match — that was the bug.
    ───────────────────────────────────────────────────────────────── */
 
 :host-context(.dark) {
+  /* Hero — translucent "honey glass" panel rather than a solid slab.
+     Two stacked glows on a low-opacity neutral fill so the page bg
+     reads through; gives a softer, lighter founding-member feel that
+     matches the light-mode warmth without the weight. */
   .hero {
-    border-color: rgba(245, 158, 11, 0.25);
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgba(245, 158, 11, 0.22) 0%, transparent 55%),
+      radial-gradient(80% 60% at 100% 100%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+      linear-gradient(140deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(245, 158, 11, 0.2);
+    backdrop-filter: blur(2px);
+  }
+
+  .hero__honeycomb {
+    /* Slightly stronger dot pattern so it shows on dark navy. */
+    opacity: 0.35;
+    background-image:
+      radial-gradient(circle at 16% 22%, rgba(245, 158, 11, 0.32) 2px, transparent 3px),
+      radial-gradient(circle at 60% 18%, rgba(245, 158, 11, 0.24) 1.5px, transparent 2.5px),
+      radial-gradient(circle at 88% 38%, rgba(245, 158, 11, 0.32) 2px, transparent 3px),
+      radial-gradient(circle at 30% 70%, rgba(245, 158, 11, 0.24) 1.5px, transparent 2.5px),
+      radial-gradient(circle at 72% 84%, rgba(245, 158, 11, 0.32) 2px, transparent 3px);
+  }
+
+  /* Eyebrow pill — needed a translucent dark fill instead of white-ish */
+  .hero__eyebrow {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: var(--color-primary-300, #fdba74);
   }
 
   .hero__title {
-    color: var(--p-surface-50);
+    color: var(--p-surface-0, #ffffff);
   }
 
   .hero__body {
-    color: var(--p-surface-200);
+    color: rgba(255, 255, 255, 0.78);
   }
 
+  /* The brand hex backdrop is already navy in light mode — give it a
+     bit more honey edge so it doesn't blend into the new dark hero. */
+  .hero__brand-hex {
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(245, 158, 11, 0.25);
+  }
+
+  /* Buzz tiles — surface tokens flip automatically, but the body text
+     is hardcoded to navy-900 in light. Override for legibility. */
   .buzz-list__item {
     color: var(--p-surface-50);
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+
+  .buzz-list__item:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Growth card (carousel below-threshold state) */
+  .growth-card {
+    background: var(--p-surface-800);
+    border-color: rgba(245, 158, 11, 0.4);
   }
 
   .growth-card__title {
     color: var(--p-surface-50);
   }
+
+  /* Stats card surface */
+  .stats-card {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+
+  /* Buzz / "this week's buzz" rail card — the navy-900 fill becomes
+     visually identical to the page background in dark mode, so lift
+     it one shade. */
+  .buzz-card {
+    background: var(--p-surface-800);
+    border: 1px solid var(--p-surface-700);
+  }
+
+  /* Invite card — honey tint becomes muddy in dark; use a subdued
+     primary glow instead. */
+  .invite-card {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .invite-card__title {
+    color: var(--p-surface-50);
+  }
+
+  .invite-card__sub {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Suggest-a-coach dashed tile (instructor grid) */
+  .instructor-grid__suggest {
+    background: rgba(245, 158, 11, 0.06);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .instructor-grid__suggest-title {
+    color: var(--p-surface-50);
+  }
+
+  /* Empty state cards */
+  .empty-card {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+
+  .empty-card__title {
+    color: var(--p-surface-50);
+  }
+
+  /* Roadmap version chip — light-mode version was honey-100/honey-800
+     which becomes invisible against the dark navy roadmap card. The
+     roadmap card itself is already dark-styled (it's intentionally
+     dark in light mode too) so no change needed there. */
 }
