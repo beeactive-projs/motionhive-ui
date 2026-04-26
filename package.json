@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build web",
+    "build:core": "ng build core",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && xliffmerge --profile xliffmerge.json"
@@ -36,9 +37,11 @@
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/postcss": "^4.1.18",
     "chart.js": "^4.5.1",
+    "libphonenumber-js": "^1.12.42",
     "postcss": "^8.5.6",
     "primeicons": "^7.0.0",
     "primeng": "^21.1.1",
+    "quill": "^2.0.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.18",
     "tailwindcss-primeui": "^0.6.1",

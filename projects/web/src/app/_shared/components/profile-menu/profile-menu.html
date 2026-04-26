@@ -11,6 +11,11 @@
       <div class="flex flex-col overflow-hidden">
         <span class="font-semibold text-sm truncate">{{ userName() }}</span>
         <span class="text-xs truncate text-muted-color">{{ user()?.email }}</span>
+        @if (isInstructor()) {
+          <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-primary-500">Instructor</span>
+        } @else {
+          <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-muted-color">Member</span>
+        }
       </div>
     </div>
 

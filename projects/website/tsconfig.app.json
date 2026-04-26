@@ -4,8 +4,15 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
-    "rootDir": "./src",
-    "types": ["@angular/localize"]
+    "rootDir": "../..",
+    "types": [
+      "@angular/localize"
+    ],
+    "paths": {
+      "core": [
+        "../../projects/core/src/public-api"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts"

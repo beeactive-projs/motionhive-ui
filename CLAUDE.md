@@ -1,38 +1,67 @@
-# CLAUDE.md
+# MotionHive UI — CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **Naming note:** The product is **MotionHive**. The repo directory is still `beeactive-ui` (historical, not renamed). Angular selector prefix is `mh-`. Any `bee-`/`beeactive` references in existing code are historical leftovers — leave them alone unless explicitly renaming.
 
 ## Project Overview
 
-Fitness platform frontend. Angular monorepo with a shared `core` library and `web` application.
+MotionHive fitness platform frontend. Angular monorepo with three projects:
+
+- **`core`** — shared library (models, services, stores, guards, interceptors, constants, enums, environment config). Imported as `'core'`. Everything re-exported from `public-api.ts`.
+- **`web`** — authenticated application (dashboard, instructor/user/super-admin/writer areas, payments, groups, sessions). Uses `SidenavLayout` + `authGuard`.
+- **`website`** — public marketing site (home, about, blog, contact, legal pages, tools like calorie calculator, feedback/waitlist dialogs). Uses `PublicLayout`. **Separate Angular application**, not a section of `web`.
+- **Future: Ionic mobile app** — planned, not yet scaffolded. When it lands, anything shared across web + website + mobile belongs in `core`.
 
 **Tech Stack**: Angular 21, PrimeNG 21 (Lara preset), Tailwind CSS 4 + PrimeUI, ngx-translate, Vitest
 
 ## Commands
 
 ```bash
-ng serve web               # Dev server (port 4200)
-ng build web               # Production build
-ng build core              # Build core library
+ng serve web               # Authenticated app dev server
+ng serve website           # Marketing site dev server
+ng build web               # Production build — authenticated app
+ng build website           # Production build — marketing site
+ng build core              # Build core library (required before building web/website locally)
 ng test                    # Run tests (Vitest)
 ```
 
-Package manager is **npm**. Prettier config is inline in `package.json`.
+Package manager is **npm**. Prettier config is inline in `package.json`. Angular selector prefix is `mh` (see `angular.json`).
 
 ## Architecture
 
-### Monorepo Structure
+### Monorepo Structure — what goes where
 
-- `projects/core/` — Shared library imported as `'core'`. Contains models, services, stores, guards, interceptors, constants, enums, and environment config. Everything is re-exported from `public-api.ts`.
-- `projects/web/` — Main Angular application with pages, layouts, and protected routes.
+- **`projects/core/`** — anything imported by more than one app. Models, HTTP services, stores (signals), guards, interceptors, constants (endpoints, storage keys), enums, UI types (e.g. `TagSeverity`), environment config. **When you find yourself copy-pasting a type/const between `web` and `website`, stop and move it to core.**
+- **`projects/web/`** — authenticated app. Structure:
+  - `app/main/<role>/*` — role-scoped pages (`instructor`, `user`, `super-admin`, `writer`)
+  - `app/main/<role>/_dialogs/*` — dialog components owned by that role
+  - `app/_shared/components/*` — cross-role components (theme toggle, profile menu, error dialog)
+  - `app/layouts/sidenav-layout/*` — the authenticated shell
+  - `app/pages/auth/*` — login/signup/reset/OAuth callbacks
+  - `app/pages/error/*` — 404, 500
+- **`projects/website/`** — public marketing site. Structure:
+  - `app/home`, `app/about`, `app/contact`, `app/blog`, `app/legal/*`, `app/tools/*`
+  - `app/_shared/*` — website-only shared components (waitlist dialog, language switcher, feedback dialog)
+  - `app/layouts/public-layout`, `app/layouts/header`, `app/layouts/footer`
 
 ### Routing
 
+**`web` app** (authenticated):
 ```
-/           → Public pages (home, about, blog) via PublicLayout
-/auth/*     → Login, signup, password reset
+/auth/*     → login, signup, password reset, OAuth callbacks
 /app/*      → Protected (authGuard) via SidenavLayout
-  /app/dashboard, /app/clients, /app/groups, /app/profile, /app/client/*
+  /app/main/instructor/*    → INSTRUCTOR role
+  /app/main/user/*          → USER role
+  /app/main/super-admin/*   → SUPER_ADMIN role
+  /app/main/writer/*        → WRITER role (blog authoring)
+  /app/main/profile/*       → shared
+```
+
+**`website` app** (public):
+```
+/           → home
+/about, /contact, /blog, /blog/:slug
+/legal/privacy-policy, /legal/terms-of-service
+/tools/calorie-calculator
 ```
 
 All routes use `loadComponent()` / `loadChildren()` for code splitting.
@@ -50,6 +79,28 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - `AuthStore` uses Angular signals (`signal()` for writable state, `computed()` for derived)
 - Components read store values via `store.value()` in templates
 - No NgRx or BehaviorSubject — signals only
+
+### Stores in `core`
+
+- **`AuthStore`** — current user, roles, isAuthenticated. `setUser`/`clearUser`. Patched in-place when a role changes mid-session (e.g. become-instructor) so guards downstream see the new role without a hard reload.
+- **`StripeOnboardingStore`** — single source of truth for the instructor's Stripe Connect status across the app. Replaces 6+ places that each hit `/payments/onboarding/status`. Signals: `status`, `loading`, `hasAccount`, `canIssueInvoices`, `needsOnboardingFinish`, `defaultCurrency`. Methods: `ensureLoaded()` (idempotent), `refresh()` (force live pull from Stripe), `reset()` (logout). Components read the signals and call `ensureLoaded()` on mount.
+
+### Shared utilities (`core/lib/utils/`)
+
+- **`api-error.utils`** — `apiErrorMessage(err, fallback)` and `showApiError(messageService, summary, fallback, err)`. Replaces 25+ copies of `err.error?.message || 'Failed to X'`. Use `showApiError` for error toasts; `apiErrorMessage` when severity isn't error or you need just the string.
+- **`url.utils`** — `normalizeUrl(input)` accepts `zoom.us/j/123` or `https://zoom.us/j/123` and returns canonical `https://…` (or `null` if it can't be coerced safely). Rejects `javascript:`, `data:`, etc. `isValidUrl` predicate variant. `detectMeetingProvider(url)` returns `'ZOOM' | 'GOOGLE_MEET' | 'TEAMS' | null` from the hostname.
+
+### Shared components (`web/src/app/_shared/components/`)
+
+- **`mh-location-picker`** — Nominatim autocomplete returning `PickedLocation` (line1, city, region, postalCode, countryCode, country, lat, lng, displayName). Two-way `[(location)]`. Optional `disabled` for read-only state.
+- **`mh-phone-input`** — country flag + calling code dropdown + national number input. Emits **E.164** (`+40712345678`) via `[(value)]`. Country list: `STRIPE_CONNECT_COUNTRIES` from core. Validation debounced 400ms; sanitizes letters at the source. The country trigger is centered; the SCSS overrides PrimeNG's `.p-select-label` to align with the adjacent input.
+- **`mh-user-search-autocomplete`** — async user lookup with avatar + name display.
+- **Venue components** live under `web/src/app/main/instructor/venues/`: `VenueCard` (compact list item, edit/archive/restore/remove actions), `VenueFormDialog` (kind-driven form, ONLINE auto-detects provider from URL), and the parent `VenuesSection` mounted inside the profile Coaching card.
+
+### Constants in `core` (`lib/constants/`)
+
+- **`countries.const`** — `STRIPE_CONNECT_COUNTRIES` (46 ISO 3166-1 alpha-2 codes Stripe Connect supports), `isStripeSupportedCountry()`, `countryNameFromCode()`, `countryFlagEmoji()` (derives 🇷🇴 from `'RO'` via Regional Indicator Symbols — zero assets).
+- **`api-endpoints.const`** — endpoint string constants. Includes `VENUES`, `PAYMENTS.ONBOARDING_REFRESH_STATUS`, `AUTH.RESEND_VERIFICATION`.
 
 ### Styling
 
@@ -83,6 +134,19 @@ When a type or constant is used in more than one place, define it once in the `c
 - Always re-export the new entry from `projects/core/src/public-api.ts`
 
 Never copy-paste the same `type` or `const` across multiple component files — extract it.
+
+**Never compare against enum string values directly in templates or component logic.** Always expose the enum object as a readonly class member and use it in comparisons. Inline string literals like `=== 'PENDING'` or `=== 'INSTRUCTOR_TO_CLIENT'` are undetectable by the compiler when the enum value changes and must be avoided. Pattern:
+
+```ts
+// component .ts
+readonly Statuses = InstructorClientStatuses;
+readonly RequestTypes = ClientRequestTypes;
+```
+
+```html
+<!-- template .html -->
+@if (item.status === Statuses.Pending && item.requestType === RequestTypes.InstructorToClient) { ... }
+```
 
 Use the **const + type** pattern (same as `UserRoles`) so values are accessible at runtime. **Always define these in a dedicated `*.enums.ts` file, separate from the `*.model.ts` interfaces** — they have different reasons to change and mixing them together clutters both files. Example: `profile.enums.ts` + `profile.model.ts`, both exported from `public-api.ts`.
 
@@ -118,7 +182,7 @@ method(): TagSeverity {
 Do not add custom CSS for things Tailwind can handle (flex, gap, padding, font-size, font-weight, overflow, text-overflow, whitespace, cursor, width, transitions, etc.). Keep `.scss` files minimal — only add rules that genuinely cannot be expressed with utility classes.
 
 **Never use plain HTML interactive elements when a PrimeNG equivalent exists — no exceptions, even when wrapping other components or building custom UI:**
-`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `p-textarea`, `<a>` (interactive) → `p-button` with `routerLink`
+`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `<textarea pTextArea>`, `<a>` (interactive) → `p-button` with `routerLink`
 
 ### File & Naming
 
@@ -146,7 +210,7 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 | Guard          | `<name>Guard` (fn) | `authGuard`     |
 | Interceptor    | `<name>Interceptor` (fn) | `authInterceptor` |
 
-- Selector prefix: `bee-` (`bee-clients`, `bee-dashboard`, `bee-user-profile`)
+- Selector prefix: `mh-` (`mh-clients`, `mh-dashboard`, `mh-user-profile`) — set in `angular.json` for all three projects
 - Always separate files: `.html` and `.scss` alongside `.ts` — no inline templates or styles
 
 ### Member Naming
@@ -192,9 +256,26 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 
 ### PrimeNG
 
+#### Imports — standalone components over modules
+
+Prefer the **standalone component** export over the `*Module` barrel. Fall back to the module only when no standalone export exists.
+
+```ts
+// preferred
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { Dialog } from 'primeng/dialog';
+
+// fallback — only when no standalone export is available
+import { ButtonModule } from 'primeng/button';
+```
+
 - Template references: `#header`, `#body`, `#footer` (not `pTemplate`)
 - Tables: `[lazy]="true"` + `(onLazyLoad)` with `#loadingbody` (p-skeleton) and `#emptymessage`
-- Forms: `isFieldInvalid()` / `getFieldError()` pattern, `p-message` for errors
+- Forms: `isFieldInvalid()` / `getFieldError()` pattern; render errors with:
+  ```html
+  <p-message severity="error" size="small" variant="simple">{{ getFieldError('field') }}</p-message>
+  ```
 - Style via `styleClass` prop, not wrapping divs
 
 #### Full-width inputs — use `fluid` instead of `class="w-full"`
@@ -205,7 +286,7 @@ The following components support a `fluid` boolean input. Use it instead of addi
 <p-button fluid />
 <input pInputText fluid />
 <p-password fluid />
-<p-textarea fluid />           <!-- [pTextarea] directive -->
+<textarea pTextarea fluid></textarea>
 <p-multiselect fluid />
 <p-listbox fluid />
 <p-treeselect fluid />
@@ -268,7 +349,7 @@ Components that are affected: `p-select`, `p-datepicker`, `p-popover`, `p-autoco
 - Use **sentence case** for all visible text — labels, headings, button labels, placeholders, dialog titles, menu items, tooltips, and error messages.
   - Correct: "Instructor profile", "Save changes", "Add new client", "Are you sure you want to delete this?"
   - Wrong: "Instructor Profile", "Save Changes", "Add New Client"
-- Proper nouns and acronyms remain capitalised as normal (e.g. "BeeActive", "PDF", "API").
+- Proper nouns and acronyms remain capitalised as normal (e.g. "MotionHive", "PDF", "API").
 - Sentences must start with a capital letter and end with the appropriate punctuation when they form a full sentence.
 
 ### Accessibility

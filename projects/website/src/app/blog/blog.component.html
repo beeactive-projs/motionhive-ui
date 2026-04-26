@@ -24,14 +24,14 @@
     <div class="flex flex-col md:flex-row flex-1 justify-between gap-4">
       <div class="hidden md:flex items-center gap-3">
         @for (category of categoryOptions; track category) {
-        <p-button [label]="category | blogCategory" [severity]="selectedCategory() === category ? 'primary' : 'contrast'"
-          size="small" rounded [outlined]="selectedCategory() !== category"
-          (onClick)="onCategoryChange(category)" class="min-w-15" fluid />
+        <p-button [label]="category | blogCategory"
+          [severity]="selectedCategory() === category ? 'primary' : 'contrast'" size="small" rounded
+          [outlined]="selectedCategory() !== category" (onClick)="onCategoryChange(category)" class="min-w-15" fluid />
         }
       </div>
       <div class="md:hidden">
-        <p-select [options]="categoryOptions" [ngModel]="selectedCategory()"
-          scrollHeight="300px" (ngModelChange)="onCategoryChange($event)" fluid>
+        <p-select [options]="categoryOptions" [ngModel]="selectedCategory()" scrollHeight="300px"
+          (ngModelChange)="onCategoryChange($event)" fluid>
           <ng-template #selectedItem let-value>{{ value | blogCategory }}</ng-template>
           <ng-template #item let-item>{{ item | blogCategory }}</ng-template>
         </p-select>
@@ -81,8 +81,8 @@
     <a [routerLink]="['/blog', featured.slug]" class="featured-card"
       [attr.aria-label]="'Read featured article: ' + featured.title">
       <div class="featured-card__image-wrap">
-        <img [src]="featured.coverImage" [alt]="featured.title" class="featured-card__image" loading="eager" width="800"
-          height="450" />
+        <img [src]="featuredCoverUrl(featured.coverImage)" [alt]="featured.title" class="featured-card__image"
+          loading="eager" width="800" height="450" />
         <span class="featured-badge" i18n="@@blog.featured">Featured</span>
       </div>
 
@@ -147,7 +147,7 @@
           <p-skeleton width="100%" height="1rem" />
           <p-skeleton width="100%" height="1rem" />
           <p-skeleton width="60%" height="1rem" />
-          <div class="flex items-center gap-2 mt-auto pt-4 border-t border-secondary-100 dark:border-secondary-700/40">
+          <div class="flex items-center gap-2 mt-auto pt-4 border-t border-navy-100 dark:border-navy-700/40">
             <p-skeleton shape="circle" size="1.75rem" />
             <div class="flex flex-col gap-1">
               <p-skeleton width="6rem" height="0.75rem" />
@@ -167,8 +167,8 @@
       @for (post of gridPosts(); track post.id) {
       <a [routerLink]="['/blog', post.slug]" class="blog-card" [attr.aria-label]="'Read article: ' + post.title">
         <div class="blog-card__image-wrap">
-          <img [src]="post.coverImage" [alt]="post.title" class="blog-card__image" loading="lazy" width="800"
-            height="450" />
+          <img [src]="gridCoverUrl(post.coverImage)" [alt]="post.title" class="blog-card__image" loading="lazy"
+            width="800" height="450" />
         </div>
 
         <div class="blog-card__content">
@@ -187,9 +187,9 @@
             {{ post.excerpt }}
           </p>
 
-          <div class="flex items-center gap-2 mt-auto pt-4 border-t border-secondary-100 dark:border-secondary-700/40">
+          <div class="flex items-center gap-2 mt-auto pt-4 border-t border-primary-100 dark:border-primary-700/40">
             <div
-              class="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold text-xs"
+              class="w-7 h-7 rounded-full bg-primary-500 text-primary-contrast flex items-center justify-center font-bold text-xs"
               aria-hidden="true">
               {{ post.authorInitials }}
             </div>

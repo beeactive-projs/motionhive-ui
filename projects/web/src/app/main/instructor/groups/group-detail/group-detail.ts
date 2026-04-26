@@ -110,7 +110,7 @@ export class GroupDetail implements OnInit {
   }
 
   goBack(): void {
-    this._router.navigate(['/groups']);
+    this._router.navigate(['coaching/groups']);
   }
 
   generateJoinLink(): void {

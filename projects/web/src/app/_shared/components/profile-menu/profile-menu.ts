@@ -20,13 +20,14 @@ export class ProfileMenu {
   private readonly _router = inject(Router);
 
   readonly menuItems = computed(() => [
-    { label: 'Profile', icon: 'pi pi-user', routerLink: 'profile' },
+    { label: 'Profile', icon: 'pi pi-user', routerLink: '/profile' },
   ]);
 
   private readonly _popover = viewChild.required<Popover>('popover');
 
   readonly user = this._authStore.user;
   readonly userName = this._authStore.userName;
+  readonly isInstructor = this._authStore.isInstructor;
 
   readonly initials = computed(() => {
     const u = this._authStore.user();

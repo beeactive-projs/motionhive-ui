@@ -6,7 +6,7 @@ import { providePrimeNG } from 'primeng/config';
 import { authInterceptor, errorInterceptor } from 'core';
 
 import { routes } from './app.routes';
-import { MotionHiveLara } from '../styles.primeng';
+import { MotionHiveLara } from '../../../core/src/styles/styles.primeng';
 
 export const appConfig: ApplicationConfig = {
   providers: [

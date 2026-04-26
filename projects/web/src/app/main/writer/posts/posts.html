@@ -1,0 +1,128 @@
+<div class="h-full flex flex-col gap-4">
+  <!-- Header -->
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-1">
+      <h1 class="font-heading font-semibold text-xl md:text-2xl">Posts</h1>
+      <p class="text-sm text-surface-700 dark:text-surface-400">Manage and publish blog posts.</p>
+    </div>
+    <div class="flex flex-wrap">
+      <p-button label="New post" icon="pi pi-plus" rounded (onClick)="navigateToNew()" />
+    </div>
+  </header>
+
+  <!-- Filters -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-sm font-medium">Category:</span>
+      @for (option of categoryOptions; track option.label) {
+      <p-button [label]="option.label" [severity]="categoryFilter() === option.value ? 'primary' : 'contrast'"
+        size="small" rounded [text]="categoryFilter() !== option.value"
+        (onClick)="onCategoryFilterChange(option.value)" />
+      }
+    </div>
+    <div class="relative">
+      <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 text-sm"></i>
+      <input pInputText class="pl-9 text-sm" placeholder="Search posts..." [value]="searchQuery()"
+        (input)="onSearch($event)" />
+    </div>
+  </div>
+
+  <!-- Posts Table -->
+  <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
+    <p-table [value]="posts()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+      [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
+      scrollHeight="flex" dataKey="id" [stripedRows]="true">
+
+      <ng-template #header>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Read time</th>
+          <th>Created</th>
+          <th class="w-28 text-center">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-post>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              @if (post.coverImage) {
+              <img [src]="thumbUrl(post.coverImage)" [alt]="post.title" loading="lazy"
+                class="h-10 w-16 rounded object-cover shrink-0" />
+              } @else {
+              <div
+                class="h-10 w-16 rounded bg-surface-200 dark:bg-surface-700 flex items-center justify-center shrink-0">
+                <i class="pi pi-image text-surface-400 text-xs"></i>
+              </div>
+              }
+              <div class="min-w-0">
+                <p class="font-medium text-surface-900 dark:text-surface-100 truncate max-w-64">{{ post.title }}</p>
+                <p class="text-xs text-surface-500 truncate max-w-64">{{ post.slug }}</p>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="post.category" severity="info" />
+          </td>
+          <td>
+            <p-tag [value]="post.isPublished ? 'Published' : 'Draft'"
+              [severity]="publishedSeverity(post.isPublished)" />
+          </td>
+          <td>
+            <span class="flex items-center gap-1 text-sm text-surface-600 dark:text-surface-400">
+              <i class="pi pi-clock text-xs"></i>
+              {{ post.readTime }} min
+            </span>
+          </td>
+          <td>{{ post.createdAt | date: 'mediumDate' }}</td>
+          <td>
+            <div class="flex items-center justify-center gap-1">
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit post"
+                (onClick)="navigateToEdit(post)" />
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" pTooltip="Delete post"
+                (onClick)="confirmDelete(post)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #loadingbody>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-skeleton width="4rem" height="2.5rem" borderRadius="4px" />
+              <div class="flex flex-col gap-1">
+                <p-skeleton width="10rem" />
+                <p-skeleton width="7rem" />
+              </div>
+            </div>
+          </td>
+          <td><p-skeleton width="5rem" /></td>
+          <td><p-skeleton width="5rem" /></td>
+          <td><p-skeleton width="4rem" /></td>
+          <td><p-skeleton width="6rem" /></td>
+          <td><p-skeleton width="4rem" /></td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <div class="flex flex-col items-center gap-3 py-12 text-center">
+              <i class="pi pi-file-edit text-4xl text-surface-300"></i>
+              <h2 class="text-lg font-semibold text-surface-700">No posts yet</h2>
+              <p class="text-sm text-surface-500">Create your first post to start publishing content.</p>
+              <p-button label="Write your first post" icon="pi pi-plus" severity="primary"
+                styleClass="!rounded-full mt-2" (onClick)="navigateToNew()" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-toast />
+<p-confirmDialog />

@@ -1,0 +1,12 @@
+<div class="roadmap-row" [class.roadmap-row--active]="active()">
+  <span class="roadmap-row__when" [class.roadmap-row__when--active]="active()">{{ when() }}</span>
+  <div class="roadmap-row__text">
+    <h3 class="roadmap-row__title">{{ title() }}</h3>
+    @if (sub()) {
+      <p class="roadmap-row__sub">{{ sub() }}</p>
+    }
+  </div>
+  @if (status()) {
+    <p-tag [value]="status()!" severity="warn" rounded />
+  }
+</div>

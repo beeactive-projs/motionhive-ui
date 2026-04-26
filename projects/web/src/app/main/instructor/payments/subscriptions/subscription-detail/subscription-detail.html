@@ -1,0 +1,181 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="flex items-center gap-2 mb-4">
+  <p-button
+    icon="pi pi-arrow-left"
+    [rounded]="true"
+    [text]="true"
+    severity="contrast"
+    pTooltip="Back to memberships"
+    tooltipPosition="bottom"
+    (onClick)="goBackToList()" />
+  <span class="text-sm text-surface-500">
+    <a routerLink="/coaching/payments" [queryParams]="{ tab: 'subscriptions' }" class="hover:underline">Memberships</a>
+    <span class="mx-1">/</span>
+    <span>Detail</span>
+  </span>
+</div>
+
+@if (loading()) {
+  <div class="flex flex-col gap-4">
+    <p-skeleton width="60%" height="2.5rem" />
+    <p-skeleton width="40%" height="1.5rem" />
+    <p-skeleton width="100%" height="10rem" />
+  </div>
+} @else if (subscription(); as sub) {
+
+  <!-- Hero -->
+  <section class="rounded-xl border border-surface-200 dark:border-surface-700 p-5 md:p-6 mb-6 flex flex-col gap-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div class="flex flex-col">
+        <span class="text-xs uppercase tracking-wide text-surface-500">Membership</span>
+        <h1 class="font-heading font-bold text-2xl md:text-3xl m-0 mt-0.5">{{ planLabel() }}</h1>
+        <span class="text-sm text-surface-500 mt-1">{{ clientName() }}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <p-tag
+          [value]="sub.status | statusLabel"
+          [severity]="statusSeverity(sub.status)" />
+        <div class="flex flex-col items-end">
+          <span class="font-heading text-2xl md:text-3xl font-semibold text-primary-500 tabular-nums leading-tight">
+            {{ sub.amountCents | currencyRon:sub.currency }}
+          </span>
+          <span class="text-xs text-surface-500">per cycle</span>
+        </div>
+      </div>
+    </div>
+
+    @if (sub.cancelAt) {
+      <div class="rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-2 text-sm">
+        <i class="pi pi-info-circle mr-2"></i>
+        Scheduled to cancel on {{ sub.cancelAt | date:'dd MMM yyyy' }}
+      </div>
+    }
+    @if (isPendingSetup()) {
+      <!-- Push-model setup banner: the client got an email with this
+           link; instructor can also re-share it from here. -->
+      <div class="rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-400 px-3 py-2 text-sm flex items-start gap-2">
+        <i class="pi pi-clock mt-0.5"></i>
+        <div class="flex flex-col gap-0.5">
+          <span>Waiting for the client to confirm and pay the first invoice.</span>
+          <span class="text-xs">An email with the setup link was sent. The membership activates automatically once they're done.</span>
+        </div>
+      </div>
+    }
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
+
+    <!-- LEFT — Client & Plan cards -->
+    <div class="flex flex-col gap-4">
+      <section class="rounded-xl border border-surface-200 dark:border-surface-700 p-5 flex flex-col gap-2">
+        <span class="text-xs uppercase tracking-wide text-surface-500">Client</span>
+        @if (sub.client; as c) {
+          <div class="flex flex-col">
+            <span class="font-medium text-base">{{ clientName() }}</span>
+            <span class="text-sm text-surface-500">{{ c.email }}</span>
+          </div>
+        } @else {
+          <span class="text-sm text-surface-500">Client information unavailable.</span>
+        }
+      </section>
+
+      <section class="rounded-xl border border-surface-200 dark:border-surface-700 p-5 flex flex-col gap-2">
+        <span class="text-xs uppercase tracking-wide text-surface-500">Plan</span>
+        <span class="font-medium text-base">{{ planLabel() }}</span>
+        <span class="text-sm text-surface-500">{{ sub.amountCents | currencyRon:sub.currency }} per cycle</span>
+      </section>
+    </div>
+
+    <!-- RIGHT — Period + Actions -->
+    <aside class="flex flex-col gap-4">
+      <section class="rounded-xl border border-surface-200 dark:border-surface-700 p-5 flex flex-col gap-3">
+        <span class="text-xs uppercase tracking-wide text-surface-500">Current period</span>
+        @if (sub.currentPeriodStart && sub.currentPeriodEnd) {
+          <div class="flex flex-col gap-0.5">
+            <span class="text-sm font-medium">
+              {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+            </span>
+            <span class="text-xs text-surface-500">Renews automatically at period end</span>
+          </div>
+        } @else {
+          <span class="text-sm text-surface-500">Period dates pending — Stripe will populate once activated.</span>
+        }
+
+        @if (sub.trialEnd) {
+          <div class="flex flex-col gap-0.5 mt-2">
+            <span class="text-xs uppercase tracking-wide text-surface-500">Trial</span>
+            <span class="text-sm">Ends {{ sub.trialEnd | date:'dd MMM yyyy' }}</span>
+          </div>
+        }
+
+        @if (sub.canceledAt) {
+          <div class="flex flex-col gap-0.5 mt-2">
+            <span class="text-xs uppercase tracking-wide text-surface-500">Cancelled</span>
+            <span class="text-sm">{{ sub.canceledAt | date:'dd MMM yyyy' }}</span>
+          </div>
+        }
+      </section>
+
+      @if (isPendingSetup()) {
+        <section class="rounded-xl border border-surface-200 dark:border-surface-700 p-5 flex flex-col gap-3">
+          <span class="text-xs uppercase tracking-wide text-surface-500">Payment setup</span>
+          @if (setupUrl(); as url) {
+            <input pInputText [value]="url" readonly class="text-xs" />
+            <div class="grid grid-cols-2 gap-2">
+              <p-button
+                icon="pi pi-copy"
+                label="Copy link"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="copySetupLink()" />
+              <p-button
+                icon="pi pi-external-link"
+                label="Open"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="openSetupLink()" />
+            </div>
+          } @else {
+            <p class="text-sm text-surface-500 m-0">
+              Generate a fresh hosted link to share with the client. The original
+              one we emailed still works too.
+            </p>
+            <p-button
+              icon="pi pi-link"
+              label="Get confirmation link"
+              [loading]="setupLinkLoading()"
+              (onClick)="fetchSetupLink()"
+              styleClass="w-full" />
+          }
+        </section>
+      }
+
+      @if (canCancel()) {
+        <section class="rounded-xl border border-surface-200 dark:border-surface-700 p-5 flex flex-col gap-3">
+          <span class="text-xs uppercase tracking-wide text-surface-500">Actions</span>
+          @if (canScheduleCancel()) {
+            <p-button
+              icon="pi pi-times"
+              label="Cancel at period end"
+              severity="danger"
+              [outlined]="true"
+              [loading]="actionLoading()"
+              (onClick)="confirmCancelAtEnd()"
+              styleClass="w-full" />
+          }
+          <p-button
+            icon="pi pi-trash"
+            label="Cancel immediately"
+            severity="danger"
+            [text]="true"
+            [loading]="actionLoading()"
+            (onClick)="confirmCancelImmediately()"
+            styleClass="w-full" />
+        </section>
+      }
+    </aside>
+  </div>
+
+}

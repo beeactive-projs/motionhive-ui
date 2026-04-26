@@ -21,6 +21,7 @@ export class AuthStore {
   readonly isSuperAdmin = computed(() => this.userRoles().includes(UserRoles.SuperAdmin));
   readonly isAdmin = computed(() => this.userRoles().includes(UserRoles.Admin));
   readonly isSupport = computed(() => this.userRoles().includes(UserRoles.Support));
+  readonly isWriter = computed(() => this.userRoles().includes(UserRoles.Writer));
   readonly isInstructor = computed(() => this.userRoles().includes(UserRoles.Instructor));
   readonly isUser = computed(() => this.userRoles().includes(UserRoles.User));
   readonly userName = computed(() => {

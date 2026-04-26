@@ -24,8 +24,6 @@ export interface InstructorProfileSummary {
   displayName: string;
   specializations: string[];
   bio: string;
-  locationCity?: string;
-  locationCountry?: string;
 }
 
 export interface InstructorClient {
@@ -38,16 +36,20 @@ export interface InstructorClient {
   startedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  invitedEmail: string | null;
+  requestType: ClientRequestType;
+  expiresAt: string | null;
+  // instructor?: ClientUser;
+  // instructorProfile?: InstructorProfileSummary | null;
   client?: ClientUser;
-  instructor?: ClientUser;
-  instructorProfile?: InstructorProfileSummary | null;
   groupMemberships?: GroupMembership[];
 }
 
 export interface ClientRequest {
   id: string;
   fromUserId: string;
-  toUserId: string;
+  toUserId: string | null;
+  invitedEmail: string | null;
   type: ClientRequestType;
   message: string | null;
   status: ClientRequestStatus;
@@ -59,9 +61,15 @@ export interface ClientRequest {
   toUser?: ClientUser;
 }
 
-export interface CreateClientInvitation {
-  email: string;
-  message?: string;
+export type CreateClientInvitation =
+  | { userId: string; email?: never; message?: string }
+  | { email: string; userId?: never; message?: string };
+
+export interface InvitationDetails {
+  token: string;
+  invitedEmail: string;
+  instructor: { firstName: string; lastName: string };
+  expiresAt: string;
 }
 
 export interface UpdateClientPayload {

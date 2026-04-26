@@ -23,6 +23,10 @@ export class GroupService {
     return this._http.get<Group[]>(this.baseUrl);
   }
 
+  getInstructorsGroups(): Observable<Group[]> {
+    return this._http.get<Group[]>(this.baseUrl + '/instructor');
+  }
+
   getById(groupId: string): Observable<Group> {
     return this._http.get<Group>(`${this.baseUrl}/${groupId}`);
   }
@@ -40,10 +44,10 @@ export class GroupService {
   }
 
   getMembers(groupId: string, page = 1, limit = 20): Observable<GroupMemberListResponse> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-    return this._http.get<GroupMemberListResponse>(`${this.baseUrl}/${groupId}/members`, { params });
+    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+    return this._http.get<GroupMemberListResponse>(`${this.baseUrl}/${groupId}/members`, {
+      params,
+    });
   }
 
   removeMember(groupId: string, userId: string): Observable<void> {
@@ -58,8 +62,13 @@ export class GroupService {
     return this._http.post<GroupMember>(`${this.baseUrl}/${groupId}/join`, {});
   }
 
-  generateJoinLink(groupId: string): Observable<{ message: string; token: string; expiresAt: string }> {
-    return this._http.post<{ message: string; token: string; expiresAt: string }>(`${this.baseUrl}/${groupId}/join-link`, {});
+  generateJoinLink(
+    groupId: string,
+  ): Observable<{ message: string; token: string; expiresAt: string }> {
+    return this._http.post<{ message: string; token: string; expiresAt: string }>(
+      `${this.baseUrl}/${groupId}/join-link`,
+      {},
+    );
   }
 
   revokeJoinLink(groupId: string): Observable<void> {

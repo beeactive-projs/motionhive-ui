@@ -1,4 +1,3 @@
-import { PaginatedResponse } from '../common/pagination.model';
 import { InstructorCertification } from '../profile/instructor-profile.model';
 
 export interface MyInstructorUser {
@@ -14,8 +13,6 @@ export interface MyInstructorProfile {
   displayName: string | null;
   specializations: string[];
   bio: string | null;
-  locationCity: string | null;
-  locationCountry: string | null;
 }
 
 export interface MyInstructor {
@@ -28,7 +25,10 @@ export interface MyInstructor {
   instructorProfile: MyInstructorProfile | null;
 }
 
-export type InstructorListResponse = PaginatedResponse<MyInstructor>;
+/**
+ * Backend returns a plain array of active instructor relationships.
+ */
+export type InstructorListResponse = MyInstructor[];
 
 export interface InstructorSearchResult {
   id: string;

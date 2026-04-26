@@ -1,0 +1,66 @@
+<!-- Status filter -->
+<div class="flex gap-2 mb-4 flex-wrap">
+  @for (opt of statusOptions; track opt.value) {
+  <p-button [label]="opt.label" size="small" [outlined]="statusFilter() !== opt.value"
+    [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'" (onClick)="onStatusFilterChange(opt.value)" />
+  }
+</div>
+
+<!-- Table -->
+<p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+  [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowTrackBy]="trackById" size="small"
+  [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices">
+
+  <ng-template #header>
+    <tr>
+      <th>Invoice</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Date</th>
+      <th>Due</th>
+      <th>Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-inv>
+    <tr>
+      <td>
+        <a [routerLink]="['/profile/invoices', inv.id]" class="text-primary-500 hover:underline">
+          {{ inv.number || inv.id.slice(0, 8) }}
+        </a>
+      </td>
+      <td class="font-medium">{{ inv.amountDueCents | currencyRon:inv.currency }}</td>
+      <td><p-tag [value]="inv.status | statusLabel" [severity]="statusSeverity(inv.status)" /></td>
+      <td>{{ inv.createdAt | date:'dd MMM yyyy' }}</td>
+      <td>{{ inv.dueDate ? (inv.dueDate | date:'dd MMM yyyy') : '—' }}</td>
+      <td>
+        <a [routerLink]="['/profile/invoices', inv.id]">
+          <p-button icon="pi pi-eye" size="small" [text]="true" />
+        </a>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template #loadingbody>
+    @for (_ of [1,2,3,4,5]; track $index) {
+    <tr>
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+      <td><p-skeleton width="100%" height="1rem" /></td>
+      }
+    </tr>
+    }
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="6" class="text-center py-8">
+        <div class="text-surface-500">
+          <i class="pi pi-file text-3xl mb-2"></i>
+          <p class="mt-2">No invoices yet</p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-toast />

@@ -1,0 +1,55 @@
+<p-dialog [header]="dialogHeader()" [(visible)]="visible" [modal]="true" [style]="{ width: '32rem' }" [closable]="true">
+  <div class="flex flex-col gap-4">
+    <!-- Name -->
+    <div class="flex flex-col gap-2">
+      <label for="groupName" class="text-sm font-medium">Name *</label>
+      <input id="groupName" type="text" pInputText fluid [(ngModel)]="formName" placeholder="Enter group name" />
+    </div>
+
+    <!-- Description -->
+    <div class="flex flex-col gap-2">
+      <label for="groupDescription" class="text-sm font-medium">Description</label>
+      <textarea pTextarea id="groupDescription" fluid [(ngModel)]="formDescription" [rows]="3"
+        placeholder="Describe the purpose of this group..."></textarea>
+    </div>
+
+    <!-- Join Policy -->
+    <div class="flex flex-col gap-2">
+      <label for="joinPolicy" class="text-sm font-medium">Join policy</label>
+      <p-select id="joinPolicy" [options]="joinPolicyOptions" [(ngModel)]="formJoinPolicy" optionLabel="label"
+        optionValue="value" placeholder="Select join policy" class="w-full" [appendTo]="'body'" />
+    </div>
+
+    <!-- Public Toggle -->
+    <div class="flex items-center justify-between rounded-lg bg-surface-50 dark:bg-surface-950 p-3">
+      <div>
+        <span class="text-sm font-medium">Public group</span>
+        <p class="text-xs">Visible in group discovery</p>
+      </div>
+      <p-toggleSwitch [(ngModel)]="formIsPublic" />
+    </div>
+
+    <!-- Tags -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Tags</label>
+      <div class="flex gap-2">
+        <input type="text" pInputText fluid [(ngModel)]="formTagInput" placeholder="Add a tag and press Enter"
+          (keydown)="onTagKeydown($event)" />
+        <p-button icon="pi pi-plus" severity="secondary" [disabled]="!formTagInput.trim()" (onClick)="addTag()" />
+      </div>
+      @if (formTags.length > 0) {
+      <div class="flex flex-wrap gap-1">
+        @for (tag of formTags; track tag) {
+        <p-chip [label]="tag" [removable]="true" (onRemove)="removeTag(tag)" rounded />
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
+    <p-button [label]="group() ? 'Save changes' : 'Create group'" icon="pi pi-check" severity="primary"
+      [loading]="saving()" [disabled]="!formName.trim()" (onClick)="saveGroup()" />
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,35 @@
+<article class="blog-card" (click)="onRead()" tabindex="0" (keydown.enter)="onRead()">
+  <div class="blog-card__cover">
+    @if (coverUrl()) {
+      <img [src]="coverUrl()" [alt]="post().title" loading="lazy" />
+    } @else {
+      <div class="blog-card__cover-fallback">
+        <i class="pi pi-book"></i>
+      </div>
+    }
+    @if (post().category) {
+      <span class="blog-card__category">{{ post().category }}</span>
+    }
+  </div>
+
+  <div class="blog-card__body">
+    <h3 class="blog-card__title">{{ post().title }}</h3>
+    <p class="blog-card__excerpt">{{ post().excerpt }}</p>
+
+    <div class="blog-card__meta">
+      <span class="blog-card__author">{{ post().authorName }}</span>
+      <span class="blog-card__sep">·</span>
+      <span class="blog-card__read">{{ readTimeLabel() }}</span>
+    </div>
+
+    <p-button
+      label="Read more"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      size="small"
+      severity="warn"
+      text
+      (onClick)="onRead(); $event.stopPropagation()"
+    />
+  </div>
+</article>

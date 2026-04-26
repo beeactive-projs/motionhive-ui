@@ -1,0 +1,107 @@
+.suggest-instructor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4px 4px 8px 4px;
+}
+
+.suggest-instructor__hero {
+  width: 88px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-coral-500), var(--color-coral-400));
+  color: #fff;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  margin-bottom: 12px;
+  font-size: 36px;
+  box-shadow: 0 8px 20px rgba(249, 112, 102, 0.3);
+}
+
+.suggest-instructor__title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 6px 0;
+  color: var(--color-navy-900);
+}
+
+.suggest-instructor__body {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+::ng-deep p-tabs {
+  width: 100%;
+}
+
+.suggest-instructor__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  padding-top: 4px;
+}
+
+.suggest-instructor__hint {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.suggest-instructor__panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggest-instructor__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.suggest-instructor__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-navy-900);
+}
+
+.suggest-instructor__optional {
+  font-weight: 400;
+  color: var(--p-text-muted-color);
+}
+
+.suggest-instructor__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.suggest-instructor__success-hex {
+  width: 72px;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent-500);
+  color: #fff;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+:host-context(.dark) {
+  .suggest-instructor__title,
+  .suggest-instructor__label {
+    color: var(--p-surface-50);
+  }
+}

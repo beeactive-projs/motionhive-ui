@@ -4,6 +4,7 @@ import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from
 import { TokenService } from '../services/auth/token.service';
 import { AuthService } from '../services/auth/auth.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints.const';
+import { environment } from '../../environments/environment';
 
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
@@ -17,6 +18,7 @@ const SKIP_AUTH_PATHS = [
 ];
 
 function shouldSkipAuth(url: string): boolean {
+  if (!url.startsWith(environment.apiUrl)) return true;
   return SKIP_AUTH_PATHS.some((path) => url.includes(path));
 }
 

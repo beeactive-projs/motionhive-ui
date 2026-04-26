@@ -7,6 +7,7 @@ import {
   InstructorClient,
   ClientRequest,
   CreateClientInvitation,
+  InvitationDetails,
   UpdateClientPayload,
 } from '../../models/client/client.model';
 import { InstructorListResponse } from '../../models/client/instructor.model';
@@ -29,11 +30,15 @@ export class ClientService {
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }
 
-  getMyInstructors(page = 1, limit = 10): Observable<InstructorListResponse> {
-    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+  getMyInstructors(): Observable<InstructorListResponse> {
     return this._http.get<InstructorListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.MY_INSTRUCTORS}`,
-      { params },
+    );
+  }
+
+  leaveInstructor(instructorId: string): Observable<InstructorClient> {
+    return this._http.delete<InstructorClient>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.LEAVE_INSTRUCTOR(instructorId)}`,
     );
   }
 
@@ -43,12 +48,38 @@ export class ClientService {
     );
   }
 
+  getSentInvites(): Observable<ClientRequest[]> {
+    return this._http.get<ClientRequest[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.SENT_INVITES}`,
+    );
+  }
+
   sendInvitation(
     dto: CreateClientInvitation,
   ): Observable<{ message: string; request: ClientRequest }> {
     return this._http.post<{ message: string; request: ClientRequest }>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE}`,
       dto,
+    );
+  }
+
+  resendInvitation(requestId: string): Observable<{ message: string; request: ClientRequest }> {
+    return this._http.post<{ message: string; request: ClientRequest }>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE}/${requestId}/resend`,
+      null,
+    );
+  }
+
+  getInvitationByToken(token: string): Observable<InvitationDetails> {
+    return this._http.get<InvitationDetails>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.INVITE_BY_TOKEN(token)}`,
+    );
+  }
+
+  acceptByToken(token: string): Observable<{ message: string }> {
+    return this._http.post<{ message: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.ACCEPT_BY_TOKEN}`,
+      { token },
     );
   }
 
@@ -89,5 +120,9 @@ export class ClientService {
 
   archiveClient(clientId: string): Observable<InstructorClient> {
     return this._http.delete<InstructorClient>(`${this.baseUrl}/${clientId}`);
+  }
+
+  unarchiveClient(clientId: string): Observable<InstructorClient> {
+    return this._http.patch<InstructorClient>(`${this.baseUrl}/${clientId}`, { status: 'ACTIVE' });
   }
 }

@@ -1,48 +1,58 @@
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   computed,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { AvatarModule } from 'primeng/avatar';
-import { TagModule } from 'primeng/tag';
-import { DividerModule } from 'primeng/divider';
-import { ButtonModule } from 'primeng/button';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
-  ProfileService,
+  ClientPaymentService,
+  ClientService,
+  MyBillingCounts,
   MyProfile,
-  GenderLabels,
-  FitnessLevelLabels,
-  UserRoles,
-  TagSeverity,
+  ProfileService,
 } from 'core';
-import { EditPersonalInfo } from './dialogs/edit-personal-info/edit-personal-info';
-import { EditFitnessProfile } from './dialogs/edit-fitness-profile/edit-fitness-profile';
-import { EditInstructorProfile } from './dialogs/edit-instructor-profile/edit-instructor-profile';
-import { BecomeInstructor } from '../user/dialogs/become-instructor/become-instructor';
+import { MessageService } from 'primeng/api';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import { SkeletonModule } from 'primeng/skeleton';
+import { CardModule } from 'primeng/card';
+import { Button } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+import { Details } from './tabs/details/details';
+import { ProfileCoaches } from './tabs/coaches/coaches';
+import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
+import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
+
+export const ProfileTabs = {
+  Details: 'details',
+  Coaches: 'coaches',
+  Invoices: 'invoices',
+  Memberships: 'memberships',
+} as const;
+
+export type ProfileTab = (typeof ProfileTabs)[keyof typeof ProfileTabs];
+
+const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
 
 @Component({
   selector: 'mh-profile',
   imports: [
-    DatePipe,
-    CardModule,
-    AvatarModule,
-    TagModule,
-    DividerModule,
-    ButtonModule,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
     SkeletonModule,
+    CardModule,
+    Button,
     ToastModule,
-    EditPersonalInfo,
-    EditFitnessProfile,
-    EditInstructorProfile,
-    BecomeInstructor,
+    Details,
+    ProfileCoaches,
+    MyInvoices,
+    MySubscriptions,
   ],
   providers: [MessageService],
   templateUrl: './profile.html',
@@ -51,46 +61,42 @@ import { BecomeInstructor } from '../user/dialogs/become-instructor/become-instr
 })
 export class Profile implements OnInit {
   private readonly _profileService = inject(ProfileService);
+  private readonly _clientPaymentService = inject(ClientPaymentService);
+  private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+
+  readonly Tabs = ProfileTabs;
 
   readonly profile = signal<MyProfile | null>(null);
   readonly loading = signal(true);
-  readonly showEditPersonalInfo = signal(false);
-  readonly showEditFitnessProfile = signal(false);
-  readonly showEditInstructor = signal(false);
-  readonly becomeInstructorVisible = signal(false);
+  readonly counts = signal<MyBillingCounts | null>(null);
+  readonly incomingRequestsCount = signal(0);
 
-  readonly fullName = computed(() => {
-    const p = this.profile();
-    return p ? `${p.account.firstName} ${p.account.lastName}` : '';
+  private readonly _queryParams = toSignal(this._route.queryParamMap, {
+    initialValue: this._route.snapshot.queryParamMap,
   });
 
-  readonly initials = computed(() => {
-    const p = this.profile();
-    if (!p) return '';
-    return `${p.account.firstName.charAt(0)}${p.account.lastName.charAt(0)}`.toUpperCase();
+  readonly activeTab = computed<ProfileTab>(() => {
+    const tab = this._queryParams().get('tab');
+    return tab && VALID_TABS.has(tab) ? (tab as ProfileTab) : ProfileTabs.Details;
   });
 
-  readonly isInstructor = computed(() => {
-    const p = this.profile();
-    if (!p) return false;
-    return p.roles.includes(UserRoles.Instructor) || p.roles.includes('ORGANIZER');
-  });
+  readonly showInvoicesTab = computed(() => (this.counts()?.invoices.total ?? 0) > 0);
+  readonly showMembershipsTab = computed(
+    () => (this.counts()?.memberships.total ?? 0) > 0,
+  );
 
-  readonly hasInstructorProfile = computed(() => this.profile()?.instructorProfile != null);
-
-  readonly formattedGender = computed(() => {
-    const gender = this.profile()?.fitnessProfile?.gender;
-    return gender ? GenderLabels[gender] : null;
-  });
-
-  readonly formattedFitnessLevel = computed(() => {
-    const level = this.profile()?.fitnessProfile?.fitnessLevel;
-    return level ? FitnessLevelLabels[level] : null;
-  });
+  readonly invoicesBadge = computed(() => this.counts()?.invoices.open ?? 0);
+  readonly membershipsBadge = computed(
+    () => this.counts()?.memberships.active ?? 0,
+  );
 
   ngOnInit(): void {
     this.loadProfile();
+    this.loadCounts();
+    this.loadIncomingRequestsCount();
   }
 
   loadProfile(): void {
@@ -111,18 +117,36 @@ export class Profile implements OnInit {
     });
   }
 
-  roleSeverity(role: string): TagSeverity {
-    switch (role) {
-      case UserRoles.SuperAdmin:
-        return TagSeverity.Danger;
-      case UserRoles.Admin:
-        return TagSeverity.Warn;
-      case UserRoles.Instructor:
-        return TagSeverity.Info;
-      case UserRoles.Support:
-        return TagSeverity.Contrast;
-      default:
-        return TagSeverity.Secondary;
-    }
+  private loadCounts(): void {
+    this._clientPaymentService.getMyCounts().subscribe({
+      next: (counts) => this.counts.set(counts),
+      error: () => {
+        // Counts are non-critical; tabs fall back to Details-only.
+        this.counts.set(null);
+      },
+    });
+  }
+
+  private loadIncomingRequestsCount(): void {
+    this._clientService.getPendingRequests().subscribe({
+      next: (requests) =>
+        this.incomingRequestsCount.set(
+          requests.filter((r) => r.type === 'INSTRUCTOR_TO_CLIENT').length,
+        ),
+      error: () => this.incomingRequestsCount.set(0),
+    });
+  }
+
+  onTabChange(value: string | number | undefined): void {
+    const tab =
+      typeof value === 'string' && VALID_TABS.has(value)
+        ? value
+        : ProfileTabs.Details;
+    if (tab === this.activeTab()) return;
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+    });
   }
 }

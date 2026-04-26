@@ -3,40 +3,72 @@
 
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
-
-    <a routerLink="/dashboard" aria-label="MotionHive home">
+    <div class="honeycomb-bg"></div>
+    <a routerLink="/home" aria-label="MotionHive home" class="mx-4">
       <mh-logo />
     </a>
 
-    <nav class="flex-1">
-      <ul class="flex flex-col gap-2">
-        @for (item of menuItems(); track (item.routerLink ?? item.label)) {
-        @if (item.separator) {
-        <li class="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-surface-400">
-          {{ item.label }}
-        </li>
-        } @else {
+    <nav class="flex-1 overflow-auto px-3">
+      @for (section of navSections(); track section.label) {
+      @if (section.label) {
+      <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider">
+        {{ section.label }}
+      </div>
+      }
+      <ul class="flex flex-col gap-1 mb-2">
+        @for (item of section.items; track item.label) {
         <li>
-          <a [routerLink]="item.routerLink" routerLinkActive="bg-primary-500 text-primary-contrast font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
-                transition-colors hover:bg-surface-300 hover:text-surface-800">
+          @if (item.action === 'stripe-dashboard') {
+          <a href="#" (click)="onNavItemClick(item, $event)" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+                  transition-colors hover:bg-surface-300 hover:text-surface-800">
+            <i [class]="item.icon + ' text-base'"></i>
+            <span class="flex-1">{{ item.label }}</span>
+          </a>
+          } @else if (item.external) {
+          <a [href]="item.route" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+                  transition-colors hover:bg-surface-300 hover:text-surface-800">
+            <i [class]="item.icon + ' text-base'"></i>
+            <span class="flex-1">{{ item.label }}</span>
+          </a>
+          } @else {
+          <a [routerLink]="item.route"
+            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+                  transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
             {{ item.label }}
           </a>
+          }
         </li>
         }
-        }
       </ul>
+      }
     </nav>
+    <!-- @if (!isInstructor()) {
+      <div class="become-coach-cta">
+        <p class="become-coach-cta__text">Start coaching on MotionHive</p>
+        <p-button label="Become a coach" icon="pi pi-arrow-right" iconPos="right" severity="secondary" [outlined]="true"
+          size="small" routerLink="/profile" [queryParams]="{ tab: 'instructor' }" />
+      </div>
+      } -->
 
-    <p-button label="Share feedback" icon="pi pi-comment" text fluid styleClass="justify-start"
-      (onClick)="openFeedback()" />
+    <!--
+    <p-button label="Share feedback" icon="pi pi-comment" fluid styleClass="justify-start" (onClick)="openFeedback()"
+      link /> -->
 
   </aside>
 
   <div class="content" [class.sidebar-open]="sidebarOpen()">
     <p-toolbar>
       <ng-template #start>
-        <p-button icon="pi pi-bars" class="mr-2" size="small" text rounded (onClick)="toggleSidebar()" />
+        <p-button icon="pi pi-bars" class="mr-3" size="small" text rounded (onClick)="toggleSidebar()" />
+        <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()"
+          aria-label="Open search">
+          <i class="pi pi-search search-trigger__icon"></i>
+          <span class="search-trigger__placeholder">Search instructors, groups, sessions…</span>
+          <kbd class="search-trigger__kbd">⌘K</kbd>
+        </button>
+        <p-button icon="pi pi-search" class="sm:hidden" size="small" text rounded
+          (onClick)="openSearch()" ariaLabel="Open search" />
       </ng-template>
       <ng-template #center>
         <ng-content select="[toolbarCenter]" />
@@ -55,3 +87,5 @@
     </main>
   </div>
 </div>
+
+<mh-search-modal />

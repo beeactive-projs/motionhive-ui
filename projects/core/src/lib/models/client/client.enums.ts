@@ -28,3 +28,15 @@ export const ClientRequestStatuses = {
 } as const;
 
 export type ClientRequestStatus = (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
+
+export const ClientStatusLabels: Record<InstructorClientStatus, string> = {
+  [InstructorClientStatuses.Active]: 'Active',
+  [InstructorClientStatuses.Archived]: 'Archived',
+  [InstructorClientStatuses.Pending]: 'Pending',
+};
+
+export const PendingClientLabels = {
+  Invited: 'Invited',
+  EmailSent: 'Email sent',
+  Request: 'Request',
+} as const;

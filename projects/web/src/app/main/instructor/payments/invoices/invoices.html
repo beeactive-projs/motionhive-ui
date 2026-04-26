@@ -1,0 +1,248 @@
+<!-- Filters -->
+<div class="flex items-center gap-3 mt-2 mb-4 overflow-x-auto no-scrollbar">
+  @for (option of statusOptions; track option.label) {
+  <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'contrast'" size="small"
+    rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
+    styleClass="py-0.5 min-w-10" />
+  }
+</div>
+
+
+<!-- Desktop: data table (hidden on mobile) -->
+<div class="md:block hidden flex-1">
+  <p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+    [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]" [scrollable]="true"
+    scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
+    <ng-template #header>
+      <tr>
+        <th style="width: 20%;">Invoice #</th>
+        <th>Client</th>
+        <th class="text-center" style="width: 1%;">Amount</th>
+        <th class="text-center" style="width: 10%;">Status</th>
+        <th class="text-center" style="width: 10%;">Due Date</th>
+        <th class="text-center" style="width: 10%;">Paid</th>
+        <th class="text-center" style="width: 1%;">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-invoice>
+      <tr [class.opacity-60]="invoice.status === Statuses.Draft">
+        <td>
+          <a [routerLink]="['/coaching/invoices', invoice.id]"
+            class="text-primary-500 hover:underline font-medium tabular-nums">
+            {{ invoiceDisplayNumber(invoice) }}
+            @if (invoice.status === Statuses.Draft) {
+              <span class="text-xs font-normal text-surface-500">(draft)</span>
+            }
+          </a>
+        </td>
+        <td>
+          <span class="font-medium">{{ clientDisplay(invoice) }}</span>
+          @if (invoice.client?.email) {
+          <p class="text-xs text-muted-color mt-0.5 mb-0">{{ invoice.client.email }}</p>
+          }
+        </td>
+        <td class="text-end">{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
+        <td>
+          <p-tag [value]="invoice.status | statusLabel" [severity]="statusSeverity(invoice.status)" class="w-full"
+            rounded />
+          @if (invoice.paidOutOfBand) {
+          <span class="text-xs text-muted-color ml-1">(manual)</span>
+          }
+        </td>
+        <td class="text-center">
+          @if (invoice.dueDate) {
+          <span [class.text-red-500]="isOverdue(invoice)">
+            {{ invoice.dueDate | date:'dd/MM/yyyy' }}
+          </span>
+          } @else {
+          —
+          }
+        </td>
+        <td class="text-center">{{ invoice.paidAt ? (invoice.paidAt | date:'dd/MM/yyyy') : '—' }}</td>
+        <td>
+          <div class="flex gap-3 justify-end">
+            @switch (invoice.status) {
+            @case (Statuses.Draft) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
+              pTooltip="Edit" (onClick)="openEdit(invoice)" />
+            <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
+              pTooltip="Send" (onClick)="openSendDialog(invoice)" />
+            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
+              tooltipPosition="left" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
+            }
+            @case (Statuses.Open) {
+            <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
+              pTooltip="Resend email" (onClick)="openSendDialog(invoice)" />
+            <p-button icon="pi pi-check" [rounded]="true" [text]="true" size="small" severity="success"
+              tooltipPosition="left" pTooltip="Mark paid" (onClick)="confirmMarkPaid(invoice)" />
+            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
+              tooltipPosition="left" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
+            }
+            @case (Statuses.Paid) {
+            @if (invoice.invoicePdf) {
+            <a [href]="invoice.invoicePdf" target="_blank" rel="noopener">
+              <p-button icon="pi pi-download" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
+                pTooltip="Download PDF" />
+            </a>
+            }
+            }
+            }
+            @if (invoice.hostedInvoiceUrl) {
+            <a [href]="invoice.hostedInvoiceUrl" target="_blank" rel="noopener">
+              <p-button icon="pi pi-external-link" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
+                pTooltip="View hosted page" />
+            </a>
+            }
+          </div>
+        </td>
+      </tr>
+
+    </ng-template>
+
+    <ng-template #loadingbody>
+      @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
+      <tr>
+        <td style="width: 20%;">
+          <p-skeleton width="60%" height="2rem" />
+        </td>
+        <td>
+          <p-skeleton width="60%" height="1.25rem" />
+          <p-skeleton width="45%" height="1rem" class="mt-2" />
+        </td>
+        <td class="text-end" style="width: 1%;">
+          <p-skeleton width="100%" height="2rem" />
+        </td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 1%;">
+          <div class="flex gap-3 justify-end">
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+          </div>
+        </td>
+      </tr>
+      }
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7">
+          <div class="flex flex-col items-center justify-center py-8 text-center">
+            <i class="pi pi-file text-4xl mb-3 text-surface-400"></i>
+            <p class="text-surface-900 dark:text-surface-50 m-0 font-medium">No invoices yet</p>
+            <p class="text-surface-500 text-sm mt-1 mb-3">
+              Create your first invoice to start billing clients.
+            </p>
+            <p-button label="Create invoice" icon="pi pi-plus" size="small" (onClick)="showCreateDialog.set(true)" />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #paginatorleft let-state>
+      <p-tag [rounded]="true">
+        View {{state.first+1}} -
+        {{state.first+state.rows>state.totalRecords?state.totalRecords:state.first+state.rows}} of
+        {{state.totalRecords}}
+      </p-tag>
+    </ng-template>
+  </p-table>
+</div>
+
+
+<!-- Mobile: card list (hidden on desktop) -->
+<div class="md:hidden">
+  @if (loading()) {
+  <div class="flex flex-col gap-3">
+    @for (_ of [1,2,3]; track $index) {
+    <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+      <p-skeleton width="30%" height="1.25rem" />
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 flex-1">
+          <p-skeleton shape="circle" size="2.25rem" />
+          <div class="flex flex-col gap-1 flex-1">
+            <p-skeleton width="60%" height="0.875rem" />
+            <p-skeleton width="40%" height="0.75rem" />
+          </div>
+        </div>
+        <p-skeleton width="4rem" height="1rem" />
+      </div>
+    </div>
+    }
+  </div>
+  } @else {
+  <p-dataview [value]="invoices()">
+    <ng-template #list let-items>
+      <div class="flex flex-col gap-3 pt-1">
+        @for (invoice of items; track trackById($index, invoice)) {
+        <a [routerLink]="['/coaching/invoices', invoice.id]" class="no-underline text-inherit">
+          <mh-list-card [status]="isOverdue(invoice) ? 'overdue' : invoice.status"
+            [statusSeverity]="isOverdue(invoice) ? 'danger' : statusSeverity(invoice.status)"
+            [avatarInitials]="clientInitials(invoice)" [title]="clientDisplay(invoice)" [subtitle]="invoiceDisplayNumber(invoice) +
+                  (invoice.status === Statuses.Paid && invoice.paidAt
+                    ? ' · Paid'
+                    : invoice.dueDate ? ' · Due' : '')" [clickable]="true" [accent]="cardAccent(invoice)">
+            <div amount class="flex flex-col items-end">
+              <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
+                {{ invoice.amountDueCents | currencyRon:invoice.currency }}
+              </span>
+            </div>
+            <div meta class="flex items-center gap-2 text-xs text-surface-500 flex-wrap">
+              @if (invoice.status === Statuses.Paid && invoice.paidAt) {
+              <span>{{ invoice.paidAt | date:'dd MMM' }}</span>
+              } @else if (invoice.dueDate) {
+              <span [class.text-red-500]="isOverdue(invoice)">{{ invoice.dueDate | date:'dd MMM' }}</span>
+              }
+              @if (invoice.paidOutOfBand) {
+              <span>· manual</span>
+              }
+            </div>
+          </mh-list-card>
+        </a>
+        }
+        @if (loadingMore()) {
+        <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+          <p-skeleton width="30%" height="1.25rem" />
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 flex-1">
+              <p-skeleton shape="circle" size="2.25rem" />
+              <div class="flex flex-col gap-1 flex-1">
+                <p-skeleton width="60%" height="0.875rem" />
+                <p-skeleton width="40%" height="0.75rem" />
+              </div>
+            </div>
+            <p-skeleton width="4rem" height="1rem" />
+          </div>
+        </div>
+        }
+      </div>
+    </ng-template>
+    <ng-template #empty>
+      <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+        <i class="pi pi-file text-4xl text-surface-400"></i>
+        <p class="m-0 font-medium">No invoices yet</p>
+        <p class="text-surface-500 text-sm m-0">Create your first invoice to start billing clients.</p>
+        <p-button label="Create invoice" icon="pi pi-plus" size="small" class="mt-2"
+          (onClick)="showCreateDialog.set(true)" />
+      </div>
+    </ng-template>
+  </p-dataview>
+  @if (hasMore()) {
+  <div #scrollSentinel class="h-2"></div>
+  }
+  }
+</div>
+
+<mh-create-invoice-dialog
+  [visible]="showCreateDialog()"
+  (visibleChange)="onCreateDialogVisibleChange($event)"
+  [editingInvoiceId]="editingInvoiceId()"
+  (saved)="onSavedFromDialog()" />
+
+<mh-send-invoice-email-dialog [(visible)]="showSendDialog" [invoice]="sendDialogInvoice()" (sent)="loadInvoices()" />
+
+<p-toast />
+<p-confirmDialog />

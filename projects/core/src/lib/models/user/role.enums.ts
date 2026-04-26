@@ -2,6 +2,7 @@ export const UserRoles = {
   SuperAdmin: 'SUPER_ADMIN',
   Admin: 'ADMIN',
   Support: 'SUPPORT',
+  Writer: 'WRITER',
   Instructor: 'INSTRUCTOR',
   User: 'USER',
 } as const;

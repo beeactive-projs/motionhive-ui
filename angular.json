@@ -37,7 +37,8 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "skipTests": true
         }
       },
       "root": "projects/web",
@@ -58,7 +59,8 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/web/public"
+                "projects/web/public",
+                "projects/core/src/styles"
               ]
             },
             "styles": [
@@ -152,7 +154,8 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/website/public"
+                "projects/website/public",
+                "projects/core/src/styles"
               ]
             },
             "styles": [
@@ -179,7 +182,13 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/core/src/environments/environment.ts",
+                  "with": "projects/core/src/environments/environment.development.ts"
+                }
+              ]
             },
             "development-ro": {
               "localize": [
@@ -187,7 +196,13 @@
               ],
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/core/src/environments/environment.ts",
+                  "with": "projects/core/src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

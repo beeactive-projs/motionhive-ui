@@ -2,52 +2,33 @@
   <!-- Header -->
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
-      <!-- <p class="text-xs uppercase text-surface-700 dark:text-surface-400">Client Management</p> -->
       <h1 class="font-heading font-semibold text-xl md:text-2xl">Clients</h1>
       <p class="text-sm text-surface-700 dark:text-surface-400">Manage your client relationships, invitations, and
         requests.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="Invite client" icon="pi pi-user-plus" rounded (onClick)="openInviteDialog()" />
+      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
     </div>
   </header>
 
-  <!-- Pending Requests Banner -->
-  @if (pendingCount() > 0) {
-  <p-card class="shadow-sm border-l-4 border-l-yellow-400">
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-2">
-        <i class="pi pi-bell text-yellow-600"></i>
-        <h3 class="text-base font-semibold text-secondary-900">
-          Pending Requests ({{ pendingCount() }})
-        </h3>
-      </div>
-      <div class="space-y-3">
-        @for (request of pendingRequests(); track trackById($index, request)) {
-        <div class="flex items-center justify-between rounded-lg bg-surface-50 p-3">
-          <div class="flex items-center gap-3">
-            <p-avatar
-              [label]="request.fromUser ? request.fromUser.firstName.charAt(0) + request.fromUser.lastName.charAt(0) : '??'"
-              shape="circle" styleClass="bg-yellow-100 text-yellow-700" />
-            <div>
-              <span class="font-medium text-secondary-900">{{ requestFromName(request) }}</span>
-              <span class="text-sm text-secondary-500"> wants to become your client</span>
-              @if (request.message) {
-              <p class="mt-1 text-xs text-secondary-500 italic">"{{ request.message }}"</p>
-              }
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true" pTooltip="Accept"
-              (onClick)="acceptPendingRequest(request)" />
-            <p-button icon="pi pi-times" severity="danger" [rounded]="true" [text]="true" pTooltip="Decline"
-              (onClick)="declinePendingRequest(request)" />
+  <!-- Incoming-request banner -->
+  @if (showIncomingBanner()) {
+    <p-card class="shadow-sm border-l-4 border-l-primary-400">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-inbox text-primary-600 text-xl"></i>
+          <div class="flex flex-col">
+            <span class="font-semibold">
+              {{ incomingRequestsCount() }} client
+              {{ incomingRequestsCount() === 1 ? 'request' : 'requests' }} waiting
+            </span>
+            <span class="text-sm text-surface-500">Users who want to work with you — review and accept or decline.</span>
           </div>
         </div>
-        }
+        <p-button label="Review" icon="pi pi-arrow-right" iconPos="right" size="small"
+          (onClick)="jumpToIncomingRequests()" />
       </div>
-    </div>
-  </p-card>
+    </p-card>
   }
 
   <!-- Filters -->
@@ -55,23 +36,24 @@
     <span class="text-sm font-medium">Status:</span>
     @for (option of statusOptions; track option.label) {
     <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'contrast'" size="small"
-      rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)" />
+      rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
+      styleClass="py-0.5 min-w-10" />
     }
   </div>
 
   <!-- Clients Table -->
-  <div class="flex-1 " style="background-color: var(--p-datatable-row-background);">
+  <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
 
     <p-table [value]="clients()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
       [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
-      scrollHeight="flex" dataKey="id">
+      scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true">
       <ng-template #header>
         <tr>
           <th>Name</th>
           <th>Email</th>
-          <th>Status</th>
-          <th>Started</th>
-          <th>Groups</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Started</th>
+          <!-- <th>Groups</th> -->
           <th>Notes</th>
           <th class="w-32 text-center">Actions</th>
         </tr>
@@ -81,16 +63,17 @@
         <tr>
           <td>
             <div class="flex items-center gap-3">
-              <p-avatar [label]="initials(client)" shape="circle" styleClass="bg-primary-100 text-primary-700" />
-              <span class="font-medium text-secondary-900">{{ clientName(client) }}</span>
+              <p-avatar [label]="initials(client)" shape="circle" />
+              <span>{{ clientName(client) }}</span>
             </div>
           </td>
-          <td>{{ client.client?.email || '—' }}</td>
-          <td>
-            <p-tag [value]="client.status" [severity]="statusSeverity(client.status)" />
+          <td>{{ clientEmail(client) }}</td>
+          <td class="text-center">
+            <p-tag [value]="clientStatusLabel(client)" [severity]="statusSeverity(client.status)" class="w-full"
+              rounded />
           </td>
-          <td>{{ client.startedAt ? (client.startedAt | date: 'mediumDate') : '—' }}</td>
-          <td>
+          <td class="text-center">{{ client.startedAt ? (client.startedAt | date: 'dd MMM yyyy') : '—' }}</td>
+          <!-- <td>
             @if (client.groupMemberships?.length) {
             <div class="flex flex-wrap gap-1">
               @for (group of client.groupMemberships; track group.groupId) {
@@ -100,23 +83,37 @@
             } @else {
             <span class="text-secondary-400">—</span>
             }
-          </td>
+          </td> -->
           <td>
             @if (client.notes) {
-            <span class="text-xs text-secondary-500 truncate max-w-10 inline-block" [pTooltip]="client.notes">
+            <span class="text-xs truncate max-w-20 inline-block" [pTooltip]="client.notes">
               {{ client.notes }}
             </span>
             } @else {
-            <span class="text-secondary-400">—</span>
+            <span class="text-surface-400">—</span>
             }
           </td>
           <td>
-            <div class="flex items-center justify-center gap-1">
-              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit Notes"
-                (onClick)="openNotesDialog(client)" />
-              @if (client.status === 'ACTIVE') {
-              <p-button icon="pi pi-inbox" [rounded]="true" [text]="true" severity="danger" pTooltip="Archive"
+            <div class="flex items-center justify-end gap-1">
+              @if (client.status === Statuses.Pending && client.requestType === RequestTypes.ClientToInstructor) {
+              <p-button icon="pi pi-check" rounded text severity="success" tooltipPosition="left" pTooltip="Accept"
+                (onClick)="acceptPendingRequest(client)" />
+              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left" pTooltip="Decline"
+                (onClick)="declinePendingRequest(client)" />
+              } @else if (client.status === Statuses.Active) {
+              <p-button icon="pi pi-pencil" rounded text severity="secondary" tooltipPosition="left"
+                pTooltip="Edit notes" (onClick)="openNotesDialog(client)" />
+              <p-button icon="pi pi-inbox" rounded text severity="danger" tooltipPosition="left" pTooltip="Archive"
                 (onClick)="confirmArchive(client)" />
+              } @else if (client.status === Statuses.Pending && client.requestType === RequestTypes.InstructorToClient)
+              {
+              <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
+                pTooltip="Resend invitation" (onClick)="resendInvitation(client)" />
+              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left"
+                pTooltip="Cancel invitation" (onClick)="cancelInvitation(client)" />
+              } @else if (client.status === Statuses.Archived) {
+              <p-button icon="pi pi-inbox" rounded text severity="success" tooltipPosition="left" pTooltip="Unarchive"
+                (onClick)="confirmUnarchive(client)" />
               }
             </div>
           </td>
@@ -149,8 +146,8 @@
               <p class="text-sm text-secondary-500">
                 Start by inviting clients to build your client base.
               </p>
-              <p-button label="Invite Your First Client" icon="pi pi-user-plus" severity="primary"
-                styleClass="!rounded-full mt-2" (onClick)="openInviteDialog()" />
+              <p-button label="Invite your first client" icon="pi pi-user-plus" severity="primary" styleClass="mt-2"
+                (onClick)="openInviteDialog()" />
             </div>
           </td>
         </tr>
@@ -158,52 +155,10 @@
     </p-table>
   </div>
 </div>
-<!-- Invite Dialog -->
-<p-dialog header="Invite client" [visible]="showInviteDialog()" (visibleChange)="showInviteDialog.set($event)"
-  [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
-  <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-2">
-      <label for="inviteEmail" class="text-sm font-medium text-secondary-700">Email Address</label>
-      <input id="inviteEmail" type="email" pInputText [(ngModel)]="inviteEmail"
-        placeholder="Enter the client's email address" />
-      <span class="text-xs text-secondary-400">The client will receive an email invitation</span>
-    </div>
-    <div class="flex flex-col gap-2">
-      <label for="inviteMessage" class="text-sm font-medium text-secondary-700">Message (optional)</label>
-      <textarea id="inviteMessage" pTextarea [(ngModel)]="inviteMessage" [rows]="3"
-        placeholder="Add a personal message..."></textarea>
-    </div>
-  </div>
-  <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="showInviteDialog.set(false)" />
-    <p-button label="Send Invitation" icon="pi pi-send" severity="primary" [loading]="inviteLoading()"
-      [disabled]="!inviteEmail.trim()" (onClick)="sendInvitation()" />
-  </ng-template>
-</p-dialog>
 
-<!-- Notes Dialog -->
-<p-dialog header="Edit Client Notes" [visible]="showNotesDialog()" (visibleChange)="showNotesDialog.set($event)"
-  [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
-  <div class="flex flex-col gap-4">
-    @if (editingClient(); as client) {
-    <div class="flex items-center gap-3 rounded-lg bg-surface-50 p-3">
-      <p-avatar [label]="initials(client)" shape="circle" styleClass="bg-primary-100 text-primary-700" />
-      <span class="font-medium text-secondary-900">{{ clientName(client) }}</span>
-    </div>
-    }
-    <div class="flex flex-col gap-2">
-      <label for="editNotes" class="text-sm font-medium text-secondary-700">Notes</label>
-      <textarea id="editNotes" pTextarea [(ngModel)]="editNotes" [rows]="5"
-        placeholder="Add private notes about this client..."></textarea>
-    </div>
-  </div>
-  <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="showNotesDialog.set(false)" />
-    <p-button label="Save Notes" icon="pi pi-check" severity="primary" [loading]="notesLoading()"
-      (onClick)="saveNotes()" />
-  </ng-template>
-</p-dialog>
+<mh-invite-client-dialog [(visible)]="showInviteDialog" (saved)="loadClients()" />
 
+<mh-edit-client-notes-dialog [(visible)]="showNotesDialog" [client]="editingClient()" (saved)="loadClients()" />
 
 <p-toast />
 <p-confirmDialog />

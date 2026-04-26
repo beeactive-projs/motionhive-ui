@@ -1,22 +1,18 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  computed,
   inject,
   OnInit,
   signal,
-  computed,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
 import { SkeletonModule } from 'primeng/skeleton';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -24,28 +20,31 @@ import { TooltipModule } from 'primeng/tooltip';
 import {
   InstructorClient,
   InstructorClientStatus,
-  ClientRequest,
+  InstructorClientStatuses,
+  ClientRequestTypes,
+  ClientStatusLabels,
+  PendingClientLabels,
   ClientService,
   TagSeverity,
 } from 'core';
+import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
+import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit-client-notes-dialog';
 
 @Component({
   selector: 'mh-clients',
   imports: [
     DatePipe,
-    FormsModule,
     CardModule,
     ButtonModule,
     TableModule,
     TagModule,
     AvatarModule,
     SkeletonModule,
-    DialogModule,
-    InputTextModule,
-    TextareaModule,
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    InviteClientDialog,
+    EditClientNotesDialog,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',
@@ -57,15 +56,16 @@ export class Clients implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
 
-  clients = signal<InstructorClient[]>([]);
+  readonly Statuses = InstructorClientStatuses;
+  readonly RequestTypes = ClientRequestTypes;
+
+  clients = signal<any[]>([]);
   totalRecords = signal(0);
   loading = signal(true);
-  pendingRequests = signal<ClientRequest[]>([]);
 
   readonly rows = 10;
   currentPage = signal(1);
 
-  // Status filter
   statusFilter = signal<InstructorClientStatus | undefined>(undefined);
   readonly statusOptions = [
     { label: 'All', value: undefined },
@@ -74,34 +74,42 @@ export class Clients implements OnInit {
     { label: 'Archived', value: 'ARCHIVED' as InstructorClientStatus },
   ];
 
-  // Invite dialog
   showInviteDialog = signal(false);
-  inviteEmail = '';
-  inviteMessage = '';
-  inviteLoading = signal(false);
-
-  // Notes dialog
   showNotesDialog = signal(false);
   editingClient = signal<InstructorClient | null>(null);
-  editNotes = '';
-  notesLoading = signal(false);
 
-  // Pending requests count
-  pendingCount = computed(() => this.pendingRequests().length);
+  incomingRequestsCount = signal(0);
+  readonly showIncomingBanner = computed(
+    () =>
+      this.incomingRequestsCount() > 0 &&
+      this.statusFilter() !== this.Statuses.Pending,
+  );
 
   ngOnInit(): void {
-    // this.loadClients();
-    this.loadPendingRequests();
+    this.loadClients();
+    this.loadIncomingCount();
+  }
+
+  private loadIncomingCount(): void {
+    this._clientService.getPendingRequests().subscribe({
+      next: (requests) =>
+        this.incomingRequestsCount.set(
+          requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR').length,
+        ),
+      error: () => this.incomingRequestsCount.set(0),
+    });
+  }
+
+  jumpToIncomingRequests(): void {
+    this.onStatusFilterChange(this.Statuses.Pending);
   }
 
   loadClients(): void {
     this.loading.set(true);
-    const page = this.currentPage();
-
     this._clientService
       .getClients({
         status: this.statusFilter(),
-        page,
+        page: this.currentPage(),
         limit: this.rows,
       })
       .subscribe({
@@ -121,13 +129,6 @@ export class Clients implements OnInit {
       });
   }
 
-  loadPendingRequests(): void {
-    this._clientService.getPendingRequests().subscribe({
-      next: (requests) => this.pendingRequests.set(requests),
-      error: () => {},
-    });
-  }
-
   onPageChange(event: { first?: number | null; rows?: number | null }): void {
     const first = event.first ?? 0;
     const rows = event.rows ?? this.rows;
@@ -141,98 +142,95 @@ export class Clients implements OnInit {
     this.loadClients();
   }
 
-  // Invite
   openInviteDialog(): void {
-    this.inviteEmail = '';
-    this.inviteMessage = '';
     this.showInviteDialog.set(true);
   }
 
-  sendInvitation(): void {
-    if (!this.inviteEmail.trim()) return;
-
-    this.inviteLoading.set(true);
-    this._clientService
-      .sendInvitation({
-        email: this.inviteEmail.trim(),
-        message: this.inviteMessage.trim() || undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.inviteLoading.set(false);
-          this.showInviteDialog.set(false);
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Invitation Sent',
-            detail: 'Client invitation has been sent successfully',
-          });
-          this.loadClients();
-        },
-        error: (err) => {
-          this.inviteLoading.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to send invitation',
-          });
-        },
-      });
-  }
-
-  // Notes
   openNotesDialog(client: InstructorClient): void {
     this.editingClient.set(client);
-    this.editNotes = client.notes || '';
     this.showNotesDialog.set(true);
   }
 
-  saveNotes(): void {
-    const client = this.editingClient();
-    if (!client) return;
+  cancelInvitation(client: InstructorClient): void {
+    const name = client.client
+      ? `${client.client.firstName} ${client.client.lastName}`
+      : 'this client';
+    this._confirmationService.confirm({
+      message: `Are you sure you want to cancel the invitation to ${name}?`,
+      header: 'Cancel invitation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.cancelInvitationRequest(client),
+    });
+  }
 
-    this.notesLoading.set(true);
-    this._clientService.updateClient(client.clientId, { notes: this.editNotes }).subscribe({
-      next: () => {
-        this.notesLoading.set(false);
-        this.showNotesDialog.set(false);
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Notes Saved',
-          detail: 'Client notes updated successfully',
-        });
-        this.loadClients();
-      },
-      error: () => {
-        this.notesLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save notes',
+  resendInvitation(client: InstructorClient): void {
+    const target = client.client
+      ? `${client.client.firstName} ${client.client.lastName}`
+      : client.invitedEmail ?? 'this client';
+    this._confirmationService.confirm({
+      message: `Resend the invitation to ${target}?`,
+      header: 'Resend invitation',
+      icon: 'pi pi-send',
+      accept: () => {
+        this._clientService.resendInvitation(client.id).subscribe({
+          next: () => {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Invitation resent',
+              detail: 'The invitation has been resent successfully',
+            });
+          },
+          error: (err) => {
+            this._messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: err.error?.message || 'Failed to resend invitation',
+            });
+          },
         });
       },
     });
   }
 
-  // Archive
   confirmArchive(client: InstructorClient): void {
     const name = client.client
       ? `${client.client.firstName} ${client.client.lastName}`
       : 'this client';
     this._confirmationService.confirm({
       message: `Are you sure you want to archive ${name}?`,
-      header: 'Archive Client',
+      header: 'Archive client',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.archiveClient(client),
     });
   }
 
+  private cancelInvitationRequest(client: InstructorClient): void {
+    // this._clientService.archiveClient(client.clientId).subscribe({
+    //   next: () => {
+    //     this._messageService.add({
+    //       severity: 'success',
+    //       summary: 'Client archived',
+    //       detail: 'Client relationship has been archived',
+    //     });
+    //     this.loadClients();
+    //   },
+    //   error: () => {
+    //     this._messageService.add({
+    //       severity: 'error',
+    //       summary: 'Error',
+    //       detail: 'Failed to archive client',
+    //     });
+    //   },
+    // });
+  }
   private archiveClient(client: InstructorClient): void {
     this._clientService.archiveClient(client.clientId).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Client Archived',
+          summary: 'Client archived',
           detail: 'Client relationship has been archived',
         });
         this.loadClients();
@@ -247,17 +245,48 @@ export class Clients implements OnInit {
     });
   }
 
-  // Pending requests actions
-  acceptPendingRequest(request: ClientRequest): void {
-    this._clientService.acceptRequest(request.id).subscribe({
+  confirmUnarchive(client: InstructorClient): void {
+    const name = client.client
+      ? `${client.client.firstName} ${client.client.lastName}`
+      : 'this client';
+    this._confirmationService.confirm({
+      message: `Are you sure you want to unarchive ${name}?`,
+      header: 'Unarchive client',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => this.unarchiveClient(client),
+    });
+  }
+
+  private unarchiveClient(client: InstructorClient): void {
+    this._clientService.unarchiveClient(client.clientId).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Request Accepted',
+          summary: 'Client unarchived',
+          detail: 'Client relationship has been restored',
+        });
+        this.loadClients();
+      },
+      error: () => {
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to unarchive client',
+        });
+      },
+    });
+  }
+
+  acceptPendingRequest(client: InstructorClient): void {
+    this._clientService.acceptRequest(client.id).subscribe({
+      next: () => {
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Request accepted',
           detail: 'Client request accepted successfully',
         });
-        this.loadPendingRequests();
         this.loadClients();
+        this.loadIncomingCount();
       },
       error: (err) => {
         this._messageService.add({
@@ -269,15 +298,16 @@ export class Clients implements OnInit {
     });
   }
 
-  declinePendingRequest(request: ClientRequest): void {
-    this._clientService.declineRequest(request.id).subscribe({
+  declinePendingRequest(client: InstructorClient): void {
+    this._clientService.declineRequest(client.id).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'info',
-          summary: 'Request Declined',
+          summary: 'Request declined',
           detail: 'Client request has been declined',
         });
-        this.loadPendingRequests();
+        this.loadClients();
+        this.loadIncomingCount();
       },
       error: (err) => {
         this._messageService.add({
@@ -289,7 +319,41 @@ export class Clients implements OnInit {
     });
   }
 
-  // Helpers
+  // --- Display helpers ---
+
+  clientName(client: InstructorClient): string {
+    if (client.client) {
+      return `${client.client.firstName} ${client.client.lastName}`;
+    }
+    if (client.invitedEmail) {
+      return client.invitedEmail;
+    }
+    return 'Unknown';
+  }
+
+  clientEmail(client: InstructorClient): string {
+    return client.client?.email || client.invitedEmail || '—';
+  }
+
+  initials(client: InstructorClient): string {
+    if (client.client) {
+      return client.client.firstName.charAt(0) + client.client.lastName.charAt(0);
+    }
+    if (client.invitedEmail) {
+      return client.invitedEmail.charAt(0).toUpperCase();
+    }
+    return '??';
+  }
+
+  clientStatusLabel(client: InstructorClient): string {
+    if (client.status !== InstructorClientStatuses.Pending)
+      return ClientStatusLabels[client.status];
+    if (client.requestType === ClientRequestTypes.InstructorToClient) {
+      return client.client ? PendingClientLabels.Invited : PendingClientLabels.EmailSent;
+    }
+    return PendingClientLabels.Request;
+  }
+
   statusSeverity(status: InstructorClientStatus): TagSeverity {
     switch (status) {
       case 'ACTIVE':
@@ -299,21 +363,6 @@ export class Clients implements OnInit {
       case 'PENDING':
         return TagSeverity.Warn;
     }
-  }
-
-  initials(client: InstructorClient): string {
-    if (!client.client) return '??';
-    return client.client.firstName.charAt(0) + client.client.lastName.charAt(0);
-  }
-
-  clientName(client: InstructorClient): string {
-    if (!client.client) return 'Unknown';
-    return `${client.client.firstName} ${client.client.lastName}`;
-  }
-
-  requestFromName(request: ClientRequest): string {
-    if (!request.fromUser) return 'Unknown';
-    return `${request.fromUser.firstName} ${request.fromUser.lastName}`;
   }
 
   trackById = (_: number, item: { id: string }) => item.id;

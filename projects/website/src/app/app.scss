@@ -19,13 +19,13 @@
     position: absolute;
     inset: 0;
     opacity: 0.06;
-    background-image: $honeycomb-svg-secondary;
+    background-image: $honeycomb-svg-primary;
     background-size: 56px 100px;
     pointer-events: none;
   }
 
   :host-context(.dark) .honeycomb-bg {
-    background-image: $honeycomb-svg-primary;
+    background-image: $honeycomb-svg-navy;
   }
 }
 
@@ -88,8 +88,9 @@
     width: 2.75rem;
     height: 2.75rem;
     clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
-    background: var(--p-primary-500);
-    color: var(--p-primary-contrast-color);
+    color: var(--p-button-primary-color);
+    background: var(--p-button-primary-background);
+    border: 1px solid var(--p-button-primary-border-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,19 +110,26 @@
   .feature-badge-live {
     background: color-mix(in oklab, var(--p-green-500) 20%, transparent);
     color: var(--p-green-600);
+    border: 1px solid color-mix(in oklab, var(--p-green-500) 20%, transparent);
   }
 
   :host-context(.dark) .feature-badge-live {
+    background: color-mix(in oklab, var(--p-green-400) 20%, transparent);
     color: var(--p-green-400);
+    border: 1px solid color-mix(in oklab, var(--p-green-400) 20%, transparent);
   }
 
+  /* "Coming soon" is muted — amber is earned */
   .feature-badge-soon {
-    background: color-mix(in oklab, var(--p-primary-500) 20%, transparent);
-    color: var(--p-primary-600);
+    background: color-mix(in oklab, var(--color-navy-500) 20%, transparent);
+    color: var(--color-navy-600);
+    border: 1px solid color-mix(in oklab, var(--color-navy-500) 20%, transparent);
   }
 
   :host-context(.dark) .feature-badge-soon {
-    color: var(--p-primary-400);
+    background: color-mix(in oklab, var(--color-navy-400) 20%, transparent);
+    color: var(--color-navy-400);
+    border: 1px solid color-mix(in oklab, var(--color-navy-400) 20%, transparent);
   }
 }
 
@@ -146,7 +154,7 @@
     left: -100px;
     background: radial-gradient(
       circle,
-      color-mix(in oklab, var(--p-primary-500) 30%, transparent) 0%,
+      color-mix(in oklab, var(--color-navy-500) 30%, transparent) 0%,
       transparent 70%
     );
     animation-delay: -3s;

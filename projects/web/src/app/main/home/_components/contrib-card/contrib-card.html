@@ -1,0 +1,14 @@
+<article class="contrib-card">
+  <mh-hex [tone]="tone()" size="md"><i [class]="icon()"></i></mh-hex>
+  <h3 class="contrib-card__title">{{ title() }}</h3>
+  <p class="contrib-card__body">{{ body() }}</p>
+  <p-button
+    [label]="cta()"
+    icon="pi pi-arrow-right"
+    iconPos="right"
+    size="small"
+    severity="warn"
+    text
+    (onClick)="ctaClick.emit()"
+  />
+</article>

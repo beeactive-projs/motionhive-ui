@@ -1,0 +1,47 @@
+<p-dialog header="Edit personal information" [(visible)]="visible" [modal]="true" [style]="{ width: '36rem' }"
+  [closable]="true">
+  <div class="flex flex-col gap-4 pt-2">
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <label for="epiFirstName" class="text-sm font-medium">First name</label>
+        <input id="epiFirstName" type="text" pInputText fluid [ngModel]="form().firstName"
+          (ngModelChange)="updateField('firstName', $event)" placeholder="First name" />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="epiLastName" class="text-sm font-medium">Last name</label>
+        <input id="epiLastName" type="text" pInputText fluid [ngModel]="form().lastName"
+          (ngModelChange)="updateField('lastName', $event)" placeholder="Last name" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="epiPhone" class="text-sm font-medium">Phone</label>
+      <mh-phone-input
+        inputId="epiPhone"
+        [value]="form().phone"
+        (valueChange)="updateField('phone', $event)"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Location</label>
+      <mh-location-picker [location]="form().location"
+        (locationChange)="updateField('location', $event)" />
+      @if (countryLocked()) {
+        <span class="text-xs text-surface-400">
+          You can update your city, but your country is locked because payments
+          are set up on your account. Contact support if you need to migrate.
+        </span>
+      } @else {
+        <span class="text-xs text-surface-400">Used to suggest nearby instructors.</span>
+      }
+    </div>
+
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Save changes" icon="pi pi-check" [loading]="saving()" (onClick)="save()" />
+  </ng-template>
+</p-dialog>

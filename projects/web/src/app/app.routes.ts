@@ -15,6 +15,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./main/main.routes').then((m) => m.mainRoutes),
   },
+
   {
     path: '**',
     redirectTo: 'error/not-found',

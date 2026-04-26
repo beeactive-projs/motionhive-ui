@@ -29,8 +29,6 @@ import {
   LoginRequest,
   Logo,
   ThemeService,
-  UserRole,
-  UserRoles,
 } from 'core';
 import { Divider } from 'primeng/divider';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
@@ -189,17 +187,7 @@ export class LoginComponent {
       return;
     }
 
-    const roleRoutes: Partial<Record<string, string>> = {
-      [UserRoles.SuperAdmin]: '/super-admin/dashboard',
-      [UserRoles.Admin]: '/dashboard',
-      [UserRoles.Support]: '/dashboard',
-      [UserRoles.Instructor]: '/dashboard',
-      [UserRoles.User]: '/user/dashboard',
-    };
-
-    const roles = new Set(this._authStore.userRoles());
-    const route = Object.entries(roleRoutes).find(([role]) => roles.has(role as UserRole))?.[1] ?? '/dashboard';
-    this._router.navigate([route]);
+    this._router.navigate(['/home']);
   }
 
   private capitalize(str: string): string {

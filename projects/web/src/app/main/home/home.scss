@@ -1,0 +1,594 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.home-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   1. Hero — founding banner
+   Layered hex bee on the left, content on the right. The honeycomb
+   pattern sits behind everything as a subtle texture, not loud.
+   ───────────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 28px 24px;
+  border-radius: 24px;
+  overflow: hidden;
+  isolation: isolate;
+
+  /* Default (light) — warm honey wash */
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--color-primary-200, #fed7aa) 0%, transparent 60%),
+    linear-gradient(140deg, var(--color-primary-100, #ffedd5) 0%, var(--color-primary-50, #fff7ed) 50%, #fffaf2 100%);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+
+.hero__honeycomb {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  background-image:
+    radial-gradient(circle at 16% 22%, rgba(245, 158, 11, 0.18) 2px, transparent 3px),
+    radial-gradient(circle at 60% 18%, rgba(245, 158, 11, 0.12) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 88% 38%, rgba(245, 158, 11, 0.18) 2px, transparent 3px),
+    radial-gradient(circle at 30% 70%, rgba(245, 158, 11, 0.12) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 72% 84%, rgba(245, 158, 11, 0.18) 2px, transparent 3px);
+  background-size: 90px 90px, 70px 70px, 110px 110px, 80px 80px, 100px 100px;
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Brand mark — hex backdrop with the MotionHive logo SVG sitting on top */
+.hero__brand {
+  position: relative;
+  width: 132px;
+  height: 152px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.hero__brand-hex {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: linear-gradient(135deg, var(--color-navy-800), var(--color-navy-900));
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+}
+
+.hero__brand-hex::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: linear-gradient(160deg, rgba(245, 158, 11, 0.12), transparent 60%);
+  pointer-events: none;
+}
+
+.hero__brand-mark {
+  position: relative;
+  width: 60px;
+  height: auto;
+  z-index: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary-700, #b45309);
+  margin: 0 0 12px 0;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  border: 1px solid rgba(180, 83, 9, 0.18);
+}
+
+.hero__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary-500, #f59e0b);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+  animation: hero-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes hero-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.05);
+  }
+}
+
+.hero__title {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--color-navy-900);
+}
+
+.hero__body {
+  font-size: 14px;
+  color: var(--color-navy-800);
+  margin: 12px 0 20px 0;
+  line-height: 1.5;
+  max-width: 640px;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 32px;
+    padding: 36px 36px;
+  }
+
+  .hero__brand {
+    margin: 0;
+  }
+
+  .hero__title {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero__title {
+    font-size: 36px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   2. Buzz list
+   ───────────────────────────────────────────────────────────────── */
+
+.buzz-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.buzz-list__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 14px;
+  font-size: 14px;
+  color: var(--color-navy-900);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.buzz-list__item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.buzz-list__text {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .buzz-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   3. Carousels — instructors + groups share the same shell
+   ───────────────────────────────────────────────────────────────── */
+
+.hive-carousel__cell {
+  padding: 4px 6px 12px 6px;
+  height: 100%;
+}
+
+::ng-deep .hive-carousel {
+  .p-carousel-item {
+    display: flex;
+  }
+
+  .p-carousel-item > * {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Lift the prev/next buttons so they don't crowd the cards */
+  .p-carousel-prev-button,
+  .p-carousel-next-button {
+    background: var(--p-content-background);
+    border: 1px solid var(--p-content-border-color);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Growth card — friendly empty/below-threshold state for carousels
+   ───────────────────────────────────────────────────────────────── */
+
+.growth-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 14px 20px;
+  align-items: center;
+  padding: 24px;
+  background: var(--p-content-background);
+  border: 1px dashed var(--color-primary-300, #fdba74);
+  border-radius: 18px;
+}
+
+.growth-card mh-hex {
+  grid-row: 1 / 3;
+  font-size: 22px;
+}
+
+.growth-card__text {
+  min-width: 0;
+}
+
+.growth-card__title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-navy-900);
+  letter-spacing: -0.01em;
+}
+
+.growth-card__body {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  margin: 4px 0 0 0;
+  line-height: 1.5;
+}
+
+.growth-card__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .growth-card {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1fr;
+  }
+
+  .growth-card mh-hex {
+    grid-row: auto;
+  }
+
+  .growth-card__actions {
+    grid-column: auto;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Contribute trio
+   ───────────────────────────────────────────────────────────────── */
+
+.contrib-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .contrib-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Roadmap
+   ───────────────────────────────────────────────────────────────── */
+
+.roadmap {
+  position: relative;
+  padding: 28px;
+  background: var(--color-navy-900);
+  color: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.roadmap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  background-image:
+    radial-gradient(circle at 90% 10%, var(--color-primary-500, #f59e0b) 0%, transparent 40%),
+    radial-gradient(circle at 10% 100%, var(--color-coral-500) 0%, transparent 50%);
+}
+
+.roadmap > * {
+  position: relative;
+  z-index: 1;
+}
+
+.roadmap__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.roadmap__head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.roadmap__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary-300, #fdba74);
+  margin: 0 0 6px 0;
+}
+
+.roadmap__title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+  color: #fff;
+}
+
+.roadmap__sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 6px 0 0 0;
+  line-height: 1.5;
+  max-width: 520px;
+}
+
+.roadmap__version {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--color-primary-300, #fdba74);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+/* roadmap-row uses light-on-light by default — invert it inside the dark slab */
+.roadmap__list {
+  ::ng-deep .roadmap-row {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  ::ng-deep .roadmap-row__title {
+    color: #fff;
+  }
+
+  ::ng-deep .roadmap-row__sub {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  ::ng-deep .roadmap-row__when {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  ::ng-deep .roadmap-row__when--active {
+    background: var(--color-primary-500, #f59e0b);
+    color: var(--color-navy-900);
+  }
+}
+
+@media (min-width: 768px) {
+  .roadmap {
+    padding: 36px;
+  }
+
+  .roadmap__title {
+    font-size: 26px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Dark mode adjustments
+   ─────────────────────────────────────────────────────────────────
+   Light-mode surfaces below the hero are already on var(--p-content-*)
+   tokens, so they flip automatically. The hero, eyebrows, invite card,
+   buzz card and growth card are the ones that hardcode honey/light
+   surfaces — they need explicit dark variants.
+
+   Selector: `:host-context(.dark)` is the only form Angular's view
+   encapsulation handles correctly when the class lives on a non-host
+   ancestor (here, <html>). Plain `html.dark` selectors get rewritten
+   to `html.dark[_ngcontent-…]` and never match — that was the bug.
+   ───────────────────────────────────────────────────────────────── */
+
+:host-context(.dark) {
+  /* Hero — translucent "honey glass" panel rather than a solid slab.
+     Two stacked glows on a low-opacity neutral fill so the page bg
+     reads through; gives a softer, lighter founding-member feel that
+     matches the light-mode warmth without the weight. */
+  .hero {
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgba(245, 158, 11, 0.22) 0%, transparent 55%),
+      radial-gradient(80% 60% at 100% 100%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+      linear-gradient(140deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(245, 158, 11, 0.2);
+    backdrop-filter: blur(2px);
+  }
+
+  .hero__honeycomb {
+    /* Slightly stronger dot pattern so it shows on dark navy. */
+    opacity: 0.35;
+    background-image:
+      radial-gradient(circle at 16% 22%, rgba(245, 158, 11, 0.32) 2px, transparent 3px),
+      radial-gradient(circle at 60% 18%, rgba(245, 158, 11, 0.24) 1.5px, transparent 2.5px),
+      radial-gradient(circle at 88% 38%, rgba(245, 158, 11, 0.32) 2px, transparent 3px),
+      radial-gradient(circle at 30% 70%, rgba(245, 158, 11, 0.24) 1.5px, transparent 2.5px),
+      radial-gradient(circle at 72% 84%, rgba(245, 158, 11, 0.32) 2px, transparent 3px);
+  }
+
+  /* Eyebrow pill — needed a translucent dark fill instead of white-ish */
+  .hero__eyebrow {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: var(--color-primary-300, #fdba74);
+  }
+
+  .hero__title {
+    color: var(--p-surface-0, #ffffff);
+  }
+
+  .hero__body {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  /* The brand hex backdrop is already navy in light mode — give it a
+     bit more honey edge so it doesn't blend into the new dark hero. */
+  .hero__brand-hex {
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(245, 158, 11, 0.25);
+  }
+
+  /* Buzz tiles — surface tokens flip automatically, but the body text
+     is hardcoded to navy-900 in light. Override for legibility. */
+  .buzz-list__item {
+    color: var(--p-surface-50);
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+
+  .buzz-list__item:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Growth card (carousel below-threshold state) */
+  .growth-card {
+    background: var(--p-surface-800);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .growth-card__title {
+    color: var(--p-surface-50);
+  }
+
+  /* Stats card surface */
+  .stats-card {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+
+  /* Buzz / "this week's buzz" rail card — the navy-900 fill becomes
+     visually identical to the page background in dark mode, so lift
+     it one shade. */
+  .buzz-card {
+    background: var(--p-surface-800);
+    border: 1px solid var(--p-surface-700);
+  }
+
+  /* Invite card — honey tint becomes muddy in dark; use a subdued
+     primary glow instead. */
+  .invite-card {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .invite-card__title {
+    color: var(--p-surface-50);
+  }
+
+  .invite-card__sub {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Suggest-a-coach dashed tile (instructor grid) */
+  .instructor-grid__suggest {
+    background: rgba(245, 158, 11, 0.06);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .instructor-grid__suggest-title {
+    color: var(--p-surface-50);
+  }
+
+  /* Empty state cards */
+  .empty-card {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
+
+  .empty-card__title {
+    color: var(--p-surface-50);
+  }
+
+  /* Roadmap version chip — light-mode version was honey-100/honey-800
+     which becomes invisible against the dark navy roadmap card. The
+     roadmap card itself is already dark-styled (it's intentionally
+     dark in light mode too) so no change needed there. */
+}

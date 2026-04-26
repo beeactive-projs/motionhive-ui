@@ -1,0 +1,45 @@
+<div class="flex items-center justify-center min-h-[60vh]">
+  <p-card class="w-full max-w-md">
+    @if (checking()) {
+      <div class="flex flex-col items-center text-center gap-4 py-8">
+        <p-progressSpinner strokeWidth="4" [style]="{ width: '50px', height: '50px' }" />
+        <div>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">
+            Verifying your account...
+          </h3>
+          <p class="text-surface-500 text-sm mt-2 mb-0">
+            Please wait while we confirm your Stripe setup.
+          </p>
+        </div>
+      </div>
+    } @else if (ready()) {
+      <div class="flex flex-col items-center text-center gap-4 py-8">
+        <i class="pi pi-check-circle text-5xl" style="color: var(--p-green-500)"></i>
+        <div>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">
+            Payments enabled!
+          </h3>
+          <p class="text-surface-500 text-sm mt-2 mb-0">
+            Your Stripe account is verified and ready. You can now create products and send invoices.
+          </p>
+        </div>
+        <p-tag value="Active" severity="success" />
+        <p-button label="Go to Payments" icon="pi pi-arrow-right" iconPos="right" (onClick)="goToPayments()" />
+      </div>
+    } @else if (pending()) {
+      <div class="flex flex-col items-center text-center gap-4 py-8">
+        <i class="pi pi-hourglass text-5xl" style="color: var(--p-blue-500)"></i>
+        <div>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">
+            Almost there!
+          </h3>
+          <p class="text-surface-500 text-sm mt-2 mb-0">
+            Stripe is still verifying your details. This usually takes a few minutes. We'll notify you when it's ready.
+          </p>
+        </div>
+        <p-tag value="Pending review" severity="info" />
+        <p-button label="Go to Payments" icon="pi pi-arrow-right" iconPos="right" [outlined]="true" (onClick)="goToPayments()" />
+      </div>
+    }
+  </p-card>
+</div>

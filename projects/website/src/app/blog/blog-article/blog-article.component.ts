@@ -14,7 +14,7 @@ import { filter, map } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import { Skeleton } from 'primeng/skeleton';
 import type { BlogPost } from 'core';
-import { BlogService } from 'core';
+import { BLOG_COVER_PRESETS, BlogService, withCloudinaryTransform } from 'core';
 import { DatePipe } from '@angular/common';
 import { BlogCategoryPipe } from '../blog-category.pipe';
 
@@ -79,4 +79,14 @@ export class BlogArticleComponent {
     ),
     { initialValue: [] as BlogPost[] },
   );
+
+  /** Article hero — wide 21:9 cinematic crop, ~1600px wide. */
+  heroCoverUrl(url: string | null | undefined): string {
+    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.articleHero);
+  }
+
+  /** Related-post grid card — 16:9 carousel-sized crop. */
+  relatedCoverUrl(url: string | null | undefined): string {
+    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.homeCarousel);
+  }
 }

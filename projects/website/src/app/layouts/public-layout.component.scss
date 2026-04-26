@@ -8,21 +8,21 @@
   top: 0;
   left: 0;
   z-index: -1;
-  background-color: var(--p-primary-50);
+  background-color: var(--p-navy-50);
   @media screen and (min-height: 440px) {
     height: 100vh;
   }
 }
 
 :host-context(.dark) .background-main {
-  background-color: var(--p-secondary-900);
+  background-color: var(--p-navy-900);
 }
 
 .honeycomb-bg {
   position: absolute;
   inset: 0;
   opacity: 0.06;
-  background-image: $honeycomb-svg-secondary;
+  background-image: $honeycomb-svg-navy;
   background-size: 56px 100px;
   pointer-events: none;
 }
@@ -46,7 +46,7 @@
   right: -150px;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--p-primary-500) 35%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-500) 35%, transparent) 0%,
     transparent 70%
   );
 }
@@ -71,7 +71,7 @@
   left: 30%;
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--p-primary-400) 22%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-400) 22%, transparent) 0%,
     transparent 70%
   );
   animation-delay: -6s;

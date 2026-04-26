@@ -45,7 +45,7 @@
   }
 
   <!-- Instructors Table -->
-  <div class="flex-1" style="background-color: var(--p-datatable-row-background);">
+  <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
     <p-table [value]="instructors()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
       [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
       scrollHeight="flex" dataKey="email">

@@ -1,0 +1,106 @@
+<p-dialog header="Invite client" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
+
+  @if (!invitationSent()) {
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    <!-- Mode toggle -->
+    <div class="inline-flex rounded-lg border border-surface-200 dark:border-surface-700 p-1 bg-surface-50 dark:bg-surface-800 self-start">
+      <button type="button"
+        class="text-sm px-3 py-1.5 rounded-md font-medium transition-colors"
+        [class.bg-white]="mode() === 'find'"
+        [class.dark:bg-surface-900]="mode() === 'find'"
+        [class.shadow-sm]="mode() === 'find'"
+        [class.text-surface-900]="mode() === 'find'"
+        [class.dark:text-white]="mode() === 'find'"
+        [class.text-surface-500]="mode() !== 'find'"
+        (click)="setMode('find')">
+        <i class="pi pi-search text-xs mr-1"></i>Find on platform
+      </button>
+      <button type="button"
+        class="text-sm px-3 py-1.5 rounded-md font-medium transition-colors"
+        [class.bg-white]="mode() === 'email'"
+        [class.dark:bg-surface-900]="mode() === 'email'"
+        [class.shadow-sm]="mode() === 'email'"
+        [class.text-surface-900]="mode() === 'email'"
+        [class.dark:text-white]="mode() === 'email'"
+        [class.text-surface-500]="mode() !== 'email'"
+        (click)="setMode('email')">
+        <i class="pi pi-envelope text-xs mr-1"></i>Invite by email
+      </button>
+    </div>
+
+    @if (mode() === 'find') {
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium">Search clients</label>
+        @if (!selectedUser()) {
+          <mh-user-search-autocomplete
+            [role]="userRole"
+            [excludeConnected]="true"
+            placeholder="Search by name or email…"
+            (selected)="onUserSelected($event)"
+            (cleared)="onUserCleared()" />
+          <span class="text-xs text-surface-400">Type at least 2 characters. Only platform users without an existing relationship with you are shown.</span>
+        } @else {
+          <div class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 px-3 py-2">
+            @if (selectedUser()!.avatarUrl) {
+              <img [src]="selectedUser()!.avatarUrl" [alt]="displayName(selectedUser()!)"
+                class="w-9 h-9 rounded-full object-cover border border-surface-200" />
+            } @else {
+              <span class="w-9 h-9 rounded-full bg-primary-100 text-primary-700 text-sm font-semibold inline-flex items-center justify-center">
+                {{ displayName(selectedUser()!).charAt(0).toUpperCase() }}
+              </span>
+            }
+            <div class="flex flex-col min-w-0 flex-1">
+              <span class="font-medium text-sm truncate">{{ displayName(selectedUser()!) }}</span>
+              <span class="text-xs text-surface-500 truncate">{{ selectedUser()!.email }}</span>
+            </div>
+            <p-button icon="pi pi-times" [text]="true" [rounded]="true" size="small" severity="secondary"
+              (onClick)="onUserCleared()" aria-label="Change selection" />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="flex flex-col gap-2">
+        <label for="inviteEmail" class="text-sm font-medium">Email address</label>
+        <input id="inviteEmail" type="email" pInputText fluid formControlName="email"
+          placeholder="Enter the client's email address"
+          [class.ng-invalid]="isEmailFieldInvalid()"
+          [class.ng-dirty]="isEmailFieldInvalid()" />
+        @if (isEmailFieldInvalid()) {
+          <p-message severity="error" size="small" variant="simple">Please enter a valid email address.</p-message>
+        }
+      </div>
+    }
+
+    <div class="flex flex-col gap-2">
+      <label for="inviteMessage" class="text-sm font-medium">Message (optional)</label>
+      <textarea pTextarea id="inviteMessage" fluid formControlName="message" [rows]="3"
+        placeholder="Add a personal message..."></textarea>
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
+    <p-button label="Send invitation" icon="pi pi-send" severity="primary"
+      [loading]="inviteLoading()" [disabled]="!canSubmit()"
+      (onClick)="sendInvitation()" />
+  </ng-template>
+  } @else {
+  <div class="flex flex-col gap-4">
+    <p-message severity="success" variant="simple">
+      Invitation sent! Share the link below with your client.
+    </p-message>
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Referral link</label>
+      <div class="flex gap-2">
+        <input pInputText fluid [value]="referralLink()" [readonly]="true" class="text-xs" />
+        <p-button [icon]="linkCopied() ? 'pi pi-check' : 'pi pi-copy'"
+          [severity]="linkCopied() ? 'success' : 'secondary'" [outlined]="true" (onClick)="copyLink()"
+          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'" tooltipPosition="top" />
+      </div>
+    </div>
+  </div>
+  <ng-template #footer>
+    <p-button label="Done" severity="primary" (onClick)="visible.set(false)" />
+  </ng-template>
+  }
+
+</p-dialog>

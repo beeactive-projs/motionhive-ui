@@ -1,3 +1,6 @@
+@use 'variables' as *;
+@use '../../app.scss' as app;
+
 $sidebar-width: 15rem;
 $duration: 300ms;
 $easing: cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -38,11 +41,9 @@ $lg: 1024px;
   flex-direction: column;
   width: $sidebar-width;
   overflow-y: auto;
-  padding: 1rem;
-  border-right: 1px solid color-mix(in oklab, var(--p-secondary-500) 30%, transparent);
-  background-color: var(--p-primary-50);
-  // color: var(--p-slate-50);
-
+  padding: 1rem 0;
+  border-right: 1px solid var(--p-overlay-modal-border-color);
+  background-color: var(--p-navy-50);
   transform: translate3d(-100%, 0, 0);
   transition: transform $duration $easing;
   gap: 2rem;
@@ -67,41 +68,61 @@ $lg: 1024px;
     position: absolute;
     z-index: 2;
   }
-
-  // .brand-logo {
-  //   position: relative;
-  //   z-index: 2;
-  //   display: flex;
-  //   align-items: center;
-  //   gap: 1rem;
-
-  //   .brand-logo-icon {
-  //     width: 3rem;
-  //     height: 3rem;
-  //     border-radius: 1rem;
-  //     display: flex;
-  //     align-items: center;
-  //     justify-content: center;
-  //     box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
-  //     flex-shrink: 0;
-  //   }
-  // }
 }
 
 :host-context(.dark) {
   .sidebar {
-    border-right: 1px solid color-mix(in oklab, var(--p-primary-500) 30%, transparent);
-    background-color: var(--p-secondary-900);
-    color: var(--p-slate-50);
+    background-color: var(--p-navy-900);
   }
 }
 
 //Toolbar
 .p-toolbar {
   border-radius: 0;
-  // border-bottom: 1px var(--p-surface-500);
-  // background-color: var(--p-surface-200);
-  // color: var(--p-slate-50);
+  border-width: 0 0 1px 0;
+}
+
+// Search trigger — looks like an input but is a button that opens the modal.
+.search-trigger {
+  align-items: center;
+  gap: 10px;
+  width: 20rem;
+  padding: 6px 10px 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--p-content-border-color);
+  background: var(--p-surface-100);
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.search-trigger:hover {
+  background: var(--p-surface-200, var(--p-surface-100));
+  border-color: var(--color-primary-300, var(--p-content-border-color));
+}
+
+.search-trigger__icon {
+  font-size: 14px;
+}
+
+.search-trigger__placeholder {
+  flex: 1;
+  text-align: left;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-trigger__kbd {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  color: var(--p-text-muted-color);
 }
 
 // --- Content ---

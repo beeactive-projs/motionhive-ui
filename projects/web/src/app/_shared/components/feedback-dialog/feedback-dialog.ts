@@ -37,7 +37,6 @@ export class FeedbackDialog {
   private readonly _authStore = inject(AuthStore);
 
   protected readonly visible = this._feedbackService.isOpen;
-  protected readonly isGuest = computed(() => !this._authStore.isAuthenticated());
 
   protected readonly types: {
     key: FeedbackCategory;
@@ -60,7 +59,6 @@ export class FeedbackDialog {
     type: new FormControl<FeedbackCategory | null>(this.types[0].key, Validators.required),
     title: new FormControl('', [Validators.required, Validators.minLength(3)]),
     message: new FormControl('', [Validators.required, Validators.minLength(10)]),
-    email: new FormControl('', [Validators.email]),
   });
 
   private readonly _selectedType = toSignal(this.form.controls.type.valueChanges, {
@@ -96,13 +94,17 @@ export class FeedbackDialog {
   protected onSubmit(): void {
     if (this.form.invalid || this.isLoading()) return;
     this.isLoading.set(true);
-    const { type, title, message, email } = this.form.getRawValue();
+    const { type, title, message } = this.form.getRawValue();
+    // Authenticated users default their contact email from the JWT
+    // profile so the confirmation mail (if any) lands where they'd
+    // expect. Anonymous visitors can omit it entirely — the BE never
+    // sends mail to a random user id.
     const user = this._authStore.user();
     const payload = {
       type: type!,
       title: title!,
       message: message!,
-      ...(user ? { userId: user.id } : email ? { email } : {}),
+      ...(user?.email ? { email: user.email } : {}),
     };
     this._feedbackService
       .submit(payload)
@@ -136,7 +138,7 @@ export class FeedbackDialog {
   }
 
   protected onDialogHide(): void {
-    this.form.reset({ type: FeedbackCategories.Suggestion, title: '', message: '', email: '' });
+    this.form.reset({ type: FeedbackCategories.Suggestion, title: '', message: '' });
     this.submitted.set(false);
   }
 }

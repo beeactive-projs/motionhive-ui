@@ -8,7 +8,7 @@
         communication.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="New group" icon="pi pi-plus" rounded (onClick)="openCreateDialog()" />
+      <p-button label="New group" icon="pi pi-plus" (onClick)="openCreateDialog()" />
     </div>
   </header>
 
@@ -35,13 +35,13 @@
   @if (!loading() && groups().length === 0) {
   <div class="flex flex-col items-center gap-4 py-16 text-center">
     <div class="flex h-20 w-20 items-center justify-center rounded-full bg-surface-200">
-      <i class="pi pi-sitemap text-4xl text-secondary-300"></i>
+      <i class="pi pi-sitemap text-4xl text-primary-300"></i>
     </div>
-    <h2 class="text-lg font-semibold text-secondary-700">No groups yet</h2>
-    <p class="max-w-sm text-sm text-secondary-500">
+    <h2 class="text-lg font-semibold text-primary-700">No groups yet</h2>
+    <p class="max-w-sm text-sm text-primary-500">
       Create your first group to start organizing clients and scheduling sessions.
     </p>
-    <p-button label="Create Your First Group" icon="pi pi-plus" severity="primary" styleClass="!rounded-full mt-2"
+    <p-button label="Create your first group" icon="pi pi-plus" severity="primary" styleClass="!rounded-full mt-2"
       (onClick)="openCreateDialog()" />
   </div>
   }
@@ -55,11 +55,10 @@
         <!-- Card Header -->
         <div class="flex items-start justify-between">
           <div class="min-w-0 flex-1">
-            <h3 class="truncate text-base font-semibold text-secondary-900">{{ group.name }}</h3>
+            <h3 class="truncate text-base font-semibold">{{ group.name }}</h3>
           </div>
           <div class="ml-2 flex shrink-0 gap-3">
-            <p-button icon="pi pi-pencil" rounded outlined severity="secondary" size="small"
-              (onClick)="openEditDialog($event, group)" />
+            <p-button icon="pi pi-pencil" rounded outlined size="small" (onClick)="openEditDialog($event, group)" />
             <p-button icon="pi pi-trash" rounded outlined severity="danger" size="small"
               (onClick)="confirmDelete($event, group)" />
           </div>
@@ -67,19 +66,19 @@
 
         <!-- Member Count & Join Policy -->
         <div class="flex items-center gap-2">
-          <span class="flex items-center gap-1 text-sm text-secondary-500">
+          <span class="flex items-center gap-1 text-sm">
             <i class="pi pi-users text-xs"></i>
             {{ group.memberCount }} {{ group.memberCount === 1 ? 'member' : 'members' }}
           </span>
           <p-tag [value]="joinPolicyLabel(group.joinPolicy)" [severity]="joinPolicySeverity(group.joinPolicy)"
             class="text-xs" rounded />
           @if (!group.isPublic) {
-          <p-tag value="Private" severity="secondary" rounded class="text-xs" />
+          <p-tag value="Private" rounded class="text-xs" />
           }
         </div>
 
         <!-- Description -->
-        <p class="text-sm text-secondary-500 line-clamp-2">
+        <p class="text-sm line-clamp-2">
           {{ descriptionExcerpt(group.description) }}
         </p>
 
@@ -98,65 +97,7 @@
   }
 </div>
 
-
-<!-- Create/Edit Dialog -->
-<p-dialog [header]="dialogHeader()" [visible]="showDialog()" (visibleChange)="showDialog.set($event)" [modal]="true"
-  [style]="{ width: '32rem' }" [closable]="true">
-  <div class="flex flex-col gap-4">
-    <!-- Name -->
-    <div class="flex flex-col gap-2">
-      <label for="groupName" class="text-sm font-medium">Name *</label>
-      <input id="groupName" type="text" pInputText [(ngModel)]="formName" placeholder="Enter group name" />
-    </div>
-
-    <!-- Description -->
-    <div class="flex flex-col gap-2">
-      <label for="groupDescription" class="text-sm font-medium">Description</label>
-      <textarea id="groupDescription" pTextarea [(ngModel)]="formDescription" [rows]="3"
-        placeholder="Describe the purpose of this group..."></textarea>
-    </div>
-
-    <!-- Join Policy -->
-    <div class="flex flex-col gap-2">
-      <label for="joinPolicy" class="text-sm font-medium">Join Policy</label>
-      <p-select id="joinPolicy" [options]="joinPolicyOptions" [(ngModel)]="formJoinPolicy" optionLabel="label"
-        optionValue="value" placeholder="Select join policy" styleClass="w-full" />
-    </div>
-
-    <!-- Public Toggle -->
-    <div class="flex items-center justify-between rounded-lg bg-surface-50 dark:bg-surface-950 p-3">
-      <div>
-        <span class="text-sm font-medium">Public Group</span>
-        <p class="text-xs">Visible in group discovery</p>
-      </div>
-      <p-toggleSwitch [(ngModel)]="formIsPublic" />
-    </div>
-
-    <!-- Tags -->
-    <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Tags</label>
-      <div class="flex gap-2">
-        <input type="text" pInputText [(ngModel)]="formTagInput" placeholder="Add a tag and press Enter" class="flex-1"
-          (keydown)="onTagKeydown($event)" />
-        <p-button icon="pi pi-plus" severity="secondary" [disabled]="!formTagInput.trim()" (onClick)="addTag()" />
-      </div>
-      @if (formTags.length > 0) {
-      <div class="flex flex-wrap gap-1">
-        @for (tag of formTags; track tag) {
-        <p-chip [label]="tag" [removable]="true" (onRemove)="removeTag(tag)" rounded />
-        }
-      </div>
-      }
-    </div>
-  </div>
-
-  <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="showDialog.set(false)" />
-    <p-button [label]="dialogMode() === 'create' ? 'Create Group' : 'Save Changes'" icon="pi pi-check"
-      severity="primary" [loading]="saving()" [disabled]="!formName.trim()" (onClick)="saveGroup()" />
-  </ng-template>
-</p-dialog>
-
+<mh-group-form-dialog [(visible)]="showGroupFormDialog" [group]="editingGroup()" (saved)="loadGroups()" />
 
 <p-toast />
 <p-confirmDialog />

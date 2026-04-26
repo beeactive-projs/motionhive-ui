@@ -69,7 +69,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         error instanceof HttpErrorResponse &&
         !SKIP_STATUSES.has(error.status) &&
-        router.url.startsWith('/app')
+        !router.url.startsWith('/auth') &&
+        !router.url.startsWith('/error')
       ) {
         errorDialogService.show(mapError(error));
       }

@@ -1,0 +1,130 @@
+<p-dialog
+  [header]="isEdit() ? 'Edit venue' : 'Add a venue'"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '36rem' }"
+  [closable]="true"
+>
+  <div class="flex flex-col gap-4 pt-2">
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Type</label>
+      <p-select
+        [options]="kindOptions"
+        [ngModel]="form().kind"
+        (ngModelChange)="updateField('kind', $event)"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        fluid
+      >
+        <ng-template pTemplate="selectedItem" let-selected>
+          @if (selected) {
+            <span class="flex items-center gap-2">
+              <i [class]="selected.icon"></i>
+              <span>{{ selected.label }}</span>
+            </span>
+          }
+        </ng-template>
+        <ng-template pTemplate="item" let-option>
+          <div class="flex flex-col">
+            <span class="flex items-center gap-2 font-medium">
+              <i [class]="option.icon"></i>
+              {{ option.label }}
+            </span>
+            <span class="text-xs text-surface-400">{{ option.description }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="vfName" class="text-sm font-medium">Name</label>
+      <input
+        id="vfName"
+        type="text"
+        pInputText
+        fluid
+        [ngModel]="form().name"
+        (ngModelChange)="updateField('name', $event)"
+        placeholder="e.g. FitZone Cluj — Downtown"
+      />
+    </div>
+
+    @if (needsAddress()) {
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium">Address</label>
+        <mh-location-picker
+          [location]="form().location"
+          (locationChange)="updateField('location', $event)"
+        />
+        <span class="text-xs text-surface-400">Pick the place from the suggestions.</span>
+      </div>
+    }
+
+    @if (isOnline()) {
+      <div class="flex flex-col gap-2">
+        <label for="vfMeetingUrl" class="text-sm font-medium">Meeting URL</label>
+        <input
+          id="vfMeetingUrl"
+          type="text"
+          pInputText
+          fluid
+          [ngModel]="form().meetingUrl"
+          (ngModelChange)="onMeetingUrlChange($event)"
+          placeholder="https://zoom.us/j/…"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium">Meeting provider</label>
+        <p-select
+          [options]="meetingProviderOptions"
+          [ngModel]="form().meetingProvider"
+          (ngModelChange)="updateField('meetingProvider', $event)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Choose a provider"
+          appendTo="body"
+          fluid
+        />
+      </div>
+    }
+
+    @if (isClientHome()) {
+      <div class="flex flex-col gap-2">
+        <label for="vfRadius" class="text-sm font-medium">Travel radius (km)</label>
+        <p-inputnumber
+          inputId="vfRadius"
+          [ngModel]="form().travelRadiusKm"
+          (ngModelChange)="updateField('travelRadiusKm', $event)"
+          [min]="0"
+          [max]="500"
+          placeholder="e.g. 15"
+          class="w-full"
+        />
+        <span class="text-xs text-surface-400">How far you're willing to travel to the client.</span>
+      </div>
+    }
+
+    <div class="flex flex-col gap-2">
+      <label for="vfNotes" class="text-sm font-medium">Notes</label>
+      <textarea
+        id="vfNotes"
+        pTextarea
+        rows="3"
+        [ngModel]="form().notes"
+        (ngModelChange)="updateField('notes', $event)"
+        placeholder="Meet at the main entrance…"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="close()" />
+    <p-button
+      [label]="isEdit() ? 'Save changes' : 'Add venue'"
+      icon="pi pi-check"
+      [loading]="saving()"
+      (onClick)="save()"
+    />
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,25 @@
+<article class="group-card">
+  <div class="group-card__top">
+    <mh-hex [tone]="resolvedTone()" size="lg">{{ initials() }}</mh-hex>
+    <div class="group-card__id">
+      <h3 class="group-card__name">{{ group().name }}</h3>
+      <p class="group-card__meta">{{ memberSummary() }}</p>
+    </div>
+  </div>
+
+  @if (group().description) {
+    <p class="group-card__desc">{{ group().description }}</p>
+  } @else {
+    <p class="group-card__desc group-card__desc--muted">No description yet.</p>
+  }
+
+  <div class="group-card__footer">
+    <p-button
+      [label]="joined() ? 'Open' : 'Join'"
+      size="small"
+      severity="warn"
+      [outlined]="!joined()"
+      (onClick)="onAction()"
+    />
+  </div>
+</article>

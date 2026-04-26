@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { instructorGuard, participantGuard, roleRedirectGuard, superAdminGuard } from 'core';
+import { rolesGuard, instructorGuard, roleRedirectGuard, superAdminGuard, UserRoles } from 'core';
 
 export const mainRoutes: Routes = [
   {
@@ -7,6 +7,16 @@ export const mainRoutes: Routes = [
     loadComponent: () => import('./main').then((m) => m.Main),
     children: [
       // Shared — accessible to all authenticated users
+      {
+        path: 'home',
+        loadComponent: () => import('./home/home').then((m) => m.Home),
+        title: 'Home - MotionHive',
+      },
+      {
+        path: 'explore',
+        loadComponent: () => import('./explore/explore').then((m) => m.Explore),
+        title: 'Explore - MotionHive',
+      },
       {
         path: 'join/:token',
         loadComponent: () => import('./join-group/join-group').then((m) => m.JoinGroup),
@@ -17,66 +27,64 @@ export const mainRoutes: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.Profile),
         title: 'My Profile - MotionHive',
       },
-
-      // Instructor section
       {
-        path: 'dashboard',
-        canActivate: [instructorGuard],
-        loadComponent: () => import('./instructor/dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - MotionHive',
-      },
-      {
-        path: 'clients',
-        canActivate: [instructorGuard],
-        loadComponent: () => import('./instructor/clients/clients').then((m) => m.Clients),
-        title: 'Clients - MotionHive',
-      },
-      {
-        path: 'groups',
-        canActivate: [instructorGuard],
-        loadComponent: () => import('./instructor/groups/groups').then((m) => m.Groups),
-        title: 'Groups - MotionHive',
-      },
-      {
-        path: 'groups/:id',
-        canActivate: [instructorGuard],
+        path: 'profile/invoices/:id',
         loadComponent: () =>
-          import('./instructor/groups/group-detail/group-detail').then((m) => m.GroupDetail),
-        title: 'Group Details - MotionHive',
+          import('./user/payments/invoice-detail/invoice-detail').then(
+            (m) => m.UserInvoiceDetail,
+          ),
+        title: 'Invoice - MotionHive',
       },
 
-      // User section
+      // Instructor
       {
-        path: 'user/dashboard',
-        canActivate: [participantGuard],
-        loadComponent: () => import('./user/dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - MotionHive',
-      },
-      {
-        path: 'user/instructors',
-        canActivate: [participantGuard],
-        loadComponent: () => import('./user/instructors/instructors').then((m) => m.Instructors),
-        title: 'My Instructors - MotionHive',
+        path: 'coaching',
+        canActivate: [instructorGuard],
+        loadChildren: () =>
+          import('./instructor/instructor.routes').then((m) => m.instructorRoutes),
       },
 
-      // Super-admin section
+      // Activity (any authenticated user)
       {
-        path: 'super-admin/dashboard',
-        canActivate: [superAdminGuard],
-        loadComponent: () => import('./super-admin/dashboard/dashboard').then((m) => m.Dashboard),
-        title: 'Dashboard - MotionHive',
+        path: 'activity',
+        loadChildren: () => import('./user/activity.routes').then((m) => m.activityRoutes),
+      },
+
+      // User
+      {
+        path: 'user',
+        // canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.User)],
+        loadChildren: () => import('./user/user.routes').then((m) => m.userRoutes),
+      },
+
+      // Writer
+      {
+        path: 'writer/posts',
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Admin, UserRoles.Writer)],
+        loadComponent: () => import('./writer/posts/posts').then((m) => m.Posts),
+        title: 'Posts - MotionHive',
       },
       {
-        path: 'super-admin/users',
-        canActivate: [superAdminGuard],
-        loadComponent: () => import('./super-admin/users/users').then((m) => m.Users),
-        title: 'Users - MotionHive',
+        path: 'writer/posts/new',
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Admin, UserRoles.Writer)],
+        loadComponent: () =>
+          import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
+        title: 'New Post - MotionHive',
       },
       {
-        path: 'super-admin/groups',
+        path: 'writer/posts/:id',
+        canActivate: [rolesGuard(UserRoles.SuperAdmin, UserRoles.Admin, UserRoles.Writer)],
+        loadComponent: () =>
+          import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
+        title: 'Edit Post - MotionHive',
+      },
+
+      // Super-admin
+      {
+        path: 'super-admin',
         canActivate: [superAdminGuard],
-        loadComponent: () => import('./super-admin/groups/groups').then((m) => m.Groups),
-        title: 'Groups - MotionHive',
+        loadChildren: () =>
+          import('./super-admin/super-admin.routes').then((m) => m.superAdminRoutes),
       },
 
       // Role-aware default redirect

@@ -36,7 +36,6 @@ export class FeedbackDialog {
   private readonly _authStore = inject(AuthStore);
 
   protected readonly visible = this._feedbackService.isOpen;
-  protected readonly isGuest = computed(() => !this._authStore.isAuthenticated());
 
   protected readonly types: {
     key: FeedbackCategory;
@@ -68,7 +67,6 @@ export class FeedbackDialog {
     type: new FormControl<FeedbackCategory | null>(this.types[0].key, Validators.required),
     title: new FormControl('', [Validators.required, Validators.minLength(3)]),
     message: new FormControl('', [Validators.required, Validators.minLength(10)]),
-    email: new FormControl('', [Validators.email]),
   });
 
   private readonly _selectedType = toSignal(this.form.controls.type.valueChanges, {
@@ -102,13 +100,18 @@ export class FeedbackDialog {
   protected onSubmit(): void {
     if (this.form.invalid || this.isLoading()) return;
     this.isLoading.set(true);
-    const { type, title, message, email } = this.form.getRawValue();
+    const { type, title, message } = this.form.getRawValue();
+    // Marketing-site feedback is typically anonymous. If we ever
+    // know the user (SSR rehydrates an AuthStore, etc.) we default
+    // their email so the confirmation reaches them; otherwise no
+    // confirmation is sent — which is the right behavior for an
+    // unauthenticated form.
     const user = this._authStore.user();
     const payload = {
       type: type!,
       title: title!,
       message: message!,
-      ...(user ? { userId: user.id } : email ? { email } : {}),
+      ...(user?.email ? { email: user.email } : {}),
     };
     this._feedbackService
       .submit(payload)
@@ -142,7 +145,7 @@ export class FeedbackDialog {
   }
 
   protected onDialogHide(): void {
-    this.form.reset({ type: FeedbackCategories.Bug, title: '', message: '', email: '' });
+    this.form.reset({ type: FeedbackCategories.Bug, title: '', message: '' });
     this.submitted.set(false);
   }
 }

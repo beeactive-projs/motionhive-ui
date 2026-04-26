@@ -14,7 +14,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import type { BlogPost } from 'core';
-import { BlogCategories, BlogService } from 'core';
+import {
+  BLOG_COVER_PRESETS,
+  BlogCategories,
+  BlogService,
+  withCloudinaryTransform,
+} from 'core';
 import { ButtonModule } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Paginator, PaginatorState } from 'primeng/paginator';
@@ -139,5 +144,15 @@ export class BlogComponent {
         this.totalRecords.set(response.total);
         this.isLoading.set(false);
       });
+  }
+
+  /** Featured-card cover — wide 21:9 hero crop, ~1600px wide. */
+  featuredCoverUrl(url: string | null | undefined): string {
+    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.articleHero);
+  }
+
+  /** Grid-card cover — 16:9 carousel-sized crop. */
+  gridCoverUrl(url: string | null | undefined): string {
+    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.homeCarousel);
   }
 }

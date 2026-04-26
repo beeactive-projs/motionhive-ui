@@ -12,29 +12,28 @@
       <span class="text-brand"> <ng-container i18n="@@contact.h1.part2">Touch</ng-container></span>
     </h1>
 
-    <p class="text-lg sm:text-xl text-secondary-400 max-w-2xl mx-auto leading-relaxed"
-      i18n="@@contact.intro">
+    <p class="text-lg sm:text-xl text-navy-400 max-w-2xl mx-auto leading-relaxed" i18n="@@contact.intro">
       Have a question or ready to start? Send us a message and we'll get back to you within one business day.
     </p>
   </div>
 </section>
 
 <!-- ===== Contact Section ===== -->
-<section class="py-20 sm:py-28 bg-white dark:bg-secondary-900">
+<section class="py-20 sm:py-28 bg-white dark:bg-navy-900">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid lg:grid-cols-2 gap-12 lg:gap-16">
 
       <!-- ===== Form ===== -->
       <div class="contact-form-card">
-        <h2 class="text-2xl font-heading font-extrabold text-secondary-900 dark:text-white mb-6"
-          i18n="@@contact.form.h2">
+        <h2 class="text-2xl font-heading font-extrabold text-navy-900 dark:text-white mb-6" i18n="@@contact.form.h2">
           Send us a Message
         </h2>
 
         @if (submitSuccess()) {
         <div class="mb-6">
           <p-message severity="success" styleClass="w-full">
-            <ng-container i18n="@@contact.success">Thank you! We'll get back to you within one business day.</ng-container>
+            <ng-container i18n="@@contact.success">Thank you! We'll get back to you within one business
+              day.</ng-container>
           </p-message>
         </div>
         }
@@ -42,57 +41,41 @@
         <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
           <!-- Name -->
           <div class="flex flex-col gap-1.5">
-            <label for="name" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300"
-              i18n="@@contact.form.name">
+            <label for="name" class="text-sm font-semibold text-navy-700 dark:text-navy-300" i18n="@@contact.form.name">
               Full Name
             </label>
-            <input
-              pInputText
-              id="name"
-              formControlName="name"
-              i18n-placeholder="@@contact.form.namePlaceholder"
-              placeholder="Your name"
-              [invalid]="isFieldInvalid('name')"
-              class="w-full" />
+            <input pInputText id="name" formControlName="name" i18n-placeholder="@@contact.form.namePlaceholder"
+              placeholder="Your name" [invalid]="isFieldInvalid('name')" class="w-full" />
             @if (isFieldInvalid('name')) {
-            <small class="text-red-500 text-xs" i18n="@@contact.form.nameError">Name is required (minimum 2 characters).</small>
+            <small class="text-red-500 text-xs" i18n="@@contact.form.nameError">Name is required (minimum 2
+              characters).</small>
             }
           </div>
 
           <!-- Email -->
           <div class="flex flex-col gap-1.5">
-            <label for="email" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300"
+            <label for="email" class="text-sm font-semibold text-navy-700 dark:text-navy-300"
               i18n="@@contact.form.email">
               Email Address
             </label>
-            <input
-              pInputText
-              id="email"
-              type="email"
-              formControlName="email"
-              i18n-placeholder="@@contact.form.emailPlaceholder"
-              placeholder="your@email.com"
-              [invalid]="isFieldInvalid('email')"
-              class="w-full" />
+            <input pInputText id="email" type="email" formControlName="email"
+              i18n-placeholder="@@contact.form.emailPlaceholder" placeholder="your@email.com"
+              [invalid]="isFieldInvalid('email')" class="w-full" />
             @if (isFieldInvalid('email')) {
-            <small class="text-red-500 text-xs" i18n="@@contact.form.emailError">A valid email address is required.</small>
+            <small class="text-red-500 text-xs" i18n="@@contact.form.emailError">A valid email address is
+              required.</small>
             }
           </div>
 
           <!-- Subject -->
           <div class="flex flex-col gap-1.5">
-            <label for="subject" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300"
+            <label for="subject" class="text-sm font-semibold text-navy-700 dark:text-navy-300"
               i18n="@@contact.form.subject">
               Subject
             </label>
-            <input
-              pInputText
-              id="subject"
-              formControlName="subject"
-              i18n-placeholder="@@contact.form.subjectPlaceholder"
-              placeholder="What is this about?"
-              [invalid]="isFieldInvalid('subject')"
-              class="w-full" />
+            <input pInputText id="subject" formControlName="subject"
+              i18n-placeholder="@@contact.form.subjectPlaceholder" placeholder="What is this about?"
+              [invalid]="isFieldInvalid('subject')" class="w-full" />
             @if (isFieldInvalid('subject')) {
             <small class="text-red-500 text-xs" i18n="@@contact.form.subjectError">Subject is required.</small>
             }
@@ -100,36 +83,22 @@
 
           <!-- Message -->
           <div class="flex flex-col gap-1.5">
-            <label for="message" class="text-sm font-semibold text-secondary-700 dark:text-secondary-300"
+            <label for="message" class="text-sm font-semibold text-navy-700 dark:text-navy-300"
               i18n="@@contact.form.message">
               Message
             </label>
-            <textarea
-              pInputTextarea
-              id="message"
-              formControlName="message"
-              rows="6"
-              i18n-placeholder="@@contact.form.messagePlaceholder"
-              placeholder="Tell us how we can help..."
-              [invalid]="isFieldInvalid('message')"
-              class="w-full"></textarea>
+            <textarea pInputTextarea id="message" formControlName="message" rows="6"
+              i18n-placeholder="@@contact.form.messagePlaceholder" placeholder="Tell us how we can help..."
+              [invalid]="isFieldInvalid('message')" class="w-full"></textarea>
             @if (isFieldInvalid('message')) {
-            <small class="text-red-500 text-xs" i18n="@@contact.form.messageError">Message must be at least 10 characters.</small>
+            <small class="text-red-500 text-xs" i18n="@@contact.form.messageError">Message must be at least 10
+              characters.</small>
             }
           </div>
 
           <!-- Submit -->
-          <p-button
-            type="submit"
-            i18n="@@contact.form.submit"
-            label="Send Message"
-            icon="pi pi-send"
-            iconPos="right"
-            [loading]="isLoading()"
-            [disabled]="isLoading()"
-            severity="warn"
-            size="large"
-            styleClass="w-full" />
+          <p-button type="submit" i18n="@@contact.form.submit" label="Send Message" icon="pi pi-send" iconPos="right"
+            [loading]="isLoading()" [disabled]="isLoading()" severity="warn" size="large" styleClass="w-full" />
         </form>
       </div>
 
@@ -138,16 +107,14 @@
         <div class="mb-8">
           <div
             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 dark:bg-primary-400/15 mb-4">
-            <span class="text-sm font-semibold text-primary-700 dark:text-primary-300"
-              i18n="@@contact.info.pill">Get in Touch</span>
+            <span class="text-sm font-semibold text-primary-700 dark:text-primary-300" i18n="@@contact.info.pill">Get in
+              Touch</span>
           </div>
-          <h2
-            class="text-2xl sm:text-3xl font-heading font-extrabold text-secondary-900 dark:text-white mb-3"
+          <h2 class="text-2xl sm:text-3xl font-heading font-extrabold text-navy-900 dark:text-white mb-3"
             i18n="@@contact.info.h2">
             We're Here to Help
           </h2>
-          <p class="text-secondary-500 dark:text-secondary-400 leading-relaxed"
-            i18n="@@contact.info.sub">
+          <p class="text-navy-500 dark:text-navy-400 leading-relaxed" i18n="@@contact.info.sub">
             Reach out through any channel below. Our team typically responds within one business day.
           </p>
         </div>
@@ -159,10 +126,10 @@
               <i class="pi pi-map-marker text-xl"></i>
             </div>
             <div>
-              <p class="text-sm font-semibold text-secondary-900 dark:text-white mb-1"
-                i18n="@@contact.info.address.label">Address</p>
-              <p class="text-sm text-secondary-500 dark:text-secondary-400 leading-relaxed"
-                i18n="@@contact.info.address.value">123 MotionHive Street, Tech City, TC 12345</p>
+              <p class="text-sm font-semibold text-navy-900 dark:text-white mb-1" i18n="@@contact.info.address.label">
+                Address</p>
+              <p class="text-sm text-navy-500 dark:text-navy-400 leading-relaxed" i18n="@@contact.info.address.value">
+                123 MotionHive Street, Tech City, TC 12345</p>
             </div>
           </div>
           <!-- Email -->
@@ -171,8 +138,8 @@
               <i class="pi pi-envelope text-xl"></i>
             </div>
             <div>
-              <p class="text-sm font-semibold text-secondary-900 dark:text-white mb-1"
-                i18n="@@contact.info.email.label">Email</p>
+              <p class="text-sm font-semibold text-navy-900 dark:text-white mb-1" i18n="@@contact.info.email.label">
+                Email</p>
               <a href="mailto:info@motionhive.fit"
                 class="text-sm text-primary-500 dark:text-primary-400 hover:underline">info&#64;motionhive.fit</a>
             </div>
@@ -183,10 +150,10 @@
               <i class="pi pi-phone text-xl"></i>
             </div>
             <div>
-              <p class="text-sm font-semibold text-secondary-900 dark:text-white mb-1"
-                i18n="@@contact.info.phone.label">Phone</p>
-              <a href="tel:+12345678900"
-                class="text-sm text-primary-500 dark:text-primary-400 hover:underline">+1 (234) 567-890</a>
+              <p class="text-sm font-semibold text-navy-900 dark:text-white mb-1" i18n="@@contact.info.phone.label">
+                Phone</p>
+              <a href="tel:+12345678900" class="text-sm text-primary-500 dark:text-primary-400 hover:underline">+1 (234)
+                567-890</a>
             </div>
           </div>
           <!-- Business Hours -->
@@ -195,9 +162,9 @@
               <i class="pi pi-clock text-xl"></i>
             </div>
             <div>
-              <p class="text-sm font-semibold text-secondary-900 dark:text-white mb-1"
-                i18n="@@contact.info.hours.label">Business Hours</p>
-              <p class="text-sm text-secondary-500 dark:text-secondary-400 leading-relaxed">
+              <p class="text-sm font-semibold text-navy-900 dark:text-white mb-1" i18n="@@contact.info.hours.label">
+                Business Hours</p>
+              <p class="text-sm text-navy-500 dark:text-navy-400 leading-relaxed">
                 <span class="block" i18n="@@contact.info.hours.line1">Mon–Fri: 9:00 AM – 6:00 PM</span>
                 <span class="block" i18n="@@contact.info.hours.line2">Weekends: Closed</span>
               </p>

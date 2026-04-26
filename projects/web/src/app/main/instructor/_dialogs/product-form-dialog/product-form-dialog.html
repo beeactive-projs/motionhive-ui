@@ -1,0 +1,83 @@
+<p-dialog [header]="dialogHeader" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }">
+  <div class="flex flex-col gap-4">
+    <!-- Name -->
+    <div class="flex flex-col gap-1">
+      <label for="productName" class="text-sm font-medium">Name</label>
+      <input id="productName" pInputText [(ngModel)]="formName" placeholder="e.g. Single PT Session" />
+    </div>
+
+    <!-- Description -->
+    <div class="flex flex-col gap-1">
+      <label for="productDesc" class="text-sm font-medium">Description</label>
+      <textarea id="productDesc" pTextarea [(ngModel)]="formDescription" rows="2"
+        placeholder="Optional description"></textarea>
+    </div>
+
+    @if (!isEditing) {
+    <!-- Type -->
+    <div class="flex flex-col gap-1">
+      <label for="productType" class="text-sm font-medium">Type</label>
+      <p-select id="productType" [(ngModel)]="formType" [options]="typeOptions" optionLabel="label" optionValue="value"
+        class="w-full" />
+    </div>
+
+    <!-- Amount -->
+    <div class="flex flex-col gap-1">
+      <label for="productAmount" class="text-sm font-medium">Price</label>
+      <p-inputNumber id="productAmount" [(ngModel)]="formAmountCents" mode="currency"
+        [currency]="displayCurrency()" [minFractionDigits]="2" [min]="0.01" fluid />
+    </div>
+
+    @if (isSubscription) {
+    <!-- Billing cadence — read as: "Bill every <N> <interval>". The
+         "every N" lives on the left, the interval on the right; both
+         use `fluid` so they share the row equally without overflowing. -->
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium">Billing cadence</label>
+      <div class="grid grid-cols-[5rem_1fr] gap-2">
+        <p-inputNumber id="productIntervalCount" [(ngModel)]="formIntervalCount"
+          [min]="1" [max]="12" fluid />
+        <p-select id="productInterval" [(ngModel)]="formInterval"
+          [options]="intervalOptions" optionLabel="label" optionValue="value"
+          appendTo="body" fluid />
+      </div>
+      <span class="text-xs text-surface-500">
+        Clients are charged every {{ formIntervalCount === 1 ? '' : formIntervalCount + ' ' }}{{ formInterval }}{{
+        formIntervalCount === 1 ? '' : 's' }}.
+      </span>
+    </div>
+    }
+    } @else {
+    <!-- Edit mode: show type & price as read-only info -->
+    <p-message severity="info" variant="simple" size="small">
+      Price and type cannot be changed after creation. To change the price, deactivate this product and create a new
+      one.
+    </p-message>
+
+    <!-- Active toggle -->
+    <div class="flex items-center gap-3">
+      <p-toggleSwitch [(ngModel)]="formIsActive" />
+      <label class="text-sm font-medium">{{ formIsActive ? 'Active' : 'Inactive' }}</label>
+    </div>
+    }
+
+    <!-- Show on public profile toggle -->
+    <div class="flex items-center justify-between gap-3 rounded-md border border-surface-200 dark:border-surface-700 p-3">
+      <div class="flex flex-col">
+        <span class="text-sm font-medium">Show on public profile</span>
+        <span class="text-xs text-surface-500">
+          List this under "Services" on your public coaching profile.
+        </span>
+      </div>
+      <p-toggleSwitch [(ngModel)]="formShowOnProfile" />
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
+      <p-button [label]="isEditing ? 'Save changes' : 'Create'" icon="pi pi-check" [loading]="saving()"
+        (onClick)="save()" />
+    </div>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,202 @@
+<header class="flex items-center justify-between gap-4 mb-4">
+  <!-- Filters -->
+  <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
+    @for (opt of typeOptions; track opt.label) {
+    <p-button [label]="opt.label" [severity]="typeFilter() === opt.value ? 'primary' : 'contrast'" size="small" rounded
+      [text]="typeFilter() !== opt.value" (onClick)="onTypeFilterChange(opt.value)" styleClass="py-0.5 min-w-10" />
+    }
+  </div>
+
+  <p-button label="Create product" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()" />
+</header>
+
+
+<!-- Desktop: data table (hidden on mobile) -->
+<div class="md:block hidden flex-1">
+  <p-table [value]="products()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+    [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
+    scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
+    <ng-template #header>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Price</th>
+        <th>Billing</th>
+        <th>Status</th>
+        <th>On profile</th>
+        <th class="w-32">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-product>
+      <tr>
+        <td>
+          <div>
+            <span class="font-medium">{{ product.name }}</span>
+            @if (product.description) {
+            <p class="text-xs text-surface-500 mt-0.5 mb-0">{{ product.description }}</p>
+            }
+          </div>
+        </td>
+        <td>
+          <p-tag [value]="typeLabel(product.type) | statusLabel" [severity]="typeSeverity(product.type)" />
+        </td>
+        <td>{{ product.amountCents | currencyRon:product.currency }}</td>
+        <td>
+          @if (product.interval) {
+          {{ billingLabel(product) }}
+          } @else {
+          <span class="text-surface-400">—</span>
+          }
+        </td>
+        <td>
+          <p-tag [value]="(product.isActive ? 'Active' : 'Inactive') | statusLabel"
+            [severity]="activeSeverity(product.isActive)" />
+        </td>
+        <td>
+          <p-toggleSwitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
+            (ngModelChange)="toggleShowOnProfile(product, $event)" />
+        </td>
+        <td>
+          <div class="flex gap-1">
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small" pTooltip="Edit"
+              (onClick)="openEditDialog(product)" />
+            @if (product.isActive) {
+            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
+              pTooltip="Deactivate" (onClick)="confirmDeactivate(product)" />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #loadingbody>
+      @for (_ of [1, 2, 3, 4, 5]; track $index) {
+      <tr>
+        <td><p-skeleton width="70%" /></td>
+        <td><p-skeleton width="60px" height="1.5rem" /></td>
+        <td><p-skeleton width="80px" /></td>
+        <td><p-skeleton width="60px" /></td>
+        <td><p-skeleton width="60px" height="1.5rem" /></td>
+        <td><p-skeleton width="40px" height="1.5rem" /></td>
+        <td><p-skeleton width="60px" /></td>
+      </tr>
+      }
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7">
+          <div class="flex flex-col items-center justify-center py-8 text-center">
+            <i class="pi pi-box text-4xl mb-3 text-surface-400"></i>
+            <p class="text-surface-900 dark:text-surface-50 m-0 font-medium">No products yet</p>
+            <p class="text-surface-500 text-sm mt-1 mb-3">Create your first product to start sending invoices.</p>
+            <p-button label="Create product" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()" />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #paginatorleft let-state>
+      <p-tag [rounded]="true">
+        View {{ state.first + 1 }} -
+        {{ state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows }} of
+        {{ state.totalRecords }}
+      </p-tag>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Mobile: card list (hidden on desktop) -->
+<div class="md:hidden">
+  @if (loading()) {
+  <div class="flex flex-col gap-3">
+    @for (_ of [1,2,3]; track $index) {
+    <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+      <p-skeleton width="30%" height="1.25rem" />
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 flex-1">
+          <p-skeleton shape="circle" size="2.25rem" />
+          <div class="flex flex-col gap-1 flex-1">
+            <p-skeleton width="60%" height="0.875rem" />
+            <p-skeleton width="40%" height="0.75rem" />
+          </div>
+        </div>
+        <p-skeleton width="4rem" height="1rem" />
+      </div>
+    </div>
+    }
+  </div>
+  } @else {
+  <p-dataview [value]="products()">
+    <ng-template #list let-items>
+      <div class="flex flex-col gap-3 pt-1">
+        @for (product of items; track trackById($index, product)) {
+        <mh-list-card [status]="typeLabel(product.type)" [statusSeverity]="typeSeverity(product.type)"
+          [avatarIcon]="productIcon(product)" [title]="product.name"
+          [subtitle]="product.description ?? subtitleFor(product)" [clickable]="true" [accent]="cardAccent(product)"
+          (click)="openEditDialog(product)">
+          <div badges class="flex items-center gap-2">
+            @if (!product.isActive) {
+            <p-tag value="Inactive" severity="danger" class="text-xs!" />
+            }
+          </div>
+          <div amount class="flex flex-col items-end">
+            <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
+              {{ product.amountCents | currencyRon:product.currency }}
+            </span>
+            @if (product.interval) {
+            <span class="text-xs text-surface-500">{{ billingLabel(product) }}</span>
+            }
+          </div>
+          <div meta class="flex items-center justify-between gap-2 text-xs text-surface-500"
+            (click)="$event.stopPropagation()">
+            <div class="flex items-center gap-2">
+              <i class="pi" [class.pi-eye]="product.showOnProfile" [class.pi-eye-slash]="!product.showOnProfile"></i>
+              <span>{{ product.showOnProfile ? 'On profile' : 'Hidden' }}</span>
+            </div>
+            <p-toggleSwitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
+              (ngModelChange)="toggleShowOnProfile(product, $event)" />
+          </div>
+        </mh-list-card>
+        }
+        @if (loadingMore()) {
+        <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-2">
+          <p-skeleton width="30%" height="1.25rem" />
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 flex-1">
+              <p-skeleton shape="circle" size="2.25rem" />
+              <div class="flex flex-col gap-1 flex-1">
+                <p-skeleton width="60%" height="0.875rem" />
+                <p-skeleton width="40%" height="0.75rem" />
+              </div>
+            </div>
+            <p-skeleton width="4rem" height="1rem" />
+          </div>
+        </div>
+        }
+      </div>
+    </ng-template>
+    <ng-template #empty>
+      <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+        <i class="pi pi-box text-4xl text-surface-400"></i>
+        <p class="m-0 font-medium">No products yet</p>
+        <p class="text-surface-500 text-sm m-0">Create your first product to start sending invoices.</p>
+        <p-button label="Create product" icon="pi pi-plus" size="small" class="mt-2" (onClick)="openCreateDialog()" />
+      </div>
+    </ng-template>
+  </p-dataview>
+  @if (hasMore()) {
+  <div class="flex flex-col items-center gap-2 pt-2">
+    <p-button label="Load more" icon="pi pi-chevron-down" severity="secondary" [outlined]="true" size="small"
+      [loading]="loadingMore()" (onClick)="loadMore()" />
+    <span class="text-xs text-surface-500">Showing {{ products().length }} of {{ totalRecords() }}</span>
+  </div>
+  }
+  }
+</div>
+
+<mh-product-form-dialog [(visible)]="showProductFormDialog" [product]="editingProduct()" (saved)="loadProducts()" />
+
+<p-toast />
+<p-confirmDialog />

@@ -1,0 +1,148 @@
+.invite-friend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4px 4px 8px 4px;
+}
+
+.invite-friend__hero {
+  width: 88px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary-500, #f59e0b), var(--color-primary-400, #fb923c));
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  margin-bottom: 12px;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+.invite-friend__bee {
+  font-size: 44px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
+}
+
+.invite-friend__title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 6px 0;
+  color: var(--color-navy-900);
+}
+
+.invite-friend__body {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+::ng-deep p-tabs {
+  width: 100%;
+}
+
+.invite-friend__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  padding-top: 4px;
+}
+
+.invite-friend__hint {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.invite-friend__link-input {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 13px;
+  text-align: center;
+}
+
+.invite-friend__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.invite-friend__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.invite-friend__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-navy-900);
+}
+
+.invite-friend__optional {
+  font-weight: 400;
+  color: var(--p-text-muted-color);
+}
+
+.invite-friend__footnote {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  margin: 0;
+  text-align: center;
+}
+
+.invite-friend__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.invite-friend__success-hex {
+  width: 64px;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent-500);
+  color: #fff;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.invite-friend__success-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-navy-900);
+}
+
+.invite-friend__success-body {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+:host-context(.dark) {
+  .invite-friend__title,
+  .invite-friend__label,
+  .invite-friend__success-title {
+    color: var(--p-surface-50);
+  }
+}
+
+@media (min-width: 480px) {
+  .invite-friend__actions {
+    flex-direction: row;
+  }
+}
