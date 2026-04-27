@@ -8,13 +8,15 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ClientService, UserSearchResult, UserRoles } from 'core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ClientService, UserRoles, UserSearchResult, showApiError } from 'core';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
+import { SelectButton } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { Tooltip } from 'primeng/tooltip';
 import { UserSearchAutocomplete } from '../../../../_shared/components/user-search-autocomplete/user-search-autocomplete';
@@ -24,12 +26,14 @@ type InviteMode = 'find' | 'email';
 @Component({
   selector: 'mh-invite-client-dialog',
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     Button,
     Dialog,
     InputText,
-    TextareaModule,
     Message,
+    SelectButton,
+    TextareaModule,
     Tooltip,
     UserSearchAutocomplete,
   ],
@@ -55,16 +59,24 @@ export class InviteClientDialog {
 
   readonly userRole = UserRoles.User;
 
+  readonly modeOptions = [
+    { label: 'Find on platform', value: 'find', icon: 'pi pi-search' },
+    { label: 'Invite by email', value: 'email', icon: 'pi pi-envelope' },
+  ];
+
   readonly form = this._formBuilder.group({
-    email: ['', [Validators.email]],
+    email: [''],
     message: [''],
+  });
+
+  private readonly _emailStatus = toSignal(this.form.controls.email.statusChanges, {
+    initialValue: this.form.controls.email.status,
   });
 
   readonly canSubmit = computed(() => {
     if (this.inviteLoading()) return false;
     if (this.mode() === 'find') return !!this.selectedUser();
-    const email = this.form.controls.email.value?.trim() ?? '';
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return this._emailStatus() === 'VALID';
   });
 
   private readonly _resetOnOpenEffect = effect(() => {
@@ -75,6 +87,7 @@ export class InviteClientDialog {
       this.invitationSent.set(false);
       this.referralLink.set(null);
       this.linkCopied.set(false);
+      this._syncEmailValidators('find');
     }
   });
 
@@ -83,6 +96,7 @@ export class InviteClientDialog {
     this.mode.set(mode);
     this.selectedUser.set(null);
     this.form.controls.email.reset('');
+    this._syncEmailValidators(mode);
   }
 
   onUserSelected(user: UserSearchResult): void {
@@ -98,9 +112,16 @@ export class InviteClientDialog {
     return name || user.email;
   }
 
-  isEmailFieldInvalid(): boolean {
-    const control = this.form.controls.email;
+  isFieldInvalid(field: 'email'): boolean {
+    const control = this.form.controls[field];
     return control.invalid && control.touched;
+  }
+
+  getFieldError(field: 'email'): string {
+    const errors = this.form.controls[field].errors;
+    if (errors?.['required']) return 'Email address is required.';
+    if (errors?.['email']) return 'Please enter a valid email address.';
+    return '';
   }
 
   sendInvitation(): void {
@@ -129,17 +150,18 @@ export class InviteClientDialog {
           this._messageService.add({
             severity: 'success',
             summary: 'Invitation sent',
-            detail: 'Client invitation has been sent successfully',
+            detail: 'Client invitation has been sent successfully.',
           });
         }
       },
       error: (err) => {
         this.inviteLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to send invitation',
-        });
+        showApiError(
+          this._messageService,
+          'Failed to send invitation',
+          'Could not send the invitation. Please try again.',
+          err,
+        );
       },
     });
   }
@@ -151,5 +173,15 @@ export class InviteClientDialog {
       this.linkCopied.set(true);
       setTimeout(() => this.linkCopied.set(false), 2000);
     });
+  }
+
+  private _syncEmailValidators(mode: InviteMode): void {
+    const emailControl = this.form.controls.email;
+    if (mode === 'email') {
+      emailControl.setValidators([Validators.required, Validators.email]);
+    } else {
+      emailControl.clearValidators();
+    }
+    emailControl.updateValueAndValidity();
   }
 }

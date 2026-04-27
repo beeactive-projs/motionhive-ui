@@ -1,18 +1,19 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
-  ClientListResponse,
   ClientListParams,
-  InstructorClient,
+  ClientListResponse,
   ClientRequest,
   CreateClientInvitation,
+  InstructorClient,
   InvitationDetails,
   UpdateClientPayload,
 } from '../../models/client/client.model';
 import { InstructorListResponse } from '../../models/client/instructor.model';
-import { environment } from '../../../environments/environment';
-import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,11 @@ export class ClientService {
     if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
 
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
+  }
+
+  // service.ts (Angular)
+  filterClients(event: TableLazyLoadEvent) {
+    return this._http.post<any>(`${this.baseUrl}/filter`, event);
   }
 
   getMyInstructors(): Observable<InstructorListResponse> {
