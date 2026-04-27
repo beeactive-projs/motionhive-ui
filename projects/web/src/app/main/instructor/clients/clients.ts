@@ -7,6 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   ClientRequestTypes,
   ClientService,
@@ -52,6 +53,7 @@ import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-clie
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Clients implements OnInit {
+  private readonly _router = inject(Router);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
@@ -161,6 +163,12 @@ export class Clients implements OnInit {
     // this.lastLazyEvent.sortOrder = -1;
     this.statusFilter.set(status);
     this.lazyLoadClients(this.lastLazyEvent);
+  }
+
+  viewProfile(client: InstructorClient): void {
+    this._router.navigate(['/coaching/clients', client.id], {
+      state: { client },
+    });
   }
 
   openInviteDialog(): void {

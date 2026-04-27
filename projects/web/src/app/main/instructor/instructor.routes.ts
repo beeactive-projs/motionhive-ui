@@ -4,14 +4,19 @@ export const instructorRoutes: Routes = [
   // Coaching
   {
     path: 'overview',
-    loadComponent: () =>
-      import('./coaching-overview/coaching-overview').then((m) => m.CoachingOverview),
-    title: 'Coaching Overview - MotionHive',
+    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
+    title: 'Overview - MotionHive',
   },
   {
     path: 'clients',
     loadComponent: () => import('./clients/clients').then((m) => m.Clients),
     title: 'Clients - MotionHive',
+  },
+  {
+    path: 'clients/:id',
+    loadComponent: () =>
+      import('./clients/client-profile/client-profile').then((m) => m.ClientProfile),
+    title: 'Client profile - MotionHive',
   },
   {
     path: 'sessions',

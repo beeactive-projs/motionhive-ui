@@ -19,6 +19,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { GroupService, Group, GroupMember, JoinPolicy, AuthStore, TagSeverity } from 'core';
+import { AddMembersDialog } from '../../_dialogs/add-members-dialog/add-members-dialog';
 
 @Component({
   selector: 'mh-group-detail',
@@ -33,6 +34,7 @@ import { GroupService, Group, GroupMember, JoinPolicy, AuthStore, TagSeverity } 
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    AddMembersDialog,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './group-detail.html',
@@ -53,6 +55,7 @@ export class GroupDetail implements OnInit {
   membersLoading = signal(true);
   totalMembers = signal(0);
   generatingLink = signal(false);
+  showAddMembersDialog = signal(false);
   joinLink = signal<string | null>(null);
 
   groupName = computed(() => this.group()?.name ?? 'Group');
@@ -107,6 +110,10 @@ export class GroupDetail implements OnInit {
         });
       },
     });
+  }
+
+  openAddMembersDialog(): void {
+    this.showAddMembersDialog.set(true);
   }
 
   goBack(): void {

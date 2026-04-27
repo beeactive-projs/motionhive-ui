@@ -121,6 +121,9 @@
   <div class="flex flex-col flex-1 gap-3">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100">Members ({{ totalMembers() }})</h2>
+      @if (isGroupOwner()) {
+      <p-button label="Add members" icon="pi pi-user-plus" size="small" (onClick)="openAddMembersDialog()" />
+      }
     </div>
 
     <p-table [value]="members()" [loading]="membersLoading()" [rows]="memberRows" [scrollable]="true"
@@ -216,6 +219,11 @@
   </div>
   }
 </div>
+
+@if (group()?.id) {
+<mh-add-members-dialog [(visible)]="showAddMembersDialog" [groupId]="group()!.id"
+  (saved)="loadMembers(group()!.id); loadGroup(group()!.id)" />
+}
 
 <p-toast />
 <p-confirmDialog />

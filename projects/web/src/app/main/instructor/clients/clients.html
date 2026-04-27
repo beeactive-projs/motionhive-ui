@@ -65,7 +65,8 @@
           <td>
             <div class="flex items-center gap-3">
               <p-avatar [label]="initials(client)" shape="circle" />
-              <span>{{ clientName(client) }}</span>
+              <p-button [label]="clientName(client)" [link]="true" severity="secondary" class="p-0 font-normal"
+                (onClick)="viewProfile(client)" />
             </div>
           </td>
           <td>{{ clientEmail(client) }}</td>

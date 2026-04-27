@@ -1,0 +1,62 @@
+<p-dialog header="Add members" [(visible)]="visible" [modal]="true" [style]="{ width: '38rem' }" [closable]="true">
+
+  @if (loading()) {
+  <div class="flex flex-col items-center gap-3 py-8">
+    <p-progressSpinner strokeWidth="4" class="w-10 h-10" />
+    <span class="text-sm text-surface-500">Loading clients...</span>
+  </div>
+  } @else {
+
+  <div class="mb-3">
+    <input pInputText fluid #filterInput placeholder="Search by name or email..."
+      (input)="dt.filterGlobal(filterInput.value, 'contains')" />
+  </div>
+
+  <p-table #dt [value]="availableClients()" [selection]="selectedClients()"
+    (selectionChange)="selectedClients.set($event)" selectionMode="multiple"
+    [globalFilterFields]="['client.firstName', 'client.lastName', 'client.email']" size="small" stripedRows rowHover
+    dataKey="id">
+
+    <ng-template #header>
+      <tr>
+        <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-client>
+      <tr [pSelectableRow]="client">
+        <td><p-tableCheckbox [value]="client" /></td>
+        <td>
+          <div class="flex items-center gap-3">
+            <p-avatar [label]="clientInitials(client)" shape="circle" />
+            <span class="font-medium">{{ clientName(client) }}</span>
+          </div>
+        </td>
+        <td>{{ client.client?.email }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="3">
+          <div class="flex flex-col items-center gap-3 py-8 text-center">
+            <i class="pi pi-users text-3xl text-surface-300"></i>
+            <p class="text-sm text-surface-500">All your active clients are already members of this group.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  }
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
+    <p-button
+      [label]="selectedCount() > 0 ? 'Add ' + selectedCount() + ' ' + (selectedCount() === 1 ? 'member' : 'members') : 'Add members'"
+      icon="pi pi-user-plus" severity="primary" [loading]="saving()" [disabled]="selectedCount() === 0 || loading()"
+      (onClick)="saveMembers()" />
+  </ng-template>
+</p-dialog>

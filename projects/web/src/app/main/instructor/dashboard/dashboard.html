@@ -1,88 +1,301 @@
 <!-- Header -->
-<header class="flex flex-col gap-4 mb-4">
-  <div class="space-y-1">
-    <h1 class="font-heading font-semibold text-xl md:text-2xl">Welcome back, {{ _authStore.userName() }}</h1>
-    <p class="text-sm text-surface-700 dark:text-surface-400">Here's your instructor hub. What would you like to do?
-    </p>
-  </div>
+<header class="mb-6 space-y-1">
+  <h1 class="font-heading font-semibold text-xl md:text-2xl">Welcome back, {{ _authStore.userName() }}</h1>
+  <p class="text-sm text-muted-color">Here's your coaching overview.</p>
 </header>
 
+<!-- KPI stats -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
 
-<!-- Stripe Onboarding Widget -->
-<div class="mb-6">
-  <mh-stripe-onboarding-card />
+  <p-card>
+    <div class="flex items-center gap-4">
+      <p-avatar icon="pi pi-users" shape="circle" size="normal"
+        [style]="{ background: 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
+      <div class="min-w-0">
+        <div class="text-xs text-surface-500 leading-tight">Active clients</div>
+        <div class="font-semibold text-lg leading-tight">{{ activeClientCount() }}</div>
+        @if (pendingClientCount() > 0) {
+        <div class="text-xs text-orange-500 leading-tight">{{ pendingClientCount() }} pending</div>
+        }
+      </div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="flex items-center gap-4">
+      <p-avatar icon="pi pi-sitemap" shape="circle" size="normal"
+        [style]="{ background: 'var(--p-green-100)', color: 'var(--p-green-600)' }" />
+      <div class="min-w-0">
+        <div class="text-xs text-surface-500 leading-tight">Groups</div>
+        <div class="font-semibold text-lg leading-tight">{{ groups().length }}</div>
+        <div class="text-xs text-surface-400 leading-tight">{{ totalMembers() }} members</div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="flex items-center gap-4">
+      <p-avatar icon="pi pi-chart-line" shape="circle" size="normal"
+        [style]="{ background: 'var(--p-teal-100)', color: 'var(--p-teal-600)' }" />
+      <div class="min-w-0">
+        <div class="text-xs text-surface-500 leading-tight">Revenue this month</div>
+        <div class="font-semibold text-lg leading-tight text-primary-600">
+          {{ earnings().monthToDateRevenueCents | currencyRon: earnings().currency }}
+        </div>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="flex items-center gap-4">
+      <p-avatar icon="pi pi-receipt" shape="circle" size="normal"
+        [style]="{ background: 'var(--p-orange-100)', color: 'var(--p-orange-600)' }" />
+      <div class="min-w-0">
+        <div class="text-xs text-surface-500 leading-tight">Outstanding</div>
+        <div class="font-semibold text-lg leading-tight text-orange-500">
+          {{ earnings().outstandingInvoicesCents | currencyRon: earnings().currency }}
+        </div>
+        @if (earnings().overdueInvoiceCount > 0) {
+        <div class="text-xs text-red-500 leading-tight">{{ earnings().overdueInvoiceCount }} overdue</div>
+        }
+      </div>
+    </div>
+  </p-card>
+
+</div>
+<!-- Recent activities + Recent clients -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
+
+  <!-- Recent activities (3/5) -->
+  <p-card class="lg:col-span-3">
+    <ng-template #header>
+      <div class="px-4 pt-4 pb-3">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-surface-500 m-0 mb-3">Recent activities</h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <p-select [options]="locationOptions" [(ngModel)]="selectedLocation" [appendTo]="'body'" size="small" />
+          <p-select [options]="eventOptions" [(ngModel)]="selectedEvent" [appendTo]="'body'" size="small" />
+          <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" [appendTo]="'body'" size="small" />
+        </div>
+      </div>
+      <p-divider class="mt-0" />
+    </ng-template>
+
+    @if (recentActivities().length === 0) {
+    <div class="flex flex-col items-center justify-center py-10 text-center">
+      <i class="pi pi-bell text-3xl text-surface-300 mb-2"></i>
+      <p class="text-sm text-surface-400 m-0">No recent activities.</p>
+    </div>
+    } @else {
+    <div>
+      @for (activity of recentActivities(); track activity.id) {
+      <div class="flex items-start gap-3 py-3 border-b border-surface-100 last:border-0">
+        <p-avatar [label]="activity.initials" shape="circle"
+          [style]="{ background: 'var(--p-primary-50)', color: 'var(--p-primary-700)' }" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm m-0 leading-relaxed">
+            <span class="text-primary-600 font-medium">{{ activity.userName }}</span>
+            {{ ' ' + activity.description }}
+          </p>
+          <div class="text-xs text-surface-400 mt-0.5">{{ activity.timeAgo }}</div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </p-card>
+
+  <!-- Recent clients (2/5) -->
+  <p-card class="lg:col-span-2">
+    <ng-template #header>
+      <div class="flex items-center justify-between px-4 pt-4">
+        <h2 class="text-base font-semibold m-0">Recent clients</h2>
+        <a routerLink="/coaching/clients" class="text-sm text-primary-600 hover:underline no-underline">View all</a>
+      </div>
+      <p-divider />
+    </ng-template>
+
+    @if (clients().length === 0) {
+    <div class="flex flex-col items-center justify-center py-6 text-center">
+      <i class="pi pi-users text-3xl mb-2 text-surface-400"></i>
+      <p class="text-surface-500 text-sm m-0">No clients yet. Start by inviting someone.</p>
+    </div>
+    } @else {
+    <div class="flex flex-col gap-3">
+      @for (item of clients(); track item.id) {
+      <div class="flex items-center gap-3">
+        @if (item.client; as c) {
+        <p-avatar [label]="clientInitials(c)" shape="circle"
+          [style]="{ background: 'var(--p-primary-100)', color: 'var(--p-primary-700)' }" />
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-sm truncate">{{ c.firstName }} {{ c.lastName }}</div>
+          <div class="text-xs text-surface-500 truncate">{{ c.email }}</div>
+        </div>
+        }
+        <p-tag [value]="ClientStatusLabels[item.status]" [severity]="clientStatusSeverity(item.status)" />
+      </div>
+      }
+    </div>
+    }
+  </p-card>
+
 </div>
 
-<!-- Quick Action Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-  <a routerLink="/coaching/clients" class="no-underline">
-    <p-card class="hover:shadow-md transition-shadow cursor-pointer h-full">
-      <div class="flex flex-col items-center text-center gap-3 py-4">
-        <p-avatar icon="pi pi-users" size="large" shape="circle" [style]="{
-                'background-color': 'var(--p-primary-100)',
-                color: 'var(--p-primary-600)',
-              }" />
-        <div>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">Manage Clients</h3>
-          <p class="text-surface-500 text-sm mt-1 mb-0">
-            View and manage your client relationships
-          </p>
-        </div>
-        <p-tag value="Clients" severity="info" />
-      </div>
-    </p-card>
-  </a>
-
-  <a routerLink="/coaching/groups" class="no-underline">
-    <p-card class="hover:shadow-md transition-shadow cursor-pointer h-full">
-      <div class="flex flex-col items-center text-center gap-3 py-4">
-        <p-avatar icon="pi pi-sitemap" size="large" shape="circle"
-          [style]="{ 'background-color': 'var(--p-green-100)', color: 'var(--p-green-600)' }" />
-        <div>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">Manage Groups</h3>
-          <p class="text-surface-500 text-sm mt-1 mb-0">
-            Create and organize your training groups
-          </p>
-        </div>
-        <p-tag value="Groups" severity="success" />
-      </div>
-    </p-card>
-  </a>
-
-  <a routerLink="/profile" class="no-underline">
-    <p-card class="hover:shadow-md transition-shadow cursor-pointer h-full">
-      <div class="flex flex-col items-center text-center gap-3 py-4">
-        <p-avatar icon="pi pi-user" size="large" shape="circle"
-          [style]="{ 'background-color': 'var(--p-orange-100)', color: 'var(--p-orange-600)' }" />
-        <div>
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">My Profile</h3>
-          <p class="text-surface-500 text-sm mt-1 mb-0">
-            Update your instructor profile and settings
-          </p>
-        </div>
-        <p-tag value="Profile" severity="warn" />
-      </div>
-    </p-card>
-  </a>
-</div>
-
-<!-- Recent Activity Placeholder -->
-<p-card>
+<!-- Business growth chart -->
+<p-card class="mb-4">
   <ng-template #header>
-    <div class="flex items-center gap-2 px-4 pt-4">
-      <i class="pi pi-clock"></i>
-      <h2 class="text-lg font-semiboldm-0">Recent Activity</h2>
+    <div class="px-4 pt-4">
+      <h2 class="text-base font-semibold m-0">Business growth (past 12 months)</h2>
     </div>
     <p-divider />
   </ng-template>
-  <!-- <p-divider /> -->
-  <div class="flex flex-col items-center justify-center py-8 text-center">
-    <i class="pi pi-inbox text-4xl mb-3"></i>
-    <p class="text-surface-900 dark:text-surface-50 m-0">Activity feed coming soon.</p>
-    <p class="text-surface-500 text-sm mt-1 mb-3">
-      Your recent sessions, client updates, and group activity will appear here.
-    </p>
-    <p-button label="Notify me" icon="pi pi-bell" iconPos="right" size="small" [outlined]="true"
-      (onClick)="openJoinWaitlist()" />
-  </div>
+  <p-chart type="line" [data]="businessGrowthData" [options]="chartOptions" />
 </p-card>
+
+<!-- Weekly stats -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+  <p-card>
+    <div class="flex items-center gap-1.5 mb-4">
+      <h2 class="text-sm font-semibold m-0">Average client sign-ins per week</h2>
+      <i class="pi pi-question-circle text-surface-400 text-xs"></i>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+      <ng-container *ngTemplateOutlet="statsEmptyIcon" />
+      <p class="font-medium text-sm m-0">Weekly snapshot coming soon</p>
+      <p class="text-xs text-surface-400 m-0 max-w-xs">
+        Your weekly business metrics is calculated every week on Sunday night.
+      </p>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="flex items-center gap-1.5 mb-4">
+      <h2 class="text-sm font-semibold m-0">Average workouts per week</h2>
+      <i class="pi pi-question-circle text-surface-400 text-xs"></i>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+      <ng-container *ngTemplateOutlet="statsEmptyIcon" />
+      <p class="font-medium text-sm m-0">Hmmm... we can't find any stats to graph yet</p>
+      <p class="text-xs text-surface-400 m-0 max-w-xs">
+        Make sure you've added clients and scheduled some workouts for them. Weekly snapshots are
+        calculated every Sunday night.
+      </p>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="flex items-center gap-1.5 mb-4">
+      <h2 class="text-sm font-semibold m-0">Average exercise compliance</h2>
+      <i class="pi pi-question-circle text-surface-400 text-xs"></i>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+      <ng-container *ngTemplateOutlet="statsEmptyIcon" />
+      <p class="font-medium text-sm m-0">Hmmm... we can't find any stats to graph yet</p>
+      <p class="text-xs text-surface-400 m-0 max-w-xs">
+        Make sure you've added clients and set up their exercise plans. Weekly snapshots are
+        calculated every Sunday night.
+      </p>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="flex items-center gap-1.5 mb-4">
+      <h2 class="text-sm font-semibold m-0">Average nutrition compliance</h2>
+      <i class="pi pi-question-circle text-surface-400 text-xs"></i>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
+      <ng-container *ngTemplateOutlet="statsEmptyIcon" />
+      <p class="font-medium text-sm m-0">Hmmm... we can't find any stats to graph yet</p>
+      <p class="text-xs text-surface-400 m-0 max-w-xs">
+        Make sure you've added clients and set up their nutrition goals and meal tracking. Weekly
+        snapshots are calculated every Sunday night.
+      </p>
+    </div>
+  </p-card>
+
+</div>
+
+<!-- Groups + Recent invoices -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+  <!-- Groups -->
+  <p-card>
+    <ng-template #header>
+      <div class="flex items-center justify-between px-4 pt-4">
+        <h2 class="text-base font-semibold m-0">Groups</h2>
+        <a routerLink="/coaching/groups" class="text-sm text-primary-600 hover:underline no-underline">View all</a>
+      </div>
+      <p-divider />
+    </ng-template>
+
+    @if (groups().length === 0) {
+    <div class="flex flex-col items-center justify-center py-6 text-center">
+      <i class="pi pi-sitemap text-3xl mb-2 text-surface-400"></i>
+      <p class="text-surface-500 text-sm m-0">No groups yet.</p>
+    </div>
+    } @else {
+    <div class="flex flex-col gap-3">
+      @for (group of groups(); track group.id) {
+      <div class="flex items-center gap-3">
+        <p-avatar icon="pi pi-sitemap" shape="circle"
+          [style]="{ background: 'var(--p-green-100)', color: 'var(--p-green-600)' }" />
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-sm truncate">{{ group.name }}</div>
+          <div class="text-xs text-surface-500">{{ group.memberCount }} members</div>
+        </div>
+        <p-tag [value]="joinPolicyLabel(group.joinPolicy)" [severity]="joinPolicySeverity(group.joinPolicy)" />
+      </div>
+      }
+    </div>
+    }
+  </p-card>
+
+  <!-- Recent invoices -->
+  <p-card>
+    <ng-template #header>
+      <div class="flex items-center justify-between px-4 pt-4">
+        <h2 class="text-base font-semibold m-0">Recent invoices</h2>
+        <a routerLink="/coaching/payments" class="text-sm text-primary-600 hover:underline no-underline">View all</a>
+      </div>
+      <p-divider />
+    </ng-template>
+
+    @if (recentInvoices().length === 0) {
+    <div class="flex flex-col items-center justify-center py-6 text-center">
+      <i class="pi pi-file-invoice text-3xl mb-2 text-surface-400"></i>
+      <p class="text-surface-500 text-sm m-0">No invoices yet.</p>
+    </div>
+    } @else {
+    <div class="flex flex-col gap-3">
+      @for (invoice of recentInvoices(); track invoice.id) {
+      <div class="flex items-center gap-2">
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-sm truncate">{{ invoice.clientEmail }}</div>
+          <div class="text-xs text-surface-500">
+            @if (invoice.dueDate) {
+            Due {{ invoice.dueDate | date:'dd MMM' }}
+            } @else {
+            No due date
+            }
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="font-semibold text-sm mb-1">
+            {{ invoiceAmount(invoice) | currencyRon: invoice.currency }}
+          </div>
+          <p-tag [value]="invoice.status | titlecase" [severity]="invoiceStatusSeverity(invoice.status)" />
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </p-card>
+
+</div>
+
+<!-- Shared empty-state icon for weekly stats -->
+<ng-template #statsEmptyIcon>
+  <span class="material-symbols-outlined text-5xl!">
+    finance_mode
+  </span>
+</ng-template>

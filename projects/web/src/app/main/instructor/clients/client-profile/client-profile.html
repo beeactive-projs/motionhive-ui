@@ -1,0 +1,186 @@
+<div class="h-full overflow-y-auto">
+  <div class="flex flex-col gap-4 pb-6">
+
+    <!-- Back -->
+    <!-- <p-button icon="pi pi-arrow-left" label="Clients" [text]="true" size="small" styleClass="pl-0 self-start"
+      (onClick)="goBack()" /> -->
+
+    <p-button icon="pi pi-arrow-left" rounded text severity="secondary" (onClick)="goBack()"
+      pTooltip="Back to Groups" />
+
+    @if (client(); as c) {
+    <div class="flex flex-col lg:flex-row gap-4 items-start">
+
+      <!-- Left sidebar -->
+      <aside class="w-full lg:w-64 shrink-0 lg:sticky lg:top-0">
+        <p-card>
+
+          <!-- Identity -->
+          <div class="flex flex-col items-center gap-3 text-center">
+            <p-avatar [label]="initials()" shape="circle" size="xlarge" styleClass="!w-20 !h-20 !text-2xl" />
+            <div>
+              <h2 class="font-heading font-semibold text-xl">{{ clientName() }}</h2>
+              <p class="text-sm text-surface-500 mt-1">{{ clientEmail() }}</p>
+            </div>
+            <p-tag [value]="statusLabel()" [severity]="statusSeverity()" rounded />
+          </div>
+
+          <div class="my-4 border-t border-surface-200 dark:border-surface-700"></div>
+
+          <!-- Info rows -->
+          <div class="flex flex-col gap-3 text-sm">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-surface-500 shrink-0">Member since</span>
+              <span class="font-medium text-right">
+                {{ c.startedAt ? (c.startedAt | date: 'dd MMM yyyy') : '—' }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-surface-500 shrink-0">Connected</span>
+              <span class="font-medium text-right">{{ c.createdAt | date: 'dd MMM yyyy' }}</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-surface-500 shrink-0">Initiated by</span>
+              <span class="font-medium text-right">
+                {{ c.initiatedBy === InitiatedBy.Instructor ? 'You' : 'Client' }}
+              </span>
+            </div>
+            @if (c.status === Statuses.Pending && c.expiresAt) {
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-surface-500 shrink-0">Expires</span>
+              <span class="font-medium text-right text-orange-500">
+                {{ c.expiresAt | date: 'dd MMM yyyy' }}
+              </span>
+            </div>
+            }
+          </div>
+
+          @if (c.status === Statuses.Active || c.status === Statuses.Archived) {
+          <div class="my-4 border-t border-surface-200 dark:border-surface-700"></div>
+          <div class="flex flex-col gap-1">
+            @if (c.status === Statuses.Active) {
+            <p-button label="Edit notes" icon="pi pi-pencil" severity="secondary" fluid [text]="true"
+              (onClick)="openNotesDialog()" />
+            <p-button label="Archive client" icon="pi pi-inbox" severity="danger" fluid [text]="true"
+              (onClick)="confirmArchive()" />
+            }
+            @if (c.status === Statuses.Archived) {
+            <p-button label="Unarchive client" icon="pi pi-inbox" severity="success" fluid [text]="true"
+              (onClick)="confirmUnarchive()" />
+            }
+          </div>
+          }
+
+        </p-card>
+      </aside>
+
+      <!-- Right content -->
+      <div class="flex-1 min-w-0 flex flex-col gap-3">
+
+        <!-- Tab strip -->
+        <div class="flex items-center gap-2 flex-wrap">
+          @for (tab of tabs; track tab.value) {
+          <p-button [label]="tab.label" [icon]="tab.icon"
+            [severity]="activeTab() === tab.value ? 'primary' : 'contrast'" [text]="activeTab() !== tab.value"
+            size="small" rounded styleClass="py-0.5" (onClick)="activeTab.set(tab.value)" />
+          }
+        </div>
+
+        <!-- Tab content -->
+        @switch (activeTab()) {
+
+        @case (0) {
+        <!-- Overview -->
+        <div class="flex flex-col gap-3">
+
+          <p-card>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold">Notes</h3>
+              @if (c.status === Statuses.Active) {
+              <p-button icon="pi pi-pencil" [text]="true" size="small" severity="secondary"
+                (onClick)="openNotesDialog()" />
+              }
+            </div>
+            @if (c.notes) {
+            <p class="text-sm whitespace-pre-line">{{ c.notes }}</p>
+            } @else {
+            <p class="text-sm text-surface-400">No notes yet.</p>
+            }
+          </p-card>
+
+          <p-card>
+            <h3 class="font-semibold mb-3">Groups</h3>
+            @if (c.groupMemberships?.length) {
+            <div class="flex flex-wrap gap-2">
+              @for (group of c.groupMemberships; track group.groupId) {
+              <p-tag [value]="group.groupName" severity="info" rounded />
+              }
+            </div>
+            } @else {
+            <p class="text-sm text-surface-400">Not a member of any groups.</p>
+            }
+          </p-card>
+
+          <p-card>
+            <div class="flex items-center gap-3 text-surface-400">
+              <i class="pi pi-calendar text-2xl"></i>
+              <div>
+                <p class="font-medium text-surface-500">Sessions</p>
+                <p class="text-sm">Session history will appear here.</p>
+              </div>
+            </div>
+          </p-card>
+
+          <p-card>
+            <div class="flex items-center gap-3 text-surface-400">
+              <i class="pi pi-chart-line text-2xl"></i>
+              <div>
+                <p class="font-medium text-surface-500">Progress</p>
+                <p class="text-sm">Progress tracking will appear here.</p>
+              </div>
+            </div>
+          </p-card>
+
+        </div>
+        }
+
+        @case (1) {
+        <p-card>
+          <div class="flex flex-col items-center gap-3 py-16 text-center">
+            <i class="pi pi-calendar text-4xl text-surface-300"></i>
+            <h3 class="text-lg font-semibold text-surface-500">Sessions</h3>
+            <p class="text-sm text-surface-400">Session history will be available once this feature is ready.</p>
+          </div>
+        </p-card>
+        }
+
+        @case (2) {
+        <p-card>
+          <div class="flex flex-col items-center gap-3 py-16 text-center">
+            <i class="pi pi-chart-line text-4xl text-surface-300"></i>
+            <h3 class="text-lg font-semibold text-surface-500">Progress</h3>
+            <p class="text-sm text-surface-400">Progress data will be available once this feature is ready.</p>
+          </div>
+        </p-card>
+        }
+
+        }
+      </div>
+    </div>
+
+    } @else {
+    <div class="flex flex-col items-center justify-center gap-4 py-24 text-center">
+      <i class="pi pi-user text-4xl text-surface-300"></i>
+      <h2 class="text-lg font-semibold text-surface-500">Client not found</h2>
+      <p class="text-sm text-surface-400">Navigate from the clients list to view a profile.</p>
+      <p-button label="Go to clients" icon="pi pi-arrow-left" (onClick)="goBack()" />
+    </div>
+    }
+
+  </div>
+</div>
+
+<mh-edit-client-notes-dialog [(visible)]="showNotesDialog" [client]="client()" (saved)="onNotesSaved()" />
+
+<p-toast />
+<p-confirmDialog />

@@ -50,6 +50,10 @@ export class GroupService {
     });
   }
 
+  addMember(groupId: string, userId: string): Observable<GroupMember> {
+    return this._http.post<GroupMember>(`${this.baseUrl}/${groupId}/members`, { userId });
+  }
+
   removeMember(groupId: string, userId: string): Observable<void> {
     return this._http.delete<void>(`${this.baseUrl}/${groupId}/members/${userId}`);
   }
