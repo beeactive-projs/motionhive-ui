@@ -114,6 +114,10 @@ export * from './lib/stores/stripe-onboarding.store';
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';
 export * from './lib/interceptors/error.interceptor';
+export * from './lib/interceptors/loading.interceptor';
+
+// Loading
+export * from './lib/services/loading/loading.service';
 
 // Components
 export * from './lib/components/logo/logo';

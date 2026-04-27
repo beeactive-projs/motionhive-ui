@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { environment } from 'core';
+import { environment, LoadingService } from 'core';
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { FeedbackDialog } from './_shared/components/feedback-dialog/feedback-dialog';
+import { Loader } from './_shared/components/loader/loader';
 import { WaitlistDialog } from './_shared/components/waitlist-dialog/waitlist-dialog';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FeedbackDialog, ErrorDialog, WaitlistDialog],
+  imports: [RouterOutlet, FeedbackDialog, ErrorDialog, WaitlistDialog, Loader],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,6 +18,9 @@ export class App {
   protected readonly title = signal('web');
 
   private readonly _meta = inject(Meta);
+  private readonly _loadingService = inject(LoadingService);
+
+  protected readonly requestLoading = this._loadingService.requestLoading;
 
   constructor() {
     const imageUrl = `${environment.appUrl}/svg/logo-navy.svg`;

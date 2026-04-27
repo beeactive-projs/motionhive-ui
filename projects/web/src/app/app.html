@@ -1,3 +1,7 @@
+@if (requestLoading()) {
+<mh-loader />
+}
+<!-- <mh-loader /> -->
 <router-outlet />
 <mh-feedback-dialog />
 <mh-error-dialog />
