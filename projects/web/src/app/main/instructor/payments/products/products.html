@@ -14,8 +14,8 @@
 <!-- Desktop: data table (hidden on mobile) -->
 <div class="md:block hidden flex-1 min-h-0">
   <p-table [value]="products()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-    [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
-    scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
+    [loading]="loading()" showLoader="false" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)"
+    [scrollable]="true" scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
         <th>Name</th>

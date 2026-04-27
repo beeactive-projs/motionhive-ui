@@ -45,9 +45,9 @@
   <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
 
     <p-table [value]="clients()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-      [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="lazyLoadClients($event)"
-      [scrollable]="true" scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true"
-      sortField="client.firstName">
+      [loading]="loading()" showLoader="false" [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="lazyLoadClients($event)" [scrollable]="true" scrollHeight="flex" dataKey="id" size="small"
+      stripedRows="true" rowHover="true" sortField="client.firstName">
       <ng-template #header>
         <tr>
           <th pSortableColumn="client.firstName">Name</th>
