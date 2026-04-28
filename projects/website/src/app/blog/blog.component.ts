@@ -146,9 +146,11 @@ export class BlogComponent {
       });
   }
 
-  /** Featured-card cover — wide 21:9 hero crop, ~1600px wide. */
+  /** Featured-card cover — 4:3 frame, gravity north so portrait
+   *  subjects keep their face + shoulders in view (instead of
+   *  Cloudinary's auto-gravity zooming into the face). */
   featuredCoverUrl(url: string | null | undefined): string {
-    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.articleHero);
+    return withCloudinaryTransform(url, BLOG_COVER_PRESETS.featuredCard);
   }
 
   /** Grid-card cover — 16:9 carousel-sized crop. */

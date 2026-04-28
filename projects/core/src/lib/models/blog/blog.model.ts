@@ -9,10 +9,21 @@ export interface BlogPost {
   category: BlogCategory;
   coverImage: string;
   content: string;
+  /**
+   * Computed by the BE — for registered authors, derived from
+   * `firstName + lastName` of the joined user; for guest contributors,
+   * mirrors `guestAuthorName`. Always populated.
+   */
   authorName: string;
+  /**
+   * Computed by the BE — first letter of first + last name (or first
+   * two letters of the byline for guests). Always populated.
+   */
   authorInitials: string;
-  authorRole: string;
+  /** FK to user; null for guest-authored posts. */
   authorUserId: string | null;
+  /** Byline for guest-authored posts (no MotionHive account). */
+  guestAuthorName: string | null;
   readTime: number;
   tags: string[];
   language: BlogLanguage;
@@ -29,9 +40,12 @@ export interface CreateBlogPostPayload {
   content: string;
   category: BlogCategory;
   coverImage: string;
-  authorName: string;
-  authorInitials: string;
-  authorRole: string;
+  /**
+   * Optional. Set ONLY when publishing under a guest byline (admins
+   * only). Leave undefined to attribute the post to the logged-in
+   * writer — the BE uses the JWT subject as `authorUserId`.
+   */
+  guestAuthorName?: string;
   readTime: number;
   tags: string[];
   language: BlogLanguage;
