@@ -8,6 +8,7 @@ import {
   GroupMemberListResponse,
   CreateGroupPayload,
   UpdateGroupPayload,
+  UpdateMemberRolePayload,
 } from '../../models/group/group.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
@@ -81,5 +82,16 @@ export class GroupService {
 
   joinViaLink(token: string): Observable<GroupMember> {
     return this._http.post<GroupMember>(`${this.baseUrl}/join/${token}`, {});
+  }
+
+  updateMemberRole(
+    groupId: string,
+    userId: string,
+    payload: UpdateMemberRolePayload,
+  ): Observable<GroupMember> {
+    return this._http.patch<GroupMember>(
+      `${environment.apiUrl}${API_ENDPOINTS.GROUPS.MEMBER_ROLE(groupId, userId)}`,
+      payload,
+    );
   }
 }

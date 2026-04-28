@@ -1,0 +1,59 @@
+<p-card class="shadow-sm">
+  <div class="flex flex-col gap-3">
+
+    <!-- Header -->
+    <div class="flex items-start gap-3">
+      <p-avatar [label]="authorInitials()" shape="circle" class="bg-primary-100 text-primary-700" />
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-medium text-sm text-surface-900 dark:text-surface-100">{{ authorName() }}</span>
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-surface-500">{{ post().createdAt | date: 'medium' }}</span>
+            @if (menuItems().length > 0) {
+            <p-button icon="pi pi-ellipsis-h" rounded text severity="secondary" size="small"
+              (onClick)="postMenu.toggle($event)" />
+            <p-menu #postMenu [model]="menuItems()" appendTo="body" [popup]="true" />
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <p class="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap break-words">
+      {{ post().content }}
+    </p>
+
+    <!-- Images -->
+    @if (visibleImages().length > 0) {
+    <div class="grid gap-1.5" [class]="imageGridClass()">
+      @for (url of visibleImages(); track url; let i = $index, last = $last) {
+      <div class="relative overflow-hidden rounded-md aspect-square bg-surface-100 dark:bg-surface-800">
+        <img [src]="url" [alt]="'Post image ' + (i + 1)" class="h-full w-full object-cover" loading="lazy" />
+        @if (last && extraImageCount() > 0) {
+        <div class="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-xl font-semibold">
+          +{{ extraImageCount() }}
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Action bar -->
+    <div class="flex items-center gap-2 pt-1">
+      <mh-post-reaction-bar [post]="post()" />
+      <p-button
+        icon="pi pi-comment"
+        [label]="post().commentCount > 0 ? post().commentCount.toString() : 'Comment'"
+        text
+        severity="secondary"
+        size="small"
+        rounded
+        (onClick)="toggleComments()" />
+    </div>
+
+    <!-- Comments section (collapsible) -->
+    <mh-post-comment-list [postId]="post().id" [active]="showComments()" />
+  </div>
+</p-card>

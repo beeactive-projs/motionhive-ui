@@ -32,6 +32,9 @@ export * from './lib/models/client/instructor.model';
 export * from './lib/models/group/group.enums';
 export * from './lib/models/group/group.model';
 
+// Models - Post
+export * from './lib/models/post/post.model';
+
 // Models - Common
 export * from './lib/models/common/api-response.model';
 export * from './lib/models/common/pagination.model';
@@ -83,6 +86,7 @@ export * from './lib/services/user/user.service';
 export * from './lib/services/profile/profile.service';
 export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
+export * from './lib/services/post/post.service';
 export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';
 export * from './lib/services/invitation/invitation.service';

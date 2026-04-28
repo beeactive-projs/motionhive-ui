@@ -154,19 +154,29 @@
           <td>{{ member.user?.email || '—' }}</td>
           }
           <td>
-            @if (member.isOwner) {
-            <p-tag value="Owner" severity="warn" class="text-xs" />
-            } @else {
-            <span class="text-sm text-surface-500">Member</span>
-            }
+            <p-tag
+              [value]="memberRoleLabel(member.role ?? (member.isOwner ? 'OWNER' : 'MEMBER'))"
+              [severity]="memberRoleSeverity(member.role ?? (member.isOwner ? 'OWNER' : 'MEMBER'))"
+              class="text-xs" />
           </td>
           <td>{{ member.joinedAt | date: 'mediumDate' }}</td>
           @if (isGroupOwner()) {
           <td>
-            <div class="flex items-center justify-center">
-              @if (!member.isOwner) {
-              <p-button icon="pi pi-user-minus" [rounded]="true" text severity="danger" pTooltip="Remove Member"
-                (onClick)="confirmRemoveMember(member)" />
+            <div class="flex items-center justify-center gap-1">
+              @if (member.role !== GroupMemberRoles.Owner && !member.isOwner) {
+                @if (member.role === GroupMemberRoles.Moderator) {
+                <p-button icon="pi pi-arrow-down" [rounded]="true" text severity="secondary"
+                  pTooltip="Demote to member"
+                  [loading]="promotingMemberId() === member.userId"
+                  (onClick)="demoteMember(member)" />
+                } @else {
+                <p-button icon="pi pi-arrow-up" [rounded]="true" text severity="info"
+                  pTooltip="Promote to moderator"
+                  [loading]="promotingMemberId() === member.userId"
+                  (onClick)="promoteMember(member)" />
+                }
+                <p-button icon="pi pi-user-minus" [rounded]="true" text severity="danger" pTooltip="Remove Member"
+                  (onClick)="confirmRemoveMember(member)" />
               }
             </div>
           </td>
@@ -206,6 +216,18 @@
     </p-table>
   </div>
 
+  <!-- Posts -->
+  @if (canModerate()) {
+  <mh-post-pending-queue [groupId]="group.id" />
+  }
+
+  <mh-post-feed
+    [groupId]="group.id"
+    [canPost]="canPost()"
+    [canModerate]="canModerate()"
+    (createRequested)="openCreatePost()"
+    (deleteRequested)="onDeleteRequested($event)" />
+
   } @else if (!loading() && !group()) {
   <!-- Not Found State -->
   <div class="flex flex-col items-center gap-4 py-16 text-center">
@@ -223,6 +245,18 @@
 @if (group()?.id) {
 <mh-add-members-dialog [(visible)]="showAddMembersDialog" [groupId]="group()!.id"
   (saved)="loadMembers(group()!.id); loadGroup(group()!.id)" />
+
+<mh-create-post-dialog
+  [(visible)]="showCreatePostDialog"
+  [preselectedGroupId]="group()!.id"
+  [userGroups]="myGroups()"
+  (saved)="onPostCreated($event)" />
+
+<mh-delete-post-dialog
+  [(visible)]="showDeletePostDialog"
+  [post]="postBeingDeleted()"
+  [userGroups]="myGroups()"
+  (deleted)="onPostDeleted($event)" />
 }
 
 <p-toast />
