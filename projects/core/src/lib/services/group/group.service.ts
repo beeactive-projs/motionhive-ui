@@ -1,17 +1,16 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
+  CreateGroupPayload,
   Group,
   GroupMember,
-  GroupListResponse,
   GroupMemberListResponse,
-  CreateGroupPayload,
   UpdateGroupPayload,
   UpdateMemberRolePayload,
 } from '../../models/group/group.model';
-import { environment } from '../../../environments/environment';
-import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
 @Injectable({
   providedIn: 'root',
@@ -53,6 +52,13 @@ export class GroupService {
 
   addMember(groupId: string, userId: string): Observable<GroupMember> {
     return this._http.post<GroupMember>(`${this.baseUrl}/${groupId}/members`, { userId });
+  }
+
+  addMembersBulk(groupId: string, userIds: string[]): Observable<GroupMember[]> {
+    return this._http.post<GroupMember[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.GROUPS.BULK_MEMBERS(groupId)}`,
+      { userIds },
+    );
   }
 
   removeMember(groupId: string, userId: string): Observable<void> {

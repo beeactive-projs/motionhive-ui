@@ -10,7 +10,6 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
 import {
   ClientService,
   GroupService,
@@ -26,6 +25,7 @@ import { InputText } from 'primeng/inputtext';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'mh-add-members-dialog',
@@ -110,23 +110,27 @@ export class AddMembersDialog {
     if (!selected.length) return;
 
     this.saving.set(true);
-    const groupId = this.groupId();
 
-    forkJoin(selected.map((c) => this._groupService.addMember(groupId, c.clientId))).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.visible.set(false);
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Members added',
-          detail: `${selected.length} ${selected.length === 1 ? 'member' : 'members'} added to the group`,
-        });
-        this.saved.emit();
-      },
-      error: (err) => {
-        this.saving.set(false);
-        showApiError(this._messageService, 'Error', 'Failed to add members', err);
-      },
-    });
+    this._groupService
+      .addMembersBulk(
+        this.groupId(),
+        selected.map((c) => c.clientId),
+      )
+      .subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.visible.set(false);
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Members added',
+            detail: `${selected.length} ${selected.length === 1 ? 'member' : 'members'} added to the group`,
+          });
+          this.saved.emit();
+        },
+        error: (err) => {
+          this.saving.set(false);
+          showApiError(this._messageService, 'Error', 'Failed to add members', err);
+        },
+      });
   }
 }

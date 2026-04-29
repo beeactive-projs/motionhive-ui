@@ -1,24 +1,14 @@
+import { DatePipe } from '@angular/common';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
+  computed,
   inject,
   OnInit,
   signal,
-  computed,
   viewChild,
 } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TableModule } from 'primeng/table';
-import { AvatarModule } from 'primeng/avatar';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   AuthStore,
   Group,
@@ -31,6 +21,16 @@ import {
   showApiError,
   TagSeverity,
 } from 'core';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { AddMembersDialog } from '../../_dialogs/add-members-dialog/add-members-dialog';
 import { CreatePostDialog } from '../../_dialogs/create-post-dialog/create-post-dialog';
 import { DeletePostDialog } from '../../_dialogs/delete-post-dialog/delete-post-dialog';
@@ -41,7 +41,6 @@ import { PostPendingQueue } from './_components/post-pending-queue/post-pending-
   selector: 'mh-group-detail',
   imports: [
     DatePipe,
-    CardModule,
     ButtonModule,
     TagModule,
     TableModule,
@@ -50,6 +49,11 @@ import { PostPendingQueue } from './_components/post-pending-queue/post-pending-
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
     AddMembersDialog,
     CreatePostDialog,
     DeletePostDialog,
@@ -72,6 +76,7 @@ export class GroupDetail implements OnInit {
   readonly postFeed = viewChild(PostFeed);
 
   readonly GroupMemberRoles = GroupMemberRoles;
+  readonly activeTab = signal<string | number | undefined>('discussion');
 
   group = signal<Group | null>(null);
   members = signal<GroupMember[]>([]);
@@ -110,10 +115,7 @@ export class GroupDetail implements OnInit {
     const userId = this._authStore.user()?.id;
     if (!userId) return false;
     const me = this.members().find((m) => m.userId === userId);
-    return (
-      me?.role === GroupMemberRoles.Owner ||
-      me?.role === GroupMemberRoles.Moderator
-    );
+    return me?.role === GroupMemberRoles.Owner || me?.role === GroupMemberRoles.Moderator;
   });
 
   readonly memberRows = 10;
@@ -260,9 +262,7 @@ export class GroupDetail implements OnInit {
   }
 
   confirmRemoveMember(member: GroupMember): void {
-    const name = member.user
-      ? `${member.user.firstName} ${member.user.lastName}`
-      : 'this member';
+    const name = member.user ? `${member.user.firstName} ${member.user.lastName}` : 'this member';
     this._confirmationService.confirm({
       message: `Are you sure you want to remove ${name} from this group?`,
       header: 'Remove Member',
@@ -314,14 +314,11 @@ export class GroupDetail implements OnInit {
       next: (updated) => {
         this.promotingMemberId.set(null);
         this.members.update((list) =>
-          list.map((m) =>
-            m.userId === member.userId ? { ...m, ...updated } : m,
-          ),
+          list.map((m) => (m.userId === member.userId ? { ...m, ...updated } : m)),
         );
         this._messageService.add({
           severity: 'success',
-          summary:
-            role === 'MODERATOR' ? 'Member promoted' : 'Member demoted',
+          summary: role === 'MODERATOR' ? 'Member promoted' : 'Member demoted',
         });
       },
       error: (err) => {

@@ -1,22 +1,26 @@
-import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthStore, NavSection, StripeOnboardingService } from 'core';
+import { AuthStore, LoadingService, NavSection, StripeOnboardingService } from 'core';
+import { Loader } from '../_shared/components/loader/loader';
 import { SidenavLayoutComponent } from '../layouts/sidenav-layout/sidenav-layout.component';
 
 @Component({
   selector: 'mh-main',
-  imports: [RouterOutlet, SidenavLayoutComponent],
+  imports: [RouterOutlet, SidenavLayoutComponent, Loader],
   templateUrl: './main.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Main {
   private readonly _authStore = inject(AuthStore);
   private readonly _stripeOnboarding = inject(StripeOnboardingService);
+  private readonly _loadingService = inject(LoadingService);
 
   readonly isInstructor = this._authStore.isInstructor;
   readonly isSuperAdmin = this._authStore.isSuperAdmin;
   readonly isWriter = this._authStore.isWriter;
   readonly isUser = this._authStore.isUser;
+
+  protected readonly requestLoading = this._loadingService.requestLoading;
 
   // readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
   //   const sections: NavSection[] = [];
@@ -94,23 +98,19 @@ export class Main {
         },
         {
           label: 'Revenue',
-          items: [
-            { label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' },
-          ],
+          items: [{ label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' }],
         },
       );
     }
 
-    sections.push(
-      {
-        label: 'Fitness',
-        items: [
-          { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
-          { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
-          { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
-        ],
-      },
-    );
+    sections.push({
+      label: 'Fitness',
+      items: [
+        { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
+        { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
+        { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
+      ],
+    });
 
     if (this.isSuperAdmin()) {
       sections.push({
