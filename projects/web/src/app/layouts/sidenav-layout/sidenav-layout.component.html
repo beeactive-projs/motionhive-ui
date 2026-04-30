@@ -61,14 +61,13 @@
     <p-toolbar>
       <ng-template #start>
         <p-button icon="pi pi-bars" class="mr-3" size="small" text rounded (onClick)="toggleSidebar()" />
-        <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()"
-          aria-label="Open search">
+        <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()" aria-label="Open search">
           <i class="pi pi-search search-trigger__icon"></i>
           <span class="search-trigger__placeholder">Search instructors, groups, sessions…</span>
           <kbd class="search-trigger__kbd">⌘K</kbd>
         </button>
-        <p-button icon="pi pi-search" class="sm:hidden" size="small" text rounded
-          (onClick)="openSearch()" ariaLabel="Open search" />
+        <p-button icon="pi pi-search" class="sm:hidden" size="small" text rounded (onClick)="openSearch()"
+          ariaLabel="Open search" />
       </ng-template>
       <ng-template #center>
         <ng-content select="[toolbarCenter]" />
@@ -82,7 +81,7 @@
       </ng-template>
     </p-toolbar>
 
-    <main class="flex flex-col flex-1 p-4 overflow-auto">
+    <main class="flex flex-col flex-1 p-4 overflow-auto relative">
       <ng-content />
     </main>
   </div>

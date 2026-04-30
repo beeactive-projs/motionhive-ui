@@ -1,18 +1,19 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import {
-  ClientListResponse,
   ClientListParams,
-  InstructorClient,
+  ClientListResponse,
   ClientRequest,
   CreateClientInvitation,
+  InstructorClient,
   InvitationDetails,
   UpdateClientPayload,
 } from '../../models/client/client.model';
 import { InstructorListResponse } from '../../models/client/instructor.model';
-import { environment } from '../../../environments/environment';
-import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,18 @@ export class ClientService {
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }
 
+  // service.ts (Angular)
+  filterClients(event: TableLazyLoadEvent) {
+    return this._http.post<any>(`${this.baseUrl}/filter`, event);
+  }
+
+  filterPendingRequests(event: TableLazyLoadEvent): Observable<ClientListResponse> {
+    return this._http.post<ClientListResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.FILTER_REQUESTS}`,
+      event,
+    );
+  }
+
   getMyInstructors(): Observable<InstructorListResponse> {
     return this._http.get<InstructorListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.MY_INSTRUCTORS}`,
@@ -45,6 +58,12 @@ export class ClientService {
   getPendingRequests(): Observable<ClientRequest[]> {
     return this._http.get<ClientRequest[]>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.PENDING_REQUESTS}`,
+    );
+  }
+
+  getPendingRequestsCount(): Observable<{ count: number }> {
+    return this._http.get<{ count: number }>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.PENDING_REQUESTS_COUNT}`,
     );
   }
 

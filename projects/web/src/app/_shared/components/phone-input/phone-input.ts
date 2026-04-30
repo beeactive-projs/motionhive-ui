@@ -16,10 +16,7 @@ import {
 } from 'libphonenumber-js';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import {
-  STRIPE_CONNECT_COUNTRIES,
-  countryFlagEmoji,
-} from 'core';
+import { STRIPE_CONNECT_COUNTRIES } from 'core';
 
 /**
  * Option shape for the country select. Pre-built once at module load
@@ -29,7 +26,8 @@ import {
 interface CountryOption {
   code: CountryCode;
   name: string;
-  flag: string;
+  /** Lowercased ISO code for the `fi fi-xx` flag-icons class. */
+  flagClass: string;
   /** "+40" — includes the "+" prefix. */
   callingCode: string;
   /** For the filter / aria — e.g. "Romania +40". */
@@ -41,7 +39,7 @@ const COUNTRY_OPTIONS: CountryOption[] = STRIPE_CONNECT_COUNTRIES.map((c) => {
   return {
     code: c.code as CountryCode,
     name: c.name,
-    flag: countryFlagEmoji(c.code),
+    flagClass: `fi fi-${c.code.toLowerCase()}`,
     callingCode,
     searchLabel: `${c.name} ${callingCode}`,
   };

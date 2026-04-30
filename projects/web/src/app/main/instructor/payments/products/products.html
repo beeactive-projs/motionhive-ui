@@ -1,4 +1,4 @@
-<header class="flex items-center justify-between gap-4 mb-4">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
   <!-- Filters -->
   <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
     @for (opt of typeOptions; track opt.label) {
@@ -12,58 +12,57 @@
 
 
 <!-- Desktop: data table (hidden on mobile) -->
-<div class="md:block hidden flex-1">
+<div class="md:block hidden flex-1 min-h-0">
   <p-table [value]="products()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-    [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
-    scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
+    [loading]="loading()" showLoader="false" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)"
+    [scrollable]="true" scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
         <th>Name</th>
-        <th>Type</th>
-        <th>Price</th>
-        <th>Billing</th>
-        <th>Status</th>
-        <th>On profile</th>
-        <th class="w-32">Actions</th>
+        <th class="text-center" style="width: 10%;">Type</th>
+        <th class="text-center" style="width: 1%;">Price</th>
+        <th class="text-center" style="width: 10%;">Billing</th>
+        <th class="text-center" style="width: 10%;">Status</th>
+        <th class="text-center" style="width: 10%;">On profile</th>
+        <th class="text-center" style="width: 1%;">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-product>
       <tr>
         <td>
-          <div>
-            <span class="font-medium">{{ product.name }}</span>
-            @if (product.description) {
-            <p class="text-xs text-surface-500 mt-0.5 mb-0">{{ product.description }}</p>
-            }
-          </div>
+          <span class="font-medium truncate">{{ product.name }}</span>
+          @if (product.description) {
+          <p class="text-xs text-muted-color mt-0.5 mb-0">{{ product.description }}</p>
+          }
         </td>
         <td>
-          <p-tag [value]="typeLabel(product.type) | statusLabel" [severity]="typeSeverity(product.type)" />
+          <p-tag [value]="typeLabel(product.type) | statusLabel" [severity]="typeSeverity(product.type)" class="w-full"
+            rounded />
         </td>
-        <td>{{ product.amountCents | currencyRon:product.currency }}</td>
-        <td>
+        <td class="text-end tabular-nums">{{ product.amountCents | currencyRon:product.currency }}</td>
+        <td class="text-center">
           @if (product.interval) {
           {{ billingLabel(product) }}
           } @else {
-          <span class="text-surface-400">—</span>
+          <span class="text-sm text-surface-500">—</span>
           }
         </td>
         <td>
           <p-tag [value]="(product.isActive ? 'Active' : 'Inactive') | statusLabel"
-            [severity]="activeSeverity(product.isActive)" />
+            [severity]="activeSeverity(product.isActive)" class="w-full" rounded />
         </td>
-        <td>
+        <td class="text-center">
           <p-toggleSwitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
             (ngModelChange)="toggleShowOnProfile(product, $event)" />
         </td>
         <td>
           <div class="flex gap-1">
             <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small" pTooltip="Edit"
-              (onClick)="openEditDialog(product)" />
+              tooltipPosition="left" (onClick)="openEditDialog(product)" />
             @if (product.isActive) {
             <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
-              pTooltip="Deactivate" (onClick)="confirmDeactivate(product)" />
+              pTooltip="Deactivate" tooltipPosition="left" (onClick)="confirmDeactivate(product)" />
             }
           </div>
         </td>
@@ -71,15 +70,23 @@
     </ng-template>
 
     <ng-template #loadingbody>
-      @for (_ of [1, 2, 3, 4, 5]; track $index) {
+      @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
       <tr>
-        <td><p-skeleton width="70%" /></td>
-        <td><p-skeleton width="60px" height="1.5rem" /></td>
-        <td><p-skeleton width="80px" /></td>
-        <td><p-skeleton width="60px" /></td>
-        <td><p-skeleton width="60px" height="1.5rem" /></td>
-        <td><p-skeleton width="40px" height="1.5rem" /></td>
-        <td><p-skeleton width="60px" /></td>
+        <td>
+          <p-skeleton width="60%" height="1.25rem" />
+          <p-skeleton width="45%" height="1rem" class="mt-2" />
+        </td>
+        <td class="text-center"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center">
+          <div class="flex gap-3 justify-end">
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+          </div>
+        </td>
       </tr>
       }
     </ng-template>
@@ -138,7 +145,7 @@
           (click)="openEditDialog(product)">
           <div badges class="flex items-center gap-2">
             @if (!product.isActive) {
-            <p-tag value="Inactive" severity="danger" class="text-xs!" />
+            <p-tag value="Inactive" severity="danger" rounded class="text-xs!" />
             }
           </div>
           <div amount class="flex flex-col items-end">
@@ -187,16 +194,12 @@
     </ng-template>
   </p-dataview>
   @if (hasMore()) {
-  <div class="flex flex-col items-center gap-2 pt-2">
-    <p-button label="Load more" icon="pi pi-chevron-down" severity="secondary" [outlined]="true" size="small"
-      [loading]="loadingMore()" (onClick)="loadMore()" />
-    <span class="text-xs text-surface-500">Showing {{ products().length }} of {{ totalRecords() }}</span>
-  </div>
+  <div #scrollSentinel class="h-2"></div>
   }
   }
 </div>
 
-<mh-product-form-dialog [(visible)]="showProductFormDialog" [product]="editingProduct()" (saved)="loadProducts()" />
+<mh-product-form-dialog [(visible)]="showProductFormDialog" [product]="editingProduct()" (saved)="reload()" />
 
 <p-toast />
 <p-confirmDialog />

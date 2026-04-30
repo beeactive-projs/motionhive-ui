@@ -1,4 +1,5 @@
-<header class="flex items-center justify-between gap-4 mb-4">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+
   <!-- Filters -->
   <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
     @for (opt of statusOptions; track opt.value) {
@@ -13,76 +14,65 @@
 
 
 <!-- Desktop: data table (hidden on mobile) -->
-<div class="md:block hidden flex-1">
+<div class="md:block hidden flex-1 min-h-0">
   <p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-    [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]" [scrollable]="true"
+    [loading]="loading()" showLoader="false" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]" [scrollable]="true"
     scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
-        <th style="width: 22%;">Client</th>
-        <th style="width: 28%;">Plan</th>
-        <th class="text-end" style="width: 12%;">Amount</th>
-        <th class="text-center" style="width: 12%;">Status</th>
-        <th class="text-center" style="width: 18%;">Current period</th>
-        <th class="text-end" style="width: 8%;">Actions</th>
+        <th>Client</th>
+        <th>Plan</th>
+        <th class="text-center" style="width: 1%;">Amount</th>
+        <th class="text-center" style="width: 10%;">Status</th>
+        <th class="text-center">Current period</th>
+        <th class="text-center" style="width: 1%;">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-sub>
       <tr class="cursor-pointer" (click)="openDetail(sub)">
         <td>
-          <div class="flex flex-col min-w-0">
-            <span class="font-medium truncate">{{ clientDisplay(sub) }}</span>
-            @if (clientEmail(sub); as email) {
-              <span class="text-xs text-surface-500 truncate">{{ email }}</span>
-            }
-          </div>
+          <span class="font-medium truncate">{{ clientDisplay(sub) }}</span>
+          @if (clientEmail(sub); as email) {
+          <p class="text-xs text-muted-color mt-0.5 mb-0 truncate">{{ email }}</p>
+          }
         </td>
         <td>
-          <!-- 2-line layout: name on top (clamped to 1 line), cycle as
-               smaller subtitle. Long product names get an ellipsis +
-               tooltip so the column stays predictable. -->
-          <div class="flex flex-col min-w-0" [pTooltip]="planDisplay(sub)" tooltipPosition="top">
-            <span class="font-medium truncate">{{ planName(sub) }}</span>
-            @if (planCycle(sub); as cycle) {
-              <span class="text-xs text-surface-500 truncate">{{ cycle }}</span>
-            }
-          </div>
+          <span class="font-medium truncate" [pTooltip]="planDisplay(sub)" tooltipPosition="top">{{ planName(sub)
+            }}</span>
+          @if (planCycle(sub); as cycle) {
+          <p class="text-xs text-muted-color mt-0.5 mb-0 truncate">{{ cycle }}</p>
+          }
         </td>
         <td class="text-end tabular-nums">{{ sub.amountCents | currencyRon:sub.currency }}</td>
         <td class="text-center">
-          <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" />
+          <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" class="w-full" rounded />
           @if (sub.cancelAt) {
-            <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM' }}</div>
+          <p class="text-xs text-muted-color mt-0.5 mb-0">cancels {{ sub.cancelAt | date:'dd MMM' }}</p>
           }
         </td>
         <td class="text-center">
           @if (sub.currentPeriodStart && sub.currentPeriodEnd) {
-            <span class="text-sm whitespace-nowrap">
-              {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
-            </span>
+          <span class="text-sm whitespace-nowrap">
+            {{ sub.currentPeriodStart | date:'dd MMM' }} — {{ sub.currentPeriodEnd | date:'dd MMM yyyy' }}
+          </span>
           } @else {
-            <span class="text-sm text-surface-500">—</span>
+          <span class="text-sm text-surface-500">—</span>
           }
           @if (sub.trialEnd) {
-            <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
+          <p class="text-xs text-muted-color mt-0.5 mb-0">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</p>
           }
         </td>
-        <td class="text-end">
-          <!-- Stop click bubbling so the row navigation doesn't fire
-               when the user actually wants to cancel. -->
+        <td>
           @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
-            <div class="flex gap-1 justify-end" (click)="$event.stopPropagation()">
-              <!-- Hide "Cancel at period end" once it's already
-                   scheduled (cancelAt is set); only "Cancel immediately"
-                   stays meaningful. -->
-              @if (!sub.cancelAt) {
-                <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
-                  pTooltip="Cancel at period end" tooltipPosition="top" (onClick)="confirmCancel(sub)" />
-              }
-              <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"
-                tooltipPosition="top" (onClick)="confirmCancelImmediately(sub)" />
-            </div>
+          <div class="flex gap-1 justify-end" (click)="$event.stopPropagation()">
+            @if (!sub.cancelAt) {
+            <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
+              pTooltip="Cancel at period end" tooltipPosition="left" (onClick)="confirmCancel(sub)" />
+            }
+            <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"
+              tooltipPosition="left" (onClick)="confirmCancelImmediately(sub)" />
+          </div>
           }
         </td>
       </tr>
@@ -91,25 +81,21 @@
     <ng-template #loadingbody>
       @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
       <tr>
-        <td style="width: 20%;">
-          <p-skeleton width="60%" height="2rem" />
+        <td style="width: 22%;">
+          <p-skeleton width="70%" height="1.25rem" />
+          <p-skeleton width="50%" height="1rem" class="mt-1" />
         </td>
-        <td>
+        <td style="width: 28%;">
           <p-skeleton width="60%" height="1.25rem" />
-          <p-skeleton width="45%" height="1rem" class="mt-2" />
+          <p-skeleton width="40%" height="1rem" class="mt-1" />
         </td>
-        <td class="text-end" style="width: 1%;">
-          <p-skeleton width="100%" height="2rem" />
-        </td>
-        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
-        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
-        <td class="text-center" style="width: 10%;"><p-skeleton width="100%" height="2rem" /></td>
-        <td class="text-center" style="width: 1%;">
-          <div class="flex gap-3 justify-end">
-            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
-            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
-            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
-            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+        <td class="text-end" style="width: 12%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 12%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-center" style="width: 18%;"><p-skeleton width="100%" height="2rem" /></td>
+        <td class="text-end" style="width: 8%;">
+          <div class="flex gap-1 justify-end">
+            <p-skeleton width="2rem" height="2rem" />
+            <p-skeleton width="2rem" height="2rem" />
           </div>
         </td>
       </tr>
@@ -119,9 +105,12 @@
     <ng-template #emptymessage>
       <tr>
         <td colspan="6" class="text-center py-8">
-          <div class="flex flex-col items-center justify-center gap-2 text-surface-500">
-            <i class="pi pi-sync text-4xl"></i>
-            <p class="m-0">No memberships found</p>
+          <div class="flex flex-col items-center justify-center gap-2">
+            <i class="pi pi-sync text-4xl text-surface-400"></i>
+            <p class="m-0 font-medium">No memberships found</p>
+            <p class="text-surface-500 text-sm m-0">Subscribe clients to recurring plans to get started.</p>
+            <p-button label="New membership" icon="pi pi-plus" size="small" class="mt-1"
+              (onClick)="showCreateDialog.set(true)" />
           </div>
         </td>
       </tr>
@@ -163,9 +152,9 @@
     <ng-template #list let-items>
       <div class="flex flex-col gap-3 pt-1">
         @for (sub of items; track trackById($index, sub)) {
-        <mh-list-card [status]="sub.status" [statusSeverity]="statusSeverity(sub.status)" avatarIcon="pi pi-user"
-          [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)" [accent]="cardAccent(sub)" [clickable]="true"
-          (click)="openActionMenu(sub, $event, actionMenu)">
+        <mh-list-card [status]="sub.status" [statusSeverity]="statusSeverity(sub.status)"
+          [avatarInitials]="clientInitials(sub)" [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)"
+          [accent]="cardAccent(sub)" [clickable]="true" (click)="openActionMenu(sub, $event, actionMenu)">
           <div amount class="flex flex-col items-end">
             <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
               {{ sub.amountCents | currencyRon:sub.currency }}
@@ -213,16 +202,12 @@
     </ng-template>
   </p-dataview>
   @if (hasMore()) {
-  <div class="flex flex-col items-center gap-2 pt-2">
-    <p-button label="Load more" icon="pi pi-chevron-down" severity="secondary" [outlined]="true" size="small"
-      [loading]="loadingMore()" (onClick)="loadMore()" />
-    <span class="text-xs text-surface-500">Showing {{ subscriptions().length }} of {{ totalRecords() }}</span>
-  </div>
+  <div #scrollSentinel class="h-2"></div>
   }
   }
 </div>
 
-<mh-create-subscription-dialog [(visible)]="showCreateDialog" (saved)="loadSubscriptions()" />
+<mh-create-subscription-dialog [(visible)]="showCreateDialog" (saved)="reload()" />
 
 <p-toast />
 <p-confirmDialog />

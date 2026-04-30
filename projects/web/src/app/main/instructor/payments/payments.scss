@@ -1,3 +1,15 @@
 :host {
   flex: 1;
 }
+:host::ng-deep {
+  .p-tablist-content {
+    flex-grow: 0;
+    .p-tablist-tab-list {
+      // border-radius: 50rem;
+      // padding: 0.25rem;
+      .p-tab {
+        // border-radius: 50rem;
+      }
+    }
+  }
+}

@@ -70,6 +70,18 @@ export const BLOG_COVER_PRESETS = {
     quality: 'auto:good',
     format: 'auto',
   },
+  /** Featured card on the blog index — left side of a 2-column card.
+   *  Slightly less wide than articleHero, and gravity 'north' so a
+   *  portrait subject's face + shoulders stay in frame instead of
+   *  Cloudinary zooming into the face. */
+  featuredCard: {
+    aspectRatio: '4:3',
+    width: 1200,
+    crop: 'fill',
+    gravity: 'north',
+    quality: 'auto:good',
+    format: 'auto',
+  },
   /** Editor preview while authoring — moderate size, square-ish OK. */
   editorPreview: {
     aspectRatio: '16:9',

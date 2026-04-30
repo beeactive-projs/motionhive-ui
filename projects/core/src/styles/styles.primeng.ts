@@ -107,6 +107,12 @@ export const MotionHiveLara = definePreset(Lara, {
     tabs: {
       tablist: {
         background: 'transparent',
+        // borderWidth: '1px',
+        // borderColor: '{surface.300}',
+      },
+      tab: {
+        padding: '0.5rem 0.75rem',
+        // borderWidth: '0',
       },
     },
     tag: {

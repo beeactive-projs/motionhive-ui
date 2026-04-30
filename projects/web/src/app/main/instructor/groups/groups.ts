@@ -5,13 +5,15 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { GroupService, Group, JoinPolicy, TagSeverity } from 'core';
 import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog';
+import { AddMembersDialog } from '../_dialogs/add-members-dialog/add-members-dialog';
 
 @Component({
   selector: 'mh-groups',
-  imports: [CardModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule, GroupFormDialog],
+  imports: [CardModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule, TooltipModule, GroupFormDialog, AddMembersDialog],
   providers: [MessageService, ConfirmationService],
   templateUrl: './groups.html',
   styleUrl: './groups.scss',
@@ -29,6 +31,8 @@ export class Groups implements OnInit {
   // Dialog visibility
   showGroupFormDialog = signal(false);
   editingGroup = signal<Group | null>(null);
+  showAddMembersDialog = signal(false);
+  addMembersGroupId = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadGroups();
@@ -55,6 +59,12 @@ export class Groups implements OnInit {
   openCreateDialog(): void {
     this.editingGroup.set(null);
     this.showGroupFormDialog.set(true);
+  }
+
+  openAddMembersDialog(event: Event, group: Group): void {
+    event.stopPropagation();
+    this.addMembersGroupId.set(group.id);
+    this.showAddMembersDialog.set(true);
   }
 
   openEditDialog(event: Event, group: Group): void {

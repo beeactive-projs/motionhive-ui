@@ -1,11 +1,15 @@
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   computed,
+  DestroyRef,
+  effect,
+  ElementRef,
   inject,
-  OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
@@ -24,9 +28,11 @@ import {
   CurrencyRonPipe,
   StatusLabelPipe,
   getSubscriptionStatusSeverity,
+  showApiError,
   type Subscription,
   type SubscriptionStatus,
 } from 'core';
+import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { CreateSubscriptionDialog } from '../../_dialogs/create-subscription-dialog/create-subscription-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
 
@@ -53,37 +59,17 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
   styleUrl: './subscriptions.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Subscriptions implements OnInit {
+export class Subscriptions {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
+  private readonly _destroyRef = inject(DestroyRef);
 
-  /** Navigate to the membership detail page. Triggered by row click. */
-  openDetail(sub: Subscription): void {
-    this._router.navigate(['/coaching/subscriptions', sub.id]);
-  }
+  private readonly _scrollSentinel = viewChild<ElementRef>('scrollSentinel');
+  private _observer?: IntersectionObserver;
 
-  /**
-   * Plan name only — for the truncated first row of the Plan cell.
-   * Falls back to a short product-id stub if the join didn't return a
-   * product (legacy rows from before the snapshot was added).
-   */
-  planName(sub: Subscription): string {
-    if (sub.product?.name) return sub.product.name;
-    return sub.productId
-      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
-      : 'Plan';
-  }
-
-  /** Cadence subtitle for the Plan cell, e.g. "every 2 months" or "monthly". */
-  planCycle(sub: Subscription): string | null {
-    const p = sub.product;
-    if (!p?.interval) return null;
-    return p.intervalCount && p.intervalCount > 1
-      ? `every ${p.intervalCount} ${p.interval}s`
-      : `${p.interval}ly`;
-  }
+  private readonly _reload$ = new Subject<void>();
 
   readonly subscriptions = signal<Subscription[]>([]);
   readonly totalRecords = signal(0);
@@ -127,8 +113,6 @@ export class Subscriptions implements OnInit {
       sub.status === SubscriptionStatuses.Trialing
     ) {
       items.push({ separator: true });
-      // Same gating as the desktop action buttons: skip the
-      // "schedule" entry when it's already scheduled.
       if (!sub.cancelAt) {
         items.push({
           label: 'Cancel at period end',
@@ -148,35 +132,99 @@ export class Subscriptions implements OnInit {
 
   readonly Statuses = SubscriptionStatuses;
 
-  ngOnInit(): void {
-    this.loadSubscriptions();
-  }
-
-  loadSubscriptions(): void {
-    this.loading.set(true);
-    this._subscriptionService
-      .list({
-        status: this.statusFilter(),
-        page: this.currentPage(),
-        limit: this.rows,
-      })
-      .subscribe({
-        next: (response) => {
+  constructor() {
+    this._reload$
+      .pipe(
+        startWith(undefined),
+        switchMap(() => {
+          this.loading.set(true);
+          return this._subscriptionService
+            .list({
+              status: this.statusFilter(),
+              page: this.currentPage(),
+              limit: this.rows,
+            })
+            .pipe(
+              catchError((err) => {
+                showApiError(this._messageService, 'Error', 'Failed to load memberships', err);
+                return of(null);
+              }),
+            );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((response) => {
+        if (response) {
           this.subscriptions.set(response.items);
           this.totalRecords.set(response.total);
-          this.loading.set(false);
-          this.loadingMore.set(false);
-        },
-        error: () => {
-          this.loading.set(false);
-          this.loadingMore.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load subscriptions',
-          });
-        },
+        }
+        this.loading.set(false);
+        this.loadingMore.set(false);
       });
+
+    effect(() => {
+      const el = this._scrollSentinel()?.nativeElement;
+      this._observer?.disconnect();
+      if (!el) return;
+      this._observer = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            this.hasMore() &&
+            !this.loadingMore() &&
+            !this.loading()
+          ) {
+            this.loadMore();
+          }
+        },
+        { threshold: 0.1 },
+      );
+      this._observer.observe(el);
+    });
+    this._destroyRef.onDestroy(() => this._observer?.disconnect());
+  }
+
+  reload(): void {
+    this._reload$.next();
+  }
+
+  /** Navigate to the membership detail page. Triggered by row click. */
+  openDetail(sub: Subscription): void {
+    this._router.navigate(['/coaching/subscriptions', sub.id]);
+  }
+
+  /**
+   * Plan name only — for the truncated first row of the Plan cell.
+   * Falls back to a short product-id stub if the join didn't return a
+   * product (legacy rows from before the snapshot was added).
+   */
+  planName(sub: Subscription): string {
+    if (sub.product?.name) return sub.product.name;
+    return sub.productId
+      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
+      : 'Plan';
+  }
+
+  /** Cadence subtitle for the Plan cell, e.g. "every 2 months" or "monthly". */
+  planCycle(sub: Subscription): string | null {
+    const p = sub.product;
+    if (!p?.interval) return null;
+    return p.intervalCount && p.intervalCount > 1
+      ? `every ${p.intervalCount} ${p.interval}s`
+      : `${p.interval}ly`;
+  }
+
+  onPageChange(event: { first?: number | null; rows?: number | null }): void {
+    const first = event.first ?? 0;
+    const rows = event.rows ?? this.rows;
+    this.currentPage.set(Math.floor(first / rows) + 1);
+    this.reload();
+  }
+
+  onStatusFilterChange(status: SubscriptionStatus | undefined): void {
+    this.statusFilter.set(status);
+    this.currentPage.set(1);
+    this.reload();
   }
 
   loadMore(): void {
@@ -188,6 +236,7 @@ export class Subscriptions implements OnInit {
         page: this.currentPage() + 1,
         limit: this.rows,
       })
+      .pipe(take(1))
       .subscribe({
         next: (response) => {
           this.subscriptions.update((list) => [...list, ...response.items]);
@@ -195,28 +244,11 @@ export class Subscriptions implements OnInit {
           this.currentPage.update((p) => p + 1);
           this.loadingMore.set(false);
         },
-        error: () => {
+        error: (err) => {
           this.loadingMore.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load more memberships',
-          });
+          showApiError(this._messageService, 'Error', 'Failed to load more memberships', err);
         },
       });
-  }
-
-  onPageChange(event: { first?: number | null; rows?: number | null }): void {
-    const first = event.first ?? 0;
-    const rows = event.rows ?? this.rows;
-    this.currentPage.set(Math.floor(first / rows) + 1);
-    this.loadSubscriptions();
-  }
-
-  onStatusFilterChange(status: SubscriptionStatus | undefined): void {
-    this.statusFilter.set(status);
-    this.currentPage.set(1);
-    this.loadSubscriptions();
   }
 
   openActionMenu(sub: Subscription, event: MouseEvent, menu: Menu): void {
@@ -245,25 +277,24 @@ export class Subscriptions implements OnInit {
   }
 
   private cancelSubscription(sub: Subscription, immediate = false): void {
-    this._subscriptionService.cancel(sub.id, { immediate }).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: immediate ? 'Subscription canceled' : 'Subscription will cancel',
-          detail: immediate
-            ? 'Subscription has been canceled immediately'
-            : 'Subscription will cancel at the end of the billing period',
-        });
-        this.loadSubscriptions();
-      },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to cancel subscription',
-        });
-      },
-    });
+    this._subscriptionService
+      .cancel(sub.id, { immediate })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: immediate ? 'Subscription canceled' : 'Subscription will cancel',
+            detail: immediate
+              ? 'Subscription has been canceled immediately'
+              : 'Subscription will cancel at the end of the billing period',
+          });
+          this.reload();
+        },
+        error: (err) => {
+          showApiError(this._messageService, 'Error', 'Failed to cancel subscription', err);
+        },
+      });
   }
 
   readonly statusSeverity = getSubscriptionStatusSeverity;
@@ -285,6 +316,15 @@ export class Subscriptions implements OnInit {
 
   clientEmail(sub: Subscription): string | null {
     return sub.client?.email ?? null;
+  }
+
+  clientInitials(sub: Subscription): string {
+    const c = sub.client;
+    if (c?.firstName && c?.lastName) {
+      return (c.firstName.charAt(0) + c.lastName.charAt(0)).toUpperCase();
+    }
+    if (c?.email) return c.email.charAt(0).toUpperCase();
+    return '?';
   }
 
   /**

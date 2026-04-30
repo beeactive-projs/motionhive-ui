@@ -64,17 +64,3 @@ export function countryNameFromCode(code: string | null | undefined): string | n
   if (!code) return null;
   return STRIPE_CONNECT_COUNTRIES.find((c) => c.code === code)?.name ?? code;
 }
-
-/**
- * Emoji flag for an ISO 3166-1 alpha-2 country code. Works by mapping
- * each letter to its Regional Indicator Symbol (U+1F1E6–U+1F1FF) —
- * the OS renders the pair as a flag. Zero assets, zero runtime cost.
- */
-export function countryFlagEmoji(code: string | null | undefined): string {
-  if (!code || code.length !== 2) return '';
-  const upper = code.toUpperCase();
-  return String.fromCodePoint(
-    0x1f1e6 + (upper.charCodeAt(0) - 65),
-    0x1f1e6 + (upper.charCodeAt(1) - 65),
-  );
-}

@@ -1,34 +1,37 @@
+import { DatePipe } from '@angular/common';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   computed,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { AvatarModule } from 'primeng/avatar';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { TooltipModule } from 'primeng/tooltip';
+import { Router, RouterLink } from '@angular/router';
 import {
+  ClientRequestTypes,
+  ClientService,
+  ClientStatusLabels,
   InstructorClient,
   InstructorClientStatus,
   InstructorClientStatuses,
-  ClientRequestTypes,
-  ClientStatusLabels,
   PendingClientLabels,
-  ClientService,
   TagSeverity,
 } from 'core';
-import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { AvatarModule } from 'primeng/avatar';
+import { BadgeModule } from 'primeng/badge';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit-client-notes-dialog';
+import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
 
 @Component({
   selector: 'mh-clients',
@@ -39,12 +42,15 @@ import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit
     TableModule,
     TagModule,
     AvatarModule,
+    BadgeModule,
+    OverlayBadgeModule,
     SkeletonModule,
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
     InviteClientDialog,
     EditClientNotesDialog,
+    RouterLink,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',
@@ -52,6 +58,7 @@ import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Clients implements OnInit {
+  private readonly _router = inject(Router);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
@@ -59,6 +66,7 @@ export class Clients implements OnInit {
   readonly Statuses = InstructorClientStatuses;
   readonly RequestTypes = ClientRequestTypes;
 
+  lastLazyEvent: TableLazyLoadEvent = {};
   clients = signal<any[]>([]);
   totalRecords = signal(0);
   loading = signal(true);
@@ -70,7 +78,7 @@ export class Clients implements OnInit {
   readonly statusOptions = [
     { label: 'All', value: undefined },
     { label: 'Active', value: 'ACTIVE' as InstructorClientStatus },
-    { label: 'Pending', value: 'PENDING' as InstructorClientStatus },
+    // { label: 'Pending', value: 'PENDING' as InstructorClientStatus },
     { label: 'Archived', value: 'ARCHIVED' as InstructorClientStatus },
   ];
 
@@ -80,66 +88,54 @@ export class Clients implements OnInit {
 
   incomingRequestsCount = signal(0);
   readonly showIncomingBanner = computed(
-    () =>
-      this.incomingRequestsCount() > 0 &&
-      this.statusFilter() !== this.Statuses.Pending,
+    () => this.incomingRequestsCount() > 0 && this.statusFilter() !== this.Statuses.Pending,
   );
 
   ngOnInit(): void {
-    this.loadClients();
-    this.loadIncomingCount();
+    this.loadPendingCount();
   }
 
-  private loadIncomingCount(): void {
-    this._clientService.getPendingRequests().subscribe({
-      next: (requests) =>
-        this.incomingRequestsCount.set(
-          requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR').length,
-        ),
+  loadClients() {
+    this.lazyLoadClients(this.lastLazyEvent);
+  }
+
+  loadPendingCount(): void {
+    this._clientService.getPendingRequestsCount().subscribe({
+      next: ({ count }) => this.incomingRequestsCount.set(count),
       error: () => this.incomingRequestsCount.set(0),
     });
   }
 
-  jumpToIncomingRequests(): void {
-    this.onStatusFilterChange(this.Statuses.Pending);
-  }
-
-  loadClients(): void {
+  lazyLoadClients(event: TableLazyLoadEvent) {
+    this.lastLazyEvent = event;
     this.loading.set(true);
-    this._clientService
-      .getClients({
-        status: this.statusFilter(),
-        page: this.currentPage(),
-        limit: this.rows,
-      })
-      .subscribe({
-        next: (response) => {
-          this.clients.set(response.items);
-          this.totalRecords.set(response.total);
-          this.loading.set(false);
-        },
-        error: () => {
-          this.loading.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load clients',
-          });
-        },
-      });
-  }
-
-  onPageChange(event: { first?: number | null; rows?: number | null }): void {
-    const first = event.first ?? 0;
-    const rows = event.rows ?? this.rows;
-    this.currentPage.set(Math.floor(first / rows) + 1);
-    this.loadClients();
+    this._clientService.filterClients(event).subscribe({
+      next: (response) => {
+        this.clients.set(response.items);
+        this.totalRecords.set(response.total);
+        this.loading.set(false);
+      },
+    });
   }
 
   onStatusFilterChange(status: InstructorClientStatus | undefined): void {
+    this.lastLazyEvent.first = 0;
+    this.lastLazyEvent.rows = this.rows;
+    this.lastLazyEvent.filters = {
+      status: { value: status },
+    };
     this.statusFilter.set(status);
-    this.currentPage.set(1);
-    this.loadClients();
+    this.lazyLoadClients(this.lastLazyEvent);
+  }
+
+  // viewProfile(client: InstructorClient): void {
+  //   this._router.navigate(['/coaching/clients', client.id], {
+  //     state: { client },
+  //   });
+  // }
+
+  goToPendingRequests() {
+    this._router.navigate(['/coaching/pending-requests']);
   }
 
   openInviteDialog(): void {
@@ -167,7 +163,7 @@ export class Clients implements OnInit {
   resendInvitation(client: InstructorClient): void {
     const target = client.client
       ? `${client.client.firstName} ${client.client.lastName}`
-      : client.invitedEmail ?? 'this client';
+      : (client.invitedEmail ?? 'this client');
     this._confirmationService.confirm({
       message: `Resend the invitation to ${target}?`,
       header: 'Resend invitation',
@@ -285,8 +281,8 @@ export class Clients implements OnInit {
           summary: 'Request accepted',
           detail: 'Client request accepted successfully',
         });
+        this.loadPendingCount();
         this.loadClients();
-        this.loadIncomingCount();
       },
       error: (err) => {
         this._messageService.add({
@@ -307,7 +303,7 @@ export class Clients implements OnInit {
           detail: 'Client request has been declined',
         });
         this.loadClients();
-        this.loadIncomingCount();
+        this.loadPendingCount();
       },
       error: (err) => {
         this._messageService.add({

@@ -98,6 +98,16 @@ export class PostDetail implements OnInit {
 
   readonly languageOptions = BLOG_LANGUAGE_OPTIONS;
 
+  /**
+   * Whether the current user can publish under a guest byline.
+   * Admins / super-admins only — writers always publish under their
+   * own user record. Mirrors the BE rule in blog.service.ts:create.
+   */
+  readonly canSetGuestByline = computed(() => {
+    const roles = this._authStore.user()?.roles ?? [];
+    return roles.includes('ADMIN') || roles.includes('SUPER_ADMIN');
+  });
+
   form = this._formBuilder.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
@@ -106,9 +116,12 @@ export class PostDetail implements OnInit {
     category: ['' as string, [Validators.required]],
     language: [null as BlogLanguage | null, [Validators.required]],
     coverImage: ['', [Validators.required]],
-    authorName: ['', [Validators.required]],
-    authorInitials: ['', [Validators.required, Validators.maxLength(3)]],
-    authorRole: ['', [Validators.required]],
+    /**
+     * Optional. Empty string = "publish under my own user" (BE uses
+     * the JWT subject). Non-empty string = "publish as a guest" — the
+     * BE rejects this with 403 if the caller is not an admin.
+     */
+    guestAuthorName: [''],
     readTime: [5, [Validators.required, Validators.min(1)]],
     isPublished: [false],
   });
@@ -118,7 +131,6 @@ export class PostDetail implements OnInit {
     if (id) {
       this.loadPost(id);
     } else {
-      this.prefillAuthor();
       this.loading.set(false);
     }
 
@@ -129,16 +141,6 @@ export class PostDetail implements OnInit {
           this.form.controls.slug.setValue(this.generateSlug(title ?? ''), { emitEvent: false });
         }
       });
-  }
-
-  private prefillAuthor(): void {
-    const firstName = this._authStore.user()?.firstName ?? '';
-    const lastName = this._authStore.user()?.lastName ?? '';
-    const name = `${firstName} ${lastName}`.trim();
-    const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-
-    if (name) this.form.controls.authorName.setValue(name);
-    if (initials.length > 0) this.form.controls.authorInitials.setValue(initials);
   }
 
   toggleSlug(): void {
@@ -202,9 +204,9 @@ export class PostDetail implements OnInit {
       category: post.category,
       language: post.language,
       coverImage: post.coverImage,
-      authorName: post.authorName,
-      authorInitials: post.authorInitials,
-      authorRole: post.authorRole,
+      // Only populated for guest-authored posts (admin attribution).
+      // Writers see this as empty when editing their own posts.
+      guestAuthorName: post.guestAuthorName ?? '',
       readTime: post.readTime,
       isPublished: post.isPublished,
     });
@@ -218,6 +220,7 @@ export class PostDetail implements OnInit {
     }
 
     const raw = this.form.getRawValue();
+    const guestByline = raw.guestAuthorName?.trim();
     const payload: CreateBlogPostPayload = {
       title: raw.title!,
       slug: raw.slug!,
@@ -226,9 +229,9 @@ export class PostDetail implements OnInit {
       category: raw.category! as BlogCategory,
       language: raw.language!,
       coverImage: raw.coverImage!,
-      authorName: raw.authorName!,
-      authorInitials: raw.authorInitials!,
-      authorRole: raw.authorRole!,
+      // Send only when admin actually entered a guest byline.
+      // Otherwise omit so the BE attributes the post to the JWT user.
+      ...(guestByline ? { guestAuthorName: guestByline } : {}),
       readTime: raw.readTime!,
       tags: this.formTags(),
       isPublished: raw.isPublished ?? false,

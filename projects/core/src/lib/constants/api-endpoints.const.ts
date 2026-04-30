@@ -29,9 +29,10 @@ export const API_ENDPOINTS = {
   CLIENTS: {
     BASE: '/clients',
     MY_INSTRUCTORS: '/clients/my-instructors',
-    LEAVE_INSTRUCTOR: (instructorId: string) =>
-      `/clients/my-instructors/${instructorId}`,
+    LEAVE_INSTRUCTOR: (instructorId: string) => `/clients/my-instructors/${instructorId}`,
     PENDING_REQUESTS: '/clients/requests/pending',
+    PENDING_REQUESTS_COUNT: '/clients/requests/pending/count',
+    FILTER_REQUESTS: '/clients/requests/filter',
     INVITE: '/clients/invite',
     SENT_INVITES: '/clients/invites',
     INVITE_BY_TOKEN: (token: string) => `/clients/invite/${token}`,
@@ -41,6 +42,19 @@ export const API_ENDPOINTS = {
   },
   GROUPS: {
     BASE: '/groups',
+    BULK_MEMBERS: (groupId: string) => `/groups/${groupId}/members/bulk`,
+    MEMBER_ROLE: (groupId: string, userId: string) => `/groups/${groupId}/members/${userId}/role`,
+  },
+  POSTS: {
+    BASE: '/posts',
+    UPLOAD_IMAGE: '/posts/upload-image',
+    GROUP_FEED: (groupId: string) => `/posts/group/${groupId}`,
+    GROUP_PENDING: (groupId: string) => `/posts/group/${groupId}/pending`,
+    BY_ID: (postId: string) => `/posts/${postId}`,
+    AUDIENCE: (postId: string, groupId: string) => `/posts/${postId}/audiences/${groupId}`,
+    COMMENTS: (postId: string) => `/posts/${postId}/comments`,
+    COMMENT: (postId: string, commentId: string) => `/posts/${postId}/comments/${commentId}`,
+    REACTIONS: (postId: string) => `/posts/${postId}/reactions`,
   },
   SESSIONS: {
     BASE: '/sessions',
@@ -108,7 +122,6 @@ export const API_ENDPOINTS = {
     MY_COUNTS: '/payments/my/counts',
 
     // Public — no auth
-    PUBLIC_INSTRUCTOR_PRODUCTS: (id: string) =>
-      `/payments/public/instructors/${id}/products`,
+    PUBLIC_INSTRUCTOR_PRODUCTS: (id: string) => `/payments/public/instructors/${id}/products`,
   },
 } as const;

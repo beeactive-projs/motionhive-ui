@@ -1,16 +1,16 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import {
-  Group,
-  GroupMember,
-  GroupListResponse,
-  GroupMemberListResponse,
-  CreateGroupPayload,
-  UpdateGroupPayload,
-} from '../../models/group/group.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import {
+  CreateGroupPayload,
+  Group,
+  GroupMember,
+  GroupMemberListResponse,
+  UpdateGroupPayload,
+  UpdateMemberRolePayload,
+} from '../../models/group/group.model';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +50,17 @@ export class GroupService {
     });
   }
 
+  addMember(groupId: string, userId: string): Observable<GroupMember> {
+    return this._http.post<GroupMember>(`${this.baseUrl}/${groupId}/members`, { userId });
+  }
+
+  addMembersBulk(groupId: string, userIds: string[]): Observable<GroupMember[]> {
+    return this._http.post<GroupMember[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.GROUPS.BULK_MEMBERS(groupId)}`,
+      { userIds },
+    );
+  }
+
   removeMember(groupId: string, userId: string): Observable<void> {
     return this._http.delete<void>(`${this.baseUrl}/${groupId}/members/${userId}`);
   }
@@ -77,5 +88,16 @@ export class GroupService {
 
   joinViaLink(token: string): Observable<GroupMember> {
     return this._http.post<GroupMember>(`${this.baseUrl}/join/${token}`, {});
+  }
+
+  updateMemberRole(
+    groupId: string,
+    userId: string,
+    payload: UpdateMemberRolePayload,
+  ): Observable<GroupMember> {
+    return this._http.patch<GroupMember>(
+      `${environment.apiUrl}${API_ENDPOINTS.GROUPS.MEMBER_ROLE(groupId, userId)}`,
+      payload,
+    );
   }
 }

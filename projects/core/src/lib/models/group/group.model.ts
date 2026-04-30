@@ -1,4 +1,8 @@
-import type { JoinPolicy } from './group.enums';
+import type {
+  GroupMemberPostPolicy,
+  GroupMemberRole,
+  JoinPolicy,
+} from './group.enums';
 import { PaginatedResponse } from '../common/pagination.model';
 
 export interface Group {
@@ -12,6 +16,7 @@ export interface Group {
   isActive: boolean;
   isPublic: boolean;
   joinPolicy: JoinPolicy;
+  memberPostPolicy: GroupMemberPostPolicy;
   tags: string[];
   contactEmail: string | null;
   contactPhone: string | null;
@@ -35,6 +40,8 @@ export interface GroupMember {
   id: string;
   groupId: string;
   userId: string;
+  role: GroupMemberRole;
+  /** @deprecated read role === 'OWNER' instead. Kept for FE migration window. */
   isOwner: boolean;
   sharedHealthInfo: boolean;
   nickname: string | null;
@@ -56,6 +63,7 @@ export interface CreateGroupPayload {
   timezone?: string;
   isPublic?: boolean;
   joinPolicy?: JoinPolicy;
+  memberPostPolicy?: GroupMemberPostPolicy;
   tags?: string[];
   contactEmail?: string;
   contactPhone?: string;
@@ -70,6 +78,7 @@ export interface UpdateGroupPayload {
   timezone?: string;
   isPublic?: boolean;
   joinPolicy?: JoinPolicy;
+  memberPostPolicy?: GroupMemberPostPolicy;
   tags?: string[];
   logoUrl?: string;
   contactEmail?: string;
@@ -77,6 +86,10 @@ export interface UpdateGroupPayload {
   address?: string;
   city?: string;
   country?: string;
+}
+
+export interface UpdateMemberRolePayload {
+  role: 'MEMBER' | 'MODERATOR';
 }
 
 export type GroupListResponse = PaginatedResponse<Group>;

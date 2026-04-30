@@ -9,10 +9,10 @@
 
 
 <!-- Desktop: data table (hidden on mobile) -->
-<div class="md:block hidden flex-1">
+<div class="md:block hidden flex-1 min-h-0">
   <p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-    [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]" [scrollable]="true"
-    scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
+    [loading]="loading()" showLoader="false" (onLazyLoad)="onPageChange($event)" [rowsPerPageOptions]="[10, 20, 50]"
+    [scrollable]="true" scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
         <th style="width: 20%;">Invoice #</th>
@@ -24,7 +24,6 @@
         <th class="text-center" style="width: 1%;">Actions</th>
       </tr>
     </ng-template>
-
     <ng-template #body let-invoice>
       <tr [class.opacity-60]="invoice.status === Statuses.Draft">
         <td>
@@ -32,18 +31,18 @@
             class="text-primary-500 hover:underline font-medium tabular-nums">
             {{ invoiceDisplayNumber(invoice) }}
             @if (invoice.status === Statuses.Draft) {
-              <span class="text-xs font-normal text-surface-500">(draft)</span>
+            <span class="text-xs font-normal text-surface-500">(draft)</span>
             }
           </a>
         </td>
         <td>
-          <span class="font-medium">{{ clientDisplay(invoice) }}</span>
+          <span class="font-medium truncate">{{ clientDisplay(invoice) }}</span>
           @if (invoice.client?.email) {
           <p class="text-xs text-muted-color mt-0.5 mb-0">{{ invoice.client.email }}</p>
           }
         </td>
-        <td class="text-end">{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
-        <td>
+        <td class="text-end tabular-nums">{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
+        <td class="text-center">
           <p-tag [value]="invoice.status | statusLabel" [severity]="statusSeverity(invoice.status)" class="w-full"
             rounded />
           @if (invoice.paidOutOfBand) {
@@ -56,7 +55,7 @@
             {{ invoice.dueDate | date:'dd/MM/yyyy' }}
           </span>
           } @else {
-          —
+          <span class="text-sm text-surface-500">—</span>
           }
         </td>
         <td class="text-center">{{ invoice.paidAt ? (invoice.paidAt | date:'dd/MM/yyyy') : '—' }}</td>
@@ -97,9 +96,7 @@
           </div>
         </td>
       </tr>
-
     </ng-template>
-
     <ng-template #loadingbody>
       @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
       <tr>
@@ -127,7 +124,6 @@
       </tr>
       }
     </ng-template>
-
     <ng-template #emptymessage>
       <tr>
         <td colspan="7">
@@ -174,7 +170,7 @@
     }
   </div>
   } @else {
-  <p-dataview [value]="invoices()">
+  <p-dataview [value]="invoices()" [lazy]="true" (onLazyLoad)="loadMore()">
     <ng-template #list let-items>
       <div class="flex flex-col gap-3 pt-1">
         @for (invoice of items; track trackById($index, invoice)) {
@@ -236,13 +232,10 @@
   }
 </div>
 
-<mh-create-invoice-dialog
-  [visible]="showCreateDialog()"
-  (visibleChange)="onCreateDialogVisibleChange($event)"
-  [editingInvoiceId]="editingInvoiceId()"
-  (saved)="onSavedFromDialog()" />
+<mh-create-invoice-dialog [visible]="showCreateDialog()" (visibleChange)="onCreateDialogVisibleChange($event)"
+  [editingInvoiceId]="editingInvoiceId()" (saved)="onSavedFromDialog()" />
 
-<mh-send-invoice-email-dialog [(visible)]="showSendDialog" [invoice]="sendDialogInvoice()" (sent)="loadInvoices()" />
+<mh-send-invoice-email-dialog [(visible)]="showSendDialog" [invoice]="sendDialogInvoice()" (sent)="reload()" />
 
 <p-toast />
 <p-confirmDialog />

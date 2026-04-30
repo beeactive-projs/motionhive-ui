@@ -237,40 +237,29 @@
         </div>
       </p-card>
 
-      <!-- Author info (auto-filled from logged-in user on create) -->
+      <!-- Author attribution -->
+      <!--
+        Default: posts are attributed to the logged-in writer; no input needed
+        (the BE uses the JWT). Admins can override the byline for guest
+        contributors by typing a name here. Writers see the read-only note.
+      -->
       <p-card header="Author">
         <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label for="authorName" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
-            <input pInputText id="authorName" formControlName="authorName" fluid placeholder="Author full name"
-              [class.ng-invalid]="isFieldInvalid('authorName')" [class.ng-dirty]="isFieldInvalid('authorName')" />
-            @if (isFieldInvalid('authorName')) {
-            <p-message severity="error" size="small" variant="simple">{{ getFieldError('authorName') }}</p-message>
-            }
-          </div>
-
-          <div class="flex gap-3">
-            <div class="flex flex-col gap-1.5 flex-1">
-              <label for="authorInitials" class="text-sm font-medium">Initials <span
-                  class="text-red-500">*</span></label>
-              <input pInputText id="authorInitials" formControlName="authorInitials" fluid placeholder="AB"
-                maxlength="3" [class.ng-invalid]="isFieldInvalid('authorInitials')"
-                [class.ng-dirty]="isFieldInvalid('authorInitials')" />
-              @if (isFieldInvalid('authorInitials')) {
-              <p-message severity="error" size="small" variant="simple">{{ getFieldError('authorInitials')
-                }}</p-message>
-              }
+          @if (canSetGuestByline()) {
+            <div class="flex flex-col gap-1.5">
+              <label for="guestAuthorName" class="text-sm font-medium">Guest byline (optional)</label>
+              <input pInputText id="guestAuthorName" formControlName="guestAuthorName" fluid
+                placeholder="e.g. Sarah Johnson" />
+              <small class="text-surface-500 text-xs">
+                Leave blank to publish under your own user. Fill in to attribute the post to a guest contributor
+                without a MotionHive account.
+              </small>
             </div>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label for="authorRole" class="text-sm font-medium">Role <span class="text-red-500">*</span></label>
-            <input pInputText id="authorRole" formControlName="authorRole" fluid placeholder="e.g. Fitness Coach"
-              [class.ng-invalid]="isFieldInvalid('authorRole')" [class.ng-dirty]="isFieldInvalid('authorRole')" />
-            @if (isFieldInvalid('authorRole')) {
-            <p-message severity="error" size="small" variant="simple">{{ getFieldError('authorRole') }}</p-message>
-            }
-          </div>
+          } @else {
+            <p class="text-sm text-surface-500">
+              This post will be published under your account. Admins can change the byline.
+            </p>
+          }
         </div>
       </p-card>
 

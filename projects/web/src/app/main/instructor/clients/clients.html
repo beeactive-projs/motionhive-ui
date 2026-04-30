@@ -6,30 +6,37 @@
       <p class="text-sm text-surface-700 dark:text-surface-400">Manage your client relationships, invitations, and
         requests.</p>
     </div>
-    <div class="flex flex-wrap">
+    <div class="flex flex-wrap gap-3">
       <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
+      @if (incomingRequestsCount() > 0) {
+      <p-overlaybadge [value]="incomingRequestsCount()" severity="danger">
+        <p-button label="Requests" icon="pi pi-hourglass" severity="contrast" (onClick)="goToPendingRequests()" />
+      </p-overlaybadge>
+      } @else {
+      <p-button label="Requests" icon="pi pi-hourglass" severity="contrast" (onClick)="goToPendingRequests()" />
+      }
     </div>
   </header>
 
   <!-- Incoming-request banner -->
-  @if (showIncomingBanner()) {
-    <p-card class="shadow-sm border-l-4 border-l-primary-400">
-      <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <i class="pi pi-inbox text-primary-600 text-xl"></i>
-          <div class="flex flex-col">
-            <span class="font-semibold">
-              {{ incomingRequestsCount() }} client
-              {{ incomingRequestsCount() === 1 ? 'request' : 'requests' }} waiting
-            </span>
-            <span class="text-sm text-surface-500">Users who want to work with you — review and accept or decline.</span>
-          </div>
+  <!-- @if (showIncomingBanner()) {
+  <p-card class="shadow-sm border-l-4 border-l-primary-400">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <i class="pi pi-inbox text-primary-600 text-xl"></i>
+        <div class="flex flex-col">
+          <span class="font-semibold">
+            {{ incomingRequestsCount() }} client
+            {{ incomingRequestsCount() === 1 ? 'request' : 'requests' }} waiting
+          </span>
+          <span class="text-sm text-surface-500">Users who want to work with you — review and accept or decline.</span>
         </div>
-        <p-button label="Review" icon="pi pi-arrow-right" iconPos="right" size="small"
-          (onClick)="jumpToIncomingRequests()" />
       </div>
-    </p-card>
-  }
+      <p-button label="Review" icon="pi pi-arrow-right" iconPos="right" size="small"
+        (onClick)="jumpToIncomingRequests()" />
+    </div>
+  </p-card>
+  } -->
 
   <!-- Filters -->
   <div class="flex items-center gap-3">
@@ -45,14 +52,15 @@
   <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
 
     <p-table [value]="clients()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-      [loading]="loading()" [rowsPerPageOptions]="[10, 20, 50]" (onLazyLoad)="onPageChange($event)" [scrollable]="true"
-      scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true">
+      [loading]="loading()" showLoader="false" [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="lazyLoadClients($event)" [scrollable]="true" scrollHeight="flex" dataKey="id" size="small"
+      stripedRows="true" rowHover="true" sortField="client.firstName">
       <ng-template #header>
         <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th class="text-center">Status</th>
-          <th class="text-center">Started</th>
+          <th pSortableColumn="client.firstName">Name</th>
+          <th pSortableColumn="client.email">Email</th>
+          <th pSortableColumn="status" class="text-center">Status</th>
+          <th pSortableColumn="startedAt" class="text-center">Started</th>
           <!-- <th>Groups</th> -->
           <th>Notes</th>
           <th class="w-32 text-center">Actions</th>
@@ -64,7 +72,10 @@
           <td>
             <div class="flex items-center gap-3">
               <p-avatar [label]="initials(client)" shape="circle" />
-              <span>{{ clientName(client) }}</span>
+              <a [routerLink]="['/coaching/clients', client.id]" [state]="client"
+                class="text-primary-500 hover:underline font-medium tabular-nums">
+                {{ clientName(client) }}
+              </a>
             </div>
           </td>
           <td>{{ clientEmail(client) }}</td>
@@ -95,32 +106,64 @@
           </td>
           <td>
             <div class="flex items-center justify-end gap-1">
-              @if (client.status === Statuses.Pending && client.requestType === RequestTypes.ClientToInstructor) {
+              <!-- @if (client.status === Statuses.Pending && client.requestType === RequestTypes.ClientToInstructor) {
               <p-button icon="pi pi-check" rounded text severity="success" tooltipPosition="left" pTooltip="Accept"
                 (onClick)="acceptPendingRequest(client)" />
               <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left" pTooltip="Decline"
                 (onClick)="declinePendingRequest(client)" />
-              } @else if (client.status === Statuses.Active) {
+              } @else -->
+
+              @if (client.status === Statuses.Active) {
               <p-button icon="pi pi-pencil" rounded text severity="secondary" tooltipPosition="left"
                 pTooltip="Edit notes" (onClick)="openNotesDialog(client)" />
               <p-button icon="pi pi-inbox" rounded text severity="danger" tooltipPosition="left" pTooltip="Archive"
                 (onClick)="confirmArchive(client)" />
-              } @else if (client.status === Statuses.Pending && client.requestType === RequestTypes.InstructorToClient)
+              }
+              <!-- @else if (client.status === Statuses.Pending )
               {
               <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
                 pTooltip="Resend invitation" (onClick)="resendInvitation(client)" />
               <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left"
                 pTooltip="Cancel invitation" (onClick)="cancelInvitation(client)" />
-              } @else if (client.status === Statuses.Archived) {
+              }  -->
+              @else if (client.status === Statuses.Archived) {
               <p-button icon="pi pi-inbox" rounded text severity="success" tooltipPosition="left" pTooltip="Unarchive"
                 (onClick)="confirmUnarchive(client)" />
               }
             </div>
           </td>
         </tr>
+
       </ng-template>
 
       <ng-template #loadingbody>
+        @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-skeleton width="2rem" height="2rem" shape="circle" />
+              <p-skeleton width="60%" height="1.5rem" />
+            </div>
+          </td>
+          <td>
+            <p-skeleton width="50%" height="1.5rem" />
+          </td>
+          <td>
+            <p-skeleton width="100%" height="2rem" />
+          </td>
+          <td><p-skeleton width="100%" height="1.5rem" /></td>
+          <td><p-skeleton width="100%" height="1.5rem" /></td>
+          <td class="text-center">
+            <div class="flex gap-3 justify-end">
+              <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+              <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            </div>
+          </td>
+        </tr>
+        }
+      </ng-template>
+
+      <!-- <ng-template #loadingbody>
         <tr>
           <td>
             <div class="flex items-center gap-3">
@@ -135,22 +178,30 @@
           <td><p-skeleton width="6rem" /></td>
           <td><p-skeleton width="4rem" /></td>
         </tr>
-      </ng-template>
+      </ng-template> -->
 
       <ng-template #emptymessage>
         <tr>
           <td colspan="7">
             <div class="flex flex-col items-center gap-3 py-12 text-center">
               <i class="pi pi-users text-4xl text-secondary-300"></i>
-              <h2 class="text-lg font-semibold text-secondary-700">No clients yet</h2>
+              <h2 class="text-lg font-semibold text-secondary-700">No clients to display</h2>
               <p class="text-sm text-secondary-500">
                 Start by inviting clients to build your client base.
               </p>
-              <p-button label="Invite your first client" icon="pi pi-user-plus" severity="primary" styleClass="mt-2"
-                (onClick)="openInviteDialog()" />
+              <!-- <p-button label="Invite your first client" icon="pi pi-user-plus" severity="primary" styleClass="mt-2"
+                (onClick)="openInviteDialog()" /> -->
             </div>
           </td>
         </tr>
+      </ng-template>
+
+      <ng-template #paginatorleft let-state>
+        <p-tag [rounded]="true">
+          View {{state.first+1}} -
+          {{state.first+state.rows>state.totalRecords?state.totalRecords:state.first+state.rows}} of
+          {{state.totalRecords}}
+        </p-tag>
       </ng-template>
     </p-table>
   </div>

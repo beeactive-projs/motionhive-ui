@@ -70,8 +70,10 @@
      aspect-ratio locks the box; otherwise a tall portrait upload would
      stretch the row to natural image height. On desktop the card is a
      2-column grid and the right column owns the row height — switch
-     back to min-height so the image fills whatever the text needs. */
-  aspect-ratio: 16 / 9;
+     back to min-height so the image fills whatever the text needs.
+     4:3 frame matches the Cloudinary featuredCard preset so the crop
+     and the box agree. */
+  aspect-ratio: 4 / 3;
 
   @media (min-width: 768px) {
     aspect-ratio: auto;

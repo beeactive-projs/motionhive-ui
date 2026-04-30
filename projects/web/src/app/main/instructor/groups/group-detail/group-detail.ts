@@ -1,30 +1,46 @@
+import { DatePipe } from '@angular/common';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
+  computed,
   inject,
   OnInit,
   signal,
-  computed,
+  viewChild,
 } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TableModule } from 'primeng/table';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  AuthStore,
+  Group,
+  GroupMember,
+  GroupMemberPostPolicies,
+  GroupMemberRoles,
+  GroupService,
+  JoinPolicy,
+  Post,
+  showApiError,
+  TagSeverity,
+} from 'core';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast';
+import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { GroupService, Group, GroupMember, JoinPolicy, AuthStore, TagSeverity } from 'core';
+import { AddMembersDialog } from '../../_dialogs/add-members-dialog/add-members-dialog';
+import { CreatePostDialog } from '../../_dialogs/create-post-dialog/create-post-dialog';
+import { DeletePostDialog } from '../../_dialogs/delete-post-dialog/delete-post-dialog';
+import { PostFeed } from './_components/post-feed/post-feed';
+import { PostPendingQueue } from './_components/post-pending-queue/post-pending-queue';
 
 @Component({
   selector: 'mh-group-detail',
   imports: [
     DatePipe,
-    CardModule,
     ButtonModule,
     TagModule,
     TableModule,
@@ -33,6 +49,16 @@ import { GroupService, Group, GroupMember, JoinPolicy, AuthStore, TagSeverity } 
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
+    AddMembersDialog,
+    CreatePostDialog,
+    DeletePostDialog,
+    PostFeed,
+    PostPendingQueue,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './group-detail.html',
@@ -47,19 +73,49 @@ export class GroupDetail implements OnInit {
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
 
+  readonly postFeed = viewChild(PostFeed);
+
+  readonly GroupMemberRoles = GroupMemberRoles;
+  readonly activeTab = signal<string | number | undefined>('discussion');
+
   group = signal<Group | null>(null);
   members = signal<GroupMember[]>([]);
   loading = signal(true);
   membersLoading = signal(true);
   totalMembers = signal(0);
   generatingLink = signal(false);
+  showAddMembersDialog = signal(false);
   joinLink = signal<string | null>(null);
+
+  // ── Posts wiring ─────────────────────────
+  myGroups = signal<Group[]>([]);
+  showCreatePostDialog = signal(false);
+  showDeletePostDialog = signal(false);
+  postBeingDeleted = signal<Post | null>(null);
+  promotingMemberId = signal<string | null>(null);
 
   groupName = computed(() => this.group()?.name ?? 'Group');
   isGroupOwner = computed(() => {
     const group = this.group();
     const user = this._authStore.user();
     return !!group && !!user && group.instructorId === user.id;
+  });
+
+  /** A post can be created when the viewer is owner, OR the group allows non-owner posting. */
+  canPost = computed(() => {
+    const group = this.group();
+    if (!group) return false;
+    if (this.isGroupOwner()) return true;
+    return group.memberPostPolicy !== GroupMemberPostPolicies.Disabled;
+  });
+
+  /** OWNER/MODERATOR of *this* group (used to gate the moderation queue + delete-as-mod). */
+  canModerate = computed(() => {
+    if (this.isGroupOwner()) return true;
+    const userId = this._authStore.user()?.id;
+    if (!userId) return false;
+    const me = this.members().find((m) => m.userId === userId);
+    return me?.role === GroupMemberRoles.Owner || me?.role === GroupMemberRoles.Moderator;
   });
 
   readonly memberRows = 10;
@@ -69,6 +125,7 @@ export class GroupDetail implements OnInit {
     if (groupId) {
       this.loadGroup(groupId);
       this.loadMembers(groupId);
+      this.loadMyGroups();
     }
   }
 
@@ -107,6 +164,18 @@ export class GroupDetail implements OnInit {
         });
       },
     });
+  }
+
+  loadMyGroups(): void {
+    this._groupService.getMyGroups().subscribe({
+      next: (groups) => this.myGroups.set(groups),
+      // Silently fail — the create-post dialog will show "no groups" if needed.
+      error: () => this.myGroups.set([]),
+    });
+  }
+
+  openAddMembersDialog(): void {
+    this.showAddMembersDialog.set(true);
   }
 
   goBack(): void {
@@ -227,6 +296,63 @@ export class GroupDetail implements OnInit {
     });
   }
 
+  // ── Promote / demote ─────────────────────
+
+  promoteMember(member: GroupMember): void {
+    this._setRole(member, 'MODERATOR');
+  }
+
+  demoteMember(member: GroupMember): void {
+    this._setRole(member, 'MEMBER');
+  }
+
+  private _setRole(member: GroupMember, role: 'MEMBER' | 'MODERATOR'): void {
+    const group = this.group();
+    if (!group) return;
+    this.promotingMemberId.set(member.userId);
+    this._groupService.updateMemberRole(group.id, member.userId, { role }).subscribe({
+      next: (updated) => {
+        this.promotingMemberId.set(null);
+        this.members.update((list) =>
+          list.map((m) => (m.userId === member.userId ? { ...m, ...updated } : m)),
+        );
+        this._messageService.add({
+          severity: 'success',
+          summary: role === 'MODERATOR' ? 'Member promoted' : 'Member demoted',
+        });
+      },
+      error: (err) => {
+        this.promotingMemberId.set(null);
+        showApiError(this._messageService, 'Could not change role', '', err);
+      },
+    });
+  }
+
+  // ── Posts ────────────────────────────────
+
+  openCreatePost(): void {
+    this.showCreatePostDialog.set(true);
+  }
+
+  onPostCreated(post: Post): void {
+    this.postFeed()?.prependPost(post);
+  }
+
+  onDeleteRequested(post: Post): void {
+    this.postBeingDeleted.set(post);
+    this.showDeletePostDialog.set(true);
+  }
+
+  onPostDeleted(result: { post: 'kept' | 'deleted'; postId: string }): void {
+    if (result.post === 'deleted') {
+      this.postFeed()?.removePost(result.postId);
+    } else {
+      // The post still exists in *some* group; if it's no longer in *this*
+      // group, drop it from the local feed. Easiest: refetch.
+      this.postFeed()?.load();
+    }
+  }
+
   joinPolicySeverity(policy: JoinPolicy): TagSeverity {
     switch (policy) {
       case 'OPEN':
@@ -247,6 +373,18 @@ export class GroupDetail implements OnInit {
       case 'INVITE_ONLY':
         return 'Invite Only';
     }
+  }
+
+  memberRoleSeverity(role: string): TagSeverity {
+    if (role === GroupMemberRoles.Owner) return TagSeverity.Warn;
+    if (role === GroupMemberRoles.Moderator) return TagSeverity.Info;
+    return TagSeverity.Secondary;
+  }
+
+  memberRoleLabel(role: string): string {
+    if (role === GroupMemberRoles.Owner) return 'Owner';
+    if (role === GroupMemberRoles.Moderator) return 'Moderator';
+    return 'Member';
   }
 
   memberName(member: GroupMember): string {

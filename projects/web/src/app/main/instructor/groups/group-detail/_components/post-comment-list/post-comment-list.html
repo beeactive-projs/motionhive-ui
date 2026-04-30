@@ -1,0 +1,124 @@
+@if (active()) {
+<div class="flex flex-col gap-3 pt-3 border-t border-surface-200 dark:border-surface-700">
+
+  <!-- New comment composer -->
+  <div class="flex items-start gap-2">
+    <textarea
+      pTextarea
+      fluid
+      rows="2"
+      [autoResize]="true"
+      placeholder="Write a comment..."
+      [ngModel]="newComment()"
+      (ngModelChange)="newComment.set($event)"
+      maxlength="2000"
+      class="flex-1"></textarea>
+    <p-button
+      label="Post"
+      size="small"
+      [disabled]="!newComment().trim() || posting()"
+      [loading]="posting() && !replyingTo()"
+      (onClick)="postComment()" />
+  </div>
+
+  @if (loading()) {
+  <div class="flex flex-col gap-3">
+    <p-skeleton width="100%" height="2.5rem" />
+    <p-skeleton width="80%" height="2.5rem" />
+  </div>
+  } @else if (comments().length === 0) {
+  <p class="text-sm text-surface-500 italic">Be the first to comment.</p>
+  } @else {
+  <div class="flex flex-col gap-3">
+    @for (comment of comments(); track trackById($index, comment)) {
+    <div class="flex flex-col gap-2">
+
+      <!-- Top-level comment -->
+      <div class="flex items-start gap-2">
+        <p-avatar
+          [label]="initials(comment)"
+          shape="circle"
+          size="normal"
+          class="bg-primary-100 text-primary-700" />
+        <div class="flex-1 min-w-0">
+          <div class="rounded-lg bg-surface-100 dark:bg-surface-800 px-3 py-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-sm font-medium text-surface-900 dark:text-surface-100">
+                {{ fullName(comment) }}
+              </span>
+              <span class="text-xs text-surface-500">{{ comment.createdAt | date: 'shortTime' }}</span>
+            </div>
+            <p class="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap break-words">
+              {{ comment.content }}
+            </p>
+          </div>
+          <div class="mt-1 flex items-center gap-2 text-xs">
+            <button type="button" class="text-surface-500 hover:underline"
+              (click)="startReply(comment.id)">Reply</button>
+            @if (isMine(comment)) {
+            <button type="button" class="text-surface-500 hover:underline"
+              (click)="confirmDelete(comment)">Delete</button>
+            }
+          </div>
+
+          <!-- Reply composer -->
+          @if (replyingTo() === comment.id) {
+          <div class="mt-2 flex items-start gap-2">
+            <textarea
+              pTextarea
+              fluid
+              rows="2"
+              [autoResize]="true"
+              placeholder="Write a reply..."
+              [ngModel]="replyContent()"
+              (ngModelChange)="replyContent.set($event)"
+              maxlength="2000"
+              class="flex-1"></textarea>
+            <div class="flex flex-col gap-1">
+              <p-button label="Reply" size="small"
+                [disabled]="!replyContent().trim() || posting()"
+                [loading]="posting()"
+                (onClick)="postReply(comment.id)" />
+              <p-button label="Cancel" size="small" severity="secondary" text
+                (onClick)="cancelReply()" />
+            </div>
+          </div>
+          }
+
+          <!-- Replies (1 level) -->
+          @if (comment.replies && comment.replies.length > 0) {
+          <div class="mt-2 flex flex-col gap-2 pl-4 border-l-2 border-surface-200 dark:border-surface-700">
+            @for (reply of comment.replies; track trackById($index, reply)) {
+            <div class="flex items-start gap-2">
+              <p-avatar [label]="initials(reply)" shape="circle" size="normal"
+                class="bg-primary-100 text-primary-700" />
+              <div class="flex-1 min-w-0">
+                <div class="rounded-lg bg-surface-100 dark:bg-surface-800 px-3 py-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-sm font-medium text-surface-900 dark:text-surface-100">
+                      {{ fullName(reply) }}
+                    </span>
+                    <span class="text-xs text-surface-500">{{ reply.createdAt | date: 'shortTime' }}</span>
+                  </div>
+                  <p class="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap break-words">
+                    {{ reply.content }}
+                  </p>
+                </div>
+                @if (isMine(reply)) {
+                <button type="button" class="mt-1 text-xs text-surface-500 hover:underline"
+                  (click)="confirmDelete(reply)">Delete</button>
+                }
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>
+<p-confirmDialog />
+}
