@@ -1,0 +1,146 @@
+<div class="h-full flex flex-col gap-4">
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="flex items-center gap-3">
+      <p-button rounded text icon="pi pi-arrow-left" severity="secondary" [routerLink]="['/coaching/clients']" />
+      <div class="space-y-1">
+        <h1 class="font-heading font-semibold text-xl md:text-2xl">Pending requests</h1>
+        <p class="text-sm text-surface-700 dark:text-surface-400">
+          Invitations you've sent and requests waiting for your response.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
+    </div>
+  </header>
+
+  <!-- <div class="flex items-center gap-3">
+    <span class="text-sm font-medium">Direction:</span>
+    @for (option of typeOptions; track option.label) {
+    <p-button [label]="option.label" [severity]="typeFilter() === option.value ? 'primary' : 'contrast'" size="small"
+      rounded [text]="typeFilter() !== option.value" (onClick)="onTypeFilterChange(option.value)"
+      styleClass="py-0.5 min-w-10" />
+    }
+  </div> -->
+
+  <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
+
+    <p-table [value]="requests()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
+      [loading]="loading()" showLoader="false" [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="lazyLoadRequests($event)" [scrollable]="true" scrollHeight="flex" dataKey="id" size="small"
+      stripedRows="true" rowHover="true" sortField="createdAt" [sortOrder]="-1">
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="fromUser.firstName">Name</th>
+          <th pSortableColumn="fromUser.email">Email</th>
+          <th class="text-center">Type</th>
+          <th pSortableColumn="createdAt" class="text-center">Sent</th>
+          <th pSortableColumn="expiresAt" class="text-center">Expires</th>
+          <th>Message</th>
+          <th class="w-32 text-center">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-row>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-avatar [label]="initials(row)" shape="circle" />
+              @if (row.clientId) {
+              <!-- TODO: route to public profile once it exists -->
+              <a [routerLink]="['/users', row.clientId]"
+                class="text-primary-500 hover:underline font-medium tabular-nums">
+                {{ clientName(row) }}
+              </a>
+              } @else {
+              <span class="font-medium tabular-nums">{{ clientName(row) }}</span>
+              }
+            </div>
+          </td>
+          <td>{{ clientEmail(row) }}</td>
+          <td class="text-center">
+            <p-tag [value]="typeLabel(row)" severity="warn" class="w-full" rounded />
+          </td>
+          <td class="text-center">{{ row.createdAt | date: 'dd MMM yyyy HH:mm' }}</td>
+          <td class="text-center">{{ row.expiresAt ? (row.expiresAt | date: 'dd MMM yyyy HH:mm') : '—' }}</td>
+          <td>
+            @if (row.notes) {
+            <span class="text-xs truncate max-w-20 inline-block" [pTooltip]="row.notes">
+              {{ row.notes }}
+            </span>
+            } @else {
+            <span class="text-surface-400">—</span>
+            }
+          </td>
+          <td>
+            <div class="flex items-center justify-end gap-1">
+              @if (direction(row) === 'INCOMING') {
+              <p-button icon="pi pi-check" rounded text severity="success" tooltipPosition="left" pTooltip="Accept"
+                (onClick)="acceptRequest(row)" />
+              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left" pTooltip="Decline"
+                (onClick)="declineRequest(row)" />
+              } @else {
+              <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
+                pTooltip="Resend invitation" (onClick)="resendInvitation(row)" />
+              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left"
+                pTooltip="Cancel invitation" (onClick)="cancelRequest(row)" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #loadingbody>
+        @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-skeleton width="2rem" height="2rem" shape="circle" />
+              <p-skeleton width="60%" height="1.5rem" />
+            </div>
+          </td>
+          <td><p-skeleton width="50%" height="1.5rem" /></td>
+          <td><p-skeleton width="100%" height="2rem" /></td>
+          <td><p-skeleton width="100%" height="2rem" /></td>
+          <td><p-skeleton width="100%" height="1.5rem" /></td>
+          <td><p-skeleton width="100%" height="1.5rem" /></td>
+          <td><p-skeleton width="100%" height="1.5rem" /></td>
+          <td class="text-center">
+            <div class="flex gap-3 justify-end">
+              <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+              <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            </div>
+          </td>
+        </tr>
+        }
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="8">
+            <div class="flex flex-col items-center gap-3 py-12 text-center">
+              <i class="pi pi-hourglass text-4xl text-secondary-300"></i>
+              <h2 class="text-lg font-semibold text-secondary-700">No pending requests</h2>
+              <p class="text-sm text-secondary-500">
+                You don't have any pending invitations or requests right now.
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #paginatorleft let-state>
+        <p-tag [rounded]="true">
+          View {{state.first+1}} -
+          {{state.first+state.rows>state.totalRecords?state.totalRecords:state.first+state.rows}} of
+          {{state.totalRecords}}
+        </p-tag>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-toast />
+<p-confirmDialog />
+<mh-invite-client-dialog [(visible)]="showInviteDialog" (saved)="loadRequests()" />

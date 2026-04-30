@@ -19,6 +19,12 @@ export const instructorRoutes: Routes = [
     title: 'Client profile - MotionHive',
   },
   {
+    path: 'pending-requests',
+    loadComponent: () =>
+      import('./clients/pending-requests/pending-requests').then((m) => m.PendingRequests),
+    title: 'Pending requests - MotionHive',
+  },
+  {
     path: 'sessions',
     loadComponent: () => import('./sessions/sessions').then((m) => m.Sessions),
     title: 'Sessions - MotionHive',

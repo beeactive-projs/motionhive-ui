@@ -36,6 +36,13 @@ export class ClientService {
     return this._http.post<any>(`${this.baseUrl}/filter`, event);
   }
 
+  filterPendingRequests(event: TableLazyLoadEvent): Observable<ClientListResponse> {
+    return this._http.post<ClientListResponse>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.FILTER_REQUESTS}`,
+      event,
+    );
+  }
+
   getMyInstructors(): Observable<InstructorListResponse> {
     return this._http.get<InstructorListResponse>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.MY_INSTRUCTORS}`,
@@ -51,6 +58,12 @@ export class ClientService {
   getPendingRequests(): Observable<ClientRequest[]> {
     return this._http.get<ClientRequest[]>(
       `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.PENDING_REQUESTS}`,
+    );
+  }
+
+  getPendingRequestsCount(): Observable<{ count: number }> {
+    return this._http.get<{ count: number }>(
+      `${environment.apiUrl}${API_ENDPOINTS.CLIENTS.PENDING_REQUESTS_COUNT}`,
     );
   }
 

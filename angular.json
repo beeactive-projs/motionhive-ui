@@ -55,6 +55,16 @@
               {
                 "glob": "**/*",
                 "input": "projects/web/public"
+              },
+              {
+                "glob": "flag-icons.min.css",
+                "input": "node_modules/flag-icons/css",
+                "output": "/flag-icons/css/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/flag-icons/flags",
+                "output": "/flag-icons/flags/"
               }
             ],
             "stylePreprocessorOptions": {

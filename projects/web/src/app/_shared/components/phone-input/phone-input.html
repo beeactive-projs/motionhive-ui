@@ -1,25 +1,14 @@
 <div class="flex items-stretch gap-2">
-  <p-select
-    class="w-32 shrink-0"
-    [options]="countries"
-    [ngModel]="country()"
-    (ngModelChange)="onCountryChange($event)"
-    optionLabel="searchLabel"
-    optionValue="code"
-    [disabled]="disabled()"
-    [filter]="true"
-    filterBy="searchLabel"
-    [showClear]="false"
-    appendTo="body"
-    [ariaLabel]="'Country code'"
-  >
+  <p-select class="w-36 shrink-0" [options]="countries" [ngModel]="country()" (ngModelChange)="onCountryChange($event)"
+    optionLabel="searchLabel" optionValue="code" [disabled]="disabled()" [filter]="true" filterBy="searchLabel"
+    [showClear]="false" appendTo="body" [ariaLabel]="'Country code'">
     <ng-template #selectedItem>
       @let option = selectedOption();
       <!-- Flat row, left-aligned. Vertical centering is enforced via
            the SCSS override on `.p-select-label` so the three pieces
            sit on the same baseline as the national-number input. -->
       <span class="inline-flex items-center gap-1.5">
-        <span class="text-base leading-none">{{ option.flag }}</span>
+        <span [class]="option.flagClass" class="leading-none"></span>
         <span class="text-xs font-medium leading-none">{{ option.code }}</span>
         <span class="text-xs text-surface-500 tabular-nums leading-none">
           {{ option.callingCode }}
@@ -27,9 +16,9 @@
       </span>
     </ng-template>
 
-    <ng-template pTemplate="item" let-option>
+    <ng-template #item let-option>
       <div class="flex items-center gap-2 min-w-0">
-        <span class="text-base leading-none shrink-0">{{ option.flag }}</span>
+        <span [class]="option.flagClass" class="leading-none shrink-0"></span>
         <span class="text-sm truncate flex-1">{{ option.name }}</span>
         <span class="text-xs text-surface-500 tabular-nums shrink-0">
           {{ option.callingCode }}
@@ -38,23 +27,12 @@
     </ng-template>
   </p-select>
 
-  <input
-    [id]="inputId()"
-    type="tel"
-    pInputText
-    fluid
-    class="flex-1"
-    [class.p-invalid]="invalid()"
-    [ngModel]="national()"
-    (ngModelChange)="onNationalInput($event)"
-    [placeholder]="placeholder()"
-    [disabled]="disabled()"
-    autocomplete="tel-national"
-    inputmode="tel"
-  />
+  <input [id]="inputId()" type="tel" pInputText fluid class="flex-1" [class.p-invalid]="invalid()"
+    [ngModel]="national()" (ngModelChange)="onNationalInput($event)" [placeholder]="placeholder()"
+    [disabled]="disabled()" autocomplete="tel-national" inputmode="tel" />
 </div>
 @if (invalid()) {
-  <span class="text-xs text-red-500 mt-1 block">
-    That doesn't look like a valid {{ selectedOption().name }} number.
-  </span>
+<span class="text-xs text-red-500 mt-1 block">
+  That doesn't look like a valid {{ selectedOption().name }} number.
+</span>
 }

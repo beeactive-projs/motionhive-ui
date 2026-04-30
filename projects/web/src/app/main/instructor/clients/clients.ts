@@ -7,7 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   ClientRequestTypes,
   ClientService,
@@ -20,9 +20,11 @@ import {
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
+import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -40,12 +42,15 @@ import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-clie
     TableModule,
     TagModule,
     AvatarModule,
+    BadgeModule,
+    OverlayBadgeModule,
     SkeletonModule,
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
     InviteClientDialog,
     EditClientNotesDialog,
+    RouterLink,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',
@@ -73,7 +78,7 @@ export class Clients implements OnInit {
   readonly statusOptions = [
     { label: 'All', value: undefined },
     { label: 'Active', value: 'ACTIVE' as InstructorClientStatus },
-    { label: 'Pending', value: 'PENDING' as InstructorClientStatus },
+    // { label: 'Pending', value: 'PENDING' as InstructorClientStatus },
     { label: 'Archived', value: 'ARCHIVED' as InstructorClientStatus },
   ];
 
@@ -87,26 +92,18 @@ export class Clients implements OnInit {
   );
 
   ngOnInit(): void {
-    // this.loadClients();
-    // this.loadIncomingCount();
-  }
-
-  // private loadIncomingCount(): void {
-  //   this._clientService.getPendingRequests().subscribe({
-  //     next: (requests) =>
-  //       this.incomingRequestsCount.set(
-  //         requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR').length,
-  //       ),
-  //     error: () => this.incomingRequestsCount.set(0),
-  //   });
-  // }
-
-  jumpToIncomingRequests(): void {
-    this.onStatusFilterChange(this.Statuses.Pending);
+    this.loadPendingCount();
   }
 
   loadClients() {
     this.lazyLoadClients(this.lastLazyEvent);
+  }
+
+  loadPendingCount(): void {
+    this._clientService.getPendingRequestsCount().subscribe({
+      next: ({ count }) => this.incomingRequestsCount.set(count),
+      error: () => this.incomingRequestsCount.set(0),
+    });
   }
 
   lazyLoadClients(event: TableLazyLoadEvent) {
@@ -121,54 +118,24 @@ export class Clients implements OnInit {
     });
   }
 
-  // loadClients(): void {
-  //   this.loading.set(true);
-  //   this._clientService
-  //     .getClients({
-  //       status: this.statusFilter(),
-  //       page: this.currentPage(),
-  //       limit: this.rows,
-  //     })
-  //     .subscribe({
-  //       next: (response) => {
-  //         this.clients.set(response.items);
-  //         this.totalRecords.set(response.total);
-  //         this.loading.set(false);
-  //       },
-  //       error: () => {
-  //         this.loading.set(false);
-  //         this._messageService.add({
-  //           severity: 'error',
-  //           summary: 'Error',
-  //           detail: 'Failed to load clients',
-  //         });
-  //       },
-  //     });
-  // }
-
-  // onPageChange(event: { first?: number | null; rows?: number | null }): void {
-  //   const first = event.first ?? 0;
-  //   const rows = event.rows ?? this.rows;
-  //   this.currentPage.set(Math.floor(first / rows) + 1);
-  //   this.loadClients();
-  // }
-
   onStatusFilterChange(status: InstructorClientStatus | undefined): void {
     this.lastLazyEvent.first = 0;
     this.lastLazyEvent.rows = this.rows;
     this.lastLazyEvent.filters = {
       status: { value: status },
     };
-    // this.lastLazyEvent.sortField = 'client.firstName';
-    // this.lastLazyEvent.sortOrder = -1;
     this.statusFilter.set(status);
     this.lazyLoadClients(this.lastLazyEvent);
   }
 
-  viewProfile(client: InstructorClient): void {
-    this._router.navigate(['/coaching/clients', client.id], {
-      state: { client },
-    });
+  // viewProfile(client: InstructorClient): void {
+  //   this._router.navigate(['/coaching/clients', client.id], {
+  //     state: { client },
+  //   });
+  // }
+
+  goToPendingRequests() {
+    this._router.navigate(['/coaching/pending-requests']);
   }
 
   openInviteDialog(): void {
@@ -314,7 +281,7 @@ export class Clients implements OnInit {
           summary: 'Request accepted',
           detail: 'Client request accepted successfully',
         });
-        // this.loadIncomingCount();
+        this.loadPendingCount();
         this.loadClients();
       },
       error: (err) => {
@@ -336,7 +303,7 @@ export class Clients implements OnInit {
           detail: 'Client request has been declined',
         });
         this.loadClients();
-        // this.loadIncomingCount();
+        this.loadPendingCount();
       },
       error: (err) => {
         this._messageService.add({
