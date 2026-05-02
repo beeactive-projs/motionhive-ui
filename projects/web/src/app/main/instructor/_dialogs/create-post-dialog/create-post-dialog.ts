@@ -51,7 +51,7 @@ export class CreatePostDialog {
   readonly visible = model(false);
   readonly preselectedGroupId = input<string | undefined>(undefined);
   readonly userGroups = input.required<Group[]>();
-  readonly saved = output<Post>();
+  readonly saved = output<Post[]>();
 
   readonly content = signal('');
   readonly selectedGroupIds = signal<string[]>([]);
@@ -176,22 +176,22 @@ export class CreatePostDialog {
     }
 
     this._postService.createPost(payload).subscribe({
-      next: (post) => {
+      next: (result) => {
         this.submitting.set(false);
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
           summary: 'Post created',
           detail:
-            payload.groupIds.length > 1
-              ? `Shared with ${payload.groupIds.length} groups.`
+            result.posts.length > 1
+              ? `Shared with ${result.posts.length} groups.`
               : 'Your post is live.',
         });
-        this.saved.emit(post);
+        this.saved.emit(result.posts);
       },
       error: (err) => {
         this.submitting.set(false);
-        showApiError(this._messageService, 'Could not create post', "", err);
+        showApiError(this._messageService, 'Could not create post', '', err);
       },
     });
   }
