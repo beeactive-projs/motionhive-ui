@@ -24,6 +24,12 @@ export const authRoutes: Routes = [
     title: 'New Password - MotionHive',
   },
   {
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./verify-email/verify-email.component').then((m) => m.VerifyEmailComponent),
+    title: 'Verify Email - MotionHive',
+  },
+  {
     path: 'facebook-callback',
     loadComponent: () =>
       import('./facebook-callback/facebook-callback.component').then(

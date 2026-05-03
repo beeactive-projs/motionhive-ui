@@ -107,10 +107,15 @@
 
         <div class="flex items-center justify-between mt-auto">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center font-bold text-xs"
-              aria-hidden="true">
-              {{ featured.authorInitials }}
-            </div>
+            @if (featured.authorAvatarUrl) {
+              <img [src]="featured.authorAvatarUrl" [alt]="featured.authorName"
+                class="w-9 h-9 rounded-full object-cover object-top" loading="lazy" />
+            } @else {
+              <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center font-bold text-xs"
+                aria-hidden="true">
+                {{ featured.authorInitials }}
+              </div>
+            }
             <div>
               <p class="text-sm font-semibold section-heading">{{ featured.authorName }}</p>
             </div>
@@ -188,11 +193,16 @@
           </p>
 
           <div class="flex items-center gap-2 mt-auto pt-4 border-t border-primary-100 dark:border-primary-700/40">
-            <div
-              class="w-7 h-7 rounded-full bg-primary-500 text-primary-contrast flex items-center justify-center font-bold text-xs"
-              aria-hidden="true">
-              {{ post.authorInitials }}
-            </div>
+            @if (post.authorAvatarUrl) {
+              <img [src]="post.authorAvatarUrl" [alt]="post.authorName"
+                class="w-7 h-7 rounded-full object-cover object-top" loading="lazy" />
+            } @else {
+              <div
+                class="w-7 h-7 rounded-full bg-primary-500 text-primary-contrast flex items-center justify-center font-bold text-xs"
+                aria-hidden="true">
+                {{ post.authorInitials }}
+              </div>
+            }
             <div class="flex-1 min-w-0">
               <p class="text-xs font-semibold section-heading truncate">{{ post.authorName }}</p>
               <p class="text-xs section-subtext">{{ post.publishedAt | date: 'mediumDate' }}</p>

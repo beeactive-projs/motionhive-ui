@@ -20,6 +20,12 @@ export interface BlogPost {
    * two letters of the byline for guests). Always populated.
    */
   authorInitials: string;
+  /**
+   * Cloudinary URL of the registered author's profile picture, or
+   * null. Always null for guest-authored posts (no user link). Use
+   * with the initials circle as fallback when null.
+   */
+  authorAvatarUrl: string | null;
   /** FK to user; null for guest-authored posts. */
   authorUserId: string | null;
   /** Byline for guest-authored posts (no MotionHive account). */

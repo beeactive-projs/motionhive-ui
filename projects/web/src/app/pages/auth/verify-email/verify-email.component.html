@@ -1,0 +1,120 @@
+<div class="min-h-screen flex">
+  <div class="brand-panel hidden lg:flex w-1/2">
+    <div class="honeycomb-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <a routerLink="/" class="brand-logo flex" aria-label="MotionHive home">
+      <mh-logo />
+    </a>
+
+    <div class="max-w-160">
+      <h1 class="text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
+        Confirm your<br>
+        <span class="text-brand">email.</span>
+      </h1>
+      <p class="text-base text-surface-600 dark:text-surface-400 leading-relaxed">
+        One quick check and you're in. We use this to keep your account secure and to send important updates only to you.
+      </p>
+    </div>
+
+    <div class="brand-stats"></div>
+  </div>
+
+  <div class="form-panel w-1/2">
+    <div class="hex-decoration"></div>
+    <mh-theme-toggle class="theme-toggle-btn"></mh-theme-toggle>
+    <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" aria-label="MotionHive home">
+      <mh-logo />
+    </a>
+
+    <div class="header w-full">
+      <div class="mb-8 animate-slide-down">
+        <h1 class="font-heading text-3xl font-bold mb-2">
+          Verifying your email
+        </h1>
+        <p class="text-sm">
+          @switch (state()) {
+            @case ('verifying') { Hold on while we confirm your link. }
+            @case ('success') { You're all set. }
+            @case ('invalid') { This link is no longer valid. }
+            @case ('missing') { This link is missing its token. }
+          }
+        </p>
+      </div>
+    </div>
+
+    <div class="form animate-fade-in w-full">
+      @switch (state()) {
+        @case ('verifying') {
+          <div class="flex flex-col items-center gap-4 py-8">
+            <p-progressSpinner
+              styleClass="w-12 h-12"
+              strokeWidth="3"
+              ariaLabel="Verifying your email"
+            />
+            <p class="text-sm text-surface-500 dark:text-surface-300">
+              Talking to the server…
+            </p>
+          </div>
+        }
+
+        @case ('success') {
+          <div class="mb-6">
+            <p-message severity="success" class="w-full">
+              {{ successMessage() }}
+            </p-message>
+          </div>
+          <div class="flex flex-col">
+            <p-button
+              routerLink="/auth/login"
+              label="Go to sign in"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              fluid
+              size="large">
+            </p-button>
+          </div>
+        }
+
+        @case ('invalid') {
+          <div class="mb-6">
+            <p-message severity="error" class="w-full">
+              {{ errorMessage() }}
+            </p-message>
+          </div>
+          <div class="flex flex-col gap-3 text-center">
+            <p class="text-xs text-surface-500 dark:text-surface-200 leading-relaxed">
+              Already have an account?
+              <a routerLink="/auth/login" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                Sign in
+              </a>
+              and request a new verification email from your profile.
+            </p>
+          </div>
+        }
+
+        @case ('missing') {
+          <div class="mb-6">
+            <p-message severity="warn" class="w-full">
+              We couldn't find a verification token in this link. Try opening the
+              email link directly, or request a new one from your profile after
+              signing in.
+            </p-message>
+          </div>
+          <div class="flex flex-col">
+            <p-button
+              routerLink="/auth/login"
+              label="Go to sign in"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              fluid
+              size="large">
+            </p-button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
