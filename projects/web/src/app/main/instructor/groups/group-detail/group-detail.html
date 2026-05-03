@@ -264,7 +264,7 @@
 <mh-create-post-dialog [(visible)]="showCreatePostDialog" [preselectedGroupId]="group()!.id" [userGroups]="myGroups()"
   (saved)="onPostCreated($event)" />
 
-<mh-delete-post-dialog [(visible)]="showDeletePostDialog" [post]="postBeingDeleted()" [userGroups]="myGroups()"
+<mh-delete-post-dialog [(visible)]="showDeletePostDialog" [post]="postBeingDeleted()"
   (deleted)="onPostDeleted($event)" />
 }
 

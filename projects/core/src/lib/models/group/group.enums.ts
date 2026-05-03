@@ -24,11 +24,11 @@ export const GroupMemberPostPolicies = {
 export type GroupMemberPostPolicy =
   (typeof GroupMemberPostPolicies)[keyof typeof GroupMemberPostPolicies];
 
-export const PostAudienceApprovalStates = {
+export const PostApprovalStates = {
   Approved: 'APPROVED',
   Pending: 'PENDING',
   Rejected: 'REJECTED',
 } as const;
 
-export type PostAudienceApprovalState =
-  (typeof PostAudienceApprovalStates)[keyof typeof PostAudienceApprovalStates];
+export type PostApprovalState =
+  (typeof PostApprovalStates)[keyof typeof PostApprovalStates];

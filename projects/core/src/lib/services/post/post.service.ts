@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 import {
   CreateCommentPayload,
   CreatePostPayload,
-  DeletePostPayload,
+  CreatePostResult,
   DeletePostResult,
   ModeratePostPayload,
   Post,
@@ -36,8 +36,8 @@ export class PostService {
 
   // ─────────────── CRUD ───────────────
 
-  createPost(payload: CreatePostPayload): Observable<Post> {
-    return this._http.post<Post>(
+  createPost(payload: CreatePostPayload): Observable<CreatePostResult> {
+    return this._http.post<CreatePostResult>(
       `${this._api}${API_ENDPOINTS.POSTS.BASE}`,
       payload,
     );
@@ -78,24 +78,18 @@ export class PostService {
     );
   }
 
-  deletePost(
-    postId: string,
-    payload: DeletePostPayload = {},
-  ): Observable<DeletePostResult> {
-    return this._http.request<DeletePostResult>(
-      'DELETE',
+  deletePost(postId: string): Observable<DeletePostResult> {
+    return this._http.delete<DeletePostResult>(
       `${this._api}${API_ENDPOINTS.POSTS.BY_ID(postId)}`,
-      { body: payload },
     );
   }
 
   moderatePost(
     postId: string,
-    groupId: string,
     payload: ModeratePostPayload,
   ): Observable<{ ok: true }> {
     return this._http.patch<{ ok: true }>(
-      `${this._api}${API_ENDPOINTS.POSTS.AUDIENCE(postId, groupId)}`,
+      `${this._api}${API_ENDPOINTS.POSTS.MODERATE(postId)}`,
       payload,
     );
   }

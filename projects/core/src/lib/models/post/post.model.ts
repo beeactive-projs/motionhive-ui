@@ -1,38 +1,32 @@
 import { PaginatedResponse } from '../common/pagination.model';
-import type { PostAudienceApprovalState } from '../group/group.enums';
+import type { PostApprovalState } from '../group/group.enums';
 
 /**
- * Post — author-owned. Audiences live in PostAudience rows; in V1 only
- * GROUP audiences exist, but the shape is forward-compatible for
- * V2 (FOLLOWERS) and V3 (PUBLIC).
+ * Post — V1 model: each post belongs to exactly one group. Cross-posting
+ * to N groups is a server-side fan-out (POST /posts with multiple
+ * groupIds creates N independent posts, each with its own comments,
+ * reactions, and image copies).
  */
 export interface Post {
   id: string;
   authorId: string;
+  groupId: string;
+  approvalState: PostApprovalState;
   content: string;
   mediaUrls: string[] | null;
+  postedAt: string;
   reactionCount: number;
   commentCount: number;
   /** Caller's own reaction type, e.g. 'LIKE'. Null when the caller hasn't reacted. */
   myReaction: string | null;
   createdAt: string;
   updatedAt: string;
-  audiences?: PostAudience[];
   author?: {
     id: string;
     firstName: string;
     lastName: string;
     avatarUrl: string | null;
   } | null;
-}
-
-export interface PostAudience {
-  id: string;
-  postId: string;
-  audienceType: 'GROUP'; // V2/V3 will widen
-  audienceId: string | null;
-  approvalState: PostAudienceApprovalState;
-  postedAt: string;
 }
 
 export interface PostComment {
@@ -59,19 +53,19 @@ export interface CreatePostPayload {
   mediaUrls?: string[];
 }
 
+/** POST /posts response — one item per group in `groupIds`. */
+export interface CreatePostResult {
+  posts: Post[];
+}
+
 export interface UpdatePostPayload {
   content?: string;
   mediaUrls?: string[];
 }
 
-export interface DeletePostPayload {
-  /** Omit to delete the post from all audiences. */
-  groupIds?: string[];
-}
-
+/** DELETE /posts/:postId response. No body required on the request. */
 export interface DeletePostResult {
-  post: 'kept' | 'deleted';
-  audiencesRemoved: number;
+  deleted: true;
 }
 
 export interface CreateCommentPayload {

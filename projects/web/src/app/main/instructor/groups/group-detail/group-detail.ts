@@ -334,8 +334,13 @@ export class GroupDetail implements OnInit {
     this.showCreatePostDialog.set(true);
   }
 
-  onPostCreated(post: Post): void {
-    this.postFeed()?.prependPost(post);
+  onPostCreated(posts: Post[]): void {
+    // The fan-out can produce posts in multiple groups; only the one
+    // belonging to the currently-viewed group is prepended here.
+    const groupId = this.group()?.id;
+    if (!groupId) return;
+    const local = posts.find((p) => p.groupId === groupId);
+    if (local) this.postFeed()?.prependPost(local);
   }
 
   onDeleteRequested(post: Post): void {
@@ -343,14 +348,8 @@ export class GroupDetail implements OnInit {
     this.showDeletePostDialog.set(true);
   }
 
-  onPostDeleted(result: { post: 'kept' | 'deleted'; postId: string }): void {
-    if (result.post === 'deleted') {
-      this.postFeed()?.removePost(result.postId);
-    } else {
-      // The post still exists in *some* group; if it's no longer in *this*
-      // group, drop it from the local feed. Easiest: refetch.
-      this.postFeed()?.load();
-    }
+  onPostDeleted(result: { deleted: true; postId: string }): void {
+    this.postFeed()?.removePost(result.postId);
   }
 
   joinPolicySeverity(policy: JoinPolicy): TagSeverity {

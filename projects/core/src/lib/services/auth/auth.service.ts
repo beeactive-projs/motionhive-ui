@@ -142,6 +142,24 @@ export class AuthService implements OnDestroy {
     );
   }
 
+  /**
+   * Verify the user's email address using the token from the email
+   * link. Called by the /auth/verify-email page when the user clicks
+   * through. The token is single-use and expires server-side.
+   *
+   * The endpoint is rate-limited (7 / 15min per IP). 200 means the
+   * email is now verified or was already verified — distinguish via
+   * the message field if you want to show different copy. Errors:
+   *   400 — token invalid or expired
+   *   429 — too many attempts
+   */
+  verifyEmail(token: string): Observable<{ message: string }> {
+    return this._http.post<{ message: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.AUTH.VERIFY_EMAIL}`,
+      { token },
+    );
+  }
+
   clearAuthDataAndRedirect(): void {
     this.clearAuthData();
     this._router.navigate(['/auth/login']);

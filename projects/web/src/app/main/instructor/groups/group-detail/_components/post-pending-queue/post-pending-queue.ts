@@ -70,7 +70,7 @@ export class PostPendingQueue {
   private _decide(post: Post, decision: 'APPROVED' | 'REJECTED'): void {
     if (this.busyId()) return;
     this.busyId.set(post.id);
-    this._postService.moderatePost(post.id, this.groupId(), { decision }).subscribe({
+    this._postService.moderatePost(post.id, { decision }).subscribe({
       next: () => {
         this.busyId.set(null);
         this.pending.update((list) => list.filter((p) => p.id !== post.id));
