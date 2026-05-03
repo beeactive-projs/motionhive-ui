@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
     RESEND_VERIFICATION: '/auth/resend-verification',
+    VERIFY_EMAIL: '/auth/verify-email',
   },
   USERS: {
     BASE: '/users',
@@ -51,7 +52,7 @@ export const API_ENDPOINTS = {
     GROUP_FEED: (groupId: string) => `/posts/group/${groupId}`,
     GROUP_PENDING: (groupId: string) => `/posts/group/${groupId}/pending`,
     BY_ID: (postId: string) => `/posts/${postId}`,
-    AUDIENCE: (postId: string, groupId: string) => `/posts/${postId}/audiences/${groupId}`,
+    MODERATE: (postId: string) => `/posts/${postId}/moderate`,
     COMMENTS: (postId: string) => `/posts/${postId}/comments`,
     COMMENT: (postId: string, commentId: string) => `/posts/${postId}/comments/${commentId}`,
     REACTIONS: (postId: string) => `/posts/${postId}/reactions`,
