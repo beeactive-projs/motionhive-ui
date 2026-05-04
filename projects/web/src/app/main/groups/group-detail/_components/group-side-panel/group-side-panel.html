@@ -4,7 +4,7 @@
   <mh-group-owner-card [group]="g" />
   }
   @if (hasTags()) {
-  <mh-group-tags-card [tags]="g.tags" />
+  <mh-group-tags-card [tags]="g.tags ?? []" />
   }
   @if (isOwner()) {
   <mh-group-owner-actions-card (editRequested)="editRequested.emit()" />

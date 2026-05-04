@@ -3,13 +3,12 @@ import { Group, JoinPolicies, TagSeverity } from 'core';
 import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { TagModule } from 'primeng/tag';
 import { Card } from 'primeng/card';
-import { Skeleton } from 'primeng/skeleton';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'mh-group-hero',
-  imports: [AvatarModule, BreadcrumbModule, TagModule, Card, Skeleton],
+  imports: [AvatarModule, BreadcrumbModule, TagModule, Card],
   templateUrl: './group-hero.html',
   styleUrl: './group-hero.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -20,7 +20,6 @@ import { AddMembersDialog } from '../_dialogs/add-members-dialog/add-members-dia
 import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog';
 import { GroupHero } from './_components/group-hero/group-hero';
 import { GroupTabs } from './_components/group-tabs/group-tabs';
-import { GroupSidePanel } from './_components/group-side-panel/group-side-panel';
 import { GroupDetailContext } from './group-detail.context';
 
 @Component({
@@ -36,7 +35,6 @@ import { GroupDetailContext } from './group-detail.context';
     GroupFormDialog,
     GroupHero,
     GroupTabs,
-    GroupSidePanel,
   ],
   providers: [MessageService, ConfirmationService, GroupDetailContext],
   templateUrl: './group-detail.html',
