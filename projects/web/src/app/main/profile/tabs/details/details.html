@@ -22,13 +22,10 @@
            actual picker; the overlay button just delegates the click so
            the Avatar keeps its exact visual size/shape. -->
       <div class="relative shrink-0">
-        <p-avatar
-          [label]="avatarUrl() ? undefined : initials()"
-          [image]="avatarUrl() ?? undefined"
-          shape="circle"
+        <mh-avatar
+          [user]="avatarUser()"
           size="xlarge"
-          class="text-2xl"
-          [style]="{ 'background-color': 'var(--p-primary-100)', color: 'var(--p-primary-600)' }"
+          styleClass="text-2xl bg-primary-100 text-primary-600"
         />
         <button
           type="button"

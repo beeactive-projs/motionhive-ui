@@ -1,9 +1,6 @@
-import type {
-  GroupMemberPostPolicy,
-  GroupMemberRole,
-  JoinPolicy,
-} from './group.enums';
+import type { GroupMemberPostPolicy, GroupMemberRole, JoinPolicy } from './group.enums';
 import { PaginatedResponse } from '../common/pagination.model';
+import type { User } from '../user/user.model';
 
 export interface Group {
   id: string;
@@ -47,13 +44,7 @@ export interface GroupMember {
   nickname: string | null;
   joinedAt: string;
   leftAt: string | null;
-  user?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    avatarId?: string;
-  };
+  user?: User;
   isClient?: boolean;
 }
 

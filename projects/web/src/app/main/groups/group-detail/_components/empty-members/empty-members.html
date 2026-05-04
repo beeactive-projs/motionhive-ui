@@ -1,0 +1,27 @@
+<div class="mh-empty-members">
+  <p-avatar
+    icon="pi pi-users"
+    shape="circle"
+    size="xlarge"
+    styleClass="mh-empty-members__avatar"
+  />
+  <h3 class="mh-empty-members__title">Just you so far.</h3>
+  <p class="mh-empty-members__sub">
+    Send a join link to your clients — they can join in one tap, no signup form.
+  </p>
+
+  <div class="mh-empty-members__actions">
+    <p-button
+      label="Generate join link"
+      icon="pi pi-link"
+      (onClick)="generateLinkRequested.emit()"
+    />
+    <p-button
+      label="Add manually"
+      icon="pi pi-plus"
+      severity="secondary"
+      outlined
+      (onClick)="addManuallyRequested.emit()"
+    />
+  </div>
+</div>

@@ -1,13 +1,11 @@
 <p-button text rounded [ariaLabel]="'Open profile menu for ' + userName()" (onClick)="toggle($event)" styleClass="p-0">
-  <p-avatar [image]="user()?.avatarUrl ?? undefined" [label]="user()?.avatarUrl ? undefined : initials()"
-    shape="circle" />
+  <mh-avatar [user]="user()" />
 </p-button>
 
 <p-popover #popover [appendTo]="'body'">
   <div class="min-w-52">
     <div class="flex items-center gap-3 py-1">
-      <p-avatar [image]="user()?.avatarUrl ?? undefined" [label]="user()?.avatarUrl ? undefined : initials()"
-        shape="circle" size="large" />
+      <mh-avatar [user]="user()" size="large" />
       <div class="flex flex-col overflow-hidden">
         <span class="font-semibold text-sm truncate">{{ userName() }}</span>
         <span class="text-xs truncate text-muted-color">{{ user()?.email }}</span>

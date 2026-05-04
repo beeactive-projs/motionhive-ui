@@ -267,13 +267,7 @@ export class Home implements OnInit {
 
   onGroupAction(payload: { group: Group; joined: boolean }): void {
     if (payload.joined) {
-      // Instructors run their groups under /coaching/groups; users in
-      // a group don't have a dedicated detail page yet, so for now we
-      // route to /coaching/groups/:id which works for instructors and
-      // 404s gracefully for plain members until a user-side group
-      // detail page is built.
-      // TODO: wire to a public/member group detail route once it exists.
-      this._router.navigate(['/coaching/groups', payload.group.id]);
+      this._router.navigate(['/groups', payload.group.id]);
     } else {
       // TODO: confirm group join policy (open vs request) before calling selfJoin.
       this._groupService.selfJoin(payload.group.id).subscribe({

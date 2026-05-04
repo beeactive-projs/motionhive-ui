@@ -47,14 +47,16 @@ Package manager is **npm**. Prettier config is inline in `package.json`. Angular
 
 **`web` app** (authenticated):
 ```
-/auth/*     → login, signup, password reset, OAuth callbacks
-/app/*      → Protected (authGuard) via SidenavLayout
-  /app/main/instructor/*    → INSTRUCTOR role
-  /app/main/user/*          → USER role
-  /app/main/super-admin/*   → SUPER_ADMIN role
-  /app/main/writer/*        → WRITER role (blog authoring)
-  /app/main/profile/*       → shared
+/auth/*           → login, signup, password reset, OAuth callbacks
+/* (under SidenavLayout, authGuard)
+  /home, /explore, /profile, /groups, /groups/:id, /activity/*, /join/:token  → shared (any authenticated user)
+  /coaching/*      → INSTRUCTOR role (instructorGuard)
+  /user/*          → USER role
+  /super-admin/*   → SUPER_ADMIN role (superAdminGuard)
+  /writer/posts/*  → WRITER role (rolesGuard)
 ```
+
+Routes are root-mounted — there is no `/app/main` URL prefix despite the directory name. Shared features (groups, profile, home, explore, activity) sit alongside the role-scoped sections so any authenticated user can reach them; mutating actions inside a shared feature are gated in-component (e.g. `isOwner`, `authStore.isInstructor()`).
 
 **`website` app** (public):
 ```
@@ -134,6 +136,14 @@ When a type or constant is used in more than one place, define it once in the `c
 - Always re-export the new entry from `projects/core/src/public-api.ts`
 
 Never copy-paste the same `type` or `const` across multiple component files — extract it.
+
+**Reuse PrimeNG's data shapes — don't invent component-local interfaces for items.** When modeling lists of options for PrimeNG components (tabs, selects, multiselects, listboxes, menus, autocompletes, breadcrumbs, etc.), use the types PrimeNG already exports: `MenuItem` from `primeng/api` for menu/tab/breadcrumb-style items (label, icon, routerLink, command, items, badge, …), `SelectItem` from `primeng/api` for select/multiselect/listbox option lists (label, value, disabled, …). Don't declare a parallel `interface TabSpec`/`interface OptionItem` when the PrimeNG type already covers the fields. If you need an extra field (e.g. a count), extend the PrimeNG type rather than redefining it:
+
+```ts
+import { MenuItem } from 'primeng/api';
+
+type GroupTab = MenuItem & { count: number | null };
+```
 
 **Never compare against enum string values directly in templates or component logic.** Always expose the enum object as a readonly class member and use it in comparisons. Inline string literals like `=== 'PENDING'` or `=== 'INSTRUCTOR_TO_CLIENT'` are undetectable by the compiler when the enum value changes and must be avoided. Pattern:
 

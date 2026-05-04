@@ -64,9 +64,8 @@
             <!-- Selected client card -->
             <div class="flex items-center justify-between gap-3 rounded-lg border-2 border-primary-500/30 bg-primary-500/5 px-3 py-2.5">
               <div class="flex items-center gap-3 min-w-0">
-                <p-avatar
-                  [label]="(sc.firstName.charAt(0) + sc.lastName.charAt(0)).toUpperCase()"
-                  shape="circle"
+                <mh-avatar
+                  [user]="sc"
                   styleClass="bg-primary-500/10 text-primary-700 dark:text-primary-400 font-semibold"
                 />
                 <div class="flex flex-col min-w-0">

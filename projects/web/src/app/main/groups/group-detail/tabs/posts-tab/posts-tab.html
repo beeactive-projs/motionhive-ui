@@ -1,0 +1,24 @@
+<div class="flex gap-4">
+  <div class="flex flex-col gap-4 basis-2/3 min-w-0">
+    @if (context.canModerate() && context.group(); as g) {
+    <mh-post-pending-queue [groupId]="g.id" />
+    }
+
+    @if (context.group(); as g) {
+    <mh-post-feed [groupId]="g.id" [canPost]="context.canPost()" [canModerate]="context.canModerate()"
+      (createRequested)="openCreate()" (deleteRequested)="onDeleteRequested($event)" />
+    }
+  </div>
+
+  <div class="basis-1/3 min-w-0">
+    <mh-group-side-panel />
+  </div>
+</div>
+
+@if (context.group(); as g) {
+<mh-create-post-dialog [(visible)]="context.showCreatePostDialog" [preselectedGroupId]="g.id"
+  [userGroups]="context.myGroups()" (saved)="onPostCreated($event)" />
+
+<mh-delete-post-dialog [(visible)]="context.showDeletePostDialog" [post]="context.postBeingDeleted()"
+  (deleted)="onDeleted($event)" />
+}

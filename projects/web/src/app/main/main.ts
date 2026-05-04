@@ -81,6 +81,7 @@ export class Main {
         items: [
           { label: 'Home', route: '/home', icon: 'pi pi-home' },
           { label: 'Explore', route: '/explore', icon: 'pi pi-compass' },
+          { label: 'Groups', route: '/groups', icon: 'pi pi-sitemap' },
         ],
       },
     ];
@@ -93,7 +94,6 @@ export class Main {
             { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-gauge' },
             { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
             { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
-            { label: 'Groups', route: '/coaching/groups', icon: 'pi pi-sitemap' },
           ],
         },
         {

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
+import { Avatar } from '../../../_shared/components/avatar/avatar';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
 import { DividerModule } from 'primeng/divider';
@@ -47,6 +48,7 @@ interface RecentActivity {
     NgTemplateOutlet,
     TitleCasePipe,
     AvatarModule,
+    Avatar,
     ButtonModule,
     CardModule,
     ChartModule,

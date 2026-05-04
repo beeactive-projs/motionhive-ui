@@ -50,9 +50,9 @@ export const MotionHiveLara = definePreset(Lara, {
     },
   },
   components: {
-    dialog: {
-      footer: {
-        padding: '{overlay.modal.padding}',
+    breadcrumb: {
+      root: {
+        background: 'transparent',
       },
     },
     button: {
@@ -98,6 +98,11 @@ export const MotionHiveLara = definePreset(Lara, {
         },
       },
     },
+    dialog: {
+      footer: {
+        padding: '{overlay.modal.padding}',
+      },
+    },
     paginator: {
       root: {
         gap: '0.5rem',
@@ -105,14 +110,31 @@ export const MotionHiveLara = definePreset(Lara, {
       },
     },
     tabs: {
+      navButton: {
+        background: 'transparent',
+      },
       tablist: {
         background: 'transparent',
-        // borderWidth: '1px',
+        borderWidth: '0 0 1px 0',
         // borderColor: '{surface.300}',
       },
       tab: {
-        padding: '0.5rem 0.75rem',
-        // borderWidth: '0',
+        padding: '0.75rem 1rem',
+        borderWidth: '0 0 3px 0',
+      },
+      colorScheme: {
+        light: {
+          tab: {
+            background: 'transparent',
+            activeBackground: 'transparent',
+          },
+        },
+        dark: {
+          tab: {
+            background: 'transparent',
+            activeBackground: 'transparent',
+          },
+        },
       },
     },
     tag: {

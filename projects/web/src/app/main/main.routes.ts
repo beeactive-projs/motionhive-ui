@@ -28,6 +28,37 @@ export const mainRoutes: Routes = [
         title: 'My Profile - MotionHive',
       },
       {
+        path: 'groups',
+        loadComponent: () => import('./groups/groups').then((m) => m.Groups),
+        title: 'Groups - MotionHive',
+      },
+      {
+        path: 'groups/:id',
+        loadComponent: () =>
+          import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
+        title: 'Group details - MotionHive',
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'posts' },
+          {
+            path: 'posts',
+            loadComponent: () =>
+              import('./groups/group-detail/tabs/posts-tab/posts-tab').then((m) => m.PostsTab),
+          },
+          {
+            path: 'members',
+            loadComponent: () =>
+              import('./groups/group-detail/tabs/members-tab/members-tab').then(
+                (m) => m.MembersTab,
+              ),
+          },
+          {
+            path: 'about',
+            loadComponent: () =>
+              import('./groups/group-detail/tabs/about-tab/about-tab').then((m) => m.AboutTab),
+          },
+        ],
+      },
+      {
         path: 'profile/invoices/:id',
         loadComponent: () =>
           import('./user/payments/invoice-detail/invoice-detail').then(

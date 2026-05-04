@@ -1,0 +1,29 @@
+<p-breadcrumb [model]="breadcrumbItems()" />
+@if(group(); as g){
+<p-card class="relative">
+  <div class="honeycomb-bg"></div>
+  <div class="flex items-center gap-4">
+    @if (g.logoUrl) {
+    <p-avatar [image]="g.logoUrl" shape="circle" size="xlarge"
+      class="bg-primary-500 border-4 border-double border-surface-100/60 p-10" />
+    } @else {
+    <p-avatar [label]="avatarLabel()" shape="circle" size="xlarge"
+      class="bg-primary-500 border-4 border-double border-surface-100/60 p-10" />
+    }
+
+    <div class="flex flex-col gap-1.5 pb-1 flex-1 min-w-0">
+      <div class="">
+        <h1 class="m-0 text-2xl font-semibold leading-tight tracking-tight text-color">{{ g.name }}</h1>
+        @if (g.description) {
+        <p class="m-0 text-sm text-muted-color max-w-[60ch]">{{ g.description }}</p>
+        }
+      </div>
+      <div class="flex flex-wrap gap-2 mt-1">
+        <p-tag rounded [value]="joinPolicyLabel()" [severity]="joinPolicySeverity()" />
+        <p-tag rounded [value]="memberCountLabel()" severity="contrast" />
+        <p-tag rounded [value]="visibilityLabel()" severity="info" />
+      </div>
+    </div>
+  </div>
+</p-card>
+}

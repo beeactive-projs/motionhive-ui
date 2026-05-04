@@ -1,0 +1,125 @@
+<div class="h-full flex flex-col gap-4">
+  <!-- Header -->
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-1">
+      <!-- <p class="text-xs uppercase text-surface-700 dark:text-surface-400">Client Management</p> -->
+      <h1 class="font-heading font-semibold text-xl md:text-2xl">Groups</h1>
+      <p class="text-sm text-surface-700 dark:text-surface-400">
+        @if (isInstructor()) {
+          Organize your clients into groups for sessions and communication.
+        } @else {
+          Groups you belong to.
+        }
+      </p>
+    </div>
+    @if (isInstructor()) {
+      <div class="flex flex-wrap">
+        <p-button label="New group" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+      </div>
+    }
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (i of [1, 2, 3]; track i) {
+    <p-card class="hover:shadow-md transition-shadow cursor-pointer h-full">
+      <div class="flex animate-pulse flex-col gap-3">
+        <div class="h-5 w-2/3 rounded bg-surface-200"></div>
+        <div class="h-4 w-1/3 rounded bg-surface-200"></div>
+        <div class="h-10 w-full rounded bg-surface-200"></div>
+        <div class="flex gap-2">
+          <div class="h-6 w-16 rounded-full bg-surface-200"></div>
+          <div class="h-6 w-12 rounded-full bg-surface-200"></div>
+        </div>
+      </div>
+    </p-card>
+    }
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && groups().length === 0) {
+  <div class="flex flex-col items-center gap-4 py-16 text-center">
+    <div class="flex h-20 w-20 items-center justify-center rounded-full bg-surface-200">
+      <i class="pi pi-sitemap text-4xl text-primary-300"></i>
+    </div>
+    @if (isInstructor()) {
+      <h2 class="text-lg font-semibold text-primary-700">No groups yet</h2>
+      <p class="max-w-sm text-sm text-primary-500">
+        Create your first group to start organizing clients and scheduling sessions.
+      </p>
+      <p-button label="Create your first group" icon="pi pi-plus" severity="primary" styleClass="!rounded-full mt-2"
+        (onClick)="openCreateDialog()" />
+    } @else {
+      <h2 class="text-lg font-semibold text-primary-700">You're not in any groups yet</h2>
+      <p class="max-w-sm text-sm text-primary-500">
+        When an instructor adds you to a group or you join via an invite link, it will show up here.
+      </p>
+    }
+  </div>
+  }
+
+  <!-- Groups Grid -->
+  @if (!loading() && groups().length > 0) {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (group of groups(); track trackById($index, group)) {
+    <p-card class="hover:shadow-md transition-shadow cursor-pointer h-full" (click)="navigateToGroup(group)">
+      <div class="flex flex-col gap-3">
+        <!-- Card Header -->
+        <div class="flex items-start justify-between">
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate text-base font-semibold">{{ group.name }}</h3>
+          </div>
+          @if (isOwner(group)) {
+            <div class="ml-2 flex shrink-0 gap-3">
+              <p-button icon="pi pi-user-plus" rounded outlined size="small" pTooltip="Add members"
+                (onClick)="openAddMembersDialog($event, group)" />
+              <p-button icon="pi pi-pencil" rounded outlined size="small" (onClick)="openEditDialog($event, group)" />
+              <p-button icon="pi pi-trash" rounded outlined severity="danger" size="small"
+                (onClick)="confirmDelete($event, group)" />
+            </div>
+          }
+        </div>
+
+        <!-- Member Count & Join Policy -->
+        <div class="flex items-center gap-2">
+          <span class="flex items-center gap-1 text-sm">
+            <i class="pi pi-users text-xs"></i>
+            {{ group.memberCount }} {{ group.memberCount === 1 ? 'member' : 'members' }}
+          </span>
+          <p-tag [value]="joinPolicyLabel(group.joinPolicy)" [severity]="joinPolicySeverity(group.joinPolicy)"
+            class="text-xs" rounded />
+          @if (!group.isPublic) {
+          <p-tag value="Private" rounded class="text-xs" />
+          }
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm line-clamp-2">
+          {{ descriptionExcerpt(group.description) }}
+        </p>
+
+        <!-- Tags -->
+        @if (group.tags && group.tags.length > 0) {
+        <div class="flex flex-wrap gap-3">
+          @for (tag of group.tags; track tag) {
+          <p-tag [value]="tag" severity="contrast" class="text-xs" rounded />
+          }
+        </div>
+        }
+      </div>
+    </p-card>
+    }
+  </div>
+  }
+</div>
+
+<mh-group-form-dialog [(visible)]="showGroupFormDialog" [group]="editingGroup()" (saved)="loadGroups()" />
+
+@if (addMembersGroupId()) {
+<mh-add-members-dialog [(visible)]="showAddMembersDialog" [groupId]="addMembersGroupId()!" (saved)="loadGroups()" />
+}
+
+<p-toast />
+<p-confirmDialog />

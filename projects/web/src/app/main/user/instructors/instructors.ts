@@ -9,7 +9,6 @@ import {
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { AvatarModule } from 'primeng/avatar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
@@ -17,6 +16,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { MyInstructor, ClientRequest, ClientService } from 'core';
 import { DiscoverInstructors } from '../_dialogs/discover-instructors/discover-instructors';
+import { Avatar } from '../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-instructors',
@@ -24,7 +24,7 @@ import { DiscoverInstructors } from '../_dialogs/discover-instructors/discover-i
     CardModule,
     ButtonModule,
     TableModule,
-    AvatarModule,
+    Avatar,
     SkeletonModule,
     ToastModule,
     TooltipModule,

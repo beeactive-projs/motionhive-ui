@@ -70,6 +70,18 @@ export interface UserSearchResult {
   avatarUrl: string | null;
 }
 
+/**
+ * Minimal shape consumed by `mh-avatar`. Any user-like object that
+ * carries a name and (optionally) an avatar URL satisfies it — the
+ * concrete entity (User, ClientUser, post.author, request.toUser,
+ * instructor search result, etc.) is irrelevant at the call site.
+ */
+export interface AvatarUser {
+  firstName?: string | null;
+  lastName?: string | null;
+  avatarUrl?: string | null;
+}
+
 export interface UserSearchParams {
   q: string;
   role?: UserRole;

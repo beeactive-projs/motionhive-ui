@@ -29,16 +29,10 @@ export const instructorRoutes: Routes = [
     loadComponent: () => import('./sessions/sessions').then((m) => m.Sessions),
     title: 'Sessions - MotionHive',
   },
-  {
-    path: 'groups',
-    loadComponent: () => import('./groups/groups').then((m) => m.Groups),
-    title: 'Groups - MotionHive',
-  },
-  {
-    path: 'groups/:id',
-    loadComponent: () => import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
-    title: 'Group Details - MotionHive',
-  },
+  // Groups now live at the shared /groups path so all roles can access them.
+  // Keep redirects so existing /coaching/groups bookmarks and in-app links still resolve.
+  { path: 'groups', redirectTo: '/groups', pathMatch: 'full' },
+  { path: 'groups/:id', redirectTo: '/groups/:id' },
   // // Payments hub — tabbed view at /coaching/payments?tab=...
   // {
   //   path: 'payments',

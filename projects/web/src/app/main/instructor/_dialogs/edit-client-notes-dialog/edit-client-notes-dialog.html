@@ -3,7 +3,7 @@
   <div class="flex flex-col gap-4">
     @if (client(); as c) {
     <div class="flex items-center gap-3 rounded-lg bg-surface-50 p-3">
-      <p-avatar [label]="initials(c)" shape="circle" styleClass="bg-primary-100 text-primary-700" />
+      <mh-avatar [user]="c.client" styleClass="bg-primary-100 text-primary-700" />
       <span class="font-medium text-secondary-900">{{ clientName(c) }}</span>
     </div>
     }

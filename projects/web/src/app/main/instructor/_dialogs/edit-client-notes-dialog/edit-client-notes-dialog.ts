@@ -9,12 +9,12 @@ import {
   effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Avatar } from 'primeng/avatar';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
 import { InstructorClient, ClientService } from 'core';
+import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-edit-client-notes-dialog',

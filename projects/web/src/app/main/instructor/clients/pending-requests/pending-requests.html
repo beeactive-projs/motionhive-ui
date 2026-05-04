@@ -46,7 +46,7 @@
         <tr>
           <td>
             <div class="flex items-center gap-3">
-              <p-avatar [label]="initials(row)" shape="circle" />
+              <mh-avatar [user]="row.client" />
               @if (row.clientId) {
               <!-- TODO: route to public profile once it exists -->
               <a [routerLink]="['/users', row.clientId]"

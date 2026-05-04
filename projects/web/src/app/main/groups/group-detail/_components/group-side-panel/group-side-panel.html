@@ -1,0 +1,14 @@
+@if (group(); as g) {
+<aside class="mh-side-panel">
+  @if (g.instructor) {
+  <mh-group-owner-card [group]="g" />
+  }
+  @if (hasTags()) {
+  <mh-group-tags-card [tags]="g.tags" />
+  }
+  @if (isOwner()) {
+  <mh-group-owner-actions-card (editRequested)="editRequested.emit()" />
+  }
+  <mh-group-activity-card [group]="g" [latestMember]="context.members()[0]" />
+</aside>
+}

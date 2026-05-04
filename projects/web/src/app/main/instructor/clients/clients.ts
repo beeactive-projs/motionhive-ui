@@ -19,7 +19,6 @@ import {
   TagSeverity,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -32,6 +31,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit-client-notes-dialog';
 import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
+import { Avatar } from '../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-clients',
@@ -41,7 +41,7 @@ import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-clie
     ButtonModule,
     TableModule,
     TagModule,
-    AvatarModule,
+    Avatar,
     BadgeModule,
     OverlayBadgeModule,
     SkeletonModule,

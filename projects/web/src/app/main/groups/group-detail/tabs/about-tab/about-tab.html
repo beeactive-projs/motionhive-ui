@@ -1,0 +1,98 @@
+@if (context.group(); as g) {
+  <section class="mh-about">
+    @if (g.description) {
+      <div class="mh-about__block">
+        <span class="mh-about__label">Description</span>
+        <p class="mh-about__text">{{ g.description }}</p>
+      </div>
+    }
+
+    <div class="mh-about__grid">
+      <div class="mh-about__field">
+        <span class="mh-about__label">Join policy</span>
+        <p-tag [value]="joinPolicyLabel()" [severity]="joinPolicySeverity()" />
+      </div>
+      <div class="mh-about__field">
+        <span class="mh-about__label">Members</span>
+        <span class="mh-about__value">{{ g.memberCount }}</span>
+      </div>
+      <div class="mh-about__field">
+        <span class="mh-about__label">Visibility</span>
+        <span class="mh-about__value">{{ g.isPublic ? 'Public' : 'Private' }}</span>
+      </div>
+      <div class="mh-about__field">
+        <span class="mh-about__label">Created</span>
+        <span class="mh-about__value">{{ g.createdAt | date: 'mediumDate' }}</span>
+      </div>
+    </div>
+
+    @if (g.contactEmail || g.contactPhone || g.address) {
+      <div class="mh-about__block">
+        <span class="mh-about__label">Contact information</span>
+        <div class="mh-about__contact">
+          @if (g.contactEmail) {
+            <span class="mh-about__contact-item">
+              <i class="pi pi-envelope" aria-hidden="true"></i>{{ g.contactEmail }}
+            </span>
+          }
+          @if (g.contactPhone) {
+            <span class="mh-about__contact-item">
+              <i class="pi pi-phone" aria-hidden="true"></i>{{ g.contactPhone }}
+            </span>
+          }
+          @if (g.address) {
+            <span class="mh-about__contact-item">
+              <i class="pi pi-map-marker" aria-hidden="true"></i>
+              {{ g.address }}@if (g.city) {, {{ g.city }}}@if (g.country) {, {{ g.country }}}
+            </span>
+          }
+        </div>
+      </div>
+    }
+
+    @if (g.tags && g.tags.length > 0) {
+      <div class="mh-about__block">
+        <span class="mh-about__label">Tags</span>
+        <div class="mh-about__tags">
+          @for (tag of g.tags; track tag) {
+            <p-tag [value]="tag" severity="contrast" />
+          }
+        </div>
+      </div>
+    }
+
+    @if (context.isOwner()) {
+      <div class="mh-about__block">
+        <span class="mh-about__label">Join link</span>
+        <div class="mh-about__actions">
+          @if (context.hasActiveJoinToken()) {
+            <p-button
+              label="Copy join link"
+              icon="pi pi-copy"
+              severity="secondary"
+              size="small"
+              (onClick)="context.copyJoinLink()"
+            />
+            <p-button
+              label="Revoke link"
+              icon="pi pi-ban"
+              severity="danger"
+              outlined
+              size="small"
+              (onClick)="context.revokeJoinLink()"
+            />
+          } @else {
+            <p-button
+              label="Generate join link"
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              [loading]="context.generatingLink()"
+              (onClick)="context.generateJoinLink()"
+            />
+          }
+        </div>
+      </div>
+    }
+  </section>
+}

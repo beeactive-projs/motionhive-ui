@@ -273,8 +273,7 @@ export class SearchModal {
         this._router.navigate(['/profile'], { queryParams: { instructorId: item.id } });
         break;
       case 'group':
-        // TODO: replace with a public/member group detail route once it exists.
-        this._router.navigate(['/coaching/groups', item.id]);
+        this._router.navigate(['/groups', item.id]);
         break;
       case 'session':
         // TODO: session detail route — sessions module pending.

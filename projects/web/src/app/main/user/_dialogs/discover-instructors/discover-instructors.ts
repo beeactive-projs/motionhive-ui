@@ -3,12 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { AvatarModule } from 'primeng/avatar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
 import { AuthStore, InstructorSearchResult, ClientService, ProfileService } from 'core';
+import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-discover-instructors',
@@ -17,7 +17,7 @@ import { AuthStore, InstructorSearchResult, ClientService, ProfileService } from
     DialogModule,
     ButtonModule,
     InputTextModule,
-    AvatarModule,
+    Avatar,
     SkeletonModule,
     ToastModule,
     TextareaModule,

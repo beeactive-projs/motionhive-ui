@@ -1,14 +1,14 @@
 import { Component, ChangeDetectionStrategy, computed, inject, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { DividerModule } from 'primeng/divider';
 import { AuthStore, AuthService, FeedbackService } from 'core';
+import { Avatar } from '../avatar/avatar';
 
 @Component({
   selector: 'mh-profile-menu',
-  imports: [RouterLink, AvatarModule, ButtonModule, PopoverModule, DividerModule],
+  imports: [RouterLink, Avatar, ButtonModule, PopoverModule, DividerModule],
   templateUrl: './profile-menu.html',
   styleUrl: './profile-menu.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
