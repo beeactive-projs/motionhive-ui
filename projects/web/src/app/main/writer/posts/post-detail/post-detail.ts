@@ -213,6 +213,25 @@ export class PostDetail implements OnInit {
     this.formTags.set(post.tags ?? []);
   }
 
+  /**
+   * Replace non-breaking spaces with regular spaces in pasted text.
+   *
+   * Pasting from Word / Google Docs / Pages produces U+00A0 (`&nbsp;`)
+   * between every word, which makes the rendered post look like
+   * `For&nbsp;many&nbsp;people&nbsp;…` in raw HTML and breaks normal
+   * line-wrapping behaviour on narrow viewports. We normalise on
+   * save — it's cheap, runs once, and matches the "long-form prose"
+   * shape of every post we publish today (we don't have code blocks
+   * where NBSP would be load-bearing).
+   *
+   * Both the literal U+00A0 character (what Quill stores after a
+   * Word paste) and the `&nbsp;` entity (rare, but seen in some
+   * paste sources) are folded to regular spaces.
+   */
+  private static normalizeWhitespace(value: string): string {
+    return value.replace(/ /g, ' ').replace(/&nbsp;/g, ' ');
+  }
+
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -222,10 +241,10 @@ export class PostDetail implements OnInit {
     const raw = this.form.getRawValue();
     const guestByline = raw.guestAuthorName?.trim();
     const payload: CreateBlogPostPayload = {
-      title: raw.title!,
+      title: PostDetail.normalizeWhitespace(raw.title!),
       slug: raw.slug!,
-      excerpt: raw.excerpt!,
-      content: raw.content!,
+      excerpt: PostDetail.normalizeWhitespace(raw.excerpt!),
+      content: PostDetail.normalizeWhitespace(raw.content!),
       category: raw.category! as BlogCategory,
       language: raw.language!,
       coverImage: raw.coverImage!,
