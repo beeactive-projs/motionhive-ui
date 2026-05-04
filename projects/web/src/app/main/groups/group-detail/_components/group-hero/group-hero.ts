@@ -5,7 +5,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TagModule } from 'primeng/tag';
 import { Card } from 'primeng/card';
-import { Skeleton } from "primeng/skeleton";
+import { Skeleton } from 'primeng/skeleton';
 
 @Component({
   selector: 'mh-group-hero',
@@ -18,13 +18,8 @@ export class GroupHero {
   readonly group = input.required<Group>();
   readonly membersCount = input<number | null>(null);
 
-  readonly breadcrumbHome: MenuItem = {
-    icon: 'pi pi-home',
-    routerLink: '/app/main/instructor/overview',
-  };
-
   readonly breadcrumbItems = computed<MenuItem[]>(() => [
-    { label: 'Groups', routerLink: '/groups' },
+    { label: 'Groups', routerLink: '/groups/your-groups' },
     { label: this.group().name },
   ]);
 

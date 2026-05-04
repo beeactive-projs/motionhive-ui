@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Menu } from 'primeng/menu';
@@ -21,6 +22,7 @@ import { Avatar } from '../../../../../_shared/components/avatar/avatar';
   selector: 'mh-post-card',
   imports: [
     DatePipe,
+    RouterLink,
     Avatar,
     Button,
     CardModule,
@@ -38,10 +40,51 @@ export class PostCard {
   readonly post = input.required<Post>();
   /** True when the viewer is OWNER/MODERATOR of the *current* group context. */
   readonly canModerate = input<boolean>(false);
+  /**
+   * When true, render a "posted in <group name>" badge above the author
+   * line using `post().group`. The aggregated feed (`/groups/feed`) sets
+   * this; the per-group feed leaves it off because the group is implicit
+   * in the URL.
+   */
+  readonly showGroupBadge = input<boolean>(false);
   readonly deleteRequested = output<Post>();
   readonly editRequested = output<Post>();
 
   readonly showComments = signal(false);
+  readonly contentExpanded = signal(false);
+
+  /**
+   * Soft cap on visible content lines before truncating with a
+   * "Read more" toggle. Posts with images get a tighter clamp so the
+   * gallery stays prominent above the fold.
+   */
+  readonly contentClampLines = computed(() =>
+    this.hasImages() ? 2 : 10,
+  );
+
+  /**
+   * Heuristic for "is the content long enough that we should bother
+   * clamping?". Avoids rendering the toggle on a one-line post.
+   *
+   * Kicks in when the content has more newlines than the clamp allows,
+   * OR when it's long enough that line-wrapping is likely to push past
+   * the clamp at typical viewport widths (~80 chars per line).
+   */
+  readonly isContentLong = computed(() => {
+    const content = this.post().content ?? '';
+    const newlines = (content.match(/\n/g) ?? []).length;
+    const limit = this.contentClampLines();
+    if (newlines >= limit) return true;
+    return content.length > limit * 80;
+  });
+
+  hasImages(): boolean {
+    return (this.post().mediaUrls?.length ?? 0) > 0;
+  }
+
+  toggleContent(): void {
+    this.contentExpanded.update((v) => !v);
+  }
 
   readonly isAuthor = computed(
     () => this.post().authorId === this._authStore.user()?.id,

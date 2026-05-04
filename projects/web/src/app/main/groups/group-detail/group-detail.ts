@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Group } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -45,6 +47,7 @@ export class GroupDetail implements OnInit {
   readonly context = inject(GroupDetailContext);
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly editingGroup = signal<Group | null>(null);
   readonly showEditDialog = signal(false);
@@ -53,12 +56,13 @@ export class GroupDetail implements OnInit {
   readonly membersCount = computed(() => this.context.totalMembers() || null);
 
   ngOnInit(): void {
-    const groupId = this._route.snapshot.paramMap.get('id');
-    if (groupId) {
+    this._route.paramMap.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params) => {
+      const groupId = params.get('id');
+      if (!groupId) return;
       this.context.loadGroup(groupId);
       this.context.loadMembers(groupId);
       this.context.loadMyGroups();
-    }
+    });
   }
 
   goBack(): void {

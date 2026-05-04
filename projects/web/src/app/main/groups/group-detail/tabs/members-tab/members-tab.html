@@ -1,117 +1,172 @@
-@if (context.totalMembers()
-<= 1 && !context.membersLoading()) { <mh-empty-members (generateLinkRequested)="context.generateJoinLink()"
-  (addManuallyRequested)="onAddMembers()" />
-} @else {
 <div class="h-full flex flex-col gap-4">
-  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-    <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-xl md:text-2xl">
-        Members · {{ context.totalMembers() }}
-      </h1>
-      <p class="text-sm text-surface-700 dark:text-surface-400">
-        Manage the people in this group, their roles, and permissions.
-      </p>
-    </div>
-    @if (context.isOwner()) {
-    <div class="flex flex-wrap gap-3">
-      <p-button label="Add members" icon="pi pi-user-plus" (onClick)="onAddMembers()" />
-    </div>
-    }
-  </header>
-
-  <div class="flex items-center gap-3">
-    <input pInputText type="search" placeholder="Search members…" [ngModel]="searchTerm()"
-      (ngModelChange)="searchTerm.set($event)" class="w-72 max-w-full" />
-  </div>
-
-  <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
-    <p-table [value]="visibleMembers()" [loading]="context.membersLoading()" [showLoader]="false" [scrollable]="true"
-      scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true">
-      <ng-template #header>
-        <tr>
-          <th>Name</th>
-          @if (context.isOwner()) { <th>Email</th> }
-          <th class="text-center">Role</th>
-          <th class="text-center">Joined</th>
-          @if (context.isOwner()) { <th class="w-32 text-center">Actions</th> }
-        </tr>
-      </ng-template>
-
-      <ng-template #body let-member>
-        <tr>
-          <td>
-            <div class="flex items-center gap-3">
-              <mh-avatar [user]="member.user" />
-              <span class="font-medium">{{ memberName(member) }}</span>
-            </div>
-          </td>
-          @if (context.isOwner()) {
-          <td>{{ member.user?.email || '—' }}</td>
-          }
-          <td class="text-center">
-            <p-tag [value]="roleLabel(member.role)" [severity]="roleSeverity(member.role)" rounded />
-          </td>
-          <td class="text-center">{{ member.joinedAt | date: 'dd MMM yyyy' }}</td>
-          @if (context.isOwner()) {
-          <td>
-            <div class="flex items-center justify-end gap-1">
-              @if (member.role === Roles.Moderator) {
-              <p-button icon="pi pi-arrow-down" rounded text severity="secondary" tooltipPosition="left"
-                pTooltip="Demote to member" (onClick)="context.demoteMember(member)" />
-              } @else if (member.role === Roles.Member) {
-              <p-button icon="pi pi-arrow-up" rounded text severity="secondary" tooltipPosition="left"
-                pTooltip="Promote to moderator" (onClick)="context.promoteMember(member)" />
-              }
-              @if (member.role !== Roles.Owner) {
-              <p-button icon="pi pi-user-minus" rounded text severity="danger" tooltipPosition="left"
-                pTooltip="Remove member" (onClick)="context.confirmRemoveMember(member)" />
-              }
-            </div>
-          </td>
-          }
-        </tr>
-      </ng-template>
-
-      <ng-template #loadingbody>
-        @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
-        <tr>
-          <td>
-            <div class="flex items-center gap-3">
-              <p-skeleton width="2rem" height="2rem" shape="circle" />
-              <p-skeleton width="60%" height="1.5rem" />
-            </div>
-          </td>
-          @if (context.isOwner()) {
-          <td><p-skeleton width="50%" height="1.5rem" /></td>
-          }
-          <td><p-skeleton width="100%" height="2rem" /></td>
-          <td><p-skeleton width="100%" height="1.5rem" /></td>
-          @if (context.isOwner()) {
-          <td>
-            <div class="flex gap-3 justify-end">
-              <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
-              <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
-            </div>
-          </td>
-          }
-        </tr>
+  <!-- Pending join requests (owner only) — always visible, even when the group is otherwise empty -->
+  @if (context.isOwner() && (loadingRequests() || joinRequests().length > 0)) {
+    <section class="flex flex-col gap-3">
+      <div class="flex items-center gap-2">
+        <h2 class="text-base font-semibold">Pending requests</h2>
+        @if (!loadingRequests()) {
+          <p-tag [value]="joinRequests().length.toString()" severity="warn" rounded
+            class="text-xs" />
         }
-      </ng-template>
+      </div>
 
-      <ng-template #emptymessage>
-        <tr>
-          <td [attr.colspan]="context.isOwner() ? 5 : 3">
-            <div class="flex flex-col items-center gap-3 py-12 text-center">
-              <i class="pi pi-users text-4xl text-secondary-300"></i>
-              <h2 class="text-lg font-semibold text-secondary-700">
-                No members match your search
-              </h2>
-              <p class="text-sm text-secondary-500">Try a different search term.</p>
+      @if (loadingRequests()) {
+        <div class="flex flex-col gap-2">
+          @for (i of [1, 2]; track i) {
+            <div class="flex items-center gap-3 p-3 rounded border"
+              style="border-color: var(--p-content-border-color)">
+              <p-skeleton shape="circle" size="2.25rem" />
+              <p-skeleton width="40%" height="1rem" />
             </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+          }
+        </div>
+      } @else {
+        <ul class="flex flex-col gap-2 list-none m-0 p-0">
+          @for (r of joinRequests(); track trackRequestById($index, r)) {
+            <li class="flex items-center gap-3 p-3 rounded border"
+              style="border-color: var(--p-content-border-color)">
+              <mh-avatar [user]="r.user" />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium m-0">{{ requestUserName(r) }}</p>
+                @if (r.user?.email) {
+                  <p class="truncate text-xs text-surface-700 dark:text-surface-400 m-0">
+                    {{ r.user?.email }}
+                  </p>
+                }
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <p-button label="Approve" icon="pi pi-check" size="small"
+                  [loading]="isRequestBusy(r.id)" (onClick)="approveRequest(r)" />
+                <p-button label="Reject" icon="pi pi-times" size="small" severity="secondary"
+                  [outlined]="true" [loading]="isRequestBusy(r.id)"
+                  (onClick)="rejectRequest(r)" />
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <!-- Empty state (owner sees onboarding hints when only the owner is a member) -->
+  @if (context.totalMembers() <= 1 && !context.membersLoading()) {
+    <mh-empty-members (generateLinkRequested)="context.generateJoinLink()"
+      (addManuallyRequested)="onAddMembers()" />
+  } @else {
+    <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div class="space-y-1">
+        <h1 class="font-heading font-semibold text-xl md:text-2xl">
+          Members · {{ context.totalMembers() }}
+        </h1>
+        <p class="text-sm text-surface-700 dark:text-surface-400">
+          Manage the people in this group, their roles, and permissions.
+        </p>
+      </div>
+      @if (context.isOwner()) {
+        <div class="flex flex-wrap gap-3">
+          <p-button label="Add members" icon="pi pi-user-plus" (onClick)="onAddMembers()" />
+        </div>
+      }
+    </header>
+
+    <div class="flex items-center gap-3">
+      <input pInputText type="search" placeholder="Search members…" [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)" class="w-72 max-w-full" />
+    </div>
+
+    <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
+      <p-table [value]="visibleMembers()" [loading]="context.membersLoading()" [showLoader]="false"
+        [scrollable]="true" scrollHeight="flex" dataKey="id" size="small" stripedRows="true"
+        rowHover="true">
+        <ng-template #header>
+          <tr>
+            <th>Name</th>
+            @if (context.isOwner()) { <th>Email</th> }
+            <th class="text-center">Role</th>
+            <th class="text-center">Joined</th>
+            @if (context.isOwner()) { <th class="w-32 text-center">Actions</th> }
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-member>
+          <tr>
+            <td>
+              <div class="flex items-center gap-3">
+                <mh-avatar [user]="member.user" />
+                <span class="font-medium">{{ memberName(member) }}</span>
+              </div>
+            </td>
+            @if (context.isOwner()) {
+              <td>{{ member.user?.email || '—' }}</td>
+            }
+            <td class="text-center">
+              <p-tag [value]="roleLabel(member.role)" [severity]="roleSeverity(member.role)"
+                rounded />
+            </td>
+            <td class="text-center">{{ member.joinedAt | date: 'dd MMM yyyy' }}</td>
+            @if (context.isOwner()) {
+              <td>
+                <div class="flex items-center justify-end gap-1">
+                  @if (member.role === Roles.Moderator) {
+                    <p-button icon="pi pi-arrow-down" rounded text severity="secondary"
+                      tooltipPosition="left" pTooltip="Demote to member"
+                      (onClick)="context.demoteMember(member)" />
+                  } @else if (member.role === Roles.Member) {
+                    <p-button icon="pi pi-arrow-up" rounded text severity="secondary"
+                      tooltipPosition="left" pTooltip="Promote to moderator"
+                      (onClick)="context.promoteMember(member)" />
+                  }
+                  @if (member.role !== Roles.Owner) {
+                    <p-button icon="pi pi-user-minus" rounded text severity="danger"
+                      tooltipPosition="left" pTooltip="Remove member"
+                      (onClick)="context.confirmRemoveMember(member)" />
+                  }
+                </div>
+              </td>
+            }
+          </tr>
+        </ng-template>
+
+        <ng-template #loadingbody>
+          @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+            <tr>
+              <td>
+                <div class="flex items-center gap-3">
+                  <p-skeleton width="2rem" height="2rem" shape="circle" />
+                  <p-skeleton width="60%" height="1.5rem" />
+                </div>
+              </td>
+              @if (context.isOwner()) {
+                <td><p-skeleton width="50%" height="1.5rem" /></td>
+              }
+              <td><p-skeleton width="100%" height="2rem" /></td>
+              <td><p-skeleton width="100%" height="1.5rem" /></td>
+              @if (context.isOwner()) {
+                <td>
+                  <div class="flex gap-3 justify-end">
+                    <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+                    <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td [attr.colspan]="context.isOwner() ? 5 : 3">
+              <div class="flex flex-col items-center gap-3 py-12 text-center">
+                <i class="pi pi-users text-4xl text-secondary-300"></i>
+                <h2 class="text-lg font-semibold text-secondary-700">
+                  No members match your search
+                </h2>
+                <p class="text-sm text-secondary-500">Try a different search term.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
 </div>
-}

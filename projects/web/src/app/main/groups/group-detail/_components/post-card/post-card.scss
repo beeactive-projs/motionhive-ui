@@ -2,6 +2,21 @@
   display: block;
 }
 
+.post-content {
+  margin: 0;
+}
+
+// Multi-line clamp driven by `--clamp-lines` (set inline on the element).
+// Posts with images get 2 lines; text-only posts get 10. The "Read more"
+// toggle removes the modifier class to expand to the full content.
+.post-content--clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: var(--clamp-lines, 10);
+  line-clamp: var(--clamp-lines, 10);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .post-gallery {
   display: grid;
   gap: 4px;

@@ -1,98 +1,156 @@
 @if (context.group(); as g) {
-  <section class="mh-about">
-    @if (g.description) {
-      <div class="mh-about__block">
-        <span class="mh-about__label">Description</span>
-        <p class="mh-about__text">{{ g.description }}</p>
-      </div>
-    }
+  <div class="flex flex-col gap-4">
+    <!-- About -->
+    <p-card>
+      <ng-template #header>
+        <div class="flex items-center gap-2 px-4 pt-4">
+          <i class="pi pi-info-circle text-primary-600"></i>
+          <h2 class="text-base font-semibold m-0">About</h2>
+        </div>
+        <p-divider />
+      </ng-template>
 
-    <div class="mh-about__grid">
-      <div class="mh-about__field">
-        <span class="mh-about__label">Join policy</span>
-        <p-tag [value]="joinPolicyLabel()" [severity]="joinPolicySeverity()" />
-      </div>
-      <div class="mh-about__field">
-        <span class="mh-about__label">Members</span>
-        <span class="mh-about__value">{{ g.memberCount }}</span>
-      </div>
-      <div class="mh-about__field">
-        <span class="mh-about__label">Visibility</span>
-        <span class="mh-about__value">{{ g.isPublic ? 'Public' : 'Private' }}</span>
-      </div>
-      <div class="mh-about__field">
-        <span class="mh-about__label">Created</span>
-        <span class="mh-about__value">{{ g.createdAt | date: 'mediumDate' }}</span>
-      </div>
-    </div>
+      @if (g.description) {
+        <p class="text-sm leading-relaxed whitespace-pre-line m-0 mb-5">{{ g.description }}</p>
+      } @else {
+        <p class="text-sm text-surface-500 italic m-0 mb-5">No description added yet.</p>
+      }
 
+      <p-divider />
+
+      <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-surface-500">Join policy</dt>
+          <dd class="mt-1">
+            <p-tag [value]="joinPolicyLabel()" [severity]="joinPolicySeverity()" class="text-xs!" />
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-surface-500">Visibility</dt>
+          <dd class="mt-1">
+            <p-tag
+              [value]="g.isPublic ? 'Public' : 'Private'"
+              [severity]="g.isPublic ? 'success' : 'secondary'"
+              [icon]="g.isPublic ? 'pi pi-globe' : 'pi pi-lock'"
+              class="text-xs!"
+            />
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-surface-500">Members</dt>
+          <dd class="mt-1 text-sm font-medium">{{ g.memberCount }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-surface-500">Created</dt>
+          <dd class="mt-1 text-sm font-medium">{{ g.createdAt | date: 'mediumDate' }}</dd>
+        </div>
+      </dl>
+
+      @if (g.tags?.length) {
+        <p-divider />
+        <div>
+          <dt class="text-xs uppercase tracking-wide text-surface-500">Tags</dt>
+          <dd class="mt-2 flex flex-wrap gap-1">
+            @for (tag of g.tags; track tag) {
+              <p-tag [value]="tag" severity="contrast" class="text-xs!" />
+            }
+          </dd>
+        </div>
+      }
+    </p-card>
+
+    <!-- Contact information -->
     @if (g.contactEmail || g.contactPhone || g.address) {
-      <div class="mh-about__block">
-        <span class="mh-about__label">Contact information</span>
-        <div class="mh-about__contact">
+      <p-card>
+        <ng-template #header>
+          <div class="flex items-center gap-2 px-4 pt-4">
+            <i class="pi pi-address-book text-primary-600"></i>
+            <h2 class="text-base font-semibold m-0">Contact information</h2>
+          </div>
+          <p-divider />
+        </ng-template>
+
+        <dl class="grid gap-4 sm:grid-cols-2">
           @if (g.contactEmail) {
-            <span class="mh-about__contact-item">
-              <i class="pi pi-envelope" aria-hidden="true"></i>{{ g.contactEmail }}
-            </span>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-surface-500">Email</dt>
+              <dd class="mt-1 text-sm font-medium flex items-center gap-2">
+                <i class="pi pi-envelope text-surface-500"></i>
+                <a [href]="'mailto:' + g.contactEmail" class="text-primary-600 hover:underline break-all">
+                  {{ g.contactEmail }}
+                </a>
+              </dd>
+            </div>
           }
           @if (g.contactPhone) {
-            <span class="mh-about__contact-item">
-              <i class="pi pi-phone" aria-hidden="true"></i>{{ g.contactPhone }}
-            </span>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-surface-500">Phone</dt>
+              <dd class="mt-1 text-sm font-medium flex items-center gap-2">
+                <i class="pi pi-phone text-surface-500"></i>
+                <a [href]="'tel:' + g.contactPhone" class="text-primary-600 hover:underline">
+                  {{ g.contactPhone }}
+                </a>
+              </dd>
+            </div>
           }
-          @if (g.address) {
-            <span class="mh-about__contact-item">
-              <i class="pi pi-map-marker" aria-hidden="true"></i>
-              {{ g.address }}@if (g.city) {, {{ g.city }}}@if (g.country) {, {{ g.country }}}
-            </span>
+          @if (g.address || g.city || g.country) {
+            <div class="sm:col-span-2">
+              <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
+              <dd class="mt-1 text-sm font-medium flex items-start gap-2">
+                <i class="pi pi-map-marker text-surface-500 mt-0.5"></i>
+                <span>{{ locationDisplay() }}</span>
+              </dd>
+            </div>
           }
-        </div>
-      </div>
+        </dl>
+      </p-card>
     }
 
-    @if (g.tags && g.tags.length > 0) {
-      <div class="mh-about__block">
-        <span class="mh-about__label">Tags</span>
-        <div class="mh-about__tags">
-          @for (tag of g.tags; track tag) {
-            <p-tag [value]="tag" severity="contrast" />
-          }
-        </div>
-      </div>
-    }
-
+    <!-- Join link (owner only) -->
     @if (context.isOwner()) {
-      <div class="mh-about__block">
-        <span class="mh-about__label">Join link</span>
-        <div class="mh-about__actions">
-          @if (context.hasActiveJoinToken()) {
-            <p-button
-              label="Copy join link"
-              icon="pi pi-copy"
-              severity="secondary"
-              size="small"
-              (onClick)="context.copyJoinLink()"
-            />
-            <p-button
-              label="Revoke link"
-              icon="pi pi-ban"
-              severity="danger"
-              outlined
-              size="small"
-              (onClick)="context.revokeJoinLink()"
-            />
-          } @else {
-            <p-button
-              label="Generate join link"
-              icon="pi pi-link"
-              severity="secondary"
-              size="small"
-              [loading]="context.generatingLink()"
-              (onClick)="context.generateJoinLink()"
-            />
-          }
+      <p-card>
+        <ng-template #header>
+          <div class="flex items-center gap-2 px-4 pt-4">
+            <i class="pi pi-link text-primary-600"></i>
+            <h2 class="text-base font-semibold m-0">Join link</h2>
+          </div>
+          <p-divider />
+        </ng-template>
+
+        <div class="flex flex-col gap-3">
+          <p class="text-sm text-surface-500 m-0">
+            Share this link with people you want to invite. Anyone with the link can request to join.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            @if (context.hasActiveJoinToken()) {
+              <p-button
+                label="Copy join link"
+                icon="pi pi-copy"
+                severity="secondary"
+                size="small"
+                (onClick)="context.copyJoinLink()"
+              />
+              <p-button
+                label="Revoke link"
+                icon="pi pi-ban"
+                severity="danger"
+                [outlined]="true"
+                size="small"
+                (onClick)="context.revokeJoinLink()"
+              />
+            } @else {
+              <p-button
+                label="Generate join link"
+                icon="pi pi-link"
+                severity="secondary"
+                size="small"
+                [loading]="context.generatingLink()"
+                (onClick)="context.generateJoinLink()"
+              />
+            }
+          </div>
         </div>
-      </div>
+      </p-card>
     }
-  </section>
+  </div>
 }

@@ -29,41 +29,60 @@ export const mainRoutes: Routes = [
       },
       {
         path: 'groups',
-        loadComponent: () => import('./groups/groups').then((m) => m.Groups),
+        loadComponent: () => import('./groups/groups').then((m) => m.GroupsLayout),
         title: 'Groups - MotionHive',
-      },
-      {
-        path: 'groups/:id',
-        loadComponent: () =>
-          import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
-        title: 'Group details - MotionHive',
         children: [
-          { path: '', pathMatch: 'full', redirectTo: 'posts' },
+          { path: '', pathMatch: 'full', redirectTo: 'feed' },
           {
-            path: 'posts',
+            path: 'feed',
             loadComponent: () =>
-              import('./groups/group-detail/tabs/posts-tab/posts-tab').then((m) => m.PostsTab),
+              import('./groups/groups-feed/groups-feed').then((m) => m.GroupsFeed),
+            title: 'Feed - MotionHive',
           },
           {
-            path: 'members',
+            path: 'discover',
             loadComponent: () =>
-              import('./groups/group-detail/tabs/members-tab/members-tab').then(
-                (m) => m.MembersTab,
-              ),
+              import('./groups/groups-discover/groups-discover').then((m) => m.GroupsDiscover),
+            title: 'Discover groups - MotionHive',
           },
           {
-            path: 'about',
+            path: 'your-groups',
             loadComponent: () =>
-              import('./groups/group-detail/tabs/about-tab/about-tab').then((m) => m.AboutTab),
+              import('./groups/your-groups/your-groups').then((m) => m.YourGroups),
+            title: 'Your groups - MotionHive',
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),
+            title: 'Group details - MotionHive',
+            children: [
+              { path: '', pathMatch: 'full', redirectTo: 'posts' },
+              {
+                path: 'posts',
+                loadComponent: () =>
+                  import('./groups/group-detail/tabs/posts-tab/posts-tab').then((m) => m.PostsTab),
+              },
+              {
+                path: 'members',
+                loadComponent: () =>
+                  import('./groups/group-detail/tabs/members-tab/members-tab').then(
+                    (m) => m.MembersTab,
+                  ),
+              },
+              {
+                path: 'about',
+                loadComponent: () =>
+                  import('./groups/group-detail/tabs/about-tab/about-tab').then((m) => m.AboutTab),
+              },
+            ],
           },
         ],
       },
       {
         path: 'profile/invoices/:id',
         loadComponent: () =>
-          import('./user/payments/invoice-detail/invoice-detail').then(
-            (m) => m.UserInvoiceDetail,
-          ),
+          import('./user/payments/invoice-detail/invoice-detail').then((m) => m.UserInvoiceDetail),
         title: 'Invoice - MotionHive',
       },
 

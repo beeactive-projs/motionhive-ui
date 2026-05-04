@@ -6,38 +6,39 @@ import {
   effect,
   ElementRef,
   inject,
-  input,
-  output,
+  OnInit,
   signal,
   viewChild,
 } from '@angular/core';
 import { take } from 'rxjs';
-import { Button } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { RouterLink } from '@angular/router';
 import { Post, PostService, showApiError } from 'core';
-import { PostCard } from '../post-card/post-card';
-import { Divider } from "primeng/divider";
+import { PostCard } from '../group-detail/_components/post-card/post-card';
 
 @Component({
-  selector: 'mh-post-feed',
-  imports: [Button, CardModule, SkeletonModule, PostCard, Divider],
-  templateUrl: './post-feed.html',
-  styleUrl: './post-feed.scss',
+  selector: 'mh-groups-feed',
+  imports: [
+    ButtonModule,
+    CardModule,
+    SkeletonModule,
+    ToastModule,
+    RouterLink,
+    PostCard,
+  ],
+  providers: [MessageService],
+  templateUrl: './groups-feed.html',
+  styleUrl: './groups-feed.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PostFeed {
+export class GroupsFeed implements OnInit {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
   private readonly _destroyRef = inject(DestroyRef);
-
-  readonly groupId = input.required<string>();
-  readonly canPost = input.required<boolean>();
-  readonly canModerate = input<boolean>(false);
-  readonly createRequested = output<void>();
-  readonly editRequested = output<Post>();
-  readonly deleteRequested = output<Post>();
 
   readonly loading = signal(true);
   readonly loadingMore = signal(false);
@@ -48,14 +49,9 @@ export class PostFeed {
   readonly currentPage = signal(1);
   readonly hasMore = computed(() => this.posts().length < this.total());
 
-  private readonly _scrollSentinel = viewChild<ElementRef<HTMLElement>>('scrollSentinel');
+  private readonly _scrollSentinel =
+    viewChild<ElementRef<HTMLElement>>('scrollSentinel');
   private _observer?: IntersectionObserver;
-
-  // Auto-reload when groupId changes.
-  private readonly _reload = effect(() => {
-    const id = this.groupId();
-    if (id) this.load();
-  });
 
   constructor() {
     effect(() => {
@@ -80,10 +76,14 @@ export class PostFeed {
     this._destroyRef.onDestroy(() => this._observer?.disconnect());
   }
 
+  ngOnInit(): void {
+    this.load();
+  }
+
   load(): void {
     this.loading.set(true);
     this.currentPage.set(1);
-    this._postService.getGroupFeed(this.groupId(), 1, this.pageSize).subscribe({
+    this._postService.getFeed(1, this.pageSize).subscribe({
       next: (res) => {
         this.posts.set(res.items);
         this.total.set(res.total);
@@ -91,7 +91,7 @@ export class PostFeed {
       },
       error: (err) => {
         this.loading.set(false);
-        showApiError(this._messageService, 'Could not load posts', '', err);
+        showApiError(this._messageService, 'Could not load feed', '', err);
       },
     });
   }
@@ -101,7 +101,7 @@ export class PostFeed {
     this.loadingMore.set(true);
     const nextPage = this.currentPage() + 1;
     this._postService
-      .getGroupFeed(this.groupId(), nextPage, this.pageSize)
+      .getFeed(nextPage, this.pageSize)
       .pipe(take(1))
       .subscribe({
         next: (res) => {
@@ -114,28 +114,14 @@ export class PostFeed {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Could not load more posts', '', err);
+          showApiError(
+            this._messageService,
+            'Could not load more posts',
+            '',
+            err,
+          );
         },
       });
-  }
-
-  /** Public API for the parent: prepend a freshly created post. */
-  prependPost(post: Post): void {
-    this.posts.update((list) => [post, ...list]);
-    this.total.update((n) => n + 1);
-  }
-
-  /** Public API for the parent: remove a post (after delete). */
-  removePost(postId: string): void {
-    this.posts.update((list) => list.filter((p) => p.id !== postId));
-    this.total.update((n) => Math.max(0, n - 1));
-  }
-
-  /** Public API for the parent: replace a post (after edit). */
-  replacePost(post: Post): void {
-    this.posts.update((list) =>
-      list.map((p) => (p.id === post.id ? { ...p, ...post } : p)),
-    );
   }
 
   trackById = (_: number, p: Post) => p.id;

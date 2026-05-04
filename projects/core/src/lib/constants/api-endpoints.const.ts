@@ -43,11 +43,17 @@ export const API_ENDPOINTS = {
   },
   GROUPS: {
     BASE: '/groups',
+    DISCOVER: '/groups/discover',
     BULK_MEMBERS: (groupId: string) => `/groups/${groupId}/members/bulk`,
     MEMBER_ROLE: (groupId: string, userId: string) => `/groups/${groupId}/members/${userId}/role`,
+    JOIN_REQUESTS: (groupId: string) => `/groups/${groupId}/join-requests`,
+    JOIN_REQUEST_BY_ID: (groupId: string, requestId: string) =>
+      `/groups/${groupId}/join-requests/${requestId}`,
+    MY_JOIN_REQUEST: (groupId: string) => `/groups/${groupId}/join-requests/mine`,
   },
   POSTS: {
     BASE: '/posts',
+    FEED: '/posts/feed',
     UPLOAD_IMAGE: '/posts/upload-image',
     GROUP_FEED: (groupId: string) => `/posts/group/${groupId}`,
     GROUP_PENDING: (groupId: string) => `/posts/group/${groupId}/pending`,

@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
-import { AvatarModule } from 'primeng/avatar';
 import { Button } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { Divider } from 'primeng/divider';
 
 @Component({
   selector: 'mh-empty-members',
-  imports: [AvatarModule, Button],
+  imports: [Button, Card, Divider],
   templateUrl: './empty-members.html',
   styleUrl: './empty-members.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,149 +1,61 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { CardModule } from 'primeng/card';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthStore, Group, GroupService, showApiError } from 'core';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
+import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { AuthStore, GroupService, Group, JoinPolicy, TagSeverity } from 'core';
-import { GroupFormDialog } from './_dialogs/group-form-dialog/group-form-dialog';
-import { AddMembersDialog } from './_dialogs/add-members-dialog/add-members-dialog';
+import { GroupFormDialog } from "./_dialogs/group-form-dialog/group-form-dialog";
 
 @Component({
-  selector: 'mh-groups',
-  imports: [CardModule, ButtonModule, TagModule, ToastModule, ConfirmDialogModule, TooltipModule, GroupFormDialog, AddMembersDialog],
-  providers: [MessageService, ConfirmationService],
+  selector: 'mh-groups-layout',
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, ButtonModule, SkeletonModule, ToastModule, GroupFormDialog],
+  providers: [MessageService],
   templateUrl: './groups.html',
   styleUrl: './groups.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Groups implements OnInit {
+export class GroupsLayout implements OnInit {
   private readonly _groupService = inject(GroupService);
-  private readonly _messageService = inject(MessageService);
-  private readonly _confirmationService = inject(ConfirmationService);
-  private readonly _router = inject(Router);
   private readonly _authStore = inject(AuthStore);
+  private readonly _messageService = inject(MessageService);
+  private readonly _router = inject(Router);
 
   readonly isInstructor = this._authStore.isInstructor;
 
-  groups = signal<Group[]>([]);
-  loading = signal(true);
-
-  // Dialog visibility
+  joinedGroups = signal<Group[]>([]);
+  loadingJoined = signal(true);
   showGroupFormDialog = signal(false);
-  editingGroup = signal<Group | null>(null);
-  showAddMembersDialog = signal(false);
-  addMembersGroupId = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadGroups();
+    this.loadJoinedGroups();
   }
 
-  loadGroups(): void {
-    this.loading.set(true);
+  loadJoinedGroups(): void {
+    this.loadingJoined.set(true);
     this._groupService.getMyGroups().subscribe({
       next: (groups) => {
-        this.groups.set(groups);
-        this.loading.set(false);
+        this.joinedGroups.set(groups);
+        this.loadingJoined.set(false);
       },
-      error: () => {
-        this.loading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load groups',
-        });
+      error: (err) => {
+        this.loadingJoined.set(false);
+        showApiError(this._messageService, 'Error', 'Failed to load your groups', err);
       },
     });
   }
 
-  openCreateDialog(): void {
-    this.editingGroup.set(null);
+  openCreate(): void {
     this.showGroupFormDialog.set(true);
   }
 
-  openAddMembersDialog(event: Event, group: Group): void {
-    event.stopPropagation();
-    this.addMembersGroupId.set(group.id);
-    this.showAddMembersDialog.set(true);
+  onGroupCreated(): void {
+    this.loadJoinedGroups();
+    this._router.navigate(['/groups/your-groups']);
   }
 
-  openEditDialog(event: Event, group: Group): void {
-    event.stopPropagation();
-    this.editingGroup.set(group);
-    this.showGroupFormDialog.set(true);
-  }
-
-  confirmDelete(event: Event, group: Group): void {
-    event.stopPropagation();
-    this._confirmationService.confirm({
-      header: 'Delete group',
-      message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-secondary',
-      acceptLabel: 'Yes, delete',
-      rejectLabel: 'No',
-      acceptIcon: 'pi pi-trash',
-      rejectIcon: 'pi pi-times',
-      accept: () => this.deleteGroup(group),
-    });
-  }
-
-  private deleteGroup(group: Group): void {
-    this._groupService.delete(group.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Group deleted',
-          detail: `"${group.name}" has been deleted`,
-        });
-        this.loadGroups();
-      },
-      error: () => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to delete group',
-        });
-      },
-    });
-  }
-
-  navigateToGroup(group: Group): void {
-    this._router.navigate(['/groups', group.id]);
-  }
-
-  isOwner(group: Group): boolean {
-    return group.instructorId === this._authStore.user()?.id;
-  }
-
-  descriptionExcerpt(description: string | null): string {
-    if (!description) return 'No description';
-    return description.length > 100 ? description.substring(0, 100) + '...' : description;
-  }
-
-  joinPolicySeverity(policy: JoinPolicy): TagSeverity {
-    switch (policy) {
-      case 'OPEN':
-        return TagSeverity.Success;
-      case 'APPROVAL':
-        return TagSeverity.Warn;
-      case 'INVITE_ONLY':
-        return TagSeverity.Info;
-    }
-  }
-
-  joinPolicyLabel(policy: JoinPolicy): string {
-    switch (policy) {
-      case 'OPEN':
-        return 'Open';
-      case 'APPROVAL':
-        return 'Approval';
-      case 'INVITE_ONLY':
-        return 'Invite only';
-    }
+  groupInitial(group: Group): string {
+    return group.name?.charAt(0).toUpperCase() || '?';
   }
 
   trackById = (_: number, item: { id: string }) => item.id;
