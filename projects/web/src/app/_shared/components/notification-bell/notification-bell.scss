@@ -1,0 +1,16 @@
+/*
+ * Component-local styles for the notification bell.
+ * Most styling is Tailwind utility classes inline in the template;
+ * this file is for the few selectors we can't reach with utilities
+ * (PrimeNG popover internals, scrollbar styling).
+ */
+
+:host {
+  display: inline-flex;
+}
+
+/* Tighten the popover so the bell list reads as a focused panel
+ * rather than a floating card. */
+::ng-deep .notification-popover .p-popover-content {
+  padding: 0.75rem;
+}

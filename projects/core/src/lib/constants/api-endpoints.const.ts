@@ -131,4 +131,30 @@ export const API_ENDPOINTS = {
     // Public — no auth
     PUBLIC_INSTRUCTOR_PRODUCTS: (id: string) => `/payments/public/instructors/${id}/products`,
   },
+  NOTIFICATIONS: {
+    // Bell list + interactions
+    BASE: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    READ_ALL: '/notifications/read-all',
+    VIEWED: '/notifications/viewed',
+    READ: (receiptId: string) => `/notifications/${receiptId}/read`,
+    CLICKED: (receiptId: string) => `/notifications/${receiptId}/clicked`,
+    DISMISS: (receiptId: string) => `/notifications/${receiptId}/dismiss`,
+    BY_ID: (receiptId: string) => `/notifications/${receiptId}`,
+  },
+  NOTIFICATION_SETTINGS: {
+    // Per-user preference overrides — grouped by NotificationCategory
+    // (~6 categories). Per-type granularity exists under the hood but
+    // isn't exposed on the API.
+    BASE: '/users/me/notification-settings',
+    RESET_CATEGORY: (category: string) =>
+      `/users/me/notification-settings/${category}/reset`,
+  },
+  DEVICES: {
+    // Web push + mobile FCM token registration
+    REGISTER: '/devices/register',
+    LIST: '/devices',
+    BY_ID: (deviceId: string) => `/devices/${deviceId}`,
+    HEARTBEAT: (deviceId: string) => `/devices/${deviceId}/seen`,
+  },
 } as const;

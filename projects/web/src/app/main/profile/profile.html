@@ -73,6 +73,11 @@
             </span>
           </p-tab>
         }
+
+        <p-tab [value]="Tabs.Notifications">
+          <i class="pi pi-bell"></i>
+          <span class="ml-2">Notifications</span>
+        </p-tab>
       </p-tablist>
 
       <p-tabpanels class="flex-1 min-h-0">
@@ -99,6 +104,12 @@
             @if (activeTab() === Tabs.Memberships) { <mh-my-subscriptions /> }
           </p-tabpanel>
         }
+
+        <p-tabpanel [value]="Tabs.Notifications">
+          @if (activeTab() === Tabs.Notifications) {
+            <mh-profile-notifications />
+          }
+        </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   } @else {
