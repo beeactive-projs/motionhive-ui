@@ -23,6 +23,7 @@ import { Button } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { Details } from './tabs/details/details';
 import { ProfileCoaches } from './tabs/coaches/coaches';
+import { ProfileNotifications } from './tabs/notifications/notifications';
 import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
 
@@ -31,6 +32,7 @@ export const ProfileTabs = {
   Coaches: 'coaches',
   Invoices: 'invoices',
   Memberships: 'memberships',
+  Notifications: 'notifications',
 } as const;
 
 export type ProfileTab = (typeof ProfileTabs)[keyof typeof ProfileTabs];
@@ -51,6 +53,7 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
     ToastModule,
     Details,
     ProfileCoaches,
+    ProfileNotifications,
     MyInvoices,
     MySubscriptions,
   ],

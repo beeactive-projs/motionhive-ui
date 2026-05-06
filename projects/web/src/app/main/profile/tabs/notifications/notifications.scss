@@ -1,0 +1,11 @@
+/*
+ * Notification preferences tab styles.
+ *
+ * Most layout is Tailwind utilities inline in the template — this
+ * file only holds rules we can't express that way (or where it'd be
+ * verbose to repeat the same class everywhere).
+ */
+
+:host {
+  display: block;
+}
