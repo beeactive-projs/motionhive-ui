@@ -37,14 +37,23 @@ export class NotificationStore {
   private readonly unreadCountSignal = signal(0);
   private readonly notificationsSignal = signal<BellNotification[]>([]);
   private readonly loadingSignal = signal(false);
+  private readonly loadingMoreSignal = signal(false);
   private readonly hasLoadedListSignal = signal(false);
+  private readonly totalSignal = signal(0);
+  private readonly currentPageSignal = signal(1);
+
+
+  readonly pageSize = 20;
 
   // ─── Public readonly surface ──────────────────────────────────
   readonly unreadCount = this.unreadCountSignal.asReadonly();
   readonly notifications = this.notificationsSignal.asReadonly();
   readonly loading = this.loadingSignal.asReadonly();
+  readonly loadingMore = this.loadingMoreSignal.asReadonly();
   readonly hasLoadedList = this.hasLoadedListSignal.asReadonly();
+  readonly total = this.totalSignal.asReadonly();
   readonly hasUnread = computed(() => this.unreadCount() > 0);
+  readonly hasMore = computed(() => this.notifications().length < this.total());
 
   private pollTimer?: ReturnType<typeof setInterval>;
   private visibilityListener?: () => void;
@@ -122,22 +131,24 @@ export class NotificationStore {
   }
 
   /**
-   * Load the list (typically called when the bell dropdown opens).
-   * Limit defaults to 20 — the typical dropdown viewport.
+   * Load the first page of the bell list (typically called when the
+   * dropdown opens). Replaces the cached list — for appending the
+   * next page on scroll, use `loadMore()`.
    *
    * Pass `markViewedAfter: true` to flag every newly-loaded item as
    * `viewed` once the response arrives. The bell uses this on every
    * dropdown-open so analytics get the signal even for items that
    * just arrived between opens.
    */
-  loadList(opts: { limit?: number; markViewedAfter?: boolean } = {}) {
-    const limit = opts.limit ?? 20;
+  loadList(opts: { markViewedAfter?: boolean } = {}) {
     this.loadingSignal.set(true);
+    this.currentPageSignal.set(1);
     this._service
-      .list({ page: 1, limit })
+      .list({ page: 1, limit: this.pageSize })
       .pipe(
         tap((response) => {
           this.notificationsSignal.set(response.items);
+          this.totalSignal.set(response.total);
           this.hasLoadedListSignal.set(true);
           if (opts.markViewedAfter) {
             this.markVisibleAsViewed();
@@ -145,6 +156,35 @@ export class NotificationStore {
         }),
         catchError(() => EMPTY),
         finalize(() => this.loadingSignal.set(false)),
+      )
+      .subscribe();
+  }
+
+  /**
+   * Append the next page to the bell list. No-op while a load is
+   * already in flight or when there's nothing more to fetch — the
+   * IntersectionObserver in the bell component fires repeatedly as
+   * the sentinel scrolls in/out of view, so we self-guard here.
+   *
+   * Dedupes by id before appending so a notification that arrived
+   * via polling between page fetches doesn't render twice.
+   */
+  loadMore() {
+    if (this.loadingMoreSignal() || !this.hasMore()) return;
+    this.loadingMoreSignal.set(true);
+    const nextPage = this.currentPageSignal() + 1;
+    this._service
+      .list({ page: nextPage, limit: this.pageSize })
+      .pipe(
+        tap((response) => {
+          const seen = new Set(this.notificationsSignal().map((n) => n.id));
+          const fresh = response.items.filter((n) => !seen.has(n.id));
+          this.notificationsSignal.update((list) => [...list, ...fresh]);
+          this.totalSignal.set(response.total);
+          this.currentPageSignal.set(nextPage);
+        }),
+        catchError(() => EMPTY),
+        finalize(() => this.loadingMoreSignal.set(false)),
       )
       .subscribe();
   }
@@ -294,5 +334,7 @@ export class NotificationStore {
     this.unreadCountSignal.set(0);
     this.notificationsSignal.set([]);
     this.hasLoadedListSignal.set(false);
+    this.totalSignal.set(0);
+    this.currentPageSignal.set(1);
   }
 }

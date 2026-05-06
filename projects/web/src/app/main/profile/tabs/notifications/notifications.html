@@ -85,18 +85,6 @@
                   [ariaLabel]="row.label + ' — email'"
                 />
               </div>
-              @if (row.isCustomized) {
-                <p-button
-                  icon="pi pi-undo"
-                  rounded
-                  text
-                  size="small"
-                  severity="secondary"
-                  pTooltip="Reset to default"
-                  tooltipPosition="top"
-                  (onClick)="resetCategory(row.category)"
-                />
-              }
             </div>
           </li>
         }

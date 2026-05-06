@@ -9,8 +9,70 @@
   display: inline-flex;
 }
 
+/* Tighten the unread badge: PrimeNG's default OverlayBadge sits
+ * way off the icon (top: -50%, right: -50%) and is full-size. We
+ * pull it back over the bell, shrink the dot, and switch the type
+ * face to something tabular so "9" and "12" don't visually shift. */
+::ng-deep .p-overlaybadge .p-badge {
+  min-width: 0.8rem;
+  height: 0.8rem;
+  line-height: 0.8rem;
+  padding-top: 0.125rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.5rem;
+  font-family: 'Courier New', Courier, monospace;
+  inset-block-start: 0.45rem;
+  inset-inline-end: 0.5rem;
+  transform: translate(35%, -35%);
+}
+
 /* Tighten the popover so the bell list reads as a focused panel
  * rather than a floating card. */
 ::ng-deep .notification-popover .p-popover-content {
   padding: 0.75rem;
+}
+
+/* PrimeNG pins the popover arrow to the target's left edge (see
+ * `align()` in primeng-popover.mjs). For a small icon target like
+ * the bell, that lands the arrow off-center — we want the tip
+ * directly under the bell icon, so we shift both arrow pseudo-
+ * elements right by half the bell button width (2.5rem / 2). */
+::ng-deep .notification-popover::before,
+::ng-deep .notification-popover::after {
+  transform: translateX(0.25rem);
+}
+
+/* Slim down the scrollbar on the notification list so the panel
+ * reads less utilitarian. Firefox uses `scrollbar-width`; Chromium
+ * needs the `::-webkit-scrollbar` pseudo. */
+::ng-deep .notification-popover ul {
+  scrollbar-width: thin;
+  scrollbar-color: var(--p-surface-300) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--p-surface-300);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--p-surface-400);
+    }
+  }
+}
+
+
+
+::ng-deep .notification-popover {
+  /* Slide the entire panel right (positive) or left (negative) of
+   * where PrimeNG places it. */
+  transform: translateX(1.25rem);
 }

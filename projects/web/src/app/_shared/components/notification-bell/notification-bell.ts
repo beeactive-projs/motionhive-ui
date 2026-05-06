@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
@@ -40,13 +49,53 @@ import { BellNotification, NotificationStore } from 'core';
 export class NotificationBell {
   private readonly _store = inject(NotificationStore);
   private readonly _router = inject(Router);
+  private readonly _destroyRef = inject(DestroyRef);
   private readonly _popover = viewChild.required<Popover>('popover');
+  private readonly _bellAnchor = viewChild.required<ElementRef<HTMLElement>>('bellAnchor');
+  private readonly _scrollContainer = viewChild<ElementRef<HTMLElement>>('scrollContainer');
+  private readonly _scrollSentinel = viewChild<ElementRef<HTMLElement>>('scrollSentinel');
+  private _observer?: IntersectionObserver;
 
   readonly unreadCount = this._store.unreadCount;
   readonly hasUnread = this._store.hasUnread;
   readonly notifications = this._store.notifications;
   readonly loading = this._store.loading;
+  readonly loadingMore = this._store.loadingMore;
   readonly hasLoadedList = this._store.hasLoadedList;
+  readonly hasMore = this._store.hasMore;
+
+  constructor() {
+    // Mirror groups-feed: re-bind the IntersectionObserver whenever
+    // the sentinel `viewChild` resolves (the popover lazy-renders its
+    // content, so the sentinel is undefined until the dropdown opens).
+    effect(() => {
+      const el = this._scrollSentinel()?.nativeElement;
+      const root = this._scrollContainer()?.nativeElement ?? null;
+      this._observer?.disconnect();
+      if (!el) return;
+      // The list is the actual scroller (`max-h-[60vh] overflow-y-auto`),
+      // not the document viewport — pass it as `root` so the observer
+      // tracks the sentinel against the list's scroll position. Without
+      // this, the sentinel's intersection is computed against the page
+      // viewport, which is why scroll-to-load only worked on mobile
+      // (where the popover happens to fill the screen).
+      this._observer = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            this.hasMore() &&
+            !this.loadingMore() &&
+            !this.loading()
+          ) {
+            this._store.loadMore();
+          }
+        },
+        { root, threshold: 0.1, rootMargin: '80px 0px' },
+      );
+      this._observer.observe(el);
+    });
+    this._destroyRef.onDestroy(() => this._observer?.disconnect());
+  }
 
   /**
    * The badge value PrimeNG expects — undefined hides the badge,
@@ -60,7 +109,7 @@ export class NotificationBell {
   });
 
   toggle(event: Event): void {
-    this._popover().toggle(event);
+    this._popover().toggle(event, this._bellAnchor().nativeElement);
   }
 
   /**
