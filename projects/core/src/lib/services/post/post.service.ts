@@ -71,6 +71,12 @@ export class PostService {
     );
   }
 
+  getPostById(postId: string): Observable<Post> {
+    return this._http.get<Post>(
+      `${this._api}${API_ENDPOINTS.POSTS.BY_ID(postId)}`,
+    );
+  }
+
   getPendingForGroup(
     groupId: string,
     page = 1,

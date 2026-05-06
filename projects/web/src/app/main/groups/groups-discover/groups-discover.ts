@@ -27,6 +27,7 @@ import { MessageService } from 'primeng/api';
 import {
   DiscoverGroup,
   GroupService,
+  GroupsRefreshService,
   JoinPolicies,
   joinPolicyLabel,
   joinPolicySeverity,
@@ -57,6 +58,7 @@ export class GroupsDiscover implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _groupsRefreshService = inject(GroupsRefreshService);
 
   readonly JoinPolicies = JoinPolicies;
   readonly joinPolicyLabel = joinPolicyLabel;
@@ -193,6 +195,7 @@ export class GroupsDiscover implements OnInit {
             summary: 'Joined',
             detail: `You're now a member of "${group.name}".`,
           });
+          this._groupsRefreshService.notify();
         } else {
           // PENDING — flip the card to "Request pending" without removing it.
           this.results.update((list) =>
@@ -239,7 +242,7 @@ export class GroupsDiscover implements OnInit {
   }
 
   openGroup(group: DiscoverGroup): void {
-    this._router.navigate(['/groups', group.id]);
+    this._router.navigate(['/groups/preview', group.id]);
   }
 
   descriptionExcerpt(description: string | null): string {

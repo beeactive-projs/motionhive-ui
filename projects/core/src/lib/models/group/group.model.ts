@@ -148,3 +148,62 @@ export interface DecideJoinRequestPayload {
 export type SelfJoinResult =
   | { status: 'JOINED'; message: string; member: GroupMember }
   | { status: 'PENDING'; message: string; request: GroupJoinRequest };
+
+/**
+ * Public-facing instructor info returned alongside a group's public profile.
+ */
+export interface PublicGroupInstructor {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  avatarId?: string | null;
+  displayName?: string | null;
+  bio?: string | null;
+  specializations?: string[] | null;
+  yearsOfExperience?: number | null;
+  isAcceptingClients?: boolean | null;
+  socialLinks?: Record<string, string> | null;
+}
+
+/**
+ * `GET /groups/:id/public` response. Available without membership for
+ * public, active groups regardless of joinPolicy. The `group` is a
+ * trimmed view (no joinToken, isActive, etc.).
+ */
+export interface PublicGroupProfile {
+  group: Pick<
+    Group,
+    | 'id'
+    | 'name'
+    | 'slug'
+    | 'description'
+    | 'logoUrl'
+    | 'joinPolicy'
+    | 'tags'
+    | 'contactEmail'
+    | 'contactPhone'
+    | 'address'
+    | 'city'
+    | 'country'
+    | 'timezone'
+    | 'createdAt'
+    | 'memberCount'
+  >;
+  instructor: PublicGroupInstructor | null;
+  upcomingSessions: PublicGroupSession[];
+}
+
+export interface PublicGroupSession {
+  id: string;
+  title: string;
+  description: string | null;
+  sessionType: string;
+  visibility: 'PUBLIC' | 'GROUP';
+  scheduledAt: string;
+  durationMinutes: number;
+  location: string | null;
+  maxParticipants: number | null;
+  price: number | null;
+  currency: string | null;
+  status: string;
+}

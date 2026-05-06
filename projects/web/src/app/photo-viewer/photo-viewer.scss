@@ -1,0 +1,88 @@
+:host.photo-viewer-host {
+  display: contents;
+}
+
+.photo-viewer__stage {
+  // Constrain on desktop so the right rail is reachable; on mobile the
+  // image area gets a fixed aspect ratio so comments don't disappear off
+  // the bottom of the viewport.
+  @media (max-width: 767px) {
+    aspect-ratio: 4 / 5;
+    flex: none;
+  }
+}
+
+// .photo-viewer__spinner {
+//   ::ng-deep .p-progressspinner-circle {
+//     stroke: var(--p-surface-0);
+//   }
+// }
+
+// ::ng-deep .photo-viewer__close.p-button {
+//   background: rgba(0, 0, 0, 0.55);
+//   color: var(--p-surface-0);
+
+//   &:hover {
+//     background: rgba(0, 0, 0, 0.75);
+//     color: var(--p-surface-0);
+//   }
+// }
+
+// The <p-galleria> host element defaults to inline-flow; without this it
+// won't expand to fill the flex parent regardless of the inner .p-galleria
+// width/height. Force it to block-level full size.
+:host::ng-deep .p-galleria {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: 0;
+
+  // Each layer flex-grows so vertical space propagates from the
+  // .p-galleria root all the way down to the rendered <img>.
+  .p-galleria-content {
+    flex: 1 1 0;
+    width: 100%;
+    // background: transparent;
+  }
+
+  .p-galleria-items-container,
+  .p-galleria-items {
+    flex: 1 1 0;
+  }
+
+  // .p-galleria-item-prev,
+  // .p-galleria-item-next {
+  //   background: rgba(0, 0, 0, 0.55);
+  //   color: var(--p-surface-0);
+  //   width: 3rem;
+  //   height: 3rem;
+
+  //   &:hover {
+  //     background: rgba(0, 0, 0, 0.75);
+  //     color: var(--p-surface-0);
+  //   }
+  // }
+
+  // .p-galleria-indicators {
+  //   padding: 1rem;
+  // }
+
+  // .p-galleria-indicator {
+  //   button {
+  //     background: rgba(255, 255, 255, 0.4);
+  //   }
+
+  //   &.p-galleria-indicator-active button {
+  //     background: var(--p-surface-0);
+  //   }
+  // }
+}
+
+// .photo-viewer__image {
+//   max-width: 100%;
+//   max-height: 100%;
+//   object-fit: contain;
+//   display: block;
+// }

@@ -52,6 +52,12 @@ export const mainRoutes: Routes = [
             title: 'Your groups - MotionHive',
           },
           {
+            path: 'preview/:id',
+            loadComponent: () =>
+              import('./groups/group-preview/group-preview').then((m) => m.GroupPreview),
+            title: 'Group preview - MotionHive',
+          },
+          {
             path: ':id',
             loadComponent: () =>
               import('./groups/group-detail/group-detail').then((m) => m.GroupDetail),

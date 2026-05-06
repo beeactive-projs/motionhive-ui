@@ -1,0 +1,130 @@
+<p-toast />
+
+@if (loading()) {
+<p-skeleton width="100%" height="200px" />
+} @else if (notFound()) {
+<div class="flex flex-col gap-3 max-w-400 mx-auto">
+  <p-message severity="warn" icon="pi pi-exclamation-triangle">
+    <div class="flex flex-col gap-2">
+      <h2 class="m-0 text-base font-semibold">Group not found</h2>
+      <p class="m-0 text-sm">
+        This group is private or no longer available.
+      </p>
+    </div>
+  </p-message>
+  <p-button label="Back to discover" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
+</div>
+} @else if (group(); as g) {
+<main class="flex flex-col gap-4 max-w-400 mx-auto">
+  <p-breadcrumb [model]="breadcrumbItems()" />
+
+  <p-card class="relative">
+    <div class="honeycomb-bg"></div>
+    <div class="flex items-center gap-4">
+      @if (g.logoUrl) {
+      <p-avatar [image]="g.logoUrl" shape="circle" size="xlarge"
+        class="bg-primary-500 border-4 border-double border-surface-100/60 p-10" />
+      } @else {
+      <p-avatar [label]="avatarLabel()" shape="circle" size="xlarge"
+        class="bg-primary-500 border-4 border-double border-surface-100/60 p-10" />
+      }
+
+      <div class="flex flex-col gap-1.5 pb-1 flex-1 min-w-0">
+        <div>
+          <h1 class="m-0 text-2xl font-semibold leading-tight tracking-tight text-color">
+            {{ g.name }}
+          </h1>
+          @if (g.description) {
+          <p class="m-0 text-sm text-muted-color max-w-[60ch]">
+            {{ g.description }}
+          </p>
+          }
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 items-center mt-1 gap-3">
+          <div class="flex items-center flex-wrap gap-2">
+            <p-tag rounded [value]="joinPolicyTagLabel()" [severity]="joinPolicyTagSeverity()" />
+            <p-tag rounded [value]="memberCountLabel()" severity="contrast" />
+            <p-tag rounded [value]="visibilityLabel()" severity="info" />
+          </div>
+          <div class="flex md:justify-end items-center gap-2">
+            @if (joinRequestPending()) {
+            <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" />
+            <p-button icon="pi pi-times" rounded text severity="contrast" size="small" pTooltip="Cancel request"
+              [loading]="joining()" (onClick)="onCancelRequest()" />
+            } @else {
+            <p-button [label]="joinButtonLabel()" [icon]="joinButtonIcon()" [loading]="joining()"
+              [disabled]="joinButtonDisabled()" (onClick)="onJoin()" [severity]="joinButtonSeverity()" />
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-card>
+
+  <mh-group-about-tab [group]="g" [showVisibility]="false" />
+
+  <!-- Instructor -->
+  @if (instructor(); as i) {
+  <p-card>
+    <ng-template #header>
+      <div class="flex items-center gap-2 px-4 pt-4">
+        <i class="pi pi-user text-primary-600"></i>
+        <h2 class="text-base font-semibold m-0">Instructor</h2>
+      </div>
+      <p-divider />
+    </ng-template>
+
+    <div class="flex items-start gap-4">
+      <p-avatar [label]="i.firstName.charAt(0) + i.lastName.charAt(0)" shape="circle" size="large"
+        class="bg-primary-500" />
+      <div class="flex-1 min-w-0">
+        <h3 class="m-0 text-base font-semibold">{{ instructorName() }}</h3>
+        @if (i.bio) {
+        <p class="m-0 mt-1 text-sm text-muted-color whitespace-pre-line">
+          {{ i.bio }}
+        </p>
+        }
+        @if (i.specializations?.length) {
+        <div class="mt-2 flex flex-wrap gap-1">
+          @for (s of i.specializations; track s) {
+          <p-tag [value]="s" severity="contrast" class="text-xs!" />
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </p-card>
+  }
+
+  <!-- Upcoming sessions -->
+  @if (upcomingSessions().length > 0) {
+  <p-card>
+    <ng-template #header>
+      <div class="flex items-center gap-2 px-4 pt-4">
+        <i class="pi pi-calendar text-primary-600"></i>
+        <h2 class="text-base font-semibold m-0">Upcoming sessions</h2>
+      </div>
+      <p-divider />
+    </ng-template>
+
+    <ul class="flex flex-col gap-3 m-0 p-0 list-none">
+      @for (s of upcomingSessions(); track s.id) {
+      <li class="flex items-start justify-between gap-3 border-b border-surface-200 pb-3 last:border-b-0 last:pb-0">
+        <div class="min-w-0">
+          <p class="m-0 text-sm font-medium">{{ s.title }}</p>
+          <p class="m-0 text-xs text-muted-color">
+            {{ s.scheduledAt | date: 'medium' }} · {{ s.durationMinutes }} min
+          </p>
+        </div>
+        @if (s.price) {
+        <span class="text-sm font-medium whitespace-nowrap">
+          {{ s.price }} {{ s.currency }}
+        </span>
+        }
+      </li>
+      }
+    </ul>
+  </p-card>
+  }
+</main>
+}

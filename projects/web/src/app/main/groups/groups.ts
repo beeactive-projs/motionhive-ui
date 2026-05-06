@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthStore, Group, GroupService, showApiError } from 'core';
+import { AuthStore, Group, GroupService, GroupsRefreshService, showApiError } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -20,6 +21,8 @@ export class GroupsLayout implements OnInit {
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _groupsRefreshService = inject(GroupsRefreshService);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly isInstructor = this._authStore.isInstructor;
 
@@ -29,6 +32,9 @@ export class GroupsLayout implements OnInit {
 
   ngOnInit(): void {
     this.loadJoinedGroups();
+    this._groupsRefreshService.refresh$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this.loadJoinedGroups());
   }
 
   loadJoinedGroups(): void {

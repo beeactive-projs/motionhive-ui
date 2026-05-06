@@ -18,10 +18,18 @@
         <p class="m-0 text-sm text-muted-color max-w-[60ch]">{{ g.description }}</p>
         }
       </div>
-      <div class="flex flex-wrap gap-2 mt-1">
-        <p-tag rounded [value]="joinPolicyLabel()" [severity]="joinPolicySeverity()" />
-        <p-tag rounded [value]="memberCountLabel()" severity="contrast" />
-        <p-tag rounded [value]="visibilityLabel()" severity="info" />
+      <div class="grid grid-cols-1 md:grid-cols-2 items-center mt-1 gap-3">
+        <div class="flex items-center flex-wrap gap-2 ">
+          <p-tag rounded [value]="joinPolicyLabel()" [severity]="joinPolicySeverity()" rounded />
+          <p-tag rounded [value]="memberCountLabel()" severity="contrast" />
+          <p-tag rounded [value]="visibilityLabel()" severity="info" />
+        </div>
+        <div class="flex md:justify-end">
+          @if (canLeave()) {
+          <p-button label="Leave group" outlined severity="secondary" icon="pi pi-sign-out"
+            (onClick)="onLeaveGroup()" />
+          }
+        </div>
       </div>
     </div>
   </div>

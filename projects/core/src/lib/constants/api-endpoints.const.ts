@@ -50,6 +50,7 @@ export const API_ENDPOINTS = {
     JOIN_REQUEST_BY_ID: (groupId: string, requestId: string) =>
       `/groups/${groupId}/join-requests/${requestId}`,
     MY_JOIN_REQUEST: (groupId: string) => `/groups/${groupId}/join-requests/mine`,
+    PUBLIC_PROFILE: (groupId: string) => `/groups/${groupId}/public`,
   },
   POSTS: {
     BASE: '/posts',

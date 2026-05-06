@@ -48,7 +48,7 @@
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     @for (g of results(); track trackById($index, g)) {
     <p-card class="h-full">
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col flex-1 gap-4 h-full">
         <!-- Header -->
         <div class="flex items-start gap-3">
           @if (g.logoUrl) {
@@ -86,12 +86,11 @@
         }
 
         <!-- Action -->
-        <div class="flex justify-end pt-1">
+        <div class="flex justify-end pt-1 mt-auto">
           @if (g.myJoinRequestStatus === 'PENDING') {
           <div class="flex items-center gap-2">
-            <p-button label="Request pending" icon="pi pi-clock" severity="secondary" [outlined]="true"
-              [disabled]="true" />
-            <p-button icon="pi pi-times" rounded text severity="secondary" size="small" pTooltip="Cancel request"
+            <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" />
+            <p-button icon="pi pi-times" rounded text severity="contrast" size="small" pTooltip="Cancel request"
               [loading]="isBusy(g.id)" (onClick)="cancelRequest(g)" />
           </div>
           } @else if (g.joinPolicy === JoinPolicies.Open) {

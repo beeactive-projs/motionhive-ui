@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -8,7 +9,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { Skeleton } from 'primeng/skeleton';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { AuthStore, Group, GroupService, joinPolicyLabel, joinPolicySeverity } from 'core';
+import { AuthStore, Group, GroupService, GroupsRefreshService, joinPolicyLabel, joinPolicySeverity } from 'core';
 import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog';
 import { AddMembersDialog } from '../_dialogs/add-members-dialog/add-members-dialog';
 
@@ -37,6 +38,8 @@ export class YourGroups implements OnInit {
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
   private readonly _authStore = inject(AuthStore);
+  private readonly _groupsRefreshService = inject(GroupsRefreshService);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly isInstructor = this._authStore.isInstructor;
   readonly joinPolicyLabel = joinPolicyLabel;
@@ -52,6 +55,9 @@ export class YourGroups implements OnInit {
 
   ngOnInit(): void {
     this.loadGroups();
+    this._groupsRefreshService.refresh$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this.loadGroups());
   }
 
   loadGroups(): void {

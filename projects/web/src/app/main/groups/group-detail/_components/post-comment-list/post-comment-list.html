@@ -113,6 +113,18 @@
     </div>
     }
   </div>
+
+  @if (hasMore()) {
+  <p-button
+    label="Load more comments"
+    severity="secondary"
+    text
+    size="small"
+    [loading]="loading()"
+    [disabled]="loading()"
+    (onClick)="loadMore()"
+    styleClass="self-start" />
+  }
   }
 </div>
 <p-confirmDialog />

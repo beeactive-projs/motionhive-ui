@@ -13,6 +13,7 @@ import {
   GroupJoinRequestListResponse,
   GroupMember,
   GroupMemberListResponse,
+  PublicGroupProfile,
   SelfJoinResult,
   UpdateGroupPayload,
   UpdateMemberRolePayload,
@@ -35,6 +36,17 @@ export class GroupService {
 
   getById(groupId: string): Observable<Group> {
     return this._http.get<Group>(`${this.baseUrl}/${groupId}`);
+  }
+
+  /**
+   * Public, member-less view of a group. Available for any active public
+   * group regardless of joinPolicy. Used by the Discover → preview flow
+   * before a user has joined.
+   */
+  getPublicProfile(groupId: string): Observable<PublicGroupProfile> {
+    return this._http.get<PublicGroupProfile>(
+      `${environment.apiUrl}${API_ENDPOINTS.GROUPS.PUBLIC_PROFILE(groupId)}`,
+    );
   }
 
   create(payload: CreateGroupPayload): Observable<Group> {

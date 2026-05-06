@@ -7,26 +7,20 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
+import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
-import { Menu } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { AuthStore, Post } from 'core';
+import { Button } from 'primeng/button';
+import { Post } from 'core';
 import { PostReactionBar } from '../post-reaction-bar/post-reaction-bar';
 import { PostCommentList } from '../post-comment-list/post-comment-list';
-import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { PostHeader } from '../post-header/post-header';
 
 @Component({
   selector: 'mh-post-card',
   imports: [
-    DatePipe,
-    RouterLink,
-    Avatar,
-    Button,
     CardModule,
-    Menu,
+    Button,
+    PostHeader,
     PostReactionBar,
     PostCommentList,
   ],
@@ -35,7 +29,7 @@ import { Avatar } from '../../../../../_shared/components/avatar/avatar';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostCard {
-  private readonly _authStore = inject(AuthStore);
+  private readonly _router = inject(Router);
 
   readonly post = input.required<Post>();
   /** True when the viewer is OWNER/MODERATOR of the *current* group context. */
@@ -86,44 +80,6 @@ export class PostCard {
     this.contentExpanded.update((v) => !v);
   }
 
-  readonly isAuthor = computed(
-    () => this.post().authorId === this._authStore.user()?.id,
-  );
-
-  readonly canEdit = computed(() => this.isAuthor());
-  readonly canDelete = computed(() => this.isAuthor() || this.canModerate());
-
-  readonly menuItems = computed<MenuItem[]>(() => {
-    const items: MenuItem[] = [];
-    if (this.canEdit()) {
-      items.push({
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: () => this.editRequested.emit(this.post()),
-      });
-    }
-    if (this.canDelete()) {
-      items.push({
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: () => this.deleteRequested.emit(this.post()),
-      });
-    }
-    return items;
-  });
-
-  authorName(): string {
-    const a = this.post().author;
-    if (!a) return 'Member';
-    return `${a.firstName} ${a.lastName}`;
-  }
-
-  authorInitials(): string {
-    const a = this.post().author;
-    if (!a) return '??';
-    return `${a.firstName.charAt(0)}${a.lastName.charAt(0)}`;
-  }
-
   toggleComments(): void {
     this.showComments.update((v) => !v);
   }
@@ -137,5 +93,11 @@ export class PostCard {
   extraImageCount(): number {
     const total = this.post().mediaUrls?.length ?? 0;
     return total > 4 ? total - 4 : 0;
+  }
+
+  openPhoto(index: number): void {
+    this._router.navigate(['/photo', this.post().id], {
+      queryParams: { index },
+    });
   }
 }

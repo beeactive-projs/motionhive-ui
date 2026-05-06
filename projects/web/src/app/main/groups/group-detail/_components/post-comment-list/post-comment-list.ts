@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -41,8 +42,13 @@ export class PostCommentList {
   readonly postId = input.required<string>();
   readonly active = input.required<boolean>();
 
+  private readonly _pageSize = 20;
+
   readonly loading = signal(false);
   readonly comments = signal<PostComment[]>([]);
+  readonly total = signal(0);
+  readonly page = signal(1);
+  readonly hasMore = computed(() => this.comments().length < this.total());
   readonly newComment = signal('');
   readonly posting = signal(false);
   readonly replyingTo = signal<string | null>(null);
@@ -56,22 +62,33 @@ export class PostCommentList {
   private readonly _loadOnActivate = effect(() => {
     if (this.active() && !this._hasLoaded) {
       this._hasLoaded = true;
-      this._load();
+      this._load(false);
     }
   });
 
-  private _load(): void {
+  private _load(append: boolean): void {
     this.loading.set(true);
-    this._postService.getComments(this.postId(), 1, 50).subscribe({
-      next: (res) => {
-        this.comments.set(res.items);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        showApiError(this._messageService, 'Could not load comments', "", err);
-      },
-    });
+    this._postService
+      .getComments(this.postId(), this.page(), this._pageSize)
+      .subscribe({
+        next: (res) => {
+          this.comments.update((list) =>
+            append ? [...list, ...res.items] : res.items,
+          );
+          this.total.set(res.total);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          showApiError(this._messageService, 'Could not load comments', '', err);
+        },
+      });
+  }
+
+  loadMore(): void {
+    if (this.loading() || !this.hasMore()) return;
+    this.page.update((p) => p + 1);
+    this._load(true);
   }
 
   postComment(): void {
@@ -83,10 +100,11 @@ export class PostCommentList {
         this.posting.set(false);
         this.newComment.set('');
         this.comments.update((list) => [...list, created]);
+        this.total.update((n) => n + 1);
       },
       error: (err) => {
         this.posting.set(false);
-        showApiError(this._messageService, 'Could not post comment', "", err);
+        showApiError(this._messageService, 'Could not post comment', '', err);
       },
     });
   }
@@ -119,10 +137,11 @@ export class PostCommentList {
                 : c,
             ),
           );
+          this.total.update((n) => n + 1);
         },
         error: (err) => {
           this.posting.set(false);
-          showApiError(this._messageService, 'Could not post reply', "", err);
+          showApiError(this._messageService, 'Could not post reply', '', err);
         },
       });
   }
@@ -149,9 +168,10 @@ export class PostCommentList {
                 : c,
             ),
         );
+        this.total.update((n) => Math.max(0, n - 1));
       },
       error: (err) => {
-        showApiError(this._messageService, 'Could not delete comment', "", err);
+        showApiError(this._messageService, 'Could not delete comment', '', err);
       },
     });
   }

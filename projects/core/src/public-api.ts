@@ -87,6 +87,7 @@ export * from './lib/services/user/user.service';
 export * from './lib/services/profile/profile.service';
 export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
+export * from './lib/services/group/groups-refresh.service';
 export * from './lib/services/post/post.service';
 export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';

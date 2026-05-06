@@ -1,21 +1,27 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Group, JoinPolicies, TagSeverity } from 'core';
 import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
+import { Button } from 'primeng/button';
+import { GroupDetailContext } from '../../group-detail.context';
 
 @Component({
   selector: 'mh-group-hero',
-  imports: [AvatarModule, BreadcrumbModule, TagModule, Card],
+  imports: [AvatarModule, BreadcrumbModule, TagModule, Card, Button],
   templateUrl: './group-hero.html',
   styleUrl: './group-hero.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupHero {
+  private readonly _context = inject(GroupDetailContext);
+
   readonly group = input.required<Group>();
   readonly membersCount = input<number | null>(null);
+
+  readonly canLeave = this._context.canLeave;
 
   readonly breadcrumbItems = computed<MenuItem[]>(() => [
     { label: 'Groups', routerLink: '/groups/your-groups' },
@@ -50,4 +56,8 @@ export class GroupHero {
     const parts = name.trim().split(/\s+/).slice(0, 2);
     return parts.map((p) => p.charAt(0).toUpperCase()).join('') || 'G';
   });
+
+  onLeaveGroup(): void {
+    this._context.leaveGroup();
+  }
 }

@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   AuthStore,
   Group,
@@ -6,6 +7,7 @@ import {
   GroupMemberPostPolicies,
   GroupMemberRoles,
   GroupService,
+  GroupsRefreshService,
   Post,
   showApiError,
 } from 'core';
@@ -17,6 +19,8 @@ export class GroupDetailContext {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _router = inject(Router);
+  private readonly _groupsRefreshService = inject(GroupsRefreshService);
 
   readonly group = signal<Group | null>(null);
   readonly members = signal<GroupMember[]>([]);
@@ -60,6 +64,11 @@ export class GroupDetailContext {
     if (!userId) return null;
     const me = this.members().find((m) => m.userId === userId);
     return me?.role ?? null;
+  });
+
+  readonly canLeave = computed(() => {
+    if (this.isOwner()) return false;
+    return this.viewerRole() !== null;
   });
 
   readonly hasActiveJoinToken = computed(() => {
@@ -186,6 +195,34 @@ export class GroupDetailContext {
           },
           error: (err) => {
             showApiError(this._messageService, 'Failed to revoke join link', '', err);
+          },
+        });
+      },
+    });
+  }
+
+  leaveGroup(): void {
+    const group = this.group();
+    if (!group) return;
+
+    this._confirmationService.confirm({
+      message: `Are you sure you want to leave "${group.name}"?`,
+      header: 'Leave group',
+      icon: 'pi pi-sign-out',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this._groupService.leaveGroup(group.id).subscribe({
+          next: () => {
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Left group',
+              detail: `You have left "${group.name}"`,
+            });
+            this._groupsRefreshService.notify();
+            this._router.navigate(['/groups']);
+          },
+          error: (err) => {
+            showApiError(this._messageService, 'Failed to leave group', '', err);
           },
         });
       },

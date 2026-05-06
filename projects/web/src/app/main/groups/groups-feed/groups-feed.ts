@@ -11,13 +11,14 @@ import {
   viewChild,
 } from '@angular/core';
 import { take } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { RouterLink } from '@angular/router';
-import { Post, PostService, showApiError } from 'core';
+import { GroupsRefreshService, Post, PostService, showApiError } from 'core';
 import { PostCard } from '../group-detail/_components/post-card/post-card';
 
 @Component({
@@ -39,6 +40,7 @@ export class GroupsFeed implements OnInit {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _groupsRefreshService = inject(GroupsRefreshService);
 
   readonly loading = signal(true);
   readonly loadingMore = signal(false);
@@ -78,6 +80,9 @@ export class GroupsFeed implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this._groupsRefreshService.refresh$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this.load());
   }
 
   load(): void {
