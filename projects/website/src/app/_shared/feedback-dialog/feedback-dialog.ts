@@ -44,16 +44,16 @@ export class FeedbackDialog {
     severity: ButtonSeverity;
   }[] = [
     {
-      key: FeedbackCategories.Bug,
-      label: $localize`:@@feedback.type.bug:Bug report`,
-      icon: 'bug_report',
-      severity: 'danger',
-    },
-    {
       key: FeedbackCategories.Suggestion,
       label: $localize`:@@feedback.type.suggestion:Suggestion`,
       icon: 'lightbulb',
       severity: 'warn',
+    },
+    {
+      key: FeedbackCategories.Bug,
+      label: $localize`:@@feedback.type.bug:Bug report`,
+      icon: 'bug_report',
+      severity: 'danger',
     },
     {
       key: FeedbackCategories.Other,
@@ -145,7 +145,7 @@ export class FeedbackDialog {
   }
 
   protected onDialogHide(): void {
-    this.form.reset({ type: FeedbackCategories.Bug, title: '', message: '' });
+    this.form.reset({ type: FeedbackCategories.Suggestion, title: '', message: '' });
     this.submitted.set(false);
   }
 }
