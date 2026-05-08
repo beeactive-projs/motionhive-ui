@@ -1,0 +1,195 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Button } from 'primeng/button';
+import { SkeletonModule } from 'primeng/skeleton';
+import { Textarea } from 'primeng/textarea';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { AuthStore, PostComment, PostService, showApiError } from 'core';
+import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+
+@Component({
+  selector: 'mh-post-comment-list',
+  imports: [
+    FormsModule,
+    DatePipe,
+    Avatar,
+    Button,
+    SkeletonModule,
+    Textarea,
+    ConfirmDialogModule,
+  ],
+  providers: [ConfirmationService],
+  templateUrl: './post-comment-list.html',
+  styleUrl: './post-comment-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PostCommentList {
+  private readonly _postService = inject(PostService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _authStore = inject(AuthStore);
+
+  readonly postId = input.required<string>();
+  readonly active = input.required<boolean>();
+
+  private readonly _pageSize = 20;
+
+  readonly loading = signal(false);
+  readonly comments = signal<PostComment[]>([]);
+  readonly total = signal(0);
+  readonly page = signal(1);
+  readonly hasMore = computed(() => this.comments().length < this.total());
+  readonly newComment = signal('');
+  readonly posting = signal(false);
+  readonly replyingTo = signal<string | null>(null);
+  readonly replyContent = signal('');
+
+  // One-shot per (postId, activation). Prevents re-entry when `loading`
+  // flips back to false on error — without this, a single failure (429,
+  // network blip, anything) re-triggers the effect into an infinite loop.
+  private _hasLoaded = false;
+
+  private readonly _loadOnActivate = effect(() => {
+    if (this.active() && !this._hasLoaded) {
+      this._hasLoaded = true;
+      this._load(false);
+    }
+  });
+
+  private _load(append: boolean): void {
+    this.loading.set(true);
+    this._postService
+      .getComments(this.postId(), this.page(), this._pageSize)
+      .subscribe({
+        next: (res) => {
+          this.comments.update((list) =>
+            append ? [...list, ...res.items] : res.items,
+          );
+          this.total.set(res.total);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          showApiError(this._messageService, 'Could not load comments', '', err);
+        },
+      });
+  }
+
+  loadMore(): void {
+    if (this.loading() || !this.hasMore()) return;
+    this.page.update((p) => p + 1);
+    this._load(true);
+  }
+
+  postComment(): void {
+    const content = this.newComment().trim();
+    if (!content || this.posting()) return;
+    this.posting.set(true);
+    this._postService.addComment(this.postId(), { content }).subscribe({
+      next: (created) => {
+        this.posting.set(false);
+        this.newComment.set('');
+        this.comments.update((list) => [...list, created]);
+        this.total.update((n) => n + 1);
+      },
+      error: (err) => {
+        this.posting.set(false);
+        showApiError(this._messageService, 'Could not post comment', '', err);
+      },
+    });
+  }
+
+  startReply(commentId: string): void {
+    this.replyingTo.set(commentId);
+    this.replyContent.set('');
+  }
+
+  cancelReply(): void {
+    this.replyingTo.set(null);
+    this.replyContent.set('');
+  }
+
+  postReply(parentCommentId: string): void {
+    const content = this.replyContent().trim();
+    if (!content || this.posting()) return;
+    this.posting.set(true);
+    this._postService
+      .addComment(this.postId(), { content, parentCommentId })
+      .subscribe({
+        next: (created) => {
+          this.posting.set(false);
+          this.replyingTo.set(null);
+          this.replyContent.set('');
+          this.comments.update((list) =>
+            list.map((c) =>
+              c.id === parentCommentId
+                ? { ...c, replies: [...(c.replies ?? []), created] }
+                : c,
+            ),
+          );
+          this.total.update((n) => n + 1);
+        },
+        error: (err) => {
+          this.posting.set(false);
+          showApiError(this._messageService, 'Could not post reply', '', err);
+        },
+      });
+  }
+
+  confirmDelete(comment: PostComment): void {
+    this._confirmationService.confirm({
+      message: 'Delete this comment?',
+      header: 'Delete comment',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this._delete(comment),
+    });
+  }
+
+  private _delete(comment: PostComment): void {
+    this._postService.deleteComment(this.postId(), comment.id).subscribe({
+      next: () => {
+        this.comments.update((list) =>
+          list
+            .filter((c) => c.id !== comment.id)
+            .map((c) =>
+              c.replies
+                ? { ...c, replies: c.replies.filter((r) => r.id !== comment.id) }
+                : c,
+            ),
+        );
+        this.total.update((n) => Math.max(0, n - 1));
+      },
+      error: (err) => {
+        showApiError(this._messageService, 'Could not delete comment', '', err);
+      },
+    });
+  }
+
+  initials(c: PostComment): string {
+    const a = c.author?.firstName?.charAt(0) ?? '?';
+    const b = c.author?.lastName?.charAt(0) ?? '?';
+    return `${a}${b}`;
+  }
+
+  fullName(c: PostComment): string {
+    if (!c.author) return 'Unknown';
+    return `${c.author.firstName} ${c.author.lastName}`;
+  }
+
+  isMine(c: PostComment): boolean {
+    return c.authorId === this._authStore.user()?.id;
+  }
+
+  trackById = (_: number, c: PostComment) => c.id;
+}

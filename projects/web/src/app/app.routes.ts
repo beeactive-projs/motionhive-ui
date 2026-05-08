@@ -13,7 +13,18 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [authGuard],
-    loadChildren: () => import('./main/main.routes').then((m) => m.mainRoutes),
+    children: [
+      {
+        path: 'photo/:postId',
+        loadComponent: () =>
+          import('./photo-viewer/photo-viewer').then((m) => m.PhotoViewer),
+        title: 'Photo - MotionHive',
+      },
+      {
+        path: '',
+        loadChildren: () => import('./main/main.routes').then((m) => m.mainRoutes),
+      },
+    ],
   },
 
   {

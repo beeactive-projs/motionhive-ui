@@ -16,6 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { FeedbackService, Logo, NavItem, NavSection } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
+import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchModal } from '../../_shared/components/search-modal/search-modal';
 import { SearchTriggerService } from '../../_shared/components/search-modal/search-trigger.service';
 
@@ -29,6 +30,7 @@ import { SearchTriggerService } from '../../_shared/components/search-modal/sear
     ThemeToggleComponent,
     Logo,
     ProfileMenu,
+    NotificationBell,
     SearchModal,
   ],
   templateUrl: './sidenav-layout.component.html',

@@ -17,7 +17,7 @@
 
           <!-- Identity -->
           <div class="flex flex-col items-center gap-3 text-center">
-            <p-avatar [label]="initials()" shape="circle" size="xlarge" styleClass="!w-20 !h-20 !text-2xl" />
+            <mh-avatar [user]="client()?.client" size="xlarge" styleClass="!w-20 !h-20 !text-2xl" />
             <div>
               <h2 class="font-heading font-semibold text-xl">{{ clientName() }}</h2>
               <p class="text-sm text-surface-500 mt-1">{{ clientEmail() }}</p>

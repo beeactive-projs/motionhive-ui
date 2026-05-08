@@ -1,0 +1,55 @@
+<p-card class="shadow-sm">
+  <div class="flex flex-col gap-3">
+
+    <!-- Header -->
+    <mh-post-header
+      [post]="post()"
+      [canModerate]="canModerate()"
+      [showGroupBadge]="showGroupBadge()"
+      (editRequested)="editRequested.emit($event)"
+      (deleteRequested)="deleteRequested.emit($event)" />
+
+    <!-- Body -->
+    <div class="flex flex-col gap-1">
+      <p class="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap wrap-break-word post-content"
+        [class.post-content--clamped]="!contentExpanded() && isContentLong()"
+        [style.--clamp-lines]="contentClampLines()">
+        {{ post().content }}
+      </p>
+      @if (isContentLong()) {
+        <button type="button"
+          class="self-start text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+          (click)="toggleContent()">
+          {{ contentExpanded() ? 'Show less' : 'Read more' }}
+        </button>
+      }
+    </div>
+
+    <!-- Images -->
+    @if (visibleImages().length > 0) {
+    <div class="post-gallery" [attr.data-count]="visibleImages().length">
+      @for (url of visibleImages(); track url; let i = $index, last = $last) {
+      <button type="button"
+        class="post-gallery__cell bg-surface-100 dark:bg-surface-800 cursor-pointer hover:opacity-95 transition-opacity"
+        [attr.aria-label]="'Open photo ' + (i + 1)"
+        (click)="openPhoto(i)">
+        <img [src]="url" [alt]="'Post image ' + (i + 1)" loading="lazy" />
+        @if (last && extraImageCount() > 0) {
+        <div class="post-gallery__overlay">+{{ extraImageCount() }}</div>
+        }
+      </button>
+      }
+    </div>
+    }
+
+    <!-- Action bar -->
+    <div class="flex items-center gap-2 pt-1">
+      <mh-post-reaction-bar [post]="post()" />
+      <p-button icon="pi pi-comment" [label]="post().commentCount > 0 ? post().commentCount.toString() : 'Comment'" text
+        severity="secondary" size="small" rounded (onClick)="toggleComments()" />
+    </div>
+
+    <!-- Comments section (collapsible) -->
+    <mh-post-comment-list [postId]="post().id" [active]="showComments()" />
+  </div>
+</p-card>

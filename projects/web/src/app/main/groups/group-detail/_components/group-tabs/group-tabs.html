@@ -1,0 +1,14 @@
+<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+  <p-tablist>
+    @for (tab of tabs(); track tab.id) {
+    <p-tab [value]="tab.id">
+      <div class="flex items-center gap-2">
+        <span>{{ tab.label }}</span>
+        @if (tab.badge !== undefined) {
+        <p-badge [value]="tab.badge" size="small" />
+        }
+      </div>
+    </p-tab>
+    }
+  </p-tablist>
+</p-tabs>

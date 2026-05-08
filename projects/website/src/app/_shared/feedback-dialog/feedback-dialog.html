@@ -21,8 +21,7 @@
     <!-- Type toggle buttons -->
     <div class="flex gap-2">
       @for (t of types; track t.key) {
-      <p-button class="flex-1" [outlined]="form.controls.type.value === t.key"
-        [outlined]="form.controls.type.value !== t.key"
+      <p-button [outlined]="form.controls.type.value !== t.key"
         [severity]="form.controls.type.value === t.key ? t.severity : 'contrast'" size="small"
         class="w-full justify-center" fluid (onClick)="form.controls.type.setValue(t.key)">
         <span class="flex flex-col md:flex-row items-center gap-1">

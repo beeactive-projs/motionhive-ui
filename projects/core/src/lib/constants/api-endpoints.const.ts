@@ -43,11 +43,18 @@ export const API_ENDPOINTS = {
   },
   GROUPS: {
     BASE: '/groups',
+    DISCOVER: '/groups/discover',
     BULK_MEMBERS: (groupId: string) => `/groups/${groupId}/members/bulk`,
     MEMBER_ROLE: (groupId: string, userId: string) => `/groups/${groupId}/members/${userId}/role`,
+    JOIN_REQUESTS: (groupId: string) => `/groups/${groupId}/join-requests`,
+    JOIN_REQUEST_BY_ID: (groupId: string, requestId: string) =>
+      `/groups/${groupId}/join-requests/${requestId}`,
+    MY_JOIN_REQUEST: (groupId: string) => `/groups/${groupId}/join-requests/mine`,
+    PUBLIC_PROFILE: (groupId: string) => `/groups/${groupId}/public`,
   },
   POSTS: {
     BASE: '/posts',
+    FEED: '/posts/feed',
     UPLOAD_IMAGE: '/posts/upload-image',
     GROUP_FEED: (groupId: string) => `/posts/group/${groupId}`,
     GROUP_PENDING: (groupId: string) => `/posts/group/${groupId}/pending`,
@@ -124,5 +131,31 @@ export const API_ENDPOINTS = {
 
     // Public — no auth
     PUBLIC_INSTRUCTOR_PRODUCTS: (id: string) => `/payments/public/instructors/${id}/products`,
+  },
+  NOTIFICATIONS: {
+    // Bell list + interactions
+    BASE: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    READ_ALL: '/notifications/read-all',
+    VIEWED: '/notifications/viewed',
+    READ: (receiptId: string) => `/notifications/${receiptId}/read`,
+    CLICKED: (receiptId: string) => `/notifications/${receiptId}/clicked`,
+    DISMISS: (receiptId: string) => `/notifications/${receiptId}/dismiss`,
+    BY_ID: (receiptId: string) => `/notifications/${receiptId}`,
+  },
+  NOTIFICATION_SETTINGS: {
+    // Per-user preference overrides — grouped by NotificationCategory
+    // (~6 categories). Per-type granularity exists under the hood but
+    // isn't exposed on the API.
+    BASE: '/users/me/notification-settings',
+    RESET_CATEGORY: (category: string) =>
+      `/users/me/notification-settings/${category}/reset`,
+  },
+  DEVICES: {
+    // Web push + mobile FCM token registration
+    REGISTER: '/devices/register',
+    LIST: '/devices',
+    BY_ID: (deviceId: string) => `/devices/${deviceId}`,
+    HEARTBEAT: (deviceId: string) => `/devices/${deviceId}/seen`,
   },
 } as const;

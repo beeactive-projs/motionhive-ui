@@ -1,0 +1,12 @@
+@if (tags().length > 0) {
+  <p-card class="mh-side-card">
+    <ng-template #title>
+      <span class="mh-side-card__title">Tags</span>
+    </ng-template>
+    <div class="mh-side-card__chips">
+      @for (tag of tags(); track tag) {
+        <p-tag [value]="'# ' + tag" severity="contrast" />
+      }
+    </div>
+  </p-card>
+}

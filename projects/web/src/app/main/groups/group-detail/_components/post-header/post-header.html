@@ -1,0 +1,31 @@
+<div class="flex flex-col gap-2">
+
+  <!-- Group badge — only shown in the cross-group feed -->
+  @if (showGroupBadge() && post().group; as g) {
+  <a [routerLink]="['/groups', g.id]"
+    class="inline-flex items-center gap-2 text-xs text-surface-700 dark:text-surface-400 hover:text-primary-500 w-fit no-underline">
+    <i class="pi pi-users text-[0.7rem]"></i>
+    <span>Posted in <span class="font-medium">{{ g.name }}</span></span>
+  </a>
+  }
+
+  <!-- Author row -->
+  <div class="flex items-center gap-3">
+    <mh-avatar [user]="post().author" styleClass="bg-primary-500 text-navy-900" />
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex flex-col gap-1">
+          <span class="font-medium text-sm">{{ authorName() }}</span>
+          <span class="text-xs text-muted-color">{{ post().createdAt | date: 'medium' }}</span>
+        </div>
+        <div class="flex items-center gap-1">
+          @if (menuItems().length > 0) {
+          <p-button icon="pi pi-ellipsis-h" rounded text severity="secondary" size="small"
+            (onClick)="postMenu.toggle($event)" />
+          <p-menu #postMenu [model]="menuItems()" [appendTo]="'body'" [popup]="true" />
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

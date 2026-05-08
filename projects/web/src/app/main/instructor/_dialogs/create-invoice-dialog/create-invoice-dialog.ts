@@ -16,7 +16,6 @@ import { DatePipe } from '@angular/common';
 import { debounceTime, Subject, Subscription, startWith } from 'rxjs';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
 import { Button } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { DatePicker } from 'primeng/datepicker';
@@ -36,6 +35,7 @@ import {
   type InstructorClient,
   type Product,
 } from 'core';
+import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 interface ClientOption {
   label: string;
@@ -87,7 +87,7 @@ interface StoredDraft {
   imports: [
     ReactiveFormsModule,
     DatePipe,
-    AvatarModule,
+    Avatar,
     Button,
     Checkbox,
     CurrencyRonPipe,

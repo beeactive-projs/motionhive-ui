@@ -17,13 +17,13 @@ import {
   showApiError,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Avatar } from 'primeng/avatar';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import { EditClientNotesDialog } from '../../_dialogs/edit-client-notes-dialog/edit-client-notes-dialog';
+import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-client-profile',

@@ -12,8 +12,8 @@ import {
   TagSeverity,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
+import { Avatar } from '../../../../_shared/components/avatar/avatar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -31,7 +31,7 @@ type RequestDirection = 'INCOMING' | 'OUTGOING';
     ButtonModule,
     TableModule,
     TagModule,
-    AvatarModule,
+    Avatar,
     SkeletonModule,
     ToastModule,
     ConfirmDialogModule,

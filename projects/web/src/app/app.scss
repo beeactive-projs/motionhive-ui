@@ -18,6 +18,10 @@
 //   background-color: var(--p-navy-900);
 // }
 
+.p-card {
+  background-color: var(--p-navy-50);
+}
+
 .honeycomb-bg {
   position: absolute;
   inset: 0;
@@ -29,6 +33,7 @@
 
 :host-context(.dark) .honeycomb-bg {
   background-image: $honeycomb-svg-primary;
+  background-color: var(--p-navy-900);
 }
 
 // ===== Orb Base + Animation =====

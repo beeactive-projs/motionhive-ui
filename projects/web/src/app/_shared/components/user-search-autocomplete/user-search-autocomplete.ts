@@ -16,10 +16,11 @@ import {
 } from 'primeng/autocomplete';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
+import { Avatar } from '../avatar/avatar';
 
 @Component({
   selector: 'mh-user-search-autocomplete',
-  imports: [AutoComplete, IconField, InputIcon],
+  imports: [AutoComplete, IconField, InputIcon, Avatar],
   templateUrl: './user-search-autocomplete.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

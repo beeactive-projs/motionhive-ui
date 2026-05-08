@@ -1,0 +1,20 @@
+<p-card class="mh-side-card">
+  <ng-template #title>
+    <span class="mh-side-card__title">Owner actions</span>
+  </ng-template>
+
+  <div class="mh-side-card__column-actions">
+    <p-button label="Add members" icon="pi pi-user-plus" fluid (onClick)="onAddMembers()" />
+    @if (hasActiveLink()) {
+    <p-button label="Copy join link" icon="pi pi-link" severity="secondary" outlined fluid (onClick)="onJoinLink()" />
+    } @else {
+    <p-button label="Generate join link" icon="pi pi-link" severity="secondary" outlined fluid [loading]="generating()"
+      (onClick)="onJoinLink()" />
+    }
+    <p-button label="Edit group" icon="pi pi-pencil" severity="secondary" outlined fluid (onClick)="onEditGroup()" />
+  </div>
+
+  @if (hint(); as h) {
+  <p-message severity="info" class="mh-side-card__hint mt-5">{{ h }}</p-message>
+  }
+</p-card>

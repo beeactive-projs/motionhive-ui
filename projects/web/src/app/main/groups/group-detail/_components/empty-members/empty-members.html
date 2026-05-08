@@ -1,0 +1,22 @@
+<p-card>
+  <ng-template #header>
+    <div class="flex items-center gap-2 px-4 pt-4">
+      <i class="pi pi-users text-primary-600"></i>
+      <h2 class="text-base font-semibold m-0">Just you so far</h2>
+    </div>
+    <p-divider />
+  </ng-template>
+
+  <div class="flex flex-col items-center gap-4 text-center py-6">
+    <i class="pi pi-users text-3xl text-primary-600"></i>
+    <p class="text-sm text-muted-color-emphasis m-0 max-w-md">
+      Send a join link to your clients — they can join in one tap, no signup form.
+    </p>
+
+    <div class="flex flex-wrap gap-2 justify-center">
+      <p-button label="Generate join link" icon="pi pi-link" size="small" (onClick)="generateLinkRequested.emit()" />
+      <p-button label="Add manually" icon="pi pi-plus" severity="contrast" [outlined]="true" size="small"
+        (onClick)="addManuallyRequested.emit()" />
+    </div>
+  </div>
+</p-card>

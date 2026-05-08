@@ -71,7 +71,7 @@
         <tr>
           <td>
             <div class="flex items-center gap-3">
-              <p-avatar [label]="initials(client)" shape="circle" />
+              <mh-avatar [user]="client.client" />
               <a [routerLink]="['/coaching/clients', client.id]" [state]="client"
                 class="text-primary-500 hover:underline font-medium tabular-nums">
                 {{ clientName(client) }}

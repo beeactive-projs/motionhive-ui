@@ -57,6 +57,26 @@ export class PostService {
     );
   }
 
+  /**
+   * Aggregated feed across every group the current user is a member of.
+   * Each item is enriched with `group: { id, name, logoUrl }`.
+   */
+  getFeed(page = 1, limit = 20): Observable<PostListResponse> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('limit', String(limit));
+    return this._http.get<PostListResponse>(
+      `${this._api}${API_ENDPOINTS.POSTS.FEED}`,
+      { params },
+    );
+  }
+
+  getPostById(postId: string): Observable<Post> {
+    return this._http.get<Post>(
+      `${this._api}${API_ENDPOINTS.POSTS.BY_ID(postId)}`,
+    );
+  }
+
   getPendingForGroup(
     groupId: string,
     page = 1,

@@ -27,6 +27,12 @@ export interface Post {
     lastName: string;
     avatarUrl: string | null;
   } | null;
+  /**
+   * Populated by the cross-group feed (`GET /posts/feed`) so the FE can
+   * render a "posted in X" badge above the author line. Null on the
+   * per-group feed because the group is implicit in the URL.
+   */
+  group?: { id: string; name: string; logoUrl: string | null } | null;
 }
 
 export interface PostComment {

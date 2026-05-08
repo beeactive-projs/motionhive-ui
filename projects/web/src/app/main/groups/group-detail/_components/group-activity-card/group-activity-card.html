@@ -1,0 +1,24 @@
+<p-card class="mh-side-card">
+  <ng-template #title>
+    <span class="mh-side-card__title">Activity</span>
+  </ng-template>
+
+  <div class="mh-side-card__activity">
+    <div class="mh-side-card__activity-row">
+      <span class="mh-side-card__activity-label">Created</span>
+      <span class="mh-side-card__activity-value">{{ group().createdAt | date: 'mediumDate' }}</span>
+    </div>
+    <div class="mh-side-card__activity-row">
+      <span class="mh-side-card__activity-label">Last post</span>
+      <span class="mh-side-card__activity-value">
+        @if (latestPostAt(); as at) { {{ at | date: 'mediumDate' }} } @else { — }
+      </span>
+    </div>
+    <div class="mh-side-card__activity-row">
+      <span class="mh-side-card__activity-label">Last member</span>
+      <span class="mh-side-card__activity-value">
+        @if (latestMemberAt(); as at) { {{ at | date: 'mediumDate' }} } @else { — }
+      </span>
+    </div>
+  </div>
+</p-card>

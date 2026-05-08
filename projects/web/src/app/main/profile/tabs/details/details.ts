@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
   AuthService,
+  AvatarUser,
   CurrencyRonPipe,
   MyProfile,
   Product,
@@ -27,6 +28,7 @@ import {
 } from 'core';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
+import { Avatar } from '../../../../_shared/components/avatar/avatar';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
@@ -47,6 +49,7 @@ import { VenuesSection } from './venues-section/venues-section';
     RouterLink,
     CardModule,
     AvatarModule,
+    Avatar,
     TagModule,
     DividerModule,
     ButtonModule,
@@ -113,6 +116,15 @@ export class Details implements OnInit {
    *  picture is visible immediately after upload. */
   readonly avatarUrl = computed<string | null>(() => {
     return this._pendingAvatarUrl() ?? this.profile().account.avatarUrl ?? null;
+  });
+
+  readonly avatarUser = computed<AvatarUser>(() => {
+    const a = this.profile().account;
+    return {
+      firstName: a.firstName,
+      lastName: a.lastName,
+      avatarUrl: this.avatarUrl(),
+    };
   });
 
   readonly isInstructor = computed(() => {

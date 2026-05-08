@@ -1,0 +1,20 @@
+<p-card class="mh-side-card">
+  <ng-template #title>
+    <span class="mh-side-card__title">Owner</span>
+  </ng-template>
+
+  <div class="mh-side-card__row">
+    <mh-avatar [user]="group().instructor" size="large" styleClass="mh-side-card__avatar" />
+    <div class="mh-side-card__lines">
+      <span class="mh-side-card__name">{{ ownerName() }}</span>
+      @if (ownerEmail()) {
+        <span class="mh-side-card__sub">{{ ownerEmail() }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="mh-side-card__actions">
+    <p-button label="Message" icon="pi pi-envelope" severity="secondary" outlined size="small" fluid />
+    <p-button label="Profile" icon="pi pi-user" severity="secondary" outlined size="small" fluid />
+  </div>
+</p-card>

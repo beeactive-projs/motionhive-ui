@@ -1,0 +1,61 @@
+<p-toast />
+
+<div class="fixed inset-0 flex flex-col md:flex-row z-50">
+
+  <!-- Top-left controls overlay -->
+  <div class="absolute top-3 left-3 z-10 flex items-center gap-2">
+    <p-button icon="pi pi-times" rounded text severity="secondary" ariaLabel="Close photo"
+      styleClass="photo-viewer__close" (onClick)="close()" />
+    @if (hasMultiple()) {
+    <span class="text-xs text-surface-0 bg-black/60 rounded-full px-2 py-1">
+      {{ currentIndex() + 1 }} / {{ images().length }}
+    </span>
+    }
+  </div>
+
+  <!-- Left pane: image carousel -->
+  <div class="flex-1 relative flex items-center justify-center min-h-0 photo-viewer__stage bg-black ">
+    @if (loading()) {
+    <p-progressspinner class="photo-viewer__spinner" />
+    } @else if (error()) {
+    <div class="flex flex-col items-center gap-3 text-surface-0">
+      <i class="pi pi-image text-4xl opacity-60"></i>
+      <p class="text-sm">{{ error() }}</p>
+      <p-button label="Go back" size="small" (onClick)="close()" />
+    </div>
+    } @else if (post() && images().length > 0) {
+    <p-galleria [value]="images()" [(activeIndex)]="currentIndex" [numVisible]="5" [circular]="true"
+      [showItemNavigators]="hasMultiple()" [showThumbnails]="false" [showIndicators]="hasMultiple()"
+      [showIndicatorsOnItem]="true" [responsiveOptions]="responsiveOptions" class="w-full h-full">
+      <ng-template #item let-item>
+        <img [src]="item.itemImageSrc" [alt]="item.alt" class="photo-viewer__image" />
+      </ng-template>
+    </p-galleria>
+    } @else if (post()) {
+    <div class="flex flex-col items-center gap-2 text-surface-0">
+      <i class="pi pi-image text-4xl opacity-60"></i>
+      <p class="text-sm">This post has no photos.</p>
+    </div>
+    }
+  </div>
+
+  <!-- Right pane: post details + comments -->
+  @if (post(); as p) {
+  <aside
+    class="w-full md:w-105 flex flex-col md:border-l border-t md:border-t-0 border-surface-200 dark:border-surface-700 overflow-y-auto">
+    <div class="flex flex-col gap-3 p-4">
+      <mh-post-header [post]="p" [showGroupBadge]="!!p.group" />
+
+      @if (p.content) {
+      <p class="text-sm  whitespace-pre-wrap wrap-break-word">
+        {{ p.content }}
+      </p>
+      }
+
+      <mh-post-reaction-bar [post]="p" />
+
+      <mh-post-comment-list [postId]="p.id" [active]="true" />
+    </div>
+  </aside>
+  }
+</div>

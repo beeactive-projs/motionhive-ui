@@ -17,7 +17,7 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
-  height: 30rem;
+  min-height: 30rem;
 }
 
 @media screen and (min-height: 668px) {

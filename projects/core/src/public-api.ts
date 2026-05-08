@@ -66,6 +66,9 @@ export * from './lib/models/payment/payment.model';
 export * from './lib/models/payment/earnings.model';
 export * from './lib/models/payment/status-severity';
 
+// Models - Notification
+export * from './lib/models/notification';
+
 // Constants
 export * from './lib/constants/api-endpoints.const';
 export * from './lib/constants/storage-keys.const';
@@ -76,6 +79,7 @@ export * from './lib/constants/countries.const';
 export * from './lib/utils/url.utils';
 export * from './lib/utils/api-error.utils';
 export * from './lib/utils/cloudinary.utils';
+export * from './lib/utils/group.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';
@@ -86,6 +90,7 @@ export * from './lib/services/user/user.service';
 export * from './lib/services/profile/profile.service';
 export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
+export * from './lib/services/group/groups-refresh.service';
 export * from './lib/services/post/post.service';
 export * from './lib/services/blog/blog.service';
 export * from './lib/services/feedback/feedback.service';
@@ -102,6 +107,7 @@ export * from './lib/services/payment/refund.service';
 export * from './lib/services/payment/earnings.service';
 export * from './lib/services/payment/client-payment.service';
 export * from './lib/services/venue/venue.service';
+export * from './lib/services/notification/notification.service';
 
 // Pipes
 export * from './lib/pipes/currency-ron.pipe';
@@ -114,11 +120,13 @@ export * from './lib/directives/stripe-iframe.directive';
 export * from './lib/stores/auth.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
+export * from './lib/stores/notification.store';
 
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';
 export * from './lib/interceptors/error.interceptor';
 export * from './lib/interceptors/loading.interceptor';
+export * from './lib/interceptors/silent-request.context';
 
 // Loading
 export * from './lib/services/loading/loading.service';

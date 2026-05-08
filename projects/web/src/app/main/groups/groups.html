@@ -1,0 +1,121 @@
+<div class="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-6">
+  <!-- Mobile horizontal nav strip (hidden on lg+) -->
+  <nav class="lg:hidden flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+    <a [routerLink]="['./feed']"
+      routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+      class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap transition-colors hover:bg-surface-300 hover:text-surface-800">
+      <i class="pi pi-bookmark text-base"></i>
+      <span>Feed</span>
+    </a>
+    <a [routerLink]="['./discover']"
+      routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+      class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap transition-colors hover:bg-surface-300 hover:text-surface-800">
+      <i class="pi pi-compass text-base"></i>
+      <span>Discover</span>
+    </a>
+    <a [routerLink]="['./your-groups']"
+      routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+      class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap transition-colors hover:bg-surface-300 hover:text-surface-800">
+      <i class="pi pi-users text-base"></i>
+      <span>Your groups</span>
+    </a>
+  </nav>
+
+  <!-- Main content -->
+  <main class="min-w-0">
+    <router-outlet />
+  </main>
+
+  <!-- Right-side panel (hidden below lg) -->
+  <aside class="hidden lg:flex lg:flex-col lg:gap-3 lg:sticky lg:top-4 lg:self-start">
+    <!-- Sidebar nav -->
+    <nav class="px-1">
+      <ul class="flex flex-col gap-1 mb-2 list-none m-0 p-0">
+        <li>
+          <a [routerLink]="['./feed']"
+            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
+            <i class="pi pi-bookmark text-base"></i>
+            <span>Feed</span>
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['./discover']"
+            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
+            <i class="pi pi-compass text-base"></i>
+            <span>Discover</span>
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['./your-groups']"
+            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
+            <i class="pi pi-users text-base"></i>
+            <span>Your groups</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    @if (isInstructor()) {
+    <p-button label="Create new group" icon="pi pi-plus" fluid (onClick)="openCreate()" />
+    }
+
+    <hr class="border-0 border-t border-surface my-1" />
+
+    <!-- Joined groups shortcuts -->
+    <nav class="px-1">
+      <h3 class="px-3 mb-2 text-xs uppercase tracking-wider text-surface-700 dark:text-surface-400">
+        Groups you've joined
+      </h3>
+
+      @if (loadingJoined()) {
+      <ul class="flex flex-col gap-1 mb-2 list-none m-0 p-0">
+        @for (i of [1, 2, 3]; track i) {
+        <li class="flex items-center gap-3 px-3 py-2">
+          <p-skeleton shape="circle" size="2.25rem" />
+          <div class="flex flex-col gap-1 flex-1">
+            <p-skeleton width="70%" height=".75rem" />
+            <p-skeleton width="40%" height=".65rem" />
+          </div>
+        </li>
+        }
+      </ul>
+      } @else if (joinedGroups().length === 0) {
+      <p class="text-xs text-surface-700 dark:text-surface-400 px-3">
+        You haven't joined any groups yet.
+      </p>
+      } @else {
+      <ul class="flex flex-col gap-1 mb-2 list-none m-0 p-0">
+        @for (g of joinedGroups(); track trackById($index, g)) {
+        <li>
+          <a [routerLink]="['/groups', g.id]"
+            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
+            @if (g.logoUrl) {
+            <img [src]="g.logoUrl" [alt]="g.name" class="w-9 h-9 rounded-lg object-cover shrink-0" />
+            } @else {
+            <span
+              class="w-9 h-9 rounded-lg shrink-0 inline-flex items-center justify-center font-semibold bg-primary-500 text-color">
+              {{ groupInitial(g) }}
+            </span>
+            }
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-medium">{{ g.name }}</span>
+              <span class="block text-xs text-muted-color">
+                {{ g.memberCount }} {{ g.memberCount === 1 ? 'member' : 'members' }}
+              </span>
+            </span>
+          </a>
+        </li>
+        }
+      </ul>
+      }
+    </nav>
+  </aside>
+</div>
+
+<mh-group-form-dialog [(visible)]="showGroupFormDialog" (saved)="onGroupCreated()" />
+
+<p-toast />

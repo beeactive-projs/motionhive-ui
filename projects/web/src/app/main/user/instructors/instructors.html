@@ -24,9 +24,7 @@
         @for (request of pendingRequests(); track trackById($index, request)) {
         <div class="flex items-center justify-between rounded-lg bg-surface-50 p-3">
           <div class="flex items-center gap-3">
-            <p-avatar
-              [label]="request.toUser ? request.toUser.firstName.charAt(0) + request.toUser.lastName.charAt(0) : '??'"
-              shape="circle" class="bg-yellow-100 text-yellow-700" />
+            <mh-avatar [user]="request.toUser" styleClass="bg-yellow-100 text-yellow-700" />
             <div>
               <span class="font-medium text-secondary-900">{{ requestToName(request) }}</span>
               <span class="text-sm text-secondary-500"> — request pending</span>
@@ -60,7 +58,7 @@
         <tr>
           <td>
             <div class="flex items-center gap-3">
-              <p-avatar [label]="initials(instructor)" shape="circle" class="bg-primary-100 text-primary-700" />
+              <mh-avatar [user]="instructor.instructor" styleClass="bg-primary-100 text-primary-700" />
               <span class="font-medium text-secondary-900">{{ instructor.name }}</span>
             </div>
           </td>
