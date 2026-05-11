@@ -56,7 +56,7 @@ export class GroupsLayout implements OnInit {
   }
 
   onGroupCreated(): void {
-    this.loadJoinedGroups();
+    this._groupsRefreshService.notify();
     this._router.navigate(['/groups/your-groups']);
   }
 

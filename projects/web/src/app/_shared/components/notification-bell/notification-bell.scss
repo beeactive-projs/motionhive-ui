@@ -14,17 +14,17 @@
  * pull it back over the bell, shrink the dot, and switch the type
  * face to something tabular so "9" and "12" don't visually shift. */
 ::ng-deep .p-overlaybadge .p-badge {
-  min-width: 0.8rem;
-  height: 0.8rem;
-  line-height: 0.8rem;
-  padding-top: 0.125rem;
-  font-size: 0.625rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.5rem;
-  font-family: 'Courier New', Courier, monospace;
-  inset-block-start: 0.45rem;
-  inset-inline-end: 0.5rem;
+  // min-width: 0.8rem;
+  // height: 0.8rem;
+  // line-height: 0.8rem;
+  // padding-top: 0.125rem;
+  // font-size: 0.625rem;
+  // font-weight: 600;
+  // font-variant-numeric: tabular-nums;
+  // font-size: 0.5rem;
+  // font-family: 'Courier New', Courier, monospace;
+  // inset-block-start: 0.45rem;
+  // inset-inline-end: 0.5rem;
   transform: translate(35%, -35%);
 }
 
@@ -68,8 +68,6 @@
     }
   }
 }
-
-
 
 ::ng-deep .notification-popover {
   /* Slide the entire panel right (positive) or left (negative) of

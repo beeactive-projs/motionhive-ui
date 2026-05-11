@@ -1,8 +1,10 @@
-<p-button text rounded [ariaLabel]="'Open profile menu for ' + userName()" (onClick)="toggle($event)" styleClass="p-0">
-  <mh-avatar [user]="user()" />
+<p-button text rounded [ariaLabel]="'Open profile menu for ' + userName()" (onClick)="toggle($event)">
+  <ng-template #icon>
+    <mh-avatar [user]="user()" />
+  </ng-template>
 </p-button>
 
-<p-popover #popover [appendTo]="'body'">
+<p-popover #popover appendTo="body">
   <div class="min-w-52">
     <div class="flex items-center gap-3 py-1">
       <mh-avatar [user]="user()" size="large" />
@@ -10,9 +12,9 @@
         <span class="font-semibold text-sm truncate">{{ userName() }}</span>
         <span class="text-xs truncate text-muted-color">{{ user()?.email }}</span>
         @if (isInstructor()) {
-          <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-primary-500">Instructor</span>
+        <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-primary-500">Instructor</span>
         } @else {
-          <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-muted-color">Member</span>
+        <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-muted-color">Member</span>
         }
       </div>
     </div>

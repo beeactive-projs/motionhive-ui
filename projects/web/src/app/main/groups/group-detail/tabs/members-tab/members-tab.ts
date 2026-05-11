@@ -3,8 +3,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -26,6 +26,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { GroupDetailContext } from '../../group-detail.context';
 import { EmptyMembers } from '../../_components/empty-members/empty-members';
 import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { Badge } from "primeng/badge";
 
 @Component({
   selector: 'mh-group-members-tab',
@@ -40,12 +41,13 @@ import { Avatar } from '../../../../../_shared/components/avatar/avatar';
     TagModule,
     TooltipModule,
     EmptyMembers,
-  ],
+    Badge
+],
   templateUrl: './members-tab.html',
   styleUrl: './members-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MembersTab implements OnInit {
+export class MembersTab {
   readonly context = inject(GroupDetailContext);
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
@@ -69,29 +71,32 @@ export class MembersTab implements OnInit {
     });
   });
 
-  ngOnInit(): void {
-    const id = this.context.group()?.id;
-    if (id) {
-      this.context.loadMembers(id);
-      if (this.context.isOwner()) {
-        this.loadJoinRequests();
+  constructor() {
+    effect(() => {
+      const groupId = this.context.group()?.id;
+      const isOwner = this.context.isOwner();
+
+      this.joinRequests.set([]);
+      this.busyRequestIds.set(new Set());
+      this.loadingRequests.set(false);
+
+      if (groupId && isOwner) {
+        this._loadJoinRequests(groupId);
       }
-    }
+    });
   }
 
-  loadJoinRequests(): void {
-    const id = this.context.group()?.id;
-    if (!id) return;
+  private _loadJoinRequests(groupId: string): void {
     this.loadingRequests.set(true);
-    this._groupService.listJoinRequests(id).subscribe({
+    this._groupService.listJoinRequests(groupId).subscribe({
       next: (res) => {
+        if (this.context.group()?.id !== groupId) return;
         this.joinRequests.set(res.items);
         this.loadingRequests.set(false);
       },
       error: () => {
+        if (this.context.group()?.id !== groupId) return;
         this.loadingRequests.set(false);
-        // Silent — pending-requests section is optional UX, don't toast
-        // every time the page opens.
       },
     });
   }
