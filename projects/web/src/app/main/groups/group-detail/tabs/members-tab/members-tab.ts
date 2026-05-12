@@ -8,6 +8,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   GroupJoinRequest,
   GroupMember,
@@ -51,6 +53,7 @@ export class MembersTab {
   readonly context = inject(GroupDetailContext);
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
+  private readonly _route = inject(ActivatedRoute);
 
   readonly Roles = GroupMemberRoles;
 
@@ -59,6 +62,15 @@ export class MembersTab {
   readonly joinRequests = signal<GroupJoinRequest[]>([]);
   readonly loadingRequests = signal(false);
   readonly busyRequestIds = signal<Set<string>>(new Set());
+
+  // Email links from `sendGroupJoinRequestReceivedEmail` include
+  // ?requestId=<id> — used to scroll-highlight the matching row.
+  private readonly _queryParams = toSignal(this._route.queryParamMap, {
+    initialValue: this._route.snapshot.queryParamMap,
+  });
+  readonly highlightedRequestId = computed(
+    () => this._queryParams().get('requestId'),
+  );
 
   readonly visibleMembers = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -83,6 +95,15 @@ export class MembersTab {
       if (groupId && isOwner) {
         this._loadJoinRequests(groupId);
       }
+    });
+
+    effect(() => {
+      const id = this.highlightedRequestId();
+      if (!id || this.loadingRequests()) return;
+      queueMicrotask(() => {
+        const el = document.getElementById(`join-request-row-${id}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     });
   }
 

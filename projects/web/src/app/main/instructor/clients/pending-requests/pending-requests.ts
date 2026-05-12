@@ -1,6 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   ClientRequestType,
   ClientRequestTypes,
@@ -46,9 +54,27 @@ type RequestDirection = 'INCOMING' | 'OUTGOING';
 })
 export class PendingRequests {
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+
+  // Email links (e.g. "New client request") include ?requestId=<id> so we
+  // can scroll-highlight the row the instructor came here to act on.
+  private readonly _queryParams = toSignal(this._route.queryParamMap, {
+    initialValue: this._route.snapshot.queryParamMap,
+  });
+  readonly highlightedRequestId = computed(
+    () => this._queryParams().get('requestId'),
+  );
+  private readonly _scrollToHighlighted = effect(() => {
+    const id = this.highlightedRequestId();
+    if (!id || this.loading()) return;
+    queueMicrotask(() => {
+      const el = document.getElementById(`request-row-${id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
 
   readonly Statuses = InstructorClientStatuses;
   readonly RequestTypes = ClientRequestTypes;

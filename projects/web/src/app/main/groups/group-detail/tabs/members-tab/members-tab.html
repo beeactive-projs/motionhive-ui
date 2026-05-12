@@ -21,7 +21,11 @@
     } @else {
     <ul class="flex flex-col gap-2 list-none m-0 p-0">
       @for (r of joinRequests(); track trackRequestById($index, r)) {
-      <li class="flex items-center gap-3 p-3 rounded border" style="border-color: var(--p-content-border-color)">
+      <li class="flex items-center gap-3 p-3 rounded border"
+          [id]="'join-request-row-' + r.id"
+          [class.ring-2]="highlightedRequestId() === r.id"
+          [class.ring-primary-400]="highlightedRequestId() === r.id"
+          style="border-color: var(--p-content-border-color)">
         <mh-avatar [user]="r.user" />
         <div class="min-w-0 flex-1">
           <p class="truncate text-sm font-medium m-0">{{ requestUserName(r) }}</p>
