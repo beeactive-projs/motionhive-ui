@@ -1,0 +1,37 @@
+<div class="flex flex-col md:flex-row md:items-center gap-4">
+  <div class="flex flex-col items-start md:items-center md:w-44 shrink-0">
+    <span
+      class="text-5xl font-semibold leading-none tracking-tight"
+      [attr.aria-label]="breakdown().average + ' out of 5 stars'">
+      {{ breakdown().average.toFixed(1) }}
+    </span>
+    <div class="flex items-center gap-0.5 mt-2" aria-hidden="true">
+      @for (i of [1, 2, 3, 4, 5]; track i) {
+        <i
+          class="pi text-yellow-500"
+          [class.pi-star-fill]="i <= breakdown().average"
+          [class.pi-star]="i > breakdown().average"></i>
+      }
+    </div>
+    <span class="text-xs text-muted-color mt-1">
+      {{ breakdown().total }} {{ breakdown().total === 1 ? 'review' : 'reviews' }}
+    </span>
+  </div>
+
+  <table class="breakdown-table flex-1 w-full" role="presentation">
+    <caption class="sr-only">Rating breakdown by star</caption>
+    <tbody>
+      @for (bucket of breakdown().distribution; track bucket.star) {
+        <tr>
+          <th scope="row" class="breakdown-label">{{ bucket.star }} ★</th>
+          <td class="breakdown-bar">
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="bucket.percent"></div>
+            </div>
+          </td>
+          <td class="breakdown-count">{{ bucket.count }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

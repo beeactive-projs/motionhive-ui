@@ -1,0 +1,39 @@
+@use 'variables' as *;
+
+:host {
+  display: block;
+}
+
+.hero {
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-content-border-color);
+}
+
+.cover {
+  background: linear-gradient(
+    135deg,
+    var(--p-primary-100) 0%,
+    var(--p-primary-200) 100%
+  );
+}
+
+:host-context(.dark) .cover {
+  background: linear-gradient(
+    135deg,
+    var(--p-primary-900) 0%,
+    var(--p-primary-800) 100%
+  );
+}
+
+.honeycomb-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background-image: $honeycomb-svg-navy;
+  background-size: 56px 100px;
+  pointer-events: none;
+}
+
+:host-context(.dark) .honeycomb-bg {
+  background-image: $honeycomb-svg-primary;
+}

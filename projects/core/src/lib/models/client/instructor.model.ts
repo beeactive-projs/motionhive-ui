@@ -33,9 +33,11 @@ export type InstructorListResponse = MyInstructor[];
 export interface InstructorSearchResult {
   id: string;
   userId: string;
+  handle: string | null;
   firstName: string;
   lastName: string;
   avatarId: string | null;
+  avatarUrl: string | null;
   displayName: string | null;
   bio: string | null;
   specializations: string[] | null;
@@ -49,18 +51,23 @@ export interface InstructorSearchResult {
 export interface PublicInstructorProfile {
   id: string;
   userId: string;
+  handle: string | null;
   firstName: string;
   lastName: string;
   avatarId: string | null;
+  avatarUrl: string | null;
   displayName: string | null;
   bio: string | null;
   specializations: string[];
   certifications: InstructorCertification[];
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
+  isPublic: boolean;
   city: string | null;
-  country: string | null;
+  countryCode: string | null;
   socialLinks: Record<string, string> | null;
   showEmail: boolean;
   showPhone: boolean;
+  joinedAt: string;
+  rating: { average: number; total: number } | null;
 }

@@ -1,0 +1,6 @@
+.cta-bar {
+  background: var(--p-surface-0);
+  border-top: 1px solid var(--p-content-border-color);
+  box-shadow: var(--p-overlay-shadow);
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}

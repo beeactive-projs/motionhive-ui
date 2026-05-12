@@ -9,11 +9,18 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  apiErrorMessage,
+  AuthService,
   ClientPaymentService,
   ClientService,
   MyBillingCounts,
   MyProfile,
+  PrivacyControlledField,
+  ProfilePrivacy,
   ProfileService,
+  showApiError,
+  UserPrivacySettings,
+  UserService,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
@@ -21,11 +28,14 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { CardModule } from 'primeng/card';
 import { Button } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { ProfileHeroCard } from './_components/profile-hero-card/profile-hero-card';
 import { Details } from './tabs/details/details';
 import { ProfileCoaches } from './tabs/coaches/coaches';
 import { ProfileNotifications } from './tabs/notifications/notifications';
 import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
+import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
+import { EditHandle } from './_dialogs/edit-handle/edit-handle';
 
 export const ProfileTabs = {
   Details: 'details',
@@ -39,6 +49,14 @@ export type ProfileTab = (typeof ProfileTabs)[keyof typeof ProfileTabs];
 
 const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
 
+/**
+ * `/profile` — Facebook-style owner view.
+ *
+ * The page owns identity-level state (avatar upload, optimistic
+ * privacy override, dialog visibility) so the hero card stays
+ * presentational and the Details tab is just a card composer. Tab
+ * routing and `MyProfile` fetch remain here unchanged.
+ */
 @Component({
   selector: 'mh-profile',
   imports: [
@@ -51,11 +69,14 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
     CardModule,
     Button,
     ToastModule,
+    ProfileHeroCard,
     Details,
     ProfileCoaches,
     ProfileNotifications,
     MyInvoices,
     MySubscriptions,
+    EditPersonalInfo,
+    EditHandle,
   ],
   providers: [MessageService],
   templateUrl: './profile.html',
@@ -64,6 +85,8 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
 })
 export class Profile implements OnInit {
   private readonly _profileService = inject(ProfileService);
+  private readonly _userService = inject(UserService);
+  private readonly _authService = inject(AuthService);
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
@@ -72,10 +95,53 @@ export class Profile implements OnInit {
 
   readonly Tabs = ProfileTabs;
 
-  readonly profile = signal<MyProfile | null>(null);
+  /** Server-truth snapshot of MyProfile (set by `loadProfile`). */
+  private readonly _rawProfile = signal<MyProfile | null>(null);
+
+  /**
+   * Optimistic patch applied on top of `_rawProfile.account.privacySettings`.
+   * Survives across tab switches so quickly flipping a chooser doesn't
+   * reset back to server truth before the PATCH resolves. Cleared on
+   * full profile reload.
+   */
+  private readonly _privacyOverride = signal<UserPrivacySettings | null>(null);
+
   readonly loading = signal(true);
   readonly counts = signal<MyBillingCounts | null>(null);
   readonly incomingRequestsCount = signal(0);
+
+  /**
+   * Optimistic avatar URL — wins over the server value between a
+   * successful upload and the parent reloading the profile.
+   */
+  readonly pendingAvatarUrl = signal<string | null>(null);
+  readonly uploadingAvatar = signal(false);
+  readonly resendingVerification = signal(false);
+
+  readonly editPersonalInfoVisible = signal(false);
+  readonly editHandleVisible = signal(false);
+
+  /**
+   * The effective MyProfile passed to children — applies the optimistic
+   * privacy override and the pending avatar URL on top of server truth.
+   */
+  readonly profile = computed<MyProfile | null>(() => {
+    const raw = this._rawProfile();
+    if (!raw) return null;
+    const override = this._privacyOverride();
+    const pendingAvatar = this.pendingAvatarUrl();
+    if (!override && pendingAvatar === null) return raw;
+    return {
+      ...raw,
+      account: {
+        ...raw.account,
+        ...(pendingAvatar !== null ? { avatarUrl: pendingAvatar } : null),
+        privacySettings: override
+          ? { ...raw.account.privacySettings, ...override }
+          : raw.account.privacySettings,
+      },
+    };
+  });
 
   private readonly _queryParams = toSignal(this._route.queryParamMap, {
     initialValue: this._route.snapshot.queryParamMap,
@@ -106,7 +172,10 @@ export class Profile implements OnInit {
     this.loading.set(true);
     this._profileService.getMyProfile().subscribe({
       next: (data) => {
-        this.profile.set(data);
+        this._rawProfile.set(data);
+        // Server response is canonical — drop the optimistic layers.
+        this._privacyOverride.set(null);
+        this.pendingAvatarUrl.set(null);
         this.loading.set(false);
       },
       error: () => {
@@ -119,6 +188,121 @@ export class Profile implements OnInit {
       },
     });
   }
+
+  onTabChange(value: string | number | undefined): void {
+    const tab =
+      typeof value === 'string' && VALID_TABS.has(value)
+        ? value
+        : ProfileTabs.Details;
+    if (tab === this.activeTab()) return;
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Hero action handlers
+  // -------------------------------------------------------------
+
+  viewAsPublic(): void {
+    const handle = this.profile()?.account.handle;
+    if (!handle) return;
+    void this._router.navigate(['/@' + handle]);
+  }
+
+  onAvatarSelected(file: File): void {
+    this.uploadingAvatar.set(true);
+    this._userService.uploadAvatar(file).subscribe({
+      next: ({ avatarUrl }) => {
+        this.pendingAvatarUrl.set(avatarUrl);
+        this.uploadingAvatar.set(false);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Profile picture updated',
+        });
+        this.loadProfile();
+      },
+      error: (err: unknown) => {
+        this.uploadingAvatar.set(false);
+        showApiError(
+          this._messageService,
+          'Upload failed',
+          'Could not upload the picture.',
+          err,
+        );
+      },
+    });
+  }
+
+  /**
+   * Re-sends the email-verification link. Backend is rate-limited and
+   * idempotent, so we surface any rejection as info rather than error.
+   */
+  resendVerification(): void {
+    if (this.resendingVerification()) return;
+    const email = this.profile()?.account.email;
+    if (!email) return;
+    this.resendingVerification.set(true);
+    this._authService.resendVerification(email).subscribe({
+      next: () => {
+        this.resendingVerification.set(false);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Verification email sent',
+          detail: `Check ${email}.`,
+        });
+      },
+      error: (err: unknown) => {
+        this.resendingVerification.set(false);
+        this._messageService.add({
+          severity: 'info',
+          summary: 'Could not resend',
+          detail: apiErrorMessage(
+            err,
+            'If the email is already verified or you recently asked, please try again later.',
+          ),
+        });
+      },
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Privacy patch — owned by the page so override survives tab switches
+  // -------------------------------------------------------------
+
+  onPrivacyChange(event: {
+    field: PrivacyControlledField;
+    level: ProfilePrivacy;
+  }): void {
+    const { field, level } = event;
+    const baseline =
+      this._privacyOverride() ??
+      this._rawProfile()?.account.privacySettings ??
+      {};
+    const optimistic: UserPrivacySettings = { ...baseline, [field]: level };
+    this._privacyOverride.set(optimistic);
+
+    this._profileService.updatePrivacy({ [field]: level }).subscribe({
+      next: (res) => {
+        this._privacyOverride.set(res.privacySettings ?? optimistic);
+      },
+      error: (err: unknown) => {
+        this._privacyOverride.set(baseline);
+        showApiError(
+          this._messageService,
+          'Error',
+          'Could not update visibility.',
+          err,
+        );
+      },
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Tabs / counts
+  // -------------------------------------------------------------
 
   private loadCounts(): void {
     this._clientPaymentService.getMyCounts().subscribe({
@@ -137,19 +321,6 @@ export class Profile implements OnInit {
           requests.filter((r) => r.type === 'INSTRUCTOR_TO_CLIENT').length,
         ),
       error: () => this.incomingRequestsCount.set(0),
-    });
-  }
-
-  onTabChange(value: string | number | undefined): void {
-    const tab =
-      typeof value === 'string' && VALID_TABS.has(value)
-        ? value
-        : ProfileTabs.Details;
-    if (tab === this.activeTab()) return;
-    this._router.navigate([], {
-      relativeTo: this._route,
-      queryParams: { tab },
-      queryParamsHandling: 'merge',
     });
   }
 }

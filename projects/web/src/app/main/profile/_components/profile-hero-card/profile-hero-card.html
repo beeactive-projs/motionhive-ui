@@ -1,0 +1,119 @@
+<p-card class="relative mh-profile-hero">
+  <div class="honeycomb-bg"></div>
+
+  <div class="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
+    <!-- Avatar with camera-overlay trigger. The hidden file input is
+         the actual picker; the overlay button just delegates the click
+         so mh-avatar keeps its exact visual size/shape. -->
+    <div class="relative shrink-0 self-center md:self-start">
+      <mh-avatar
+        [user]="avatarUser()"
+        size="xlarge"
+        styleClass="!h-28 !w-28 text-3xl bg-primary-100 text-primary-600 border-4 border-double border-surface-100/60"
+      />
+      <button
+        type="button"
+        class="mh-profile-hero__camera"
+        [disabled]="uploadingAvatar()"
+        pTooltip="Change photo"
+        tooltipPosition="top"
+        aria-label="Change photo"
+        (click)="openFilePicker()"
+      >
+        @if (uploadingAvatar()) {
+          <i class="pi pi-spin pi-spinner text-sm"></i>
+        } @else {
+          <i class="pi pi-camera text-sm"></i>
+        }
+      </button>
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        class="hidden"
+        (change)="onFileSelected($event)"
+      />
+    </div>
+
+    <div class="flex flex-1 flex-col gap-1 min-w-0 text-center md:text-left">
+      <h1 class="m-0 text-2xl font-semibold leading-tight tracking-tight text-color">
+        {{ fullName() }}
+      </h1>
+
+      <div class="flex flex-wrap items-center justify-center md:justify-start gap-x-2 gap-y-1 text-sm text-muted-color">
+        @if (hasHandle()) {
+          <span class="font-mono">&#64;{{ handle() }}</span>
+        } @else {
+          <span class="italic">No handle yet</span>
+        }
+        @if (locationLabel(); as loc) {
+          <span aria-hidden="true">·</span>
+          <span class="inline-flex items-center gap-1">
+            <i class="pi pi-map-marker text-xs" aria-hidden="true"></i>{{ loc }}
+          </span>
+        }
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-calendar text-xs" aria-hidden="true"></i>
+          Joined {{ memberSince() | date: 'MMM y' }}
+        </span>
+      </div>
+
+      <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+        @for (badge of displayBadges(); track badge.label) {
+          <p-tag rounded [value]="badge.label" [severity]="badge.severity" class="text-xs!" />
+        }
+        @if (profile().account.isEmailVerified) {
+          <p-tag rounded value="Verified" severity="success" icon="pi pi-check" class="text-xs!" />
+        } @else {
+          <span class="inline-flex items-center gap-1">
+            <p-tag rounded value="Unverified" severity="warn" icon="pi pi-exclamation-triangle" class="text-xs!" />
+            <p-button
+              icon="pi pi-refresh"
+              severity="warn"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              [loading]="resendingVerification()"
+              pTooltip="Resend verification email"
+              tooltipPosition="top"
+              aria-label="Resend verification email"
+              (onClick)="resendVerification.emit()"
+            />
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Action row: pinned bottom-right on md+, full-width row on mobile. -->
+    <div class="flex flex-wrap items-center justify-center gap-2 md:self-start md:justify-end">
+      <p-button
+        label="Edit profile"
+        icon="pi pi-pencil"
+        severity="secondary"
+        outlined
+        size="small"
+        (onClick)="editPersonalInfo.emit()"
+      />
+      <p-button
+        [label]="hasHandle() ? 'Edit handle' : 'Pick a handle'"
+        icon="pi pi-at"
+        severity="secondary"
+        outlined
+        size="small"
+        (onClick)="editHandle.emit()"
+      />
+      <p-button
+        label="View as public"
+        icon="pi pi-external-link"
+        severity="secondary"
+        outlined
+        size="small"
+        [disabled]="!hasHandle()"
+        [pTooltip]="hasHandle() ? '' : 'Pick a handle first'"
+        tooltipPosition="top"
+        (onClick)="viewAsPublic.emit()"
+      />
+    </div>
+  </div>
+</p-card>

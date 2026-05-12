@@ -1,0 +1,20 @@
+@if (loading() && !offerings()) {
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <p-skeleton height="180px" />
+    <p-skeleton height="180px" />
+    <p-skeleton height="180px" />
+  </div>
+} @else if (!offerings() || offerings()!.length === 0) {
+  <p-card>
+    <div class="text-center py-6 text-muted-color">
+      <i class="pi pi-shopping-bag text-2xl mb-2 block"></i>
+      <p class="m-0 text-sm">No offerings yet.</p>
+    </div>
+  </p-card>
+} @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    @for (product of offerings(); track product.id) {
+      <mh-offering-card [product]="product" />
+    }
+  </div>
+}

@@ -66,3 +66,36 @@ export const AvailableDays = {
 } as const;
 
 export type AvailableDay = (typeof AvailableDays)[keyof typeof AvailableDays];
+
+/**
+ * Per-field visibility level on a public profile. PUBLIC = everyone,
+ * COACHES_ONLY = the owner's active coaches + the owner, ONLY_ME =
+ * just the owner. Mirrors `ProfilePrivacyLevel` on the API.
+ */
+export const ProfilePrivacy = {
+  Public: 'PUBLIC',
+  CoachesOnly: 'COACHES_ONLY',
+  OnlyMe: 'ONLY_ME',
+} as const;
+
+export type ProfilePrivacy =
+  (typeof ProfilePrivacy)[keyof typeof ProfilePrivacy];
+
+export const ProfilePrivacyLabels: Record<ProfilePrivacy, string> = {
+  [ProfilePrivacy.Public]: 'Public',
+  [ProfilePrivacy.CoachesOnly]: 'Coaches only',
+  [ProfilePrivacy.OnlyMe]: 'Only me',
+};
+
+export const ProfilePrivacyIcons: Record<ProfilePrivacy, string> = {
+  [ProfilePrivacy.Public]: 'pi pi-globe',
+  [ProfilePrivacy.CoachesOnly]: 'pi pi-users',
+  [ProfilePrivacy.OnlyMe]: 'pi pi-lock',
+};
+
+/** Selectable order for the privacy chooser dropdown (most → least open). */
+export const ProfilePrivacyOptions: readonly ProfilePrivacy[] = [
+  ProfilePrivacy.Public,
+  ProfilePrivacy.CoachesOnly,
+  ProfilePrivacy.OnlyMe,
+] as const;

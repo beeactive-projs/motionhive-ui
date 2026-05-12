@@ -1,0 +1,53 @@
+@if (loading() && !groups()) {
+  <div class="flex flex-col gap-3">
+    <p-skeleton height="92px" />
+    <p-skeleton height="92px" />
+  </div>
+} @else if (!groups() || groups()!.length === 0) {
+  <p-card>
+    <div class="text-center py-6 text-muted-color">
+      <i class="pi pi-users text-2xl mb-2 block"></i>
+      <p class="m-0 text-sm">No public groups yet.</p>
+    </div>
+  </p-card>
+} @else {
+  <div class="flex flex-col gap-3">
+    @for (group of groups(); track group.id) {
+      <p-card>
+        <a
+          [routerLink]="['/groups', group.id]"
+          class="flex items-start gap-3 no-underline text-color"
+          [attr.aria-label]="'Open ' + group.name">
+          <div class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center bg-primary-500 text-white text-lg font-semibold shrink-0">
+            @if (group.logoUrl) {
+              <img [src]="group.logoUrl" [alt]="group.name" class="w-full h-full object-cover" />
+            } @else {
+              <span>{{ group.name.charAt(0) }}</span>
+            }
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="m-0 text-base font-semibold truncate">{{ group.name }}</h3>
+              <span class="text-xs text-muted-color flex items-center gap-1">
+                <i class="pi pi-users text-xs"></i>{{ group.memberCount }}
+              </span>
+            </div>
+            @if (group.description) {
+              <p class="m-0 mt-1 text-sm text-muted-color line-clamp-2">{{ group.description }}</p>
+            }
+            <div class="flex flex-wrap items-center gap-2 mt-2">
+              @if (group.city) {
+                <span class="text-xs text-muted-color flex items-center gap-1">
+                  <i class="pi pi-map-marker text-xs"></i>{{ group.city }}
+                </span>
+              }
+              @for (tag of (group.tags ?? []).slice(0, 3); track tag) {
+                <p-tag [value]="tag" severity="secondary" rounded />
+              }
+            </div>
+          </div>
+        </a>
+      </p-card>
+    }
+  </div>
+}

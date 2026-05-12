@@ -1,0 +1,41 @@
+.breakdown-table {
+  border-collapse: collapse;
+
+  tr {
+    height: 1.75rem;
+  }
+
+  .breakdown-label {
+    width: 3.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--p-text-muted-color);
+    text-align: left;
+  }
+
+  .breakdown-count {
+    width: 2.5rem;
+    font-size: 0.8rem;
+    color: var(--p-text-muted-color);
+    text-align: right;
+  }
+}
+
+.bar-track {
+  position: relative;
+  height: 0.5rem;
+  border-radius: var(--p-border-radius-sm);
+  background: var(--p-surface-200);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--p-primary-color);
+  border-radius: inherit;
+  transition: width 0.3s ease-out;
+}
+
+:host-context(.dark) .bar-track {
+  background: var(--p-surface-700);
+}

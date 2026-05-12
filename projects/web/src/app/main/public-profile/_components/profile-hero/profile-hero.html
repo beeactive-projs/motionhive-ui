@@ -1,0 +1,51 @@
+<section class="hero relative overflow-hidden rounded-2xl">
+  <div class="cover h-40 md:h-60"></div>
+  <div class="honeycomb-bg"></div>
+
+  <div class="content relative px-4 md:px-8 pb-5 md:pb-7">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 -mt-12 md:-mt-16">
+      <div class="flex items-end gap-4 min-w-0">
+        <mh-avatar
+          [user]="avatarUser()"
+          size="xlarge"
+          styleClass="hero-avatar !h-22 !w-22 md:!h-32 md:!w-32 !text-3xl md:!text-4xl border-4 border-surface-0 shadow-lg" />
+        <div class="flex flex-col gap-1 min-w-0 pb-1">
+          <h1 class="m-0 text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-color truncate">
+            {{ displayName() }}
+          </h1>
+          @if (profile().handle) {
+            <span class="text-sm text-muted-color">&#64;{{ profile().handle }}</span>
+          }
+          <div class="flex flex-wrap items-center gap-2 mt-1">
+            @if (locationLabel(); as loc) {
+              <span class="text-sm text-muted-color flex items-center gap-1">
+                <i class="pi pi-map-marker text-xs"></i>{{ loc }}
+              </span>
+            }
+            @if (profile().isAcceptingClients) {
+              <p-tag rounded value="Accepting clients" severity="success" />
+            }
+            @for (role of profile().displayRoles ?? []; track role) {
+              <p-tag rounded [value]="role" severity="info" />
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (showCtas()) {
+        <div class="hidden md:flex gap-2 self-end">
+          <p-button
+            label="Message"
+            icon="pi pi-envelope"
+            severity="secondary"
+            outlined
+            (onClick)="message.emit()" />
+          <p-button
+            label="Book a session"
+            icon="pi pi-calendar"
+            (onClick)="book.emit()" />
+        </div>
+      }
+    </div>
+  </div>
+</section>

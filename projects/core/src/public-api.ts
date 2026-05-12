@@ -18,6 +18,11 @@ export * from './lib/models/user/role.model';
 export * from './lib/models/profile/profile.enums';
 export * from './lib/models/profile/instructor-profile.model';
 export * from './lib/models/profile/profile.model';
+export * from './lib/models/profile/instructor-group-summary.model';
+export * from './lib/models/profile/public-user-profile.model';
+
+// Models - Review
+export * from './lib/models/review/review.model';
 
 // Models - Venue
 export * from './lib/models/venue/venue.enums';
@@ -121,6 +126,7 @@ export * from './lib/stores/auth.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
 export * from './lib/stores/notification.store';
+export * from './lib/stores/public-profile.store';
 
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';

@@ -1,0 +1,44 @@
+@if (locked()) {
+  <span
+    class="privacy-chooser-locked"
+    [pTooltip]="lockedTooltip()"
+    tooltipPosition="top"
+  >
+    <i [class]="currentIcon()" aria-hidden="true"></i>
+    <span class="sr-only">{{ currentLabel() }} (locked)</span>
+  </span>
+} @else {
+  <p-button
+    [icon]="currentIcon()"
+    [text]="true"
+    [rounded]="true"
+    size="small"
+    severity="secondary"
+    [disabled]="disabled()"
+    [ariaLabel]="'Visibility: ' + currentLabel() + '. Change.'"
+    [pTooltip]="currentLabel()"
+    tooltipPosition="top"
+    (click)="toggle($event)"
+  />
+
+  <p-popover #popover [appendTo]="'body'">
+    <div class="privacy-chooser-options" role="listbox">
+      @for (opt of options; track opt) {
+        <button
+          type="button"
+          role="option"
+          class="privacy-chooser-option"
+          [class.is-selected]="opt === level()"
+          [attr.aria-selected]="opt === level()"
+          (click)="pick(opt)"
+        >
+          <i [class]="Icons[opt]" aria-hidden="true"></i>
+          <span>{{ Labels[opt] }}</span>
+          @if (opt === level()) {
+            <i class="pi pi-check ml-auto text-primary" aria-hidden="true"></i>
+          }
+        </button>
+      }
+    </div>
+  </p-popover>
+}

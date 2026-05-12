@@ -2,8 +2,9 @@ import type { SessionType, AvailableDay } from './profile.enums';
 
 export interface InstructorCertification {
   name: string;
-  issuer: string;
-  year: number;
+  issuer: string | null;
+  year: number | null;
+  credentialUrl?: string | null;
 }
 
 export interface InstructorProfile {

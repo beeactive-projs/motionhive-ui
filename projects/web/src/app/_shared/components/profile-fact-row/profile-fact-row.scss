@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.mh-fact-row {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0;
+
+  &__icon {
+    font-size: 1rem;
+    color: var(--p-text-muted-color);
+    text-align: center;
+    line-height: 1.5rem;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--p-text-muted-color);
+  }
+
+  &__value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--p-text-color);
+    overflow-wrap: anywhere;
+
+    &--placeholder {
+      color: var(--p-text-muted-color);
+      font-weight: 400;
+      font-style: italic;
+    }
+  }
+
+  &__chooser {
+    display: inline-flex;
+    align-items: center;
+  }
+}

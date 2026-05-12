@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+::ng-deep .offering-card--popular .p-card {
+  border-top: 3px solid var(--p-primary-color);
+}

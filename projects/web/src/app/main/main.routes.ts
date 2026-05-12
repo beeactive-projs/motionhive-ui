@@ -1,5 +1,19 @@
-import { Routes } from '@angular/router';
+import { Routes, UrlMatcher, UrlSegment } from '@angular/router';
 import { rolesGuard, instructorGuard, roleRedirectGuard, superAdminGuard, UserRoles } from 'core';
+
+// Matches a single URL segment that starts with `@` (e.g. `/@ionut`) and
+// exposes the part after the `@` as the `handle` route param. Angular's
+// `:param` syntax claims a whole segment, so a literal `@` prefix needs a
+// custom matcher.
+const handleMatcher: UrlMatcher = (segments) => {
+  if (segments.length === 0) return null;
+  const first = segments[0];
+  if (!first.path.startsWith('@') || first.path.length < 2) return null;
+  return {
+    consumed: [first],
+    posParams: { handle: new UrlSegment(first.path.slice(1), {}) },
+  };
+};
 
 export const mainRoutes: Routes = [
   {
@@ -90,6 +104,13 @@ export const mainRoutes: Routes = [
         loadComponent: () =>
           import('./user/payments/invoice-detail/invoice-detail').then((m) => m.UserInvoiceDetail),
         title: 'Invoice - MotionHive',
+      },
+
+      // Public instructor profile (`/@<handle>`)
+      {
+        matcher: handleMatcher,
+        loadChildren: () =>
+          import('./public-profile/public-profile.routes').then((m) => m.publicProfileRoutes),
       },
 
       // Instructor

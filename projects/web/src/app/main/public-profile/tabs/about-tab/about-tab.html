@@ -1,0 +1,62 @@
+@if (profile(); as p) {
+  @if (!hasContent()) {
+    <p-card>
+      <div class="text-center py-6 text-muted-color">
+        <p class="m-0 text-sm">No bio yet — check back soon.</p>
+      </div>
+    </p-card>
+  } @else {
+    <div class="flex flex-col gap-4">
+      @if (p.bio) {
+        <p-card>
+          <ng-template #header>
+            <div class="px-4 pt-4">
+              <h2 class="m-0 text-base font-semibold">About</h2>
+            </div>
+          </ng-template>
+          <p class="m-0 text-sm leading-relaxed whitespace-pre-wrap">{{ p.bio }}</p>
+        </p-card>
+      }
+
+      @if (specializations().length > 0) {
+        <p-card>
+          <ng-template #header>
+            <div class="px-4 pt-4">
+              <h2 class="m-0 text-base font-semibold">Specializations</h2>
+            </div>
+          </ng-template>
+          <div class="flex flex-wrap gap-2">
+            @for (spec of specializations(); track spec) {
+              <p-tag [value]="spec" severity="secondary" rounded />
+            }
+          </div>
+        </p-card>
+      }
+
+      @if (certifications().length > 0) {
+        <p-card>
+          <ng-template #header>
+            <div class="px-4 pt-4">
+              <h2 class="m-0 text-base font-semibold">Certifications</h2>
+            </div>
+          </ng-template>
+          <ul class="m-0 p-0 list-none flex flex-col gap-3">
+            @for (cert of certifications(); track cert.name) {
+              <li class="flex items-start gap-3">
+                <span class="cert-badge"><i class="pi pi-verified"></i></span>
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium">{{ cert.name }}</span>
+                  @if (cert.issuer) {
+                    <span class="text-xs text-muted-color">{{ cert.issuer }}{{ cert.year ? ' · ' + cert.year : '' }}</span>
+                  } @else if (cert.year) {
+                    <span class="text-xs text-muted-color">{{ cert.year }}</span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        </p-card>
+      }
+    </div>
+  }
+}

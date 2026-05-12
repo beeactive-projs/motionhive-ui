@@ -1,0 +1,61 @@
+<p-dialog
+  header="Edit profile handle"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="true"
+  [style]="{ width: '28rem' }"
+  [appendTo]="'body'"
+>
+  <div class="flex flex-col gap-3">
+    <p class="text-sm text-muted-color m-0">
+      Your handle is the short URL for your profile. People can find you at
+      <span class="font-semibold">/@your-handle</span>.
+    </p>
+
+    <label class="flex flex-col gap-1.5">
+      <span class="text-sm font-medium">Handle</span>
+      <span class="p-inputgroup">
+        <span class="p-inputgroup-addon">{{ '@' }}</span>
+        <input
+          pInputText
+          name="handle"
+          autocomplete="off"
+          spellcheck="false"
+          [ngModel]="handle()"
+          (ngModelChange)="handle.set($event)"
+          [maxlength]="40"
+          placeholder="jane-doe"
+        />
+      </span>
+    </label>
+
+    @if (validationError(); as err) {
+      <p-message severity="error" size="small" variant="simple">
+        {{ err }}
+      </p-message>
+    } @else if (!unchanged()) {
+      <p class="text-xs text-muted-color m-0">
+        Preview: <span class="font-semibold">/@{{ normalized() }}</span>
+      </p>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      (onClick)="visible.set(false)"
+      [disabled]="saving()"
+    />
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      [disabled]="!!validationError() || unchanged() || saving()"
+      [loading]="saving()"
+      (onClick)="save()"
+    />
+  </ng-template>
+</p-dialog>

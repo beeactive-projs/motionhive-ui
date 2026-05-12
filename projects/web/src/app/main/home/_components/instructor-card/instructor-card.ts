@@ -1,21 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { InstructorSearchResult } from 'core';
 import { Hex, HexTone } from '../hex/hex';
 
 /**
- * Compact instructor card used in the "Meet every instructor" grid on
- * the home page. Hex avatar with initials + name + role + tag chips +
- * a Follow button.
+ * Compact instructor card used in the "Meet every instructor" carousel
+ * on the home page. Hex avatar with initials + name + role + tag chips
+ * + a "View profile" CTA that navigates to `/@<handle>`.
  *
- * NOTE: "Follow" is not a real backend feature yet — the button emits
- * `followClick` and call-sites currently log/no-op. Wire to a real
- * follow endpoint once it ships.
+ * Falls back to a disabled button when the instructor has no handle —
+ * still a rare edge for legacy profiles created before migration 038.
  */
 @Component({
   selector: 'mh-instructor-card',
-  imports: [ButtonModule, TagModule, Hex],
+  imports: [RouterLink, ButtonModule, Card, TagModule, Hex],
   templateUrl: './instructor-card.html',
   styleUrl: './instructor-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,8 +25,6 @@ export class InstructorCard {
   readonly instructor = input.required<InstructorSearchResult>();
   /** Picks a hex tone from the instructor id so cards visually vary across the grid. */
   readonly tone = input<HexTone | null>(null);
-
-  readonly followClick = output<InstructorSearchResult>();
 
   readonly initials = computed(() => {
     const i = this.instructor();
@@ -55,7 +54,7 @@ export class InstructorCard {
   readonly resolvedTone = computed<HexTone>(() => {
     const explicit = this.tone();
     if (explicit) return explicit;
-    // Deterministic-ish tone from id so the same instructor always gets the same colour.
+    // Deterministic tone from id so the same instructor always gets the same colour.
     const tones: HexTone[] = ['honey', 'coral', 'teal', 'navy'];
     const id = this.instructor().id ?? '';
     let sum = 0;
@@ -63,7 +62,8 @@ export class InstructorCard {
     return tones[sum % tones.length];
   });
 
-  onFollow(): void {
-    this.followClick.emit(this.instructor());
-  }
+  readonly profileLink = computed(() => {
+    const handle = this.instructor().handle;
+    return handle ? ['/@' + handle] : null;
+  });
 }

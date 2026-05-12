@@ -1,0 +1,22 @@
+<div class="mh-fact-row">
+  <i class="mh-fact-row__icon" [class]="icon()" aria-hidden="true"></i>
+  <div class="mh-fact-row__body">
+    <span class="mh-fact-row__label">{{ label() }}</span>
+    @if (hasValue()) {
+      <span class="mh-fact-row__value">{{ value() }}</span>
+    } @else {
+      <span class="mh-fact-row__value mh-fact-row__value--placeholder">
+        {{ placeholder() }}
+      </span>
+    }
+  </div>
+  @if (hasChooser()) {
+    <mh-privacy-chooser
+      class="mh-fact-row__chooser"
+      [level]="privacyLevel()!"
+      [locked]="lockedPrivacy()"
+      [lockedTooltip]="lockedTooltip() ?? 'This setting is managed by the system.'"
+      (levelChange)="privacyChange.emit($event)"
+    />
+  }
+</div>

@@ -6,6 +6,11 @@
     .p-button {
       width: var(--p-button-sm-icon-only-width);
       height: var(--p-button-sm-icon-only-width);
+
+      mh-avatar {
+        width: var(--p-button-sm-icon-only-width);
+        height: var(--p-button-sm-icon-only-width);
+      }
     }
     .p-avatar {
       width: var(--p-button-sm-icon-only-width);
@@ -15,11 +20,6 @@
       // color: var(--p-primary-color);
     }
   }
-}
-
-mh-avatar {
-  width: var(--p-button-sm-icon-only-width);
-  height: var(--p-button-sm-icon-only-width);
 }
 
 // :host-context(.dark) {
