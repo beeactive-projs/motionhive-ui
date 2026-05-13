@@ -1,0 +1,76 @@
+.mh-report__lead {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #334155;
+}
+
+.mh-report__lead strong {
+  color: #0f172a;
+}
+
+.mh-report__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mh-report__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #94a3b8;
+}
+
+.mh-report__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mh-report__chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+}
+
+.mh-report__chip:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.mh-report__chip--active {
+  background: #fef3c7;
+  border-color: #fbbf24;
+  color: #78350f;
+}
+
+.mh-report__chip--active:hover {
+  background: #fde68a;
+}
+
+.mh-report__textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 96px;
+}
+
+.mh-report__counter {
+  align-self: flex-end;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+// Dark-mode overrides for this dialog live in
+// `projects/web/src/styles-messaging-dialogs.css` because PrimeNG
+// `p-dialog` portals its content to `<body>`. See the
+// `.dark .mh-report-dialog …` rules there.

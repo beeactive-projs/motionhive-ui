@@ -73,6 +73,11 @@
           <i class="pi pi-bell"></i>
           <span class="ml-2">Notifications</span>
         </p-tab>
+
+        <p-tab [value]="Tabs.Safety">
+          <i class="pi pi-shield"></i>
+          <span class="ml-2">Safety</span>
+        </p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -108,6 +113,12 @@
         <p-tabpanel [value]="Tabs.Notifications">
           @if (activeTab() === Tabs.Notifications) {
             <mh-profile-notifications />
+          }
+        </p-tabpanel>
+
+        <p-tabpanel [value]="Tabs.Safety">
+          @if (activeTab() === Tabs.Safety) {
+            <mh-profile-safety />
           }
         </p-tabpanel>
       </p-tabpanels>

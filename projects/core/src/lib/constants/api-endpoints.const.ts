@@ -164,4 +164,21 @@ export const API_ENDPOINTS = {
     BY_ID: (deviceId: string) => `/devices/${deviceId}`,
     HEARTBEAT: (deviceId: string) => `/devices/${deviceId}/seen`,
   },
+  MESSAGING: {
+    CONVERSATIONS: '/messaging/conversations',
+    CONVERSATION: (id: string) => `/messaging/conversations/${id}`,
+    CONVERSATION_MESSAGES: (id: string) =>
+      `/messaging/conversations/${id}/messages`,
+    CONVERSATION_READ: (id: string) => `/messaging/conversations/${id}/read`,
+    CONVERSATION_MUTE: (id: string) => `/messaging/conversations/${id}/mute`,
+    CONVERSATION_LEAVE: (id: string) => `/messaging/conversations/${id}/leave`,
+    MESSAGES: '/messaging/messages',
+    MESSAGE: (id: string) => `/messaging/messages/${id}`,
+    BLOCKS: '/messaging/blocks',
+    BLOCK: (blockedId: string) => `/messaging/blocks/${blockedId}`,
+    REPORTS: '/messaging/reports',
+    UNREAD_COUNT: '/messaging/unread-count',
+    STREAM: '/messaging/stream',
+    STREAM_ACK: '/messaging/stream/ack',
+  },
 } as const;

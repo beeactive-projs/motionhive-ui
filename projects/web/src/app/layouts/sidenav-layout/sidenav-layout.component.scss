@@ -125,6 +125,32 @@ $lg: 1024px;
   color: var(--p-text-muted-color);
 }
 
+// Coral unread pill rendered inside a NavItem when its `badge` signal
+// resolves > 0. Per design tokens: coral default, honey when the row
+// is active (the active background is honey-soft so coral would clash).
+.mh-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #f97066;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+// Flip to honey when the row is active. routerLinkActive applies the
+// `bg-primary-500/30` and `text-primary-700` classes — we anchor on
+// the first since it's stable across light/dark themes.
+a.bg-primary-500\/30 .mh-nav-badge {
+  background: #f59e0b;
+  color: #0f172a;
+}
+
 // --- Content ---
 .content {
   display: flex;

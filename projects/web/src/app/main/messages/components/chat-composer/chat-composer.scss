@@ -1,0 +1,154 @@
+:host {
+  display: block;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.mh-composer-wrap {
+  padding: 14px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mh-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  border-radius: 22px;
+  background: #f7f1e6;
+  transition: opacity 120ms ease;
+}
+
+.mh-composer--disabled {
+  opacity: 0.7;
+}
+
+.mh-composer__input {
+  flex: 1;
+  min-height: 36px;
+  max-height: 160px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #0f172a;
+  outline: none;
+  resize: none;
+  padding: 8px 0;
+  line-height: 1.4;
+  // Hide scrollbar until it's needed; let height grow with content.
+  overflow-y: auto;
+}
+
+.mh-composer__input::placeholder {
+  color: #94a3b8;
+}
+
+.mh-composer__send {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: none;
+  background: #f59e0b;
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 0 rgba(120, 53, 15, 0.18),
+    inset 0 -1px 0 rgba(120, 53, 15, 0.12);
+}
+
+.mh-composer__send:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mh-composer__send i {
+  font-size: 14px;
+}
+
+.mh-composer-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #ffe4dc;
+  color: #c4392f;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.mh-composer-error__text {
+  flex: 1;
+}
+
+.mh-composer-error__dismiss {
+  border: none;
+  background: transparent;
+  color: #c4392f;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mh-composer-error__dismiss:hover {
+  background: rgba(196, 57, 47, 0.12);
+}
+
+.mh-composer-hint {
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .mh-composer-wrap {
+    padding: 10px 14px 12px;
+  }
+}
+
+// ── Dark mode ────────────────────────────────────────────────────
+// `:host-context(.dark) { … }` styles the host element when an
+// ancestor has the `.dark` class — so the host-level background +
+// border-top set on `:host` above can be re-themed here directly.
+:host-context(.dark) {
+  background: var(--p-surface-800, #1e293b);
+  border-top-color: rgba(248, 250, 252, 0.08);
+  .mh-composer {
+    background: var(--p-surface-700, #334155);
+  }
+  .mh-composer__input {
+    color: var(--p-surface-50, #f1f5f9);
+  }
+  .mh-composer__input::placeholder {
+    color: var(--p-surface-400, #94a3b8);
+  }
+  // Send button keeps the honey gradient — readable on dark.
+  .mh-composer__send:disabled {
+    background: rgba(248, 250, 252, 0.10);
+    color: var(--p-surface-400, #94a3b8);
+  }
+  .mh-composer-error {
+    background: rgba(220, 38, 38, 0.16);
+    color: #fca5a5;
+  }
+  .mh-composer-error__dismiss {
+    color: #fca5a5;
+  }
+  .mh-composer-error__dismiss:hover {
+    background: rgba(252, 165, 165, 0.16);
+  }
+  .mh-composer-hint {
+    color: var(--p-surface-400, #94a3b8);
+  }
+}

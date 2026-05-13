@@ -32,6 +32,7 @@ import { ProfileHeroCard } from './_components/profile-hero-card/profile-hero-ca
 import { Details } from './tabs/details/details';
 import { ProfileCoaches } from './tabs/coaches/coaches';
 import { ProfileNotifications } from './tabs/notifications/notifications';
+import { ProfileSafety } from './tabs/safety/safety';
 import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
 import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
@@ -43,6 +44,7 @@ export const ProfileTabs = {
   Invoices: 'invoices',
   Memberships: 'memberships',
   Notifications: 'notifications',
+  Safety: 'safety',
 } as const;
 
 export type ProfileTab = (typeof ProfileTabs)[keyof typeof ProfileTabs];
@@ -73,6 +75,7 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
     Details,
     ProfileCoaches,
     ProfileNotifications,
+    ProfileSafety,
     MyInvoices,
     MySubscriptions,
     EditPersonalInfo,

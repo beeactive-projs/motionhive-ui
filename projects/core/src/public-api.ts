@@ -74,6 +74,9 @@ export * from './lib/models/payment/status-severity';
 // Models - Notification
 export * from './lib/models/notification';
 
+// Models - Messaging
+export * from './lib/models/messaging';
+
 // Constants
 export * from './lib/constants/api-endpoints.const';
 export * from './lib/constants/storage-keys.const';
@@ -113,6 +116,7 @@ export * from './lib/services/payment/earnings.service';
 export * from './lib/services/payment/client-payment.service';
 export * from './lib/services/venue/venue.service';
 export * from './lib/services/notification/notification.service';
+export * from './lib/services/messaging';
 
 // Pipes
 export * from './lib/pipes/currency-ron.pipe';
@@ -127,6 +131,7 @@ export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
 export * from './lib/stores/notification.store';
 export * from './lib/stores/public-profile.store';
+export * from './lib/stores/messaging.store';
 
 // Interceptors
 export * from './lib/interceptors/auth.interceptor';

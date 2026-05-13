@@ -1,0 +1,99 @@
+@if (conversation(); as conv) {
+  <div class="mh-pane">
+    <mh-chat-header
+      [conversation]="conv"
+      (back)="onBack()"
+      (toggleInfo)="onToggleInfo()"
+    />
+
+    @if (loading() && messages().length === 0) {
+      <div class="mh-pane__initial-load">
+        <span class="mh-pane__pill">Loading messages…</span>
+      </div>
+    } @else if (messages().length === 0) {
+      <div class="mh-pane__empty">
+        <p class="mh-pane__empty-title">No messages yet</p>
+        <p class="mh-pane__empty-sub">Send the first message to start the conversation.</p>
+      </div>
+    } @else {
+      <mh-chat-thread
+        [conversation]="conv"
+        [messages]="messages()"
+        [currentUserId]="currentUserId()"
+        [loadingOlder]="loading()"
+        [hasOlder]="hasOlder()"
+        (loadOlder)="onLoadOlder()"
+      />
+    }
+
+    <mh-threat-banner />
+
+    <mh-chat-composer
+      [conversationId]="conv.id"
+      [recipientId]="conv.otherUser?.id ?? null"
+      [placeholder]="conv.otherUser ? 'Message ' + (conv.otherUser.firstName || 'them') + '…' : 'Message…'"
+    />
+  </div>
+
+  <!-- Detail rail. Fixed on ≥1024px; drawer below that. -->
+  <aside
+    class="mh-pane__rail"
+    [class.mh-pane__rail--open]="railOpen()"
+  >
+    <mh-dm-detail-rail
+      [conversation]="conv"
+      (block)="onBlock()"
+      (toggleMute)="onToggleMute()"
+      (report)="onReport()"
+    />
+  </aside>
+
+  <!-- Drawer backdrop (mobile/tablet only — desktop sees neither). -->
+  @if (railOpen()) {
+    <div
+      class="mh-pane__backdrop"
+      (click)="onToggleInfo()"
+      aria-label="Close info panel"
+    ></div>
+  }
+} @else if (!store.hasLoaded()) {
+  <!--
+    URL has an :id but the conversation list is still loading. Show
+    a transient loading state — once `loadConversations` resolves and
+    `activeConversation()` returns the row, we re-render with the
+    real pane.
+  -->
+  <div class="mh-pane__empty">
+    <p class="mh-pane__empty-title">Loading conversation…</p>
+  </div>
+} @else {
+  <!--
+    List has loaded but the id isn't in it. Either the conversation
+    was blocked / left / never existed for this user. Don't pretend
+    it's still loading — surface a clear empty state and let them
+    pick another row.
+  -->
+  <div class="mh-pane__empty">
+    <p class="mh-pane__empty-title">Conversation not available</p>
+    <p class="mh-pane__empty-sub">It may have been removed, or you no longer have access. Pick another conversation from the list.</p>
+  </div>
+}
+
+<!-- Safety dialogs. Mounted at the pane level so they survive any
+     internal re-renders, and so the same instance is reused as the
+     active conversation changes. -->
+<mh-block-confirm-dialog
+  [(visible)]="blockDialogVisible"
+  [blockedId]="otherId()"
+  [conversationId]="conversation()?.id ?? null"
+  [displayName]="otherName()"
+/>
+
+<mh-report-conversation-dialog
+  [(visible)]="reportDialogVisible"
+  [conversationId]="conversation()?.id ?? null"
+  [displayName]="otherName()"
+/>
+
+<p-toast position="top-right" />
+

@@ -1,0 +1,46 @@
+<aside class="mh-rail">
+  @if (other()) {
+    <div class="mh-rail__profile">
+      <mh-hex-avatar
+        [size]="64"
+        [userId]="other()!.id"
+        [initials]="initials()"
+        [imageUrl]="other()!.avatarUrl"
+      />
+      <div class="mh-rail__name">{{ name() }}</div>
+    </div>
+
+    <div class="mh-rail__section">
+      <div class="mh-rail__eyebrow">Quick actions</div>
+      <div class="mh-rail__actions">
+        <button
+          type="button"
+          class="mh-rail__action-btn"
+          (click)="toggleMute.emit()"
+          [attr.aria-pressed]="muted()"
+        >
+          <i class="pi pi-bell" aria-hidden="true"></i>
+          <span>{{ muted() ? 'Unmute notifications' : 'Mute notifications' }}</span>
+        </button>
+        <button
+          type="button"
+          class="mh-rail__action-btn"
+          (click)="report.emit()"
+        >
+          <i class="pi pi-flag" aria-hidden="true"></i>
+          <span>Report conversation</span>
+        </button>
+        <button
+          type="button"
+          class="mh-rail__action-btn mh-rail__action-btn--danger"
+          (click)="block.emit()"
+        >
+          <i class="pi pi-ban" aria-hidden="true"></i>
+          <span>Block this user</span>
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="mh-rail__placeholder">No participant info</div>
+  }
+</aside>

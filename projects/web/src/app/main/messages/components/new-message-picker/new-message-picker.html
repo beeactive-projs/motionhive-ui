@@ -1,0 +1,85 @@
+<section class="mh-picker">
+  <header class="mh-picker__header">
+    <button
+      type="button"
+      class="mh-picker__cancel"
+      (click)="onCancel()"
+      aria-label="Cancel new message"
+    >
+      <i class="pi pi-times" aria-hidden="true"></i>
+      <span>Cancel</span>
+    </button>
+    <h2 class="mh-picker__title">New message</h2>
+    <span class="mh-picker__spacer"></span>
+  </header>
+
+  <div class="mh-picker__to">
+    <span class="mh-picker__to-label">To:</span>
+    @if (selected(); as picked) {
+      <span class="mh-picker__chip">
+        <mh-hex-avatar
+          [size]="22"
+          [userId]="picked.id"
+          [initials]="initials(picked)"
+          [imageUrl]="picked.avatarUrl"
+        />
+        {{ nameOf(picked) }}
+        <button
+          type="button"
+          class="mh-picker__chip-remove"
+          (click)="clearSelection()"
+          aria-label="Remove recipient"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </span>
+    } @else {
+      <input
+        type="search"
+        class="mh-picker__search"
+        placeholder="Search people…"
+        [ngModel]="query()"
+        (ngModelChange)="onQueryChange($event)"
+        aria-label="Search people"
+      />
+    }
+  </div>
+
+  @if (canShowResults()) {
+    <div class="mh-picker__results">
+      @if (searching()) {
+        <div class="mh-picker__result-placeholder">Searching…</div>
+      } @else if (results().length === 0) {
+        <div class="mh-picker__result-placeholder">No people match.</div>
+      } @else {
+        @for (user of results(); track user.id) {
+          <button
+            type="button"
+            class="mh-picker__result-row"
+            (click)="onSelect(user)"
+          >
+            <mh-hex-avatar
+              [size]="36"
+              [userId]="user.id"
+              [initials]="initials(user)"
+              [imageUrl]="user.avatarUrl"
+            />
+            <div class="mh-picker__result-text">
+              <div class="mh-picker__result-name">{{ nameOf(user) }}</div>
+              <div class="mh-picker__result-sub">{{ user.email }}</div>
+            </div>
+          </button>
+        }
+      }
+    </div>
+  }
+
+  <div class="mh-picker__composer">
+    <mh-chat-composer
+      [conversationId]="null"
+      [recipientId]="selected()?.id ?? null"
+      [placeholder]="placeholder()"
+      [disabled]="!selected()"
+    />
+  </div>
+</section>

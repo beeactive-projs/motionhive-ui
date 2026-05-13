@@ -32,6 +32,11 @@ export const mainRoutes: Routes = [
         title: 'Explore - MotionHive',
       },
       {
+        path: 'messages',
+        loadChildren: () =>
+          import('./messages/messages.routes').then((m) => m.messagesRoutes),
+      },
+      {
         path: 'join/:token',
         loadComponent: () => import('./join-group/join-group').then((m) => m.JoinGroup),
         title: 'Join Group - MotionHive',
