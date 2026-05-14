@@ -63,8 +63,12 @@ export interface PublicInstructorProfile {
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
   isPublic: boolean;
+  email: string | null;
+  phone: string | null;
   city: string | null;
   countryCode: string | null;
+  language: string | null;
+  timezone: string | null;
   socialLinks: Record<string, string> | null;
   showEmail: boolean;
   showPhone: boolean;

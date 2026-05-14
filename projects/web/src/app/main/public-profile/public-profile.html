@@ -1,78 +1,91 @@
 <p-toast />
 
 @if (loading()) {
-<div class="flex flex-col gap-4 max-w-400 mx-auto w-full">
-  <p-skeleton width="100%" height="240px" />
-  <p-skeleton width="100%" height="48px" />
-  <p-skeleton width="100%" height="240px" />
-</div>
+  <div class="flex flex-col gap-4 max-w-400 mx-auto w-full">
+    <p-skeleton width="100%" height="240px" />
+    <p-skeleton width="100%" height="48px" />
+    <p-skeleton width="100%" height="240px" />
+  </div>
 } @else if (error(); as err) {
-<div class="flex flex-col gap-3 max-w-400 mx-auto w-full">
-  <p-message severity="warn" icon="pi pi-exclamation-triangle">
-    <div class="flex flex-col gap-2">
-      <h2 class="m-0 text-base font-semibold">Profile not found</h2>
-      <p class="m-0 text-sm">{{ err }}</p>
-    </div>
-  </p-message>
-  <p-button label="Back to explore" icon="pi pi-arrow-left" (onClick)="goBack()" />
-</div>
-} @else if (heroProfile(); as hero) {
-<main class="flex flex-col gap-4 max-w-400 mx-auto w-full pb-24 lg:pb-4">
-  <mh-profile-hero [profile]="hero" [isSelf]="isSelf()" (book)="onBook()" (message)="onMessage()" />
-
-  @if (isInstructor() && profile(); as p) {
-    <!-- Instructor surfaces: tabs (about / offerings / reviews / groups),
-         side rail with pricing + at-a-glance, and the mobile CTA bar. -->
-    <div class="flex flex-col lg:flex-row gap-4 items-start">
-      <div class="flex-1 min-w-0 flex flex-col gap-4 w-full">
-        <mh-profile-tabs />
-        <div>
-          <router-outlet />
-        </div>
+  <div class="flex flex-col gap-3 max-w-400 mx-auto w-full">
+    <p-message severity="warn" icon="pi pi-exclamation-triangle">
+      <div class="flex flex-col gap-2">
+        <h2 class="m-0 text-base font-semibold">Profile not found</h2>
+        <p class="m-0 text-sm">{{ err }}</p>
       </div>
+    </p-message>
+    <p-button label="Back to explore" icon="pi pi-arrow-left" (onClick)="goBack()" />
+  </div>
+} @else if (heroProfile(); as hero) {
+  <!-- Shell-level 2-column layout: hero + content on the left, sticky
+       side rail/panel on the right. The aside starts alongside the
+       hero (not below it) so the "Train with X" CTA card and the hero
+       portrait line up at the top, matching the design screenshots. -->
+  <main class="flex flex-col lg:flex-row gap-4 items-start max-w-400 mx-auto w-full pb-24 lg:pb-4">
+    <div class="flex-1 min-w-0 flex flex-col gap-4 w-full">
+      <mh-profile-hero
+        [profile]="hero"
+        [viewerMode]="viewerMode()"
+        (book)="onBook()"
+        (message)="onMessage()"
+        (share)="onShare()"
+        (save)="onSave()"
+        (edit)="onEdit()" />
 
-      <aside class="hidden lg:block lg:basis-80 lg:shrink-0 lg:sticky lg:top-6">
-        <mh-profile-side-rail [profile]="p" [isSelf]="isSelf()" (book)="onBook()" (message)="onMessage()" />
-      </aside>
+      @if (isInstructor() && profile()) {
+        <!-- Stat strip — between hero and the section cards. Renders only
+             the cells we have real data for; 1-4 columns depending on
+             payload. -->
+        <mh-stat-strip [stats]="instructorStats()" />
+        <mh-public-profile-about-tab />
+        <mh-public-profile-offerings-tab />
+        <mh-public-profile-groups-tab (lockedJoin)="onLockedAction(Actions.Group)" />
+      } @else if (userProfile(); as u) {
+        <!-- Non-instructor: long-scroll about + future user sections. -->
+        <mh-user-profile [profile]="u" [viewerMode]="viewerMode()" />
+      }
     </div>
 
+    <aside class="hidden lg:block lg:basis-80 lg:shrink-0 lg:self-start lg:sticky lg:top-6">
+      @if (isInstructor() && profile(); as p) {
+        <mh-profile-side-rail
+          [profile]="p"
+          [viewerMode]="viewerMode()"
+          (book)="onBook()"
+          (message)="onMessage()"
+          (share)="onShare()" />
+      } @else if (userProfile(); as u) {
+        <mh-user-side-panel
+          [profile]="u"
+          [viewerMode]="viewerMode()"
+          (share)="onShare()"
+          (message)="onMessage()" />
+      }
+    </aside>
+  </main>
+
+  <!-- Outside the column layout — fixed-position bar and portal dialog. -->
+  @if (isInstructor() && profile(); as p) {
     @if (!isSelf()) {
       <mh-mobile-cta-bar [profile]="p" (book)="onBook()" (message)="onMessage()" />
     }
-
-    <mh-request-to-be-client-dialog [(visible)]="dialogVisible" [instructorUserId]="p.userId"
-      [instructorName]="p.displayName || (p.firstName + ' ' + p.lastName)" />
-  } @else if (userProfile(); as u) {
-    <!-- Non-instructor: about card listing whatever facts the server
-         returned. Fields the viewer isn't allowed to see come back as
-         null and are filtered out of `visibleFacts` upstream. -->
-    <p-card>
-      <ng-template #header>
-        <div class="flex items-center gap-2 px-4 pt-4">
-          <i class="pi pi-info-circle text-primary-600"></i>
-          <h2 class="text-base font-semibold m-0">About</h2>
-        </div>
-      </ng-template>
-
-      <dl class="grid gap-4 sm:grid-cols-2">
-        @for (fact of visibleFacts(); track fact.label) {
-          <div>
-            <dt class="text-xs uppercase tracking-wide text-surface-500">{{ fact.label }}</dt>
-            <dd class="mt-1 text-sm font-medium">{{ fact.value }}</dd>
-          </div>
-        }
-        <div>
-          <dt class="text-xs uppercase tracking-wide text-surface-500">Member since</dt>
-          <dd class="mt-1 text-sm font-medium">{{ u.memberSince | date: 'mediumDate' }}</dd>
-        </div>
-      </dl>
-
-      @if (visibleFacts().length === 0) {
-        <p class="text-sm text-muted-color m-0 mt-2">
-          This member hasn't shared any public details yet.
-        </p>
-      }
-    </p-card>
+    <mh-contact-instructor-dialog
+      [(visible)]="contactDialogVisible"
+      [instructorUserId]="p.userId"
+      [instructorName]="p.displayName || (p.firstName + ' ' + p.lastName)"
+      [instructorAvatar]="instructorAvatar()" />
   }
-</main>
+
+  <mh-signup-prompt-dialog
+    [(visible)]="signupPromptVisible"
+    [action]="signupPromptAction()"
+    [next]="signupPromptNext()"
+    [instructorName]="signupPromptInstructorName()"
+    [instructorAvatar]="instructorAvatar()" />
+
+  <mh-share-dialog
+    [(visible)]="shareDialogVisible"
+    [url]="shareUrl()"
+    [previewTitle]="sharePreviewTitle()"
+    [previewSubtitle]="sharePreviewSubtitle()" />
 }

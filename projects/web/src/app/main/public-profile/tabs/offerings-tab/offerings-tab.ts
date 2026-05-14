@@ -5,13 +5,14 @@ import {
   OnInit,
 } from '@angular/core';
 import { PublicProfileStore } from 'core';
+import { AvatarModule } from 'primeng/avatar';
 import { Card } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { OfferingCard } from './offering-card/offering-card';
 
 @Component({
   selector: 'mh-public-profile-offerings-tab',
-  imports: [Card, SkeletonModule, OfferingCard],
+  imports: [AvatarModule, Card, SkeletonModule, OfferingCard],
   templateUrl: './offerings-tab.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

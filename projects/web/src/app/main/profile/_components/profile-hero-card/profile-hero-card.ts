@@ -47,6 +47,7 @@ export class ProfileHeroCard {
   readonly editPersonalInfo = output<void>();
   readonly editHandle = output<void>();
   readonly viewAsPublic = output<void>();
+  readonly share = output<void>();
   readonly resendVerification = output<void>();
   readonly avatarSelected = output<File>();
 

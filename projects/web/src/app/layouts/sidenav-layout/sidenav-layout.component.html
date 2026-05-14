@@ -37,8 +37,8 @@
             <i [class]="item.icon + ' text-base'"></i>
             <span class="flex-1">{{ item.label }}</span>
             @if (item.badge && item.badge() > 0) {
-              <span class="mh-nav-badge" aria-hidden="true">{{ item.badge()! > 99 ? '99+' : item.badge() }}</span>
-              <span class="sr-only">{{ item.badge() }} unread</span>
+            <span class="mh-nav-badge" aria-hidden="true">{{ item.badge()! > 99 ? '99+' : item.badge() }}</span>
+            <span class="sr-only">{{ item.badge() }} unread</span>
             }
           </a>
           }

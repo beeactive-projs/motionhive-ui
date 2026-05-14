@@ -25,17 +25,17 @@
       icon="pi pi-user"
       label="First name"
       [value]="profile().account.firstName"
-      [privacyField]="'firstName'"
-      [privacyLevel]="privacyLevel('firstName')"
-      (privacyChange)="emit('firstName', $event)"
+      [privacyLevel]="LockedPublic"
+      [lockedPrivacy]="true"
+      lockedTooltip="Always public — shown to everyone."
     />
     <mh-profile-fact-row
       icon="pi pi-user"
       label="Last name"
       [value]="profile().account.lastName"
-      [privacyField]="'lastName'"
-      [privacyLevel]="privacyLevel('lastName')"
-      (privacyChange)="emit('lastName', $event)"
+      [privacyLevel]="LockedPublic"
+      [lockedPrivacy]="true"
+      lockedTooltip="Always public — shown to everyone."
     />
     <mh-profile-fact-row
       icon="pi pi-envelope"
@@ -53,6 +53,15 @@
       [privacyField]="'phone'"
       [privacyLevel]="privacyLevel('phone')"
       (privacyChange)="emit('phone', $event)"
+    />
+    <mh-profile-fact-row
+      icon="pi pi-map-marker"
+      label="Location"
+      [value]="locationDisplay()"
+      placeholder="Not provided"
+      [privacyField]="'city'"
+      [privacyLevel]="privacyLevel('city')"
+      (privacyChange)="emit('city', $event)"
     />
   </div>
 </p-card>

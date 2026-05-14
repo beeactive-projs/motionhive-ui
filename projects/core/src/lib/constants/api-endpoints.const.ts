@@ -27,6 +27,10 @@ export const API_ENDPOINTS = {
     USER_BY_HANDLE: (handle: string) => `/profile/users/by-handle/${handle}`,
     PRIVACY: '/profile/privacy',
     HANDLE: '/profile/handle',
+    // Public lead-capture endpoint — POSTed from the "Reach out to <Name>"
+    // dialog on the instructor profile. No auth required (the design's
+    // one always-public action). Backend lands in Phase A2.
+    INSTRUCTOR_LEADS: '/profile/instructor-leads',
   },
   VENUES: {
     BASE: '/venues',

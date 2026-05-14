@@ -25,6 +25,7 @@
       (editPersonalInfo)="editPersonalInfoVisible.set(true)"
       (editHandle)="editHandleVisible.set(true)"
       (viewAsPublic)="viewAsPublic()"
+      (share)="onShare()"
       (resendVerification)="resendVerification()"
     />
 
@@ -133,6 +134,12 @@
       [(visible)]="editHandleVisible"
       [currentHandle]="p.account.handle"
       (saved)="loadProfile()"
+    />
+    <mh-share-dialog
+      [(visible)]="shareDialogVisible"
+      [url]="shareUrl()"
+      [previewTitle]="sharePreviewTitle()"
+      [previewSubtitle]="sharePreviewSubtitle()"
     />
   } @else {
     <p-card>

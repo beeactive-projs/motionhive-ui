@@ -1,0 +1,51 @@
+<p-dialog [(visible)]="visible" modal [closable]="true" [dismissableMask]="true"
+  [style]="{ width: '460px', maxWidth: '94vw' }">
+
+  <ng-template #header>
+    <div class="flex items-center gap-3">
+      @if (instructorAvatar(); as a) {
+      <mh-avatar [user]="a" />
+      }
+      <h2 class="m-0 text-xl md:text-2xl font-semibold leading-tight">
+        Reach out to {{ firstName() }}
+      </h2>
+    </div>
+  </ng-template>
+
+
+  <div class="relative flex flex-col items-center text-center gap-4 pt-6 pb-2">
+
+    <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-yellow-100 dark:bg-yellow-900/30">
+      <i class="pi {{ copy().icon }} text-2xl text-yellow-700 dark:text-yellow-400"></i>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <h2 class="m-0 font-heading text-2xl font-bold leading-tight">
+        {{ copy().title }}
+      </h2>
+      <p class="m-0 text-sm text-muted-color">
+        {{ copy().subtitle }}
+      </p>
+    </div>
+
+    <ul class="m-0 p-0 list-none flex flex-col gap-2 text-sm text-left">
+      <li class="flex items-center gap-2">
+        <i class="pi pi-check text-emerald-600"></i>
+        <span>Free forever for clients</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <i class="pi pi-check text-emerald-600"></i>
+        <span>Book, message, save coaches</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <i class="pi pi-check text-emerald-600"></i>
+        <span>Join groups & try workouts</span>
+      </li>
+    </ul>
+
+    <div class="flex flex-col gap-2 w-full pt-1">
+      <p-button label="Create account" fluid rounded (onClick)="goSignUp()" />
+      <p-button label="Login" severity="contrast" [outlined]="true" fluid rounded (onClick)="goLogIn()" />
+    </div>
+  </div>
+</p-dialog>

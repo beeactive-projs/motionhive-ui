@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { PublicProfileStore } from 'core';
+import { Avatar } from 'primeng/avatar';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 
 /**
- * Renders the bio paragraph, specializations, and certifications. All
- * data is on the root profile so no extra fetch is needed.
+ * Renders the bio paragraph, certifications, and specializations as a
+ * single section card that lives inline on the profile page.
  */
 @Component({
   selector: 'mh-public-profile-about-tab',
-  imports: [Card, TagModule],
+  imports: [Avatar, Card, TagModule],
   templateUrl: './about-tab.html',
+  styleUrl: './about-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutTab {

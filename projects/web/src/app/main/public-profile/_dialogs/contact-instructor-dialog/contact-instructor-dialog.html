@@ -1,0 +1,119 @@
+<p-dialog [(visible)]="visible" modal [closable]="!submitting()" [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()" [style]="{ width: '600px', maxWidth: '94vw' }"
+  styleClass="contact-instructor-dialog">
+
+  <ng-template #header>
+    <div class="flex items-start gap-3">
+      @if (instructorAvatar(); as a) {
+      <mh-avatar [user]="a" size="large" styleClass="!h-14 !w-14 !text-lg shrink-0" />
+      }
+      <div class="min-w-0">
+        <h2 class="m-0 text-xl md:text-2xl font-semibold leading-tight">
+          Reach out to {{ firstName() }}
+        </h2>
+        <p class="m-0 mt-1 text-sm text-muted-color">
+          {{ headerSubcopy() }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5 pt-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label for="lead-name" class="text-sm font-medium">Your name</label>
+        <input pInputText id="lead-name" formControlName="name" fluid autocomplete="name"
+          [class.ng-invalid]="invalid('name')" [class.ng-dirty]="invalid('name')" placeholder="Your name" />
+        @if (invalid('name')) {
+        <p-message severity="error" size="small" variant="simple">{{ getFieldError('name') }}</p-message>
+        }
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="lead-email" class="text-sm font-medium">Email</label>
+        <input pInputText id="lead-email" type="email" formControlName="email" fluid autocomplete="email"
+          [class.ng-invalid]="invalid('email')" [class.ng-dirty]="invalid('email')" placeholder="your@email.com" />
+        @if (invalid('email')) {
+        <p-message severity="error" size="small" variant="simple">{{ getFieldError('email') }}</p-message>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="lead-phone" class="text-sm font-medium">
+        Phone / WhatsApp
+        <span class="text-muted-color font-normal">optional</span>
+      </label>
+      <mh-phone-input inputId="lead-phone" [value]="form.controls.phone.value"
+        (valueChange)="form.controls.phone.setValue($event ?? '')" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">What's your main goal?</label>
+      <div class="flex flex-wrap items-center gap-2">
+        @for (option of goals; track option.value) {
+        <p-button type="button" [label]="option.label"
+          [severity]="form.controls.goal.value === option.value ? 'primary' : 'contrast'" size="small" rounded
+          [outlined]="form.controls.goal.value !== option.value" (onClick)="form.controls.goal.setValue(option.value)"
+          styleClass="py-0.5" />
+        }
+      </div>
+      @if (invalid('goal')) {
+      <p-message severity="error" size="small" variant="simple">{{ getFieldError('goal') }}</p-message>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Where are you starting from?</label>
+      <div class="flex flex-wrap items-center gap-2">
+        @for (option of levels; track option.value) {
+        <p-button type="button" [label]="option.label"
+          [severity]="form.controls.level.value === option.value ? 'primary' : 'contrast'" size="small" rounded
+          [outlined]="form.controls.level.value !== option.value" (onClick)="form.controls.level.setValue(option.value)"
+          styleClass="py-0.5" />
+        }
+      </div>
+      @if (invalid('level')) {
+      <p-message severity="error" size="small" variant="simple">{{ getFieldError('level') }}</p-message>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">How would you like to train?</label>
+      <div class="flex flex-wrap items-center gap-2">
+        @for (option of formats; track option.value) {
+        <p-button type="button" [label]="option.label"
+          [severity]="form.controls.format.value === option.value ? 'primary' : 'contrast'" size="small" rounded
+          [outlined]="form.controls.format.value !== option.value"
+          (onClick)="form.controls.format.setValue(option.value)" styleClass="py-0.5" />
+        }
+      </div>
+      @if (invalid('format')) {
+      <p-message severity="error" size="small" variant="simple">{{ getFieldError('format') }}</p-message>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="lead-message" class="text-sm font-medium">
+        Anything else?
+        <span class="text-muted-color font-normal">optional</span>
+      </label>
+      <textarea pTextarea id="lead-message" formControlName="message" rows="3" autoResize
+        placeholder="Hey! I've been on/off the gym for 2 years and want to commit. Free weekday evenings."></textarea>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="flex items-center justify-between gap-3 w-full">
+      <p class="m-0 text-xs text-muted-color flex items-center gap-1.5 min-w-0">
+        <i class="pi pi-shield"></i>
+        <span class="truncate">
+          {{ firstName() }} only sees your name, email and message.
+          <a href="https://www.motionhive.fit/legal/privacy-policy" target="_blank"
+            class="text-primary-600 hover:underline">Privacy</a>
+        </span>
+      </p>
+      <p-button label="Send message" icon="pi pi-arrow-right" iconPos="right" type="submit" [loading]="submitting()"
+        [disabled]="form.invalid" (onClick)="onSubmit()" />
+    </div>
+  </ng-template>
+</p-dialog>

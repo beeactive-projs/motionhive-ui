@@ -226,6 +226,25 @@ export class PublicProfileStore {
     this._cache.clear();
   }
 
+  /**
+   * Drop the cached payload for `handle` and, if it's the one currently
+   * mounted, clear the live signals so the next `load()` re-fetches.
+   * Called after the owner edits their own profile so the public view
+   * picks up the change instead of serving the LRU cache.
+   */
+  invalidate(handle: string | null | undefined): void {
+    if (!handle) return;
+    const key = handle.trim().toLowerCase();
+    if (!key) return;
+    this._cache.delete(key);
+    const currentHandle = this._userProfile()?.handle?.toLowerCase() ?? null;
+    if (currentHandle === key) {
+      this._userProfile.set(null);
+      this._profile.set(null);
+      this._resetTabState();
+    }
+  }
+
   private _fetchInstructorPayload(handle: string, key: string): void {
     this._profileService
       .getInstructorByHandle(handle)

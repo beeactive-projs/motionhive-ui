@@ -9,14 +9,6 @@
 
   <div class="flex flex-col gap-1">
     <mh-profile-fact-row
-      icon="pi pi-map-marker"
-      label="Location"
-      [value]="locationDisplay()"
-      [privacyField]="'city'"
-      [privacyLevel]="privacyLevel('city')"
-      (privacyChange)="emit('city', $event)"
-    />
-    <mh-profile-fact-row
       icon="pi pi-globe"
       label="Language"
       [value]="profile().account.language"

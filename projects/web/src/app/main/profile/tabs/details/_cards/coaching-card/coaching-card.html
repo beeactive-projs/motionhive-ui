@@ -55,6 +55,38 @@
           }
         </dd>
       </div>
+      <div class="sm:col-span-2 lg:col-span-3">
+        <dt class="text-xs uppercase tracking-wide text-surface-500 flex items-center gap-2">
+          <span>Social links</span>
+          @if (socialLinks().length > 0) {
+            @if (ip.showSocialLinks) {
+              <p-tag value="Public" severity="success" class="text-xs!" />
+            } @else {
+              <p-tag value="Hidden" severity="secondary" class="text-xs!" />
+            }
+          }
+        </dt>
+        <dd class="mt-1">
+          @if (socialLinks().length > 0) {
+            <ul class="flex flex-col gap-1 m-0 p-0 list-none">
+              @for (link of socialLinks(); track link.key) {
+                <li class="flex items-center gap-2 text-sm">
+                  <i [class]="link.icon + ' text-surface-500'"></i>
+                  <a
+                    [href]="link.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-primary-600 hover:underline truncate">
+                    {{ link.url }}
+                  </a>
+                </li>
+              }
+            </ul>
+          } @else {
+            <span class="text-sm font-medium">Not set</span>
+          }
+        </dd>
+      </div>
     </dl>
   }
 

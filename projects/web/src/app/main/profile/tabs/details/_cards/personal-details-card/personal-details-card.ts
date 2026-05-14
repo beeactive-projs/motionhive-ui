@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from '@angular/core';
@@ -8,6 +9,7 @@ import {
   MyProfile,
   PrivacyControlledField,
   ProfilePrivacy,
+  countryNameFromCode,
   resolveFieldPrivacy,
 } from 'core';
 import { Button } from 'primeng/button';
@@ -35,6 +37,16 @@ export class PersonalDetailsCard {
     field: PrivacyControlledField;
     level: ProfilePrivacy;
   }>();
+
+  readonly LockedPublic: ProfilePrivacy = ProfilePrivacy.Public;
+
+  readonly locationDisplay = computed<string | null>(() => {
+    const a = this.profile().account;
+    const parts = [a.city, countryNameFromCode(a.countryCode)].filter(
+      (x): x is string => !!x,
+    );
+    return parts.length ? parts.join(', ') : null;
+  });
 
   privacyLevel(field: PrivacyControlledField): ProfilePrivacy {
     return resolveFieldPrivacy(

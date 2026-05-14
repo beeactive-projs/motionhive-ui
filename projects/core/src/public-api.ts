@@ -20,6 +20,10 @@ export * from './lib/models/profile/instructor-profile.model';
 export * from './lib/models/profile/profile.model';
 export * from './lib/models/profile/instructor-group-summary.model';
 export * from './lib/models/profile/public-user-profile.model';
+export * from './lib/models/profile/public-profile-view.model';
+export * from './lib/models/profile/profile-stat.model';
+export * from './lib/models/profile/profile-badge.model';
+export * from './lib/models/profile/instructor-lead.model';
 
 // Models - Review
 export * from './lib/models/review/review.model';

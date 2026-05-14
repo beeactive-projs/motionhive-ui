@@ -10,7 +10,6 @@ import {
   MyProfile,
   PrivacyControlledField,
   ProfilePrivacy,
-  countryNameFromCode,
   resolveFieldPrivacy,
 } from 'core';
 import { Card } from 'primeng/card';
@@ -35,14 +34,6 @@ export class IntroCard {
     field: PrivacyControlledField;
     level: ProfilePrivacy;
   }>();
-
-  readonly locationDisplay = computed<string | null>(() => {
-    const a = this.profile().account;
-    const parts = [a.city, countryNameFromCode(a.countryCode)].filter(
-      (x): x is string => !!x,
-    );
-    return parts.length ? parts.join(', ') : null;
-  });
 
   readonly memberSince = computed(() => this.profile().account.createdAt);
 

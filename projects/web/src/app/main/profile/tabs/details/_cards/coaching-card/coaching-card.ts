@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   input,
   OnInit,
@@ -61,6 +62,23 @@ export class CoachingCard implements OnInit {
   readonly refresh = output<void>();
 
   readonly showEditInstructor = signal(false);
+
+  private readonly _socialPlatforms: readonly { key: string; label: string; icon: string }[] = [
+    { key: 'instagram', label: 'Instagram', icon: 'pi pi-instagram' },
+    { key: 'youtube', label: 'YouTube', icon: 'pi pi-youtube' },
+    { key: 'tiktok', label: 'TikTok', icon: 'pi pi-tiktok' },
+    { key: 'facebook', label: 'Facebook', icon: 'pi pi-facebook' },
+    { key: 'twitter', label: 'X / Twitter', icon: 'pi pi-twitter' },
+    { key: 'linkedin', label: 'LinkedIn', icon: 'pi pi-linkedin' },
+    { key: 'website', label: 'Website', icon: 'pi pi-globe' },
+  ];
+
+  readonly socialLinks = computed(() => {
+    const links = this.profile().instructorProfile?.socialLinks ?? {};
+    return this._socialPlatforms
+      .map((p) => ({ ...p, url: links[p.key] }))
+      .filter((p): p is { key: string; label: string; icon: string; url: string } => !!p.url);
+  });
 
   readonly coachingProducts = signal<Product[]>([]);
   readonly coachingProductsLoading = signal(false);

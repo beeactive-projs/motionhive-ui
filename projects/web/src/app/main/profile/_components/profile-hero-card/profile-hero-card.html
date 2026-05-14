@@ -114,6 +114,17 @@
         tooltipPosition="top"
         (onClick)="viewAsPublic.emit()"
       />
+      <p-button
+        label="Share"
+        icon="pi pi-share-alt"
+        severity="secondary"
+        outlined
+        size="small"
+        [disabled]="!hasHandle()"
+        [pTooltip]="hasHandle() ? '' : 'Pick a handle first'"
+        tooltipPosition="top"
+        (onClick)="share.emit()"
+      />
     </div>
   </div>
 </p-card>

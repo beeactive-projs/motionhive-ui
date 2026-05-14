@@ -13,11 +13,13 @@ import {
   AuthService,
   ClientPaymentService,
   ClientService,
+  countryNameFromCode,
   MyBillingCounts,
   MyProfile,
   PrivacyControlledField,
   ProfilePrivacy,
   ProfileService,
+  PublicProfileStore,
   showApiError,
   UserPrivacySettings,
   UserService,
@@ -37,6 +39,7 @@ import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
 import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
 import { EditHandle } from './_dialogs/edit-handle/edit-handle';
+import { ShareDialog } from '../../_shared/components/share-dialog/share-dialog';
 
 export const ProfileTabs = {
   Details: 'details',
@@ -80,6 +83,7 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
     MySubscriptions,
     EditPersonalInfo,
     EditHandle,
+    ShareDialog,
   ],
   providers: [MessageService],
   templateUrl: './profile.html',
@@ -92,6 +96,7 @@ export class Profile implements OnInit {
   private readonly _authService = inject(AuthService);
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _clientService = inject(ClientService);
+  private readonly _publicProfileStore = inject(PublicProfileStore);
   private readonly _messageService = inject(MessageService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
@@ -123,6 +128,7 @@ export class Profile implements OnInit {
 
   readonly editPersonalInfoVisible = signal(false);
   readonly editHandleVisible = signal(false);
+  readonly shareDialogVisible = signal(false);
 
   /**
    * The effective MyProfile passed to children — applies the optimistic
@@ -180,6 +186,10 @@ export class Profile implements OnInit {
         this._privacyOverride.set(null);
         this.pendingAvatarUrl.set(null);
         this.loading.set(false);
+        // Drop any cached public-profile view of this handle so the
+        // next visit re-fetches and reflects edits made here
+        // (e.g. social-links visibility toggle).
+        this._publicProfileStore.invalidate(data.account.handle);
       },
       error: () => {
         this.loading.set(false);
@@ -214,6 +224,43 @@ export class Profile implements OnInit {
     if (!handle) return;
     void this._router.navigate(['/@' + handle]);
   }
+
+  onShare(): void {
+    if (!this.profile()?.account.handle) return;
+    this.shareDialogVisible.set(true);
+  }
+
+  /** Public URL of the current user's profile — `https://<origin>/@<handle>`. */
+  readonly shareUrl = computed(() => {
+    const handle = this.profile()?.account.handle ?? '';
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://motionhive.fit';
+    return handle ? `${origin}/@${handle}` : origin;
+  });
+
+  /** Preview card title — full name (+ instructor bio if present). */
+  readonly sharePreviewTitle = computed(() => {
+    const p = this.profile();
+    if (!p) return 'MotionHive';
+    const name = `${p.account.firstName} ${p.account.lastName}`.trim();
+    const bio = p.instructorProfile?.bio?.trim();
+    return bio ? `${name} · ${bio}` : name;
+  });
+
+  /** Preview card meta — `city, Country · N yrs experience`. */
+  readonly sharePreviewSubtitle = computed(() => {
+    const p = this.profile();
+    if (!p) return '';
+    const parts: string[] = [];
+    const city = p.account.city;
+    const country = countryNameFromCode(p.account.countryCode);
+    if (city && country) parts.push(`${city}, ${country}`);
+    else if (city) parts.push(city);
+    else if (country) parts.push(country);
+    const years = p.instructorProfile?.yearsOfExperience;
+    if (years && years > 0) parts.push(`${years} yrs experience`);
+    return parts.join(' · ');
+  });
 
   onAvatarSelected(file: File): void {
     this.uploadingAvatar.set(true);

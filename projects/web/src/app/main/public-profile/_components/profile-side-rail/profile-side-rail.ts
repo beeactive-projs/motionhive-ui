@@ -5,89 +5,154 @@ import {
   inject,
   input,
   output,
-  OnInit,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Card } from 'primeng/card';
 import { Button } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { PublicProfileStore, getProductBillingLabel } from 'core';
-import type { PublicInstructorProfile, Product } from 'core';
+import { MessageService } from 'primeng/api';
+import type { PublicInstructorProfile, ViewerMode } from 'core';
+import { countryNameFromCode, ViewerMode as ViewerModes } from 'core';
 
 interface SocialLink {
   key: string;
   label: string;
   icon: string;
   url: string;
+  display: string;
+}
+
+interface GlanceRow {
+  icon: string;
+  label: string;
+  value: string;
 }
 
 /**
- * Sticky right rail (desktop ≥ lg). Three cards stacked: pricing,
- * at-a-glance, socials. Hidden on mobile — its content is replaced by
- * the sticky bottom CTA bar.
+ * Sticky right rail (desktop ≥ lg) for the instructor profile:
+ *   1. CTA card — pulse pill + name + reassurance + [Contact] + [Book].
+ *   2. At a glance — label/value rows pulled from the profile.
+ *   3. Find me elsewhere — socials list.
+ *   4. Share row — `Liking this profile? [Share] [Copy link]`.
+ *
+ * Below `lg` the rail is hidden; its CTAs surface in the hero and
+ * (later) in the sticky mobile CTA bar.
  */
 @Component({
   selector: 'mh-profile-side-rail',
-  imports: [DatePipe, Card, Button, TagModule],
+  imports: [DatePipe, Card, Button],
   templateUrl: './profile-side-rail.html',
   styleUrl: './profile-side-rail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileSideRail implements OnInit {
-  private readonly _store = inject(PublicProfileStore);
+export class ProfileSideRail {
+  private readonly _messageService = inject(MessageService);
 
   readonly profile = input.required<PublicInstructorProfile>();
-  readonly isSelf = input<boolean>(false);
+  readonly viewerMode = input.required<ViewerMode>();
 
   readonly book = output<void>();
   readonly message = output<void>();
+  readonly share = output<void>();
 
-  readonly offerings = this._store.offerings;
+  protected readonly Modes = ViewerModes;
 
-  ngOnInit(): void {
-    // Pricing card needs the cheapest offering to show "From X RON".
-    // Pull lazily — the rail mounts after the page resolves so the
-    // store always has a profile by now.
-    this._store.loadOfferings();
-  }
+  readonly isOwner = computed(() => this.viewerMode() === ViewerModes.Owner);
 
-  readonly cheapestProduct = computed<Product | null>(() => {
-    const items = this.offerings();
-    if (!items || items.length === 0) return null;
-    return items.reduce((min, p) =>
-      p.amountCents < min.amountCents ? p : min,
-    );
-  });
+  readonly firstName = computed(() => this.profile().firstName?.trim() || 'them');
 
-  readonly startingPriceLabel = computed(() => {
-    const p = this.cheapestProduct();
-    if (!p) return null;
-    const amount = (p.amountCents / 100).toFixed(0);
-    return `${amount} ${p.currency.toUpperCase()}`;
-  });
+  readonly contactLabel = computed(() => `Contact ${this.firstName()}`);
 
-  readonly billingLabel = computed(() => {
-    const p = this.cheapestProduct();
-    return p ? getProductBillingLabel(p) : '';
-  });
-
-  readonly languagesLabel = computed(() => {
-    // The backend model surfaces languages as an array on InstructorProfile;
-    // the public DTO doesn't include it yet. Fall back to the user's
-    // primary language once that's added — for now this stays empty.
-    return null;
+  readonly glanceRows = computed<GlanceRow[]>(() => {
+    const p = this.profile();
+    const rows: GlanceRow[] = [];
+    const location = [p.city, countryNameFromCode(p.countryCode)].filter(Boolean).join(', ');
+    if (location) rows.push({ icon: 'pi pi-map-marker', label: 'Based in', value: location });
+    if (p.yearsOfExperience != null && p.yearsOfExperience > 0) {
+      const yrs = p.yearsOfExperience;
+      rows.push({
+        icon: 'pi pi-briefcase',
+        label: 'Experience',
+        value: `${yrs} ${yrs === 1 ? 'year' : 'years'}`,
+      });
+    }
+    if (p.email) rows.push({ icon: 'pi pi-envelope', label: 'Email', value: p.email });
+    if (p.phone) rows.push({ icon: 'pi pi-phone', label: 'Phone', value: p.phone });
+    if (p.language) rows.push({ icon: 'pi pi-globe', label: 'Language', value: p.language });
+    if (p.timezone) rows.push({ icon: 'pi pi-clock', label: 'Timezone', value: p.timezone });
+    return rows;
   });
 
   readonly socials = computed<SocialLink[]>(() => {
     const links = this.profile().socialLinks ?? {};
     const out: SocialLink[] = [];
-    if (links['instagram']) out.push({ key: 'instagram', label: 'Instagram', icon: 'pi pi-instagram', url: links['instagram'] });
-    if (links['tiktok']) out.push({ key: 'tiktok', label: 'TikTok', icon: 'pi pi-tiktok', url: links['tiktok'] });
-    if (links['youtube']) out.push({ key: 'youtube', label: 'YouTube', icon: 'pi pi-youtube', url: links['youtube'] });
-    if (links['facebook']) out.push({ key: 'facebook', label: 'Facebook', icon: 'pi pi-facebook', url: links['facebook'] });
-    if (links['twitter']) out.push({ key: 'twitter', label: 'X / Twitter', icon: 'pi pi-twitter', url: links['twitter'] });
-    if (links['linkedin']) out.push({ key: 'linkedin', label: 'LinkedIn', icon: 'pi pi-linkedin', url: links['linkedin'] });
-    if (links['website']) out.push({ key: 'website', label: 'Website', icon: 'pi pi-globe', url: links['website'] });
+    const push = (key: string, label: string, icon: string, url: string | undefined) => {
+      if (!url) return;
+      out.push({ key, label, icon, url, display: this.displayHandle(url) });
+    };
+    push('instagram', 'Instagram', 'pi pi-instagram', links['instagram']);
+    push('youtube', 'YouTube', 'pi pi-youtube', links['youtube']);
+    push('tiktok', 'TikTok', 'pi pi-tiktok', links['tiktok']);
+    push('facebook', 'Facebook', 'pi pi-facebook', links['facebook']);
+    push('twitter', 'X / Twitter', 'pi pi-twitter', links['twitter']);
+    push('linkedin', 'LinkedIn', 'pi pi-linkedin', links['linkedin']);
+    push('website', 'Website', 'pi pi-globe', links['website']);
     return out;
   });
+
+  /**
+   * Pull a recognisable handle / hostname out of a URL so the row reads
+   * `Instagram   @mayapetrov` rather than a full URL.
+   */
+  private displayHandle(url: string): string {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./, '');
+      const path = u.pathname.replace(/\/$/, '');
+      const segments = path.split('/').filter(Boolean);
+      const first = segments[0]?.replace(/^@/, '');
+
+      if (host.includes('instagram.com') || host.includes('tiktok.com')) {
+        return first ? `@${first}` : host;
+      }
+      if (host.includes('youtube.com')) {
+        return path.startsWith('/@') ? path.slice(1) : `youtube.com${path}`;
+      }
+      if (host.includes('facebook.com') || host.endsWith('fb.com')) {
+        return first ? `@${first}` : host;
+      }
+      if (host === 'x.com' || host.endsWith('.x.com') || host.includes('twitter.com')) {
+        return first ? `@${first}` : host;
+      }
+      if (host.includes('linkedin.com')) {
+        // linkedin.com/in/<handle>, /company/<slug>, /school/<slug>
+        const slug = segments[1] ?? segments[0];
+        return slug ? `@${slug.replace(/^@/, '')}` : host;
+      }
+      return host + (path && path !== '/' ? path : '');
+    } catch {
+      return url;
+    }
+  }
+
+  onCopyLink(): void {
+    const handle = this.profile().handle;
+    if (!handle) return;
+    const url = `${window.location.origin}/@${handle}`;
+    void navigator.clipboard.writeText(url).then(
+      () =>
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Link copied',
+          detail: url,
+          life: 2000,
+        }),
+      () =>
+        this._messageService.add({
+          severity: 'warn',
+          summary: 'Copy failed',
+          detail: 'Couldn\'t copy the link. Long-press to copy manually.',
+          life: 2500,
+        }),
+    );
+  }
 }

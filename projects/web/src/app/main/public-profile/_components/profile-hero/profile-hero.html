@@ -1,51 +1,67 @@
-<section class="hero relative overflow-hidden rounded-2xl">
-  <div class="cover h-40 md:h-60"></div>
+<p-card class="relative">
   <div class="honeycomb-bg"></div>
 
-  <div class="content relative px-4 md:px-8 pb-5 md:pb-7">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 -mt-12 md:-mt-16">
-      <div class="flex items-end gap-4 min-w-0">
-        <mh-avatar
-          [user]="avatarUser()"
-          size="xlarge"
-          styleClass="hero-avatar !h-22 !w-22 md:!h-32 md:!w-32 !text-3xl md:!text-4xl border-4 border-surface-0 shadow-lg" />
-        <div class="flex flex-col gap-1 min-w-0 pb-1">
-          <h1 class="m-0 text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-color truncate">
+  <div class="flex items-start gap-4">
+    <mh-avatar [user]="avatarUser()" size="xlarge"
+      styleClass="bg-primary-500 border-4 border-double border-surface-100/60 !h-22 !w-22 md:!h-28 md:!w-28 !text-2xl md:!text-3xl shadow-sm" />
+
+    <div class="flex flex-col gap-3 flex-1 min-w-0 pb-1">
+      <div>
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 class="m-0 text-2xl font-semibold leading-tight tracking-tight text-color">
             {{ displayName() }}
           </h1>
           @if (profile().handle) {
-            <span class="text-sm text-muted-color">&#64;{{ profile().handle }}</span>
+          <span class="text-sm text-muted-color">&#64;{{ profile().handle }}</span>
           }
-          <div class="flex flex-wrap items-center gap-2 mt-1">
-            @if (locationLabel(); as loc) {
-              <span class="text-sm text-muted-color flex items-center gap-1">
-                <i class="pi pi-map-marker text-xs"></i>{{ loc }}
-              </span>
-            }
-            @if (profile().isAcceptingClients) {
-              <p-tag rounded value="Accepting clients" severity="success" />
-            }
-            @for (role of profile().displayRoles ?? []; track role) {
-              <p-tag rounded [value]="role" severity="info" />
-            }
-          </div>
         </div>
+        @if (profile().bio; as bio) {
+        <p class="m-0 mt-1.5 text-sm md:text-base text-color/85 max-w-[60ch] leading-relaxed">
+          {{ bio }}
+        </p>
+        }
       </div>
 
-      @if (showCtas()) {
-        <div class="hidden md:flex gap-2 self-end">
-          <p-button
-            label="Message"
-            icon="pi pi-envelope"
-            severity="secondary"
-            outlined
-            (onClick)="message.emit()" />
-          <p-button
-            label="Book a session"
-            icon="pi pi-calendar"
-            (onClick)="book.emit()" />
-        </div>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-color">
+        @if (locationLabel(); as loc) {
+        <span class="inline-flex items-center gap-1.5">
+          <i class="pi pi-map-marker text-xs"></i>{{ loc }}
+        </span>
+        }
+        @if (yearsLabel(); as yrs) {
+        <span class="inline-flex items-center gap-1.5">
+          <i class="pi pi-briefcase text-xs"></i>{{ yrs }}
+        </span>
+        }
+        @if (profile().isAcceptingClients) {
+        <span class="pulse-pill" aria-label="Currently accepting new clients">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Accepting clients
+        </span>
+        }
+        @for (role of profile().displayRoles ?? []; track role) {
+        <span class="inline-flex items-center gap-1.5">{{ role }}</span>
+        }
+      </div>
+
+      @if (badges().length > 0) {
+      <mh-badge-strip [badges]="badges()" />
       }
+
+      <div class="cta-row flex flex-wrap items-center gap-2 mt-1">
+        @if (isOwner()) {
+        <p-button label="Share my profile" icon="pi pi-share-alt" (onClick)="share.emit()" />
+        <p-button label="Edit profile" icon="pi pi-pencil" severity="secondary" outlined routerLink="/profile" />
+        } @else if (showInstructorCtas()) {
+        <p-button [label]="contactLabel()" icon="pi pi-envelope" (onClick)="message.emit()" />
+        <p-button label="Book a session" icon="pi pi-calendar" severity="secondary" outlined (onClick)="book.emit()" />
+        <p-button icon="pi pi-bookmark" severity="secondary" text ariaLabel="Save profile" (onClick)="save.emit()" />
+        <p-button icon="pi pi-share-alt" severity="secondary" text ariaLabel="Share profile" (onClick)="share.emit()" />
+        } @else if (showUserCtas()) {
+        <p-button label="Message" icon="pi pi-envelope" (onClick)="message.emit()" />
+        <p-button icon="pi pi-share-alt" severity="secondary" text ariaLabel="Share profile" (onClick)="share.emit()" />
+        }
+      </div>
     </div>
   </div>
-</section>
+</p-card>
