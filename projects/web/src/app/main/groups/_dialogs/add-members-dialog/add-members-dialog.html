@@ -29,10 +29,7 @@
       <tr [pSelectableRow]="client">
         <td><p-tableCheckbox [value]="client" /></td>
         <td>
-          <div class="flex items-center gap-3">
-            <mh-avatar [user]="client.client" />
-            <span class="font-medium">{{ clientName(client) }}</span>
-          </div>
+          <mh-user-info [user]="client.client" />
         </td>
         <td>{{ client.client?.email }}</td>
       </tr>

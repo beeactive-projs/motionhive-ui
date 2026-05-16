@@ -21,14 +21,14 @@ import {
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { Avatar } from '../../../../_shared/components/avatar/avatar';
+import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
-import { InviteClientDialog } from "../../_dialogs/invite-client-dialog/invite-client-dialog";
+import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-client-dialog';
 
 type RequestDirection = 'INCOMING' | 'OUTGOING';
 
@@ -39,14 +39,14 @@ type RequestDirection = 'INCOMING' | 'OUTGOING';
     ButtonModule,
     TableModule,
     TagModule,
-    Avatar,
+    UserInfo,
     SkeletonModule,
     ToastModule,
     ConfirmDialogModule,
     TooltipModule,
+    InviteClientDialog,
     RouterLink,
-    InviteClientDialog
-],
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './pending-requests.html',
   styleUrl: './pending-requests.scss',
@@ -64,9 +64,7 @@ export class PendingRequests {
   private readonly _queryParams = toSignal(this._route.queryParamMap, {
     initialValue: this._route.snapshot.queryParamMap,
   });
-  readonly highlightedRequestId = computed(
-    () => this._queryParams().get('requestId'),
-  );
+  readonly highlightedRequestId = computed(() => this._queryParams().get('requestId'));
   private readonly _scrollToHighlighted = effect(() => {
     const id = this.highlightedRequestId();
     if (!id || this.loading()) return;

@@ -90,10 +90,7 @@
       <ng-template #body let-member>
         <tr>
           <td>
-            <div class="flex items-center gap-3">
-              <mh-avatar [user]="member.user" />
-              <span class="font-medium">{{ memberName(member) }}</span>
-            </div>
+            <mh-user-info [user]="member.user" />
           </td>
           @if (context.isOwner()) {
           <td>{{ member.user?.email || '—' }}</td>

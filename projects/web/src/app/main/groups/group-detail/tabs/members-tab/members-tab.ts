@@ -28,6 +28,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { GroupDetailContext } from '../../group-detail.context';
 import { EmptyMembers } from '../../_components/empty-members/empty-members';
 import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { UserInfo } from '../../../../../_shared/components/user-info/user-info';
 import { Badge } from "primeng/badge";
 
 @Component({
@@ -36,6 +37,7 @@ import { Badge } from "primeng/badge";
     DatePipe,
     FormsModule,
     Avatar,
+    UserInfo,
     Button,
     InputText,
     SkeletonModule,

@@ -57,10 +57,7 @@
       <ng-template #body let-instructor>
         <tr>
           <td>
-            <div class="flex items-center gap-3">
-              <mh-avatar [user]="instructor.instructor" styleClass="bg-primary-100 text-primary-700" />
-              <span class="font-medium text-secondary-900">{{ instructor.name }}</span>
-            </div>
+            <mh-user-info [user]="instructor.instructor" avatarStyleClass="bg-primary-100 text-primary-700" />
           </td>
           <td>{{ instructor.email }}</td>
         </tr>

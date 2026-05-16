@@ -1,12 +1,5 @@
+import { User } from 'core';
 import { InstructorCertification } from '../profile/instructor-profile.model';
-
-export interface MyInstructorUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatarId: string | null;
-}
 
 export interface MyInstructorProfile {
   userId: string;
@@ -21,7 +14,7 @@ export interface MyInstructor {
   clientId: string;
   status: string;
   startedAt: string;
-  instructor: MyInstructorUser;
+  instructor: User;
   instructorProfile: MyInstructorProfile | null;
 }
 

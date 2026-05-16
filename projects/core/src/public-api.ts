@@ -9,7 +9,7 @@ export * from './lib/models/auth/auth-response.model';
 export * from './lib/models/auth/password-reset.model';
 export * from './lib/models/auth/social-login.model';
 
-// Models - User
+// Models - User — exports User, AvatarUser, UserInfo, UserSearchResult, …
 export * from './lib/models/user/user.model';
 export * from './lib/models/user/role.enums';
 export * from './lib/models/user/role.model';
