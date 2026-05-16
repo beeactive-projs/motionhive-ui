@@ -1,4 +1,4 @@
-import { User } from 'core';
+import { User } from '../user/user.model';
 import { InstructorCertification } from '../profile/instructor-profile.model';
 
 export interface MyInstructorProfile {

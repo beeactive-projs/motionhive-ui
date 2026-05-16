@@ -5,7 +5,7 @@ import type {
   ClientRequestStatus,
 } from './client.enums';
 import { PaginatedResponse } from '../common/pagination.model';
-import { User } from 'core';
+import { User } from '../user/user.model';
 
 export interface GroupMembership {
   groupId: string;
