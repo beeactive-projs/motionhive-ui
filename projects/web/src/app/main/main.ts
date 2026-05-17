@@ -124,7 +124,8 @@ export class Main {
       label: 'Fitness',
       items: [
         { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
-        { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
+        { label: 'My sessions', route: '/my/sessions', icon: 'pi pi-calendar-clock' },
+        { label: 'Discover', route: '/sessions/discover', icon: 'pi pi-search' },
         { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
       ],
     });

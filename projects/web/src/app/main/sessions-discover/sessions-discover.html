@@ -1,0 +1,102 @@
+<mh-page-shell
+  title="Discover sessions"
+  [breadcrumb]="[{ label: 'Discover' }]"
+>
+  <!-- Filter bar -->
+  <div class="mh-disc__filters">
+    <div class="mh-disc__search">
+      <i class="pi pi-search"></i>
+      <input
+        type="search"
+        pInputText
+        fluid
+        [ngModel]="searchInput()"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search sessions, instructors, venues…"
+      />
+    </div>
+    <p-select
+      [options]="typeOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="store.filters().type ?? null"
+      (ngModelChange)="onTypeChange($event)"
+      appendTo="body"
+      styleClass="mh-disc__select"
+    />
+    <p-select
+      [options]="locationOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="store.filters().locationKind ?? null"
+      (ngModelChange)="onLocationChange($event)"
+      appendTo="body"
+      styleClass="mh-disc__select"
+    />
+  </div>
+
+  @if (store.error()) {
+    <p-message severity="error" [closable]="false">
+      Couldn’t load sessions — {{ store.error() }}
+      <p-button label="Retry" [outlined]="true" size="small" (onClick)="store.load()" />
+    </p-message>
+  } @else if (store.loading() && store.items().length === 0) {
+    <div class="mh-disc__skeletons">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <p-skeleton width="100%" height="120px" borderRadius="12px" />
+      }
+    </div>
+  } @else if (store.items().length === 0) {
+    <div class="mh-disc__empty" data-testid="discover-empty">
+      <i class="pi pi-calendar"></i>
+      <p>
+        No sessions found{{ store.filters().q ? ' for “' + store.filters().q + '”' : '' }}.
+      </p>
+      @if (store.filters().q || store.filters().type || store.filters().locationKind) {
+        <p-button
+          label="Clear filters"
+          [outlined]="true"
+          (onClick)="searchInput.set(''); store.setFilters({ q: undefined, type: undefined, locationKind: undefined })"
+        />
+      }
+    </div>
+  } @else {
+    <div class="mh-disc__grid">
+      @for (group of groupedItems(); track group.lead.id) {
+        <div class="mh-disc__card-wrap" [class.is-booked]="isBooked(group.lead)">
+          @if (isBooked(group.lead)) {
+            <span class="mh-disc__badge" data-testid="discover-booked-badge">
+              <i class="pi pi-check-circle"></i>
+              Booked
+            </span>
+          }
+          @if (group.moreCount > 0) {
+            <span class="mh-disc__more-badge" aria-label="More occurrences available">
+              +{{ group.moreCount }} more
+            </span>
+          }
+          <mh-session-card
+            [instance]="$any(group.lead)"
+            variant="list-card"
+            [showCTA]="false"
+            (open)="onCardOpen(group.lead)"
+          />
+        </div>
+      }
+    </div>
+
+    @if (store.hasMore()) {
+      <div class="mh-disc__more">
+        <p-button
+          label="Load more"
+          [outlined]="true"
+          [loading]="store.loading()"
+          (onClick)="store.loadMore()"
+        />
+        <span class="mh-disc__count">
+          Showing {{ store.items().length }} of {{ store.total() }}
+        </span>
+      </div>
+    }
+  }
+</mh-page-shell>

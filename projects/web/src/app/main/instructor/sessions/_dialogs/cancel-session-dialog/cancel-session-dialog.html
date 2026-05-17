@@ -1,0 +1,80 @@
+<p-dialog
+  header="Cancel session"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '30rem' }"
+  [closable]="true"
+  styleClass="mh-cancel"
+>
+  <div class="mh-cancel__body">
+    <!-- Blast radius -->
+    <div class="mh-cancel__radius">
+      <i class="pi pi-exclamation-triangle"></i>
+      <div>
+        @if (affectedCount() > 0) {
+          <strong>{{ affectedCount() }}</strong> participant(s) will be notified.
+        } @else {
+          No participants are currently booked.
+        }
+      </div>
+    </div>
+
+    <!-- Scope -->
+    <fieldset class="mh-cancel__scope" [class.is-single]="scopeOptions().length === 1">
+      <legend>What should be cancelled?</legend>
+      @for (opt of scopeOptions(); track opt.value) {
+        <label class="mh-cancel__opt" [class.is-active]="scope() === opt.value">
+          <input
+            type="radio"
+            name="cancel-scope"
+            [value]="opt.value"
+            [checked]="scope() === opt.value"
+            (change)="scope.set(opt.value)"
+          />
+          <div>
+            <span class="mh-cancel__opt-label">{{ opt.label }}</span>
+            <span class="mh-cancel__opt-help">{{ opt.help }}</span>
+          </div>
+        </label>
+      }
+    </fieldset>
+
+    <!-- Reason (internal) + message (to attendees) -->
+    <div class="mh-cancel__field">
+      <label for="cdReason">Reason (internal, optional)</label>
+      <input
+        id="cdReason"
+        type="text"
+        pInputText
+        fluid
+        [ngModel]="reason()"
+        (ngModelChange)="reason.set($event)"
+        placeholder="e.g. illness, venue closure"
+      />
+    </div>
+
+    <div class="mh-cancel__field">
+      <label for="cdMessage">Message to attendees (optional)</label>
+      <textarea
+        id="cdMessage"
+        pTextarea
+        rows="3"
+        fluid
+        [ngModel]="message()"
+        (ngModelChange)="message.set($event)"
+        placeholder="Sorry — I’m feeling unwell. I’ll reschedule next week."
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Keep session" severity="secondary" [text]="true" (onClick)="close()" />
+    <p-button
+      label="Cancel session"
+      icon="pi pi-times"
+      severity="danger"
+      [loading]="busy()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>

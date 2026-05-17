@@ -1,0 +1,231 @@
+<mh-page-shell title="Sessions">
+  <ng-container actions>
+    <div class="mh-seg" role="tablist" aria-label="View">
+      <button
+        type="button"
+        class="mh-seg__btn is-active"
+        (click)="setView('cards')"
+        aria-pressed="true"
+      >
+        <i class="pi pi-th-large" aria-hidden="true"></i>
+        List
+      </button>
+      <button
+        type="button"
+        class="mh-seg__btn"
+        (click)="setView('calendar')"
+        aria-pressed="false"
+      >
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        Calendar
+      </button>
+    </div>
+    <p-button
+      label="Public profile"
+      severity="secondary"
+      [outlined]="true"
+      icon="pi pi-external-link"
+    />
+    <p-button
+      label="New session"
+      icon="pi pi-plus"
+      (click)="onCreateNew()"
+    />
+  </ng-container>
+
+  <!-- KPI strip -->
+  <section class="mh-sessions__kpi" aria-label="Overview">
+    @if (store.loading() && store.templates().length === 0) {
+      @for (i of [1,2,3,4]; track i) {
+        <p-skeleton width="100%" height="80px" borderRadius="12px" />
+      }
+    } @else {
+      <mh-kpi-card
+        icon="pi pi-calendar"
+        label="This week"
+        [value]="store.kpis().thisWeek"
+        sub="Scheduled sessions"
+      />
+      <mh-kpi-card
+        icon="pi pi-users"
+        label="Total signups"
+        [value]="store.kpis().totalSignups"
+        sub="Across upcoming"
+      />
+      <mh-kpi-card
+        icon="pi pi-replay"
+        label="Recurring templates"
+        [value]="store.kpis().recurring + ' active'"
+        sub="Series in motion"
+      />
+      <mh-kpi-card
+        icon="pi pi-exclamation-triangle"
+        label="Needs attention"
+        [value]="store.kpis().needsAttention"
+        [sub]="store.kpis().needsAttention === 0 ? 'All clear' : 'Conflicts and pending'"
+        [variant]="store.kpis().needsAttention > 0 ? 'warn' : 'default'"
+      />
+    }
+  </section>
+
+  <!-- Tabs -->
+  <nav class="mh-sessions__tabs" role="tablist" aria-label="Filter by status">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        role="tab"
+        class="mh-tab"
+        [class.is-active]="store.tab() === tab.key"
+        [attr.aria-selected]="store.tab() === tab.key"
+        (click)="onTabChange(tab.key)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  <!-- Filters -->
+  <div class="mh-sessions__filters" role="search">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Search sessions, venues, clients…"
+        [ngModel]="searchInput()"
+        (ngModelChange)="onSearchInput($event)"
+      />
+    </span>
+  </div>
+
+  <!-- Error -->
+  @if (store.error()) {
+    <p-message severity="error" [closable]="false" class="mh-sessions__error">
+      <span class="mh-sessions__error-text">
+        Couldn't load sessions: {{ store.error() }}
+      </span>
+      <p-button
+        label="Retry"
+        size="small"
+        [outlined]="true"
+        (click)="retry()"
+      />
+    </p-message>
+  }
+
+  <!-- Body: loading / empty / cards / table -->
+  @if (store.loading() && store.templates().length === 0) {
+    <div class="mh-sessions__skeletons">
+      @for (g of [1,2,3]; track g) {
+        <div class="mh-sessions__skeleton-group">
+          <p-skeleton width="160px" height="14px" />
+          @for (c of [1,2]; track c) {
+            <p-skeleton width="100%" height="84px" borderRadius="12px" />
+          }
+        </div>
+      }
+    </div>
+  } @else if (
+    store.tab() !== 'cancelled' &&
+    store.templates().length === 0 &&
+    !store.error()
+  ) {
+    <div class="mh-sessions__empty">
+      <div class="mh-sessions__empty-tile" aria-hidden="true">
+        <i class="pi pi-calendar-plus"></i>
+      </div>
+      <h2>No sessions yet</h2>
+      <p>
+        Sessions let you schedule training and showcase your availability.
+        People can see your public sessions on your profile — even if they're
+        not signed up to MotionHive yet.
+      </p>
+      <div class="mh-sessions__empty-ctas">
+        <p-button
+          label="Create your first session"
+          icon="pi pi-plus"
+          (click)="onCreateNew()"
+        />
+        <p-button
+          label="Use a template"
+          severity="secondary"
+          [outlined]="true"
+        />
+      </div>
+    </div>
+  } @else if (store.tab() === 'cancelled') {
+    <!-- Cancelled tab shows cancelled INSTANCES directly (one card per
+         cancelled occurrence) — the BE's tab=cancelled only matches
+         templates whose whole series ended, which would miss most user-
+         initiated cancels. -->
+    @if (store.cancelledInstances().length === 0) {
+      <div class="mh-sessions__empty">
+        <div class="mh-sessions__empty-tile" aria-hidden="true">
+          <i class="pi pi-times-circle"></i>
+        </div>
+        <h2>No cancelled sessions</h2>
+        <p>Sessions you cancel show up here for the last 90 days.</p>
+      </div>
+    } @else {
+      <div class="mh-sessions__groups">
+        <mh-section-label
+          [label]="store.cancelledInstances().length + ' cancelled'"
+          [count]="store.cancelledInstances().length"
+        />
+        @for (inst of store.cancelledInstances(); track inst.id) {
+          <mh-session-card
+            [instance]="inst"
+            variant="list-card"
+            [showCTA]="false"
+            (open)="openCancelledInstance(inst.id)"
+          />
+        }
+      </div>
+    }
+  } @else {
+    <div class="mh-sessions__groups">
+      @for (group of groupedByDay(); track group.date.getTime()) {
+        <section class="mh-sessions__group">
+          <mh-section-label
+            [label]="sectionLabel(group.date)"
+            [count]="group.items.length"
+          />
+          @for (t of group.items; track t.id) {
+            <mh-session-card
+              [instance]="cardInstanceFor(t)"
+              variant="list-card"
+              [showCTA]="false"
+              (open)="onCardOpen(t.id)"
+            />
+          }
+        </section>
+      }
+
+      <!-- Infinite-scroll sentinel + footer states. Mirrors the
+           groups-discover pattern so user-perceived behavior is the
+           same across long-list pages. -->
+      @if (store.hasMore()) {
+        <div #scrollSentinel class="mh-sessions__sentinel" aria-hidden="true"></div>
+        @if (store.loading()) {
+          <div class="mh-sessions__loading-more" role="status">
+            <i class="pi pi-spinner pi-spin"></i>
+            Loading more sessions…
+          </div>
+        }
+      } @else if (store.templates().length > 0) {
+        <div class="mh-sessions__end" role="status">
+          That's everything — {{ store.total() }} session{{ store.total() === 1 ? '' : 's' }} total.
+        </div>
+      }
+    </div>
+  }
+</mh-page-shell>
+
+<mh-session-form-dialog
+  [visible]="formOpen()"
+  (visibleChange)="formOpen.set($event)"
+  [template]="editingTemplate()"
+  (saved)="onSessionSaved()"
+/>
+
+<p-toast position="top-right" />

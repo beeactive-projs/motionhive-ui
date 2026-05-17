@@ -1,0 +1,171 @@
+:host {
+  display: block;
+  padding: 24px;
+
+  @media (max-width: 640px) {
+    padding: 12px;
+  }
+}
+
+.mh-show__loading {
+  margin-top: 16px;
+}
+
+.mh-show {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 16px;
+
+  @media (min-width: 960px) {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.mh-show__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+
+  @media (max-width: 640px) {
+    padding: 14px;
+    gap: 10px;
+  }
+}
+
+// On mobile, let the time block wrap gracefully instead of forcing
+// `Sunday 17 May, 06:00 · 75 min` onto one line.
+.mh-show__time {
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+  }
+}
+
+.mh-show__time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--p-primary-700);
+  i { color: var(--p-primary-500); }
+}
+.mh-show__dot { color: var(--p-text-muted-color); }
+
+.mh-show__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mh-show__desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--p-text-color);
+}
+
+.mh-show__instructor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--p-content-border-color);
+
+  small {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--p-text-muted-color);
+    display: block;
+  }
+  strong { font-size: 14px; color: var(--p-text-color); }
+}
+
+.mh-show__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--p-primary-100);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--p-primary-700);
+}
+.mh-show__avatar--ph { background: var(--p-primary-100); }
+
+.mh-show__cta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  height: max-content;
+
+  @media (max-width: 640px) {
+    padding: 14px;
+    // Sticky bottom on mobile so the Book button stays in reach without
+    // scrolling. Falls back to inline above the breakpoint.
+    position: sticky;
+    bottom: 12px;
+    margin-top: 8px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
+  }
+}
+
+:host ::ng-deep .mh-show__book-btn { width: 100%; justify-content: center; }
+
+.mh-show__booked {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--p-green-500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-green-500) 30%, transparent);
+  border-radius: 8px;
+
+  i { color: var(--p-green-600); font-size: 20px; }
+  strong { display: block; font-size: 14px; color: var(--p-text-color); }
+  small { display: block; font-size: 11px; color: var(--p-text-muted-color); }
+}
+
+.mh-show__terms {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  text-align: center;
+}
+
+.mh-show__blocked {
+  margin-top: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  i {
+    font-size: 32px;
+    color: var(--p-primary-500);
+  }
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--p-text-color);
+  }
+  p {
+    margin: 0;
+    color: var(--p-text-muted-color);
+    font-size: 14px;
+  }
+}

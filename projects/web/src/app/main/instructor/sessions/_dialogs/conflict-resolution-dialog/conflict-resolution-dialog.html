@@ -1,0 +1,110 @@
+<p-dialog
+  header="Resolve conflicts"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '36rem' }"
+  [closable]="true"
+  styleClass="mh-conflict"
+>
+  <div class="mh-conflict__body">
+    <p class="mh-conflict__intro">
+      <i class="pi pi-exclamation-triangle"></i>
+      The following session(s) overlap with the one you just saved. Reschedule
+      or cancel them to clear the conflict.
+    </p>
+
+    @if (loading()) {
+      <div class="mh-conflict__loading">Loading conflicting sessions…</div>
+    } @else if (instances().length === 0) {
+      <div class="mh-conflict__empty">
+        No detail available for the conflicting sessions. They may have already
+        been cancelled or moved.
+      </div>
+    } @else {
+      <ul class="mh-conflict__list">
+        @for (inst of instances(); track inst.id) {
+          <li class="mh-conflict__row" [class.is-done]="rowOf(inst.id) === 'done'">
+            <div class="mh-conflict__row-info">
+              <strong>
+                {{ inst.template?.title ?? 'Session' }}
+              </strong>
+              <span class="mh-conflict__time">
+                {{ inst.startAt | date: 'EEE d MMM, HH:mm' }}
+              </span>
+              <span class="mh-conflict__meta">
+                {{ inst.confirmedCount }} confirmed · {{ inst.pendingApprovalCount }} pending
+              </span>
+            </div>
+
+            @switch (rowOf(inst.id)) {
+              @case ('rescheduling') {
+                <div class="mh-conflict__resched">
+                  <p-datepicker
+                    [ngModel]="rescheduleDate().get(inst.id)"
+                    (ngModelChange)="updateDate(inst.id, $event)"
+                    [showTime]="true"
+                    [showSeconds]="false"
+                    hourFormat="24"
+                    dateFormat="dd M yy"
+                    appendTo="body"
+                  />
+                  <p-button
+                    icon="pi pi-check"
+                    severity="success"
+                    [text]="true"
+                    [rounded]="true"
+                    (onClick)="confirmReschedule(inst.id)"
+                    ariaLabel="Confirm reschedule"
+                  />
+                  <p-button
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [text]="true"
+                    [rounded]="true"
+                    (onClick)="cancelReschedule(inst.id)"
+                    ariaLabel="Cancel reschedule"
+                  />
+                </div>
+              }
+              @case ('done') {
+                <span class="mh-conflict__done">
+                  <i class="pi pi-check-circle"></i> Resolved
+                </span>
+              }
+              @case ('busy') {
+                <span class="mh-conflict__busy">Working…</span>
+              }
+              @default {
+                <div class="mh-conflict__actions">
+                  <p-button
+                    label="Reschedule"
+                    icon="pi pi-calendar"
+                    severity="secondary"
+                    [outlined]="true"
+                    size="small"
+                    (onClick)="startReschedule(inst.id)"
+                  />
+                  <p-button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    severity="danger"
+                    [text]="true"
+                    size="small"
+                    (onClick)="cancelOne(inst.id)"
+                  />
+                </div>
+              }
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    @if (remaining() > 0) {
+      <span class="mh-conflict__remaining">{{ remaining() }} conflict(s) remaining</span>
+    }
+    <p-button label="Done" icon="pi pi-check" (onClick)="close()" />
+  </ng-template>
+</p-dialog>

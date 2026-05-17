@@ -33,6 +33,35 @@ export const mainRoutes: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.Profile),
         title: 'My Profile - MotionHive',
       },
+      // Phase E — client-facing session surfaces.
+      {
+        path: 'sessions/discover',
+        loadComponent: () =>
+          import('./sessions-discover/sessions-discover').then(
+            (m) => m.SessionsDiscover,
+          ),
+        title: 'Discover sessions - MotionHive',
+      },
+      {
+        path: 'my/sessions',
+        loadComponent: () =>
+          import('./sessions-my/sessions-my').then((m) => m.SessionsMy),
+        title: 'My sessions - MotionHive',
+      },
+      // Notification producers emit `screen: 'sessions/my'` (BE convention
+      // since the API surface is /sessions/my). Forward to the canonical
+      // FE route so deep-links from emails / push don't 404.
+      { path: 'sessions/my', redirectTo: 'my/sessions', pathMatch: 'full' },
+      {
+        // Public session showcase. Order matters: `sessions/discover` +
+        // `sessions/my` are declared above so they always match before `:id`.
+        path: 'sessions/:id',
+        loadComponent: () =>
+          import('./session-showcase/session-showcase').then(
+            (m) => m.SessionShowcase,
+          ),
+        title: 'Session - MotionHive',
+      },
       {
         path: 'groups',
         loadComponent: () => import('./groups/groups').then((m) => m.GroupsLayout),

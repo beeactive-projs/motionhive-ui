@@ -1,0 +1,146 @@
+@let inst = publicInst();
+@let blocked = blockedInst();
+@let t = tpl();
+
+<mh-page-shell
+  [title]="inst?.titleOverride ?? t?.title ?? blocked?.template?.title ?? 'Session'"
+  [breadcrumb]="[
+    { label: 'Discover', routerLink: '/sessions/discover' },
+    { label: inst?.titleOverride ?? t?.title ?? 'Session' }
+  ]"
+  [showBack]="true"
+>
+  <div actions>
+    <p-button
+      label="Back to Discover"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/sessions/discover"
+    />
+  </div>
+
+  @if (loading() && !inst && !blocked) {
+    <div class="mh-show__loading">
+      <p-skeleton width="100%" height="180px" borderRadius="12px" />
+    </div>
+  } @else if (error()) {
+    <p-message severity="error" [closable]="false">{{ error() }}</p-message>
+  } @else if (blocked && blocked.template) {
+    <!-- GROUP_ONLY non-member view: just enough to invite the user to join the group -->
+    <section class="mh-show__blocked">
+      <i class="pi pi-lock"></i>
+      <h2>This session is for {{ blocked.template.title }} group members only.</h2>
+      <p>Join the group to book sessions and see the full schedule.</p>
+      @if (blocked.template.groupId) {
+        <p-button label="View group" icon="pi pi-users" (onClick)="goToGroup()" />
+      }
+    </section>
+  } @else if (inst && t) {
+    <div class="mh-show">
+      <section class="mh-show__hero">
+        <div class="mh-show__time">
+          <i class="pi pi-calendar"></i>
+          {{ inst.startAt | date: 'EEEE d MMMM, HH:mm' }}
+          <span class="mh-show__dot">·</span>
+          {{ t.durationMinutes }} min
+        </div>
+
+        <div class="mh-show__chips">
+          <mh-type-chip [type]="t.type" />
+          <mh-access-chip [access]="t.access" [approvalRequired]="t.approvalRequired" />
+          @if (t.meetingProvider) {
+            <mh-provider-chip [provider]="t.meetingProvider" />
+          }
+        </div>
+
+        @if (t.description) {
+          <p class="mh-show__desc">{{ t.description }}</p>
+        }
+
+        <mh-capacity-bar
+          [signups]="inst.confirmedCount"
+          [cap]="inst.capacityOverride ?? t.capacity"
+        />
+
+        @if (inst.instructor) {
+          <div class="mh-show__instructor">
+            @if (inst.instructor.avatarUrl) {
+              <img [src]="inst.instructor.avatarUrl" alt="" class="mh-show__avatar" />
+            } @else {
+              <span class="mh-show__avatar mh-show__avatar--ph">
+                {{ (inst.instructor.firstName?.[0] ?? '') + (inst.instructor.lastName?.[0] ?? '') }}
+              </span>
+            }
+            <div>
+              <small>Instructor</small>
+              <strong>
+                {{ inst.instructor.firstName }} {{ inst.instructor.lastName }}
+              </strong>
+            </div>
+          </div>
+        }
+      </section>
+
+      <aside class="mh-show__cta">
+        @let booking = myBooking();
+        @let cap = inst.capacityOverride ?? t.capacity;
+
+        @if (booking) {
+          <!-- Already booked: surface status + nav to My Sessions -->
+          <div class="mh-show__booked">
+            <i class="pi pi-check-circle"></i>
+            <div>
+              <strong>
+                @switch (booking.status) {
+                  @case ('CONFIRMED') { You're booked }
+                  @case ('PENDING_APPROVAL') { Pending instructor approval }
+                  @case ('WAITLISTED') { You're on the waitlist }
+                  @default { Booked }
+                }
+              </strong>
+              <small>Booked {{ booking.bookedAt | date: 'd MMM' }}</small>
+            </div>
+          </div>
+          <p-button
+            label="Go to My Sessions"
+            icon="pi pi-arrow-right"
+            severity="primary"
+            (onClick)="goToMySessions()"
+            styleClass="mh-show__book-btn"
+          />
+        } @else {
+          @if (cap != null && inst.confirmedCount >= cap) {
+            <p-message severity="warn" [closable]="false">
+              This session is full. You can join the waitlist if enabled.
+            </p-message>
+          }
+          <p-button
+            [label]="t.approvalRequired ? 'Request to join' : 'Book'"
+            icon="pi pi-check"
+            severity="primary"
+            [disabled]="!canBook()"
+            (onClick)="bookOpen.set(true)"
+            styleClass="mh-show__book-btn"
+          />
+        }
+        <small class="mh-show__terms">
+          @if (t.priceAmountCents > 0) {
+            {{ t.priceAmountCents / 100 | number: '1.0-2' }} {{ t.priceCurrency }}
+            ·
+          }
+          Cancel up to {{ t.cancellationCutoffHours }}h before
+        </small>
+      </aside>
+    </div>
+
+    <mh-book-dialog
+      [visible]="bookOpen()"
+      (visibleChange)="bookOpen.set($event)"
+      [instance]="inst"
+      (booked)="onBookSuccess()"
+    />
+  }
+</mh-page-shell>
+
+<p-toast position="top-right" />

@@ -81,10 +81,76 @@ export * from './lib/models/notification';
 // Models - Messaging
 export * from './lib/models/messaging';
 
+// Models - Session
+// NOTE: profile.enums.ts already exports a `SessionType` referring to the
+// instructor-profile "session kinds" concept (ONLINE/IN_PERSON/HYBRID).
+// To avoid a collision with the new session module's `SessionType`
+// (GROUP/PRIVATE/OPEN), the session module enums are re-exported via
+// a namespaced barrel until we can clean up the profile model.
+export {
+  CancelScope,
+  FollowUpAudience,
+  MyTab,
+  SessionAccess,
+  SessionInstanceStatus,
+  SessionLocationKind,
+  SessionMeetingProvider,
+  SessionParticipantStatus,
+  SessionReminderKind,
+  SessionTemplateStatus,
+  SessionType as SessionKind,
+  TemplateTab,
+} from './lib/models/session/session.enums';
+export type {
+  // Refs
+  SessionInstructorRef,
+  SessionVenueRef,
+  SessionGroupRef,
+  // Core domain
+  RecurrenceRule,
+  SessionTemplate,
+  SessionInstance,
+  SessionParticipant,
+  // Public + blocked variants
+  PublicSessionInstance,
+  BlockedSessionInstance,
+  // Service request / response shapes
+  CreateTemplateRequest,
+  UpdateTemplateRequest,
+  PreviewRecurrenceRequest,
+  PreviewRecurrenceResponse,
+  RegenerateRequest,
+  RegenerateResponse,
+  CreateTemplateResponse,
+  SessionWarning,
+  ListTemplatesQuery,
+  ListInstancesQuery,
+  ListParticipantsQuery,
+  DiscoverQuery,
+  MyQuery,
+  BookRequest,
+  BookResponse,
+  CancelBookingRequest,
+  CancelBookingResponse,
+  CancelInstanceRequest,
+  CancelInstanceResponse,
+  RescheduleInstanceRequest,
+  RescheduleInstanceResponse,
+  PatchInstanceRequest,
+  DeclineParticipantRequest,
+  PatchParticipantRequest,
+  FollowUpRequest,
+  FollowUpResponse,
+  MyCounts,
+  JoinInfo,
+} from './lib/models/session/session.model';
+export { isBlockedInstance } from './lib/models/session/session.model';
+
 // Constants
 export * from './lib/constants/api-endpoints.const';
 export * from './lib/constants/storage-keys.const';
 export * from './lib/constants/timezones.const';
+export * from './lib/constants/date-windows.const';
 export * from './lib/constants/countries.const';
 
 // Utils
@@ -92,6 +158,8 @@ export * from './lib/utils/url.utils';
 export * from './lib/utils/api-error.utils';
 export * from './lib/utils/cloudinary.utils';
 export * from './lib/utils/group.utils';
+export * from './lib/utils/date.utils';
+export * from './lib/utils/html.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';
@@ -121,6 +189,7 @@ export * from './lib/services/payment/client-payment.service';
 export * from './lib/services/venue/venue.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
+export * from './lib/services/session/session.service';
 
 // Pipes
 export * from './lib/pipes/currency-ron.pipe';
@@ -148,6 +217,35 @@ export * from './lib/services/loading/loading.service';
 
 // Components
 export * from './lib/components/logo/logo';
+export * from './lib/components/page-shell/page-shell';
+export * from './lib/components/dialog-shell/dialog-shell';
+export * from './lib/components/kpi-card/kpi-card';
+export * from './lib/components/section-label/section-label';
+export * from './lib/components/tri-state-toggle/tri-state-toggle';
+export * from './lib/components/calendar/calendar-event.model';
+export * from './lib/components/calendar/calendar-grid';
+export * from './lib/components/calendar/event-block';
+// Phase B — session-flavored chips, capacity bar, avatar stack, session card.
+export * from './lib/components/access-chip/access-chip';
+export * from './lib/components/type-chip/type-chip';
+export * from './lib/components/provider-chip/provider-chip';
+export * from './lib/components/capacity-bar/capacity-bar';
+export * from './lib/components/avatar-stack/avatar-stack';
+export * from './lib/components/session-card/session-card';
+
+// Phase C — date-picker primitive (calendar left rail navigation).
+export * from './lib/components/mini-month/mini-month';
+
+// Phase D — dialog primitives.
+export * from './lib/components/recurrence-builder/recurrence-builder';
+export * from './lib/components/participants-table/participants-table';
+
+// Stores — Sessions
+export * from './lib/stores/sessions-instructor.store';
+export * from './lib/stores/sessions-detail.store';
+export * from './lib/stores/sessions-discover.store';
+export * from './lib/stores/sessions-my.store';
+export * from './lib/stores/my-bookings-index.store';
 
 // Guards
 export * from './lib/guards/auth.guard';

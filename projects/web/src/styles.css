@@ -1,2 +1,44 @@
 @import '../../core/src/styles/theme.css';
 @import './styles-messaging-dialogs.css';
+
+/* Calendar event-block tooltip: rich PrimeNG tooltip rendered at body
+   level (so component-scoped styles can't reach it — must live here). */
+.mh-event-tooltip .p-tooltip-text {
+  background: var(--p-surface-900, #1f2937);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 280px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+.mh-event-tooltip .mh-evt-tt__title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.mh-event-tooltip .mh-evt-tt__time {
+  font-weight: 600;
+  color: var(--p-primary-200, #fcd34d);
+  margin-bottom: 4px;
+}
+.mh-event-tooltip .mh-evt-tt__sub {
+  color: rgba(255, 255, 255, 0.75);
+}
+.mh-event-tooltip .mh-evt-tt__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.mh-event-tooltip .mh-evt-tt__flags span {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}

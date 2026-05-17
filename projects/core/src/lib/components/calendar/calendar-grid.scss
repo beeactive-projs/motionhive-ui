@@ -1,0 +1,247 @@
+// Calendar grid — Phase A baseline styles.
+// Phase C polishes (dashed half-hour separator, conflict halo refinement,
+// agenda variant layout, mini-month rail integration).
+
+.mh-calendar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  // Horizontal-scroll on narrow widths so the 7-day grid stays usable
+  // instead of vanishing off-screen. The min-width keeps each day at a
+  // legible 80px.
+  overflow-x: auto;
+  overflow-y: hidden;
+  font-family: inherit;
+
+  // Body content needs at least 52px (gutter) + 7*80px = 612px to look
+  // right; narrower viewports get horizontal scroll inside the card.
+  &__header,
+  &__body {
+    min-width: 612px;
+  }
+
+  &__loading {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    background: var(--p-surface-100);
+    border-radius: 999px;
+    color: var(--p-text-muted-color);
+    z-index: 2;
+  }
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 52px repeat(7, 1fr);
+    background: color-mix(in srgb, var(--p-content-background) 70%, transparent);
+    backdrop-filter: blur(4px);
+    border-bottom: 1px solid var(--p-content-border-color);
+  }
+
+  &__hour-gutter {
+    width: 52px;
+    flex: 0 0 52px;
+    border-right: 1px solid var(--p-content-border-color);
+    background: color-mix(in srgb, var(--p-content-background) 70%, transparent);
+  }
+
+  &__header-cell {
+    padding: 8px 12px;
+    border-left: 1px solid var(--p-content-border-color);
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--p-text-muted-color);
+
+    &.is-today {
+      background: color-mix(in srgb, var(--p-primary-500) 18%, transparent);
+      color: var(--p-text-color);
+    }
+    /* Selected (anchor) day: soft primary tint on the header — visible
+       at a glance without dominating the screen. The day column itself
+       carries the heavier "you are here" rail; together they read
+       cleanly without either feeling shouty. */
+    &.is-selected {
+      background: color-mix(in srgb, var(--p-primary-500) 14%, transparent);
+      .mh-calendar__day-num {
+        color: var(--p-primary-700);
+      }
+    }
+  }
+
+  &__day-name {
+    display: block;
+    font-weight: 600;
+  }
+
+  &__day-num {
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--p-text-color);
+  }
+
+  &__body {
+    position: relative;
+    display: grid;
+    grid-template-columns: 52px repeat(7, 1fr);
+
+    &--day {
+      grid-template-columns: 52px 1fr;
+    }
+  }
+
+  &__hour-label {
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--p-text-muted-color);
+    border-bottom: 1px solid var(--p-content-border-color);
+  }
+
+  &__day-col {
+    position: relative;
+    border-left: 1px solid var(--p-content-border-color);
+
+    /* Anchor (selected) column: soft tint that runs the full column
+       height. Background-only — no inset rail — so the visual reads
+       as "this region is active" rather than a hard frame. */
+    &.is-selected {
+      background: color-mix(in srgb, var(--p-primary-500) 5%, transparent);
+    }
+  }
+
+  &__hour-cell {
+    border-bottom: 1px solid var(--p-content-border-color);
+    cursor: pointer;
+
+    // Subtle banding — semi-transparent overlay so it works in both light
+    // and dark mode. Cream tint in light, slightly lighter than the card
+    // background in dark.
+    &--odd {
+      background: color-mix(in srgb, var(--p-text-color) 3%, transparent);
+    }
+
+    &:hover {
+      background: var(--p-primary-50);
+    }
+  }
+
+  &__now-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--p-red-500);
+    z-index: 3;
+    cursor: help;
+  }
+
+  &__now-dot {
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    background: var(--p-red-500);
+    border-radius: 50%;
+  }
+
+  &__now-label {
+    position: absolute;
+    left: 8px;
+    top: -10px;
+    padding: 1px 6px;
+    background: var(--p-red-500);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 999px;
+    line-height: 1.4;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  &__drag-selection {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    border: 2px dashed var(--p-primary-500);
+    background: var(--p-primary-50);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-primary-700);
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  &__event {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+  }
+
+  &__overflow {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    z-index: 4;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--p-content-border-color);
+    background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
+    color: var(--p-text-color);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease;
+    &:hover {
+      background: color-mix(in srgb, var(--p-primary-500) 20%, transparent);
+      border-color: var(--p-primary-500);
+    }
+  }
+
+  &__month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--p-surface-200);
+    padding: 1px;
+  }
+
+  &__month-event {
+    padding: 4px 6px;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--p-primary-50);
+    }
+  }
+
+  &--readonly {
+    .mh-calendar__hour-cell {
+      cursor: default;
+      &:hover { background: transparent; }
+    }
+  }
+
+  &--loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}

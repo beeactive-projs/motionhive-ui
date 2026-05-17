@@ -1,0 +1,119 @@
+.mh-conflict__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.mh-conflict__intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--p-yellow-50);
+  border: 1px solid var(--p-yellow-200);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--p-yellow-900);
+  i {
+    color: var(--p-yellow-700);
+    font-size: 16px;
+    margin-top: 2px;
+  }
+}
+
+.mh-conflict__loading,
+.mh-conflict__empty {
+  text-align: center;
+  padding: 18px;
+  color: var(--p-text-muted-color);
+  font-size: 13px;
+  background: color-mix(in srgb, var(--p-text-color) 4%, transparent);
+  border-radius: 8px;
+}
+
+.mh-conflict__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mh-conflict__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  background: var(--p-content-background);
+
+  &.is-done {
+    opacity: 0.55;
+    background: color-mix(in srgb, var(--p-text-color) 4%, transparent);
+  }
+}
+
+.mh-conflict__row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  min-width: 0;
+
+  strong {
+    font-weight: 700;
+    color: var(--p-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.mh-conflict__time {
+  font-size: 12px;
+  color: var(--p-primary-700);
+  font-weight: 600;
+}
+
+.mh-conflict__meta {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+}
+
+.mh-conflict__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.mh-conflict__resched {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mh-conflict__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-green-600);
+  i { font-size: 14px; }
+}
+
+.mh-conflict__busy {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  font-style: italic;
+}
+
+.mh-conflict__remaining {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  margin-right: 8px;
+}

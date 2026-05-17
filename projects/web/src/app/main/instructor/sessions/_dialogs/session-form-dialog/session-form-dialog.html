@@ -1,0 +1,328 @@
+<p-dialog
+  [header]="isEdit() ? 'Edit session' : 'Create session'"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '42rem', maxWidth: '95vw' }"
+  [contentStyle]="{ maxHeight: '70vh', overflow: 'auto' }"
+  [closable]="true"
+  styleClass="mh-sf"
+>
+  <div class="mh-sf__body">
+    <!-- Basics -->
+    <section class="mh-sf__section">
+      <header class="mh-sf__sec-h">
+        <i class="pi pi-tag"></i>
+        <span>Basics</span>
+      </header>
+      <div class="mh-sf__grid">
+        <div class="mh-sf__field mh-sf__field--full">
+          <label for="sfTitle">Title</label>
+          <input
+            id="sfTitle"
+            type="text"
+            pInputText
+            fluid
+            [ngModel]="form().title"
+            (ngModelChange)="updateField('title', $event)"
+            placeholder="e.g. Vinyasa flow — Tuesday morning"
+          />
+        </div>
+
+        <div class="mh-sf__field mh-sf__field--full">
+          <label for="sfDesc">Description (optional)</label>
+          <textarea
+            id="sfDesc"
+            pTextarea
+            rows="2"
+            fluid
+            [ngModel]="form().description"
+            (ngModelChange)="updateField('description', $event)"
+            placeholder="What should attendees know?"
+          ></textarea>
+        </div>
+
+        <div class="mh-sf__field">
+          <label>Type</label>
+          <p-select
+            [options]="typeOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="form().type"
+            (ngModelChange)="updateField('type', $event)"
+            appendTo="body"
+            fluid
+          />
+        </div>
+
+        <div class="mh-sf__field">
+          <label>Access</label>
+          <p-select
+            [options]="accessOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="form().access"
+            (ngModelChange)="updateField('access', $event)"
+            appendTo="body"
+            fluid
+          />
+        </div>
+
+        @if (needsGroup()) {
+          <div class="mh-sf__field mh-sf__field--full">
+            <label>Group</label>
+            <p-select
+              [options]="groups()"
+              optionLabel="name"
+              optionValue="id"
+              [ngModel]="form().groupId"
+              (ngModelChange)="updateField('groupId', $event)"
+              appendTo="body"
+              fluid
+              placeholder="Pick a group"
+              [showClear]="true"
+            />
+          </div>
+        }
+
+        <div class="mh-sf__checkbox-row mh-sf__field--full">
+          <p-checkbox
+            [binary]="true"
+            inputId="sfApproval"
+            [ngModel]="form().approvalRequired"
+            (ngModelChange)="updateField('approvalRequired', $event)"
+          />
+          <label for="sfApproval" class="mh-sf__inline-label">
+            Require approval before confirming
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Where -->
+    <section class="mh-sf__section">
+      <header class="mh-sf__sec-h">
+        <i class="pi pi-map-marker"></i>
+        <span>Where</span>
+      </header>
+      <div class="mh-sf__grid">
+        <div class="mh-sf__field">
+          <label>Location</label>
+          <p-select
+            [options]="locationOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="form().locationKind"
+            (ngModelChange)="updateField('locationKind', $event)"
+            appendTo="body"
+            fluid
+          />
+        </div>
+
+        @if (needsVenue()) {
+          <div class="mh-sf__field">
+            <label>Venue</label>
+            <p-select
+              [options]="venues()"
+              optionLabel="name"
+              optionValue="id"
+              [ngModel]="form().venueId"
+              (ngModelChange)="updateField('venueId', $event)"
+              appendTo="body"
+              fluid
+              placeholder="Pick a venue"
+              [showClear]="true"
+            />
+          </div>
+        }
+
+        @if (isOnline()) {
+          <div class="mh-sf__field mh-sf__field--full">
+            <label for="sfUrl">Meeting link</label>
+            <input
+              id="sfUrl"
+              type="url"
+              pInputText
+              fluid
+              [ngModel]="form().meetingUrl"
+              (ngModelChange)="updateField('meetingUrl', $event)"
+              placeholder="https://meet.google.com/abc-defg-hij"
+            />
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- When -->
+    <section class="mh-sf__section">
+      <header class="mh-sf__sec-h">
+        <i class="pi pi-clock"></i>
+        <span>When</span>
+      </header>
+      <div class="mh-sf__grid">
+        <div class="mh-sf__field">
+          <label>First start</label>
+          <p-datepicker
+            [ngModel]="form().firstStartAt"
+            (ngModelChange)="updateField('firstStartAt', $event)"
+            [showTime]="true"
+            [showSeconds]="false"
+            hourFormat="24"
+            dateFormat="dd M yy"
+            appendTo="body"
+            fluid
+            placeholder="Pick date & time"
+          />
+        </div>
+
+        <div class="mh-sf__field">
+          <label>Duration (min)</label>
+          <p-inputNumber
+            [ngModel]="form().durationMinutes"
+            (ngModelChange)="updateField('durationMinutes', $event ?? 60)"
+            [min]="5"
+            [max]="480"
+            [step]="5"
+            [showButtons]="true"
+            fluid
+          />
+        </div>
+
+        <div class="mh-sf__field mh-sf__field--full">
+          <label>Timezone</label>
+          <p-select
+            [options]="timezones"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="form().timezone"
+            (ngModelChange)="updateField('timezone', $event)"
+            [filter]="true"
+            filterBy="label"
+            appendTo="body"
+            fluid
+          />
+        </div>
+
+        <div class="mh-sf__checkbox-row mh-sf__field--full">
+          <p-checkbox
+            [binary]="true"
+            inputId="sfRecurring"
+            [ngModel]="form().isRecurring"
+            (ngModelChange)="updateField('isRecurring', $event)"
+            [disabled]="isEdit()"
+          />
+          <label for="sfRecurring" class="mh-sf__inline-label">
+            Repeat on a schedule
+            @if (isEdit()) {
+              <span class="mh-sf__hint"> (use cancel + recreate to change)</span>
+            }
+          </label>
+        </div>
+
+        @if (form().isRecurring) {
+          <div class="mh-sf__field mh-sf__field--full">
+            <mh-recurrence-builder
+              [rule]="form().recurrenceRule"
+              (ruleChange)="updateRule($event)"
+              [firstStartAt]="(form().firstStartAt ?? '').toString()"
+            />
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Capacity + cancel -->
+    <section class="mh-sf__section">
+      <header class="mh-sf__sec-h">
+        <i class="pi pi-users"></i>
+        <span>Capacity &amp; cancellation</span>
+      </header>
+      <div class="mh-sf__grid">
+        <div class="mh-sf__field">
+          <label>Capacity (blank = unlimited)</label>
+          <p-inputNumber
+            [ngModel]="form().capacity"
+            (ngModelChange)="updateField('capacity', $event)"
+            [min]="1"
+            [max]="999"
+            [showButtons]="true"
+            fluid
+          />
+        </div>
+
+        <div class="mh-sf__field">
+          <label>Cancel cutoff (hours)</label>
+          <p-inputNumber
+            [ngModel]="form().cancellationCutoffHours"
+            (ngModelChange)="updateField('cancellationCutoffHours', $event ?? 24)"
+            [min]="0"
+            [max]="168"
+            [showButtons]="true"
+            fluid
+          />
+        </div>
+
+        <div class="mh-sf__checkbox-row mh-sf__field--full">
+          <p-checkbox
+            [binary]="true"
+            inputId="sfWl"
+            [ngModel]="form().waitlistEnabled"
+            (ngModelChange)="updateField('waitlistEnabled', $event)"
+          />
+          <label for="sfWl" class="mh-sf__inline-label">
+            Enable waitlist when full
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Price -->
+    <section class="mh-sf__section">
+      <header class="mh-sf__sec-h">
+        <i class="pi pi-money-bill"></i>
+        <span>Price</span>
+      </header>
+      <div class="mh-sf__grid">
+        <div class="mh-sf__field">
+          <label>Amount</label>
+          <p-inputNumber
+            [ngModel]="form().priceAmountCents / 100"
+            (ngModelChange)="updateField('priceAmountCents', ($event ?? 0) * 100)"
+            mode="decimal"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            [min]="0"
+            [max]="9999"
+            fluid
+          />
+        </div>
+        <div class="mh-sf__field">
+          <label>Currency</label>
+          <p-select
+            [options]="currencies"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="form().priceCurrency"
+            (ngModelChange)="updateField('priceCurrency', $event)"
+            appendTo="body"
+            fluid
+          />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      (onClick)="close()"
+    />
+    <p-button
+      [label]="isEdit() ? 'Save changes' : 'Create session'"
+      [loading]="saving()"
+      icon="pi pi-check"
+      (onClick)="save()"
+    />
+  </ng-template>
+</p-dialog>

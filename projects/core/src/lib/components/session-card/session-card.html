@@ -1,0 +1,99 @@
+<article
+  class="mh-card"
+  [class.mh-card--list]="variant === 'list-card'"
+  [class.mh-card--mine]="variant === 'mine-row'"
+  [class.mh-card--showcase]="variant === 'showcase'"
+  [class.mh-card--mobile]="variant === 'mobile'"
+  [class.mh-card--related]="variant === 'related'"
+  [class.mh-card--popover]="variant === 'calendar-popover'"
+  [class.mh-card--selected]="selected"
+  [class.mh-card--blocked]="isBlocked()"
+  [style.--stripe]="stripeColor()"
+  (click)="onOpen()"
+>
+  @if (selectable) {
+    <input
+      type="checkbox"
+      class="mh-card__check"
+      [checked]="selected"
+      (click)="onSelectToggle($event)"
+      [attr.aria-label]="'Select ' + title()"
+    />
+  }
+
+  <!-- Time block (date + time) -->
+  <div class="mh-card__time">
+    <span class="mh-card__date">{{ startAt() | date: 'EEE d MMM' : '' : 'en-GB' }}</span>
+    <span class="mh-card__hour">{{ startAt() | date: 'HH:mm' : '' : 'en-GB' }}</span>
+    <span class="mh-card__dur">{{ durationMinutes() }} min</span>
+  </div>
+
+  <!-- Main info -->
+  <div class="mh-card__body">
+    <div class="mh-card__chips">
+      @if (!isBlocked()) {
+        <mh-type-chip [type]="$any(instance).template.type"></mh-type-chip>
+      }
+      <mh-access-chip
+        [access]="access()"
+        [approvalRequired]="approvalRequired()"
+      ></mh-access-chip>
+      @if (isOnline()) {
+        <mh-provider-chip
+          [provider]="$any(instance).template.meetingProvider"
+        ></mh-provider-chip>
+      }
+      @if (isRecurring()) {
+        <span class="mh-card__chip-recurring" title="Recurring series">
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          Recurring
+        </span>
+      }
+    </div>
+    <h3 class="mh-card__title">{{ title() }}</h3>
+    @if (isBlocked()) {
+      <p class="mh-card__locked">
+        <i class="pi pi-lock" aria-hidden="true"></i>
+        Description and signup hidden — members only
+      </p>
+    } @else {
+      <p class="mh-card__meta">
+        @if (isOnline()) {
+          <i class="pi pi-video" aria-hidden="true"></i>
+          Online
+        } @else {
+          <i class="pi pi-map-marker" aria-hidden="true"></i>
+          {{ $any(instance).venueOverride?.name ?? $any(instance).template?.venue?.name ?? 'In-person' }}
+        }
+      </p>
+    }
+  </div>
+
+  <!-- Right side: capacity + CTA -->
+  @if (!isBlocked() && variant !== 'related') {
+    <div class="mh-card__side">
+      <mh-capacity-bar
+        [signups]="signups()"
+        [cap]="capacity()"
+      ></mh-capacity-bar>
+      @if (showCTA) {
+        <button
+          type="button"
+          class="mh-card__cta"
+          [class.is-disabled]="ctaDisabled()"
+          [disabled]="ctaDisabled()"
+          (click)="onBook($event)"
+        >
+          {{ ctaText() }}
+        </button>
+      }
+    </div>
+  } @else if (isBlocked()) {
+    <div class="mh-card__side">
+      <button type="button" class="mh-card__cta is-disabled" disabled>
+        <i class="pi pi-lock" aria-hidden="true"></i>
+        {{ ctaText() }}
+      </button>
+    </div>
+  }
+</article>

@@ -74,8 +74,42 @@ export const API_ENDPOINTS = {
     COMMENT: (postId: string, commentId: string) => `/posts/${postId}/comments/${commentId}`,
     REACTIONS: (postId: string) => `/posts/${postId}/reactions`,
   },
+  // Sessions module — see SESSIONS_FRONTEND_BUILD_PLAN.md §A.2.
+  // Mirrors every endpoint of the live BE (24 surfaces).
   SESSIONS: {
     BASE: '/sessions',
+    // Templates (instructor)
+    TEMPLATES: '/sessions/templates',
+    TEMPLATE_BY_ID: (id: string) => `/sessions/templates/${id}`,
+    PREVIEW_RECURRENCE: '/sessions/templates/preview-recurrence',
+    REGENERATE: (id: string) => `/sessions/templates/${id}/regenerate`,
+    // Instances (read + write)
+    INSTANCES: '/sessions/instances',
+    INSTANCE_BY_ID: (id: string) => `/sessions/instances/${id}`,
+    INSTANCE_PARTICIPANTS: (id: string) => `/sessions/instances/${id}/participants`,
+    CANCEL_INSTANCE: (id: string) => `/sessions/instances/${id}/cancel`,
+    RESCHEDULE_INSTANCE: (id: string) => `/sessions/instances/${id}/reschedule`,
+    FOLLOW_UP: (id: string) => `/sessions/instances/${id}/follow-up`,
+    // Booking (client)
+    BOOK: (id: string) => `/sessions/instances/${id}/book`,
+    CANCEL_BOOKING: (id: string) => `/sessions/instances/${id}/cancel-booking`,
+    // Instructor → participant
+    APPROVE_PARTICIPANT: (instanceId: string, participantId: string) =>
+      `/sessions/instances/${instanceId}/participants/${participantId}/approve`,
+    DECLINE_PARTICIPANT: (instanceId: string, participantId: string) =>
+      `/sessions/instances/${instanceId}/participants/${participantId}/decline`,
+    PARTICIPANT_BY_ID: (instanceId: string, participantId: string) =>
+      `/sessions/instances/${instanceId}/participants/${participantId}`,
+    // Public surface
+    DISCOVER: '/sessions/discover',
+    PUBLIC_BY_SLUG: (handle: string, slug: string) =>
+      `/sessions/public/${handle}/${slug}`,
+    PUBLIC_INSTANCE: (id: string) => `/sessions/instances/${id}/public`,
+    // Client utilities
+    MY: '/sessions/my',
+    MY_COUNTS: '/sessions/my/counts',
+    ICS: (id: string) => `/sessions/instances/${id}/ics`,
+    JOIN_INFO: (id: string) => `/sessions/instances/${id}/join-info`,
   },
   BLOG: {
     BASE: '/blog',

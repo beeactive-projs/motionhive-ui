@@ -1,0 +1,64 @@
+.mh-sf__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 4px;
+}
+
+.mh-sf__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mh-sf__sec-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--p-text-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  i {
+    color: var(--p-primary-500);
+  }
+}
+
+.mh-sf__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mh-sf__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+}
+.mh-sf__field--full { grid-column: 1 / -1; }
+
+.mh-sf__checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mh-sf__inline-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--p-text-color);
+  margin-left: 0;
+  cursor: pointer;
+}
+
+.mh-sf__hint {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  font-style: italic;
+}

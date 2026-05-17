@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  padding: 24px;
+}
+
+.mh-disc__filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) max-content max-content;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mh-disc__search {
+  position: relative;
+  i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--p-text-muted-color);
+    pointer-events: none;
+  }
+  input {
+    padding-left: 36px;
+  }
+}
+
+:host ::ng-deep .mh-disc__select {
+  min-width: 160px;
+}
+
+.mh-disc__skeletons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.mh-disc__empty {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--p-text-muted-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  i { font-size: 36px; color: var(--p-text-muted-color); }
+  p { margin: 0; font-size: 14px; }
+}
+
+.mh-disc__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mh-disc__card-wrap {
+  position: relative;
+  &.is-booked mh-session-card {
+    opacity: 0.85;
+  }
+}
+
+.mh-disc__badge {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: color-mix(in srgb, var(--p-green-500) 18%, transparent);
+  color: var(--p-green-700);
+  border: 1px solid color-mix(in srgb, var(--p-green-500) 40%, transparent);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  i { font-size: 12px; }
+}
+
+// "+N more" pill — surfaced on cards that represent a series so the user
+// knows the card stands for multiple occurrences. Sits to the left of
+// the booked badge (or alone when not booked).
+.mh-disc__more-badge {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 2;
+  padding: 3px 10px;
+  background: color-mix(in srgb, var(--p-primary-500) 14%, transparent);
+  color: var(--p-primary-700);
+  border: 1px solid color-mix(in srgb, var(--p-primary-500) 30%, transparent);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+// If both badges show, offset the "more" badge to the left so they don't stack.
+.mh-disc__card-wrap.is-booked .mh-disc__more-badge {
+  right: 96px;
+}
+
+.mh-disc__more {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mh-disc__count {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+}
