@@ -8,12 +8,12 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
-import { TextareaModule } from 'primeng/textarea';
+import { Textarea } from 'primeng/textarea';
 import {
   BookResponse,
   PublicSessionInstance,
@@ -30,8 +30,7 @@ import {
  */
 @Component({
   selector: 'mh-book-dialog',
-  standalone: true,
-  imports: [CommonModule, FormsModule, Dialog, ButtonModule, TextareaModule],
+  imports: [DatePipe, DecimalPipe, FormsModule, Dialog, Button, Textarea],
   template: `
     <p-dialog
       header="Confirm booking"
@@ -94,7 +93,7 @@ import {
         }
       </div>
 
-      <ng-template pTemplate="footer">
+      <ng-template #footer>
         <p-button
           label="Cancel"
           severity="secondary"
@@ -145,8 +144,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDialog {
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
 
   readonly visible = model(false);
   readonly instance = input<PublicSessionInstance | null>(null);
@@ -173,7 +172,7 @@ export class BookDialog {
     const inst = this.instance();
     if (!inst) return;
     this.busy.set(true);
-    this._svc
+    this._sessionService
       .book(inst.id, { bookingNote: this.note().trim() || undefined })
       .subscribe({
         next: (res) => {
@@ -188,7 +187,7 @@ export class BookDialog {
           // wording than "Could not book — Conflict".
           const status = (err as { status?: number })?.status;
           if (status === 409) {
-            this._msg.add({
+            this._messageService.add({
               severity: 'warn',
               summary: 'Time conflict',
               detail:
@@ -197,7 +196,7 @@ export class BookDialog {
             });
             return;
           }
-          showApiError(this._msg, 'Could not book', 'Please try again.', err);
+          showApiError(this._messageService, 'Could not book', 'Please try again.', err);
         },
       });
   }
