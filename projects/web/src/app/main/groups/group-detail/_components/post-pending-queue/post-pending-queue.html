@@ -1,5 +1,5 @@
 @if (loading()) {
-<p-card>
+<p-card class="shadow-md">
   <div class="flex flex-col gap-3" role="status" aria-label="Loading pending posts">
     @for (i of skeletonRows; track i) {
     <div class="flex items-start gap-3">
@@ -13,7 +13,7 @@
   </div>
 </p-card>
 } @else if (count() > 0) {
-<p-card>
+<p-card class="shadow-md">
   <header class="flex items-center gap-2 mb-3">
     <i class="pi pi-clock text-warn-500" aria-hidden="true"></i>
     <h3 class="font-medium text-surface-900 dark:text-surface-100 m-0">

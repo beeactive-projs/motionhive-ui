@@ -2,27 +2,30 @@
   display: block;
 }
 
-.discover-logo {
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--p-border-radius-md);
-  object-fit: cover;
-  flex-shrink: 0;
+.gp-content {
+  container-type: inline-size;
 }
 
-.discover-logo-fallback {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--p-primary-color);
-  color: var(--p-primary-contrast-color);
-  font-weight: 600;
-  font-size: 1.1rem;
+.gp-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
 }
 
-:host::ng-deep {
-  .p-card-body,
-  .p-card-content {
-    height: 100%;
+@container (min-width: 40rem) {
+  .gp-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container (min-width: 80rem) {
+  .gp-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container (min-width: 96rem) {
+  .gp-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }

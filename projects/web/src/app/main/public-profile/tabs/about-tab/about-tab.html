@@ -1,53 +1,50 @@
 @if (profile(); as p) {
-  @if (!hasContent()) {
-    <p-card>
-      <div class="text-center py-6 text-muted-color">
-        <p class="m-0 text-sm">No bio yet — check back soon.</p>
-      </div>
-    </p-card>
-  } @else {
-    <p-card>
-      <ng-template #header>
-        <div class="flex items-start gap-3 px-4 pt-4">
-          <p-avatar
-            icon="pi pi-user"
-            shape="square"
-            size="normal"
-            [style]="{ background: 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
-          <h2 class="m-0 text-lg font-bold leading-tight self-center">About</h2>
-        </div>
-      </ng-template>
+@if (!hasContent()) {
+<p-card class="shadow-md">
+  <div class="text-center py-6 text-muted-color">
+    <p class="m-0 text-sm">No bio yet — check back soon.</p>
+  </div>
+</p-card>
+} @else {
+<p-card class="shadow-md">
+  <ng-template #header>
+    <div class="flex items-start gap-3 px-4 pt-4">
+      <p-avatar icon="pi pi-user" shape="square" size="normal"
+        [style]="{ background: 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
+      <h2 class="m-0 text-lg font-bold leading-tight self-center">About</h2>
+    </div>
+  </ng-template>
 
-      <div class="flex flex-col gap-5">
-        @if (p.bio) {
-          <p class="m-0 text-sm leading-relaxed whitespace-pre-wrap">{{ p.bio }}</p>
-        }
+  <div class="flex flex-col gap-5">
+    @if (p.bio) {
+    <p class="m-0 text-sm leading-relaxed whitespace-pre-wrap">{{ p.bio }}</p>
+    }
 
-        @if (certifications().length > 0) {
-          <div class="flex flex-col gap-2">
-            <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">Certifications</span>
-            <div class="flex flex-wrap gap-2">
-              @for (cert of certifications(); track cert.name) {
-                <span class="cert-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium">
-                  <i class="pi pi-verified text-xs"></i>
-                  <span>{{ cert.name }}</span>
-                </span>
-              }
-            </div>
-          </div>
-        }
-
-        @if (specializations().length > 0) {
-          <div class="flex flex-col gap-2">
-            <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">I specialize in</span>
-            <div class="flex flex-wrap gap-2">
-              @for (spec of specializations(); track spec) {
-                <p-tag [value]="spec" severity="secondary" rounded />
-              }
-            </div>
-          </div>
+    @if (certifications().length > 0) {
+    <div class="flex flex-col gap-2">
+      <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">Certifications</span>
+      <div class="flex flex-wrap gap-2">
+        @for (cert of certifications(); track cert.name) {
+        <span class="cert-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium">
+          <i class="pi pi-verified text-xs"></i>
+          <span>{{ cert.name }}</span>
+        </span>
         }
       </div>
-    </p-card>
-  }
+    </div>
+    }
+
+    @if (specializations().length > 0) {
+    <div class="flex flex-col gap-2">
+      <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">I specialize in</span>
+      <div class="flex flex-wrap gap-2">
+        @for (spec of specializations(); track spec) {
+        <p-tag [value]="spec" severity="secondary" rounded />
+        }
+      </div>
+    </div>
+    }
+  </div>
+</p-card>
+}
 }

@@ -18,7 +18,7 @@
 <main class="flex flex-col gap-4 max-w-400 mx-auto">
   <p-breadcrumb [model]="breadcrumbItems()" />
 
-  <p-card class="relative">
+  <p-card class="relative shadow-md">
     <div class="honeycomb-bg"></div>
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
       @if (g.logoUrl) {
@@ -65,7 +65,7 @@
 
   <!-- Instructor -->
   @if (instructor(); as i) {
-  <p-card>
+  <p-card class="shadow-md">
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-user text-primary-600"></i>
@@ -98,7 +98,7 @@
 
   <!-- Upcoming sessions -->
   @if (upcomingSessions().length > 0) {
-  <p-card>
+  <p-card class="shadow-md">
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-calendar text-primary-600"></i>

@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-4">
-  <p-card>
+  <p-card class="shadow-md">
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-info-circle text-primary-600"></i>
@@ -10,46 +10,43 @@
 
     <div class="flex flex-col gap-1">
       @if (profile().language) {
-        <mh-profile-fact-row icon="pi pi-globe" label="Language" [value]="profile().language" />
+      <mh-profile-fact-row icon="pi pi-globe" label="Language" [value]="profile().language" />
       }
       @if (profile().timezone) {
-        <mh-profile-fact-row icon="pi pi-clock" label="Timezone" [value]="profile().timezone" />
+      <mh-profile-fact-row icon="pi pi-clock" label="Timezone" [value]="profile().timezone" />
       }
-      <mh-profile-fact-row
-        icon="pi pi-calendar"
-        label="Member since"
-        [value]="profile().memberSince | date: 'mediumDate'"
-      />
+      <mh-profile-fact-row icon="pi pi-calendar" label="Member since"
+        [value]="profile().memberSince | date: 'mediumDate'" />
     </div>
   </p-card>
 
   @if (hasPersonalDetails()) {
-    <p-card>
-      <ng-template #header>
-        <div class="flex items-center gap-2 px-4 pt-4">
-          <i class="pi pi-id-card text-primary-600"></i>
-          <h2 class="text-base font-semibold m-0">Personal details</h2>
-        </div>
-        <p-divider />
-      </ng-template>
-
-      <div class="flex flex-col gap-1">
-        @if (profile().firstName) {
-          <mh-profile-fact-row icon="pi pi-user" label="First name" [value]="profile().firstName" />
-        }
-        @if (profile().lastName) {
-          <mh-profile-fact-row icon="pi pi-user" label="Last name" [value]="profile().lastName" />
-        }
-        @if (profile().email) {
-          <mh-profile-fact-row icon="pi pi-envelope" label="Email" [value]="profile().email" />
-        }
-        @if (profile().phone) {
-          <mh-profile-fact-row icon="pi pi-phone" label="Phone" [value]="profile().phone" />
-        }
-        @if (locationDisplay()) {
-          <mh-profile-fact-row icon="pi pi-map-marker" label="Location" [value]="locationDisplay()" />
-        }
+  <p-card class="shadow-md">
+    <ng-template #header>
+      <div class="flex items-center gap-2 px-4 pt-4">
+        <i class="pi pi-id-card text-primary-600"></i>
+        <h2 class="text-base font-semibold m-0">Personal details</h2>
       </div>
-    </p-card>
+      <p-divider />
+    </ng-template>
+
+    <div class="flex flex-col gap-1">
+      @if (profile().firstName) {
+      <mh-profile-fact-row icon="pi pi-user" label="First name" [value]="profile().firstName" />
+      }
+      @if (profile().lastName) {
+      <mh-profile-fact-row icon="pi pi-user" label="Last name" [value]="profile().lastName" />
+      }
+      @if (profile().email) {
+      <mh-profile-fact-row icon="pi pi-envelope" label="Email" [value]="profile().email" />
+      }
+      @if (profile().phone) {
+      <mh-profile-fact-row icon="pi pi-phone" label="Phone" [value]="profile().phone" />
+      }
+      @if (locationDisplay()) {
+      <mh-profile-fact-row icon="pi pi-map-marker" label="Location" [value]="locationDisplay()" />
+      }
+    </div>
+  </p-card>
   }
 </div>

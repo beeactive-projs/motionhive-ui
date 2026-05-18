@@ -1,0 +1,147 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.gp-card-wrap {
+  height: 100%;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.gp-card-wrap.is-inactive {
+  opacity: 0.62;
+  filter: saturate(0.6);
+}
+
+.gp-card-wrap.is-inactive:hover {
+  opacity: 0.85;
+}
+
+/* Group name link — inherits color, underlines on hover */
+.gp-name-link {
+  color: inherit;
+  text-decoration: none;
+
+  // &:hover {
+  //   text-decoration: underline;
+  //   text-underline-offset: 2px;
+  // }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* p-card host — stretch full height */
+::ng-deep p-card.gp-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .p-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .p-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.125rem;
+    gap: 0;
+  }
+
+  .p-card-content {
+    padding: 0;
+    padding-top: 0.875rem;
+    flex: 1;
+  }
+
+  .p-card-footer {
+    padding: 0.75rem 0 0;
+    margin-top: auto;
+    border-top: 1px dashed var(--p-surface-200);
+  }
+}
+
+/* p-avatar host — square gradient tile */
+::ng-deep p-avatar.gp-avatar .p-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  font-size: 20px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* p-tag base — shared tighter typography for all tags in this component */
+:host ::ng-deep .p-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* Status tags (policy, private, inactive) — uppercase badge style */
+:host ::ng-deep .gp-status-tags .p-tag {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Content tags (group.tags) — monospace pill, no uppercase */
+:host ::ng-deep p-tag.gp-tag-content {
+  font:
+    500 11px ui-monospace,
+    'JetBrains Mono',
+    monospace;
+  border-radius: 6px;
+}
+
+/* p-button host — kebab sits at top-right of its flex row */
+::ng-deep p-button.gp-kebab {
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+/* p-button host — visit link: tighten inner button padding */
+::ng-deep p-button.gp-visit .p-button {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* p-avatarGroup circles — scoped via footer wrapper */
+:host ::ng-deep .gp-foot .p-avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+  border: 2px solid var(--p-surface-0);
+}
+
+/* Overflow "+N" avatar */
+::ng-deep p-avatar.gp-avatar-more .p-avatar {
+  background: var(--p-surface-100) !important;
+  color: var(--p-text-muted-color) !important;
+}
+
+/* Danger item in kebab menu */
+::ng-deep .gp-menu-danger .p-menuitem-content a {
+  color: var(--p-red-500) !important;
+}
+
+.gp-foot {
+  min-height: 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gp-card-wrap,
+  .gp-card-wrap:hover {
+    transition: none;
+    transform: none;
+  }
+}

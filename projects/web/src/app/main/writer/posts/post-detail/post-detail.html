@@ -48,7 +48,7 @@
     <div class="lg:col-span-2 flex flex-col gap-4">
 
       <!-- Title + Slug -->
-      <p-card>
+      <p-card class="shadow-md">
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5">
             <label for="title" class="text-sm font-medium">Title <span class="text-red-500">*</span></label>
@@ -71,9 +71,8 @@
           @if (showSlug()) {
           <div class="flex flex-col gap-1.5">
             <label for="slug" class="text-sm font-medium">Slug</label>
-            <input pInputText id="slug" formControlName="slug" fluid placeholder="post-url-slug"
-              (input)="onSlugInput()" [class.ng-invalid]="isFieldInvalid('slug')"
-              [class.ng-dirty]="isFieldInvalid('slug')" />
+            <input pInputText id="slug" formControlName="slug" fluid placeholder="post-url-slug" (input)="onSlugInput()"
+              [class.ng-invalid]="isFieldInvalid('slug')" [class.ng-dirty]="isFieldInvalid('slug')" />
             @if (isFieldInvalid('slug')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('slug') }}</p-message>
             }
@@ -83,7 +82,7 @@
       </p-card>
 
       <!-- Excerpt -->
-      <p-card>
+      <p-card class="shadow-md">
         <div class="flex flex-col gap-1.5">
           <label for="excerpt" class="text-sm font-medium">Excerpt <span class="text-red-500">*</span></label>
           <textarea pTextarea id="excerpt" formControlName="excerpt" fluid [rows]="3"
@@ -96,7 +95,7 @@
       </p-card>
 
       <!-- Content -->
-      <p-card class="flex-1">
+      <p-card class="flex-1 shadow-md">
         <div class="flex flex-col gap-1.5 h-full">
           <label for="content" class="text-sm font-medium">Content <span class="text-red-500">*</span></label>
           <p-editor id="content" formControlName="content" [invalid]="isFieldInvalid('content')"
@@ -112,7 +111,7 @@
     <div class="flex flex-col gap-4">
 
       <!-- Publishing -->
-      <p-card header="Publishing">
+      <p-card header="Publishing" class="shadow-md">
         <div class="flex items-center justify-between gap-3">
           <div class="flex flex-col">
             <span class="text-sm font-medium">Published</span>
@@ -125,7 +124,7 @@
       </p-card>
 
       <!-- Post settings -->
-      <p-card header="Post settings">
+      <p-card header="Post settings" class="shadow-md">
         <div class="flex flex-col gap-4">
           <!-- Category (autocomplete — pick existing or type new) -->
           <div class="flex flex-col gap-1.5">
@@ -195,7 +194,7 @@
       </p-card>
 
       <!-- Cover image -->
-      <p-card header="Cover image">
+      <p-card header="Cover image" class="shadow-md">
         <div class="flex flex-col gap-3">
           @if (form.controls.coverImage.value) {
           <!-- Aspect-locked preview matches what readers actually see in carousels and the article hero. -->
@@ -224,7 +223,8 @@
           </div>
 
           <!-- Writer guidance — what to upload for best results. -->
-          <div class="rounded-md border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 p-3 text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
+          <div
+            class="rounded-md border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 p-3 text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
             <p class="font-medium text-surface-800 dark:text-surface-100 mb-1">Image tips</p>
             <ul class="list-disc list-inside space-y-0.5">
               <li>Use a <span class="font-medium">landscape</span> photo (wider than tall).</li>
@@ -243,22 +243,22 @@
         (the BE uses the JWT). Admins can override the byline for guest
         contributors by typing a name here. Writers see the read-only note.
       -->
-      <p-card header="Author">
+      <p-card header="Author" class="shadow-md">
         <div class="flex flex-col gap-4">
           @if (canSetGuestByline()) {
-            <div class="flex flex-col gap-1.5">
-              <label for="guestAuthorName" class="text-sm font-medium">Guest byline (optional)</label>
-              <input pInputText id="guestAuthorName" formControlName="guestAuthorName" fluid
-                placeholder="e.g. Sarah Johnson" />
-              <small class="text-surface-500 text-xs">
-                Leave blank to publish under your own user. Fill in to attribute the post to a guest contributor
-                without a MotionHive account.
-              </small>
-            </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="guestAuthorName" class="text-sm font-medium">Guest byline (optional)</label>
+            <input pInputText id="guestAuthorName" formControlName="guestAuthorName" fluid
+              placeholder="e.g. Sarah Johnson" />
+            <small class="text-surface-500 text-xs">
+              Leave blank to publish under your own user. Fill in to attribute the post to a guest contributor
+              without a MotionHive account.
+            </small>
+          </div>
           } @else {
-            <p class="text-sm text-surface-500">
-              This post will be published under your account. Admins can change the byline.
-            </p>
+          <p class="text-sm text-surface-500">
+            This post will be published under your account. Admins can change the byline.
+          </p>
           }
         </div>
       </p-card>
