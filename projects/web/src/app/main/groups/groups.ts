@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore, Group, GroupService, GroupsRefreshService, showApiError } from 'core';
@@ -6,11 +13,22 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
-import { GroupFormDialog } from "./_dialogs/group-form-dialog/group-form-dialog";
+import { GroupFormDialog } from './_dialogs/group-form-dialog/group-form-dialog';
+import { Avatar } from 'primeng/avatar';
+import { monogramFromName, paletteFor } from './_utils/group-palette.util';
 
 @Component({
   selector: 'mh-groups-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, ButtonModule, SkeletonModule, ToastModule, GroupFormDialog],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    ButtonModule,
+    SkeletonModule,
+    ToastModule,
+    GroupFormDialog,
+    Avatar,
+  ],
   providers: [MessageService],
   templateUrl: './groups.html',
   styleUrl: './groups.scss',
@@ -29,6 +47,20 @@ export class GroupsLayout implements OnInit {
   joinedGroups = signal<Group[]>([]);
   loadingJoined = signal(true);
   showGroupFormDialog = signal(false);
+
+  monogram(group: Group): string {
+    return monogramFromName(group.name);
+  }
+
+  avatarStyle(group: Group): Record<string, string> | null {
+    if (group.logoUrl) return null;
+    const palette = paletteFor(group.id);
+    return {
+      background: `linear-gradient(155deg, var(--p-${palette}-400), var(--p-${palette}-600))`,
+      color: `var(--p-${palette}-50)`,
+      fontWeight: '700',
+    };
+  }
 
   ngOnInit(): void {
     this.loadJoinedGroups();
@@ -58,10 +90,6 @@ export class GroupsLayout implements OnInit {
   onGroupCreated(): void {
     this._groupsRefreshService.notify();
     this._router.navigate(['/groups/your-groups']);
-  }
-
-  groupInitial(group: Group): string {
-    return group.name?.charAt(0).toUpperCase() || '?';
   }
 
   trackById = (_: number, item: { id: string }) => item.id;
