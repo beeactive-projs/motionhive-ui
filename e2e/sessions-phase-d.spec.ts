@@ -1,5 +1,6 @@
 import { expect, test, type ConsoleMessage } from '@playwright/test';
-import { loginAsInstructor } from './auth.helper';
+import { INSTRUCTOR_FIXTURE, loginAsInstructor, mintToken } from './auth.helper';
+import { expectSeedOk } from './seed.helper';
 
 /**
  * Phase D smoke walk — drives a real Chromium against the dev server
@@ -159,8 +160,6 @@ test.describe('Phase D — instructor session flows', () => {
   }) => {
     // Seed a one-off so the detail page is guaranteed to be the instance
     // detail (with Cancel), not the template detail.
-    const { INSTRUCTOR_FIXTURE, mintToken } = await import('./auth.helper');
-    const { expectSeedOk } = await import('./seed.helper');
     const token = mintToken(INSTRUCTOR_FIXTURE);
     const title = `E2E edit-cancel ${Date.now()}`;
     const future = new Date(Date.now() + 7 * 86_400_000).toISOString();

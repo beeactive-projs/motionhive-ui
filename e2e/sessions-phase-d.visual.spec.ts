@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import { loginAsInstructor } from './auth.helper';
+import { INSTRUCTOR_FIXTURE, loginAsInstructor, mintToken } from './auth.helper';
+import { expectSeedOk } from './seed.helper';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -97,8 +98,6 @@ for (const vp of VIEWPORTS) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       // Seed a one-off so the screenshot is of the instance detail page
       // regardless of what's already in the DB.
-      const { INSTRUCTOR_FIXTURE, mintToken } = await import('./auth.helper');
-      const { expectSeedOk } = await import('./seed.helper');
       const token = mintToken(INSTRUCTOR_FIXTURE);
       const title = `E2E visual ${Date.now()}`;
       const future = new Date(Date.now() + 7 * 86_400_000).toISOString();

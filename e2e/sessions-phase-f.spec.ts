@@ -98,6 +98,22 @@ test('calendar: clicking an empty hour cell opens the form prefilled with that t
 
 // ─── Phase F: Message participants ──────────────────────────────────────
 
+test('sessions list: Public profile button opens /@<handle> in a new tab', async ({ page, context }) => {
+  await loginAsInstructor(page);
+  await page.goto('/coaching/sessions');
+  await page.locator('mh-instructor-sessions').waitFor({ timeout: 10_000 });
+
+  const btn = page.getByRole('button', { name: /public profile/i });
+  await expect(btn).toBeVisible();
+  await expect(btn).toBeEnabled();
+
+  // window.open with target=_blank opens a new page in the same context.
+  const [popup] = await Promise.all([context.waitForEvent('page'), btn.click()]);
+  await popup.waitForLoadState('domcontentloaded');
+  expect(popup.url()).toContain('/@testinstructor');
+  await popup.close();
+});
+
 test('phase F: instructor can message participants of a future scheduled session', async ({
   page,
   request,

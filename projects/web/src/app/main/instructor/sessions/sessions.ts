@@ -20,7 +20,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import {
+  AuthStore,
   KpiCard,
   PageShell,
   SectionLabel,
@@ -60,6 +62,7 @@ const TABS: TabSpec[] = [
     SessionCard,
     SessionFormDialog,
     ToastModule,
+    TooltipModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './sessions.html',
@@ -69,6 +72,10 @@ const TABS: TabSpec[] = [
 export class Sessions implements OnInit, OnDestroy {
   protected readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
+  private readonly _auth = inject(AuthStore);
+
+  /** Handle on the logged-in instructor, used to drive the "Public profile" button. */
+  protected readonly handle = computed(() => this._auth.user()?.handle ?? null);
   private readonly _destroyRef = inject(DestroyRef);
 
   // Infinite scroll: a sentinel at the end of the list pulls the next page on intersection.
@@ -265,6 +272,17 @@ export class Sessions implements OnInit, OnDestroy {
 
   protected retry(): void {
     this.store.reload();
+  }
+
+  /**
+   * Open the instructor's own public profile (`/@<handle>`) in a new tab —
+   * it's a preview of how the world sees their sessions. New tab so we
+   * don't lose the instructor's place in the management UI.
+   */
+  protected openPublicProfile(): void {
+    const h = this.handle();
+    if (!h) return;
+    window.open(`/@${h}`, '_blank', 'noopener');
   }
 
   /**

@@ -25,6 +25,10 @@
       severity="secondary"
       [outlined]="true"
       icon="pi pi-external-link"
+      [disabled]="!handle()"
+      pTooltip="Preview your sessions list as clients see it"
+      tooltipPosition="bottom"
+      (onClick)="openPublicProfile()"
     />
     <p-button
       label="New session"

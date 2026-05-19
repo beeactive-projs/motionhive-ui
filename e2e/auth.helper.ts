@@ -24,6 +24,7 @@ export interface SeededUser {
   email: string;
   firstName: string;
   lastName: string;
+  handle: string;
   roles: string[];
 }
 
@@ -32,6 +33,7 @@ export const INSTRUCTOR_FIXTURE: SeededUser = {
   email: 'instructor@motionhive.fit',
   firstName: 'Test',
   lastName: 'Instructor',
+  handle: 'testinstructor',
   roles: ['INSTRUCTOR', 'USER'],
 };
 
@@ -40,6 +42,7 @@ export const USER_FIXTURE: SeededUser = {
   email: 'user@motionhive.fit',
   firstName: 'Test',
   lastName: 'User',
+  handle: 'testuser',
   roles: ['USER'],
 };
 
@@ -76,6 +79,7 @@ async function seedAuth(page: Page, user: SeededUser) {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    handle: user.handle,
     roles: user.roles,
     permissions: [],
     isEmailVerified: true,
