@@ -88,9 +88,10 @@
     }
   </nav>
 
-  <!-- Filters -->
+  <!-- Filters: search + pill toggles for type/location. Mobile collapses
+       the pill strip into a horizontal scroll; desktop wraps on its own. -->
   <div class="mh-sessions__filters" role="search">
-    <span class="p-input-icon-left">
+    <span class="p-input-icon-left mh-sessions__search">
       <i class="pi pi-search"></i>
       <input
         pInputText
@@ -100,6 +101,57 @@
         (ngModelChange)="onSearchInput($event)"
       />
     </span>
+
+    <div class="mh-sessions__pills" role="group" aria-label="Quick filters">
+      <button
+        type="button"
+        class="mh-pill"
+        [class.is-active]="!store.filters().locationKind && !store.filters().type"
+        (click)="clearQuickFilters()"
+      >All</button>
+
+      <span class="mh-pill__divider" aria-hidden="true"></span>
+
+      <button
+        type="button"
+        class="mh-pill"
+        [class.is-active]="store.filters().locationKind === 'ONLINE'"
+        (click)="toggleLocation('ONLINE')"
+      >
+        <i class="pi pi-video" aria-hidden="true"></i>
+        Online
+      </button>
+      <button
+        type="button"
+        class="mh-pill"
+        [class.is-active]="store.filters().locationKind === 'IN_PERSON'"
+        (click)="toggleLocation('IN_PERSON')"
+      >
+        <i class="pi pi-map-marker" aria-hidden="true"></i>
+        In-person
+      </button>
+
+      <span class="mh-pill__divider" aria-hidden="true"></span>
+
+      <button
+        type="button"
+        class="mh-pill"
+        [class.is-active]="store.filters().type === 'GROUP'"
+        (click)="toggleType('GROUP')"
+      >Group</button>
+      <button
+        type="button"
+        class="mh-pill"
+        [class.is-active]="store.filters().type === 'PRIVATE'"
+        (click)="toggleType('PRIVATE')"
+      >1-on-1</button>
+      <button
+        type="button"
+        class="mh-pill"
+        [class.is-active]="store.filters().type === 'OPEN'"
+        (click)="toggleType('OPEN')"
+      >Open</button>
+    </div>
   </div>
 
   <!-- Error -->

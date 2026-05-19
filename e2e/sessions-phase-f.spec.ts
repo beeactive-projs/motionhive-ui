@@ -304,6 +304,86 @@ test('notification deep-link routes to /coaching/sessions/:id (instructor) after
 
 // ─── Infinite scroll on instructor sessions list ────────────────────────
 
+// ─── BE fix: template.venue eager-load ─────────────────────────────────
+
+test('session detail surfaces the template venue (not "No venue set")', async ({ page, request }) => {
+  // Seed a venue, then a one-off that points at it.
+  const token = mintToken(INSTRUCTOR_FIXTURE);
+  const venueRes = await request.post(`${API}/venues`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { kind: 'GYM', name: `E2E Test Gym ${Date.now()}`, city: 'Cluj' },
+  });
+  await expectSeedOk(venueRes, 'seed venue');
+  const venue = (await venueRes.json()) as { id: string; name: string };
+
+  const future = new Date(Date.now() + 7 * 86_400_000).toISOString();
+  const tplRes = await request.post(`${API}/sessions/templates`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: {
+      title: `E2E venue render ${Date.now()}`,
+      type: 'OPEN',
+      access: 'OPEN',
+      locationKind: 'IN_PERSON',
+      venueId: venue.id,
+      durationMinutes: 60,
+      timezone: 'Europe/Bucharest',
+      isRecurring: false,
+      firstStartAt: future,
+    },
+  });
+  await expectSeedOk(tplRes, 'seed template with venue');
+  const body = (await tplRes.json()) as { generatedInstances: { id: string }[] };
+  const instanceId = body.generatedInstances[0].id;
+
+  await loginAsInstructor(page);
+  await page.goto(`/coaching/sessions/${instanceId}`);
+  await expect(page.locator('mh-instructor-session-detail')).toBeVisible({ timeout: 10_000 });
+
+  // "Where & how" section should show the venue name — NOT the "No venue set" placeholder.
+  await expect(page.locator('.mh-sd__venue')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('.mh-sd__venue')).toContainText(venue.name);
+  await expect(page.locator('.mh-sd__none')).toHaveCount(0);
+});
+
+// ─── Filter pills on the sessions list ─────────────────────────────────
+
+test('sessions list: location pill filters templates by IN_PERSON / ONLINE', async ({ page }) => {
+  await loginAsInstructor(page);
+  await page.goto('/coaching/sessions');
+  await page.locator('mh-session-card, .mh-sessions__empty').first().waitFor({ timeout: 10_000 });
+
+  // All pill is the default active state.
+  const allPill = page.locator('.mh-pill', { hasText: /^All$/ });
+  await expect(allPill).toHaveClass(/is-active/);
+
+  // Toggle Online → All loses is-active, Online gains it.
+  await page.locator('.mh-pill', { hasText: 'Online' }).click();
+  await page.waitForTimeout(400);
+  await expect(page.locator('.mh-pill.is-active', { hasText: 'Online' })).toBeVisible();
+  await expect(allPill).not.toHaveClass(/is-active/);
+
+  // Toggle Online again (re-click) → clears, All reactivates.
+  await page.locator('.mh-pill', { hasText: 'Online' }).click();
+  await page.waitForTimeout(400);
+  await expect(allPill).toHaveClass(/is-active/);
+});
+
+test('sessions list: type pill filters templates by Group / 1-on-1 / Open', async ({ page }) => {
+  await loginAsInstructor(page);
+  await page.goto('/coaching/sessions');
+  await page.locator('mh-session-card, .mh-sessions__empty').first().waitFor({ timeout: 10_000 });
+
+  await page.locator('.mh-pill', { hasText: /^Group$/ }).click();
+  await page.waitForTimeout(400);
+  await expect(page.locator('.mh-pill.is-active', { hasText: /^Group$/ })).toBeVisible();
+
+  // Switching to 1-on-1 should drop Group's active state (single-select per group).
+  await page.locator('.mh-pill', { hasText: '1-on-1' }).click();
+  await page.waitForTimeout(400);
+  await expect(page.locator('.mh-pill.is-active', { hasText: '1-on-1' })).toBeVisible();
+  await expect(page.locator('.mh-pill', { hasText: /^Group$/ })).not.toHaveClass(/is-active/);
+});
+
 test('instructor sessions list: scroll-sentinel triggers loadMore + appends', async ({ page }) => {
   await loginAsInstructor(page);
   await page.goto('/coaching/sessions');

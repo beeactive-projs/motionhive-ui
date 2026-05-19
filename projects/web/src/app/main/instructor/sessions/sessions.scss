@@ -46,9 +46,62 @@
 
 .mh-sessions__filters {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
   align-items: center;
+}
+.mh-sessions__search {
+  flex: 0 1 320px;
+  min-width: 220px;
+}
+.mh-sessions__pills {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  /* On narrow widths the pill row could spill — let it scroll horizontally
+     rather than push the page wider on phones. Hide the scrollbar visual; the
+     -webkit-overflow-scrolling keeps momentum on iOS. */
+  @media (max-width: 600px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    width: 100%;
+  }
+}
+.mh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+  background: transparent;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  i { font-size: 11px; }
+  &:hover {
+    color: var(--p-text-color);
+    border-color: var(--p-primary-300);
+  }
+  &.is-active {
+    background: var(--p-primary-500);
+    color: var(--p-primary-contrast-color, #fff);
+    border-color: var(--p-primary-500);
+  }
+}
+.mh-pill__divider {
+  width: 1px;
+  height: 18px;
+  background: var(--p-content-border-color);
+  margin: 0 4px;
+  flex-shrink: 0;
 }
 
 .mh-sessions__error {

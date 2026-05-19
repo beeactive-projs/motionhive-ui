@@ -27,6 +27,8 @@ import {
   PageShell,
   SectionLabel,
   SessionCard,
+  SessionKind,
+  SessionLocationKind,
   SessionsInstructorStore,
   type SessionInstance,
   type SessionTemplate,
@@ -227,6 +229,27 @@ export class Sessions implements OnInit, OnDestroy {
 
   protected onTabChange(tab: TemplateTab): void {
     this.store.setTab(tab);
+  }
+
+  /** Toggle a location pill — click the active one again to clear. */
+  protected toggleLocation(kind: 'IN_PERSON' | 'ONLINE'): void {
+    const current = this.store.filters().locationKind;
+    this.store.setFilters({
+      locationKind: current === kind ? undefined : (kind as SessionLocationKind),
+    });
+  }
+
+  /** Toggle a type pill — click the active one again to clear. */
+  protected toggleType(type: 'GROUP' | 'PRIVATE' | 'OPEN'): void {
+    const current = this.store.filters().type;
+    this.store.setFilters({
+      type: current === type ? undefined : (type as SessionKind),
+    });
+  }
+
+  /** Drop all quick filters (the "All" pill). Search input is left intact. */
+  protected clearQuickFilters(): void {
+    this.store.setFilters({ locationKind: undefined, type: undefined });
   }
 
   /**
