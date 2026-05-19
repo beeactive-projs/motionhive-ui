@@ -1,0 +1,29 @@
+<p-card class="gp-empty shadow-md">
+  <div class="text-center">
+    <div class="gp-empty-art mx-auto mb-4">
+      <i class="pi pi-users text-2xl"></i>
+    </div>
+
+    @if (variant() === 'manage') {
+      <h3 class="text-lg font-bold">
+        No groups yet<span class="text-primary">.</span>
+      </h3>
+      <p class="max-w-sm mx-auto mb-4 text-sm text-surface-600">
+        Organize your clients into groups for sessions and communication —
+        start with your most active 3 to 5 clients.
+      </p>
+      <div class="flex gap-2.5 justify-center">
+        <p-button label="Create your first group"
+                  icon="pi pi-plus"
+                  (onClick)="createGroup.emit()"/>
+      </div>
+    } @else {
+      <h3 class="text-lg font-bold">
+        No groups match your search<span class="text-primary">.</span>
+      </h3>
+      <p class="max-w-sm mx-auto text-sm text-surface-600">
+        Try a different search, or check back later.
+      </p>
+    }
+  </div>
+</p-card>

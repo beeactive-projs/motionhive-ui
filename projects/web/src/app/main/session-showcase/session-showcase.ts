@@ -6,13 +6,13 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
-import { SkeletonModule } from 'primeng/skeleton';
+import { Button } from 'primeng/button';
+import { Message } from 'primeng/message';
+import { Skeleton } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
+import { Toast } from 'primeng/toast';
 import { catchError, of } from 'rxjs';
 import {
   AccessChip,
@@ -43,14 +43,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  */
 @Component({
   selector: 'mh-session-showcase',
-  standalone: true,
   imports: [
-    CommonModule,
+    DatePipe,
+    DecimalPipe,
     RouterLink,
-    ButtonModule,
-    MessageModule,
-    SkeletonModule,
-    ToastModule,
+    Button,
+    Message,
+    Skeleton,
+    Toast,
     PageShell,
     AccessChip,
     TypeChip,
@@ -66,9 +66,9 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export class SessionShowcase implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
-  protected readonly _bookings = inject(MyBookingsIndexStore);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
 
   protected readonly instance = signal<
     PublicSessionInstance | BlockedSessionInstance | null
@@ -76,11 +76,6 @@ export class SessionShowcase implements OnInit {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly bookOpen = signal(false);
-
-  protected readonly blocked = computed(() => {
-    const inst = this.instance();
-    return inst != null && isBlockedInstance(inst);
-  });
 
   protected readonly publicInst = computed<PublicSessionInstance | null>(() => {
     const inst = this.instance();
@@ -99,7 +94,7 @@ export class SessionShowcase implements OnInit {
   /** Did the current user already book this instance? */
   protected readonly myBooking = computed(() => {
     const inst = this.publicInst();
-    return inst ? this._bookings.bookingFor(inst.id) : null;
+    return inst ? this._myBookingsIndexStore.bookingFor(inst.id) : null;
   });
 
   protected readonly canBook = computed(() => {
@@ -126,17 +121,17 @@ export class SessionShowcase implements OnInit {
     }
     this._load(id);
     // Make sure we know whether the user already booked this instance.
-    this._bookings.ensureLoaded();
+    this._myBookingsIndexStore.ensureLoaded();
     // Deep-link from reminders / "Join now" rows: ?action=join → fetch
     // the join info immediately and open the meeting URL in a new tab.
     if (this._route.snapshot.queryParamMap.get('action') === 'join') {
-      this._svc.joinInfo(id).subscribe({
+      this._sessionService.joinInfo(id).subscribe({
         next: (info) => {
           if (info?.meetingUrl) window.open(info.meetingUrl, '_blank');
         },
         error: (err: unknown) => {
           showApiError(
-            this._msg,
+            this._messageService,
             'Join not available yet',
             'Try again closer to the session start.',
             err,
@@ -148,15 +143,15 @@ export class SessionShowcase implements OnInit {
 
   protected onBookSuccess(): void {
     this.bookOpen.set(false);
-    this._msg.add({
+    this._messageService.add({
       severity: 'success',
       summary: 'Booking confirmed',
       detail: 'See it in My sessions.',
     });
     // Invalidate the bookings index so the Book button flips to "Booked"
     // immediately if the user navigates back here.
-    this._bookings.invalidate();
-    this._bookings.ensureLoaded();
+    this._myBookingsIndexStore.invalidate();
+    this._myBookingsIndexStore.ensureLoaded();
     void this._router.navigate(['/my/sessions']);
   }
 
@@ -174,11 +169,11 @@ export class SessionShowcase implements OnInit {
   private _load(id: string): void {
     this.loading.set(true);
     this.error.set(null);
-    this._svc
+    this._sessionService
       .getPublicInstance(id)
       .pipe(
         catchError((err: unknown) => {
-          showApiError(this._msg, 'Could not load session', 'Please try again.', err);
+          showApiError(this._messageService, 'Could not load session', 'Please try again.', err);
           this.error.set('Could not load this session.');
           return of(null);
         }),

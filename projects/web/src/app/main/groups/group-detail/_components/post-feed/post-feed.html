@@ -11,7 +11,7 @@
   @if (loading()) {
   <div class="flex flex-col gap-3 mw-1/4">
     @for (i of [1, 2, 3]; track i) {
-    <p-card>
+    <p-card class="shadow-md">
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-3">
           <p-skeleton shape="circle" size="2.5rem" />
@@ -27,7 +27,7 @@
     }
   </div>
   } @else if (posts().length === 0) {
-  <p-card>
+  <p-card class="shadow-md">
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-comments text-primary-600"></i>
@@ -60,7 +60,7 @@
       (deleteRequested)="deleteRequested.emit($event)" />
     }
     @if (loadingMore()) {
-    <p-card>
+    <p-card class="shadow-md">
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-3">
           <p-skeleton shape="circle" size="2.5rem" />

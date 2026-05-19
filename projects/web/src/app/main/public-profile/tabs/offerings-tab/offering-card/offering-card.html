@@ -1,16 +1,16 @@
-<p-card [styleClass]="isPopular() ? 'offering-card offering-card--popular' : 'offering-card'">
+<p-card [class]="isPopular() ? 'offering-card offering-card--popular shadow-md' : 'offering-card shadow-md'">
   <ng-template #header>
     <div class="px-4 pt-4 flex items-center justify-between gap-2">
       <h3 class="m-0 text-base font-semibold leading-tight">{{ product().name }}</h3>
       @if (isPopular()) {
-        <p-tag value="Popular" severity="warn" rounded />
+      <p-tag value="Popular" severity="warn" rounded />
       }
     </div>
   </ng-template>
 
   <div class="flex flex-col gap-2">
     @if (product().description) {
-      <p class="m-0 text-sm text-muted-color leading-relaxed">{{ product().description }}</p>
+    <p class="m-0 text-sm text-muted-color leading-relaxed">{{ product().description }}</p>
     }
     <div class="flex items-baseline gap-2 mt-2">
       <span class="text-2xl font-semibold leading-tight">{{ priceLabel() }}</span>

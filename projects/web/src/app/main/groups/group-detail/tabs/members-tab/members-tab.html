@@ -21,19 +21,21 @@
     } @else {
     <ul class="flex flex-col gap-2 list-none m-0 p-0">
       @for (r of joinRequests(); track trackRequestById($index, r)) {
-      <li class="flex items-center gap-3 p-3 rounded border"
+      <li class="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded border"
           [id]="'join-request-row-' + r.id"
           [class.ring-2]="highlightedRequestId() === r.id"
           [class.ring-primary-400]="highlightedRequestId() === r.id"
           style="border-color: var(--p-content-border-color)">
-        <mh-avatar [user]="r.user" />
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-medium m-0">{{ requestUserName(r) }}</p>
-          @if (r.user?.email) {
-          <p class="truncate text-xs text-surface-700 dark:text-surface-400 m-0">
-            {{ r.user?.email }}
-          </p>
-          }
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+          <mh-avatar [user]="r.user" />
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium m-0">{{ requestUserName(r) }}</p>
+            @if (r.user?.email) {
+            <p class="truncate text-xs text-surface-700 dark:text-surface-400 m-0">
+              {{ r.user?.email }}
+            </p>
+            }
+          </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <p-button label="Approve" icon="pi pi-check" size="small" [loading]="isRequestBusy(r.id)"
@@ -74,7 +76,7 @@
       (ngModelChange)="searchTerm.set($event)" class="w-72 max-w-full" />
   </div>
 
-  <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
+  <div class="flex-1 min-h-0 overflow-x-auto" style="background-color: var(--p-datatable-row-background);">
     <p-table [value]="visibleMembers()" [loading]="context.membersLoading()" [showLoader]="false" [scrollable]="true"
       scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true">
       <ng-template #header>
