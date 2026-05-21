@@ -41,7 +41,9 @@ import { sameDay, startOfDay } from '../../utils/date.utils';
       </header>
 
       <div class="mh-mm__weekdays" aria-hidden="true">
-        @for (d of weekdayLabels; track d) {
+        <!-- Track by index, not the label — Tue/Thu both render "T" and
+             Sat/Sun both "S" → tracking by value would dupe-key (NG0955). -->
+        @for (d of weekdayLabels; track $index) {
           <span>{{ d }}</span>
         }
       </div>

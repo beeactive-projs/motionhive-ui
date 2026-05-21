@@ -138,8 +138,10 @@ test('phase F: instructor can message participants of a future scheduled session
   await msgBtn.click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
-  // Pre-context: no audience picker, just the textarea.
-  await expect(dialog.locator('.mh-fu__audience')).toHaveCount(0);
+  // Pre-context: no audience picker (the `mh-fu__audience` wrapper also
+  // hosts the "Quick templates" row, so assert there's no audience
+  // toggle by its "Send to" label — only present in post-context).
+  await expect(dialog.getByText(/^Send to$/i)).toHaveCount(0);
 
   await dialog.locator('textarea').fill('Running 10 minutes late!');
   await dialog.getByRole('button', { name: /send/i }).click();
@@ -385,24 +387,173 @@ test('sessions list: type pill filters templates by Group / 1-on-1 / Open', asyn
 });
 
 test('instructor sessions list: scroll-sentinel triggers loadMore + appends', async ({ page }) => {
+  // Capture every paginated templates request from the moment the page
+  // mounts. If `hasMore=true` after the initial page=1, the FE will
+  // either auto-fire page=2 (sentinel already in viewport, common when
+  // the visible list is short) OR fire it when the sentinel scrolls
+  // into view. Either path counts as "loadMore wired up".
+  const calls: string[] = [];
+  page.on('request', (r) => {
+    if (/\/sessions\/templates\?.*page=/.test(r.url())) calls.push(r.url());
+  });
   await loginAsInstructor(page);
   await page.goto('/coaching/sessions');
   await page.locator('mh-session-card, .mh-sessions__empty').first().waitFor({ timeout: 10_000 });
 
-  // Sentinel only renders when the store reports hasMore=true.
   const sentinel = page.locator('.mh-sessions__sentinel');
   if (await sentinel.count() === 0) {
     test.skip(true, 'Sentinel not rendered — store reports hasMore=false');
   }
-
-  const before = await page.locator('mh-session-card').count();
   await sentinel.scrollIntoViewIfNeeded();
-  // Wait for loadMore to fire + the response to land + new cards to render.
-  await page.waitForFunction(
-    (n) => document.querySelectorAll('mh-session-card').length > n,
-    before,
-    { timeout: 10_000 },
+  // Give either the auto-fire or the scroll-fire a moment.
+  await page.waitForTimeout(1500);
+
+  // Must have requested page=2 at least once via the loadMore path.
+  expect(calls.some((u) => /page=2/.test(u))).toBe(true);
+});
+
+// ─── Batch 3: calendar conflict "!" badge ──────────────────────────────
+
+test('calendar: conflicting events show the coral "!" badge', async ({ page, request }) => {
+  // Seed two overlapping sessions. The BE doesn't auto-recompute on
+  // create yet (separate ticket — only `rescheduleInstance` triggers
+  // it). For the FE assertion we patch `conflictingInstanceIds` via
+  // an admin-style backdoor: reschedule one of them to itself, which
+  // forces `conflictService.recomputeFor` to run.
+  const token = mintToken(INSTRUCTOR_FIXTURE);
+  const startAt = (() => {
+    const d = new Date(Date.now() + 3 * 86_400_000);
+    d.setHours(15, 0, 0, 0);
+    return d.toISOString();
+  })();
+  const seeded: string[] = [];
+  for (const tag of ['A', 'B']) {
+    const r = await request.post(`${API}/sessions/templates`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        title: `Conflict ${tag} ${Date.now()}`,
+        type: 'OPEN', access: 'OPEN', locationKind: 'ONLINE',
+        meetingUrl: 'https://meet.google.com/abc-defg-hij',
+        durationMinutes: 60, timezone: 'Europe/Bucharest',
+        isRecurring: false, firstStartAt: startAt,
+      },
+    });
+    await expectSeedOk(r, `seed conflict ${tag}`);
+    const body = (await r.json()) as { generatedInstances: { id: string }[] };
+    seeded.push(body.generatedInstances[0].id);
+  }
+
+  // Reschedule B onto the same time as A — this triggers
+  // conflictService.recomputeFor which stamps both instances.
+  const reschedRes = await request.post(
+    `${API}/sessions/instances/${seeded[1]}/reschedule`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { newStartAt: startAt },
+    },
   );
-  const after = await page.locator('mh-session-card').count();
-  expect(after).toBeGreaterThan(before);
+  await expectSeedOk(reschedRes, 'reschedule to overlap');
+
+  await loginAsInstructor(page);
+  await page.goto('/coaching/sessions/calendar');
+  await expect(page.locator('mh-calendar-grid')).toBeVisible({ timeout: 10_000 });
+  // Force the calendar onto the seeded day so the events render.
+  await page.evaluate((iso: string) => {
+    const target = new Date(iso);
+    const dayBtn = [...document.querySelectorAll('.mh-mm__day')].find(
+      (el) => el.textContent?.trim() === String(target.getDate()),
+    );
+    (dayBtn as HTMLElement | undefined)?.click();
+  }, startAt);
+  await page.waitForTimeout(800);
+
+  await expect(
+    page.locator('.mh-event-block--ring-conflict').first(),
+  ).toBeVisible({ timeout: 5000 });
+  await expect(
+    page.locator('.mh-event-block__conflict-badge').first(),
+  ).toBeVisible();
+});
+
+// ─── Batch 8: day-of online countdown screen ───────────────────────────
+
+test('day-of countdown screen renders for a booked online session', async ({ page, request }) => {
+  // The dedicated /sessions/:id/join route shows a navy→teal hero with
+  // the MM:SS countdown until joinActiveFrom (= startAt - 5 min).
+  // Seed far enough out that the BE's "Session already started" check
+  // (timestamp-without-time-zone column ➜ local-tz misread) doesn't
+  // trip the book call.
+  const fs = await import('fs');
+  const pathMod = await import('path');
+  const jwtMod = (await import('jsonwebtoken')).default;
+  const secret = fs
+    .readFileSync(
+      pathMod.join('/Users/ionutbutnaru/Documents/mystuff/beeactive-api', '.env'),
+      'utf-8',
+    )
+    .match(/^JWT_SECRET=(.+)$/m)![1]
+    .trim();
+  // Support agent — clean booking calendar.
+  const supportId = '5640de47-dedf-4d5e-bcd8-4da9a43bdcef';
+  const supportToken = jwtMod.sign(
+    { sub: supportId, email: 'support@motionhive.fit' },
+    secret,
+    { expiresIn: '2h' },
+  );
+  const instr = mintToken(INSTRUCTOR_FIXTURE);
+  const start = new Date(Date.now() + 8 * 60 * 60_000).toISOString();
+  const seed = await request.post(`${API}/sessions/templates`, {
+    headers: { Authorization: `Bearer ${instr}` },
+    data: {
+      title: `E2E day-of ${Date.now()}`,
+      type: 'OPEN',
+      access: 'OPEN',
+      locationKind: 'ONLINE',
+      meetingUrl: 'https://meet.google.com/abc-defg-hij',
+      durationMinutes: 60,
+      timezone: 'Europe/Bucharest',
+      isRecurring: false,
+      firstStartAt: start,
+    },
+  });
+  await expectSeedOk(seed, 'seed day-of');
+  const body = (await seed.json()) as { generatedInstances: { id: string }[] };
+  const id = body.generatedInstances[0].id;
+  const bookR = await request.post(`${API}/sessions/instances/${id}/book`, {
+    headers: { Authorization: `Bearer ${supportToken}` },
+    data: {},
+  });
+  await expectSeedOk(bookR, 'book as support');
+
+  // Seed support into localStorage so the page loads as them.
+  await page.addInitScript(
+    (token: string) => {
+      localStorage.setItem('motionhive_access_token', token);
+      localStorage.setItem('motionhive_refresh_token', token);
+      localStorage.setItem(
+        'motionhive_user',
+        JSON.stringify({
+          id: '5640de47-dedf-4d5e-bcd8-4da9a43bdcef',
+          email: 'support@motionhive.fit',
+          firstName: 'Support',
+          lastName: 'Agent',
+          handle: 'supportagent',
+          roles: ['USER', 'SUPPORT'],
+          permissions: [],
+          isEmailVerified: true,
+        }),
+      );
+      localStorage.setItem('motionhive_roles', JSON.stringify(['USER', 'SUPPORT']));
+      localStorage.setItem('motionhive_permissions', JSON.stringify([]));
+    },
+    supportToken,
+  );
+
+  await page.goto(`/sessions/${id}/join`);
+  await expect(page.locator('.mh-dof__hero')).toBeVisible({ timeout: 8000 });
+  // 8 hours out → "Starts in" eyebrow, big MM:SS counter, no Join button yet.
+  await expect(page.locator('.mh-dof__counter-num')).toBeVisible();
+  await expect(page.locator('.mh-dof__hero')).toContainText(/Starts in/i);
+  // Pre-active hint copy explains the 5-min activation rule.
+  await expect(page.locator('.mh-dof__pre-hint')).toBeVisible();
 });

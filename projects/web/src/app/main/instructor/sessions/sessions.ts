@@ -23,13 +23,17 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import {
   AuthStore,
+  BottomSheet,
+  DaySeparator,
   KpiCard,
+  MobileFab,
   PageShell,
   SectionLabel,
   SessionCard,
   SessionKind,
   SessionLocationKind,
   SessionsInstructorStore,
+  TimeRow,
   type SessionInstance,
   type SessionTemplate,
   type TemplateTab,
@@ -65,6 +69,10 @@ const TABS: TabSpec[] = [
     SessionFormDialog,
     ToastModule,
     TooltipModule,
+    BottomSheet,
+    DaySeparator,
+    MobileFab,
+    TimeRow,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './sessions.html',
@@ -97,6 +105,29 @@ export class Sessions implements OnInit, OnDestroy {
   protected readonly formOpen = signal(false);
   protected readonly editingTemplate = signal<SessionTemplate | null>(null);
 
+  // ─── Mobile state ──────────────────────────────────────────────────
+  //
+  // `isMobile` mirrors a `matchMedia('(max-width: 600px)')` query so the
+  // template can branch on viewport. We listen once and update the
+  // signal — no per-frame layout reads.
+  protected readonly isMobile = signal<boolean>(
+    typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 600px)').matches
+      : false,
+  );
+  protected readonly filterSheetOpen = signal(false);
+  /** When non-null, an action sheet shows for this template row. */
+  protected readonly actionSheetTemplate = signal<SessionTemplate | null>(null);
+
+  /** How many quick filters are currently applied (type + location). */
+  protected readonly appliedFilterCount = computed(() => {
+    const f = this.store.filters();
+    let n = 0;
+    if (f.type) n++;
+    if (f.locationKind) n++;
+    return n;
+  });
+
   constructor() {
     effect(() => {
       const el = this._scrollSentinel()?.nativeElement;
@@ -113,6 +144,18 @@ export class Sessions implements OnInit, OnDestroy {
       this._observer.observe(el);
     });
     this._destroyRef.onDestroy(() => this._observer?.disconnect());
+
+    // Mobile breakpoint listener. matchMedia.addEventListener is
+    // supported on all evergreen targets; the legacy addListener path
+    // is only needed for Safari < 14 which we don't ship to.
+    if (typeof window !== 'undefined') {
+      const mql = window.matchMedia('(max-width: 600px)');
+      const update = () => this.isMobile.set(mql.matches);
+      mql.addEventListener('change', update);
+      this._destroyRef.onDestroy(() =>
+        mql.removeEventListener('change', update),
+      );
+    }
   }
 
   ngOnInit(): void {
@@ -319,5 +362,64 @@ export class Sessions implements OnInit, OnDestroy {
       return;
     }
     this.view.set('cards');
+  }
+
+  // ─── Mobile rendering helpers ─────────────────────────────────────
+
+  /** "09:00" formatted in 24h local time from an ISO string. */
+  protected formatTime(iso: string): string {
+    const d = new Date(iso);
+    return d.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
+
+  /** "60min" duration label for the time-row chip. */
+  protected formatDuration(minutes: number): string {
+    return `${minutes}min`;
+  }
+
+  /**
+   * Tone for a TimeRow given a template + instance pair:
+   *   - conflict → coral
+   *   - cancelled instance → muted
+   *   - online → teal
+   *   - private 1-on-1 → navy
+   *   - everything else (group/open in-person) → honey
+   */
+  protected toneFor(
+    t: SessionTemplate,
+    inst: SessionInstance | null,
+  ): 'honey' | 'teal' | 'navy' | 'coral' | 'muted' {
+    if (inst?.conflictingInstanceIds?.length) return 'coral';
+    if (inst?.status === 'CANCELLED') return 'muted';
+    if (t.locationKind === 'ONLINE') return 'teal';
+    if (t.type === 'PRIVATE') return 'navy';
+    return 'honey';
+  }
+
+  /** Day-separator label/tone for the agenda grouping. */
+  protected dayTone(date: Date): 'today' | 'default' {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === today.getTime() ? 'today' : 'default';
+  }
+
+  /** Open the action sheet for a long-pressed (or ⋮-tapped) row. */
+  protected openActions(t: SessionTemplate): void {
+    this.actionSheetTemplate.set(t);
+  }
+
+  protected closeActions(): void {
+    this.actionSheetTemplate.set(null);
+  }
+
+  /** Reset all quick filters from inside the filter sheet. */
+  protected resetSheetFilters(): void {
+    this.store.setFilters({ type: undefined, locationKind: undefined });
   }
 }

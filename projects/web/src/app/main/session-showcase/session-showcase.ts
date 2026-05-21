@@ -17,17 +17,20 @@ import { catchError, of } from 'rxjs';
 import {
   AccessChip,
   BlockedSessionInstance,
+  BookResponse,
   CapacityBar,
   MyBookingsIndexStore,
   PageShell,
   ProviderChip,
   PublicSessionInstance,
+  SessionParticipantStatus,
   SessionService,
   TypeChip,
   isBlockedInstance,
   showApiError,
 } from 'core';
 import { BookDialog } from './_dialogs/book-dialog/book-dialog';
+import { BookingConfirmedDialog } from './_dialogs/booking-confirmed-dialog/booking-confirmed-dialog';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -57,6 +60,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     ProviderChip,
     CapacityBar,
     BookDialog,
+    BookingConfirmedDialog,
   ],
   providers: [MessageService],
   templateUrl: './session-showcase.html',
@@ -76,6 +80,9 @@ export class SessionShowcase implements OnInit {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly bookOpen = signal(false);
+  /** Success modal opens after a successful book — replaces the old toast. */
+  protected readonly confirmedOpen = signal(false);
+  protected readonly bookedStatus = signal<SessionParticipantStatus>('CONFIRMED');
 
   protected readonly publicInst = computed<PublicSessionInstance | null>(() => {
     const inst = this.instance();
@@ -122,37 +129,25 @@ export class SessionShowcase implements OnInit {
     this._load(id);
     // Make sure we know whether the user already booked this instance.
     this._myBookingsIndexStore.ensureLoaded();
-    // Deep-link from reminders / "Join now" rows: ?action=join → fetch
-    // the join info immediately and open the meeting URL in a new tab.
+    // Deep-link from reminders / "Join now" rows: ?action=join routes
+    // to the dedicated day-of countdown screen, which polls join-info
+    // and surfaces the active window properly instead of just popping
+    // a tab open.
     if (this._route.snapshot.queryParamMap.get('action') === 'join') {
-      this._sessionService.joinInfo(id).subscribe({
-        next: (info) => {
-          if (info?.meetingUrl) window.open(info.meetingUrl, '_blank');
-        },
-        error: (err: unknown) => {
-          showApiError(
-            this._messageService,
-            'Join not available yet',
-            'Try again closer to the session start.',
-            err,
-          );
-        },
-      });
+      void this._router.navigate(['/sessions', id, 'join']);
     }
   }
 
-  protected onBookSuccess(): void {
+  protected onBookSuccess(res: BookResponse): void {
     this.bookOpen.set(false);
-    this._messageService.add({
-      severity: 'success',
-      summary: 'Booking confirmed',
-      detail: 'See it in My sessions.',
-    });
+    // Capture the participant status so the confirmation modal can adapt
+    // its copy + hide the calendar-export row for PENDING_APPROVAL.
+    this.bookedStatus.set(res.status);
+    this.confirmedOpen.set(true);
     // Invalidate the bookings index so the Book button flips to "Booked"
     // immediately if the user navigates back here.
     this._myBookingsIndexStore.invalidate();
     this._myBookingsIndexStore.ensureLoaded();
-    void this._router.navigate(['/my/sessions']);
   }
 
   protected goToMySessions(): void {

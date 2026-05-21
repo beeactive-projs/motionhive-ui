@@ -173,11 +173,36 @@ export class SessionFormDialog {
     { value: 'GROUP', label: 'Group' },
     { value: 'PRIVATE', label: 'Private (1:1)' },
   ];
-  readonly accessOptions = [
-    { value: 'OPEN', label: 'Open — anyone can book' },
-    { value: 'FREE', label: 'Free — book without payment' },
-    { value: 'CLIENTS_ONLY', label: 'Clients only' },
-    { value: 'GROUP_ONLY', label: 'Group members only' },
+  /**
+   * Access requirement options rendered as 4 radio-cards (icon + label
+   * + sub-copy). The orthogonal `approvalRequired` toggle sits below as
+   * a separate checkbox — both compose without enums multiplying.
+   */
+  readonly accessOptions: { value: SessionAccess; label: string; sub: string; icon: string }[] = [
+    {
+      value: 'OPEN',
+      label: 'Open',
+      sub: 'Anyone with the link can book.',
+      icon: 'pi-globe',
+    },
+    {
+      value: 'FREE',
+      label: 'Free',
+      sub: 'Listed publicly with no price tag.',
+      icon: 'pi-heart',
+    },
+    {
+      value: 'CLIENTS_ONLY',
+      label: 'Clients only',
+      sub: 'Only your active clients can book.',
+      icon: 'pi-user',
+    },
+    {
+      value: 'GROUP_ONLY',
+      label: 'Group members',
+      sub: 'Only members of a specific group.',
+      icon: 'pi-sitemap',
+    },
   ];
   readonly locationOptions = [
     { value: 'ONLINE', label: 'Online' },

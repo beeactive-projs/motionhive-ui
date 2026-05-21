@@ -17,16 +17,6 @@
       [outlined]="true"
       routerLink="/coaching/sessions/calendar"
     />
-    @if (t?.isRecurring && t?.status !== 'CANCELLED' && t?.status !== 'ENDED') {
-      <p-button
-        label="Extend +4 weeks"
-        icon="pi pi-refresh"
-        severity="secondary"
-        [outlined]="true"
-        [loading]="busyRegen()"
-        (onClick)="regenerate()"
-      />
-    }
     @if (t && t.status !== 'CANCELLED') {
       <p-button
         label="Edit"
@@ -127,6 +117,70 @@
         </dl>
       </section>
 
+      <!-- Regenerate forward + bulk actions — only meaningful on active
+           recurring templates. Past / cancelled series hide it. -->
+      @if (t.isRecurring && t.status === 'ACTIVE') {
+        <section class="mh-td__regen">
+          <div class="mh-td__regen-main">
+            <header>
+              <h3>Regenerate forward</h3>
+              <p>
+                Append more occurrences after
+                <strong>{{ lastOccurrenceLabel() }}</strong>
+                — past occurrences stay untouched.
+              </p>
+            </header>
+            <div class="mh-td__regen-row">
+              <label class="mh-td__regen-stepper">
+                <span>Add</span>
+                <p-inputNumber
+                  [ngModel]="regenCount()"
+                  (ngModelChange)="regenCount.set($event ?? 1)"
+                  [min]="1"
+                  [max]="12"
+                  [showButtons]="true"
+                  buttonLayout="horizontal"
+                  spinnerMode="horizontal"
+                  inputStyleClass="mh-td__regen-input"
+                  decrementButtonClass="p-button-text"
+                  incrementButtonClass="p-button-text"
+                />
+                <span>more</span>
+              </label>
+              <p-button
+                [label]="'Generate ' + regenCount() + ' more'"
+                icon="pi pi-refresh"
+                [loading]="busyRegen()"
+                (onClick)="regenerate()"
+              />
+            </div>
+          </div>
+
+          <aside class="mh-td__regen-bulk" aria-label="Bulk actions">
+            <h4>Bulk actions</h4>
+            <p-button
+              label="End series after this week"
+              icon="pi pi-stop-circle"
+              severity="danger"
+              [outlined]="true"
+              [disabled]="!firstFutureInstance()"
+              (onClick)="endAfterThisWeek()"
+              styleClass="mh-td__regen-bulk-btn"
+            />
+            <small class="mh-td__regen-bulk-note">
+              Cancels every occurrence after the next one and ends the series.
+            </small>
+            <div class="mh-td__regen-bulk-stub">
+              <i class="pi pi-clock" aria-hidden="true"></i>
+              <span>
+                <strong>Coming soon:</strong> shift all upcoming times,
+                update venue across the remaining series.
+              </span>
+            </div>
+          </aside>
+        </section>
+      }
+
       <!-- Upcoming -->
       <section class="mh-td__list">
         <h3>
@@ -138,7 +192,7 @@
           <p class="mh-td__none">
             No upcoming occurrences.
             @if (t.isRecurring) {
-              Click <strong>Extend +4 weeks</strong> to generate more.
+              Use <strong>Regenerate forward</strong> above to generate more.
             }
           </p>
         } @else {

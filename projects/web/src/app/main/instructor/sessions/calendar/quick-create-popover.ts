@@ -4,14 +4,17 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnInit,
   Output,
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import type { CreateTemplateRequest, SessionKind } from 'core';
+import { Select } from 'primeng/select';
+import { VenueService } from 'core';
+import type { CreateTemplateRequest, SessionKind, Venue } from 'core';
 
 /**
  * Drag-to-create popover.
@@ -38,7 +41,14 @@ import type { CreateTemplateRequest, SessionKind } from 'core';
 @Component({
   selector: 'mh-quick-create-popover',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    InputTextModule,
+    Select,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -90,6 +100,46 @@ import type { CreateTemplateRequest, SessionKind } from 'core';
               <i [class]="opt.icon" aria-hidden="true"></i>
               <span>{{ opt.label }}</span>
             </button>
+          }
+        </div>
+
+        <!-- Location: segmented toggle ONLINE/IN_PERSON. In-person opens
+             a venue picker right below — the instructor's saved venues
+             only; "Add new" is left to the full form. -->
+        <div class="mh-qcp__where">
+          <div class="mh-qcp__seg" role="radiogroup" aria-label="Location">
+            <button
+              type="button"
+              class="mh-qcp__seg-btn"
+              [class.is-active]="locationKind() === 'ONLINE'"
+              (click)="selectLocation('ONLINE')"
+            >
+              <i class="pi pi-video" aria-hidden="true"></i> Online
+            </button>
+            <button
+              type="button"
+              class="mh-qcp__seg-btn"
+              [class.is-active]="locationKind() === 'IN_PERSON'"
+              (click)="selectLocation('IN_PERSON')"
+            >
+              <i class="pi pi-map-marker" aria-hidden="true"></i> In-person
+            </button>
+          </div>
+
+          @if (locationKind() === 'IN_PERSON') {
+            <p-select
+              [options]="venues()"
+              optionLabel="name"
+              optionValue="id"
+              [ngModel]="selectedVenueId()"
+              (ngModelChange)="selectedVenueId.set($event)"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Pick a venue"
+              [showClear]="true"
+              appendTo="body"
+              styleClass="mh-qcp__venue"
+              fluid
+            />
           }
         </div>
 
@@ -197,9 +247,44 @@ import type { CreateTemplateRequest, SessionKind } from 'core';
       gap: 6px;
       margin-top: 4px;
     }
+
+    /* Location segmented toggle + (conditional) venue picker below. */
+    .mh-qcp__where {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mh-qcp__seg {
+      display: inline-flex;
+      background: var(--p-surface-100);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .mh-qcp__seg-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--p-text-muted-color);
+      i { font-size: 11px; }
+      &.is-active {
+        background: var(--p-content-background);
+        color: var(--p-text-color);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+    }
   `,
 })
-export class QuickCreatePopover {
+export class QuickCreatePopover implements OnInit {
   @Input({ required: true }) range!: { start: Date; end: Date };
   @Input() anchor: { x: number; y: number } = { x: 0, y: 0 };
   @Input() defaultTimezone: string = 'Europe/Bucharest';
@@ -214,10 +299,30 @@ export class QuickCreatePopover {
     { value: 'OPEN', label: 'Open', icon: 'pi pi-globe' },
   ];
 
+  /** Location toggle — ONLINE skips the venue picker; IN_PERSON shows it. */
+  protected readonly locationKind = signal<'ONLINE' | 'IN_PERSON'>('ONLINE');
+  /** Instructor's saved venues — loaded once on init. */
+  protected readonly venues = signal<Venue[]>([]);
+  protected readonly selectedVenueId = signal<string | null>(null);
+
   private readonly _fb = inject(FormBuilder);
+  private readonly _venueService = inject(VenueService);
   protected readonly form = this._fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
   });
+
+  ngOnInit(): void {
+    // Best-effort venue list — on error we just hide the dropdown.
+    this._venueService.list().subscribe({
+      next: (vs) => this.venues.set(vs),
+      error: () => this.venues.set([]),
+    });
+  }
+
+  protected selectLocation(kind: 'ONLINE' | 'IN_PERSON'): void {
+    this.locationKind.set(kind);
+    if (kind === 'ONLINE') this.selectedVenueId.set(null);
+  }
 
   protected minutes(): number {
     return Math.max(
@@ -247,18 +352,18 @@ export class QuickCreatePopover {
 
   private _buildPayload(): CreateTemplateRequest {
     const title = (this.form.value.title ?? '').trim();
+    const kind = this.locationKind();
+    const venueId = this.selectedVenueId();
     return {
       title,
       type: this.selectedType(),
       // Default access depends on type — Open type → OPEN, Group/Private
       // start CLIENTS_ONLY (more conservative; user can change in full form).
       access: this.selectedType() === 'OPEN' ? 'OPEN' : 'CLIENTS_ONLY',
-      // Quick-create can't capture a meeting URL or a venue — both are
-      // required by the BE depending on locationKind. The full form
-      // collects them. The "Save" button is therefore a hand-off that
-      // emits the partial payload; the parent must open the full form
-      // to complete it.
-      locationKind: 'ONLINE',
+      locationKind: kind,
+      // For IN_PERSON we pass through the picked venue; the BE still
+      // requires `meetingUrl` for ONLINE so the full form catches that.
+      ...(venueId ? { venueId } : {}),
       durationMinutes: this.minutes(),
       timezone: this.defaultTimezone,
       isRecurring: false,

@@ -53,6 +53,17 @@ export const mainRoutes: Routes = [
       // FE route so deep-links from emails / push don't 404.
       { path: 'sessions/my', redirectTo: 'my/sessions', pathMatch: 'full' },
       {
+        // Day-of online countdown — the screen reminders link to 10 min
+        // before start. Must be declared BEFORE `sessions/:id` so the
+        // `/join` suffix wins.
+        path: 'sessions/:id/join',
+        loadComponent: () =>
+          import('./session-day-of-online/session-day-of-online').then(
+            (m) => m.SessionDayOfOnline,
+          ),
+        title: 'Join session - MotionHive',
+      },
+      {
         // Public session showcase. Order matters: `sessions/discover` +
         // `sessions/my` are declared above so they always match before `:id`.
         path: 'sessions/:id',

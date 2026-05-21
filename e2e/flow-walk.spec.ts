@@ -203,10 +203,16 @@ test('client flow walk: discover → showcase → book', async ({ page, request 
     .filter({ hasText: /confirm booking|request to join/i })
     .first()
     .click();
-  // Lands on My Sessions
+  // Booking confirmed modal → "Go to My sessions"
+  const confirmed = page.locator('mh-booking-confirmed-dialog');
+  await confirmed
+    .getByRole('heading', { name: /you're in|request sent/i })
+    .waitFor({ timeout: 5000 });
+  await snap(page, '23-client-booking-confirmed-modal');
+  await confirmed.getByRole('button', { name: /go to my sessions/i }).click();
   await page.waitForURL(/\/my\/sessions/);
   await page.waitForTimeout(800);
-  await snap(page, '23-client-my-sessions-after-book');
+  await snap(page, '23b-client-my-sessions-after-book');
 
   // Back to showcase → should now show "Booked" state
   await page.locator('[data-testid="my-row"]').first().click();

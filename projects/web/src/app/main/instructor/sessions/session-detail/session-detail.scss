@@ -36,12 +36,18 @@
 }
 
 .mh-sd {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   margin-top: 16px;
 
+  /* Desktop: two-column grid (hero + where, participants spanning).
+     Mobile/tablet: simple vertical stack via flex column above —
+     using grid-areas referencing non-existent named lines made each
+     child auto-size to its content width and offset on mobile (hero
+     ended up at x=60 in a 390px viewport, 30px wider on each side). */
   @media (min-width: 1024px) {
+    display: grid;
     grid-template-columns: 2fr 1fr;
     grid-template-areas:
       'hero where'
@@ -50,7 +56,7 @@
 }
 
 .mh-sd__hero {
-  grid-area: hero;
+  @media (min-width: 1024px) { grid-area: hero; }
   padding: 20px;
   background: var(--p-content-background);
   border: 1px solid var(--p-content-border-color);
@@ -111,7 +117,7 @@
 .mh-sd__pending strong { color: var(--p-yellow-700); }
 
 .mh-sd__where {
-  grid-area: where;
+  @media (min-width: 1024px) { grid-area: where; }
   padding: 20px;
   background: var(--p-content-background);
   border: 1px solid var(--p-content-border-color);
@@ -185,7 +191,7 @@
 }
 
 .mh-sd__participants {
-  grid-area: participants;
+  @media (min-width: 1024px) { grid-area: participants; }
   padding: 20px;
   background: var(--p-content-background);
   border: 1px solid var(--p-content-border-color);

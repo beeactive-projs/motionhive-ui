@@ -50,6 +50,15 @@ import type { CalendarEvent } from './calendar-event.model';
       @if (event().subtitle) {
         <span class="mh-event-block__sub">{{ event().subtitle }}</span>
       }
+      <!-- Conflict marker — 16px coral "!" disc top-right. Pairs with
+           the ring set via the --ring-conflict modifier. -->
+      @if (event().ring === 'conflict') {
+        <span
+          class="mh-event-block__conflict-badge"
+          aria-label="Schedule conflict"
+          title="Schedule conflict"
+        >!</span>
+      }
     </div>
   `,
   styles: `
@@ -131,6 +140,27 @@ import type { CalendarEvent } from './calendar-event.model';
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    /* Conflict "!" badge — small coral disc at the top-right of the
+       block. Bordered with the surface color so it reads cleanly even
+       when adjacent blocks share a similar tint. */
+    .mh-event-block__conflict-badge {
+      position: absolute;
+      top: -6px;
+      right: -4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--p-red-500);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 16px;
+      text-align: center;
+      box-shadow: 0 0 0 2px var(--p-content-background);
+      cursor: help;
+      pointer-events: auto;
     }
   `,
 })

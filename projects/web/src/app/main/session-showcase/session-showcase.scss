@@ -110,13 +110,31 @@
   height: max-content;
 
   @media (max-width: 640px) {
-    padding: 14px;
-    // Sticky bottom on mobile so the Book button stays in reach without
-    // scrolling. Falls back to inline above the breakpoint.
-    position: sticky;
-    bottom: 12px;
-    margin-top: 8px;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
+    /* Persistent bottom action bar (mobile rule 10) — pinned above the
+       viewport bottom + safe-area inset, full-width card with a subtle
+       shadow so it visually floats. The Book / "You're booked" content
+       layout stays vertical because copy + the big primary CTA both
+       benefit from line breaks at narrow widths. */
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    margin: 0;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+    border-radius: 14px 14px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.18);
+  }
+}
+
+/* Reserve space at the bottom of the article so the fixed CTA doesn't
+   cover the last paragraph of content. Desktop is unaffected. */
+@media (max-width: 640px) {
+  .mh-show {
+    padding-bottom: 140px;
   }
 }
 
@@ -167,5 +185,81 @@
     margin: 0;
     color: var(--p-text-muted-color);
     font-size: 14px;
+  }
+}
+
+/* ─── GROUP_ONLY soft-lock variant ───────────────────────────────────
+   Shows title + time + instructor publicly; description, location, and
+   signup counts sit behind a frosted overlay with a lock + "Members
+   only" callout. The CTA below offers a join-group flow. */
+.mh-show--locked {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.mh-show__title {
+  margin: 8px 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--p-text-color);
+}
+.mh-show__instructor-line {
+  margin: 0;
+  color: var(--p-text-muted-color);
+  strong { color: var(--p-text-color); }
+}
+.mh-show__locked-card {
+  position: relative;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  padding: 24px;
+  overflow: hidden;
+  min-height: 220px;
+}
+.mh-show__locked-blur {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  filter: blur(6px);
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+.mh-show__locked-row {
+  height: 14px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--p-text-color) 12%, transparent);
+}
+.mh-show__locked-row--short { width: 60%; }
+.mh-show__locked-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  background: color-mix(in srgb, var(--p-content-background) 60%, transparent);
+  backdrop-filter: blur(2px);
+  i {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--p-primary-50);
+    color: var(--p-primary-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  strong { font-size: 15px; color: var(--p-text-color); }
+  span {
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    max-width: 280px;
+    line-height: 1.4;
   }
 }

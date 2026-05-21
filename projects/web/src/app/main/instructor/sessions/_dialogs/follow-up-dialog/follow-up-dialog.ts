@@ -64,6 +64,21 @@ import {
           </div>
         }
 
+        @if (quickTemplates().length > 0) {
+          <div class="mh-fu__audience">
+            <span class="mh-fu__label">Quick templates</span>
+            <div class="mh-fu__opts">
+              @for (q of quickTemplates(); track q.label) {
+                <button
+                  type="button"
+                  class="mh-fu__opt mh-fu__opt--template"
+                  (click)="applyTemplate(q.body)"
+                >{{ q.label }}</button>
+              }
+            </div>
+          </div>
+        }
+
         <div class="mh-fu__field">
           <label for="fuMsg">Message</label>
           <textarea
@@ -110,6 +125,17 @@ import {
       background: var(--p-primary-500); color: var(--p-primary-contrast-color, #fff);
       border-color: var(--p-primary-500);
     }
+    /* Template buttons are different from audience pills — single-shot
+       "fill the textarea" actions, not exclusive selections. Style as a
+       subtler ghost variant so users don't read them as selected state. */
+    .mh-fu__opt--template {
+      color: var(--p-text-color);
+      &:hover {
+        background: var(--p-primary-50);
+        border-color: var(--p-primary-300);
+        color: var(--p-primary-700);
+      }
+    }
     .mh-fu__field {
       display: flex; flex-direction: column; gap: 4px;
       label { font-size: 12px; font-weight: 600; color: var(--p-text-color); }
@@ -154,6 +180,45 @@ export class FollowUpDialog {
         ],
   );
 
+  /**
+   * One-tap message templates that pre-fill the textarea. Context-aware:
+   * pre-session covers "running late / venue update / what to bring",
+   * post-session covers "thanks / homework / next reminder". Clicking
+   * replaces whatever's currently in the textarea — instructors who want
+   * to keep their draft just don't touch the templates.
+   */
+  readonly quickTemplates = computed(() => {
+    return this.context() === 'pre'
+      ? [
+          {
+            label: 'Running late',
+            body: "Heads up — I'm running about 10 minutes behind. We'll start as soon as I'm there. Thanks for your patience!",
+          },
+          {
+            label: 'Venue update',
+            body: "Quick update on where we're meeting — same time, but a slightly different spot. I'll share the new address shortly.",
+          },
+          {
+            label: 'What to bring',
+            body: 'Bring a mat, water, and clothes you can move in. Looking forward to seeing you!',
+          },
+        ]
+      : [
+          {
+            label: 'Thank you',
+            body: 'Thanks for joining today — great work in there. Let me know how your body feels tomorrow.',
+          },
+          {
+            label: 'Homework',
+            body: "Here's what to practise before our next session — three sets of the breath work we covered, daily if you can.",
+          },
+          {
+            label: 'Next reminder',
+            body: "Our next session is on the books — don't forget to book in if it's a public class.",
+          },
+        ];
+  });
+
   constructor() {
     effect(() => {
       if (this.visible()) {
@@ -161,6 +226,11 @@ export class FollowUpDialog {
         this.message.set('');
       }
     });
+  }
+
+  /** Drop the templated copy into the textarea, replacing whatever's there. */
+  applyTemplate(body: string): void {
+    this.message.set(body);
   }
 
   close(): void {

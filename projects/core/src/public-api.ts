@@ -219,6 +219,12 @@ export * from './lib/services/loading/loading.service';
 export * from './lib/components/logo/logo';
 export * from './lib/components/page-shell/page-shell';
 export * from './lib/components/dialog-shell/dialog-shell';
+// Mobile-first primitives — sheet/time-row/day-sep/sticky-cta/fab.
+export * from './lib/components/bottom-sheet/bottom-sheet';
+export * from './lib/components/time-row/time-row';
+export * from './lib/components/day-separator/day-separator';
+export * from './lib/components/sticky-cta/sticky-cta';
+export * from './lib/components/mobile-fab/mobile-fab';
 export * from './lib/components/kpi-card/kpi-card';
 export * from './lib/components/section-label/section-label';
 export * from './lib/components/tri-state-toggle/tri-state-toggle';

@@ -54,17 +54,29 @@
           />
         </div>
 
-        <div class="mh-sf__field">
-          <label>Access</label>
-          <p-select
-            [options]="accessOptions"
-            optionLabel="label"
-            optionValue="value"
-            [ngModel]="form().access"
-            (ngModelChange)="updateField('access', $event)"
-            appendTo="body"
-            fluid
-          />
+        <div class="mh-sf__field mh-sf__field--full">
+          <label>Who can book</label>
+          <div class="mh-sf__access" role="radiogroup" aria-label="Access requirement">
+            @for (opt of accessOptions; track opt.value) {
+              <button
+                type="button"
+                role="radio"
+                class="mh-sf__access-card"
+                [class.is-active]="form().access === opt.value"
+                [attr.aria-checked]="form().access === opt.value"
+                (click)="updateField('access', opt.value)"
+              >
+                <i [class]="'pi ' + opt.icon" aria-hidden="true"></i>
+                <span class="mh-sf__access-text">
+                  <strong>{{ opt.label }}</strong>
+                  <small>{{ opt.sub }}</small>
+                </span>
+                @if (form().access === opt.value) {
+                  <i class="pi pi-check-circle mh-sf__access-tick" aria-hidden="true"></i>
+                }
+              </button>
+            }
+          </div>
         </div>
 
         @if (needsGroup()) {

@@ -9,6 +9,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 // MessageService scoped per page so child dialogs can emit toasts.
@@ -50,8 +52,10 @@ import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     ButtonModule,
+    InputNumberModule,
     PageShell,
     AccessChip,
     TypeChip,
@@ -81,6 +85,25 @@ export class InstructorTemplateDetail implements OnInit {
   readonly error = signal<string | null>(null);
   readonly busyRegen = signal(false);
   readonly editOpen = signal(false);
+  /** Stepper-driven count for the "Regenerate forward" card (1..12). */
+  readonly regenCount = signal(4);
+
+  /** Last (latest) scheduled occurrence — label used in the regen panel. */
+  protected readonly lastOccurrenceLabel = computed(() => {
+    const all = this.instances();
+    if (!all.length) return 'first start';
+    const last = all
+      .slice()
+      .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime())[0];
+    return new Date(last.startAt).toLocaleDateString('en-GB', {
+      weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+    });
+  });
+
+  /** Earliest upcoming SCHEDULED instance — what "End after this week" preserves. */
+  protected readonly firstFutureInstance = computed<SessionInstance | null>(
+    () => this.upcoming().find((i) => i.status === 'SCHEDULED') ?? null,
+  );
 
   readonly upcoming = computed(() => {
     const now = Date.now();
@@ -111,7 +134,7 @@ export class InstructorTemplateDetail implements OnInit {
     const t = this.template();
     if (!t) return;
     this.busyRegen.set(true);
-    this._svc.regenerate(t.id, { count: 4 }).subscribe({
+    this._svc.regenerate(t.id, { count: this.regenCount() }).subscribe({
       next: (res) => {
         this.busyRegen.set(false);
         this._msg.add({
@@ -184,6 +207,57 @@ export class InstructorTemplateDetail implements OnInit {
               showApiError(
                 this._msg,
                 'Could not cancel series',
+                'Please try again.',
+                err,
+              );
+            },
+          });
+      },
+    });
+  }
+
+  /**
+   * End the series after this week — keep the very next upcoming instance
+   * intact, cancel everything after it. Uses the existing
+   * `cancelInstance(id, scope='thisAndFuture')` endpoint against the
+   * SECOND upcoming instance.
+   */
+  protected endAfterThisWeek(): void {
+    const upcoming = this.upcoming().filter((i) => i.status === 'SCHEDULED');
+    if (upcoming.length < 2) {
+      this._msg.add({
+        severity: 'info',
+        summary: 'Nothing to end',
+        detail: 'No occurrences are scheduled beyond this week.',
+      });
+      return;
+    }
+    const cutoff = upcoming[1]; // first one to cancel
+    this._confirm.confirm({
+      header: 'End series after this week?',
+      message: `Cancels ${upcoming.length - 1} occurrence(s) from ${new Date(cutoff.startAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} onward. Attendees will be notified.`,
+      acceptLabel: 'Yes, end after this week',
+      rejectLabel: 'Keep series',
+      acceptButtonProps: { severity: 'danger' },
+      accept: () => {
+        const t = this.template();
+        if (!t) return;
+        this._svc
+          .cancelInstance(cutoff.id, { scope: 'thisAndFuture' })
+          .subscribe({
+            next: (res) => {
+              this._msg.add({
+                severity: 'success',
+                summary: 'Series ended after this week',
+                detail: `${res.cancelledInstanceIds.length} occurrence(s) cancelled · ${res.notifiedUserIds.length} attendee(s) notified.`,
+              });
+              this._load(t.id);
+              this._listStore.reload();
+            },
+            error: (err: unknown) => {
+              showApiError(
+                this._msg,
+                'Could not end the series',
                 'Please try again.',
                 err,
               );

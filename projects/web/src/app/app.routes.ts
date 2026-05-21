@@ -57,6 +57,17 @@ export const routes: Routes = [
     ],
   },
 
+  // Dev-only kitchen-sink view for the mobile primitives. No auth
+  // guard so we can screenshot it without seeding a token. Strip
+  // before prod build (or gate behind environment.dev flag).
+  {
+    path: '__primitives',
+    loadComponent: () =>
+      import('./__debug/primitives-debug/primitives-debug').then(
+        (m) => m.PrimitivesDebug,
+      ),
+  },
+
   {
     path: '**',
     redirectTo: 'error/not-found',

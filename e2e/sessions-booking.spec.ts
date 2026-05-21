@@ -1,5 +1,24 @@
 import { expect, test } from '@playwright/test';
-import { loginAsUser } from './auth.helper';
+import { INSTRUCTOR_FIXTURE, loginAsUser, mintToken } from './auth.helper';
+import { expectSeedOk } from './seed.helper';
+
+async function seedFreshSession(request: any): Promise<string> {
+  const token = mintToken(INSTRUCTOR_FIXTURE);
+  const title = `E2E book ${Date.now()}`;
+  const future = new Date(Date.now() + 21 * 86_400_000).toISOString();
+  const res = await request.post('http://localhost:3800/sessions/templates', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: {
+      title, type: 'OPEN', access: 'OPEN', locationKind: 'ONLINE',
+      meetingUrl: 'https://meet.google.com/abc-defg-hij',
+      durationMinutes: 60, timezone: 'Europe/Bucharest',
+      isRecurring: false, firstStartAt: future,
+    },
+  });
+  await expectSeedOk(res, 'seed booking target');
+  const body = (await res.json()) as { generatedInstances: { id: string }[] };
+  return body.generatedInstances[0].id;
+}
 
 /**
  * Phase E — booking E2E.
@@ -31,32 +50,11 @@ test('public showcase loads with either a Book button or a Booked state', async 
   ).toBeVisible({ timeout: 5000 });
 });
 
-test('booking a session adds it to /my/sessions', async ({ page }) => {
-  // Walk the discover list until we find a card that's NOT already
-  // booked (its showcase still shows the Book button). With repeated
-  // test runs every visible session may eventually be booked — skip
-  // in that case rather than fail.
-  await page.goto('/sessions/discover');
-  const cards = page.locator('mh-session-card');
-  // Give the bookings index time to mark already-booked cards.
-  await page.waitForTimeout(1000);
-  const total = await cards.count();
-  if (total === 0) test.skip(true, 'No discoverable sessions');
+test('booking a session adds it to /my/sessions', async ({ page, request }) => {
+  // Seed a fresh instance so this test never skips on a populated DB.
+  const instanceId = await seedFreshSession(request);
 
-  let bookable = -1;
-  for (let i = 0; i < total; i++) {
-    const wrap = cards.nth(i).locator('xpath=ancestor::div[contains(@class, "mh-disc__card-wrap")][1]');
-    const cls = (await wrap.getAttribute('class')) ?? '';
-    if (!cls.includes('is-booked')) {
-      bookable = i;
-      break;
-    }
-  }
-  if (bookable === -1)
-    test.skip(true, 'All discoverable sessions already booked by this user');
-
-  await cards.nth(bookable).click();
-  await expect(page).toHaveURL(/\/sessions\/[0-9a-f-]{36}/);
+  await page.goto(`/sessions/${instanceId}`);
   await page.locator('.mh-show__hero').waitFor({ timeout: 5000 });
   const heading = page.getByRole('heading').first();
   const title = ((await heading.textContent()) ?? '').trim();
@@ -82,12 +80,16 @@ test('booking a session adds it to /my/sessions', async ({ page }) => {
     .first();
   await confirm.click();
 
-  // Success toast OR navigation to /my/sessions.
-  const toast = page.locator('p-toast').getByText(/booked|reserved|pending approval/i);
-  await expect(toast).toBeVisible({ timeout: 5000 }).catch(() => undefined);
-
-  // Verify a row exists somewhere — total across tabs should be > 0.
-  await page.goto('/my/sessions');
+  // Success modal (`mh-booking-confirmed-dialog`) — "You're in!" or
+  // "Request sent!" headline, with calendar export + "what happens next".
+  const modal = page.locator('mh-booking-confirmed-dialog');
+  await expect(
+    modal.getByRole('heading', { name: /you're in|request sent/i }),
+  ).toBeVisible({ timeout: 5000 });
+  // Use the modal's "Go to My sessions" CTA so the test follows the same
+  // path a real user would.
+  await modal.getByRole('button', { name: /go to my sessions/i }).click();
+  await page.waitForURL(/\/my\/sessions/, { timeout: 5000 });
   for (const tab of ['upcoming', 'pending', 'waitlisted']) {
     await page.getByRole('tab', { name: new RegExp(tab, 'i') }).click();
     await page.waitForTimeout(500);
@@ -95,6 +97,62 @@ test('booking a session adds it to /my/sessions', async ({ page }) => {
     if (rows > 0) return;
   }
   expect(`No rows found in any My Sessions tab after booking "${title}"`).toBe('found');
+});
+
+test('booking confirmation modal renders calendar export + next-steps', async ({
+  page,
+  request,
+}) => {
+  // Seed a fresh instance so this test never skips just because the user
+  // has already booked everything on Discover.
+  const instanceId = await seedFreshSession(request);
+
+  await page.goto(`/sessions/${instanceId}`);
+  await page.locator('.mh-show__hero').waitFor({ timeout: 5000 });
+
+  const bookBtn = page
+    .getByRole('button')
+    .filter({ hasText: /^(Book|Reserve|Request to join)$/ })
+    .first();
+  await bookBtn.click();
+  const confirmBtn = page
+    .getByRole('dialog')
+    .getByRole('button')
+    .filter({ hasText: /confirm booking|request to join/i })
+    .first();
+  await confirmBtn.click();
+
+  // The new success modal — assert all 3 design elements are there.
+  const modal = page.locator('mh-booking-confirmed-dialog');
+  await expect(
+    modal.getByRole('heading', { name: /you're in|request sent/i }),
+  ).toBeVisible({ timeout: 5000 });
+
+  // The calendar export row OR a pending-approval explainer.
+  const hasCalRow = (await modal.locator('.mh-bc__cal-buttons').count()) > 0;
+  if (hasCalRow) {
+    // Apple .ics is a button, Google + Outlook are anchors.
+    await expect(modal.locator('.mh-bc__cal-btn')).toHaveCount(3);
+    const googleLink = await modal
+      .locator('a.mh-bc__cal-btn')
+      .filter({ hasText: /google/i })
+      .first()
+      .getAttribute('href');
+    expect(googleLink).toContain('calendar.google.com/calendar/render');
+    const outlookLink = await modal
+      .locator('a.mh-bc__cal-btn')
+      .filter({ hasText: /outlook/i })
+      .first()
+      .getAttribute('href');
+    expect(outlookLink).toContain('outlook.live.com/calendar');
+  }
+
+  // "What happens next" section.
+  await expect(modal.locator('.mh-bc__steps')).toBeVisible();
+
+  // Done dismisses the modal.
+  await modal.getByRole('button', { name: /done/i }).click();
+  await expect(modal.locator('.mh-bc__title')).toHaveCount(0);
 });
 
 test('cancel-booking dialog opens from a My Sessions row', async ({ page }) => {

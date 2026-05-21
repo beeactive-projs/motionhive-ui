@@ -27,14 +27,59 @@
   } @else if (error()) {
     <p-message severity="error" [closable]="false">{{ error() }}</p-message>
   } @else if (blocked && blocked.template) {
-    <!-- GROUP_ONLY non-member view: just enough to invite the user to join the group -->
-    <section class="mh-show__blocked">
-      <i class="pi pi-lock"></i>
-      <h2>This session is for {{ blocked.template.title }} group members only.</h2>
-      <p>Join the group to book sessions and see the full schedule.</p>
-      @if (blocked.template.groupId) {
-        <p-button label="View group" icon="pi pi-users" (onClick)="goToGroup()" />
-      }
+    <!-- GROUP_ONLY non-member view: soft-locked card. Title + time + instructor
+         visible; description / location / signup deliberately redacted with a
+         frosted overlay + lock icon. CTA invites them to join the group. -->
+    <section class="mh-show mh-show--locked">
+      <section class="mh-show__hero">
+        <div class="mh-show__time">
+          <i class="pi pi-calendar"></i>
+          {{ blocked.startAt | date: 'EEEE d MMMM, HH:mm' }}
+          <span class="mh-show__dot">·</span>
+          {{ blocked.template.durationMinutes }} min
+        </div>
+        <div class="mh-show__chips">
+          <mh-type-chip [type]="blocked.template.type" />
+          <mh-access-chip [access]="blocked.template.access" [approvalRequired]="false" />
+        </div>
+        <h1 class="mh-show__title">{{ blocked.template.title }}</h1>
+        @if (blocked.instructor) {
+          <p class="mh-show__instructor-line">
+            with <strong>{{ blocked.instructor.firstName }} {{ blocked.instructor.lastName }}</strong>
+          </p>
+        }
+      </section>
+
+      <!-- Redacted card: 4 blurred placeholder rows so the user sees there's
+           more content here, but it stays gated behind group membership. -->
+      <section class="mh-show__locked-card">
+        <div class="mh-show__locked-overlay" aria-hidden="true">
+          <i class="pi pi-lock"></i>
+          <strong>Members only</strong>
+          <span>Session details unlock when you join the group.</span>
+        </div>
+        <div class="mh-show__locked-blur">
+          <div class="mh-show__locked-row"></div>
+          <div class="mh-show__locked-row mh-show__locked-row--short"></div>
+          <div class="mh-show__locked-row"></div>
+          <div class="mh-show__locked-row mh-show__locked-row--short"></div>
+        </div>
+      </section>
+
+      <aside class="mh-show__cta">
+        @if (blocked.template.groupId) {
+          <p-button
+            label="Request to join group"
+            icon="pi pi-users"
+            severity="primary"
+            (onClick)="goToGroup()"
+            styleClass="mh-show__book-btn"
+          />
+        }
+        <small class="mh-show__terms">
+          The instructor will review group requests before granting access.
+        </small>
+      </aside>
     </section>
   } @else if (inst && t) {
     <div class="mh-show">
@@ -138,7 +183,15 @@
       [visible]="bookOpen()"
       (visibleChange)="bookOpen.set($event)"
       [instance]="inst"
-      (booked)="onBookSuccess()"
+      (booked)="onBookSuccess($event)"
+    />
+
+    <mh-booking-confirmed-dialog
+      [visible]="confirmedOpen()"
+      (visibleChange)="confirmedOpen.set($event)"
+      [instance]="inst"
+      [status]="bookedStatus()"
+      (goMySessions)="goToMySessions()"
     />
   }
 </mh-page-shell>

@@ -229,3 +229,73 @@
   background: color-mix(in srgb, var(--p-red-500) 12%, transparent);
   color: var(--p-red-700);
 }
+
+/* ─── Regenerate forward + bulk actions ─────────────────────────────
+   Two-column on desktop (main editor left, bulk actions sidebar right);
+   single column on phone. Pairs with `t.isRecurring && status==='ACTIVE'`
+   guard on the template — past / cancelled series hide the section. */
+.mh-td__regen {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+.mh-td__regen-main,
+.mh-td__regen-bulk {
+  padding: 20px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mh-td__regen-main header {
+  h3 { margin: 0 0 4px; font-size: 15px; }
+  p { margin: 0; font-size: 13px; color: var(--p-text-muted-color); line-height: 1.5; }
+}
+.mh-td__regen-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.mh-td__regen-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--p-text-color);
+}
+:host ::ng-deep .mh-td__regen-input { width: 72px; text-align: center; }
+
+.mh-td__regen-bulk h4 {
+  margin: 0; font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.02em;
+  color: var(--p-text-muted-color);
+}
+:host ::ng-deep .mh-td__regen-bulk-btn { width: 100%; justify-content: center; }
+.mh-td__regen-bulk-note {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  line-height: 1.4;
+}
+.mh-td__regen-bulk-stub {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--p-surface-50);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  line-height: 1.4;
+  i {
+    flex-shrink: 0;
+    color: var(--p-primary-700);
+    font-size: 14px;
+    margin-top: 1px;
+  }
+  strong { color: var(--p-text-color); }
+}
