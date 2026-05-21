@@ -32,15 +32,14 @@ test('instructor can cancel a session end-to-end', async ({ page, request }) => 
     },
   });
   await expectSeedOk(seeded, 'seed one-off');
+  // Navigate directly — the list page's next-instance index caps at 100
+  // and the seeded one may be off-page in a heavily-populated test DB.
+  const body = (await seeded.json()) as { generatedInstances: { id: string }[] };
+  const instanceId = body.generatedInstances[0].id;
 
   await loginAsInstructor(page);
-  await page.goto('/coaching/sessions');
-  await page.getByPlaceholder(/search sessions/i).fill(title);
-  await page.waitForTimeout(400);
-  const card = page.locator('mh-session-card', { hasText: title }).first();
-  await expect(card).toBeVisible({ timeout: 10_000 });
-  await card.click();
-  await page.waitForURL(/\/coaching\/sessions\/[0-9a-f-]{36}$/, { timeout: 5000 });
+  await page.goto(`/coaching/sessions/${instanceId}`);
+  await expect(page.locator('mh-instructor-session-detail')).toBeVisible({ timeout: 10_000 });
 
   await page
     .locator('[actions]')

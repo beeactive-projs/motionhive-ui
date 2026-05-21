@@ -163,9 +163,15 @@
   font-size: 16px;
   font-weight: 700;
   color: var(--p-text-color);
-  white-space: nowrap;
+  /* 2-line clamp on long titles — single-line ellipsis hides the
+     meaningful prefix for IDs like "E2E phase-F deep-link 1779...".
+     Full title still shows on the detail page. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 .mh-card__meta,
 .mh-card__locked {

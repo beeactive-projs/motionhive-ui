@@ -116,14 +116,13 @@ for (const vp of VIEWPORTS) {
         },
       });
       await expectSeedOk(seeded, 'seed one-off');
-
-      await page.goto('/coaching/sessions');
-      await page.getByPlaceholder(/search sessions/i).fill(title);
-      await page.waitForTimeout(400);
-      const card = page.locator('mh-session-card', { hasText: title }).first();
-      await expect(card).toBeVisible({ timeout: 10_000 });
-      await card.click();
-      await page.waitForURL(/\/coaching\/sessions\/[0-9a-f-]{36}$/, { timeout: 5000 });
+      // Navigate directly — list page's next-instance index is capped at 100,
+      // so a freshly seeded instance may not be on the first page when the
+      // test DB has accumulated. Visual is what we're after here.
+      const body = (await seeded.json()) as { generatedInstances: { id: string }[] };
+      const instanceId = body.generatedInstances[0].id;
+      await page.goto(`/coaching/sessions/${instanceId}`);
+      await expect(page.locator('mh-instructor-session-detail')).toBeVisible({ timeout: 10_000 });
       await page.waitForTimeout(800);
       await snap(page, 'session-detail', vp);
     });

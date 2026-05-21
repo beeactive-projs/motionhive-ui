@@ -15,8 +15,24 @@
   @media (max-width: 960px) {
     grid-template-columns: repeat(2, 1fr);
   }
+  /* Phone: 4 stacked KPI cards = 4 wasted screens. Horizontal-scroll
+     strip of fixed-width pills instead, with edge fade. */
   @media (max-width: 600px) {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+    /* Negative inline margin + matching padding so cards bleed to the
+       page edge — looks intentional, no clipped first card. */
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 0 16px;
+    > * {
+      flex: 0 0 200px;
+    }
   }
 }
 
@@ -25,6 +41,16 @@
   gap: 4px;
   border-bottom: 1px solid var(--p-surface-200);
   padding-bottom: 0;
+  /* Mobile: never wrap; horizontal scroll with an edge fade so users see
+     there's more. Hide the scrollbar so it doesn't claim a row of height. */
+  @media (max-width: 600px) {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+  }
 }
 .mh-tab {
   padding: 8px 14px;
@@ -36,6 +62,8 @@
   border-bottom: 2px solid transparent;
   cursor: pointer;
   transition: color 120ms ease, border-color 120ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:hover { color: var(--p-text-color); }
   &.is-active {
@@ -222,4 +250,36 @@
 }
 .mh-sessions__end {
   opacity: 0.6;
+}
+
+/* Mobile FAB — visible only ≤600px. Sits above the bottom tab-bar so
+   it never clips with the page chrome. Hide the toolbar's New session
+   button on phones so we have exactly one create-CTA. */
+.mh-sessions__fab {
+  display: none;
+}
+:host ::ng-deep .mh-sessions__new-btn { display: inline-flex; }
+
+@media (max-width: 600px) {
+  :host ::ng-deep .mh-sessions__new-btn { display: none; }
+  .mh-sessions__fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 16px;
+    /* Above the bottom-nav (≈64px) + safe-area inset. */
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--p-primary-500);
+    color: var(--p-primary-contrast-color, #fff);
+    border: none;
+    box-shadow: 0 6px 16px rgba(228, 137, 19, 0.4);
+    cursor: pointer;
+    z-index: 50;
+    i { font-size: 20px; }
+    &:active { transform: scale(0.96); }
+  }
 }

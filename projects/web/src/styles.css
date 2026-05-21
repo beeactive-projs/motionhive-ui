@@ -42,3 +42,60 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
+/* ─── Mobile dialogs as bottom sheets ────────────────────────────────
+   At ≤600px every p-dialog turns into a slide-up sheet: full width,
+   pinned to the bottom of the viewport, rounded top corners, drag-
+   handle pseudo-element. Header + footer become sticky so the body
+   scrolls inside the sheet (not the page).
+   Scope: applies to ALL p-dialog modals so this is a one-place fix. */
+@media (max-width: 600px) {
+  .p-dialog-mask:has(.p-dialog) {
+    align-items: flex-end !important;
+  }
+  .p-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 92vh !important;
+    animation: mh-sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .p-dialog .p-dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--p-content-background);
+    border-radius: 16px 16px 0 0;
+    padding-top: 18px;
+  }
+  /* Drag-handle bar above the header. */
+  .p-dialog .p-dialog-header::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--p-surface-300);
+  }
+  .p-dialog .p-dialog-content {
+    max-height: none !important;
+    overflow-y: auto;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .p-dialog .p-dialog-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--p-content-background);
+    border-top: 1px solid var(--p-content-border-color);
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@keyframes mh-sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}

@@ -34,6 +34,7 @@
       label="New session"
       icon="pi pi-plus"
       (click)="onCreateNew()"
+      styleClass="mh-sessions__new-btn"
     />
   </ng-container>
 
@@ -276,6 +277,17 @@
     </div>
   }
 </mh-page-shell>
+
+<!-- Mobile FAB — single primary action, sits above the bottom tab-bar.
+     Hidden ≥600px where the toolbar button is the canonical CTA. -->
+<button
+  type="button"
+  class="mh-sessions__fab"
+  aria-label="New session"
+  (click)="onCreateNew()"
+>
+  <i class="pi pi-plus" aria-hidden="true"></i>
+</button>
 
 <mh-session-form-dialog
   [visible]="formOpen()"
