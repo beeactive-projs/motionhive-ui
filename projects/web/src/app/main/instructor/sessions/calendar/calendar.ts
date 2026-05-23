@@ -15,15 +15,28 @@ import { MessageModule } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import {
+  BottomSheet,
   CalendarEvent,
   CalendarGrid,
   CalendarRange,
   CalendarView,
   CreateTemplateRequest,
+  DaySeparator,
   MiniMonth,
+  MobileFab,
   PageShell,
   SessionInstance,
+  SessionTemplate,
   SessionsInstructorStore,
+  TimeRow,
+  WeekStrip,
+  WeekStripDot,
+  dayTone,
+  formatSessionDuration,
+  formatSessionTime,
+  injectIsMobile,
+  sessionDayLabel,
+  sessionTone,
 } from 'core';
 import { instanceToCalendarEvent } from './mappers';
 import { QuickCreatePopover } from './quick-create-popover';
@@ -68,6 +81,11 @@ import {
     QuickCreatePopover,
     WeekFiltersPanel,
     SessionFormDialog,
+    BottomSheet,
+    DaySeparator,
+    MobileFab,
+    TimeRow,
+    WeekStrip,
   ],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,6 +116,17 @@ export class SessionsCalendar implements OnInit {
   // to this dialog (pre-filled from the partial popover payload).
   protected readonly formOpen = signal(false);
   protected readonly formPrefill = signal<Partial<SessionForm> | null>(null);
+
+  // ─── Mobile state ────────────────────────────────────────────────
+  //
+  // Mobile branches into a different shell: 7-day week strip + agenda
+  // list. View defaults to 'day' on mobile (set in ngOnInit). The
+  // user-facing "view" segment shows Day | Agenda (Week + Month are
+  // unusable at phone widths — Month becomes a bottom-sheet
+  // navigator instead).
+  protected readonly isMobile = injectIsMobile();
+  /** Month-picker sheet open state (triggered by "May 2026 ▾"). */
+  protected readonly monthSheetOpen = signal(false);
 
   // ─── Derived state ─────────────────────────────────────────────────
 
@@ -174,14 +203,96 @@ export class SessionsCalendar implements OnInit {
       .map(instanceToCalendarEvent);
   });
 
+  // ─── Mobile-only derived state ─────────────────────────────────────
+
+  /**
+   * The week containing `anchor()`, Monday-start. The mobile week-strip
+   * picker renders 7 cells from here. Independent from `range()`
+   * because the range tracks the selected *view* (day/week/month) and
+   * the week-strip always shows a week regardless.
+   */
+  protected readonly weekStripStart = computed(() => this._weekStart(this.anchor()));
+
+  /**
+   * Dots-per-day map for the week strip. Each session in the current
+   * range contributes one dot under its day, colored by its tone
+   * (online=teal, 1-on-1=navy, in-person=honey, conflict=coral).
+   * Truncated to 4 dots per day by the strip itself.
+   */
+  protected readonly weekStripDots = computed(() => {
+    const f = this.filters();
+    const map: Record<string, WeekStripDot[]> = {};
+    for (const inst of this.store.rangeInstances()) {
+      if (!this._passesFilters(inst, f)) continue;
+      if (!inst.template) continue;
+      const d = new Date(inst.startAt);
+      const iso = this._toISODateLocal(d);
+      const tone = sessionTone(inst.template, inst);
+      // Strip ignores the 'muted' tone (cancelled rows don't render
+      // dots on the navigator — they're past intent, not active).
+      if (tone === 'muted') continue;
+      (map[iso] ??= []).push({ tone });
+    }
+    return map;
+  });
+
+  /**
+   * Agenda groups for the mobile body: instances grouped by local
+   * day, sorted ascending. Drives the `<mh-day-separator>` + repeated
+   * `<mh-time-row>` rendering.
+   */
+  protected readonly agendaGroups = computed(() => {
+    const f = this.filters();
+    const groups = new Map<string, { date: Date; items: SessionInstance[] }>();
+    for (const inst of this.store.rangeInstances()) {
+      if (!this._passesFilters(inst, f)) continue;
+      const d = new Date(inst.startAt);
+      const dayKey = this._toISODateLocal(d);
+      if (!groups.has(dayKey)) {
+        const dayStart = new Date(d);
+        dayStart.setHours(0, 0, 0, 0);
+        groups.set(dayKey, { date: dayStart, items: [] });
+      }
+      groups.get(dayKey)!.items.push(inst);
+    }
+    return Array.from(groups.values())
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .map((g) => ({
+        ...g,
+        items: g.items.sort(
+          (a, b) =>
+            new Date(a.startAt).getTime() - new Date(b.startAt).getTime(),
+        ),
+      }));
+  });
+
+  /** "May 2026" label for the mobile month-picker trigger. */
+  protected readonly monthLabel = computed(() =>
+    this.anchor().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+  );
+
+  /** Template alias — local-zone YYYY-MM-DD for `data-agenda-day`. */
+  protected agendaDayKey(d: Date): string {
+    return this._toISODateLocal(d);
+  }
+
+  // Template-facing aliases for the core/utils format helpers (same
+  // pattern as the Sessions list page).
+  protected readonly formatTime = formatSessionTime;
+  protected readonly formatDuration = formatSessionDuration;
+  protected readonly toneFor = sessionTone;
+  protected readonly dayTone = dayTone;
+  protected readonly dayLabel = sessionDayLabel;
+
   // ─── Lifecycle ────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    // On phones, default to Day view — the 7-column Week grid forces
-    // ~40px per column, which truncates titles to 1-2 chars. Day is
-    // narrower (single column) and reads cleanly.
-    if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      this.view.set('day');
+    // On phones, default to mobile Agenda mode (the design's 2A
+    // primary). We mark `view='week'` because that's the 7-day range
+    // the agenda visually represents — the template branch on
+    // `inAgenda()` swaps the grid for the agenda list.
+    if (this.isMobile()) {
+      this.view.set('week');
     }
     this.store.loadRange(this.range());
   }
@@ -227,6 +338,34 @@ export class SessionsCalendar implements OnInit {
   protected onMiniMonthSelect(date: Date): void {
     this.anchor.set(date);
     this.store.loadRange(this.range());
+  }
+
+  /**
+   * Mobile week-strip day tap. Two behaviors depending on view:
+   *   - In Day mode: re-anchor (range shifts to that day) + load.
+   *   - In Agenda mode: re-anchor for visual selection, then scroll
+   *     the day-separator that matches this date into view. Loading
+   *     isn't strictly needed because the week is already in the
+   *     range, but we update the anchor so the strip selection is
+   *     consistent.
+   */
+  protected onWeekStripSelect(date: Date): void {
+    this.anchor.set(date);
+    if (!this.inAgenda()) {
+      this.store.loadRange(this.range());
+      return;
+    }
+    // Defer scroll until Angular re-renders with the new anchor +
+    // selection state. setTimeout 0 puts us after the next CD tick.
+    setTimeout(() => {
+      const iso = this._toISODateLocal(date);
+      const el = document.querySelector<HTMLElement>(
+        `[data-agenda-day="${iso}"]`,
+      );
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   }
 
   protected onRangeChange(range: CalendarRange): void {
@@ -325,6 +464,92 @@ export class SessionsCalendar implements OnInit {
     this.store.loadRange(this.range());
   }
 
+  // ─── Mobile handlers ──────────────────────────────────────────────
+
+  /** Mobile view segment toggle — only 'day' or 'agenda' on phones. */
+  protected setMobileView(v: 'day' | 'agenda'): void {
+    if (v === 'day') {
+      this.view.set('day');
+      this.store.loadRange(this.range());
+    } else {
+      // Agenda mode uses the existing `week` range (Mon..Sun) so we
+      // load 7 days of instances at a time. The grid component isn't
+      // rendered in agenda mode — the body switches to <mh-time-row>
+      // groups directly.
+      this.view.set('week');
+      this.store.loadRange(this.range());
+    }
+  }
+
+  /** Is the user currently in mobile-Agenda mode? */
+  protected readonly inAgenda = computed(() => this.isMobile() && this.view() === 'week');
+
+  /** Tap "May 2026 ▾" → opens the month-picker sheet (design 2C). */
+  protected openMonthSheet(): void {
+    this.monthSheetOpen.set(true);
+  }
+
+  /**
+   * Month sheet picked a day → close the sheet, anchor to that day,
+   * and refresh the range. The mini-month's selection is the
+   * "navigator" target — we don't change view here, just where the
+   * agenda/day grid is centered.
+   */
+  protected onMonthSheetSelect(date: Date): void {
+    this.monthSheetOpen.set(false);
+    this.anchor.set(date);
+    this.store.loadRange(this.range());
+  }
+
+  /** Mobile filter pills — single-select; tapping the active one clears. */
+  protected toggleMobileLocation(kind: 'ONLINE' | 'IN_PERSON'): void {
+    const f = this.filters();
+    if (kind === 'ONLINE') {
+      // ONLINE active = only online cards visible = !inPerson, online=true.
+      const showingOnly = !f.inPerson && f.online;
+      this.filters.set({ ...f, inPerson: showingOnly, online: true });
+    } else {
+      const showingOnly = !f.online && f.inPerson;
+      this.filters.set({ ...f, online: showingOnly, inPerson: true });
+    }
+  }
+
+  protected toggleMobileConflictsOnly(): void {
+    const f = this.filters();
+    this.filters.set({ ...f, conflictsOnly: !f.conflictsOnly });
+  }
+
+  protected clearMobileFilters(): void {
+    this.filters.set({
+      ...DEFAULT_CALENDAR_FILTERS,
+      types: { ...DEFAULT_CALENDAR_FILTERS.types },
+    });
+  }
+
+  /** Tap a row in the agenda → navigate to the instance detail page. */
+  protected onAgendaInstanceClick(inst: SessionInstance): void {
+    void this._router.navigate(['/coaching/sessions', inst.id]);
+  }
+
+  // ─── Helpers used by the template ─────────────────────────────────
+
+  /** Title to render for an instance row (override wins if set). */
+  protected instanceTitle(inst: SessionInstance): string {
+    return inst.titleOverride ?? inst.template?.title ?? '(Session)';
+  }
+
+  /** Conflict flag for the row's conflict ring. */
+  protected hasConflict(inst: SessionInstance): boolean {
+    return (inst.conflictingInstanceIds?.length ?? 0) > 0;
+  }
+
+  /** Template-facing helper: tone for the row (calls core's sessionTone with safe fallback). */
+  protected instanceTone(
+    inst: SessionInstance,
+  ): 'honey' | 'teal' | 'navy' | 'coral' | 'muted' {
+    return inst.template ? sessionTone(inst.template, inst) : 'honey';
+  }
+
   private _openFormForRange(start: Date, end: Date): void {
     const minutes = Math.max(
       5,
@@ -372,6 +597,18 @@ export class SessionsCalendar implements OnInit {
     const out = new Date(d);
     out.setHours(23, 59, 59, 999);
     return out;
+  }
+
+  /**
+   * Local-zone YYYY-MM-DD. Avoid `toISOString().slice(0,10)` which
+   * shifts the date in non-UTC zones (e.g. EAT +03:00 midnight rolls
+   * back to "yesterday").
+   */
+  private _toISODateLocal(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   private _passesFilters(inst: SessionInstance, f: CalendarFilters): boolean {

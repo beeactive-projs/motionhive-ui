@@ -125,11 +125,11 @@ import type { RecurrenceRule } from '../../models/session/session.model';
             [(ngModel)]="endCountSig"
             (ngModelChange)="setEndCount($event)"
             [min]="1"
-            [max]="365"
+            [max]="24"
             [showButtons]="true"
             inputStyleClass="mh-rec__num"
           />
-          <span class="mh-rec__hint">occurrences</span>
+          <span class="mh-rec__hint">occurrences (max 24)</span>
         }
       </div>
 
@@ -188,7 +188,24 @@ import type { RecurrenceRule } from '../../models/session/session.model';
       color: var(--p-primary-contrast-color, #fff);
     }
     .mh-rec__hint { font-size: 12px; color: var(--p-text-muted-color); }
-    :host ::ng-deep .mh-rec__num { width: 64px; text-align: center; }
+    /* Widen the input itself + give the p-inputNumber wrapper a
+       minimum width so the stepper buttons don't squeeze the digit
+       out of view. Default 64px input + default PrimeNG stepper
+       padding meant a 2-digit value rendered as an apostrophe-wide
+       column. */
+    :host ::ng-deep .mh-rec__num {
+      width: 72px;
+      text-align: center;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+    :host ::ng-deep p-inputNumber {
+      display: inline-flex;
+      min-width: 120px;
+    }
+    :host ::ng-deep p-inputNumber .p-inputnumber {
+      width: 100%;
+    }
     .mh-rec__dows {
       display: inline-flex;
       gap: 4px;

@@ -163,6 +163,7 @@
 }
 
 .mh-sessions__empty {
+  position: relative;
   text-align: center;
   max-width: 520px;
   margin: 48px auto;
@@ -170,6 +171,7 @@
   background: var(--p-content-background);
   border: 1px solid var(--p-content-border-color);
   border-radius: 16px;
+  overflow: hidden;
 
   h2 {
     margin: 16px 0 8px;
@@ -180,6 +182,16 @@
     color: var(--p-text-muted-color);
     margin: 0 0 20px;
     line-height: 1.5;
+  }
+
+  /* Mobile: shrink the card chrome so two stacked buttons don't tower
+     over the page. Per the design's empty 5B pattern. */
+  @media (max-width: 600px) {
+    margin: 24px 0;
+    padding: 20px 16px;
+    border-radius: 12px;
+    h2 { font-size: 17px; }
+    p { font-size: 13px; }
   }
 }
 .mh-sessions__empty-tile {
@@ -193,11 +205,32 @@
   justify-content: center;
   color: var(--p-primary-700);
   font-size: 28px;
+  @media (max-width: 600px) {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+    border-radius: 12px;
+  }
 }
 .mh-sessions__empty-ctas {
   display: flex;
   gap: 8px;
   justify-content: center;
+
+  /* PrimeNG's default p-button on a mobile column stack pushes the CTAs
+     to ~52px tall and the label wraps awkwardly. Shrink the inner
+     padding + font so the row reads as a primary action, not body
+     copy. Buttons take width:100% so they line up. */
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    :host ::ng-deep & .p-button {
+      width: 100%;
+      justify-content: center;
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+  }
 }
 
 .mh-sessions__table-placeholder {
@@ -209,23 +242,30 @@
 }
 
 .mh-seg {
+  /* Segmented control aligned to PrimeNG default button height
+     (38px) so the View toggle sits on the same baseline as the
+     Public profile / New session buttons in the toolbar. */
   display: inline-flex;
   background: var(--p-surface-100);
   border-radius: 8px;
-  padding: 2px;
+  padding: 4px;
+  height: 38px;
+  box-sizing: border-box;
 }
 .mh-seg__btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  font-size: 12px;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 13px;
   font-weight: 600;
   background: transparent;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   color: var(--p-text-muted-color);
+  font-family: inherit;
+  i { font-size: 12px; }
 }
 .mh-seg__btn.is-active {
   background: var(--p-content-background);
@@ -452,32 +492,74 @@
 :host ::ng-deep .mh-mob__sheet-primary { flex: 1; }
 :host ::ng-deep .mh-mob__sheet-primary .p-button { width: 100%; }
 
-/* 1C action list */
-.mh-mob__action-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* 1C action list — now rendered by <mh-action-list> from core. */
+
+/* ─── 5B · Rich empty (Upcoming first-time only) ─────────────────────
+   Honeycomb watermark, hex-shaped tile, 2-up info hint cards. The
+   `--rich` class is only on the default tab variant. */
+.mh-sessions__empty--rich {
+  /* The hex-tile icon container gets a true hex outline via
+     clip-path to match the design's mono-hex glyph. */
+  .mh-sessions__empty-tile {
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    border-radius: 0;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    @media (max-width: 600px) {
+      width: 52px;
+      height: 52px;
+      font-size: 22px;
+    }
+  }
 }
-.mh-mob__action-list li {
-  border-bottom: 1px solid var(--p-content-border-color);
-  &:last-child { border-bottom: none; }
+/* Honeycomb watermark — repeated SVG pattern at 22% opacity, sits
+   behind everything else in the empty card. Only renders on the
+   --rich variant via the [class.mh-sessions__empty--rich] gate in
+   the template. */
+.mh-sessions__empty-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 50 L28 66 L0 50 L0 16 Z M28 66 L56 82 L56 100 M0 100 L0 82 L28 66 M56 16 L56 50 M0 16 L0 50' fill='none' stroke='%23E48913' stroke-width='1' opacity='.22'/%3E%3C/svg%3E");
+  background-size: 56px 100px;
+  pointer-events: none;
+  z-index: 0;
 }
-.mh-mob__action-list button {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 13px 16px;
-  background: transparent;
-  border: none;
+/* Lift the foreground above the watermark. */
+.mh-sessions__empty > *:not(.mh-sessions__empty-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* 2-up info hints. */
+.mh-sessions__empty-hints {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 18px;
   text-align: left;
-  font-size: 13px;
-  color: var(--p-text-color);
-  cursor: pointer;
-  font-family: inherit;
-  i { font-size: 14px; color: var(--p-primary-700); }
 }
-.mh-mob__action-list-danger {
-  color: var(--p-red-700) !important;
-  i { color: var(--p-red-500) !important; }
+.mh-sessions__empty-hint {
+  padding: 12px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  i {
+    color: var(--p-primary-600, var(--p-primary-700));
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+  strong {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+  small {
+    font-size: 10px;
+    color: var(--p-text-muted-color);
+    line-height: 1.4;
+  }
 }

@@ -75,8 +75,31 @@ import {
       color: var(--p-text-muted-color);
       line-height: 1.2;
       flex-shrink: 0;
+      max-width: 40%;
     }
     .mh-sc__meta:empty { display: none; }
+    /* Force projected meta content to stack vertically regardless of
+       whether the caller wraps it in a div / uses bare strong+span.
+       Bigger strong above (the headline number/label), small span
+       below. */
+    .mh-sc__meta ::ng-deep > * { display: contents; }
+    .mh-sc__meta ::ng-deep strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--p-text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mh-sc__meta ::ng-deep span {
+      display: block;
+      font-size: 10px;
+      color: var(--p-text-muted-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .mh-sc__leading {
       display: inline-flex;
       align-items: center;

@@ -1,111 +1,249 @@
-<mh-page-shell
-  title="Sessions calendar"
-  [breadcrumb]="[
-    { label: 'Coaching', routerLink: '/coaching/overview' },
-    { label: 'Sessions', routerLink: '/coaching/sessions' },
-    { label: 'Calendar' }
-  ]"
->
-  <ng-container actions>
-    <p-button
-      label="New session"
-      icon="pi pi-plus"
-      (onClick)="onNewSession()"
-    />
-  </ng-container>
+<!--
+  Two branches:
+    - Desktop (>600px): existing day/week/month grid + mini-month rail +
+      filters panel. Untouched from baseline.
+    - Mobile (≤600px): design frame 2A — `May 2026 ▾` trigger + Day |
+      Agenda segment + 7-day week-strip with dots-per-day + filter
+      pills + day-grouped agenda. Month picker opens as a bottom sheet
+      (frame 2C). Calendar grid stays for the Day mode zoom-in (2B).
+-->
 
-  <!-- Calendar toolbar: nav + view picker. Wraps on narrow widths. -->
-  <div class="mh-cal__toolbar">
-    <div class="mh-cal__toolbar-group">
+@if (!isMobile()) {
+  <!-- ────────────────────── DESKTOP ────────────────────── -->
+  <mh-page-shell
+    title="Sessions calendar"
+    [breadcrumb]="[
+      { label: 'Coaching', routerLink: '/coaching/overview' },
+      { label: 'Sessions', routerLink: '/coaching/sessions' },
+      { label: 'Calendar' }
+    ]"
+  >
+    <ng-container actions>
       <p-button
-        label="Today"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        (click)="goToday()"
+        label="New session"
+        icon="pi pi-plus"
+        (onClick)="onNewSession()"
       />
-      <button
-        type="button"
-        class="mh-cal__nav"
-        (click)="goPrev()"
-        aria-label="Previous"
-      >
-        <i class="pi pi-chevron-left"></i>
-      </button>
-      <button
-        type="button"
-        class="mh-cal__nav"
-        (click)="goNext()"
-        aria-label="Next"
-      >
-        <i class="pi pi-chevron-right"></i>
-      </button>
-      <span class="mh-cal__range">{{ rangeLabel() }}</span>
-      <span class="mh-cal__tz">Europe/Bucharest</span>
-    </div>
+    </ng-container>
 
-    <div class="mh-cal__view-seg" role="tablist" aria-label="View">
-      <button
-        type="button"
-        class="mh-cal__view-btn"
-        [class.is-active]="view() === 'day'"
-        (click)="setView('day')"
-      >Day</button>
-      <button
-        type="button"
-        class="mh-cal__view-btn"
-        [class.is-active]="view() === 'week'"
-        (click)="setView('week')"
-      >Week</button>
-      <button
-        type="button"
-        class="mh-cal__view-btn"
-        [class.is-active]="view() === 'month'"
-        (click)="setView('month')"
-      >Month</button>
-    </div>
-  </div>
-
-  <!-- Error banner -->
-  @if (store.rangeError()) {
-    <p-message severity="error" [closable]="false" class="mh-cal__error">
-      Couldn't load calendar — {{ store.rangeError() }}
-      <p-button
-        label="Retry"
-        size="small"
-        [outlined]="true"
-        (click)="store.loadRange(range())"
-      />
-    </p-message>
-  }
-
-  <!-- Two-column layout -->
-  <div class="mh-cal__shell">
-    <aside class="mh-cal__rail">
-      <mh-mini-month
-        [selectedDate]="anchor()"
-        [rangeStart]="miniMonthRangeStart()"
-        [rangeEnd]="miniMonthRangeEnd()"
-        (selectedDateChange)="onMiniMonthSelect($event)"
-      />
-      <mh-week-filters-panel
-        [filters]="filters()"
-        (filtersChange)="onFiltersChange($event)"
-      />
-      <div class="mh-cal__tip">
-        <p>
-          <strong>Tip:</strong> drag on any empty slot to create a session.
-          Hold <kbd>Shift</kbd> for the full form.
-        </p>
+    <div class="mh-cal__toolbar">
+      <div class="mh-cal__toolbar-group">
+        <p-button
+          label="Today"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (click)="goToday()"
+        />
+        <button
+          type="button"
+          class="mh-cal__nav"
+          (click)="goPrev()"
+          aria-label="Previous"
+        >
+          <i class="pi pi-chevron-left"></i>
+        </button>
+        <button
+          type="button"
+          class="mh-cal__nav"
+          (click)="goNext()"
+          aria-label="Next"
+        >
+          <i class="pi pi-chevron-right"></i>
+        </button>
+        <span class="mh-cal__range">{{ rangeLabel() }}</span>
+        <span class="mh-cal__tz">Europe/Bucharest</span>
       </div>
-    </aside>
 
-    <main class="mh-cal__main">
-      @if (store.rangeLoading() && store.rangeInstances().length === 0) {
-        <p-skeleton width="100%" height="600px" borderRadius="12px" />
-      } @else {
+      <div class="mh-cal__view-seg" role="tablist" aria-label="View">
+        <button
+          type="button"
+          class="mh-cal__view-btn"
+          [class.is-active]="view() === 'day'"
+          (click)="setView('day')"
+        >Day</button>
+        <button
+          type="button"
+          class="mh-cal__view-btn"
+          [class.is-active]="view() === 'week'"
+          (click)="setView('week')"
+        >Week</button>
+        <button
+          type="button"
+          class="mh-cal__view-btn"
+          [class.is-active]="view() === 'month'"
+          (click)="setView('month')"
+        >Month</button>
+      </div>
+    </div>
+
+    @if (store.rangeError()) {
+      <p-message severity="error" [closable]="false" class="mh-cal__error">
+        Couldn't load calendar — {{ store.rangeError() }}
+        <p-button
+          label="Retry"
+          size="small"
+          [outlined]="true"
+          (click)="store.loadRange(range())"
+        />
+      </p-message>
+    }
+
+    <div class="mh-cal__shell">
+      <aside class="mh-cal__rail">
+        <mh-mini-month
+          [selectedDate]="anchor()"
+          [rangeStart]="miniMonthRangeStart()"
+          [rangeEnd]="miniMonthRangeEnd()"
+          (selectedDateChange)="onMiniMonthSelect($event)"
+        />
+        <mh-week-filters-panel
+          [filters]="filters()"
+          (filtersChange)="onFiltersChange($event)"
+        />
+        <div class="mh-cal__tip">
+          <p>
+            <strong>Tip:</strong> drag on any empty slot to create a session.
+            Hold <kbd>Shift</kbd> for the full form.
+          </p>
+        </div>
+      </aside>
+
+      <main class="mh-cal__main">
+        @if (store.rangeLoading() && store.rangeInstances().length === 0) {
+          <p-skeleton width="100%" height="600px" borderRadius="12px" />
+        } @else {
+          <mh-calendar-grid
+            [view]="view()"
+            [dateRange]="range()"
+            [events]="events()"
+            [loading]="store.rangeLoading()"
+            [selectedDate]="anchor()"
+            timezone="Europe/Bucharest"
+            (cellClick)="onCellClick($event)"
+            (cellDrag)="onCellDrag($event)"
+            (eventClick)="onEventClick($event)"
+            (rangeChange)="onRangeChange($event)"
+            (overflowClick)="onOverflowClick($event)"
+          />
+        }
+      </main>
+    </div>
+
+    @if (popover(); as pop) {
+      <mh-quick-create-popover
+        [range]="pop.range"
+        [anchor]="pop.anchor"
+        (openFullForm)="onPopoverSubmit($event)"
+        (dismiss)="onPopoverDismiss()"
+      />
+    }
+  </mh-page-shell>
+} @else {
+  <!-- ────────────────────── MOBILE (2A / 2B / 2C) ────────────────────── -->
+  <mh-page-shell
+    title="Calendar"
+    [breadcrumb]="[
+      { label: 'Coaching', routerLink: '/coaching/overview' },
+      { label: 'Sessions', routerLink: '/coaching/sessions' },
+      { label: 'Calendar' }
+    ]"
+  >
+    <!-- Top: 'May 2026 ▾' trigger + Today + Day|Agenda segment -->
+    <div class="mh-mob-cal__top">
+      <button
+        type="button"
+        class="mh-mob-cal__month-trigger"
+        (click)="openMonthSheet()"
+        aria-label="Pick month"
+      >
+        <span>{{ monthLabel() }}</span>
+        <i class="pi pi-angle-down" aria-hidden="true"></i>
+      </button>
+      <div class="mh-mob-cal__top-right">
+        <button
+          type="button"
+          class="mh-mob-cal__today"
+          (click)="goToday()"
+        >Today</button>
+        <div class="mh-mob-cal__view-seg" role="tablist" aria-label="View">
+          <button
+            type="button"
+            class="mh-mob-cal__view-btn"
+            [class.is-active]="!inAgenda()"
+            (click)="setMobileView('day')"
+          >Day</button>
+          <button
+            type="button"
+            class="mh-mob-cal__view-btn"
+            [class.is-active]="inAgenda()"
+            (click)="setMobileView('agenda')"
+          >Agenda</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Week strip — visible in Agenda mode (2A). Tapping a day
+         scrolls the agenda below to that day's separator (when the
+         day has sessions) and updates the strip's selected outline. -->
+    @if (inAgenda()) {
+      <mh-week-strip
+        [weekStart]="weekStripStart()"
+        [selectedDate]="anchor()"
+        [dotsByDate]="weekStripDots()"
+        (selectedDateChange)="onWeekStripSelect($event)"
+      />
+    }
+
+    <!-- Filter pills — single horizontal row, scrolls if needed. -->
+    <div class="mh-mob-cal__pills" role="group" aria-label="Quick filters">
+      <button
+        type="button"
+        class="mh-mob-cal__pill"
+        [class.is-active]="filters().online && filters().inPerson && !filters().conflictsOnly"
+        (click)="clearMobileFilters()"
+      >All</button>
+      <button
+        type="button"
+        class="mh-mob-cal__pill"
+        [class.is-active]="filters().online && !filters().inPerson"
+        (click)="toggleMobileLocation('ONLINE')"
+      ><i class="pi pi-video"></i> Online</button>
+      <button
+        type="button"
+        class="mh-mob-cal__pill"
+        [class.is-active]="filters().inPerson && !filters().online"
+        (click)="toggleMobileLocation('IN_PERSON')"
+      ><i class="pi pi-map-marker"></i> In-person</button>
+      <button
+        type="button"
+        class="mh-mob-cal__pill mh-mob-cal__pill--conflicts"
+        [class.is-active]="filters().conflictsOnly"
+        (click)="toggleMobileConflictsOnly()"
+      ><i class="pi pi-exclamation-triangle"></i> Conflicts</button>
+    </div>
+
+    <!-- Error -->
+    @if (store.rangeError()) {
+      <p-message severity="error" [closable]="false" class="mh-cal__error">
+        Couldn't load calendar — {{ store.rangeError() }}
+        <p-button label="Retry" size="small" [outlined]="true" (click)="store.loadRange(range())" />
+      </p-message>
+    }
+
+    <!-- Body: Day view (2B) or Agenda list (2A). -->
+    @if (store.rangeLoading() && store.rangeInstances().length === 0) {
+      <div class="mh-mob-cal__skel">
+        <p-skeleton width="100%" height="40px" borderRadius="10px" />
+        <p-skeleton width="100%" height="60px" borderRadius="10px" />
+        <p-skeleton width="100%" height="60px" borderRadius="10px" />
+      </div>
+    } @else if (!inAgenda()) {
+      <!-- 2B: Day view zoom-in. The existing calendar grid handles
+           single-column day rendering. -->
+      <main class="mh-mob-cal__day">
         <mh-calendar-grid
-          [view]="view()"
+          [view]="'day'"
           [dateRange]="range()"
           [events]="events()"
           [loading]="store.rangeLoading()"
@@ -117,21 +255,91 @@
           (rangeChange)="onRangeChange($event)"
           (overflowClick)="onOverflowClick($event)"
         />
-      }
-    </main>
-  </div>
+      </main>
+    } @else if (agendaGroups().length === 0) {
+      <!-- Empty: no sessions in the visible week. -->
+      <div class="mh-mob-cal__empty">
+        <i class="pi pi-calendar"></i>
+        <p>No sessions this week.</p>
+        @if (filters().conflictsOnly || !filters().online || !filters().inPerson) {
+          <p-button
+            label="Clear filters"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="clearMobileFilters()"
+          />
+        }
+      </div>
+    } @else {
+      <!-- 2A: Agenda list, day-grouped. Each day section carries a
+           data-agenda-day attribute so onWeekStripSelect can scroll
+           the tapped day into view. -->
+      <div class="mh-mob-cal__agenda">
+        @for (group of agendaGroups(); track group.date.getTime()) {
+          <div class="mh-mob-cal__day-group" [attr.data-agenda-day]="agendaDayKey(group.date)">
+            <mh-day-separator
+              [label]="dayLabel(group.date)"
+              [count]="group.items.length"
+              [tone]="dayTone(group.date)"
+            />
+          @for (inst of group.items; track inst.id) {
+            <mh-time-row
+              [time]="formatTime(inst.startAt)"
+              [duration]="inst.template ? formatDuration(inst.template.durationMinutes) : ''"
+              [title]="instanceTitle(inst)"
+              [tone]="instanceTone(inst)"
+              [conflict]="hasConflict(inst)"
+              (click)="onAgendaInstanceClick(inst)"
+            >
+              <span meta>
+                @if (hasConflict(inst)) {
+                  <span class="mh-mob-cal__chip mh-mob-cal__chip--coral">
+                    <i class="pi pi-exclamation-triangle"></i> Conflict
+                  </span>
+                } @else if (inst.template?.type === 'PRIVATE') {
+                  <span class="mh-mob-cal__chip mh-mob-cal__chip--blue">1-on-1</span>
+                } @else if (inst.template?.locationKind === 'ONLINE') {
+                  <span class="mh-mob-cal__chip mh-mob-cal__chip--teal">Online</span>
+                } @else {
+                  <span class="mh-mob-cal__chip mh-mob-cal__chip--honey">
+                    {{ inst.template?.type | titlecase }}
+                  </span>
+                }
+                @if ((inst.template?.capacity ?? 0) > 0) {
+                  <span class="mh-mob-cal__meta-text">
+                    {{ inst.confirmedCount }}/{{ inst.template?.capacity }}
+                  </span>
+                } @else if (inst.confirmedCount > 0) {
+                  <span class="mh-mob-cal__meta-text">{{ inst.confirmedCount }} confirmed</span>
+                }
+              </span>
+            </mh-time-row>
+          }
+          </div>
+        }
+      </div>
+    }
+  </mh-page-shell>
 
-  <!-- Quick-create popover (drag-to-create result) -->
-  @if (popover(); as pop) {
-    <mh-quick-create-popover
-      [range]="pop.range"
-      [anchor]="pop.anchor"
-      (openFullForm)="onPopoverSubmit($event)"
-      (dismiss)="onPopoverDismiss()"
+  <!-- FAB -->
+  <mh-mobile-fab icon="pi pi-plus" label="New session" (tap)="onNewSession()" />
+
+  <!-- 2C · Month sheet (mini-month inside a bottom sheet). -->
+  <mh-bottom-sheet
+    [open]="monthSheetOpen()"
+    (openChange)="monthSheetOpen.set($event)"
+    size="medium"
+    [title]="monthLabel()"
+    subtitle="Pick a day to jump to"
+  >
+    <mh-mini-month
+      [selectedDate]="anchor()"
+      (selectedDateChange)="onMonthSheetSelect($event)"
     />
-  }
-</mh-page-shell>
+  </mh-bottom-sheet>
+}
 
+<!-- Shared dialogs -->
 <mh-session-form-dialog
   [visible]="formOpen()"
   (visibleChange)="formOpen.set($event)"

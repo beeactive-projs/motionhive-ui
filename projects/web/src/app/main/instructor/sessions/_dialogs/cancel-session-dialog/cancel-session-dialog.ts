@@ -17,11 +17,13 @@ import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { InputText } from 'primeng/inputtext';
 import {
+  BottomSheet,
   CancelInstanceResponse,
   CancelScope,
   SessionInstance,
   SessionService,
   SessionTemplate,
+  injectIsMobile,
   showApiError,
 } from 'core';
 
@@ -51,6 +53,7 @@ import {
     ButtonModule,
     TextareaModule,
     InputText,
+    BottomSheet,
   ],
   templateUrl: './cancel-session-dialog.html',
   styleUrl: './cancel-session-dialog.scss',
@@ -59,6 +62,13 @@ import {
 export class CancelSessionDialog {
   private readonly _svc = inject(SessionService);
   private readonly _msg = inject(MessageService);
+
+  /**
+   * Mobile breakpoint. When true, the template renders the sheet
+   * variant (4C from the design); when false, the existing p-dialog.
+   * Same form state in both branches.
+   */
+  readonly isMobile = injectIsMobile();
 
   readonly visible = model(false);
   readonly instance = input<SessionInstance | null>(null);

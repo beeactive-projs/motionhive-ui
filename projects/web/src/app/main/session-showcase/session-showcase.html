@@ -97,6 +97,11 @@
           @if (t.meetingProvider) {
             <mh-provider-chip [provider]="t.meetingProvider" />
           }
+          @if (isFull()) {
+            <span class="mh-show__chip-full">
+              <i class="pi pi-times-circle"></i> Full
+            </span>
+          }
         </div>
 
         @if (t.description) {
@@ -154,12 +159,51 @@
             (onClick)="goToMySessions()"
             styleClass="mh-show__book-btn"
           />
+        } @else if (isPast()) {
+          <!-- Past: booking is meaningless. Show a muted "This session
+               has already started/ended" chip in place of the CTA so
+               the user can still browse the detail without seeing a
+               misleading Book button. -->
+          <div class="mh-show__past-card" role="status">
+            <i class="pi pi-history"></i>
+            <div>
+              <strong>This session has already started</strong>
+              <small>Bookings are closed.</small>
+            </div>
+          </div>
+        } @else if (isFull()) {
+          <!-- 5C · capacity-full state. Coral banner with the
+               "Session is full · N/Capacity" headline, plus a
+               sub-line about the waitlist behavior. -->
+          <div class="mh-show__full-card" role="status">
+            <div class="mh-show__full-head">
+              <i class="pi pi-clock"></i>
+              <strong>Session is full · {{ inst.confirmedCount }} / {{ cap }}</strong>
+            </div>
+            @if (waitlistEnabled()) {
+              <p>
+                Join the waitlist — you'll get a notification if a spot
+                opens. Andrei approves waitlist promotions.
+              </p>
+              <p-button
+                label="Join waitlist"
+                icon="pi pi-clock"
+                severity="primary"
+                (onClick)="bookOpen.set(true)"
+                styleClass="mh-show__book-btn"
+              />
+            } @else {
+              <p>This session is full and the waitlist is closed.</p>
+              <p-button
+                label="Session full"
+                icon="pi pi-times"
+                severity="secondary"
+                [disabled]="true"
+                styleClass="mh-show__book-btn"
+              />
+            }
+          </div>
         } @else {
-          @if (cap != null && inst.confirmedCount >= cap) {
-            <p-message severity="warn" [closable]="false">
-              This session is full. You can join the waitlist if enabled.
-            </p-message>
-          }
           <p-button
             [label]="t.approvalRequired ? 'Request to join' : 'Book'"
             icon="pi pi-check"

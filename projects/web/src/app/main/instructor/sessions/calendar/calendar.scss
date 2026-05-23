@@ -116,3 +116,163 @@
     font-family: ui-monospace, SFMono-Regular, monospace;
   }
 }
+
+/* ─── Mobile (≤600px) Calendar rebuild — frames 2A/2B/2C ─────────────
+   The desktop selectors above are untouched. These classes only get
+   rendered by the mobile branch of calendar.html, so no @media gates
+   are needed here. */
+
+.mh-mob-cal__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0 4px;
+}
+.mh-mob-cal__month-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--p-primary-700);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  &:hover { background: var(--p-surface-100); }
+  i { font-size: 10px; }
+}
+.mh-mob-cal__top-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mh-mob-cal__today {
+  padding: 4px 10px;
+  background: var(--p-surface-100);
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--p-text-color);
+  cursor: pointer;
+  font-family: inherit;
+}
+.mh-mob-cal__view-seg {
+  display: inline-flex;
+  background: var(--p-surface-100);
+  padding: 2px;
+  border-radius: 6px;
+  gap: 1px;
+}
+.mh-mob-cal__view-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  font-family: inherit;
+  &.is-active {
+    background: var(--p-content-background);
+    color: var(--p-text-color);
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* Filter pills — same shape as the sessions list pills. */
+.mh-mob-cal__pills {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  padding: 8px 0 4px;
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+}
+.mh-mob-cal__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 999px;
+  color: var(--p-text-color);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  i { font-size: 10px; }
+  &.is-active {
+    background: var(--p-text-color);
+    color: var(--p-content-background);
+    border-color: var(--p-text-color);
+  }
+}
+.mh-mob-cal__pill--conflicts.is-active {
+  background: var(--p-red-500, #F97066);
+  color: #fff;
+  border-color: var(--p-red-500, #F97066);
+}
+
+.mh-mob-cal__skel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mh-mob-cal__day {
+  margin-top: 8px;
+  /* Day mode keeps the existing calendar-grid as-is; the grid itself
+     handles horizontal-scroll inside on narrow widths. */
+}
+
+.mh-mob-cal__agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding-bottom: 96px; /* room for the FAB */
+}
+.mh-mob-cal__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  i { font-size: 8px; }
+}
+.mh-mob-cal__chip--honey { background: var(--p-primary-50, #FEEFD2); color: var(--p-primary-700, #965509); }
+.mh-mob-cal__chip--teal  { background: #CCFBF1; color: #0D9488; }
+.mh-mob-cal__chip--blue  { background: #DBEAFE; color: #1D4ED8; }
+.mh-mob-cal__chip--coral { background: #FFE4DC; color: #B91C1C; }
+.mh-mob-cal__meta-text { font-size: 10px; color: var(--p-text-muted-color); }
+
+.mh-mob-cal__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 48px 0;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--p-text-muted-color);
+  i {
+    font-size: 32px;
+    color: var(--p-primary-500);
+    opacity: 0.6;
+  }
+  p { margin: 0; font-size: 13px; }
+}

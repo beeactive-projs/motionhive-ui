@@ -2,12 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -34,8 +37,10 @@ interface TabSpec {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     ButtonModule,
+    InputTextModule,
     MessageModule,
     SkeletonModule,
     TagModule,
@@ -65,6 +70,51 @@ export class SessionsMy implements OnInit {
     { key: MyTab.Past, label: 'Past', countKey: 'past' },
     { key: MyTab.Cancelled, label: 'Cancelled', countKey: 'cancelled' },
   ];
+
+  // ─── Filters (client-side, no extra requests) ─────────────────────
+  //
+  // The BE's MySessionsQueryDto only takes `tab` + pagination. To
+  // mirror the instructor-side filter UX (search + quick pill row) we
+  // filter the already-loaded participants locally. Avoids the extra
+  // round-trips the user explicitly asked us to skip; trade-off is
+  // that a filter only operates on the current page slice — that's
+  // fine because client-side My Sessions volumes are tiny.
+  protected readonly searchInput = signal<string>('');
+  protected readonly locationKindFilter = signal<'ONLINE' | 'IN_PERSON' | null>(null);
+
+  protected readonly filteredItems = computed(() => {
+    const all = this.store.items();
+    const q = this.searchInput().trim().toLowerCase();
+    const loc = this.locationKindFilter();
+    if (!q && !loc) return all;
+    return all.filter((p) => {
+      if (loc) {
+        const isOnline = this.isOnline(p);
+        if (loc === 'ONLINE' && !isOnline) return false;
+        if (loc === 'IN_PERSON' && isOnline) return false;
+      }
+      if (q) {
+        const title = this.sessionTitle(p).toLowerCase();
+        if (!title.includes(q)) return false;
+      }
+      return true;
+    });
+  });
+
+  protected onSearchInput(value: string): void {
+    this.searchInput.set(value);
+  }
+
+  protected toggleLocation(kind: 'ONLINE' | 'IN_PERSON'): void {
+    this.locationKindFilter.set(
+      this.locationKindFilter() === kind ? null : kind,
+    );
+  }
+
+  protected clearFilters(): void {
+    this.searchInput.set('');
+    this.locationKindFilter.set(null);
+  }
 
   ngOnInit(): void {
     this.store.load();

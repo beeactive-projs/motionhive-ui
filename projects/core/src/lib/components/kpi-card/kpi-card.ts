@@ -39,6 +39,10 @@ import {
     </article>
   `,
   styles: `
+    :host {
+      display: block;
+      height: 100%;
+    }
     .mh-kpi {
       display: flex;
       align-items: flex-start;
@@ -48,6 +52,12 @@ import {
       border: 1px solid var(--p-content-border-color);
       border-radius: 12px;
       min-width: 0;
+      /* Uniform baseline height so the row reads as a strip even when
+         one card has a 2-line sub-copy and another has one. The
+         label/value/sub stack distributes via flex column + gap. */
+      min-height: 92px;
+      height: 100%;
+      box-sizing: border-box;
     }
     .mh-kpi--warn {
       border-color: #ff6f61;
@@ -69,6 +79,8 @@ import {
       display: flex;
       flex-direction: column;
       min-width: 0;
+      flex: 1;
+      gap: 2px;
     }
     .mh-kpi__label {
       font-size: 12px;
@@ -76,17 +88,26 @@ import {
       letter-spacing: 0.02em;
       text-transform: uppercase;
       color: var(--p-text-muted-color);
+      /* Truncate so longer labels stay on one line; wrapping into two
+         pushes the value down and breaks row alignment. */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .mh-kpi__value {
       font-size: 22px;
       font-weight: 700;
       color: var(--p-text-color);
-      margin-top: 2px;
+      line-height: 1.15;
     }
     .mh-kpi__sub {
       font-size: 12px;
       color: var(--p-text-muted-color);
-      margin-top: 2px;
+      /* Same 1-line clamp on sub copy. The needs-attention sub-text
+         would otherwise wrap and stretch the card taller. */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   `,
 })

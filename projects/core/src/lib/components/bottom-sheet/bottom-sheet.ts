@@ -210,7 +210,10 @@ import { DOCUMENT } from '@angular/common';
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 14px 16px;
+      /* Extra bottom padding so the last field doesn't sit flush
+         behind the sticky foot; the user scrolls to the end and
+         still sees ~16px of breathing room. */
+      padding: 14px 16px 24px;
       min-height: 0;
     }
 
@@ -218,9 +221,19 @@ import { DOCUMENT } from '@angular/common';
       display: flex;
       gap: 8px;
       padding: 12px 16px;
+      /* Pad bottom for the iOS home indicator + URL bar — keyboard
+         pushes the visual viewport up and the foot can otherwise
+         disappear behind the address bar. */
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
       border-top: 1px solid var(--p-content-border-color);
       background: var(--p-content-background);
       flex-shrink: 0;
+      /* Subtle drop-shadow upward so the foot reads as separate from
+         the scrolling body even when content butts right up to it. */
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+      position: sticky;
+      bottom: 0;
+      z-index: 1;
     }
     /* Auto-hide foot when nothing is projected. Saves callers from
        having to pass [hasFoot]="false" — the slot is its own source

@@ -99,3 +99,24 @@
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
+
+/* ─── Mobile datepicker (touchUI) overrides ──────────────────────────
+   PrimeNG's touchUI variant defaults to a 90vw picker with no maximum
+   cap. On phones we want the picker to feel like a clean modal: capped
+   width, centered, with a dimmed backdrop. Without these, the picker
+   stretches edge-to-edge with no breathing room, and the bottom sheet
+   underneath bleeds through (no backdrop). */
+@media (max-width: 600px) {
+  /* Darken the touch-UI backdrop so the create-sheet underneath
+     doesn't visually compete with the picker. PrimeNG's default
+     panel width (~360px) already fits a 390px viewport with 15px
+     gutters; the previous override was clipping the right column. */
+  body .p-datepicker-mask.p-overlay-mask {
+    background: rgba(20, 18, 12, 0.6) !important;
+  }
+  body p-motion {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  }
+}

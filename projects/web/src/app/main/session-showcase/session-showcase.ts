@@ -109,8 +109,42 @@ export class SessionShowcase implements OnInit {
     if (!inst) return false;
     if (inst.status !== 'SCHEDULED') return false;
     if (this.myBooking()) return false; // already booked
+    if (this.isFull()) return false; // capacity reached; user gets waitlist CTA instead
+    if (this.isPast()) return false; // session start is in the past — read-only
     return true;
   });
+
+  /**
+   * Past = the instance's start time has already passed. Booking a
+   * session that already happened isn't meaningful — the user can
+   * still view the detail (re-book a similar slot, etc.), but the
+   * primary CTA is suppressed in favor of a read-only chip.
+   */
+  protected readonly isPast = computed(() => {
+    const inst = this.publicInst();
+    if (!inst) return false;
+    return new Date(inst.startAt).getTime() < Date.now();
+  });
+
+  /**
+   * Capacity-full: the template has a hard cap AND confirmed signups
+   * are at-or-over it. Drives the design's 5C coral banner + Join
+   * waitlist sticky CTA path. Unlimited-capacity sessions (capacity
+   * null/0) are never "full" — they always show the regular Book CTA.
+   */
+  protected readonly isFull = computed(() => {
+    const inst = this.publicInst();
+    const t = this.tpl();
+    if (!inst || !t) return false;
+    const cap = inst.capacityOverride ?? t.capacity;
+    if (!cap || cap <= 0) return false;
+    return inst.confirmedCount >= cap;
+  });
+
+  /** Waitlist toggle from the template — gates the secondary CTA. */
+  protected readonly waitlistEnabled = computed(
+    () => this.tpl()?.waitlistEnabled === true,
+  );
 
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');

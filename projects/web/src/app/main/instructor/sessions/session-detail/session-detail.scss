@@ -251,3 +251,201 @@
 .mh-sd--cancelled .mh-sd__where {
   opacity: 0.7;
 }
+
+/* ─── Mobile (≤600px) rebuild — frames 3A/3B/3C ─────────────────────
+   Same component, three visual variants driven by heroTone():
+   honey/teal/muted/coral. The desktop CSS above is untouched. */
+
+.mh-mob-sd__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mh-mob-sd {
+  display: flex;
+  flex-direction: column;
+  margin: -16px -12px 0; /* bleed to the page padding */
+}
+
+/* 96px tinted hero. The chips bottom-left sit on the gradient. */
+.mh-mob-sd__hero {
+  position: relative;
+  height: 96px;
+  flex-shrink: 0;
+  padding: 12px;
+  display: flex;
+  align-items: flex-end;
+}
+.mh-mob-sd__hero--honey {
+  background: linear-gradient(135deg, #FEEFD2, #F9C06B);
+}
+.mh-mob-sd__hero--teal {
+  background: linear-gradient(135deg, #CCFBF1, #14B8A6);
+}
+.mh-mob-sd__hero--muted {
+  background: linear-gradient(135deg, var(--p-surface-200), var(--p-surface-400, #B0A998));
+}
+.mh-mob-sd__hero--coral {
+  background: linear-gradient(135deg, #FFE4DC, #F97066);
+}
+
+.mh-mob-sd__hero-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mh-mob-sd__chip-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--p-text-color);
+  i { font-size: 10px; }
+}
+.mh-mob-sd__chip-status--cancelled { color: var(--p-red-700); }
+.mh-mob-sd__chip-status--completed { color: var(--p-text-muted-color); }
+
+/* Body lives below the hero strip, full width. Leaves 100px breathing
+   room below for the sticky-cta bar so the last paragraph isn't
+   covered by it. */
+.mh-mob-sd__body {
+  padding: 14px 14px 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mh-mob-sd__banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin: 8px 0 14px;
+  font-size: 12px;
+  line-height: 1.4;
+  i { font-size: 18px; flex-shrink: 0; }
+  strong { font-weight: 700; }
+  em { font-style: italic; }
+}
+.mh-mob-sd__banner--cancelled {
+  background: color-mix(in srgb, var(--p-red-500) 8%, transparent);
+  color: var(--p-red-800);
+  border: 1px solid color-mix(in srgb, var(--p-red-500) 25%, transparent);
+  i { color: var(--p-red-600); }
+}
+.mh-mob-sd__banner--ended {
+  background: color-mix(in srgb, var(--p-text-muted-color) 8%, transparent);
+  color: var(--p-text-color);
+  border: 1px solid var(--p-content-border-color);
+  i { color: var(--p-text-muted-color); }
+}
+
+/* 3-row meta card with thin dividers. Tap targets stay 44px tall. */
+.mh-mob-sd__meta-card {
+  margin: 8px 0 14px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+}
+.mh-mob-sd__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--p-content-border-color);
+  &:last-child { border-bottom: none; }
+  > i {
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+    color: var(--p-text-muted-color);
+    font-size: 14px;
+  }
+}
+.mh-mob-sd__icon--teal { color: var(--p-teal-500, #14B8A6) !important; }
+.mh-mob-sd__icon--honey { color: var(--p-primary-500) !important; }
+
+.mh-mob-sd__meta-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  strong {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+  span {
+    font-size: 10px;
+    color: var(--p-text-muted-color);
+  }
+}
+.mh-mob-sd__meta-text--url code {
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: transparent;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  color: var(--p-text-color);
+}
+
+/* Labels (uppercase small-caps under sections). */
+.mh-mob-sd__label {
+  margin: 14px 0 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--p-text-muted-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mh-mob-sd__participants-count {
+  background: var(--p-surface-100);
+  color: var(--p-text-muted-color);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.mh-mob-sd__spots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.mh-mob-sd__counters {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  strong {
+    font-size: 13px;
+    color: var(--p-text-color);
+    margin-right: 2px;
+  }
+}
+.mh-mob-sd__pending strong { color: var(--p-yellow-700); }
+
+.mh-mob-sd__desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--p-text-color);
+}
+
+/* Mute the body when cancelled — keeps the banner as the focal point. */
+.mh-mob-sd--cancelled .mh-mob-sd__meta-card,
+.mh-mob-sd--cancelled .mh-mob-sd__spots,
+.mh-mob-sd--cancelled .mh-mob-sd__desc { opacity: 0.7; }
+
+/* Action sheet rows are now rendered by <mh-action-list> from core. */

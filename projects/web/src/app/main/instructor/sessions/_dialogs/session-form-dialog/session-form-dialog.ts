@@ -21,6 +21,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
 import {
+  BottomSheet,
   CreateTemplateRequest,
   CreateTemplateResponse,
   RecurrenceRule,
@@ -35,6 +36,7 @@ import {
   VenueService,
   GroupService,
   Group,
+  injectIsMobile,
   showApiError,
 } from 'core';
 import { Observable } from 'rxjs';
@@ -140,6 +142,7 @@ function blankForm(): SessionForm {
     DatePickerModule,
     CheckboxModule,
     RecurrenceBuilder,
+    BottomSheet,
   ],
   templateUrl: './session-form-dialog.html',
   styleUrl: './session-form-dialog.scss',
@@ -150,6 +153,13 @@ export class SessionFormDialog {
   private readonly _venueSvc = inject(VenueService);
   private readonly _groupSvc = inject(GroupService);
   private readonly _msg = inject(MessageService);
+
+  /**
+   * Mobile breakpoint — drives the template branch: `<p-dialog>`
+   * (desktop) vs `<mh-bottom-sheet size="large">` (mobile). The form
+   * body is the same in both — only the chrome changes.
+   */
+  readonly isMobile = injectIsMobile();
 
   readonly visible = model(false);
   /** Null = create mode. */
@@ -327,7 +337,8 @@ export class SessionFormDialog {
     }
 
     const existing = this.template();
-    const payload: CreateTemplateRequest = {
+    // Fields shared between create + update — same shape, same names.
+    const common = {
       title: f.title.trim(),
       description: f.description.trim() || undefined,
       type: f.type,
@@ -344,19 +355,31 @@ export class SessionFormDialog {
       cancellationCutoffHours: f.cancellationCutoffHours,
       priceAmountCents: f.priceAmountCents,
       priceCurrency: f.priceCurrency,
-      isRecurring: f.isRecurring,
       recurrenceRule: f.isRecurring ? f.recurrenceRule : undefined,
-      firstStartAt: f.firstStartAt.toISOString(),
-      // BE only generates initial occurrences when this is explicit on
-      // recurring templates (non-recurring auto-generates a single
-      // occurrence by default).
-      ...(f.isRecurring && !existing ? { generateInitialInstances: true } : {}),
     };
 
     this.saving.set(true);
-    const req$: Observable<SessionTemplate | CreateTemplateResponse> = existing
-      ? this._svc.updateTemplate(existing.id, payload)
-      : this._svc.createTemplate(payload);
+    let req$: Observable<SessionTemplate | CreateTemplateResponse>;
+    if (existing) {
+      // Update path — UpdateTemplateDto on the BE is whitelist+strict,
+      // so we must NOT send `isRecurring`, `firstStartAt`, or
+      // `generateInitialInstances`. Recurrence flag is fixed once the
+      // template exists; users go through cancel+recreate to change it.
+      req$ = this._svc.updateTemplate(existing.id, common);
+    } else {
+      // Create path — full create-shape with the recurrence flag and
+      // first-start anchor.
+      const createPayload: CreateTemplateRequest = {
+        ...common,
+        isRecurring: f.isRecurring,
+        firstStartAt: f.firstStartAt.toISOString(),
+        // BE only generates initial occurrences when this is explicit
+        // on recurring templates (non-recurring auto-generates a
+        // single occurrence by default).
+        ...(f.isRecurring ? { generateInitialInstances: true } : {}),
+      };
+      req$ = this._svc.createTemplate(createPayload);
+    }
 
     req$.subscribe({
       next: (res) => {

@@ -97,6 +97,11 @@
     background: var(--p-primary-50);
     box-shadow: 0 0 0 1px var(--p-primary-500);
     > i:first-child { color: var(--p-primary-700); }
+    /* Active card uses a cream background regardless of theme — force
+       text to the primary-tinted dark colors so dark-mode white text
+       doesnt disappear on cream. */
+    .mh-sf__access-text strong { color: var(--p-primary-800, #6B3E07); }
+    .mh-sf__access-text small { color: var(--p-primary-700); }
   }
 }
 .mh-sf__access-text {

@@ -92,13 +92,26 @@ type CrumbInput = string | BreadcrumbItem;
       justify-content: space-between;
       align-items: flex-end;
       gap: 16px;
-      flex-wrap: wrap;
+      /* No wrap: the actions slot (⋮, primary CTAs) MUST stay on the
+         same row as the title so a long title can't push it onto a
+         second line and break the appbar shape. Title-block flexes
+         and the title ellipsizes instead. */
+      flex-wrap: nowrap;
     }
-    .mh-page-shell__title-block { display: flex; flex-direction: column; gap: 4px; }
+    .mh-page-shell__title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      /* Let the block shrink below its content's intrinsic width so
+         the title can ellipsize instead of forcing a wrap. */
+      min-width: 0;
+      flex: 1 1 auto;
+    }
     .mh-page-shell__title-row {
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
     }
     .mh-page-shell__back {
       width: 32px;
@@ -144,12 +157,24 @@ type CrumbInput = string | BreadcrumbItem;
       font-size: 24px;
       font-weight: 700;
       color: var(--p-text-color);
+      /* Single-line ellipsis. Long session titles like
+         "Flow walk recurring 1778968673968" used to wrap and push the
+         ⋮ actions button below; now they truncate with "..." and the
+         action stays anchored top-right. Full title remains in the
+         breadcrumb + DOM (screen readers / hover tooltip). */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
     .mh-page-shell__actions {
       display: flex;
       gap: 8px;
       align-items: center;
-      flex-wrap: wrap;
+      /* Don't wrap; flex-shrink: 0 keeps the actions full-width on the
+         right while the title-block flexes. */
+      flex-wrap: nowrap;
+      flex-shrink: 0;
     }
     .mh-page-shell__body { display: contents; }
   `,

@@ -160,6 +160,8 @@ export * from './lib/utils/cloudinary.utils';
 export * from './lib/utils/group.utils';
 export * from './lib/utils/date.utils';
 export * from './lib/utils/html.utils';
+export * from './lib/utils/viewport.utils';
+export * from './lib/utils/session-format.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';
@@ -225,6 +227,9 @@ export * from './lib/components/time-row/time-row';
 export * from './lib/components/day-separator/day-separator';
 export * from './lib/components/sticky-cta/sticky-cta';
 export * from './lib/components/mobile-fab/mobile-fab';
+export * from './lib/components/action-list/action-list';
+export * from './lib/components/week-strip/week-strip';
+export * from './lib/components/time-row-skeleton/time-row-skeleton';
 export * from './lib/components/kpi-card/kpi-card';
 export * from './lib/components/section-label/section-label';
 export * from './lib/components/tri-state-toggle/tri-state-toggle';

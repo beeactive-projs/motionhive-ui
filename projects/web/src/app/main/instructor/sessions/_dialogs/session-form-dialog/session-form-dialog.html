@@ -1,12 +1,43 @@
-<p-dialog
-  [header]="isEdit() ? 'Edit session' : 'Create session'"
-  [(visible)]="visible"
-  [modal]="true"
-  [style]="{ width: '42rem', maxWidth: '95vw' }"
-  [contentStyle]="{ maxHeight: '70vh', overflow: 'auto' }"
-  [closable]="true"
-  styleClass="mh-sf"
->
+<!--
+  Two shells, one body. The form contents are identical between
+  desktop and mobile — only the surrounding chrome changes:
+    Desktop: <p-dialog> (centered modal, 42rem wide)
+    Mobile:  <mh-bottom-sheet size="large"> (90vh from-bottom sheet)
+  Both surface the same Cancel / Save buttons in a sticky footer.
+-->
+
+@if (!isMobile()) {
+  <p-dialog
+    [header]="isEdit() ? 'Edit session' : 'Create session'"
+    [(visible)]="visible"
+    [modal]="true"
+    [style]="{ width: '42rem', maxWidth: '95vw' }"
+    [contentStyle]="{ maxHeight: '70vh', overflow: 'auto' }"
+    [closable]="true"
+    styleClass="mh-sf"
+  >
+    <ng-container *ngTemplateOutlet="formBody" />
+    <ng-template pTemplate="footer">
+      <ng-container *ngTemplateOutlet="formFoot" />
+    </ng-template>
+  </p-dialog>
+} @else {
+  <mh-bottom-sheet
+    [open]="visible()"
+    (openChange)="visible.set($event)"
+    size="large"
+    [title]="isEdit() ? 'Edit session' : 'New session'"
+    [subtitle]="form().isRecurring ? 'Repeats weekly' : 'One-off'"
+  >
+    <ng-container *ngTemplateOutlet="formBody" />
+    <ng-container foot>
+      <ng-container *ngTemplateOutlet="formFoot" />
+    </ng-container>
+  </mh-bottom-sheet>
+}
+
+<!-- ─── Form body (shared) ──────────────────────────────────────── -->
+<ng-template #formBody>
   <div class="mh-sf__body">
     <!-- Basics -->
     <section class="mh-sf__section">
@@ -181,6 +212,7 @@
             hourFormat="24"
             dateFormat="dd M yy"
             appendTo="body"
+            [touchUI]="isMobile()"
             fluid
             placeholder="Pick date & time"
           />
@@ -322,19 +354,21 @@
       </div>
     </section>
   </div>
+</ng-template>
 
-  <ng-template pTemplate="footer">
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      (onClick)="close()"
-    />
-    <p-button
-      [label]="isEdit() ? 'Save changes' : 'Create session'"
-      [loading]="saving()"
-      icon="pi pi-check"
-      (onClick)="save()"
-    />
-  </ng-template>
-</p-dialog>
+<!-- ─── Footer buttons (shared) ─────────────────────────────────── -->
+<ng-template #formFoot>
+  <p-button
+    label="Cancel"
+    severity="secondary"
+    [text]="true"
+    (onClick)="close()"
+  />
+  <p-button
+    [label]="isEdit() ? 'Save changes' : 'Create session'"
+    [loading]="saving()"
+    icon="pi pi-check"
+    (onClick)="save()"
+    styleClass="mh-sf__primary"
+  />
+</ng-template>

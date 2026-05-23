@@ -22,6 +22,8 @@ import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import {
+  ActionItem,
+  ActionList,
   AuthStore,
   BottomSheet,
   DaySeparator,
@@ -34,6 +36,13 @@ import {
   SessionLocationKind,
   SessionsInstructorStore,
   TimeRow,
+  TimeRowSkeleton,
+  dayTone,
+  formatSessionDuration,
+  formatSessionTime,
+  injectIsMobile,
+  sessionDayLabel,
+  sessionTone,
   type SessionInstance,
   type SessionTemplate,
   type TemplateTab,
@@ -69,10 +78,12 @@ const TABS: TabSpec[] = [
     SessionFormDialog,
     ToastModule,
     TooltipModule,
+    ActionList,
     BottomSheet,
     DaySeparator,
     MobileFab,
     TimeRow,
+    TimeRowSkeleton,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './sessions.html',
@@ -106,15 +117,7 @@ export class Sessions implements OnInit, OnDestroy {
   protected readonly editingTemplate = signal<SessionTemplate | null>(null);
 
   // ─── Mobile state ──────────────────────────────────────────────────
-  //
-  // `isMobile` mirrors a `matchMedia('(max-width: 600px)')` query so the
-  // template can branch on viewport. We listen once and update the
-  // signal — no per-frame layout reads.
-  protected readonly isMobile = signal<boolean>(
-    typeof window !== 'undefined'
-      ? window.matchMedia('(max-width: 600px)').matches
-      : false,
-  );
+  protected readonly isMobile = injectIsMobile();
   protected readonly filterSheetOpen = signal(false);
   /** When non-null, an action sheet shows for this template row. */
   protected readonly actionSheetTemplate = signal<SessionTemplate | null>(null);
@@ -126,6 +129,19 @@ export class Sessions implements OnInit, OnDestroy {
     if (f.type) n++;
     if (f.locationKind) n++;
     return n;
+  });
+
+  /**
+   * Header label for the Cancelled tab. The BE caps per-request at 100
+   * instances; when we hit the cap we want the user to understand the
+   * displayed list is a window, not the total ("100+" suffix). Reads
+   * the server-reported total via `cancelledTotal()`.
+   */
+  protected readonly cancelledLabel = computed(() => {
+    const total = this.store.cancelledTotal();
+    const items = this.store.cancelledInstances().length;
+    const isCap = items >= 100 && total >= 100;
+    return isCap ? '100+ cancelled (showing latest 100)' : `${total} cancelled`;
   });
 
   constructor() {
@@ -144,18 +160,6 @@ export class Sessions implements OnInit, OnDestroy {
       this._observer.observe(el);
     });
     this._destroyRef.onDestroy(() => this._observer?.disconnect());
-
-    // Mobile breakpoint listener. matchMedia.addEventListener is
-    // supported on all evergreen targets; the legacy addListener path
-    // is only needed for Safari < 14 which we don't ship to.
-    if (typeof window !== 'undefined') {
-      const mql = window.matchMedia('(max-width: 600px)');
-      const update = () => this.isMobile.set(mql.matches);
-      mql.addEventListener('change', update);
-      this._destroyRef.onDestroy(() =>
-        mql.removeEventListener('change', update),
-      );
-    }
   }
 
   ngOnInit(): void {
@@ -169,7 +173,36 @@ export class Sessions implements OnInit, OnDestroy {
     }
   }
 
-  // ─── Day-grouped cards: group templates by their next instance's date ──
+  // ─── Day-grouped cards ──────────────────────────────────────────
+  //
+  // Two grouping strategies, picked by tab:
+  //
+  // (1) Upcoming tab uses `upcomingInstancesByDay`: instances grouped
+  //     by their `startAt` day. Bypasses the BE templates pagination
+  //     (which sorts firstStartAt DESC and puts long-running fixtures
+  //     on top of what's actually happening this week).
+  //
+  // (2) Recurring / Past tabs use `groupedByDay`: templates grouped
+  //     by their next instance when available, else firstStartAt.
+  //     For these tabs the question is "show me my templates", not
+  //     "show me what's coming next chronologically".
+  protected readonly upcomingInstancesByDay = computed(() => {
+    const insts = this.store.upcomingInstances();
+    const groups = new Map<string, { date: Date; items: SessionInstance[] }>();
+    for (const inst of insts) {
+      const d = new Date(inst.startAt);
+      const dayKey = this._toISODateLocal(d);
+      if (!groups.has(dayKey)) {
+        const day = new Date(d);
+        day.setHours(0, 0, 0, 0);
+        groups.set(dayKey, { date: day, items: [] });
+      }
+      groups.get(dayKey)!.items.push(inst);
+    }
+    return Array.from(groups.values()).sort(
+      (a, b) => a.date.getTime() - b.date.getTime(),
+    );
+  });
 
   protected readonly groupedByDay = computed(() => {
     const templates = this.store.templates();
@@ -177,18 +210,12 @@ export class Sessions implements OnInit, OnDestroy {
 
     for (const t of templates) {
       const next = this.store.nextInstanceFor(t.id);
-      // Hide one-off templates from Upcoming when there's no scheduled
-      // next instance (it was cancelled, or already happened). The BE
-      // keeps the template ACTIVE — we filter on the FE so the tab
-      // matches the user's mental model ("Upcoming = something I can
-      // attend or run").
-      if (this.store.tab() === 'active' && !next && !t.isRecurring) {
-        continue;
-      }
       const ref = next ? new Date(next.startAt) : new Date(t.firstStartAt);
-      const dayKey = ref.toISOString().slice(0, 10);
+      const dayKey = this._toISODateLocal(ref);
       if (!groups.has(dayKey)) {
-        groups.set(dayKey, { date: ref, items: [] });
+        const day = new Date(ref);
+        day.setHours(0, 0, 0, 0);
+        groups.set(dayKey, { date: day, items: [] });
       }
       groups.get(dayKey)!.items.push(t);
     }
@@ -198,24 +225,23 @@ export class Sessions implements OnInit, OnDestroy {
     );
   });
 
-  protected sectionLabel(date: Date): string {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    const diffDays = Math.round((d.getTime() - today.getTime()) / 86_400_000);
-    if (diffDays === 0) {
-      return `Today · ${date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}`;
-    }
-    if (diffDays === 1) {
-      return `Tomorrow · ${date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}`;
-    }
-    return date.toLocaleDateString('en-GB', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-    });
+  /**
+   * Local-zone YYYY-MM-DD. Using `toISOString().slice(0,10)` shifts the
+   * date in non-UTC timezones (e.g. EAT +03:00, 00:30 local rolls back
+   * to "yesterday" via UTC). All grouping keys use local time so the
+   * "Today" label means the user's today.
+   */
+  private _toISODateLocal(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
+
+  // Thin shims so the template keeps calling `sectionLabel(...)` etc.
+  // The actual logic lives in core/utils/session-format.utils so the
+  // calendar agenda (and future surfaces) can share it.
+  protected readonly sectionLabel = sessionDayLabel;
 
   // ─── Project the template + its next instance into a card-friendly shape ──
 
@@ -304,6 +330,17 @@ export class Sessions implements OnInit, OnDestroy {
     void this._router.navigate(['/coaching/sessions', instanceId]);
   }
 
+  /**
+   * Tap-through on an Upcoming agenda row. The row represents a
+   * specific session occurrence (SessionInstance), so we navigate
+   * directly to the instance detail page. Recurring templates with
+   * no current instance fall back to the template-detail view —
+   * but in Upcoming we always have an instance per row.
+   */
+  protected onInstanceOpen(inst: SessionInstance): void {
+    void this._router.navigate(['/coaching/sessions', inst.id]);
+  }
+
   protected onCardOpen(templateId: string): void {
     // Navigate to the right detail page based on template kind:
     //   - recurring → template-detail (shows the series + all occurrences)
@@ -364,50 +401,13 @@ export class Sessions implements OnInit, OnDestroy {
     this.view.set('cards');
   }
 
-  // ─── Mobile rendering helpers ─────────────────────────────────────
-
-  /** "09:00" formatted in 24h local time from an ISO string. */
-  protected formatTime(iso: string): string {
-    const d = new Date(iso);
-    return d.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  }
-
-  /** "60min" duration label for the time-row chip. */
-  protected formatDuration(minutes: number): string {
-    return `${minutes}min`;
-  }
-
-  /**
-   * Tone for a TimeRow given a template + instance pair:
-   *   - conflict → coral
-   *   - cancelled instance → muted
-   *   - online → teal
-   *   - private 1-on-1 → navy
-   *   - everything else (group/open in-person) → honey
-   */
-  protected toneFor(
-    t: SessionTemplate,
-    inst: SessionInstance | null,
-  ): 'honey' | 'teal' | 'navy' | 'coral' | 'muted' {
-    if (inst?.conflictingInstanceIds?.length) return 'coral';
-    if (inst?.status === 'CANCELLED') return 'muted';
-    if (t.locationKind === 'ONLINE') return 'teal';
-    if (t.type === 'PRIVATE') return 'navy';
-    return 'honey';
-  }
-
-  /** Day-separator label/tone for the agenda grouping. */
-  protected dayTone(date: Date): 'today' | 'default' {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() === today.getTime() ? 'today' : 'default';
-  }
+  // Template-facing aliases for the pure helpers in core/utils. Keeps
+  // the HTML readable (`formatTime(iso)` instead of
+  // `formatSessionTime(iso)`) without duplicating the implementation.
+  protected readonly formatTime = formatSessionTime;
+  protected readonly formatDuration = formatSessionDuration;
+  protected readonly toneFor = sessionTone;
+  protected readonly dayTone = dayTone;
 
   /** Open the action sheet for a long-pressed (or ⋮-tapped) row. */
   protected openActions(t: SessionTemplate): void {
@@ -416,6 +416,42 @@ export class Sessions implements OnInit, OnDestroy {
 
   protected closeActions(): void {
     this.actionSheetTemplate.set(null);
+  }
+
+  /**
+   * Action-sheet rows for a session card (frame 1C). Static — every
+   * row has the same verbs in the same order. The `(select)` handler
+   * switches on `id` to dispatch the right effect against the
+   * template captured in `actionSheetTemplate`. Stubbed rows
+   * (duplicate, share) close the sheet but don't act yet — the BE
+   * surfaces aren't wired.
+   */
+  protected readonly rowActions: ActionItem[] = [
+    { id: 'open', icon: 'pi pi-external-link', label: 'Open session' },
+    { id: 'edit', icon: 'pi pi-pencil', label: 'Edit' },
+    { id: 'message', icon: 'pi pi-send', label: 'Message all signups' },
+    { id: 'duplicate', icon: 'pi pi-copy', label: 'Duplicate' },
+    { id: 'share', icon: 'pi pi-share-alt', label: 'Share public link' },
+    { id: 'cancel', icon: 'pi pi-times', label: 'Cancel session…', danger: true },
+  ];
+
+  protected onRowAction(item: ActionItem, t: SessionTemplate): void {
+    this.closeActions();
+    switch (item.id) {
+      case 'open':
+        this.onCardOpen(t.id);
+        break;
+      case 'edit':
+        this.editingTemplate.set(t);
+        this.formOpen.set(true);
+        break;
+      // The remaining verbs are visual-only for now — the surfaces
+      // they call into either don't exist yet (duplicate, share) or
+      // live on the detail page (message, cancel — both surfaced as
+      // ⋮-actions in session-detail's own sheet).
+      default:
+        break;
+    }
   }
 
   /** Reset all quick filters from inside the filter sheet. */
