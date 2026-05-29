@@ -1,25 +1,40 @@
-<article class="instructor-card">
-  <div class="instructor-card__top">
-    <mh-hex [tone]="resolvedTone()" size="lg">{{ initials() }}</mh-hex>
-    <div class="instructor-card__id">
-      <h3 class="instructor-card__name">{{ displayName() }}</h3>
-      <p class="instructor-card__role">{{ role() }}</p>
-      @if (tags().length > 0) {
-        <div class="instructor-card__tags">
-          @for (tag of tags(); track tag) {
-            <p-tag [value]="tag" severity="secondary" rounded styleClass="instructor-card__chip" />
-          }
-        </div>
+<p-card class="instructor-card h-full shadow-md">
+  <div class="flex flex-col gap-3 h-full">
+    <div class="flex items-start gap-3">
+      <mh-hex [tone]="resolvedTone()" size="lg">{{ initials() }}</mh-hex>
+      <div class="flex-1 min-w-0">
+        <h3 class="instructor-card__name m-0 text-sm font-semibold truncate">{{ displayName() }}</h3>
+        <p class="instructor-card__role m-0 mt-0.5 text-xs text-muted-color truncate">{{ role() }}</p>
+        @if (tags().length > 0) {
+          <div class="flex flex-wrap gap-1 mt-1.5">
+            @for (tag of tags(); track tag) {
+              <p-tag [value]="tag" severity="secondary" rounded class="instructor-card__chip" />
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="mt-auto">
+      @if (profileLink(); as link) {
+        <p-button
+          label="View profile"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          fluid
+          [routerLink]="link" />
+      } @else {
+        <p-button
+          label="View profile"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          fluid
+          [disabled]="true" />
       }
     </div>
   </div>
-  <p-button
-    label="Follow"
-    icon="pi pi-plus"
-    size="small"
-    severity="secondary"
-    [outlined]="true"
-    fluid
-    (onClick)="onFollow()"
-  />
-</article>
+</p-card>

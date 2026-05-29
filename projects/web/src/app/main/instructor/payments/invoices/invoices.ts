@@ -33,6 +33,7 @@ import { ToastModule } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
 import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
+import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 import { CreateInvoiceDialog } from '../../_dialogs/create-invoice-dialog/create-invoice-dialog';
 import { SendInvoiceEmailDialog } from '../../_dialogs/send-invoice-email-dialog/send-invoice-email-dialog';
 
@@ -54,6 +55,7 @@ import { SendInvoiceEmailDialog } from '../../_dialogs/send-invoice-email-dialog
     CreateInvoiceDialog,
     SendInvoiceEmailDialog,
     ListCard,
+    UserInfo,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './invoices.html',

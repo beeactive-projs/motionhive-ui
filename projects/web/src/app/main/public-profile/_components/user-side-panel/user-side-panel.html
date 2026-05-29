@@ -1,0 +1,60 @@
+<div class="flex flex-col gap-4">
+  <p-card class="shadow-md">
+    <ng-template #header>
+      <div class="px-4 pt-4">
+        <span class="text-sm font-medium text-muted-color uppercase tracking-wide">At a glance</span>
+      </div>
+    </ng-template>
+    <ul class="m-0 p-0 list-none flex flex-col gap-2 text-sm">
+      @if (locationLabel(); as loc) {
+      <li class="flex items-start gap-2">
+        <i class="pi pi-map-marker mt-0.5 text-muted-color"></i>
+        <span>{{ loc }}</span>
+      </li>
+      }
+      @if (profile().language; as lang) {
+      <li class="flex items-start gap-2">
+        <i class="pi pi-comments mt-0.5 text-muted-color"></i>
+        <span>{{ lang }}</span>
+      </li>
+      }
+      @if (profile().timezone; as tz) {
+      <li class="flex items-start gap-2">
+        <i class="pi pi-clock mt-0.5 text-muted-color"></i>
+        <span>{{ tz }}</span>
+      </li>
+      }
+      @if (profile().email; as email) {
+      <li class="flex items-start gap-2">
+        <i class="pi pi-envelope mt-0.5 text-muted-color"></i>
+        <span>{{ email }}</span>
+      </li>
+      }
+      @if (profile().phone; as phone) {
+      <li class="flex items-start gap-2">
+        <i class="pi pi-phone mt-0.5 text-muted-color"></i>
+        <span>{{ phone }}</span>
+      </li>
+      }
+      <li class="flex items-start gap-2">
+        <i class="pi pi-calendar mt-0.5 text-muted-color"></i>
+        <span>Joined {{ profile().memberSince | date: 'MMMM y' }}</span>
+      </li>
+    </ul>
+  </p-card>
+
+  <p-card class="shadow-md">
+    <ng-template #header>
+      <div class="px-4 pt-4">
+        <span class="text-sm font-medium text-muted-color uppercase tracking-wide">Liking this profile?</span>
+      </div>
+    </ng-template>
+    <div class="flex flex-col gap-2">
+      <p-button fluid label="Share profile" icon="pi pi-share-alt" severity="secondary" outlined
+        (onClick)="share.emit()" />
+      @if (!isOwner()) {
+      <p-button fluid label="Send a message" icon="pi pi-envelope" (onClick)="message.emit()" />
+      }
+    </div>
+  </p-card>
+</div>

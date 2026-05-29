@@ -36,10 +36,7 @@
           </a>
         </td>
         <td>
-          <span class="font-medium truncate">{{ clientDisplay(invoice) }}</span>
-          @if (invoice.client?.email) {
-          <p class="text-xs text-muted-color mt-0.5 mb-0">{{ invoice.client.email }}</p>
-          }
+          <mh-user-info [user]="invoice.client" [showEmail]="true" />
         </td>
         <td class="text-end tabular-nums">{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
         <td class="text-center">

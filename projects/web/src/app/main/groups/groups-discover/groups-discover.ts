@@ -11,42 +11,36 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, take } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { InputTextModule } from 'primeng/inputtext';
+import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
-import { SkeletonModule } from 'primeng/skeleton';
-import { TagModule } from 'primeng/tag';
-import { ToastModule } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
+import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import {
   DiscoverGroup,
+  Group,
   GroupService,
   GroupsRefreshService,
   JoinPolicies,
-  joinPolicyLabel,
-  joinPolicySeverity,
   showApiError,
 } from 'core';
+import { GroupCard } from '../group-card/group-card';
+import { GroupCardSkeleton } from '../group-card-skeleton/group-card-skeleton';
+import { GroupsEmptyState } from '../groups-empty-state/groups-empty-state';
 
 @Component({
   selector: 'mh-groups-discover',
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
-    CardModule,
-    InputTextModule,
+    InputText,
     IconField,
     InputIcon,
-    SkeletonModule,
-    TagModule,
-    ToastModule,
-    TooltipModule,
+    Toast,
+    GroupCard,
+    GroupCardSkeleton,
+    GroupsEmptyState,
   ],
   providers: [MessageService],
   templateUrl: './groups-discover.html',
@@ -56,13 +50,10 @@ import {
 export class GroupsDiscover implements OnInit {
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
-  private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
 
   readonly JoinPolicies = JoinPolicies;
-  readonly joinPolicyLabel = joinPolicyLabel;
-  readonly joinPolicySeverity = joinPolicySeverity;
 
   readonly searchControl = new FormControl<string>('', { nonNullable: true });
 
@@ -74,7 +65,6 @@ export class GroupsDiscover implements OnInit {
   readonly pageSize = 20;
   readonly hasMore = computed(() => this.results().length < this.total());
 
-  /** Track per-group action busy state so the button can show a spinner. */
   readonly busyGroupIds = signal<Set<string>>(new Set());
 
   private readonly _scrollSentinel =
@@ -156,18 +146,23 @@ export class GroupsDiscover implements OnInit {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(
-            this._messageService,
-            'Could not load more groups',
-            '',
-            err,
-          );
+          showApiError(this._messageService, 'Could not load more groups', '', err);
         },
       });
   }
 
   isBusy(groupId: string): boolean {
     return this.busyGroupIds().has(groupId);
+  }
+
+  onDiscoverAction(event: { kind: 'join' | 'cancel'; group: Group }): void {
+    const g = this.results().find((r) => r.id === event.group.id);
+    if (!g) return;
+    if (event.kind === 'join') {
+      this.join(g);
+    } else {
+      this.cancelRequest(g);
+    }
   }
 
   private setBusy(groupId: string, busy: boolean): void {
@@ -187,7 +182,6 @@ export class GroupsDiscover implements OnInit {
       next: (result) => {
         this.setBusy(group.id, false);
         if (result.status === 'JOINED') {
-          // Member groups don't belong in Discover — drop the card.
           this.results.update((list) => list.filter((g) => g.id !== group.id));
           this.total.update((n) => Math.max(0, n - 1));
           this._messageService.add({
@@ -197,7 +191,6 @@ export class GroupsDiscover implements OnInit {
           });
           this._groupsRefreshService.notify();
         } else {
-          // PENDING — flip the card to "Request pending" without removing it.
           this.results.update((list) =>
             list.map((g) =>
               g.id === group.id ? { ...g, myJoinRequestStatus: 'PENDING' } : g,
@@ -240,17 +233,4 @@ export class GroupsDiscover implements OnInit {
       },
     });
   }
-
-  openGroup(group: DiscoverGroup): void {
-    this._router.navigate(['/groups/preview', group.id]);
-  }
-
-  descriptionExcerpt(description: string | null): string {
-    if (!description) return 'No description';
-    return description.length > 120
-      ? description.substring(0, 120) + '...'
-      : description;
-  }
-
-  trackById = (_: number, item: { id: string }) => item.id;
 }

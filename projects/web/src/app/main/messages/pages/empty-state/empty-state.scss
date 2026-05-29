@@ -1,0 +1,55 @@
+:host {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.mh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px;
+  text-align: center;
+}
+
+.mh-empty__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--honey-100, #fef3c7);
+  color: var(--honey-800, #92400e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mh-empty__title {
+  margin: 0;
+  font-family: var(--font-display, 'Poppins'), 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--navy-900, #0f172a);
+}
+
+.mh-empty__sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2, #475569);
+}
+
+// ── Dark mode ────────────────────────────────────────────────────
+:host-context(.dark) {
+  .mh-empty__icon {
+    background: rgba(245, 158, 11, 0.16);
+    color: #fbbf24;
+  }
+  .mh-empty__title {
+    color: var(--p-surface-50, #f1f5f9);
+  }
+  .mh-empty__sub {
+    color: var(--p-surface-300, #cbd5e1);
+  }
+}

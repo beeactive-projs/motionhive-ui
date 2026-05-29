@@ -1,26 +1,12 @@
 <span #bellAnchor class="inline-flex">
   @if (badgeValue(); as value) {
-    <p-overlaybadge [value]="value" severity="danger">
-      <p-button
-        text
-        rounded
-        pTooltip="Notifications"
-        tooltipPosition="bottom"
-        ariaLabel="Open notifications"
-        icon="pi pi-bell"
-        (onClick)="toggle($event)"
-      />
-    </p-overlaybadge>
+  <p-overlaybadge [value]="value" severity="danger" badgeSize="small">
+    <p-button outlined rounded pTooltip="Notifications" tooltipPosition="bottom" ariaLabel="Open notifications"
+      icon="pi pi-bell" (onClick)="toggle($event)" size="small" />
+  </p-overlaybadge>
   } @else {
-    <p-button
-      text
-      rounded
-      pTooltip="Notifications"
-      tooltipPosition="bottom"
-      ariaLabel="Open notifications"
-      icon="pi pi-bell"
-      (onClick)="toggle($event)"
-    />
+  <p-button outlined rounded pTooltip="Notifications" tooltipPosition="bottom" ariaLabel="Open notifications"
+    icon="pi pi-bell" (onClick)="toggle($event)" size="small" />
   }
 </span>
 
@@ -30,13 +16,7 @@
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-sm font-semibold m-0">Notifications</h3>
       @if (hasUnread()) {
-        <p-button
-          label="Mark all read"
-          text
-          size="small"
-          styleClass="text-xs p-1 h-auto"
-          (onClick)="markAllRead()"
-        />
+      <p-button label="Mark all read" text size="small" styleClass="text-xs p-1 h-auto" (onClick)="markAllRead()" />
       }
     </div>
 
@@ -44,85 +24,75 @@
 
     <!-- Loading skeleton (only while we haven't loaded once) -->
     @if (loading() && !hasLoadedList()) {
-      <div class="flex flex-col gap-3 py-2">
-        @for (_ of [1, 2, 3]; track $index) {
-          <div class="flex gap-3">
-            <p-skeleton shape="circle" size="2rem" />
-            <div class="flex flex-col gap-1 flex-1">
-              <p-skeleton width="80%" height="0.75rem" />
-              <p-skeleton width="60%" height="0.625rem" />
-            </div>
-          </div>
-        }
+    <div class="flex flex-col gap-3 py-2">
+      @for (_ of [1, 2, 3]; track $index) {
+      <div class="flex gap-3">
+        <p-skeleton shape="circle" size="2rem" />
+        <div class="flex flex-col gap-1 flex-1">
+          <p-skeleton width="80%" height="0.75rem" />
+          <p-skeleton width="60%" height="0.625rem" />
+        </div>
       </div>
+      }
+    </div>
     }
 
     <!-- Empty state -->
     @else if (notifications().length === 0) {
-      <div class="flex flex-col items-center justify-center py-8 px-4 text-center">
-        <i class="pi pi-bell-slash text-3xl text-surface-400 mb-2"></i>
-        <p class="text-sm text-muted-color m-0">You're all caught up</p>
-        <p class="text-xs text-muted-color mt-1 m-0">
-          New notifications will show up here.
-        </p>
-      </div>
+    <div class="flex flex-col items-center justify-center py-8 px-4 text-center">
+      <i class="pi pi-bell-slash text-3xl text-surface-400 mb-2"></i>
+      <p class="text-sm text-muted-color m-0">You're all caught up</p>
+      <p class="text-xs text-muted-color mt-1 m-0">
+        New notifications will show up here.
+      </p>
+    </div>
     }
 
     <!-- List -->
     @else {
-      <ul #scrollContainer class="flex flex-col list-none p-0 m-0 max-h-[60vh] overflow-y-auto">
-        @for (item of notifications(); track item.id) {
-          <li
-            class="group flex items-start gap-3 px-2 py-2.5 rounded-lg cursor-pointer
+    <ul #scrollContainer class="flex flex-col list-none p-0 m-0 max-h-[60vh] overflow-y-auto">
+      @for (item of notifications(); track item.id) {
+      <li class="group flex items-start gap-3 px-2 py-2.5 rounded-lg cursor-pointer
                    transition-colors hover:bg-surface-100 dark:hover:bg-surface-800"
-            [class.bg-surface-50]="!item.readAt && !item.dismissedAt"
-            [class.dark:bg-surface-900]="!item.readAt && !item.dismissedAt"
-            (click)="onItemClick(item)"
-          >
-            <i [class]="iconForSeverity(item.severity) + ' text-lg mt-0.5 shrink-0'"></i>
+        [class.bg-surface-50]="!item.readAt && !item.dismissedAt"
+        [class.dark:bg-surface-900]="!item.readAt && !item.dismissedAt" (click)="onItemClick(item)">
+        <i [class]="iconForSeverity(item.severity) + ' text-lg mt-0.5 shrink-0'"></i>
 
-            <div class="flex flex-col flex-1 min-w-0">
-              <div class="flex items-start justify-between gap-2">
-                <span
-                  class="text-sm leading-tight truncate"
-                  [class.font-semibold]="!item.readAt && !item.dismissedAt"
-                >
-                  {{ item.title }}
-                </span>
-                <button
-                  type="button"
-                  class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0
+        <div class="flex flex-col flex-1 min-w-0">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-sm leading-tight truncate" [class.font-semibold]="!item.readAt && !item.dismissedAt">
+              {{ item.title }}
+            </span>
+            <button type="button" class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0
                          text-muted-color hover:text-surface-700 dark:hover:text-surface-200"
-                  aria-label="Dismiss notification"
-                  (click)="dismiss(item, $event)"
-                >
-                  <i class="pi pi-times text-xs"></i>
-                </button>
-              </div>
-              <span class="text-xs text-muted-color line-clamp-2 mt-0.5">{{ item.body }}</span>
-              <span class="text-[0.6875rem] text-surface-400 mt-1">{{ timeAgo(item.createdAt) }}</span>
-            </div>
-          </li>
-        }
+              aria-label="Dismiss notification" (click)="dismiss(item, $event)">
+              <i class="pi pi-times text-xs"></i>
+            </button>
+          </div>
+          <span class="text-xs text-muted-color line-clamp-2 mt-0.5">{{ item.body }}</span>
+          <span class="text-[0.6875rem] text-surface-400 mt-1">{{ timeAgo(item.createdAt) }}</span>
+        </div>
+      </li>
+      }
 
-        @if (loadingMore()) {
-          <li class="flex gap-3 px-2 py-2.5">
-            <p-skeleton shape="circle" size="2rem" />
-            <div class="flex flex-col gap-1 flex-1">
-              <p-skeleton width="80%" height="0.75rem" />
-              <p-skeleton width="60%" height="0.625rem" />
-            </div>
-          </li>
-        }
+      @if (loadingMore()) {
+      <li class="flex gap-3 px-2 py-2.5">
+        <p-skeleton shape="circle" size="2rem" />
+        <div class="flex flex-col gap-1 flex-1">
+          <p-skeleton width="80%" height="0.75rem" />
+          <p-skeleton width="60%" height="0.625rem" />
+        </div>
+      </li>
+      }
 
-        <li #scrollSentinel class="h-px"></li>
+      <li #scrollSentinel class="h-px"></li>
 
-        @if (!hasMore()) {
-          <li class="text-center text-xs text-surface-400 py-2">
-            You're all caught up.
-          </li>
-        }
-      </ul>
+      @if (!hasMore()) {
+      <li class="text-center text-xs text-surface-400 py-2">
+        You're all caught up.
+      </li>
+      }
+    </ul>
     }
   </div>
 </p-popover>

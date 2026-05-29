@@ -1,0 +1,40 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [style]="{ width: '32rem' }"
+  header="Send a request">
+  <div class="flex flex-col gap-3">
+    <p class="m-0 text-sm">
+      Tell {{ instructorName() }} a bit about you and what you're looking for.
+      A short note helps them respond faster — but it's optional.
+    </p>
+    <label for="request-message" class="text-sm font-medium">Message</label>
+    <textarea
+      pTextarea
+      id="request-message"
+      rows="5"
+      fluid
+      [ngModel]="message()"
+      (ngModelChange)="message.set($event)"
+      placeholder="Hi! I'd love to train with you."
+      [disabled]="submitting()"></textarea>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex gap-2 justify-end">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        outlined
+        [disabled]="submitting()"
+        (onClick)="cancel()" />
+      <p-button
+        label="Send request"
+        icon="pi pi-send"
+        [loading]="submitting()"
+        (onClick)="send()" />
+    </div>
+  </ng-template>
+</p-dialog>

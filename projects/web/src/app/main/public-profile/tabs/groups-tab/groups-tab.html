@@ -1,0 +1,65 @@
+<p-card class="shadow-md">
+  <ng-template #header>
+    <div class="flex items-start gap-3 px-4 pt-4">
+      <p-avatar icon="pi pi-users" shape="square" size="normal"
+        [style]="{ background: 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
+      <div class="flex flex-col self-center">
+        <h2 class="m-0 text-lg font-bold leading-tight">Communities I run</h2>
+        <p class="m-0 mt-0.5 text-sm text-muted-color">Train with people on the same path</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (loading() && !groups()) {
+  <div class="flex flex-col gap-3">
+    <p-skeleton height="96px" />
+    <p-skeleton height="96px" />
+  </div>
+  } @else if (!groups() || groups()!.length === 0) {
+  <div class="text-center py-6 text-muted-color">
+    <i class="pi pi-users text-2xl mb-2 block"></i>
+    <p class="m-0 text-sm">No public groups yet.</p>
+  </div>
+  } @else {
+  <div class="flex flex-col gap-3">
+    @for (group of groups(); track group.id) {
+    <div class="group-row flex items-center gap-3 p-3 rounded-lg">
+      <mh-avatar [user]="groupAvatar(group)" size="xlarge" shape="square" styleClass="shrink-0" />
+
+      <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+        <div class="flex items-center flex-wrap gap-2">
+          <h3 class="m-0 text-base font-semibold truncate">{{ group.name }}</h3>
+          <p-tag [value]="policyLabel(group.joinPolicy)" [severity]="policySeverity(group.joinPolicy)" rounded
+            class="py-0.5 text-xs" />
+        </div>
+        @if (group.description) {
+        <p class="m-0 text-sm text-muted-color line-clamp-2">{{ group.description }}</p>
+        }
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-0.5 text-xs text-muted-color">
+          <span class="inline-flex items-center gap-1.5">
+            <i class="pi pi-users text-xs"></i>{{ group.memberCount }} {{ group.memberCount === 1 ? 'member' : 'members'
+            }}
+          </span>
+          @if (group.city) {
+          <span class="inline-flex items-center gap-1.5">
+            <i class="pi pi-map-marker text-xs"></i>{{ group.city }}
+          </span>
+          }
+          @for (tag of extraTags(group); track tag) {
+          <span class="inline-flex items-center gap-1.5">
+            <i class="pi pi-tag text-xs"></i>{{ tag }}
+          </span>
+          }
+        </div>
+      </div>
+
+      <div class="flex items-center shrink-0">
+        <p-button label="Join" [icon]="isGuest() ? 'pi pi-lock' : 'pi pi-arrow-right'" iconPos="left" [outlined]="true"
+          rounded size="small" severity="contrast" [attr.aria-label]="'Join ' + group.name"
+          (onClick)="onJoin(group.id)" />
+      </div>
+    </div>
+    }
+  </div>
+  }
+</p-card>

@@ -28,7 +28,7 @@ import {
   type EarningsSummary,
   type Invoice,
   type InvoiceStatus,
-  type ClientUser,
+  User,
 } from 'core';
 
 interface RecentActivity {
@@ -178,68 +178,7 @@ export class Dashboard {
     },
   };
 
-  readonly clients = signal<InstructorClient[]>([
-    {
-      id: '1',
-      instructorId: 'inst-1',
-      clientId: 'u1',
-      status: InstructorClientStatuses.Active,
-      initiatedBy: 'INSTRUCTOR',
-      notes: null,
-      startedAt: '2025-01-10T10:00:00.000Z',
-      createdAt: '2025-01-10T10:00:00.000Z',
-      updatedAt: '2025-01-10T10:00:00.000Z',
-      invitedEmail: null,
-      requestType: 'INSTRUCTOR_TO_CLIENT',
-      expiresAt: null,
-      client: { id: 'u1', firstName: 'Ana', lastName: 'Ionescu', email: 'ana@example.com' },
-    },
-    {
-      id: '2',
-      instructorId: 'inst-1',
-      clientId: 'u2',
-      status: InstructorClientStatuses.Active,
-      initiatedBy: 'INSTRUCTOR',
-      notes: null,
-      startedAt: '2025-02-15T10:00:00.000Z',
-      createdAt: '2025-02-15T10:00:00.000Z',
-      updatedAt: '2025-02-15T10:00:00.000Z',
-      invitedEmail: null,
-      requestType: 'INSTRUCTOR_TO_CLIENT',
-      expiresAt: null,
-      client: { id: 'u2', firstName: 'Mihai', lastName: 'Pop', email: 'mihai@example.com' },
-    },
-    {
-      id: '3',
-      instructorId: 'inst-1',
-      clientId: 'u3',
-      status: InstructorClientStatuses.Pending,
-      initiatedBy: 'INSTRUCTOR',
-      notes: null,
-      startedAt: null,
-      createdAt: '2026-04-20T10:00:00.000Z',
-      updatedAt: '2026-04-20T10:00:00.000Z',
-      invitedEmail: 'elena@example.com',
-      requestType: 'INSTRUCTOR_TO_CLIENT',
-      expiresAt: '2026-05-20T10:00:00.000Z',
-      client: { id: 'u3', firstName: 'Elena', lastName: 'Dumitrescu', email: 'elena@example.com' },
-    },
-    {
-      id: '4',
-      instructorId: 'inst-1',
-      clientId: 'u4',
-      status: InstructorClientStatuses.Active,
-      initiatedBy: 'CLIENT',
-      notes: 'Focused on marathon training',
-      startedAt: '2025-03-01T10:00:00.000Z',
-      createdAt: '2025-03-01T10:00:00.000Z',
-      updatedAt: '2025-03-01T10:00:00.000Z',
-      invitedEmail: null,
-      requestType: 'CLIENT_TO_INSTRUCTOR',
-      expiresAt: null,
-      client: { id: 'u4', firstName: 'Andrei', lastName: 'Munteanu', email: 'andrei@example.com' },
-    },
-  ]);
+  readonly clients = signal<InstructorClient[]>([]);
 
   readonly activeClientCount = computed(
     () => this.clients().filter((c) => c.status === InstructorClientStatuses.Active).length,
@@ -502,7 +441,7 @@ export class Dashboard {
     }
   }
 
-  clientInitials(client: ClientUser): string {
+  clientInitials(client: User): string {
     return `${client.firstName.charAt(0)}${client.lastName.charAt(0)}`.toUpperCase();
   }
 

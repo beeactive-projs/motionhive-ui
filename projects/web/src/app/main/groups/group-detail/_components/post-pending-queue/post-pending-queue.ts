@@ -13,8 +13,18 @@ import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
-import { Post, PostService, showApiError } from 'core';
+import {
+  ModeratePostPayload,
+  Post,
+  PostApprovalStates,
+  PostService,
+  showApiError,
+} from 'core';
 import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+
+const PAGE_SIZE = 50;
+
+type ModerationDecision = ModeratePostPayload['decision'];
 
 @Component({
   selector: 'mh-post-pending-queue',
@@ -34,15 +44,32 @@ export class PostPendingQueue {
   readonly busyId = signal<string | null>(null);
 
   readonly count = computed(() => this.pending().length);
+  readonly isAnyBusy = computed(() => this.busyId() !== null);
 
-  private readonly _reload = effect(() => {
-    const id = this.groupId();
-    if (id) this.load();
-  });
+  protected readonly skeletonRows = [1, 2];
 
-  load(): void {
+  constructor() {
+    effect(() => {
+      const id = this.groupId();
+      if (id) this._load(id);
+    });
+  }
+
+  approve(post: Post): void {
+    this._decide(post, PostApprovalStates.Approved);
+  }
+
+  reject(post: Post): void {
+    this._decide(post, PostApprovalStates.Rejected);
+  }
+
+  isBusy(post: Post): boolean {
+    return this.busyId() === post.id;
+  }
+
+  private _load(groupId: string): void {
     this.loading.set(true);
-    this._postService.getPendingForGroup(this.groupId(), 1, 50).subscribe({
+    this._postService.getPendingForGroup(groupId, 1, PAGE_SIZE).subscribe({
       next: (res) => {
         this.pending.set(res.items);
         this.loading.set(false);
@@ -59,16 +86,8 @@ export class PostPendingQueue {
     });
   }
 
-  approve(post: Post): void {
-    this._decide(post, 'APPROVED');
-  }
-
-  reject(post: Post): void {
-    this._decide(post, 'REJECTED');
-  }
-
-  private _decide(post: Post, decision: 'APPROVED' | 'REJECTED'): void {
-    if (this.busyId()) return;
+  private _decide(post: Post, decision: ModerationDecision): void {
+    if (this.isAnyBusy()) return;
     this.busyId.set(post.id);
     this._postService.moderatePost(post.id, { decision }).subscribe({
       next: () => {
@@ -77,7 +96,9 @@ export class PostPendingQueue {
         this._messageService.add({
           severity: 'success',
           summary:
-            decision === 'APPROVED' ? 'Post approved' : 'Post rejected',
+            decision === PostApprovalStates.Approved
+              ? 'Post approved'
+              : 'Post rejected',
         });
       },
       error: (err) => {
@@ -91,16 +112,4 @@ export class PostPendingQueue {
       },
     });
   }
-
-  authorName(p: Post): string {
-    if (!p.author) return 'Member';
-    return `${p.author.firstName} ${p.author.lastName}`;
-  }
-
-  authorInitials(p: Post): string {
-    if (!p.author) return '??';
-    return `${p.author.firstName.charAt(0)}${p.author.lastName.charAt(0)}`;
-  }
-
-  trackById = (_: number, p: Post) => p.id;
 }

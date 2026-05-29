@@ -1,0 +1,10 @@
+@if (badges().length > 0) {
+  <ul class="badge-strip" role="list">
+    @for (badge of badges(); track badge.id) {
+      <li class="badge-pill" [attr.data-tone]="badge.tone" [attr.title]="badge.title ?? null">
+        <i [class]="iconClass(badge.icon)" aria-hidden="true"></i>
+        <span>{{ badge.label }}</span>
+      </li>
+    }
+  </ul>
+}

@@ -3,11 +3,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   GroupJoinRequest,
   GroupMember,
@@ -26,6 +28,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { GroupDetailContext } from '../../group-detail.context';
 import { EmptyMembers } from '../../_components/empty-members/empty-members';
 import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { UserInfo } from '../../../../../_shared/components/user-info/user-info';
+import { Badge } from "primeng/badge";
 
 @Component({
   selector: 'mh-group-members-tab',
@@ -33,6 +37,7 @@ import { Avatar } from '../../../../../_shared/components/avatar/avatar';
     DatePipe,
     FormsModule,
     Avatar,
+    UserInfo,
     Button,
     InputText,
     SkeletonModule,
@@ -40,15 +45,17 @@ import { Avatar } from '../../../../../_shared/components/avatar/avatar';
     TagModule,
     TooltipModule,
     EmptyMembers,
-  ],
+    Badge
+],
   templateUrl: './members-tab.html',
   styleUrl: './members-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MembersTab implements OnInit {
+export class MembersTab {
   readonly context = inject(GroupDetailContext);
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
+  private readonly _route = inject(ActivatedRoute);
 
   readonly Roles = GroupMemberRoles;
 
@@ -57,6 +64,15 @@ export class MembersTab implements OnInit {
   readonly joinRequests = signal<GroupJoinRequest[]>([]);
   readonly loadingRequests = signal(false);
   readonly busyRequestIds = signal<Set<string>>(new Set());
+
+  // Email links from `sendGroupJoinRequestReceivedEmail` include
+  // ?requestId=<id> — used to scroll-highlight the matching row.
+  private readonly _queryParams = toSignal(this._route.queryParamMap, {
+    initialValue: this._route.snapshot.queryParamMap,
+  });
+  readonly highlightedRequestId = computed(
+    () => this._queryParams().get('requestId'),
+  );
 
   readonly visibleMembers = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -69,29 +85,41 @@ export class MembersTab implements OnInit {
     });
   });
 
-  ngOnInit(): void {
-    const id = this.context.group()?.id;
-    if (id) {
-      this.context.loadMembers(id);
-      if (this.context.isOwner()) {
-        this.loadJoinRequests();
+  constructor() {
+    effect(() => {
+      const groupId = this.context.group()?.id;
+      const isOwner = this.context.isOwner();
+
+      this.joinRequests.set([]);
+      this.busyRequestIds.set(new Set());
+      this.loadingRequests.set(false);
+
+      if (groupId && isOwner) {
+        this._loadJoinRequests(groupId);
       }
-    }
+    });
+
+    effect(() => {
+      const id = this.highlightedRequestId();
+      if (!id || this.loadingRequests()) return;
+      queueMicrotask(() => {
+        const el = document.getElementById(`join-request-row-${id}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
   }
 
-  loadJoinRequests(): void {
-    const id = this.context.group()?.id;
-    if (!id) return;
+  private _loadJoinRequests(groupId: string): void {
     this.loadingRequests.set(true);
-    this._groupService.listJoinRequests(id).subscribe({
+    this._groupService.listJoinRequests(groupId).subscribe({
       next: (res) => {
+        if (this.context.group()?.id !== groupId) return;
         this.joinRequests.set(res.items);
         this.loadingRequests.set(false);
       },
       error: () => {
+        if (this.context.group()?.id !== groupId) return;
         this.loadingRequests.set(false);
-        // Silent — pending-requests section is optional UX, don't toast
-        // every time the page opens.
       },
     });
   }

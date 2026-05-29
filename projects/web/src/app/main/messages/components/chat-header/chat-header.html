@@ -1,0 +1,31 @@
+<header class="mh-chat-header">
+  <button
+    type="button"
+    class="mh-chat-header__back"
+    (click)="back.emit()"
+    aria-label="Back to inbox"
+  >
+    <i class="pi pi-chevron-left" aria-hidden="true"></i>
+  </button>
+
+  <mh-hex-avatar
+    [size]="36"
+    [userId]="avatarUserId()"
+    [initials]="initials()"
+    [imageUrl]="avatarImageUrl()"
+  />
+
+  <div class="mh-chat-header__name">{{ title() }}</div>
+
+  <span class="mh-chat-header__spacer"></span>
+
+  <button
+    type="button"
+    class="mh-chat-header__icon-btn"
+    (click)="toggleInfo.emit()"
+    aria-label="Toggle conversation info"
+    title="Conversation info"
+  >
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+  </button>
+</header>

@@ -5,14 +5,7 @@ import type {
   ClientRequestStatus,
 } from './client.enums';
 import { PaginatedResponse } from '../common/pagination.model';
-
-export interface ClientUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatarId?: string;
-}
+import { User } from '../user/user.model';
 
 export interface GroupMembership {
   groupId: string;
@@ -41,7 +34,7 @@ export interface InstructorClient {
   expiresAt: string | null;
   // instructor?: ClientUser;
   // instructorProfile?: InstructorProfileSummary | null;
-  client?: ClientUser;
+  client?: User;
   groupMemberships?: GroupMembership[];
 }
 
@@ -57,8 +50,8 @@ export interface ClientRequest {
   expiresAt: string;
   respondedAt: string | null;
   createdAt: string;
-  fromUser?: ClientUser;
-  toUser?: ClientUser;
+  fromUser?: User;
+  toUser?: User;
 }
 
 export type CreateClientInvitation =

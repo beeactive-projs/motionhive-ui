@@ -79,6 +79,10 @@ export class GroupDetailContext {
   });
 
   loadGroup(groupId: string): void {
+    if (this.group()?.id !== groupId) {
+      this.members.set([]);
+      this.totalMembers.set(0);
+    }
     this.loading.set(true);
     this._groupService.getById(groupId).subscribe({
       next: (group) => {

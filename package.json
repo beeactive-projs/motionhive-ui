@@ -7,7 +7,8 @@
     "build": "ng build web",
     "build:core": "ng build core",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "npm run check:reusability && ng test",
+    "check:reusability": "node scripts/check-reusability.mjs",
     "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && xliffmerge --profile xliffmerge.json"
   },
   "prettier": {
@@ -52,7 +53,10 @@
     "@angular/build": "^21.2.5",
     "@angular/cli": "^21.2.5",
     "@angular/compiler-cli": "^21.2.6",
+    "@playwright/test": "^1.60.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "jsdom": "^27.1.0",
+    "jsonwebtoken": "^9.0.3",
     "ng-packagr": "^21.2.2",
     "ngx-i18nsupport": "^0.17.1",
     "typescript": "~5.9.2",

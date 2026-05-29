@@ -1,0 +1,13 @@
+:host {
+  display: contents;
+}
+
+.og-cover-fallback {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--p-yellow-300, #fde047),
+    var(--p-yellow-300, #fde047) 14px,
+    var(--p-yellow-200, #fef08a) 14px,
+    var(--p-yellow-200, #fef08a) 28px
+  );
+}

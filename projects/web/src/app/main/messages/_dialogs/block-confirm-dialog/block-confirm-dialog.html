@@ -1,0 +1,51 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [draggable]="false"
+  [resizable]="false"
+  header="Block this user?"
+  styleClass="mh-block-dialog"
+  [style]="{ width: '440px', maxWidth: '94vw' }"
+  (onHide)="onHide()"
+>
+  <p class="mh-block__lead">
+    <strong>{{ displayName() }}</strong> won't be able to message you or see your
+    conversation history with them. You can unblock them later from your
+    safety settings.
+  </p>
+
+  <div class="mh-block__reason">
+    <div class="mh-block__eyebrow">Reason (optional)</div>
+    <div class="mh-block__chips">
+      @for (r of reasons; track r.key) {
+        <button
+          type="button"
+          class="mh-block__chip"
+          [class.mh-block__chip--active]="reason() === r.key"
+          (click)="selectReason(r.key)"
+        >
+          {{ r.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <p-button
+      label="Block"
+      severity="danger"
+      icon="pi pi-ban"
+      [loading]="submitting()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>

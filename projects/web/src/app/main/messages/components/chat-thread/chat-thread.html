@@ -1,0 +1,43 @@
+<div
+  #scrollContainer
+  class="mh-thread"
+  role="log"
+  aria-live="polite"
+  aria-label="Conversation messages"
+  (scroll)="onScrollContainer()"
+>
+  @if (hasOlder()) {
+    <div class="mh-thread__loading-older">
+      @if (loadingOlder()) {
+        <span class="mh-thread__loading-pill">Loading earlier messages…</span>
+      } @else {
+        <button
+          type="button"
+          class="mh-thread__loading-btn"
+          (click)="loadOlder.emit()"
+        >
+          Load earlier
+        </button>
+      }
+    </div>
+  }
+
+  @for (bubble of rendered(); track trackByMessageId($index, bubble)) {
+    @if (bubble.startsNewDay) {
+      <mh-day-divider [label]="dayLabel(bubble.dayKey)" />
+    }
+
+    @if (bubble.message.kind !== 'TEXT') {
+      <!-- SYSTEM_* events. Body is the BE-rendered text; v1 never
+           inserts these but the scaffold handles them when they appear. -->
+      <mh-system-event [text]="bubble.message.body" />
+    } @else {
+      <mh-message-bubble
+        [message]="bubble.message"
+        [position]="bubble.position"
+        [mine]="bubble.message.senderId === currentUserId()"
+        [author]="bubble.message.senderId === currentUserId() ? null : conversation().otherUser"
+      />
+    }
+  }
+</div>

@@ -35,7 +35,11 @@
             routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
-            {{ item.label }}
+            <span class="flex-1">{{ item.label }}</span>
+            @if (item.badge && item.badge() > 0) {
+            <span class="mh-nav-badge" aria-hidden="true">{{ item.badge()! > 99 ? '99+' : item.badge() }}</span>
+            <span class="sr-only">{{ item.badge() }} unread</span>
+            }
           </a>
           }
         </li>

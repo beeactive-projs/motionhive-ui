@@ -1,29 +1,46 @@
-<p-dialog header="Edit instructor profile" [(visible)]="visible" [modal]="true" [style]="{ width: '40rem' }"
-  [closable]="true">
-  <div class="flex flex-col gap-4 pt-2">
+<p-dialog header="Edit instructor profile" [(visible)]="visible" [modal]="true"
+  [style]="{ width: '40rem' }" [closable]="true">
+
+  <form [formGroup]="form" class="flex flex-col gap-4 pt-2">
+
     <div class="flex flex-col gap-2">
       <label for="epDisplayName" class="text-sm font-medium">Display name</label>
-      <input id="epDisplayName" type="text" pInputText [ngModel]="form().displayName"
-        (ngModelChange)="updateField('displayName', $event)" placeholder="Name shown to clients" />
+      <input id="epDisplayName" type="text" pInputText fluid formControlName="displayName"
+        placeholder="Name shown to clients"
+        [class.ng-invalid]="isFieldInvalid('displayName')"
+        [class.ng-dirty]="isFieldInvalid('displayName')" />
+      @if (isFieldInvalid('displayName')) {
+        <p-message severity="error" size="small" variant="simple">{{ getFieldError('displayName') }}</p-message>
+      }
     </div>
 
     <div class="flex flex-col gap-2">
       <label for="epBio" class="text-sm font-medium">Bio</label>
-      <textarea id="epBio" pTextarea [ngModel]="form().bio" (ngModelChange)="updateField('bio', $event)" [rows]="4"
-        placeholder="Tell clients about yourself..."></textarea>
+      <textarea id="epBio" pTextarea fluid formControlName="bio" [rows]="4"
+        placeholder="Tell clients about yourself..."
+        [class.ng-invalid]="isFieldInvalid('bio')"
+        [class.ng-dirty]="isFieldInvalid('bio')"></textarea>
+      @if (isFieldInvalid('bio')) {
+        <p-message severity="error" size="small" variant="simple">{{ getFieldError('bio') }}</p-message>
+      }
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
         <label for="epSpecializations" class="text-sm font-medium">Specializations</label>
-        <input id="epSpecializations" type="text" pInputText [ngModel]="form().specializations"
-          (ngModelChange)="updateField('specializations', $event)" placeholder="e.g. Yoga, HIIT, Pilates" />
+        <input id="epSpecializations" type="text" pInputText fluid formControlName="specializations"
+          placeholder="e.g. Yoga, HIIT, Pilates" />
         <span class="text-xs text-surface-400">Separate with commas.</span>
       </div>
       <div class="flex flex-col gap-2">
         <label for="epYears" class="text-sm font-medium">Years of experience</label>
-        <p-inputnumber inputId="epYears" [ngModel]="form().yearsOfExperience"
-          (ngModelChange)="updateField('yearsOfExperience', $event)" placeholder="e.g. 5" [min]="0" class="w-full" />
+        <p-inputnumber inputId="epYears" formControlName="yearsOfExperience" placeholder="e.g. 5"
+          [min]="0" [max]="50" class="w-full"
+          [class.ng-invalid]="isFieldInvalid('yearsOfExperience')"
+          [class.ng-dirty]="isFieldInvalid('yearsOfExperience')" />
+        @if (isFieldInvalid('yearsOfExperience')) {
+          <p-message severity="error" size="small" variant="simple">{{ getFieldError('yearsOfExperience') }}</p-message>
+        }
       </div>
     </div>
 
@@ -34,17 +51,54 @@
     </div>
 
     <div class="flex items-center gap-3 rounded-lg bg-surface-50 dark:bg-surface-800 p-4">
-      <p-toggleSwitch [ngModel]="form().isAcceptingClients"
-        (ngModelChange)="updateField('isAcceptingClients', $event)" />
+      <p-toggleswitch formControlName="isAcceptingClients" inputId="epAccepting" />
       <div>
-        <span class="text-sm font-medium">Accepting new clients</span>
+        <label for="epAccepting" class="text-sm font-medium cursor-pointer">Accepting new clients</label>
         <p class="text-xs text-surface-500 m-0">Allow clients to send you requests.</p>
       </div>
     </div>
-  </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-semibold m-0">Social links</h3>
+          <p class="text-xs text-surface-500 m-0">Help clients find you elsewhere.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <p-toggleswitch formControlName="showSocialLinks" inputId="epShowSocials" />
+          <label for="epShowSocials" class="text-xs text-surface-500 cursor-pointer">Show on profile</label>
+        </div>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2">
+        @for (platform of socialPlatforms; track platform.key) {
+          <div class="flex flex-col gap-1">
+            <label [for]="'epSocial-' + platform.key" class="text-xs font-medium flex items-center gap-2">
+              <i [class]="platform.icon"></i>
+              <span>{{ platform.label }}</span>
+            </label>
+            <input
+              [id]="'epSocial-' + platform.key"
+              type="text"
+              pInputText
+              fluid
+              [formControlName]="platform.key"
+              [placeholder]="platform.placeholder"
+              [class.ng-invalid]="isFieldInvalid(platform.key)"
+              [class.ng-dirty]="isFieldInvalid(platform.key)" />
+            @if (isFieldInvalid(platform.key)) {
+              <p-message severity="error" size="small" variant="simple">{{ getFieldError(platform.key) }}</p-message>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+  </form>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
-    <p-button label="Save changes" icon="pi pi-check" [loading]="saving()" (onClick)="save()" />
+    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Save changes" icon="pi pi-check" [loading]="saving()"
+      [disabled]="!canSubmit()" (onClick)="save()" />
   </ng-template>
 </p-dialog>

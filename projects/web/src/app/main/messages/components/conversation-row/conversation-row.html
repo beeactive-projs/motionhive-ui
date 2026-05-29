@@ -1,0 +1,29 @@
+<button
+  type="button"
+  class="mh-conv-row"
+  [class.mh-conv-row--active]="active()"
+  [class.mh-conv-row--unread]="isUnread()"
+  (click)="select.emit()"
+  [attr.aria-label]="title() + (isUnread() ? ', ' + conversation().unreadCount + ' unread' : '')"
+>
+  <mh-hex-avatar
+    [size]="42"
+    [userId]="avatarUserId()"
+    [initials]="initials()"
+    [imageUrl]="avatarImageUrl()"
+  />
+
+  <div class="mh-conv-row__body">
+    <div class="mh-conv-row__top">
+      <span class="mh-conv-row__title">{{ title() }}</span>
+      <span class="mh-conv-row__time">{{ relativeTime() }}</span>
+    </div>
+    <div class="mh-conv-row__bottom">
+      <span class="mh-conv-row__preview">{{ preview() }}</span>
+      <mh-unread-badge
+        [count]="conversation().unreadCount"
+        [active]="active()"
+      />
+    </div>
+  </div>
+</button>

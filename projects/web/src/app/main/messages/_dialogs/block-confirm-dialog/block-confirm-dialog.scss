@@ -1,0 +1,61 @@
+.mh-block__lead {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #334155;
+}
+
+.mh-block__lead strong {
+  color: #0f172a;
+}
+
+.mh-block__reason {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mh-block__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #94a3b8;
+}
+
+.mh-block__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mh-block__chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+}
+
+.mh-block__chip:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.mh-block__chip--active {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.mh-block__chip--active:hover {
+  background: #fecaca;
+}
+
+// Dark-mode overrides for this dialog live in
+// `projects/web/src/styles.css` because PrimeNG `p-dialog` portals
+// its content to `<body>`, outside this component's view scope. See
+// the `.dark .mh-block-dialog …` rules there.

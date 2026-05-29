@@ -1,0 +1,133 @@
+<p-card class="shadow-md">
+  <ng-template #header>
+    <div class="flex items-center justify-between px-4 pt-4">
+      <div class="flex items-center gap-2">
+        <i class="pi pi-graduation-cap text-primary-600"></i>
+        <h2 class="text-base font-semibold m-0">Coaching profile</h2>
+        @if (profile().instructorProfile?.isAcceptingClients) {
+        <p-tag rounded value="Accepting clients" severity="success" icon="pi pi-check" class="text-xs!" />
+        } @else {
+        <p-tag rounded value="Not accepting" severity="secondary" class="text-xs!" />
+        }
+      </div>
+      <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" severity="secondary"
+        pTooltip="Edit coaching profile" tooltipPosition="left" ariaLabel="Edit coaching profile"
+        (onClick)="showEditInstructor.set(true)" />
+    </div>
+    <p-divider />
+  </ng-template>
+
+  @if (profile().instructorProfile; as ip) {
+  <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div>
+      <dt class="text-xs uppercase tracking-wide text-surface-500">Display name</dt>
+      <dd class="mt-1 text-sm font-medium">{{ ip.displayName || 'Not set' }}</dd>
+    </div>
+    <div>
+      <dt class="text-xs uppercase tracking-wide text-surface-500">Years of experience</dt>
+      <dd class="mt-1 text-sm font-medium">
+        {{ ip.yearsOfExperience != null ? ip.yearsOfExperience + ' years' : 'Not set' }}
+      </dd>
+    </div>
+    <div class="sm:col-span-2 lg:col-span-3">
+      <dt class="text-xs uppercase tracking-wide text-surface-500">Bio</dt>
+      <dd class="mt-1 text-sm font-medium whitespace-pre-line">{{ ip.bio || 'No bio added yet.' }}</dd>
+    </div>
+    <div class="sm:col-span-2 lg:col-span-3">
+      <dt class="text-xs uppercase tracking-wide text-surface-500">Specializations</dt>
+      <dd class="mt-1">
+        @if (ip.specializations?.length) {
+        <div class="flex flex-wrap gap-1">
+          @for (spec of ip.specializations; track spec) {
+          <p-tag [value]="spec" severity="info" class="text-xs!" />
+          }
+        </div>
+        } @else {
+        <span class="text-sm font-medium">Not set</span>
+        }
+      </dd>
+    </div>
+    <div class="sm:col-span-2 lg:col-span-3">
+      <dt class="text-xs uppercase tracking-wide text-surface-500 flex items-center gap-2">
+        <span>Social links</span>
+        @if (socialLinks().length > 0) {
+        @if (ip.showSocialLinks) {
+        <p-tag value="Public" severity="success" class="text-xs!" />
+        } @else {
+        <p-tag value="Hidden" severity="secondary" class="text-xs!" />
+        }
+        }
+      </dt>
+      <dd class="mt-1">
+        @if (socialLinks().length > 0) {
+        <ul class="flex flex-col gap-1 m-0 p-0 list-none">
+          @for (link of socialLinks(); track link.key) {
+          <li class="flex items-center gap-2 text-sm">
+            <i [class]="link.icon + ' text-surface-500'"></i>
+            <a [href]="link.url" target="_blank" rel="noopener noreferrer"
+              class="text-primary-600 hover:underline truncate">
+              {{ link.url }}
+            </a>
+          </li>
+          }
+        </ul>
+        } @else {
+        <span class="text-sm font-medium">Not set</span>
+        }
+      </dd>
+    </div>
+  </dl>
+  }
+
+  <p-divider />
+
+  <!-- Services on your public profile -->
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between">
+      <h3 class="text-sm font-semibold uppercase tracking-wide text-surface-500 m-0">
+        Services on your public profile
+      </h3>
+      <a routerLink="/coaching/payments" [queryParams]="{ tab: 'pricing' }"
+        class="text-sm text-primary-600 hover:underline">
+        Manage all pricing →
+      </a>
+    </div>
+
+    @if (coachingProductsLoading()) {
+    <p class="text-sm text-surface-500 m-0">Loading…</p>
+    } @else if (coachingProducts().length === 0) {
+    <p class="text-sm text-surface-500 m-0">
+      You don't have any products yet. Add them in
+      <a routerLink="/coaching/payments" [queryParams]="{ tab: 'pricing' }"
+        class="text-primary-600 hover:underline">Pricing</a>.
+    </p>
+    } @else {
+    <div class="flex flex-col gap-2">
+      @for (product of coachingProducts(); track product.id) {
+      <div class="flex items-center justify-between rounded-md bg-surface-50 dark:bg-surface-900 px-3 py-2">
+        <div class="flex flex-col">
+          <span class="text-sm font-medium">{{ product.name }}</span>
+          <span class="text-xs text-surface-500">
+            {{ product.amountCents | currencyRon : product.currency }} ·
+            {{ billingLabel(product) }}
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-surface-500">
+            {{ product.showOnProfile ? 'Visible' : 'Hidden' }}
+          </span>
+          <p-toggleswitch [ngModel]="product.showOnProfile" [disabled]="isToggling(product.id)"
+            (ngModelChange)="toggleProductVisibility(product, $event)" />
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <p-divider />
+
+  <mh-venues-section />
+</p-card>
+
+<mh-edit-instructor-profile [(visible)]="showEditInstructor" [profile]="profile()" (saved)="onInstructorSaved()" />

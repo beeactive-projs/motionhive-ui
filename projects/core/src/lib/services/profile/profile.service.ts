@@ -2,15 +2,32 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MyProfile, UpdateMyProfilePayload } from '../../models/profile/profile.model';
+import {
+  MyProfile,
+  UpdateMyProfilePayload,
+  UserPrivacySettings,
+} from '../../models/profile/profile.model';
 import {
   InstructorProfile,
   UpdateInstructorProfilePayload,
   CreateInstructorProfilePayload,
 } from '../../models/profile/instructor-profile.model';
-import { InstructorSearchResult } from '../../models/client/instructor.model';
+import {
+  InstructorSearchResult,
+  PublicInstructorProfile,
+} from '../../models/client/instructor.model';
+import { PaginatedReviews } from '../../models/review/review.model';
+import { InstructorGroupSummary } from '../../models/profile/instructor-group-summary.model';
+import { PublicUserProfile } from '../../models/profile/public-user-profile.model';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+
+export interface ListReviewsParams {
+  cursor?: string;
+  limit?: number;
+  rating?: number;
+  breakdown?: boolean;
+}
 
 /**
  * Shape of the PATCH /profile/me response. The backend returns ONLY
@@ -74,6 +91,77 @@ export class ProfileService {
     return this._http.get<InstructorSearchResult[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROFILE.DISCOVER_INSTRUCTORS}`,
       { params },
+    );
+  }
+
+  /**
+   * Public Profile page lookup. Powers `/@<handle>`.
+   */
+  getInstructorByHandle(handle: string): Observable<PublicInstructorProfile> {
+    return this._http.get<PublicInstructorProfile>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.INSTRUCTOR_BY_HANDLE(handle)}`,
+    );
+  }
+
+  /**
+   * Cursor-paginated reviews for an instructor. Pass `breakdown: true`
+   * on the first page to get the rating distribution in the same call.
+   */
+  getInstructorReviews(
+    instructorUserId: string,
+    params: ListReviewsParams = {},
+  ): Observable<PaginatedReviews> {
+    let httpParams = new HttpParams();
+    if (params.cursor) httpParams = httpParams.set('cursor', params.cursor);
+    if (params.limit != null) httpParams = httpParams.set('limit', String(params.limit));
+    if (params.rating != null) httpParams = httpParams.set('rating', String(params.rating));
+    if (params.breakdown) httpParams = httpParams.set('breakdown', 'true');
+    return this._http.get<PaginatedReviews>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.INSTRUCTOR_REVIEWS(instructorUserId)}`,
+      { params: httpParams },
+    );
+  }
+
+  /**
+   * Public groups owned by an instructor. Powers the Groups tab.
+   */
+  getInstructorGroups(instructorUserId: string): Observable<InstructorGroupSummary[]> {
+    return this._http.get<InstructorGroupSummary[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.INSTRUCTOR_GROUPS(instructorUserId)}`,
+    );
+  }
+
+  /**
+   * `/@<handle>` for any user — also resolves instructors but doesn't
+   * include their richer instructor-only payload (offerings, reviews).
+   * The server returns `isInstructor: true` for instructor accounts so
+   * callers can fan out to `getInstructorByHandle()` in parallel.
+   */
+  getUserByHandle(handle: string): Observable<PublicUserProfile> {
+    return this._http.get<PublicUserProfile>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.USER_BY_HANDLE(handle)}`,
+    );
+  }
+
+  /**
+   * Patch one or more per-field privacy levels. The body is partial,
+   * so the privacy chooser can ship a one-field PATCH when the user
+   * flips a single dropdown. Response is the full merged settings map.
+   */
+  updatePrivacy(
+    patch: UserPrivacySettings,
+  ): Observable<{ privacySettings: UserPrivacySettings }> {
+    return this._http.patch<{ privacySettings: UserPrivacySettings }>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.PRIVACY}`,
+      patch,
+    );
+  }
+
+  /** Claim or rename the profile handle. Throws 409 if already taken. */
+  updateHandle(handle: string): Observable<{ handle: string }> {
+    return this._http.patch<{ handle: string }>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROFILE.HANDLE}`,
+      { handle },
     );
   }
 }

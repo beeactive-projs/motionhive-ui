@@ -1,0 +1,129 @@
+:host {
+  display: block;
+}
+
+.mh-conv-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background-color 120ms ease;
+}
+
+.mh-conv-row:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.mh-conv-row--active,
+.mh-conv-row--active:hover {
+  background: #fef3c7; // honey-100
+}
+
+.mh-conv-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mh-conv-row__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mh-conv-row__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a; // navy-900
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mh-conv-row--unread .mh-conv-row__title {
+  font-weight: 700;
+}
+
+.mh-conv-row--active .mh-conv-row__title {
+  color: #92400e; // honey-800
+}
+
+.mh-conv-row__time {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8; // ink-3
+  flex-shrink: 0;
+}
+
+.mh-conv-row--unread .mh-conv-row__time {
+  font-weight: 600;
+  color: #b45309; // honey-700
+}
+
+.mh-conv-row--active .mh-conv-row__time {
+  color: #b45309;
+}
+
+.mh-conv-row__bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mh-conv-row__preview {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: #94a3b8; // ink-3
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mh-conv-row--unread .mh-conv-row__preview {
+  color: #1e293b; // navy-800
+  font-weight: 500;
+}
+
+// ── Dark mode ────────────────────────────────────────────────────
+:host-context(.dark) {
+  .mh-conv-row:hover {
+    background: rgba(248, 250, 252, 0.06);
+  }
+  .mh-conv-row--active,
+  .mh-conv-row--active:hover {
+    // Subtle honey tint instead of the bright honey-100 background.
+    background: rgba(245, 158, 11, 0.16);
+  }
+  .mh-conv-row__title {
+    color: var(--p-surface-50, #f1f5f9);
+  }
+  .mh-conv-row--active .mh-conv-row__title {
+    color: #fbbf24; // honey-400 reads well on dark
+  }
+  .mh-conv-row__time {
+    color: var(--p-surface-400, #94a3b8);
+  }
+  .mh-conv-row--unread .mh-conv-row__time,
+  .mh-conv-row--active .mh-conv-row__time {
+    color: #fbbf24;
+  }
+  .mh-conv-row__preview {
+    color: var(--p-surface-400, #94a3b8);
+  }
+  .mh-conv-row--unread .mh-conv-row__preview {
+    color: var(--p-surface-100, #e2e8f0);
+  }
+}

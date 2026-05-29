@@ -2,33 +2,29 @@
 <p-message severity="warn" class="w-full mb-4">
   <div class="flex items-center gap-3">
     <span>
-      {{ hasStripeAccount() ? 'Finish Stripe setup to start receiving money.' : 'Set up payouts to start receiving money.' }}
+      {{ hasStripeAccount() ? 'Finish Stripe setup to start receiving money.' : 'Set up payouts to start receiving
+      money.' }}
     </span>
-    <p-button
-      [label]="hasStripeAccount() ? 'Finish setup' : 'Connect Stripe'"
-      [icon]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'"
-      severity="warn"
-      [text]="true"
-      size="small"
-      (onClick)="startOnboarding()"
-    />
+    <p-button [label]="hasStripeAccount() ? 'Finish setup' : 'Connect Stripe'"
+      [icon]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'" severity="warn" [text]="true"
+      size="small" (onClick)="startOnboarding()" />
   </div>
 </p-message>
 }
 
 <!-- Actions -->
 @if (hasStripeAccount()) {
-  <div class="flex justify-end mb-4">
-    <p-button label="Open Stripe Dashboard" icon="pi pi-external-link" iconPos="right" severity="secondary" [text]="true"
-      size="small" [loading]="dashboardLoading()" (onClick)="openStripeDashboard()" />
-  </div>
+<div class="flex justify-end mb-4">
+  <p-button label="Open Stripe Dashboard" icon="pi pi-external-link" iconPos="right" severity="secondary" [text]="true"
+    size="small" [loading]="dashboardLoading()" (onClick)="openStripeDashboard()" />
+</div>
 }
 
 <!-- KPI Cards -->
 @if (summaryLoading()) {
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
   @for (_ of [1,2,3,4]; track $index) {
-  <p-card>
+  <p-card class="shadow-md">
     <p-skeleton width="60%" height="1rem" styleClass="mb-2" />
     <p-skeleton width="40%" height="1.5rem" />
   </p-card>
@@ -36,19 +32,19 @@
 </div>
 } @else if (summary(); as s) {
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-  <p-card>
+  <p-card class="shadow-md">
     <div class="text-sm text-surface-500 mb-1">Month to date</div>
     <div class="font-semibold text-xl text-primary-600">{{ s.monthToDateRevenueCents | currencyRon:s.currency }}</div>
   </p-card>
-  <p-card>
+  <p-card class="shadow-md">
     <div class="text-sm text-surface-500 mb-1">Available balance</div>
     <div class="font-semibold text-xl">{{ s.availableBalanceCents | currencyRon:s.currency }}</div>
   </p-card>
-  <p-card>
+  <p-card class="shadow-md">
     <div class="text-sm text-surface-500 mb-1">Pending balance</div>
     <div class="font-semibold text-xl">{{ s.pendingBalanceCents | currencyRon:s.currency }}</div>
   </p-card>
-  <p-card>
+  <p-card class="shadow-md">
     <div class="text-sm text-surface-500 mb-1">Outstanding invoices</div>
     <div class="font-semibold text-xl text-orange-500">{{ s.outstandingInvoicesCents | currencyRon:s.currency }}</div>
   </p-card>
@@ -57,7 +53,7 @@
 <!-- Next payout + Top clients -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
   <!-- Next payout -->
-  <p-card>
+  <p-card class="shadow-md">
     <div class="flex items-center gap-3">
       <i class="pi pi-calendar text-2xl text-primary-500"></i>
       <div>
@@ -74,7 +70,7 @@
   </p-card>
 
   <!-- Top clients -->
-  <p-card>
+  <p-card class="shadow-md">
     <div class="text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">Top clients</div>
     @if (s.topClients.length === 0) {
     <p class="text-sm text-surface-500">No payments yet</p>
@@ -124,9 +120,9 @@
       <td>
         <p-tag [value]="payment.status" [severity]="paymentStatusSeverity(payment.status)" />
         @if (payment.amountRefundedCents > 0) {
-          <span class="text-xs text-surface-500 ml-1">
-            ({{ payment.amountRefundedCents | currencyRon:payment.currency }} refunded)
-          </span>
+        <span class="text-xs text-surface-500 ml-1">
+          ({{ payment.amountRefundedCents | currencyRon:payment.currency }} refunded)
+        </span>
         }
       </td>
       <td class="text-sm">{{ payment.paymentMethodType || '—' }}</td>

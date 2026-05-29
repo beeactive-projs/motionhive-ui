@@ -1,0 +1,71 @@
+/* ============================================================
+   Messaging dialog dark-mode overrides.
+
+   PrimeNG `p-dialog` portals its content to `<body>`, outside the
+   originating component's view encapsulation. Component-scoped
+   `:host-context(.dark)` selectors don't reach that portal'd
+   content, so the dark overrides for our custom dialog content
+   (lead text, eyebrow labels, chip groups, counters) live here
+   globally and target the dialog by the `styleClass=` hook each
+   dialog template passes to `p-dialog`.
+
+   Light-mode styles for these dialogs remain in their respective
+   component SCSS files; only the dark-mode flips are global.
+   ============================================================ */
+
+/* ── Block confirm dialog ─────────────────────────────────── */
+.dark .mh-block-dialog .mh-block__lead {
+  color: var(--p-surface-200, #e2e8f0);
+}
+.dark .mh-block-dialog .mh-block__lead strong {
+  color: var(--p-surface-50, #f1f5f9);
+}
+.dark .mh-block-dialog .mh-block__eyebrow {
+  color: var(--p-surface-400, #94a3b8);
+}
+.dark .mh-block-dialog .mh-block__chip {
+  background: var(--p-surface-700, #334155);
+  border-color: rgba(248, 250, 252, 0.10);
+  color: var(--p-surface-200, #e2e8f0);
+}
+.dark .mh-block-dialog .mh-block__chip:hover {
+  background: rgba(248, 250, 252, 0.10);
+}
+.dark .mh-block-dialog .mh-block__chip--active {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(252, 165, 165, 0.4);
+  color: #fca5a5;
+}
+.dark .mh-block-dialog .mh-block__chip--active:hover {
+  background: rgba(220, 38, 38, 0.32);
+}
+
+/* ── Report conversation dialog ───────────────────────────── */
+.dark .mh-report-dialog .mh-report__lead {
+  color: var(--p-surface-200, #e2e8f0);
+}
+.dark .mh-report-dialog .mh-report__lead strong {
+  color: var(--p-surface-50, #f1f5f9);
+}
+.dark .mh-report-dialog .mh-report__eyebrow {
+  color: var(--p-surface-400, #94a3b8);
+}
+.dark .mh-report-dialog .mh-report__chip {
+  background: var(--p-surface-700, #334155);
+  border-color: rgba(248, 250, 252, 0.10);
+  color: var(--p-surface-200, #e2e8f0);
+}
+.dark .mh-report-dialog .mh-report__chip:hover {
+  background: rgba(248, 250, 252, 0.10);
+}
+.dark .mh-report-dialog .mh-report__chip--active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(251, 191, 36, 0.4);
+  color: #fde68a;
+}
+.dark .mh-report-dialog .mh-report__chip--active:hover {
+  background: rgba(245, 158, 11, 0.3);
+}
+.dark .mh-report-dialog .mh-report__counter {
+  color: var(--p-surface-400, #94a3b8);
+}

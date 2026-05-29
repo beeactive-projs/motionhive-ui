@@ -1,0 +1,187 @@
+<mh-page-shell
+  title="My sessions"
+  [breadcrumb]="[
+    { label: 'Discover', routerLink: '/sessions/discover' },
+    { label: 'My sessions' }
+  ]"
+>
+  <div actions>
+    <p-button
+      label="Discover"
+      icon="pi pi-search"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/sessions/discover"
+    />
+  </div>
+
+  <!-- Tabs -->
+  <nav class="mh-my__tabs" role="tablist" aria-label="My sessions tabs">
+    @for (t of tabs; track t.key) {
+      <button
+        type="button"
+        role="tab"
+        class="mh-my__tab"
+        [class.is-active]="store.tab() === t.key"
+        [attr.aria-selected]="store.tab() === t.key"
+        (click)="setTab(t.key)"
+      >
+        {{ t.label }}
+        @if (countFor(t) > 0) {
+          <span class="mh-my__tab-count">{{ countFor(t) }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  <!--
+    Filters · client-side. Mirrors the instructor-side surface so the
+    two pages feel like siblings. Search filters by title; pills filter
+    by location-kind. BE's /sessions/my endpoint does not (yet) support
+    these query params, so we operate on the already-fetched items.
+  -->
+  <div class="mh-my__filters" role="search">
+    <span class="p-input-icon-left mh-my__search">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Search sessions…"
+        [ngModel]="searchInput()"
+        (ngModelChange)="onSearchInput($event)"
+      />
+    </span>
+
+    <div class="mh-my__pills" role="group" aria-label="Quick filters">
+      <button
+        type="button"
+        class="mh-my__pill"
+        [class.is-active]="!locationKindFilter() && !searchInput()"
+        (click)="clearFilters()"
+      >All</button>
+      <span class="mh-my__pill-divider" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="mh-my__pill"
+        [class.is-active]="locationKindFilter() === 'ONLINE'"
+        (click)="toggleLocation('ONLINE')"
+      >
+        <i class="pi pi-video" aria-hidden="true"></i>
+        Online
+      </button>
+      <button
+        type="button"
+        class="mh-my__pill"
+        [class.is-active]="locationKindFilter() === 'IN_PERSON'"
+        (click)="toggleLocation('IN_PERSON')"
+      >
+        <i class="pi pi-map-marker" aria-hidden="true"></i>
+        In-person
+      </button>
+    </div>
+  </div>
+
+  @if (store.error()) {
+    <p-message severity="error" [closable]="false">
+      {{ store.error() }}
+      <p-button label="Retry" [outlined]="true" size="small" (onClick)="store.load()" />
+    </p-message>
+  } @else if (store.loading() && store.items().length === 0) {
+    <div class="mh-my__skeletons">
+      @for (i of [1, 2, 3]; track i) {
+        <p-skeleton width="100%" height="80px" borderRadius="12px" />
+      }
+    </div>
+  } @else if (filteredItems().length === 0) {
+    <div class="mh-my__empty" data-testid="my-empty">
+      <i class="pi pi-calendar-clock"></i>
+      @if (store.items().length === 0) {
+        <p>Nothing here yet.</p>
+        @if (store.tab() === 'upcoming') {
+          <p-button
+            label="Find a session"
+            icon="pi pi-search"
+            routerLink="/sessions/discover"
+          />
+        }
+      } @else {
+        <p>No sessions match your filters.</p>
+        <p-button
+          label="Clear filters"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="clearFilters()"
+        />
+      }
+    </div>
+  } @else {
+    <ul class="mh-my__list">
+      @for (p of filteredItems(); track p.id) {
+        <li class="mh-my__row" data-testid="my-row" (click)="openSession(p)">
+          <div class="mh-my__time">
+            @if (startAt(p); as s) {
+              <span class="mh-my__date">{{ s | date: 'EEE d MMM' }}</span>
+              <span class="mh-my__hour">{{ s | date: 'HH:mm' }}</span>
+            }
+          </div>
+          <div class="mh-my__main">
+            <strong class="mh-my__title">{{ sessionTitle(p) }}</strong>
+            <div class="mh-my__chips">
+              <p-tag
+                [value]="statusLabel(p.status)"
+                [severity]="statusSeverity(p.status)"
+              />
+              @if (isOnline(p)) {
+                @if (meetingProvider(p); as prov) {
+                  <mh-provider-chip [provider]="$any(prov)" />
+                }
+              }
+            </div>
+          </div>
+          <div class="mh-my__actions">
+            @if (canJoin(p)) {
+              <p-button
+                label="Join"
+                icon="pi pi-video"
+                size="small"
+                severity="success"
+                (onClick)="join(p, $event)"
+              />
+            }
+            @if (canCancel(p)) {
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true"
+                size="small"
+                ariaLabel="Cancel booking"
+                (onClick)="openCancel(p, $event)"
+              />
+            }
+          </div>
+          <i class="pi pi-chevron-right mh-my__arrow"></i>
+        </li>
+      }
+    </ul>
+    @if (store.hasMore()) {
+      <div class="mh-my__more">
+        <p-button
+          label="Load more"
+          [outlined]="true"
+          [loading]="store.loading()"
+          (onClick)="store.loadMore()"
+        />
+      </div>
+    }
+  }
+</mh-page-shell>
+
+<mh-cancel-booking-dialog
+  [visible]="cancelOpen()"
+  (visibleChange)="cancelOpen.set($event)"
+  [participant]="cancelTarget()"
+  (cancelled)="onCancelled()"
+/>
+
+<p-toast position="top-right" />
+

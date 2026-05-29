@@ -8,11 +8,13 @@ export type AvatarSize = 'normal' | 'large' | 'xlarge';
   selector: 'mh-avatar',
   imports: [AvatarModule],
   templateUrl: './avatar.html',
+  styleUrl: './avatar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Avatar {
   readonly user = input<AvatarUser | null | undefined>(null);
   readonly size = input<AvatarSize>('normal');
+  readonly shape = input<'square' | 'circle' | undefined>('circle');
   readonly styleClass = input<string>('');
 
   readonly image = computed(() => this.user()?.avatarUrl ?? undefined);

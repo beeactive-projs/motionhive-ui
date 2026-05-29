@@ -261,10 +261,6 @@ export class Home implements OnInit {
     this._feedbackService.open();
   }
 
-  onFollowInstructor(_instructor: InstructorSearchResult): void {
-    // TODO: wire to follow endpoint when "follow" is a real backend feature.
-  }
-
   onGroupAction(payload: { group: Group; joined: boolean }): void {
     if (payload.joined) {
       this._router.navigate(['/groups', payload.group.id]);

@@ -1,0 +1,140 @@
+.mh-cancel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.mh-cancel__radius {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--p-yellow-500) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-yellow-500) 30%, transparent);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--p-text-color);
+  i {
+    font-size: 18px;
+    color: var(--p-yellow-500);
+  }
+}
+
+.mh-cancel__scope {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  legend {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--p-text-muted-color);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  &.is-single legend { display: none; }
+}
+
+.mh-cancel__opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1.5px solid var(--p-content-border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--p-content-background);
+  transition: all 120ms ease;
+
+  &:hover { border-color: var(--p-red-300, var(--p-red-500)); }
+  &.is-active {
+    border-color: var(--p-red-500, #F97066);
+    background: color-mix(in srgb, var(--p-red-500, #F97066) 8%, transparent);
+  }
+
+  /* Hide the native radio — we render our own coral pill so we get
+     the design's "selected" affordance without browser styling. */
+  input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.mh-cancel__opt-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Custom radio pill — 16px circle. Coral when the option is active. */
+.mh-cancel__radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--p-surface-400, #B0A998);
+  flex-shrink: 0;
+  margin-top: 2px;
+  position: relative;
+}
+.mh-cancel__opt.is-active .mh-cancel__radio {
+  border-color: var(--p-red-500, #F97066);
+}
+.mh-cancel__opt.is-active .mh-cancel__radio::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--p-red-500, #F97066);
+  border-radius: 50%;
+}
+
+/* Warning banner shown only for recurring sessions (4C top strip). */
+.mh-cancel__warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, #FFB020 14%, transparent);
+  border: 1px solid color-mix(in srgb, #FFB020 35%, transparent);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--p-text-color);
+  i {
+    color: #A16207;
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+}
+
+/* Cancel-session button takes the rest of the foot width on mobile. */
+:host ::ng-deep .mh-cancel__primary { flex: 1; }
+:host ::ng-deep .mh-cancel__primary .p-button { width: 100%; }
+
+.mh-cancel__opt-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--p-text-color);
+}
+
+.mh-cancel__opt-help {
+  display: block;
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  margin-top: 2px;
+}
+
+.mh-cancel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+}

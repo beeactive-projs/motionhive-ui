@@ -1,0 +1,41 @@
+<section class="mh-list">
+  <mh-inbox-search-bar
+    [value]="store.searchQuery()"
+    (valueChange)="onSearchChange($event)"
+  />
+
+  <mh-inbox-filters
+    [active]="store.filter()"
+    [totalCount]="counts().all"
+    [unreadCount]="counts().unread"
+    (filterChange)="onFilterChange($event)"
+  />
+
+  <div class="mh-list__scroll">
+    @if (store.loading() && !store.hasLoaded()) {
+      <!-- Skeleton rows on first load only. Subsequent reloads update
+           data in place without flashing the skeleton. -->
+      @for (_ of [1, 2, 3, 4, 5]; track $index) {
+        <div class="mh-list__skeleton"></div>
+      }
+    } @else if (noConversationsAtAll()) {
+      <div class="mh-list__empty">
+        <p class="mh-list__empty-title">No conversations yet</p>
+        <p class="mh-list__empty-sub">Start a new message to begin one.</p>
+      </div>
+    } @else if (noResults()) {
+      <div class="mh-list__empty">
+        <p class="mh-list__empty-title">No matches</p>
+        <p class="mh-list__empty-sub">Try a different search or filter.</p>
+      </div>
+    } @else {
+      @for (conversation of visible(); track conversation.id) {
+        <mh-conversation-row
+          [conversation]="conversation"
+          [active]="conversation.id === store.activeId()"
+          (select)="onRowSelect(conversation.id)"
+        />
+      }
+    }
+  </div>
+</section>

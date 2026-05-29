@@ -25,7 +25,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { forkJoin } from 'rxjs';
-import { Avatar } from '../../../../_shared/components/avatar/avatar';
+import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 
 @Component({
   selector: 'mh-add-members-dialog',
@@ -34,7 +34,7 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
     Button,
     Dialog,
     InputText,
-    Avatar,
+    UserInfo,
     ProgressSpinner,
     SkeletonModule,
     TableModule,

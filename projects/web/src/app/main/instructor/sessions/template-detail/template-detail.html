@@ -1,0 +1,286 @@
+@let t = template();
+
+<mh-page-shell
+  [title]="t?.title ?? 'Recurring session'"
+  [breadcrumb]="[
+    { label: 'Coaching', routerLink: '/coaching/overview' },
+    { label: 'Sessions', routerLink: '/coaching/sessions' },
+    { label: t?.title ?? 'Series' }
+  ]"
+  [showBack]="true"
+>
+  <div actions class="mh-td__actions">
+    <p-button
+      label="Calendar"
+      icon="pi pi-calendar"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/coaching/sessions/calendar"
+    />
+    @if (t && t.status !== 'CANCELLED') {
+      <p-button
+        label="Edit"
+        icon="pi pi-pencil"
+        (onClick)="editOpen.set(true)"
+      />
+      <p-button
+        label="Cancel series"
+        icon="pi pi-times"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="cancelSeries()"
+      />
+    }
+  </div>
+
+  @if (loading() && !t) {
+    <div class="mh-td__loading">Loading…</div>
+  } @else if (error()) {
+    <div class="mh-td__error">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ error() }}
+    </div>
+  } @else if (t) {
+    <div class="mh-td" [class.mh-td--cancelled]="t.status === 'CANCELLED'">
+      <!-- Status banner: prominent when the series itself has been
+           cancelled or ended. Makes "this is done, you can't act on it"
+           obvious before the user tries an action that'd be disabled. -->
+      @if (t.status === 'CANCELLED') {
+        <div class="mh-td__banner mh-td__banner--cancelled" role="status">
+          <i class="pi pi-times-circle"></i>
+          <div>
+            <strong>Series cancelled.</strong>
+            All upcoming occurrences were cancelled and attendees notified.
+            Editing and rescheduling are disabled.
+          </div>
+        </div>
+      } @else if (t.status === 'ENDED') {
+        <div class="mh-td__banner mh-td__banner--ended" role="status">
+          <i class="pi pi-check-circle"></i>
+          <div>
+            <strong>Series ended.</strong>
+            No new occurrences will be generated.
+          </div>
+        </div>
+      }
+
+      <!-- Summary -->
+      <section class="mh-td__summary">
+        <div class="mh-td__chips">
+          <mh-type-chip [type]="t.type" />
+          <mh-access-chip [access]="t.access" [approvalRequired]="t.approvalRequired" />
+          @if (t.meetingProvider) {
+            <mh-provider-chip [provider]="t.meetingProvider" />
+          }
+          @if (t.isRecurring) {
+            <span class="mh-td__recurring">
+              <i class="pi pi-refresh"></i>
+              {{ t.recurrenceRule?.frequency | lowercase }}
+              @if (t.recurrenceRule?.interval && t.recurrenceRule!.interval > 1) {
+                · every {{ t.recurrenceRule!.interval }}
+              }
+            </span>
+          }
+        </div>
+
+        @if (t.description) {
+          <p class="mh-td__desc">{{ t.description }}</p>
+        }
+
+        <dl class="mh-td__props">
+          <div>
+            <dt>Duration</dt>
+            <dd>{{ t.durationMinutes }} min</dd>
+          </div>
+          <div>
+            <dt>Capacity</dt>
+            <dd>{{ t.capacity ?? 'Unlimited' }}</dd>
+          </div>
+          <div>
+            <dt>Cancel cutoff</dt>
+            <dd>{{ t.cancellationCutoffHours }} hours</dd>
+          </div>
+          <div>
+            <dt>Price</dt>
+            <dd>
+              @if (t.priceAmountCents > 0) {
+                {{ t.priceAmountCents / 100 | number: '1.0-2' }} {{ t.priceCurrency }}
+              } @else {
+                Free
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Timezone</dt>
+            <dd>{{ t.timezone }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Regenerate forward + bulk actions — only meaningful on active
+           recurring templates. Past / cancelled series hide it. -->
+      @if (t.isRecurring && t.status === 'ACTIVE') {
+        <section class="mh-td__regen">
+          <div class="mh-td__regen-main">
+            <header>
+              <h3>Regenerate forward</h3>
+              <p>
+                Append more occurrences after
+                <strong>{{ lastOccurrenceLabel() }}</strong>
+                — past occurrences stay untouched.
+              </p>
+            </header>
+            <div class="mh-td__regen-row">
+              <label class="mh-td__regen-stepper">
+                <span>Add</span>
+                <p-inputNumber
+                  [ngModel]="regenCount()"
+                  (ngModelChange)="regenCount.set($event ?? 1)"
+                  [min]="1"
+                  [max]="12"
+                  [showButtons]="true"
+                  buttonLayout="horizontal"
+                  spinnerMode="horizontal"
+                  inputStyleClass="mh-td__regen-input"
+                  decrementButtonClass="p-button-text"
+                  incrementButtonClass="p-button-text"
+                />
+                <span>more</span>
+              </label>
+              <p-button
+                [label]="'Generate ' + regenCount() + ' more'"
+                icon="pi pi-refresh"
+                [loading]="busyRegen()"
+                (onClick)="regenerate()"
+              />
+            </div>
+          </div>
+
+          <aside class="mh-td__regen-bulk" aria-label="Bulk actions">
+            <h4>Bulk actions</h4>
+            <p-button
+              label="End series after this week"
+              icon="pi pi-stop-circle"
+              severity="danger"
+              [outlined]="true"
+              [disabled]="!firstFutureInstance()"
+              (onClick)="endAfterThisWeek()"
+              styleClass="mh-td__regen-bulk-btn"
+            />
+            <small class="mh-td__regen-bulk-note">
+              Cancels every occurrence after the next one and ends the series.
+            </small>
+            <div class="mh-td__regen-bulk-stub">
+              <i class="pi pi-clock" aria-hidden="true"></i>
+              <span>
+                <strong>Coming soon:</strong> shift all upcoming times,
+                update venue across the remaining series.
+              </span>
+            </div>
+          </aside>
+        </section>
+      }
+
+      <!-- Upcoming -->
+      <section class="mh-td__list">
+        <h3>
+          Upcoming
+          <span class="mh-td__count">{{ upcoming().length }}</span>
+        </h3>
+
+        @if (upcoming().length === 0) {
+          <p class="mh-td__none">
+            No upcoming occurrences.
+            @if (t.isRecurring) {
+              Use <strong>Regenerate forward</strong> above to generate more.
+            }
+          </p>
+        } @else {
+          <ul class="mh-td__rows">
+            @for (i of upcoming(); track i.id) {
+              <li
+                class="mh-td__row"
+                [class.mh-td__row--cancelled]="i.status === 'CANCELLED'"
+              >
+                <a [routerLink]="['/coaching/sessions', i.id]" class="mh-td__row-link">
+                  <span class="mh-td__row-time">
+                    {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
+                  </span>
+                  @if (i.status === 'CANCELLED') {
+                    <span class="mh-td__row-status mh-td__row-status--cancelled">
+                      <i class="pi pi-times-circle"></i> Cancelled
+                    </span>
+                  } @else {
+                    <span class="mh-td__row-counters">
+                      <strong>{{ i.confirmedCount }}</strong> confirmed
+                      @if (i.pendingApprovalCount > 0) {
+                        · <strong class="mh-td__row-pending">{{ i.pendingApprovalCount }} pending</strong>
+                      }
+                      @if (i.waitlistedCount > 0) {
+                        · {{ i.waitlistedCount }} waitlisted
+                      }
+                    </span>
+                    @if (i.conflictingInstanceIds?.length) {
+                      <span class="mh-td__row-warn">
+                        <i class="pi pi-exclamation-triangle"></i> conflict
+                      </span>
+                    }
+                  }
+                  <i class="pi pi-chevron-right mh-td__row-arrow"></i>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- Past (collapsed by default behavior is implicit — fewer rows usually) -->
+      @if (past().length > 0) {
+        <section class="mh-td__list">
+          <h3>
+            Past
+            <span class="mh-td__count">{{ past().length }}</span>
+          </h3>
+          <ul class="mh-td__rows mh-td__rows--past">
+            @for (i of past(); track i.id) {
+              <li
+                class="mh-td__row"
+                [class.mh-td__row--cancelled]="i.status === 'CANCELLED'"
+              >
+                <a [routerLink]="['/coaching/sessions', i.id]" class="mh-td__row-link">
+                  <span class="mh-td__row-time">
+                    {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
+                  </span>
+                  @if (i.status === 'CANCELLED') {
+                    <span class="mh-td__row-status mh-td__row-status--cancelled">
+                      <i class="pi pi-times-circle"></i> Cancelled
+                    </span>
+                  } @else {
+                    <span class="mh-td__row-counters">
+                      @if (i.attendedCount !== null) {
+                        <strong>{{ i.attendedCount }}</strong> attended
+                      } @else {
+                        <strong>{{ i.confirmedCount }}</strong> confirmed
+                      }
+                    </span>
+                  }
+                  <i class="pi pi-chevron-right mh-td__row-arrow"></i>
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    <mh-session-form-dialog
+      [visible]="editOpen()"
+      (visibleChange)="editOpen.set($event)"
+      [template]="t"
+      (saved)="onSaved()"
+    />
+  }
+</mh-page-shell>
+
+<p-toast position="top-right" />
+<p-confirmDialog />

@@ -1,0 +1,177 @@
+<div
+  class="mh-calendar"
+  [class.mh-calendar--readonly]="readonly()"
+  [class.mh-calendar--loading]="loading()"
+  [attr.role]="'grid'"
+  [attr.aria-busy]="loading()"
+>
+  @if (loading()) {
+    <div class="mh-calendar__loading" role="status">Loading…</div>
+  }
+
+  @switch (view()) {
+    @case ('week') {
+      <!-- Sticky day header row -->
+      <div class="mh-calendar__header" role="row">
+        <div class="mh-calendar__hour-gutter mh-calendar__header-cell" aria-hidden="true"></div>
+        @for (day of days(); track day.getTime()) {
+          <div
+            class="mh-calendar__header-cell"
+            role="columnheader"
+            [class.is-today]="isToday(day)"
+            [class.is-selected]="isSelected(day)"
+          >
+            <span class="mh-calendar__day-name">
+              {{ day | date: 'EEE' : '' : 'en-GB' }}
+            </span>
+            <span class="mh-calendar__day-num">{{ day.getDate() }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Body: hour rows × day columns -->
+      <div
+        class="mh-calendar__body"
+        [style.height.px]="bodyHeightPx()"
+        (pointerup)="onCellPointerUp()"
+      >
+        <!-- Hour labels in the left gutter -->
+        <div class="mh-calendar__hour-gutter">
+          @for (h of hours(); track h) {
+            <div
+              class="mh-calendar__hour-label"
+              [style.height.px]="rowHeightPx()"
+            >
+              {{ h }}:00
+            </div>
+          }
+        </div>
+
+        <!-- Day columns -->
+        @for (day of days(); track day.getTime(); let dayIndex = $index) {
+          <div
+            class="mh-calendar__day-col"
+            role="gridcell"
+            [class.is-today]="isToday(day)"
+            [class.is-selected]="isSelected(day)"
+          >
+            <!-- Empty hour cells (click + drag affordance) -->
+            @for (h of hours(); track h) {
+              <div
+                class="mh-calendar__hour-cell"
+                [class.mh-calendar__hour-cell--odd]="h % 2 === 1"
+                [style.height.px]="rowHeightPx()"
+                (click)="onCellClick(day, h, $event)"
+                (pointerdown)="onCellPointerDown(dayIndex, h, $event)"
+                (pointermove)="onCellPointerMove(h, $event)"
+              ></div>
+            }
+
+            @if (isToday(day) && nowOffsetPx() !== null) {
+              <div
+                class="mh-calendar__now-line"
+                [style.top.px]="nowOffsetPx()"
+                [attr.aria-label]="'Current time: ' + nowTimeLabel()"
+                [attr.title]="'Current time: ' + nowTimeLabel()"
+              >
+                <span class="mh-calendar__now-dot" aria-hidden="true"></span>
+                <span class="mh-calendar__now-label">Now · {{ nowTimeLabel() }}</span>
+              </div>
+            }
+
+            <!-- Drag selection overlay (normalised: min..max so upward drags render correctly) -->
+            @if (_dragState(); as drag) {
+              @if (drag.dayIndex === dayIndex) {
+                <div
+                  class="mh-calendar__drag-selection"
+                  [style.top.px]="(dragMinHour(drag) - hourRange()[0]) * rowHeightPx()"
+                  [style.height.px]="(dragMaxHour(drag) - dragMinHour(drag)) * rowHeightPx()"
+                  aria-hidden="true"
+                >
+                  <span>{{ dragMinHour(drag) }}:00 – {{ dragMaxHour(drag) }}:00</span>
+                </div>
+              }
+            }
+
+            <!-- Events for this day, absolutely positioned -->
+            @for (event of eventsForDay(day); track event.id) {
+              <mh-event-block
+                class="mh-calendar__event"
+                [event]="event"
+                [layout]="eventLayout(event)"
+                (click)="onEventClick(event, $event)"
+              ></mh-event-block>
+            }
+            @if (overflowCountFor(day); as n) {
+              @if (n > 0) {
+                <button
+                  type="button"
+                  class="mh-calendar__overflow"
+                  (click)="onOverflowClick(day, $event)"
+                  [attr.aria-label]="n + ' more sessions this day'"
+                >+{{ n }} more</button>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+    @case ('day') {
+      <!-- Day view: same body, single column. Phase C polishes this. -->
+      <div
+        class="mh-calendar__body mh-calendar__body--day"
+        [style.height.px]="bodyHeightPx()"
+        (pointerup)="onCellPointerUp()"
+      >
+        <div class="mh-calendar__hour-gutter">
+          @for (h of hours(); track h) {
+            <div
+              class="mh-calendar__hour-label"
+              [style.height.px]="rowHeightPx()"
+            >
+              {{ h }}:00
+            </div>
+          }
+        </div>
+        <div class="mh-calendar__day-col">
+          @for (h of hours(); track h) {
+            <div
+              class="mh-calendar__hour-cell"
+              [class.mh-calendar__hour-cell--odd]="h % 2 === 1"
+              [style.height.px]="rowHeightPx()"
+              (click)="onCellClick(dateRange().start, h, $event)"
+            ></div>
+          }
+          @if (nowOffsetPx() !== null) {
+            <div
+              class="mh-calendar__now-line"
+              [style.top.px]="nowOffsetPx()"
+              aria-hidden="true"
+            ></div>
+          }
+          @for (event of eventsForDay(dateRange().start); track event.id) {
+            <mh-event-block
+              class="mh-calendar__event"
+              [event]="event"
+              [layout]="eventLayout(event)"
+              (click)="onEventClick(event, $event)"
+            ></mh-event-block>
+          }
+        </div>
+      </div>
+    }
+    @case ('month') {
+      <!-- Month view: 5x7 cell grid. Phase C polishes — Phase A renders structure only. -->
+      <div class="mh-calendar__month-grid" role="grid">
+        @for (event of events(); track event.id) {
+          <div
+            class="mh-calendar__month-event"
+            (click)="onEventClick(event, $event)"
+          >
+            {{ event.title }}
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

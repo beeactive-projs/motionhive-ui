@@ -1,1 +1,122 @@
 @import '../../core/src/styles/theme.css';
+@import './styles-messaging-dialogs.css';
+
+/* Calendar event-block tooltip: rich PrimeNG tooltip rendered at body
+   level (so component-scoped styles can't reach it — must live here). */
+.mh-event-tooltip .p-tooltip-text {
+  background: var(--p-surface-900, #1f2937);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 280px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+.mh-event-tooltip .mh-evt-tt__title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.mh-event-tooltip .mh-evt-tt__time {
+  font-weight: 600;
+  color: var(--p-primary-200, #fcd34d);
+  margin-bottom: 4px;
+}
+.mh-event-tooltip .mh-evt-tt__sub {
+  color: rgba(255, 255, 255, 0.75);
+}
+.mh-event-tooltip .mh-evt-tt__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.mh-event-tooltip .mh-evt-tt__flags span {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ─── Mobile dialogs as bottom sheets ────────────────────────────────
+   At ≤600px every p-dialog turns into a slide-up sheet: full width,
+   pinned to the bottom of the viewport, rounded top corners, drag-
+   handle pseudo-element. Header + footer become sticky so the body
+   scrolls inside the sheet (not the page).
+   Scope: applies to ALL p-dialog modals so this is a one-place fix. */
+@media (max-width: 600px) {
+  .p-dialog-mask:has(.p-dialog) {
+    align-items: flex-end !important;
+  }
+  .p-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 92vh !important;
+    animation: mh-sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .p-dialog .p-dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--p-content-background);
+    border-radius: 16px 16px 0 0;
+    padding-top: 18px;
+  }
+  /* Drag-handle bar above the header. */
+  .p-dialog .p-dialog-header::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--p-surface-300);
+  }
+  .p-dialog .p-dialog-content {
+    max-height: none !important;
+    overflow-y: auto;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .p-dialog .p-dialog-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--p-content-background);
+    border-top: 1px solid var(--p-content-border-color);
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@keyframes mh-sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ─── Mobile datepicker (touchUI) overrides ──────────────────────────
+   PrimeNG's touchUI variant defaults to a 90vw picker with no maximum
+   cap. On phones we want the picker to feel like a clean modal: capped
+   width, centered, with a dimmed backdrop. Without these, the picker
+   stretches edge-to-edge with no breathing room, and the bottom sheet
+   underneath bleeds through (no backdrop). */
+@media (max-width: 600px) {
+  /* Darken the touch-UI backdrop so the create-sheet underneath
+     doesn't visually compete with the picker. PrimeNG's default
+     panel width (~360px) already fits a 390px viewport with 15px
+     gutters; the previous override was clipping the right column. */
+  body .p-datepicker-mask.p-overlay-mask {
+    background: rgba(20, 18, 12, 0.6) !important;
+  }
+  body p-motion {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  }
+}

@@ -7,7 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   ClientRequestTypes,
   ClientService,
@@ -31,7 +31,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit-client-notes-dialog';
 import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
-import { Avatar } from '../../../_shared/components/avatar/avatar';
+import { UserInfo } from '../../../_shared/components/user-info/user-info';
 
 @Component({
   selector: 'mh-clients',
@@ -41,7 +41,7 @@ import { Avatar } from '../../../_shared/components/avatar/avatar';
     ButtonModule,
     TableModule,
     TagModule,
-    Avatar,
+    UserInfo,
     BadgeModule,
     OverlayBadgeModule,
     SkeletonModule,
@@ -50,7 +50,6 @@ import { Avatar } from '../../../_shared/components/avatar/avatar';
     TooltipModule,
     InviteClientDialog,
     EditClientNotesDialog,
-    RouterLink,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',

@@ -43,20 +43,11 @@
       </ng-template>
 
       <ng-template #body let-row>
-        <tr>
+        <tr [id]="'request-row-' + row.id"
+            [class.ring-2]="highlightedRequestId() === row.id"
+            [class.ring-primary-400]="highlightedRequestId() === row.id">
           <td>
-            <div class="flex items-center gap-3">
-              <mh-avatar [user]="row.client" />
-              @if (row.clientId) {
-              <!-- TODO: route to public profile once it exists -->
-              <a [routerLink]="['/users', row.clientId]"
-                class="text-primary-500 hover:underline font-medium tabular-nums">
-                {{ clientName(row) }}
-              </a>
-              } @else {
-              <span class="font-medium tabular-nums">{{ clientName(row) }}</span>
-              }
-            </div>
+            <mh-user-info [user]="row.client" />
           </td>
           <td>{{ clientEmail(row) }}</td>
           <td class="text-center">

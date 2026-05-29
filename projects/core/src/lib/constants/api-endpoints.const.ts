@@ -21,6 +21,16 @@ export const API_ENDPOINTS = {
     BASE: '/profile',
     INSTRUCTORS: '/profile/instructors',
     DISCOVER_INSTRUCTORS: '/profile/instructors/discover',
+    INSTRUCTOR_BY_HANDLE: (handle: string) => `/profile/instructors/by-handle/${handle}`,
+    INSTRUCTOR_GROUPS: (id: string) => `/profile/instructors/${id}/groups`,
+    INSTRUCTOR_REVIEWS: (id: string) => `/profile/instructors/${id}/reviews`,
+    USER_BY_HANDLE: (handle: string) => `/profile/users/by-handle/${handle}`,
+    PRIVACY: '/profile/privacy',
+    HANDLE: '/profile/handle',
+    // Public lead-capture endpoint — POSTed from the "Reach out to <Name>"
+    // dialog on the instructor profile. No auth required (the design's
+    // one always-public action). Backend lands in Phase A2.
+    INSTRUCTOR_LEADS: '/profile/instructor-leads',
   },
   VENUES: {
     BASE: '/venues',
@@ -64,8 +74,42 @@ export const API_ENDPOINTS = {
     COMMENT: (postId: string, commentId: string) => `/posts/${postId}/comments/${commentId}`,
     REACTIONS: (postId: string) => `/posts/${postId}/reactions`,
   },
+  // Sessions module — see SESSIONS_FRONTEND_BUILD_PLAN.md §A.2.
+  // Mirrors every endpoint of the live BE (24 surfaces).
   SESSIONS: {
     BASE: '/sessions',
+    // Templates (instructor)
+    TEMPLATES: '/sessions/templates',
+    TEMPLATE_BY_ID: (id: string) => `/sessions/templates/${id}`,
+    PREVIEW_RECURRENCE: '/sessions/templates/preview-recurrence',
+    REGENERATE: (id: string) => `/sessions/templates/${id}/regenerate`,
+    // Instances (read + write)
+    INSTANCES: '/sessions/instances',
+    INSTANCE_BY_ID: (id: string) => `/sessions/instances/${id}`,
+    INSTANCE_PARTICIPANTS: (id: string) => `/sessions/instances/${id}/participants`,
+    CANCEL_INSTANCE: (id: string) => `/sessions/instances/${id}/cancel`,
+    RESCHEDULE_INSTANCE: (id: string) => `/sessions/instances/${id}/reschedule`,
+    FOLLOW_UP: (id: string) => `/sessions/instances/${id}/follow-up`,
+    // Booking (client)
+    BOOK: (id: string) => `/sessions/instances/${id}/book`,
+    CANCEL_BOOKING: (id: string) => `/sessions/instances/${id}/cancel-booking`,
+    // Instructor → participant
+    APPROVE_PARTICIPANT: (instanceId: string, participantId: string) =>
+      `/sessions/instances/${instanceId}/participants/${participantId}/approve`,
+    DECLINE_PARTICIPANT: (instanceId: string, participantId: string) =>
+      `/sessions/instances/${instanceId}/participants/${participantId}/decline`,
+    PARTICIPANT_BY_ID: (instanceId: string, participantId: string) =>
+      `/sessions/instances/${instanceId}/participants/${participantId}`,
+    // Public surface
+    DISCOVER: '/sessions/discover',
+    PUBLIC_BY_SLUG: (handle: string, slug: string) =>
+      `/sessions/public/${handle}/${slug}`,
+    PUBLIC_INSTANCE: (id: string) => `/sessions/instances/${id}/public`,
+    // Client utilities
+    MY: '/sessions/my',
+    MY_COUNTS: '/sessions/my/counts',
+    ICS: (id: string) => `/sessions/instances/${id}/ics`,
+    JOIN_INFO: (id: string) => `/sessions/instances/${id}/join-info`,
   },
   BLOG: {
     BASE: '/blog',
@@ -157,5 +201,22 @@ export const API_ENDPOINTS = {
     LIST: '/devices',
     BY_ID: (deviceId: string) => `/devices/${deviceId}`,
     HEARTBEAT: (deviceId: string) => `/devices/${deviceId}/seen`,
+  },
+  MESSAGING: {
+    CONVERSATIONS: '/messaging/conversations',
+    CONVERSATION: (id: string) => `/messaging/conversations/${id}`,
+    CONVERSATION_MESSAGES: (id: string) =>
+      `/messaging/conversations/${id}/messages`,
+    CONVERSATION_READ: (id: string) => `/messaging/conversations/${id}/read`,
+    CONVERSATION_MUTE: (id: string) => `/messaging/conversations/${id}/mute`,
+    CONVERSATION_LEAVE: (id: string) => `/messaging/conversations/${id}/leave`,
+    MESSAGES: '/messaging/messages',
+    MESSAGE: (id: string) => `/messaging/messages/${id}`,
+    BLOCKS: '/messaging/blocks',
+    BLOCK: (blockedId: string) => `/messaging/blocks/${blockedId}`,
+    REPORTS: '/messaging/reports',
+    UNREAD_COUNT: '/messaging/unread-count',
+    STREAM: '/messaging/stream',
+    STREAM_ACK: '/messaging/stream/ack',
   },
 } as const;

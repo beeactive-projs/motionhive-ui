@@ -1,0 +1,220 @@
+// Session card — shared across 6 variants. Layout differences per variant
+// are confined to this file; visual atoms (chips, capacity bar, etc.)
+// stay identical.
+
+.mh-card {
+  --stripe: var(--p-primary-500);
+  position: relative;
+  display: grid;
+  // Time block | main body (chips + title + meta) | side (capacity + CTA)
+  // `minmax(0,1fr)` lets the body truncate instead of pushing other columns.
+  grid-template-columns: 84px minmax(0, 1fr) max-content;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px 14px 20px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    background: var(--stripe);
+    border-radius: 999px;
+  }
+
+  &:hover {
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+    border-color: var(--p-surface-300);
+  }
+
+  &--selected {
+    background: #FFFBEF;
+    border-color: var(--p-primary-300);
+  }
+
+  &--blocked {
+    opacity: 0.7;
+    cursor: default;
+    .mh-card__title { color: var(--p-text-muted-color); }
+    &:hover { box-shadow: none; border-color: var(--p-content-border-color); }
+  }
+
+  // Layout variants
+  &--mine {
+    grid-template-columns: 84px minmax(0, 1fr) max-content;
+    padding: 12px 14px 12px 18px;
+  }
+  // Compact mobile layout: tight single row with reduced padding.
+  // The time block becomes a single horizontal line (date + hour) and
+  // the right-side capacity collapses to text-only ("3/10") so the card
+  // height drops by ~40% vs. the desktop layout.
+  &--list, &--mine {
+    @media (max-width: 640px) {
+      grid-template-columns: minmax(0, 1fr) max-content;
+      gap: 10px;
+      padding: 10px 12px 10px 16px;
+
+      .mh-card__time {
+        // Inline date + hour above the title (one row), drop the duration.
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 6px;
+        order: -1;
+      }
+      .mh-card__date {
+        font-size: 11px;
+        letter-spacing: 0;
+      }
+      .mh-card__hour {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .mh-card__dur { display: none; }
+      .mh-card__title { font-size: 14px; }
+      .mh-card__chips { gap: 4px; }
+      .mh-card__meta { font-size: 12px; }
+    }
+  }
+  &--showcase {
+    border-radius: 14px;
+  }
+  &--mobile {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    .mh-card__time { flex-direction: row; gap: 8px; }
+    .mh-card__side { width: 100%; flex-direction: row; justify-content: space-between; }
+  }
+  &--related {
+    grid-template-columns: 64px 1fr;
+    padding: 10px 12px 10px 16px;
+  }
+  &--popover {
+    border-radius: 10px;
+    padding: 10px 12px 10px 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.mh-card__check {
+  align-self: flex-start;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.mh-card__time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.mh-card__date {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+}
+.mh-card__hour {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--p-text-color);
+  line-height: 1;
+}
+.mh-card__dur {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+}
+
+.mh-card__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mh-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mh-card__chip-recurring {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--p-primary-500) 12%, transparent);
+  color: var(--p-primary-700);
+  border: 1px solid color-mix(in srgb, var(--p-primary-500) 25%, transparent);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  i { font-size: 10px; }
+}
+.mh-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--p-text-color);
+  /* 2-line clamp on long titles — single-line ellipsis hides the
+     meaningful prefix for IDs like "E2E phase-F deep-link 1779...".
+     Full title still shows on the detail page. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+}
+.mh-card__meta,
+.mh-card__locked {
+  margin: 0;
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mh-card__locked {
+  color: var(--p-text-muted-color);
+  font-style: italic;
+}
+
+.mh-card__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mh-card__cta {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--p-primary-500);
+  background: var(--p-primary-500);
+  color: var(--p-primary-contrast-color, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease;
+  white-space: nowrap;
+
+  &:hover:not(.is-disabled) { background: var(--p-primary-600); }
+  &.is-disabled {
+    background: var(--p-surface-100);
+    color: var(--p-text-muted-color);
+    border-color: var(--p-content-border-color);
+    cursor: not-allowed;
+  }
+}

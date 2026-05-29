@@ -5,6 +5,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  handle: string | null;
   phone?: string;
   avatarUrl?: string;
   isActive: boolean;
@@ -80,6 +81,15 @@ export interface AvatarUser {
   firstName?: string | null;
   lastName?: string | null;
   avatarUrl?: string | null;
+}
+
+/**
+ * Extends `AvatarUser` with email and handle for use in `mh-user-info`.
+ * When `handle` is present the component renders the name as a link to `/@<handle>`.
+ */
+export interface UserInfo extends AvatarUser {
+  email?: string | null;
+  handle?: string | null;
 }
 
 export interface UserSearchParams {

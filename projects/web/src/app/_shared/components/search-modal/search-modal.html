@@ -37,9 +37,21 @@
           size="small"
           (onClick)="onClear()"
           ariaLabel="Clear search"
+          styleClass="search-modal__clear-btn"
         />
       }
       <kbd class="search-modal__esc">Esc</kbd>
+      <!-- Mobile-only close button. Phones have no Esc key, so the Esc
+           kbd chip isn't actionable — give them a tappable target that
+           always closes the overlay, separate from the clear-query (×). -->
+      <button
+        type="button"
+        class="search-modal__close"
+        (click)="close()"
+        aria-label="Close search"
+      >
+        Close
+      </button>
     </div>
 
     <!-- ─────────── Category tabs ─────────── -->

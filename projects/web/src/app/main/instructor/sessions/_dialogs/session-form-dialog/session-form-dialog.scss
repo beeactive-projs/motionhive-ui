@@ -1,0 +1,115 @@
+.mh-sf__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 4px;
+}
+
+.mh-sf__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mh-sf__sec-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--p-text-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  i {
+    color: var(--p-primary-500);
+  }
+}
+
+.mh-sf__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mh-sf__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+}
+.mh-sf__field--full { grid-column: 1 / -1; }
+
+.mh-sf__checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mh-sf__inline-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--p-text-color);
+  margin-left: 0;
+  cursor: pointer;
+}
+
+.mh-sf__hint {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  font-style: italic;
+}
+
+/* Access requirement — 4 radio-cards in a 2×2 grid on desktop, single
+   column on phone. Each card carries an icon + label + sub-copy plus a
+   primary check-circle in the corner when selected. Replaces the old
+   <p-select> so the four kinds feel like decisions, not a dropdown. */
+.mh-sf__access {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+.mh-sf__access-card {
+  display: grid;
+  grid-template-columns: 28px 1fr 18px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+  > i { color: var(--p-text-muted-color); font-size: 16px; }
+  &:hover {
+    border-color: var(--p-primary-300);
+    background: var(--p-primary-50);
+  }
+  &.is-active {
+    border-color: var(--p-primary-500);
+    background: var(--p-primary-50);
+    box-shadow: 0 0 0 1px var(--p-primary-500);
+    > i:first-child { color: var(--p-primary-700); }
+    /* Active card uses a cream background regardless of theme — force
+       text to the primary-tinted dark colors so dark-mode white text
+       doesnt disappear on cream. */
+    .mh-sf__access-text strong { color: var(--p-primary-800, #6B3E07); }
+    .mh-sf__access-text small { color: var(--p-primary-700); }
+  }
+}
+.mh-sf__access-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  strong { font-size: 13px; color: var(--p-text-color); }
+  small { font-size: 11px; color: var(--p-text-muted-color); line-height: 1.3; }
+}
+.mh-sf__access-tick { color: var(--p-primary-700); font-size: 18px; }

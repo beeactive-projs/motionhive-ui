@@ -1,0 +1,38 @@
+<div
+  class="mh-bubble"
+  [class.mh-bubble--me]="isMine()"
+  [class.mh-bubble--them]="!isMine()"
+  [class.mh-bubble--last]="position() === 'last' || position() === 'only'"
+>
+  <!-- Avatar column. Always reserved for "them" so adjacent bubbles
+       in a run stay aligned even when the avatar is hidden. -->
+  @if (!isMine()) {
+    <div class="mh-bubble__avatar-col">
+      @if (showAvatar() && author()) {
+        <mh-hex-avatar
+          [size]="30"
+          [userId]="author()!.id"
+          [initials]="authorInitials()"
+          [imageUrl]="author()!.avatarUrl"
+        />
+      }
+    </div>
+  }
+
+  <div class="mh-bubble__stack">
+    @if (showAuthorName()) {
+      <div class="mh-bubble__author">{{ authorName() }}</div>
+    }
+    <div
+      class="mh-bubble__body"
+      [class.mh-bubble__body--deleted]="isDeleted()"
+      [style.border-radius]="bubbleRadius()"
+    >
+      <!-- Body is plaintext — bound via {{ }} so HTML is never injected. -->
+      {{ message().body }}
+    </div>
+    @if (showMeta()) {
+      <div class="mh-bubble__meta">{{ timeLabel() }}</div>
+    }
+  </div>
+</div>

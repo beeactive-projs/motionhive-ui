@@ -17,6 +17,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { MyInstructor, ClientRequest, ClientService } from 'core';
 import { DiscoverInstructors } from '../_dialogs/discover-instructors/discover-instructors';
 import { Avatar } from '../../../_shared/components/avatar/avatar';
+import { UserInfo } from '../../../_shared/components/user-info/user-info';
 
 @Component({
   selector: 'mh-instructors',
@@ -25,6 +26,7 @@ import { Avatar } from '../../../_shared/components/avatar/avatar';
     ButtonModule,
     TableModule,
     Avatar,
+    UserInfo,
     SkeletonModule,
     ToastModule,
     TooltipModule,

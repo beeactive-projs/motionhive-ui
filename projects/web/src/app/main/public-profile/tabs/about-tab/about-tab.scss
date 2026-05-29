@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.cert-pill {
+  background: var(--p-primary-50);
+  color: var(--p-primary-700);
+  border: 1px solid var(--p-primary-200);
+}
+
+:host-context(.dark) .cert-pill {
+  background: color-mix(in srgb, var(--p-primary-700) 25%, var(--p-surface-800));
+  color: var(--p-primary-200);
+  border-color: color-mix(in srgb, var(--p-primary-500) 30%, var(--p-surface-700));
+}

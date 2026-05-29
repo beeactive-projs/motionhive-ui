@@ -1,0 +1,56 @@
+<!--
+  "New message" toggles the store's compose mode. When active, the
+  right pane shows <mh-new-message-picker> instead of the routed
+  child — URL stays /messages throughout (plan §14 decision #3).
+
+  Group conversations are deferred to v2 — the disabled "New group"
+  button was removed so the UI doesn't promise functionality that
+  doesn't exist. The DB schema (`conversation.type='GROUP'`,
+  membership events, SYSTEM_* message kinds) is ready, but no FE
+  flow consumes it. When groups land: re-add the button, build a
+  member picker, wire role management, render SYSTEM events.
+-->
+<div class="mh-inbox">
+  <header class="mh-inbox__header">
+    <h1 class="mh-inbox__title">Messages</h1>
+    @if (store.unreadTotal() > 0) {
+      <span class="mh-inbox__unread-chip">{{ store.unreadTotal() }} unread</span>
+    }
+    @if (store.streamStatus() === 'closed') {
+      <span class="mh-inbox__status-chip" role="status" aria-live="polite">
+        <i class="pi pi-wifi" aria-hidden="true"></i>
+        Reconnecting…
+      </span>
+    }
+    <span class="mh-inbox__header-spacer"></span>
+    <button
+      type="button"
+      class="mh-inbox__btn mh-inbox__btn--primary"
+      (click)="onNewMessage()"
+      [disabled]="store.composeMode()"
+      aria-label="New message"
+    >
+      <i class="pi pi-pencil" aria-hidden="true"></i>
+      <span>New message</span>
+    </button>
+  </header>
+
+  <div class="mh-inbox__body">
+    <aside class="mh-inbox__list-column">
+      <mh-conversation-list />
+    </aside>
+
+    <main class="mh-inbox__chat-column">
+      @if (store.composeMode()) {
+        <!--
+          Compose mode rents the right pane. The router-outlet is
+          intentionally NOT rendered while compose is on so a stale
+          /messages/:id route doesn't render under the picker.
+        -->
+        <mh-new-message-picker />
+      } @else {
+        <router-outlet />
+      }
+    </main>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="mh-composer-wrap">
+  @if (store.sendError(); as error) {
+    <div class="mh-composer-error" role="alert">
+      <span class="mh-composer-error__text">{{ error }}</span>
+      <button
+        type="button"
+        class="mh-composer-error__dismiss"
+        (click)="dismissError()"
+        aria-label="Dismiss error"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+
+  <div
+    class="mh-composer"
+    [class.mh-composer--disabled]="disabled() || isRateLimited()"
+  >
+    <textarea
+      #textarea
+      class="mh-composer__input"
+      [ngModel]="value()"
+      (ngModelChange)="onModelChange($event)"
+      (keydown)="onKeydown($event)"
+      [placeholder]="isRateLimited() ? 'Slow down — try again in ' + limitedSecs() + 's' : placeholder()"
+      [disabled]="disabled()"
+      [attr.aria-label]="placeholder()"
+      rows="1"
+    ></textarea>
+
+    <button
+      type="button"
+      class="mh-composer__send"
+      [disabled]="!canSend()"
+      (click)="send()"
+      [attr.aria-label]="sending() ? 'Sending…' : 'Send message'"
+      [title]="isRateLimited() ? 'Slow down — try again in ' + limitedSecs() + 's' : 'Send'"
+    >
+      @if (sending()) {
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      } @else {
+        <i class="pi pi-send" aria-hidden="true"></i>
+      }
+    </button>
+  </div>
+
+  @if (tooLong()) {
+    <div class="mh-composer-hint">
+      Messages are capped at 4000 characters.
+    </div>
+  }
+</div>

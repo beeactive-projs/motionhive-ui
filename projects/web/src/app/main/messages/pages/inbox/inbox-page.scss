@@ -1,0 +1,176 @@
+// Inbox shell — Stage F1 scaffold. Real split-view styling lands in F2.
+:host {
+  display: block;
+  height: 100%;
+}
+
+.mh-inbox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-50, #fcfaf6);
+}
+
+.mh-inbox__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line, rgba(15, 23, 42, 0.08));
+  background: var(--surface-50, #fcfaf6);
+}
+
+.mh-inbox__title {
+  margin: 0;
+  font-family: var(--font-display, 'Poppins'), 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--navy-900, #0f172a);
+}
+
+.mh-inbox__unread-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--honey-100, #fef3c7);
+  color: var(--honey-800, #92400e);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mh-inbox__status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mh-inbox__status-chip i {
+  font-size: 10px;
+}
+
+.mh-inbox__body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.mh-inbox__header-spacer {
+  flex: 1;
+}
+
+.mh-inbox__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mh-inbox__btn--ghost {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: var(--line, rgba(15, 23, 42, 0.08));
+}
+
+.mh-inbox__btn--primary {
+  background: #f59e0b;
+  color: #0f172a;
+  box-shadow: 0 1px 0 rgba(120, 53, 15, 0.18),
+    inset 0 -1px 0 rgba(120, 53, 15, 0.12);
+}
+
+.mh-inbox__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mh-inbox__btn i {
+  font-size: 12px;
+}
+
+.mh-inbox__list-column {
+  width: 340px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--line, rgba(15, 23, 42, 0.08));
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mh-inbox__chat-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface-50, #fcfaf6);
+}
+
+// Mobile: stack to a single column. The chat-column hides on the
+// inbox route; on /messages/:id (added in F3) the list-column hides.
+// F2 introduces the conditional class — for F1 we just stack.
+@media (max-width: 768px) {
+  .mh-inbox__body {
+    flex-direction: column;
+  }
+  .mh-inbox__list-column {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line, rgba(15, 23, 42, 0.08));
+  }
+}
+
+// ── Dark mode ────────────────────────────────────────────────────
+// `:host-context(.dark)` is the only selector form that Angular's
+// view encapsulation rewrites correctly when the `.dark` class
+// lives on a non-host ancestor (here, <html>).
+:host-context(.dark) {
+  .mh-inbox,
+  .mh-inbox__header,
+  .mh-inbox__chat-column {
+    background: var(--p-surface-900, #0f172a);
+  }
+  .mh-inbox__header {
+    border-bottom-color: rgba(248, 250, 252, 0.08);
+  }
+  .mh-inbox__title {
+    color: var(--p-surface-50, #f1f5f9);
+  }
+  .mh-inbox__status-chip {
+    background: rgba(248, 250, 252, 0.08);
+    color: var(--p-surface-300, #cbd5e1);
+  }
+  // The unread chip keeps its honey palette — it pops on dark.
+  .mh-inbox__btn--ghost {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-50, #f1f5f9);
+    border-color: rgba(248, 250, 252, 0.10);
+  }
+  // Primary CTA stays honey-on-dark — readable, brand-consistent.
+  .mh-inbox__list-column {
+    background: var(--p-surface-800, #1e293b);
+    border-right-color: rgba(248, 250, 252, 0.08);
+  }
+  @media (max-width: 768px) {
+    .mh-inbox__list-column {
+      border-bottom-color: rgba(248, 250, 252, 0.08);
+    }
+  }
+}

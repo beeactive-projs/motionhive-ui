@@ -1,0 +1,66 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [draggable]="false"
+  [resizable]="false"
+  header="Report conversation"
+  styleClass="mh-report-dialog"
+  [style]="{ width: '480px', maxWidth: '94vw' }"
+  (onHide)="onHide()"
+>
+  <p class="mh-report__lead">
+    Reports about <strong>{{ displayName() }}</strong> go to MotionHive's
+    safety team. They review every report — please pick the closest
+    category and add any details that help.
+  </p>
+
+  <div class="mh-report__group">
+    <div class="mh-report__eyebrow">What's the issue?</div>
+    <div class="mh-report__chips">
+      @for (c of categories; track c.key) {
+        <button
+          type="button"
+          class="mh-report__chip"
+          [class.mh-report__chip--active]="category() === c.key"
+          (click)="selectCategory(c.key)"
+        >
+          {{ c.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mh-report__group">
+    <label for="mh-report-notes" class="mh-report__eyebrow">Additional details (optional)</label>
+    <textarea
+      pTextarea
+      id="mh-report-notes"
+      class="mh-report__textarea"
+      rows="4"
+      [ngModel]="notes()"
+      (ngModelChange)="onNotesChange($event)"
+      [maxlength]="maxNotes"
+      placeholder="What happened? Include message snippets or context if it helps."
+    ></textarea>
+    <div class="mh-report__counter">{{ notes().length }}/{{ maxNotes }}</div>
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <p-button
+      label="Submit report"
+      icon="pi pi-flag"
+      [loading]="submitting()"
+      [disabled]="!canSubmit()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>

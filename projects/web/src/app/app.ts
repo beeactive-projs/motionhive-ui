@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { environment } from 'core';
+import { AuthService, environment } from 'core';
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { FeedbackDialog } from './_shared/components/feedback-dialog/feedback-dialog';
 import { WaitlistDialog } from './_shared/components/waitlist-dialog/waitlist-dialog';
@@ -17,6 +17,7 @@ export class App {
   protected readonly title = signal('web');
 
   private readonly _meta = inject(Meta);
+  private readonly _authService = inject(AuthService);
 
   constructor() {
     const imageUrl = `${environment.appUrl}/svg/logo-navy.svg`;

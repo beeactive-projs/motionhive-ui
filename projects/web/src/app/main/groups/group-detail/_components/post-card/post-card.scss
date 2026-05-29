@@ -21,7 +21,7 @@
   display: grid;
   gap: 4px;
   width: 100%;
-  height: 500px;
+  aspect-ratio: 16/9;
   border-radius: var(--p-border-radius-md);
   overflow: hidden;
 
@@ -89,8 +89,3 @@
   }
 }
 
-@media (max-width: 640px) {
-  .post-gallery {
-    height: 320px;
-  }
-}

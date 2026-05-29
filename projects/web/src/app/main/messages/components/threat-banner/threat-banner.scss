@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+.mh-threat {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 40px 8px;
+  padding: 10px 12px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 12px;
+  color: #7c2d12;
+}
+
+.mh-threat__icon {
+  font-size: 14px;
+  color: #c2410c;
+  margin-top: 2px;
+}
+
+.mh-threat__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mh-threat__title {
+  font-weight: 600;
+}
+
+.mh-threat__copy {
+  color: #9a3412;
+}
+
+.mh-threat__dismiss {
+  background: transparent;
+  border: none;
+  color: #9a3412;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  line-height: 1;
+}
+
+.mh-threat__dismiss:hover {
+  background: rgba(154, 52, 18, 0.08);
+}
+
+@media (max-width: 768px) {
+  .mh-threat {
+    margin: 0 14px 8px;
+  }
+}
+
+// ── Dark mode ────────────────────────────────────────────────────
+:host-context(.dark) {
+  .mh-threat {
+    // Warm amber wash on dark — preserves the "warning" semantics
+    // without the bright cream that burns on a dark page.
+    background: rgba(194, 65, 12, 0.16);
+    border-color: rgba(251, 146, 60, 0.4);
+    color: #fed7aa;
+  }
+  .mh-threat__icon {
+    color: #fb923c;
+  }
+  .mh-threat__copy {
+    color: #fdba74;
+  }
+  .mh-threat__dismiss {
+    color: #fdba74;
+  }
+  .mh-threat__dismiss:hover {
+    background: rgba(253, 186, 116, 0.16);
+  }
+}

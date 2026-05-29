@@ -1,6 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthStore, LoadingService, NavSection, StripeOnboardingService } from 'core';
+import {
+  AuthStore,
+  LoadingService,
+  MessagingStore,
+  NavSection,
+  StripeOnboardingService,
+} from 'core';
 import { Loader } from '../_shared/components/loader/loader';
 import { SidenavLayoutComponent } from '../layouts/sidenav-layout/sidenav-layout.component';
 
@@ -14,6 +20,7 @@ export class Main {
   private readonly _authStore = inject(AuthStore);
   private readonly _stripeOnboarding = inject(StripeOnboardingService);
   private readonly _loadingService = inject(LoadingService);
+  private readonly _messagingStore = inject(MessagingStore);
 
   readonly isInstructor = this._authStore.isInstructor;
   readonly isSuperAdmin = this._authStore.isSuperAdmin;
@@ -81,6 +88,16 @@ export class Main {
         items: [
           { label: 'Home', route: '/home', icon: 'pi pi-home' },
           { label: 'Explore', route: '/explore', icon: 'pi pi-compass' },
+          // Messages sits between Explore and Groups per design §4.
+          // Live unread badge wired straight to the store's signal —
+          // the sidenav re-renders the pill without us touching the
+          // section array.
+          {
+            label: 'Messages',
+            route: '/messages',
+            icon: 'pi pi-comment',
+            badge: this._messagingStore.unreadTotal,
+          },
           { label: 'Groups', route: '/groups', icon: 'pi pi-sitemap' },
         ],
       },
@@ -107,7 +124,8 @@ export class Main {
       label: 'Fitness',
       items: [
         { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
-        { label: 'Schedule', route: '/activity/schedule', icon: 'pi pi-calendar-clock' },
+        { label: 'My sessions', route: '/my/sessions', icon: 'pi pi-calendar-clock' },
+        { label: 'Discover', route: '/sessions/discover', icon: 'pi pi-search' },
         { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
       ],
     });

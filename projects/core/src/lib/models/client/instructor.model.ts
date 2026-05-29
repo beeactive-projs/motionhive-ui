@@ -1,12 +1,5 @@
+import { User } from '../user/user.model';
 import { InstructorCertification } from '../profile/instructor-profile.model';
-
-export interface MyInstructorUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatarId: string | null;
-}
 
 export interface MyInstructorProfile {
   userId: string;
@@ -21,7 +14,7 @@ export interface MyInstructor {
   clientId: string;
   status: string;
   startedAt: string;
-  instructor: MyInstructorUser;
+  instructor: User;
   instructorProfile: MyInstructorProfile | null;
 }
 
@@ -33,9 +26,11 @@ export type InstructorListResponse = MyInstructor[];
 export interface InstructorSearchResult {
   id: string;
   userId: string;
+  handle: string | null;
   firstName: string;
   lastName: string;
   avatarId: string | null;
+  avatarUrl: string | null;
   displayName: string | null;
   bio: string | null;
   specializations: string[] | null;
@@ -49,18 +44,27 @@ export interface InstructorSearchResult {
 export interface PublicInstructorProfile {
   id: string;
   userId: string;
+  handle: string | null;
   firstName: string;
   lastName: string;
   avatarId: string | null;
+  avatarUrl: string | null;
   displayName: string | null;
   bio: string | null;
   specializations: string[];
   certifications: InstructorCertification[];
   yearsOfExperience: number | null;
   isAcceptingClients: boolean;
+  isPublic: boolean;
+  email: string | null;
+  phone: string | null;
   city: string | null;
-  country: string | null;
+  countryCode: string | null;
+  language: string | null;
+  timezone: string | null;
   socialLinks: Record<string, string> | null;
   showEmail: boolean;
   showPhone: boolean;
+  joinedAt: string;
+  rating: { average: number; total: number } | null;
 }

@@ -1,0 +1,153 @@
+.mh-safety {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mh-safety__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mh-safety__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.mh-safety__lead {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #475569;
+}
+
+.mh-safety__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mh-safety__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.mh-safety__row--placeholder {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.mh-safety__row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mh-safety__row-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mh-safety__row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.mh-safety__chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mh-safety__date {
+  font-size: 11px;
+}
+
+.mh-safety__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 12px;
+  gap: 8px;
+  color: #64748b;
+}
+
+.mh-safety__empty-icon {
+  font-size: 32px;
+  color: #cbd5e1;
+}
+
+.mh-safety__empty-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.mh-safety__empty-sub {
+  margin: 0;
+  font-size: 13px;
+  max-width: 360px;
+  line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .mh-safety__row {
+    flex-wrap: wrap;
+  }
+  .mh-safety__row > :last-child {
+    margin-left: auto;
+  }
+}
+
+// ── Dark mode ────────────────────────────────────────────────────
+:host-context(.dark) {
+  .mh-safety__title,
+  .mh-safety__row-name,
+  .mh-safety__empty-title {
+    color: var(--p-surface-50, #f1f5f9);
+  }
+  .mh-safety__lead,
+  .mh-safety__empty,
+  .mh-safety__empty-sub {
+    color: var(--p-surface-300, #cbd5e1);
+  }
+  .mh-safety__row {
+    background: var(--p-surface-800, #1e293b);
+    border-color: rgba(248, 250, 252, 0.10);
+  }
+  .mh-safety__row--placeholder {
+    background: rgba(248, 250, 252, 0.04);
+  }
+  .mh-safety__row-meta {
+    color: var(--p-surface-400, #94a3b8);
+  }
+  // Chip keeps honey palette — pops on dark.
+  .mh-safety__empty-icon {
+    color: var(--p-surface-500, #64748b);
+  }
+}

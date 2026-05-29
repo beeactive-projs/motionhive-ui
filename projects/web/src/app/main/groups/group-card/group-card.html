@@ -1,0 +1,102 @@
+<div class="gp-card-wrap" [class.is-inactive]="!group().isActive">
+
+  <p-card class="gp-card h-full shadow-md">
+
+    <!-- HEADER: avatar + name/meta + policy chips + kebab -->
+    <ng-template #header>
+      <div class="flex items-start gap-3.5 p-[1.125rem] pb-0" [class.pr-2]="mode() === 'manage'">
+
+        <p-avatar [image]="group().logoUrl ?? undefined" [label]="group().logoUrl ? undefined : monogram" shape="square"
+          size="large" class="gp-avatar" [style]="avatarStyle" />
+
+        <div class="min-w-0 flex-1">
+          <a class="gp-name-link text-base font-semibold leading-tight truncate block" [routerLink]="cardLink">
+            {{ group().name }}
+          </a>
+          <div class="mt-0.5 text-xs text-surface-400">
+            {{ group().memberCount }} {{ group().memberCount === 1 ? 'member' : 'members' }}
+            @if (locationLabel) { · {{ locationLabel }} }
+          </div>
+          <div class="gp-status-tags mt-1.5 flex flex-wrap items-center gap-1.5">
+            <p-tag [value]="policyLabel" [severity]="policySeverity" [pTooltip]="policyTooltip" tooltipPosition="top" />
+            @if (!group().isPublic) {
+            <p-tag value="Private" icon="pi pi-lock" severity="secondary" pTooltip="Not discoverable in search"
+              tooltipPosition="top" />
+            }
+            @if (!group().isActive) {
+            <p-tag value="Inactive" severity="warn" />
+            }
+          </div>
+        </div>
+
+        @if (mode() === 'manage') {
+        <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true" [rounded]="true" size="small"
+          class="gp-kebab" ariaLabel="Group actions" (onClick)="onKebab($event)" />
+        <p-menu #menu [model]="menuItems" [popup]="true" [appendTo]="'body'" />
+        }
+      </div>
+    </ng-template>
+
+    <!-- CONTENT: description + tags -->
+    @if (group().description) {
+    <p class="m-0! text-[13px] leading-snug text-surface-600 line-clamp-2">
+      {{ group().description }}
+    </p>
+    }
+    @if (group().tags?.length) {
+    <div class="mt-3 flex flex-wrap gap-1.5">
+      @for (t of group().tags!.slice(0, 3); track t) {
+      <p-tag [value]="t" severity="secondary" class="gp-tag-content" />
+      }
+      @if (group().tags!.length > 3) {
+      <p-tag [value]="'+' + (group().tags!.length - 3)" severity="secondary" class="gp-tag-content" />
+      }
+    </div>
+    }
+
+    <!-- FOOTER -->
+    <ng-template #footer>
+      <div class="gp-foot flex items-center justify-between gap-2">
+
+        @if (mode() === 'manage') {
+        <!-- Member avatar stack -->
+        <p-avatarGroup>
+          @for (a of recentAvatars; track $index) {
+          <p-avatar [label]="a.label" shape="circle" size="normal" [style]="{ background: a.bg, color: a.fg }" />
+          }
+          @if (group().memberCount > recentAvatars.length) {
+          <p-avatar [label]="'+' + (group().memberCount - recentAvatars.length)" shape="circle" size="normal"
+            class="gp-avatar-more" />
+          }
+        </p-avatarGroup>
+
+        <p-button label="Visit group" icon="pi pi-arrow-right" iconPos="right" [link]="true" size="small"
+          class="gp-visit" [routerLink]="cardLink" />
+
+        } @else {
+        <!-- Discover mode: join / cancel / invite-only -->
+        <span></span>
+        @if (joinRequestStatus() === 'PENDING') {
+        <div class="flex items-center gap-2">
+          <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" size="small" />
+          <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary" size="small"
+            pTooltip="Cancel request" [loading]="isBusy()"
+            (onClick)="discoverAction.emit({ kind: 'cancel', group: group() })" />
+        </div>
+        } @else if (group().joinPolicy === JoinPolicies.Open) {
+        <p-button label="Join" icon="pi pi-plus" size="small" [loading]="isBusy()"
+          (onClick)="discoverAction.emit({ kind: 'join', group: group() })" />
+        } @else if (group().joinPolicy === JoinPolicies.Approval) {
+        <p-button label="Request to join" icon="pi pi-send" size="small" [loading]="isBusy()"
+          (onClick)="discoverAction.emit({ kind: 'join', group: group() })" />
+        } @else {
+        <p-button label="Invite only" icon="pi pi-lock" severity="secondary" [outlined]="true" [disabled]="true"
+          size="small" />
+        }
+        }
+
+      </div>
+    </ng-template>
+
+  </p-card>
+</div>

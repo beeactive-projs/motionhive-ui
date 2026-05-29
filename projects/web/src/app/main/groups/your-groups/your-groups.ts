@@ -1,31 +1,27 @@
 import { Component, ChangeDetectionStrategy, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { Skeleton } from 'primeng/skeleton';
+import { Toast } from 'primeng/toast';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Button } from 'primeng/button';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { AuthStore, Group, GroupService, GroupsRefreshService, joinPolicyLabel, joinPolicySeverity } from 'core';
+import { AuthStore, Group, GroupService, GroupsRefreshService } from 'core';
 import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog';
 import { AddMembersDialog } from '../_dialogs/add-members-dialog/add-members-dialog';
+import { GroupCard } from '../group-card/group-card';
+import { GroupCardSkeleton } from '../group-card-skeleton/group-card-skeleton';
+import { GroupsEmptyState } from '../groups-empty-state/groups-empty-state';
 
 @Component({
   selector: 'mh-your-groups',
   imports: [
-    CardModule,
-    ButtonModule,
-    TagModule,
-    ToastModule,
-    ConfirmDialogModule,
-    TooltipModule,
-    Skeleton,
+    Button,
+    Toast,
+    ConfirmDialog,
     GroupFormDialog,
     AddMembersDialog,
-    RouterLink,
+    GroupCard,
+    GroupCardSkeleton,
+    GroupsEmptyState,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './your-groups.html',
@@ -36,14 +32,11 @@ export class YourGroups implements OnInit {
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
-  private readonly _router = inject(Router);
   private readonly _authStore = inject(AuthStore);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly isInstructor = this._authStore.isInstructor;
-  readonly joinPolicyLabel = joinPolicyLabel;
-  readonly joinPolicySeverity = joinPolicySeverity;
 
   groups = signal<Group[]>([]);
   loading = signal(true);
@@ -83,34 +76,62 @@ export class YourGroups implements OnInit {
     this.showGroupFormDialog.set(true);
   }
 
-  openAddMembersDialog(event: Event, group: Group): void {
-    event.stopPropagation();
-    this.addMembersGroupId.set(group.id);
-    this.showAddMembersDialog.set(true);
+  onAction(event: { kind: 'invite' | 'edit' | 'share' | 'archive' | 'delete'; group: Group }): void {
+    switch (event.kind) {
+      case 'invite':
+        this.addMembersGroupId.set(event.group.id);
+        this.showAddMembersDialog.set(true);
+        break;
+      case 'edit':
+        this.editingGroup.set(event.group);
+        this.showGroupFormDialog.set(true);
+        break;
+      case 'share':
+        this._copyInviteLink(event.group);
+        break;
+      case 'archive':
+        this._messageService.add({
+          severity: 'info',
+          summary: 'Coming soon',
+          detail: 'Archiving groups will be available in a future update.',
+        });
+        break;
+      case 'delete':
+        this._confirmDelete(event.group);
+        break;
+    }
   }
 
-  openEditDialog(event: Event, group: Group): void {
-    event.stopPropagation();
-    this.editingGroup.set(group);
-    this.showGroupFormDialog.set(true);
-  }
-
-  confirmDelete(event: Event, group: Group): void {
-    event.stopPropagation();
-    this._confirmationService.confirm({
-      header: 'Delete group',
-      message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-contrast',
-      acceptLabel: 'Yes, delete',
-      rejectLabel: 'No',
-      acceptIcon: 'pi pi-trash',
-      rejectIcon: 'pi pi-times',
-      accept: () => this.deleteGroup(group),
+  private _copyInviteLink(group: Group): void {
+    if (!group.joinToken) {
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'No invite link',
+        detail: 'Generate an invite link from the group settings first.',
+      });
+      return;
+    }
+    const url = `${window.location.origin}/groups/join/${group.joinToken}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this._messageService.add({
+        severity: 'success',
+        summary: 'Copied',
+        detail: 'Invite link copied to clipboard.',
+      });
     });
   }
 
-  private deleteGroup(group: Group): void {
+  private _confirmDelete(group: Group): void {
+    this._confirmationService.confirm({
+      header: 'Delete group',
+      message: `Are you sure you want to delete "${group.name}"? This action cannot be undone.`,
+      acceptButtonProps: { severity: 'danger', label: 'Yes, delete', icon: 'pi pi-trash' },
+      rejectButtonProps: { severity: 'secondary', label: 'No', icon: 'pi pi-times', outlined: true },
+      accept: () => this._deleteGroup(group),
+    });
+  }
+
+  private _deleteGroup(group: Group): void {
     this._groupService.delete(group.id).subscribe({
       next: () => {
         this._messageService.add({
@@ -129,19 +150,4 @@ export class YourGroups implements OnInit {
       },
     });
   }
-
-  navigateToGroup(group: Group): void {
-    this._router.navigate(['/groups', group.id]);
-  }
-
-  isOwner(group: Group): boolean {
-    return group.instructorId === this._authStore.user()?.id;
-  }
-
-  descriptionExcerpt(description: string | null): string {
-    if (!description) return 'No description';
-    return description.length > 100 ? description.substring(0, 100) + '...' : description;
-  }
-
-  trackById = (_: number, item: { id: string }) => item.id;
 }
