@@ -8,7 +8,6 @@
    (lead text, eyebrow labels, chip groups, counters) live here
    globally and target the dialog by the `styleClass=` hook each
    dialog template passes to `p-dialog`.
-
    Light-mode styles for these dialogs remain in their respective
    component SCSS files; only the dark-mode flips are global.
    ============================================================ */
