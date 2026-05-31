@@ -17,7 +17,7 @@
   }
   /* Phone: 4 stacked KPI cards = 4 wasted screens. Horizontal-scroll
      strip of fixed-width pills instead, with edge fade. */
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -43,7 +43,7 @@
   padding-bottom: 0;
   /* Mobile: never wrap; horizontal scroll with an edge fade so users see
      there's more. Hide the scrollbar so it doesn't claim a row of height. */
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
@@ -90,7 +90,7 @@
   /* On narrow widths the pill row could spill — let it scroll horizontally
      rather than push the page wider on phones. Hide the scrollbar visual; the
      -webkit-overflow-scrolling keeps momentum on iOS. */
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -186,7 +186,7 @@
 
   /* Mobile: shrink the card chrome so two stacked buttons don't tower
      over the page. Per the design's empty 5B pattern. */
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     margin: 24px 0;
     padding: 20px 16px;
     border-radius: 12px;
@@ -205,7 +205,7 @@
   justify-content: center;
   color: var(--p-primary-700);
   font-size: 28px;
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     width: 48px;
     height: 48px;
     font-size: 22px;
@@ -221,7 +221,7 @@
      to ~52px tall and the label wraps awkwardly. Shrink the inner
      padding + font so the row reads as a primary action, not body
      copy. Buttons take width:100% so they line up. */
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     flex-direction: column;
     align-items: stretch;
     :host ::ng-deep & .p-button {
@@ -300,7 +300,7 @@
 }
 :host ::ng-deep .mh-sessions__new-btn { display: inline-flex; }
 
-@media (max-width: 600px) {
+@media (max-width: 767.98px) {
   :host ::ng-deep .mh-sessions__new-btn { display: none; }
   .mh-sessions__fab {
     display: inline-flex;
@@ -506,7 +506,7 @@
     width: 60px;
     height: 60px;
     font-size: 24px;
-    @media (max-width: 600px) {
+    @media (max-width: 767.98px) {
       width: 52px;
       height: 52px;
       font-size: 22px;

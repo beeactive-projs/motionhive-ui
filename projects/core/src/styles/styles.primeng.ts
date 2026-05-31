@@ -53,6 +53,7 @@ export const MotionHiveLara = definePreset(Lara, {
     breadcrumb: {
       root: {
         background: 'transparent',
+        padding: '0',
       },
     },
     button: {

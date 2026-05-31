@@ -71,7 +71,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  @media (max-width: 600px) {
+  @media (max-width: 767.98px) {
     grid-template-columns: 1fr;
   }
 }

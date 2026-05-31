@@ -76,7 +76,7 @@ import {
     .mh-fab:active { transform: scale(0.94); }
 
     /* Only renders on mobile by default. */
-    @media (max-width: 600px) {
+    @media (max-width: 767.98px) {
       .mh-fab { display: inline-flex; }
     }
     /* force-mode shows it everywhere: used for the bottom-nav tabbar
