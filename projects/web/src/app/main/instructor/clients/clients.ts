@@ -240,10 +240,15 @@ export class Clients implements OnInit {
 
   confirmArchive(client: InstructorClient): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to archive ${this.clientName(client)}?`,
       header: 'Archive client',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
+      message: `Are you sure you want to archive <strong>${this.clientName(client)}</strong>?`,
+      acceptIcon: 'pi pi-inbox',
+      acceptButtonProps: {
+        label: 'Yes, archive',
+        severity: 'danger',
+        iconPos: 'left',
+      },
+      rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => this.archiveClient(client),
     });
   }
@@ -268,9 +273,11 @@ export class Clients implements OnInit {
 
   confirmUnarchive(client: InstructorClient): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to unarchive ${this.clientName(client)}?`,
       header: 'Unarchive client',
-      icon: 'pi pi-exclamation-triangle',
+      message: `Are you sure you want to unarchive <strong>${this.clientName(client)}</strong>?`,
+      acceptIcon: 'pi pi-inbox',
+      acceptButtonProps: { label: 'Yes, unarchive', iconPos: 'left' },
+      rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => this.unarchiveClient(client),
     });
   }

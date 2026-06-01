@@ -2,19 +2,22 @@
   <!-- Header -->
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-xl md:text-2xl">Clients</h1>
-      <p class="text-sm text-surface-700 dark:text-surface-400">Manage your client relationships, invitations, and
-        requests.</p>
+      <h1 class="font-heading font-semibold text-lg md:text-2xl">Clients</h1>
+      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400">Manage your client relationships,
+        invitations, and requests.</p>
     </div>
-    <div class="flex flex-wrap gap-3">
-      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
+    <div class="flex gap-3">
       @if (incomingRequestsCount() > 0) {
-      <p-overlaybadge [value]="incomingRequestsCount()" severity="danger">
-        <p-button label="Requests" icon="pi pi-hourglass" severity="contrast" (onClick)="goToPendingRequests()" />
+      <p-overlaybadge [value]="incomingRequestsCount()" severity="danger" badgeSize="small" [class.w-1/2]="isMobile()">
+        <p-button label="Requests" icon="pi pi-hourglass" severity="contrast" (onClick)="goToPendingRequests()"
+          [size]="isMobile() ? 'small' : undefined" [fluid]="isMobile() ? true : false" />
       </p-overlaybadge>
       } @else {
-      <p-button label="Requests" icon="pi pi-hourglass" severity="contrast" (onClick)="goToPendingRequests()" />
+      <p-button label="Requests" icon="pi pi-hourglass" severity="contrast" (onClick)="goToPendingRequests()"
+        [size]="isMobile() ? 'small' : undefined" [fluid]="isMobile() ? true : false" [class.w-1/2]="isMobile()" />
       }
+      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()"
+        [size]="isMobile() ? 'small' : undefined" [fluid]="isMobile() ? true : false" [class.w-1/2]="isMobile()" />
     </div>
   </header>
 
@@ -84,7 +87,7 @@
       </ng-template>
 
       <ng-template #loadingbody>
-        @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
+        @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
         <tr>
           <td>
             <div class="flex items-center gap-3">

@@ -15,10 +15,12 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
 import { InstructorClient, ClientService } from 'core';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
+import { UserInfo } from "../../../../_shared/components/user-info/user-info";
+import { Card } from "primeng/card";
 
 @Component({
   selector: 'mh-edit-client-notes-dialog',
-  imports: [FormsModule, Avatar, Button, Dialog, TextareaModule],
+  imports: [FormsModule, Avatar, Button, Dialog, TextareaModule, UserInfo, Card],
   templateUrl: './edit-client-notes-dialog.html',
   styleUrl: './edit-client-notes-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

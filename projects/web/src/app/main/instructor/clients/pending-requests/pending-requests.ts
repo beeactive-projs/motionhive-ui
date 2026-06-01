@@ -11,7 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClientRequestType,
   ClientRequestTypes,
@@ -59,6 +59,8 @@ import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-c
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PendingRequests {
+  private readonly _router = inject(Router);
+
   private readonly _route = inject(ActivatedRoute);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
@@ -165,9 +167,7 @@ export class PendingRequests {
       rows: this.rows,
       sortField: 'createdAt',
       sortOrder: -1,
-      filters: this.typeFilter()
-        ? { type: { value: this.typeFilter(), matchMode: 'equals' } }
-        : {},
+      filters: this.typeFilter() ? { type: { value: this.typeFilter(), matchMode: 'equals' } } : {},
     };
 
     this._clientService
@@ -228,6 +228,10 @@ export class PendingRequests {
     this.showInviteDialog.set(true);
   }
 
+  goToClients(): void {
+    this._router.navigate(['/coaching/clients']);
+  }
+
   // --- Actions ---
 
   acceptRequest(row: InstructorClient): void {
@@ -268,10 +272,11 @@ export class PendingRequests {
 
   cancelRequest(row: InstructorClient): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to cancel the invitation to ${this.clientName(row)}?`,
       header: 'Cancel invitation',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
+      message: `Are you sure you want to cancel the invitation to <strong>${this.clientName(row)}</strong>?`,
+      acceptIcon: 'pi pi-times',
+      acceptButtonProps: { label: 'Cancel invitation', severity: 'danger', iconPos: 'left' },
+      rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => {
         this._clientService
           .cancelRequest(row.id)
@@ -294,9 +299,11 @@ export class PendingRequests {
 
   resendInvitation(row: InstructorClient): void {
     this._confirmationService.confirm({
-      message: `Resend the invitation to ${this.clientName(row)}?`,
       header: 'Resend invitation',
-      icon: 'pi pi-send',
+      message: `Resend the invitation to <strong>${this.clientName(row)}</strong>?`,
+      acceptIcon: 'pi pi-send',
+      acceptButtonProps: { label: 'Resend invitation', iconPos: 'left' },
+      rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => {
         this._clientService
           .resendInvitation(row.id)

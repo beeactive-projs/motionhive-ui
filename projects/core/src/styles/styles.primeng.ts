@@ -109,6 +109,11 @@ export const MotionHiveLara = definePreset(Lara, {
         },
       },
     },
+    dataview: {
+      root: {
+        borderWidth: '0',
+      },
+    },
     dialog: {
       footer: {
         padding: '{overlay.modal.padding}',

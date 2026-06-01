@@ -1,11 +1,5 @@
 import { DatePipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   ClientService,
@@ -139,7 +133,8 @@ export class ClientProfile {
           prev ? { ...prev, status: InstructorClientStatuses.Archived } : prev,
         );
       },
-      error: (err) => showApiError(this._messageService, 'Archive failed', 'Failed to archive client', err),
+      error: (err) =>
+        showApiError(this._messageService, 'Archive failed', 'Failed to archive client', err),
     });
   }
 
@@ -148,6 +143,7 @@ export class ClientProfile {
       message: `Are you sure you want to unarchive ${this.clientName()}?`,
       header: 'Unarchive client',
       icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: { text: 'true' },
       accept: () => this.doUnarchive(),
     });
   }
