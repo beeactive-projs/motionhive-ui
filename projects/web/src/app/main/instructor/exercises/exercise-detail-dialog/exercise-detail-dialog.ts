@@ -19,6 +19,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import {
   AuthStore,
   Exercise,
+  ExerciseMedia,
+  ExerciseMediaKind,
   ExerciseService,
   ExerciseSource,
   ExerciseVisibility,
@@ -75,6 +77,25 @@ export class ExerciseDetailDialog {
   readonly busy = signal(false);
   private _loadedId: string | null = null;
 
+  /**
+   * Image frames for the motion-cycle hero. Free Exercise DB seeds
+   * two frames per exercise (start + end position) — alternating them
+   * gives the same "in motion" hint a GIF would, with zero filesize
+   * cost (just two JPGs already on jsDelivr).
+   *
+   * Sorted by `displayOrder` so the start frame is always first; the
+   * cycle index advances every 1.4s.
+   */
+  readonly imageFrames = computed<ExerciseMedia[]>(() => {
+    const media = this.exercise()?.media ?? [];
+    return media
+      .filter((m) => m.kind === ExerciseMediaKind.Image)
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+  });
+
+  readonly cycleIndex = signal(0);
+  private _cycleTimer: ReturnType<typeof setInterval> | null = null;
+
   // ── Role-based action visibility ─────────────────────────────────
 
   readonly isMine = computed(() => {
@@ -129,6 +150,28 @@ export class ExerciseDetailDialog {
       const id = this.exerciseId();
       if (!id || id === this._loadedId) return;
       this.fetch(id);
+    });
+
+    // Drive the image cycle. Pure effect — re-evaluates whenever the
+    // dialog opens/closes or the frame list changes. Cleans up on
+    // close so the interval doesn't leak across instances.
+    effect((onCleanup) => {
+      const open = this.visible();
+      const frames = this.imageFrames();
+      if (!open || frames.length < 2) {
+        if (this._cycleTimer) clearInterval(this._cycleTimer);
+        this._cycleTimer = null;
+        this.cycleIndex.set(0);
+        return;
+      }
+      this.cycleIndex.set(0);
+      this._cycleTimer = setInterval(() => {
+        this.cycleIndex.update((i) => (i + 1) % frames.length);
+      }, 1400);
+      onCleanup(() => {
+        if (this._cycleTimer) clearInterval(this._cycleTimer);
+        this._cycleTimer = null;
+      });
     });
   }
 

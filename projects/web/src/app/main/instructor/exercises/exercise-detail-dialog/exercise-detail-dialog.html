@@ -16,13 +16,32 @@
     </div>
   } @else if (exercise(); as e) {
     <div class="detail">
-      <!-- Hero media -->
-      <div class="detail__hero">
-        @if (e.thumbnailUrl) {
-          <img [src]="e.thumbnailUrl" [alt]="e.name" />
+      <!-- Hero media — cycles through start/end frames every 1.4s -->
+      @let frames = imageFrames();
+      <div class="detail__hero" [class.detail__hero--cycling]="frames.length > 1">
+        @if (frames.length > 0) {
+          @for (frame of frames; track frame.id; let i = $index) {
+            <img
+              [src]="frame.url"
+              [alt]="e.name"
+              [class.is-active]="i === cycleIndex()"
+              loading="lazy"
+            />
+          }
+        } @else if (e.thumbnailUrl) {
+          <img [src]="e.thumbnailUrl" [alt]="e.name" class="is-active" />
         } @else {
           <div class="detail__hero-placeholder"><i class="pi pi-image"></i></div>
         }
+
+        @if (frames.length > 1) {
+          <div class="detail__cycle-dots" aria-hidden="true">
+            @for (frame of frames; track frame.id; let i = $index) {
+              <span class="dot" [class.dot--on]="i === cycleIndex()"></span>
+            }
+          </div>
+        }
+
         @if (e.youtubeUrl) {
           <a
             class="detail__play"
