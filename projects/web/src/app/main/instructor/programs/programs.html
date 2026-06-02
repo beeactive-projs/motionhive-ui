@@ -1,0 +1,121 @@
+<div class="page">
+  <header class="page__header">
+    <div class="page__title">
+      <h1>Programs</h1>
+      <p class="page__count">
+        @if (loading() && !items().length) {
+          Loading…
+        } @else {
+          {{ total() }} {{ total() === 1 ? 'program' : 'programs' }}
+        }
+      </p>
+    </div>
+    <p-button
+      label="Create program"
+      icon="pi pi-plus"
+      pTooltip="Builder ships in the next slice — read view is live now."
+      tooltipPosition="bottom"
+      (onClick)="openCreateStub()"
+    />
+  </header>
+
+  <div class="toolbar">
+    <span class="search">
+      <input
+        pInputText
+        type="text"
+        placeholder="Search by name…"
+        [ngModel]="searchInput()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </span>
+
+    <nav class="tabs" aria-label="Status filter">
+      @for (tab of statusTabs; track tab.value ?? 'all') {
+        <button
+          type="button"
+          class="tab"
+          [class.tab--active]="statusFilter() === tab.value"
+          (click)="setStatus(tab.value)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+  </div>
+
+  @if (loading() && !items().length) {
+    <div class="grid">
+      @for (i of [0, 1, 2, 3]; track i) {
+        <div class="card-skeleton">
+          <div class="card-skeleton__title"></div>
+          <div class="card-skeleton__line"></div>
+          <div class="card-skeleton__line card-skeleton__line--short"></div>
+        </div>
+      }
+    </div>
+  } @else if (items().length === 0) {
+    <div class="empty">
+      <div class="empty__icon"><i class="pi pi-objects-column"></i></div>
+      <h3>No programs yet</h3>
+      <p>
+        Programs are how you author your coaching plans — workouts, exercises,
+        and sets the client follows. The builder ships in the next slice; the
+        backend endpoints are live now (see Swagger).
+      </p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (p of items(); track p.id) {
+        <a class="card" [routerLink]="['/coaching/programs', p.id]">
+          <div class="card__head">
+            <h3 class="card__name">{{ p.name }}</h3>
+            <span class="status status--{{ statusTone(p.status) }}">
+              {{ p.status | titlecase }}
+            </span>
+          </div>
+
+          @if (p.description) {
+            <p class="card__desc">{{ p.description }}</p>
+          }
+
+          <div class="card__meta">
+            @if (p.durationWeeks) {
+              <span class="chip">
+                <i class="pi pi-calendar"></i>
+                {{ p.durationWeeks }} weeks
+              </span>
+            }
+            @if (p.periodizationModel) {
+              <span class="chip">{{ p.periodizationModel | titlecase }}</span>
+            }
+            @if (p.goalTags?.length) {
+              @for (tag of p.goalTags; track tag) {
+                <span class="chip chip--tag">{{ tag }}</span>
+              }
+            }
+          </div>
+
+          <div class="card__foot">
+            <span class="card__date">
+              Updated {{ p.updatedAt | date: 'mediumDate' }}
+            </span>
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (hasMore()) {
+      <div class="load-more">
+        <p-button
+          [label]="loadingMore() ? 'Loading…' : 'Load more'"
+          [loading]="loadingMore()"
+          severity="secondary"
+          (onClick)="loadMore()"
+        />
+      </div>
+    }
+  }
+</div>
+
+<p-toast />

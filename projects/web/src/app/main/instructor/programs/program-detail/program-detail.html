@@ -1,0 +1,210 @@
+<div class="page">
+  <nav class="breadcrumb">
+    <a routerLink="/coaching/programs">
+      <i class="pi pi-arrow-left"></i> Programs
+    </a>
+  </nav>
+
+  @if (loading() && !program()) {
+    <div class="loading"><i class="pi pi-spin pi-spinner"></i> Loading program…</div>
+  } @else if (program(); as p) {
+    <!-- Hero -->
+    <header class="hero">
+      <div class="hero__main">
+        <div class="hero__head">
+          <h1 class="hero__title">{{ p.name }}</h1>
+          <span class="status status--{{ statusTone(p.status) }}">
+            {{ p.status | titlecase }}
+          </span>
+        </div>
+        @if (p.description) {
+          <p class="hero__desc">{{ p.description }}</p>
+        }
+
+        <div class="hero__meta">
+          @if (p.durationWeeks) {
+            <span class="chip"><i class="pi pi-calendar"></i> {{ p.durationWeeks }} weeks</span>
+          }
+          @if (p.periodizationModel) {
+            <span class="chip">{{ p.periodizationModel | titlecase }}</span>
+          }
+          @if (p.goalTags?.length) {
+            @for (tag of p.goalTags; track tag) {
+              <span class="chip chip--tag">{{ tag }}</span>
+            }
+          }
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat__num">{{ totalWorkouts() }}</div>
+            <div class="stat__lbl">{{ totalWorkouts() === 1 ? 'workout' : 'workouts' }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat__num">{{ totalExercises() }}</div>
+            <div class="stat__lbl">{{ totalExercises() === 1 ? 'exercise' : 'exercises' }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat__num">{{ totalSets() }}</div>
+            <div class="stat__lbl">{{ totalSets() === 1 ? 'set' : 'sets' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__actions">
+        <p-button
+          label="Edit"
+          icon="pi pi-pencil"
+          severity="secondary"
+          [text]="true"
+          pTooltip="Builder ships in FE-P2"
+          (onClick)="editStub()"
+        />
+        <p-button
+          label="Assign to client"
+          icon="pi pi-user-plus"
+          (onClick)="openAssign()"
+        />
+      </div>
+    </header>
+
+    <!-- Empty tree state -->
+    @if (totalWorkouts() === 0) {
+      <div class="empty">
+        <div class="empty__icon"><i class="pi pi-calendar-plus"></i></div>
+        <h3>No workouts yet</h3>
+        <p>
+          This program shell exists, but no workouts have been added. The
+          builder ships in the next slice — for now you can hit the BE
+          directly via Swagger to add workouts/exercises/sets.
+        </p>
+      </div>
+    } @else {
+      <!-- Weeks -->
+      <div class="weeks">
+        @for (w of weeks(); track w.week) {
+          <section class="week">
+            <h2 class="week__title">Week {{ w.week + 1 }}</h2>
+
+            <div class="week__days">
+              @for (workout of w.workouts; track workout.id) {
+                <article class="workout">
+                  <header class="workout__head">
+                    <div class="workout__head-l">
+                      <span class="day-badge">Day {{ workout.dayIndex + 1 }}</span>
+                      <h3 class="workout__name">{{ workout.name }}</h3>
+                    </div>
+                    <div class="workout__meta">
+                      @if (workout.phase) {
+                        <span class="chip chip--phase">{{ workout.phase | titlecase }}</span>
+                      }
+                      @if (workout.estimatedDurationMinutes) {
+                        <span class="chip">
+                          <i class="pi pi-clock"></i> ~{{ workout.estimatedDurationMinutes }}m
+                        </span>
+                      }
+                    </div>
+                  </header>
+
+                  @if (workout.notes) {
+                    <p class="workout__notes">{{ workout.notes }}</p>
+                  }
+
+                  @if (!workout.exercises || workout.exercises.length === 0) {
+                    <div class="workout__empty">No exercises added.</div>
+                  } @else {
+                    <div class="exercises">
+                      @for (ex of workout.exercises; track ex.id; let idx = $index) {
+                        <div class="exercise">
+                          <div class="exercise__num">{{ idx + 1 }}</div>
+                          <div class="exercise__body">
+                            <div class="exercise__head">
+                              @if (ex.exercise?.thumbnailUrl) {
+                                <img
+                                  class="exercise__thumb"
+                                  [src]="ex.exercise!.thumbnailUrl!"
+                                  [alt]="ex.exercise!.name"
+                                  loading="lazy"
+                                />
+                              }
+                              <div class="exercise__title">
+                                {{ ex.exercise?.name ?? '—' }}
+                              </div>
+                              @if (ex.supersetGroupId != null) {
+                                <span class="chip chip--super">SS{{ ex.supersetGroupId }}</span>
+                              }
+                            </div>
+
+                            @if (ex.notes) {
+                              <p class="exercise__notes">{{ ex.notes }}</p>
+                            }
+
+                            @if (ex.sets?.length) {
+                              <table class="sets">
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Type</th>
+                                    <th>Target</th>
+                                    <th>Rest</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  @for (s of ex.sets; track s.id) {
+                                    <tr>
+                                      <td>{{ s.orderIndex + 1 }}</td>
+                                      <td>
+                                        <span class="set-type set-type--{{ s.setType.toLowerCase() }}">
+                                          {{ s.setType | titlecase }}
+                                        </span>
+                                      </td>
+                                      <td>{{ setSummary(s) }}</td>
+                                      <td>
+                                        @if (s.restAfterSeconds != null) {
+                                          {{ s.restAfterSeconds }}s
+                                        } @else {
+                                          —
+                                        }
+                                      </td>
+                                    </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            } @else {
+                              <div class="exercise__no-sets">No sets prescribed.</div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+
+    <footer class="page__foot">
+      <p-button
+        label="Delete program"
+        icon="pi pi-trash"
+        severity="danger"
+        [text]="true"
+        pTooltip="Delete ships in FE-P2"
+        (onClick)="deleteStub()"
+      />
+    </footer>
+  }
+</div>
+
+<p-toast />
+
+@if (program(); as p) {
+  <mh-assign-program-dialog
+    [program]="p"
+    [(visible)]="assignDialogOpen"
+    (assigned)="onAssigned()"
+  />
+}

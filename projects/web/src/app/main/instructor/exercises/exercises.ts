@@ -339,6 +339,12 @@ export class Exercises {
       this.loadingMore.set(true);
     }
 
+    const settle = () => {
+      // Always release loading — `complete` doesn't fire after `error`.
+      // Without this, a BE outage leaves the page stuck on the skeleton.
+      this.loading.set(false);
+      this.loadingMore.set(false);
+    };
     this._exerciseService.list(query).subscribe({
       next: (res) => {
         if (replace) {
@@ -348,17 +354,16 @@ export class Exercises {
           this.items.update((cur) => [...cur, ...res.items]);
         }
         this.total.set(res.total);
+        settle();
       },
-      error: (err) =>
+      error: (err) => {
+        settle();
         showApiError(
           this._messageService,
           "Couldn't load exercises",
           'Check your connection and try again.',
           err,
-        ),
-      complete: () => {
-        this.loading.set(false);
-        this.loadingMore.set(false);
+        );
       },
     });
   }

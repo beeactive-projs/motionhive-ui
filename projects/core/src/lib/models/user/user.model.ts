@@ -16,6 +16,13 @@ export interface User {
   timezone?: string | null;
   countryCode?: string | null;
   city?: string | null;
+  /**
+   * Client-side exercise catalog browse gate (locked decision §19).
+   * Stores only the explicit opt-in; effective access on the catalog
+   * endpoints is `optIn OR has-any-active-assignment`. The toggle in
+   * /profile/details surfaces this.
+   */
+  exerciseCatalogOptIn?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +45,8 @@ export interface UpdateUserPayload {
   timezone?: string;
   countryCode?: string | null;
   city?: string | null;
+  /** Locked decision §19 — client browse gate on the exercise catalog. */
+  exerciseCatalogOptIn?: boolean;
 }
 
 /**

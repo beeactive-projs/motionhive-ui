@@ -1,0 +1,115 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [appendTo]="'body'"
+  [style]="{ width: '480px' }"
+  [breakpoints]="{ '640px': '95vw' }"
+  styleClass="mh-assign-dialog"
+  header="Assign program">
+  <div class="dialog-body">
+    <p class="lede">
+      <strong>{{ program().name }}</strong> will be copied to your client.
+      They'll see it under their plans and you can track their progress as they
+      log workouts.
+    </p>
+
+    @if (loadingClients()) {
+      <div class="loading">Loading clients…</div>
+    } @else if (clients().length === 0) {
+      <div class="empty">
+        <i class="pi pi-users"></i>
+        <p>No active clients yet.</p>
+        <small
+          >Invite clients from the Clients page before assigning a program.</small
+        >
+      </div>
+    } @else {
+      <div class="field">
+        <label for="client">Client</label>
+        <p-select
+          inputId="client"
+          [options]="clients()"
+          [(ngModel)]="clientId"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Pick a client"
+          [filter]="true"
+          filterBy="label,sub"
+          appendTo="body"
+          styleClass="w-full">
+          <ng-template let-c #item>
+            <div class="client-row">
+              @if (c.avatarUrl) {
+                <img [src]="c.avatarUrl" alt="" class="avatar" />
+              } @else {
+                <div class="avatar avatar-fallback">
+                  <i class="pi pi-user"></i>
+                </div>
+              }
+              <div class="meta">
+                <div class="name">{{ c.label }}</div>
+                @if (c.sub) {
+                  <small class="email">{{ c.sub }}</small>
+                }
+              </div>
+            </div>
+          </ng-template>
+          <ng-template let-c #selectedItem>
+            <span class="selected-label">{{ c.label }}</span>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="field">
+        <label for="start">Start date</label>
+        <p-datepicker
+          inputId="start"
+          [(ngModel)]="startDate"
+          [minDate]="minDate"
+          [showIcon]="true"
+          dateFormat="dd M yy"
+          appendTo="body"
+          styleClass="w-full" />
+        <small class="hint">
+          Day 1 of the program lands on
+          <strong>{{ startDate() | date: 'longDate' }}</strong
+          >.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="notes">Notes <span class="optional">(optional)</span></label>
+        <textarea
+          pTextarea
+          id="notes"
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          rows="3"
+          maxlength="500"
+          placeholder="Anything the client should know about this plan…"
+          class="w-full"></textarea>
+        <small class="counter">{{ notes().length }}/500</small>
+      </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()" />
+    <p-button
+      label="Assign program"
+      icon="pi pi-send"
+      [loading]="submitting()"
+      [disabled]="!canSubmit() || clients().length === 0"
+      (onClick)="submit()" />
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right" />
