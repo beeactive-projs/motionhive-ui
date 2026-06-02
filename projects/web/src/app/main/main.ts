@@ -111,6 +111,7 @@ export class Main {
             { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-gauge' },
             { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
             { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
+            { label: 'Exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },
           ],
         },
         {

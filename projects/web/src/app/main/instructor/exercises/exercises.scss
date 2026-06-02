@@ -1,0 +1,260 @@
+:host {
+  display: block;
+}
+
+.page {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 18px;
+
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      margin: 0;
+      color: var(--p-surface-900);
+    }
+  }
+
+  &__title {
+    flex: 1;
+  }
+
+  &__count {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--p-surface-500);
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+
+  .search {
+    flex: 0 0 320px;
+    max-width: 360px;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  &__right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  // Filter trigger — only visible when the rail is hidden (<900px).
+  ::ng-deep .filter-trigger {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .toolbar ::ng-deep .filter-trigger {
+    display: inline-flex;
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--p-surface-300);
+  background: var(--p-surface-0);
+  color: var(--p-surface-700);
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: var(--p-surface-100);
+  }
+
+  &--active {
+    background: var(--p-surface-900);
+    color: var(--p-surface-0);
+    border-color: var(--p-surface-900);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+  .rail {
+    display: none; // mobile filters land in a sheet — next slice
+  }
+}
+
+.rail {
+  border: 1px solid var(--p-surface-200);
+  border-radius: 10px;
+  background: var(--p-surface-0);
+  padding: 4px 0;
+
+  &__clear {
+    padding: 10px 14px;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-skeleton {
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 10px;
+  padding: 0 0 12px;
+  overflow: hidden;
+
+  &__thumb {
+    aspect-ratio: 16 / 10;
+    background: var(--p-surface-100);
+  }
+
+  &__line {
+    height: 12px;
+    margin: 12px;
+    border-radius: 4px;
+    background: var(--p-surface-200);
+
+    &--lg {
+      width: 70%;
+    }
+
+    &--sm {
+      width: 40%;
+      height: 9px;
+    }
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    background: var(--p-surface-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--p-surface-400);
+
+    &--accent {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: var(--p-primary-50, #fff8ec);
+      border: 1px solid var(--p-primary-200, #fcd9a1);
+      color: var(--p-primary-500, #e48913);
+      font-size: 26px;
+    }
+  }
+
+  h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 6px;
+    color: var(--p-surface-900);
+  }
+
+  p {
+    font-size: 13px;
+    color: var(--p-surface-600);
+    margin: 0 0 16px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.55;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+// ─── Mobile filter drawer ────────────────────────────────────────
+
+::ng-deep .filter-drawer {
+  width: min(420px, 90vw);
+
+  .p-drawer-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+  }
+}
+
+.filter-drawer__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0 4px;
+  border-top: 1px solid var(--p-surface-200);
+  margin-top: 12px;
+  position: sticky;
+  bottom: 0;
+  background: var(--p-surface-0);
+}

@@ -202,6 +202,17 @@ export const API_ENDPOINTS = {
     BY_ID: (deviceId: string) => `/devices/${deviceId}`,
     HEARTBEAT: (deviceId: string) => `/devices/${deviceId}/seen`,
   },
+  EXERCISES: {
+    BASE: '/exercises',
+    BY_ID: (id: string) => `/exercises/${id}`,
+    FORK: (id: string) => `/exercises/${id}/fork`,
+  },
+  MUSCLES: {
+    BASE: '/muscles',
+  },
+  EQUIPMENT: {
+    BASE: '/equipment',
+  },
   MESSAGING: {
     CONVERSATIONS: '/messaging/conversations',
     CONVERSATION: (id: string) => `/messaging/conversations/${id}`,

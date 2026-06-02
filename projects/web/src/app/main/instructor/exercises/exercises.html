@@ -1,0 +1,237 @@
+<div class="page">
+  <!-- Header -->
+  <header class="page__header">
+    <div class="page__title">
+      <h1>Exercises</h1>
+      <p class="page__count">
+        @if (loading() && !items().length) {
+          Loading…
+        } @else {
+          {{ total() }} {{ total() === 1 ? 'exercise' : 'exercises' }}
+        }
+      </p>
+    </div>
+    <p-button
+      [label]="createLabel()"
+      icon="pi pi-plus"
+      styleClass="create-cta"
+      (onClick)="openCreate()"
+      pTooltip="Create custom exercise"
+      tooltipPosition="bottom"
+    />
+  </header>
+
+  <!-- Toolbar: search + ownership tabs + sort -->
+  <div class="toolbar">
+    <span class="p-input-icon-left search">
+      <input
+        pInputText
+        type="text"
+        placeholder="Search by name…"
+        [ngModel]="searchInput()"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </span>
+
+    <nav class="tabs" aria-label="Ownership filter">
+      @for (tab of ownershipTabs; track tab.value) {
+        <button
+          type="button"
+          class="tab"
+          [class.tab--active]="ownership() === tab.value"
+          (click)="setOwnership(tab.value)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+
+    <div class="toolbar__right">
+      <!-- Mobile-only: open filter drawer -->
+      <p-button
+        [label]="activeFilterCount() > 0 ? 'Filters · ' + activeFilterCount() : 'Filters'"
+        icon="pi pi-sliders-h"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        styleClass="filter-trigger"
+        (onClick)="filterDrawerVisible.set(true)"
+      />
+      <p-button
+        [label]="sortLabel()"
+        icon="pi pi-sort-alt"
+        iconPos="left"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        (onClick)="sortMenu.toggle($event)"
+        aria-haspopup="true"
+      />
+      <p-menu #sortMenu [model]="sortItems" [popup]="true" [appendTo]="'body'" />
+    </div>
+  </div>
+
+  <!-- Body: filter rail + grid -->
+  <div class="body">
+    <aside class="rail" aria-label="Filters">
+      <mh-exercise-filter-panel
+        [kindOptions]="kindOptions"
+        [levelOptions]="levelOptions"
+        [muscles]="taxonomy.muscles()"
+        [equipment]="taxonomy.equipment()"
+        [facets]="facets()"
+        [selectedKinds]="selectedKinds()"
+        [selectedLevels]="selectedLevels()"
+        [selectedMuscleIds]="selectedMuscleIds()"
+        [selectedEquipmentIds]="selectedEquipmentIds()"
+        (toggleKind)="toggleKind($event)"
+        (toggleLevel)="toggleLevel($event)"
+        (toggleMuscle)="toggleMuscle($event)"
+        (toggleEquipment)="toggleEquipment($event)"
+      />
+
+      @if (activeFilterCount() > 0) {
+        <div class="rail__clear">
+          <p-button
+            label="Clear filters"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            (onClick)="clearFilters()"
+          />
+        </div>
+      }
+    </aside>
+
+    <section class="content" aria-busy="loading() ? 'true' : 'false'">
+      @if (loading() && !items().length) {
+        <div class="grid">
+          @for (i of [0, 1, 2, 3, 4, 5]; track i) {
+            <div class="card-skeleton">
+              <div class="card-skeleton__thumb"></div>
+              <div class="card-skeleton__line card-skeleton__line--lg"></div>
+              <div class="card-skeleton__line card-skeleton__line--sm"></div>
+            </div>
+          }
+        </div>
+      } @else if (items().length === 0) {
+        @if (ownership() === 'mine' && activeFilterCount() === 0) {
+          <div class="empty empty--mine">
+            <div class="empty__icon empty__icon--accent">
+              <i class="pi pi-bolt"></i>
+            </div>
+            <h3>No custom exercises yet</h3>
+            <p>
+              Build movements specific to your coaching style, or fork a
+              public one to make it your own.
+            </p>
+            <div class="empty__actions">
+              <p-button
+                label="Create your first exercise"
+                icon="pi pi-plus"
+                (onClick)="openCreate()"
+              />
+              <p-button
+                label="Browse the catalog to fork"
+                icon="pi pi-compass"
+                severity="secondary"
+                [text]="true"
+                (onClick)="setOwnership('public-others')"
+              />
+            </div>
+          </div>
+        } @else {
+          <div class="empty">
+            <div class="empty__icon"><i class="pi pi-filter-slash"></i></div>
+            <h3>No exercises match</h3>
+            <p>Loosen a filter or search differently to see more.</p>
+            @if (activeFilterCount() > 0) {
+              <p-button
+                label="Clear all filters"
+                severity="secondary"
+                (onClick)="clearFilters()"
+              />
+            }
+          </div>
+        }
+      } @else {
+        <div class="grid">
+          @for (ex of items(); track ex.id) {
+            <mh-exercise-card
+              [exercise]="ex"
+              [isMine]="isMine(ex)"
+              (select)="openDetail($event)"
+            />
+          }
+        </div>
+
+        @if (hasMore()) {
+          <div class="load-more">
+            <p-button
+              [label]="loadingMore() ? 'Loading…' : 'Load more'"
+              [loading]="loadingMore()"
+              severity="secondary"
+              (onClick)="loadMore()"
+            />
+          </div>
+        }
+      }
+    </section>
+  </div>
+</div>
+
+<p-drawer
+  [(visible)]="filterDrawerVisible"
+  position="right"
+  [appendTo]="'body'"
+  styleClass="filter-drawer"
+  header="Filters"
+>
+  <mh-exercise-filter-panel
+    [kindOptions]="kindOptions"
+    [levelOptions]="levelOptions"
+    [muscles]="taxonomy.muscles()"
+    [equipment]="taxonomy.equipment()"
+    [facets]="facets()"
+    [selectedKinds]="selectedKinds()"
+    [selectedLevels]="selectedLevels()"
+    [selectedMuscleIds]="selectedMuscleIds()"
+    [selectedEquipmentIds]="selectedEquipmentIds()"
+    (toggleKind)="toggleKind($event)"
+    (toggleLevel)="toggleLevel($event)"
+    (toggleMuscle)="toggleMuscle($event)"
+    (toggleEquipment)="toggleEquipment($event)"
+  />
+
+  <div class="filter-drawer__foot">
+    <p-button
+      label="Clear all"
+      severity="secondary"
+      [text]="true"
+      (onClick)="clearFilters()"
+      [disabled]="activeFilterCount() === 0"
+    />
+    <p-button
+      [label]="loading() ? 'Loading…' : 'Show ' + total() + ' results'"
+      (onClick)="filterDrawerVisible.set(false)"
+    />
+  </div>
+</p-drawer>
+
+<mh-exercise-detail-dialog
+  [(visible)]="detailVisible"
+  [exerciseId]="detailExerciseId()"
+  (editRequested)="openEdit($event)"
+  (deleted)="onMutated()"
+  (visibilityChanged)="onMutated()"
+  (forked)="onForked($event)"
+/>
+
+<mh-exercise-form-dialog
+  [(visible)]="formVisible"
+  [exercise]="formExercise()"
+  (saved)="onSaved($event)"
+/>
+
+<p-toast />
+

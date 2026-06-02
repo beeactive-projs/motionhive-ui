@@ -32,6 +32,12 @@ export * from './lib/models/review/review.model';
 export * from './lib/models/venue/venue.enums';
 export * from './lib/models/venue/venue.model';
 
+// Models - Exercise
+export * from './lib/models/exercise/exercise.enums';
+export * from './lib/models/exercise/exercise.model';
+export * from './lib/models/exercise/muscle.model';
+export * from './lib/models/exercise/equipment.model';
+
 // Models - Client
 export * from './lib/models/client/client.enums';
 export * from './lib/models/client/client.model';
@@ -159,6 +165,7 @@ export * from './lib/utils/api-error.utils';
 export * from './lib/utils/cloudinary.utils';
 export * from './lib/utils/group.utils';
 export * from './lib/utils/date.utils';
+export * from './lib/utils/youtube.utils';
 export * from './lib/utils/html.utils';
 export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';
@@ -189,6 +196,7 @@ export * from './lib/services/payment/refund.service';
 export * from './lib/services/payment/earnings.service';
 export * from './lib/services/payment/client-payment.service';
 export * from './lib/services/venue/venue.service';
+export * from './lib/services/exercise/exercise.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
 export * from './lib/services/session/session.service';
@@ -202,6 +210,7 @@ export * from './lib/directives/stripe-iframe.directive';
 
 // Stores
 export * from './lib/stores/auth.store';
+export * from './lib/stores/exercise-taxonomy.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
 export * from './lib/stores/notification.store';

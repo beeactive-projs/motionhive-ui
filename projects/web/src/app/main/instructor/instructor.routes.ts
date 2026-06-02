@@ -58,6 +58,11 @@ export const instructorRoutes: Routes = [
       import('./sessions/session-detail/session-detail').then((m) => m.InstructorSessionDetail),
     title: 'Session - MotionHive',
   },
+  {
+    path: 'exercises',
+    loadComponent: () => import('./exercises/exercises').then((m) => m.Exercises),
+    title: 'Exercises - MotionHive',
+  },
   // Groups now live at the shared /groups path so all roles can access them.
   // Keep redirects so existing /coaching/groups bookmarks and in-app links still resolve.
   { path: 'groups', redirectTo: '/groups', pathMatch: 'full' },

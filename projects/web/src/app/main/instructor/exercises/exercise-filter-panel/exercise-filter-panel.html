@@ -1,0 +1,71 @@
+<section class="group">
+  <h4>Kind</h4>
+  @for (opt of kindOptions(); track opt.value) {
+    <label class="opt">
+      <input
+        type="checkbox"
+        [checked]="selectedKinds().has(opt.value)"
+        (change)="toggleKind.emit(opt.value)"
+      />
+      <span class="opt__lbl">{{ opt.label }}</span>
+      @if (facets()?.kind?.[opt.value]; as count) {
+        <span class="opt__cnt">{{ count }}</span>
+      }
+    </label>
+  }
+</section>
+
+<section class="group">
+  <h4>Level</h4>
+  @for (opt of levelOptions(); track opt.value) {
+    <label class="opt">
+      <input
+        type="checkbox"
+        [checked]="selectedLevels().has(opt.value)"
+        (change)="toggleLevel.emit(opt.value)"
+      />
+      <span class="opt__lbl">{{ opt.label }}</span>
+      @if (facets()?.level?.[opt.value]; as count) {
+        <span class="opt__cnt">{{ count }}</span>
+      }
+    </label>
+  }
+</section>
+
+@if (hasMuscles()) {
+  <section class="group">
+    <h4>Primary muscle</h4>
+    @for (m of muscles(); track m.id) {
+      <label class="opt">
+        <input
+          type="checkbox"
+          [checked]="selectedMuscleIds().has(m.id)"
+          (change)="toggleMuscle.emit(m.id)"
+        />
+        <span class="opt__lbl">{{ m.commonName }}</span>
+        @if (facets()?.primaryMuscleId?.[m.id]; as count) {
+          <span class="opt__cnt">{{ count }}</span>
+        }
+      </label>
+    }
+  </section>
+}
+
+@if (hasEquipment()) {
+  <section class="group">
+    <h4>Equipment</h4>
+    @for (eq of equipment(); track eq.id) {
+      <label class="opt">
+        <input
+          type="checkbox"
+          [checked]="selectedEquipmentIds().has(eq.id)"
+          (change)="toggleEquipment.emit(eq.id)"
+        />
+        <span class="opt__lbl">{{ eq.name }}</span>
+        @if (facets()?.equipmentId?.[eq.id]; as count) {
+          <span class="opt__cnt">{{ count }}</span>
+        }
+      </label>
+    }
+  </section>
+}
