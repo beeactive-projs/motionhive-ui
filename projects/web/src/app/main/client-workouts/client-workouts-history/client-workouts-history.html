@@ -55,7 +55,15 @@
                 <div class="time">{{ l.startedAt | date: 'shortTime' }}</div>
               </div>
               <div class="hrow__main">
-                <div class="name">{{ l.name }}</div>
+                <div class="name">
+                  {{ l.name }}
+                  @if ((l.prCount ?? 0) > 0) {
+                    <span class="mh-tag mh-tag--warn pr-badge">
+                      <i class="pi pi-trophy"></i>
+                      {{ l.prCount === 1 ? 'PR' : (l.prCount + ' PRs') }}
+                    </span>
+                  }
+                </div>
                 @if (row?.subtitle) {
                   <div class="sub">{{ row.subtitle }}</div>
                 } @else {

@@ -34,6 +34,24 @@ export interface WorkoutLog {
     programNameSnapshot: string;
     masterProgramId: string | null;
   } | null;
+  /**
+   * 1RM personal records broken in this session (Epley-estimated from
+   * loaded sets). Present on the detail endpoint after the workout is
+   * completed; absent otherwise.
+   */
+  personalRecords?: PersonalRecord[];
+  /** History list only — count of session PRs, for the badge. */
+  prCount?: number;
+}
+
+export interface PersonalRecord {
+  id: string;
+  exerciseId: string;
+  exerciseName: string;
+  /** New 1RM in kg. */
+  weightKg: number;
+  /** Improvement over prior best; equals `weightKg` for first-ever PRs. */
+  deltaKg: number;
 }
 
 export interface LoggedExercise {

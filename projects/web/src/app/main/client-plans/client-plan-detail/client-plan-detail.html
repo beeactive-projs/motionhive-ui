@@ -127,6 +127,16 @@
                               [loading]="starting() === w.id"
                               (onClick)="startWorkout(w)"
                             />
+                            <p-button
+                              icon="pi pi-forward"
+                              size="small"
+                              severity="secondary"
+                              [text]="true"
+                              [rounded]="true"
+                              [disabled]="isPaused()"
+                              pTooltip="Skip workout"
+                              (onClick)="confirmSkip(w)"
+                            />
                           }
                           @case ('resume') {
                             <p-button
@@ -136,6 +146,16 @@
                               [disabled]="isPaused()"
                               [loading]="starting() === w.id"
                               (onClick)="startWorkout(w)"
+                            />
+                            <p-button
+                              icon="pi pi-forward"
+                              size="small"
+                              severity="secondary"
+                              [text]="true"
+                              [rounded]="true"
+                              [disabled]="isPaused()"
+                              pTooltip="Skip workout"
+                              (onClick)="confirmSkip(w)"
                             />
                           }
                           @case ('view') {
@@ -162,3 +182,4 @@
 </div>
 
 <p-toast position="top-right" />
+<p-confirmdialog [appendTo]="'body'" />

@@ -133,6 +133,9 @@ export class WorkoutComplete implements OnInit {
   readonly hasReps = computed(() => this.totalReps() > 0);
   readonly hasDistance = computed(() => this.totalDistanceM() > 0);
 
+  readonly personalRecords = computed(() => this.log()?.personalRecords ?? []);
+  readonly prCount = computed(() => this.personalRecords().length);
+
   readonly durationLabel = computed(() => {
     const d = this.log()?.durationSeconds;
     if (d == null) return '—';

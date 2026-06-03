@@ -53,13 +53,36 @@
           <div class="mh-stat__lbl">Distance</div>
         </div>
       }
-      <!--
-        PR tile reserved for when we compute personal records from the
-        log vs prior bests (locked V1 metric — see the design doc). Only
-        rendered when records were actually broken so the trophy never
-        sits empty.
-      -->
+      @if (prCount() > 0) {
+        <div class="mh-stat mh-stat--pr">
+          <div class="mh-stat__num">
+            <i class="pi pi-trophy"></i> {{ prCount() }}
+          </div>
+          <div class="mh-stat__lbl">
+            New 1RM {{ prCount() === 1 ? 'PR' : 'PRs' }}
+          </div>
+        </div>
+      }
     </div>
+
+    @if (prCount() > 0) {
+      <section class="prs">
+        <div class="prs__title">
+          <i class="pi pi-trophy"></i> Personal records
+        </div>
+        @for (pr of personalRecords(); track pr.id) {
+          <div class="prs__row">
+            <span class="ex">{{ pr.exerciseName }}</span>
+            <span class="kg">
+              {{ pr.weightKg | number }} kg
+              @if (pr.deltaKg > 0) {
+                <span class="delta">+{{ pr.deltaKg | number }}</span>
+              }
+            </span>
+          </div>
+        }
+      </section>
+    }
 
     <!-- Feeling + notes -->
     <section class="feedback">

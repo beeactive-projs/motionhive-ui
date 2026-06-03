@@ -9,8 +9,11 @@ import {
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Menu } from 'primeng/menu';
 import { Toast } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 import {
   AssignedWorkout,
@@ -56,9 +59,12 @@ interface WorkoutDerived {
     UpperCasePipe,
     RouterLink,
     ButtonModule,
+    ConfirmDialog,
+    Menu,
     Toast,
+    TooltipModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './client-plan-detail.html',
   styleUrl: './client-plan-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,6 +75,7 @@ export class ClientPlanDetail implements OnInit {
   private readonly _service = inject(ProgramAssignmentService);
   private readonly _logService = inject(WorkoutLogService);
   private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
 
   readonly assignment = signal<ProgramAssignment | null>(null);
   readonly loading = signal(false);
@@ -193,6 +200,58 @@ export class ClientPlanDetail implements OnInit {
       summary: 'Read-only log lands with S11',
       detail: `Replay of "${w.name}" is coming once the active log ships.`,
       life: 3000,
+    });
+  }
+
+  confirmSkip(w: AssignedWorkout): void {
+    if (this.derive(w).state === 'done' || this.derive(w).state === 'skip') {
+      return;
+    }
+    this._confirmationService.confirm({
+      header: 'Skip workout?',
+      message: `Skip "${w.name}"? You can still come back to it later if you change your mind, but it won't count toward your weekly goal.`,
+      icon: 'pi pi-forward',
+      acceptLabel: 'Skip workout',
+      acceptButtonProps: { severity: 'secondary' },
+      rejectLabel: 'Cancel',
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._skipWorkout(w),
+    });
+  }
+
+  private _skipWorkout(w: AssignedWorkout): void {
+    this._service.skipAssignedWorkout(w.id).subscribe({
+      next: () => {
+        // Optimistically flip the workout state + bump completion%.
+        const a = this.assignment();
+        if (!a) return;
+        const workouts = (a.workouts ?? []).map((aw) =>
+          aw.id === w.id
+            ? { ...aw, status: WorkoutLogStatus.Skipped }
+            : aw,
+        );
+        const done = workouts.filter(
+          (aw) =>
+            aw.status === WorkoutLogStatus.Completed ||
+            aw.status === WorkoutLogStatus.Skipped,
+        ).length;
+        const percent =
+          workouts.length === 0 ? 0 : Math.round((done / workouts.length) * 100);
+        this.assignment.set({ ...a, workouts, completionPercent: percent });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Workout skipped',
+          life: 2000,
+        });
+      },
+      error: (err) => {
+        showApiError(
+          this._messageService,
+          "Couldn't skip workout",
+          'Please retry.',
+          err,
+        );
+      },
     });
   }
 

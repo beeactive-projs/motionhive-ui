@@ -78,4 +78,17 @@ export class ProgramAssignmentService {
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.BY_ID(id)}`,
     );
   }
+
+  /**
+   * Client manually skips an assigned workout. Locked V1 decision —
+   * skip is both auto-derived (passed date, no log) and manual.
+   * Returns the updated assigned-workout so the FE can optimistically
+   * patch its tree.
+   */
+  skipAssignedWorkout(assignedWorkoutId: string): Observable<{ id: string; status: string }> {
+    return this._http.post<{ id: string; status: string }>(
+      `${environment.apiUrl}/my/assigned-workouts/${assignedWorkoutId}/skip`,
+      {},
+    );
+  }
 }
