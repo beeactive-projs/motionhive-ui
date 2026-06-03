@@ -2,6 +2,23 @@
   display: contents;
 }
 
+.duration-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+
+  :host ::ng-deep .duration-input {
+    flex: 1;
+  }
+
+  :host ::ng-deep .duration-unit .p-togglebutton {
+    border-radius: 6px !important;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+}
+
 .dialog-body {
   display: flex;
   flex-direction: column;

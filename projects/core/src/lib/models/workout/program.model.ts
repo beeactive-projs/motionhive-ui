@@ -105,7 +105,12 @@ export interface Program {
   description: string | null;
   kind: ProgramKind;
   status: ProgramStatus;
-  durationWeeks: number | null;
+  /**
+   * Program length in days. Author UI defaults to "Weeks" with a
+   * Weeks/Days toggle — multiply by 7 client-side when posting from a
+   * weeks input. Null = open-ended (no end date).
+   */
+  durationDays: number | null;
   periodizationModel: string | null;
   coverImageUrl: string | null;
   goalTags: string[] | null;
@@ -145,7 +150,8 @@ export interface CreateProgramPayload {
   description?: string;
   kind?: ProgramKind;
   status?: ProgramStatus;
-  durationWeeks?: number;
+  /** Days; 1..728 (≤ 104 weeks). */
+  durationDays?: number;
   periodizationModel?: string;
   coverImageUrl?: string;
   goalTags?: string[];

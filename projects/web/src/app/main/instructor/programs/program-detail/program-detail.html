@@ -22,8 +22,15 @@
         }
 
         <div class="hero__meta">
-          @if (p.durationWeeks) {
-            <span class="chip"><i class="pi pi-calendar"></i> {{ p.durationWeeks }} weeks</span>
+          @if (p.durationDays) {
+            <span class="chip">
+              <i class="pi pi-calendar"></i>
+              @if (p.durationDays % 7 === 0) {
+                {{ p.durationDays / 7 }} weeks
+              } @else {
+                {{ p.durationDays }} days
+              }
+            </span>
           }
           @if (p.periodizationModel) {
             <span class="chip">{{ p.periodizationModel | titlecase }}</span>

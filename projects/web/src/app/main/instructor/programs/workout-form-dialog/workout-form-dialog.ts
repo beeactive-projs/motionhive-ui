@@ -36,7 +36,7 @@ interface SelectOption<T> {
 /**
  * Create / edit a workout (a single "day") within a program.
  *
- * `weekIndex` is 0-based; the BE caps it at `program.durationWeeks - 1`
+ * `weekIndex` is 0-based; the BE caps it at `ceil(program.durationDays / 7) - 1`
  * when set, otherwise at 104. `dayIndex` is 0..6 (Mon..Sun, matching
  * BE convention which differs from the ISO 1..7 used for recurrence).
  *
@@ -97,7 +97,8 @@ export class WorkoutFormDialog {
   ];
 
   readonly weekOptions = computed<SelectOption<number>[]>(() => {
-    const dur = this.program().durationWeeks ?? 12;
+    const days = this.program().durationDays ?? 84; // 12 weeks default
+    const dur = Math.max(1, Math.ceil(days / 7));
     return Array.from({ length: dur }, (_, i) => ({
       value: i,
       label: `Week ${i + 1}`,

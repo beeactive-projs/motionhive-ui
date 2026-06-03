@@ -16,6 +16,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
@@ -57,6 +58,7 @@ interface SelectOption<T> {
     InputNumber,
     InputTextModule,
     Select,
+    SelectButton,
     TextareaModule,
     Toast,
   ],
@@ -82,7 +84,13 @@ export class ProgramFormDialog {
   readonly description = signal('');
   readonly kind = signal<ProgramKind>(ProgramKind.Workout);
   readonly status = signal<ProgramStatus>(ProgramStatus.Draft);
-  readonly durationWeeks = signal<number | null>(null);
+  /**
+   * Storage unit — BE is days. The form lets the author pick the
+   * INPUT unit (weeks default, days for short / "21-day" shapes).
+   */
+  readonly durationUnit = signal<'weeks' | 'days'>('weeks');
+  /** Raw value in whatever unit the author picked. */
+  readonly durationValue = signal<number | null>(null);
   readonly periodizationModel = signal<string>('');
   readonly goalTagsRaw = signal<string>('');
 
@@ -106,6 +114,16 @@ export class ProgramFormDialog {
     { value: 'block', label: 'Block' },
     { value: 'conjugate', label: 'Conjugate' },
   ];
+
+  readonly unitOptions: SelectOption<'weeks' | 'days'>[] = [
+    { value: 'weeks', label: 'Weeks' },
+    { value: 'days', label: 'Days' },
+  ];
+
+  /** Cap derived from the unit. BE accepts 1..728 days = 1..104 weeks. */
+  readonly durationMax = computed(() =>
+    this.durationUnit() === 'weeks' ? 104 : 728,
+  );
 
   // ── Derived ──────────────────────────────────────────────────────
 
@@ -140,6 +158,13 @@ export class ProgramFormDialog {
     if (!this.canSubmit()) return;
 
     const goalTags = this._parseTags(this.goalTagsRaw());
+    const value = this.durationValue();
+    const durationDays =
+      value == null
+        ? undefined
+        : this.durationUnit() === 'weeks'
+          ? value * 7
+          : value;
     const payload: CreateProgramPayload = {
       name: this.name().trim(),
       ...(this.description().trim()
@@ -147,9 +172,7 @@ export class ProgramFormDialog {
         : {}),
       kind: this.kind(),
       status: this.status(),
-      ...(this.durationWeeks() != null
-        ? { durationWeeks: this.durationWeeks() as number }
-        : {}),
+      ...(durationDays != null ? { durationDays } : {}),
       ...(this.periodizationModel().trim()
         ? { periodizationModel: this.periodizationModel().trim() }
         : {}),
@@ -196,7 +219,19 @@ export class ProgramFormDialog {
       this.description.set(p.description ?? '');
       this.kind.set(p.kind);
       this.status.set(p.status);
-      this.durationWeeks.set(p.durationWeeks);
+      // Hydrate the input unit by preferring weeks when the value
+      // divides evenly (the common case authored as N weeks). Day-
+      // counted programs (e.g. 21 days) snap to days automatically.
+      if (p.durationDays == null) {
+        this.durationUnit.set('weeks');
+        this.durationValue.set(null);
+      } else if (p.durationDays % 7 === 0) {
+        this.durationUnit.set('weeks');
+        this.durationValue.set(p.durationDays / 7);
+      } else {
+        this.durationUnit.set('days');
+        this.durationValue.set(p.durationDays);
+      }
       this.periodizationModel.set(p.periodizationModel ?? '');
       this.goalTagsRaw.set((p.goalTags ?? []).join(', '));
     } else {
@@ -204,7 +239,8 @@ export class ProgramFormDialog {
       this.description.set('');
       this.kind.set(ProgramKind.Workout);
       this.status.set(ProgramStatus.Draft);
-      this.durationWeeks.set(null);
+      this.durationUnit.set('weeks');
+      this.durationValue.set(null);
       this.periodizationModel.set('');
       this.goalTagsRaw.set('');
     }

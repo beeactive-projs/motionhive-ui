@@ -72,19 +72,32 @@
     <div class="row">
       <div class="field grow">
         <label for="duration">
-          Duration <span class="optional">(weeks)</span>
+          Duration
+          <span class="optional">
+            ({{ durationUnit() === 'weeks' ? 'weeks' : 'days' }}, optional)
+          </span>
         </label>
-        <p-inputnumber
-          inputId="duration"
-          [ngModel]="durationWeeks()"
-          (ngModelChange)="durationWeeks.set($event)"
-          [min]="1"
-          [max]="104"
-          [showButtons]="true"
-          [allowEmpty]="true"
-          placeholder="—"
-          styleClass="w-full"
-        />
+        <div class="duration-row">
+          <p-inputnumber
+            inputId="duration"
+            [ngModel]="durationValue()"
+            (ngModelChange)="durationValue.set($event)"
+            [min]="1"
+            [max]="durationMax()"
+            [showButtons]="true"
+            [allowEmpty]="true"
+            placeholder="—"
+            styleClass="duration-input"
+          />
+          <p-selectbutton
+            [options]="unitOptions"
+            [(ngModel)]="durationUnit"
+            [allowEmpty]="false"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="duration-unit"
+          />
+        </div>
       </div>
       <div class="field grow">
         <label for="periodization">Periodization</label>

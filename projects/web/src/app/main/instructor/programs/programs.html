@@ -82,10 +82,14 @@
           }
 
           <div class="card__meta">
-            @if (p.durationWeeks) {
+            @if (p.durationDays) {
               <span class="chip">
                 <i class="pi pi-calendar"></i>
-                {{ p.durationWeeks }} weeks
+                @if (p.durationDays % 7 === 0) {
+                  {{ p.durationDays / 7 }} weeks
+                } @else {
+                  {{ p.durationDays }} days
+                }
               </span>
             }
             @if (p.periodizationModel) {
