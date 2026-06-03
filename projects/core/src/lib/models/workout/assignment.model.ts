@@ -1,4 +1,8 @@
-import type { ProgramAssignmentStatus } from './workout.enums';
+import type {
+  ExerciseSetType,
+  ProgramAssignmentStatus,
+  WorkoutLogStatus,
+} from './workout.enums';
 
 /**
  * A client's deep-copy assignment of a program. Created server-side
@@ -39,6 +43,74 @@ export interface ProgramAssignment {
     avatarUrl: string | null;
     handle: string | null;
   };
+  /**
+   * Deep-copied tree. Present on the detail endpoint; absent from
+   * list responses (kept lean for performance).
+   */
+  workouts?: AssignedWorkout[];
+}
+
+// ─── Deep-copy tree (per-client snapshot) ────────────────────────────
+
+/**
+ * One workout day inside the assignment — a deep copy of the
+ * `program_workout` row at the time of assignment. Carries its own
+ * scheduledDate so the client knows when to do it.
+ */
+export interface AssignedWorkout {
+  id: string;
+  programAssignmentId: string;
+  masterWorkoutId: string | null;
+  sequenceNumber: number;
+  /** ISO date (YYYY-MM-DD) when this workout is supposed to happen. */
+  scheduledDate: string;
+  /** Mirror of program_workout fields snapshot at booking. */
+  name: string;
+  notes: string | null;
+  weekIndex: number;
+  dayIndex: number;
+  phase: string | null;
+  estimatedDurationMinutes: number | null;
+  status: WorkoutLogStatus | null;
+  exercises?: AssignedExercise[];
+}
+
+export interface AssignedExercise {
+  id: string;
+  assignedWorkoutId: string;
+  masterPrescribedExerciseId: string | null;
+  exerciseId: string;
+  orderIndex: number;
+  supersetGroupId: number | null;
+  notes: string | null;
+  exercise?: {
+    id: string;
+    name: string;
+    slug: string;
+    kind: string;
+    level: string;
+    thumbnailUrl: string | null;
+  };
+  sets?: AssignedSet[];
+}
+
+export interface AssignedSet {
+  id: string;
+  assignedExerciseId: string;
+  masterSetId: string | null;
+  orderIndex: number;
+  setType: ExerciseSetType;
+  targetRepsMin: number | null;
+  targetRepsMax: number | null;
+  targetWeightKg: number | null;
+  targetWeightPercent1rm: number | null;
+  targetDurationSeconds: number | null;
+  targetDistanceMeters: number | null;
+  targetRpe: number | null;
+  targetRir: number | null;
+  restAfterSeconds: number | null;
+  tempo: string | null;
+  notes: string | null;
 }
 
 // ─── Query / payload shapes ──────────────────────────────────────────

@@ -1,0 +1,169 @@
+<div class="page">
+  <nav class="breadcrumb">
+    <a routerLink="/my/plans"><i class="pi pi-arrow-left"></i> My plans</a>
+  </nav>
+
+  @if (loading()) {
+    <div class="loading"><i class="pi pi-spin pi-spinner"></i> Loading…</div>
+  } @else if (assignment(); as a) {
+    <header class="hero">
+      <div class="hero__main">
+        <div class="hero__head">
+          <h1 class="hero__title">{{ a.programNameSnapshot }}</h1>
+          <span class="status status--{{ statusTone(a.status) }}">
+            {{ a.status | titlecase }}
+          </span>
+        </div>
+        <p class="hero__by">
+          From <strong>{{ instructorName(a) }}</strong>
+        </p>
+
+        <div class="hero__meta">
+          <span class="chip">
+            <i class="pi pi-calendar"></i>
+            Starts {{ a.startDate | date: 'mediumDate' }}
+          </span>
+          @if (a.endDate) {
+            <span class="chip">
+              Ends {{ a.endDate | date: 'mediumDate' }}
+            </span>
+          }
+        </div>
+
+        <div class="progress">
+          <div class="progress__bar">
+            <div
+              class="progress__fill"
+              [style.width.%]="a.completionPercent"
+            ></div>
+          </div>
+          <small>
+            {{ completedWorkouts() }} / {{ totalWorkouts() }} workouts ·
+            {{ a.completionPercent }}% complete
+          </small>
+        </div>
+      </div>
+    </header>
+
+    @if (totalWorkouts() === 0) {
+      <div class="empty">
+        <div class="empty__icon"><i class="pi pi-calendar-plus"></i></div>
+        <h3>No workouts in this plan yet</h3>
+        <p>
+          Your instructor will add workouts here. Check back later — you'll
+          get a notification when there's something new to do.
+        </p>
+      </div>
+    } @else {
+      <div class="weeks">
+        @for (w of weeks(); track w.week) {
+          <section class="week">
+            <h2 class="week__title">Week {{ w.week + 1 }}</h2>
+
+            <div class="week__days">
+              @for (workout of w.workouts; track workout.id) {
+                <article
+                  class="workout workout--{{ workoutStatusTone(workout) }}"
+                >
+                  <header class="workout__head">
+                    <div class="workout__head-l">
+                      <span class="day-badge">
+                        {{ workout.scheduledDate | date: 'EEE d MMM' }}
+                      </span>
+                      <h3 class="workout__name">{{ workout.name }}</h3>
+                    </div>
+                    <div class="workout__meta">
+                      @if (workout.estimatedDurationMinutes) {
+                        <span class="chip">
+                          <i class="pi pi-clock"></i>
+                          ~{{ workout.estimatedDurationMinutes }}m
+                        </span>
+                      }
+                      <span class="chip chip--status">
+                        {{ workoutStatusLabel(workout) }}
+                      </span>
+                      <p-button
+                        label="Start"
+                        icon="pi pi-play"
+                        size="small"
+                        (onClick)="startWorkoutStub(workout)"
+                      />
+                    </div>
+                  </header>
+
+                  @if (workout.notes) {
+                    <p class="workout__notes">{{ workout.notes }}</p>
+                  }
+
+                  @if (!workout.exercises || workout.exercises.length === 0) {
+                    <div class="workout__empty">No exercises in this workout.</div>
+                  } @else {
+                    <div class="exercises">
+                      @for (
+                        ex of workout.exercises;
+                        track ex.id;
+                        let idx = $index
+                      ) {
+                        <div class="exercise">
+                          <div class="exercise__num">{{ idx + 1 }}</div>
+                          <div class="exercise__body">
+                            <div class="exercise__head">
+                              @if (ex.exercise?.thumbnailUrl) {
+                                <img
+                                  class="exercise__thumb"
+                                  [src]="ex.exercise!.thumbnailUrl!"
+                                  [alt]="ex.exercise!.name"
+                                  loading="lazy"
+                                />
+                              }
+                              <div class="exercise__title">
+                                {{ ex.exercise?.name ?? '—' }}
+                              </div>
+                            </div>
+
+                            @if (ex.sets?.length) {
+                              <table class="sets">
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Target</th>
+                                    <th>Rest</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  @for (s of ex.sets; track s.id) {
+                                    <tr>
+                                      <td>{{ s.orderIndex + 1 }}</td>
+                                      <td>{{ setSummary(s) }}</td>
+                                      <td>
+                                        @if (s.restAfterSeconds != null) {
+                                          {{ s.restAfterSeconds }}s
+                                        } @else {
+                                          —
+                                        }
+                                      </td>
+                                    </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            } @else {
+                              <div class="exercise__no-sets">
+                                No sets prescribed.
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+  }
+</div>
+
+<p-toast />
