@@ -1,0 +1,164 @@
+<div class="mh-page">
+  <nav class="mh-breadcrumb">
+    <a routerLink="/my/plans">My plans</a>
+    <i class="pi pi-angle-right"></i>
+    @if (assignment(); as a) {
+      <span>{{ a.programNameSnapshot }}</span>
+    }
+  </nav>
+
+  @if (loading()) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
+      <h3>Loading…</h3>
+    </div>
+  } @else if (assignment(); as a) {
+    <section class="hero">
+      <div class="hero__head">
+        <h1 class="hero__title">{{ a.programNameSnapshot }}</h1>
+        <span class="mh-tag" [class.mh-tag--warn]="a.status === 'ACTIVE'" [class.mh-tag--success]="a.status === 'COMPLETED'" [class.mh-tag--muted]="a.status === 'PAUSED'" [class.mh-tag--info]="a.status === 'PENDING'" [class.mh-tag--danger]="a.status === 'CANCELLED'">
+          @switch (a.status) {
+            @case ('ACTIVE') { <i class="pi pi-spinner"></i> Active }
+            @case ('PENDING') { <i class="pi pi-clock"></i> Pending }
+            @case ('PAUSED') { <i class="pi pi-pause"></i> Paused }
+            @case ('COMPLETED') { <i class="pi pi-check-circle"></i> Completed }
+            @case ('CANCELLED') { <i class="pi pi-times-circle"></i> Cancelled }
+          }
+        </span>
+      </div>
+
+      <div class="hero__by">
+        @if (a.instructor?.avatarUrl) {
+          <span class="mh-avatar">
+            <img [src]="a.instructor!.avatarUrl!" [alt]="instructorName()" />
+          </span>
+        } @else {
+          <span class="mh-avatar">{{ instructorInitials() }}</span>
+        }
+        From <strong>{{ instructorName() }}</strong>
+        <span class="dot">·</span>
+        <span class="hero__dates">
+          {{ a.startDate | date: 'mediumDate' }}
+          @if (a.endDate) { – {{ a.endDate | date: 'mediumDate' }} }
+        </span>
+      </div>
+
+      <div class="hero__progress">
+        <div class="mh-progress" [class.mh-progress--success]="a.completionPercent >= 100">
+          <div class="mh-progress__fill" [style.width.%]="a.completionPercent"></div>
+        </div>
+        <div class="hero__progress-text">
+          <strong>{{ completedCount() }} / {{ workouts().length }}</strong> workouts
+          <span class="dot">·</span>
+          <strong>{{ a.completionPercent }}%</strong> complete
+        </div>
+      </div>
+
+      @if (isPaused()) {
+        <div class="hero__paused">
+          <i class="pi pi-pause"></i>
+          Your coach has paused this plan. They'll resume it when you're ready
+          to pick up again.
+        </div>
+      }
+    </section>
+
+    @if (workouts().length === 0) {
+      <div class="mh-empty">
+        <div class="mh-empty__icon"><i class="pi pi-calendar-plus"></i></div>
+        <h3>No workouts in this plan yet</h3>
+        <p>
+          Your coach will add workouts here. You'll get a notification when
+          there's something new to do.
+        </p>
+      </div>
+    } @else {
+      <div class="weeks">
+        @for (g of weeks(); track g.week) {
+          <section
+            class="mh-week"
+            [class.mh-week--open]="g.open"
+          >
+            <header class="mh-week__head" (click)="toggleWeek(g.week)">
+              <i
+                class="pi caret"
+                [class.pi-chevron-right]="!g.open"
+                [class.pi-chevron-down]="g.open"
+              ></i>
+              <span class="wk">Week {{ g.week + 1 }}</span>
+              <span class="wmeta">
+                @if (g.current) { · this week · }
+                {{ g.workouts.length }} {{ g.workouts.length === 1 ? 'workout' : 'workouts' }}
+              </span>
+            </header>
+
+            @if (g.open) {
+              <div class="mh-week__body">
+                @for (w of g.workouts; track w.id) {
+                  <article
+                    class="mh-cwk"
+                    [class.mh-cwk--todo]="derive(w).state === 'todo'"
+                    [class.mh-cwk--doing]="derive(w).state === 'doing'"
+                    [class.mh-cwk--done]="derive(w).state === 'done'"
+                    [class.mh-cwk--skip]="derive(w).state === 'skip'"
+                  >
+                    <div class="mh-cwk__row">
+                      <div class="mh-cwk__date">
+                        <div class="dow">{{ w.scheduledDate | date: 'EEE' }}</div>
+                        <div class="num">{{ w.scheduledDate | date: 'd' }}</div>
+                        <div class="mon">{{ w.scheduledDate | date: 'MMM' | uppercase }}</div>
+                      </div>
+                      <div class="mh-cwk__main">
+                        <h4 class="name">{{ w.name }}</h4>
+                        <div class="meta">{{ workoutVolume(w) }}</div>
+                      </div>
+                      <div class="mh-cwk__actions">
+                        <span class="mh-tag" [class]="workoutTagClass(w)">
+                          <i [class]="workoutTagIcon(w)"></i>
+                          {{ workoutTagLabel(w) }}
+                        </span>
+                        @switch (derive(w).cta) {
+                          @case ('start') {
+                            <p-button
+                              label="Start"
+                              icon="pi pi-play"
+                              size="small"
+                              [disabled]="isPaused()"
+                              [loading]="starting() === w.id"
+                              (onClick)="startWorkout(w)"
+                            />
+                          }
+                          @case ('resume') {
+                            <p-button
+                              label="Resume"
+                              icon="pi pi-play"
+                              size="small"
+                              [disabled]="isPaused()"
+                              [loading]="starting() === w.id"
+                              (onClick)="startWorkout(w)"
+                            />
+                          }
+                          @case ('view') {
+                            <p-button
+                              label="View"
+                              size="small"
+                              severity="secondary"
+                              [text]="true"
+                              (onClick)="viewWorkoutStub(w)"
+                            />
+                          }
+                        }
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            }
+          </section>
+        }
+      </div>
+    }
+  }
+</div>
+
+<p-toast position="top-right" />

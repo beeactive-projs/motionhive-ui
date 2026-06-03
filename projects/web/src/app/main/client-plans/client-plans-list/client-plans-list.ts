@@ -6,10 +6,12 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe, TitleCasePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
+import { SelectButton } from 'primeng/selectbutton';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -21,34 +23,40 @@ import {
   showApiError,
 } from 'core';
 
+interface StatusTab {
+  value: ProgramAssignmentStatus | null;
+  label: string;
+}
+
 /**
- * Client-side "My plans" — list of program assignments the logged-in
- * user has been given by their instructors.
+ * Client "My plans" list (S9 in the Claude Design package).
  *
- * Mirrors the instructor programs list shape (status tabs + card grid
- * + load more) so the visual language stays consistent across the two
- * surfaces. The detail view + logging UI ship in later slices.
+ * Status segmented control (PrimeNG selectbutton) + card grid with
+ * the design's atoms (`mh-plan-card`, `mh-tag`, `mh-progress`,
+ * instructor avatar). Empty state CTA points to Discover — a client
+ * with no plans can't create one, so the meaningful action is to find
+ * an instructor.
  */
 @Component({
-  selector: 'mh-my-plans',
+  selector: 'mh-client-plans-list',
   standalone: true,
   imports: [
     DatePipe,
+    FormsModule,
     RouterLink,
-    TitleCasePipe,
     ButtonModule,
+    SelectButton,
     Toast,
   ],
   providers: [MessageService],
-  templateUrl: './my-plans.html',
-  styleUrl: './my-plans.scss',
+  templateUrl: './client-plans-list.html',
+  styleUrl: './client-plans-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyPlans {
+export class ClientPlansList {
   private readonly _service = inject(ProgramAssignmentService);
   private readonly _messageService = inject(MessageService);
-
-  // ── State ────────────────────────────────────────────────────────
+  private readonly _router = inject(Router);
 
   readonly items = signal<ProgramAssignment[]>([]);
   readonly total = signal(0);
@@ -58,14 +66,9 @@ export class MyPlans {
   readonly pageSize = 20;
   readonly statusFilter = signal<ProgramAssignmentStatus | null>(null);
 
-  // ── Derived ──────────────────────────────────────────────────────
-
   readonly hasMore = computed(() => this.items().length < this.total());
 
-  readonly statusTabs: {
-    value: ProgramAssignmentStatus | null;
-    label: string;
-  }[] = [
+  readonly statusOptions: StatusTab[] = [
     { value: null, label: 'All' },
     { value: ProgramAssignmentStatus.Active, label: 'Active' },
     { value: ProgramAssignmentStatus.Pending, label: 'Pending' },
@@ -81,10 +84,55 @@ export class MyPlans {
     });
   }
 
-  // ── Actions ──────────────────────────────────────────────────────
+  // ── Template helpers ─────────────────────────────────────────────
 
-  setStatus(value: ProgramAssignmentStatus | null): void {
-    this.statusFilter.set(value);
+  instructorInitials(a: ProgramAssignment): string {
+    const i = a.instructor;
+    if (!i) return '?';
+    const f = (i.firstName?.[0] ?? '').toUpperCase();
+    const l = (i.lastName?.[0] ?? '').toUpperCase();
+    return `${f}${l}` || '?';
+  }
+
+  instructorName(a: ProgramAssignment): string {
+    const i = a.instructor;
+    if (!i) return 'your instructor';
+    return `${i.firstName} ${i.lastName}`.trim() || 'your instructor';
+  }
+
+  /** Map status → tag modifier the SCSS knows about. */
+  statusTagClass(s: ProgramAssignmentStatus): string {
+    switch (s) {
+      case ProgramAssignmentStatus.Active:
+        return 'mh-tag--warn';
+      case ProgramAssignmentStatus.Completed:
+        return 'mh-tag--success';
+      case ProgramAssignmentStatus.Paused:
+        return 'mh-tag--muted';
+      case ProgramAssignmentStatus.Cancelled:
+        return 'mh-tag--danger';
+      default:
+        return 'mh-tag--info';
+    }
+  }
+
+  statusIcon(s: ProgramAssignmentStatus): string {
+    switch (s) {
+      case ProgramAssignmentStatus.Active:
+        return 'pi pi-spinner';
+      case ProgramAssignmentStatus.Completed:
+        return 'pi pi-check-circle';
+      case ProgramAssignmentStatus.Paused:
+        return 'pi pi-pause';
+      case ProgramAssignmentStatus.Cancelled:
+        return 'pi pi-times-circle';
+      default:
+        return 'pi pi-clock';
+    }
+  }
+
+  statusLabel(s: ProgramAssignmentStatus): string {
+    return s.charAt(0) + s.slice(1).toLowerCase();
   }
 
   loadMore(): void {
@@ -93,25 +141,8 @@ export class MyPlans {
     this.fetch(false);
   }
 
-  statusTone(s: ProgramAssignmentStatus): string {
-    switch (s) {
-      case ProgramAssignmentStatus.Active:
-        return 'active';
-      case ProgramAssignmentStatus.Completed:
-        return 'completed';
-      case ProgramAssignmentStatus.Paused:
-        return 'paused';
-      case ProgramAssignmentStatus.Cancelled:
-        return 'cancelled';
-      default:
-        return 'pending';
-    }
-  }
-
-  instructorName(a: ProgramAssignment): string {
-    const i = a.instructor;
-    if (!i) return 'your instructor';
-    return `${i.firstName} ${i.lastName}`.trim() || 'your instructor';
+  goToDiscover(): void {
+    this._router.navigate(['/sessions/discover']);
   }
 
   // ── Internals ────────────────────────────────────────────────────

@@ -1,0 +1,103 @@
+<div class="mh-page">
+  <header class="mh-page-head">
+    <div>
+      <h1>Workout history</h1>
+      <p class="sub">
+        @if (total() === 0 && !loading()) {
+          Finished workouts will land here with their stats and feel.
+        } @else if (total() === 1) {
+          1 workout logged
+        } @else {
+          {{ total() }} workouts logged
+          @if (totalTrainingHours() > 0) {
+            · {{ totalTrainingHours() }}h total training time
+          }
+        }
+      </p>
+    </div>
+  </header>
+
+  @if (loading() && items().length === 0) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
+      <h3>Loading…</h3>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-history"></i></div>
+      <h3>No workouts yet</h3>
+      <p>
+        Finish your first workout and it'll be saved here —
+        durations, sets, PRs, and how it felt.
+      </p>
+      <p-button
+        label="Go to my plans"
+        icon="pi pi-bookmark"
+        (onClick)="goToPlans()"
+        styleClass="mt-3"
+      />
+    </div>
+  } @else {
+    @for (m of months(); track m.label) {
+      <div class="month">
+        <div class="month__label">{{ m.label }}</div>
+        <div class="month__rows">
+          @for (l of m.logs; track l.id) {
+            @let row = rows()[items().indexOf(l)];
+            <button
+              type="button"
+              class="hrow"
+              (click)="openReplay(l)"
+            >
+              <div class="hrow__date">
+                <div class="dow">{{ l.startedAt | date: 'EEE' }}</div>
+                <div class="num">{{ l.startedAt | date: 'd' }}</div>
+                <div class="time">{{ l.startedAt | date: 'shortTime' }}</div>
+              </div>
+              <div class="hrow__main">
+                <div class="name">{{ l.name }}</div>
+                @if (row?.subtitle) {
+                  <div class="sub">{{ row.subtitle }}</div>
+                } @else {
+                  <div class="sub muted">Freestyle workout</div>
+                }
+              </div>
+              <div class="hrow__metric">
+                @if (row?.durationMin != null) {
+                  <i class="pi pi-stopwatch"></i> {{ row.durationMin }} min
+                } @else {
+                  —
+                }
+              </div>
+              <div class="hrow__metric">
+                <i class="pi pi-check"></i> {{ row?.setsDone ?? 0 }} sets
+              </div>
+              <div class="hrow__feeling">
+                @if (row?.feelingGlyph) {
+                  {{ row.feelingGlyph }}
+                } @else {
+                  <span class="dash">—</span>
+                }
+              </div>
+              <i class="pi pi-chevron-right hrow__chev"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (hasMore()) {
+      <div class="load-more">
+        <p-button
+          [label]="loadingMore() ? 'Loading…' : 'Load more'"
+          [loading]="loadingMore()"
+          severity="secondary"
+          [text]="true"
+          (onClick)="loadMore()"
+        />
+      </div>
+    }
+  }
+</div>
+
+<p-toast position="top-right" />

@@ -1,0 +1,115 @@
+<div class="mh-page complete-page">
+  @if (loading()) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
+      <h3>Loading…</h3>
+    </div>
+  } @else if (log(); as l) {
+    <div class="complete-hero">
+      <div class="check">
+        <i class="pi pi-check"></i>
+      </div>
+      <h1>Workout complete</h1>
+      <p class="sub">
+        {{ l.name }}
+        @if (l.completedAt) {
+          · finished {{ l.completedAt | date: 'shortTime' }}
+        }
+      </p>
+    </div>
+
+    <!-- Stat tiles — conditional per modality -->
+    <div class="stats">
+      <div class="mh-stat">
+        <div class="mh-stat__num">{{ durationLabel() }}</div>
+        <div class="mh-stat__lbl">Duration</div>
+      </div>
+      <div class="mh-stat">
+        <div class="mh-stat__num">
+          {{ setsDone() }}
+          <span class="unit">/ {{ setsPlanned() }}</span>
+        </div>
+        <div class="mh-stat__lbl">Sets done</div>
+      </div>
+      @if (hasVolume()) {
+        <div class="mh-stat">
+          <div class="mh-stat__num">
+            {{ totalVolumeKg() | number }}<span class="unit"> kg</span>
+          </div>
+          <div class="mh-stat__lbl">Total volume</div>
+        </div>
+      }
+      @if (hasReps()) {
+        <div class="mh-stat">
+          <div class="mh-stat__num">{{ totalReps() }}</div>
+          <div class="mh-stat__lbl">Total reps</div>
+        </div>
+      }
+      @if (hasDistance()) {
+        <div class="mh-stat">
+          <div class="mh-stat__num">
+            {{ totalDistanceM() | number }}<span class="unit"> m</span>
+          </div>
+          <div class="mh-stat__lbl">Distance</div>
+        </div>
+      }
+      <!--
+        PR tile reserved for when we compute personal records from the
+        log vs prior bests (locked V1 metric — see the design doc). Only
+        rendered when records were actually broken so the trophy never
+        sits empty.
+      -->
+    </div>
+
+    <!-- Feeling + notes -->
+    <section class="feedback">
+      <h3 class="feedback__title">How did that feel?</h3>
+      <div class="mh-feeling">
+        @for (opt of feelingOptions; track opt.value) {
+          <button
+            type="button"
+            class="mh-feeling__opt"
+            [class.mh-feeling__opt--active]="feelingRating() === opt.value"
+            [attr.aria-label]="opt.label"
+            [title]="opt.label"
+            (click)="selectFeeling(opt.value)"
+          >
+            {{ opt.glyph }}
+          </button>
+        }
+      </div>
+      <textarea
+        pTextarea
+        rows="2"
+        maxlength="2000"
+        placeholder="Anything to note for your coach? (optional)"
+        [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)"
+        class="w-full"
+      ></textarea>
+    </section>
+
+    <footer class="actions">
+      <p-button
+        label="Save & back to my plan"
+        icon="pi pi-arrow-left"
+        size="large"
+        [loading]="saving()"
+        (onClick)="saveFeedback()"
+        styleClass="w-full"
+      />
+      <p-button
+        label="Share to feed"
+        icon="pi pi-share-alt"
+        severity="secondary"
+        size="large"
+        [text]="true"
+        [disabled]="true"
+        styleClass="w-full"
+      />
+      <small class="soon">Share to feed lands in a future slice.</small>
+    </footer>
+  }
+</div>
+
+<p-toast position="top-right" />

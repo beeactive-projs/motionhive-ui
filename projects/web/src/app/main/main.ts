@@ -127,7 +127,8 @@ export class Main {
       items: [
         { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
         { label: 'My sessions', route: '/my/sessions', icon: 'pi pi-calendar-clock' },
-        { label: 'My plans', route: '/my/plans', icon: 'pi pi-objects-column' },
+        { label: 'My plans', route: '/my/plans', icon: 'pi pi-bookmark' },
+        { label: 'Workout history', route: '/my/workouts', icon: 'pi pi-history' },
         { label: 'Discover', route: '/sessions/discover', icon: 'pi pi-search' },
         { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
       ],

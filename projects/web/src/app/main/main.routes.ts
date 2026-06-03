@@ -48,20 +48,42 @@ export const mainRoutes: Routes = [
           import('./sessions-my/sessions-my').then((m) => m.SessionsMy),
         title: 'My sessions - MotionHive',
       },
+      // ── Client workouts area (re-skinned against Claude Design output) ──
       {
         path: 'my/plans',
         loadComponent: () =>
-          import('./my-plans/my-plans').then((m) => m.MyPlans),
+          import('./client-plans/client-plans-list/client-plans-list').then(
+            (m) => m.ClientPlansList,
+          ),
         title: 'My plans - MotionHive',
       },
       {
         path: 'my/plans/:id',
         loadComponent: () =>
-          import('./my-plans/my-plan-detail/my-plan-detail').then(
-            (m) => m.MyPlanDetail,
+          import('./client-plans/client-plan-detail/client-plan-detail').then(
+            (m) => m.ClientPlanDetail,
           ),
         title: 'My plan - MotionHive',
       },
+      {
+        path: 'my/workouts',
+        loadComponent: () =>
+          import('./client-workouts/client-workouts-history/client-workouts-history').then(
+            (m) => m.ClientWorkoutsHistory,
+          ),
+        title: 'Workout history - MotionHive',
+      },
+      {
+        path: 'my/workouts/:id/complete',
+        loadComponent: () =>
+          import('./client-workouts/workout-complete/workout-complete').then(
+            (m) => m.WorkoutComplete,
+          ),
+        title: 'Workout complete - MotionHive',
+      },
+      // S11 active log — owned by the separate logging brief, rebuilt later.
+      // Keeping the route name reserved so deep-links + nav stay stable.
+      // { path: 'my/workout-log/:id', loadComponent: ... }
       // Notification producers emit `screen: 'sessions/my'` (BE convention
       // since the API surface is /sessions/my). Forward to the canonical
       // FE route so deep-links from emails / push don't 404.
