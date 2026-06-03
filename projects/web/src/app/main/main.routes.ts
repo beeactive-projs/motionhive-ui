@@ -48,6 +48,12 @@ export const mainRoutes: Routes = [
           import('./sessions-my/sessions-my').then((m) => m.SessionsMy),
         title: 'My sessions - MotionHive',
       },
+      {
+        path: 'my/plans',
+        loadComponent: () =>
+          import('./my-plans/my-plans').then((m) => m.MyPlans),
+        title: 'My plans - MotionHive',
+      },
       // Notification producers emit `screen: 'sessions/my'` (BE convention
       // since the API surface is /sessions/my). Forward to the canonical
       // FE route so deep-links from emails / push don't 404.
