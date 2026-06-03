@@ -104,6 +104,11 @@ export interface AssignedSet {
   targetRepsMax: number | null;
   targetWeightKg: number | null;
   targetWeightPercent1rm: number | null;
+  /**
+   * Stamped at workout-log start by the BE — the %1RM resolved against
+   * the user's latest one_rep_max for this exercise.
+   */
+  resolvedWeightKg?: number | null;
   targetDurationSeconds: number | null;
   targetDistanceMeters: number | null;
   targetRpe: number | null;

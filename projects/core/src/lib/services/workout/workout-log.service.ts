@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import type {
   CompleteWorkoutPayload,
+  LoggedExercise,
   LogSetPayload,
   LoggedSet,
   StartWorkoutPayload,
@@ -75,5 +76,48 @@ export class WorkoutLogService {
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     return this._http.get<PaginatedWorkoutLogs>(this._base, { params: p });
+  }
+
+  // ── Mid-session mutations (freestyle + S14 affordances) ──────────
+
+  addExercise(
+    workoutLogId: string,
+    exerciseId: string,
+  ): Observable<LoggedExercise> {
+    return this._http.post<LoggedExercise>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.ADD_EXERCISE(workoutLogId)}`,
+      { exerciseId },
+    );
+  }
+
+  removeExercise(
+    workoutLogId: string,
+    loggedExerciseId: string,
+  ): Observable<void> {
+    return this._http.delete<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.REMOVE_EXERCISE(workoutLogId, loggedExerciseId)}`,
+    );
+  }
+
+  addSet(
+    workoutLogId: string,
+    loggedExerciseId: string,
+    payload: { setType?: string } = {},
+  ): Observable<LoggedSet> {
+    return this._http.post<LoggedSet>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.ADD_SET(workoutLogId, loggedExerciseId)}`,
+      payload,
+    );
+  }
+
+  /**
+   * "Last time you did this" — most-recent completed log's actuals for
+   * a catalog exercise. Returns up to 6 sets (one workout's worth).
+   * Powers the `LastTimeHint` component on the active log.
+   */
+  lastForExercise(exerciseId: string): Observable<LoggedSet[]> {
+    return this._http.get<LoggedSet[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.LAST_FOR_EXERCISE(exerciseId)}`,
+    );
   }
 }

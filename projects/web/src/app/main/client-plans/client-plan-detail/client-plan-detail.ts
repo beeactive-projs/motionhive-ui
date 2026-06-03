@@ -171,16 +171,7 @@ export class ClientPlanDetail implements OnInit {
     this._logService.start({ assignedWorkoutId: w.id }).subscribe({
       next: (log) => {
         this.starting.set(null);
-        // S11 route is reserved but not yet implemented — fall back to
-        // a friendly toast so the demo still makes sense.
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Workout started',
-          detail: 'The active log screen lands in the next slice.',
-          life: 3000,
-        });
-        // Once S11 ships:
-        // this._router.navigate(['/my/workout-log', log.id]);
+        this._router.navigate(['/my/workout-log', log.id]);
       },
       error: (err) => {
         this.starting.set(null);

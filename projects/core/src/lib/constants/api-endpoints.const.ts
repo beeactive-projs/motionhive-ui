@@ -238,6 +238,13 @@ export const API_ENDPOINTS = {
     COMPLETE: (id: string) => `/workout-logs/${id}/complete`,
     LOG_SET: (id: string, setId: string) =>
       `/workout-logs/${id}/sets/${setId}`,
+    ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,
+    REMOVE_EXERCISE: (id: string, exId: string) =>
+      `/workout-logs/${id}/exercises/${exId}`,
+    ADD_SET: (id: string, exId: string) =>
+      `/workout-logs/${id}/exercises/${exId}/sets`,
+    LAST_FOR_EXERCISE: (exerciseId: string) =>
+      `/workout-logs/last-for-exercise/${exerciseId}`,
   },
   ONE_REP_MAXES: {
     BASE: '/one-rep-maxes',

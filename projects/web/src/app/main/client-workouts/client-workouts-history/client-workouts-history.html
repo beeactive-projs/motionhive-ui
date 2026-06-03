@@ -1,12 +1,16 @@
 <div class="mh-page">
   <header class="mh-page-head">
     <div>
-      <h1>Workout history</h1>
+      <h1>Workouts</h1>
       <p class="sub">
-        @if (total() === 0 && !loading()) {
-          Finished workouts will land here with their stats and feel.
+        @if (tab() !== 'workouts') {
+          {{ tab() === 'routines'
+            ? 'Save a workout shape to start it again with one tap.'
+            : 'Browse the catalog or build your own custom exercises.' }}
+        } @else if (total() === 0 && !loading()) {
+          Start an empty workout or open one from your plans.
         } @else if (total() === 1) {
-          1 workout logged
+          1 workout logged · keep going
         } @else {
           {{ total() }} workouts logged
           @if (totalTrainingHours() > 0) {
@@ -15,9 +19,56 @@
         }
       </p>
     </div>
+    <p-button
+      label="Start workout"
+      icon="pi pi-bolt"
+      severity="success"
+      size="large"
+      (onClick)="openStartFreestyle()"
+    />
   </header>
 
-  @if (loading() && items().length === 0) {
+  <div class="tabs">
+    <p-selectbutton
+      [options]="tabOptions"
+      [(ngModel)]="tab"
+      [allowEmpty]="false"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="mh-tabs"
+    />
+  </div>
+
+  @if (tab() === 'routines') {
+    <div class="mh-empty">
+      <div class="mh-empty__icon mh-empty__icon--primary">
+        <i class="pi pi-clone"></i>
+      </div>
+      <h3>Routines are coming soon</h3>
+      <p>
+        Save a workout shape — name, exercises, default sets — and start
+        it again with one tap. We're working on this; for now you can
+        log freestyle sessions from the button above.
+      </p>
+    </div>
+  } @else if (tab() === 'exercises') {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-bolt"></i></div>
+      <h3>Exercise catalog</h3>
+      <p>
+        Browse 800+ system exercises and build your own custom ones in
+        the Exercises area.
+      </p>
+      <p-button
+        label="Open exercises"
+        icon="pi pi-external-link"
+        severity="secondary"
+        [text]="true"
+        (onClick)="goToExercises()"
+        styleClass="mt-3"
+      />
+    </div>
+  } @else if (loading() && items().length === 0) {
     <div class="mh-empty">
       <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
       <h3>Loading…</h3>
@@ -27,17 +78,19 @@
       <div class="mh-empty__icon"><i class="pi pi-history"></i></div>
       <h3>No workouts yet</h3>
       <p>
-        Finish your first workout and it'll be saved here —
-        durations, sets, PRs, and how it felt.
+        Tap "Start workout" above to log one freestyle, or open a plan
+        your coach assigned you to start a structured session.
       </p>
       <p-button
         label="Go to my plans"
         icon="pi pi-bookmark"
+        severity="secondary"
+        [text]="true"
         (onClick)="goToPlans()"
         styleClass="mt-3"
       />
     </div>
-  } @else {
+  } @else if (tab() === 'workouts') {
     @for (m of months(); track m.label) {
       <div class="month">
         <div class="month__label">{{ m.label }}</div>
@@ -109,3 +162,50 @@
 </div>
 
 <p-toast position="top-right" />
+
+<!-- Freestyle start dialog -->
+<p-dialog
+  [(visible)]="startDialogOpen"
+  [modal]="true"
+  [closable]="!starting()"
+  [closeOnEscape]="!starting()"
+  [dismissableMask]="!starting()"
+  [appendTo]="'body'"
+  [style]="{ width: '440px' }"
+  [breakpoints]="{ '540px': '95vw' }"
+  header="Start a workout">
+  <div class="freestyle-body">
+    <p class="lede">
+      No assigned plan today? Start a freestyle session. You'll add
+      exercises as you go.
+    </p>
+    <label for="name">Workout name</label>
+    <input
+      pInputText
+      id="name"
+      [ngModel]="newWorkoutName()"
+      (ngModelChange)="newWorkoutName.set($event)"
+      maxlength="200"
+      class="w-full"
+      placeholder="e.g. Saturday session"
+      autocomplete="off"
+    />
+  </div>
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="starting()"
+      (onClick)="startDialogOpen.set(false)"
+    />
+    <p-button
+      label="Start"
+      icon="pi pi-bolt"
+      severity="success"
+      [loading]="starting()"
+      [disabled]="!newWorkoutName().trim()"
+      (onClick)="startFreestyle()"
+    />
+  </ng-template>
+</p-dialog>

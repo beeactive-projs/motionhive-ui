@@ -7,9 +7,13 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
+import { SelectButton } from 'primeng/selectbutton';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -19,6 +23,8 @@ import {
   WorkoutLogService,
   showApiError,
 } from 'core';
+
+type Tab = 'workouts' | 'routines' | 'exercises';
 
 interface MonthGroup {
   label: string;
@@ -48,7 +54,15 @@ interface HistoryRow {
 @Component({
   selector: 'mh-client-workouts-history',
   standalone: true,
-  imports: [DatePipe, ButtonModule, Toast],
+  imports: [
+    DatePipe,
+    FormsModule,
+    ButtonModule,
+    Dialog,
+    InputTextModule,
+    SelectButton,
+    Toast,
+  ],
   providers: [MessageService],
   templateUrl: './client-workouts-history.html',
   styleUrl: './client-workouts-history.scss',
@@ -65,6 +79,21 @@ export class ClientWorkoutsHistory {
   readonly loadingMore = signal(false);
   readonly page = signal(1);
   readonly pageSize = 30;
+
+  // ── Tabs (Workouts / Routines stub / Exercises shortcut) ─────────
+
+  readonly tab = signal<Tab>('workouts');
+  readonly tabOptions: { value: Tab; label: string }[] = [
+    { value: 'workouts', label: 'Workouts' },
+    { value: 'routines', label: 'Routines' },
+    { value: 'exercises', label: 'Exercises' },
+  ];
+
+  // ── Freestyle start dialog ───────────────────────────────────────
+
+  readonly startDialogOpen = signal(false);
+  readonly newWorkoutName = signal('');
+  readonly starting = signal(false);
 
   readonly hasMore = computed(() => this.items().length < this.total());
 
@@ -132,6 +161,39 @@ export class ClientWorkoutsHistory {
 
   goToPlans(): void {
     this._router.navigate(['/my/plans']);
+  }
+
+  openStartFreestyle(): void {
+    // Default the name to a friendly "Tuesday session" pattern.
+    const day = new Date().toLocaleString('en', { weekday: 'long' });
+    this.newWorkoutName.set(`${day} session`);
+    this.startDialogOpen.set(true);
+  }
+
+  startFreestyle(): void {
+    const name = this.newWorkoutName().trim();
+    if (!name || this.starting()) return;
+    this.starting.set(true);
+    this._service.start({ name }).subscribe({
+      next: (log) => {
+        this.starting.set(false);
+        this.startDialogOpen.set(false);
+        this._router.navigate(['/my/workout-log', log.id]);
+      },
+      error: (err) => {
+        this.starting.set(false);
+        showApiError(
+          this._messageService,
+          "Couldn't start workout",
+          'Please retry.',
+          err,
+        );
+      },
+    });
+  }
+
+  goToExercises(): void {
+    this._router.navigate(['/coaching/exercises']);
   }
 
   // ── Template helpers ─────────────────────────────────────────────

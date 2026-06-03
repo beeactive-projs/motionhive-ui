@@ -4,6 +4,63 @@
   display: block;
 }
 
+.mh-page-head {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tabs {
+  margin-bottom: 18px;
+}
+
+:host ::ng-deep .mh-tabs .p-selectbutton {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border: none;
+}
+
+:host ::ng-deep .mh-tabs .p-togglebutton {
+  border-radius: 999px !important;
+  border: 1px solid var(--p-content-border-color);
+  background: var(--p-content-background);
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+
+  &:hover:not(.p-togglebutton-checked) {
+    background: var(--p-surface-100, #f1f5f9);
+  }
+
+  &.p-togglebutton-checked {
+    background: var(--p-primary-color);
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-contrast-color, #fff);
+  }
+}
+
+.freestyle-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .lede {
+    margin: 0;
+    color: var(--p-text-muted-color);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+}
+
+.w-full { width: 100%; }
+
 .month {
   margin-bottom: 22px;
 

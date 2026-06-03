@@ -81,9 +81,14 @@ export const mainRoutes: Routes = [
           ),
         title: 'Workout complete - MotionHive',
       },
-      // S11 active log — owned by the separate logging brief, rebuilt later.
-      // Keeping the route name reserved so deep-links + nav stay stable.
-      // { path: 'my/workout-log/:id', loadComponent: ... }
+      {
+        path: 'my/workout-log/:id',
+        loadComponent: () =>
+          import('./client-workouts/workout-log-active/workout-log-active').then(
+            (m) => m.WorkoutLogActive,
+          ),
+        title: 'Workout - MotionHive',
+      },
       // Notification producers emit `screen: 'sessions/my'` (BE convention
       // since the API surface is /sessions/my). Forward to the canonical
       // FE route so deep-links from emails / push don't 404.

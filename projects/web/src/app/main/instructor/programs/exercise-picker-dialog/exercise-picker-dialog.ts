@@ -61,6 +61,15 @@ export class ExercisePickerDialog {
   readonly workout = input.required<ProgramWorkout>();
   readonly visible = model<boolean>(false);
   readonly added = output<PrescribedExercise>();
+  /**
+   * Emit-only mode: the dialog doesn't call the programs BE; it just
+   * fires `picked` with the chosen Exercise so the parent can decide
+   * what to do with it (e.g. attach to a live workout-log instead of a
+   * program). When true, the footer button still says "Add to workout"
+   * and the dialog closes after picking, but no network call happens.
+   */
+  readonly emitOnly = input<boolean>(false);
+  readonly picked = output<Exercise>();
 
   private readonly _programService = inject(ProgramService);
   private readonly _exerciseService = inject(ExerciseService);
@@ -123,6 +132,15 @@ export class ExercisePickerDialog {
   submit(): void {
     const id = this.selectedId();
     if (!id) return;
+    const pickedEx = this.selected();
+    // Emit-only mode: hand the chosen exercise back to the parent and
+    // close. The parent owns the BE call (the active log calls the
+    // workout-log endpoint, not the programs endpoint).
+    if (this.emitOnly()) {
+      if (pickedEx) this.picked.emit(pickedEx);
+      this.visible.set(false);
+      return;
+    }
     const payload: CreatePrescribedExercisePayload = { exerciseId: id };
 
     this.submitting.set(true);

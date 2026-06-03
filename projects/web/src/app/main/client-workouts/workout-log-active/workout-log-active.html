@@ -1,0 +1,289 @@
+<!--
+  Active workout log (S11). Mobile-first layout:
+    - Top: status bar with workout name + elapsed timer
+    - Middle: scrollable list of exercise cards (done collapse / current expands)
+    - Bottom: sticky rest card (when resting) + sticky Complete bar
+  Desktop variant uses CSS to widen rows; same component tree.
+-->
+<div class="log-shell" [class.is-completed]="isComplete()">
+  <header class="log-appbar">
+    <button
+      type="button"
+      class="iconbtn"
+      pTooltip="Back"
+      (click)="confirmComplete()"
+    >
+      <i class="pi pi-times"></i>
+    </button>
+    <div class="title">
+      <div class="name">{{ log()?.name ?? 'Workout' }}</div>
+      @if (isFreestyle()) {
+        <div class="sub">Freestyle session</div>
+      } @else {
+        <div class="sub">Assigned session</div>
+      }
+    </div>
+    <div class="elapsed">
+      <div class="t">{{ elapsedLabel() }}</div>
+      <div class="lbl">elapsed</div>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="loading">
+      <i class="pi pi-spin pi-spinner"></i> Loading…
+    </div>
+  } @else if (log(); as l) {
+    <main class="log-body">
+      @if (exercises().length === 0) {
+        <div class="empty">
+          <div class="empty__icon"><i class="pi pi-bolt"></i></div>
+          <h3>Build your workout</h3>
+          <p>
+            Add exercises from the catalog, log your sets as you go,
+            and finish when you're done.
+          </p>
+          <p-button
+            label="Add exercise"
+            icon="pi pi-plus"
+            (onClick)="openAddExercise()"
+          />
+        </div>
+      } @else {
+        @for (ex of exercises(); track ex.id) {
+          <article
+            class="exlog"
+            [class.done]="isExerciseDone(ex)"
+            [class.current]="isCurrentExercise(ex)"
+          >
+            <header class="exlog__head">
+              @if (ex.exerciseThumbnailUrlSnapshot) {
+                <img
+                  class="thumb"
+                  [src]="ex.exerciseThumbnailUrlSnapshot"
+                  [alt]="ex.exerciseNameSnapshot"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="thumb thumb--fallback">
+                  <i class="pi pi-bolt"></i>
+                </div>
+              }
+              <div class="meta">
+                <div class="name">{{ ex.exerciseNameSnapshot }}</div>
+                <div class="sub" [class.sub--done]="isExerciseDone(ex)">
+                  @if (isExerciseDone(ex)) {
+                    <i class="pi pi-check-circle"></i>
+                    {{ exerciseProgressLabel(ex) }} done
+                  } @else {
+                    {{ exerciseProgressLabel(ex) }}
+                  }
+                </div>
+              </div>
+              <button
+                type="button"
+                class="iconbtn"
+                pTooltip="Skip exercise"
+                [disabled]="isComplete()"
+                (click)="confirmRemoveExercise(ex)"
+              >
+                <i class="pi pi-times-circle"></i>
+              </button>
+            </header>
+
+            @if (isCurrentExercise(ex) && !isComplete()) {
+              @if (lastTimeSummary(ex)) {
+                <div class="lasttime">
+                  <i class="pi pi-history"></i>
+                  <span><strong>Last time</strong> · {{ lastTimeSummary(ex) }}</span>
+                </div>
+              }
+            }
+
+            @if (!isExerciseDone(ex) || ex.sets?.length) {
+              <table class="slog">
+                <thead>
+                  <tr>
+                    <th class="num">#</th>
+                    <th class="tgt">Target</th>
+                    <th>kg</th>
+                    <th>Reps</th>
+                    <th class="check"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (s of ex.sets ?? []; track s.id) {
+                    <tr
+                      class="set-row"
+                      [class.set-row--done]="s.isCompleted"
+                      [class.set-row--current]="
+                        !s.isCompleted &&
+                        isCurrentExercise(ex) &&
+                        s.id === (ex.sets ?? [])[(ex.sets ?? []).findIndex((x) => !x.isCompleted)]?.id
+                      "
+                    >
+                      <td class="num">{{ s.orderIndex + 1 }}</td>
+                      <td class="tgt">
+                        @if (setTarget(s)) {
+                          <span>{{ setTarget(s) }}</span>
+                        } @else {
+                          <span class="muted">—</span>
+                        }
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          inputmode="decimal"
+                          class="numin"
+                          [class.numin--filled]="s.weightKg != null && s.isCompleted"
+                          [value]="s.weightKg ?? ''"
+                          [placeholder]="
+                            s.assignedSet?.targetWeightKg ??
+                              s.assignedSet?.resolvedWeightKg ?? 'kg'
+                          "
+                          [disabled]="isComplete()"
+                          (blur)="onWeightBlur(ex, s, $any($event.target).value)"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          inputmode="numeric"
+                          class="numin"
+                          [class.numin--filled]="s.reps != null && s.isCompleted"
+                          [value]="s.reps ?? ''"
+                          [placeholder]="
+                            s.assignedSet?.targetRepsMin ?? 'reps'
+                          "
+                          [disabled]="isComplete()"
+                          (blur)="onRepsBlur(ex, s, $any($event.target).value)"
+                        />
+                      </td>
+                      <td class="check">
+                        <button
+                          type="button"
+                          class="checkbtn"
+                          [class.checkbtn--on]="s.isCompleted"
+                          [disabled]="isComplete()"
+                          [attr.aria-label]="
+                            s.isCompleted ? 'Mark set incomplete' : 'Mark set done'
+                          "
+                          (click)="toggleComplete(ex, s)"
+                        >
+                          <i
+                            class="pi"
+                            [class.pi-check]="s.isCompleted"
+                            [class.pi-circle]="!s.isCompleted"
+                          ></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              @if (!isComplete()) {
+                <div class="addset">
+                  <button
+                    type="button"
+                    class="add-cta"
+                    (click)="addSet(ex)"
+                  >
+                    <i class="pi pi-plus"></i> Add set
+                  </button>
+                </div>
+              }
+            }
+          </article>
+        }
+
+        @if (!isComplete()) {
+          <button
+            type="button"
+            class="add-cta add-cta--block"
+            (click)="openAddExercise()"
+          >
+            <i class="pi pi-plus"></i> Add exercise
+          </button>
+        }
+      }
+    </main>
+
+    @if (!isComplete()) {
+      <!-- Sticky rest card — only when resting -->
+      @if (restSecondsLeft() != null) {
+        <aside class="rest-card">
+          <div class="rest-card__main">
+            <div class="big">{{ restLabel() }}</div>
+            @if (restNextSet(); as next) {
+              <div class="nx">
+                Next ·
+                <strong>{{ restNextExerciseName() }}</strong>
+                @if (next.assignedSet?.targetWeightKg ?? next.assignedSet?.resolvedWeightKg; as kg) {
+                  · {{ kg }} kg
+                }
+                @if (next.assignedSet?.targetRepsMin; as reps) {
+                  × {{ reps }}
+                }
+              </div>
+            } @else {
+              <div class="nx">All sets complete · tap finish below</div>
+            }
+          </div>
+          <button type="button" class="rest-ctl" (click)="restMinus()">−10</button>
+          <button type="button" class="rest-ctl" (click)="restPlus()">+10</button>
+          <button
+            type="button"
+            class="rest-ctl rest-ctl--primary"
+            pTooltip="Skip rest"
+            (click)="restSkip()"
+          >
+            <i class="pi pi-forward"></i>
+          </button>
+        </aside>
+      }
+
+      <!-- Sticky complete bar -->
+      <footer class="complete-bar">
+        <div class="cb-progress">
+          <div class="prog-bar">
+            <div class="prog-bar__fill" [style.width.%]="progressPercent()"></div>
+          </div>
+          <span class="cb-progress__lbl">
+            {{ setsDone() }} / {{ totalSets() }} sets
+          </span>
+        </div>
+        <p-button
+          [label]="isFreestyle() ? 'Finish & save' : 'Complete workout'"
+          icon="pi pi-flag-fill"
+          severity="success"
+          size="large"
+          [loading]="completing()"
+          (onClick)="confirmComplete()"
+          styleClass="w-full"
+        />
+      </footer>
+    } @else {
+      <footer class="complete-bar complete-bar--done">
+        <i class="pi pi-check-circle"></i>
+        <span>Workout completed</span>
+        @if (l.completedAt) {
+          <span class="muted">at {{ l.completedAt | date: 'shortTime' }}</span>
+        }
+      </footer>
+    }
+  }
+</div>
+
+<p-toast position="top-right" />
+<p-confirmdialog [appendTo]="'body'" />
+
+@if (log(); as l) {
+  <mh-exercise-picker-dialog
+    [program]="$any({ id: 'inline' })"
+    [workout]="$any({ id: l.id, name: l.name })"
+    [emitOnly]="true"
+    [(visible)]="pickerOpen"
+    (picked)="onExercisePicked($event)"
+  />
+}

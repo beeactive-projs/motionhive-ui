@@ -60,6 +60,12 @@ export interface LoggedExercise {
   exerciseId: string | null;
   assignedExerciseId: string | null;
   orderIndex: number;
+  /** Snapshot of the catalog exercise's name at log time. */
+  exerciseNameSnapshot: string;
+  /** Snapshot of the catalog exercise's thumbnail at log time. */
+  exerciseThumbnailUrlSnapshot: string | null;
+  /** Optional grouping with other exercises (e.g. SUPERSET A). */
+  supersetGroupId?: number | null;
   notes: string | null;
   exercise?: {
     id: string;
