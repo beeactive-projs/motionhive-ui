@@ -76,7 +76,7 @@
     font-weight: 600;
     font-size: 24px;
     margin: 0;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
   }
 
   &__desc {
@@ -171,7 +171,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 22px;
     font-weight: 700;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
     line-height: 1;
   }
 
@@ -190,9 +190,23 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  &__add-more {
+    display: flex;
+    justify-content: center;
+    padding-top: 4px;
+  }
 }
 
 .week {
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 12px;
+  }
+
   &__title {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
@@ -200,7 +214,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--p-text-muted-color);
-    margin: 0 0 12px;
+    margin: 0;
   }
 
   &__days {
@@ -235,12 +249,19 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 15px;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
   }
 
   &__meta {
     display: flex;
+    align-items: center;
     gap: 6px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 2px;
+    margin-left: 4px;
   }
 
   &__notes {
@@ -257,7 +278,51 @@
     border-radius: 8px;
     font-size: 12px;
     color: var(--p-text-muted-color);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+.exercises__add {
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.exercise__add-set {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sets__actions {
+  width: 72px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--p-text-muted-color);
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+  }
+
+  &--danger:hover {
+    color: var(--p-red-500, #ef4444);
+  }
+
+  i {
+    font-size: 11px;
   }
 }
 
@@ -327,7 +392,7 @@
     flex: 1;
     font-weight: 600;
     font-size: 13px;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
   }
 
   &__notes {
@@ -429,7 +494,7 @@
     font-weight: 600;
     font-size: 16px;
     margin: 0 0 6px;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
   }
 
   p {

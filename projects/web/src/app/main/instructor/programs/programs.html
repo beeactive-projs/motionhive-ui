@@ -13,9 +13,7 @@
     <p-button
       label="Create program"
       icon="pi pi-plus"
-      pTooltip="Builder ships in the next slice — read view is live now."
-      tooltipPosition="bottom"
-      (onClick)="openCreateStub()"
+      (onClick)="openCreate()"
     />
   </header>
 
@@ -60,9 +58,13 @@
       <h3>No programs yet</h3>
       <p>
         Programs are how you author your coaching plans — workouts, exercises,
-        and sets the client follows. The builder ships in the next slice; the
-        backend endpoints are live now (see Swagger).
+        and sets your clients follow. Create your first one to get started.
       </p>
+      <p-button
+        label="Create program"
+        icon="pi pi-plus"
+        (onClick)="openCreate()"
+      />
     </div>
   } @else {
     <div class="grid">
@@ -119,3 +121,8 @@
 </div>
 
 <p-toast />
+
+<mh-program-form-dialog
+  [(visible)]="formDialogOpen"
+  (saved)="onCreated($event)"
+/>

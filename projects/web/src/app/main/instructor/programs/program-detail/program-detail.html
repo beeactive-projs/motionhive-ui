@@ -57,8 +57,7 @@
           icon="pi pi-pencil"
           severity="secondary"
           [text]="true"
-          pTooltip="Builder ships in FE-P2"
-          (onClick)="editStub()"
+          (onClick)="openEdit()"
         />
         <p-button
           label="Assign to client"
@@ -74,17 +73,30 @@
         <div class="empty__icon"><i class="pi pi-calendar-plus"></i></div>
         <h3>No workouts yet</h3>
         <p>
-          This program shell exists, but no workouts have been added. The
-          builder ships in the next slice — for now you can hit the BE
-          directly via Swagger to add workouts/exercises/sets.
+          A program is a series of workouts grouped into weeks. Add your first
+          workout to start building this plan.
         </p>
+        <p-button
+          label="Add workout"
+          icon="pi pi-plus"
+          (onClick)="openAddWorkout(0)"
+        />
       </div>
     } @else {
       <!-- Weeks -->
       <div class="weeks">
         @for (w of weeks(); track w.week) {
           <section class="week">
-            <h2 class="week__title">Week {{ w.week + 1 }}</h2>
+            <header class="week__head">
+              <h2 class="week__title">Week {{ w.week + 1 }}</h2>
+              <p-button
+                label="Add workout"
+                icon="pi pi-plus"
+                size="small"
+                [text]="true"
+                (onClick)="openAddWorkout(w.week)"
+              />
+            </header>
 
             <div class="week__days">
               @for (workout of w.workouts; track workout.id) {
@@ -103,6 +115,26 @@
                           <i class="pi pi-clock"></i> ~{{ workout.estimatedDurationMinutes }}m
                         </span>
                       }
+                      <div class="workout__actions">
+                        <p-button
+                          icon="pi pi-pencil"
+                          size="small"
+                          severity="secondary"
+                          [text]="true"
+                          [rounded]="true"
+                          pTooltip="Edit workout"
+                          (onClick)="openEditWorkout(workout)"
+                        />
+                        <p-button
+                          icon="pi pi-trash"
+                          size="small"
+                          severity="danger"
+                          [text]="true"
+                          [rounded]="true"
+                          pTooltip="Delete workout"
+                          (onClick)="confirmDeleteWorkout(workout)"
+                        />
+                      </div>
                     </div>
                   </header>
 
@@ -111,7 +143,16 @@
                   }
 
                   @if (!workout.exercises || workout.exercises.length === 0) {
-                    <div class="workout__empty">No exercises added.</div>
+                    <div class="workout__empty">
+                      <span>No exercises added.</span>
+                      <p-button
+                        label="Add exercise"
+                        icon="pi pi-plus"
+                        size="small"
+                        [text]="true"
+                        (onClick)="openExercisePicker(workout)"
+                      />
+                    </div>
                   } @else {
                     <div class="exercises">
                       @for (ex of workout.exercises; track ex.id; let idx = $index) {
@@ -133,6 +174,15 @@
                               @if (ex.supersetGroupId != null) {
                                 <span class="chip chip--super">SS{{ ex.supersetGroupId }}</span>
                               }
+                              <p-button
+                                icon="pi pi-trash"
+                                size="small"
+                                severity="danger"
+                                [text]="true"
+                                [rounded]="true"
+                                pTooltip="Remove exercise"
+                                (onClick)="confirmDeleteExercise(workout, ex)"
+                              />
                             </div>
 
                             @if (ex.notes) {
@@ -147,6 +197,7 @@
                                     <th>Type</th>
                                     <th>Target</th>
                                     <th>Rest</th>
+                                    <th></th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -166,6 +217,24 @@
                                           —
                                         }
                                       </td>
+                                      <td class="sets__actions">
+                                        <button
+                                          type="button"
+                                          class="icon-btn"
+                                          pTooltip="Edit set"
+                                          (click)="openEditSet(workout, ex, s)"
+                                        >
+                                          <i class="pi pi-pencil"></i>
+                                        </button>
+                                        <button
+                                          type="button"
+                                          class="icon-btn icon-btn--danger"
+                                          pTooltip="Remove set"
+                                          (click)="confirmDeleteSet(workout, ex, s)"
+                                        >
+                                          <i class="pi pi-trash"></i>
+                                        </button>
+                                      </td>
                                     </tr>
                                   }
                                 </tbody>
@@ -173,9 +242,29 @@
                             } @else {
                               <div class="exercise__no-sets">No sets prescribed.</div>
                             }
+
+                            <div class="exercise__add-set">
+                              <p-button
+                                label="Add set"
+                                icon="pi pi-plus"
+                                size="small"
+                                [text]="true"
+                                (onClick)="openAddSet(workout, ex)"
+                              />
+                            </div>
                           </div>
                         </div>
                       }
+
+                      <div class="exercises__add">
+                        <p-button
+                          label="Add exercise"
+                          icon="pi pi-plus"
+                          size="small"
+                          [text]="true"
+                          (onClick)="openExercisePicker(workout)"
+                        />
+                      </div>
                     </div>
                   }
                 </article>
@@ -183,6 +272,16 @@
             </div>
           </section>
         }
+
+        <div class="weeks__add-more">
+          <p-button
+            label="Add workout in another week"
+            icon="pi pi-plus"
+            severity="secondary"
+            [text]="true"
+            (onClick)="openAddWorkout()"
+          />
+        </div>
       </div>
     }
 
@@ -192,8 +291,8 @@
         icon="pi pi-trash"
         severity="danger"
         [text]="true"
-        pTooltip="Delete ships in FE-P2"
-        (onClick)="deleteStub()"
+        [loading]="deleting()"
+        (onClick)="confirmDelete()"
       />
     </footer>
   }
@@ -207,4 +306,36 @@
     [(visible)]="assignDialogOpen"
     (assigned)="onAssigned()"
   />
+  <mh-program-form-dialog
+    [program]="p"
+    [(visible)]="editDialogOpen"
+    (saved)="onEdited($event)"
+  />
+  <mh-workout-form-dialog
+    [program]="p"
+    [workout]="workoutDialogTarget()"
+    [initialWeek]="workoutDialogInitialWeek()"
+    [(visible)]="workoutDialogOpen"
+    (saved)="onWorkoutSaved($event)"
+  />
+  @if (exercisePickerTarget(); as picked) {
+    <mh-exercise-picker-dialog
+      [program]="p"
+      [workout]="picked"
+      [(visible)]="exercisePickerOpen"
+      (added)="onExerciseAdded($event)"
+    />
+  }
+  @if (setDialogTarget(); as target) {
+    <mh-set-form-dialog
+      [program]="p"
+      [workout]="target.workout"
+      [exercise]="target.exercise"
+      [set]="target.set"
+      [(visible)]="setDialogOpen"
+      (saved)="onSetSaved($event)"
+    />
+  }
 }
+
+<p-confirmdialog [appendTo]="'body'" />

@@ -1,19 +1,21 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   computed,
   inject,
-  input,
   signal,
 } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
+  PrescribedExercise,
   PrescribedSet,
   Program,
   ProgramService,
@@ -23,6 +25,10 @@ import {
 } from 'core';
 
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
+import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
+import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
+import { SetFormDialog } from '../set-form-dialog/set-form-dialog';
+import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
 
 /**
  * Program detail (FE-P1, read surface).
@@ -40,27 +46,46 @@ import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dia
     RouterLink,
     TitleCasePipe,
     ButtonModule,
+    ConfirmDialog,
     Toast,
     TooltipModule,
     AssignProgramDialog,
+    ExercisePickerDialog,
+    ProgramFormDialog,
+    SetFormDialog,
+    WorkoutFormDialog,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './program-detail.html',
   styleUrl: './program-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProgramDetail {
-  /** Bound from the route param via `withComponentInputBinding()`. */
-  readonly id = input.required<string>();
-
+export class ProgramDetail implements OnInit {
+  private readonly _route = inject(ActivatedRoute);
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
 
   readonly program = signal<Program | null>(null);
   readonly loading = signal(false);
   readonly assignDialogOpen = signal(false);
-  private _loadedId: string | null = null;
+  readonly editDialogOpen = signal(false);
+  readonly workoutDialogOpen = signal(false);
+  /** Workout being edited; null → create mode. */
+  readonly workoutDialogTarget = signal<ProgramWorkout | null>(null);
+  /** Pre-filled weekIndex when adding a new workout from a specific week. */
+  readonly workoutDialogInitialWeek = signal<number | null>(null);
+  readonly exercisePickerOpen = signal(false);
+  /** Workout the picker will add the exercise to. */
+  readonly exercisePickerTarget = signal<ProgramWorkout | null>(null);
+  readonly setDialogOpen = signal(false);
+  readonly setDialogTarget = signal<{
+    workout: ProgramWorkout;
+    exercise: PrescribedExercise;
+    set: PrescribedSet | null;
+  } | null>(null);
+  readonly deleting = signal(false);
 
   // Group workouts by week for rendering.
   readonly weeks = computed<{ week: number; workouts: ProgramWorkout[] }[]>(
@@ -103,25 +128,284 @@ export class ProgramDetail {
     return n;
   });
 
-  constructor() {
-    // Lazy-load on id change. `input.required<string>()` runs in the
-    // injection context so accessing `id()` inside a computed/effect
-    // re-runs on route change.
-    queueMicrotask(() => {
-      const cur = this.id();
-      if (cur && cur !== this._loadedId) this.fetch(cur);
-    });
+  ngOnInit(): void {
+    // The codebase reads route params via ActivatedRoute snapshot
+    // (input binding via `withComponentInputBinding()` is NOT wired
+    // in app.config.ts). Single-shot read is enough — navigating to
+    // a different program id always re-mounts the component because
+    // there are no sibling routes that would reuse it.
+    const id = this._route.snapshot.paramMap.get('id');
+    if (id) this.fetch(id);
+    else this._router.navigate(['/coaching/programs']);
   }
 
   // ── Stub actions (wired in FE-P2/P3) ─────────────────────────────
 
-  editStub(): void {
-    this._messageService.add({
-      severity: 'info',
-      summary: 'Coming next',
-      detail: 'Inline editing lands in FE-P2 (program builder).',
-      life: 3500,
+  openEdit(): void {
+    if (!this.program()) return;
+    this.editDialogOpen.set(true);
+  }
+
+  onEdited(p: Program): void {
+    // Preserve nested workouts (the edit payload returns the shell only).
+    const existing = this.program();
+    this.program.set(existing ? { ...existing, ...p, workouts: existing.workouts } : p);
+    this.editDialogOpen.set(false);
+  }
+
+  // ── Workout CRUD ─────────────────────────────────────────────────
+
+  openAddWorkout(weekIndex: number | null = null): void {
+    if (!this.program()) return;
+    this.workoutDialogTarget.set(null);
+    this.workoutDialogInitialWeek.set(weekIndex);
+    this.workoutDialogOpen.set(true);
+  }
+
+  openEditWorkout(workout: ProgramWorkout): void {
+    this.workoutDialogTarget.set(workout);
+    this.workoutDialogInitialWeek.set(null);
+    this.workoutDialogOpen.set(true);
+  }
+
+  onWorkoutSaved(saved: ProgramWorkout): void {
+    const p = this.program();
+    if (!p) return;
+    const existing = p.workouts ?? [];
+    const idx = existing.findIndex((w) => w.id === saved.id);
+    // PATCH responses don't include nested exercises — preserve them.
+    const merged: ProgramWorkout =
+      idx >= 0
+        ? { ...existing[idx], ...saved, exercises: existing[idx].exercises }
+        : { ...saved, exercises: saved.exercises ?? [] };
+    const next =
+      idx >= 0
+        ? existing.map((w, i) => (i === idx ? merged : w))
+        : [...existing, merged];
+    this.program.set({ ...p, workouts: next });
+    this.workoutDialogOpen.set(false);
+  }
+
+  confirmDeleteWorkout(workout: ProgramWorkout): void {
+    const p = this.program();
+    if (!p) return;
+    this._confirmationService.confirm({
+      header: 'Delete workout?',
+      message: `"${workout.name}" and its exercises will be removed from this program. Client copies of already-assigned programs keep their data.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Delete',
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: 'Cancel',
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._deleteWorkout(workout),
     });
+  }
+
+  private _deleteWorkout(workout: ProgramWorkout): void {
+    const p = this.program();
+    if (!p) return;
+    this._programService.removeWorkout(p.id, workout.id).subscribe({
+      next: () => {
+        const next = (p.workouts ?? []).filter((w) => w.id !== workout.id);
+        this.program.set({ ...p, workouts: next });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Workout deleted',
+          life: 2000,
+        });
+      },
+      error: (err) => {
+        showApiError(
+          this._messageService,
+          "Couldn't delete workout",
+          'Please try again.',
+          err,
+        );
+      },
+    });
+  }
+
+  // ── Exercise CRUD ────────────────────────────────────────────────
+
+  openExercisePicker(workout: ProgramWorkout): void {
+    this.exercisePickerTarget.set(workout);
+    this.exercisePickerOpen.set(true);
+  }
+
+  onExerciseAdded(saved: PrescribedExercise): void {
+    const p = this.program();
+    const target = this.exercisePickerTarget();
+    if (!p || !target) return;
+    const next = (p.workouts ?? []).map((w) =>
+      w.id === target.id
+        ? { ...w, exercises: [...(w.exercises ?? []), { ...saved, sets: saved.sets ?? [] }] }
+        : w,
+    );
+    this.program.set({ ...p, workouts: next });
+    this.exercisePickerOpen.set(false);
+  }
+
+  confirmDeleteExercise(
+    workout: ProgramWorkout,
+    ex: PrescribedExercise,
+  ): void {
+    const p = this.program();
+    if (!p) return;
+    const name = ex.exercise?.name ?? 'this exercise';
+    this._confirmationService.confirm({
+      header: 'Remove exercise?',
+      message: `Remove "${name}" and its prescribed sets from ${workout.name}? Client copies of already-assigned programs keep their data.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Remove',
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: 'Cancel',
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._deleteExercise(workout, ex),
+    });
+  }
+
+  private _deleteExercise(
+    workout: ProgramWorkout,
+    ex: PrescribedExercise,
+  ): void {
+    const p = this.program();
+    if (!p) return;
+    this._programService
+      .removeExercise(p.id, workout.id, ex.id)
+      .subscribe({
+        next: () => {
+          const next = (p.workouts ?? []).map((w) =>
+            w.id === workout.id
+              ? {
+                  ...w,
+                  exercises: (w.exercises ?? []).filter((e) => e.id !== ex.id),
+                }
+              : w,
+          );
+          this.program.set({ ...p, workouts: next });
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Exercise removed',
+            life: 2000,
+          });
+        },
+        error: (err) => {
+          showApiError(
+            this._messageService,
+            "Couldn't remove exercise",
+            'Please try again.',
+            err,
+          );
+        },
+      });
+  }
+
+  // ── Set CRUD ─────────────────────────────────────────────────────
+
+  openAddSet(workout: ProgramWorkout, exercise: PrescribedExercise): void {
+    this.setDialogTarget.set({ workout, exercise, set: null });
+    this.setDialogOpen.set(true);
+  }
+
+  openEditSet(
+    workout: ProgramWorkout,
+    exercise: PrescribedExercise,
+    set: PrescribedSet,
+  ): void {
+    this.setDialogTarget.set({ workout, exercise, set });
+    this.setDialogOpen.set(true);
+  }
+
+  onSetSaved(saved: PrescribedSet): void {
+    const p = this.program();
+    const target = this.setDialogTarget();
+    if (!p || !target) return;
+    const next = (p.workouts ?? []).map((w) =>
+      w.id === target.workout.id
+        ? {
+            ...w,
+            exercises: (w.exercises ?? []).map((e) =>
+              e.id === target.exercise.id
+                ? { ...e, sets: this._mergeSet(e.sets ?? [], saved) }
+                : e,
+            ),
+          }
+        : w,
+    );
+    this.program.set({ ...p, workouts: next });
+    this.setDialogOpen.set(false);
+  }
+
+  private _mergeSet(
+    existing: PrescribedSet[],
+    saved: PrescribedSet,
+  ): PrescribedSet[] {
+    const idx = existing.findIndex((s) => s.id === saved.id);
+    if (idx >= 0) {
+      return existing.map((s, i) => (i === idx ? saved : s));
+    }
+    return [...existing, saved].sort((a, b) => a.orderIndex - b.orderIndex);
+  }
+
+  confirmDeleteSet(
+    workout: ProgramWorkout,
+    ex: PrescribedExercise,
+    set: PrescribedSet,
+  ): void {
+    this._confirmationService.confirm({
+      header: 'Remove set?',
+      message: `Remove set ${set.orderIndex + 1}? This can't be undone — but client copies of already-assigned programs keep their data.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Remove',
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: 'Cancel',
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._deleteSet(workout, ex, set),
+    });
+  }
+
+  private _deleteSet(
+    workout: ProgramWorkout,
+    ex: PrescribedExercise,
+    set: PrescribedSet,
+  ): void {
+    const p = this.program();
+    if (!p) return;
+    this._programService
+      .removeSet(p.id, workout.id, ex.id, set.id)
+      .subscribe({
+        next: () => {
+          const next = (p.workouts ?? []).map((w) =>
+            w.id === workout.id
+              ? {
+                  ...w,
+                  exercises: (w.exercises ?? []).map((e) =>
+                    e.id === ex.id
+                      ? {
+                          ...e,
+                          sets: (e.sets ?? []).filter((s) => s.id !== set.id),
+                        }
+                      : e,
+                  ),
+                }
+              : w,
+          );
+          this.program.set({ ...p, workouts: next });
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Set removed',
+            life: 2000,
+          });
+        },
+        error: (err) => {
+          showApiError(
+            this._messageService,
+            "Couldn't remove set",
+            'Please try again.',
+            err,
+          );
+        },
+      });
   }
 
   openAssign(): void {
@@ -135,12 +419,42 @@ export class ProgramDetail {
     this.assignDialogOpen.set(false);
   }
 
-  deleteStub(): void {
-    this._messageService.add({
-      severity: 'info',
-      summary: 'Coming next',
-      detail: 'Delete flow lands in FE-P2 alongside the builder.',
-      life: 3500,
+  confirmDelete(): void {
+    const p = this.program();
+    if (!p) return;
+    this._confirmationService.confirm({
+      header: 'Delete program?',
+      message: `"${p.name}" will be removed from your library. Existing client assignments keep their copy, but you won't be able to assign it to new clients.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Delete',
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: 'Cancel',
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._deleteProgram(p.id),
+    });
+  }
+
+  private _deleteProgram(id: string): void {
+    this.deleting.set(true);
+    this._programService.remove(id).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Program deleted',
+          life: 2500,
+        });
+        this._router.navigate(['/coaching/programs']);
+      },
+      error: (err) => {
+        this.deleting.set(false);
+        showApiError(
+          this._messageService,
+          "Couldn't delete program",
+          'Please try again.',
+          err,
+        );
+      },
     });
   }
 
@@ -187,7 +501,6 @@ export class ProgramDetail {
     this._programService.get(id).subscribe({
       next: (p) => {
         this.program.set(p);
-        this._loadedId = id;
         this.loading.set(false);
       },
       error: (err) => {

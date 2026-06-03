@@ -24,6 +24,8 @@ import {
   showApiError,
 } from 'core';
 
+import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
+
 /**
  * Programs list (FE-P1, read surface).
  *
@@ -43,6 +45,7 @@ import {
     InputTextModule,
     Toast,
     TooltipModule,
+    ProgramFormDialog,
   ],
   providers: [MessageService],
   templateUrl: './programs.html',
@@ -67,6 +70,7 @@ export class Programs {
   private _searchTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly statusFilter = signal<ProgramStatus | null>(null);
+  readonly formDialogOpen = signal(false);
 
   // ── Derived ──────────────────────────────────────────────────────
 
@@ -107,13 +111,16 @@ export class Programs {
     this.fetch(false);
   }
 
-  openCreateStub(): void {
-    this._messageService.add({
-      severity: 'info',
-      summary: 'Coming next',
-      detail: 'Program builder lands in the next slice (FE-P2).',
-      life: 4000,
-    });
+  openCreate(): void {
+    this.formDialogOpen.set(true);
+  }
+
+  onCreated(p: Program): void {
+    // Prepend the new program so the instructor sees it without waiting
+    // for a refetch. The next filter change will reset the list anyway.
+    this.items.update((cur) => [p, ...cur]);
+    this.total.update((t) => t + 1);
+    this.formDialogOpen.set(false);
   }
 
   workoutCount(p: Program): number | null {

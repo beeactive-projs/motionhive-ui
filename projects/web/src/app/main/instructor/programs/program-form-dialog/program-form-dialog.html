@@ -1,0 +1,145 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [appendTo]="'body'"
+  [style]="{ width: '560px' }"
+  [breakpoints]="{ '640px': '95vw' }"
+  styleClass="mh-program-form-dialog"
+  [header]="dialogHeader()">
+  <div class="dialog-body">
+    <div class="field">
+      <label for="name">Name *</label>
+      <input
+        pInputText
+        id="name"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+        maxlength="200"
+        placeholder="e.g. Strength foundations — 8 weeks"
+        class="w-full"
+        autocomplete="off"
+      />
+      <small class="counter">{{ name().length }}/200</small>
+    </div>
+
+    <div class="field">
+      <label for="description">
+        Description <span class="optional">(optional)</span>
+      </label>
+      <textarea
+        pTextarea
+        id="description"
+        [ngModel]="description()"
+        (ngModelChange)="description.set($event)"
+        rows="3"
+        maxlength="2000"
+        placeholder="What this program covers, who it's for, how often it should be done…"
+        class="w-full"
+      ></textarea>
+      <small class="counter">{{ description().length }}/2000</small>
+    </div>
+
+    <div class="row">
+      <div class="field grow">
+        <label for="kind">Kind</label>
+        <p-select
+          inputId="kind"
+          [options]="kindOptions"
+          [(ngModel)]="kind"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="field grow">
+        <label for="status">Status</label>
+        <p-select
+          inputId="status"
+          [options]="statusOptions"
+          [(ngModel)]="status"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field grow">
+        <label for="duration">
+          Duration <span class="optional">(weeks)</span>
+        </label>
+        <p-inputnumber
+          inputId="duration"
+          [ngModel]="durationWeeks()"
+          (ngModelChange)="durationWeeks.set($event)"
+          [min]="1"
+          [max]="104"
+          [showButtons]="true"
+          [allowEmpty]="true"
+          placeholder="—"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="field grow">
+        <label for="periodization">Periodization</label>
+        <p-select
+          inputId="periodization"
+          [options]="periodizationOptions"
+          [(ngModel)]="periodizationModel"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="tags">
+        Goal tags <span class="optional">(comma-separated, up to 10)</span>
+      </label>
+      <input
+        pInputText
+        id="tags"
+        [ngModel]="goalTagsRaw()"
+        (ngModelChange)="goalTagsRaw.set($event)"
+        placeholder="e.g. hypertrophy, fat loss, beginner"
+        class="w-full"
+        autocomplete="off"
+      />
+    </div>
+
+    @if (!isEdit()) {
+      <p class="hint-banner">
+        <i class="pi pi-info-circle"></i>
+        After creating the program shell, you'll add weeks, workouts, and
+        exercises from the program detail page.
+      </p>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <p-button
+      [label]="submitLabel()"
+      icon="pi pi-check"
+      [loading]="submitting()"
+      [disabled]="!canSubmit()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right" />

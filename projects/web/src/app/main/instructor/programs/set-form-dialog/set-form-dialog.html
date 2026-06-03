@@ -1,0 +1,225 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [appendTo]="'body'"
+  [style]="{ width: '520px' }"
+  [breakpoints]="{ '640px': '95vw' }"
+  styleClass="mh-set-form-dialog"
+  [header]="dialogHeader()">
+  <div class="dialog-body">
+    <div class="exercise-banner">
+      <i class="pi pi-bolt"></i>
+      <span>{{ exercise().exercise?.name ?? 'Exercise' }}</span>
+    </div>
+
+    <div class="field">
+      <label for="setType">Set type</label>
+      <p-select
+        inputId="setType"
+        [options]="setTypeOptions"
+        [(ngModel)]="setType"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="row">
+      <div class="field grow">
+        <label for="repsMin">Reps (min)</label>
+        <p-inputnumber
+          inputId="repsMin"
+          [ngModel]="repsMin()"
+          (ngModelChange)="repsMin.set($event)"
+          [min]="0"
+          [max]="1000"
+          [allowEmpty]="true"
+          placeholder="—"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="field grow">
+        <label for="repsMax">Reps (max)</label>
+        <p-inputnumber
+          inputId="repsMax"
+          [ngModel]="repsMax()"
+          (ngModelChange)="repsMax.set($event)"
+          [min]="0"
+          [max]="1000"
+          [allowEmpty]="true"
+          placeholder="—"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field grow">
+        <label for="weightKg">Weight (kg)</label>
+        <p-inputnumber
+          inputId="weightKg"
+          [ngModel]="weightKg()"
+          (ngModelChange)="weightKg.set($event)"
+          [min]="0"
+          [max]="9999"
+          [maxFractionDigits]="2"
+          [allowEmpty]="true"
+          placeholder="—"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="field grow">
+        <label for="rest">Rest after (s)</label>
+        <p-inputnumber
+          inputId="rest"
+          [ngModel]="restSeconds()"
+          (ngModelChange)="restSeconds.set($event)"
+          [min]="0"
+          [allowEmpty]="true"
+          placeholder="—"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="snotes">Notes <span class="optional">(optional)</span></label>
+      <textarea
+        pTextarea
+        id="snotes"
+        [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)"
+        rows="2"
+        maxlength="2000"
+        placeholder="Cue, focus, regression…"
+        class="w-full"
+      ></textarea>
+    </div>
+
+    <button
+      type="button"
+      class="advanced-toggle"
+      (click)="toggleAdvanced()"
+    >
+      <i
+        class="pi"
+        [class.pi-chevron-right]="!showAdvanced()"
+        [class.pi-chevron-down]="showAdvanced()"
+      ></i>
+      Advanced (intensity, time, distance, tempo)
+    </button>
+
+    @if (showAdvanced()) {
+      <div class="advanced">
+        <div class="row">
+          <div class="field grow">
+            <label for="pct">% 1RM</label>
+            <p-inputnumber
+              inputId="pct"
+              [ngModel]="weightPercent1rm()"
+              (ngModelChange)="weightPercent1rm.set($event)"
+              [min]="0"
+              [max]="100"
+              [maxFractionDigits]="1"
+              [allowEmpty]="true"
+              placeholder="—"
+              suffix="%"
+              styleClass="w-full"
+            />
+          </div>
+          <div class="field grow">
+            <label for="rpe">RPE (1–10)</label>
+            <p-inputnumber
+              inputId="rpe"
+              [ngModel]="rpe()"
+              (ngModelChange)="rpe.set($event)"
+              [min]="1"
+              [max]="10"
+              [maxFractionDigits]="1"
+              [allowEmpty]="true"
+              placeholder="—"
+              styleClass="w-full"
+            />
+          </div>
+          <div class="field grow">
+            <label for="rir">RIR</label>
+            <p-inputnumber
+              inputId="rir"
+              [ngModel]="rir()"
+              (ngModelChange)="rir.set($event)"
+              [min]="0"
+              [allowEmpty]="true"
+              placeholder="—"
+              styleClass="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field grow">
+            <label for="dur">Duration (s)</label>
+            <p-inputnumber
+              inputId="dur"
+              [ngModel]="durationSeconds()"
+              (ngModelChange)="durationSeconds.set($event)"
+              [min]="0"
+              [allowEmpty]="true"
+              placeholder="—"
+              styleClass="w-full"
+            />
+          </div>
+          <div class="field grow">
+            <label for="dist">Distance (m)</label>
+            <p-inputnumber
+              inputId="dist"
+              [ngModel]="distanceMeters()"
+              (ngModelChange)="distanceMeters.set($event)"
+              [min]="0"
+              [allowEmpty]="true"
+              placeholder="—"
+              styleClass="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="tempo">
+            Tempo <span class="optional">(e.g. 3-1-1-0)</span>
+          </label>
+          <input
+            id="tempo"
+            type="text"
+            [ngModel]="tempo()"
+            (ngModelChange)="tempo.set($event)"
+            placeholder="e.g. 3-1-1-0"
+            class="p-inputtext w-full"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <p-button
+      [label]="submitLabel()"
+      icon="pi pi-check"
+      [loading]="submitting()"
+      [disabled]="!canSubmit()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right" />

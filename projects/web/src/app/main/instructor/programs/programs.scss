@@ -18,7 +18,7 @@
       font-weight: 600;
       font-size: 22px;
       margin: 0;
-      color: var(--p-surface-900);
+      color: var(--p-text-color);
     }
   }
 
@@ -73,7 +73,7 @@
   &--active {
     background: var(--p-surface-900);
     color: var(--p-surface-0);
-    border-color: var(--p-surface-900);
+    border-color: var(--p-text-color);
   }
 
   &:focus-visible {
@@ -130,7 +130,7 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 14px;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
     line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -269,7 +269,7 @@
     font-weight: 600;
     font-size: 16px;
     margin: 0 0 6px;
-    color: var(--p-surface-900);
+    color: var(--p-text-color);
   }
 
   p {
