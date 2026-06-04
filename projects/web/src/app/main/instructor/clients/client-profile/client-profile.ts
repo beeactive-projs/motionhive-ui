@@ -284,6 +284,12 @@ export class ClientProfile {
     });
   }
 
+  openWorkoutReplay(log: WorkoutLog): void {
+    this._router.navigate(['/my/workout-log', log.id, 'replay'], {
+      queryParams: { coach: 1 },
+    });
+  }
+
   workoutSetCount(log: WorkoutLog): number {
     return (log.exercises ?? []).reduce(
       (n, e) => n + (e.sets ?? []).filter((s) => s.isCompleted).length,

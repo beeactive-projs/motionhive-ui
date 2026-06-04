@@ -296,14 +296,7 @@ export class ClientWorkoutsHistory {
   }
 
   openReplay(log: WorkoutLog): void {
-    // S11 read-mode lands with the active log slice. For now a polite
-    // stub so the route doesn't dead-end.
-    this._messageService.add({
-      severity: 'info',
-      summary: 'Replay lands with S11',
-      detail: `Read-only replay of "${log.name}" arrives with the active log.`,
-      life: 3000,
-    });
+    this._router.navigate(['/my/workout-log', log.id, 'replay']);
   }
 
   goToPlans(): void {

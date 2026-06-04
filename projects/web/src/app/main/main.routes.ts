@@ -89,6 +89,15 @@ export const mainRoutes: Routes = [
           ),
         title: 'Workout - MotionHive',
       },
+      {
+        // Read-only replay — used by client history + coach (with ?coach=1)
+        path: 'my/workout-log/:id/replay',
+        loadComponent: () =>
+          import('./client-workouts/workout-log-replay/workout-log-replay').then(
+            (m) => m.WorkoutLogReplay,
+          ),
+        title: 'Workout replay - MotionHive',
+      },
       // Notification producers emit `screen: 'sessions/my'` (BE convention
       // since the API surface is /sessions/my). Forward to the canonical
       // FE route so deep-links from emails / push don't 404.
