@@ -11,12 +11,17 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
+import { Dialog } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
 import {
+  CreateRoutineExercisePayload,
+  CreateRoutinePayload,
   LoggedExercise,
   LoggedSet,
+  RoutineService,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
@@ -53,6 +58,8 @@ interface FeelingOption {
     FormsModule,
     RouterLink,
     ButtonModule,
+    Dialog,
+    InputTextModule,
     TextareaModule,
     Toast,
   ],
@@ -65,6 +72,7 @@ export class WorkoutComplete implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _service = inject(WorkoutLogService);
+  private readonly _routineService = inject(RoutineService);
   private readonly _messageService = inject(MessageService);
 
   readonly log = signal<WorkoutLog | null>(null);
@@ -72,6 +80,16 @@ export class WorkoutComplete implements OnInit {
   readonly saving = signal(false);
   readonly feelingRating = signal<number | null>(null);
   readonly notes = signal('');
+
+  // ── Save-as-routine dialog ──────────────────────────────────────
+  readonly saveAsRoutineOpen = signal(false);
+  readonly savingRoutine = signal(false);
+  readonly routineName = signal('');
+  readonly routineFolder = signal('');
+  /** Tracks whether the user has already saved this log as a routine, so
+   *  we can swap the CTA for a soft confirmation instead of letting them
+   *  spam-create dupes. Per-session only — page reload resets it. */
+  readonly savedRoutineId = signal<string | null>(null);
 
   readonly feelingOptions: FeelingOption[] = [
     { value: 1, glyph: '😣', label: 'Rough' },
@@ -210,6 +228,114 @@ export class WorkoutComplete implements OnInit {
     } else {
       this._router.navigate(['/my/plans']);
     }
+  }
+
+  // ── Save as routine ─────────────────────────────────────────────
+
+  /** Only offered when at least one exercise has a usable exerciseId. */
+  readonly canSaveAsRoutine = computed(() => {
+    const sources = this._routineExerciseSources();
+    return sources.length > 0;
+  });
+
+  openSaveAsRoutineDialog(): void {
+    const cur = this.log();
+    if (!cur) return;
+    this.routineName.set(cur.name);
+    this.routineFolder.set('');
+    this.saveAsRoutineOpen.set(true);
+  }
+
+  saveAsRoutine(): void {
+    const name = this.routineName().trim();
+    if (!name || this.savingRoutine()) return;
+    const exercises = this._routineExerciseSources();
+    if (exercises.length === 0) return;
+
+    const payload: CreateRoutinePayload = {
+      name,
+      ...(this.routineFolder().trim()
+        ? { folder: this.routineFolder().trim() }
+        : {}),
+      exercises,
+    };
+
+    this.savingRoutine.set(true);
+    this._routineService.create(payload).subscribe({
+      next: (saved) => {
+        this.savingRoutine.set(false);
+        this.saveAsRoutineOpen.set(false);
+        this.savedRoutineId.set(saved.id);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Routine saved',
+          detail: `"${saved.name}" is in your routines tab.`,
+          life: 3000,
+        });
+      },
+      error: (err) => {
+        this.savingRoutine.set(false);
+        showApiError(
+          this._messageService,
+          "Couldn't save routine",
+          'Please retry.',
+          err,
+        );
+      },
+    });
+  }
+
+  goToRoutines(): void {
+    this._router.navigate(['/my/workouts'], { queryParams: { tab: 'routines' } });
+  }
+
+  /**
+   * Build CreateRoutineExercisePayload[] from the log:
+   *  - Skip exercises without a canonical exerciseId (legacy custom rows).
+   *  - defaultSets = completed set count (fall back to total sets, min 1).
+   *  - targetReps min/max from the completed reps range.
+   *  - targetWeightKg = max weight across completed sets.
+   *  - restAfterSeconds = mode/first non-null rest from completed sets.
+   */
+  private _routineExerciseSources(): CreateRoutineExercisePayload[] {
+    const out: CreateRoutineExercisePayload[] = [];
+    for (const ex of this.exercises()) {
+      if (!ex.exerciseId) continue;
+      const allSets = ex.sets ?? [];
+      const done = allSets.filter((s) => s.isCompleted);
+      const ref = done.length > 0 ? done : allSets;
+      if (ref.length === 0) {
+        out.push({ exerciseId: ex.exerciseId, defaultSets: 3 });
+        continue;
+      }
+
+      const repsList = ref
+        .map((s) => s.reps)
+        .filter((r): r is number => r != null);
+      const weightList = ref
+        .map((s) => s.weightKg)
+        .filter((w): w is number => w != null);
+      const restList = ref
+        .map((s) => s.restAfterSeconds)
+        .filter((r): r is number => r != null);
+
+      const payload: CreateRoutineExercisePayload = {
+        exerciseId: ex.exerciseId,
+        defaultSets: Math.max(1, Math.min(30, ref.length)),
+      };
+      if (repsList.length > 0) {
+        payload.targetRepsMin = Math.min(...repsList);
+        payload.targetRepsMax = Math.max(...repsList);
+      }
+      if (weightList.length > 0) {
+        payload.targetWeightKg = Math.max(...weightList);
+      }
+      if (restList.length > 0) {
+        payload.restAfterSeconds = restList[0];
+      }
+      out.push(payload);
+    }
+    return out;
   }
 
   // ── Internals ────────────────────────────────────────────────────

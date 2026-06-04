@@ -78,6 +78,31 @@ export class WorkoutLogService {
     return this._http.get<PaginatedWorkoutLogs>(this._base, { params: p });
   }
 
+  /**
+   * Coach-side read: a specific client's workout history. BE 404s when
+   * the caller isn't an ACTIVE coach of that client, so no extra
+   * permission gating is needed here.
+   */
+  listForClient(
+    clientId: string,
+    query: ListWorkoutLogsQuery = {},
+  ): Observable<PaginatedWorkoutLogs> {
+    let p = new HttpParams();
+    if (query.page !== undefined) p = p.set('page', String(query.page));
+    if (query.limit !== undefined) p = p.set('limit', String(query.limit));
+    return this._http.get<PaginatedWorkoutLogs>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_LIST_FOR_CLIENT(clientId)}`,
+      { params: p },
+    );
+  }
+
+  /** Coach-side single-log read. Same gating as listForClient. */
+  getForCoach(id: string): Observable<WorkoutLog> {
+    return this._http.get<WorkoutLog>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.COACH_BY_ID(id)}`,
+    );
+  }
+
   // ── Mid-session mutations (freestyle + S14 affordances) ──────────
 
   addExercise(

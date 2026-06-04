@@ -1,0 +1,198 @@
+:host {
+  display: contents;
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+
+  @media (max-width: 540px) {
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &.grow {
+    flex: 1;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+
+    .optional {
+      font-weight: 400;
+      color: var(--p-text-muted-color);
+    }
+  }
+}
+
+.w-full {
+  width: 100%;
+}
+
+.ex-section {
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    h4 {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--p-text-color);
+    }
+  }
+}
+
+.ex-empty {
+  text-align: center;
+  padding: 16px;
+  background: var(--p-surface-100, #f1f5f9);
+  border: 1px dashed var(--p-content-border-color);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+}
+
+.ex-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ex-item {
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: var(--p-surface-100, #f1f5f9);
+      border: 1px solid var(--p-content-border-color);
+    }
+
+    .thumb--fallback {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--p-text-muted-color);
+    }
+
+    .meta {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .num {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      color: var(--p-text-muted-color);
+      font-size: 13px;
+    }
+
+    .name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--p-text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ex-actions {
+      display: flex;
+      gap: 2px;
+    }
+  }
+}
+
+.iconbtn {
+  background: transparent;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color);
+  }
+
+  &--danger:hover:not(:disabled) {
+    color: var(--p-red-500, #ef4444);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.ex-fields {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+
+  @media (max-width: 580px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ex-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  label {
+    font-size: 10px;
+    color: var(--p-text-muted-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+  }
+}
+
+:host ::ng-deep .num-input .p-inputnumber-input {
+  width: 100%;
+  font-size: 13px;
+  padding: 6px 8px;
+  text-align: center;
+}

@@ -121,6 +121,34 @@
         (onClick)="saveFeedback()"
         styleClass="w-full"
       />
+
+      @if (canSaveAsRoutine()) {
+        @if (savedRoutineId(); as rid) {
+          <p-button
+            label="Routine saved · view"
+            icon="pi pi-check"
+            severity="success"
+            size="large"
+            [text]="true"
+            (onClick)="goToRoutines()"
+            styleClass="w-full"
+          />
+        } @else {
+          <p-button
+            label="Save as routine"
+            icon="pi pi-clone"
+            severity="secondary"
+            size="large"
+            [text]="true"
+            (onClick)="openSaveAsRoutineDialog()"
+            styleClass="w-full"
+          />
+          <small class="soon">
+            Save this shape so you can run it again with one tap.
+          </small>
+        }
+      }
+
       <p-button
         label="Share to feed"
         icon="pi pi-share-alt"
@@ -134,5 +162,65 @@
     </footer>
   }
 </div>
+
+<!-- Save-as-routine dialog -->
+<p-dialog
+  [(visible)]="saveAsRoutineOpen"
+  [modal]="true"
+  [closable]="!savingRoutine()"
+  [closeOnEscape]="!savingRoutine()"
+  [dismissableMask]="!savingRoutine()"
+  [appendTo]="'body'"
+  [style]="{ width: '440px' }"
+  [breakpoints]="{ '540px': '95vw' }"
+  header="Save as routine">
+  <div class="save-routine-body">
+    <p class="lede">
+      We'll save this workout's exercises with sensible defaults from
+      what you actually did. You can tweak them later from the routines
+      tab.
+    </p>
+    <label for="rname">Routine name *</label>
+    <input
+      pInputText
+      id="rname"
+      [ngModel]="routineName()"
+      (ngModelChange)="routineName.set($event)"
+      maxlength="200"
+      class="w-full"
+      placeholder="e.g. Push day A"
+      autocomplete="off"
+    />
+    <label for="rfolder">
+      Folder <span class="muted">(optional)</span>
+    </label>
+    <input
+      pInputText
+      id="rfolder"
+      [ngModel]="routineFolder()"
+      (ngModelChange)="routineFolder.set($event)"
+      maxlength="100"
+      class="w-full"
+      placeholder="e.g. PPL split"
+      autocomplete="off"
+    />
+  </div>
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="savingRoutine()"
+      (onClick)="saveAsRoutineOpen.set(false)"
+    />
+    <p-button
+      label="Save routine"
+      icon="pi pi-check"
+      [loading]="savingRoutine()"
+      [disabled]="!routineName().trim()"
+      (onClick)="saveAsRoutine()"
+    />
+  </ng-template>
+</p-dialog>
 
 <p-toast position="top-right" />

@@ -164,6 +164,143 @@
         </p-card>
         }
 
+        @case (4) {
+        <p-card class="shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">Assigned plans</h3>
+            @if (assignments().length > 0) {
+            <span class="text-xs text-surface-400">{{ assignments().length }} plan{{ assignments().length === 1 ? '' : 's' }}</span>
+            }
+          </div>
+
+          @if (assignmentsLoading()) {
+          <div class="flex flex-col items-center gap-3 py-12 text-center">
+            <i class="pi pi-spin pi-spinner text-2xl text-surface-400"></i>
+            <p class="text-sm text-surface-400">Loading plans…</p>
+          </div>
+          } @else if (assignments().length === 0) {
+          <div class="flex flex-col items-center gap-3 py-12 text-center">
+            <i class="pi pi-bookmark text-4xl text-surface-300"></i>
+            <h4 class="text-base font-semibold text-surface-500">No plans assigned yet</h4>
+            <p class="text-sm text-surface-400">
+              Assign a program from the Programs area to schedule
+              structured workouts for this client.
+            </p>
+          </div>
+          } @else {
+          <ul class="flex flex-col gap-2 list-none m-0 p-0">
+            @for (a of assignments(); track a.id) {
+            <li class="flex items-center gap-3 px-3 py-3 rounded-md border border-surface-200">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-medium text-sm">{{ a.programNameSnapshot }}</span>
+                  <p-tag [value]="a.status" [severity]="assignmentStatusSeverity(a)" rounded />
+                </div>
+                <div class="text-xs text-surface-400 mt-1">
+                  Started {{ a.startDate | date: 'mediumDate' }}
+                  @if (a.endDate) {
+                  · ends {{ a.endDate | date: 'mediumDate' }}
+                  }
+                  · {{ a.completionPercent }}% complete
+                </div>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                @if (a.status === 'ACTIVE') {
+                <p-button
+                  icon="pi pi-pause"
+                  label="Pause"
+                  severity="secondary"
+                  [text]="true"
+                  size="small"
+                  [loading]="assignmentMutatingId() === a.id"
+                  (onClick)="pauseAssignment(a)"
+                />
+                } @else if (a.status === 'PAUSED') {
+                <p-button
+                  icon="pi pi-play"
+                  label="Resume"
+                  severity="success"
+                  [text]="true"
+                  size="small"
+                  [loading]="assignmentMutatingId() === a.id"
+                  (onClick)="resumeAssignment(a)"
+                />
+                }
+                @if (!isAssignmentTerminal(a)) {
+                <p-button
+                  icon="pi pi-times"
+                  pTooltip="Cancel plan"
+                  severity="danger"
+                  [text]="true"
+                  size="small"
+                  [disabled]="assignmentMutatingId() === a.id"
+                  (onClick)="confirmCancelAssignment(a)"
+                />
+                }
+              </div>
+            </li>
+            }
+          </ul>
+          }
+        </p-card>
+        }
+
+        @case (3) {
+        <p-card class="shadow-md">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">Logged workouts</h3>
+            @if (workouts().length > 0) {
+            <span class="text-xs text-surface-400">{{ workouts().length }} session{{ workouts().length === 1 ? '' : 's' }}</span>
+            }
+          </div>
+
+          @if (workoutsLoading()) {
+          <div class="flex flex-col items-center gap-3 py-12 text-center">
+            <i class="pi pi-spin pi-spinner text-2xl text-surface-400"></i>
+            <p class="text-sm text-surface-400">Loading workouts…</p>
+          </div>
+          } @else if (workouts().length === 0) {
+          <div class="flex flex-col items-center gap-3 py-12 text-center">
+            <i class="pi pi-bolt text-4xl text-surface-300"></i>
+            <h4 class="text-base font-semibold text-surface-500">No workouts logged yet</h4>
+            <p class="text-sm text-surface-400">
+              Sessions this client completes will appear here, including
+              freestyle workouts and sessions from your assigned plans.
+            </p>
+          </div>
+          } @else {
+          <ul class="flex flex-col gap-2 list-none m-0 p-0">
+            @for (w of workouts(); track w.id) {
+            <li class="flex items-center gap-3 px-3 py-2 rounded-md border border-surface-200 hover:bg-surface-100 transition-colors">
+              <div class="w-14 text-center">
+                <div class="text-[10px] uppercase font-semibold text-surface-400">{{ w.startedAt | date: 'EEE' }}</div>
+                <div class="text-lg font-bold leading-none">{{ w.startedAt | date: 'd' }}</div>
+                <div class="text-[10px] text-surface-400">{{ w.startedAt | date: 'MMM y' }}</div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-sm truncate">{{ w.name }}</div>
+                <div class="text-xs text-surface-400 truncate">
+                  @if (w.assignment?.programNameSnapshot) {
+                  {{ w.assignment?.programNameSnapshot }}
+                  } @else {
+                  Freestyle workout
+                  }
+                  @if ((w.prCount ?? 0) > 0) {
+                  · <i class="pi pi-trophy text-[10px]"></i> {{ w.prCount }} PR{{ w.prCount === 1 ? '' : 's' }}
+                  }
+                </div>
+              </div>
+              <div class="text-xs text-surface-500 whitespace-nowrap">
+                <span class="mr-3"><i class="pi pi-stopwatch text-[10px] mr-1"></i>{{ workoutDurationMin(w) ?? '—' }}{{ workoutDurationMin(w) != null ? ' min' : '' }}</span>
+                <span><i class="pi pi-check text-[10px] mr-1"></i>{{ workoutSetCount(w) }} sets</span>
+              </div>
+            </li>
+            }
+          </ul>
+          }
+        </p-card>
+        }
+
         }
       </div>
     </div>

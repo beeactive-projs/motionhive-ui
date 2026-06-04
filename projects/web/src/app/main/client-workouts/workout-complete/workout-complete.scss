@@ -8,6 +8,31 @@
   max-width: 640px;
 }
 
+.save-routine-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .lede {
+    margin: 0 0 6px;
+    color: var(--p-text-muted-color);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--p-text-color);
+    margin-top: 6px;
+  }
+
+  .muted {
+    font-weight: 400;
+    color: var(--p-text-muted-color);
+  }
+}
+
 .complete-hero {
   text-align: center;
   padding: 28px 20px 22px;

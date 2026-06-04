@@ -43,6 +43,7 @@ export * from './lib/models/workout/workout.enums';
 export * from './lib/models/workout/program.model';
 export * from './lib/models/workout/assignment.model';
 export * from './lib/models/workout/log.model';
+export * from './lib/models/workout/routine.model';
 
 // Models - Client
 export * from './lib/models/client/client.enums';
@@ -206,6 +207,7 @@ export * from './lib/services/exercise/exercise.service';
 export * from './lib/services/workout/program.service';
 export * from './lib/services/workout/program-assignment.service';
 export * from './lib/services/workout/workout-log.service';
+export * from './lib/services/workout/routine.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
 export * from './lib/services/session/session.service';
