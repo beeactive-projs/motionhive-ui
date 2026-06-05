@@ -1,15 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { MyInvoices } from '../../../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../../../user/payments/my-subscriptions/my-subscriptions';
 
+type BillingView = 'invoices' | 'memberships';
+
 /**
- * Billing tab — the single, always-present home for a user's billing.
+ * Billing tab — the single home for a user's billing.
  *
- * Consolidates the two formerly-conditional tabs (Invoices + Memberships)
- * into one section so the account-menu "Billing & payments" link always
- * lands somewhere real, even with zero billing activity. Each child owns
- * its own empty state ("No invoices yet" / "No subscriptions") and the
- * memberships block carries the Stripe "Manage billing" portal button.
+ * Invoices and memberships used to stack as two full paginated tables,
+ * which read as two pages crammed into one. Here they live behind a
+ * compact segmented toggle so only one is on screen at a time, under a
+ * single header. Each child still owns its own empty state and the
+ * memberships view carries the Stripe "Manage billing" portal button.
  */
 @Component({
   selector: 'mh-profile-billing',
@@ -17,4 +19,6 @@ import { MySubscriptions } from '../../../user/payments/my-subscriptions/my-subs
   templateUrl: './billing.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileBilling {}
+export class ProfileBilling {
+  readonly view = signal<BillingView>('invoices');
+}

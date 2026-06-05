@@ -1,0 +1,119 @@
+<p-toast />
+
+<div class="disc">
+  <!-- Head -->
+  <header class="disc__head">
+    <p class="disc__eyebrow">Discover</p>
+    <h1 class="disc__h1">Find your people in the hive</h1>
+    <p class="disc__sub">
+      Coaches, sessions, and groups — all in one place. Use ⌘K up top when you already know what you want.
+    </p>
+  </header>
+
+  <!-- Shared search -->
+  <div class="disc__search">
+    <i class="pi pi-search disc__search-ic"></i>
+    <input class="disc__search-in" type="text" [ngModel]="query()" (ngModelChange)="onSearch($event)"
+      placeholder="Search coaches, sessions, venues…" aria-label="Search" />
+  </div>
+
+  <!-- Tabs -->
+  <nav class="disc__tabs" role="tablist" aria-label="Discover">
+    <button role="tab" [attr.aria-selected]="tab() === 'coaches'" class="disc__tab"
+      [class.is-active]="tab() === 'coaches'" (click)="setTab('coaches')">Coaches</button>
+    <button role="tab" [attr.aria-selected]="tab() === 'sessions'" class="disc__tab"
+      [class.is-active]="tab() === 'sessions'" (click)="setTab('sessions')">Sessions</button>
+    <button role="tab" [attr.aria-selected]="tab() === 'groups'" class="disc__tab"
+      [class.is-active]="tab() === 'groups'" (click)="setTab('groups')">Groups</button>
+  </nav>
+
+  <!-- ── Coaches ── -->
+  @if (tab() === 'coaches') {
+  <div class="disc__chips">
+    @for (c of coachChips; track c) {
+    <button class="disc__chip" [class.is-active]="coachChip() === c" (click)="coachChip.set(c)">{{ c }}</button>
+    }
+  </div>
+
+  @if (loadingCoaches()) {
+  <div class="disc__grid">
+    @for (i of [1,2,3]; track i) { <div class="disc__card disc__card--skeleton"></div> }
+  </div>
+  } @else if (visibleCoaches().length === 0) {
+  <div class="disc__empty">No coaches match yet — try a different search.</div>
+  } @else {
+  <div class="disc__grid">
+    @for (c of visibleCoaches(); track c.id; let i = $index) {
+    <article class="disc__coach">
+      <div class="disc__coach-top">
+        <mh-hex [tone]="toneFor(i)" size="xl">{{ coachInitials(c) }}</mh-hex>
+        <div class="disc__coach-id">
+          <h3>{{ coachName(c) }}</h3>
+          @if (c.specializations?.length) {
+          <p class="disc__coach-tag">{{ c.specializations!.join(' · ') }}</p>
+          }
+          <p class="disc__coach-loc"><i class="pi pi-compass"></i> {{ coachLocation(c) }}</p>
+        </div>
+      </div>
+      <div class="disc__coach-foot">
+        <span class="disc__coach-meta">{{ coachExperience(c) }}</span>
+        <button class="disc__btn disc__btn--soft" [disabled]="!c.handle" (click)="viewCoach(c)">
+          View profile
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+  }
+  }
+
+  <!-- ── Sessions ── -->
+  @if (tab() === 'sessions') {
+  <div class="disc__chips">
+    @for (c of sessionChips; track c) {
+    <button class="disc__chip" [class.is-active]="sessionChip() === c" (click)="onSessionChip(c)">{{ c }}</button>
+    }
+  </div>
+
+  @if (sessionsStore.loading()) {
+  <div class="disc__grid disc__grid--2">
+    @for (i of [1,2,3,4]; track i) { <div class="disc__card disc__card--skeleton"></div> }
+  </div>
+  } @else if (sessionsStore.items().length === 0) {
+  <div class="disc__empty">No sessions found — try a different search or filter.</div>
+  } @else {
+  <div class="disc__grid disc__grid--2">
+    @for (s of sessionsStore.items(); track s.id) {
+    <mh-session-card [instance]="$any(s)" variant="list-card" [showCTA]="false" (open)="openSession(s)" />
+    }
+  </div>
+  }
+  }
+
+  <!-- ── Groups ── -->
+  @if (tab() === 'groups') {
+  @if (loadingGroups()) {
+  <div class="disc__grid">
+    @for (i of [1,2,3]; track i) { <div class="disc__card disc__card--skeleton"></div> }
+  </div>
+  } @else if (groups().length === 0) {
+  <div class="disc__empty">No groups found — try a different search.</div>
+  } @else {
+  <div class="disc__grid">
+    @for (g of groups(); track g.id; let i = $index) {
+    <article class="disc__group">
+      <mh-hex [tone]="toneFor(i)" size="lg">{{ groupInitials(g.name) }}</mh-hex>
+      <h3>{{ g.name }}</h3>
+      @if (g.tags?.length) {
+      <p class="disc__coach-tag">{{ g.tags!.join(' · ') }}</p>
+      }
+      <p class="disc__group-members">{{ g.memberCount }} member{{ g.memberCount === 1 ? '' : 's' }}</p>
+      <button class="disc__btn disc__btn--soft" (click)="openGroup(g)">
+        {{ g.myJoinRequestStatus === 'PENDING' ? 'Request pending' : 'View group' }}
+      </button>
+    </article>
+    }
+  </div>
+  }
+  }
+</div>

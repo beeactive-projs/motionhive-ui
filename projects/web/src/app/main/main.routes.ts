@@ -19,6 +19,12 @@ export const mainRoutes: Routes = [
         title: 'Explore - MotionHive',
       },
       {
+        // Unified discovery hub — coaches, sessions, groups in one place.
+        path: 'discover',
+        loadComponent: () => import('./discover/discover').then((m) => m.Discover),
+        title: 'Discover - MotionHive',
+      },
+      {
         path: 'messages',
         loadChildren: () =>
           import('./messages/messages.routes').then((m) => m.messagesRoutes),

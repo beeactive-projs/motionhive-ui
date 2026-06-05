@@ -92,9 +92,9 @@ export class Main {
         label: '',
         items: [
           { label: 'Home', route: '/home', icon: 'pi pi-home' },
-          // One discovery surface — replaces the Explore stub and the old
-          // duplicate Fitness ▸ Discover entry.
-          { label: 'Discover', route: '/sessions/discover', icon: 'pi pi-compass' },
+          // Unified discovery hub — coaches, sessions, groups in one place.
+          // Replaces the Explore stub and the old duplicate Fitness ▸ Discover.
+          { label: 'Discover', route: '/discover', icon: 'pi pi-compass' },
           // Live unread badge wired straight to the store's signal — the
           // sidenav re-renders the pill without us touching the section array.
           {
