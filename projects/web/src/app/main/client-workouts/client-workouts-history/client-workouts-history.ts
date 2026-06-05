@@ -333,7 +333,9 @@ export class ClientWorkoutsHistory {
   }
 
   goToExercises(): void {
-    this._router.navigate(['/coaching/exercises']);
+    // Shared, role-agnostic catalog route — /coaching/exercises is
+    // instructor-gated and would bounce a client to /home.
+    this._router.navigate(['/exercises']);
   }
 
   // ── Template helpers ─────────────────────────────────────────────

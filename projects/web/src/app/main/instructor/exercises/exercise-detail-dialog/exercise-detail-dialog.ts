@@ -107,6 +107,9 @@ export class ExerciseDetailDialog {
   readonly canFork = computed(() => {
     const ex = this.exercise();
     return (
+      // Forking writes a copy into a personal library — instructor-only
+      // on the BE. Clients browse read-only, so don't offer them Fork.
+      this._authStore.isInstructor() &&
       !!ex &&
       ex.source !== ExerciseSource.System &&
       ex.visibility === ExerciseVisibility.Public &&

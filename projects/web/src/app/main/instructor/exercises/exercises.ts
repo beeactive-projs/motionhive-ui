@@ -16,6 +16,7 @@ import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
+  AuthStore,
   Exercise,
   ExerciseFacets,
   ExerciseKind,
@@ -69,7 +70,11 @@ import { ExerciseFormDialog } from './exercise-form-dialog/exercise-form-dialog'
 export class Exercises {
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _messageService = inject(MessageService);
+  private readonly _authStore = inject(AuthStore);
   readonly taxonomy = inject(ExerciseTaxonomyStore);
+
+  /** Authoring (create custom exercises) is instructor-only; clients browse. */
+  readonly isInstructor = this._authStore.isInstructor;
 
   // ── State ────────────────────────────────────────────────────────
 

@@ -25,6 +25,15 @@ export const mainRoutes: Routes = [
         title: 'Discover - MotionHive',
       },
       {
+        // Exercise catalog — browsable by everyone (clients build their own
+        // workouts/routines from it). Authoring is gated to instructors
+        // inside the component. Instructors also reach it via /coaching/exercises.
+        path: 'exercises',
+        loadComponent: () =>
+          import('./instructor/exercises/exercises').then((m) => m.Exercises),
+        title: 'Exercises - MotionHive',
+      },
+      {
         path: 'messages',
         loadChildren: () =>
           import('./messages/messages.routes').then((m) => m.messagesRoutes),
