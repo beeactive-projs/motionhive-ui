@@ -108,9 +108,22 @@
       <p class="disc__coach-tag">{{ g.tags!.join(' · ') }}</p>
       }
       <p class="disc__group-members">{{ g.memberCount }} member{{ g.memberCount === 1 ? '' : 's' }}</p>
-      <button class="disc__btn disc__btn--soft" (click)="openGroup(g)">
-        {{ g.myJoinRequestStatus === 'PENDING' ? 'Request pending' : 'View group' }}
-      </button>
+      <div class="disc__group-actions">
+        @if (g.myJoinRequestStatus === 'PENDING') {
+        <button class="disc__btn disc__btn--soft" [disabled]="isGroupBusy(g.id)" (click)="cancelGroupRequest(g)">
+          Cancel request
+        </button>
+        } @else if (g.joinPolicy === JoinPolicies.Approval) {
+        <button class="disc__btn disc__btn--primary" [disabled]="isGroupBusy(g.id)" (click)="joinOrRequest(g)">
+          Request to join
+        </button>
+        } @else {
+        <button class="disc__btn disc__btn--primary" [disabled]="isGroupBusy(g.id)" (click)="joinOrRequest(g)">
+          Join group
+        </button>
+        }
+        <button class="disc__btn disc__btn--soft" (click)="viewGroup(g)">View</button>
+      </div>
     </article>
     }
   </div>

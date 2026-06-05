@@ -15,6 +15,7 @@ import {
   DiscoverGroup,
   GroupService,
   InstructorSearchResult,
+  JoinPolicies,
   ProfileService,
   PublicSessionInstance,
   SessionCard,
@@ -65,6 +66,10 @@ export class Discover implements OnInit {
   readonly groups = signal<DiscoverGroup[]>([]);
   readonly loadingCoaches = signal(false);
   readonly loadingGroups = signal(false);
+
+  readonly JoinPolicies = JoinPolicies;
+  /** Groups with an in-flight join/cancel request — disables their button. */
+  readonly busyGroupIds = signal<Set<string>>(new Set());
 
   private _searchTimer?: ReturnType<typeof setTimeout>;
 
@@ -195,7 +200,75 @@ export class Discover implements OnInit {
     return name.slice(0, 2).toUpperCase();
   }
 
-  openGroup(g: DiscoverGroup): void {
+  isGroupBusy(id: string): boolean {
+    return this.busyGroupIds().has(id);
+  }
+
+  private setGroupBusy(id: string, busy: boolean): void {
+    this.busyGroupIds.update((set) => {
+      const next = new Set(set);
+      if (busy) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  /** Open group → instant join; approval group → request to join. */
+  joinOrRequest(g: DiscoverGroup): void {
+    if (this.isGroupBusy(g.id)) return;
+    this.setGroupBusy(g.id, true);
+    this._groupService.selfJoin(g.id).subscribe({
+      next: (res) => {
+        this.setGroupBusy(g.id, false);
+        if (res.status === 'JOINED') {
+          // Now a member — it belongs in "Your groups", drop from Discover.
+          this.groups.update((list) => list.filter((x) => x.id !== g.id));
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Joined',
+            detail: `You're now a member of "${g.name}".`,
+          });
+        } else {
+          this.groups.update((list) =>
+            list.map((x) =>
+              x.id === g.id ? { ...x, myJoinRequestStatus: 'PENDING' } : x,
+            ),
+          );
+          this._messageService.add({
+            severity: 'info',
+            summary: 'Request sent',
+            detail: 'The owner will review your request to join.',
+          });
+        }
+      },
+      error: (err) => {
+        this.setGroupBusy(g.id, false);
+        showApiError(this._messageService, 'Could not join group', '', err);
+      },
+    });
+  }
+
+  cancelGroupRequest(g: DiscoverGroup): void {
+    if (this.isGroupBusy(g.id)) return;
+    this.setGroupBusy(g.id, true);
+    this._groupService.cancelMyJoinRequest(g.id).subscribe({
+      next: () => {
+        this.setGroupBusy(g.id, false);
+        this.groups.update((list) =>
+          list.map((x) =>
+            x.id === g.id ? { ...x, myJoinRequestStatus: null } : x,
+          ),
+        );
+        this._messageService.add({ severity: 'success', summary: 'Request cancelled' });
+      },
+      error: (err) => {
+        this.setGroupBusy(g.id, false);
+        showApiError(this._messageService, 'Could not cancel request', '', err);
+      },
+    });
+  }
+
+  viewGroup(g: DiscoverGroup): void {
     void this._router.navigate(['/groups/preview', g.id]);
   }
 }

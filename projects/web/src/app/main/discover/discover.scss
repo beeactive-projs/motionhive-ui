@@ -232,6 +232,26 @@
     cursor: not-allowed;
   }
 }
+.disc__btn--primary {
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+  font-size: 13px;
+  padding: 9px 15px;
+  border-radius: 9px;
+  margin-top: 8px;
+  &:hover {
+    filter: brightness(0.96);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+.disc__group-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 /* States */
 .disc__empty {
