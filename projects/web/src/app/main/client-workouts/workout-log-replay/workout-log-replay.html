@@ -1,0 +1,156 @@
+<div class="mh-page replay-page">
+  <header class="replay-head">
+    <p-button
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [text]="true"
+      size="small"
+      (onClick)="goBack()"
+      pTooltip="Back"
+    />
+    <div class="title">
+      <h1>{{ log()?.name ?? 'Workout' }}</h1>
+      @if (log(); as l) {
+        <p class="sub">
+          {{ l.startedAt | date: 'MMM d, y · shortTime' }}
+          @if (isCoachView()) {
+            · <span class="muted">read-only · client view</span>
+          }
+        </p>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
+      <h3>Loading…</h3>
+    </div>
+  } @else if (log(); as l) {
+    <!-- Stats -->
+    <div class="stats">
+      <div class="mh-stat">
+        <div class="mh-stat__num">{{ durationLabel() }}</div>
+        <div class="mh-stat__lbl">Duration</div>
+      </div>
+      <div class="mh-stat">
+        <div class="mh-stat__num">
+          {{ setsDone() }}<span class="unit">/{{ setsPlanned() }}</span>
+        </div>
+        <div class="mh-stat__lbl">Sets done</div>
+      </div>
+      @if (hasVolume()) {
+        <div class="mh-stat">
+          <div class="mh-stat__num">
+            {{ totalVolumeKg() | number }}<span class="unit"> kg</span>
+          </div>
+          <div class="mh-stat__lbl">Total volume</div>
+        </div>
+      }
+      @if (prCount() > 0) {
+        <div class="mh-stat mh-stat--pr">
+          <div class="mh-stat__num">
+            <i class="pi pi-trophy"></i> {{ prCount() }}
+          </div>
+          <div class="mh-stat__lbl">
+            New 1RM {{ prCount() === 1 ? 'PR' : 'PRs' }}
+          </div>
+        </div>
+      }
+      @if (feelingGlyph()) {
+        <div class="mh-stat">
+          <div class="mh-stat__num glyph">{{ feelingGlyph() }}</div>
+          <div class="mh-stat__lbl">Feeling</div>
+        </div>
+      }
+    </div>
+
+    @if (l.notes) {
+      <section class="notes-card">
+        <h4>Notes</h4>
+        <p>{{ l.notes }}</p>
+      </section>
+    }
+
+    <!-- Exercise blocks -->
+    @if (exercises().length === 0) {
+      <div class="mh-empty">
+        <div class="mh-empty__icon"><i class="pi pi-bolt"></i></div>
+        <h3>No exercises logged</h3>
+      </div>
+    } @else {
+      <ul class="ex-list">
+        @for (ex of exercises(); track ex.id) {
+          <li class="ex-card">
+            <header class="ex-card__head">
+              @if (ex.exerciseThumbnailUrlSnapshot) {
+                <img
+                  class="thumb"
+                  [src]="ex.exerciseThumbnailUrlSnapshot"
+                  [alt]="ex.exerciseNameSnapshot"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="thumb thumb--fallback">
+                  <i class="pi pi-bolt"></i>
+                </div>
+              }
+              <div class="meta">
+                <div class="name">{{ ex.exerciseNameSnapshot }}</div>
+                <div class="sub">
+                  {{ exerciseSetsDone(ex) }} / {{ exerciseTotal(ex) }} sets
+                  @if (hasPr(ex); as pr) {
+                    @if (prForExercise(ex); as p) {
+                      · <span class="pr-chip">
+                        <i class="pi pi-trophy"></i>
+                        PR {{ p.weightKg | number }} kg
+                        @if (p.deltaKg > 0) {
+                          <span class="delta">+{{ p.deltaKg | number }}</span>
+                        }
+                      </span>
+                    }
+                  }
+                </div>
+              </div>
+            </header>
+
+            @if ((ex.sets ?? []).length > 0) {
+              <table class="set-table">
+                <thead>
+                  <tr>
+                    <th class="num">#</th>
+                    <th>Type</th>
+                    <th class="grow">Result</th>
+                    <th class="done">Done</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (s of ex.sets ?? []; track s.id; let i = $index) {
+                    <tr [class.skipped]="!s.isCompleted">
+                      <td class="num">{{ i + 1 }}</td>
+                      <td class="type">{{ s.setType }}</td>
+                      <td class="result">{{ setActualLabel(s) }}</td>
+                      <td class="done">
+                        @if (s.isCompleted) {
+                          <i class="pi pi-check"></i>
+                        } @else {
+                          <i class="pi pi-minus muted"></i>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+
+            @if (ex.notes) {
+              <div class="ex-notes">{{ ex.notes }}</div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>
+
+<p-toast position="top-right" />

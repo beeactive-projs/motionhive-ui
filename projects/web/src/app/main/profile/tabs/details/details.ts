@@ -15,7 +15,6 @@ import { IntroCard } from './_cards/intro-card/intro-card';
 import { PersonalDetailsCard } from './_cards/personal-details-card/personal-details-card';
 import { CoachingCard } from './_cards/coaching-card/coaching-card';
 import { BecomeInstructorCard } from './_cards/become-instructor-card/become-instructor-card';
-import { ExerciseCatalogCard } from './_cards/exercise-catalog-card/exercise-catalog-card';
 
 /**
  * Thin shell for the Profile details tab — composes the four
@@ -34,7 +33,6 @@ import { ExerciseCatalogCard } from './_cards/exercise-catalog-card/exercise-cat
     PersonalDetailsCard,
     CoachingCard,
     BecomeInstructorCard,
-    ExerciseCatalogCard,
   ],
   templateUrl: './details.html',
   styleUrl: './details.scss',

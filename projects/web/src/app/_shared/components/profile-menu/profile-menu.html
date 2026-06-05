@@ -21,17 +21,28 @@
 
     <p-divider />
 
-    <ul class="flex flex-col gap-2">
-      @for (item of menuItems(); track item.label) {
+    @for (group of accountGroups(); track group.label; let first = $first) {
+    @if (group.label) {
+    <p class="px-3 pt-2 pb-1 text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-color">
+      {{ group.label }}
+    </p>
+    }
+    <ul class="flex flex-col gap-1" [class.mb-1]="!first">
+      @for (item of group.items; track item.label) {
       <li>
-        <a [routerLink]="item.routerLink" routerLinkActive="bg-primary-500 text-primary-contrast font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+        <a [routerLink]="item.routerLink" [queryParams]="item.queryParams"
+          routerLinkActive="bg-primary-500 text-primary-contrast font-semibold" (click)="closeMenu()" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
             transition-colors hover:bg-surface-300 hover:text-surface-800">
           <i [class]="item.icon + ' text-base'"></i>
-          {{ item.label }}
+          <span class="flex-1">{{ item.label }}</span>
+          @if (item.hint) {
+          <span class="text-[0.6875rem] text-muted-color">{{ item.hint }}</span>
+          }
         </a>
       </li>
       }
     </ul>
+    }
     <p-divider />
 
     <p-button label="Share feedback" icon="pi pi-comment" text fluid styleClass="justify-start"

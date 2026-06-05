@@ -20,7 +20,7 @@ import {
   InstructorSearchResult,
   ProfileService,
 } from 'core';
-import { Hex, HexTone } from './_components/hex/hex';
+import { Hex, HexTone } from '../../_shared/components/hex/hex';
 import { SectionHeader } from './_components/section-header/section-header';
 import { RoadmapRow } from './_components/roadmap-row/roadmap-row';
 import { InstructorCard } from './_components/instructor-card/instructor-card';

@@ -19,6 +19,21 @@ export const mainRoutes: Routes = [
         title: 'Explore - MotionHive',
       },
       {
+        // Unified discovery hub — coaches, sessions, groups in one place.
+        path: 'discover',
+        loadComponent: () => import('./discover/discover').then((m) => m.Discover),
+        title: 'Discover - MotionHive',
+      },
+      {
+        // Exercise catalog — browsable by everyone (clients build their own
+        // workouts/routines from it). Authoring is gated to instructors
+        // inside the component. Instructors also reach it via /coaching/exercises.
+        path: 'exercises',
+        loadComponent: () =>
+          import('./instructor/exercises/exercises').then((m) => m.Exercises),
+        title: 'Exercises - MotionHive',
+      },
+      {
         path: 'messages',
         loadChildren: () =>
           import('./messages/messages.routes').then((m) => m.messagesRoutes),
@@ -88,6 +103,15 @@ export const mainRoutes: Routes = [
             (m) => m.WorkoutLogActive,
           ),
         title: 'Workout - MotionHive',
+      },
+      {
+        // Read-only replay — used by client history + coach (with ?coach=1)
+        path: 'my/workout-log/:id/replay',
+        loadComponent: () =>
+          import('./client-workouts/workout-log-replay/workout-log-replay').then(
+            (m) => m.WorkoutLogReplay,
+          ),
+        title: 'Workout replay - MotionHive',
       },
       // Notification producers emit `screen: 'sessions/my'` (BE convention
       // since the API surface is /sessions/my). Forward to the canonical

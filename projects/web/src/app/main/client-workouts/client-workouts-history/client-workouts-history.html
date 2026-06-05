@@ -40,17 +40,99 @@
   </div>
 
   @if (tab() === 'routines') {
-    <div class="mh-empty">
-      <div class="mh-empty__icon mh-empty__icon--primary">
-        <i class="pi pi-clone"></i>
+    @if (routinesLoading()) {
+      <div class="mh-empty">
+        <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
+        <h3>Loading routines…</h3>
       </div>
-      <h3>Routines are coming soon</h3>
-      <p>
-        Save a workout shape — name, exercises, default sets — and start
-        it again with one tap. We're working on this; for now you can
-        log freestyle sessions from the button above.
-      </p>
-    </div>
+    } @else if (routines().length === 0) {
+      <div class="mh-empty">
+        <div class="mh-empty__icon mh-empty__icon--primary">
+          <i class="pi pi-clone"></i>
+        </div>
+        <h3>No routines yet</h3>
+        <p>
+          Save a workout shape — name, exercises, default sets — and
+          start it again with one tap.
+        </p>
+        <p-button
+          label="Create routine"
+          icon="pi pi-plus"
+          (onClick)="openCreateRoutine()"
+          styleClass="mt-3"
+        />
+      </div>
+    } @else {
+      <div class="routines-actions">
+        <p-button
+          label="New routine"
+          icon="pi pi-plus"
+          severity="secondary"
+          [text]="true"
+          (onClick)="openCreateRoutine()"
+        />
+      </div>
+      <div class="routines-grid">
+        @for (r of routines(); track r.id) {
+          <article class="routine-card">
+            <header class="routine-card__head">
+              <div class="meta">
+                <h4>{{ r.name }}</h4>
+                @if (r.folder) {
+                  <span class="folder">
+                    <i class="pi pi-folder"></i> {{ r.folder }}
+                  </span>
+                }
+              </div>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="iconbtn"
+                  pTooltip="Edit"
+                  (click)="openEditRoutine(r)">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button
+                  type="button"
+                  class="iconbtn iconbtn--danger"
+                  pTooltip="Delete"
+                  (click)="confirmDeleteRoutine(r)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </header>
+            <div class="routine-card__body">
+              <div class="stats">
+                <span>
+                  {{ routineExerciseCount(r) }}
+                  {{ routineExerciseCount(r) === 1 ? 'exercise' : 'exercises' }}
+                </span>
+                @if (r.lastPerformedAt) {
+                  <span class="dot">·</span>
+                  <span>Last done {{ r.lastPerformedAt | date: 'mediumDate' }}</span>
+                } @else {
+                  <span class="dot">·</span>
+                  <span class="muted">Never started yet</span>
+                }
+              </div>
+              @if (r.notes) {
+                <p class="notes">{{ r.notes }}</p>
+              }
+            </div>
+            <footer class="routine-card__foot">
+              <p-button
+                label="Start workout"
+                icon="pi pi-bolt"
+                severity="success"
+                size="small"
+                [loading]="startingRoutineId() === r.id"
+                (onClick)="startRoutine(r)"
+              />
+            </footer>
+          </article>
+        }
+      </div>
+    }
   } @else if (tab() === 'exercises') {
     <div class="mh-empty">
       <div class="mh-empty__icon"><i class="pi pi-bolt"></i></div>
@@ -209,3 +291,12 @@
     />
   </ng-template>
 </p-dialog>
+
+<!-- Routine create / edit -->
+<mh-routine-form-dialog
+  [routine]="routineDialogTarget()"
+  [(visible)]="routineDialogOpen"
+  (saved)="onRoutineSaved($event)"
+/>
+
+<p-confirmdialog />

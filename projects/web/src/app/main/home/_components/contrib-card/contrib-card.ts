@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { Hex, HexTone } from '../hex/hex';
+import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
 
 /**
  * One of the three "Help build the hive" cards: hex glyph, title, body

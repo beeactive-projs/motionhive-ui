@@ -11,14 +11,16 @@
         }
       </p>
     </div>
-    <p-button
-      [label]="createLabel()"
-      icon="pi pi-plus"
-      styleClass="create-cta"
-      (onClick)="openCreate()"
-      pTooltip="Create custom exercise"
-      tooltipPosition="bottom"
-    />
+    @if (isInstructor()) {
+      <p-button
+        [label]="createLabel()"
+        icon="pi pi-plus"
+        styleClass="create-cta"
+        (onClick)="openCreate()"
+        pTooltip="Create custom exercise"
+        tooltipPosition="bottom"
+      />
+    }
   </header>
 
   <!-- Toolbar: search + ownership tabs + sort -->

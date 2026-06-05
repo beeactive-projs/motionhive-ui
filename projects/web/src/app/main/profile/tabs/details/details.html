@@ -18,9 +18,4 @@
   } @else if (!hasInstructorProfile()) {
     <mh-become-instructor-card />
   }
-
-  <mh-exercise-catalog-card
-    [profile]="profile()"
-    (refresh)="refresh.emit()"
-  />
 </div>

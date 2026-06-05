@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Group } from 'core';
-import { Hex, HexTone } from '../hex/hex';
+import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
 
 /**
  * Group tile for the "Every group, all in one place" row. Uses the

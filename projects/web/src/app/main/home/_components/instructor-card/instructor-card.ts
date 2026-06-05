@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { InstructorSearchResult } from 'core';
-import { Hex, HexTone } from '../hex/hex';
+import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
 
 /**
  * Compact instructor card used in the "Meet every instructor" carousel
