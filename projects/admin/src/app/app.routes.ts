@@ -39,6 +39,18 @@ export const routes: Routes = [
         title: 'Admin · Users',
       },
       {
+        path: 'operations',
+        loadComponent: () =>
+          import('./pages/operations/operations').then((m) => m.Operations),
+        title: 'Admin · Operations',
+      },
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./pages/payments/payments').then((m) => m.Payments),
+        title: 'Admin · Payments',
+      },
+      {
         path: 'database',
         loadComponent: () =>
           import('./pages/database/database').then((m) => m.Database),
