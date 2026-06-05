@@ -81,58 +81,58 @@ export class Main {
   //   return sections;
   // });
 
+  // Navigation model A — "grouped by intent" (Claude Design redesign,
+  // motionhive-redesign/MotionHive Redesign.html). A shared top block for
+  // everyone, a "My training" group for the consumer self, and a "Coaching"
+  // group only for instructors. Account/Billing/Notifications/Safety moved
+  // out of the rail into the avatar menu (see ProfileMenu).
   readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
     const sections: NavSection[] = [
       {
         label: '',
         items: [
           { label: 'Home', route: '/home', icon: 'pi pi-home' },
-          { label: 'Explore', route: '/explore', icon: 'pi pi-compass' },
-          // Messages sits between Explore and Groups per design §4.
-          // Live unread badge wired straight to the store's signal —
-          // the sidenav re-renders the pill without us touching the
-          // section array.
+          // One discovery surface — replaces the Explore stub and the old
+          // duplicate Fitness ▸ Discover entry.
+          { label: 'Discover', route: '/sessions/discover', icon: 'pi pi-compass' },
+          // Live unread badge wired straight to the store's signal — the
+          // sidenav re-renders the pill without us touching the section array.
           {
             label: 'Messages',
             route: '/messages',
             icon: 'pi pi-comment',
             badge: this._messagingStore.unreadTotal,
           },
-          { label: 'Groups', route: '/groups', icon: 'pi pi-sitemap' },
+          { label: 'Groups', route: '/groups', icon: 'pi pi-users' },
+        ],
+      },
+      {
+        label: 'My training',
+        items: [
+          { label: 'My sessions', route: '/my/sessions', icon: 'pi pi-calendar-clock' },
+          { label: 'My plans', route: '/my/plans', icon: 'pi pi-bookmark' },
+          // Workout history + progress folded into one "Workouts" destination.
+          { label: 'Workouts', route: '/my/workouts', icon: 'pi pi-history' },
         ],
       },
     ];
 
     if (this.isInstructor()) {
-      sections.push(
-        {
-          label: 'Coaching',
-          items: [
-            { label: 'Overview', route: '/coaching/overview', icon: 'pi pi-gauge' },
-            { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-users' },
-            { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
-            { label: 'Programs', route: '/coaching/programs', icon: 'pi pi-objects-column' },
-            { label: 'Exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },
-          ],
-        },
-        {
-          label: 'Revenue',
-          items: [{ label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' }],
-        },
-      );
+      sections.push({
+        label: 'Coaching',
+        items: [
+          // Overview pulled from the rail — the current dashboard is mostly
+          // placeholder/mock data. Route + component kept so it can come back
+          // as a real coaching dashboard once it has live data to show.
+          { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-id-card' },
+          { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
+          { label: 'Programs', route: '/coaching/programs', icon: 'pi pi-objects-column' },
+          { label: 'Exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },
+          // Payments lives in Coaching now (the one-item "Revenue" group is gone).
+          { label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' },
+        ],
+      });
     }
-
-    sections.push({
-      label: 'Fitness',
-      items: [
-        { label: 'Overview', route: '/user/dashboard', icon: 'pi pi-objects-column' },
-        { label: 'My sessions', route: '/my/sessions', icon: 'pi pi-calendar-clock' },
-        { label: 'My plans', route: '/my/plans', icon: 'pi pi-bookmark' },
-        { label: 'Workout history', route: '/my/workouts', icon: 'pi pi-history' },
-        { label: 'Discover', route: '/sessions/discover', icon: 'pi pi-search' },
-        { label: 'Progress', route: '/activity/progress', icon: 'pi pi-chart-bar' },
-      ],
-    });
 
     if (this.isSuperAdmin()) {
       sections.push({

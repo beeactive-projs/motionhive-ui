@@ -224,6 +224,7 @@ export * from './lib/stores/auth.store';
 export * from './lib/stores/exercise-taxonomy.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
+export * from './lib/stores/billing-counts.store';
 export * from './lib/stores/notification.store';
 export * from './lib/stores/public-profile.store';
 export * from './lib/stores/messaging.store';
