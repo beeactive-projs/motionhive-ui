@@ -248,7 +248,6 @@ export * from './lib/components/mobile-fab/mobile-fab';
 export * from './lib/components/action-list/action-list';
 export * from './lib/components/week-strip/week-strip';
 export * from './lib/components/time-row-skeleton/time-row-skeleton';
-export * from './lib/components/kpi-card/kpi-card';
 export * from './lib/components/section-label/section-label';
 export * from './lib/components/tri-state-toggle/tri-state-toggle';
 export * from './lib/components/calendar/calendar-event.model';

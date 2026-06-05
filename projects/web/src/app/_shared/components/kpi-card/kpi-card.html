@@ -1,0 +1,20 @@
+<p-card
+  [class]="variant() === 'warn' ? 'shadow-md border border-red-300 bg-red-50 dark:border-red-500/40 dark:bg-red-500/10' : 'border border-surface'">
+  <div class="flex items-center gap-3">
+    @if (icon()) {
+    <span class="flex h-10 w-10 flex-none items-center justify-center rounded-lg text-base"
+      [class]="variant() === 'warn' ? 'bg-red-100 text-red-600 dark:bg-red-500/15' : 'bg-primary-100 text-primary-700'"
+      aria-hidden="true">
+      <span [class]="icon()"></span>
+    </span>
+    }
+    <div class="flex min-w-0 flex-1 flex-col">
+      <span class="text-xs uppercase text-muted-color">{{ label() }}</span>
+      <span class="font-heading text-sm md:text-lg font-semibold tabular-nums"
+        [class.text-red-500]="variant() === 'warn'">{{ value() }}</span>
+      @if (sub()) {
+      <span class="text-xs text-muted-color hidden sm:inline-flex">{{ sub() }}</span>
+      }
+    </div>
+  </div>
+</p-card>

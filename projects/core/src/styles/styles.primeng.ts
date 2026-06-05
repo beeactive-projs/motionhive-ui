@@ -100,14 +100,14 @@ export const MotionHiveLara = definePreset(Lara, {
       },
     },
     card: {
-      colorScheme: {
-        light: {
-          root: {
-            background: '{surface.50}',
-            shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
-          },
-        },
-      },
+      // colorScheme: {
+      //   light: {
+      //     root: {
+      //       background: '{surface.50}',
+      //       shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
+      //     },
+      //   },
+      // },
     },
     dataview: {
       root: {
@@ -126,9 +126,9 @@ export const MotionHiveLara = definePreset(Lara, {
       },
     },
     tabs: {
-      navButton: {
-        background: 'transparent',
-      },
+      // navButton: {
+      //   background: 'transparent',
+      // },
       tablist: {
         background: 'transparent',
         borderWidth: '0 0 1px 0',
