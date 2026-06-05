@@ -1,0 +1,46 @@
+<div class="flex min-h-screen bg-[var(--p-surface-100)]">
+  <!-- Sidebar -->
+  <aside
+    class="flex w-60 flex-col gap-1 border-r border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-3 py-4"
+  >
+    <div class="mb-4 px-2">
+      <div class="text-lg font-semibold text-[var(--p-text-color)]">MotionHive</div>
+      <div class="text-xs uppercase tracking-wider text-[var(--p-primary-color)]">Admin</div>
+    </div>
+
+    @for (item of navItems(); track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="bg-[var(--p-highlight-background)] text-[var(--p-primary-color)]"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[var(--p-text-muted-color)] hover:bg-[var(--p-surface-100)]"
+      >
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </aside>
+
+  <!-- Main -->
+  <div class="flex flex-1 flex-col">
+    <header
+      class="flex items-center justify-between border-b border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-6 py-3"
+    >
+      <div></div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-[var(--p-text-muted-color)]">{{ userName() }}</span>
+        <button
+          type="button"
+          (click)="logout()"
+          class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-[var(--p-text-muted-color)] hover:bg-[var(--p-surface-100)]"
+        >
+          <i class="pi pi-sign-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-auto p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>

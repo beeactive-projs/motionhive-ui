@@ -1,0 +1,246 @@
+<h1 class="mb-4 text-2xl font-semibold text-[var(--p-text-color)]">Users</h1>
+
+<!-- Filters -->
+<div class="mb-4 flex flex-wrap items-end gap-3">
+  <div class="flex flex-col gap-1">
+    <label class="text-xs text-[var(--p-text-muted-color)]">Search</label>
+    <input
+      pInputText
+      [(ngModel)]="q"
+      (keyup.enter)="applyFilters()"
+      placeholder="Name, email, handle"
+      class="w-64"
+    />
+  </div>
+  <div class="flex flex-col gap-1">
+    <label class="text-xs text-[var(--p-text-muted-color)]">Role</label>
+    <p-select
+      [(ngModel)]="role"
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Any"
+      [showClear]="true"
+      appendTo="body"
+      styleClass="w-44"
+    />
+  </div>
+  <div class="flex items-center gap-2">
+    <p-checkbox [(ngModel)]="locked" [binary]="true" inputId="locked" />
+    <label for="locked" class="text-sm text-[var(--p-text-color)]">Locked only</label>
+  </div>
+  <div class="flex items-center gap-2">
+    <p-checkbox [(ngModel)]="includeDeleted" [binary]="true" inputId="incdel" />
+    <label for="incdel" class="text-sm text-[var(--p-text-color)]">Include deleted</label>
+  </div>
+  <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()" />
+</div>
+
+<!-- Table -->
+<p-table
+  [value]="items()"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="rows"
+  [totalRecords]="total()"
+  [loading]="loading()"
+  (onLazyLoad)="onLazyLoad($event)"
+  dataKey="id"
+  size="small"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+>
+  <ng-template #header>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Roles</th>
+      <th>Status</th>
+      <th>Created</th>
+      <th></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-u>
+    <tr>
+      <td>{{ u.firstName }} {{ u.lastName }}</td>
+      <td>{{ u.email }}</td>
+      <td>
+        @for (r of u.roles; track r) {
+          <p-tag [value]="r" severity="secondary" class="mr-1" />
+        }
+      </td>
+      <td>
+        @if (u.deletedAt) {
+          <p-tag value="Deleted" severity="danger" />
+        } @else if (!u.isActive) {
+          <p-tag value="Inactive" severity="warn" />
+        } @else if (u.locked) {
+          <p-tag value="Locked" severity="warn" />
+        } @else if (!u.isEmailVerified) {
+          <p-tag value="Unverified" severity="info" />
+        } @else {
+          <p-tag value="Active" severity="success" />
+        }
+      </td>
+      <td>{{ u.createdAt | date: 'mediumDate' }}</td>
+      <td>
+        <p-button
+          icon="pi pi-eye"
+          severity="secondary"
+          [text]="true"
+          (onClick)="openDetail(u.id)"
+        />
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="6" class="py-6 text-center text-[var(--p-text-muted-color)]">No users found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- Detail drawer -->
+<p-drawer
+  [visible]="drawerOpen()"
+  (visibleChange)="drawerOpen.set($event)"
+  position="right"
+  styleClass="!w-full md:!w-[28rem]"
+>
+  <ng-template #header>
+    <span class="font-semibold">User detail</span>
+  </ng-template>
+
+  @if (detailLoading()) {
+    <div class="text-[var(--p-text-muted-color)]">Loading…</div>
+  } @else if (detail(); as d) {
+    <div class="flex flex-col gap-4">
+      <div>
+        <div class="text-lg font-semibold text-[var(--p-text-color)]">
+          {{ d.firstName }} {{ d.lastName }}
+        </div>
+        <div class="text-sm text-[var(--p-text-muted-color)]">{{ d.email }}</div>
+        @if (d.handle) {
+          <div class="text-xs text-[var(--p-text-muted-color)]">&#64;{{ d.handle }}</div>
+        }
+      </div>
+
+      <!-- Status chips -->
+      <div class="flex flex-wrap gap-2">
+        <p-tag [value]="d.isActive ? 'Active' : 'Inactive'" [severity]="d.isActive ? 'success' : 'warn'" />
+        <p-tag [value]="d.isEmailVerified ? 'Verified' : 'Unverified'" [severity]="d.isEmailVerified ? 'success' : 'info'" />
+        @if (d.locked) { <p-tag value="Locked" severity="warn" /> }
+        @if (d.deletedAt) { <p-tag value="Deleted" severity="danger" /> }
+      </div>
+
+      <!-- Counts -->
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+          <div class="text-lg font-semibold">{{ d.counts.groups }}</div>
+          <div class="text-xs text-[var(--p-text-muted-color)]">Groups</div>
+        </div>
+        <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+          <div class="text-lg font-semibold">{{ d.counts.sessions }}</div>
+          <div class="text-xs text-[var(--p-text-muted-color)]">Sessions</div>
+        </div>
+        <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+          <div class="text-lg font-semibold">{{ d.counts.clients }}</div>
+          <div class="text-xs text-[var(--p-text-muted-color)]">Clients</div>
+        </div>
+      </div>
+
+      <!-- Status actions -->
+      <div class="flex flex-col gap-2">
+        <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Status</div>
+        <div class="flex flex-wrap gap-2">
+          <p-button
+            [label]="d.isActive ? 'Deactivate' : 'Activate'"
+            [severity]="d.isActive ? 'warn' : 'success'"
+            size="small"
+            (onClick)="toggleActive()"
+          />
+          @if (d.locked) {
+            <p-button label="Unlock" severity="secondary" size="small" (onClick)="unlock()" />
+          }
+          @if (!d.isEmailVerified) {
+            <p-button label="Force verify" severity="secondary" size="small" (onClick)="forceVerify()" />
+          }
+          @if (d.deletedAt && isSuperAdmin()) {
+            <p-button label="Restore" severity="success" size="small" (onClick)="restore()" />
+          }
+        </div>
+      </div>
+
+      <!-- Roles (SUPER_ADMIN) -->
+      @if (isSuperAdmin()) {
+        <div class="flex flex-col gap-2">
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Roles</div>
+          <div class="flex flex-wrap gap-2">
+            @for (r of d.roles; track r) {
+              <p-tag [value]="r" severity="secondary" />
+              <button
+                type="button"
+                class="text-xs text-[var(--p-red-500)] hover:underline"
+                (click)="revokeRole(r)"
+              >
+                remove
+              </button>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <p-select
+              [(ngModel)]="roleToAssign"
+              [options]="assignableRoles"
+              placeholder="Add role"
+              appendTo="body"
+              styleClass="w-40"
+            />
+            <p-button label="Add" size="small" [disabled]="!roleToAssign" (onClick)="assignRole()" />
+          </div>
+        </div>
+      }
+
+      <!-- Impersonation (SUPER_ADMIN) -->
+      @if (isSuperAdmin() && !d.deletedAt && d.isActive) {
+        <div class="flex flex-col gap-2 rounded-lg border border-[var(--p-content-border-color)] p-3">
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">
+            Impersonate
+          </div>
+          <input
+            pInputText
+            [(ngModel)]="impersonateReason"
+            placeholder="Reason (audited)"
+            class="w-full"
+          />
+          <p-button
+            label="Open session as this user"
+            icon="pi pi-user"
+            severity="contrast"
+            size="small"
+            (onClick)="impersonate()"
+          />
+          <span class="text-xs text-[var(--p-text-muted-color)]">
+            Opens the app in a new tab with a 30-minute token. Every impersonation is logged.
+          </span>
+        </div>
+      }
+
+      <!-- Stripe / last session -->
+      @if (d.stripeAccount; as s) {
+        <div class="flex flex-col gap-1 text-sm">
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Stripe</div>
+          <div>Charges: {{ s.chargesEnabled ? 'yes' : 'no' }} · Payouts: {{ s.payoutsEnabled ? 'yes' : 'no' }}</div>
+          @if (s.disabledReason) {
+            <div class="text-[var(--p-red-500)]">Disabled: {{ s.disabledReason }}</div>
+          }
+        </div>
+      }
+      @if (d.lastSession; as ls) {
+        <div class="text-xs text-[var(--p-text-muted-color)]">
+          Latest session token expires: {{ ls.expiresAt | date: 'medium' }}
+          {{ ls.revoked ? '(revoked)' : '' }}
+        </div>
+      }
+    </div>
+  }
+</p-drawer>
