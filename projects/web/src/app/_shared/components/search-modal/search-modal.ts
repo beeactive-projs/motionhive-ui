@@ -262,25 +262,32 @@ export class SearchModal {
 
   // --- Routing decisions -----------------------------------------------------
 
-  /** Where each result type takes the user when clicked. Today most
-   *  destinations route to `/profile/{slug-or-id}` style URLs that
-   *  exist in the app. Tags don't have a destination yet — we re-fire
-   *  the search filtered by tag. */
+  /** Where each result type takes the user when clicked. */
   private _navigateToResult(item: SearchResultItem): void {
     switch (item.type) {
       case 'instructor':
-        // TODO: route to a public instructor profile page when it exists.
-        this._router.navigate(['/profile'], { queryParams: { instructorId: item.id } });
+      case 'user': {
+        // Public profile lives at /@<handle>. Plain users are only ever
+        // discoverable to themselves (non-instructors aren't public), so a
+        // user hit without a handle is "me" — go to my own profile.
+        if (item.handle) {
+          this._router.navigate(['/@' + item.handle]);
+        } else {
+          this._router.navigate(['/profile']);
+        }
         break;
+      }
       case 'group':
-        this._router.navigate(['/groups', item.id]);
+        // The OUTSIDE view. Never route a search hit to /groups/:id — that
+        // is the members-only inside and 404s/errors for non-members. The
+        // preview shows public info + join/request and handles every case.
+        this._router.navigate(['/groups/preview', item.id]);
         break;
       case 'session':
-        // TODO: session detail route — sessions module pending.
-        this._router.navigate(['/activity/schedule'], { queryParams: { sessionId: item.id } });
-        break;
-      case 'user':
-        this._router.navigate(['/profile'], { queryParams: { userId: item.id } });
+        // Session search indexes recurring TEMPLATES, and there's no public
+        // per-template page — so land on Discover (filtered to sessions)
+        // rather than the dead /activity/schedule path it used before.
+        this._router.navigate(['/sessions/discover']);
         break;
       case 'tag': {
         // No tag-detail page yet; convert the click into a tag-scoped search.

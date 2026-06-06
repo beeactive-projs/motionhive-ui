@@ -22,6 +22,9 @@ export interface SearchResultItem {
   subtitle?: string | null;
   /** Avatar/cover image URL. Optional; the modal falls back to initials/icons. */
   avatarUrl?: string | null;
+  /** Public-profile handle for `user`/`instructor` rows — lets the modal
+   *  route a click to `/@<handle>`. Absent for groups/sessions/tags. */
+  handle?: string | null;
   /** 0..1 relevance score. Useful for FE A/B presentation; can be ignored. */
   score?: number;
   /** Field paths that matched, e.g. ["specializations", "displayName"].
