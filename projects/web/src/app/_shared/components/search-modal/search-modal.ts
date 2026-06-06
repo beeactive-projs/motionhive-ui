@@ -22,6 +22,7 @@ import {
   SearchResponse,
   SearchResultItem,
   SearchService,
+  SessionService,
 } from 'core';
 import { SearchTriggerService } from './search-trigger.service';
 
@@ -51,6 +52,7 @@ const MIN_QUERY_LENGTH = 2;
 })
 export class SearchModal {
   private readonly _searchService = inject(SearchService);
+  private readonly _sessionService = inject(SessionService);
   private readonly _trigger = inject(SearchTriggerService);
   private readonly _recents = inject(RecentSearchesStore);
   private readonly _router = inject(Router);
@@ -278,16 +280,30 @@ export class SearchModal {
         break;
       }
       case 'group':
-        // The OUTSIDE view. Never route a search hit to /groups/:id — that
-        // is the members-only inside and 404s/errors for non-members. The
-        // preview shows public info + join/request and handles every case.
-        this._router.navigate(['/groups/preview', item.id]);
+        // Access-aware: members go INSIDE (/groups/:id); everyone else gets
+        // the OUTSIDE preview (public info + join/request). Never send a
+        // non-member to /groups/:id — that's members-only and 403s.
+        this._router.navigate(
+          item.viewerIsMember ? ['/groups', item.id] : ['/groups/preview', item.id],
+        );
         break;
       case 'session':
-        // Session search indexes recurring TEMPLATES, and there's no public
-        // per-template page — so land on Discover (filtered to sessions)
-        // rather than the dead /activity/schedule path it used before.
-        this._router.navigate(['/sessions/discover']);
+        // Search indexes recurring TEMPLATES; the showcase is instance-based.
+        // Resolve the template -> its next public instance via the slug
+        // endpoint, then open the showcase (which itself shows the full or
+        // access-blocked view). Fall back to Discover only if it can't
+        // resolve (no upcoming instance / not public).
+        if (item.handle && item.slug) {
+          const handle = item.handle;
+          this._sessionService.getPublicBySlug(handle, item.slug).subscribe({
+            next: (inst) => void this._router.navigate(['/sessions', inst.id]),
+            // No upcoming instance (the series ended / it was a past one-off)
+            // → the instructor's public profile, where their sessions live.
+            error: () => void this._router.navigate(['/@' + handle]),
+          });
+        } else {
+          this._router.navigate(['/sessions/discover']);
+        }
         break;
       case 'tag': {
         // No tag-detail page yet; convert the click into a tag-scoped search.
