@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService, AuthStore } from 'core';
+import { AuthService, AuthStore, Logo } from 'core';
 
 interface AdminNavItem {
   label: string;
@@ -16,7 +16,7 @@ interface AdminNavItem {
  */
 @Component({
   selector: 'mh-admin-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Logo],
   templateUrl: './admin-shell.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

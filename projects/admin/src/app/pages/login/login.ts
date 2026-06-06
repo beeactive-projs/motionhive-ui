@@ -14,6 +14,7 @@ import { MessageService } from 'primeng/api';
 import {
   AuthService,
   AuthStore,
+  Logo,
   LoginRequest,
   UserRoles,
   showApiError,
@@ -33,6 +34,7 @@ import {
     InputTextModule,
     PasswordModule,
     MessageModule,
+    Logo,
   ],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

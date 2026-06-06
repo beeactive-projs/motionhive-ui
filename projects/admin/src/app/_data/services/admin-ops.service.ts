@@ -5,6 +5,7 @@ import { environment, type PaginatedResponse } from 'core';
 import {
   JobsOverview,
   PaymentsResource,
+  QueueJobRow,
   ReprocessResult,
   TriggerResult,
 } from '../models/ops.models';
@@ -24,6 +25,23 @@ export class AdminOpsService {
     return this._http.post<TriggerResult>(`${this._api}/admin/jobs/trigger`, {
       name,
     });
+  }
+
+  queueJobs(
+    queue: string,
+    perState = 10,
+  ): Observable<{ available: boolean; jobs: QueueJobRow[] }> {
+    return this._http.get<{ available: boolean; jobs: QueueJobRow[] }>(
+      `${this._api}/admin/jobs/queues/${queue}/jobs`,
+      { params: new HttpParams().set('perState', String(perState)) },
+    );
+  }
+
+  retryJob(queue: string, jobId: string): Observable<{ id: string; state: string }> {
+    return this._http.post<{ id: string; state: string }>(
+      `${this._api}/admin/jobs/queues/${queue}/jobs/${jobId}/retry`,
+      {},
+    );
   }
 
   listPayments(

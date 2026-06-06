@@ -3,7 +3,8 @@
 @if (loading()) {
   <div class="text-[var(--p-text-muted-color)]">Loading…</div>
 } @else {
-  <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+  <!-- KPI cards -->
+  <div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
     @for (kpi of kpis(); track kpi.label) {
       <div
         class="rounded-xl border bg-[var(--p-content-background)] p-4"
@@ -24,4 +25,72 @@
       </div>
     }
   </div>
+
+  @if (insights(); as ins) {
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- Growth -->
+      <div class="rounded-xl border border-[var(--p-content-border-color)] bg-[var(--p-content-background)] p-5">
+        <h2 class="mb-3 text-sm font-semibold uppercase text-[var(--p-text-muted-color)]">Growth</h2>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <div class="text-2xl font-semibold text-[var(--p-text-color)]">{{ ins.signups.last24h }}</div>
+            <div class="text-xs text-[var(--p-text-muted-color)]">signups · 24h</div>
+          </div>
+          <div>
+            <div class="text-2xl font-semibold text-[var(--p-text-color)]">{{ ins.signups.last7d }}</div>
+            <div class="text-xs text-[var(--p-text-muted-color)]">signups · 7d</div>
+          </div>
+          <div>
+            <div class="text-2xl font-semibold text-[var(--p-text-color)]">{{ ins.signups.last30d }}</div>
+            <div class="text-xs text-[var(--p-text-muted-color)]">signups · 30d</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-around border-t border-[var(--p-content-border-color)] pt-3 text-center">
+          <div>
+            <div class="text-xl font-semibold text-[var(--p-primary-color)]">{{ ins.activeUsers.last24h }}</div>
+            <div class="text-xs text-[var(--p-text-muted-color)]">active · 24h</div>
+          </div>
+          <div>
+            <div class="text-xl font-semibold text-[var(--p-primary-color)]">{{ ins.activeUsers.last7d }}</div>
+            <div class="text-xs text-[var(--p-text-muted-color)]">active · 7d</div>
+          </div>
+        </div>
+        <div class="mt-2 text-center text-[11px] text-[var(--p-text-muted-color)]">
+          "active" = signed in within the window
+        </div>
+      </div>
+
+      <!-- Activity (last 7d) -->
+      <div class="rounded-xl border border-[var(--p-content-border-color)] bg-[var(--p-content-background)] p-5">
+        <h2 class="mb-3 text-sm font-semibold uppercase text-[var(--p-text-muted-color)]">
+          Records created · 7d
+        </h2>
+        @for (row of activity(); track row.label) {
+          <div class="mb-1.5 flex items-center justify-between">
+            <span class="text-sm text-[var(--p-text-color)]">{{ row.label }}</span>
+            <span class="text-sm font-semibold text-[var(--p-text-color)]">{{ row.value }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Latest signups -->
+      <div class="rounded-xl border border-[var(--p-content-border-color)] bg-[var(--p-content-background)] p-5">
+        <h2 class="mb-3 text-sm font-semibold uppercase text-[var(--p-text-muted-color)]">Latest signups</h2>
+        @if (!ins.recentSignups.length) {
+          <div class="text-sm text-[var(--p-text-muted-color)]">No recent signups.</div>
+        }
+        @for (u of ins.recentSignups; track u.id) {
+          <div class="mb-2 flex items-center justify-between">
+            <div class="min-w-0">
+              <div class="truncate text-sm text-[var(--p-text-color)]">{{ u.firstName }} {{ u.lastName }}</div>
+              <div class="truncate text-xs text-[var(--p-text-muted-color)]">{{ u.email }}</div>
+            </div>
+            <div class="ml-2 whitespace-nowrap text-xs text-[var(--p-text-muted-color)]">
+              {{ u.createdAt | date: 'MMM d' }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
 }

@@ -31,6 +31,18 @@ export interface ReprocessResult {
   error: string | null;
 }
 
+export interface QueueJobRow {
+  id: string;
+  queue: string;
+  name: string;
+  state: string;
+  attemptsMade: number;
+  timestamp: number | null;
+  processedOn: number | null;
+  finishedOn: number | null;
+  failedReason: string | null;
+}
+
 /** A payments-oversight resource (drives the generic table). */
 export type PaymentsResource =
   | 'accounts'

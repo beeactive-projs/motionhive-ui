@@ -4,10 +4,13 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { MessageService } from 'primeng/api';
+import { TableModule } from 'primeng/table';
 import { showApiError } from 'core';
 import { AdminOverviewService } from '../../_data/services/admin-overview.service';
-import { AdminOverview } from '../../_data/models/admin.models';
+import { AdminInsights, AdminOverview } from '../../_data/models/admin.models';
 
 interface Kpi {
   label: string;
@@ -16,9 +19,14 @@ interface Kpi {
   alert?: boolean;
 }
 
+interface ActivityRow {
+  label: string;
+  value: number;
+}
+
 @Component({
   selector: 'mh-admin-dashboard',
-  imports: [],
+  imports: [DatePipe, TableModule],
   templateUrl: './dashboard.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,11 +36,25 @@ export class Dashboard {
 
   readonly loading = signal(true);
   readonly kpis = signal<Kpi[]>([]);
+  readonly insights = signal<AdminInsights | null>(null);
+  readonly activity = signal<ActivityRow[]>([]);
 
   constructor() {
-    this._overview.get().subscribe({
-      next: (o) => {
-        this.kpis.set(this.toKpis(o));
+    forkJoin({
+      overview: this._overview.get(),
+      insights: this._overview.insights(),
+    }).subscribe({
+      next: ({ overview, insights }) => {
+        this.kpis.set(this.toKpis(overview));
+        this.insights.set(insights);
+        this.activity.set([
+          { label: 'Sessions', value: insights.activity7d.sessions },
+          { label: 'Groups', value: insights.activity7d.groups },
+          { label: 'Posts', value: insights.activity7d.posts },
+          { label: 'Reviews', value: insights.activity7d.reviews },
+          { label: 'Subscriptions', value: insights.activity7d.subscriptions },
+          { label: 'Invoices', value: insights.activity7d.invoices },
+        ].sort((a, b) => b.value - a.value));
         this.loading.set(false);
       },
       error: (err) => {

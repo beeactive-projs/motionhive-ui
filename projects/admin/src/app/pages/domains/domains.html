@@ -30,6 +30,7 @@
   size="small"
   [scrollable]="true"
   scrollHeight="60vh"
+  [tableStyle]="{ 'min-width': 'max-content' }"
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
 >
@@ -38,7 +39,7 @@
       @for (col of columns; track col.path) {
         <th class="whitespace-nowrap">{{ col.label }}</th>
       }
-      @if (isGroups() && canMutate()) {
+      @if (isDeletable() && canMutate()) {
         <th></th>
       }
     </tr>
@@ -48,14 +49,14 @@
       @for (col of columns; track col.path) {
         <td class="max-w-xs truncate" [title]="cell(row, col.path)">{{ cell(row, col.path) }}</td>
       }
-      @if (isGroups() && canMutate()) {
+      @if (isDeletable() && canMutate()) {
         <td class="text-right">
           <p-button
             label="Delete"
             severity="danger"
             size="small"
             [text]="true"
-            (onClick)="confirmDeleteGroup(row)"
+            (onClick)="confirmDelete(row)"
           />
         </td>
       }

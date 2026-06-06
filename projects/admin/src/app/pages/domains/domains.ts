@@ -98,8 +98,9 @@ export class Domains {
   get columns(): Col[] {
     return COLUMNS[this.resource];
   }
-  isGroups(): boolean {
-    return this.resource === 'groups';
+  /** Resources that support a soft-delete moderation action. */
+  isDeletable(): boolean {
+    return this.resource === 'groups' || this.resource === 'exercises';
   }
 
   onResourceChange(): void {
@@ -122,19 +123,25 @@ export class Domains {
     return getPath(row, path);
   }
 
-  confirmDeleteGroup(row: DbRow): void {
+  confirmDelete(row: DbRow): void {
     const id = String(row['id']);
+    const isGroup = this.resource === 'groups';
     this._confirm.confirm({
-      header: 'Delete group',
-      message: `Soft-delete "${this.cell(row, 'name')}"? Members keep history; the group is hidden.`,
+      header: isGroup ? 'Delete group' : 'Delete exercise',
+      message: isGroup
+        ? `Soft-delete "${this.cell(row, 'name')}"? Members keep history; the group is hidden.`
+        : `Soft-delete exercise "${this.cell(row, 'name')}"? It's hidden from the catalog; existing references keep their snapshot.`,
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this._domain.deleteGroup(id).subscribe({
+        const op = isGroup
+          ? this._domain.deleteGroup(id)
+          : this._domain.deleteExercise(id);
+        op.subscribe({
           next: () => {
-            this._messages.add({ severity: 'success', summary: 'Deleted', detail: 'Group hidden.' });
+            this._messages.add({ severity: 'success', summary: 'Deleted', detail: 'Hidden.' });
             this.load();
           },
-          error: (err) => showApiError(this._messages, 'Delete', 'Failed to delete group', err),
+          error: (err) => showApiError(this._messages, 'Delete', 'Failed to delete', err),
         });
       },
     });

@@ -33,4 +33,8 @@ export class AdminDomainService {
   deleteGroup(id: string): Observable<DbRow> {
     return this._http.delete<DbRow>(`${this._api}/admin/domain/groups/${id}`);
   }
+
+  deleteExercise(id: string): Observable<DbRow> {
+    return this._http.delete<DbRow>(`${this._api}/admin/domain/exercises/${id}`);
+  }
 }

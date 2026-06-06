@@ -81,6 +81,26 @@ export interface AdminOverview {
   moderation: { openMessageReports: number };
 }
 
+export interface AdminInsights {
+  signups: { last24h: number; last7d: number; last30d: number };
+  activeUsers: { last24h: number; last7d: number };
+  recentSignups: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    createdAt: string;
+  }[];
+  activity7d: {
+    sessions: number;
+    groups: number;
+    posts: number;
+    reviews: number;
+    subscriptions: number;
+    invoices: number;
+  };
+}
+
 export interface DbTableInfo {
   key: string;
   label: string;

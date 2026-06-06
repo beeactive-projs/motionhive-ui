@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'core';
-import { AdminOverview } from '../models/admin.models';
+import { AdminInsights, AdminOverview } from '../models/admin.models';
 
 @Injectable({ providedIn: 'root' })
 export class AdminOverviewService {
@@ -10,5 +10,11 @@ export class AdminOverviewService {
 
   get(): Observable<AdminOverview> {
     return this._http.get<AdminOverview>(`${environment.apiUrl}/admin/overview`);
+  }
+
+  insights(): Observable<AdminInsights> {
+    return this._http.get<AdminInsights>(
+      `${environment.apiUrl}/admin/overview/insights`,
+    );
   }
 }

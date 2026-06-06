@@ -3,9 +3,13 @@
   <aside
     class="flex w-60 flex-col gap-1 border-r border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-3 py-4"
   >
-    <div class="mb-4 px-2">
-      <div class="text-lg font-semibold text-[var(--p-text-color)]">MotionHive</div>
-      <div class="text-xs uppercase tracking-wider text-[var(--p-primary-color)]">Admin</div>
+    <div class="mb-4 flex items-center gap-2 px-2">
+      <mh-logo styleClass="max-w-8" />
+      <span
+        class="rounded bg-[var(--p-primary-color)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--p-primary-contrast-color)]"
+      >
+        Admin
+      </span>
     </div>
 
     @for (item of navItems(); track item.route) {

@@ -47,6 +47,8 @@
   (onLazyLoad)="onLazyLoad($event)"
   dataKey="id"
   size="small"
+  [scrollable]="true"
+  [tableStyle]="{ 'min-width': 'max-content' }"
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
 >
