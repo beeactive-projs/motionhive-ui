@@ -100,6 +100,9 @@ export class Domains {
 
   resource: DomainResource = 'groups';
   q = '';
+  statusFilter: string | null = null;
+  readonly sessionStatuses = ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+  readonly exerciseSources = ['SYSTEM', 'INSTRUCTOR', 'ADMIN'];
   readonly items = signal<DbRow[]>([]);
   readonly total = signal(0);
   readonly loading = signal(false);
@@ -189,12 +192,20 @@ export class Domains {
 
   onResourceChange(): void {
     this.q = '';
+    this.statusFilter = null;
     this.page = 1;
     this.load();
   }
   applySearch(): void {
     this.page = 1;
     this.load();
+  }
+  /** Sessions filter by status; exercises filter by source (both map to
+   *  the backend `status` param). Other resources have no status filter. */
+  filterOptions(): string[] {
+    if (this.resource === 'sessions') return this.sessionStatuses;
+    if (this.resource === 'exercises') return this.exerciseSources;
+    return [];
   }
   onLazyLoad(e: TableLazyLoadEvent): void {
     const first = e.first ?? 0;
@@ -233,7 +244,9 @@ export class Domains {
 
   private load(): void {
     this.loading.set(true);
-    this._domain.list(this.resource, this.page, this.rows, this.q || undefined).subscribe({
+    this._domain
+      .list(this.resource, this.page, this.rows, this.q || undefined, this.statusFilter ?? undefined)
+      .subscribe({
       next: (res) => {
         this.items.set(res.items);
         this.total.set(res.total);

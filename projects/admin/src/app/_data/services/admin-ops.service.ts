@@ -29,12 +29,27 @@ export class AdminOpsService {
 
   queueJobs(
     queue: string,
-    perState = 10,
-  ): Observable<{ available: boolean; jobs: QueueJobRow[] }> {
-    return this._http.get<{ available: boolean; jobs: QueueJobRow[] }>(
-      `${this._api}/admin/jobs/queues/${queue}/jobs`,
-      { params: new HttpParams().set('perState', String(perState)) },
-    );
+    state: string,
+    page: number,
+    limit: number,
+  ): Observable<{
+    available: boolean;
+    items: QueueJobRow[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }> {
+    const params = new HttpParams()
+      .set('state', state)
+      .set('page', String(page))
+      .set('limit', String(limit));
+    return this._http.get<{
+      available: boolean;
+      items: QueueJobRow[];
+      total: number;
+      page: number;
+      pageSize: number;
+    }>(`${this._api}/admin/jobs/queues/${queue}/jobs`, { params });
   }
 
   retryJob(queue: string, jobId: string): Observable<{ id: string; state: string }> {

@@ -7,10 +7,12 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { TableModule } from 'primeng/table';
+import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { SelectModule } from 'primeng/select';
+import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthStore, showApiError, type PaginatedResponse } from 'core';
@@ -31,14 +33,13 @@ interface Section {
   key: SectionKey;
   label: string;
   access: Access;
+  searchable: boolean;
   columns: { path: string; label: string }[];
 }
 
 const SECTIONS: Section[] = [
   {
-    key: 'reports',
-    label: 'Reports',
-    access: 'msg',
+    key: 'reports', label: 'Reports', access: 'msg', searchable: false,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'category', label: 'Category' },
@@ -48,9 +49,7 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'velocity',
-    label: 'Velocity alarms',
-    access: 'msg',
+    key: 'velocity', label: 'Velocity alarms', access: 'msg', searchable: false,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'userId', label: 'User' },
@@ -60,9 +59,7 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'posts',
-    label: 'Posts',
-    access: 'content',
+    key: 'posts', label: 'Posts', access: 'content', searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'author.email', label: 'Author' },
@@ -71,9 +68,7 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'reviews',
-    label: 'Reviews',
-    access: 'content',
+    key: 'reviews', label: 'Reviews', access: 'content', searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'author.email', label: 'Author' },
@@ -82,9 +77,7 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'feedback',
-    label: 'Feedback',
-    access: 'admin',
+    key: 'feedback', label: 'Feedback', access: 'admin', searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'type', label: 'Type' },
@@ -93,9 +86,7 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    key: 'waitlist',
-    label: 'Waitlist',
-    access: 'admin',
+    key: 'waitlist', label: 'Waitlist', access: 'admin', searchable: true,
     columns: [
       { path: 'createdAt', label: 'When' },
       { path: 'email', label: 'Email' },
@@ -106,6 +97,9 @@ const SECTIONS: Section[] = [
   },
 ];
 
+const REPORT_STATUSES = ['OPEN', 'REVIEWING', 'RESOLVED', 'DISMISSED'];
+const REPORT_CATEGORIES = ['SPAM', 'SCAM', 'HARASSMENT', 'IMPERSONATION', 'SEXUAL', 'OTHER'];
+
 @Component({
   selector: 'mh-admin-moderation',
   imports: [
@@ -113,6 +107,9 @@ const SECTIONS: Section[] = [
     TableModule,
     ButtonModule,
     SelectButtonModule,
+    SelectModule,
+    InputTextModule,
+    CheckboxModule,
     ConfirmDialogModule,
   ],
   providers: [ConfirmationService],
@@ -130,20 +127,32 @@ export class Moderation {
   private readonly isAdminPlus =
     this._authStore.isAdmin() || this._authStore.isSuperAdmin();
 
+  readonly reportStatuses = REPORT_STATUSES;
+  readonly reportCategories = REPORT_CATEGORIES;
+
   readonly sectionOptions = computed(() =>
     SECTIONS.filter((s) => {
       if (s.access === 'msg') return this.isMsgStaff;
       if (s.access === 'admin') return this.isAdminPlus;
-      return true; // content: any admin-app role
+      return true;
     }).map((s) => ({ label: s.label, value: s.key })),
   );
 
   section: SectionKey = this.sectionOptions()[0]?.value ?? 'posts';
+  readonly rows = 20;
   readonly items = signal<DbRow[]>([]);
+  readonly total = signal(0);
   readonly loading = signal(false);
+  private page = 1;
+
+  // filters
+  q = '';
+  reportStatus: string | null = null;
+  reportCategory: string | null = null;
+  velocityIncludeReviewed = false;
 
   constructor() {
-    this.load();
+    this.reload();
   }
 
   get current(): Section {
@@ -157,31 +166,50 @@ export class Moderation {
   }
 
   onSectionChange(): void {
+    this.q = '';
+    this.reportStatus = null;
+    this.reportCategory = null;
+    this.reload();
+  }
+
+  reload(): void {
+    this.page = 1;
     this.load();
   }
 
-  private fetch(): Observable<DbRow[]> {
+  onLazyLoad(e: TableLazyLoadEvent): void {
+    const first = e.first ?? 0;
+    const rows = e.rows ?? this.rows;
+    this.page = Math.floor(first / rows) + 1;
+    this.load();
+  }
+
+  private fetch(): Observable<PaginatedResponse<DbRow>> {
+    const p = this.page;
+    const l = this.rows;
+    const q = this.q || undefined;
     switch (this.section) {
       case 'reports':
-        return this._mod.reports(1, 100).pipe(map((r) => r.items));
+        return this._mod.reports(p, l, this.reportStatus ?? undefined, this.reportCategory ?? undefined);
       case 'velocity':
-        return this._mod.velocityAlarms(1, 100).pipe(map((r) => r.items));
+        return this._mod.velocityAlarms(p, l, this.velocityIncludeReviewed);
       case 'posts':
-        return this._mod.posts(1, 100).pipe(map((r) => r.items));
+        return this._mod.posts(p, l, q);
       case 'reviews':
-        return this._mod.reviews(1, 100).pipe(map((r) => r.items));
+        return this._mod.reviews(p, l, q);
       case 'feedback':
-        return this._mod.feedback();
+        return this._mod.feedback(p, l, q);
       case 'waitlist':
-        return this._mod.waitlist();
+        return this._mod.waitlist(p, l, q);
     }
   }
 
   private load(): void {
     this.loading.set(true);
     this.fetch().subscribe({
-      next: (rows) => {
-        this.items.set(this.normalize(rows));
+      next: (res) => {
+        this.items.set(res.items);
+        this.total.set(res.total);
         this.loading.set(false);
       },
       error: (err) => {
@@ -189,13 +217,6 @@ export class Moderation {
         showApiError(this._messages, 'Moderation', 'Failed to load', err);
       },
     });
-  }
-
-  // Some legacy endpoints may return a PaginatedResponse instead of a raw
-  // array — normalize both to a row array.
-  private normalize(rows: DbRow[] | PaginatedResponse<DbRow>): DbRow[] {
-    if (Array.isArray(rows)) return rows;
-    return (rows as PaginatedResponse<DbRow>).items ?? [];
   }
 
   resolveReport(row: DbRow, status: 'RESOLVED' | 'DISMISSED'): void {

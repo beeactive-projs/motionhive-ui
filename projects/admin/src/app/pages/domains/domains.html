@@ -16,6 +16,17 @@
     placeholder="search"
     class="w-56"
   />
+  @if (filterOptions().length) {
+    <p-select
+      [(ngModel)]="statusFilter"
+      (onChange)="applySearch()"
+      [options]="filterOptions()"
+      [placeholder]="isExercises() ? 'Any source' : 'Any status'"
+      [showClear]="true"
+      appendTo="body"
+      styleClass="w-44"
+    />
+  }
   <p-button label="Search" icon="pi pi-search" size="small" (onClick)="applySearch()" />
 </div>
 

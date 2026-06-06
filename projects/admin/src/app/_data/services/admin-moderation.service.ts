@@ -21,9 +21,17 @@ export class AdminModerationService {
   }
 
   // ── Messaging ──
-  reports(page: number, limit: number, status?: string): Observable<PaginatedResponse<DbRow>> {
+  reports(
+    page: number,
+    limit: number,
+    status?: string,
+    category?: string,
+  ): Observable<PaginatedResponse<DbRow>> {
+    const extra: Record<string, string> = {};
+    if (status) extra['status'] = status;
+    if (category) extra['category'] = category;
     return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/messaging/reports`, {
-      params: this.page(page, limit, status ? { status } : undefined),
+      params: this.page(page, limit, extra),
     });
   }
   resolveReport(id: string, status: string, resolutionNotes?: string): Observable<DbRow> {
@@ -48,28 +56,32 @@ export class AdminModerationService {
   }
 
   // ── Content ──
-  posts(page: number, limit: number): Observable<PaginatedResponse<DbRow>> {
+  posts(page: number, limit: number, q?: string): Observable<PaginatedResponse<DbRow>> {
     return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/content/posts`, {
-      params: this.page(page, limit),
+      params: this.page(page, limit, q ? { q } : undefined),
     });
   }
   deletePost(id: string): Observable<DbRow> {
     return this._http.delete<DbRow>(`${this._api}/admin/content/posts/${id}`);
   }
-  reviews(page: number, limit: number): Observable<PaginatedResponse<DbRow>> {
+  reviews(page: number, limit: number, q?: string): Observable<PaginatedResponse<DbRow>> {
     return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/content/reviews`, {
-      params: this.page(page, limit),
+      params: this.page(page, limit, q ? { q } : undefined),
     });
   }
   deleteReview(id: string): Observable<DbRow> {
     return this._http.delete<DbRow>(`${this._api}/admin/content/reviews/${id}`);
   }
 
-  // ── Feedback / Waitlist (existing endpoints; may return array) ──
-  feedback(): Observable<DbRow[]> {
-    return this._http.get<DbRow[]>(`${this._api}/feedback`);
+  // ── Feedback / Waitlist (paginated admin endpoints) ──
+  feedback(page: number, limit: number, q?: string): Observable<PaginatedResponse<DbRow>> {
+    return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/content/feedback`, {
+      params: this.page(page, limit, q ? { q } : undefined),
+    });
   }
-  waitlist(): Observable<DbRow[]> {
-    return this._http.get<DbRow[]>(`${this._api}/waitlist`);
+  waitlist(page: number, limit: number, q?: string): Observable<PaginatedResponse<DbRow>> {
+    return this._http.get<PaginatedResponse<DbRow>>(`${this._api}/admin/content/waitlist`, {
+      params: this.page(page, limit, q ? { q } : undefined),
+    });
   }
 }

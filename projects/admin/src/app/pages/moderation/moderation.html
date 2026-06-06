@@ -1,6 +1,6 @@
 <h1 class="mb-4 text-2xl font-semibold text-[var(--p-text-color)]">Moderation</h1>
 
-<div class="mb-4">
+<div class="mb-4 flex flex-wrap items-center gap-3">
   <p-selectButton
     [(ngModel)]="section"
     [options]="sectionOptions()"
@@ -9,17 +9,40 @@
     [allowEmpty]="false"
     (onChange)="onSectionChange()"
   />
+
+  <!-- Per-section filters -->
+  @if (current.searchable) {
+    <input pInputText [(ngModel)]="q" (keyup.enter)="reload()" placeholder="search" class="w-56" />
+    <p-button label="Search" icon="pi pi-search" size="small" (onClick)="reload()" />
+  }
+  @if (section === 'reports') {
+    <p-select [(ngModel)]="reportStatus" (onChange)="reload()" [options]="reportStatuses"
+      placeholder="Any status" [showClear]="true" appendTo="body" styleClass="w-40" />
+    <p-select [(ngModel)]="reportCategory" (onChange)="reload()" [options]="reportCategories"
+      placeholder="Any category" [showClear]="true" appendTo="body" styleClass="w-44" />
+  }
+  @if (section === 'velocity') {
+    <div class="flex items-center gap-2">
+      <p-checkbox [(ngModel)]="velocityIncludeReviewed" [binary]="true" inputId="increv" (onChange)="reload()" />
+      <label for="increv" class="text-sm text-[var(--p-text-color)]">Include reviewed</label>
+    </div>
+  }
 </div>
 
 <p-table
   [value]="items()"
+  [lazy]="true"
   [paginator]="true"
-  [rows]="20"
+  [rows]="rows"
+  [totalRecords]="total()"
   [loading]="loading()"
+  (onLazyLoad)="onLazyLoad($event)"
   size="small"
   [scrollable]="true"
   scrollHeight="60vh"
   [tableStyle]="{ 'min-width': 'max-content' }"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
 >
   <ng-template #header>
     <tr>
