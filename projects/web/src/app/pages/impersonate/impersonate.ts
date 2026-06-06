@@ -37,6 +37,13 @@ export class Impersonate {
 
   constructor() {
     const token = this._route.snapshot.queryParamMap.get('token');
+    // Scrub the token from the URL/history immediately so it can't linger
+    // in the address bar, browser history, or a Referer header.
+    try {
+      history.replaceState(null, '', '/impersonate');
+    } catch {
+      /* non-fatal */
+    }
     if (!token) {
       this.message.set('Missing impersonation token.');
       return;
@@ -48,6 +55,21 @@ export class Impersonate {
     this._tokens.clearTokens();
     this._tokens.setAccessToken(token);
 
+    // Mark this browser context as an impersonation session so the app
+    // shell can show a persistent banner + "exit" control. Best-effort.
+    try {
+      const claims = JSON.parse(atob(token.split('.')[1] ?? '')) as {
+        act_as?: string;
+        email?: string;
+      };
+      localStorage.setItem(
+        'mh_impersonation',
+        JSON.stringify({ by: claims.act_as ?? null, at: Date.now() }),
+      );
+    } catch {
+      /* non-fatal — banner just won't show */
+    }
+
     this._http.get<User>(`${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`).subscribe({
       next: (user) => {
         this._tokens.setUser(user);
@@ -56,6 +78,7 @@ export class Impersonate {
       },
       error: () => {
         this._tokens.clearTokens();
+        localStorage.removeItem('mh_impersonation');
         this.message.set('Impersonation failed or the token has expired.');
       },
     });

@@ -31,8 +31,11 @@ export class AdminShell {
   private readonly _items: AdminNavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: 'pi pi-home' },
     { label: 'Users', route: '/users', icon: 'pi pi-users' },
+    { label: 'Moderation', route: '/moderation', icon: 'pi pi-flag' },
+    { label: 'Domains', route: '/domains', icon: 'pi pi-sitemap' },
     { label: 'Operations', route: '/operations', icon: 'pi pi-cog' },
     { label: 'Payments', route: '/payments', icon: 'pi pi-credit-card' },
+    { label: 'Audit', route: '/audit', icon: 'pi pi-history' },
     { label: 'Database', route: '/database', icon: 'pi pi-database', superAdminOnly: true },
   ];
 

@@ -1,0 +1,68 @@
+<h1 class="mb-4 text-2xl font-semibold text-[var(--p-text-color)]">Moderation</h1>
+
+<div class="mb-4">
+  <p-selectButton
+    [(ngModel)]="section"
+    [options]="sectionOptions()"
+    optionLabel="label"
+    optionValue="value"
+    [allowEmpty]="false"
+    (onChange)="onSectionChange()"
+  />
+</div>
+
+<p-table
+  [value]="items()"
+  [paginator]="true"
+  [rows]="20"
+  [loading]="loading()"
+  size="small"
+  [scrollable]="true"
+  scrollHeight="60vh"
+>
+  <ng-template #header>
+    <tr>
+      @for (col of current.columns; track col.path) {
+        <th class="whitespace-nowrap">{{ col.label }}</th>
+      }
+      <th></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-row>
+    <tr>
+      @for (col of current.columns; track col.path) {
+        <td class="max-w-xs truncate" [title]="cell(row, col.path)">{{ cell(row, col.path) }}</td>
+      }
+      <td class="whitespace-nowrap text-right">
+        @switch (section) {
+          @case ('reports') {
+            <p-button label="Resolve" size="small" severity="secondary" [text]="true" (onClick)="resolveReport(row, 'RESOLVED')" />
+            <p-button label="Dismiss" size="small" severity="secondary" [text]="true" (onClick)="resolveReport(row, 'DISMISSED')" />
+          }
+          @case ('velocity') {
+            <p-button label="Review" size="small" severity="secondary" [text]="true" (onClick)="reviewAlarm(row)" />
+          }
+          @case ('posts') {
+            @if (canDeleteContent()) {
+              <p-button label="Delete" size="small" severity="danger" [text]="true" (onClick)="deleteContent(row)" />
+            }
+          }
+          @case ('reviews') {
+            @if (canDeleteContent()) {
+              <p-button label="Delete" size="small" severity="danger" [text]="true" (onClick)="deleteContent(row)" />
+            }
+          }
+        }
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td [attr.colspan]="current.columns.length + 1" class="py-6 text-center text-[var(--p-text-muted-color)]">
+        Nothing here.
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-confirmDialog />

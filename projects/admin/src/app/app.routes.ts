@@ -21,7 +21,10 @@ export const routes: Routes = [
   { path: 'home', redirectTo: 'auth/login' },
   {
     path: '',
-    canActivate: [authGuard, rolesGuard(UserRoles.Admin, UserRoles.SuperAdmin)],
+    canActivate: [
+      authGuard,
+      rolesGuard(UserRoles.Admin, UserRoles.SuperAdmin, UserRoles.Support),
+    ],
     loadComponent: () =>
       import('./layout/admin-shell').then((m) => m.AdminShell),
     children: [
@@ -49,6 +52,24 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/payments/payments').then((m) => m.Payments),
         title: 'Admin · Payments',
+      },
+      {
+        path: 'moderation',
+        loadComponent: () =>
+          import('./pages/moderation/moderation').then((m) => m.Moderation),
+        title: 'Admin · Moderation',
+      },
+      {
+        path: 'domains',
+        loadComponent: () =>
+          import('./pages/domains/domains').then((m) => m.Domains),
+        title: 'Admin · Domains',
+      },
+      {
+        path: 'audit',
+        loadComponent: () =>
+          import('./pages/audit/audit').then((m) => m.Audit),
+        title: 'Admin · Audit',
       },
       {
         path: 'database',
