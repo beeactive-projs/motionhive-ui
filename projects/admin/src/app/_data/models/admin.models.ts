@@ -50,6 +50,19 @@ export interface AdminUserDetail extends AdminUserListItem {
   } | null;
 }
 
+export interface AdminUserActivity {
+  lastLoginAt: string | null;
+  counts: {
+    workoutsLogged: number;
+    bookings: number;
+    posts: number;
+    messagesSent: number;
+    programsAssigned: number;
+    routines: number;
+  };
+  sessions: { total: number; active: number };
+}
+
 export interface AdminUserFilters {
   page?: number;
   limit?: number;

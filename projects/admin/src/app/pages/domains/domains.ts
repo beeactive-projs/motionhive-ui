@@ -8,7 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TextareaModule } from 'primeng/textarea';
+import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthStore, showApiError } from 'core';
@@ -64,7 +69,12 @@ const COLUMNS: Record<DomainResource, Col[]> = {
     TableModule,
     ButtonModule,
     SelectButtonModule,
+    SelectModule,
     InputTextModule,
+    InputNumberModule,
+    CheckboxModule,
+    TextareaModule,
+    DialogModule,
     ConfirmDialogModule,
   ],
   providers: [ConfirmationService],
@@ -95,12 +105,86 @@ export class Domains {
   readonly loading = signal(false);
   private page = 1;
 
+  // Exercise edit dialog
+  readonly editOpen = signal(false);
+  readonly saving = signal(false);
+  private editId: string | null = null;
+  readonly form = signal<Record<string, unknown>>({});
+  readonly opt = {
+    kind: ['STRENGTH', 'CARDIO', 'DURATION', 'DISTANCE', 'BODYWEIGHT', 'MOBILITY'],
+    level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'],
+    mechanic: ['COMPOUND', 'ISOLATION'],
+    force: ['PUSH', 'PULL', 'STATIC'],
+    movementPattern: [
+      'SQUAT', 'HINGE', 'LUNGE', 'PUSH_HORIZONTAL', 'PUSH_VERTICAL',
+      'PULL_HORIZONTAL', 'PULL_VERTICAL', 'CARRY', 'ROTATION',
+      'ANTI_ROTATION', 'LOCOMOTION', 'ISOLATION',
+    ],
+    visibility: ['PRIVATE', 'PUBLIC'],
+  };
+
   get columns(): Col[] {
     return COLUMNS[this.resource];
   }
   /** Resources that support a soft-delete moderation action. */
   isDeletable(): boolean {
     return this.resource === 'groups' || this.resource === 'exercises';
+  }
+  isExercises(): boolean {
+    return this.resource === 'exercises';
+  }
+
+  openEditExercise(row: DbRow): void {
+    this.editId = String(row['id']);
+    this.editOpen.set(true);
+    this.form.set({});
+    this._domain.getExercise(this.editId).subscribe({
+      next: (ex) => {
+        this.form.set({
+          name: ex['name'] ?? '',
+          description: ex['description'] ?? '',
+          instructions: ex['instructions'] ?? '',
+          kind: ex['kind'] ?? null,
+          level: ex['level'] ?? null,
+          mechanic: ex['mechanic'] ?? null,
+          force: ex['force'] ?? null,
+          movementPattern: ex['movementPattern'] ?? null,
+          visibility: ex['visibility'] ?? null,
+          metValue: ex['metValue'] ?? null,
+          thumbnailUrl: ex['thumbnailUrl'] ?? '',
+          youtubeUrl: ex['youtubeUrl'] ?? '',
+          isUnilateral: ex['isUnilateral'] ?? false,
+        });
+      },
+      error: (err) => {
+        this.editOpen.set(false);
+        showApiError(this._messages, 'Exercise', 'Failed to load exercise', err);
+      },
+    });
+  }
+
+  fval(key: string): unknown {
+    return this.form()[key];
+  }
+  setF(key: string, value: unknown): void {
+    this.form.update((f) => ({ ...f, [key]: value }));
+  }
+
+  saveExercise(): void {
+    if (!this.editId) return;
+    this.saving.set(true);
+    this._domain.updateExercise(this.editId, this.form()).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.editOpen.set(false);
+        this._messages.add({ severity: 'success', summary: 'Saved', detail: 'Exercise updated.' });
+        this.load();
+      },
+      error: (err) => {
+        this.saving.set(false);
+        showApiError(this._messages, 'Save', 'Failed to update exercise', err);
+      },
+    });
   }
 
   onResourceChange(): void {

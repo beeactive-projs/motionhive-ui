@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment, type PaginatedResponse } from 'core';
 import {
+  AdminUserActivity,
   AdminUserDetail,
   AdminUserFilters,
   AdminUserListItem,
@@ -28,6 +29,10 @@ export class AdminUsersService {
 
   get(id: string): Observable<AdminUserDetail> {
     return this._http.get<AdminUserDetail>(`${this._baseUrl}/${id}`);
+  }
+
+  activity(id: string): Observable<AdminUserActivity> {
+    return this._http.get<AdminUserActivity>(`${this._baseUrl}/${id}/activity`);
   }
 
   updateStatus(

@@ -18,6 +18,7 @@ import { AuthStore, showApiError } from 'core';
 import { AdminUsersService } from '../../_data/services/admin-users.service';
 import { AdminImpersonationService } from '../../_data/services/admin-impersonation.service';
 import {
+  AdminUserActivity,
   AdminUserDetail,
   AdminUserFilters,
   AdminUserListItem,
@@ -69,6 +70,7 @@ export class Users {
   readonly drawerOpen = signal(false);
   readonly detailLoading = signal(false);
   readonly detail = signal<AdminUserDetail | null>(null);
+  readonly activity = signal<AdminUserActivity | null>(null);
   impersonateReason = '';
   roleToAssign: string | null = null;
 
@@ -111,6 +113,7 @@ export class Users {
   openDetail(id: string): void {
     this.drawerOpen.set(true);
     this.detail.set(null);
+    this.activity.set(null);
     this.impersonateReason = '';
     this.roleToAssign = null;
     this.detailLoading.set(true);
@@ -124,6 +127,11 @@ export class Users {
         this.drawerOpen.set(false);
         showApiError(this._messages, 'User', 'Failed to load user', err);
       },
+    });
+    // Activity loads in parallel — counts only (GDPR-safe), best-effort.
+    this._users.activity(id).subscribe({
+      next: (a) => this.activity.set(a),
+      error: () => this.activity.set(null),
     });
   }
 

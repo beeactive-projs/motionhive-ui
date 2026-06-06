@@ -4,9 +4,11 @@
     class="flex w-60 flex-col gap-1 border-r border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-3 py-4"
   >
     <div class="mb-4 flex items-center gap-2 px-2">
-      <mh-logo styleClass="max-w-8" />
+      <img src="svg/logo-navy.svg" alt="MotionHive" class="h-7 w-7 shrink-0 dark:hidden" />
+      <img src="svg/logo-honey.svg" alt="MotionHive" class="hidden h-7 w-7 shrink-0 dark:block" />
+      <span class="truncate text-base font-bold text-[var(--p-text-color)]">MotionHive</span>
       <span
-        class="rounded bg-[var(--p-primary-color)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--p-primary-contrast-color)]"
+        class="shrink-0 rounded bg-[var(--p-primary-color)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--p-primary-contrast-color)]"
       >
         Admin
       </span>
@@ -24,8 +26,9 @@
     }
   </aside>
 
-  <!-- Main -->
-  <div class="flex flex-1 flex-col">
+  <!-- Main (min-w-0 lets wide tables scroll inside this column instead of
+       pushing the whole layout wider — the flexbox min-width:auto gotcha) -->
+  <div class="flex min-w-0 flex-1 flex-col">
     <header
       class="flex items-center justify-between border-b border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-6 py-3"
     >
@@ -43,7 +46,7 @@
       </div>
     </header>
 
-    <main class="flex-1 overflow-auto p-6">
+    <main class="min-w-0 flex-1 overflow-auto p-6">
       <router-outlet />
     </main>
   </div>

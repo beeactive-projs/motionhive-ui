@@ -50,7 +50,16 @@
         <td class="max-w-xs truncate" [title]="cell(row, col.path)">{{ cell(row, col.path) }}</td>
       }
       @if (isDeletable() && canMutate()) {
-        <td class="text-right">
+        <td class="whitespace-nowrap text-right">
+          @if (isExercises()) {
+            <p-button
+              label="Edit"
+              severity="secondary"
+              size="small"
+              [text]="true"
+              (onClick)="openEditExercise(row)"
+            />
+          }
           <p-button
             label="Delete"
             severity="danger"
@@ -72,3 +81,73 @@
 </p-table>
 
 <p-confirmDialog />
+
+<!-- Exercise edit dialog -->
+<p-dialog
+  [visible]="editOpen()"
+  (visibleChange)="editOpen.set($event)"
+  header="Edit exercise"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+  appendTo="body"
+>
+  <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-1">
+      <label class="text-xs text-[var(--p-text-muted-color)]">Name</label>
+      <input pInputText [ngModel]="fval('name')" (ngModelChange)="setF('name', $event)" class="w-full" />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-xs text-[var(--p-text-muted-color)]">Description</label>
+      <textarea pTextarea [ngModel]="fval('description')" (ngModelChange)="setF('description', $event)" rows="2" class="w-full"></textarea>
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-xs text-[var(--p-text-muted-color)]">Instructions</label>
+      <textarea pTextarea [ngModel]="fval('instructions')" (ngModelChange)="setF('instructions', $event)" rows="3" class="w-full"></textarea>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Kind</label>
+        <p-select [ngModel]="fval('kind')" (ngModelChange)="setF('kind', $event)" [options]="opt.kind" placeholder="—" appendTo="body" styleClass="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Level</label>
+        <p-select [ngModel]="fval('level')" (ngModelChange)="setF('level', $event)" [options]="opt.level" placeholder="—" appendTo="body" styleClass="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Mechanic</label>
+        <p-select [ngModel]="fval('mechanic')" (ngModelChange)="setF('mechanic', $event)" [options]="opt.mechanic" placeholder="—" appendTo="body" styleClass="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Force</label>
+        <p-select [ngModel]="fval('force')" (ngModelChange)="setF('force', $event)" [options]="opt.force" placeholder="—" appendTo="body" styleClass="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Movement</label>
+        <p-select [ngModel]="fval('movementPattern')" (ngModelChange)="setF('movementPattern', $event)" [options]="opt.movementPattern" placeholder="—" appendTo="body" styleClass="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Visibility</label>
+        <p-select [ngModel]="fval('visibility')" (ngModelChange)="setF('visibility', $event)" [options]="opt.visibility" placeholder="—" appendTo="body" styleClass="w-full" />
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">Thumbnail URL</label>
+        <input pInputText [ngModel]="fval('thumbnailUrl')" (ngModelChange)="setF('thumbnailUrl', $event)" class="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs text-[var(--p-text-muted-color)]">YouTube URL</label>
+        <input pInputText [ngModel]="fval('youtubeUrl')" (ngModelChange)="setF('youtubeUrl', $event)" class="w-full" />
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <p-checkbox [ngModel]="fval('isUnilateral')" (ngModelChange)="setF('isUnilateral', $event)" [binary]="true" inputId="uni" />
+      <label for="uni" class="text-sm text-[var(--p-text-color)]">Unilateral</label>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="editOpen.set(false)" />
+    <p-button label="Save" [loading]="saving()" (onClick)="saveExercise()" />
+  </ng-template>
+</p-dialog>

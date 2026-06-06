@@ -37,4 +37,15 @@ export class AdminDomainService {
   deleteExercise(id: string): Observable<DbRow> {
     return this._http.delete<DbRow>(`${this._api}/admin/domain/exercises/${id}`);
   }
+
+  getExercise(id: string): Observable<DbRow> {
+    return this._http.get<DbRow>(`${this._api}/admin/domain/exercises/${id}`);
+  }
+
+  updateExercise(id: string, payload: Record<string, unknown>): Observable<DbRow> {
+    return this._http.patch<DbRow>(
+      `${this._api}/admin/domain/exercises/${id}`,
+      payload,
+    );
+  }
 }

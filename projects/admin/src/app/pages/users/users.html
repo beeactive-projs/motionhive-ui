@@ -151,6 +151,44 @@
         </div>
       </div>
 
+      <!-- Activity (GDPR-safe counts only) -->
+      @if (activity(); as act) {
+        <div class="flex flex-col gap-2">
+          <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">
+            Activity
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+              <div class="text-base font-semibold">{{ act.counts.workoutsLogged }}</div>
+              <div class="text-[11px] text-[var(--p-text-muted-color)]">Workouts</div>
+            </div>
+            <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+              <div class="text-base font-semibold">{{ act.counts.bookings }}</div>
+              <div class="text-[11px] text-[var(--p-text-muted-color)]">Bookings</div>
+            </div>
+            <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+              <div class="text-base font-semibold">{{ act.counts.posts }}</div>
+              <div class="text-[11px] text-[var(--p-text-muted-color)]">Posts</div>
+            </div>
+            <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+              <div class="text-base font-semibold">{{ act.counts.messagesSent }}</div>
+              <div class="text-[11px] text-[var(--p-text-muted-color)]">Messages</div>
+            </div>
+            <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+              <div class="text-base font-semibold">{{ act.counts.programsAssigned }}</div>
+              <div class="text-[11px] text-[var(--p-text-muted-color)]">Programs</div>
+            </div>
+            <div class="rounded-lg border border-[var(--p-content-border-color)] p-2">
+              <div class="text-base font-semibold">{{ act.counts.routines }}</div>
+              <div class="text-[11px] text-[var(--p-text-muted-color)]">Routines</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-[var(--p-text-muted-color)]">
+            Sessions: {{ act.sessions.active }} active / {{ act.sessions.total }} total
+          </div>
+        </div>
+      }
+
       <!-- Status actions -->
       <div class="flex flex-col gap-2">
         <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Status</div>
