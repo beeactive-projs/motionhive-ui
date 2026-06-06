@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 import { HttpErrorInfo, ErrorDialogService } from '../services/error-dialog/error-dialog.service';
+import { isSilentRequest } from './silent-request.context';
 
 // 401 is handled by the auth interceptor (token refresh / redirect to login).
 // 400 and 422 are validation/business-logic errors — components show field-level errors.
@@ -69,6 +70,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         error instanceof HttpErrorResponse &&
         !SKIP_STATUSES.has(error.status) &&
+        // The caller opted to handle this error itself (e.g. search-modal
+        // resolving a session that may have just run out) — no global dialog.
+        !isSilentRequest(req.context) &&
         !router.url.startsWith('/auth') &&
         !router.url.startsWith('/error')
       ) {

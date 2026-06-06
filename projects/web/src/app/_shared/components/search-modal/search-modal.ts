@@ -295,7 +295,7 @@ export class SearchModal {
         // resolve (no upcoming instance / not public).
         if (item.handle && item.slug) {
           const handle = item.handle;
-          this._sessionService.getPublicBySlug(handle, item.slug).subscribe({
+          this._sessionService.getPublicBySlug(handle, item.slug, { silent: true }).subscribe({
             next: (inst) => void this._router.navigate(['/sessions', inst.id]),
             // No upcoming instance (the series ended / it was a past one-off)
             // → the instructor's public profile, where their sessions live.

@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import type { PaginatedResponse } from '../../models/common/pagination.model';
 import type {
   BlockedSessionInstance,
@@ -248,9 +249,13 @@ export class SessionService {
   getPublicBySlug(
     instructorHandle: string,
     templateSlug: string,
+    opts?: { silent?: boolean },
   ): Observable<PublicSessionInstance | BlockedSessionInstance> {
     return this._http.get<PublicSessionInstance | BlockedSessionInstance>(
       `${this._base}${API_ENDPOINTS.SESSIONS.PUBLIC_BY_SLUG(instructorHandle, templateSlug)}`,
+      // Callers that resolve-then-redirect (search) handle a 404 themselves;
+      // mark the request silent so the global error dialog stays quiet.
+      opts?.silent ? { context: silentRequest() } : undefined,
     );
   }
 
