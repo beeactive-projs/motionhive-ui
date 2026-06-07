@@ -34,6 +34,7 @@ export class AdminShell {
     { label: 'Moderation', route: '/moderation', icon: 'pi pi-flag' },
     { label: 'Domains', route: '/domains', icon: 'pi pi-sitemap' },
     { label: 'Operations', route: '/operations', icon: 'pi pi-cog' },
+    { label: 'Schedules', route: '/schedules', icon: 'pi pi-clock' },
     { label: 'Payments', route: '/payments', icon: 'pi pi-credit-card' },
     { label: 'Audit', route: '/audit', icon: 'pi pi-history' },
     { label: 'Database', route: '/database', icon: 'pi pi-database', superAdminOnly: true },

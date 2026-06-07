@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -11,18 +10,17 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
-import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { AuthStore, environment, showApiError } from 'core';
 import { AdminOpsService } from '../../_data/services/admin-ops.service';
-import {
-  JobsOverview,
-  QueueJobRow,
-  TriggerableJob,
-} from '../../_data/models/ops.models';
+import { JobsOverview, QueueJobRow } from '../../_data/models/ops.models';
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 
+/**
+ * Live queues + jobs monitor. Cron schedules live on their own
+ * Schedules page (kept separate for a clearer view).
+ */
 @Component({
   selector: 'mh-admin-operations',
   imports: [
@@ -32,7 +30,6 @@ type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast
     TagModule,
     SelectButtonModule,
     SelectModule,
-    InputTextModule,
   ],
   templateUrl: './operations.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,10 +42,8 @@ export class Operations {
   readonly isSuperAdmin = this._authStore.isSuperAdmin;
   readonly loading = signal(true);
   readonly overview = signal<JobsOverview | null>(null);
-  readonly triggering = signal<string | null>(null);
   readonly bullBoardUrl = signal('');
 
-  // ── Jobs (paginated, per state) ──
   readonly queueOptions = signal<{ label: string; value: string }[]>([]);
   readonly stateOptions = [
     { label: 'Failed', value: 'failed' },
@@ -66,24 +61,6 @@ export class Operations {
   readonly retrying = signal<string | null>(null);
   private jobsPage = 1;
 
-  // ── Scheduled sweeps (client-side search + queue filter + paginate) ──
-  sweepSearch = '';
-  sweepQueue: string | null = null;
-  readonly sweepQueueOptions = signal<{ label: string; value: string }[]>([]);
-  readonly filteredSweeps = computed(() => {
-    this.sweepTick(); // dependency so plain-field filters re-evaluate
-    const ov = this.overview();
-    if (!ov) return [];
-    const term = this.sweepSearch.trim().toLowerCase();
-    return ov.triggerable.filter(
-      (j) =>
-        (!this.sweepQueue || j.queue === this.sweepQueue) &&
-        (!term || j.key.toLowerCase().includes(term)),
-    );
-  });
-  // re-evaluate the computed when the plain ngModel fields change
-  readonly sweepTick = signal(0);
-
   constructor() {
     this.load();
   }
@@ -95,8 +72,6 @@ export class Operations {
         this.overview.set(o);
         this.bullBoardUrl.set(`${environment.apiUrl}${o.bullBoardPath}`);
         this.queueOptions.set(o.queues.map((q) => ({ label: q.name, value: q.name })));
-        const uniqueQueues = [...new Set(o.triggerable.map((t) => t.queue))];
-        this.sweepQueueOptions.set(uniqueQueues.map((q) => ({ label: q, value: q })));
         this.loading.set(false);
         if (!this.selectedQueue && o.queues.length) {
           this.selectedQueue = o.queues[0].name;
@@ -143,8 +118,15 @@ export class Operations {
     this.loadJobs();
   }
 
-  onSweepFilter(): void {
-    this.sweepTick.update((n) => n + 1);
+  /** Reload counts + the jobs list, then once more shortly after — fast
+   *  jobs re-complete in <1s, so a delayed refresh catches the new state. */
+  private refreshSoon(): void {
+    this.load();
+    this.loadJobs();
+    setTimeout(() => {
+      this.load();
+      this.loadJobs();
+    }, 1500);
   }
 
   stateSeverity(state: string): Severity {
@@ -182,36 +164,16 @@ export class Operations {
     this._ops.retryJob(j.queue, j.id).subscribe({
       next: (r) => {
         this.retrying.set(null);
-        this._messages.add({ severity: 'success', summary: 'Job re-queued', detail: `${j.name} → ${r.state}` });
-        this.loadJobs();
-        this.load();
+        this._messages.add({
+          severity: 'success',
+          summary: 'Job re-queued',
+          detail: `${j.name} → ${r.state} (will reprocess)`,
+        });
+        this.refreshSoon();
       },
       error: (err) => {
         this.retrying.set(null);
         showApiError(this._messages, 'Retry', 'Failed to retry job', err);
-      },
-    });
-  }
-
-  run(job: TriggerableJob): void {
-    this.triggering.set(job.key);
-    this._ops.triggerJob(job.key).subscribe({
-      next: (r) => {
-        this.triggering.set(null);
-        this._messages.add({
-          severity: r.enqueued ? 'success' : 'warn',
-          summary: r.enqueued ? 'Job enqueued' : 'Not enqueued',
-          detail: r.enqueued ? `${job.key} (job ${r.jobId})` : `${job.key} — Redis disabled?`,
-        });
-        this.selectedQueue = job.queue;
-        this.jobState = 'waiting';
-        this.jobsPage = 1;
-        this.loadJobs();
-        this.load();
-      },
-      error: (err) => {
-        this.triggering.set(null);
-        showApiError(this._messages, 'Trigger', 'Failed to trigger job', err);
       },
     });
   }

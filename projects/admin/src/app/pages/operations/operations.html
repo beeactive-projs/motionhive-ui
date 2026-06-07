@@ -78,33 +78,8 @@
     </ng-template>
   </p-table>
 
-  <!-- Scheduled sweeps (search + queue filter + paginate) -->
-  <h2 class="mb-2 mt-6 text-sm font-semibold uppercase text-[var(--p-text-muted-color)]">Scheduled sweeps</h2>
-  <div class="mb-3 flex flex-wrap items-center gap-3">
-    <input pInputText [(ngModel)]="sweepSearch" (ngModelChange)="onSweepFilter()" placeholder="search job" class="w-56" />
-    <p-select [(ngModel)]="sweepQueue" (onChange)="onSweepFilter()" [options]="sweepQueueOptions()"
-      optionLabel="label" optionValue="value" placeholder="All queues" [showClear]="true" appendTo="body" styleClass="w-44" />
-  </div>
-  <p-table [value]="filteredSweeps()" size="small" [paginator]="true" [rows]="10" [scrollable]="true"
-    [tableStyle]="{ 'min-width': 'max-content' }">
-    <ng-template #header>
-      <tr><th>Job</th><th>Queue</th><th>Cadence</th><th></th></tr>
-    </ng-template>
-    <ng-template #body let-j>
-      <tr>
-        <td class="font-mono text-xs">{{ j.key }}</td>
-        <td>{{ j.queue }}</td>
-        <td class="text-[var(--p-text-muted-color)]">{{ j.schedule }}</td>
-        <td class="text-right">
-          @if (isSuperAdmin()) {
-            <p-button label="Run now" size="small" severity="secondary"
-              [loading]="triggering() === j.key" (onClick)="run(j)" />
-          }
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template #emptymessage>
-      <tr><td colspan="4" class="py-6 text-center text-[var(--p-text-muted-color)]">No matching sweeps.</td></tr>
-    </ng-template>
-  </p-table>
+  <p class="mt-4 text-xs text-[var(--p-text-muted-color)]">
+    Looking for the recurring cron sweeps? They're under
+    <b class="text-[var(--p-text-color)]">Schedules</b>.
+  </p>
 }

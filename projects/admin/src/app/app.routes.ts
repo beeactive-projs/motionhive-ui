@@ -48,6 +48,12 @@ export const routes: Routes = [
         title: 'Admin · Operations',
       },
       {
+        path: 'schedules',
+        loadComponent: () =>
+          import('./pages/schedules/schedules').then((m) => m.Schedules),
+        title: 'Admin · Schedules',
+      },
+      {
         path: 'payments',
         loadComponent: () =>
           import('./pages/payments/payments').then((m) => m.Payments),
