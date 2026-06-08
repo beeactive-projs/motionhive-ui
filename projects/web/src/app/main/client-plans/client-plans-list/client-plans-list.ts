@@ -142,7 +142,7 @@ export class ClientPlansList {
   }
 
   goToDiscover(): void {
-    this._router.navigate(['/sessions/discover']);
+    this._router.navigate(['/user/sessions/discover']);
   }
 
   // ── Internals ────────────────────────────────────────────────────

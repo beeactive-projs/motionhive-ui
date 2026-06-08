@@ -1,24 +1,26 @@
 <div class="h-full flex flex-col gap-4">
 
-  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-
-
+  <!-- Header · shared across desktop + mobile -->
+  <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1">
-      <!-- <p-breadcrumb [model]="breadcrumbItems" /> -->
-
-      <h1 class="font-heading font-semibold text-lg md:text-2xl">Pending requests</h1>
-      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400">
-        Invitations you've sent and requests waiting for your response.
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Pending requests</h1>
+      @if (isTabletDown()) {
+      <p class="text-xs text-surface-700 dark:text-surface-400">Invitations sent and requests awaiting your response.
       </p>
+      } @else {
+      <p class="text-sm text-surface-700 dark:text-surface-400">Invitations you've sent and requests waiting for your
+        response.</p>
+      }
     </div>
-
     <div class="flex gap-3">
-
-
-      <p-button label="Clients" icon="pi pi-users" severity="contrast" (onClick)="goToClients()"
-        [size]="isMobile() ? 'small' : undefined" [fluid]="isMobile() ? true : false" [class.w-1/2]="isMobile()" />
+      @if (isMobile()) {
+      <p-button icon="pi pi-users" outlined rounded severity="secondary" (onClick)="goToClients()" size="small" />
+      } @else {
+      <p-button label="Clients" icon="pi pi-users" outlined severity="secondary" (onClick)="goToClients()"
+        [size]="isTablet() ? 'small' : undefined" />
       <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()"
-        [size]="isMobile() ? 'small' : undefined" [fluid]="isMobile() ? true : false" [class.w-1/2]="isMobile()" />
+        [size]="isTablet() ? 'small' : undefined" />
+      }
     </div>
   </header>
 
@@ -32,7 +34,7 @@
   </div> -->
 
   <!-- Requests table (desktop) -->
-  @if (!isMobile()) {
+  @if (!isTabletDown()) {
   <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
 
     <p-table [value]="requests()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
@@ -136,7 +138,7 @@
   }
 
   <!-- Requests list (mobile, infinite scroll) -->
-  @if (isMobile()) {
+  @if (isTabletDown()) {
   <div class="flex-1 min-h-0 overflow-y-auto">
     @if (loading() && mobileRequests().length === 0) {
     <!-- Initial loading skeletons -->
@@ -221,6 +223,11 @@
 </div>
 }
 </div>
+
+@if (isMobile()) {
+<!-- Mobile FAB (single primary action). -->
+<mh-mobile-fab icon="pi pi-user-plus" label="Invite client" (tap)="openInviteDialog()" />
+}
 
 <p-toast />
 <p-confirmDialog />

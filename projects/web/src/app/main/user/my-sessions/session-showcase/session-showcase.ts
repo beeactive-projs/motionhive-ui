@@ -1,18 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DatePipe, DecimalPipe, Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Message } from 'primeng/message';
-import { Skeleton } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { catchError, of } from 'rxjs';
@@ -22,7 +19,6 @@ import {
   BookResponse,
   CapacityBar,
   MyBookingsIndexStore,
-  PageShell,
   ProviderChip,
   PublicSessionInstance,
   SessionParticipantStatus,
@@ -51,12 +47,9 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   imports: [
     DatePipe,
     DecimalPipe,
-    RouterLink,
     Button,
     Message,
-    Skeleton,
     Toast,
-    PageShell,
     AccessChip,
     TypeChip,
     ProviderChip,
@@ -72,7 +65,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export class SessionShowcase implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _location = inject(Location);
   private readonly _sessionService = inject(SessionService);
   private readonly _messageService = inject(MessageService);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
@@ -150,37 +143,29 @@ export class SessionShowcase implements OnInit {
   );
 
   ngOnInit(): void {
-    // Subscribe to the param (don't read the snapshot once): Angular reuses
-    // this component when navigating /sessions/A -> /sessions/B (e.g. picking
-    // another session from the ⌘K search), so a snapshot read would keep
-    // showing the first session. Reload whenever the id changes.
-    this._route.paramMap
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((params) => {
-        const id = params.get('id');
-        if (!id) {
-          this.error.set('Missing session id.');
-          return;
-        }
-        // Defensive: a malformed deep-link (e.g. /sessions/my from an old
-        // notification) would hit this with a non-UUID. Bail with a friendly
-        // error instead of firing /sessions/instances/my/public at the BE,
-        // which 400s with "Validation failed (uuid is expected)".
-        if (!UUID_RE.test(id)) {
-          this.error.set('That session link looks invalid.');
-          return;
-        }
-        this._load(id);
-        // Make sure we know whether the user already booked this instance.
-        this._myBookingsIndexStore.ensureLoaded();
-        // Deep-link from reminders / "Join now" rows: ?action=join routes
-        // to the dedicated day-of countdown screen, which polls join-info
-        // and surfaces the active window properly instead of just popping
-        // a tab open.
-        if (this._route.snapshot.queryParamMap.get('action') === 'join') {
-          void this._router.navigate(['/sessions', id, 'join']);
-        }
-      });
+    const id = this._route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.error.set('Missing session id.');
+      return;
+    }
+    // Defensive: a malformed deep-link (e.g. /sessions/my from an old
+    // notification) would hit this with a non-UUID. Bail with a friendly
+    // error instead of firing /sessions/instances/my/public at the BE,
+    // which 400s with "Validation failed (uuid is expected)".
+    if (!UUID_RE.test(id)) {
+      this.error.set('That session link looks invalid.');
+      return;
+    }
+    this._load(id);
+    // Make sure we know whether the user already booked this instance.
+    this._myBookingsIndexStore.ensureLoaded();
+    // Deep-link from reminders / "Join now" rows: ?action=join routes
+    // to the dedicated day-of countdown screen, which polls join-info
+    // and surfaces the active window properly instead of just popping
+    // a tab open.
+    if (this._route.snapshot.queryParamMap.get('action') === 'join') {
+      void this._router.navigate(['/user/sessions', id, 'join']);
+    }
   }
 
   protected onBookSuccess(res: BookResponse): void {
@@ -195,8 +180,18 @@ export class SessionShowcase implements OnInit {
     this._myBookingsIndexStore.ensureLoaded();
   }
 
+  protected goBack(): void {
+    // Location.back() === history.back(). If we arrived via deep link or a
+    // refresh there's no in-app history to pop, so fall back to Discover.
+    if (this._router.lastSuccessfulNavigation()?.previousNavigation) {
+      this._location.back();
+    } else {
+      void this._router.navigate(['/user/sessions/discover']);
+    }
+  }
+
   protected goToMySessions(): void {
-    void this._router.navigate(['/my/sessions']);
+    void this._router.navigate(['/user/sessions']);
   }
 
   protected goToGroup(): void {

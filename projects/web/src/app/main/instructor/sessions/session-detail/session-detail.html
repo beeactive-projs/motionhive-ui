@@ -1,418 +1,164 @@
 @let inst = store.instance();
 @let tpl = store.template();
 
-@if (!isMobile()) {
-  <!-- ────────────────────── DESKTOP ────────────────────── -->
-  <mh-page-shell
-    [title]="tpl?.title ?? 'Session'"
-    [breadcrumb]="[
-      { label: 'Coaching', routerLink: '/coaching/overview' },
-      { label: 'Sessions', routerLink: '/coaching/sessions' },
-      { label: tpl?.title ?? 'Session' }
-    ]"
-    [showBack]="true"
-  >
-    <div actions class="mh-sd__actions">
-      <p-button
-        label="Calendar"
-        icon="pi pi-calendar"
-        severity="secondary"
-        [outlined]="true"
-        routerLink="/coaching/sessions/calendar"
-      />
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · back button + title + actions (mirrors the sessions list header) -->
+  <header class="flex gap-3 md:gap-4 items-center justify-between">
+    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+        (onClick)="goBack()" />
+      <div class="space-y-1 min-w-0">
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ?? 'Session' }}</h1>
+        @if (inst && tpl) {
+        <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
+          {{ inst.startAt | date: 'EEE d MMM, HH:mm' }} · {{ tpl.durationMinutes }} min
+        </p>
+        }
+      </div>
+    </div>
+
+    <div class="flex gap-2 md:gap-3 shrink-0">
       @if (inst && tpl) {
-        @if (inst.status === 'SCHEDULED') {
-          @if (canMessageParticipants()) {
-            <p-button
-              label="Message participants"
-              icon="pi pi-send"
-              severity="secondary"
-              [outlined]="true"
-              (onClick)="messageOpen.set(true)"
-            />
-          }
-          <p-button
-            label="Edit"
-            icon="pi pi-pencil"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="editOpen.set(true)"
-          />
-          <p-button
-            label="Cancel"
-            icon="pi pi-times"
-            severity="danger"
-            [outlined]="true"
-            (onClick)="cancelOpen.set(true)"
-          />
+      @if (inst.status === SessionStatus.Scheduled) {
+        @if (isMobile()) {
+        <p-button icon="pi pi-ellipsis-v" outlined rounded severity="secondary" size="small" ariaLabel="More actions"
+          (onClick)="openActionsSheet()" />
         } @else {
-          <p-tag
-            [value]="statusLabel(inst.status)"
-            [severity]="inst.status === 'CANCELLED' ? 'danger' : 'secondary'"
-          />
+        <p-button label="Calendar" icon="pi pi-calendar" outlined severity="secondary"
+          [size]="isTablet() ? 'small' : undefined" routerLink="/coaching/sessions/calendar" />
+        @if (canMessageParticipants()) {
+        <p-button label="Message" icon="pi pi-send" outlined severity="secondary"
+          [size]="isTablet() ? 'small' : undefined" (onClick)="messageOpen.set(true)" />
         }
+        <p-button label="Edit" icon="pi pi-pencil" outlined severity="secondary"
+          [size]="isTablet() ? 'small' : undefined" (onClick)="editOpen.set(true)" />
+        <p-button label="Cancel" icon="pi pi-times" outlined severity="danger"
+          [size]="isTablet() ? 'small' : undefined" (onClick)="cancelOpen.set(true)" />
+        }
+      } @else {
+      <p-tag [value]="statusLabel(inst.status)"
+        [severity]="inst.status === SessionStatus.Cancelled ? 'danger' : 'secondary'" />
+      }
       }
     </div>
+  </header>
 
-    @if (store.loading() && !inst) {
-      <div class="mh-sd__loading">Loading session…</div>
-    } @else if (store.error()) {
-      <div class="mh-sd__error">
-        <i class="pi pi-exclamation-circle"></i>
-        {{ store.error() }}
-      </div>
-    } @else if (inst && tpl) {
-      <div class="mh-sd" [class.mh-sd--cancelled]="inst.status === 'CANCELLED'">
-        @if (inst.status === 'CANCELLED') {
-          <div class="mh-sd__banner mh-sd__banner--cancelled" role="status">
-            <i class="pi pi-times-circle"></i>
-            <div>
-              <strong>Session cancelled.</strong>
-              @if (inst.cancelReason) {
-                Reason: <em>{{ inst.cancelReason }}</em>.
-              }
-              Attendees were notified.
-            </div>
-          </div>
-        } @else if (inst.status === 'COMPLETED') {
-          <div class="mh-sd__banner mh-sd__banner--ended" role="status">
-            <i class="pi pi-check-circle"></i>
-            <div><strong>Session completed.</strong></div>
-          </div>
-        }
-
-        <section class="mh-sd__hero">
-          <div class="mh-sd__time">
-            <i class="pi pi-calendar"></i>
-            {{ inst.startAt | date: 'EEEE d MMMM, HH:mm' }}
-            <span class="mh-sd__dot">·</span>
-            {{ tpl.durationMinutes }} min
-          </div>
-
-          <div class="mh-sd__chips">
-            <mh-type-chip [type]="tpl.type" />
-            <mh-access-chip [access]="tpl.access" [approvalRequired]="tpl.approvalRequired" />
-            @if (tpl.meetingProvider) {
-              <mh-provider-chip [provider]="tpl.meetingProvider" />
-            }
-          </div>
-
-          @if (tpl.description) {
-            <p class="mh-sd__desc">{{ tpl.description }}</p>
-          }
-
-          <div class="mh-sd__capacity">
-            <mh-capacity-bar
-              [signups]="inst.confirmedCount"
-              [cap]="inst.capacityOverride ?? tpl.capacity"
-            />
-            <div class="mh-sd__counters">
-              <span><strong>{{ inst.confirmedCount }}</strong> confirmed</span>
-              @if (inst.pendingApprovalCount > 0) {
-                <span class="mh-sd__pending">
-                  <strong>{{ inst.pendingApprovalCount }}</strong> pending
-                </span>
-              }
-              @if (inst.waitlistedCount > 0) {
-                <span><strong>{{ inst.waitlistedCount }}</strong> waitlisted</span>
-              }
-            </div>
-          </div>
-        </section>
-
-        <section class="mh-sd__where">
-          <h3>Where &amp; how</h3>
-          @if (isOnline()) {
-            <div class="mh-sd__online">
-              <div class="mh-sd__url">
-                <i class="pi pi-video"></i>
-                <code>{{ inst.meetingUrlOverride ?? tpl.meetingUrl }}</code>
-              </div>
-              <p-button
-                label="Copy link"
-                icon="pi pi-copy"
-                [text]="true"
-                (onClick)="copyMeetingUrl(inst, tpl)"
-              />
-            </div>
-          } @else if (inst.venueOverride || tpl.venue) {
-            @let v = inst.venueOverride ?? tpl.venue!;
-            <div class="mh-sd__venue">
-              <i class="pi pi-map-marker"></i>
-              <div>
-                <strong>{{ v.name }}</strong>
-                @if (v.city) {
-                  <span class="mh-sd__city">{{ v.city }}</span>
-                }
-              </div>
-            </div>
-          } @else {
-            <p class="mh-sd__none">No venue set.</p>
-          }
-        </section>
-
-        <section class="mh-sd__participants">
-          <h3>
-            Participants
-            <span class="mh-sd__participants-count">
-              {{ store.participants().length }}
-            </span>
-          </h3>
-          <mh-participants-table
-            [participants]="store.participants()"
-            mode="roster"
-            [busyIds]="store.busyParticipantIds()"
-            (approve)="approve($event)"
-            (decline)="decline($event)"
-          />
-        </section>
-      </div>
-    }
-  </mh-page-shell>
-} @else {
-  <!-- ────────────────────── MOBILE (3A/3B/3C) ────────────────────── -->
-  <!--
-    One template, three visual variants driven by `heroTone()`:
-      honey → 3A in-person
-      teal  → 3B online (provider chip + meeting URL + Copy link)
-      muted → 3C completed/past
-      coral → cancelled
-    The instructor's overflow actions (Edit/Message/Cancel) live in
-    a bottom-sheet triggered from a single ⋮ button in the appbar,
-    keeping the page chrome to a single row.
-  -->
-  <mh-page-shell
-    [title]="tpl?.title ?? 'Session'"
-    [breadcrumb]="[
-      { label: 'Coaching', routerLink: '/coaching/overview' },
-      { label: 'Sessions', routerLink: '/coaching/sessions' },
-      { label: tpl?.title ?? 'Session' }
-    ]"
-    [showBack]="true"
-  >
-    <div actions class="mh-mob-sd__actions">
-      <p-button
-        icon="pi pi-ellipsis-v"
-        severity="secondary"
-        [text]="true"
-        size="small"
-        ariaLabel="More actions"
-        (onClick)="openActionsSheet()"
-        [disabled]="!inst || !tpl"
-      />
+  <!-- States -->
+  @if (store.loading() && !inst) {
+  <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
+    <i class="pi pi-spinner pi-spin"></i> Loading session…
+  </div>
+  } @else if (store.error()) {
+  <p-message severity="error" [closable]="false">
+    <span class="text-(--p-red-700)">{{ store.error() }}</span>
+  </p-message>
+  } @else if (inst && tpl) {
+  <!-- Status banner: cancelled / completed only. -->
+  @if (inst.status === SessionStatus.Cancelled) {
+  <div class="mh-sd-banner mh-sd-banner--cancelled flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
+    <i class="pi pi-times-circle text-xl shrink-0"></i>
+    <div>
+      <strong class="font-bold">Session cancelled.</strong>
+      @if (inst.cancelReason) { Reason: <em class="italic">{{ inst.cancelReason }}</em>. }
+      Attendees were notified.
     </div>
+  </div>
+  } @else if (inst.status === SessionStatus.Completed) {
+  <div class="mh-sd-banner mh-sd-banner--ended flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
+    <i class="pi pi-check-circle text-xl shrink-0"></i>
+    <div><strong class="font-bold">Session completed.</strong></div>
+  </div>
+  }
 
-    @if (store.loading() && !inst) {
-      <div class="mh-sd__loading">Loading session…</div>
-    } @else if (store.error()) {
-      <div class="mh-sd__error">
-        <i class="pi pi-exclamation-circle"></i>
-        {{ store.error() }}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4" [class.opacity-70]="inst.status === SessionStatus.Cancelled">
+    <!-- Hero · chips + description + capacity -->
+    <section
+      class="lg:col-span-2 flex flex-col gap-3.5 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+      <div class="flex flex-wrap gap-1.5">
+        <mh-type-chip [type]="tpl.type" />
+        <mh-access-chip [access]="tpl.access" [approvalRequired]="tpl.approvalRequired" />
+        @if (tpl.meetingProvider) {
+        <mh-provider-chip [provider]="tpl.meetingProvider" />
+        }
       </div>
-    } @else if (inst && tpl) {
-      <div class="mh-mob-sd"
-        [class.mh-mob-sd--cancelled]="inst.status === 'CANCELLED'"
-      >
-        <!-- 96px tinted hero strip — color per heroTone() -->
+
+      @if (tpl.description) {
+      <p class="m-0 text-sm leading-relaxed text-muted-color">{{ tpl.description }}</p>
+      }
+
+      <div class="flex flex-col gap-2">
+        <mh-capacity-bar [signups]="inst.confirmedCount" [cap]="inst.capacityOverride ?? tpl.capacity" />
+        <div class="flex flex-wrap gap-3.5 text-xs text-muted-color">
+          <span><strong class="text-sm text-color mr-0.5">{{ inst.confirmedCount }}</strong> confirmed</span>
+          @if (inst.pendingApprovalCount > 0) {
+          <span><strong class="text-sm text-(--p-yellow-700) mr-0.5">{{ inst.pendingApprovalCount }}</strong> pending</span>
+          }
+          @if (inst.waitlistedCount > 0) {
+          <span><strong class="text-sm text-color mr-0.5">{{ inst.waitlistedCount }}</strong> waitlisted</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Where & how -->
+    <section class="rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+      <h3 class="m-0 mb-3 text-[13px] font-bold uppercase tracking-wide text-muted-color">Where &amp; how</h3>
+      @if (isOnline()) {
+      <div class="flex flex-col gap-2">
         <div
-          class="mh-mob-sd__hero"
-          [class.mh-mob-sd__hero--honey]="heroTone() === 'honey'"
-          [class.mh-mob-sd__hero--teal]="heroTone() === 'teal'"
-          [class.mh-mob-sd__hero--muted]="heroTone() === 'muted'"
-          [class.mh-mob-sd__hero--coral]="heroTone() === 'coral'"
-        >
-          <div class="mh-mob-sd__hero-chips">
-            <mh-type-chip [type]="tpl.type" />
-            <mh-access-chip [access]="tpl.access" [approvalRequired]="tpl.approvalRequired" />
-            @if (tpl.meetingProvider) {
-              <mh-provider-chip [provider]="tpl.meetingProvider" />
-            }
-            @if (inst.status === 'CANCELLED') {
-              <span class="mh-mob-sd__chip-status mh-mob-sd__chip-status--cancelled">
-                <i class="pi pi-times-circle"></i> Cancelled
-              </span>
-            } @else if (inst.status === 'COMPLETED') {
-              <span class="mh-mob-sd__chip-status mh-mob-sd__chip-status--completed">
-                <i class="pi pi-check"></i> Completed
-              </span>
-            }
-          </div>
+          class="flex items-center gap-2 rounded-lg border border-(--p-content-border-color) bg-(--p-surface-100) px-3 py-2.5 text-xs">
+          <i class="pi pi-video text-(--p-primary-500)"></i>
+          <code class="bg-transparent break-all text-color">{{ inst.meetingUrlOverride ?? tpl.meetingUrl }}</code>
         </div>
-
-        <div class="mh-mob-sd__body">
-          <!-- Status banner: cancelled / completed only. The session
-               title is rendered by page-shell as the page H1; not
-               repeated here. -->
-          @if (inst.status === 'CANCELLED') {
-            <div class="mh-mob-sd__banner mh-mob-sd__banner--cancelled" role="status">
-              <i class="pi pi-times-circle"></i>
-              <div>
-                <strong>Session cancelled.</strong>
-                @if (inst.cancelReason) {
-                  Reason: <em>{{ inst.cancelReason }}</em>.
-                }
-                Attendees were notified.
-              </div>
-            </div>
-          } @else if (inst.status === 'COMPLETED') {
-            <div class="mh-mob-sd__banner mh-mob-sd__banner--ended" role="status">
-              <i class="pi pi-check-circle"></i>
-              <div><strong>Session completed.</strong></div>
-            </div>
+        <p-button label="Copy link" icon="pi pi-copy" [text]="true" size="small" (onClick)="copyMeetingUrl(inst, tpl)" />
+      </div>
+      } @else if (inst.venueOverride || tpl.venue) {
+      @let v = inst.venueOverride ?? tpl.venue!;
+      <div class="flex items-start gap-2.5 text-sm">
+        <i class="pi pi-map-marker text-lg text-(--p-primary-500) mt-0.5"></i>
+        <div>
+          <strong class="block font-semibold text-color">{{ v.name }}</strong>
+          @if (v.city) {
+          <span class="block text-xs text-muted-color">{{ v.city }}</span>
           }
-
-          <!-- 3-row meta card (When / Time / Where-or-Meeting) -->
-          <div class="mh-mob-sd__meta-card">
-            <div class="mh-mob-sd__meta-row">
-              <i class="pi pi-calendar"></i>
-              <div class="mh-mob-sd__meta-text">
-                <strong>{{ inst.startAt | date: 'EEE d MMM' }}</strong>
-                <span>{{ inst.startAt | date: 'HH:mm' }} · {{ tpl.durationMinutes }} min</span>
-              </div>
-            </div>
-
-            <div class="mh-mob-sd__meta-row">
-              <i class="pi pi-clock"></i>
-              <div class="mh-mob-sd__meta-text">
-                <strong>{{ inst.startAt | date: 'HH:mm' }} – {{ inst.endAt | date: 'HH:mm' }}</strong>
-                <span>{{ tpl.durationMinutes }} min · {{ tpl.timezone }}</span>
-              </div>
-            </div>
-
-            <!-- Location or meeting URL row, depending on isOnline() -->
-            @if (isOnline()) {
-              <div class="mh-mob-sd__meta-row">
-                <i class="pi pi-video mh-mob-sd__icon--teal"></i>
-                <div class="mh-mob-sd__meta-text mh-mob-sd__meta-text--url">
-                  <code>{{ inst.meetingUrlOverride ?? tpl.meetingUrl }}</code>
-                  <span>Join opens 5 min before</span>
-                </div>
-                <p-button
-                  icon="pi pi-copy"
-                  severity="secondary"
-                  [outlined]="true"
-                  size="small"
-                  ariaLabel="Copy meeting link"
-                  (onClick)="copyMeetingUrl(inst, tpl)"
-                />
-              </div>
-            } @else if (inst.venueOverride || tpl.venue) {
-              @let v = inst.venueOverride ?? tpl.venue!;
-              <div class="mh-mob-sd__meta-row">
-                <i class="pi pi-map-marker mh-mob-sd__icon--honey"></i>
-                <div class="mh-mob-sd__meta-text">
-                  <strong>{{ v.name }}</strong>
-                  @if (v.city) {
-                    <span>{{ v.city }}</span>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-
-          <!-- Spots bar -->
-          <p class="mh-mob-sd__label">Spots</p>
-          <div class="mh-mob-sd__spots">
-            <mh-capacity-bar
-              [signups]="inst.confirmedCount"
-              [cap]="inst.capacityOverride ?? tpl.capacity"
-            />
-            <div class="mh-mob-sd__counters">
-              <span><strong>{{ inst.confirmedCount }}</strong> confirmed</span>
-              @if (inst.pendingApprovalCount > 0) {
-                <span class="mh-mob-sd__pending">
-                  <strong>{{ inst.pendingApprovalCount }}</strong> pending
-                </span>
-              }
-              @if (inst.waitlistedCount > 0) {
-                <span><strong>{{ inst.waitlistedCount }}</strong> waitlist</span>
-              }
-            </div>
-          </div>
-
-          @if (tpl.description) {
-            <p class="mh-mob-sd__label">About</p>
-            <p class="mh-mob-sd__desc">{{ tpl.description }}</p>
-          }
-
-          <!-- Participants section (full-width, uses existing mobile cards). -->
-          <p class="mh-mob-sd__label">
-            Participants
-            <span class="mh-mob-sd__participants-count">
-              {{ store.participants().length }}
-            </span>
-          </p>
-          <mh-participants-table
-            [participants]="store.participants()"
-            mode="roster"
-            [busyIds]="store.busyParticipantIds()"
-            (approve)="approve($event)"
-            (decline)="decline($event)"
-          />
         </div>
       </div>
-
-      <!-- Sticky bottom CTA — instructor verb depends on status:
-            SCHEDULED   → primary "Message participants" + secondary action sheet
-            CANCELLED / → no CTA (read-only)
-            COMPLETED -->
-      @if (inst.status === 'SCHEDULED') {
-        <mh-sticky-cta>
-          <div meta>
-            @if (canMessageParticipants()) {
-              <strong>{{ inst.confirmedCount + inst.pendingApprovalCount }} attendees</strong>
-              <span>{{ inst.startAt | date: 'EEE d MMM, HH:mm' }}</span>
-            } @else {
-              <strong>No signups yet</strong>
-              <span>{{ inst.startAt | date: 'EEE d MMM, HH:mm' }}</span>
-            }
-          </div>
-          <p-button
-            [label]="canMessageParticipants() ? 'Message participants' : 'Edit session'"
-            [icon]="canMessageParticipants() ? 'pi pi-send' : 'pi pi-pencil'"
-            (onClick)="canMessageParticipants() ? messageOpen.set(true) : editOpen.set(true)"
-          />
-        </mh-sticky-cta>
+      } @else {
+      <p class="m-0 italic text-[13px] text-muted-color">No venue set.</p>
       }
-    }
+    </section>
 
-    <!-- Action sheet — opens from the ⋮ button in the appbar. -->
-    <mh-bottom-sheet
-      [open]="actionsOpen()"
-      (openChange)="actionsOpen.set($event)"
-      size="small"
-      [showClose]="false"
-    >
-      @if (inst && tpl) {
-        <mh-action-list
-          [items]="detailActions()"
-          (select)="onDetailAction($event, inst, tpl)"
-        />
-      }
-    </mh-bottom-sheet>
-  </mh-page-shell>
+    <!-- Participants -->
+    <section class="lg:col-span-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+      <h3 class="m-0 mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-color">
+        Participants
+        <span class="rounded-full bg-(--p-surface-100) px-2 py-0.5 text-xs font-normal normal-case tracking-normal">
+          {{ store.participants().length }}
+        </span>
+      </h3>
+      <mh-participants-table [participants]="store.participants()" mode="roster" [busyIds]="store.busyParticipantIds()"
+        (approve)="approve($event)" (decline)="decline($event)" />
+    </section>
+  </div>
+  }
+</div>
+
+<!-- Mobile overflow action sheet — opens from the ⋮ button in the header. -->
+@if (isMobile()) {
+<mh-bottom-sheet [open]="actionsOpen()" (openChange)="actionsOpen.set($event)" size="small" [showClose]="false">
+  @if (inst && tpl) {
+  <mh-action-list [items]="detailActions()" (select)="onDetailAction($event, inst, tpl)" />
+  }
+</mh-bottom-sheet>
 }
 
-<!-- Dialogs (shared across both branches) -->
+<!-- Dialogs -->
 @if (inst && tpl) {
-  <mh-session-form-dialog
-    [visible]="editOpen()"
-    (visibleChange)="editOpen.set($event)"
-    [template]="tpl"
-    (saved)="onSessionSaved()"
-  />
-  <mh-cancel-session-dialog
-    [visible]="cancelOpen()"
-    (visibleChange)="cancelOpen.set($event)"
-    [instance]="inst"
-    [template]="tpl"
-    (cancelled)="onCancelled()"
-  />
-  <mh-follow-up-dialog
-    [(visible)]="messageOpen"
-    [instanceId]="inst.id"
-    context="pre"
-  />
+<mh-session-form-dialog [visible]="editOpen()" (visibleChange)="editOpen.set($event)" [template]="tpl"
+  (saved)="onSessionSaved()" />
+<mh-cancel-session-dialog [visible]="cancelOpen()" (visibleChange)="cancelOpen.set($event)" [instance]="inst"
+  [template]="tpl" (cancelled)="onCancelled()" />
+<mh-follow-up-dialog [(visible)]="messageOpen" [instanceId]="inst.id" context="pre" />
 }
 
 <p-toast position="top-right" />

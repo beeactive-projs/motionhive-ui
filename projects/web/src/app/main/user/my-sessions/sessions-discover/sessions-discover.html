@@ -1,0 +1,156 @@
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · back button + title (mirrors the sessions list header) -->
+  <header class="flex gap-3 md:gap-4 items-center justify-between">
+    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+        (onClick)="goBack()" />
+      <div class="space-y-1 min-w-0">
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Discover sessions</h1>
+        <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">Find and book sessions from
+          instructors across MotionHive.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filters · desktop shows the full pill row; tablet + mobile collapse
+       the type/location toggles behind the popover button. Search is always
+       present. Mirrors the instructor sessions list. -->
+  <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+    @if (isTabletDown()) {
+    <p-button [label]="appliedFilterCount() > 0 ? 'Filters · ' + appliedFilterCount() : 'Filters'" icon="pi pi-filter"
+      size="small" rounded [severity]="appliedFilterCount() > 0 ? 'primary' : 'secondary'"
+      [outlined]="appliedFilterCount() === 0" (onClick)="filtersPopover.toggle($event)" />
+    } @else {
+    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+      <p-button label="All" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="!store.filters().locationKind && !store.filters().type ? 'primary' : 'secondary'"
+        [text]="!!store.filters().locationKind || !!store.filters().type" (onClick)="clearQuickFilters()" />
+
+      <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+
+      <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().locationKind === SessionLocationKind.Online ? 'primary' : 'secondary'"
+        [text]="store.filters().locationKind !== SessionLocationKind.Online"
+        (onClick)="toggleLocation(SessionLocationKind.Online)" />
+      <p-button label="In-person" icon="pi pi-map-marker" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().locationKind === SessionLocationKind.InPerson ? 'primary' : 'secondary'"
+        [text]="store.filters().locationKind !== SessionLocationKind.InPerson"
+        (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
+
+      <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+
+      <p-button label="Group" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().type === SessionKind.Group ? 'primary' : 'secondary'"
+        [text]="store.filters().type !== SessionKind.Group" (onClick)="toggleType(SessionKind.Group)" />
+      <p-button label="1-on-1" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().type === SessionKind.Private ? 'primary' : 'secondary'"
+        [text]="store.filters().type !== SessionKind.Private" (onClick)="toggleType(SessionKind.Private)" />
+      <p-button label="Open" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().type === SessionKind.Open ? 'primary' : 'secondary'"
+        [text]="store.filters().type !== SessionKind.Open" (onClick)="toggleType(SessionKind.Open)" />
+    </div>
+    }
+    <p-iconfield class="flex-1 md:flex-[0_1_320px]">
+      <p-inputicon class="pi pi-search" />
+      <input pInputText type="text" fluid placeholder="Search sessions" aria-label="Search sessions"
+        [ngModel]="searchInput()" (ngModelChange)="onSearchChange($event)" />
+      @if (searchInput() !== '') {
+      <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchChange('')" />
+      }
+    </p-iconfield>
+  </div>
+
+  @if (store.error()) {
+  <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
+    <span class="text-(--p-red-700)">Couldn't load sessions — {{ store.error() }}</span>
+    <p-button label="Retry" [outlined]="true" size="small" (onClick)="store.load()" />
+  </p-message>
+  } @else if (store.loading() && store.items().length === 0) {
+  <div class="flex flex-col gap-2">
+    @for (i of [1, 2, 3, 4]; track i) {
+    <p-skeleton width="100%" height="120px" borderRadius="12px" />
+    }
+  </div>
+  } @else if (store.items().length === 0) {
+  <mh-list-empty-state icon="pi pi-calendar" title="No sessions found"
+    message="Try a different search or filter to find a session to book."
+    [actionLabel]="hasActiveFilters() ? 'Clear filters' : undefined" actionIcon="pi pi-filter-slash"
+    actionSeverity="contrast" [actionOutlined]="true" (action)="clearFilters()" />
+  } @else {
+  <div class="flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto" data-testid="discover-list">
+    @for (group of groupedItems(); track group.lead.id) {
+    <div class="relative" [class.opacity-[0.85]]="isBooked(group.lead)">
+      @if (isBooked(group.lead)) {
+      <span
+        class="absolute right-3 top-2 z-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-(--p-green-700) bg-[color-mix(in_srgb,var(--p-green-500)_18%,transparent)] border border-[color-mix(in_srgb,var(--p-green-500)_40%,transparent)]"
+        data-testid="discover-booked-badge">
+        <i class="pi pi-check-circle text-xs"></i> Booked
+      </span>
+      }
+      @if (group.moreCount > 0) {
+      <span
+        class="absolute top-2 z-2 rounded-full px-2.5 py-0.5 text-[11px] font-bold text-primary-700 bg-[color-mix(in_srgb,var(--p-primary-500)_14%,transparent)] border border-[color-mix(in_srgb,var(--p-primary-500)_30%,transparent)]"
+        [class.right-3]="!isBooked(group.lead)" [class.right-24]="isBooked(group.lead)"
+        aria-label="More occurrences available">
+        +{{ group.moreCount }} more
+      </span>
+      }
+      <mh-session-card [instance]="$any(group.lead)" variant="list-card" [showCTA]="false"
+        (open)="onCardOpen(group.lead)" />
+    </div>
+    }
+
+    @if (store.hasMore()) {
+    <div class="flex items-center justify-center gap-3 p-4">
+      <p-button label="Load more" [outlined]="true" [loading]="store.loading()" (onClick)="store.loadMore()" />
+      <span class="text-xs text-muted-color">Showing {{ store.items().length }} of {{ store.total() }}</span>
+    </div>
+    }
+  </div>
+  }
+</div>
+
+<!--
+  Filter popover — shown by the tablet/mobile "Filters" button. Declared
+  at the template root so `#filtersPopover` resolves inside the nested
+  @if branch that triggers it. Toggles apply instantly, so there is no
+  Apply/Cancel — the only extra action is clearing everything at once.
+-->
+<p-popover #filtersPopover [appendTo]="'body'" [dismissable]="true">
+  <div class="flex flex-col gap-3 min-w-52">
+    <div class="flex flex-wrap gap-1.5">
+      <p-button label="All" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="!store.filters().locationKind && !store.filters().type ? 'primary' : 'secondary'"
+        [outlined]="!!store.filters().locationKind || !!store.filters().type" (onClick)="clearQuickFilters()" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Type</p>
+      <div class="flex flex-wrap gap-1.5">
+        <p-button label="Group" icon="pi pi-users" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().type === SessionKind.Group ? 'primary' : 'secondary'"
+          [outlined]="store.filters().type !== SessionKind.Group" (onClick)="toggleType(SessionKind.Group)" />
+        <p-button label="1-on-1" icon="pi pi-user" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().type === SessionKind.Private ? 'primary' : 'secondary'"
+          [outlined]="store.filters().type !== SessionKind.Private" (onClick)="toggleType(SessionKind.Private)" />
+        <p-button label="Open" icon="pi pi-globe" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().type === SessionKind.Open ? 'primary' : 'secondary'"
+          [outlined]="store.filters().type !== SessionKind.Open" (onClick)="toggleType(SessionKind.Open)" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Location</p>
+      <div class="flex flex-wrap gap-1.5">
+        <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().locationKind === SessionLocationKind.Online ? 'primary' : 'secondary'"
+          [outlined]="store.filters().locationKind !== SessionLocationKind.Online"
+          (onClick)="toggleLocation(SessionLocationKind.Online)" />
+        <p-button label="In-person" icon="pi pi-map-marker" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().locationKind === SessionLocationKind.InPerson ? 'primary' : 'secondary'"
+          [outlined]="store.filters().locationKind !== SessionLocationKind.InPerson"
+          (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
+      </div>
+    </div>
+  </div>
+</p-popover>

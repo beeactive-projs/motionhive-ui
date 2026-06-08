@@ -45,11 +45,11 @@ test('mobile · session-detail action sheet opens from ⋮', async ({ page }) =>
   test.skip(!instanceId, 'no session instances seeded');
 
   await page.goto(`/coaching/sessions/${instanceId}`);
-  await page.waitForSelector('.mh-mob-sd__hero', { timeout: 10_000 });
+  await page.waitForSelector('mh-participants-table', { timeout: 10_000 });
   await snap(page, '07-detail-mobile-loaded');
 
-  // Tap the ⋮ overflow button in the appbar
-  const overflowBtn = page.locator('.mh-mob-sd__actions button').first();
+  // Tap the ⋮ overflow button in the header
+  const overflowBtn = page.getByRole('button', { name: 'More actions' });
   await overflowBtn.click();
   await page.waitForSelector('.mh-bs__sheet', { timeout: 5_000 });
   await snap(page, '07b-detail-mobile-actions-open');

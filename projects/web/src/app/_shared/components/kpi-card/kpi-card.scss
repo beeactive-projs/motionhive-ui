@@ -1,0 +1,11 @@
+// Compact card body on mobile + tablet; PrimeNG's default padding at desktop.
+// Breakpoint mirrors `Breakpoints.Desktop` (1024px) in viewport.utils.ts.
+:host ::ng-deep .p-card-body {
+  padding: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  :host ::ng-deep .p-card-body {
+    padding: 1rem;
+  }
+}

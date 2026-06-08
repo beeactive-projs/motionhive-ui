@@ -296,13 +296,13 @@ export class SearchModal {
         if (item.handle && item.slug) {
           const handle = item.handle;
           this._sessionService.getPublicBySlug(handle, item.slug, { silent: true }).subscribe({
-            next: (inst) => void this._router.navigate(['/sessions', inst.id]),
+            next: (inst) => void this._router.navigate(['/user/sessions', inst.id]),
             // No upcoming instance (the series ended / it was a past one-off)
             // → the instructor's public profile, where their sessions live.
             error: () => void this._router.navigate(['/@' + handle]),
           });
         } else {
-          this._router.navigate(['/sessions/discover']);
+          this._router.navigate(['/user/sessions/discover']);
         }
         break;
       case 'tag': {

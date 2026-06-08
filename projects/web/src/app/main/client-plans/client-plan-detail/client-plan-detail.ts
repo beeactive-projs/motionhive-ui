@@ -54,16 +54,7 @@ interface WorkoutDerived {
 @Component({
   selector: 'mh-client-plan-detail',
   standalone: true,
-  imports: [
-    DatePipe,
-    UpperCasePipe,
-    RouterLink,
-    ButtonModule,
-    ConfirmDialog,
-    Menu,
-    Toast,
-    TooltipModule,
-  ],
+  imports: [DatePipe, UpperCasePipe, RouterLink, ButtonModule, ConfirmDialog, Toast, TooltipModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './client-plan-detail.html',
   styleUrl: './client-plan-detail.scss',
@@ -85,15 +76,10 @@ export class ClientPlanDetail implements OnInit {
 
   // ── Derived ──────────────────────────────────────────────────────
 
-  readonly workouts = computed<AssignedWorkout[]>(
-    () => this.assignment()?.workouts ?? [],
-  );
+  readonly workouts = computed<AssignedWorkout[]>(() => this.assignment()?.workouts ?? []);
 
   readonly completedCount = computed(
-    () =>
-      this.workouts().filter(
-        (w) => w.status === WorkoutLogStatus.Completed,
-      ).length,
+    () => this.workouts().filter((w) => w.status === WorkoutLogStatus.Completed).length,
   );
 
   /**
@@ -175,12 +161,7 @@ export class ClientPlanDetail implements OnInit {
       },
       error: (err) => {
         this.starting.set(null);
-        showApiError(
-          this._messageService,
-          "Couldn't start workout",
-          'Please retry.',
-          err,
-        );
+        showApiError(this._messageService, "Couldn't start workout", 'Please retry.', err);
       },
     });
   }
@@ -217,17 +198,13 @@ export class ClientPlanDetail implements OnInit {
         const a = this.assignment();
         if (!a) return;
         const workouts = (a.workouts ?? []).map((aw) =>
-          aw.id === w.id
-            ? { ...aw, status: WorkoutLogStatus.Skipped }
-            : aw,
+          aw.id === w.id ? { ...aw, status: WorkoutLogStatus.Skipped } : aw,
         );
         const done = workouts.filter(
           (aw) =>
-            aw.status === WorkoutLogStatus.Completed ||
-            aw.status === WorkoutLogStatus.Skipped,
+            aw.status === WorkoutLogStatus.Completed || aw.status === WorkoutLogStatus.Skipped,
         ).length;
-        const percent =
-          workouts.length === 0 ? 0 : Math.round((done / workouts.length) * 100);
+        const percent = workouts.length === 0 ? 0 : Math.round((done / workouts.length) * 100);
         this.assignment.set({ ...a, workouts, completionPercent: percent });
         this._messageService.add({
           severity: 'success',
@@ -236,12 +213,7 @@ export class ClientPlanDetail implements OnInit {
         });
       },
       error: (err) => {
-        showApiError(
-          this._messageService,
-          "Couldn't skip workout",
-          'Please retry.',
-          err,
-        );
+        showApiError(this._messageService, "Couldn't skip workout", 'Please retry.', err);
       },
     });
   }
@@ -249,12 +221,9 @@ export class ClientPlanDetail implements OnInit {
   // ── Template helpers ─────────────────────────────────────────────
 
   derive(w: AssignedWorkout): WorkoutDerived {
-    if (w.status === WorkoutLogStatus.Completed)
-      return { state: 'done', cta: 'view' };
-    if (w.status === WorkoutLogStatus.Skipped)
-      return { state: 'skip', cta: 'view' };
-    if (w.status === WorkoutLogStatus.InProgress)
-      return { state: 'doing', cta: 'resume' };
+    if (w.status === WorkoutLogStatus.Completed) return { state: 'done', cta: 'view' };
+    if (w.status === WorkoutLogStatus.Skipped) return { state: 'skip', cta: 'view' };
+    if (w.status === WorkoutLogStatus.InProgress) return { state: 'doing', cta: 'resume' };
     return { state: 'todo', cta: 'start' };
   }
 
@@ -302,10 +271,7 @@ export class ClientPlanDetail implements OnInit {
 
   workoutVolume(w: AssignedWorkout): string {
     const exCount = w.exercises?.length ?? 0;
-    const setCount = (w.exercises ?? []).reduce(
-      (n, e) => n + (e.sets?.length ?? 0),
-      0,
-    );
+    const setCount = (w.exercises ?? []).reduce((n, e) => n + (e.sets?.length ?? 0), 0);
     const parts: string[] = [];
     parts.push(`${exCount} ${exCount === 1 ? 'exercise' : 'exercises'}`);
     parts.push(`${setCount} ${setCount === 1 ? 'set' : 'sets'}`);

@@ -1,0 +1,59 @@
+@let inst = store.instance();
+@let tpl = store.template();
+
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · back button + title + actions (mirrors the sessions list header) -->
+  <header class="flex gap-3 md:gap-4 items-center justify-between">
+    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+        (onClick)="goBack()" />
+      <div class="space-y-1 min-w-0">
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ? 'Attendance · ' +
+          tpl?.title : 'Attendance' }}</h1>
+      </div>
+    </div>
+    @if (inst) {
+    <div class="flex gap-2 md:gap-3 shrink-0">
+      <p-button label="Send follow-up" icon="pi pi-send" (onClick)="followUpOpen.set(true)" />
+    </div>
+    }
+  </header>
+
+  @if (store.loading() && !inst) {
+  <div class="mh-att__loading">Loading…</div>
+  } @else if (store.error()) {
+  <div class="mh-att__error">
+    <i class="pi pi-exclamation-circle"></i>
+    {{ store.error() }}
+  </div>
+  } @else if (inst && tpl) {
+  <div class="mh-att">
+    <header class="mh-att__head">
+      <div class="mh-att__time">
+        <i class="pi pi-calendar"></i>
+        {{ inst.startAt | date: 'EEE d MMM, HH:mm' }}
+      </div>
+      <div class="mh-att__counters">
+        <span class="mh-att__counter mh-att__counter--ok">
+          <i class="pi pi-check-circle"></i>
+          <strong>{{ store.counts().attended }}</strong> attended
+        </span>
+        <span class="mh-att__counter mh-att__counter--no">
+          <i class="pi pi-times-circle"></i>
+          <strong>{{ store.counts().noShow }}</strong> no-show
+        </span>
+        <span class="mh-att__counter">
+          <strong>{{ pendingMark() }}</strong> not marked
+        </span>
+      </div>
+    </header>
+
+    <mh-participants-table [participants]="confirmedOnly()" mode="attendance" [busyIds]="store.busyParticipantIds()"
+      (markAttended)="onMark($event)" />
+  </div>
+
+  <mh-follow-up-dialog [visible]="followUpOpen()" (visibleChange)="followUpOpen.set($event)" [instanceId]="inst.id" />
+  }
+</div>
+
+<p-toast position="top-right" />

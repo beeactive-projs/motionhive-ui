@@ -17,7 +17,10 @@ import {
   ClientRequestTypes,
   ClientService,
   injectIsMobile,
+  injectIsTablet,
+  injectIsTabletDown,
   InstructorClient,
+  MobileFab,
   PendingClientLabels,
   showApiError,
 } from 'core';
@@ -52,6 +55,7 @@ import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-c
     TooltipModule,
     InviteClientDialog,
     ListEmptyState,
+    MobileFab,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './pending-requests.html',
@@ -89,6 +93,9 @@ export class PendingRequests {
   ];
 
   protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller text, condensed copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
 
   lastLazyEvent: TableLazyLoadEvent = {};
   requests = signal<InstructorClient[]>([]);
@@ -116,9 +123,9 @@ export class PendingRequests {
   ];
 
   constructor() {
-    // First time the layout drops to mobile, kick off the initial page.
+    // First time the layout drops to tablet-or-smaller, kick off the initial page.
     effect(() => {
-      if (this.isMobile() && !this._mobileInitialized) {
+      if (this.isTabletDown() && !this._mobileInitialized) {
         this._mobileInitialized = true;
         this.loadMobilePage(true);
       }
@@ -146,7 +153,7 @@ export class PendingRequests {
   }
 
   loadRequests(): void {
-    if (this.isMobile()) {
+    if (this.isTabletDown()) {
       this.loadMobilePage(true);
     } else {
       this.lazyLoadRequests(this.lastLazyEvent);
@@ -217,10 +224,14 @@ export class PendingRequests {
   }
 
   onTypeFilterChange(type: ClientRequestType | undefined): void {
+    this.typeFilter.set(type);
+    if (this.isTabletDown()) {
+      this.loadMobilePage(true);
+      return;
+    }
     this.lastLazyEvent.first = 0;
     this.lastLazyEvent.rows = this.rows;
     this.lastLazyEvent.filters = type ? { type: { value: type, matchMode: 'equals' } } : {};
-    this.typeFilter.set(type);
     this.lazyLoadRequests(this.lastLazyEvent);
   }
 

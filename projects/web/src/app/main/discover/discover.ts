@@ -176,7 +176,7 @@ export class Discover implements OnInit {
   }
 
   openSession(instance: PublicSessionInstance): void {
-    void this._router.navigate(['/sessions', instance.id]);
+    void this._router.navigate(['/user/sessions', instance.id]);
   }
 
   // ── Groups ───────────────────────────────────────────────────────

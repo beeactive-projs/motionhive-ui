@@ -6,10 +6,11 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
+import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import {
@@ -18,16 +19,17 @@ import {
   ActionList,
   BottomSheet,
   CapacityBar,
-  PageShell,
   ParticipantsTable,
   ProviderChip,
   SessionInstance,
+  SessionInstanceStatus,
+  SessionLocationKind,
   SessionTemplate,
   SessionsDetailStore,
   SessionsInstructorStore,
-  StickyCta,
   TypeChip,
   injectIsMobile,
+  injectIsTablet,
 } from 'core';
 import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-dialog';
 import { CancelSessionDialog } from '../_dialogs/cancel-session-dialog/cancel-session-dialog';
@@ -41,7 +43,6 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
     CommonModule,
     RouterLink,
     ButtonModule,
-    PageShell,
     AccessChip,
     TypeChip,
     ProviderChip,
@@ -50,11 +51,11 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
     SessionFormDialog,
     CancelSessionDialog,
     FollowUpDialog,
+    MessageModule,
     ToastModule,
     TagModule,
     ActionList,
     BottomSheet,
-    StickyCta,
   ],
   providers: [SessionsDetailStore, MessageService],
   templateUrl: './session-detail.html',
@@ -64,7 +65,8 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
 export class InstructorSessionDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _msg = inject(MessageService);
+  private readonly _location = inject(Location);
+  private readonly _messageService = inject(MessageService);
   protected readonly store = inject(SessionsDetailStore);
   // Root-scoped — reload after cancel so the list page reflects the new tab on next visit.
   private readonly _listStore = inject(SessionsInstructorStore);
@@ -76,6 +78,11 @@ export class InstructorSessionDetail implements OnInit {
   readonly actionsOpen = signal(false);
 
   protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+
+  // Enum consts exposed for template comparisons — never compare against
+  // raw string literals (see CLAUDE.md).
+  protected readonly SessionStatus = SessionInstanceStatus;
 
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
@@ -83,11 +90,7 @@ export class InstructorSessionDetail implements OnInit {
   }
 
   protected readonly isOnline = computed(
-    () => this.store.template()?.locationKind === 'ONLINE',
-  );
-
-  protected readonly canApprove = computed(
-    () => this.store.template()?.approvalRequired === true,
+    () => this.store.template()?.locationKind === SessionLocationKind.Online,
   );
 
   // Confirmed + pending-approval both count — "running late" still helps people awaiting approval.
@@ -97,14 +100,24 @@ export class InstructorSessionDetail implements OnInit {
     return i.confirmedCount + i.pendingApprovalCount > 0;
   });
 
-  protected statusLabel(status: string): string {
+  protected statusLabel(status: SessionInstanceStatus): string {
     switch (status) {
-      case 'CANCELLED':
+      case SessionInstanceStatus.Cancelled:
         return 'Cancelled';
-      case 'COMPLETED':
+      case SessionInstanceStatus.Completed:
         return 'Completed';
       default:
         return status;
+    }
+  }
+
+  protected goBack(): void {
+    // Location.back() === history.back(). If we arrived via deep link or a
+    // refresh there's no in-app history to pop, so fall back to the list.
+    if (this._router.lastSuccessfulNavigation()?.previousNavigation) {
+      this._location.back();
+    } else {
+      void this._router.navigate(['/coaching/sessions']);
     }
   }
 
@@ -119,8 +132,8 @@ export class InstructorSessionDetail implements OnInit {
     const url = inst.meetingUrlOverride ?? tpl?.meetingUrl;
     if (!url) return;
     navigator.clipboard.writeText(url).then(
-      () => this._msg.add({ severity: 'success', summary: 'Meeting link copied' }),
-      () => this._msg.add({ severity: 'warn', summary: 'Could not copy', detail: url }),
+      () => this._messageService.add({ severity: 'success', summary: 'Meeting link copied' }),
+      () => this._messageService.add({ severity: 'warn', summary: 'Could not copy', detail: url }),
     );
   }
 
@@ -139,43 +152,15 @@ export class InstructorSessionDetail implements OnInit {
     this._listStore.reload();
   }
 
-  // ─── Mobile helpers ──────────────────────────────────────────────
+  // ─── Mobile overflow sheet ───────────────────────────────────────
 
-  /**
-   * Hero strip tone driven by location + status — keeps the design's
-   * tinted hero pattern (3A honey · 3B teal · 3C muted) without
-   * forking the template.
-   */
-  protected readonly heroTone = computed<'honey' | 'teal' | 'muted' | 'coral'>(() => {
-    const i = this.store.instance();
-    const t = this.store.template();
-    if (!i || !t) return 'honey';
-    if (i.status === 'CANCELLED') return 'coral';
-    if (i.status === 'COMPLETED') return 'muted';
-    if (t.locationKind === 'ONLINE') return 'teal';
-    return 'honey';
-  });
-
-  /**
-   * Open the action sheet on mobile (overflow menu) — equivalent to
-   * the row of buttons in the desktop header.
-   */
+  /** Open the mobile action sheet — equivalent to the desktop header buttons. */
   protected openActionsSheet(): void {
     this.actionsOpen.set(true);
   }
 
   protected closeActionsSheet(): void {
     this.actionsOpen.set(false);
-  }
-
-  /**
-   * Close the action sheet then navigate. Done in TS instead of
-   * `routerLink` + `(click)` on the same button to guarantee the
-   * sheet closes before the route change, not race the order.
-   */
-  protected goAndClose(commands: unknown[]): void {
-    this.actionsOpen.set(false);
-    void this._router.navigate(commands as string[]);
   }
 
   /**
@@ -188,10 +173,8 @@ export class InstructorSessionDetail implements OnInit {
   protected readonly detailActions = computed<ActionItem[]>(() => {
     const i = this.store.instance();
     if (!i) return [];
-    if (i.status !== 'SCHEDULED') {
-      return [
-        { id: 'calendar', icon: 'pi pi-calendar', label: 'Open calendar' },
-      ];
+    if (i.status !== SessionInstanceStatus.Scheduled) {
+      return [{ id: 'calendar', icon: 'pi pi-calendar', label: 'Open calendar' }];
     }
     const items: ActionItem[] = [];
     if (this.canMessageParticipants()) {

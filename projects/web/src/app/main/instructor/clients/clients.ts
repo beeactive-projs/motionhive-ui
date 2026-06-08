@@ -16,7 +16,10 @@ import {
   ClientService,
   ClientStatusLabels,
   injectIsMobile,
+  injectIsTablet,
+  injectIsTabletDown,
   InstructorClient,
+  MobileFab,
   InstructorClientStatus,
   InstructorClientStatuses,
   PendingClientLabels,
@@ -56,6 +59,7 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
     InviteClientDialog,
     EditClientNotesDialog,
     ListEmptyState,
+    MobileFab,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',
@@ -71,6 +75,9 @@ export class Clients implements OnInit {
   readonly Statuses = InstructorClientStatuses;
 
   protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller text, condensed copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
 
   lastLazyEvent: TableLazyLoadEvent = {};
   clients = signal<InstructorClient[]>([]);
@@ -103,9 +110,9 @@ export class Clients implements OnInit {
   incomingRequestsCount = signal(0);
 
   constructor() {
-    // First time the layout drops to mobile, kick off the initial page.
+    // First time the layout drops to tablet-or-smaller, kick off the initial page.
     effect(() => {
-      if (this.isMobile() && !this._mobileInitialized) {
+      if (this.isTabletDown() && !this._mobileInitialized) {
         this._mobileInitialized = true;
         this.loadMobilePage(true);
       }
@@ -137,7 +144,7 @@ export class Clients implements OnInit {
   }
 
   loadClients(): void {
-    if (this.isMobile()) {
+    if (this.isTabletDown()) {
       this.loadMobilePage(true);
     } else {
       this.lazyLoadClients(this.lastLazyEvent);
@@ -215,7 +222,7 @@ export class Clients implements OnInit {
 
   onStatusFilterChange(status: InstructorClientStatus | undefined): void {
     this.statusFilter.set(status);
-    if (this.isMobile()) {
+    if (this.isTabletDown()) {
       this.loadMobilePage(true);
       return;
     }

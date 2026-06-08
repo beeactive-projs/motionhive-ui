@@ -16,20 +16,17 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { Card } from 'primeng/card';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectButton } from 'primeng/selectbutton';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
-import { Tab, TabList, Tabs } from 'primeng/tabs';
+import { Popover } from 'primeng/popover';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
 import {
   ActionItem,
   ActionList,
-  AuthStore,
   BottomSheet,
   DaySeparator,
   MobileFab,
@@ -45,22 +42,17 @@ import {
   formatSessionDuration,
   formatSessionTime,
   injectIsMobile,
+  injectIsTabletDown,
   sessionDayLabel,
   sessionTone,
   TemplateTab,
   type SessionInstance,
   type SessionTemplate,
+  injectIsTablet,
 } from 'core';
 import { KpiCard } from '../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { SessionFormDialog } from './_dialogs/session-form-dialog/session-form-dialog';
-
-/** View toggle option — `value` drives `setView()` (cards stays, calendar navigates). */
-interface ViewOption {
-  label: string;
-  value: 'cards' | 'calendar';
-  icon: string;
-}
 
 /** Tabs that may appear in the `?tab=` query param; anything else falls back to Upcoming. */
 const VALID_TABS = new Set<string>(Object.values(TemplateTab));
@@ -72,23 +64,23 @@ const VALID_TABS = new Set<string>(Object.values(TemplateTab));
     TitleCasePipe,
     FormsModule,
     ButtonModule,
-    Card,
     IconField,
     InputIcon,
     InputTextModule,
-    SelectButton,
     SkeletonModule,
     MessageModule,
+    Popover,
     Tabs,
     TabList,
     Tab,
+    TabPanels,
+    TabPanel,
     KpiCard,
     ListEmptyState,
     SectionLabel,
     SessionCard,
     SessionFormDialog,
     ToastModule,
-    TooltipModule,
     ActionList,
     BottomSheet,
     DaySeparator,
@@ -105,11 +97,6 @@ export class Sessions implements OnDestroy {
   protected readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
-
-  private readonly _auth = inject(AuthStore);
-
-  /** Handle on the logged-in instructor, used to drive the "Public profile" button. */
-  protected readonly handle = computed(() => this._auth.user()?.handle ?? null);
   private readonly _destroyRef = inject(DestroyRef);
 
   // The active tab is URL-driven (`?tab=`) so it survives reloads and
@@ -140,14 +127,6 @@ export class Sessions implements OnDestroy {
     { id: TemplateTab.Cancelled, label: 'Cancelled', icon: 'pi pi-times-circle' },
   ];
 
-  // The view signal stays here even though the only real value is
-  // 'cards' — the segmented control needs something to bind to for the
-  // pressed state. 'calendar' is a navigation event, not a state.
-  protected readonly view = signal<'cards' | 'calendar'>('cards');
-  protected readonly viewOptions: ViewOption[] = [
-    { label: 'List', value: 'cards', icon: 'pi pi-list' },
-    { label: 'Calendar', value: 'calendar', icon: 'pi pi-calendar' },
-  ];
   protected readonly searchInput = signal<string>('');
   protected searchTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -157,7 +136,9 @@ export class Sessions implements OnDestroy {
 
   // ─── Mobile state ──────────────────────────────────────────────────
   protected readonly isMobile = injectIsMobile();
-  protected readonly filterSheetOpen = signal(false);
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller text, condensed copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
   /** When non-null, an action sheet shows for this template row. */
   protected readonly actionSheetTemplate = signal<SessionTemplate | null>(null);
 
@@ -429,32 +410,8 @@ export class Sessions implements OnDestroy {
     this.store.reload();
   }
 
-  /**
-   * Open the instructor's own public profile (`/@<handle>`) in a new tab —
-   * it's a preview of how the world sees their sessions. New tab so we
-   * don't lose the instructor's place in the management UI.
-   */
-  protected openPublicProfile(): void {
-    const h = this.handle();
-    if (!h) return;
-    window.open(`/@${h}`, '_blank', 'noopener');
-  }
-
-  /**
-   * View toggle: 'cards' stays on the list page. 'calendar' navigates
-   * to the dedicated calendar route — they're separate pages, not
-   * just a local visual swap.
-   */
-  protected setView(v: 'cards' | 'calendar'): void {
-    if (v === 'calendar') {
-      void this._router.navigate(['/coaching/sessions/calendar']);
-      return;
-    }
-    this.view.set('cards');
-  }
-
-  goToCalendar(): void {
-    this._router.navigate(['/coaching/sessions/calendar']);
+  protected goToCalendar(): void {
+    void this._router.navigate(['/coaching/sessions/calendar']);
   }
 
   // Template-facing aliases for the pure helpers in core/utils. Keeps
@@ -508,10 +465,5 @@ export class Sessions implements OnDestroy {
       default:
         break;
     }
-  }
-
-  /** Reset all quick filters from inside the filter sheet. */
-  protected resetSheetFilters(): void {
-    this.store.setFilters({ type: undefined, locationKind: undefined });
   }
 }

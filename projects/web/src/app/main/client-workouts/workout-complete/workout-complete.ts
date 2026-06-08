@@ -56,7 +56,6 @@ interface FeelingOption {
     DatePipe,
     DecimalPipe,
     FormsModule,
-    RouterLink,
     ButtonModule,
     Dialog,
     InputTextModule,
@@ -101,17 +100,11 @@ export class WorkoutComplete implements OnInit {
 
   // ── Derived stats ────────────────────────────────────────────────
 
-  readonly exercises = computed<LoggedExercise[]>(
-    () => this.log()?.exercises ?? [],
-  );
+  readonly exercises = computed<LoggedExercise[]>(() => this.log()?.exercises ?? []);
 
-  readonly allSets = computed<LoggedSet[]>(() =>
-    this.exercises().flatMap((e) => e.sets ?? []),
-  );
+  readonly allSets = computed<LoggedSet[]>(() => this.exercises().flatMap((e) => e.sets ?? []));
 
-  readonly setsDone = computed(
-    () => this.allSets().filter((s) => s.isCompleted).length,
-  );
+  readonly setsDone = computed(() => this.allSets().filter((s) => s.isCompleted).length);
 
   readonly setsPlanned = computed(() => this.allSets().length);
 
@@ -162,9 +155,7 @@ export class WorkoutComplete implements OnInit {
     return `${m}:${String(s).padStart(2, '0')}`;
   });
 
-  readonly isCompleted = computed(
-    () => this.log()?.status === WorkoutLogStatus.Completed,
-  );
+  readonly isCompleted = computed(() => this.log()?.status === WorkoutLogStatus.Completed);
 
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
@@ -194,9 +185,7 @@ export class WorkoutComplete implements OnInit {
     this.saving.set(true);
     this._service
       .complete(cur.id, {
-        ...(this.feelingRating() != null
-          ? { feelingRating: this.feelingRating() as number }
-          : {}),
+        ...(this.feelingRating() != null ? { feelingRating: this.feelingRating() as number } : {}),
         ...(this.notes().trim() ? { notes: this.notes().trim() } : {}),
       })
       .subscribe({
@@ -211,12 +200,7 @@ export class WorkoutComplete implements OnInit {
         },
         error: (err) => {
           this.saving.set(false);
-          showApiError(
-            this._messageService,
-            "Couldn't save feedback",
-            'Please retry.',
-            err,
-          );
+          showApiError(this._messageService, "Couldn't save feedback", 'Please retry.', err);
         },
       });
   }
@@ -254,9 +238,7 @@ export class WorkoutComplete implements OnInit {
 
     const payload: CreateRoutinePayload = {
       name,
-      ...(this.routineFolder().trim()
-        ? { folder: this.routineFolder().trim() }
-        : {}),
+      ...(this.routineFolder().trim() ? { folder: this.routineFolder().trim() } : {}),
       exercises,
     };
 
@@ -275,12 +257,7 @@ export class WorkoutComplete implements OnInit {
       },
       error: (err) => {
         this.savingRoutine.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't save routine",
-          'Please retry.',
-          err,
-        );
+        showApiError(this._messageService, "Couldn't save routine", 'Please retry.', err);
       },
     });
   }
@@ -309,15 +286,9 @@ export class WorkoutComplete implements OnInit {
         continue;
       }
 
-      const repsList = ref
-        .map((s) => s.reps)
-        .filter((r): r is number => r != null);
-      const weightList = ref
-        .map((s) => s.weightKg)
-        .filter((w): w is number => w != null);
-      const restList = ref
-        .map((s) => s.restAfterSeconds)
-        .filter((r): r is number => r != null);
+      const repsList = ref.map((s) => s.reps).filter((r): r is number => r != null);
+      const weightList = ref.map((s) => s.weightKg).filter((w): w is number => w != null);
+      const restList = ref.map((s) => s.restAfterSeconds).filter((r): r is number => r != null);
 
       const payload: CreateRoutineExercisePayload = {
         exerciseId: ex.exerciseId,

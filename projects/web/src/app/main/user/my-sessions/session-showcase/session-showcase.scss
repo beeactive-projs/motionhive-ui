@@ -1,59 +1,13 @@
 :host {
-  display: block;
-  padding: 24px;
-
-  @media (max-width: 640px) {
-    padding: 12px;
-  }
-}
-
-.mh-show__loading {
-  margin-top: 16px;
-}
-
-.mh-show {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-top: 16px;
-
-  @media (min-width: 960px) {
-    grid-template-columns: 2fr 1fr;
-  }
-}
-
-.mh-show__hero {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 20px;
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 12px;
-
-  @media (max-width: 640px) {
-    padding: 14px;
-    gap: 10px;
-  }
+  flex: 1;
+  min-height: 0;
 }
 
-// On mobile, let the time block wrap gracefully instead of forcing
-// `Sunday 17 May, 06:00 · 75 min` onto one line.
-.mh-show__time {
-  @media (max-width: 640px) {
-    flex-wrap: wrap;
-  }
-}
-
-.mh-show__time {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: var(--p-primary-700);
-  i { color: var(--p-primary-500); }
-}
-.mh-show__dot { color: var(--p-text-muted-color); }
+/* Section card layout is handled by Tailwind utilities in the template;
+   the rules below style the inner content + the tinted state cards
+   (theme-aware via color-mix, which Tailwind can't express cleanly). */
 
 .mh-show__chips {
   display: flex;
@@ -66,6 +20,12 @@
   font-size: 14px;
   line-height: 1.5;
   color: var(--p-text-color);
+}
+
+.mh-show__instructor-line {
+  margin: 0;
+  color: var(--p-text-muted-color);
+  strong { color: var(--p-text-color); }
 }
 
 .mh-show__instructor {
@@ -99,45 +59,6 @@
 }
 .mh-show__avatar--ph { background: var(--p-primary-100); }
 
-.mh-show__cta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 20px;
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 12px;
-  height: max-content;
-
-  @media (max-width: 640px) {
-    /* Persistent bottom action bar (mobile rule 10) — pinned above the
-       viewport bottom + safe-area inset, full-width card with a subtle
-       shadow so it visually floats. The Book / "You're booked" content
-       layout stays vertical because copy + the big primary CTA both
-       benefit from line breaks at narrow widths. */
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 30;
-    margin: 0;
-    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
-    border-radius: 14px 14px 0 0;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.18);
-  }
-}
-
-/* Reserve space at the bottom of the article so the fixed CTA doesn't
-   cover the last paragraph of content. Desktop is unaffected. */
-@media (max-width: 640px) {
-  .mh-show {
-    padding-bottom: 140px;
-  }
-}
-
 :host ::ng-deep .mh-show__book-btn { width: 100%; justify-content: center; }
 
 .mh-show__booked {
@@ -160,54 +81,7 @@
   text-align: center;
 }
 
-.mh-show__blocked {
-  margin-top: 16px;
-  padding: 48px 24px;
-  text-align: center;
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  i {
-    font-size: 32px;
-    color: var(--p-primary-500);
-  }
-  h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--p-text-color);
-  }
-  p {
-    margin: 0;
-    color: var(--p-text-muted-color);
-    font-size: 14px;
-  }
-}
-
-/* ─── GROUP_ONLY soft-lock variant ───────────────────────────────────
-   Shows title + time + instructor publicly; description, location, and
-   signup counts sit behind a frosted overlay with a lock + "Members
-   only" callout. The CTA below offers a join-group flow. */
-.mh-show--locked {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.mh-show__title {
-  margin: 8px 0 4px;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--p-text-color);
-}
-.mh-show__instructor-line {
-  margin: 0;
-  color: var(--p-text-muted-color);
-  strong { color: var(--p-text-color); }
-}
+/* GROUP_ONLY soft-lock variant — frosted overlay over blurred rows. */
 .mh-show__locked-card {
   position: relative;
   background: var(--p-content-background);
@@ -215,7 +89,7 @@
   border-radius: 12px;
   padding: 24px;
   overflow: hidden;
-  min-height: 220px;
+  min-height: 200px;
 }
 .mh-show__locked-blur {
   display: flex;
@@ -264,7 +138,7 @@
   }
 }
 
-/* 5C · capacity-full ─────────────────────────────────────────────── */
+/* Capacity-full state. */
 .mh-show__chip-full {
   display: inline-flex;
   align-items: center;
@@ -273,26 +147,25 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background: color-mix(in srgb, var(--p-red-500, #F97066) 14%, transparent);
-  color: var(--p-red-700, #B91C1C);
+  background: color-mix(in srgb, var(--p-red-500, #f97066) 14%, transparent);
+  color: var(--p-red-700, #b91c1c);
   i { font-size: 10px; }
 }
 .mh-show__full-card {
   padding: 14px;
-  background: color-mix(in srgb, var(--p-red-500, #F97066) 8%, transparent);
-  border: 1px solid var(--p-red-500, #F97066);
+  background: color-mix(in srgb, var(--p-red-500, #f97066) 8%, transparent);
+  border: 1px solid var(--p-red-500, #f97066);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 8px;
 }
 .mh-show__full-head {
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: 'Poppins', sans-serif;
-  color: var(--p-red-700, #B91C1C);
+  color: var(--p-red-700, #b91c1c);
   i { font-size: 18px; }
   strong { font-size: 14px; font-weight: 600; color: var(--p-text-color); }
 }
@@ -312,7 +185,6 @@
   background: var(--p-surface-100);
   border: 1px solid var(--p-content-border-color);
   border-radius: 12px;
-  margin-bottom: 8px;
   i {
     font-size: 20px;
     color: var(--p-text-muted-color);

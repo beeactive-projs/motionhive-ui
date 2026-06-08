@@ -114,6 +114,19 @@ export function injectIsTablet(): Signal<boolean> {
 }
 
 /**
+ * `injectIsTabletDown()` — true while the viewport is tablet *or* smaller
+ * (< {@link Breakpoints.Desktop}px), i.e. the "compact" surface that uses
+ * smaller text and condensed copy versus the roomy desktop layout. Derived
+ * from {@link injectBreakpoint}.
+ *
+ *   protected readonly isTabletDown = injectIsTabletDown();
+ */
+export function injectIsTabletDown(): Signal<boolean> {
+  const breakpoint = injectBreakpoint();
+  return computed(() => breakpoint() !== 'desktop');
+}
+
+/**
  * `injectIsDesktop()` — true while the viewport is in the desktop tier
  * (≥1024px). Derived from {@link injectBreakpoint}.
  */

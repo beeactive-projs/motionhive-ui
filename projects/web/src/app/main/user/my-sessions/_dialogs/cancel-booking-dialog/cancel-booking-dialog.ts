@@ -40,79 +40,8 @@ import {
     TextareaModule,
     InputText,
   ],
-  template: `
-    <p-dialog
-      header="Cancel booking"
-      [(visible)]="visible"
-      [modal]="true"
-      [style]="{ width: '28rem', maxWidth: '95vw' }"
-      [closable]="true"
-    >
-      @let p = participant();
-      <div class="mh-cb">
-        @if (p) {
-          <p class="mh-cb__intro">
-            Cancel up to <strong>{{ p.snapshotCancelCutoffH }}h</strong> before
-            the session to avoid charges.
-          </p>
-          <div class="mh-cb__field">
-            <label for="cbReason">Reason (optional)</label>
-            <input
-              id="cbReason"
-              pInputText
-              fluid
-              [ngModel]="reason()"
-              (ngModelChange)="reason.set($event)"
-              placeholder="Conflict, illness, etc."
-            />
-          </div>
-          <div class="mh-cb__field">
-            <label for="cbMessage">Message to instructor (optional)</label>
-            <textarea
-              id="cbMessage"
-              pTextarea
-              rows="3"
-              fluid
-              [ngModel]="message()"
-              (ngModelChange)="message.set($event)"
-              placeholder="Anything you want them to know."
-            ></textarea>
-          </div>
-        }
-      </div>
-
-      <ng-template pTemplate="footer">
-        <p-button
-          label="Keep booking"
-          severity="secondary"
-          [text]="true"
-          (onClick)="close()"
-        />
-        <p-button
-          label="Cancel booking"
-          icon="pi pi-times"
-          severity="danger"
-          [loading]="busy()"
-          (onClick)="submit()"
-        />
-      </ng-template>
-    </p-dialog>
-  `,
-  styles: `
-    .mh-cb { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
-    .mh-cb__intro {
-      margin: 0; padding: 10px 12px;
-      background: color-mix(in srgb, var(--p-yellow-500) 12%, transparent);
-      border: 1px solid color-mix(in srgb, var(--p-yellow-500) 25%, transparent);
-      border-radius: 8px;
-      font-size: 13px; color: var(--p-text-color);
-      strong { color: var(--p-text-color); }
-    }
-    .mh-cb__field { display: flex; flex-direction: column; gap: 4px; }
-    .mh-cb__field label {
-      font-size: 12px; font-weight: 600; color: var(--p-text-color);
-    }
-  `,
+  templateUrl: './cancel-booking-dialog.html',
+  styleUrl: './cancel-booking-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelBookingDialog {

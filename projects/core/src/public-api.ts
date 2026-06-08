@@ -240,7 +240,6 @@ export * from './lib/services/loading/loading.service';
 
 // Components
 export * from './lib/components/logo/logo';
-export * from './lib/components/page-shell/page-shell';
 export * from './lib/components/dialog-shell/dialog-shell';
 // Mobile-first primitives — sheet/time-row/day-sep/sticky-cta/fab.
 export * from './lib/components/bottom-sheet/bottom-sheet';
