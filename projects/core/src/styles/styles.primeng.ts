@@ -122,14 +122,14 @@ export const MotionHiveLara = definePreset(Lara, {
       },
     },
     card: {
-      // colorScheme: {
-      //   light: {
-      //     root: {
-      //       background: '{surface.50}',
-      //       shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
-      //     },
-      //   },
-      // },
+      colorScheme: {
+        light: {
+          root: {
+            // background: '{surface.50}',
+            // shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
+          },
+        },
+      },
     },
     dataview: {
       root: {

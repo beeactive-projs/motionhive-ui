@@ -1,132 +1,128 @@
-<div class="page">
-  <header class="page__header">
-    <div class="page__title">
-      <h1>Programs</h1>
-      <p class="page__count">
-        @if (loading() && !items().length) {
-          Loading…
-        } @else {
-          {{ total() }} {{ total() === 1 ? 'program' : 'programs' }}
-        }
-      </p>
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · shared across desktop + mobile -->
+  <header class="flex gap-4 items-center justify-between">
+    <div class="space-y-1">
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Programs</h1>
+      @if (isTabletDown()) {
+      <p class="text-xs text-surface-700 dark:text-surface-400">Author the coaching plans clients follow.</p>
+      } @else {
+      <p class="text-sm text-surface-700 dark:text-surface-400">Author the workouts, exercises, and sets your clients
+        follow.</p>
+      }
     </div>
-    <p-button
-      label="Create program"
-      icon="pi pi-plus"
-      (onClick)="openCreate()"
-    />
+    @if (!isMobile()) {
+    <p-button label="Create program" icon="pi pi-plus" (onClick)="openCreate()"
+      [size]="isTablet() ? 'small' : undefined" />
+    }
   </header>
 
-  <div class="toolbar">
-    <span class="search">
-      <input
-        pInputText
-        type="text"
-        placeholder="Search by name…"
-        [ngModel]="searchInput()"
-        (ngModelChange)="onSearchChange($event)"
-      />
-    </span>
+  <!-- Filters · status pills + search, projected once above the list. -->
+  <ng-container *ngTemplateOutlet="filtersRow" />
 
-    <nav class="tabs" aria-label="Status filter">
-      @for (tab of statusTabs; track tab.value ?? 'all') {
-        <button
-          type="button"
-          class="tab"
-          [class.tab--active]="statusFilter() === tab.value"
-          (click)="setStatus(tab.value)"
-        >
-          {{ tab.label }}
-        </button>
-      }
-    </nav>
+  <!-- Content body · error / skeleton / empty / grid. -->
+  <div class="flex-1 min-h-0" [class.overflow-y-auto]="!isMobile()">
+    <ng-container *ngTemplateOutlet="panelBody" />
   </div>
+</div>
 
-  @if (loading() && !items().length) {
-    <div class="grid">
-      @for (i of [0, 1, 2, 3]; track i) {
-        <div class="card-skeleton">
-          <div class="card-skeleton__title"></div>
-          <div class="card-skeleton__line"></div>
-          <div class="card-skeleton__line card-skeleton__line--short"></div>
-        </div>
+@if (isMobile()) {
+<!-- Mobile FAB (single primary action). -->
+<mh-mobile-fab icon="pi pi-plus" label="New program" (tap)="openCreate()" />
+}
+
+<!--
+  Filters · the status quick-filter pills and the search field. Status is
+  a filter over a single list (not a top-level surface), so it renders as
+  pills rather than tabs. Clicking a pill sets the filter; the effect in
+  the component refetches.
+-->
+<ng-template #filtersRow>
+  <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Status filter">
+      @for (tab of statusTabs; track tab.label) {
+      <p-button [label]="tab.label" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="statusFilter() === tab.status ? 'primary' : 'secondary'" [text]="statusFilter() !== tab.status"
+        (onClick)="setStatus(tab.status)" />
       }
     </div>
-  } @else if (items().length === 0) {
-    <div class="empty">
-      <div class="empty__icon"><i class="pi pi-objects-column"></i></div>
-      <h3>No programs yet</h3>
-      <p>
-        Programs are how you author your coaching plans — workouts, exercises,
-        and sets your clients follow. Create your first one to get started.
-      </p>
-      <p-button
-        label="Create program"
-        icon="pi pi-plus"
-        (onClick)="openCreate()"
-      />
+
+    <p-iconfield class="flex-1 md:flex-[0_1_320px]">
+      <p-inputicon class="pi pi-search" />
+      <input pInputText type="text" fluid placeholder="Search programs…" aria-label="Search programs"
+        [ngModel]="searchInput()" (ngModelChange)="onSearchChange($event)" />
+      @if (searchInput() !== '') {
+      <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchChange('')" />
+      }
+    </p-iconfield>
+  </div>
+</ng-template>
+
+<!-- Single content body — no per-tab panels. -->
+<ng-template #panelBody>
+  @if (error()) {
+  <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
+    <span class="text-(--p-red-700)">Couldn't load programs: {{ error() }}</span>
+    <p-button label="Retry" size="small" [outlined]="true" (onClick)="retry()" />
+  </p-message>
+  } @else if (loading() && !items().length) {
+  <div class="grid gap-3.5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+    @for (i of skeletonRows; track i) {
+    <div class="flex flex-col gap-2.5 rounded-xl border border-surface bg-(--p-content-background) p-4">
+      <p-skeleton width="70%" height="1rem" />
+      <p-skeleton width="100%" height="0.75rem" />
+      <p-skeleton width="50%" height="0.75rem" />
     </div>
+    }
+  </div>
+  } @else if (items().length === 0) {
+  <mh-list-empty-state [icon]="emptyState().icon" [title]="emptyState().title" [message]="emptyState().message"
+    [actionLabel]="emptyState().action ? 'Create program' : undefined" actionIcon="pi pi-plus"
+    (action)="openCreate()" />
   } @else {
-    <div class="grid">
+  <div class="flex flex-col gap-4">
+    <div class="grid gap-3.5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       @for (p of items(); track p.id) {
-        <a class="card" [routerLink]="['/coaching/programs', p.id]">
-          <div class="card__head">
-            <h3 class="card__name">{{ p.name }}</h3>
-            <span class="status status--{{ statusTone(p.status) }}">
-              {{ p.status | titlecase }}
-            </span>
-          </div>
+      <a [routerLink]="['/coaching/programs', p.id]" class="no-underline text-inherit">
+        <p-card class="h-full">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-start gap-2.5">
+              <h3 class="flex-1 m-0 font-heading text-sm font-semibold leading-snug line-clamp-2">{{ p.name }}</h3>
+              <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
+            </div>
 
-          @if (p.description) {
-            <p class="card__desc">{{ p.description }}</p>
-          }
+            @if (p.description) {
+            <p class="m-0 text-xs leading-relaxed text-muted-color line-clamp-2">{{ p.description }}</p>
+            }
 
-          <div class="card__meta">
-            @if (p.durationDays) {
-              <span class="chip">
-                <i class="pi pi-calendar"></i>
-                @if (p.durationDays % 7 === 0) {
-                  {{ p.durationDays / 7 }} weeks
-                } @else {
-                  {{ p.durationDays }} days
-                }
-              </span>
-            }
-            @if (p.periodizationModel) {
-              <span class="chip">{{ p.periodizationModel | titlecase }}</span>
-            }
-            @if (p.goalTags?.length) {
-              @for (tag of p.goalTags; track tag) {
-                <span class="chip chip--tag">{{ tag }}</span>
+            @if (p.durationDays || p.periodizationModel || p.goalTags?.length) {
+            <div class="flex flex-wrap items-center gap-1.5">
+              @if (p.durationDays) {
+              <p-tag icon="pi pi-calendar" [value]="durationLabel(p.durationDays)" severity="secondary" />
               }
+              @if (p.periodizationModel) {
+              <p-tag [value]="p.periodizationModel | titlecase" severity="secondary" />
+              }
+              @for (tag of p.goalTags ?? []; track tag) {
+              <p-tag [value]="tag" severity="info" />
+              }
+            </div>
             }
-          </div>
 
-          <div class="card__foot">
-            <span class="card__date">
-              Updated {{ p.updatedAt | date: 'mediumDate' }}
-            </span>
+            <span class="mt-1 text-[11px] text-muted-color">Updated {{ p.updatedAt | date: 'mediumDate' }}</span>
           </div>
-        </a>
+        </p-card>
+      </a>
       }
     </div>
 
     @if (hasMore()) {
-      <div class="load-more">
-        <p-button
-          [label]="loadingMore() ? 'Loading…' : 'Load more'"
-          [loading]="loadingMore()"
-          severity="secondary"
-          (onClick)="loadMore()"
-        />
-      </div>
+    <div class="flex justify-center pt-1">
+      <p-button [label]="loadingMore() ? 'Loading…' : 'Load more'" [loading]="loadingMore()" severity="secondary"
+        [outlined]="true" (onClick)="loadMore()" />
+    </div>
     }
+  </div>
   }
-</div>
+</ng-template>
 
-<p-toast />
-
-<mh-program-form-dialog
-  [(visible)]="formDialogOpen"
-  (saved)="onCreated($event)"
-/>
+<mh-program-form-dialog [(visible)]="formDialogOpen" (saved)="onCreated($event)" />

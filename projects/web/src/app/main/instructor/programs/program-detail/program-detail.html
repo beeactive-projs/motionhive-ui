@@ -1,348 +1,255 @@
-<div class="page">
-  <nav class="breadcrumb">
-    <a routerLink="/coaching/programs">
-      <i class="pi pi-arrow-left"></i> Programs
-    </a>
-  </nav>
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · back button + title + actions (mirrors the sessions detail header) -->
+  <header class="flex gap-3 md:gap-4 items-center justify-between">
+    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+        (onClick)="goBack()" />
+      <div class="space-y-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
+            {{ program()?.name ?? 'Program' }}
 
-  @if (loading() && !program()) {
-    <div class="loading"><i class="pi pi-spin pi-spinner"></i> Loading program…</div>
-  } @else if (program(); as p) {
-    <!-- Hero -->
-    <header class="hero">
-      <div class="hero__main">
-        <div class="hero__head">
-          <h1 class="hero__title">{{ p.name }}</h1>
-          <span class="status status--{{ statusTone(p.status) }}">
-            {{ p.status | titlecase }}
-          </span>
-        </div>
-        @if (p.description) {
-          <p class="hero__desc">{{ p.description }}</p>
-        }
-
-        <div class="hero__meta">
-          @if (p.durationDays) {
-            <span class="chip">
-              <i class="pi pi-calendar"></i>
-              @if (p.durationDays % 7 === 0) {
-                {{ p.durationDays / 7 }} weeks
-              } @else {
-                {{ p.durationDays }} days
-              }
-            </span>
+          </h1>
+          @if (program(); as p) {
+          <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
           }
-          @if (p.periodizationModel) {
-            <span class="chip">{{ p.periodizationModel | titlecase }}</span>
-          }
-          @if (p.goalTags?.length) {
-            @for (tag of p.goalTags; track tag) {
-              <span class="chip chip--tag">{{ tag }}</span>
-            }
-          }
+
         </div>
-
-        <div class="stats">
-          <div class="stat">
-            <div class="stat__num">{{ totalWorkouts() }}</div>
-            <div class="stat__lbl">{{ totalWorkouts() === 1 ? 'workout' : 'workouts' }}</div>
-          </div>
-          <div class="stat">
-            <div class="stat__num">{{ totalExercises() }}</div>
-            <div class="stat__lbl">{{ totalExercises() === 1 ? 'exercise' : 'exercises' }}</div>
-          </div>
-          <div class="stat">
-            <div class="stat__num">{{ totalSets() }}</div>
-            <div class="stat__lbl">{{ totalSets() === 1 ? 'set' : 'sets' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero__actions">
-        <p-button
-          label="Edit"
-          icon="pi pi-pencil"
-          severity="secondary"
-          [text]="true"
-          (onClick)="openEdit()"
-        />
-        <p-button
-          label="Assign to client"
-          icon="pi pi-user-plus"
-          (onClick)="openAssign()"
-        />
-      </div>
-    </header>
-
-    <!-- Empty tree state -->
-    @if (totalWorkouts() === 0) {
-      <div class="empty">
-        <div class="empty__icon"><i class="pi pi-calendar-plus"></i></div>
-        <h3>No workouts yet</h3>
-        <p>
-          A program is a series of workouts grouped into weeks. Add your first
-          workout to start building this plan.
+        @if (program(); as p) {
+        <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
+          @if (p.durationDays) { {{ durationLabel(p.durationDays) }} · }
+          {{ totalWorkouts() }} {{ totalWorkouts() === 1 ? 'workout' : 'workouts' }}
         </p>
-        <p-button
-          label="Add workout"
-          icon="pi pi-plus"
-          (onClick)="openAddWorkout(0)"
-        />
-      </div>
-    } @else {
-      <!-- Weeks -->
-      <div class="weeks">
-        @for (w of weeks(); track w.week) {
-          <section class="week">
-            <header class="week__head">
-              <h2 class="week__title">Week {{ w.week + 1 }}</h2>
-              <p-button
-                label="Add workout"
-                icon="pi pi-plus"
-                size="small"
-                [text]="true"
-                (onClick)="openAddWorkout(w.week)"
-              />
-            </header>
-
-            <div class="week__days">
-              @for (workout of w.workouts; track workout.id) {
-                <article class="workout">
-                  <header class="workout__head">
-                    <div class="workout__head-l">
-                      <span class="day-badge">Day {{ workout.dayIndex + 1 }}</span>
-                      <h3 class="workout__name">{{ workout.name }}</h3>
-                    </div>
-                    <div class="workout__meta">
-                      @if (workout.phase) {
-                        <span class="chip chip--phase">{{ workout.phase | titlecase }}</span>
-                      }
-                      @if (workout.estimatedDurationMinutes) {
-                        <span class="chip">
-                          <i class="pi pi-clock"></i> ~{{ workout.estimatedDurationMinutes }}m
-                        </span>
-                      }
-                      <div class="workout__actions">
-                        <p-button
-                          icon="pi pi-pencil"
-                          size="small"
-                          severity="secondary"
-                          [text]="true"
-                          [rounded]="true"
-                          pTooltip="Edit workout"
-                          (onClick)="openEditWorkout(workout)"
-                        />
-                        <p-button
-                          icon="pi pi-trash"
-                          size="small"
-                          severity="danger"
-                          [text]="true"
-                          [rounded]="true"
-                          pTooltip="Delete workout"
-                          (onClick)="confirmDeleteWorkout(workout)"
-                        />
-                      </div>
-                    </div>
-                  </header>
-
-                  @if (workout.notes) {
-                    <p class="workout__notes">{{ workout.notes }}</p>
-                  }
-
-                  @if (!workout.exercises || workout.exercises.length === 0) {
-                    <div class="workout__empty">
-                      <span>No exercises added.</span>
-                      <p-button
-                        label="Add exercise"
-                        icon="pi pi-plus"
-                        size="small"
-                        [text]="true"
-                        (onClick)="openExercisePicker(workout)"
-                      />
-                    </div>
-                  } @else {
-                    <div class="exercises">
-                      @for (ex of workout.exercises; track ex.id; let idx = $index) {
-                        <div class="exercise">
-                          <div class="exercise__num">{{ idx + 1 }}</div>
-                          <div class="exercise__body">
-                            <div class="exercise__head">
-                              @if (ex.exercise?.thumbnailUrl) {
-                                <img
-                                  class="exercise__thumb"
-                                  [src]="ex.exercise!.thumbnailUrl!"
-                                  [alt]="ex.exercise!.name"
-                                  loading="lazy"
-                                />
-                              }
-                              <div class="exercise__title">
-                                {{ ex.exercise?.name ?? '—' }}
-                              </div>
-                              @if (ex.supersetGroupId != null) {
-                                <span class="chip chip--super">SS{{ ex.supersetGroupId }}</span>
-                              }
-                              <p-button
-                                icon="pi pi-trash"
-                                size="small"
-                                severity="danger"
-                                [text]="true"
-                                [rounded]="true"
-                                pTooltip="Remove exercise"
-                                (onClick)="confirmDeleteExercise(workout, ex)"
-                              />
-                            </div>
-
-                            @if (ex.notes) {
-                              <p class="exercise__notes">{{ ex.notes }}</p>
-                            }
-
-                            @if (ex.sets?.length) {
-                              <table class="sets">
-                                <thead>
-                                  <tr>
-                                    <th>#</th>
-                                    <th>Type</th>
-                                    <th>Target</th>
-                                    <th>Rest</th>
-                                    <th></th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  @for (s of ex.sets; track s.id) {
-                                    <tr>
-                                      <td>{{ s.orderIndex + 1 }}</td>
-                                      <td>
-                                        <span class="set-type set-type--{{ s.setType.toLowerCase() }}">
-                                          {{ s.setType | titlecase }}
-                                        </span>
-                                      </td>
-                                      <td>{{ setSummary(s) }}</td>
-                                      <td>
-                                        @if (s.restAfterSeconds != null) {
-                                          {{ s.restAfterSeconds }}s
-                                        } @else {
-                                          —
-                                        }
-                                      </td>
-                                      <td class="sets__actions">
-                                        <button
-                                          type="button"
-                                          class="icon-btn"
-                                          pTooltip="Edit set"
-                                          (click)="openEditSet(workout, ex, s)"
-                                        >
-                                          <i class="pi pi-pencil"></i>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          class="icon-btn icon-btn--danger"
-                                          pTooltip="Remove set"
-                                          (click)="confirmDeleteSet(workout, ex, s)"
-                                        >
-                                          <i class="pi pi-trash"></i>
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  }
-                                </tbody>
-                              </table>
-                            } @else {
-                              <div class="exercise__no-sets">No sets prescribed.</div>
-                            }
-
-                            <div class="exercise__add-set">
-                              <p-button
-                                label="Add set"
-                                icon="pi pi-plus"
-                                size="small"
-                                [text]="true"
-                                (onClick)="openAddSet(workout, ex)"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      }
-
-                      <div class="exercises__add">
-                        <p-button
-                          label="Add exercise"
-                          icon="pi pi-plus"
-                          size="small"
-                          [text]="true"
-                          (onClick)="openExercisePicker(workout)"
-                        />
-                      </div>
-                    </div>
-                  }
-                </article>
-              }
-            </div>
-          </section>
         }
-
-        <div class="weeks__add-more">
-          <p-button
-            label="Add workout in another week"
-            icon="pi pi-plus"
-            severity="secondary"
-            [text]="true"
-            (onClick)="openAddWorkout()"
-          />
-        </div>
       </div>
+    </div>
+
+    @if (program(); as p) {
+    <div class="flex gap-2 md:gap-3 items-center shrink-0">
+      @if (isMobile()) {
+      <p-button icon="pi pi-ellipsis-v" outlined rounded severity="secondary" size="small" ariaLabel="More actions"
+        (onClick)="openActionsSheet()" />
+      } @else {
+      <p-button label="Edit" icon="pi pi-pencil" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined"
+        (onClick)="openEdit()" />
+      <p-button label="Assign to client" icon="pi pi-user-plus" [size]="isTablet() ? 'small' : undefined"
+        (onClick)="openAssign()" />
+      <p-button label="Delete" icon="pi pi-trash" outlined severity="danger" [loading]="deleting()"
+        [size]="isTablet() ? 'small' : undefined" (onClick)="confirmDelete()" />
+      }
+    </div>
+    }
+  </header>
+
+  <!-- States -->
+  @if (loading() && !program()) {
+  <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
+    <i class="pi pi-spinner pi-spin"></i> Loading program…
+  </div>
+  } @else if (program(); as p) {
+  <!-- Archived banner -->
+  @if (p.status === ProgramStatus.Archived) {
+  <div class="mh-pd-banner mh-pd-banner--archived flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
+    <i class="pi pi-inbox text-xl shrink-0"></i>
+    <div><strong class="font-bold">This program is archived.</strong> It's hidden from new assignments but not deleted.
+    </div>
+  </div>
+  }
+
+  <!-- Overview · KPI strip mirrors the sessions overview -->
+  <section class="grid grid-cols-3 gap-2 md:gap-3" aria-label="Program overview">
+    <mh-kpi-card icon="pi pi-calendar" label="Workouts" [value]="totalWorkouts()" />
+    <mh-kpi-card icon="pi pi-list" label="Exercises" [value]="totalExercises()" />
+    <mh-kpi-card icon="pi pi-replay" label="Sets" [value]="totalSets()" />
+  </section>
+
+  <!-- Details · metadata chips + description -->
+  @if (p.description || p.durationDays || p.periodizationModel || p.goalTags?.length) {
+  <section class="flex flex-col gap-2.5 rounded-xl border border-surface bg-(--p-content-background) px-4 py-3">
+    @if (p.durationDays || p.periodizationModel || p.goalTags?.length) {
+    <div class="flex flex-wrap items-center gap-1.5">
+      @if (p.durationDays) {
+      <p-chip [label]="durationLabel(p.durationDays)" icon="pi pi-calendar" />
+      }
+      @if (p.periodizationModel) {
+      <p-chip [label]="p.periodizationModel | titlecase" icon="pi pi-chart-line" />
+      }
+      @for (tag of p.goalTags ?? []; track tag) {
+      <p-chip [label]="tag" icon="pi pi-tag" />
+      }
+    </div>
+    }
+    @if (p.description) {
+    <p class="m-0 text-sm leading-relaxed text-muted-color">{{ p.description }}</p>
+    }
+  </section>
+  }
+
+  <!-- Empty tree state -->
+  @if (totalWorkouts() === 0) {
+  <section
+    class="flex flex-col items-center gap-3 rounded-xl border border-surface bg-(--p-content-background) p-8 text-center">
+    <div class="flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 text-2xl text-muted-color">
+      <i class="pi pi-calendar-plus"></i>
+    </div>
+    <h3 class="m-0 font-heading text-base font-semibold">No workouts yet</h3>
+    <p class="m-0 max-w-md text-sm leading-relaxed text-muted-color">
+      A program is a series of workouts grouped into weeks. Add your first workout to start building this plan.
+    </p>
+    <p-button label="Add workout" icon="pi pi-plus" (onClick)="openAddWorkout(0)" />
+  </section>
+  } @else {
+  <!-- Weeks -->
+  <div class="flex flex-col gap-5">
+    @for (w of weeks(); track w.week) {
+    <section class="flex flex-col gap-3">
+      <header class="flex items-center justify-between gap-3">
+        <h2 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">Week {{ w.week + 1 }}</h2>
+        <p-button label="Add workout" icon="pi pi-plus" size="small" [text]="true" (onClick)="openAddWorkout(w.week)" />
+      </header>
+
+      <div class="flex flex-col gap-3.5">
+        @for (workout of w.workouts; track workout.id) {
+        <article class="rounded-xl border border-surface bg-(--p-content-background) p-4 md:p-5">
+          <header class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <p-tag [value]="'Day ' + (workout.dayIndex + 1)" />
+              <h3 class="m-0 font-heading text-[15px] font-semibold truncate">{{ workout.name }}</h3>
+            </div>
+            <div class="flex items-center gap-1.5">
+              @if (workout.phase) {
+              <p-chip [label]="workout.phase | titlecase" class="bg-blue-300 text-blue-800" size="small" />
+              }
+              @if (workout.estimatedDurationMinutes) {
+              <p-chip [label]="'~' + workout.estimatedDurationMinutes + 'm'" icon="pi pi-clock"
+                class="bg-sky-200 text-sky-800" size="small" />
+              }
+              <p-button icon="pi pi-pencil" size="small" severity="secondary" [text]="true" [rounded]="true"
+                pTooltip="Edit workout" (onClick)="openEditWorkout(workout)" />
+              <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
+                pTooltip="Delete workout" (onClick)="confirmDeleteWorkout(workout)" />
+            </div>
+          </header>
+
+          @if (workout.notes) {
+          <p class="m-0 mt-2 text-xs leading-relaxed text-muted-color">{{ workout.notes }}</p>
+          }
+
+          @if (!workout.exercises || workout.exercises.length === 0) {
+          <div
+            class="mt-3 flex items-center justify-between gap-3 rounded-lg bg-surface-100 p-3 text-xs text-muted-color">
+            <span>No exercises added.</span>
+            <p-button label="Add exercise" icon="pi pi-plus" size="small" [text]="true"
+              (onClick)="openExercisePicker(workout)" />
+          </div>
+          } @else {
+          <div class="mt-3 flex flex-col gap-2.5">
+            @for (ex of workout.exercises; track ex.id; let idx = $index) {
+            <div class="flex gap-3 border-t border-surface-100 pt-2.5 first:border-t-0 first:pt-1">
+              <div class="w-6 shrink-0 text-center font-heading text-xs font-bold text-muted-color">{{ idx + 1 }}</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                  @if (ex.exercise?.thumbnailUrl) {
+                  <img class="h-9 w-9 shrink-0 rounded-md bg-surface-100 object-cover"
+                    [src]="ex.exercise!.thumbnailUrl!" [alt]="ex.exercise!.name" loading="lazy" />
+                  }
+                  <div class="flex-1 min-w-0 text-[13px] font-semibold truncate">{{ ex.exercise?.name ?? '—' }}</div>
+                  @if (ex.supersetGroupId != null) {
+                  <p-tag [value]="'SS' + ex.supersetGroupId" severity="warn" />
+                  }
+                  <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
+                    pTooltip="Remove exercise" (onClick)="confirmDeleteExercise(workout, ex)" />
+                </div>
+
+                @if (ex.notes) {
+                <p class="m-0 mt-1.5 text-[11px] leading-relaxed text-muted-color">{{ ex.notes }}</p>
+                }
+
+                @if (ex.sets?.length) {
+                <p-table [value]="ex.sets ?? []" [rowTrackBy]="trackSetById" size="small" class="mt-2 text-xs">
+                  <ng-template #header>
+                    <tr>
+                      <th>#</th>
+                      <th>Type</th>
+                      <th>Target</th>
+                      <th>Rest</th>
+                      <th></th>
+                    </tr>
+                  </ng-template>
+                  <ng-template #body let-s>
+                    <tr>
+                      <td>{{ s.orderIndex + 1 }}</td>
+                      <td><p-tag [value]="s.setType | titlecase" [severity]="setTypeSeverity(s.setType)" /></td>
+                      <td>{{ setSummary(s) }}</td>
+                      <td>
+                        @if (s.restAfterSeconds != null) { {{ s.restAfterSeconds }}s } @else { — }
+                      </td>
+                      <td class="text-right whitespace-nowrap">
+                        <p-button icon="pi pi-pencil" size="small" severity="secondary" [text]="true" [rounded]="true"
+                          pTooltip="Edit set" (onClick)="openEditSet(workout, ex, s)" />
+                        <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
+                          pTooltip="Remove set" (onClick)="confirmDeleteSet(workout, ex, s)" />
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+                } @else {
+                <div class="mt-2 text-[11px] italic text-muted-color">No sets prescribed.</div>
+                }
+
+                <div class="mt-1.5 flex justify-end">
+                  <p-button label="Add set" icon="pi pi-plus" size="small" [text]="true"
+                    (onClick)="openAddSet(workout, ex)" />
+                </div>
+              </div>
+            </div>
+            }
+
+            <div class="flex justify-center">
+              <p-button label="Add exercise" icon="pi pi-plus" size="small" [text]="true"
+                (onClick)="openExercisePicker(workout)" />
+            </div>
+          </div>
+          }
+        </article>
+        }
+      </div>
+    </section>
     }
 
-    <footer class="page__foot">
-      <p-button
-        label="Delete program"
-        icon="pi pi-trash"
-        severity="danger"
-        [text]="true"
-        [loading]="deleting()"
-        (onClick)="confirmDelete()"
-      />
-    </footer>
+    <div class="flex justify-center pt-1">
+      <p-button label="Add workout in another week" icon="pi pi-plus" severity="secondary" [text]="true"
+        (onClick)="openAddWorkout()" />
+    </div>
+  </div>
+  }
   }
 </div>
 
-<p-toast />
-
-@if (program(); as p) {
-  <mh-assign-program-dialog
-    [program]="p"
-    [(visible)]="assignDialogOpen"
-    (assigned)="onAssigned()"
-  />
-  <mh-program-form-dialog
-    [program]="p"
-    [(visible)]="editDialogOpen"
-    (saved)="onEdited($event)"
-  />
-  <mh-workout-form-dialog
-    [program]="p"
-    [workout]="workoutDialogTarget()"
-    [initialWeek]="workoutDialogInitialWeek()"
-    [(visible)]="workoutDialogOpen"
-    (saved)="onWorkoutSaved($event)"
-  />
-  @if (exercisePickerTarget(); as picked) {
-    <mh-exercise-picker-dialog
-      [program]="p"
-      [workout]="picked"
-      [(visible)]="exercisePickerOpen"
-      (added)="onExerciseAdded($event)"
-    />
+<!-- Mobile overflow action sheet — opens from the ⋮ button in the header. -->
+@if (isMobile()) {
+<mh-bottom-sheet [open]="actionsOpen()" (openChange)="actionsOpen.set($event)" size="small" [showClose]="false">
+  @if (program()) {
+  <mh-action-list [items]="detailActions()" (select)="onDetailAction($event)" />
   }
-  @if (setDialogTarget(); as target) {
-    <mh-set-form-dialog
-      [program]="p"
-      [workout]="target.workout"
-      [exercise]="target.exercise"
-      [set]="target.set"
-      [(visible)]="setDialogOpen"
-      (saved)="onSetSaved($event)"
-    />
-  }
+</mh-bottom-sheet>
 }
 
+<!-- Dialogs -->
+@if (program(); as p) {
+<mh-assign-program-dialog [program]="p" [(visible)]="assignDialogOpen" (assigned)="onAssigned()" />
+<mh-program-form-dialog [program]="p" [(visible)]="editDialogOpen" (saved)="onEdited($event)" />
+<mh-workout-form-dialog [program]="p" [workout]="workoutDialogTarget()" [initialWeek]="workoutDialogInitialWeek()"
+  [(visible)]="workoutDialogOpen" (saved)="onWorkoutSaved($event)" />
+@if (exercisePickerTarget(); as picked) {
+<mh-exercise-picker-dialog [program]="p" [workout]="picked" [(visible)]="exercisePickerOpen"
+  (added)="onExerciseAdded($event)" />
+}
+@if (setDialogTarget(); as target) {
+<mh-set-form-dialog [program]="p" [workout]="target.workout" [exercise]="target.exercise" [set]="target.set"
+  [(visible)]="setDialogOpen" (saved)="onSetSaved($event)" />
+}
+}
+
+<p-toast position="top-right" />
 <p-confirmdialog [appendTo]="'body'" />

@@ -6,55 +6,79 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe, TitleCasePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
+import { MessageModule } from 'primeng/message';
+import { SkeletonModule } from 'primeng/skeleton';
+import { Tag } from 'primeng/tag';
 
 import {
   ListProgramsQuery,
+  MobileFab,
   PaginatedPrograms,
   Program,
   ProgramService,
   ProgramStatus,
-  showApiError,
+  TagSeverity,
+  apiErrorMessage,
+  injectIsMobile,
+  injectIsTablet,
+  injectIsTabletDown,
 } from 'core';
 
+import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
 
 /**
  * Programs list (FE-P1, read surface).
  *
- * Builder ships in FE-P2 — the create CTA is wired to a toast for
- * now because authoring a program shell without nested workout/set
- * UX would create empty rows the instructor can't fill in yet.
+ * The create CTA opens the metadata dialog; nested workout/set authoring
+ * happens on the program-detail page.
+ *
+ * Layout mirrors the sessions list: a Tailwind shell, a projected
+ * `#filtersRow` holding the status pills + search, and a single content
+ * body that switches between error / skeleton / empty / grid. Unlike
+ * sessions there are no `p-tabs` — status is a filter over one list, not
+ * a top-level surface switch, so it renders as quick-filter pills.
  */
 @Component({
   selector: 'mh-programs',
-  standalone: true,
   imports: [
     DatePipe,
+    NgTemplateOutlet,
+    TitleCasePipe,
     FormsModule,
     RouterLink,
-    TitleCasePipe,
     ButtonModule,
+    Card,
+    IconField,
+    InputIcon,
     InputTextModule,
-    Toast,
-    TooltipModule,
+    MessageModule,
+    SkeletonModule,
+    Tag,
+    ListEmptyState,
+    MobileFab,
     ProgramFormDialog,
   ],
-  providers: [MessageService],
   templateUrl: './programs.html',
   styleUrl: './programs.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Programs {
   private readonly _programService = inject(ProgramService);
-  private readonly _messageService = inject(MessageService);
+
+  // ── Responsive ───────────────────────────────────────────────────
+  protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
 
   // ── State ────────────────────────────────────────────────────────
 
@@ -62,6 +86,7 @@ export class Programs {
   readonly total = signal(0);
   readonly loading = signal(false);
   readonly loadingMore = signal(false);
+  readonly error = signal<string | null>(null);
   readonly page = signal(1);
   readonly pageSize = 20;
 
@@ -72,16 +97,54 @@ export class Programs {
   readonly statusFilter = signal<ProgramStatus | null>(null);
   readonly formDialogOpen = signal(false);
 
+  /** Placeholder rows for the skeleton grid. */
+  readonly skeletonRows = [0, 1, 2, 3, 4, 5];
+
   // ── Derived ──────────────────────────────────────────────────────
 
   readonly hasMore = computed(() => this.items().length < this.total());
 
-  readonly statusTabs: { value: ProgramStatus | null; label: string }[] = [
-    { value: null, label: 'All' },
-    { value: ProgramStatus.Draft, label: 'Draft' },
-    { value: ProgramStatus.Published, label: 'Published' },
-    { value: ProgramStatus.Archived, label: 'Archived' },
+  readonly statusTabs: { status: ProgramStatus | null; label: string }[] = [
+    { status: null, label: 'All' },
+    { status: ProgramStatus.Draft, label: 'Draft' },
+    { status: ProgramStatus.Published, label: 'Published' },
+    { status: ProgramStatus.Archived, label: 'Archived' },
   ];
+
+  /** Status-aware empty-state copy. Only All/Draft offer a create CTA. */
+  readonly emptyState = computed(() => {
+    switch (this.statusFilter()) {
+      case ProgramStatus.Draft:
+        return {
+          icon: 'pi pi-pencil',
+          title: 'No draft programs',
+          message: "Programs you're still authoring show up here.",
+          action: true,
+        };
+      case ProgramStatus.Published:
+        return {
+          icon: 'pi pi-check-circle',
+          title: 'No published programs',
+          message: 'Publish a program to make it assignable to clients.',
+          action: false,
+        };
+      case ProgramStatus.Archived:
+        return {
+          icon: 'pi pi-inbox',
+          title: 'No archived programs',
+          message: 'Archived programs are hidden but not deleted.',
+          action: false,
+        };
+      default:
+        return {
+          icon: 'pi pi-objects-column',
+          title: 'No programs yet',
+          message:
+            'Programs are how you author your coaching plans — workouts, exercises, and sets your clients follow. Create your first one to get started.',
+          action: true,
+        };
+    }
+  });
 
   constructor() {
     // Effect-driven refetch on any filter change.
@@ -115,6 +178,10 @@ export class Programs {
     this.formDialogOpen.set(true);
   }
 
+  retry(): void {
+    this.fetch(true);
+  }
+
   onCreated(p: Program): void {
     // Prepend the new program so the instructor sees it without waiting
     // for a refetch. The next filter change will reset the list anyway.
@@ -123,21 +190,24 @@ export class Programs {
     this.formDialogOpen.set(false);
   }
 
-  workoutCount(p: Program): number | null {
-    // The list endpoint does NOT include workouts (per BE: read for
-    // performance). Detail loads them. Show '—' here.
-    return p.workouts?.length ?? null;
-  }
-
-  statusTone(s: ProgramStatus): 'draft' | 'published' | 'archived' {
+  statusSeverity(s: ProgramStatus): TagSeverity {
     switch (s) {
       case ProgramStatus.Published:
-        return 'published';
+        return TagSeverity.Success;
       case ProgramStatus.Archived:
-        return 'archived';
+        return TagSeverity.Contrast;
       default:
-        return 'draft';
+        return TagSeverity.Secondary;
     }
+  }
+
+  /** Human duration label — weeks when the day count divides evenly. */
+  durationLabel(days: number): string {
+    if (days % 7 === 0) {
+      const weeks = days / 7;
+      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
+    }
+    return `${days} ${days === 1 ? 'day' : 'days'}`;
   }
 
   // ── Internals ────────────────────────────────────────────────────
@@ -150,8 +220,12 @@ export class Programs {
       status: this.statusFilter() ?? undefined,
     };
 
-    if (replace) this.loading.set(true);
-    else this.loadingMore.set(true);
+    if (replace) {
+      this.loading.set(true);
+      this.error.set(null);
+    } else {
+      this.loadingMore.set(true);
+    }
 
     const settle = () => {
       // Fires on BOTH success and error — RxJS's `complete` does NOT
@@ -169,11 +243,8 @@ export class Programs {
         settle();
       },
       error: (err) => {
-        showApiError(
-          this._messageService,
-          "Couldn't load programs",
-          'Check your connection and try again.',
-          err,
+        this.error.set(
+          apiErrorMessage(err, 'Check your connection and try again.'),
         );
         settle();
       },

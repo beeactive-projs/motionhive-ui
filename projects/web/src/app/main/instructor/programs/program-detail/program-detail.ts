@@ -6,24 +6,35 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Location, TitleCasePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
+import { TagModule } from 'primeng/tag';
+import { TableModule } from 'primeng/table';
+import { Chip } from 'primeng/chip';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
+  ActionItem,
+  ActionList,
+  BottomSheet,
+  ExerciseSetType,
   PrescribedExercise,
   PrescribedSet,
   Program,
   ProgramService,
   ProgramStatus,
   ProgramWorkout,
+  TagSeverity,
+  injectIsMobile,
+  injectIsTablet,
   showApiError,
 } from 'core';
 
+import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
 import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
@@ -43,12 +54,17 @@ import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
   selector: 'mh-program-detail',
   standalone: true,
   imports: [
-    RouterLink,
     TitleCasePipe,
     ButtonModule,
     ConfirmDialog,
     Toast,
+    TagModule,
+    TableModule,
+    Chip,
     TooltipModule,
+    ActionList,
+    BottomSheet,
+    KpiCard,
     AssignProgramDialog,
     ExercisePickerDialog,
     ProgramFormDialog,
@@ -66,9 +82,19 @@ export class ProgramDetail implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
+  private readonly _location = inject(Location);
+
+  protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+
+  // Enum const exposed for template comparisons — never compare against raw
+  // string literals (see CLAUDE.md).
+  protected readonly ProgramStatus = ProgramStatus;
 
   readonly program = signal<Program | null>(null);
   readonly loading = signal(false);
+  /** Mobile overflow sheet (Edit / Assign / Delete). */
+  readonly actionsOpen = signal(false);
   readonly assignDialogOpen = signal(false);
   readonly editDialogOpen = signal(false);
   readonly workoutDialogOpen = signal(false);
@@ -88,27 +114,23 @@ export class ProgramDetail implements OnInit {
   readonly deleting = signal(false);
 
   // Group workouts by week for rendering.
-  readonly weeks = computed<{ week: number; workouts: ProgramWorkout[] }[]>(
-    () => {
-      const all = this.program()?.workouts ?? [];
-      const map = new Map<number, ProgramWorkout[]>();
-      for (const w of all) {
-        const arr = map.get(w.weekIndex) ?? [];
-        arr.push(w);
-        map.set(w.weekIndex, arr);
-      }
-      return Array.from(map.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([week, workouts]) => ({
-          week,
-          workouts: workouts.sort((a, b) => a.dayIndex - b.dayIndex),
-        }));
-    },
-  );
+  readonly weeks = computed<{ week: number; workouts: ProgramWorkout[] }[]>(() => {
+    const all = this.program()?.workouts ?? [];
+    const map = new Map<number, ProgramWorkout[]>();
+    for (const w of all) {
+      const arr = map.get(w.weekIndex) ?? [];
+      arr.push(w);
+      map.set(w.weekIndex, arr);
+    }
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([week, workouts]) => ({
+        week,
+        workouts: workouts.sort((a, b) => a.dayIndex - b.dayIndex),
+      }));
+  });
 
-  readonly totalWorkouts = computed(
-    () => this.program()?.workouts?.length ?? 0,
-  );
+  readonly totalWorkouts = computed(() => this.program()?.workouts?.length ?? 0);
 
   readonly totalExercises = computed(() => {
     let n = 0;
@@ -127,6 +149,13 @@ export class ProgramDetail implements OnInit {
     }
     return n;
   });
+
+  /** Action-sheet rows for the mobile ⋮ menu — mirror the desktop header buttons. */
+  readonly detailActions = computed<ActionItem[]>(() => [
+    { id: 'edit', icon: 'pi pi-pencil', label: 'Edit program' },
+    { id: 'assign', icon: 'pi pi-user-plus', label: 'Assign to client' },
+    { id: 'delete', icon: 'pi pi-trash', label: 'Delete program…', danger: true },
+  ]);
 
   ngOnInit(): void {
     // The codebase reads route params via ActivatedRoute snapshot
@@ -179,9 +208,7 @@ export class ProgramDetail implements OnInit {
         ? { ...existing[idx], ...saved, exercises: existing[idx].exercises }
         : { ...saved, exercises: saved.exercises ?? [] };
     const next =
-      idx >= 0
-        ? existing.map((w, i) => (i === idx ? merged : w))
-        : [...existing, merged];
+      idx >= 0 ? existing.map((w, i) => (i === idx ? merged : w)) : [...existing, merged];
     this.program.set({ ...p, workouts: next });
     this.workoutDialogOpen.set(false);
   }
@@ -215,12 +242,7 @@ export class ProgramDetail implements OnInit {
         });
       },
       error: (err) => {
-        showApiError(
-          this._messageService,
-          "Couldn't delete workout",
-          'Please try again.',
-          err,
-        );
+        showApiError(this._messageService, "Couldn't delete workout", 'Please try again.', err);
       },
     });
   }
@@ -245,10 +267,7 @@ export class ProgramDetail implements OnInit {
     this.exercisePickerOpen.set(false);
   }
 
-  confirmDeleteExercise(
-    workout: ProgramWorkout,
-    ex: PrescribedExercise,
-  ): void {
+  confirmDeleteExercise(workout: ProgramWorkout, ex: PrescribedExercise): void {
     const p = this.program();
     if (!p) return;
     const name = ex.exercise?.name ?? 'this exercise';
@@ -264,40 +283,30 @@ export class ProgramDetail implements OnInit {
     });
   }
 
-  private _deleteExercise(
-    workout: ProgramWorkout,
-    ex: PrescribedExercise,
-  ): void {
+  private _deleteExercise(workout: ProgramWorkout, ex: PrescribedExercise): void {
     const p = this.program();
     if (!p) return;
-    this._programService
-      .removeExercise(p.id, workout.id, ex.id)
-      .subscribe({
-        next: () => {
-          const next = (p.workouts ?? []).map((w) =>
-            w.id === workout.id
-              ? {
-                  ...w,
-                  exercises: (w.exercises ?? []).filter((e) => e.id !== ex.id),
-                }
-              : w,
-          );
-          this.program.set({ ...p, workouts: next });
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Exercise removed',
-            life: 2000,
-          });
-        },
-        error: (err) => {
-          showApiError(
-            this._messageService,
-            "Couldn't remove exercise",
-            'Please try again.',
-            err,
-          );
-        },
-      });
+    this._programService.removeExercise(p.id, workout.id, ex.id).subscribe({
+      next: () => {
+        const next = (p.workouts ?? []).map((w) =>
+          w.id === workout.id
+            ? {
+                ...w,
+                exercises: (w.exercises ?? []).filter((e) => e.id !== ex.id),
+              }
+            : w,
+        );
+        this.program.set({ ...p, workouts: next });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Exercise removed',
+          life: 2000,
+        });
+      },
+      error: (err) => {
+        showApiError(this._messageService, "Couldn't remove exercise", 'Please try again.', err);
+      },
+    });
   }
 
   // ── Set CRUD ─────────────────────────────────────────────────────
@@ -307,11 +316,7 @@ export class ProgramDetail implements OnInit {
     this.setDialogOpen.set(true);
   }
 
-  openEditSet(
-    workout: ProgramWorkout,
-    exercise: PrescribedExercise,
-    set: PrescribedSet,
-  ): void {
+  openEditSet(workout: ProgramWorkout, exercise: PrescribedExercise, set: PrescribedSet): void {
     this.setDialogTarget.set({ workout, exercise, set });
     this.setDialogOpen.set(true);
   }
@@ -325,9 +330,7 @@ export class ProgramDetail implements OnInit {
         ? {
             ...w,
             exercises: (w.exercises ?? []).map((e) =>
-              e.id === target.exercise.id
-                ? { ...e, sets: this._mergeSet(e.sets ?? [], saved) }
-                : e,
+              e.id === target.exercise.id ? { ...e, sets: this._mergeSet(e.sets ?? [], saved) } : e,
             ),
           }
         : w,
@@ -336,10 +339,7 @@ export class ProgramDetail implements OnInit {
     this.setDialogOpen.set(false);
   }
 
-  private _mergeSet(
-    existing: PrescribedSet[],
-    saved: PrescribedSet,
-  ): PrescribedSet[] {
+  private _mergeSet(existing: PrescribedSet[], saved: PrescribedSet): PrescribedSet[] {
     const idx = existing.findIndex((s) => s.id === saved.id);
     if (idx >= 0) {
       return existing.map((s, i) => (i === idx ? saved : s));
@@ -347,11 +347,7 @@ export class ProgramDetail implements OnInit {
     return [...existing, saved].sort((a, b) => a.orderIndex - b.orderIndex);
   }
 
-  confirmDeleteSet(
-    workout: ProgramWorkout,
-    ex: PrescribedExercise,
-    set: PrescribedSet,
-  ): void {
+  confirmDeleteSet(workout: ProgramWorkout, ex: PrescribedExercise, set: PrescribedSet): void {
     this._confirmationService.confirm({
       header: 'Remove set?',
       message: `Remove set ${set.orderIndex + 1}? This can't be undone — but client copies of already-assigned programs keep their data.`,
@@ -364,48 +360,37 @@ export class ProgramDetail implements OnInit {
     });
   }
 
-  private _deleteSet(
-    workout: ProgramWorkout,
-    ex: PrescribedExercise,
-    set: PrescribedSet,
-  ): void {
+  private _deleteSet(workout: ProgramWorkout, ex: PrescribedExercise, set: PrescribedSet): void {
     const p = this.program();
     if (!p) return;
-    this._programService
-      .removeSet(p.id, workout.id, ex.id, set.id)
-      .subscribe({
-        next: () => {
-          const next = (p.workouts ?? []).map((w) =>
-            w.id === workout.id
-              ? {
-                  ...w,
-                  exercises: (w.exercises ?? []).map((e) =>
-                    e.id === ex.id
-                      ? {
-                          ...e,
-                          sets: (e.sets ?? []).filter((s) => s.id !== set.id),
-                        }
-                      : e,
-                  ),
-                }
-              : w,
-          );
-          this.program.set({ ...p, workouts: next });
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Set removed',
-            life: 2000,
-          });
-        },
-        error: (err) => {
-          showApiError(
-            this._messageService,
-            "Couldn't remove set",
-            'Please try again.',
-            err,
-          );
-        },
-      });
+    this._programService.removeSet(p.id, workout.id, ex.id, set.id).subscribe({
+      next: () => {
+        const next = (p.workouts ?? []).map((w) =>
+          w.id === workout.id
+            ? {
+                ...w,
+                exercises: (w.exercises ?? []).map((e) =>
+                  e.id === ex.id
+                    ? {
+                        ...e,
+                        sets: (e.sets ?? []).filter((s) => s.id !== set.id),
+                      }
+                    : e,
+                ),
+              }
+            : w,
+        );
+        this.program.set({ ...p, workouts: next });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Set removed',
+          life: 2000,
+        });
+      },
+      error: (err) => {
+        showApiError(this._messageService, "Couldn't remove set", 'Please try again.', err);
+      },
+    });
   }
 
   openAssign(): void {
@@ -448,27 +433,78 @@ export class ProgramDetail implements OnInit {
       },
       error: (err) => {
         this.deleting.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't delete program",
-          'Please try again.',
-          err,
-        );
+        showApiError(this._messageService, "Couldn't delete program", 'Please try again.', err);
       },
     });
   }
 
+  // ── Header navigation / actions ──────────────────────────────────
+
+  goBack(): void {
+    // Location.back() === history.back(). If we arrived via deep link or a
+    // refresh there's no in-app history to pop, so fall back to the list.
+    if (this._router.lastSuccessfulNavigation()?.previousNavigation) {
+      this._location.back();
+    } else {
+      void this._router.navigate(['/coaching/programs']);
+    }
+  }
+
+  openActionsSheet(): void {
+    this.actionsOpen.set(true);
+  }
+
+  onDetailAction(item: ActionItem): void {
+    this.actionsOpen.set(false);
+    switch (item.id) {
+      case 'edit':
+        this.openEdit();
+        break;
+      case 'assign':
+        this.openAssign();
+        break;
+      case 'delete':
+        this.confirmDelete();
+        break;
+    }
+  }
+
   // ── Helpers for the template ─────────────────────────────────────
 
-  statusTone(s: ProgramStatus): 'draft' | 'published' | 'archived' {
+  statusSeverity(s: ProgramStatus): TagSeverity {
     switch (s) {
       case ProgramStatus.Published:
-        return 'published';
+        return TagSeverity.Success;
       case ProgramStatus.Archived:
-        return 'archived';
+        return TagSeverity.Contrast;
+      case ProgramStatus.Draft:
+        return TagSeverity.Warn;
       default:
-        return 'draft';
+        return TagSeverity.Secondary;
     }
+  }
+
+  trackSetById = (_: number, s: PrescribedSet): string => s.id;
+
+  setTypeSeverity(s: ExerciseSetType): TagSeverity {
+    switch (s) {
+      case ExerciseSetType.Warmup:
+        return TagSeverity.Info;
+      case ExerciseSetType.Failure:
+      case ExerciseSetType.Dropset:
+        return TagSeverity.Danger;
+      default:
+        return TagSeverity.Secondary;
+    }
+  }
+
+  /** Human duration label — weeks when the day count divides evenly. */
+  durationLabel(days: number): string {
+    if (days % 7 === 0) {
+      const weeks = days / 7;
+      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
+    }
+    return `${days} ${days === 1 ? 'day' : 'days'}`;
   }
 
   setSummary(s: PrescribedSet): string {
@@ -483,12 +519,9 @@ export class ProgramDetail implements OnInit {
       parts.push(`${s.targetRepsMin}+ reps`);
     }
     if (s.targetWeightKg != null) parts.push(`${s.targetWeightKg} kg`);
-    else if (s.targetWeightPercent1rm != null)
-      parts.push(`${s.targetWeightPercent1rm}% 1RM`);
-    if (s.targetDurationSeconds != null)
-      parts.push(`${s.targetDurationSeconds}s`);
-    if (s.targetDistanceMeters != null)
-      parts.push(`${s.targetDistanceMeters}m`);
+    else if (s.targetWeightPercent1rm != null) parts.push(`${s.targetWeightPercent1rm}% 1RM`);
+    if (s.targetDurationSeconds != null) parts.push(`${s.targetDurationSeconds}s`);
+    if (s.targetDistanceMeters != null) parts.push(`${s.targetDistanceMeters}m`);
     if (s.targetRpe != null) parts.push(`RPE ${s.targetRpe}`);
     if (s.targetRir != null) parts.push(`${s.targetRir} RIR`);
     return parts.length ? parts.join(' · ') : '—';
