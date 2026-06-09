@@ -66,6 +66,26 @@ export class SessionsInstructorStore {
    */
   private _pendingReload = false;
 
+  /**
+   * True while a templates/instances request is in flight. Separate from
+   * the public `loading` signal: a "silent" reload (search-as-you-type)
+   * still needs the in-flight guard for dedupe, but must NOT flip the
+   * visible loader — the list updates in place without a skeleton flash.
+   */
+  private _inFlight = false;
+
+  /**
+   * When the upcoming SCHEDULED instances window was last loaded (epoch
+   * ms; 0 = never). The window query (today → +14d, SCHEDULED) does NOT
+   * depend on the tab, filters, search, or page — those are applied
+   * server-side on the templates call or client-side in the
+   * `upcomingInstances`/`kpis` computeds. So we fetch it once and reuse
+   * it across tab/filter/page changes, refreshing only on a hard reload
+   * (init, save, retry) or once the cache goes stale.
+   */
+  private _instancesLoadedAt = 0;
+  private static readonly INSTANCES_TTL_MS = 120_000;
+
   // BE `tab=cancelled` only matches templates with status=CANCELLED, so
   // one-off cancellations wouldn't appear. We fetch cancelled INSTANCES
   // separately and render them directly under the Cancelled tab.
@@ -171,37 +191,66 @@ export class SessionsInstructorStore {
 
   // ─── Mutators (called by pages) ────────────────────────────────────
 
+  // Tab / filter / page changes only affect the server-filtered
+  // templates list (and, on the Cancelled tab, the cancelled-instances
+  // fetch). The upcoming SCHEDULED window is reused from cache — see
+  // `_instancesLoadedAt`.
+
   setTab(tab: TemplateTab): void {
     if (this._tab() === tab) return;
     this._tab.set(tab);
     this._page.set(1);
-    this.reload();
+    this._reload({ append: false, refreshInstances: false });
   }
 
-  setFilters(patch: Partial<InstructorFilters>): void {
+  /**
+   * Merge a filter patch and refetch the (server-filtered) templates
+   * list. Pass `{ silent: true }` for search-as-you-type so the list
+   * refreshes without flashing the loader (the cached instances window
+   * is also filtered client-side, so results feel instant).
+   */
+  setFilters(
+    patch: Partial<InstructorFilters>,
+    opts?: { silent?: boolean },
+  ): void {
     this._filters.set({ ...this._filters(), ...patch });
     this._page.set(1);
-    this.reload();
+    this._reload({ append: false, refreshInstances: false, silent: opts?.silent });
   }
 
   setPage(page: number): void {
     this._page.set(page);
-    this.reload();
+    this._reload({ append: false, refreshInstances: false });
   }
 
-  /** Append the next page (no-op when already loading or nothing more). */
+  /** Append the next page (no-op when a request is in flight or nothing more). */
   loadMore(): void {
-    if (!this.hasMore() || this._loading()) return;
+    if (!this.hasMore() || this._inFlight) return;
     this._page.set(this._page() + 1);
-    this.reload(/* append */ true);
+    this._reload({ append: true, refreshInstances: false });
   }
 
   // ─── Load ──────────────────────────────────────────────────────────
 
+  /**
+   * Hard reload — refetch the templates list AND the upcoming instances
+   * window. Use on first load, after a save, and on retry. Tab/filter/
+   * page changes go through their dedicated mutators, which reuse the
+   * cached instances window.
+   */
+  reload(): void {
+    this._reload({ append: false, refreshInstances: true });
+  }
+
   // forkJoin templates + next-instances so `loading` flips off only after
   // BOTH complete (avoids a flash of "0 signups" cards mid-fetch).
-  reload(append = false): void {
-    if (this._loading()) {
+  private _reload(opts: {
+    append: boolean;
+    refreshInstances: boolean;
+    silent?: boolean;
+  }): void {
+    const { append, silent } = opts;
+    if (this._inFlight) {
       // A request is already in flight. Mark a follow-up reload so
       // the just-saved template doesn't get swallowed. Append-mode
       // reloads (infinite scroll) intentionally skip — the next page
@@ -209,8 +258,18 @@ export class SessionsInstructorStore {
       if (!append) this._pendingReload = true;
       return;
     }
-    this._loading.set(true);
+    this._inFlight = true;
+    // Silent reloads (search-as-you-type) skip the visible loader so the
+    // list refreshes in place without a skeleton / "loading more" flash.
+    if (!silent) this._loading.set(true);
     this._error.set(null);
+
+    // Refetch the instances window when forced (hard reload), when it
+    // was never loaded, or when the cache has gone stale.
+    const refreshInstances =
+      opts.refreshInstances ||
+      this._instancesLoadedAt === 0 ||
+      Date.now() - this._instancesLoadedAt > SessionsInstructorStore.INSTANCES_TTL_MS;
 
     const templatesQuery: ListTemplatesQuery = {
       tab: this._tab(),
@@ -257,7 +316,13 @@ export class SessionsInstructorStore {
       // per request). Cap at 3 pages = 300 instances. Beyond that the
       // user is well past "this week's plan" and won't notice missing
       // far-future rows in the list summary.
-      instances: this._loadInstancesPaged(instancesQuery, 3),
+      //
+      // `null` means "reuse the cached window" — the instances query is
+      // tab/filter/page-independent, so we skip the call unless this is
+      // a hard/stale reload (see `refreshInstances`).
+      instances: refreshInstances
+        ? this._loadInstancesPaged(instancesQuery, 3)
+        : of(null),
       cancelled: onCancelled
         ? this._loadInstancesPaged(cancelledQuery, 3)
         : of({ items: [] as SessionInstance[], total: 0 }),
@@ -276,24 +341,29 @@ export class SessionsInstructorStore {
         this._cancelledInstances.set(cancelled.items);
         this._cancelledTotal.set(cancelled.total);
 
-        // Index by template id, keeping the EARLIEST scheduled instance.
-        // On append, merge into the existing map so first-page items
-        // keep their next-instance references.
-        const map = append
-          ? new Map(this._nextInstancesByTemplateId())
-          : new Map<string, SessionInstance>();
-        for (const inst of instances.items) {
-          const existing = map.get(inst.templateId);
-          if (
-            !existing ||
-            new Date(inst.startAt) < new Date(existing.startAt)
-          ) {
-            map.set(inst.templateId, inst);
+        // `instances` is null when we reused the cached window — leave
+        // the next-instances map untouched. When present, rebuild it
+        // from the freshly-fetched window (the window is the full
+        // today→+14d range, so a from-scratch rebuild is complete and
+        // no append-merge is needed). Keep the EARLIEST instance per
+        // template id.
+        if (instances) {
+          const map = new Map<string, SessionInstance>();
+          for (const inst of instances.items) {
+            const existing = map.get(inst.templateId);
+            if (
+              !existing ||
+              new Date(inst.startAt) < new Date(existing.startAt)
+            ) {
+              map.set(inst.templateId, inst);
+            }
           }
+          this._nextInstancesByTemplateId.set(map);
+          this._instancesLoadedAt = Date.now();
         }
-        this._nextInstancesByTemplateId.set(map);
       },
       complete: () => {
+        this._inFlight = false;
         this._loading.set(false);
         // Flush a queued reload if one was requested mid-flight
         // (e.g. user saved a new template before the initial load

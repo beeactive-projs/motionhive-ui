@@ -39,7 +39,7 @@ for (const [name, vp] of Object.entries(VIEWPORTS)) {
 
       await loginAsInstructor(page, INSTRUCTOR_FIXTURE);
       await page.goto('/coaching/sessions/calendar');
-      await page.waitForSelector('mh-page-shell', { timeout: 15_000 });
+      await page.waitForSelector('header', { timeout: 15_000 });
       await page.waitForTimeout(800);
       await snap('10-calendar-default');
 

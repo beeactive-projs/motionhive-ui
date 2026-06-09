@@ -1,0 +1,132 @@
+<div class="mh-page">
+  <header class="mh-page-head">
+    <div>
+      <h1>My plans</h1>
+      <p class="sub">
+        @if (total() === 0 && !loading()) {
+          Training programs your coaches assign you will live here.
+        } @else if (total() === 1) {
+          1 plan from your coaches.
+        } @else {
+          {{ total() }} plans from your coaches.
+        }
+      </p>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <p-selectbutton
+      [options]="statusOptions"
+      [(ngModel)]="statusFilter"
+      [allowEmpty]="false"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="mh-status-tabs"
+    />
+  </div>
+
+  @if (loading() && items().length === 0) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon"><i class="pi pi-spin pi-spinner"></i></div>
+      <h3>Loading your plans…</h3>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="mh-empty">
+      <div class="mh-empty__icon mh-empty__icon--primary">
+        <i class="pi pi-bookmark"></i>
+      </div>
+      <h3>No plans yet</h3>
+      <p>
+        Once an instructor assigns you a program, it'll show up here with
+        your schedule and progress.
+      </p>
+      <p-button
+        label="Find an instructor"
+        icon="pi pi-compass"
+        severity="secondary"
+        [text]="true"
+        (onClick)="goToDiscover()"
+        styleClass="mt-3"
+      />
+    </div>
+  } @else {
+    <div class="plans-grid">
+      @for (a of items(); track a.id) {
+        <a
+          class="mh-plan-card"
+          [class.mh-plan-card--done]="a.status === 'COMPLETED'"
+          [routerLink]="['/my/plans', a.id]"
+        >
+          <div class="mh-plan-card__top">
+            <h3 class="mh-plan-card__name">{{ a.programNameSnapshot }}</h3>
+            <span class="mh-tag" [class]="statusTagClass(a.status)">
+              <i [class]="statusIcon(a.status)"></i>
+              {{ statusLabel(a.status) }}
+            </span>
+          </div>
+
+          <div class="mh-plan-card__by">
+            @if (a.instructor?.avatarUrl) {
+              <span class="mh-avatar">
+                <img [src]="a.instructor!.avatarUrl!" [alt]="instructorName(a)" />
+              </span>
+            } @else {
+              <span class="mh-avatar">{{ instructorInitials(a) }}</span>
+            }
+            From <strong>{{ instructorName(a) }}</strong>
+          </div>
+
+          @if (a.completionPercent > 0 || a.status === 'COMPLETED') {
+            <div class="mh-plan-card__progress-row">
+              <div
+                class="mh-progress"
+                [class.mh-progress--success]="a.completionPercent >= 100"
+              >
+                <div
+                  class="mh-progress__fill"
+                  [style.width.%]="a.completionPercent"
+                ></div>
+              </div>
+              <span
+                class="pct"
+                [class.pct--success]="a.completionPercent >= 100"
+              >
+                {{ a.completionPercent }}%
+              </span>
+            </div>
+          }
+
+          <div class="mh-plan-card__chips">
+            <span class="mh-chip">
+              <i class="pi pi-calendar"></i>
+              @if (a.status === 'PENDING') {
+                Starts {{ a.startDate | date: 'd MMM' }}
+              } @else {
+                Started {{ a.startDate | date: 'd MMM' }}
+              }
+            </span>
+            @if (a.endDate) {
+              <span class="mh-chip">
+                Ends {{ a.endDate | date: 'd MMM' }}
+              </span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (hasMore()) {
+      <div class="load-more">
+        <p-button
+          [label]="loadingMore() ? 'Loading…' : 'Load more'"
+          [loading]="loadingMore()"
+          severity="secondary"
+          [text]="true"
+          (onClick)="loadMore()"
+        />
+      </div>
+    }
+  }
+</div>
+
+<p-toast position="top-right" />

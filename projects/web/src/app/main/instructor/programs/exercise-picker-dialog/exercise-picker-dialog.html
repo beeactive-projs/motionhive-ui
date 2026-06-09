@@ -1,0 +1,97 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="!submitting()"
+  [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()"
+  [appendTo]="'body'"
+  [style]="{ width: '640px' }"
+  [breakpoints]="{ '720px': '95vw' }"
+  styleClass="mh-exercise-picker-dialog"
+  header="Add exercise">
+  <div class="dialog-body">
+    <div class="search">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="search"
+        placeholder="Search exercises…"
+        [ngModel]="query()"
+        (ngModelChange)="onSearchChange($event)"
+        autocomplete="off"
+        class="w-full"
+      />
+    </div>
+
+    @if (loading() && results().length === 0) {
+      <div class="state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Loading…</span>
+      </div>
+    } @else if (results().length === 0) {
+      <div class="state">
+        <i class="pi pi-search"></i>
+        <p>No exercises found.</p>
+        <small>Try a different search term.</small>
+      </div>
+    } @else {
+      <ul class="results">
+        @for (ex of results(); track ex.id) {
+          <li>
+            <button
+              type="button"
+              class="result"
+              [class.result--selected]="selectedId() === ex.id"
+              (click)="select(ex.id)"
+            >
+              @if (ex.thumbnailUrl) {
+                <img
+                  class="result__thumb"
+                  [src]="ex.thumbnailUrl"
+                  [alt]="ex.name"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="result__thumb result__thumb--fallback">
+                  <i class="pi pi-bolt"></i>
+                </div>
+              }
+              <div class="result__body">
+                <div class="result__name">{{ ex.name }}</div>
+                <div class="result__meta">
+                  <span>{{ ex.kind | lowercase }}</span>
+                  <span>· {{ ex.level | lowercase }}</span>
+                  @if (ex.equipment && ex.equipment.length > 0) {
+                    <span>· {{ ex.equipment[0].name }}</span>
+                  }
+                </div>
+              </div>
+              @if (selectedId() === ex.id) {
+                <i class="pi pi-check-circle result__check"></i>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <p-button
+      label="Add to workout"
+      icon="pi pi-plus"
+      [loading]="submitting()"
+      [disabled]="!canSubmit()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right" />

@@ -1,286 +1,272 @@
 @let t = template();
 
-<mh-page-shell
-  [title]="t?.title ?? 'Recurring session'"
-  [breadcrumb]="[
-    { label: 'Coaching', routerLink: '/coaching/overview' },
-    { label: 'Sessions', routerLink: '/coaching/sessions' },
-    { label: t?.title ?? 'Series' }
-  ]"
-  [showBack]="true"
->
-  <div actions class="mh-td__actions">
-    <p-button
-      label="Calendar"
-      icon="pi pi-calendar"
-      severity="secondary"
-      [outlined]="true"
-      routerLink="/coaching/sessions/calendar"
-    />
-    @if (t && t.status !== 'CANCELLED') {
-      <p-button
-        label="Edit"
-        icon="pi pi-pencil"
-        (onClick)="editOpen.set(true)"
-      />
-      <p-button
-        label="Cancel series"
-        icon="pi pi-times"
-        severity="danger"
-        [outlined]="true"
-        (onClick)="cancelSeries()"
-      />
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · back button + title + actions (mirrors the sessions list header) -->
+  <header class="flex gap-3 md:gap-4 items-center justify-between">
+    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+        (onClick)="goBack()" />
+      <div class="space-y-1 min-w-0">
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ t?.title ?? 'Recurring
+          session' }}</h1>
+        @if (t) {
+        <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
+          {{ t.durationMinutes }} min · {{ t.timezone }}
+        </p>
+        }
+      </div>
+    </div>
+
+    @if (t) {
+    <div class="flex gap-2 md:gap-3 shrink-0">
+      @if (isMobile()) {
+      <p-button icon="pi pi-calendar" outlined rounded severity="secondary" size="small" ariaLabel="Calendar"
+        routerLink="/coaching/sessions/calendar" />
+      @if (t.status !== SessionTemplateStatus.Cancelled) {
+      <p-button icon="pi pi-pencil" rounded size="small" ariaLabel="Edit" (onClick)="editOpen.set(true)" />
+      <p-button icon="pi pi-times" outlined rounded severity="danger" size="small" ariaLabel="Cancel series"
+        (onClick)="cancelSeries()" />
+      }
+      } @else {
+      <p-button label="Calendar" icon="pi pi-calendar" outlined severity="secondary"
+        [size]="isTablet() ? 'small' : undefined" routerLink="/coaching/sessions/calendar" />
+      @if (t.status !== SessionTemplateStatus.Cancelled) {
+      <p-button label="Edit" icon="pi pi-pencil" [size]="isTablet() ? 'small' : undefined"
+        (onClick)="editOpen.set(true)" />
+      <p-button label="Cancel series" icon="pi pi-times" outlined severity="danger"
+        [size]="isTablet() ? 'small' : undefined" (onClick)="cancelSeries()" />
+      }
+      }
+    </div>
+    }
+  </header>
+
+  <!-- States -->
+  @if (loading() && !t) {
+  <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
+    <i class="pi pi-spinner pi-spin"></i> Loading…
+  </div>
+  } @else if (error()) {
+  <p-message severity="error" [closable]="false">
+    <span class="text-(--p-red-700)">{{ error() }}</span>
+  </p-message>
+  } @else if (t) {
+  <div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 overflow-auto" [class.opacity-70]="t.status === SessionTemplateStatus.Cancelled">
+    <!-- Status banner: prominent when the series itself has been cancelled or ended. -->
+    @if (t.status === SessionTemplateStatus.Cancelled) {
+    <div class="mh-td-banner mh-td-banner--cancelled flex items-center gap-3 rounded-xl px-4 py-3 text-sm"
+      role="status">
+      <i class="pi pi-times-circle text-xl shrink-0"></i>
+      <div>
+        <strong class="font-bold">Series cancelled.</strong>
+        All upcoming occurrences were cancelled and attendees notified. Editing and rescheduling are disabled.
+      </div>
+    </div>
+    } @else if (t.status === SessionTemplateStatus.Ended) {
+    <div class="mh-td-banner mh-td-banner--ended flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
+      <i class="pi pi-check-circle text-xl shrink-0"></i>
+      <div><strong class="font-bold">Series ended.</strong> No new occurrences will be generated.</div>
+    </div>
+    }
+
+    <!-- Summary -->
+    <section
+      class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+      <div class="flex flex-wrap items-center gap-1.5">
+        <mh-type-chip [type]="t.type" />
+        <mh-access-chip [access]="t.access" [approvalRequired]="t.approvalRequired" />
+        @if (t.meetingProvider) {
+        <mh-provider-chip [provider]="t.meetingProvider" />
+        }
+        @if (t.isRecurring) {
+        <span
+          class="inline-flex items-center gap-1.5 rounded-full bg-(--p-primary-50) px-2.5 py-0.5 text-xs font-semibold capitalize text-(--p-primary-800)">
+          <i class="pi pi-refresh"></i>
+          {{ t.recurrenceRule?.frequency | lowercase }}
+          @if (t.recurrenceRule?.interval && t.recurrenceRule!.interval > 1) {
+          · every {{ t.recurrenceRule!.interval }}
+          }
+        </span>
+        }
+      </div>
+
+      @if (t.description) {
+      <p class="m-0 text-sm leading-relaxed text-muted-color">{{ t.description }}</p>
+      }
+
+      <dl class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 m-0">
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-[11px] font-bold uppercase text-muted-color">Duration</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ t.durationMinutes }} min</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-[11px] font-bold uppercase text-muted-color">Capacity</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ t.capacity ?? 'Unlimited' }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-[11px] font-bold uppercase text-muted-color">Cancel cutoff</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ t.cancellationCutoffHours }} hours</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-[11px] font-bold uppercase text-muted-color">Price</dt>
+          <dd class="m-0 text-sm font-semibold text-color">
+            @if (t.priceAmountCents > 0) {
+            {{ t.priceAmountCents / 100 | number: '1.0-2' }} {{ t.priceCurrency }}
+            } @else {
+            Free
+            }
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-[11px] font-bold uppercase text-muted-color">Timezone</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ t.timezone }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Regenerate forward + bulk actions — only meaningful on active recurring templates. -->
+    @if (t.isRecurring && t.status === SessionTemplateStatus.Active) {
+    <section class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3 lg:gap-4">
+      <div
+        class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+        <header>
+          <h3 class="m-0 mb-1 text-base font-semibold">Regenerate forward</h3>
+          <p class="m-0 text-[13px] leading-relaxed text-muted-color">
+            Append more occurrences after <strong class="text-color">{{ lastOccurrenceLabel() }}</strong>
+            — past occurrences stay untouched.
+          </p>
+        </header>
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="inline-flex items-center gap-2 text-[13px] text-color">
+            <span>Add</span>
+            <p-inputNumber [ngModel]="regenCount()" (ngModelChange)="regenCount.set($event ?? 1)" [min]="1" [max]="12"
+              [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal" inputStyleClass="w-18 text-center"
+              decrementButtonClass="p-button-text" incrementButtonClass="p-button-text" />
+            <span>more</span>
+          </label>
+          <p-button [label]="'Generate ' + regenCount() + ' more'" icon="pi pi-refresh" [loading]="busyRegen()"
+            (onClick)="regenerate()" />
+        </div>
+      </div>
+
+      <aside
+        class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5"
+        aria-label="Bulk actions">
+        <h4 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">Bulk actions</h4>
+        <p-button label="End series after this week" icon="pi pi-stop-circle" severity="danger" [outlined]="true"
+          [disabled]="!firstFutureInstance()" (onClick)="endAfterThisWeek()" styleClass="w-full justify-center" />
+        <small class="text-[11px] leading-snug text-muted-color">
+          Cancels every occurrence after the next one and ends the series.
+        </small>
+        <div class="flex gap-2.5 rounded-lg bg-(--p-surface-50) px-3 py-2.5 text-xs leading-snug text-muted-color">
+          <i class="pi pi-clock shrink-0 mt-px text-sm text-(--p-primary-700)" aria-hidden="true"></i>
+          <span><strong class="text-color">Coming soon:</strong> shift all upcoming times, update venue across the
+            remaining series.</span>
+        </div>
+      </aside>
+    </section>
+    }
+
+    <!-- Upcoming -->
+    <section class="rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+      <h3 class="m-0 mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-color">
+        Upcoming
+        <span class="rounded-full bg-(--p-surface-100) px-2 py-0.5 text-xs font-normal normal-case tracking-normal">
+          {{ upcoming().length }}
+        </span>
+      </h3>
+
+      @if (upcoming().length === 0) {
+      <p class="m-0 italic text-[13px] text-muted-color">
+        No upcoming occurrences.
+        @if (t.isRecurring) {
+        Use <strong>Regenerate forward</strong> above to generate more.
+        }
+      </p>
+      } @else {
+      <ul class="list-none m-0 p-0 flex flex-col gap-1">
+        @for (i of upcoming(); track i.id) {
+        <li [class.opacity-60]="i.status === SessionInstanceStatus.Cancelled">
+          <a [routerLink]="['/coaching/sessions', i.id]"
+            class="flex items-center gap-3 rounded-lg bg-(--p-surface-50) px-3 py-2.5 no-underline text-inherit transition-colors hover:bg-(--p-primary-50)">
+            <span class="shrink-0 text-[13px] font-semibold text-(--p-primary-700)"
+              [class.line-through]="i.status === SessionInstanceStatus.Cancelled">
+              {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
+            </span>
+            @if (i.status === SessionInstanceStatus.Cancelled) {
+            <span
+              class="mh-td-status--cancelled inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
+              <i class="pi pi-times-circle text-xs"></i> Cancelled
+            </span>
+            } @else {
+            <span class="flex-1 text-xs text-muted-color">
+              <strong class="font-bold text-color">{{ i.confirmedCount }}</strong> confirmed
+              @if (i.pendingApprovalCount > 0) {
+              · <strong class="text-(--p-yellow-700)">{{ i.pendingApprovalCount }} pending</strong>
+              }
+              @if (i.waitlistedCount > 0) {
+              · {{ i.waitlistedCount }} waitlisted
+              }
+            </span>
+            @if (i.conflictingInstanceIds?.length) {
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-(--p-red-700)">
+              <i class="pi pi-exclamation-triangle text-xs"></i> conflict
+            </span>
+            }
+            }
+            <i class="pi pi-chevron-right ml-auto shrink-0 text-muted-color"></i>
+          </a>
+        </li>
+        }
+      </ul>
+      }
+    </section>
+
+    <!-- Past -->
+    @if (past().length > 0) {
+    <section class="rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+      <h3 class="m-0 mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-color">
+        Past
+        <span class="rounded-full bg-(--p-surface-100) px-2 py-0.5 text-xs font-normal normal-case tracking-normal">
+          {{ past().length }}
+        </span>
+      </h3>
+      <ul class="list-none m-0 p-0 flex flex-col gap-1 opacity-90">
+        @for (i of past(); track i.id) {
+        <li [class.opacity-60]="i.status === SessionInstanceStatus.Cancelled">
+          <a [routerLink]="['/coaching/sessions', i.id]"
+            class="flex items-center gap-3 rounded-lg bg-(--p-surface-50) px-3 py-2.5 no-underline text-inherit transition-colors hover:bg-(--p-primary-50)">
+            <span class="shrink-0 text-[13px] font-semibold text-(--p-primary-700)"
+              [class.line-through]="i.status === SessionInstanceStatus.Cancelled">
+              {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
+            </span>
+            @if (i.status === SessionInstanceStatus.Cancelled) {
+            <span
+              class="mh-td-status--cancelled inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
+              <i class="pi pi-times-circle text-xs"></i> Cancelled
+            </span>
+            } @else {
+            <span class="flex-1 text-xs text-muted-color">
+              @if (i.attendedCount !== null) {
+              <strong class="font-bold text-color">{{ i.attendedCount }}</strong> attended
+              } @else {
+              <strong class="font-bold text-color">{{ i.confirmedCount }}</strong> confirmed
+              }
+            </span>
+            }
+            <i class="pi pi-chevron-right ml-auto shrink-0 text-muted-color"></i>
+          </a>
+        </li>
+        }
+      </ul>
+    </section>
     }
   </div>
 
-  @if (loading() && !t) {
-    <div class="mh-td__loading">Loading…</div>
-  } @else if (error()) {
-    <div class="mh-td__error">
-      <i class="pi pi-exclamation-circle"></i>
-      {{ error() }}
-    </div>
-  } @else if (t) {
-    <div class="mh-td" [class.mh-td--cancelled]="t.status === 'CANCELLED'">
-      <!-- Status banner: prominent when the series itself has been
-           cancelled or ended. Makes "this is done, you can't act on it"
-           obvious before the user tries an action that'd be disabled. -->
-      @if (t.status === 'CANCELLED') {
-        <div class="mh-td__banner mh-td__banner--cancelled" role="status">
-          <i class="pi pi-times-circle"></i>
-          <div>
-            <strong>Series cancelled.</strong>
-            All upcoming occurrences were cancelled and attendees notified.
-            Editing and rescheduling are disabled.
-          </div>
-        </div>
-      } @else if (t.status === 'ENDED') {
-        <div class="mh-td__banner mh-td__banner--ended" role="status">
-          <i class="pi pi-check-circle"></i>
-          <div>
-            <strong>Series ended.</strong>
-            No new occurrences will be generated.
-          </div>
-        </div>
-      }
-
-      <!-- Summary -->
-      <section class="mh-td__summary">
-        <div class="mh-td__chips">
-          <mh-type-chip [type]="t.type" />
-          <mh-access-chip [access]="t.access" [approvalRequired]="t.approvalRequired" />
-          @if (t.meetingProvider) {
-            <mh-provider-chip [provider]="t.meetingProvider" />
-          }
-          @if (t.isRecurring) {
-            <span class="mh-td__recurring">
-              <i class="pi pi-refresh"></i>
-              {{ t.recurrenceRule?.frequency | lowercase }}
-              @if (t.recurrenceRule?.interval && t.recurrenceRule!.interval > 1) {
-                · every {{ t.recurrenceRule!.interval }}
-              }
-            </span>
-          }
-        </div>
-
-        @if (t.description) {
-          <p class="mh-td__desc">{{ t.description }}</p>
-        }
-
-        <dl class="mh-td__props">
-          <div>
-            <dt>Duration</dt>
-            <dd>{{ t.durationMinutes }} min</dd>
-          </div>
-          <div>
-            <dt>Capacity</dt>
-            <dd>{{ t.capacity ?? 'Unlimited' }}</dd>
-          </div>
-          <div>
-            <dt>Cancel cutoff</dt>
-            <dd>{{ t.cancellationCutoffHours }} hours</dd>
-          </div>
-          <div>
-            <dt>Price</dt>
-            <dd>
-              @if (t.priceAmountCents > 0) {
-                {{ t.priceAmountCents / 100 | number: '1.0-2' }} {{ t.priceCurrency }}
-              } @else {
-                Free
-              }
-            </dd>
-          </div>
-          <div>
-            <dt>Timezone</dt>
-            <dd>{{ t.timezone }}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <!-- Regenerate forward + bulk actions — only meaningful on active
-           recurring templates. Past / cancelled series hide it. -->
-      @if (t.isRecurring && t.status === 'ACTIVE') {
-        <section class="mh-td__regen">
-          <div class="mh-td__regen-main">
-            <header>
-              <h3>Regenerate forward</h3>
-              <p>
-                Append more occurrences after
-                <strong>{{ lastOccurrenceLabel() }}</strong>
-                — past occurrences stay untouched.
-              </p>
-            </header>
-            <div class="mh-td__regen-row">
-              <label class="mh-td__regen-stepper">
-                <span>Add</span>
-                <p-inputNumber
-                  [ngModel]="regenCount()"
-                  (ngModelChange)="regenCount.set($event ?? 1)"
-                  [min]="1"
-                  [max]="12"
-                  [showButtons]="true"
-                  buttonLayout="horizontal"
-                  spinnerMode="horizontal"
-                  inputStyleClass="mh-td__regen-input"
-                  decrementButtonClass="p-button-text"
-                  incrementButtonClass="p-button-text"
-                />
-                <span>more</span>
-              </label>
-              <p-button
-                [label]="'Generate ' + regenCount() + ' more'"
-                icon="pi pi-refresh"
-                [loading]="busyRegen()"
-                (onClick)="regenerate()"
-              />
-            </div>
-          </div>
-
-          <aside class="mh-td__regen-bulk" aria-label="Bulk actions">
-            <h4>Bulk actions</h4>
-            <p-button
-              label="End series after this week"
-              icon="pi pi-stop-circle"
-              severity="danger"
-              [outlined]="true"
-              [disabled]="!firstFutureInstance()"
-              (onClick)="endAfterThisWeek()"
-              styleClass="mh-td__regen-bulk-btn"
-            />
-            <small class="mh-td__regen-bulk-note">
-              Cancels every occurrence after the next one and ends the series.
-            </small>
-            <div class="mh-td__regen-bulk-stub">
-              <i class="pi pi-clock" aria-hidden="true"></i>
-              <span>
-                <strong>Coming soon:</strong> shift all upcoming times,
-                update venue across the remaining series.
-              </span>
-            </div>
-          </aside>
-        </section>
-      }
-
-      <!-- Upcoming -->
-      <section class="mh-td__list">
-        <h3>
-          Upcoming
-          <span class="mh-td__count">{{ upcoming().length }}</span>
-        </h3>
-
-        @if (upcoming().length === 0) {
-          <p class="mh-td__none">
-            No upcoming occurrences.
-            @if (t.isRecurring) {
-              Use <strong>Regenerate forward</strong> above to generate more.
-            }
-          </p>
-        } @else {
-          <ul class="mh-td__rows">
-            @for (i of upcoming(); track i.id) {
-              <li
-                class="mh-td__row"
-                [class.mh-td__row--cancelled]="i.status === 'CANCELLED'"
-              >
-                <a [routerLink]="['/coaching/sessions', i.id]" class="mh-td__row-link">
-                  <span class="mh-td__row-time">
-                    {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
-                  </span>
-                  @if (i.status === 'CANCELLED') {
-                    <span class="mh-td__row-status mh-td__row-status--cancelled">
-                      <i class="pi pi-times-circle"></i> Cancelled
-                    </span>
-                  } @else {
-                    <span class="mh-td__row-counters">
-                      <strong>{{ i.confirmedCount }}</strong> confirmed
-                      @if (i.pendingApprovalCount > 0) {
-                        · <strong class="mh-td__row-pending">{{ i.pendingApprovalCount }} pending</strong>
-                      }
-                      @if (i.waitlistedCount > 0) {
-                        · {{ i.waitlistedCount }} waitlisted
-                      }
-                    </span>
-                    @if (i.conflictingInstanceIds?.length) {
-                      <span class="mh-td__row-warn">
-                        <i class="pi pi-exclamation-triangle"></i> conflict
-                      </span>
-                    }
-                  }
-                  <i class="pi pi-chevron-right mh-td__row-arrow"></i>
-                </a>
-              </li>
-            }
-          </ul>
-        }
-      </section>
-
-      <!-- Past (collapsed by default behavior is implicit — fewer rows usually) -->
-      @if (past().length > 0) {
-        <section class="mh-td__list">
-          <h3>
-            Past
-            <span class="mh-td__count">{{ past().length }}</span>
-          </h3>
-          <ul class="mh-td__rows mh-td__rows--past">
-            @for (i of past(); track i.id) {
-              <li
-                class="mh-td__row"
-                [class.mh-td__row--cancelled]="i.status === 'CANCELLED'"
-              >
-                <a [routerLink]="['/coaching/sessions', i.id]" class="mh-td__row-link">
-                  <span class="mh-td__row-time">
-                    {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
-                  </span>
-                  @if (i.status === 'CANCELLED') {
-                    <span class="mh-td__row-status mh-td__row-status--cancelled">
-                      <i class="pi pi-times-circle"></i> Cancelled
-                    </span>
-                  } @else {
-                    <span class="mh-td__row-counters">
-                      @if (i.attendedCount !== null) {
-                        <strong>{{ i.attendedCount }}</strong> attended
-                      } @else {
-                        <strong>{{ i.confirmedCount }}</strong> confirmed
-                      }
-                    </span>
-                  }
-                  <i class="pi pi-chevron-right mh-td__row-arrow"></i>
-                </a>
-              </li>
-            }
-          </ul>
-        </section>
-      }
-    </div>
-
-    <mh-session-form-dialog
-      [visible]="editOpen()"
-      (visibleChange)="editOpen.set($event)"
-      [template]="t"
-      (saved)="onSaved()"
-    />
+  <mh-session-form-dialog [visible]="editOpen()" (visibleChange)="editOpen.set($event)" [template]="t"
+    (saved)="onSaved()" />
   }
-</mh-page-shell>
+</div>
 
 <p-toast position="top-right" />
 <p-confirmDialog />

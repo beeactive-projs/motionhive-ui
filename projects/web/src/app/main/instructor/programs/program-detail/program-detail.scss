@@ -1,0 +1,20 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+// Archived banner — color-mix keeps the tint theme-aware in light + dark,
+// which Tailwind arbitrary values can't express cleanly. Layout is handled
+// by utility classes in the template (mirrors session-detail's banners).
+.mh-pd-banner {
+  line-height: 1.4;
+
+  &--archived {
+    background: color-mix(in srgb, var(--p-text-muted-color) 8%, transparent);
+    color: var(--p-text-color);
+    border: 1px solid var(--p-content-border-color);
+    i { color: var(--p-text-muted-color); }
+  }
+}

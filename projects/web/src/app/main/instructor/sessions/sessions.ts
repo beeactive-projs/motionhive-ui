@@ -1,37 +1,38 @@
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
   OnDestroy,
-  OnInit,
   computed,
   effect,
   inject,
   signal,
   viewChild,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
+import { Popover } from 'primeng/popover';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
 import {
   ActionItem,
   ActionList,
-  AuthStore,
   BottomSheet,
   DaySeparator,
-  KpiCard,
   MobileFab,
-  PageShell,
   SectionLabel,
   SessionCard,
+  SessionInstanceStatus,
   SessionKind,
   SessionLocationKind,
   SessionsInstructorStore,
@@ -41,43 +42,45 @@ import {
   formatSessionDuration,
   formatSessionTime,
   injectIsMobile,
+  injectIsTabletDown,
   sessionDayLabel,
   sessionTone,
+  TemplateTab,
   type SessionInstance,
   type SessionTemplate,
-  type TemplateTab,
+  injectIsTablet,
 } from 'core';
+import { KpiCard } from '../../../_shared/components/kpi-card/kpi-card';
+import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { SessionFormDialog } from './_dialogs/session-form-dialog/session-form-dialog';
 
-interface TabSpec {
-  key: TemplateTab;
-  label: string;
-}
-
-const TABS: TabSpec[] = [
-  { key: 'active', label: 'Upcoming' },
-  { key: 'recurring', label: 'Recurring templates' },
-  { key: 'ended', label: 'Past' },
-  { key: 'cancelled', label: 'Cancelled' },
-];
+/** Tabs that may appear in the `?tab=` query param; anything else falls back to Upcoming. */
+const VALID_TABS = new Set<string>(Object.values(TemplateTab));
 
 @Component({
   selector: 'mh-instructor-sessions',
-  standalone: true,
   imports: [
-    CommonModule,
+    NgTemplateOutlet,
+    TitleCasePipe,
     FormsModule,
     ButtonModule,
+    IconField,
+    InputIcon,
     InputTextModule,
     SkeletonModule,
     MessageModule,
-    PageShell,
+    Popover,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
     KpiCard,
+    ListEmptyState,
     SectionLabel,
     SessionCard,
     SessionFormDialog,
     ToastModule,
-    TooltipModule,
     ActionList,
     BottomSheet,
     DaySeparator,
@@ -90,25 +93,40 @@ const TABS: TabSpec[] = [
   styleUrl: './sessions.scss',
   providers: [MessageService],
 })
-export class Sessions implements OnInit, OnDestroy {
+export class Sessions implements OnDestroy {
   protected readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
-  private readonly _auth = inject(AuthStore);
-
-  /** Handle on the logged-in instructor, used to drive the "Public profile" button. */
-  protected readonly handle = computed(() => this._auth.user()?.handle ?? null);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
 
+  // The active tab is URL-driven (`?tab=`) so it survives reloads and
+  // deep links, mirroring the payments page. A constructor effect syncs
+  // it into the store, which reloads when the tab actually changes.
+  private readonly _queryParams = toSignal(this._route.queryParamMap, {
+    initialValue: this._route.snapshot.queryParamMap,
+  });
+  protected readonly activeTab = computed<TemplateTab>(() => {
+    const tab = this._queryParams().get('tab');
+    return tab && VALID_TABS.has(tab) ? (tab as TemplateTab) : TemplateTab.Active;
+  });
+
   // Infinite scroll: a sentinel at the end of the list pulls the next page on intersection.
-  private readonly _scrollSentinel =
-    viewChild<ElementRef<HTMLElement>>('scrollSentinel');
+  private readonly _scrollSentinel = viewChild<ElementRef<HTMLElement>>('scrollSentinel');
   private _observer?: IntersectionObserver;
 
-  protected readonly tabs = TABS;
-  // The view signal stays here even though the only real value is
-  // 'cards' — the segmented control needs something to bind to for the
-  // pressed state. 'calendar' is a navigation event, not a state.
-  protected readonly view = signal<'cards'>('cards');
+  // Enum consts exposed for template comparisons — never compare against
+  // raw string literals (see CLAUDE.md).
+  protected readonly TemplateTab = TemplateTab;
+  protected readonly SessionKind = SessionKind;
+  protected readonly SessionLocationKind = SessionLocationKind;
+
+  protected readonly tabs: MenuItem[] = [
+    { id: TemplateTab.Active, label: 'Upcoming', icon: 'pi pi-calendar' },
+    { id: TemplateTab.Recurring, label: 'Recurring templates', icon: 'pi pi-replay' },
+    { id: TemplateTab.Ended, label: 'Past', icon: 'pi pi-history' },
+    { id: TemplateTab.Cancelled, label: 'Cancelled', icon: 'pi pi-times-circle' },
+  ];
+
   protected readonly searchInput = signal<string>('');
   protected searchTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -118,7 +136,9 @@ export class Sessions implements OnInit, OnDestroy {
 
   // ─── Mobile state ──────────────────────────────────────────────────
   protected readonly isMobile = injectIsMobile();
-  protected readonly filterSheetOpen = signal(false);
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller text, condensed copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
   /** When non-null, an action sheet shows for this template row. */
   protected readonly actionSheetTemplate = signal<SessionTemplate | null>(null);
 
@@ -160,10 +180,20 @@ export class Sessions implements OnInit, OnDestroy {
       this._observer.observe(el);
     });
     this._destroyRef.onDestroy(() => this._observer?.disconnect());
-  }
 
-  ngOnInit(): void {
-    this.store.reload();
+    // Drive the store off the URL tab. `setTab` resets paging + reloads
+    // when the tab changes; when it matches (initial load, or a default
+    // tab with no `?tab=`) `setTab` no-ops, so kick the first load once.
+    let firstSync = true;
+    effect(() => {
+      const tab = this.activeTab();
+      if (this.store.tab() !== tab) {
+        this.store.setTab(tab);
+      } else if (firstSync) {
+        this.store.reload();
+      }
+      firstSync = false;
+    });
   }
 
   ngOnDestroy(): void {
@@ -199,9 +229,7 @@ export class Sessions implements OnInit, OnDestroy {
       }
       groups.get(dayKey)!.items.push(inst);
     }
-    return Array.from(groups.values()).sort(
-      (a, b) => a.date.getTime() - b.date.getTime(),
-    );
+    return Array.from(groups.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
   });
 
   protected readonly groupedByDay = computed(() => {
@@ -220,9 +248,7 @@ export class Sessions implements OnInit, OnDestroy {
       groups.get(dayKey)!.items.push(t);
     }
 
-    return Array.from(groups.values()).sort(
-      (a, b) => a.date.getTime() - b.date.getTime(),
-    );
+    return Array.from(groups.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
   });
 
   /**
@@ -270,7 +296,7 @@ export class Sessions implements OnInit, OnDestroy {
       meetingUrlOverride: null,
       capacityOverride: null,
       isOverride: false,
-      status: 'SCHEDULED',
+      status: SessionInstanceStatus.Scheduled,
       cancelReason: null,
       cancelledAt: null,
       confirmedCount: 0,
@@ -292,28 +318,35 @@ export class Sessions implements OnInit, OnDestroy {
     this.searchInput.set(value);
     if (this.searchTimer) clearTimeout(this.searchTimer);
     this.searchTimer = setTimeout(() => {
-      this.store.setFilters({ q: value.trim() || undefined });
+      // Silent: search-as-you-type refreshes the list in place without
+      // flashing the skeleton / "loading more" loader.
+      this.store.setFilters({ q: value.trim() || undefined }, { silent: true });
     }, 200);
   }
 
-  protected onTabChange(tab: TemplateTab): void {
-    this.store.setTab(tab);
+  protected onTabChange(value: string | number | undefined): void {
+    const tab =
+      typeof value === 'string' && VALID_TABS.has(value)
+        ? value
+        : TemplateTab.Active;
+    if (tab === this.activeTab()) return;
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+    });
   }
 
   /** Toggle a location pill — click the active one again to clear. */
-  protected toggleLocation(kind: 'IN_PERSON' | 'ONLINE'): void {
+  protected toggleLocation(kind: SessionLocationKind): void {
     const current = this.store.filters().locationKind;
-    this.store.setFilters({
-      locationKind: current === kind ? undefined : (kind as SessionLocationKind),
-    });
+    this.store.setFilters({ locationKind: current === kind ? undefined : kind });
   }
 
   /** Toggle a type pill — click the active one again to clear. */
-  protected toggleType(type: 'GROUP' | 'PRIVATE' | 'OPEN'): void {
+  protected toggleType(type: SessionKind): void {
     const current = this.store.filters().type;
-    this.store.setFilters({
-      type: current === type ? undefined : (type as SessionKind),
-    });
+    this.store.setFilters({ type: current === type ? undefined : type });
   }
 
   /** Drop all quick filters (the "All" pill). Search input is left intact. */
@@ -377,28 +410,8 @@ export class Sessions implements OnInit, OnDestroy {
     this.store.reload();
   }
 
-  /**
-   * Open the instructor's own public profile (`/@<handle>`) in a new tab —
-   * it's a preview of how the world sees their sessions. New tab so we
-   * don't lose the instructor's place in the management UI.
-   */
-  protected openPublicProfile(): void {
-    const h = this.handle();
-    if (!h) return;
-    window.open(`/@${h}`, '_blank', 'noopener');
-  }
-
-  /**
-   * View toggle: 'cards' stays on the list page. 'calendar' navigates
-   * to the dedicated calendar route — they're separate pages, not
-   * just a local visual swap.
-   */
-  protected setView(v: 'cards' | 'calendar'): void {
-    if (v === 'calendar') {
-      void this._router.navigate(['/coaching/sessions/calendar']);
-      return;
-    }
-    this.view.set('cards');
+  protected goToCalendar(): void {
+    void this._router.navigate(['/coaching/sessions/calendar']);
   }
 
   // Template-facing aliases for the pure helpers in core/utils. Keeps
@@ -452,10 +465,5 @@ export class Sessions implements OnInit, OnDestroy {
       default:
         break;
     }
-  }
-
-  /** Reset all quick filters from inside the filter sheet. */
-  protected resetSheetFilters(): void {
-    this.store.setFilters({ type: undefined, locationKind: undefined });
   }
 }

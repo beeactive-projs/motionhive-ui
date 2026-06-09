@@ -1,0 +1,40 @@
+<h1 class="mb-1 text-2xl font-semibold text-[var(--p-text-color)]">Schedules</h1>
+<p class="mb-4 text-sm text-[var(--p-text-muted-color)]">
+  Recurring system sweeps (cron). Run one on demand; watch it execute under
+  Operations → its queue.
+</p>
+
+@if (loading()) {
+  <div class="text-[var(--p-text-muted-color)]">Loading…</div>
+} @else {
+  <div class="mb-3 flex flex-wrap items-center gap-3">
+    <input pInputText [(ngModel)]="search" (ngModelChange)="onFilter()" placeholder="search job" class="w-56" />
+    <p-select [(ngModel)]="queue" (onChange)="onFilter()" [options]="queueOptions()" optionLabel="label"
+      optionValue="value" placeholder="All queues" [showClear]="true" appendTo="body" styleClass="w-44" />
+  </div>
+
+  <p-table [value]="filtered()" size="small" [paginator]="true" [rows]="10" [scrollable]="true"
+    [tableStyle]="{ 'min-width': 'max-content' }"
+    [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sweeps">
+    <ng-template #header>
+      <tr><th>Job</th><th>Queue</th><th>Cadence</th><th>Last manual run</th><th></th></tr>
+    </ng-template>
+    <ng-template #body let-j>
+      <tr>
+        <td class="font-mono text-xs">{{ j.key }}</td>
+        <td><p-tag [value]="j.queue" severity="secondary" /></td>
+        <td class="text-[var(--p-text-muted-color)]">{{ j.schedule }}</td>
+        <td class="text-xs text-[var(--p-text-muted-color)]">{{ lastRun()[j.key] || '—' }}</td>
+        <td class="text-right">
+          @if (isSuperAdmin()) {
+            <p-button label="Run now" size="small" severity="secondary"
+              [loading]="triggering() === j.key" (onClick)="run(j)" />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="5" class="py-6 text-center text-[var(--p-text-muted-color)]">No matching sweeps.</td></tr>
+    </ng-template>
+  </p-table>
+}

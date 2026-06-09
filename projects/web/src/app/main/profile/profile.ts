@@ -11,10 +11,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   apiErrorMessage,
   AuthService,
-  ClientPaymentService,
+  BillingCountsStore,
   ClientService,
   countryNameFromCode,
-  MyBillingCounts,
   MyProfile,
   PrivacyControlledField,
   ProfilePrivacy,
@@ -35,8 +34,7 @@ import { Details } from './tabs/details/details';
 import { ProfileCoaches } from './tabs/coaches/coaches';
 import { ProfileNotifications } from './tabs/notifications/notifications';
 import { ProfileSafety } from './tabs/safety/safety';
-import { MyInvoices } from '../user/payments/my-invoices/my-invoices';
-import { MySubscriptions } from '../user/payments/my-subscriptions/my-subscriptions';
+import { ProfileBilling } from './tabs/billing/billing';
 import { EditPersonalInfo } from './_dialogs/edit-personal-info/edit-personal-info';
 import { EditHandle } from './_dialogs/edit-handle/edit-handle';
 import { ShareDialog } from '../../_shared/components/share-dialog/share-dialog';
@@ -44,8 +42,7 @@ import { ShareDialog } from '../../_shared/components/share-dialog/share-dialog'
 export const ProfileTabs = {
   Details: 'details',
   Coaches: 'coaches',
-  Invoices: 'invoices',
-  Memberships: 'memberships',
+  Billing: 'billing',
   Notifications: 'notifications',
   Safety: 'safety',
 } as const;
@@ -53,6 +50,17 @@ export const ProfileTabs = {
 export type ProfileTab = (typeof ProfileTabs)[keyof typeof ProfileTabs];
 
 const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
+
+/**
+ * Legacy tab values still arriving from notification deep-links
+ * (`screen: 'profile', queryParams: { tab: 'invoices' | 'memberships' }`
+ * in the BE notifications). Both now resolve to the consolidated Billing
+ * tab — don't drop these mappings without updating the BE notifications.
+ */
+const LEGACY_TAB_ALIASES: Record<string, ProfileTab> = {
+  invoices: ProfileTabs.Billing,
+  memberships: ProfileTabs.Billing,
+};
 
 /**
  * `/profile` — Facebook-style owner view.
@@ -79,8 +87,7 @@ const VALID_TABS = new Set<string>(Object.values(ProfileTabs));
     ProfileCoaches,
     ProfileNotifications,
     ProfileSafety,
-    MyInvoices,
-    MySubscriptions,
+    ProfileBilling,
     EditPersonalInfo,
     EditHandle,
     ShareDialog,
@@ -94,7 +101,7 @@ export class Profile implements OnInit {
   private readonly _profileService = inject(ProfileService);
   private readonly _userService = inject(UserService);
   private readonly _authService = inject(AuthService);
-  private readonly _clientPaymentService = inject(ClientPaymentService);
+  private readonly _billingCounts = inject(BillingCountsStore);
   private readonly _clientService = inject(ClientService);
   private readonly _publicProfileStore = inject(PublicProfileStore);
   private readonly _messageService = inject(MessageService);
@@ -115,7 +122,6 @@ export class Profile implements OnInit {
   private readonly _privacyOverride = signal<UserPrivacySettings | null>(null);
 
   readonly loading = signal(true);
-  readonly counts = signal<MyBillingCounts | null>(null);
   readonly incomingRequestsCount = signal(0);
 
   /**
@@ -158,22 +164,31 @@ export class Profile implements OnInit {
 
   readonly activeTab = computed<ProfileTab>(() => {
     const tab = this._queryParams().get('tab');
-    return tab && VALID_TABS.has(tab) ? (tab as ProfileTab) : ProfileTabs.Details;
+    let resolved: ProfileTab = ProfileTabs.Details;
+    if (tab) {
+      if (LEGACY_TAB_ALIASES[tab]) resolved = LEGACY_TAB_ALIASES[tab];
+      else if (VALID_TABS.has(tab)) resolved = tab as ProfileTab;
+    }
+    // The Billing tab only exists once the user has billing — a stale
+    // bookmark / deep-link to it falls back to Details instead of a blank.
+    if (resolved === ProfileTabs.Billing && !this._billingCounts.hasBilling()) {
+      return ProfileTabs.Details;
+    }
+    return resolved;
   });
 
-  readonly showInvoicesTab = computed(() => (this.counts()?.invoices.total ?? 0) > 0);
-  readonly showMembershipsTab = computed(
-    () => (this.counts()?.memberships.total ?? 0) > 0,
-  );
-
-  readonly invoicesBadge = computed(() => this.counts()?.invoices.open ?? 0);
-  readonly membershipsBadge = computed(
-    () => this.counts()?.memberships.active ?? 0,
-  );
+  /**
+   * Billing surfaces read the shared cached counts (one request per
+   * session, fetched by the account menu). Tab hides until the user has
+   * real billing; badge shows open invoices needing payment.
+   */
+  readonly showBillingTab = this._billingCounts.hasBilling;
+  readonly billingBadge = this._billingCounts.openInvoices;
 
   ngOnInit(): void {
     this.loadProfile();
-    this.loadCounts();
+    // Idempotent — reuses the cache the account menu already populated.
+    this._billingCounts.ensureLoaded();
     this.loadIncomingRequestsCount();
   }
 
@@ -353,16 +368,6 @@ export class Profile implements OnInit {
   // -------------------------------------------------------------
   // Tabs / counts
   // -------------------------------------------------------------
-
-  private loadCounts(): void {
-    this._clientPaymentService.getMyCounts().subscribe({
-      next: (counts) => this.counts.set(counts),
-      error: () => {
-        // Counts are non-critical; tabs fall back to Details-only.
-        this.counts.set(null);
-      },
-    });
-  }
 
   private loadIncomingRequestsCount(): void {
     this._clientService.getPendingRequests().subscribe({

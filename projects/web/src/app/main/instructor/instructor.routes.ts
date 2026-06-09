@@ -31,8 +31,7 @@ export const instructorRoutes: Routes = [
   },
   {
     path: 'sessions/calendar',
-    loadComponent: () =>
-      import('./sessions/calendar/calendar').then((m) => m.SessionsCalendar),
+    loadComponent: () => import('./sessions/calendar/calendar').then((m) => m.SessionsCalendar),
     title: 'Sessions calendar - MotionHive',
   },
   {
@@ -44,9 +43,7 @@ export const instructorRoutes: Routes = [
   {
     path: 'sessions/templates/:id',
     loadComponent: () =>
-      import('./sessions/template-detail/template-detail').then(
-        (m) => m.InstructorTemplateDetail,
-      ),
+      import('./sessions/template-detail/template-detail').then((m) => m.InstructorTemplateDetail),
     title: 'Recurring session - MotionHive',
   },
   {
@@ -58,10 +55,26 @@ export const instructorRoutes: Routes = [
   {
     path: 'sessions/:id',
     loadComponent: () =>
-      import('./sessions/session-detail/session-detail').then(
-        (m) => m.InstructorSessionDetail,
-      ),
+      import('./sessions/session-detail/session-detail').then((m) => m.InstructorSessionDetail),
     title: 'Session - MotionHive',
+  },
+  {
+    path: 'exercises',
+    loadComponent: () => import('./exercises/exercises').then((m) => m.Exercises),
+    title: 'Exercises - MotionHive',
+  },
+  {
+    path: 'programs',
+    loadComponent: () => import('./programs/programs').then((m) => m.Programs),
+    title: 'Programs - MotionHive',
+  },
+  {
+    path: 'programs/:id',
+    loadComponent: () =>
+      import('./programs/program-detail/program-detail').then(
+        (m) => m.ProgramDetail,
+      ),
+    title: 'Program detail - MotionHive',
   },
   // Groups now live at the shared /groups path so all roles can access them.
   // Keep redirects so existing /coaching/groups bookmarks and in-app links still resolve.

@@ -1,0 +1,53 @@
+<div class="flex min-h-screen bg-[var(--p-surface-100)]">
+  <!-- Sidebar -->
+  <aside
+    class="flex w-60 flex-col gap-1 border-r border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-3 py-4"
+  >
+    <div class="mb-4 flex items-center gap-2 px-2">
+      <img src="svg/logo-navy.svg" alt="MotionHive" class="h-7 w-7 shrink-0 dark:hidden" />
+      <img src="svg/logo-honey.svg" alt="MotionHive" class="hidden h-7 w-7 shrink-0 dark:block" />
+      <span class="truncate text-base font-bold text-[var(--p-text-color)]">MotionHive</span>
+      <span
+        class="shrink-0 rounded bg-[var(--p-primary-color)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--p-primary-contrast-color)]"
+      >
+        Admin
+      </span>
+    </div>
+
+    @for (item of navItems(); track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="bg-[var(--p-highlight-background)] text-[var(--p-primary-color)]"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[var(--p-text-muted-color)] hover:bg-[var(--p-surface-100)]"
+      >
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </aside>
+
+  <!-- Main (min-w-0 lets wide tables scroll inside this column instead of
+       pushing the whole layout wider — the flexbox min-width:auto gotcha) -->
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header
+      class="flex items-center justify-between border-b border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-6 py-3"
+    >
+      <div></div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-[var(--p-text-muted-color)]">{{ userName() }}</span>
+        <button
+          type="button"
+          (click)="logout()"
+          class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-[var(--p-text-muted-color)] hover:bg-[var(--p-surface-100)]"
+        >
+          <i class="pi pi-sign-out"></i>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="min-w-0 flex-1 overflow-auto p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>

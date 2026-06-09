@@ -8,6 +8,7 @@ import {
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -235,30 +236,46 @@ export class SessionFormDialog {
 
   private readonly _initEffect = effect(() => {
     if (!this.visible()) return;
-    // Lazy-load venues + groups on first open.
-    if (this.venues().length === 0) {
-      this._venueSvc.list().subscribe({
-        next: (vs) => this.venues.set(vs),
-        error: () => this.venues.set([]),
-      });
-    }
-    if (this.groups().length === 0) {
-      this._groupSvc.getMyGroups().subscribe({
-        next: (gs) => this.groups.set(gs),
-        error: () => this.groups.set([]),
-      });
-    }
-    const t = this.template();
-    if (t) {
-      this._hydrateFromTemplate(t);
-    } else {
-      // Create mode — start from a blank form, then layer any prefill
-      // defaults the caller supplied (e.g. calendar quick-create maps
-      // the dragged time range here).
-      const base = blankForm();
-      const p = this.prefill();
-      this.form.set(p ? { ...base, ...p } : base);
-    }
+    // Only `visible()` is a dependency — everything below runs untracked.
+    // Previously this effect read `venues()` / `groups()` (via `.length`)
+    // as reactive deps, so when their lazy-load responses landed the whole
+    // body re-ran and `form.set(blankForm())` wiped any in-progress edit.
+    // The user would then hit "Create" on a blanked form and the title
+    // guard would silently abort the request. Reading them untracked makes
+    // init fire exactly once per open.
+    untracked(() => {
+      // Always start a fresh open with a clickable primary button. If a
+      // previous create/update request ever hung (no emit), `saving` would
+      // otherwise stay true forever — the component isn't destroyed on
+      // close, so the next open would render the button permanently
+      // `[loading]`/disabled. The user then can't submit and dismisses the
+      // dialog (Escape/X) → "dialog just closes, no toast, nothing saved".
+      this.saving.set(false);
+      // Lazy-load venues + groups on first open.
+      if (this.venues().length === 0) {
+        this._venueSvc.list().subscribe({
+          next: (vs) => this.venues.set(vs),
+          error: () => this.venues.set([]),
+        });
+      }
+      if (this.groups().length === 0) {
+        this._groupSvc.getMyGroups().subscribe({
+          next: (gs) => this.groups.set(gs),
+          error: () => this.groups.set([]),
+        });
+      }
+      const t = this.template();
+      if (t) {
+        this._hydrateFromTemplate(t);
+      } else {
+        // Create mode — start from a blank form, then layer any prefill
+        // defaults the caller supplied (e.g. calendar quick-create maps
+        // the dragged time range here).
+        const base = blankForm();
+        const p = this.prefill();
+        this.form.set(p ? { ...base, ...p } : base);
+      }
+    });
   });
 
   updateField<K extends keyof SessionForm>(key: K, value: SessionForm[K]): void {
@@ -274,6 +291,10 @@ export class SessionFormDialog {
   }
 
   save(): void {
+    // Re-entry guard: a second click while a request is already in flight
+    // would fire a duplicate create. The button is also `[loading]` during
+    // this window, but guard in code too so it can't slip through.
+    if (this.saving()) return;
     const f = this.form();
     if (!f.title.trim()) {
       this._toast('warn', 'Title required', 'Give your session a name.');

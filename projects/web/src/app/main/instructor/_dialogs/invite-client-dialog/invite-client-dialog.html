@@ -9,7 +9,7 @@
 
     @if (mode() === 'find') {
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Search clients</label>
+      <label class="text-sm font-medium">Search clients <span class="text-red-500">*</span></label>
       @if (!selectedUser()) {
       <mh-user-search-autocomplete [role]="userRole" [excludeConnected]="true" placeholder="Search by name or email…"
         (selected)="onUserSelected($event)" (cleared)="onUserCleared()" />
@@ -38,7 +38,7 @@
     </div>
     } @else {
     <div class="flex flex-col gap-2">
-      <label for="inviteEmail" class="text-sm font-medium">Email address</label>
+      <label for="inviteEmail" class="text-sm font-medium">Email address <span class="text-red-500">*</span></label>
       <input id="inviteEmail" type="email" pInputText fluid formControlName="email"
         placeholder="Enter the client's email address" [class.ng-invalid]="isFieldInvalid('email')"
         [class.ng-dirty]="isFieldInvalid('email')" />

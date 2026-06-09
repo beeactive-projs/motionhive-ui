@@ -9,6 +9,7 @@ import {
 } from '../../models/user/user.model';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
+import { silentRequest } from '../../interceptors/silent-request.context';
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +47,7 @@ export class UserService {
     if (params.limit != null) httpParams = httpParams.set('limit', String(params.limit));
     return this._http.get<UserSearchResult[]>(
       `${environment.apiUrl}${API_ENDPOINTS.USERS.SEARCH}`,
-      { params: httpParams },
+      { params: httpParams, context: silentRequest() },
     );
   }
 }

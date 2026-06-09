@@ -2,10 +2,7 @@
   [closable]="true">
   <div class="flex flex-col gap-4">
     @if (client(); as c) {
-    <div class="flex items-center gap-3 rounded-lg bg-surface-50 p-3">
-      <mh-avatar [user]="c.client" styleClass="bg-primary-100 text-primary-700" />
-      <span class="font-medium text-secondary-900">{{ clientName(c) }}</span>
-    </div>
+    <mh-user-info [user]="c.client" />
     }
     <div class="flex flex-col gap-2">
       <label for="editNotes" class="text-sm font-medium text-secondary-700">Notes</label>

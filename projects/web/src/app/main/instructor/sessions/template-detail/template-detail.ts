@@ -6,11 +6,12 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 // MessageService scoped per page so child dialogs can emit toasts.
@@ -20,14 +21,17 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import {
   AccessChip,
   DateWindowsMs,
-  PageShell,
   ProviderChip,
   SessionInstance,
+  SessionInstanceStatus,
   SessionService,
   SessionTemplate,
+  SessionTemplateStatus,
   SessionsInstructorStore,
   TypeChip,
   apiErrorMessage,
+  injectIsMobile,
+  injectIsTablet,
   showApiError,
 } from 'core';
 import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-dialog';
@@ -56,11 +60,11 @@ import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-
     RouterLink,
     ButtonModule,
     InputNumberModule,
-    PageShell,
     AccessChip,
     TypeChip,
     ProviderChip,
     SessionFormDialog,
+    MessageModule,
     ToastModule,
     ConfirmDialogModule,
   ],
@@ -72,12 +76,21 @@ import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-
 export class InstructorTemplateDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _location = inject(Location);
   private readonly _svc = inject(SessionService);
   private readonly _msg = inject(MessageService);
   private readonly _confirm = inject(ConfirmationService);
   // Root-scoped: refresh the list after the series is cancelled so the
   // template card moves out of Upcoming / Recurring tabs.
   private readonly _listStore = inject(SessionsInstructorStore);
+
+  protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+
+  // Enum consts exposed for template comparisons — never compare against
+  // raw string literals (see CLAUDE.md).
+  protected readonly SessionTemplateStatus = SessionTemplateStatus;
+  protected readonly SessionInstanceStatus = SessionInstanceStatus;
 
   readonly template = signal<SessionTemplate | null>(null);
   readonly instances = signal<SessionInstance[]>([]);
@@ -102,7 +115,7 @@ export class InstructorTemplateDetail implements OnInit {
 
   /** Earliest upcoming SCHEDULED instance — what "End after this week" preserves. */
   protected readonly firstFutureInstance = computed<SessionInstance | null>(
-    () => this.upcoming().find((i) => i.status === 'SCHEDULED') ?? null,
+    () => this.upcoming().find((i) => i.status === SessionInstanceStatus.Scheduled) ?? null,
   );
 
   readonly upcoming = computed(() => {
@@ -128,6 +141,16 @@ export class InstructorTemplateDetail implements OnInit {
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
     if (id) this._load(id);
+  }
+
+  protected goBack(): void {
+    // Location.back() === history.back(). If we arrived via deep link or a
+    // refresh there's no in-app history to pop, so fall back to the list.
+    if (this._router.lastSuccessfulNavigation()?.previousNavigation) {
+      this._location.back();
+    } else {
+      void this._router.navigate(['/coaching/sessions']);
+    }
   }
 
   protected regenerate(): void {
@@ -223,7 +246,7 @@ export class InstructorTemplateDetail implements OnInit {
    * SECOND upcoming instance.
    */
   protected endAfterThisWeek(): void {
-    const upcoming = this.upcoming().filter((i) => i.status === 'SCHEDULED');
+    const upcoming = this.upcoming().filter((i) => i.status === SessionInstanceStatus.Scheduled);
     if (upcoming.length < 2) {
       this._msg.add({
         severity: 'info',

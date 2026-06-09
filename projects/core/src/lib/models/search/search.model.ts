@@ -22,6 +22,15 @@ export interface SearchResultItem {
   subtitle?: string | null;
   /** Avatar/cover image URL. Optional; the modal falls back to initials/icons. */
   avatarUrl?: string | null;
+  /** Public-profile handle for `user`/`instructor` rows (and a session's
+   *  instructor) — lets the modal route a click to `/@<handle>` or resolve
+   *  the public session by slug. */
+  handle?: string | null;
+  /** Session template slug — with `handle`, resolves the public showcase. */
+  slug?: string | null;
+  /** Group rows only: the viewer is an active member → route them inside
+   *  (`/groups/:id`) instead of the outside preview. */
+  viewerIsMember?: boolean;
   /** 0..1 relevance score. Useful for FE A/B presentation; can be ignored. */
   score?: number;
   /** Field paths that matched, e.g. ["specializations", "displayName"].

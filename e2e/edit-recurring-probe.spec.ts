@@ -24,7 +24,7 @@ test('edit recurring template mobile', async ({ page }) => {
   // Tap the first recurring row to open template-detail
   const row = page.locator('mh-time-row').first();
   await row.click();
-  await page.waitForSelector('mh-page-shell', { timeout: 10_000 });
+  await page.waitForSelector('header', { timeout: 10_000 });
   await page.screenshot({
     path: path.join(OUT, '15-recurring-detail.png'),
     fullPage: false,

@@ -16,4 +16,36 @@ export const userRoutes: Routes = [
     ],
     children: [],
   },
+  {
+    path: 'sessions',
+    loadComponent: () => import('./my-sessions/my-sessions').then((m) => m.MySessions),
+    title: 'My sessions - MotionHive',
+  },
+  {
+    path: 'sessions/discover',
+    loadComponent: () =>
+      import('./my-sessions/sessions-discover/sessions-discover').then(
+        (m) => m.SessionsDiscover,
+      ),
+    title: 'Discover sessions - MotionHive',
+  },
+  {
+    // Day-of online countdown. Declared before `sessions/:id` so the
+    // `/join` suffix wins; `sessions/discover` above already wins over `:id`.
+    path: 'sessions/:id/join',
+    loadComponent: () =>
+      import('../session-day-of-online/session-day-of-online').then(
+        (m) => m.SessionDayOfOnline,
+      ),
+    title: 'Join session - MotionHive',
+  },
+  {
+    // Public session showcase (reached from Discover, share links, reminders).
+    path: 'sessions/:id',
+    loadComponent: () =>
+      import('./my-sessions/session-showcase/session-showcase').then(
+        (m) => m.SessionShowcase,
+      ),
+    title: 'Session - MotionHive',
+  },
 ];

@@ -202,6 +202,62 @@ export const API_ENDPOINTS = {
     BY_ID: (deviceId: string) => `/devices/${deviceId}`,
     HEARTBEAT: (deviceId: string) => `/devices/${deviceId}/seen`,
   },
+  EXERCISES: {
+    BASE: '/exercises',
+    BY_ID: (id: string) => `/exercises/${id}`,
+    FORK: (id: string) => `/exercises/${id}/fork`,
+  },
+  PROGRAMS: {
+    BASE: '/programs',
+    BY_ID: (id: string) => `/programs/${id}`,
+    WORKOUTS: (id: string) => `/programs/${id}/workouts`,
+    WORKOUT_BY_ID: (id: string, workoutId: string) =>
+      `/programs/${id}/workouts/${workoutId}`,
+    EXERCISES: (id: string, workoutId: string) =>
+      `/programs/${id}/workouts/${workoutId}/exercises`,
+    EXERCISE_BY_ID: (id: string, workoutId: string, exerciseId: string) =>
+      `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}`,
+    SETS: (id: string, workoutId: string, exerciseId: string) =>
+      `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}/sets`,
+    SET_BY_ID: (
+      id: string,
+      workoutId: string,
+      exerciseId: string,
+      setId: string,
+    ) =>
+      `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}/sets/${setId}`,
+  },
+  PROGRAM_ASSIGNMENTS: {
+    BASE: '/program-assignments',
+    BY_ID: (id: string) => `/program-assignments/${id}`,
+    MY: '/my/program-assignments',
+  },
+  WORKOUT_LOGS: {
+    BASE: '/workout-logs',
+    BY_ID: (id: string) => `/workout-logs/${id}`,
+    COMPLETE: (id: string) => `/workout-logs/${id}/complete`,
+    LOG_SET: (id: string, setId: string) =>
+      `/workout-logs/${id}/sets/${setId}`,
+    ADD_EXERCISE: (id: string) => `/workout-logs/${id}/exercises`,
+    REMOVE_EXERCISE: (id: string, exId: string) =>
+      `/workout-logs/${id}/exercises/${exId}`,
+    ADD_SET: (id: string, exId: string) =>
+      `/workout-logs/${id}/exercises/${exId}/sets`,
+    LAST_FOR_EXERCISE: (exerciseId: string) =>
+      `/workout-logs/last-for-exercise/${exerciseId}`,
+    COACH_LIST_FOR_CLIENT: (clientId: string) =>
+      `/coach/clients/${clientId}/workout-logs`,
+    COACH_BY_ID: (id: string) => `/coach/workout-logs/${id}`,
+  },
+  ONE_REP_MAXES: {
+    BASE: '/one-rep-maxes',
+  },
+  MUSCLES: {
+    BASE: '/muscles',
+  },
+  EQUIPMENT: {
+    BASE: '/equipment',
+  },
   MESSAGING: {
     CONVERSATIONS: '/messaging/conversations',
     CONVERSATION: (id: string) => `/messaging/conversations/${id}`,

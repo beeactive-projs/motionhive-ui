@@ -1,576 +1,397 @@
-<!--
-  Two render branches:
-    - Desktop (>600px): legacy KPI cards + sticky pill row + grouped
-      mh-session-card list. Untouched on purpose so the desktop
-      experience the design team signed off on doesn't regress.
-    - Mobile (≤600px): frames 1A/1B/1C from the design — inline
-      summary line, scrolling tabs with counts, Filters · N chip
-      opens a bottom sheet, day-grouped agenda using mh-time-row
-      + mh-day-separator, mh-mobile-fab for create. Long-press a
-      row → mh-bottom-sheet action menu (frame 1C).
--->
-
-@if (!isMobile()) {
-  <!-- ───────────────────── DESKTOP ───────────────────── -->
-  <mh-page-shell title="Sessions">
-    <ng-container actions>
-      <div class="mh-seg" role="tablist" aria-label="View">
-        <button
-          type="button"
-          class="mh-seg__btn is-active"
-          (click)="setView('cards')"
-          aria-pressed="true"
-        >
-          <i class="pi pi-th-large" aria-hidden="true"></i>
-          List
-        </button>
-        <button
-          type="button"
-          class="mh-seg__btn"
-          (click)="setView('calendar')"
-          aria-pressed="false"
-        >
-          <i class="pi pi-calendar" aria-hidden="true"></i>
-          Calendar
-        </button>
-      </div>
-      <p-button
-        label="Public profile"
-        severity="secondary"
-        [outlined]="true"
-        icon="pi pi-external-link"
-        [disabled]="!handle()"
-        pTooltip="Preview your sessions list as clients see it"
-        tooltipPosition="bottom"
-        (onClick)="openPublicProfile()"
-      />
-      <p-button
-        label="New session"
-        icon="pi pi-plus"
-        (click)="onCreateNew()"
-        styleClass="mh-sessions__new-btn"
-      />
-    </ng-container>
-
-    <!-- KPI strip -->
-    <section class="mh-sessions__kpi" aria-label="Overview">
-      @if (store.loading() && store.templates().length === 0) {
-        @for (i of [1,2,3,4]; track i) {
-          <p-skeleton width="100%" height="80px" borderRadius="12px" />
-        }
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · shared across desktop + mobile -->
+  <header class="flex gap-4 items-center justify-between">
+    <div class="space-y-1">
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Sessions</h1>
+      @if (isTabletDown()) {
+      <p class="text-xs text-surface-700 dark:text-surface-400">Schedule training and manage signups.</p>
       } @else {
-        <mh-kpi-card
-          icon="pi pi-calendar"
-          label="This week"
-          [value]="store.kpis().thisWeek"
-          sub="Scheduled sessions"
-        />
-        <mh-kpi-card
-          icon="pi pi-users"
-          label="Total signups"
-          [value]="store.kpis().totalSignups"
-          sub="Across upcoming"
-        />
-        <mh-kpi-card
-          icon="pi pi-replay"
-          label="Recurring templates"
-          [value]="store.kpis().recurring + ' active'"
-          sub="Series in motion"
-        />
-        <mh-kpi-card
-          icon="pi pi-exclamation-triangle"
-          label="Needs attention"
-          [value]="store.kpis().needsAttention"
-          [sub]="store.kpis().needsAttention === 0 ? 'All clear' : 'Conflicts and pending'"
-          [variant]="store.kpis().needsAttention > 0 ? 'warn' : 'default'"
-        />
+      <p class="text-sm text-surface-700 dark:text-surface-400">Schedule training, manage signups, and showcase your
+        availability.</p>
       }
-    </section>
-
-    <!-- Tabs -->
-    <nav class="mh-sessions__tabs" role="tablist" aria-label="Filter by status">
-      @for (tab of tabs; track tab.key) {
-        <button
-          type="button"
-          role="tab"
-          class="mh-tab"
-          [class.is-active]="store.tab() === tab.key"
-          [attr.aria-selected]="store.tab() === tab.key"
-          (click)="onTabChange(tab.key)"
-        >
-          {{ tab.label }}
-        </button>
-      }
-    </nav>
-
-    <!-- Filters: search + pill toggles for type/location. -->
-    <div class="mh-sessions__filters" role="search">
-      <span class="p-input-icon-left mh-sessions__search">
-        <i class="pi pi-search"></i>
-        <input
-          pInputText
-          type="text"
-          placeholder="Search sessions, venues, clients…"
-          [ngModel]="searchInput()"
-          (ngModelChange)="onSearchInput($event)"
-        />
-      </span>
-
-      <div class="mh-sessions__pills" role="group" aria-label="Quick filters">
-        <button
-          type="button"
-          class="mh-pill"
-          [class.is-active]="!store.filters().locationKind && !store.filters().type"
-          (click)="clearQuickFilters()"
-        >All</button>
-
-        <span class="mh-pill__divider" aria-hidden="true"></span>
-
-        <button
-          type="button"
-          class="mh-pill"
-          [class.is-active]="store.filters().locationKind === 'ONLINE'"
-          (click)="toggleLocation('ONLINE')"
-        >
-          <i class="pi pi-video" aria-hidden="true"></i>
-          Online
-        </button>
-        <button
-          type="button"
-          class="mh-pill"
-          [class.is-active]="store.filters().locationKind === 'IN_PERSON'"
-          (click)="toggleLocation('IN_PERSON')"
-        >
-          <i class="pi pi-map-marker" aria-hidden="true"></i>
-          In-person
-        </button>
-
-        <span class="mh-pill__divider" aria-hidden="true"></span>
-
-        <button
-          type="button"
-          class="mh-pill"
-          [class.is-active]="store.filters().type === 'GROUP'"
-          (click)="toggleType('GROUP')"
-        >Group</button>
-        <button
-          type="button"
-          class="mh-pill"
-          [class.is-active]="store.filters().type === 'PRIVATE'"
-          (click)="toggleType('PRIVATE')"
-        >1-on-1</button>
-        <button
-          type="button"
-          class="mh-pill"
-          [class.is-active]="store.filters().type === 'OPEN'"
-          (click)="toggleType('OPEN')"
-        >Open</button>
-      </div>
     </div>
+    <div class="flex gap-3">
+      @if (isMobile()) {
+      <p-button icon="pi pi-calendar" outlined rounded severity="secondary" (onClick)="goToCalendar()" size="small" />
+      } @else {
+      <p-button label="Calendar" icon="pi pi-calendar" outlined severity="secondary" (onClick)="goToCalendar()"
+        [size]="isTablet() ? 'small' : undefined" />
+      <p-button label="New session" icon="pi pi-plus" (onClick)="onCreateNew()"
+        [size]="isTablet() ? 'small' : undefined" />
+      }
+    </div>
+  </header>
 
-    <ng-container *ngTemplateOutlet="errorState" />
+  <!-- KPI strip · shared — mobile 2-col, tablet/desktop 4-col -->
+  @let kpiLoading = store.loading() && store.templates().length === 0;
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3" aria-label="Overview">
+    <mh-kpi-card icon="pi pi-calendar" label="This week" [value]="store.kpis().thisWeek" sub="Scheduled sessions"
+      [loading]="kpiLoading" />
+    <mh-kpi-card icon="pi pi-users" label="Total signups" [value]="store.kpis().totalSignups" sub="Across upcoming"
+      [loading]="kpiLoading" />
+    <mh-kpi-card icon="pi pi-replay" label="Recurring" [value]="store.kpis().recurring + ' active'"
+      sub="Series in motion" [loading]="kpiLoading" />
+    <mh-kpi-card icon="pi pi-exclamation-triangle" label="Needs attention" [value]="store.kpis().needsAttention"
+      [sub]="store.kpis().needsAttention === 0 ? 'All clear' : 'Conflicts and pending'"
+      [severity]="store.kpis().needsAttention > 0 ? 'danger' : undefined" [loading]="kpiLoading" />
+  </section>
 
-    @if (store.loading() && store.templates().length === 0) {
-      <ng-container *ngTemplateOutlet="skeletonState" />
-    } @else if (
-      store.tab() !== 'cancelled' &&
-      store.templates().length === 0 &&
-      !store.error()
-    ) {
-      <ng-container *ngTemplateOutlet="emptyState" />
-    } @else if (store.tab() === 'cancelled') {
-      @if (store.cancelledInstances().length === 0) {
+  <!--
+    Tabs · single source of truth for the active surface, shared across
+    desktop + mobile. The tab headers (#tablist), the filter row, and the
+    per-tab content (#tabpanels) all live inside <p-tabs> so the tab/panel
+    ARIA wiring is correct on every device.
+
+    Each panel body is additionally gated on `store.tab()` so only the
+    active tab is materialised in the DOM — PrimeNG keeps inactive panels
+    mounted (just `[hidden]`), and rendering them would duplicate the
+    infinite-scroll `#scrollSentinel` and the filter inputs.
+  -->
+  <p-tabs [value]="store.tab()" (valueChange)="onTabChange($event)" [scrollable]="true"
+    class="flex-1 min-h-0 flex flex-col gap-3 lg:gap-4">
+    <p-tablist>
+      @for (tab of tabs; track tab.id) {
+      <p-tab [value]="tab.id">
+        <i class="text-md" [class]="tab.icon" [class.text-xs]="isTabletDown()"></i>
+        <span class="ml-2 text-md" [class.text-xs]="isTabletDown()">{{ tab.label }}</span>
+      </p-tab>
+      }
+    </p-tablist>
+
+    <!-- Filters · projected once between the tab headers and the panels so
+         a single instance drives every tab (search + quick filters apply
+         globally, not per-tab). -->
+    <ng-container *ngTemplateOutlet="filtersRow" />
+
+    <p-tabpanels class="p-0! flex flex-col flex-1 min-h-0">
+      <!-- Upcoming · instances-first chronological list. -->
+      <p-tabpanel [value]="TemplateTab.Active" class="flex-1 min-h-0" [class.overflow-y-auto]="!isMobile()">
+        @if (store.tab() === TemplateTab.Active) {
+        <ng-container *ngTemplateOutlet="errorState" />
+        @if (store.loading() && store.templates().length === 0) {
+        <ng-container *ngTemplateOutlet="skeletonState" />
+        } @else if (store.templates().length === 0 && !store.error()) {
+        <ng-container *ngTemplateOutlet="emptyState" />
+        } @else {
+        <ng-container *ngTemplateOutlet="activeContent" />
+        }
+        }
+      </p-tabpanel>
+
+      <!-- Recurring templates -->
+      <p-tabpanel [value]="TemplateTab.Recurring" class="flex-1 min-h-0" [class.overflow-y-auto]="!isMobile()">
+        @if (store.tab() === TemplateTab.Recurring) {
+        <ng-container *ngTemplateOutlet="errorState" />
+        @if (store.loading() && store.templates().length === 0) {
+        <ng-container *ngTemplateOutlet="skeletonState" />
+        } @else if (store.templates().length === 0 && !store.error()) {
+        <ng-container *ngTemplateOutlet="emptyState" />
+        } @else {
+        <ng-container *ngTemplateOutlet="listContent" />
+        }
+        }
+      </p-tabpanel>
+
+      <!-- Past -->
+      <p-tabpanel [value]="TemplateTab.Ended" class="flex-1 min-h-0" [class.overflow-y-auto]="!isMobile()">
+        @if (store.tab() === TemplateTab.Ended) {
+        <ng-container *ngTemplateOutlet="errorState" />
+        @if (store.loading() && store.templates().length === 0) {
+        <ng-container *ngTemplateOutlet="skeletonState" />
+        } @else if (store.templates().length === 0 && !store.error()) {
+        <ng-container *ngTemplateOutlet="emptyState" />
+        } @else {
+        <ng-container *ngTemplateOutlet="listContent" />
+        }
+        }
+      </p-tabpanel>
+
+      <!-- Cancelled · each row is a SessionInstance, not a template. -->
+      <p-tabpanel [value]="TemplateTab.Cancelled" class="flex-1 min-h-0" [class.overflow-y-auto]="!isMobile()">
+        @if (store.tab() === TemplateTab.Cancelled) {
+        <ng-container *ngTemplateOutlet="errorState" />
+        @if (store.loading() && store.templates().length === 0) {
+        <ng-container *ngTemplateOutlet="skeletonState" />
+        } @else if (store.cancelledInstances().length === 0) {
         <ng-container *ngTemplateOutlet="cancelledEmptyState" />
-      } @else {
-        <div class="mh-sessions__groups">
-          <mh-section-label
-            [label]="cancelledLabel()"
-            [count]="store.cancelledTotal()"
-          />
-          @for (inst of store.cancelledInstances(); track inst.id) {
-            <mh-session-card
-              [instance]="inst"
-              variant="list-card"
-              [showCTA]="false"
-              (open)="openCancelledInstance(inst.id)"
-            />
-          }
-        </div>
-      }
-    } @else if (store.tab() === 'active') {
-      <!-- Upcoming: drive directly from instances so the chronological
-           order is "what's next" not "templates sorted by firstStartAt
-           DESC". Each instance renders as its own card. -->
-      <div class="mh-sessions__groups">
-        @for (group of upcomingInstancesByDay(); track group.date.getTime()) {
-          <section class="mh-sessions__group">
-            <mh-section-label
-              [label]="sectionLabel(group.date)"
-              [count]="group.items.length"
-            />
-            @for (inst of group.items; track inst.id) {
-              <mh-session-card
-                [instance]="inst"
-                variant="list-card"
-                [showCTA]="false"
-                (open)="onInstanceOpen(inst)"
-              />
-            }
-          </section>
+        } @else {
+        <ng-container *ngTemplateOutlet="cancelledContent" />
         }
-      </div>
-    } @else {
-      <div class="mh-sessions__groups">
-        @for (group of groupedByDay(); track group.date.getTime()) {
-          <section class="mh-sessions__group">
-            <mh-section-label
-              [label]="sectionLabel(group.date)"
-              [count]="group.items.length"
-            />
-            @for (t of group.items; track t.id) {
-              <mh-session-card
-                [instance]="cardInstanceFor(t)"
-                variant="list-card"
-                [showCTA]="false"
-                (open)="onCardOpen(t.id)"
-              />
-            }
-          </section>
         }
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
 
-        @if (store.hasMore()) {
-          <div #scrollSentinel class="mh-sessions__sentinel" aria-hidden="true"></div>
-          @if (store.loading()) {
-            <div class="mh-sessions__loading-more" role="status">
-              <i class="pi pi-spinner pi-spin"></i>
-              Loading more sessions…
-            </div>
-          }
-        } @else if (store.templates().length > 0) {
-          <div class="mh-sessions__end" role="status">
-            That's everything — {{ store.total() }} session{{ store.total() === 1 ? '' : 's' }} total.
-          </div>
-        }
-      </div>
-    }
-  </mh-page-shell>
-} @else {
-  <!-- ───────────────────── MOBILE (1A) ───────────────────── -->
-  <mh-page-shell title="Sessions">
-    <!-- Inline summary line — 11 this week · 52 signups · 1 conflict -->
-    <div class="mh-mob__stats" aria-label="Sessions overview">
-      <span><strong>{{ store.kpis().thisWeek }}</strong> this week</span>
-      <span class="mh-mob__stats-dot">·</span>
-      <span><strong>{{ store.kpis().totalSignups }}</strong> signups</span>
-      @if (store.kpis().needsAttention > 0) {
-        <span class="mh-mob__stats-dot">·</span>
-        <span class="mh-mob__stats-warn">
-          <i class="pi pi-exclamation-triangle"></i>
-          {{ store.kpis().needsAttention }} to review
-        </span>
-      }
-    </div>
+@if (isMobile()) {
+<!-- Mobile FAB (single primary action). -->
+<mh-mobile-fab icon="pi pi-plus" label="New session" (tap)="onCreateNew()" />
+}
 
-    <!-- View toggle (List / Calendar) -->
-    <div class="mh-mob__view-seg" role="tablist" aria-label="View">
-      <button
-        type="button"
-        class="mh-mob__view-btn is-active"
-        (click)="setView('cards')"
-      ><i class="pi pi-list"></i> List</button>
-      <button
-        type="button"
-        class="mh-mob__view-btn"
-        (click)="setView('calendar')"
-      ><i class="pi pi-calendar"></i> Calendar</button>
-    </div>
-
-    <!-- Tabs · scrolling row -->
-    <nav class="mh-mob__tabs" role="tablist" aria-label="Filter by status">
-      @for (tab of tabs; track tab.key) {
-        <button
-          type="button"
-          role="tab"
-          class="mh-mob__tab"
-          [class.is-active]="store.tab() === tab.key"
-          [attr.aria-selected]="store.tab() === tab.key"
-          (click)="onTabChange(tab.key)"
-        >{{ tab.label }}</button>
-      }
-    </nav>
-
-    <!-- Filter pills · scrolling row.
-         The "Filters · N" pill is FIRST and opens the filter sheet.
-         The other pills mirror the desktop pills but compact. -->
-    <div class="mh-mob__pills" role="group" aria-label="Quick filters">
-      <button
-        type="button"
-        class="mh-mob__pill mh-mob__pill--filters"
-        [class.is-active]="appliedFilterCount() > 0"
-        (click)="filterSheetOpen.set(true)"
-      >
-        <i class="pi pi-filter"></i>
-        Filters{{ appliedFilterCount() > 0 ? ' · ' + appliedFilterCount() : '' }}
-      </button>
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="!store.filters().locationKind && !store.filters().type"
-        (click)="clearQuickFilters()"
-      >All</button>
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().locationKind === 'ONLINE'"
-        (click)="toggleLocation('ONLINE')"
-      ><i class="pi pi-video"></i> Online</button>
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().locationKind === 'IN_PERSON'"
-        (click)="toggleLocation('IN_PERSON')"
-      ><i class="pi pi-map-marker"></i> In-person</button>
-    </div>
-
-    <ng-container *ngTemplateOutlet="errorState" />
-
-    @if (store.loading() && store.templates().length === 0) {
-      <ng-container *ngTemplateOutlet="skeletonState" />
-    } @else if (
-      store.tab() !== 'cancelled' &&
-      store.templates().length === 0 &&
-      !store.error()
-    ) {
-      <ng-container *ngTemplateOutlet="emptyState" />
-    } @else if (store.tab() === 'cancelled') {
-      @if (store.cancelledInstances().length === 0) {
-        <ng-container *ngTemplateOutlet="cancelledEmptyState" />
-      } @else {
-        <div class="mh-mob__agenda">
-          <mh-day-separator
-            [label]="cancelledLabel()"
-            [count]="store.cancelledTotal()"
-            [sticky]="false"
-          />
-          @for (inst of store.cancelledInstances(); track inst.id) {
-            <mh-time-row
-              [time]="formatTime(inst.startAt)"
-              [duration]="formatDuration(inst.template?.durationMinutes ?? 0)"
-              [title]="inst.template?.title ?? 'Cancelled session'"
-              tone="muted"
-              (click)="openCancelledInstance(inst.id)"
-            >
-              <span meta>Cancelled</span>
-            </mh-time-row>
-          }
-        </div>
-      }
-    } @else if (store.tab() === 'active') {
-      <!-- Upcoming: instances-first chronological list. -->
-      <div class="mh-mob__agenda">
-        @for (group of upcomingInstancesByDay(); track group.date.getTime()) {
-          <mh-day-separator
-            [label]="sectionLabel(group.date)"
-            [count]="group.items.length"
-            [tone]="dayTone(group.date)"
-          />
-          @for (inst of group.items; track inst.id) {
-            <mh-time-row
-              [time]="formatTime(inst.startAt)"
-              [duration]="formatDuration(inst.template?.durationMinutes ?? 0)"
-              [title]="inst.titleOverride ?? inst.template?.title ?? 'Session'"
-              [tone]="inst.template ? toneFor(inst.template, inst) : 'honey'"
-              [conflict]="!!inst.conflictingInstanceIds?.length"
-              (click)="onInstanceOpen(inst)"
-              (contextmenu)="$event.preventDefault(); inst.template && openActions(inst.template)"
-            >
-              <span meta>
-                @if (inst.conflictingInstanceIds?.length) {
-                  <span class="mh-mob__chip mh-mob__chip--coral">
-                    <i class="pi pi-exclamation-triangle"></i> Conflict
-                  </span>
-                } @else if (inst.template?.type === 'PRIVATE') {
-                  <span class="mh-mob__chip mh-mob__chip--blue">1-on-1</span>
-                } @else if (inst.template?.locationKind === 'ONLINE') {
-                  <span class="mh-mob__chip mh-mob__chip--teal">Online</span>
-                } @else {
-                  <span class="mh-mob__chip mh-mob__chip--honey">{{ inst.template?.type | titlecase }}</span>
-                }
-                @if ((inst.template?.capacity ?? 0) > 0) {
-                  <span class="mh-mob__meta-text">
-                    {{ inst.confirmedCount }}/{{ inst.template?.capacity }}
-                  </span>
-                } @else if (inst.confirmedCount > 0) {
-                  <span class="mh-mob__meta-text">{{ inst.confirmedCount }} confirmed</span>
-                }
-              </span>
-            </mh-time-row>
-          }
-        }
-      </div>
-    } @else {
-      <div class="mh-mob__agenda">
-        @for (group of groupedByDay(); track group.date.getTime()) {
-          <mh-day-separator
-            [label]="sectionLabel(group.date)"
-            [count]="group.items.length"
-            [tone]="dayTone(group.date)"
-          />
-          @for (t of group.items; track t.id) {
-            @let inst = cardInstanceFor(t);
-            <mh-time-row
-              [time]="formatTime(inst.startAt)"
-              [duration]="formatDuration(t.durationMinutes)"
-              [title]="t.title"
-              [tone]="toneFor(t, inst)"
-              [conflict]="!!inst.conflictingInstanceIds?.length"
-              (click)="onCardOpen(t.id)"
-              (contextmenu)="$event.preventDefault(); openActions(t)"
-            >
-              <span meta>
-                @if (inst.conflictingInstanceIds?.length) {
-                  <span class="mh-mob__chip mh-mob__chip--coral">
-                    <i class="pi pi-exclamation-triangle"></i> Conflict
-                  </span>
-                } @else if (t.type === 'PRIVATE') {
-                  <span class="mh-mob__chip mh-mob__chip--blue">1-on-1</span>
-                } @else if (t.locationKind === 'ONLINE') {
-                  <span class="mh-mob__chip mh-mob__chip--teal">Online</span>
-                } @else {
-                  <span class="mh-mob__chip mh-mob__chip--honey">{{ t.type | titlecase }}</span>
-                }
-                @if ((t.capacity ?? 0) > 0) {
-                  <span class="mh-mob__meta-text">
-                    {{ inst.confirmedCount }}/{{ t.capacity }}
-                  </span>
-                } @else if (inst.confirmedCount > 0) {
-                  <span class="mh-mob__meta-text">{{ inst.confirmedCount }} confirmed</span>
-                }
-              </span>
-            </mh-time-row>
-          }
-        }
-
-        @if (store.hasMore()) {
-          <div #scrollSentinel class="mh-sessions__sentinel" aria-hidden="true"></div>
-          @if (store.loading()) {
-            <div class="mh-sessions__loading-more" role="status">
-              <i class="pi pi-spinner pi-spin"></i> Loading more…
-            </div>
-          }
-        } @else if (store.templates().length > 0) {
-          <div class="mh-sessions__end" role="status">
-            That's everything — {{ store.total() }} total.
-          </div>
-        }
-      </div>
-    }
-  </mh-page-shell>
-
-  <!-- Mobile FAB (single primary action). -->
-  <mh-mobile-fab icon="pi pi-plus" label="New session" (tap)="onCreateNew()" />
-
-  <!-- 1B · Filter sheet -->
-  <mh-bottom-sheet
-    [open]="filterSheetOpen()"
-    (openChange)="filterSheetOpen.set($event)"
-    size="large"
-    title="Filters"
-    [subtitle]="appliedFilterCount() + ' applied'"
-  >
-    <p-button
-      head-actions
-      label="Reset"
-      severity="secondary"
-      [text]="true"
-      size="small"
-      (onClick)="resetSheetFilters()"
-    />
-
-    <p class="mh-mob__sheet-label">Type</p>
-    <div class="mh-mob__sheet-pills">
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().type === 'GROUP'"
-        (click)="toggleType('GROUP')"
-      ><i class="pi pi-users"></i> Group</button>
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().type === 'PRIVATE'"
-        (click)="toggleType('PRIVATE')"
-      ><i class="pi pi-user"></i> 1-on-1</button>
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().type === 'OPEN'"
-        (click)="toggleType('OPEN')"
-      ><i class="pi pi-globe"></i> Open</button>
-    </div>
-
-    <p class="mh-mob__sheet-label">Location</p>
-    <div class="mh-mob__sheet-pills">
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().locationKind === 'ONLINE'"
-        (click)="toggleLocation('ONLINE')"
-      ><i class="pi pi-video"></i> Online</button>
-      <button
-        type="button"
-        class="mh-mob__pill"
-        [class.is-active]="store.filters().locationKind === 'IN_PERSON'"
-        (click)="toggleLocation('IN_PERSON')"
-      ><i class="pi pi-map-marker"></i> In-person</button>
-    </div>
-
-    <ng-container foot>
-      <p-button
-        label="Cancel"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="filterSheetOpen.set(false)"
-      />
-      <p-button
-        [label]="appliedFilterCount() > 0 ? 'Apply · ' + appliedFilterCount() + ' filters' : 'Apply'"
-        (onClick)="filterSheetOpen.set(false)"
-        styleClass="mh-mob__sheet-primary"
-      />
-    </ng-container>
-  </mh-bottom-sheet>
-
-  <!-- 1C · Long-press action sheet -->
-  <mh-bottom-sheet
-    [open]="!!actionSheetTemplate()"
-    (openChange)="actionSheetTemplate.set(null)"
-    size="small"
-    [showClose]="false"
-  >
-    @if (actionSheetTemplate(); as t) {
-      <mh-action-list
-        [items]="rowActions"
-        (select)="onRowAction($event, t)"
-      />
-    }
-  </mh-bottom-sheet>
+@if (isMobile()) {
+<!-- 1C · Long-press action sheet -->
+<mh-bottom-sheet [open]="!!actionSheetTemplate()" (openChange)="actionSheetTemplate.set(null)" size="small"
+  [showClose]="false">
+  @if (actionSheetTemplate(); as t) {
+  <mh-action-list [items]="rowActions" (select)="onRowAction($event, t)" />
+  }
+</mh-bottom-sheet>
 }
 
 <!--
+  Filters · shared by desktop, tablet, and mobile. Desktop shows the full
+  pill row; tablet + mobile collapse the type/location toggles behind the
+  popover button. The search field is always present.
+-->
+<ng-template #filtersRow>
+  <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+    @if (isTabletDown()) {
+    <p-button [label]="appliedFilterCount() > 0 ? 'Filters · ' + appliedFilterCount() : 'Filters'" icon="pi pi-filter"
+      size="small" rounded [severity]="appliedFilterCount() > 0 ? 'primary' : 'secondary'"
+      [outlined]="appliedFilterCount() === 0" (onClick)="filtersPopover.toggle($event)" />
+    } @else {
+    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+      <p-button label="All" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="!store.filters().locationKind && !store.filters().type ? 'primary' : 'secondary'"
+        [text]="!!store.filters().locationKind || !!store.filters().type" (onClick)="clearQuickFilters()" />
+
+      <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+
+      <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().locationKind === SessionLocationKind.Online ? 'primary' : 'secondary'"
+        [text]="store.filters().locationKind !== SessionLocationKind.Online"
+        (onClick)="toggleLocation(SessionLocationKind.Online)" />
+      <p-button label="In-person" icon="pi pi-map-marker" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().locationKind === SessionLocationKind.InPerson ? 'primary' : 'secondary'"
+        [text]="store.filters().locationKind !== SessionLocationKind.InPerson"
+        (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
+
+      <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+
+      <p-button label="Group" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().type === SessionKind.Group ? 'primary' : 'secondary'"
+        [text]="store.filters().type !== SessionKind.Group" (onClick)="toggleType(SessionKind.Group)" />
+      <p-button label="1-on-1" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().type === SessionKind.Private ? 'primary' : 'secondary'"
+        [text]="store.filters().type !== SessionKind.Private" (onClick)="toggleType(SessionKind.Private)" />
+      <p-button label="Open" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="store.filters().type === SessionKind.Open ? 'primary' : 'secondary'"
+        [text]="store.filters().type !== SessionKind.Open" (onClick)="toggleType(SessionKind.Open)" />
+    </div>
+    }
+    <p-iconfield class="flex-1 md:flex-[0_1_320px]">
+      <p-inputicon class="pi pi-search" />
+      <input pInputText type="text" fluid placeholder="Search sessions, venues, clients…" aria-label="Search sessions"
+        [ngModel]="searchInput()" (ngModelChange)="onSearchInput($event)" />
+      @if (searchInput() !== '') {
+      <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchInput('')" />
+      }
+    </p-iconfield>
+  </div>
+</ng-template>
+
+<!--
+  Per-tab content bodies. Each handles its own desktop (card list) and
+  mobile (time-row agenda) layout so the surrounding panel only deals with
+  loading / empty / error states.
+-->
+
+<!-- Upcoming · driven directly off instances so the order is "what's next"
+     not "templates sorted by firstStartAt DESC". -->
+<ng-template #activeContent>
+  @if (!isMobile()) {
+  <div class="flex flex-col gap-4.5">
+    @for (group of upcomingInstancesByDay(); track group.date.getTime()) {
+    <section class="flex flex-col gap-2">
+      <mh-section-label [label]="sectionLabel(group.date)" [count]="group.items.length" />
+      @for (inst of group.items; track inst.id) {
+      <mh-session-card [instance]="inst" variant="list-card" [showCTA]="false" (open)="onInstanceOpen(inst)" />
+      }
+    </section>
+    }
+
+    @if (store.upcomingInstances().length > 0) {
+    <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+      role="status">
+      That's everything — {{ store.upcomingInstances().length }} session{{ store.upcomingInstances().length === 1 ? '' :
+      's' }} total.
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="flex flex-col gap-2 pb-24">
+    @for (group of upcomingInstancesByDay(); track group.date.getTime()) {
+    <mh-day-separator [label]="sectionLabel(group.date)" [count]="group.items.length" [tone]="dayTone(group.date)" />
+    @for (inst of group.items; track inst.id) {
+    <mh-time-row [time]="formatTime(inst.startAt)" [duration]="formatDuration(inst.template?.durationMinutes ?? 0)"
+      [title]="inst.titleOverride ?? inst.template?.title ?? 'Session'"
+      [tone]="inst.template ? toneFor(inst.template, inst) : 'honey'" [conflict]="!!inst.conflictingInstanceIds?.length"
+      (click)="onInstanceOpen(inst)"
+      (contextmenu)="$event.preventDefault(); inst.template && openActions(inst.template)">
+      <span meta>
+        @if (inst.conflictingInstanceIds?.length) {
+        <span class="mh-mob__chip mh-mob__chip--coral">
+          <i class="pi pi-exclamation-triangle"></i> Conflict
+        </span>
+        } @else if (inst.template?.type === SessionKind.Private) {
+        <span class="mh-mob__chip mh-mob__chip--blue">1-on-1</span>
+        } @else if (inst.template?.locationKind === SessionLocationKind.Online) {
+        <span class="mh-mob__chip mh-mob__chip--teal">Online</span>
+        } @else {
+        <span class="mh-mob__chip mh-mob__chip--honey">{{ inst.template?.type | titlecase }}</span>
+        }
+        @if ((inst.template?.capacity ?? 0) > 0) {
+        <span class="text-[10px] text-muted-color">
+          {{ inst.confirmedCount }}/{{ inst.template?.capacity }}
+        </span>
+        } @else if (inst.confirmedCount > 0) {
+        <span class="text-[10px] text-muted-color">{{ inst.confirmedCount }} confirmed</span>
+        }
+      </span>
+    </mh-time-row>
+    }
+    }
+
+    @if (store.upcomingInstances().length > 0) {
+    <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+      role="status">
+      That's everything — {{ store.upcomingInstances().length }} total.
+    </div>
+    }
+  </div>
+  }
+</ng-template>
+
+<!-- Recurring + Past · templates grouped by day, with infinite scroll. -->
+<ng-template #listContent>
+  @if (!isMobile()) {
+  <div class="flex flex-col gap-4.5">
+    @for (group of groupedByDay(); track group.date.getTime()) {
+    <section class="flex flex-col gap-2">
+      <mh-section-label [label]="sectionLabel(group.date)" [count]="group.items.length" />
+      @for (t of group.items; track t.id) {
+      <mh-session-card [instance]="cardInstanceFor(t)" variant="list-card" [showCTA]="false"
+        (open)="onCardOpen(t.id)" />
+      }
+    </section>
+    }
+
+    @if (store.hasMore()) {
+    <div #scrollSentinel class="h-px w-full" aria-hidden="true"></div>
+    @if (store.loading()) {
+    <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color" role="status">
+      <i class="pi pi-spinner pi-spin"></i>
+      Loading more sessions…
+    </div>
+    }
+    } @else if (store.templates().length > 0) {
+    <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+      role="status">
+      That's everything — {{ store.total() }} session{{ store.total() === 1 ? '' : 's' }} total.
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="flex flex-col gap-2 pb-24">
+    @for (group of groupedByDay(); track group.date.getTime()) {
+    <mh-day-separator [label]="sectionLabel(group.date)" [count]="group.items.length" [tone]="dayTone(group.date)" />
+    @for (t of group.items; track t.id) {
+    @let inst = cardInstanceFor(t);
+    <mh-time-row [time]="formatTime(inst.startAt)" [duration]="formatDuration(t.durationMinutes)" [title]="t.title"
+      [tone]="toneFor(t, inst)" [conflict]="!!inst.conflictingInstanceIds?.length" (click)="onCardOpen(t.id)"
+      (contextmenu)="$event.preventDefault(); openActions(t)">
+      <span meta>
+        @if (inst.conflictingInstanceIds?.length) {
+        <span class="mh-mob__chip mh-mob__chip--coral">
+          <i class="pi pi-exclamation-triangle"></i> Conflict
+        </span>
+        } @else if (t.type === SessionKind.Private) {
+        <span class="mh-mob__chip mh-mob__chip--blue">1-on-1</span>
+        } @else if (t.locationKind === SessionLocationKind.Online) {
+        <span class="mh-mob__chip mh-mob__chip--teal">Online</span>
+        } @else {
+        <span class="mh-mob__chip mh-mob__chip--honey">{{ t.type | titlecase }}</span>
+        }
+        @if ((t.capacity ?? 0) > 0) {
+        <span class="text-[10px] text-muted-color">
+          {{ inst.confirmedCount }}/{{ t.capacity }}
+        </span>
+        } @else if (inst.confirmedCount > 0) {
+        <span class="text-[10px] text-muted-color">{{ inst.confirmedCount }} confirmed</span>
+        }
+      </span>
+    </mh-time-row>
+    }
+    }
+
+    @if (store.hasMore()) {
+    <div #scrollSentinel class="h-px w-full" aria-hidden="true"></div>
+    @if (store.loading()) {
+    <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color" role="status">
+      <i class="pi pi-spinner pi-spin"></i> Loading more…
+    </div>
+    }
+    } @else if (store.templates().length > 0) {
+    <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+      role="status">
+      That's everything — {{ store.total() }} total.
+    </div>
+    }
+  </div>
+  }
+</ng-template>
+
+<!-- Cancelled · instances over the last 90 days. -->
+<ng-template #cancelledContent>
+  @if (!isMobile()) {
+  <div class="flex flex-col gap-4.5">
+    <mh-section-label [label]="cancelledLabel()" [count]="store.cancelledTotal()" />
+    @for (inst of store.cancelledInstances(); track inst.id) {
+    <mh-session-card [instance]="inst" variant="list-card" [showCTA]="false" (open)="openCancelledInstance(inst.id)" />
+    }
+
+    @if (store.cancelledInstances().length > 0 && store.cancelledInstances().length < 100) { <div
+      class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+      role="status">
+      That's everything — {{ store.cancelledTotal() }} cancelled total.
+  </div>
+  }
+  </div>
+  } @else {
+  <div class="flex flex-col gap-2 pb-24">
+    <mh-day-separator [label]="cancelledLabel()" [count]="store.cancelledTotal()" [sticky]="false" />
+    @for (inst of store.cancelledInstances(); track inst.id) {
+    <mh-time-row [time]="formatTime(inst.startAt)" [duration]="formatDuration(inst.template?.durationMinutes ?? 0)"
+      [title]="inst.template?.title ?? 'Cancelled session'" tone="muted" (click)="openCancelledInstance(inst.id)">
+      <span meta>Cancelled</span>
+    </mh-time-row>
+    }
+
+    @if (store.cancelledInstances().length > 0 && store.cancelledInstances().length < 100) { <div
+      class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+      role="status">
+      That's everything — {{ store.cancelledTotal() }} cancelled total.
+  </div>
+  }
+  </div>
+  }
+</ng-template>
+
+<!--
   Shared state templates — error banner, skeleton placeholders, empty
-  state, cancelled-empty state. Both desktop and mobile branches above
-  inject these via *ngTemplateOutlet so the markup lives in exactly
-  one place. Tweaking copy or buttons here updates both surfaces.
+  state, cancelled-empty state. Every tab panel injects these via
+  *ngTemplateOutlet so the markup lives in exactly one place. Tweaking
+  copy or buttons here updates every surface.
 -->
 
 <ng-template #errorState>
   @if (store.error()) {
-    <p-message severity="error" [closable]="false" class="mh-sessions__error">
-      <span class="mh-sessions__error-text">
-        Couldn't load sessions: {{ store.error() }}
-      </span>
-      <p-button label="Retry" size="small" [outlined]="true" (click)="retry()" />
-    </p-message>
+  <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
+    <span class="text-(--p-red-700)">
+      Couldn't load sessions: {{ store.error() }}
+    </span>
+    <p-button label="Retry" size="small" [outlined]="true" (click)="retry()" />
+  </p-message>
   }
 </ng-template>
 
@@ -580,105 +401,92 @@
        shimmer uses a plain p-skeleton at the same 14px height as
        <mh-section-label> / <mh-day-separator>. Tones rotate so the
        row strip looks like the variety the user will actually see. -->
-  <div class="mh-sessions__skeletons">
+  <div class="flex flex-col gap-4">
     @for (g of [1,2,3]; track g) {
-      <div class="mh-sessions__skeleton-group">
-        <p-skeleton width="160px" height="14px" />
-        <mh-time-row-skeleton tone="honey" />
-        <mh-time-row-skeleton tone="teal" />
-      </div>
+    <div class="flex flex-col gap-2">
+      <p-skeleton width="160px" height="14px" />
+      <mh-time-row-skeleton tone="honey" />
+      <mh-time-row-skeleton tone="teal" />
+    </div>
     }
   </div>
 </ng-template>
 
 <ng-template #emptyState>
-  <!-- Empty state copy is tab-aware. The "Create your first session"
-       CTA + 2-up info cards only render on the Upcoming first-time
-       empty (design frame 5B); Past and Recurring use the cleaner
-       single-message variant since they're not onboarding moments. -->
-  <div class="mh-sessions__empty" [class.mh-sessions__empty--rich]="store.tab() === 'active'">
-    @if (store.tab() === 'active') {
-      <!-- Honeycomb watermark from frame 5B — hex pattern in honey 22%
-           opacity, set as a CSS background. Doesn't compete with the
-           foreground content. -->
-      <div class="mh-sessions__empty-bg" aria-hidden="true"></div>
-    }
-    <div class="mh-sessions__empty-tile" aria-hidden="true">
-      @switch (store.tab()) {
-        @case ('ended') { <i class="pi pi-history"></i> }
-        @case ('recurring') { <i class="pi pi-replay"></i> }
-        @default { <i class="pi pi-calendar-plus"></i> }
-      }
-    </div>
-    @switch (store.tab()) {
-      @case ('ended') {
-        <h2>No past sessions yet</h2>
-        <p>Sessions you've run will show up here once they end.</p>
-      }
-      @case ('recurring') {
-        <h2>No recurring templates</h2>
-        <p>Create a session and toggle "Repeat on a schedule" to build a series.</p>
-        <div class="mh-sessions__empty-ctas">
-          <p-button
-            label="Create a recurring session"
-            icon="pi pi-plus"
-            size="small"
-            (click)="onCreateNew()"
-          />
-        </div>
-      }
-      @default {
-        <h2>No sessions yet</h2>
-        <p>
-          Sessions let you schedule training and showcase your availability.
-          People can see your public sessions on your profile — even if they're
-          not signed up to MotionHive yet.
-        </p>
-        <div class="mh-sessions__empty-ctas">
-          <p-button
-            label="Create your first session"
-            icon="pi pi-plus"
-            size="small"
-            (click)="onCreateNew()"
-          />
-          <p-button label="Use a template" severity="secondary" [outlined]="true" size="small" />
-        </div>
-        <!-- Two-up "what you can do" hint cards (frame 5B). Plain
-             info; tapping them today is a no-op — they're there to
-             help a first-time instructor picture the surface. -->
-        <div class="mh-sessions__empty-hints">
-          <div class="mh-sessions__empty-hint">
-            <i class="pi pi-users"></i>
-            <strong>Group classes</strong>
-            <small>Set a capacity, invite your clients, sell spots.</small>
-          </div>
-          <div class="mh-sessions__empty-hint">
-            <i class="pi pi-globe"></i>
-            <strong>Open &amp; free</strong>
-            <small>Showcase a community run on your profile.</small>
-          </div>
-        </div>
-      }
-    }
-  </div>
+  <!-- Empty state copy is tab-aware; every variant offers a create
+       action so the instructor can add a session straight from here. -->
+  @switch (store.tab()) {
+  @case (TemplateTab.Ended) {
+  <mh-list-empty-state icon="pi pi-history" title="No past sessions yet"
+    message="Sessions you've run will show up here once they end." actionLabel="Create a session"
+    actionIcon="pi pi-plus" (action)="onCreateNew()" />
+  }
+  @case (TemplateTab.Recurring) {
+  <mh-list-empty-state icon="pi pi-replay" title="No recurring templates"
+    message="Create a session and toggle 'Repeat on a schedule' to build a series."
+    actionLabel="Create a recurring session" actionIcon="pi pi-plus" (action)="onCreateNew()" />
+  }
+  @default {
+  <mh-list-empty-state icon="pi pi-calendar-plus" title="No sessions yet"
+    message="Sessions let you schedule training and showcase your availability. People can see your public sessions on your profile — even if they're not signed up to MotionHive yet."
+    actionLabel="Create your first session" actionIcon="pi pi-plus" (action)="onCreateNew()" />
+  }
+  }
 </ng-template>
 
 <ng-template #cancelledEmptyState>
-  <div class="mh-sessions__empty">
-    <div class="mh-sessions__empty-tile" aria-hidden="true">
-      <i class="pi pi-times-circle"></i>
-    </div>
-    <h2>No cancelled sessions</h2>
-    <p>Sessions you cancel show up here for the last 90 days.</p>
-  </div>
+  <mh-list-empty-state icon="pi pi-times-circle" title="No cancelled sessions"
+    message="Sessions you cancel show up here for the last 90 days." />
 </ng-template>
 
-<!-- Create / edit dialog (used by both branches) -->
-<mh-session-form-dialog
-  [visible]="formOpen()"
-  (visibleChange)="formOpen.set($event)"
-  [template]="editingTemplate()"
-  (saved)="onSessionSaved()"
-/>
+<!-- Create / edit dialog (used by every tab) -->
+<mh-session-form-dialog [visible]="formOpen()" (visibleChange)="formOpen.set($event)" [template]="editingTemplate()"
+  (saved)="onSessionSaved()" />
+
+<!--
+  Filter popover — shared by the tablet and mobile "Filters" buttons.
+  Declared at the template root so the `#filtersPopover` ref resolves
+  inside the nested @if branches that trigger it. Type/location toggles
+  apply instantly (each click hits store.setFilters), so there is no
+  Apply/Cancel — the only extra action is clearing everything at once.
+-->
+<p-popover #filtersPopover [appendTo]="'body'" [dismissable]="true">
+  <div class="flex flex-col gap-3 min-w-52">
+    <div class="flex flex-wrap gap-1.5">
+      <p-button label="All" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="!store.filters().locationKind && !store.filters().type ? 'primary' : 'secondary'"
+        [text]="!!store.filters().locationKind || !!store.filters().type" (onClick)="clearQuickFilters()" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Type</p>
+      <div class="flex flex-wrap gap-1.5">
+        <p-button label="Group" icon="pi pi-users" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().type === SessionKind.Group ? 'primary' : 'secondary'"
+          [outlined]="store.filters().type !== SessionKind.Group" (onClick)="toggleType(SessionKind.Group)" />
+        <p-button label="1-on-1" icon="pi pi-user" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().type === SessionKind.Private ? 'primary' : 'secondary'"
+          [outlined]="store.filters().type !== SessionKind.Private" (onClick)="toggleType(SessionKind.Private)" />
+        <p-button label="Open" icon="pi pi-globe" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().type === SessionKind.Open ? 'primary' : 'secondary'"
+          [outlined]="store.filters().type !== SessionKind.Open" (onClick)="toggleType(SessionKind.Open)" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Location</p>
+      <div class="flex flex-wrap gap-1.5">
+        <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().locationKind === SessionLocationKind.Online ? 'primary' : 'secondary'"
+          [outlined]="store.filters().locationKind !== SessionLocationKind.Online"
+          (onClick)="toggleLocation(SessionLocationKind.Online)" />
+        <p-button label="In-person" icon="pi pi-map-marker" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="store.filters().locationKind === SessionLocationKind.InPerson ? 'primary' : 'secondary'"
+          [outlined]="store.filters().locationKind !== SessionLocationKind.InPerson"
+          (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
+      </div>
+    </div>
+  </div>
+</p-popover>
 
 <p-toast position="top-right" />

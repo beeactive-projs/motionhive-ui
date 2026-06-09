@@ -1,0 +1,350 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [appendTo]="'body'"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="false"
+  [closeOnEscape]="true"
+  [style]="{ width: '880px', maxWidth: '95vw' }"
+  [contentStyle]="{ maxHeight: '78vh', overflow: 'auto' }"
+  [header]="dialogTitle()"
+>
+  <form class="form" (ngSubmit)="save()">
+    @if (forkDivergenceCount() > 0) {
+      <div class="banner banner--info">
+        <i class="pi pi-info-circle"></i>
+        <p>
+          <strong>{{ forkDivergenceCount() }} instructors have forked this.</strong>
+          Their copies are independent — your edits won't change them.
+        </p>
+      </div>
+    }
+
+    <div class="form__cols">
+      <!-- Left column -->
+      <div class="form__col">
+        <!-- Name -->
+        <div class="field">
+          <label for="ex-name">
+            Name <span class="req">*</span>
+            <span class="charcount">{{ nameCharCount() }} / 200</span>
+          </label>
+          <input
+            id="ex-name"
+            pInputText
+            type="text"
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            name="name"
+            maxlength="200"
+            placeholder="e.g. Tempo goblet squat"
+            class="w-full"
+            required
+          />
+        </div>
+
+        <!-- Kind -->
+        <div class="field">
+          <label>
+            Kind <span class="req">*</span>
+          </label>
+          <p class="hint">Determines what gets tracked when a client logs this.</p>
+          <div class="kind-grid">
+            @for (card of kindCards; track card.value) {
+              <button
+                type="button"
+                class="kind-card"
+                [class.kind-card--on]="kind() === card.value"
+                (click)="selectKind(card.value)"
+              >
+                <div class="kind-card__head">
+                  <i class="pi" [class]="'pi ' + card.icon"></i>
+                  <span>{{ card.label }}</span>
+                  @if (kind() === card.value) {
+                    <i class="pi pi-check-circle kind-card__check"></i>
+                  }
+                </div>
+                <p class="kind-card__hint">{{ card.hint }}</p>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Primary muscles -->
+        <div class="field">
+          <label>
+            Primary muscles <span class="req">*</span>
+            <span class="opt">— 1 to 3</span>
+          </label>
+          <p-multiSelect
+            [options]="taxonomy.muscles()"
+            optionLabel="commonName"
+            optionValue="id"
+            [ngModel]="primaryMuscleIds()"
+            (ngModelChange)="primaryMuscleIds.set($event)"
+            name="primaryMuscles"
+            [selectionLimit]="3"
+            placeholder="Pick at least one"
+            display="chip"
+            [appendTo]="'body'"
+            [filter]="true"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <label for="ex-desc">Description <span class="opt">— optional</span></label>
+          <textarea
+            id="ex-desc"
+            pTextarea
+            rows="2"
+            [ngModel]="description()"
+            (ngModelChange)="description.set($event)"
+            name="description"
+            maxlength="2000"
+            placeholder="1–3 sentences about the movement…"
+            class="w-full"
+          ></textarea>
+        </div>
+
+        <!-- Instructions -->
+        <div class="field">
+          <label for="ex-instr">Instructions <span class="opt">— optional</span></label>
+          <textarea
+            id="ex-instr"
+            pTextarea
+            rows="4"
+            [ngModel]="instructions()"
+            (ngModelChange)="instructions.set($event)"
+            name="instructions"
+            maxlength="5000"
+            placeholder="Step-by-step form cues…"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="form__col">
+        <!-- Level -->
+        <div class="field">
+          <label>Level <span class="req">*</span></label>
+          <div class="pills">
+            @for (opt of levelOptions; track opt.value) {
+              <button
+                type="button"
+                class="pill"
+                [class.pill--on]="level() === opt.value"
+                (click)="level.set(opt.value)"
+              >
+                <i class="pi" [class]="'pi ' + opt.icon"></i> {{ opt.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Secondary muscles -->
+        <div class="field">
+          <label>Secondary muscles <span class="opt">— optional</span></label>
+          <p-multiSelect
+            [options]="taxonomy.muscles()"
+            optionLabel="commonName"
+            optionValue="id"
+            [ngModel]="secondaryMuscleIds()"
+            (ngModelChange)="secondaryMuscleIds.set($event)"
+            name="secondaryMuscles"
+            placeholder="—"
+            display="chip"
+            [appendTo]="'body'"
+            [filter]="true"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Stabilizer muscles -->
+        <div class="field">
+          <label>Stabilizers <span class="opt">— optional</span></label>
+          <p-multiSelect
+            [options]="taxonomy.muscles()"
+            optionLabel="commonName"
+            optionValue="id"
+            [ngModel]="stabilizerMuscleIds()"
+            (ngModelChange)="stabilizerMuscleIds.set($event)"
+            name="stabilizerMuscles"
+            placeholder="—"
+            display="chip"
+            [appendTo]="'body'"
+            [filter]="true"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Equipment -->
+        <div class="field">
+          <label>Equipment <span class="opt">— Bodyweight if none</span></label>
+          <p-multiSelect
+            [options]="taxonomy.equipment()"
+            optionLabel="name"
+            optionValue="id"
+            [ngModel]="equipmentIds()"
+            (ngModelChange)="equipmentIds.set($event)"
+            name="equipment"
+            placeholder="—"
+            display="chip"
+            [appendTo]="'body'"
+            [filter]="true"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- YouTube URL -->
+        <div class="field">
+          <label for="ex-yt">YouTube demo <span class="opt">— optional</span></label>
+          <input
+            id="ex-yt"
+            pInputText
+            type="url"
+            [ngModel]="youtubeUrl()"
+            (ngModelChange)="youtubeUrl.set($event)"
+            name="youtubeUrl"
+            maxlength="500"
+            placeholder="https://youtube.com/watch?v=…"
+            class="w-full"
+            [class.error]="!youtubeValid()"
+          />
+          @if (youtubeUrl() && !youtubeValid()) {
+            <p class="error-msg">Paste a valid YouTube URL (youtube.com or youtu.be).</p>
+          } @else if (youtubeThumb(); as thumb) {
+            <div class="yt-preview">
+              <img [src]="thumb" alt="YouTube thumbnail preview" />
+              <div>
+                <div class="yt-preview__title">Thumbnail loaded</div>
+                <div class="yt-preview__hint">Used in catalog cards</div>
+              </div>
+            </div>
+          }
+          <p class="hint">Native upload comes in V2. Paste any YouTube URL to get a thumbnail.</p>
+        </div>
+
+        <!-- Classification (optional) -->
+        <div class="field">
+          <label>Classification <span class="opt">— optional</span></label>
+          <div class="classification">
+            <div class="classification__row">
+              <span class="classification__lbl">Pattern</span>
+              <p-select
+                [options]="patternOptions"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="movementPattern()"
+                (ngModelChange)="movementPattern.set($event)"
+                name="pattern"
+                placeholder="Auto / pick"
+                [showClear]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="classification__row">
+              <span class="classification__lbl">Mechanic</span>
+              <p-select
+                [options]="mechanicOptions"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="mechanic()"
+                (ngModelChange)="mechanic.set($event)"
+                name="mechanic"
+                placeholder="Auto / pick"
+                [showClear]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="classification__row">
+              <span class="classification__lbl">Force</span>
+              <p-select
+                [options]="forceOptions"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="force()"
+                (ngModelChange)="force.set($event)"
+                name="force"
+                placeholder="—"
+                [showClear]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Unilateral -->
+        <div class="field field--inline">
+          <label for="ex-uni">Unilateral movement</label>
+          <p-toggleswitch
+            inputId="ex-uni"
+            [ngModel]="isUnilateral()"
+            (ngModelChange)="isUnilateral.set($event)"
+            name="unilateral"
+          />
+          <p class="hint">Single-arm / single-leg — drives L vs R tracking later.</p>
+        </div>
+
+        <!-- Visibility -->
+        <div class="field">
+          <label>Visibility</label>
+          <div class="visibility">
+            <div class="visibility__row">
+              <i
+                class="pi"
+                [class.pi-lock]="visibility() === 'PRIVATE'"
+                [class.pi-globe]="visibility() === 'PUBLIC'"
+              ></i>
+              <div class="visibility__copy">
+                <div class="visibility__name">
+                  {{ visibility() === 'PUBLIC' ? 'Public' : 'Private' }}
+                </div>
+                <div class="visibility__hint">
+                  @if (visibility() === 'PUBLIC') {
+                    Any instructor can view and fork this. You stay the only editor.
+                  } @else {
+                    Only you can see and use it.
+                  }
+                </div>
+              </div>
+              <p-toggleswitch
+                [ngModel]="visibility() === 'PUBLIC'"
+                (ngModelChange)="
+                  visibility.set($event ? 'PUBLIC' : 'PRIVATE')
+                "
+                name="visibility"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancel()"
+    />
+    <p-button
+      [label]="
+        saving()
+          ? (isEditMode() ? 'Saving…' : 'Creating…')
+          : (isEditMode() ? 'Save changes' : 'Create exercise')
+      "
+      icon="pi pi-check"
+      [loading]="saving()"
+      [disabled]="!canSave() || saving()"
+      (onClick)="save()"
+    />
+  </ng-template>
+</p-dialog>

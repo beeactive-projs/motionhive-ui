@@ -39,6 +39,7 @@ export class ThemeService {
       return stored;
     }
 
-    return 'dark';
+    // Light is the product's primary theme.
+    return 'light';
   }
 }

@@ -3,39 +3,47 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
+  ElementRef,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClientRequestType,
   ClientRequestTypes,
   ClientService,
+  injectIsMobile,
+  injectIsTablet,
+  injectIsTabletDown,
   InstructorClient,
-  InstructorClientStatuses,
+  MobileFab,
   PendingClientLabels,
   showApiError,
-  TagSeverity,
 } from 'core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { UserInfo } from '../../../../_shared/components/user-info/user-info';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DataView } from 'primeng/dataview';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { take } from 'rxjs';
 import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-client-dialog';
-
-type RequestDirection = 'INCOMING' | 'OUTGOING';
 
 @Component({
   selector: 'mh-pending-requests',
   imports: [
     DatePipe,
+    BreadcrumbModule,
     ButtonModule,
     TableModule,
     TagModule,
@@ -43,9 +51,11 @@ type RequestDirection = 'INCOMING' | 'OUTGOING';
     SkeletonModule,
     ToastModule,
     ConfirmDialogModule,
+    DataView,
     TooltipModule,
     InviteClientDialog,
-    RouterLink,
+    ListEmptyState,
+    MobileFab,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './pending-requests.html',
@@ -54,6 +64,7 @@ type RequestDirection = 'INCOMING' | 'OUTGOING';
 })
 export class PendingRequests {
   private readonly _router = inject(Router);
+
   private readonly _route = inject(ActivatedRoute);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
@@ -74,8 +85,17 @@ export class PendingRequests {
     });
   });
 
-  readonly Statuses = InstructorClientStatuses;
   readonly RequestTypes = ClientRequestTypes;
+
+  readonly breadcrumbItems: MenuItem[] = [
+    { label: 'Clients', routerLink: '/coaching/clients' },
+    { label: 'Pending requests' },
+  ];
+
+  protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller text, condensed copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
 
   lastLazyEvent: TableLazyLoadEvent = {};
   requests = signal<InstructorClient[]>([]);
@@ -83,45 +103,135 @@ export class PendingRequests {
   loading = signal(true);
   showInviteDialog = signal(false);
 
+  // Mobile infinite-scroll state — the list accumulates pages instead of
+  // paginating, and a bottom sentinel pulls the next page as it scrolls in.
+  mobileRequests = signal<InstructorClient[]>([]);
+  loadingMore = signal(false);
+  private readonly _mobilePage = signal(0);
+  private _mobileInitialized = false;
+
+  private readonly _scrollSentinel = viewChild<ElementRef<HTMLElement>>('scrollSentinel');
+  private _io?: IntersectionObserver;
+
   readonly rows = 10;
-  currentPage = signal(1);
 
   typeFilter = signal<ClientRequestType | undefined>(undefined);
   readonly typeOptions: { label: string; value: ClientRequestType | undefined }[] = [
     { label: 'All', value: undefined },
-    { label: 'Incoming', value: ClientRequestTypes.ClientToInstructor as ClientRequestType },
-    { label: 'Outgoing', value: ClientRequestTypes.InstructorToClient as ClientRequestType },
+    { label: 'Incoming', value: ClientRequestTypes.ClientToInstructor },
+    { label: 'Outgoing', value: ClientRequestTypes.InstructorToClient },
   ];
 
-  loadRequests(): void {
-    this.lazyLoadRequests(this.lastLazyEvent);
+  constructor() {
+    // First time the layout drops to tablet-or-smaller, kick off the initial page.
+    effect(() => {
+      if (this.isTabletDown() && !this._mobileInitialized) {
+        this._mobileInitialized = true;
+        this.loadMobilePage(true);
+      }
+    });
+
+    // Observe the bottom sentinel so reaching the end of the list pulls the
+    // next page (infinite scroll). Re-reading mobileRequests() re-attaches the
+    // observer after each append, forcing a fresh intersection check when the
+    // sentinel is still on screen.
+    effect(() => {
+      this.mobileRequests();
+      const el = this._scrollSentinel()?.nativeElement;
+      this._io?.disconnect();
+      if (!el || typeof IntersectionObserver === 'undefined') return;
+      this._io = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) this.loadMoreMobile();
+        },
+        { rootMargin: '200px' },
+      );
+      this._io.observe(el);
+    });
+
+    inject(DestroyRef).onDestroy(() => this._io?.disconnect());
   }
 
-  goBack(): void {
-    this._router.navigate(['/coaching/clients']);
+  loadRequests(): void {
+    if (this.isTabletDown()) {
+      this.loadMobilePage(true);
+    } else {
+      this.lazyLoadRequests(this.lastLazyEvent);
+    }
+  }
+
+  private loadMobilePage(reset: boolean): void {
+    if (reset) {
+      this._mobilePage.set(0);
+      this.mobileRequests.set([]);
+      this.loading.set(true);
+    } else {
+      this.loadingMore.set(true);
+    }
+
+    const event: TableLazyLoadEvent = {
+      first: this._mobilePage() * this.rows,
+      rows: this.rows,
+      sortField: 'createdAt',
+      sortOrder: -1,
+      filters: this.typeFilter() ? { type: { value: this.typeFilter(), matchMode: 'equals' } } : {},
+    };
+
+    this._clientService
+      .filterPendingRequests(event)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.mobileRequests.update((list) =>
+            reset ? response.items : [...list, ...response.items],
+          );
+          this.totalRecords.set(response.total);
+          this._mobilePage.update((p) => p + 1);
+          this.loading.set(false);
+          this.loadingMore.set(false);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.loadingMore.set(false);
+          showApiError(this._messageService, 'Error', 'Failed to load pending requests', err);
+        },
+      });
+  }
+
+  private loadMoreMobile(): void {
+    if (this.loading() || this.loadingMore()) return;
+    if (this.mobileRequests().length >= this.totalRecords()) return;
+    this.loadMobilePage(false);
   }
 
   lazyLoadRequests(event: TableLazyLoadEvent): void {
     this.lastLazyEvent = event;
     this.loading.set(true);
-    this._clientService.filterPendingRequests(event).subscribe({
-      next: (response) => {
-        this.requests.set(response.items);
-        this.totalRecords.set(response.total);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        showApiError(this._messageService, 'Error', 'Failed to load pending requests', err);
-      },
-    });
+    this._clientService
+      .filterPendingRequests(event)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.requests.set(response.items);
+          this.totalRecords.set(response.total);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          showApiError(this._messageService, 'Error', 'Failed to load pending requests', err);
+        },
+      });
   }
 
   onTypeFilterChange(type: ClientRequestType | undefined): void {
+    this.typeFilter.set(type);
+    if (this.isTabletDown()) {
+      this.loadMobilePage(true);
+      return;
+    }
     this.lastLazyEvent.first = 0;
     this.lastLazyEvent.rows = this.rows;
     this.lastLazyEvent.filters = type ? { type: { value: type, matchMode: 'equals' } } : {};
-    this.typeFilter.set(type);
     this.lazyLoadRequests(this.lastLazyEvent);
   }
 
@@ -129,83 +239,98 @@ export class PendingRequests {
     this.showInviteDialog.set(true);
   }
 
+  goToClients(): void {
+    this._router.navigate(['/coaching/clients']);
+  }
+
   // --- Actions ---
 
   acceptRequest(row: InstructorClient): void {
-    this._clientService.acceptRequest(row.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Request accepted',
-          detail: 'Client request accepted successfully',
-        });
-        this.loadRequests();
-      },
-      error: (err) => showApiError(this._messageService, 'Error', 'Failed to accept request', err),
-    });
+    this._clientService
+      .acceptRequest(row.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Request accepted',
+            detail: 'Client request accepted successfully',
+          });
+          this.loadRequests();
+        },
+        error: (err) =>
+          showApiError(this._messageService, 'Error', 'Failed to accept request', err),
+      });
   }
 
   declineRequest(row: InstructorClient): void {
-    this._clientService.declineRequest(row.id).subscribe({
-      next: () => {
-        this._messageService.add({
-          severity: 'info',
-          summary: 'Request declined',
-          detail: 'Client request has been declined',
-        });
-        this.loadRequests();
-      },
-      error: (err) => showApiError(this._messageService, 'Error', 'Failed to decline request', err),
-    });
+    this._clientService
+      .declineRequest(row.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._messageService.add({
+            severity: 'info',
+            summary: 'Request declined',
+            detail: 'Client request has been declined',
+          });
+          this.loadRequests();
+        },
+        error: (err) =>
+          showApiError(this._messageService, 'Error', 'Failed to decline request', err),
+      });
   }
 
   cancelRequest(row: InstructorClient): void {
-    const target = row.client
-      ? `${row.client.firstName} ${row.client.lastName}`
-      : (row.invitedEmail ?? 'this client');
     this._confirmationService.confirm({
-      message: `Are you sure you want to cancel the invitation to ${target}?`,
       header: 'Cancel invitation',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
+      message: `Are you sure you want to cancel the invitation to <strong>${this.clientName(row)}</strong>?`,
+      acceptIcon: 'pi pi-times',
+      acceptButtonProps: { label: 'Cancel invitation', severity: 'danger', iconPos: 'left' },
+      rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => {
-        this._clientService.cancelRequest(row.id).subscribe({
-          next: () => {
-            this._messageService.add({
-              severity: 'success',
-              summary: 'Invitation cancelled',
-              detail: 'The invitation has been cancelled',
-            });
-            this.loadRequests();
-          },
-          error: (err) =>
-            showApiError(this._messageService, 'Error', 'Failed to cancel invitation', err),
-        });
+        this._clientService
+          .cancelRequest(row.id)
+          .pipe(take(1))
+          .subscribe({
+            next: () => {
+              this._messageService.add({
+                severity: 'success',
+                summary: 'Invitation cancelled',
+                detail: 'The invitation has been cancelled',
+              });
+              this.loadRequests();
+            },
+            error: (err) =>
+              showApiError(this._messageService, 'Error', 'Failed to cancel invitation', err),
+          });
       },
     });
   }
 
   resendInvitation(row: InstructorClient): void {
-    const target = row.client
-      ? `${row.client.firstName} ${row.client.lastName}`
-      : (row.invitedEmail ?? 'this client');
     this._confirmationService.confirm({
-      message: `Resend the invitation to ${target}?`,
       header: 'Resend invitation',
-      icon: 'pi pi-send',
+      message: `Resend the invitation to <strong>${this.clientName(row)}</strong>?`,
+      acceptIcon: 'pi pi-send',
+      acceptButtonProps: { label: 'Resend invitation', iconPos: 'left' },
+      rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => {
-        this._clientService.resendInvitation(row.id).subscribe({
-          next: () => {
-            this._messageService.add({
-              severity: 'success',
-              summary: 'Invitation resent',
-              detail: 'The invitation has been resent successfully',
-            });
-            this.loadRequests();
-          },
-          error: (err) =>
-            showApiError(this._messageService, 'Error', 'Failed to resend invitation', err),
-        });
+        this._clientService
+          .resendInvitation(row.id)
+          .pipe(take(1))
+          .subscribe({
+            next: () => {
+              this._messageService.add({
+                severity: 'success',
+                summary: 'Invitation resent',
+                detail: 'The invitation has been resent successfully',
+              });
+              this.loadRequests();
+            },
+            error: (err) =>
+              showApiError(this._messageService, 'Error', 'Failed to resend invitation', err),
+          });
       },
     });
   }
@@ -216,36 +341,15 @@ export class PendingRequests {
     if (row.client) {
       return `${row.client.firstName} ${row.client.lastName}`;
     }
-    if (row.invitedEmail) {
-      return row.invitedEmail;
-    }
-    return 'Unknown';
+    return row.invitedEmail ?? 'this client';
   }
 
   clientEmail(row: InstructorClient): string {
     return row.client?.email || row.invitedEmail || '—';
   }
 
-  initials(row: InstructorClient): string {
-    if (row.client) {
-      return row.client.firstName.charAt(0) + row.client.lastName.charAt(0);
-    }
-    if (row.invitedEmail) {
-      return row.invitedEmail.charAt(0).toUpperCase();
-    }
-    return '??';
-  }
-
-  direction(row: InstructorClient): RequestDirection {
-    return row.requestType === this.RequestTypes.InstructorToClient ? 'OUTGOING' : 'INCOMING';
-  }
-
-  directionLabel(row: InstructorClient): string {
-    return this.direction(row) === 'OUTGOING' ? 'Outgoing' : 'Incoming';
-  }
-
-  directionSeverity(row: InstructorClient): TagSeverity {
-    return this.direction(row) === 'OUTGOING' ? TagSeverity.Info : TagSeverity.Warn;
+  isIncoming(row: InstructorClient): boolean {
+    return row.requestType !== this.RequestTypes.InstructorToClient;
   }
 
   typeLabel(row: InstructorClient): string {
@@ -254,6 +358,4 @@ export class PendingRequests {
     }
     return PendingClientLabels.Request;
   }
-
-  trackById = (_: number, item: { id: string }) => item.id;
 }

@@ -1,0 +1,30 @@
+<p-card [class]="cardClass()">
+  <div class="flex items-center gap-2 lg:gap-3">
+    @if (loading()) {
+    @if (icon()) {
+    <p-skeleton shape="circle" size="2rem" class="flex-none lg:h-10! lg:w-10!" />
+    }
+    <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+      <p-skeleton width="55%" height="0.7rem" />
+      <p-skeleton width="40%" height="1.1rem" />
+      <p-skeleton width="70%" height="0.7rem" class="hidden lg:block" />
+    </div>
+    } @else {
+    @if (icon()) {
+    <span
+      class="flex h-8 w-8 lg:h-10 lg:w-10 flex-none items-center justify-center rounded-lg text-sm lg:text-base"
+      [class]="iconClass()"
+      aria-hidden="true">
+      <span [class]="icon()"></span>
+    </span>
+    }
+    <div class="flex min-w-0 flex-1 flex-col">
+      <span class="text-[10px] lg:text-xs uppercase text-muted-color truncate">{{ label() }}</span>
+      <span class="font-heading text-sm lg:text-lg font-semibold tabular-nums" [class]="valueClass()">{{ value() }}</span>
+      @if (sub()) {
+      <span class="text-xs text-muted-color hidden lg:inline-flex">{{ sub() }}</span>
+      }
+    </div>
+    }
+  </div>
+</p-card>

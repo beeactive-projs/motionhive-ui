@@ -22,6 +22,7 @@ import {
   SearchResponse,
   SearchResultItem,
   SearchService,
+  SessionService,
 } from 'core';
 import { SearchTriggerService } from './search-trigger.service';
 
@@ -51,6 +52,7 @@ const MIN_QUERY_LENGTH = 2;
 })
 export class SearchModal {
   private readonly _searchService = inject(SearchService);
+  private readonly _sessionService = inject(SessionService);
   private readonly _trigger = inject(SearchTriggerService);
   private readonly _recents = inject(RecentSearchesStore);
   private readonly _router = inject(Router);
@@ -262,25 +264,46 @@ export class SearchModal {
 
   // --- Routing decisions -----------------------------------------------------
 
-  /** Where each result type takes the user when clicked. Today most
-   *  destinations route to `/profile/{slug-or-id}` style URLs that
-   *  exist in the app. Tags don't have a destination yet — we re-fire
-   *  the search filtered by tag. */
+  /** Where each result type takes the user when clicked. */
   private _navigateToResult(item: SearchResultItem): void {
     switch (item.type) {
       case 'instructor':
-        // TODO: route to a public instructor profile page when it exists.
-        this._router.navigate(['/profile'], { queryParams: { instructorId: item.id } });
+      case 'user': {
+        // Public profile lives at /@<handle>. Plain users are only ever
+        // discoverable to themselves (non-instructors aren't public), so a
+        // user hit without a handle is "me" — go to my own profile.
+        if (item.handle) {
+          this._router.navigate(['/@' + item.handle]);
+        } else {
+          this._router.navigate(['/profile']);
+        }
         break;
+      }
       case 'group':
-        this._router.navigate(['/groups', item.id]);
+        // Access-aware: members go INSIDE (/groups/:id); everyone else gets
+        // the OUTSIDE preview (public info + join/request). Never send a
+        // non-member to /groups/:id — that's members-only and 403s.
+        this._router.navigate(
+          item.viewerIsMember ? ['/groups', item.id] : ['/groups/preview', item.id],
+        );
         break;
       case 'session':
-        // TODO: session detail route — sessions module pending.
-        this._router.navigate(['/activity/schedule'], { queryParams: { sessionId: item.id } });
-        break;
-      case 'user':
-        this._router.navigate(['/profile'], { queryParams: { userId: item.id } });
+        // Search indexes recurring TEMPLATES; the showcase is instance-based.
+        // Resolve the template -> its next public instance via the slug
+        // endpoint, then open the showcase (which itself shows the full or
+        // access-blocked view). Fall back to Discover only if it can't
+        // resolve (no upcoming instance / not public).
+        if (item.handle && item.slug) {
+          const handle = item.handle;
+          this._sessionService.getPublicBySlug(handle, item.slug, { silent: true }).subscribe({
+            next: (inst) => void this._router.navigate(['/user/sessions', inst.id]),
+            // No upcoming instance (the series ended / it was a past one-off)
+            // → the instructor's public profile, where their sessions live.
+            error: () => void this._router.navigate(['/@' + handle]),
+          });
+        } else {
+          this._router.navigate(['/user/sessions/discover']);
+        }
         break;
       case 'tag': {
         // No tag-detail page yet; convert the click into a tag-scoped search.

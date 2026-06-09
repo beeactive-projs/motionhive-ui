@@ -19,9 +19,22 @@ export const mainRoutes: Routes = [
         title: 'Explore - MotionHive',
       },
       {
+        // Unified discovery hub — coaches, sessions, groups in one place.
+        path: 'discover',
+        loadComponent: () => import('./discover/discover').then((m) => m.Discover),
+        title: 'Discover - MotionHive',
+      },
+      {
+        // Exercise catalog — browsable by everyone (clients build their own
+        // workouts/routines from it). Authoring is gated to instructors
+        // inside the component. Instructors also reach it via /coaching/exercises.
+        path: 'exercises',
+        loadComponent: () => import('./instructor/exercises/exercises').then((m) => m.Exercises),
+        title: 'Exercises - MotionHive',
+      },
+      {
         path: 'messages',
-        loadChildren: () =>
-          import('./messages/messages.routes').then((m) => m.messagesRoutes),
+        loadChildren: () => import('./messages/messages.routes').then((m) => m.messagesRoutes),
       },
       {
         path: 'join/:token',
@@ -34,45 +47,78 @@ export const mainRoutes: Routes = [
         title: 'My Profile - MotionHive',
       },
       // Phase E — client-facing session surfaces.
+      // Discover sessions now lives in the user area
+      // (/user/sessions/discover). Keep the legacy path redirecting; it
+      // must stay declared before `sessions/:id` so it wins over the
+      // showcase wildcard.
+      { path: 'sessions/discover', redirectTo: 'user/sessions/discover', pathMatch: 'full' },
+      // My sessions now lives in the user area — see `userRoutes`
+      // (/user/sessions). Legacy paths are redirected below.
+      // ── Client workouts area (re-skinned against Claude Design output) ──
       {
-        path: 'sessions/discover',
+        path: 'my/plans',
         loadComponent: () =>
-          import('./sessions-discover/sessions-discover').then(
-            (m) => m.SessionsDiscover,
+          import('./client-plans/client-plans-list/client-plans-list').then(
+            (m) => m.ClientPlansList,
           ),
-        title: 'Discover sessions - MotionHive',
+        title: 'My plans - MotionHive',
       },
       {
-        path: 'my/sessions',
+        path: 'my/plans/:id',
         loadComponent: () =>
-          import('./sessions-my/sessions-my').then((m) => m.SessionsMy),
-        title: 'My sessions - MotionHive',
+          import('./client-plans/client-plan-detail/client-plan-detail').then(
+            (m) => m.ClientPlanDetail,
+          ),
+        title: 'My plan - MotionHive',
+      },
+      {
+        path: 'my/workouts',
+        loadComponent: () =>
+          import('./client-workouts/client-workouts-history/client-workouts-history').then(
+            (m) => m.ClientWorkoutsHistory,
+          ),
+        title: 'Workout history - MotionHive',
+      },
+      {
+        path: 'my/workouts/:id/complete',
+        loadComponent: () =>
+          import('./client-workouts/workout-complete/workout-complete').then(
+            (m) => m.WorkoutComplete,
+          ),
+        title: 'Workout complete - MotionHive',
+      },
+      {
+        path: 'my/workout-log/:id',
+        loadComponent: () =>
+          import('./client-workouts/workout-log-active/workout-log-active').then(
+            (m) => m.WorkoutLogActive,
+          ),
+        title: 'Workout - MotionHive',
+      },
+      {
+        // Read-only replay — used by client history + coach (with ?coach=1)
+        path: 'my/workout-log/:id/replay',
+        loadComponent: () =>
+          import('./client-workouts/workout-log-replay/workout-log-replay').then(
+            (m) => m.WorkoutLogReplay,
+          ),
+        title: 'Workout replay - MotionHive',
       },
       // Notification producers emit `screen: 'sessions/my'` (BE convention
-      // since the API surface is /sessions/my). Forward to the canonical
-      // FE route so deep-links from emails / push don't 404.
-      { path: 'sessions/my', redirectTo: 'my/sessions', pathMatch: 'full' },
-      {
-        // Day-of online countdown — the screen reminders link to 10 min
-        // before start. Must be declared BEFORE `sessions/:id` so the
-        // `/join` suffix wins.
-        path: 'sessions/:id/join',
-        loadComponent: () =>
-          import('./session-day-of-online/session-day-of-online').then(
-            (m) => m.SessionDayOfOnline,
-          ),
-        title: 'Join session - MotionHive',
-      },
-      {
-        // Public session showcase. Order matters: `sessions/discover` +
-        // `sessions/my` are declared above so they always match before `:id`.
-        path: 'sessions/:id',
-        loadComponent: () =>
-          import('./session-showcase/session-showcase').then(
-            (m) => m.SessionShowcase,
-          ),
-        title: 'Session - MotionHive',
-      },
+      // since the API surface is /sessions/my); older FE links used
+      // /my/sessions. The page now lives under the user area, so forward
+      // both legacy paths to the canonical route to avoid 404s. `sessions/my`
+      // must precede `sessions/:id` below so it wins over the showcase wildcard
+      // (otherwise it resolves to `/user/sessions/my` and the showcase rejects
+      // the non-UUID id with "that session link looks invalid").
+      { path: 'sessions/my', redirectTo: 'user/sessions', pathMatch: 'full' },
+      { path: 'my/sessions', redirectTo: 'user/sessions', pathMatch: 'full' },
+      // Session showcase + day-of join now live under the user area
+      // (/user/sessions/:id, see `userRoutes`). Redirect the legacy /
+      // externally-shared paths (email reminders, share links) so they
+      // don't 404. `:id/join` must precede `:id` so the /join suffix wins.
+      { path: 'sessions/:id/join', redirectTo: 'user/sessions/:id/join', pathMatch: 'full' },
+      { path: 'sessions/:id', redirectTo: 'user/sessions/:id', pathMatch: 'full' },
       {
         path: 'groups',
         loadComponent: () => import('./groups/groups').then((m) => m.GroupsLayout),

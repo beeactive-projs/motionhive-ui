@@ -16,6 +16,14 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/error/error.routes').then((m) => m.errorRoutes),
   },
 
+  // Admin impersonation handoff. Renders nothing unless a `token` query
+  // param is present; seeds it and reloads into the app as that user.
+  {
+    path: 'impersonate',
+    loadComponent: () =>
+      import('./pages/impersonate/impersonate').then((m) => m.Impersonate),
+  },
+
   // Canonical public share-target URL — `/public/@<handle>`. Always
   // renders the slim public chrome regardless of auth state, the way
   // share-target URLs do on other social platforms. The share dialog

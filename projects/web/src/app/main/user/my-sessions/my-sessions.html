@@ -1,0 +1,221 @@
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- Header · mirrors the instructor sessions list header -->
+  <header class="flex gap-4 items-center justify-between">
+    <div class="space-y-1 min-w-0">
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">My sessions</h1>
+      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">Your bookings, waitlists, and past
+        sessions.</p>
+    </div>
+    @if (!isMobile()) {
+    <div class="flex gap-3 shrink-0">
+      <p-button label="Discover" icon="pi pi-search" [outlined]="true" severity="secondary"
+        [size]="isTablet() ? 'small' : undefined" routerLink="/user/sessions/discover" />
+    </div>
+    }
+  </header>
+
+  <!-- Tabs · single source of truth for the active surface; filters live
+       between the tab headers and the panels so one instance drives all. -->
+  <p-tabs [value]="store.tab()" (valueChange)="onTabChange($event)" [scrollable]="true"
+    class="flex-1 min-h-0 flex flex-col gap-3 lg:gap-4">
+    <p-tablist>
+      @for (t of tabs; track t.key) {
+      <p-tab [value]="t.key">
+        <i class="text-md" [class]="t.icon" [class.text-xs]="isTabletDown()"></i>
+        <span class="ml-2 text-md" [class.text-xs]="isTabletDown()">{{ t.label }}</span>
+        @if (countFor(t) > 0) {
+        <p-badge [value]="countFor(t)" class="ml-2" />
+        }
+      </p-tab>
+      }
+    </p-tablist>
+
+    <!-- Filters · desktop shows the full pill row; tablet + mobile collapse
+         the type/location toggles behind the popover button. Search is always
+         present. Client-side filters over the loaded bookings. -->
+    <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+      @if (isTabletDown()) {
+      <p-button [label]="appliedFilterCount() > 0 ? 'Filters · ' + appliedFilterCount() : 'Filters'" icon="pi pi-filter"
+        size="small" rounded [severity]="appliedFilterCount() > 0 ? 'primary' : 'secondary'"
+        [text]="appliedFilterCount() === 0" (onClick)="filtersPopover.toggle($event)" />
+      } @else {
+      <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+        <p-button label="All" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="!locationKindFilter() && !typeFilter() ? 'primary' : 'secondary'"
+          [text]="!!locationKindFilter() || !!typeFilter()" (onClick)="clearQuickFilters()" />
+
+        <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+
+        <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="locationKindFilter() === SessionLocationKind.Online ? 'primary' : 'secondary'"
+          [text]="locationKindFilter() !== SessionLocationKind.Online"
+          (onClick)="toggleLocation(SessionLocationKind.Online)" />
+        <p-button label="In-person" icon="pi pi-map-marker" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="locationKindFilter() === SessionLocationKind.InPerson ? 'primary' : 'secondary'"
+          [text]="locationKindFilter() !== SessionLocationKind.InPerson"
+          (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
+
+        <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+
+        <p-button label="Group" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="typeFilter() === SessionKind.Group ? 'primary' : 'secondary'"
+          [text]="typeFilter() !== SessionKind.Group" (onClick)="toggleType(SessionKind.Group)" />
+        <p-button label="1-on-1" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="typeFilter() === SessionKind.Private ? 'primary' : 'secondary'"
+          [text]="typeFilter() !== SessionKind.Private" (onClick)="toggleType(SessionKind.Private)" />
+        <p-button label="Open" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="typeFilter() === SessionKind.Open ? 'primary' : 'secondary'"
+          [text]="typeFilter() !== SessionKind.Open" (onClick)="toggleType(SessionKind.Open)" />
+      </div>
+      }
+      <p-iconfield class="flex-1 md:flex-[0_1_320px]">
+        <p-inputicon class="pi pi-search" />
+        <input pInputText type="text" fluid placeholder="Search sessions…" aria-label="Search sessions"
+          [ngModel]="searchInput()" (ngModelChange)="onSearchInput($event)" />
+        @if (searchInput() !== '') {
+        <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchInput('')" />
+        }
+      </p-iconfield>
+    </div>
+
+    <p-tabpanels class="p-0! flex flex-col flex-1 min-h-0">
+      @for (t of tabs; track t.key) {
+      <p-tabpanel [value]="t.key" class="flex-1 min-h-0" [class.overflow-y-auto]="!isMobile()">
+        @if (store.tab() === t.key) {
+        <ng-container *ngTemplateOutlet="content" />
+        }
+      </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+@if (isMobile()) {
+<!-- Mobile FAB (single primary action). -->
+<mh-mobile-fab icon="pi pi-search" label="Discover" (tap)="goToDiscover()" />
+}
+
+<!--
+  Shared per-tab content — error / skeleton / empty / list. Each panel
+  injects this via *ngTemplateOutlet so the markup lives in one place.
+-->
+<ng-template #content>
+  @if (store.error()) {
+  <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
+    <span class="text-(--p-red-700)">{{ store.error() }}</span>
+    <p-button label="Retry" size="small" [outlined]="true" (onClick)="store.load()" />
+  </p-message>
+  } @else if (store.loading() && store.items().length === 0) {
+  <div class="flex flex-col gap-2">
+    @for (i of [1, 2, 3]; track i) {
+    <mh-time-row-skeleton tone="honey" />
+    }
+  </div>
+  } @else if (filteredItems().length === 0) {
+  @if (store.items().length === 0) {
+  <mh-list-empty-state icon="pi pi-calendar-clock" title="Nothing here yet"
+    message="Sessions you book will show up here. Find one to get started."
+    [actionLabel]="store.tab() === 'upcoming' ? 'Find a session' : undefined" actionIcon="pi pi-search"
+    (action)="goToDiscover()" />
+  } @else {
+  <mh-list-empty-state icon="pi pi-filter-slash" title="No sessions match your filters"
+    message="Try a different filter or clear the search." actionLabel="Clear filters" actionIcon="pi pi-filter-slash"
+    actionSeverity="contrast" [actionOutlined]="true" (action)="clearFilters()" />
+  }
+  } @else {
+  <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
+    @for (group of groupedItems(); track group.date.getTime()) {
+    @if (!isMobile()) {
+    <section class="flex flex-col gap-2">
+      <mh-section-label [label]="dayLabel(group.date)" [count]="group.items.length" />
+      <ng-container *ngTemplateOutlet="rows; context: { $implicit: group.items }" />
+    </section>
+    } @else {
+    <mh-day-separator [label]="dayLabel(group.date)" [count]="group.items.length" [tone]="dayTone(group.date)" />
+    <ng-container *ngTemplateOutlet="rows; context: { $implicit: group.items }" />
+    }
+    }
+
+    @if (store.hasMore()) {
+    <div class="flex justify-center p-4">
+      <p-button label="Load more" [outlined]="true" [loading]="store.loading()" (onClick)="store.loadMore()" />
+    </div>
+    }
+  </div>
+  }
+</ng-template>
+
+<!-- Row list · shared between the desktop section + mobile day group. -->
+<ng-template #rows let-items>
+  @for (p of items; track p.id) {
+  <mh-time-row [time]="rowTime(p)" [duration]="rowDuration(p)" [title]="sessionTitle(p)" [tone]="rowTone(p)"
+    [chevron]="!canJoin(p) && !canCancel(p)" (click)="openSession(p)">
+    <span meta>
+      <p-tag [value]="statusLabel(p.status)" [severity]="statusSeverity(p.status)" />
+      @if (isOnline(p) && meetingProvider(p); as prov) {
+      <mh-provider-chip [provider]="$any(prov)" />
+      }
+    </span>
+    @if (canJoin(p) || canCancel(p)) {
+    <span trailing class="flex items-center gap-1.5">
+      @if (canJoin(p)) {
+      <p-button label="Join" icon="pi pi-video" size="small" severity="success" (onClick)="join(p, $event)" />
+      }
+      @if (canCancel(p)) {
+      <p-button icon="pi pi-times" severity="danger" [text]="true" size="small" ariaLabel="Cancel booking"
+        (onClick)="openCancel(p, $event)" />
+      }
+    </span>
+    }
+  </mh-time-row>
+  }
+</ng-template>
+
+<!--
+  Filter popover — shown by the tablet/mobile "Filters" button. Declared
+  at the template root so `#filtersPopover` resolves inside the nested
+  @if branch (inside the tabs) that triggers it.
+-->
+<p-popover #filtersPopover [appendTo]="'body'" [dismissable]="true">
+  <div class="flex flex-col gap-3 min-w-52">
+    <div class="flex flex-wrap gap-1.5">
+      <p-button label="All" size="small" rounded styleClass="py-0.5 min-w-10"
+        [severity]="!locationKindFilter() && !typeFilter() ? 'primary' : 'secondary'"
+        [outlined]="!!locationKindFilter() || !!typeFilter()" (onClick)="clearQuickFilters()" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Type</p>
+      <div class="flex flex-wrap gap-1.5">
+        <p-button label="Group" icon="pi pi-users" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="typeFilter() === SessionKind.Group ? 'primary' : 'secondary'"
+          [outlined]="typeFilter() !== SessionKind.Group" (onClick)="toggleType(SessionKind.Group)" />
+        <p-button label="1-on-1" icon="pi pi-user" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="typeFilter() === SessionKind.Private ? 'primary' : 'secondary'"
+          [outlined]="typeFilter() !== SessionKind.Private" (onClick)="toggleType(SessionKind.Private)" />
+        <p-button label="Open" icon="pi pi-globe" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="typeFilter() === SessionKind.Open ? 'primary' : 'secondary'"
+          [outlined]="typeFilter() !== SessionKind.Open" (onClick)="toggleType(SessionKind.Open)" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Location</p>
+      <div class="flex flex-wrap gap-1.5">
+        <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="locationKindFilter() === SessionLocationKind.Online ? 'primary' : 'secondary'"
+          [outlined]="locationKindFilter() !== SessionLocationKind.Online"
+          (onClick)="toggleLocation(SessionLocationKind.Online)" />
+        <p-button label="In-person" icon="pi pi-map-marker" size="small" rounded styleClass="py-0.5 min-w-10"
+          [severity]="locationKindFilter() === SessionLocationKind.InPerson ? 'primary' : 'secondary'"
+          [outlined]="locationKindFilter() !== SessionLocationKind.InPerson"
+          (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
+      </div>
+    </div>
+  </div>
+</p-popover>
+
+<mh-cancel-booking-dialog [visible]="cancelOpen()" (visibleChange)="cancelOpen.set($event)"
+  [participant]="cancelTarget()" (cancelled)="onCancelled()" />
+
+<p-toast position="top-right" />

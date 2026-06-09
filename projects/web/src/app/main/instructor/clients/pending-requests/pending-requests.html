@@ -1,17 +1,26 @@
 <div class="h-full flex flex-col gap-4">
-  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-    <div class="flex items-center gap-3">
-      <p-button rounded text icon="pi pi-arrow-left" severity="secondary" [routerLink]="['/coaching/clients']" />
-      <div class="space-y-1">
-        <h1 class="font-heading font-semibold text-xl md:text-2xl">Pending requests</h1>
-        <p class="text-sm text-surface-700 dark:text-surface-400">
-          Invitations you've sent and requests waiting for your response.
-        </p>
-      </div>
-    </div>
 
-    <div class="flex flex-wrap gap-3">
-      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
+  <!-- Header · shared across desktop + mobile -->
+  <header class="flex gap-4 items-center justify-between">
+    <div class="space-y-1">
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Pending requests</h1>
+      @if (isTabletDown()) {
+      <p class="text-xs text-surface-700 dark:text-surface-400">Invitations sent and requests awaiting your response.
+      </p>
+      } @else {
+      <p class="text-sm text-surface-700 dark:text-surface-400">Invitations you've sent and requests waiting for your
+        response.</p>
+      }
+    </div>
+    <div class="flex gap-3">
+      @if (isMobile()) {
+      <p-button icon="pi pi-users" outlined rounded severity="secondary" (onClick)="goToClients()" size="small" />
+      } @else {
+      <p-button label="Clients" icon="pi pi-users" outlined severity="secondary" (onClick)="goToClients()"
+        [size]="isTablet() ? 'small' : undefined" />
+      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()"
+        [size]="isTablet() ? 'small' : undefined" />
+      }
     </div>
   </header>
 
@@ -24,12 +33,14 @@
     }
   </div> -->
 
+  <!-- Requests table (desktop) -->
+  @if (!isTabletDown()) {
   <div class="flex-1 min-h-0" style="background-color: var(--p-datatable-row-background);">
 
     <p-table [value]="requests()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
-      [loading]="loading()" showLoader="false" [rowsPerPageOptions]="[10, 20, 50]"
+      [loading]="loading()" [showLoader]="false" [rowsPerPageOptions]="[10, 20, 50]"
       (onLazyLoad)="lazyLoadRequests($event)" [scrollable]="true" scrollHeight="flex" dataKey="id" size="small"
-      stripedRows="true" rowHover="true" sortField="createdAt" [sortOrder]="-1">
+      [stripedRows]="true" [rowHover]="true" sortField="createdAt" [sortOrder]="-1">
       <ng-template #header>
         <tr>
           <th pSortableColumn="fromUser.firstName">Name</th>
@@ -43,9 +54,8 @@
       </ng-template>
 
       <ng-template #body let-row>
-        <tr [id]="'request-row-' + row.id"
-            [class.ring-2]="highlightedRequestId() === row.id"
-            [class.ring-primary-400]="highlightedRequestId() === row.id">
+        <tr [id]="'request-row-' + row.id" [class.ring-2]="highlightedRequestId() === row.id"
+          [class.ring-primary-400]="highlightedRequestId() === row.id">
           <td>
             <mh-user-info [user]="row.client" />
           </td>
@@ -66,16 +76,16 @@
           </td>
           <td>
             <div class="flex items-center justify-end gap-1">
-              @if (direction(row) === 'INCOMING') {
+              @if (isIncoming(row)) {
               <p-button icon="pi pi-check" rounded text severity="success" tooltipPosition="left" pTooltip="Accept"
-                (onClick)="acceptRequest(row)" />
+                ariaLabel="Accept" (onClick)="acceptRequest(row)" />
               <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left" pTooltip="Decline"
-                (onClick)="declineRequest(row)" />
+                ariaLabel="Decline" (onClick)="declineRequest(row)" />
               } @else {
               <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
-                pTooltip="Resend invitation" (onClick)="resendInvitation(row)" />
+                pTooltip="Resend invitation" ariaLabel="Resend invitation" (onClick)="resendInvitation(row)" />
               <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left"
-                pTooltip="Cancel invitation" (onClick)="cancelRequest(row)" />
+                pTooltip="Cancel invitation" ariaLabel="Cancel invitation" (onClick)="cancelRequest(row)" />
               }
             </div>
           </td>
@@ -93,7 +103,6 @@
           </td>
           <td><p-skeleton width="50%" height="1.5rem" /></td>
           <td><p-skeleton width="100%" height="2rem" /></td>
-          <td><p-skeleton width="100%" height="2rem" /></td>
           <td><p-skeleton width="100%" height="1.5rem" /></td>
           <td><p-skeleton width="100%" height="1.5rem" /></td>
           <td><p-skeleton width="100%" height="1.5rem" /></td>
@@ -109,14 +118,10 @@
 
       <ng-template #emptymessage>
         <tr>
-          <td colspan="8">
-            <div class="flex flex-col items-center gap-3 py-12 text-center">
-              <i class="pi pi-hourglass text-4xl text-secondary-300"></i>
-              <h2 class="text-lg font-semibold text-secondary-700">No pending requests</h2>
-              <p class="text-sm text-secondary-500">
-                You don't have any pending invitations or requests right now.
-              </p>
-            </div>
+          <td colspan="7">
+            <mh-list-empty-state icon="pi pi-hourglass" title="No pending requests"
+              message="Invitations you send and incoming client requests will show up here." actionLabel="Invite client"
+              actionIcon="pi pi-user-plus" (action)="openInviteDialog()" />
           </td>
         </tr>
       </ng-template>
@@ -130,7 +135,99 @@
       </ng-template>
     </p-table>
   </div>
+  }
+
+  <!-- Requests list (mobile, infinite scroll) -->
+  @if (isTabletDown()) {
+  <div class="flex-1 min-h-0 overflow-y-auto">
+    @if (loading() && mobileRequests().length === 0) {
+    <!-- Initial loading skeletons -->
+    <div class="flex flex-col gap-2">
+      @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+      <div class="border-surface-200 dark:border-surface-700 flex flex-col gap-2 rounded-lg border p-3">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <p-skeleton width="2.5rem" height="2.5rem" shape="circle" />
+            <p-skeleton width="8rem" height="1.25rem" />
+          </div>
+          <p-skeleton width="4rem" height="1.5rem" />
+        </div>
+        <p-skeleton width="60%" height="1rem" />
+      </div>
+      }
+    </div>
+    } @else {
+    <p-dataview [value]="mobileRequests()" dataKey="id">
+      <ng-template #list let-items>
+        <div class="flex flex-col gap-2">
+          @for (request of items; track request.id) {
+          <div
+            class="border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 flex flex-col gap-2 rounded-lg border p-3"
+            [id]="'request-row-' + request.id" [class.ring-2]="highlightedRequestId() === request.id"
+            [class.ring-primary-400]="highlightedRequestId() === request.id">
+            <div class="flex items-start justify-between gap-2">
+              <mh-user-info [user]="request.client" class="min-w-0" />
+              <p-tag [value]="typeLabel(request)" severity="warn" rounded class="text-xs shrink-0" />
+            </div>
+
+            <div class="text-surface-600 dark:text-surface-400 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+              <span class="inline-flex min-w-0 items-center gap-1">
+                <i class="pi pi-envelope text-[10px]" aria-hidden="true"></i>
+                <span class="truncate">{{ clientEmail(request) }}</span>
+              </span>
+              @if (request.createdAt) {
+              <span class="inline-flex items-center gap-1">
+                <i class="pi pi-calendar text-[10px]" aria-hidden="true"></i>
+                {{ request.createdAt | date: 'dd MMM yyyy' }}
+              </span>
+              }
+            </div>
+
+            @if (request.notes) {
+            <p class="text-surface-500 dark:text-surface-400 m-0 line-clamp-2 text-xs">{{ request.notes }}</p>
+            }
+
+            <div class="border-surface-100 dark:border-surface-800 flex items-center justify-end gap-1 border-t pt-2">
+              @if (isIncoming(request)) {
+              <p-button icon="pi pi-check" label="Accept" rounded text size="small" severity="success"
+                (onClick)="acceptRequest(request)" />
+              <p-button icon="pi pi-times" label="Decline" rounded text size="small" severity="danger"
+                (onClick)="declineRequest(request)" />
+              } @else {
+              <p-button icon="pi pi-send" label="Resend" rounded text size="small" severity="secondary"
+                (onClick)="resendInvitation(request)" />
+              <p-button icon="pi pi-times" label="Cancel" rounded text size="small" severity="danger"
+                (onClick)="cancelRequest(request)" />
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <mh-list-empty-state icon="pi pi-hourglass" title="No pending requests"
+          message="Invitations you send and incoming client requests will show up here." actionLabel="Invite client"
+          actionIcon="pi pi-user-plus" (action)="openInviteDialog()" />
+      </ng-template>
+    </p-dataview>
+    }
+
+    <!-- Infinite-scroll sentinel + loader -->
+    @if (mobileRequests().length < totalRecords()) { <div #scrollSentinel class="flex justify-center py-4">
+      @if (loadingMore()) {
+      <i class="pi pi-spin pi-spinner text-secondary-400 text-xl" aria-hidden="true"></i>
+      }
+  </div>
+  }
 </div>
+}
+</div>
+
+@if (isMobile()) {
+<!-- Mobile FAB (single primary action). -->
+<mh-mobile-fab icon="pi pi-user-plus" label="Invite client" (tap)="openInviteDialog()" />
+}
 
 <p-toast />
 <p-confirmDialog />

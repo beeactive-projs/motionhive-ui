@@ -53,6 +53,7 @@ export const MotionHiveLara = definePreset(Lara, {
     breadcrumb: {
       root: {
         background: 'transparent',
+        padding: '0',
       },
     },
     button: {
@@ -70,12 +71,23 @@ export const MotionHiveLara = definePreset(Lara, {
               hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
               activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
             },
+            secondary: {
+              borderColor: '{surface.600}',
+              color: '{surface.600}',
+              hoverBackground: 'color-mix(in srgb, {surface.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {surface.700} 40%, transparent)',
+            },
           },
           text: {
             primary: {
               color: '{primary.500}',
               hoverBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
               activeBackground: 'color-mix(in srgb, {primary.700} 40%, transparent)',
+            },
+            secondary: {
+              color: '{surface.600}',
+              hoverBackground: 'color-mix(in srgb, {surface.600} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {surface.700} 40%, transparent)',
             },
           },
         },
@@ -87,12 +99,23 @@ export const MotionHiveLara = definePreset(Lara, {
               hoverBackground: 'color-mix(in srgb, {primary.500} 20%, transparent)',
               activeBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
             },
+            secondary: {
+              borderColor: '{surface.400}',
+              color: '{surface.400}',
+              hoverBackground: 'color-mix(in srgb, {surface.500} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {surface.600} 40%, transparent)',
+            },
           },
           text: {
             primary: {
               color: '{primary.400}',
               hoverBackground: 'color-mix(in srgb, {primary.500} 20%, transparent)',
               activeBackground: 'color-mix(in srgb, {primary.600} 30%, transparent)',
+            },
+            secondary: {
+              color: '{surface.400}',
+              hoverBackground: 'color-mix(in srgb, {surface.500} 30%, transparent)',
+              activeBackground: 'color-mix(in srgb, {surface.600} 40%, transparent)',
             },
           },
         },
@@ -102,10 +125,15 @@ export const MotionHiveLara = definePreset(Lara, {
       colorScheme: {
         light: {
           root: {
-            background: '{surface.50}',
-            shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
+            // background: '{surface.50}',
+            // shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
           },
         },
+      },
+    },
+    dataview: {
+      root: {
+        borderWidth: '0',
       },
     },
     dialog: {
@@ -120,16 +148,16 @@ export const MotionHiveLara = definePreset(Lara, {
       },
     },
     tabs: {
-      navButton: {
-        background: 'transparent',
-      },
+      // navButton: {
+      //   background: 'transparent',
+      // },
       tablist: {
         background: 'transparent',
         borderWidth: '0 0 1px 0',
         // borderColor: '{surface.300}',
       },
       tab: {
-        padding: '0.75rem 1rem',
+        padding: '0.5rem 0.75rem',
         borderWidth: '0 0 3px 0',
       },
       colorScheme: {

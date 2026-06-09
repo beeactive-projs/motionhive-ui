@@ -14,6 +14,7 @@ import {
   UpdateClientPayload,
 } from '../../models/client/client.model';
 import { InstructorListResponse } from '../../models/client/instructor.model';
+import { silentRequest } from '../../interceptors/silent-request.context';
 
 @Injectable({
   providedIn: 'root',
@@ -31,9 +32,10 @@ export class ClientService {
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }
 
-  // service.ts (Angular)
-  filterClients(event: TableLazyLoadEvent) {
-    return this._http.post<any>(`${this.baseUrl}/filter`, event);
+  filterClients(event: TableLazyLoadEvent): Observable<ClientListResponse> {
+    return this._http.post<ClientListResponse>(`${this.baseUrl}/filter`, event, {
+      context: silentRequest(),
+    });
   }
 
   filterPendingRequests(event: TableLazyLoadEvent): Observable<ClientListResponse> {

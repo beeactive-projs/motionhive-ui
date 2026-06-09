@@ -137,7 +137,7 @@ describe('SessionsInstructorStore', () => {
     expect((next as { id: string }).id).toBe('i-2'); // earliest
   });
 
-  it('setTab() resets page + reloads', () => {
+  it('setTab() resets page + refetches templates only (instances window reused)', () => {
     store.reload();
     flushReload(
       { items: [], total: 0, page: 1, pageSize: 20 },
@@ -146,19 +146,18 @@ describe('SessionsInstructorStore', () => {
     store.setTab('recurring');
     expect(store.tab()).toBe('recurring');
     expect(store.page()).toBe(1);
-    // Verify the new request has tab=recurring
+    // Verify the new request has tab=recurring...
     const tReq = httpMock.expectOne(
       (r) =>
         r.url === `${BASE}/sessions/templates` &&
         r.params.get('tab') === 'recurring',
     );
     tReq.flush({ items: [], total: 0, page: 1, pageSize: 20 });
-    httpMock
-      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
-      .flush({ items: [], total: 0, page: 1, pageSize: 100 });
+    // ...and the tab/filter-independent instances window is NOT refetched.
+    httpMock.expectNone((r) => r.url === `${BASE}/sessions/instances`);
   });
 
-  it('setFilters() merges and reloads', () => {
+  it('setFilters() merges and refetches templates only (instances window reused)', () => {
     store.reload();
     flushReload(
       { items: [], total: 0, page: 1, pageSize: 20 },
@@ -173,9 +172,38 @@ describe('SessionsInstructorStore', () => {
         r.params.get('type') === 'GROUP',
     );
     tReq.flush({ items: [], total: 0, page: 1, pageSize: 20 });
+    // Filters are applied server-side on templates + client-side on the
+    // cached instances window — no instances refetch.
+    httpMock.expectNone((r) => r.url === `${BASE}/sessions/instances`);
+  });
+
+  it('setTab(cancelled) fetches cancelled instances but reuses the scheduled window', () => {
+    store.reload();
+    flushReload(
+      { items: [], total: 0, page: 1, pageSize: 20 },
+      { items: [], total: 0, page: 1, pageSize: 100 },
+    );
+    store.setTab('cancelled');
+    // Templates for the cancelled tab.
     httpMock
-      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
-      .flush({ items: [], total: 0, page: 1, pageSize: 100 });
+      .expectOne(
+        (r) =>
+          r.url === `${BASE}/sessions/templates` &&
+          r.params.get('tab') === 'cancelled',
+      )
+      .flush({ items: [], total: 0, page: 1, pageSize: 20 });
+    // Exactly one /sessions/instances call — the CANCELLED-status fetch.
+    // The SCHEDULED window is served from cache, so there's no second call.
+    const instReqs = httpMock.match((r) => r.url === `${BASE}/sessions/instances`);
+    expect(instReqs.length).toBe(1);
+    expect(instReqs[0].request.params.get('status')).toBe('CANCELLED');
+    instReqs[0].flush({
+      items: [fakeInstance({ id: 'c-1' })],
+      total: 1,
+      page: 1,
+      pageSize: 100,
+    });
+    expect(store.cancelledInstances().length).toBe(1);
   });
 
   it('kpis computed: counts recurring + signups + conflicts', () => {

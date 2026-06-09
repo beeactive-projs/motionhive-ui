@@ -1,0 +1,187 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [appendTo]="'body'"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [style]="{ width: '720px', maxWidth: '95vw' }"
+  [contentStyle]="{ maxHeight: '70vh', overflow: 'auto', padding: '1rem 1.25rem' }"
+  [header]="exercise()?.name ?? 'Exercise'"
+>
+  @if (loading()) {
+    <div class="detail-loading">
+      <i class="pi pi-spin pi-spinner"></i> Loading…
+    </div>
+  } @else if (exercise(); as e) {
+    <div class="detail">
+      <!-- Hero media — cycles through start/end frames every 1.4s -->
+      @let frames = imageFrames();
+      <div class="detail__hero" [class.detail__hero--cycling]="frames.length > 1">
+        @if (frames.length > 0) {
+          @for (frame of frames; track frame.id; let i = $index) {
+            <img
+              [src]="frame.url"
+              [alt]="e.name"
+              [class.is-active]="i === cycleIndex()"
+              loading="lazy"
+            />
+          }
+        } @else if (e.thumbnailUrl) {
+          <img [src]="e.thumbnailUrl" [alt]="e.name" class="is-active" />
+        } @else {
+          <div class="detail__hero-placeholder"><i class="pi pi-image"></i></div>
+        }
+
+        @if (frames.length > 1) {
+          <div class="detail__cycle-dots" aria-hidden="true">
+            @for (frame of frames; track frame.id; let i = $index) {
+              <span class="dot" [class.dot--on]="i === cycleIndex()"></span>
+            }
+          </div>
+        }
+
+        @if (e.youtubeUrl) {
+          <a
+            class="detail__play"
+            [href]="e.youtubeUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open YouTube demo in a new tab"
+          >
+            <i class="pi pi-youtube"></i> YouTube demo
+          </a>
+        }
+      </div>
+
+      <!-- Meta chips -->
+      <div class="detail__chips">
+        <span class="chip chip--neutral">{{ e.kind | titlecase }}</span>
+        <span class="chip chip--neutral">{{ e.level | titlecase }}</span>
+        @if (e.movementPattern) {
+          <span class="chip chip--neutral">{{ e.movementPattern | titlecase }}</span>
+        }
+        @if (e.mechanic) {
+          <span class="chip chip--neutral">{{ e.mechanic | titlecase }}</span>
+        }
+        @if (e.force) {
+          <span class="chip chip--neutral">{{ e.force | titlecase }}</span>
+        }
+        @if (e.isUnilateral) {
+          <span class="chip chip--accent">Unilateral</span>
+        }
+        @if (e.source === 'SYSTEM') {
+          <span class="chip chip--system"><i class="pi pi-verified"></i> System</span>
+        }
+        @if (e.visibility === 'PUBLIC') {
+          <span class="chip chip--public"><i class="pi pi-globe"></i> Public</span>
+        } @else if (e.visibility === 'PRIVATE') {
+          <span class="chip chip--private"><i class="pi pi-lock"></i> Private</span>
+        }
+      </div>
+
+      <!-- Muscles -->
+      @if (primaryMuscles().length || secondaryMuscles().length || stabilizerMuscles().length) {
+        <section class="detail__section">
+          <h4>Muscles worked</h4>
+          <div class="muscle-list">
+            @for (m of primaryMuscles(); track m) {
+              <span class="m-tag m-tag--pri">{{ m }}</span>
+            }
+            @for (m of secondaryMuscles(); track m) {
+              <span class="m-tag m-tag--sec">{{ m }}</span>
+            }
+            @for (m of stabilizerMuscles(); track m) {
+              <span class="m-tag m-tag--stab">{{ m }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Equipment -->
+      @if (equipmentList().length) {
+        <section class="detail__section">
+          <h4>Equipment</h4>
+          <div class="muscle-list">
+            @for (eq of equipmentList(); track eq) {
+              <span class="chip chip--neutral">{{ eq }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Description -->
+      @if (e.description) {
+        <section class="detail__section">
+          <h4>Description</h4>
+          <p>{{ e.description }}</p>
+        </section>
+      }
+
+      <!-- Instructions -->
+      @if (e.instructions) {
+        <section class="detail__section">
+          <h4>Instructions</h4>
+          <p class="instructions">{{ e.instructions }}</p>
+        </section>
+      }
+
+      <!-- Attribution -->
+      @if (e.owner; as owner) {
+        <section class="detail__section detail__attribution">
+          <div>
+            <div class="attr-label">Created by</div>
+            <div class="attr-name">{{ owner.firstName }} {{ owner.lastName }}</div>
+          </div>
+          @if (e.forkCount > 0) {
+            <div class="attr-forks">
+              <i class="pi pi-share-alt"></i> Forked by {{ e.forkCount }} {{ e.forkCount === 1 ? 'instructor' : 'instructors' }}
+            </div>
+          }
+        </section>
+      }
+    </div>
+  }
+
+  <ng-template #footer>
+    @if (exercise(); as e) {
+      @if (canEdit()) {
+        <p-button
+          label="Edit"
+          icon="pi pi-pencil"
+          severity="secondary"
+          [text]="true"
+          (onClick)="requestEdit()"
+          [disabled]="busy()"
+        />
+        <p-button
+          [label]="e.visibility === 'PUBLIC' ? 'Make private' : 'Make public'"
+          [icon]="e.visibility === 'PUBLIC' ? 'pi pi-lock' : 'pi pi-globe'"
+          severity="secondary"
+          [text]="true"
+          (onClick)="toggleVisibility()"
+          [loading]="busy()"
+        />
+        <p-button
+          label="Delete"
+          icon="pi pi-trash"
+          severity="danger"
+          [text]="true"
+          (onClick)="confirmDelete()"
+          [disabled]="busy()"
+        />
+      }
+      @if (canFork()) {
+        <p-button
+          label="Fork to my library"
+          icon="pi pi-clone"
+          (onClick)="fork()"
+          [loading]="busy()"
+        />
+      }
+    }
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [appendTo]="'body'" />

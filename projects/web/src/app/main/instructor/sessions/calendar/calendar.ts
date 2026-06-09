@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -24,8 +24,9 @@ import {
   DaySeparator,
   MiniMonth,
   MobileFab,
-  PageShell,
   SessionInstance,
+  SessionKind,
+  SessionLocationKind,
   SessionTemplate,
   SessionsInstructorStore,
   TimeRow,
@@ -75,7 +76,6 @@ import {
     MessageModule,
     SkeletonModule,
     ToastModule,
-    PageShell,
     CalendarGrid,
     MiniMonth,
     QuickCreatePopover,
@@ -95,6 +95,12 @@ import {
 export class SessionsCalendar implements OnInit {
   protected readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
+  private readonly _location = inject(Location);
+
+  // Enum consts exposed for template comparisons — never compare against
+  // raw string literals (see CLAUDE.md).
+  protected readonly SessionKind = SessionKind;
+  protected readonly SessionLocationKind = SessionLocationKind;
 
   protected readonly view = signal<CalendarView>('week');
   protected readonly anchor = signal<Date>(this._weekStart(new Date()));
@@ -299,6 +305,16 @@ export class SessionsCalendar implements OnInit {
 
   // ─── Event handlers ───────────────────────────────────────────────
 
+  protected goBack(): void {
+    // Location.back() === history.back(). If we arrived via deep link or a
+    // refresh there's no in-app history to pop, so fall back to the list.
+    if (this._router.lastSuccessfulNavigation()?.previousNavigation) {
+      this._location.back();
+    } else {
+      void this._router.navigate(['/coaching/sessions']);
+    }
+  }
+
   protected setView(v: CalendarView): void {
     this.view.set(v);
     this.store.loadRange(this.range());
@@ -502,9 +518,9 @@ export class SessionsCalendar implements OnInit {
   }
 
   /** Mobile filter pills — single-select; tapping the active one clears. */
-  protected toggleMobileLocation(kind: 'ONLINE' | 'IN_PERSON'): void {
+  protected toggleMobileLocation(kind: SessionLocationKind): void {
     const f = this.filters();
-    if (kind === 'ONLINE') {
+    if (kind === SessionLocationKind.Online) {
       // ONLINE active = only online cards visible = !inPerson, online=true.
       const showingOnly = !f.inPerson && f.online;
       this.filters.set({ ...f, inPerson: showingOnly, online: true });
@@ -615,8 +631,8 @@ export class SessionsCalendar implements OnInit {
     const t = inst.template;
     if (!t) return true; // permissive when ref missing
     if (!f.types[t.type]) return false;
-    if (t.locationKind === 'ONLINE' && !f.online) return false;
-    if (t.locationKind === 'IN_PERSON' && !f.inPerson) return false;
+    if (t.locationKind === SessionLocationKind.Online && !f.online) return false;
+    if (t.locationKind === SessionLocationKind.InPerson && !f.inPerson) return false;
     if (f.conflictsOnly && (inst.conflictingInstanceIds?.length ?? 0) === 0)
       return false;
     return true;

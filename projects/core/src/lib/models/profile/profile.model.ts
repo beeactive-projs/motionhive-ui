@@ -76,6 +76,8 @@ export interface AccountInfo {
   handle: string | null;
   /** Per-field visibility map; missing keys fall back to `PROFILE_PRIVACY_DEFAULTS`. */
   privacySettings: UserPrivacySettings;
+  /** Locked decision §19 — client browse gate on the exercise catalog. */
+  exerciseCatalogOptIn?: boolean;
 }
 
 export interface MyProfile {

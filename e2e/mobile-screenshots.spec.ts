@@ -39,12 +39,12 @@ for (const [name, vp] of Object.entries(VIEWPORTS)) {
 
       // Sessions list
       await page.goto('/coaching/sessions');
-      await page.waitForSelector('mh-page-shell', { timeout: 15_000 });
+      await page.waitForSelector('header', { timeout: 15_000 });
       await snap('01-sessions-list');
 
       // Calendar
       await page.goto('/coaching/sessions/calendar');
-      await page.waitForSelector('mh-page-shell', { timeout: 15_000 });
+      await page.waitForSelector('header', { timeout: 15_000 });
       await snap('02-calendar-day');
 
       const weekBtn = page.locator('button:has-text("Week")').first();
@@ -61,7 +61,7 @@ for (const [name, vp] of Object.entries(VIEWPORTS)) {
       // Create session form — mobile uses the <mh-mobile-fab>
       // (.mh-fab), desktop uses the header "New session" button.
       await page.goto('/coaching/sessions');
-      await page.waitForSelector('mh-page-shell', { timeout: 15_000 });
+      await page.waitForSelector('header', { timeout: 15_000 });
       const mobileFab = page.locator('mh-mobile-fab .mh-fab');
       const headerNew = page.locator('button:has-text("New session")').first();
       const opener = (await mobileFab.isVisible().catch(() => false))

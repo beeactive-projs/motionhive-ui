@@ -1,0 +1,275 @@
+// Exercise grid card — design S1
+//
+// Variables come from the global PrimeNG / Tailwind theme; never
+// hardcode hex values (skill rule). The honey/navy/teal palette lives
+// in the global theme; we reference via the design tokens.
+
+:host {
+  display: block;
+}
+
+.ex-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+
+  &:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.ex-thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--p-surface-100);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-400);
+    font-size: 22px;
+  }
+
+  &__play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+
+    i {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+  }
+}
+
+.ex-corner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--p-content-background);
+  letter-spacing: 0.02em;
+
+  i {
+    font-size: 9px;
+  }
+
+  &--system {
+    color: var(--p-surface-700);
+  }
+
+  &--mine {
+    color: var(--p-teal-700);
+    background: var(--p-teal-100);
+  }
+
+  &--public {
+    color: var(--p-blue-700);
+    background: var(--p-blue-100);
+  }
+}
+
+.ex-body {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.ex-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--p-surface-900);
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ex-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-height: 22px;
+}
+
+.ex-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--p-surface-100);
+  margin-top: auto;
+  font-size: 11px;
+}
+
+// Role-weighted muscle tag (primary / secondary / stabilizer)
+.m-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+
+  &--pri {
+    background: var(--p-primary-100, #fcd9a1);
+    color: var(--p-primary-700, #965509);
+
+    &::before {
+      background: var(--p-primary-500, #e48913);
+    }
+  }
+}
+
+.m-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  color: var(--p-text-muted-color);
+
+  &--sub {
+    background: var(--p-surface-100);
+    border-color: transparent;
+    color: var(--p-surface-600);
+  }
+}
+
+// Level badge — icon + text + color triple-signal (never color alone)
+.lvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.02em;
+
+  i {
+    font-size: 9px;
+  }
+
+  &--beg {
+    background: var(--p-green-100);
+    color: var(--p-green-700);
+  }
+
+  &--int {
+    background: var(--p-primary-100, #fcd9a1);
+    color: var(--p-primary-700, #965509);
+  }
+
+  &--adv {
+    background: var(--p-red-100, #ffe4e6);
+    color: var(--p-red-700, #be123c);
+  }
+}
+
+.ex-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--p-surface-600);
+  min-width: 0;
+
+  &__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 90px;
+  }
+}
+
+.ex-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--p-teal-600);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.ex-forks {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--p-surface-100);
+  color: var(--p-surface-700);
+
+  i {
+    font-size: 9px;
+  }
+}

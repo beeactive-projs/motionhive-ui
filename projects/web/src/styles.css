@@ -49,7 +49,7 @@
    handle pseudo-element. Header + footer become sticky so the body
    scrolls inside the sheet (not the page).
    Scope: applies to ALL p-dialog modals so this is a one-place fix. */
-@media (max-width: 600px) {
+@media (max-width: 767.98px) {
   .p-dialog-mask:has(.p-dialog) {
     align-items: flex-end !important;
   }
@@ -106,7 +106,7 @@
    width, centered, with a dimmed backdrop. Without these, the picker
    stretches edge-to-edge with no breathing room, and the bottom sheet
    underneath bleeds through (no backdrop). */
-@media (max-width: 600px) {
+@media (max-width: 767.98px) {
   /* Darken the touch-UI backdrop so the create-sheet underneath
      doesn't visually compete with the picker. PrimeNG's default
      panel width (~360px) already fits a 390px viewport with 15px

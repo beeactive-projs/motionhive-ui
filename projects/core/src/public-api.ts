@@ -32,6 +32,19 @@ export * from './lib/models/review/review.model';
 export * from './lib/models/venue/venue.enums';
 export * from './lib/models/venue/venue.model';
 
+// Models - Exercise
+export * from './lib/models/exercise/exercise.enums';
+export * from './lib/models/exercise/exercise.model';
+export * from './lib/models/exercise/muscle.model';
+export * from './lib/models/exercise/equipment.model';
+
+// Models - Workout (program / assignment / log)
+export * from './lib/models/workout/workout.enums';
+export * from './lib/models/workout/program.model';
+export * from './lib/models/workout/assignment.model';
+export * from './lib/models/workout/log.model';
+export * from './lib/models/workout/routine.model';
+
 // Models - Client
 export * from './lib/models/client/client.enums';
 export * from './lib/models/client/client.model';
@@ -159,6 +172,7 @@ export * from './lib/utils/api-error.utils';
 export * from './lib/utils/cloudinary.utils';
 export * from './lib/utils/group.utils';
 export * from './lib/utils/date.utils';
+export * from './lib/utils/youtube.utils';
 export * from './lib/utils/html.utils';
 export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';
@@ -189,6 +203,11 @@ export * from './lib/services/payment/refund.service';
 export * from './lib/services/payment/earnings.service';
 export * from './lib/services/payment/client-payment.service';
 export * from './lib/services/venue/venue.service';
+export * from './lib/services/exercise/exercise.service';
+export * from './lib/services/workout/program.service';
+export * from './lib/services/workout/program-assignment.service';
+export * from './lib/services/workout/workout-log.service';
+export * from './lib/services/workout/routine.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
 export * from './lib/services/session/session.service';
@@ -202,8 +221,10 @@ export * from './lib/directives/stripe-iframe.directive';
 
 // Stores
 export * from './lib/stores/auth.store';
+export * from './lib/stores/exercise-taxonomy.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';
+export * from './lib/stores/billing-counts.store';
 export * from './lib/stores/notification.store';
 export * from './lib/stores/public-profile.store';
 export * from './lib/stores/messaging.store';
@@ -219,7 +240,6 @@ export * from './lib/services/loading/loading.service';
 
 // Components
 export * from './lib/components/logo/logo';
-export * from './lib/components/page-shell/page-shell';
 export * from './lib/components/dialog-shell/dialog-shell';
 // Mobile-first primitives — sheet/time-row/day-sep/sticky-cta/fab.
 export * from './lib/components/bottom-sheet/bottom-sheet';
@@ -230,7 +250,6 @@ export * from './lib/components/mobile-fab/mobile-fab';
 export * from './lib/components/action-list/action-list';
 export * from './lib/components/week-strip/week-strip';
 export * from './lib/components/time-row-skeleton/time-row-skeleton';
-export * from './lib/components/kpi-card/kpi-card';
 export * from './lib/components/section-label/section-label';
 export * from './lib/components/tri-state-toggle/tri-state-toggle';
 export * from './lib/components/calendar/calendar-event.model';

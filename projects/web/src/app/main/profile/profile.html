@@ -38,25 +38,13 @@
         </span>
       </p-tab>
 
-      @if (showInvoicesTab()) {
-      <p-tab [value]="Tabs.Invoices">
-        <i class="pi pi-receipt"></i>
+      @if (showBillingTab()) {
+      <p-tab [value]="Tabs.Billing">
+        <i class="pi pi-credit-card"></i>
         <span class="ml-2">
-          My invoices
-          @if (invoicesBadge() > 0) {
-          <span class="ml-1 text-xs text-surface-500">· {{ invoicesBadge() }}</span>
-          }
-        </span>
-      </p-tab>
-      }
-
-      @if (showMembershipsTab()) {
-      <p-tab [value]="Tabs.Memberships">
-        <i class="pi pi-refresh"></i>
-        <span class="ml-2">
-          My memberships
-          @if (membershipsBadge() > 0) {
-          <span class="ml-1 text-xs text-surface-500">· {{ membershipsBadge() }}</span>
+          Billing
+          @if (billingBadge() > 0) {
+          <span class="ml-1 text-xs text-surface-500">· {{ billingBadge() }}</span>
           }
         </span>
       </p-tab>
@@ -87,15 +75,9 @@
         }
       </p-tabpanel>
 
-      @if (showInvoicesTab()) {
-      <p-tabpanel [value]="Tabs.Invoices">
-        @if (activeTab() === Tabs.Invoices) { <mh-my-invoices /> }
-      </p-tabpanel>
-      }
-
-      @if (showMembershipsTab()) {
-      <p-tabpanel [value]="Tabs.Memberships">
-        @if (activeTab() === Tabs.Memberships) { <mh-my-subscriptions /> }
+      @if (showBillingTab()) {
+      <p-tabpanel [value]="Tabs.Billing">
+        @if (activeTab() === Tabs.Billing) { <mh-profile-billing /> }
       </p-tabpanel>
       }
 

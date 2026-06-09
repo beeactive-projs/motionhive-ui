@@ -53,7 +53,7 @@ import {
             label="Back to my sessions"
             severity="secondary"
             [outlined]="true"
-            routerLink="/my/sessions"
+            routerLink="/user/sessions"
           />
         </div>
       } @else if (info()) {
@@ -109,7 +109,7 @@ import {
             label="Back to my sessions"
             severity="secondary"
             [outlined]="true"
-            routerLink="/my/sessions"
+            routerLink="/user/sessions"
             styleClass="mh-dof__join-btn"
           />
         } @else {

@@ -233,7 +233,7 @@ import type { SessionParticipant } from '../../models/session/session.model';
 
     /* Mobile (≤600px): swap. Tables horizontal-scrolling on a phone reads
        as broken; one stacked card per row carries the same information. */
-    @media (max-width: 600px) {
+    @media (max-width: 767.98px) {
       .mh-pt-cards {
         display: flex;
         flex-direction: column;

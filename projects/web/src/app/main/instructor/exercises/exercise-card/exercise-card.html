@@ -1,0 +1,68 @@
+@let e = exercise();
+@let badge = cornerBadge();
+@let level = levelLabel();
+
+<button type="button" class="ex-card" (click)="onClick()" [attr.aria-label]="'Open ' + e.name">
+  <div class="ex-thumb">
+    @if (e.thumbnailUrl; as src) {
+      <img [src]="src" [alt]="e.name" loading="lazy" />
+    } @else {
+      <div class="ex-thumb__placeholder" aria-hidden="true">
+        <i class="pi pi-image"></i>
+      </div>
+    }
+
+    @if (e.youtubeUrl) {
+      <span class="ex-thumb__play" aria-hidden="true"><i class="pi pi-youtube"></i></span>
+    }
+
+    @switch (badge) {
+      @case ('system') {
+        <span class="ex-corner ex-corner--system"><i class="pi pi-verified"></i> System</span>
+      }
+      @case ('mine') {
+        <span class="ex-corner ex-corner--mine"><i class="pi pi-lock"></i> Mine</span>
+      }
+      @case ('public') {
+        <span class="ex-corner ex-corner--public"><i class="pi pi-globe"></i> Public</span>
+      }
+    }
+  </div>
+
+  <div class="ex-body">
+    <h3 class="ex-name">{{ e.name }}</h3>
+
+    <div class="ex-meta">
+      @if (primaryMuscle(); as m) {
+        <span class="m-tag m-tag--pri">{{ m }}</span>
+      }
+      @if (leadEquipment(); as eq) {
+        <span class="m-chip">{{ eq }}</span>
+      }
+    </div>
+
+    <div class="ex-foot">
+      <span class="lvl lvl--{{ level.tone }}">
+        <i class="pi" [class]="'pi ' + level.icon"></i> {{ level.text }}
+      </span>
+
+      @if (badge === 'public' && authorName(); as name) {
+        <span class="ex-author" [pTooltip]="'Created by ' + name" tooltipPosition="top">
+          @if (authorInitials(); as initials) {
+            <span class="ex-avatar" aria-hidden="true">{{ initials }}</span>
+          }
+          <span class="ex-author__name">{{ name }}</span>
+          @if (e.forkCount > 0) {
+            <span class="ex-forks"><i class="pi pi-share-alt"></i> {{ e.forkCount }}</span>
+          }
+        </span>
+      } @else if (badge === 'mine' && e.forkCount > 0) {
+        <span class="ex-forks" [pTooltip]="'Forked by ' + e.forkCount + ' instructors'" tooltipPosition="top">
+          <i class="pi pi-share-alt"></i> {{ e.forkCount }}
+        </span>
+      } @else if (e.mechanic) {
+        <span class="m-chip m-chip--sub">{{ e.mechanic | titlecase }}</span>
+      }
+    </div>
+  </div>
+</button>

@@ -1,0 +1,53 @@
+<div class="flex min-h-screen items-center justify-center bg-[var(--p-surface-100)] p-4">
+  <div
+    class="w-full max-w-sm rounded-2xl border border-[var(--p-content-border-color)] bg-[var(--p-content-background)] p-8 shadow-sm"
+  >
+    <div class="mb-6 flex flex-col items-center gap-2 text-center">
+      <mh-logo styleClass="max-w-12" />
+      <div class="text-xs uppercase tracking-wider text-[var(--p-primary-color)]">
+        Admin console
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label for="email" class="text-sm font-medium text-[var(--p-text-color)]">Email</label>
+        <input
+          id="email"
+          pInputText
+          type="email"
+          formControlName="email"
+          autocomplete="username"
+          class="w-full"
+          placeholder="you@motionhive.fit"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="password" class="text-sm font-medium text-[var(--p-text-color)]">
+          Password
+        </label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          autocomplete="current-password"
+        />
+      </div>
+
+      @if (error()) {
+        <p-message severity="error" [text]="error()!" />
+      }
+
+      <p-button
+        type="submit"
+        label="Sign in"
+        styleClass="w-full"
+        [loading]="submitting()"
+      />
+    </form>
+  </div>
+</div>
