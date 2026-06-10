@@ -92,6 +92,7 @@ export class SignUpComponent {
   private readonly googleBtnContainer = viewChild<ElementRef>('googleBtn');
 
   private static readonly INVITE_TOKEN_KEY = 'mh_client_invite_token';
+  private static readonly REFERRER_KEY = 'mh_friend_referrer_id';
 
   constructor() {
     const token = this._route.snapshot.queryParamMap.get('token');
@@ -115,6 +116,16 @@ export class SignUpComponent {
       if (storedToken) {
         this._invitationToken.set(storedToken);
       }
+    }
+
+    // Friend-referral param (?ref=<userId>) — persisted to localStorage
+    // so it survives the Google/Facebook OAuth redirect dance. Read on
+    // submit and sent to the BE; the BE doesn't yet store the
+    // attribution but persisting the value client-side means the link
+    // we hand out actually carries information end-to-end.
+    const ref = this._route.snapshot.queryParamMap.get('ref');
+    if (ref) {
+      localStorage.setItem(SignUpComponent.REFERRER_KEY, ref);
     }
 
     afterNextRender(() => {
@@ -266,6 +277,12 @@ export class SignUpComponent {
   }
 
   private acceptInvitationAndNavigate(): void {
+    // Friend-referral cleanup — we persisted ?ref= on landing so it
+    // would survive an OAuth round-trip, but once registration
+    // succeeds it's stale. (BE attribution lands in a follow-up;
+    // until then this is just hygiene.)
+    localStorage.removeItem(SignUpComponent.REFERRER_KEY);
+
     const token = this._invitationToken() || localStorage.getItem(SignUpComponent.INVITE_TOKEN_KEY);
     if (token) {
       localStorage.removeItem(SignUpComponent.INVITE_TOKEN_KEY);

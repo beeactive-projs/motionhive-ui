@@ -58,11 +58,14 @@ export class InviteFriendDialog {
   protected readonly inviteLink = computed(() => {
     const userId = this._authStore.user()?.id ?? '';
     const ref = userId ? `?ref=${encodeURIComponent(userId)}` : '';
+    // Always link to the app's signup route — the marketing site
+    // doesn't host a registration form. In dev `environment.appUrl`
+    // is localhost; in prod we use the canonical app host.
     const base =
       environment.production && typeof window !== 'undefined'
-        ? 'https://motionhive.fit'
+        ? 'https://app.motionhive.fit'
         : environment.appUrl;
-    return `${base}/signup${ref}`;
+    return `${base}/auth/signup${ref}`;
   });
 
   protected readonly canShare = signal(
