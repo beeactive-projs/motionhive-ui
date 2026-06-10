@@ -52,6 +52,8 @@ const BLOG_LIMIT = 3;
 const COACHES_OWN_LIMIT = 2;
 const COACHES_SUGGESTED_LIMIT = 3;
 const COACH_TONES: HexTone[] = ['honey', 'teal', 'navy', 'coral'];
+/** Blog articles live on the public marketing site, not in-app. */
+const MARKETING_BLOG_URL = 'https://www.motionhive.fit/blog';
 const CATEGORY_TONES: Record<BlogCategory, HexTone> = {
   [BlogCategories.Guide]: 'honey',
   [BlogCategories.Nutrition]: 'teal',
@@ -204,7 +206,9 @@ export class Home implements OnInit {
     this._loadResume();
     this._loadCoaches();
     this._loadPosts();
-    this._loadInstructorTemplatesCount();
+    // listTemplates fires inside _loadProfile() once we know the
+    // caller is an instructor — calling it for a plain USER returns
+    // 403, which a global error interceptor surfaces as a toast.
   }
 
   // ── Actions ──────────────────────────────────────────────────────
@@ -216,11 +220,11 @@ export class Home implements OnInit {
   }
 
   openPost(p: BlogPost): void {
-    this._router.navigate(['/blog', p.slug]);
+    window.open(`${MARKETING_BLOG_URL}/${p.slug}`, '_blank', 'noopener');
   }
 
   goToBlog(): void {
-    this._router.navigate(['/blog']);
+    window.open(MARKETING_BLOG_URL, '_blank', 'noopener');
   }
 
   goToMyCoaches(): void {
@@ -239,7 +243,16 @@ export class Home implements OnInit {
 
   private _loadProfile(): void {
     this._profileSvc.getMyProfile().subscribe({
-      next: (p) => this._profile.set(p),
+      next: (p) => {
+        this._profile.set(p);
+        // Only the instructor surface exposes /sessions/templates —
+        // a non-instructor call returns 403 (and the global error
+        // interceptor toasts it). Gate strictly on the actual
+        // instructor profile existing, not on derived isInstructor().
+        if (p?.instructorProfile) {
+          this._loadInstructorTemplatesCount();
+        }
+      },
       error: () => this._profile.set(null),
     });
   }
@@ -313,7 +326,7 @@ export class Home implements OnInit {
       initials,
       avatarUrl: u.avatarUrl ?? null,
       tone: COACH_TONES[i % COACH_TONES.length],
-      go: () => this._router.navigate(['/p', u.id]),
+      go: () => this._gotoPublicProfile(u.handle),
     };
   }
 
@@ -329,10 +342,17 @@ export class Home implements OnInit {
       initials,
       avatarUrl: s.avatarUrl ?? null,
       tone: COACH_TONES[i % COACH_TONES.length],
-      go: () =>
-        s.handle
-          ? this._router.navigate(['/p', s.handle])
-          : this._router.navigate(['/discover'], { queryParams: { tab: 'instructors' } }),
+      go: () => this._gotoPublicProfile(s.handle),
     };
+  }
+
+  /** Public instructor profiles live at `/@<handle>` (UrlMatcher). Falls
+   *  back to discover when the user hasn't claimed a handle yet. */
+  private _gotoPublicProfile(handle: string | null): void {
+    if (handle && handle.trim()) {
+      this._router.navigateByUrl(`/@${handle.trim()}`);
+    } else {
+      this._router.navigate(['/discover'], { queryParams: { tab: 'instructors' } });
+    }
   }
 }

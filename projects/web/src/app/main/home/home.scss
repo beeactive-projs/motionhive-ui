@@ -109,6 +109,19 @@
     font-weight: 600;
     flex-shrink: 0;
   }
+
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+
+    &__go {
+      // Keep the row scannable on phones — the arrow is enough.
+      font-size: 0;
+      &::after {
+        content: '→';
+        font-size: 16px;
+      }
+    }
+  }
 }
 
 // ── Hero ────────────────────────────────────────────────────────────
@@ -671,6 +684,11 @@
     &__actions {
       align-items: flex-start;
       width: 100%;
+
+      ::ng-deep .p-button {
+        width: 100%;
+        justify-content: center;
+      }
     }
   }
 }
