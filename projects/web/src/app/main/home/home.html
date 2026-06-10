@@ -45,8 +45,23 @@
       </header>
 
       @if (postsLoading()) {
-        <div class="loading-row">
-          <p-progressspinner strokeWidth="3" />
+        <div class="jr-list" aria-busy="true" aria-label="Loading articles">
+          @for (sk of [1, 2, 3]; track sk) {
+            <div class="jr-row jr-row--skel">
+              <div class="jr-row__main">
+                <p-skeleton width="68px" height="14px" borderRadius="999px" />
+                <p-skeleton width="90%" height="16px" styleClass="mt-2" />
+                <p-skeleton width="100%" height="12px" styleClass="mt-1" />
+                <p-skeleton width="70%" height="12px" styleClass="mt-1" />
+                <div class="jr-skel-foot">
+                  <p-skeleton shape="circle" size="22px" />
+                  <p-skeleton width="80px" height="11px" />
+                  <p-skeleton width="50px" height="11px" />
+                </div>
+              </div>
+              <p-skeleton width="96px" height="96px" borderRadius="10px" />
+            </div>
+          }
         </div>
       } @else if (posts().length === 0) {
         <div class="empty-card">
@@ -160,8 +175,16 @@
         </div>
 
         @if (coachesLoading()) {
-          <div class="loading-row loading-row--sm">
-            <p-progressspinner strokeWidth="3" />
+          <div class="ed-coachrows" aria-busy="true" aria-label="Loading coaches">
+            @for (sk of [1, 2, 3]; track sk) {
+              <div class="ed-coachrow ed-coachrow--skel">
+                <p-skeleton shape="circle" size="40px" />
+                <div class="ed-coachrow__meta">
+                  <p-skeleton width="60%" height="13px" />
+                  <p-skeleton width="40%" height="11px" styleClass="mt-1" />
+                </div>
+              </div>
+            }
           </div>
         } @else {
           <div class="ed-coachrows">
@@ -190,9 +213,7 @@
               </button>
             }
             @if (!hasOwnCoaches() && rows.length > 0) {
-              <div class="ed-coach-note">
-                More joining soon — we onboard by hand.
-              </div>
+              <div class="ed-coach-note">More joining soon.</div>
             }
             @if (rows.length === 0) {
               <button type="button" class="ed-coach-empty" (click)="suggestOpen.set(true)">

@@ -95,12 +95,17 @@ export class SuggestInstructorDialog {
           this.isSending.set(false);
           this.sent.set('direct');
         },
-        error: () => {
+        error: (err: { status?: number; error?: { message?: string } }) => {
           this.isSending.set(false);
+          const detail =
+            err.status === 429
+              ? "You've sent a lot recently — try again in an hour."
+              : err.error?.message ||
+                'Try again in a moment, or use the other tab.';
           this._messageService.add({
-            severity: 'warn',
-            summary: 'Direct invite not ready yet',
-            detail: 'Use the other tab — we\'ll reach out for you.',
+            severity: 'error',
+            summary: "Couldn't send the suggestion",
+            detail,
             life: 5000,
           });
         },

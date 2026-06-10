@@ -693,17 +693,30 @@
   }
 }
 
-// ── Loading + empty fillers ────────────────────────────────────────
+// ── Loading skeletons ──────────────────────────────────────────────
 
-.loading-row {
-  display: flex;
-  justify-content: center;
-  padding: 28px 0;
+.jr-row--skel,
+.ed-coachrow--skel {
+  cursor: default;
+  pointer-events: none;
 
-  &--sm {
-    padding: 16px 0;
+  &:hover {
+    background: var(--hp-card);
+    border-color: var(--hp-border);
+    transform: none;
   }
 }
+
+.jr-skel-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mt-1 { margin-top: 6px; }
+.mt-2 { margin-top: 10px; }
+
 
 .empty-card {
   padding: 22px;

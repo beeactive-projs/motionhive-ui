@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SkeletonModule } from 'primeng/skeleton';
 import {
   AuthStore,
   BlogCategories,
@@ -85,7 +85,7 @@ const CATEGORY_TONES: Record<BlogCategory, HexTone> = {
   standalone: true,
   imports: [
     ButtonModule,
-    ProgressSpinnerModule,
+    SkeletonModule,
     Hex,
     InviteFriendDialog,
     SuggestInstructorDialog,
