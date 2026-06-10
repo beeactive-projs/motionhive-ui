@@ -247,6 +247,7 @@ export const API_ENDPOINTS = {
       `/workout-logs/last-for-exercise/${exerciseId}`,
     BY_ASSIGNED_WORKOUT: (assignedWorkoutId: string) =>
       `/workout-logs/by-assigned-workout/${assignedWorkoutId}`,
+    IN_PROGRESS: '/workout-logs/in-progress',
     COACH_LIST_FOR_CLIENT: (clientId: string) =>
       `/coach/clients/${clientId}/workout-logs`,
     COACH_BY_ID: (id: string) => `/coach/workout-logs/${id}`,

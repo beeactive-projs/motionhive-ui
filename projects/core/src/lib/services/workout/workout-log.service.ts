@@ -112,6 +112,14 @@ export class WorkoutLogService {
     );
   }
 
+  /** Most-recent IN_PROGRESS workout for the signed-in user (or null
+   *  if there's nothing to resume). 200 with null body — no 404. */
+  getInProgress(): Observable<WorkoutLog | null> {
+    return this._http.get<WorkoutLog | null>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.IN_PROGRESS}`,
+    );
+  }
+
   // ── Mid-session mutations (freestyle + S14 affordances) ──────────
 
   addExercise(

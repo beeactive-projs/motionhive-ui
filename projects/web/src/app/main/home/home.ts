@@ -9,72 +9,82 @@ import {
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { CarouselModule } from 'primeng/carousel';
 import {
   AuthStore,
+  BlogCategories,
   BlogPost,
   BlogService,
-  FeedbackService,
-  Group,
-  GroupService,
+  ClientService,
   InstructorSearchResult,
+  MyInstructor,
   ProfileService,
+  SessionService,
+  WorkoutLog,
+  WorkoutLogService,
+  type BlogCategory,
+  type MyProfile,
 } from 'core';
 import { Hex, HexTone } from '../../_shared/components/hex/hex';
-import { SectionHeader } from './_components/section-header/section-header';
-import { RoadmapRow } from './_components/roadmap-row/roadmap-row';
-import { InstructorCard } from './_components/instructor-card/instructor-card';
-import { GroupCard } from './_components/group-card/group-card';
-import { ContribCard } from './_components/contrib-card/contrib-card';
-import { BlogCard } from './_components/blog-card/blog-card';
 import { InviteFriendDialog } from './_dialogs/invite-friend-dialog/invite-friend-dialog';
 import { SuggestInstructorDialog } from './_dialogs/suggest-instructor-dialog/suggest-instructor-dialog';
 
-interface RoadmapEntry {
-  when: string;
-  active: boolean;
+interface StartStep {
+  id: 'profile' | 'session' | 'coach';
   title: string;
   sub: string;
-  status: string | null;
+  done: boolean;
+  /** Only shown when relevant — e.g. "Create your first session" hides for non-instructors. */
+  show: boolean;
+  /** Route to land on when the user taps the step. */
+  go: () => void;
 }
 
-interface BuzzEntry {
-  text: string;
+interface CoachRow {
+  name: string;
+  tag: string;
+  initials: string;
+  avatarUrl: string | null;
   tone: HexTone;
+  go: () => void;
 }
 
-/** Below these counts the carousel feels half-empty, so we render a
- *  "growing the hive" state instead with a real CTA. Lowered to 1 so
- *  even a single instructor / group renders the carousel — autoplay
- *  + circular still works on a one-item list. Raise back to 3/2 if
- *  the single-card experience feels weird. */
-const INSTRUCTORS_CAROUSEL_MIN = 1;
-const GROUPS_CAROUSEL_MIN = 1;
-const BLOG_CAROUSEL_MIN = 1;
+const BLOG_LIMIT = 3;
+const COACHES_OWN_LIMIT = 2;
+const COACHES_SUGGESTED_LIMIT = 3;
+const COACH_TONES: HexTone[] = ['honey', 'teal', 'navy', 'coral'];
+const CATEGORY_TONES: Record<BlogCategory, HexTone> = {
+  [BlogCategories.Guide]: 'honey',
+  [BlogCategories.Nutrition]: 'teal',
+  [BlogCategories.Science]: 'navy',
+  [BlogCategories.Wellness]: 'coral',
+};
 
-/** Cap how many entities live in each carousel — beyond this the page
- *  becomes a list, not a highlight reel. */
-const CAROUSEL_MAX = 10;
-
-/** Autoplay tick. Slow enough to read, fast enough to feel alive. */
-const CAROUSEL_AUTOPLAY_MS = 4000;
-
-/** Public marketing site — blog articles open here in a new tab. */
-const MARKETING_BLOG_URL = 'https://www.motionhive.fit/blog';
-
+/**
+ * Cold-start home (editorial layout, light-first).
+ *
+ * Built from the Claude Design "Refined Home" handoff with one
+ * difference: it's a SINGLE component that handles both the cold and
+ * warm states without a hard switch. As real data lands, panels swap
+ * in-place — your-coaches replaces some-of-our-coaches, the steps
+ * panel hides when everything is checked, a resume tile surfaces
+ * above the hero if you have an in-progress workout.
+ *
+ * Explicit anti-patterns from the design brief (chat10):
+ *   - No "Founding member" pill, no founder's-note framing.
+ *   - No buzz feed faking social proof.
+ *   - No "joined N days ago" stamps on coach rows (a stagnant list
+ *     reads worse than a curated one).
+ *
+ * Everything renders from real endpoints — there's no placeholder
+ * data hard-coded into the component.
+ */
 @Component({
   selector: 'mh-home',
+  standalone: true,
   imports: [
     ButtonModule,
     ProgressSpinnerModule,
-    CarouselModule,
     Hex,
-    SectionHeader,
-    RoadmapRow,
-    InstructorCard,
-    GroupCard,
-    ContribCard,
-    BlogCard,
     InviteFriendDialog,
     SuggestInstructorDialog,
   ],
@@ -83,202 +93,246 @@ const MARKETING_BLOG_URL = 'https://www.motionhive.fit/blog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
-  private readonly _authStore = inject(AuthStore);
-  private readonly _profileService = inject(ProfileService);
-  private readonly _groupService = inject(GroupService);
-  private readonly _blogService = inject(BlogService);
-  private readonly _feedbackService = inject(FeedbackService);
+  private readonly _auth = inject(AuthStore);
+  private readonly _profileSvc = inject(ProfileService);
+  private readonly _clientSvc = inject(ClientService);
+  private readonly _blogSvc = inject(BlogService);
+  private readonly _sessionSvc = inject(SessionService);
+  private readonly _workoutLogSvc = inject(WorkoutLogService);
   private readonly _router = inject(Router);
 
-  /** Backing store for the full lists fetched from the API. */
-  private readonly _allInstructors = signal<InstructorSearchResult[]>([]);
-  private readonly _allGroups = signal<Group[]>([]);
-  private readonly _allPosts = signal<BlogPost[]>([]);
+  // ── Source signals ────────────────────────────────────────────────
 
-  /** Top-10 most-recent slice the carousels actually render. */
-  readonly instructors = computed(() => this._allInstructors().slice(0, CAROUSEL_MAX));
-  readonly groups = computed(() => this._allGroups().slice(0, CAROUSEL_MAX));
-  readonly posts = computed(() => this._allPosts().slice(0, CAROUSEL_MAX));
-
-  readonly instructorsLoading = signal(true);
-  readonly groupsLoading = signal(true);
-  readonly postsLoading = signal(true);
-
-  readonly hasInstructorsCarousel = computed(
-    () => this.instructors().length >= INSTRUCTORS_CAROUSEL_MIN,
-  );
-  readonly hasGroupsCarousel = computed(() => this.groups().length >= GROUPS_CAROUSEL_MIN);
-  readonly hasPostsCarousel = computed(() => this.posts().length >= BLOG_CAROUSEL_MIN);
-
-  readonly user = this._authStore.user;
-  readonly isInstructor = this._authStore.isInstructor;
-
+  readonly user = computed(() => this._auth.user());
   readonly firstName = computed(() => this.user()?.firstName?.trim() || 'there');
 
+  private readonly _profile = signal<MyProfile | null>(null);
+  private readonly _resume = signal<WorkoutLog | null>(null);
+  private readonly _myCoaches = signal<MyInstructor[]>([]);
+  private readonly _suggestedCoaches = signal<InstructorSearchResult[]>([]);
+  private readonly _posts = signal<BlogPost[]>([]);
+  private readonly _instructorTemplatesTotal = signal(0);
+
+  readonly postsLoading = signal(true);
+  readonly coachesLoading = signal(true);
+
+  // ── Derived state ─────────────────────────────────────────────────
+
+  /** True once the caller is a registered instructor (profile exists, or any sessions on the books). */
+  readonly isInstructor = computed(
+    () =>
+      !!this._profile()?.instructorProfile ||
+      this._profile()?.roles?.includes('INSTRUCTOR') === true ||
+      this._instructorTemplatesTotal() > 0,
+  );
+
+  readonly hasResume = computed(() => !!this._resume());
+  readonly resume = computed(() => this._resume());
+
+  /** Real coaches the user already trains with, mapped to display rows. */
+  readonly myCoachRows = computed<CoachRow[]>(() =>
+    this._myCoaches()
+      .slice(0, COACHES_OWN_LIMIT)
+      .map((mi, i) => this._coachFromMine(mi, i)),
+  );
+
+  /**
+   * Discovery rows — only computed when the user has no coaches of
+   * their own. Capped at 3 + the design's "more joining soon" note.
+   */
+  readonly suggestedCoachRows = computed<CoachRow[]>(() =>
+    this._suggestedCoaches()
+      .slice(0, COACHES_SUGGESTED_LIMIT)
+      .map((s, i) => this._coachFromSuggested(s, i)),
+  );
+
+  readonly hasOwnCoaches = computed(() => this._myCoaches().length > 0);
+
+  /** Top 3 published posts, ready for the reading-list rows. */
+  readonly posts = computed(() => this._posts().slice(0, BLOG_LIMIT));
+
+  readonly steps = computed<StartStep[]>(() => {
+    const account = this._profile()?.account;
+    const profileDone = !!account?.avatarUrl && !!account?.handle;
+    const sessionDone = this._instructorTemplatesTotal() > 0;
+    const coachDone = this._myCoaches().length > 0;
+
+    const all: StartStep[] = [
+      {
+        id: 'profile',
+        title: 'Finish your profile',
+        sub: 'So coaches and clients know who you are.',
+        done: profileDone,
+        show: true,
+        go: () => this._router.navigate(['/profile']),
+      },
+      {
+        id: 'session',
+        title: 'Create your first session',
+        sub: 'Online or in person, group or 1-on-1.',
+        done: sessionDone,
+        show: this.isInstructor(),
+        go: () => this._router.navigate(['/coaching/sessions']),
+      },
+      {
+        id: 'coach',
+        title: 'Find a coach for yourself',
+        sub: 'Book time with someone you rate.',
+        done: coachDone,
+        show: true,
+        go: () =>
+          this._router.navigate(['/discover'], {
+            queryParams: { tab: 'instructors' },
+          }),
+      },
+    ];
+    return all.filter((s) => s.show);
+  });
+
+  /** Hide the panel entirely when every relevant step is checked. */
+  readonly showStepsPanel = computed(() => this.steps().some((s) => !s.done));
+
+  // ── Dialog state ─────────────────────────────────────────────────
+
   protected readonly inviteOpen = signal(false);
-  protected readonly suggestInstructorOpen = signal(false);
+  protected readonly suggestOpen = signal(false);
 
-  /** Responsive carousel breakpoints, shared between instructor and group rails. */
-  protected readonly carouselResponsive = [
-    { breakpoint: '1280px', numVisible: 3, numScroll: 1 },
-    { breakpoint: '900px', numVisible: 2, numScroll: 1 },
-    { breakpoint: '560px', numVisible: 1, numScroll: 1 },
-  ];
-
-  protected readonly autoplayInterval = CAROUSEL_AUTOPLAY_MS;
-
-  // TODO: replace with real recent-activity once the notification module
-  // ships. Until then this is illustrative — the layout earns its keep
-  // by showing what platform liveliness will look like.
-  readonly buzz = signal<BuzzEntry[]>([
-    { text: 'New instructor joined the hive', tone: 'coral' },
-    { text: 'A group hit 40 members', tone: 'honey' },
-    { text: 'First long run — 7 showed up', tone: 'teal' },
-    { text: 'Boxing fundamentals on the calendar', tone: 'navy-soft' },
-  ]);
-
-  // TODO: roadmap copy is hardcoded. Move to a CMS/static config once
-  // we want non-engineers editing it. Needs sign-off before launch.
-  readonly roadmap = signal<RoadmapEntry[]>([
-    {
-      when: 'Now',
-      active: true,
-      title: 'Group chat for booked sessions',
-      sub: 'See who else is going, coordinate beforehand.',
-      status: 'Building now',
-    },
-    {
-      when: 'Apr',
-      active: false,
-      title: 'Mobile app — iOS + Android',
-      sub: 'Same product, native shell. TestFlight in 3 weeks.',
-      status: null,
-    },
-    {
-      when: 'May',
-      active: false,
-      title: 'Recurring sessions & class packs',
-      sub: 'Buy 5, save 10%. Auto-rebook your favourites.',
-      status: null,
-    },
-    {
-      when: 'Jun',
-      active: false,
-      title: 'In-app payments to instructors',
-      sub: 'No more bank transfers. Tip option included.',
-      status: null,
-    },
-  ]);
+  // ── Lifecycle ────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this._loadInstructors();
-    this._loadGroups();
+    this._loadProfile();
+    this._loadResume();
+    this._loadCoaches();
     this._loadPosts();
+    this._loadInstructorTemplatesCount();
   }
 
-  private _loadInstructors(): void {
-    // TODO: when /profile/instructors/discover exposes `createdAt`,
-    // sort by it desc so the home shows the newest coaches. Today the
-    // shape doesn't carry it, so we keep API order and slice the top
-    // CAROUSEL_MAX.
-    this._profileService.discoverInstructors().subscribe({
-      next: (list) => {
-        this._allInstructors.set(list ?? []);
-        this.instructorsLoading.set(false);
-      },
-      error: () => {
-        this._allInstructors.set([]);
-        this.instructorsLoading.set(false);
-      },
+  // ── Actions ──────────────────────────────────────────────────────
+
+  resumeWorkout(): void {
+    const r = this.resume();
+    if (!r) return;
+    this._router.navigate(['/my/workout-log', r.id]);
+  }
+
+  openPost(p: BlogPost): void {
+    this._router.navigate(['/blog', p.slug]);
+  }
+
+  goToBlog(): void {
+    this._router.navigate(['/blog']);
+  }
+
+  goToMyCoaches(): void {
+    this._router.navigate(['/coaching/clients']);
+  }
+
+  goToDiscoverCoaches(): void {
+    this._router.navigate(['/discover'], { queryParams: { tab: 'instructors' } });
+  }
+
+  categoryTone(cat: BlogCategory): HexTone {
+    return CATEGORY_TONES[cat] ?? 'honey';
+  }
+
+  // ── Loaders ──────────────────────────────────────────────────────
+
+  private _loadProfile(): void {
+    this._profileSvc.getMyProfile().subscribe({
+      next: (p) => this._profile.set(p),
+      error: () => this._profile.set(null),
     });
   }
 
-  private _loadGroups(): void {
-    // Instructors see the groups they run; everyone else sees the
-    // groups they're in. There's no "discover public groups" endpoint
-    // yet — when there is, swap this to discovery so non-members also
-    // see the wider hive.
-    const stream$ = this.isInstructor()
-      ? this._groupService.getInstructorsGroups()
-      : this._groupService.getMyGroups();
+  private _loadResume(): void {
+    this._workoutLogSvc.getInProgress().subscribe({
+      next: (log) => this._resume.set(log),
+      error: () => this._resume.set(null),
+    });
+  }
 
-    stream$.subscribe({
-      next: (list) => {
-        // Newest first — Group has a real createdAt timestamp.
-        const sorted = [...(list ?? [])].sort((a, b) => {
-          const av = Date.parse(a.createdAt ?? '') || 0;
-          const bv = Date.parse(b.createdAt ?? '') || 0;
-          return bv - av;
-        });
-        this._allGroups.set(sorted);
-        this.groupsLoading.set(false);
+  private _loadCoaches(): void {
+    this.coachesLoading.set(true);
+    this._clientSvc.getMyInstructors().subscribe({
+      next: (rows) => {
+        this._myCoaches.set(rows ?? []);
+        if ((rows?.length ?? 0) === 0) {
+          this._profileSvc.discoverInstructors().subscribe({
+            next: (sr) => {
+              this._suggestedCoaches.set(sr ?? []);
+              this.coachesLoading.set(false);
+            },
+            error: () => {
+              this._suggestedCoaches.set([]);
+              this.coachesLoading.set(false);
+            },
+          });
+        } else {
+          this.coachesLoading.set(false);
+        }
       },
       error: () => {
-        this._allGroups.set([]);
-        this.groupsLoading.set(false);
+        this._myCoaches.set([]);
+        this.coachesLoading.set(false);
       },
     });
   }
 
   private _loadPosts(): void {
-    // BlogService.getPosts already filters to published posts only and
-    // accepts a limit. Backend orders by publishedAt desc.
-    this._blogService.getPosts({ limit: CAROUSEL_MAX, page: 1 }).subscribe({
+    this.postsLoading.set(true);
+    this._blogSvc.getPosts({ page: 1, limit: BLOG_LIMIT }).subscribe({
       next: (res) => {
-        this._allPosts.set(res?.items ?? []);
+        this._posts.set(res.items ?? []);
         this.postsLoading.set(false);
       },
       error: () => {
-        this._allPosts.set([]);
+        this._posts.set([]);
         this.postsLoading.set(false);
       },
     });
   }
 
-  // --- Action handlers ------------------------------------------------------
-
-  onInviteFriend(): void {
-    this.inviteOpen.set(true);
+  private _loadInstructorTemplatesCount(): void {
+    this._sessionSvc.listTemplates({ page: 1, limit: 1 }).subscribe({
+      next: (res) => this._instructorTemplatesTotal.set(res.total ?? 0),
+      error: () => this._instructorTemplatesTotal.set(0),
+    });
   }
 
-  onSuggestSomeone(): void {
-    this.suggestInstructorOpen.set(true);
+  // ── Mappers ──────────────────────────────────────────────────────
+
+  private _coachFromMine(mi: MyInstructor, i: number): CoachRow {
+    const u = mi.instructor;
+    const name = `${u.firstName} ${u.lastName}`.trim() || 'Coach';
+    const initials = ((u.firstName?.[0] ?? '') + (u.lastName?.[0] ?? '')).toUpperCase() || 'C';
+    const tag =
+      mi.instructorProfile?.specializations?.slice(0, 2).join(' · ') || 'Coach';
+    return {
+      name,
+      tag,
+      initials,
+      avatarUrl: u.avatarUrl ?? null,
+      tone: COACH_TONES[i % COACH_TONES.length],
+      go: () => this._router.navigate(['/p', u.id]),
+    };
   }
 
-  onShareIdea(): void {
-    this._feedbackService.open();
-  }
-
-  onReadFoundersNote(): void {
-    // TODO: replace with a real founders' note page when one exists.
-    this._feedbackService.open();
-  }
-
-  onSuggestGroup(): void {
-    // Same shape as "suggest an instructor" but for groups; for now
-    // it routes through the same feedback dialog so users always have
-    // a path to reach us.
-    this._feedbackService.open();
-  }
-
-  onGroupAction(payload: { group: Group; joined: boolean }): void {
-    if (payload.joined) {
-      this._router.navigate(['/groups', payload.group.id]);
-    } else {
-      // TODO: confirm group join policy (open vs request) before calling selfJoin.
-      this._groupService.selfJoin(payload.group.id).subscribe({
-        next: () => this._loadGroups(),
-        error: () => {},
-      });
-    }
-  }
-
-  onReadPost(post: BlogPost): void {
-    // Articles live on the marketing site, not in the authenticated app.
-    window.open(`${MARKETING_BLOG_URL}/${post.slug}`, '_blank', 'noopener,noreferrer');
-  }
-
-  onReadAllPosts(): void {
-    window.open(MARKETING_BLOG_URL, '_blank', 'noopener,noreferrer');
+  private _coachFromSuggested(s: InstructorSearchResult, i: number): CoachRow {
+    const name = `${s.firstName} ${s.lastName}`.trim() || s.displayName || 'Coach';
+    const initials = ((s.firstName?.[0] ?? '') + (s.lastName?.[0] ?? '')).toUpperCase() || 'C';
+    const tag =
+      s.specializations?.slice(0, 2).join(' · ') ||
+      (s.city ? s.city : 'Open to new clients');
+    return {
+      name,
+      tag,
+      initials,
+      avatarUrl: s.avatarUrl ?? null,
+      tone: COACH_TONES[i % COACH_TONES.length],
+      go: () =>
+        s.handle
+          ? this._router.navigate(['/p', s.handle])
+          : this._router.navigate(['/discover'], { queryParams: { tab: 'instructors' } }),
+    };
   }
 }
