@@ -6,14 +6,18 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { Drawer } from 'primeng/drawer';
 import { Menu } from 'primeng/menu';
 import { MenuItem, MessageService } from 'primeng/api';
+import { Skeleton } from 'primeng/skeleton';
 import { Toast } from 'primeng/toast';
-import { TooltipModule } from 'primeng/tooltip';
 
 import {
   AuthStore,
@@ -26,6 +30,10 @@ import {
   ExerciseSortKey,
   ExerciseTaxonomyStore,
   ListExercisesQuery,
+  MobileFab,
+  injectIsMobile,
+  injectIsTablet,
+  injectIsTabletDown,
   showApiError,
 } from 'core';
 
@@ -50,13 +58,18 @@ import { ExerciseFormDialog } from './exercise-form-dialog/exercise-form-dialog'
   selector: 'mh-exercises',
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     FormsModule,
     ButtonModule,
+    Card,
+    IconField,
+    InputIcon,
     Drawer,
     InputTextModule,
     Menu,
+    Skeleton,
     Toast,
-    TooltipModule,
+    MobileFab,
     ExerciseCard,
     ExerciseDetailDialog,
     ExerciseFilterPanel,
@@ -73,8 +86,20 @@ export class Exercises {
   private readonly _authStore = inject(AuthStore);
   readonly taxonomy = inject(ExerciseTaxonomyStore);
 
+  // ── Responsive ───────────────────────────────────────────────────
+  protected readonly isMobile = injectIsMobile();
+  protected readonly isTablet = injectIsTablet();
+  /** Tablet or smaller — the "compact" surface (smaller copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
+
   /** Authoring (create custom exercises) is instructor-only; clients browse. */
   readonly isInstructor = this._authStore.isInstructor;
+
+  /** Exposed for enum-safe comparisons in the template (no magic strings). */
+  readonly Ownership = ExerciseOwnershipFilter;
+
+  /** Placeholder rows for the skeleton grid. */
+  readonly skeletonRows = [0, 1, 2, 3, 4, 5];
 
   // ── State ────────────────────────────────────────────────────────
 
@@ -116,14 +141,6 @@ export class Exercises {
   // ── Derived ──────────────────────────────────────────────────────
 
   readonly hasMore = computed(() => this.items().length < this.total());
-
-  /** Responsive CTA label — short on phones to stop the header from wrapping. */
-  readonly viewportWidth = signal(
-    typeof window !== 'undefined' ? window.innerWidth : 1440,
-  );
-  readonly createLabel = computed(() =>
-    this.viewportWidth() < 600 ? 'Create' : 'Create custom exercise',
-  );
 
   readonly activeFilterCount = computed(() => {
     return (
@@ -192,11 +209,6 @@ export class Exercises {
 
   constructor() {
     this.taxonomy.ensureLoaded();
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', () =>
-        this.viewportWidth.set(window.innerWidth),
-      );
-    }
 
     // Reset to page 1 + refetch whenever a filter changes.
     effect(() => {

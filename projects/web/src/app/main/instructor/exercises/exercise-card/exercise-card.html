@@ -2,67 +2,80 @@
 @let badge = cornerBadge();
 @let level = levelLabel();
 
-<button type="button" class="ex-card" (click)="onClick()" [attr.aria-label]="'Open ' + e.name">
-  <div class="ex-thumb">
-    @if (e.thumbnailUrl; as src) {
-      <img [src]="src" [alt]="e.name" loading="lazy" />
-    } @else {
-      <div class="ex-thumb__placeholder" aria-hidden="true">
-        <i class="pi pi-image"></i>
+<p-card class="group block h-full cursor-pointer overflow-hidden transition hover:shadow-md" role="button" tabindex="0"
+  [attr.aria-label]="'Open ' + e.name" (click)="onClick()" (keydown.enter)="onClick()"
+  (keydown.space)="$event.preventDefault(); onClick()">
+  <ng-template #header>
+    <div class="relative aspect-16/10 overflow-hidden bg-surface-100 dark:bg-surface-800">
+      @if (e.thumbnailUrl; as src) {
+      <img [src]="src" [alt]="e.name" loading="lazy" class="size-full object-cover" />
+      } @else {
+      @if (e.youtubeUrl) {
+      <span class="absolute inset-0 flex items-center justify-center text-surface-400" aria-hidden="true">
+        <i class="pi pi-youtube text-5xl text-red-500"></i>
+      </span>
+      } @else {
+      <div class="absolute inset-0 flex items-center justify-center text-surface-400" aria-hidden="true">
+        <i class="pi pi-image text-5xl"></i>
       </div>
-    }
+      }}
 
-    @if (e.youtubeUrl) {
-      <span class="ex-thumb__play" aria-hidden="true"><i class="pi pi-youtube"></i></span>
-    }
 
-    @switch (badge) {
+
+      @switch (badge) {
       @case ('system') {
-        <span class="ex-corner ex-corner--system"><i class="pi pi-verified"></i> System</span>
+      <p-tag value="System" icon="pi pi-verified" severity="secondary" rounded size="small"
+        class="absolute right-2 top-2" />
       }
       @case ('mine') {
-        <span class="ex-corner ex-corner--mine"><i class="pi pi-lock"></i> Mine</span>
+      <p-tag value="Mine" icon="pi pi-lock" rounded size="small"
+        class="absolute right-2 top-2 bg-teal-100 text-teal-800" />
       }
       @case ('public') {
-        <span class="ex-corner ex-corner--public"><i class="pi pi-globe"></i> Public</span>
+      <p-tag value="Public" icon="pi pi-globe" severity="info" rounded size="small" class="absolute right-2 top-2" />
       }
-    }
-  </div>
+      }
+    </div>
+  </ng-template>
 
-  <div class="ex-body">
-    <h3 class="ex-name">{{ e.name }}</h3>
+  <div class="flex flex-col gap-2">
+    <div class="line-clamp-2 font-semibold text-surface-900 dark:text-surface-100">
+      {{ e.name }}
+    </div>
 
-    <div class="ex-meta">
+    <div class="flex flex-wrap items-center gap-2">
       @if (primaryMuscle(); as m) {
-        <span class="m-tag m-tag--pri">{{ m }}</span>
+      <p-tag [value]="m" class="bg-sky-300 text-sky-800" rounded />
       }
       @if (leadEquipment(); as eq) {
-        <span class="m-chip">{{ eq }}</span>
+      <p-tag [value]="eq" class="bg-orange-300 text-orange-800" rounded />
       }
     </div>
 
-    <div class="ex-foot">
-      <span class="lvl lvl--{{ level.tone }}">
-        <i class="pi" [class]="'pi ' + level.icon"></i> {{ level.text }}
-      </span>
+    <div class="flex items-center justify-between gap-2 border-t border-surface-100 pt-2 dark:border-surface-800">
+      <p-tag [value]="level.text" [icon]="level.icon" [class]="level.class" rounded />
 
       @if (badge === 'public' && authorName(); as name) {
-        <span class="ex-author" [pTooltip]="'Created by ' + name" tooltipPosition="top">
-          @if (authorInitials(); as initials) {
-            <span class="ex-avatar" aria-hidden="true">{{ initials }}</span>
-          }
-          <span class="ex-author__name">{{ name }}</span>
-          @if (e.forkCount > 0) {
-            <span class="ex-forks"><i class="pi pi-share-alt"></i> {{ e.forkCount }}</span>
-          }
+      <span class="flex min-w-0 items-center gap-1.5 text-[11px] text-surface-600 dark:text-surface-400"
+        [pTooltip]="'Created by ' + name" tooltipPosition="top">
+        @if (authorInitials(); as initials) {
+        <span
+          class="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-teal-600 text-3xs font-semibold text-white"
+          aria-hidden="true">
+          {{ initials }}
         </span>
+        }
+        <span class="max-w-22.5 truncate">{{ name }}</span>
+        @if (e.forkCount > 0) {
+        <p-tag [value]="e.forkCount.toString()" icon="pi pi-share-alt" class="bg-blue-100 text-blue-800" rounded />
+        }
+      </span>
       } @else if (badge === 'mine' && e.forkCount > 0) {
-        <span class="ex-forks" [pTooltip]="'Forked by ' + e.forkCount + ' instructors'" tooltipPosition="top">
-          <i class="pi pi-share-alt"></i> {{ e.forkCount }}
-        </span>
+      <p-tag [value]="e.forkCount.toString()" icon="pi pi-share-alt" class="bg-blue-100 text-blue-800" rounded
+        [pTooltip]="'Forked by ' + e.forkCount + ' instructors'" tooltipPosition="top" />
       } @else if (e.mechanic) {
-        <span class="m-chip m-chip--sub">{{ e.mechanic | titlecase }}</span>
+      <p-tag [value]="e.mechanic | titlecase" class="bg-surface-100 text-surface-800" />
       }
     </div>
   </div>
-</button>
+</p-card>
