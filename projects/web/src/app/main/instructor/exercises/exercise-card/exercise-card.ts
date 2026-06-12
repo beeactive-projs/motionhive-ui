@@ -1,19 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
+import { Card } from 'primeng/card';
+import { Tag } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import {
-  Exercise,
-  ExerciseLevel,
-  ExerciseSource,
-  ExerciseVisibility,
-} from 'core';
+import { Exercise, ExerciseLevel, ExerciseSource, ExerciseVisibility, TagSeverity } from 'core';
 
 /**
  * Catalog grid card. Pure presentational — emits `select` so the
@@ -30,7 +21,7 @@ import {
 @Component({
   selector: 'mh-exercise-card',
   standalone: true,
-  imports: [TooltipModule, TitleCasePipe],
+  imports: [TooltipModule, TitleCasePipe, Tag, Card],
   templateUrl: './exercise-card.html',
   styleUrl: './exercise-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,15 +34,11 @@ export class ExerciseCard {
   readonly select = output<Exercise>();
 
   readonly primaryMuscle = computed(() => {
-    const role = this.exercise().muscleRoles?.find(
-      (m) => m.role === 'PRIMARY',
-    );
+    const role = this.exercise().muscleRoles?.find((m) => m.role === 'PRIMARY');
     return role?.muscle?.commonName ?? null;
   });
 
-  readonly leadEquipment = computed(
-    () => this.exercise().equipment?.[0]?.name ?? null,
-  );
+  readonly leadEquipment = computed(() => this.exercise().equipment?.[0]?.name ?? null);
 
   readonly authorName = computed(() => {
     const owner = this.exercise().owner;
@@ -77,14 +64,34 @@ export class ExerciseCard {
     return null;
   });
 
-  readonly levelLabel = computed(() => {
+  readonly levelLabel = computed<{
+    text: string;
+    icon: string;
+    severity: TagSeverity;
+    class?: string;
+  }>(() => {
     switch (this.exercise().level) {
       case ExerciseLevel.Beginner:
-        return { text: 'Beginner', icon: 'pi-angle-down', tone: 'beg' };
+        return {
+          text: 'Beginner',
+          icon: 'pi pi-angle-down',
+          severity: TagSeverity.Success,
+          class: 'bg-green-200 text-green-800',
+        };
       case ExerciseLevel.Intermediate:
-        return { text: 'Intermediate', icon: 'pi-equals', tone: 'int' };
-      case ExerciseLevel.Advanced:
-        return { text: 'Advanced', icon: 'pi-angle-double-up', tone: 'adv' };
+        return {
+          text: 'Intermediate',
+          icon: 'pi pi-equals',
+          severity: TagSeverity.Warn,
+          class: 'bg-yellow-200 text-yellow-800',
+        };
+      default:
+        return {
+          text: 'Advanced',
+          icon: 'pi pi-angle-double-up',
+          severity: TagSeverity.Danger,
+          class: 'bg-red-200 text-red-800',
+        };
     }
   });
 

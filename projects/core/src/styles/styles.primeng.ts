@@ -180,6 +180,20 @@ export const MotionHiveLara = definePreset(Lara, {
         fontWeight: 'normal',
         roundedBorderRadius: '50rem',
       },
+      colorScheme: {
+        light: {
+          secondary: {
+            color: '{surface.600}',
+            background: '{surface.200}',
+          },
+        },
+        dark: {
+          secondary: {
+            color: '{surface.300}',
+            background: '{surface.800}',
+          },
+        },
+      },
     },
   },
 });

@@ -18,7 +18,6 @@ import { MultiSelect } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
-import { TooltipModule } from 'primeng/tooltip';
 
 import {
   CreateExercisePayload,
@@ -83,7 +82,6 @@ interface MultiOption<T> {
     Select,
     TextareaModule,
     ToggleSwitch,
-    TooltipModule,
   ],
   templateUrl: './exercise-form-dialog.html',
   styleUrl: './exercise-form-dialog.scss',
@@ -98,6 +96,8 @@ export class ExerciseFormDialog {
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _messageService = inject(MessageService);
   readonly taxonomy = inject(ExerciseTaxonomyStore);
+
+  readonly Visibilities = ExerciseVisibility;
 
   // ── Form state ───────────────────────────────────────────────────
 
