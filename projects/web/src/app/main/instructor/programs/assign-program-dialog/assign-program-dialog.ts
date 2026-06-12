@@ -11,12 +11,13 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
-import { MessageService } from 'primeng/api';
+import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
+import { Skeleton } from 'primeng/skeleton';
+import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -30,12 +31,10 @@ import {
   showApiError,
 } from 'core';
 
-interface ClientOption {
-  value: string;
-  label: string;
+type ClientOption = SelectItem<string> & {
   avatarUrl: string | null;
   sub: string | null;
-}
+};
 
 /**
  * Assign-to-client dialog (FE-P3).
@@ -50,15 +49,15 @@ interface ClientOption {
  */
 @Component({
   selector: 'mh-assign-program-dialog',
-  standalone: true,
   imports: [
     DatePipe,
     FormsModule,
-    ButtonModule,
+    Button,
     DatePicker,
     Dialog,
     Select,
-    TextareaModule,
+    Skeleton,
+    Textarea,
     Toast,
   ],
   providers: [MessageService],

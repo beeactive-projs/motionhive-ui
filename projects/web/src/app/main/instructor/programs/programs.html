@@ -85,9 +85,11 @@
       <a [routerLink]="['/coaching/programs', p.id]" class="no-underline text-inherit">
         <p-card class="h-full">
           <div class="flex flex-col gap-2">
-            <div class="flex items-start gap-2.5">
+            <div class="flex items-center gap-2">
               <h3 class="flex-1 m-0 font-heading text-sm font-semibold leading-snug line-clamp-2">{{ p.name }}</h3>
               <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
+              <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true" [rounded]="true" size="small"
+                ariaLabel="Program actions" [loading]="mutatingIds().has(p.id)" (onClick)="openCardMenu($event, p)" />
             </div>
 
             @if (p.description) {
@@ -125,4 +127,10 @@
   }
 </ng-template>
 
-<mh-program-form-dialog [(visible)]="formDialogOpen" (saved)="onCreated($event)" />
+<mh-program-form-dialog [(visible)]="formDialogOpen" [program]="editTarget()" (saved)="onSaved($event)" />
+
+<!-- Shared status-aware action menu for the card kebabs. -->
+<p-menu #cardMenu [model]="cardMenuItems()" [popup]="true" [appendTo]="'body'" />
+
+<p-confirmdialog />
+<p-toast position="top-right" />

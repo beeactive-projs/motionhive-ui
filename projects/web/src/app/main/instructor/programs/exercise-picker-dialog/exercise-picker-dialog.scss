@@ -2,138 +2,48 @@
   display: contents;
 }
 
-.dialog-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  min-height: 320px;
-}
-
-.search {
-  position: relative;
-
-  i {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--p-text-muted-color);
-    font-size: 0.8125rem;
-    pointer-events: none;
-  }
-
-  input {
-    padding-left: 34px;
-  }
-}
-
-.state {
-  text-align: center;
-  padding: 2rem 1rem;
-  color: var(--p-text-muted-color);
-
-  i {
-    font-size: 1.75rem;
+// Result rows reshape PrimeNG's `.p-button` into a left-aligned, full-width
+// card — those internals can't be reached with Tailwind utilities. The row
+// content itself is laid out in the template. Mirrors the exercise-form
+// kind-card pattern.
+::ng-deep .exercise-picker {
+  .picker-row.p-button {
     display: block;
-    margin-bottom: 0.5rem;
-    opacity: 0.7;
-  }
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 0.5rem 0.625rem;
+    border-color: var(--p-content-border-color);
 
-  p {
-    margin: 0 0 0.25rem;
-    color: var(--p-text-color);
-    font-weight: 500;
-  }
+    &:hover {
+      border-color: var(--p-primary-color);
+      background: var(--p-primary-50);
+    }
 
-  small {
-    font-size: 0.8125rem;
-  }
-}
-
-.results {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 440px;
-  overflow-y: auto;
-}
-
-.result {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 10px;
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.12s, background 0.12s;
-
-  &:hover {
-    border-color: var(--p-primary-color);
-  }
-
-  &--selected {
-    border-color: var(--p-primary-color);
-    background: color-mix(
-      in srgb,
-      var(--p-primary-color) 8%,
-      var(--p-content-background)
-    );
-  }
-
-  &__thumb {
-    width: 44px;
-    height: 44px;
-    border-radius: 6px;
-    object-fit: cover;
-    flex: 0 0 auto;
-    background: var(--p-content-background);
-    border: 1px solid var(--p-content-border-color);
-
-    &--fallback {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--p-text-muted-color);
+    .p-button-label {
+      width: 100%;
+      font-weight: inherit;
     }
   }
 
-  &__body {
-    flex: 1;
-    min-width: 0;
+  .picker-row--on.p-button {
+    border-color: var(--p-primary-color);
+    background: var(--p-primary-50);
+  }
+}
+
+// Dark mode: `--p-primary-50` is a fixed near-white tint that glares against
+// the dark dialog surface and washes out the row text. Swap the hover/selected
+// fills for a translucent primary wash that reads correctly on dark surfaces.
+// `::ng-deep` stays first so the rule compiles to a global selector — the
+// dialog is appended to `body`, outside this component's host, so host-scoped
+// rules wouldn't reach it. `.dark` (on `<html>`) is a real DOM ancestor.
+::ng-deep .dark .exercise-picker {
+  .picker-row.p-button:hover {
+    background: color-mix(in srgb, var(--p-primary-color) 14%, transparent);
   }
 
-  &__name {
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--p-text-color);
-    margin-bottom: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__meta {
-    font-size: 11px;
-    color: var(--p-text-muted-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    span + span {
-      margin-left: 4px;
-    }
-  }
-
-  &__check {
-    color: var(--p-primary-color);
-    font-size: 18px;
-    flex: 0 0 auto;
+  .picker-row--on.p-button {
+    background: color-mix(in srgb, var(--p-primary-color) 14%, transparent);
   }
 }

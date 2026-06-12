@@ -1,114 +1,92 @@
-<p-dialog
-  [(visible)]="visible"
-  [modal]="true"
-  [closable]="!submitting()"
-  [closeOnEscape]="!submitting()"
-  [dismissableMask]="!submitting()"
-  [appendTo]="'body'"
-  [style]="{ width: '480px' }"
-  [breakpoints]="{ '640px': '95vw' }"
-  styleClass="mh-assign-dialog"
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '30rem' }" [breakpoints]="{ '640px': '95vw' }"
   header="Assign program">
-  <div class="dialog-body">
-    <p class="lede">
-      <strong>{{ program().name }}</strong> will be copied to your client.
-      They'll see it under their plans and you can track their progress as they
-      log workouts.
+  <div class="flex flex-col gap-5">
+    <p class="m-0 text-sm leading-relaxed text-surface-500">
+      <strong class="text-surface-900 dark:text-surface-100">{{ program().name }}</strong> will be copied to your
+      client. They'll see it under their plans and you can track their progress as they log workouts.
     </p>
 
     @if (loadingClients()) {
-      <div class="loading">Loading clients…</div>
+    <!-- Skeleton mirrors the loaded form: client + start date + notes -->
+    <div class="flex flex-col gap-5">
+      @for (field of [1, 2]; track field) {
+      <div class="flex flex-col gap-1.5">
+        <p-skeleton width="6rem" height="0.75rem" />
+        <p-skeleton width="100%" height="2.5rem" borderRadius="var(--p-border-radius-md)" />
+      </div>
+      }
+      <div class="flex flex-col gap-1.5">
+        <p-skeleton width="6rem" height="0.75rem" />
+        <p-skeleton width="100%" height="4.5rem" borderRadius="var(--p-border-radius-md)" />
+      </div>
+    </div>
     } @else if (clients().length === 0) {
-      <div class="empty">
-        <i class="pi pi-users"></i>
-        <p>No active clients yet.</p>
-        <small
-          >Invite clients from the Clients page before assigning a program.</small
-        >
-      </div>
+    <div class="flex flex-col items-center gap-1 px-2 py-6 text-center">
+      <i class="pi pi-users mb-1 text-3xl text-surface-300"></i>
+      <p class="m-0 text-sm font-medium text-surface-700 dark:text-surface-200">No active clients yet.</p>
+      <small class="text-xs text-surface-500">Invite clients from the Clients page before assigning a program.</small>
+    </div>
     } @else {
-      <div class="field">
-        <label for="client">Client</label>
-        <p-select
-          inputId="client"
-          [options]="clients()"
-          [(ngModel)]="clientId"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Pick a client"
-          [filter]="true"
-          filterBy="label,sub"
-          appendTo="body"
-          styleClass="w-full">
-          <ng-template let-c #item>
-            <div class="client-row">
-              @if (c.avatarUrl) {
-                <img [src]="c.avatarUrl" alt="" class="avatar" />
-              } @else {
-                <div class="avatar avatar-fallback">
-                  <i class="pi pi-user"></i>
-                </div>
-              }
-              <div class="meta">
-                <div class="name">{{ c.label }}</div>
-                @if (c.sub) {
-                  <small class="email">{{ c.sub }}</small>
-                }
-              </div>
+    <!-- Client -->
+    <div class="flex flex-col gap-1.5">
+      <label for="client" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Client</label>
+      <p-select inputId="client" [options]="clients()" [ngModel]="clientId()" (ngModelChange)="clientId.set($event)"
+        optionLabel="label" optionValue="value" placeholder="Pick a client" [filter]="true" filterBy="label,sub"
+        [appendTo]="'body'" class="w-full">
+        <ng-template let-c #item>
+          <div class="flex items-center gap-2.5">
+            @if (c.avatarUrl) {
+            <img [src]="c.avatarUrl" alt=""
+              class="size-8 shrink-0 rounded-full border border-surface-200 object-cover dark:border-surface-700" />
+            } @else {
+            <div
+              class="flex size-8 shrink-0 items-center justify-center rounded-full border border-surface-200 bg-surface-50 text-surface-400 dark:border-surface-700 dark:bg-surface-800">
+              <i class="pi pi-user text-sm"></i>
             </div>
-          </ng-template>
-          <ng-template let-c #selectedItem>
-            <span class="selected-label">{{ c.label }}</span>
-          </ng-template>
-        </p-select>
-      </div>
+            }
+            <div class="flex min-w-0 flex-col">
+              <span class="text-sm font-medium leading-tight text-surface-900 dark:text-surface-100">{{ c.label
+                }}</span>
+              @if (c.sub) {
+              <small class="truncate text-xs leading-tight text-surface-500">{{ c.sub }}</small>
+              }
+            </div>
+          </div>
+        </ng-template>
+        <ng-template let-c #selectedItem>
+          <span class="text-sm text-surface-900 dark:text-surface-100">{{ c.label }}</span>
+        </ng-template>
+      </p-select>
+    </div>
 
-      <div class="field">
-        <label for="start">Start date</label>
-        <p-datepicker
-          inputId="start"
-          [(ngModel)]="startDate"
-          [minDate]="minDate"
-          [showIcon]="true"
-          dateFormat="dd M yy"
-          appendTo="body"
-          styleClass="w-full" />
-        <small class="hint">
-          Day 1 of the program lands on
-          <strong>{{ startDate() | date: 'longDate' }}</strong
-          >.
-        </small>
-      </div>
+    <!-- Start date -->
+    <div class="flex flex-col gap-1.5">
+      <label for="start" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Start date</label>
+      <p-datepicker inputId="start" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)" [minDate]="minDate"
+        [showIcon]="true" dateFormat="dd M yy" [appendTo]="'body'" class="w-full" />
+      <small class="text-xs text-surface-500">
+        Day 1 of the program lands on
+        <strong class="text-surface-800 dark:text-surface-200">{{ startDate() | date: 'longDate' }}</strong>.
+      </small>
+    </div>
 
-      <div class="field">
-        <label for="notes">Notes <span class="optional">(optional)</span></label>
-        <textarea
-          pTextarea
-          id="notes"
-          [ngModel]="notes()"
-          (ngModelChange)="notes.set($event)"
-          rows="3"
-          maxlength="500"
-          placeholder="Anything the client should know about this plan…"
-          class="w-full"></textarea>
-        <small class="counter">{{ notes().length }}/500</small>
-      </div>
+    <!-- Notes -->
+    <div class="flex flex-col gap-1.5">
+      <label for="notes" class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Notes <span class="font-medium text-surface-400">— optional</span>
+        <span class="ml-auto text-3xs font-medium text-surface-400">{{ notes().length }} / 500</span>
+      </label>
+      <textarea id="notes" pTextarea rows="3" [ngModel]="notes()" (ngModelChange)="notes.set($event)" maxlength="500"
+        placeholder="Anything the client should know about this plan…" fluid></textarea>
+    </div>
     }
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      [disabled]="submitting()"
-      (onClick)="cancel()" />
-    <p-button
-      label="Assign program"
-      icon="pi pi-send"
-      [loading]="submitting()"
-      [disabled]="!canSubmit() || clients().length === 0"
-      (onClick)="submit()" />
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
+    <p-button label="Assign program" icon="pi pi-user-plus" [loading]="submitting()"
+      [disabled]="!canSubmit() || clients().length === 0" (onClick)="submit()" />
   </ng-template>
 </p-dialog>
 

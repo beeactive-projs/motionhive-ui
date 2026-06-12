@@ -1,157 +1,90 @@
-<p-dialog
-  [(visible)]="visible"
-  [modal]="true"
-  [closable]="!submitting()"
-  [closeOnEscape]="!submitting()"
-  [dismissableMask]="!submitting()"
-  [appendTo]="'body'"
-  [style]="{ width: '560px' }"
-  [breakpoints]="{ '640px': '95vw' }"
-  styleClass="mh-program-form-dialog"
-  [header]="dialogHeader()">
-  <div class="dialog-body">
-    <div class="field">
-      <label for="name">Name *</label>
-      <input
-        pInputText
-        id="name"
-        [ngModel]="name()"
-        (ngModelChange)="name.set($event)"
-        maxlength="200"
-        placeholder="e.g. Strength foundations — 8 weeks"
-        class="w-full"
-        autocomplete="off"
-      />
-      <small class="counter">{{ name().length }}/200</small>
-    </div>
-
-    <div class="field">
-      <label for="description">
-        Description <span class="optional">(optional)</span>
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '40rem' }" [header]="dialogHeader()" styleClass="program-dialog">
+  <div class="flex flex-col gap-3.5">
+    <!-- Name -->
+    <div class="flex flex-col gap-1.5">
+      <label for="name" class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Name <span class="text-red-500">*</span>
+        <span class="ml-auto text-3xs font-medium text-surface-400">{{ name().length }} / 200</span>
       </label>
-      <textarea
-        pTextarea
-        id="description"
-        [ngModel]="description()"
-        (ngModelChange)="description.set($event)"
-        rows="3"
-        maxlength="2000"
-        placeholder="What this program covers, who it's for, how often it should be done…"
-        class="w-full"
-      ></textarea>
-      <small class="counter">{{ description().length }}/2000</small>
+      <input id="name" pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" maxlength="200"
+        placeholder="e.g. Strength foundations — 8 weeks" autocomplete="off" fluid />
     </div>
 
-    <div class="row">
-      <div class="field grow">
-        <label for="kind">Kind</label>
-        <p-select
-          inputId="kind"
-          [options]="kindOptions"
-          [(ngModel)]="kind"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          styleClass="w-full"
-        />
+    <!-- Description -->
+    <div class="flex flex-col gap-1.5">
+      <label for="description"
+        class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Description <span class="font-medium text-surface-400">— optional</span>
+        <span class="ml-auto text-3xs font-medium text-surface-400">{{ description().length }} / 2000</span>
+      </label>
+      <textarea id="description" pTextarea rows="3" [ngModel]="description()" (ngModelChange)="description.set($event)"
+        maxlength="2000" placeholder="What this program covers, who it's for, how often it should be done…"
+        fluid></textarea>
+    </div>
+
+    <!-- Kind / Status -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label for="kind" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Kind</label>
+        <p-select inputId="kind" [options]="kindOptions" [ngModel]="kind()" (ngModelChange)="kind.set($event)"
+          optionLabel="label" optionValue="value" [appendTo]="'body'" class="w-full" />
       </div>
-      <div class="field grow">
-        <label for="status">Status</label>
-        <p-select
-          inputId="status"
-          [options]="statusOptions"
-          [(ngModel)]="status"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          styleClass="w-full"
-        />
+      <div class="flex flex-col gap-1.5">
+        <label for="status" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Status</label>
+        <p-select inputId="status" [options]="statusOptions" [ngModel]="status()" (ngModelChange)="status.set($event)"
+          optionLabel="label" optionValue="value" [appendTo]="'body'" class="w-full" />
       </div>
     </div>
 
-    <div class="row">
-      <div class="field grow">
-        <label for="duration">
+    <!-- Duration / Periodization -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label for="duration"
+          class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
           Duration
-          <span class="optional">
-            ({{ durationUnit() === 'weeks' ? 'weeks' : 'days' }}, optional)
+          <span class="font-medium text-surface-400">
+            — {{ durationUnit() === 'weeks' ? 'weeks' : 'days' }}, optional
           </span>
         </label>
-        <div class="duration-row">
-          <p-inputnumber
-            inputId="duration"
-            [ngModel]="durationValue()"
-            (ngModelChange)="durationValue.set($event)"
-            [min]="1"
-            [max]="durationMax()"
-            [showButtons]="true"
-            [allowEmpty]="true"
-            placeholder="—"
-            styleClass="duration-input"
-          />
-          <p-selectbutton
-            [options]="unitOptions"
-            [(ngModel)]="durationUnit"
-            [allowEmpty]="false"
-            optionLabel="label"
-            optionValue="value"
-            styleClass="duration-unit"
-          />
+        <div class="flex items-stretch gap-1.5">
+          <p-inputnumber inputId="duration" [ngModel]="durationValue()" (ngModelChange)="durationValue.set($event)"
+            [min]="1" [max]="durationMax()" [allowEmpty]="true" placeholder="—" class="min-w-0 flex-1" fluid />
+          <p-selectbutton [options]="unitOptions" [ngModel]="durationUnit()" (ngModelChange)="durationUnit.set($event)"
+            [allowEmpty]="false" optionLabel="label" optionValue="value" />
         </div>
       </div>
-      <div class="field grow">
-        <label for="periodization">Periodization</label>
-        <p-select
-          inputId="periodization"
-          [options]="periodizationOptions"
-          [(ngModel)]="periodizationModel"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          styleClass="w-full"
-        />
+      <div class="flex flex-col gap-1.5">
+        <label for="periodization"
+          class="text-xs font-semibold text-surface-800 dark:text-surface-200">Periodization</label>
+        <p-select inputId="periodization" [options]="periodizationOptions" [ngModel]="periodizationModel()"
+          (ngModelChange)="periodizationModel.set($event)" optionLabel="label" optionValue="value" [appendTo]="'body'"
+          class="w-full" />
       </div>
     </div>
 
-    <div class="field">
-      <label for="tags">
-        Goal tags <span class="optional">(comma-separated, up to 10)</span>
+    <!-- Goal tags -->
+    <div class="flex flex-col gap-1.5">
+      <label for="tags" class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Goal tags <span class="font-medium text-surface-400">— comma-separated, up to 10</span>
       </label>
-      <input
-        pInputText
-        id="tags"
-        [ngModel]="goalTagsRaw()"
-        (ngModelChange)="goalTagsRaw.set($event)"
-        placeholder="e.g. hypertrophy, fat loss, beginner"
-        class="w-full"
-        autocomplete="off"
-      />
+      <input id="tags" pInputText [ngModel]="goalTagsRaw()" (ngModelChange)="goalTagsRaw.set($event)"
+        placeholder="e.g. hypertrophy, fat loss, beginner" autocomplete="off" fluid />
     </div>
 
     @if (!isEdit()) {
-      <p class="hint-banner">
-        <i class="pi pi-info-circle"></i>
-        After creating the program shell, you'll add weeks, workouts, and
-        exercises from the program detail page.
-      </p>
+    <p
+      class="m-0 flex items-start gap-2 rounded-lg border border-surface-200 bg-surface-50 px-3 py-2.5 text-2xs leading-relaxed text-surface-600 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-400">
+      <i class="pi pi-info-circle mt-px shrink-0 text-primary"></i>
+      After creating the program shell, you'll add weeks, workouts, and exercises from the program detail page.
+    </p>
     }
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      [disabled]="submitting()"
-      (onClick)="cancel()"
-    />
-    <p-button
-      [label]="submitLabel()"
-      icon="pi pi-check"
-      [loading]="submitting()"
-      [disabled]="!canSubmit()"
-      (onClick)="submit()"
-    />
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
+    <p-button [label]="submitLabel()" icon="pi pi-check" [loading]="submitting()" [disabled]="!canSubmit()"
+      (onClick)="submit()" />
   </ng-template>
 </p-dialog>
 
