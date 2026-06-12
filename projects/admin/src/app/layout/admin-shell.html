@@ -3,7 +3,7 @@
   <aside
     class="flex w-60 flex-col gap-1 border-r border-[var(--p-content-border-color)] bg-[var(--p-content-background)] px-3 py-4"
   >
-    <div class="mb-4 flex items-center gap-2 px-2">
+    <a routerLink="/dashboard" class="mb-4 flex items-center gap-2 px-2" title="Go to dashboard">
       <img src="svg/logo-navy.svg" alt="MotionHive" class="h-7 w-7 shrink-0 dark:hidden" />
       <img src="svg/logo-honey.svg" alt="MotionHive" class="hidden h-7 w-7 shrink-0 dark:block" />
       <span class="truncate text-base font-bold text-[var(--p-text-color)]">MotionHive</span>
@@ -12,7 +12,7 @@
       >
         Admin
       </span>
-    </div>
+    </a>
 
     @for (item of navItems(); track item.route) {
       <a

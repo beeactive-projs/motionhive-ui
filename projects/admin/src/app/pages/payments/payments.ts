@@ -18,6 +18,8 @@ import { PaymentsResource } from '../../_data/models/ops.models';
 interface ColumnDef {
   path: string;
   label: string;
+  /** Render `path` (cents) as a formatted currency amount using `currency`. */
+  money?: boolean;
 }
 
 const COLUMNS: Record<PaymentsResource, ColumnDef[]> = {
@@ -31,25 +33,25 @@ const COLUMNS: Record<PaymentsResource, ColumnDef[]> = {
     { path: 'disabledReason', label: 'Disabled' },
   ],
   subscriptions: [
-    { path: 'client.email', label: 'Client' },
+    // customerEmail = registered client OR the stripe_customer (guest).
+    { path: 'customerEmail', label: 'Client' },
     { path: 'status', label: 'Status' },
-    { path: 'amountCents', label: 'Amount (¢)' },
-    { path: 'currency', label: 'Cur' },
+    { path: 'amountCents', label: 'Amount', money: true },
     { path: 'currentPeriodEnd', label: 'Period end' },
   ],
   invoices: [
-    { path: 'client.email', label: 'Client' },
+    { path: 'customerEmail', label: 'Client' },
     { path: 'number', label: 'Number' },
     { path: 'status', label: 'Status' },
-    { path: 'amountDueCents', label: 'Due (¢)' },
-    { path: 'currency', label: 'Cur' },
+    { path: 'amountDueCents', label: 'Due', money: true },
+    { path: 'amountPaidCents', label: 'Paid', money: true },
     { path: 'dueDate', label: 'Due date' },
   ],
   disputes: [
     { path: 'instructor.email', label: 'Instructor' },
     { path: 'status', label: 'Status' },
     { path: 'reason', label: 'Reason' },
-    { path: 'amountCents', label: 'Amount (¢)' },
+    { path: 'amountCents', label: 'Amount', money: true },
     { path: 'evidenceDueBy', label: 'Evidence due' },
   ],
   webhooks: [
@@ -119,17 +121,39 @@ export class Payments {
     this.load();
   }
 
-  cell(row: DbRow, path: string): string {
-    const v = path.split('.').reduce<unknown>((acc, k) => {
+  private raw(row: DbRow, path: string): unknown {
+    return path.split('.').reduce<unknown>((acc, k) => {
       if (acc && typeof acc === 'object') {
         return (acc as Record<string, unknown>)[k];
       }
       return undefined;
     }, row);
+  }
+
+  cell(row: DbRow, path: string): string {
+    const v = this.raw(row, path);
     if (v === null || v === undefined) return '';
     if (typeof v === 'boolean') return v ? 'yes' : 'no';
     if (typeof v === 'object') return JSON.stringify(v);
     return String(v);
+  }
+
+  /** Column-aware display: formats money columns (cents → currency). */
+  display(row: DbRow, col: ColumnDef): string {
+    if (col.money) {
+      const cents = Number(this.raw(row, col.path));
+      if (!Number.isFinite(cents)) return '';
+      const currency = String(this.raw(row, 'currency') || 'usd').toUpperCase();
+      try {
+        return new Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency,
+        }).format(cents / 100);
+      } catch {
+        return `${(cents / 100).toFixed(2)} ${currency}`;
+      }
+    }
+    return this.cell(row, col.path);
   }
 
   isWebhooks(): boolean {

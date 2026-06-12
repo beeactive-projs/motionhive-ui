@@ -163,6 +163,16 @@ export class Users {
     this.patchStatus({ forceEmailVerified: true });
   }
 
+  resendVerification(): void {
+    const d = this.detail();
+    if (!d) return;
+    this._users.resendVerification(d.id).subscribe({
+      next: () => this.toast('Verification email sent', `Sent to ${d.email}.`),
+      error: (err) =>
+        showApiError(this._messages, 'Resend', 'Failed to resend verification', err),
+    });
+  }
+
   restore(): void {
     const d = this.detail();
     if (!d) return;
@@ -211,9 +221,13 @@ export class Users {
     }
     this._impersonation.impersonate(d.id, reason).subscribe({
       next: (res) => {
-        const url = `${resolveWebAppUrl()}/impersonate?token=${encodeURIComponent(res.accessToken)}`;
+        const base = resolveWebAppUrl();
+        const url = `${base}/impersonate?token=${encodeURIComponent(res.accessToken)}`;
         window.open(url, '_blank', 'noopener');
-        this.toast('Impersonating', `Opened a session as ${res.targetUser.email}.`);
+        this.toast(
+          'Impersonating',
+          `Opening the app (${base}) as ${res.targetUser.email} in a new tab.`,
+        );
         this.impersonateReason = '';
       },
       error: (err) =>
