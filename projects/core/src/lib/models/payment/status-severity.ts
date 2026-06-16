@@ -16,7 +16,10 @@ export function getInvoiceStatusSeverity(status: InvoiceStatus): TagSeverity {
     case InvoiceStatuses.Paid:
       return TagSeverity.Success;
     case InvoiceStatuses.Open:
-      return TagSeverity.Warn;
+      // Honey/primary is reserved for actions, not states — OPEN is a
+      // neutral "awaiting payment" state, so render it as a neutral tag
+      // rather than the brand amber it used to share with CTAs.
+      return TagSeverity.Secondary;
     case InvoiceStatuses.Draft:
       return TagSeverity.Secondary;
     case InvoiceStatuses.Void:

@@ -22,6 +22,11 @@ export const userRoutes: Routes = [
     title: 'My sessions - MotionHive',
   },
   {
+    path: 'workouts',
+    loadComponent: () => import('./my-workouts/my-workouts').then((m) => m.MyWorkouts),
+    title: 'Workout history - MotionHive',
+  },
+  {
     path: 'sessions/discover',
     loadComponent: () =>
       import('./my-sessions/sessions-discover/sessions-discover').then(

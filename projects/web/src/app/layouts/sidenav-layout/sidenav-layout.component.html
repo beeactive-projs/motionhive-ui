@@ -32,7 +32,7 @@
           </a>
           } @else {
           <a [routerLink]="item.route"
-            routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
+            routerLinkActive="mh-nav-active bg-primary-500/10 text-primary-700 dark:text-primary-500 font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
             <span class="flex-1">{{ item.label }}</span>
@@ -71,7 +71,7 @@
         <p-button icon="pi pi-bars" class="mr-3" size="small" text rounded (onClick)="toggleSidebar()" />
         <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()" aria-label="Open search">
           <i class="pi pi-search search-trigger__icon"></i>
-          <span class="search-trigger__placeholder">Search instructors, groups, sessions…</span>
+          <span class="search-trigger__placeholder">Search coaches, groups, sessions…</span>
           <kbd class="search-trigger__kbd">⌘K</kbd>
         </button>
         <p-button icon="pi pi-search" class="sm:hidden" size="small" text rounded (onClick)="openSearch()"

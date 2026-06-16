@@ -184,7 +184,7 @@ export class Home implements OnInit {
         show: true,
         go: () =>
           this._router.navigate(['/discover'], {
-            queryParams: { tab: 'instructors' },
+            queryParams: { tab: 'coaches' },
           }),
       },
     ];
@@ -232,7 +232,7 @@ export class Home implements OnInit {
   }
 
   goToDiscoverCoaches(): void {
-    this._router.navigate(['/discover'], { queryParams: { tab: 'instructors' } });
+    this._router.navigate(['/discover'], { queryParams: { tab: 'coaches' } });
   }
 
   categoryTone(cat: BlogCategory): HexTone {
@@ -352,7 +352,7 @@ export class Home implements OnInit {
     if (handle && handle.trim()) {
       this._router.navigateByUrl(`/@${handle.trim()}`);
     } else {
-      this._router.navigate(['/discover'], { queryParams: { tab: 'instructors' } });
+      this._router.navigate(['/discover'], { queryParams: { tab: 'coaches' } });
     }
   }
 }

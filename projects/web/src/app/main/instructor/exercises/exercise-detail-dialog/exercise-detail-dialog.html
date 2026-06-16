@@ -42,19 +42,19 @@
 
     <!-- Meta chips -->
     <div class="flex flex-wrap items-center gap-2">
-      <p-tag [value]="e.kind | titlecase" class="bg-surface-100 text-surface-700" rounded />
-      <p-tag [value]="e.level | titlecase" class="bg-surface-100 text-surface-700" rounded />
+      <p-tag [value]="e.kind | titlecase" [class]="metaClass" rounded />
+      <p-tag [value]="levelTag(e.level).text" [class]="levelTag(e.level).class" rounded />
       @if (e.movementPattern) {
-      <p-tag [value]="e.movementPattern | titlecase" class="bg-surface-100 text-surface-700" rounded />
+      <p-tag [value]="e.movementPattern | titlecase" [class]="metaClass" rounded />
       }
       @if (e.mechanic) {
-      <p-tag [value]="e.mechanic | titlecase" class="bg-surface-100 text-surface-700" rounded />
+      <p-tag [value]="e.mechanic | titlecase" [class]="metaClass" rounded />
       }
       @if (e.force) {
-      <p-tag [value]="e.force | titlecase" class="bg-surface-100 text-surface-700" rounded />
+      <p-tag [value]="e.force | titlecase" [class]="metaClass" rounded />
       }
       @if (e.isUnilateral) {
-      <p-tag value="Unilateral" class="bg-amber-100 text-amber-800" rounded />
+      <p-tag value="Unilateral" [class]="metaClass" rounded />
       }
       @if (e.source === Sources.System) {
       <p-tag value="System" icon="pi pi-verified" severity="secondary" rounded />
@@ -74,13 +74,13 @@
       </h4>
       <div class="flex flex-wrap gap-2">
         @for (m of primaryMuscles(); track m) {
-        <p-tag [value]="m" class="bg-sky-300 text-sky-800" rounded />
+        <p-tag [value]="m" [class]="muscleClass(MuscleRoles.Primary)" rounded />
         }
         @for (m of secondaryMuscles(); track m) {
-        <p-tag [value]="m" class="bg-blue-100 text-blue-800" rounded />
+        <p-tag [value]="m" [class]="muscleClass(MuscleRoles.Secondary)" rounded />
         }
         @for (m of stabilizerMuscles(); track m) {
-        <p-tag [value]="m" class="bg-surface-100 text-surface-600" rounded />
+        <p-tag [value]="m" [class]="muscleClass(MuscleRoles.Stabilizer)" rounded />
         }
       </div>
     </section>
@@ -94,7 +94,7 @@
       </h4>
       <div class="flex flex-wrap gap-2">
         @for (eq of equipmentList(); track eq) {
-        <p-tag [value]="eq" class="bg-orange-300 text-orange-800" rounded />
+        <p-tag [value]="eq" [class]="equipmentClass" rounded />
         }
       </div>
     </section>

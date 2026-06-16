@@ -19,12 +19,16 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import {
   AuthStore,
+  EXERCISE_EQUIPMENT_TAG_CLASS,
+  EXERCISE_META_TAG_CLASS,
   Exercise,
   ExerciseMedia,
   ExerciseMediaKind,
   ExerciseService,
   ExerciseSource,
   ExerciseVisibility,
+  exerciseLevelTag,
+  exerciseMuscleTagClass,
   MuscleRole,
   showApiError,
 } from 'core';
@@ -69,6 +73,13 @@ export class ExerciseDetailDialog {
 
   readonly Sources = ExerciseSource;
   readonly Visibilities = ExerciseVisibility;
+  readonly MuscleRoles = MuscleRole;
+
+  // Shared exercise tag palette (single source of truth in core).
+  readonly levelTag = exerciseLevelTag;
+  readonly muscleClass = exerciseMuscleTagClass;
+  readonly equipmentClass = EXERCISE_EQUIPMENT_TAG_CLASS;
+  readonly metaClass = EXERCISE_META_TAG_CLASS;
 
   readonly exercise = signal<Exercise | null>(null);
   readonly loading = signal(false);

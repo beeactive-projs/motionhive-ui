@@ -112,7 +112,7 @@ export class Main {
           { label: 'My sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
           { label: 'My plans', route: '/my/plans', icon: 'pi pi-bookmark' },
           // Workout history + progress folded into one "Workouts" destination.
-          { label: 'Workouts', route: '/my/workouts', icon: 'pi pi-history' },
+          { label: 'Workouts', route: '/user/workouts', icon: 'pi pi-history' },
         ],
       },
     ];
@@ -125,7 +125,9 @@ export class Main {
           // placeholder/mock data. Route + component kept so it can come back
           // as a real coaching dashboard once it has live data to show.
           { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-id-card' },
-          { label: 'Sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
+          // "Manage sessions" (not bare "Sessions") to disambiguate from the
+          // trainee-side "My sessions" item above in the My training section.
+          { label: 'Manage sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
           { label: 'Programs', route: '/coaching/programs', icon: 'pi pi-objects-column' },
           { label: 'Exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },
           // Payments lives in Coaching now (the one-item "Revenue" group is gone).

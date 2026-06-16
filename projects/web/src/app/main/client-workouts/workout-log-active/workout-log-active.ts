@@ -149,7 +149,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) {
-      this._router.navigate(['/my/workouts']);
+      this._router.navigate(['/user/workouts']);
       return;
     }
     this.fetch(id);
@@ -483,7 +483,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
           'It may have been removed or you may not have access.',
           err,
         );
-        this._router.navigate(['/my/workouts']);
+        this._router.navigate(['/user/workouts']);
       },
     });
   }

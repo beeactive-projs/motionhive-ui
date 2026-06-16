@@ -1,6 +1,6 @@
 @let e = exercise();
 @let badge = cornerBadge();
-@let level = levelLabel();
+@let level = levelTag();
 
 <p-card class="group block h-full cursor-pointer overflow-hidden transition hover:shadow-md" role="button" tabindex="0"
   [attr.aria-label]="'Open ' + e.name" (click)="onClick()" (keydown.enter)="onClick()"
@@ -45,15 +45,15 @@
 
     <div class="flex flex-wrap items-center gap-2">
       @if (primaryMuscle(); as m) {
-      <p-tag [value]="m" class="bg-sky-300 text-sky-800" rounded />
+      <p-tag [value]="m" [class]="primaryMuscleClass" rounded />
       }
       @if (leadEquipment(); as eq) {
-      <p-tag [value]="eq" class="bg-orange-300 text-orange-800" rounded />
+      <p-tag [value]="eq" [class]="equipmentClass" rounded />
       }
     </div>
 
     <div class="flex items-center justify-between gap-2 border-t border-surface-100 pt-2 dark:border-surface-800">
-      <p-tag [value]="level.text" [icon]="level.icon" [class]="level.class" rounded />
+      <p-tag [value]="level.text" [class]="level.class" rounded />
 
       @if (badge === 'public' && authorName(); as name) {
       <span class="flex min-w-0 items-center gap-1.5 text-[11px] text-surface-600 dark:text-surface-400"

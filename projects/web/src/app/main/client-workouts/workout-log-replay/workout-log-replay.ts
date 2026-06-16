@@ -24,7 +24,7 @@ import {
  * Read-only replay of a completed (or abandoned) workout log.
  *
  * One screen, two callers:
- *   - Client opens it from `/my/workouts` history rows.
+ *   - Client opens it from `/user/workouts` history rows.
  *   - Coach opens it from a client-profile Workouts tab row, with
  *     `?coach=1` — the BE hits its coach endpoint instead, gated by
  *     ACTIVE instructor_client.

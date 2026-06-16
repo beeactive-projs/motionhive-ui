@@ -71,7 +71,7 @@
         styleClass="mh-show__book-btn" />
       }
       <small class="mh-show__terms">
-        The instructor will review group requests before granting access.
+        The coach will review group requests before granting access.
       </small>
     </section>
   </div>
@@ -107,7 +107,7 @@
         </span>
         }
         <div>
-          <small>Instructor</small>
+          <small>Coach</small>
           <strong>{{ inst.instructor.firstName }} {{ inst.instructor.lastName }}</strong>
         </div>
       </div>
@@ -127,7 +127,7 @@
           <strong>
             @switch (booking.status) {
             @case ('CONFIRMED') { You're booked }
-            @case ('PENDING_APPROVAL') { Pending instructor approval }
+            @case ('PENDING_APPROVAL') { Pending coach approval }
             @case ('WAITLISTED') { You're on the waitlist }
             @default { Booked }
             }

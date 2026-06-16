@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import {
@@ -50,6 +50,7 @@ export class Discover implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _router = inject(Router);
+  private readonly _activatedRoute = inject(ActivatedRoute);
 
   protected readonly sessionsStore = inject(SessionsDiscoverStore);
 
@@ -85,6 +86,10 @@ export class Discover implements OnInit {
   });
 
   ngOnInit(): void {
+    const tab = this._activatedRoute.snapshot.queryParamMap.get('tab');
+    if (tab === 'coaches' || tab === 'sessions' || tab === 'groups') {
+      this.tab.set(tab);
+    }
     this.loadCoaches();
     this.sessionsStore.load();
     this.loadGroups();

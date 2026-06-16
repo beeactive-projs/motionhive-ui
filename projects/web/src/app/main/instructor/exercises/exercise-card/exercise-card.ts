@@ -4,7 +4,15 @@ import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { Exercise, ExerciseLevel, ExerciseSource, ExerciseVisibility, TagSeverity } from 'core';
+import {
+  EXERCISE_EQUIPMENT_TAG_CLASS,
+  Exercise,
+  ExerciseSource,
+  ExerciseVisibility,
+  exerciseLevelTag,
+  exerciseMuscleTagClass,
+  MuscleRole,
+} from 'core';
 
 /**
  * Catalog grid card. Pure presentational — emits `select` so the
@@ -64,36 +72,12 @@ export class ExerciseCard {
     return null;
   });
 
-  readonly levelLabel = computed<{
-    text: string;
-    icon: string;
-    severity: TagSeverity;
-    class?: string;
-  }>(() => {
-    switch (this.exercise().level) {
-      case ExerciseLevel.Beginner:
-        return {
-          text: 'Beginner',
-          icon: 'pi pi-angle-down',
-          severity: TagSeverity.Success,
-          class: 'bg-green-200 text-green-800',
-        };
-      case ExerciseLevel.Intermediate:
-        return {
-          text: 'Intermediate',
-          icon: 'pi pi-equals',
-          severity: TagSeverity.Warn,
-          class: 'bg-yellow-200 text-yellow-800',
-        };
-      default:
-        return {
-          text: 'Advanced',
-          icon: 'pi pi-angle-double-up',
-          severity: TagSeverity.Danger,
-          class: 'bg-red-200 text-red-800',
-        };
-    }
-  });
+  /** Difficulty tag (label + ramped colour) from the shared palette. */
+  readonly levelTag = computed(() => exerciseLevelTag(this.exercise().level));
+
+  /** Shared tag-palette classes, exposed for the template. */
+  readonly primaryMuscleClass = exerciseMuscleTagClass(MuscleRole.Primary);
+  readonly equipmentClass = EXERCISE_EQUIPMENT_TAG_CLASS;
 
   onClick(): void {
     this.select.emit(this.exercise());

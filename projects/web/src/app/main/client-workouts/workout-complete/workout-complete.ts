@@ -263,7 +263,7 @@ export class WorkoutComplete implements OnInit {
   }
 
   goToRoutines(): void {
-    this._router.navigate(['/my/workouts'], { queryParams: { tab: 'routines' } });
+    this._router.navigate(['/user/workouts'], { queryParams: { tab: 'routines' } });
   }
 
   /**

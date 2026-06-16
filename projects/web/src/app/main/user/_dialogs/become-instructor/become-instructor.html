@@ -1,4 +1,4 @@
-<p-dialog [(visible)]="visible" header="Become an Instructor" [modal]="true" [draggable]="false" [resizable]="false"
+<p-dialog [(visible)]="visible" header="Become a coach" [modal]="true" [draggable]="false" [resizable]="false"
   styleClass="become-instructor-dialog" [contentStyle]="{ 'overflow-y': 'auto', 'height': '65vh' }">
   <form [formGroup]="form" (ngSubmit)="submit()">
 
@@ -183,7 +183,7 @@
       (onClick)="activeStep.set(activeStep() + 1)" />
     }
     @if (activeStep() === 3) {
-    <p-button label="Become an Instructor" icon="pi pi-graduation-cap" [loading]="isLoading()" (onClick)="submit()" />
+    <p-button label="Become a coach" icon="pi pi-graduation-cap" [loading]="isLoading()" (onClick)="submit()" />
     }
   </ng-template>
 </p-dialog>
