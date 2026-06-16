@@ -1,0 +1,123 @@
+<div class="mx-auto flex w-full max-w-3xl flex-col gap-4">
+  <nav class="flex items-center gap-1.5 text-xs text-muted-color">
+    <a routerLink="/user/plans" class="font-semibold text-primary hover:underline">My plans</a>
+    <i class="pi pi-angle-right text-[10px] opacity-70"></i>
+    @if (assignment(); as a) {
+    <span class="truncate">{{ a.programNameSnapshot }}</span>
+    }
+  </nav>
+
+  @if (loading()) {
+  <p-card>
+    <div class="flex flex-col gap-3">
+      <p-skeleton width="50%" height="1.5rem" />
+      <div class="flex items-center gap-2">
+        <p-skeleton shape="circle" size="2rem" />
+        <p-skeleton width="40%" height="0.8rem" />
+      </div>
+      <p-skeleton width="100%" height="0.6rem" />
+    </div>
+  </p-card>
+  } @else if (assignment(); as a) {
+  <!-- Hero -->
+  <p-card>
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="m-0 min-w-0 flex-1 font-heading text-xl font-semibold md:text-2xl">{{ a.programNameSnapshot }}</h1>
+        <p-tag [value]="planLabel(a.status)" [icon]="planIcon(a.status)" [severity]="planSeverity(a.status)" rounded />
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 text-sm text-muted-color">
+        @if (a.instructor?.avatarUrl) {
+        <p-avatar [image]="a.instructor!.avatarUrl!" shape="circle" />
+        } @else {
+        <p-avatar [label]="instructorInitials()" shape="circle" />
+        }
+        <span>From <span class="font-semibold text-surface-800 dark:text-surface-200">{{ instructorName() }}</span></span>
+        <span class="opacity-40">·</span>
+        <span class="tabular-nums">
+          {{ a.startDate | date: 'mediumDate' }}
+          @if (a.endDate) { – {{ a.endDate | date: 'mediumDate' }} }
+        </span>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-surface pt-3">
+        <p-progressbar [value]="a.completionPercent" [showValue]="false" class="flex-1 [&_.p-progressbar]:h-2" />
+        <span class="whitespace-nowrap text-xs text-muted-color">
+          <span class="font-heading font-semibold text-surface-900 dark:text-surface-100">{{ completedCount() }} / {{
+            workouts().length }}</span> workouts
+          <span class="mx-1 opacity-40">·</span>
+          <span class="font-heading font-semibold text-surface-900 dark:text-surface-100">{{ a.completionPercent
+            }}%</span>
+        </span>
+      </div>
+
+      @if (isPaused()) {
+      <div class="flex items-center gap-2 rounded-lg bg-surface-100 p-3 text-[13px] text-muted-color dark:bg-surface-800">
+        <i class="pi pi-pause text-primary"></i>
+        Your coach has paused this plan. They'll resume it when you're ready to pick up again.
+      </div>
+      }
+    </div>
+  </p-card>
+
+  @if (workouts().length === 0) {
+  <mh-list-empty-state icon="pi pi-calendar-plus" title="No workouts in this plan yet"
+    message="Your coach will add workouts here. You'll get a notification when there's something new to do." />
+  } @else {
+  <p-accordion [value]="openWeeks()" [multiple]="true" (valueChange)="openWeeks.set($any($event))">
+    @for (g of weeks(); track g.week) {
+    <p-accordion-panel [value]="g.week">
+      <p-accordion-header>
+        <span class="flex flex-1 items-center gap-2">
+          <span class="font-heading text-sm font-semibold">Week {{ g.week + 1 }}</span>
+          @if (g.current) {
+          <p-tag value="This week" severity="info" rounded class="[&_.p-tag]:text-[10px]!" />
+          }
+          <span class="text-xs font-normal text-muted-color">
+            {{ g.workouts.length }} {{ g.workouts.length === 1 ? 'workout' : 'workouts' }}
+          </span>
+        </span>
+      </p-accordion-header>
+      <p-accordion-content>
+        <div class="flex flex-col gap-2 pt-1">
+          @for (w of g.workouts; track w.id) {
+          <mh-time-row [time]="(w.scheduledDate | date: 'd') ?? ''" [duration]="(w.scheduledDate | date: 'EEE') ?? ''"
+            [title]="w.name" [tone]="workoutTone(w)" [interactive]="false" [chevron]="false">
+            <span meta class="flex flex-wrap items-center gap-1.5">
+              <span>{{ workoutVolume(w) }}</span>
+              <p-tag [value]="workoutTagLabel(w)" [icon]="workoutTagIcon(w)" [severity]="workoutSeverity(w)"
+                class="[&_.p-tag]:text-[10px]! [&_.p-tag]:py-0! [&_.p-tag]:px-1.5!" />
+            </span>
+            <span trailing class="flex items-center gap-1">
+              @switch (workoutCta(w)) {
+              @case ('start') {
+              <p-button label="Start" icon="pi pi-play" size="small" [disabled]="isPaused()"
+                [loading]="starting() === w.id" (onClick)="startWorkout(w)" />
+              <p-button icon="pi pi-forward" size="small" severity="secondary" [text]="true" [rounded]="true"
+                [disabled]="isPaused()" pTooltip="Skip workout" ariaLabel="Skip workout" (onClick)="confirmSkip(w)" />
+              }
+              @case ('resume') {
+              <p-button label="Resume" icon="pi pi-play" size="small" [disabled]="isPaused()"
+                [loading]="starting() === w.id" (onClick)="startWorkout(w)" />
+              <p-button icon="pi pi-forward" size="small" severity="secondary" [text]="true" [rounded]="true"
+                [disabled]="isPaused()" pTooltip="Skip workout" ariaLabel="Skip workout" (onClick)="confirmSkip(w)" />
+              }
+              @case ('view') {
+              <p-button label="View" size="small" severity="secondary" [text]="true" (onClick)="viewWorkout(w)" />
+              }
+              }
+            </span>
+          </mh-time-row>
+          }
+        </div>
+      </p-accordion-content>
+    </p-accordion-panel>
+    }
+  </p-accordion>
+  }
+  }
+</div>
+
+<p-toast position="top-right" />
+<p-confirmdialog [appendTo]="'body'" />

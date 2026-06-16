@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { rolesGuard, instructorGuard, roleRedirectGuard, superAdminGuard, UserRoles } from 'core';
+import { rolesGuard, instructorGuard, roleRedirectGuard, UserRoles } from 'core';
 import { handleMatcher } from '../pages/public-profile/handle-matcher';
 
 export const mainRoutes: Routes = [
@@ -12,11 +12,6 @@ export const mainRoutes: Routes = [
         path: 'home',
         loadComponent: () => import('./home/home').then((m) => m.Home),
         title: 'Home - MotionHive',
-      },
-      {
-        path: 'explore',
-        loadComponent: () => import('./explore/explore').then((m) => m.Explore),
-        title: 'Explore - MotionHive',
       },
       {
         // Unified discovery hub — coaches, sessions, groups in one place.
@@ -54,48 +49,6 @@ export const mainRoutes: Routes = [
       { path: 'sessions/discover', redirectTo: 'user/sessions/discover', pathMatch: 'full' },
       // My sessions now lives in the user area — see `userRoutes`
       // (/user/sessions). Legacy paths are redirected below.
-      // ── Client workouts area (re-skinned against Claude Design output) ──
-      {
-        path: 'my/plans',
-        loadComponent: () =>
-          import('./client-plans/client-plans-list/client-plans-list').then(
-            (m) => m.ClientPlansList,
-          ),
-        title: 'My plans - MotionHive',
-      },
-      {
-        path: 'my/plans/:id',
-        loadComponent: () =>
-          import('./client-plans/client-plan-detail/client-plan-detail').then(
-            (m) => m.ClientPlanDetail,
-          ),
-        title: 'My plan - MotionHive',
-      },
-      {
-        path: 'my/workouts/:id/complete',
-        loadComponent: () =>
-          import('./client-workouts/workout-complete/workout-complete').then(
-            (m) => m.WorkoutComplete,
-          ),
-        title: 'Workout complete - MotionHive',
-      },
-      {
-        path: 'my/workout-log/:id',
-        loadComponent: () =>
-          import('./client-workouts/workout-log-active/workout-log-active').then(
-            (m) => m.WorkoutLogActive,
-          ),
-        title: 'Workout - MotionHive',
-      },
-      {
-        // Read-only replay — used by client history + coach (with ?coach=1)
-        path: 'my/workout-log/:id/replay',
-        loadComponent: () =>
-          import('./client-workouts/workout-log-replay/workout-log-replay').then(
-            (m) => m.WorkoutLogReplay,
-          ),
-        title: 'Workout replay - MotionHive',
-      },
       // Notification producers emit `screen: 'sessions/my'` (BE convention
       // since the API surface is /sessions/my); older FE links used
       // /my/sessions. The page now lives under the user area, so forward
@@ -225,15 +178,6 @@ export const mainRoutes: Routes = [
           import('./writer/posts/post-detail/post-detail').then((m) => m.PostDetail),
         title: 'Edit Post - MotionHive',
       },
-
-      // Super-admin
-      {
-        path: 'super-admin',
-        canActivate: [superAdminGuard],
-        loadChildren: () =>
-          import('./super-admin/super-admin.routes').then((m) => m.superAdminRoutes),
-      },
-
       // Role-aware default redirect
       {
         path: '',

@@ -1,0 +1,128 @@
+<div class="mx-auto flex w-full max-w-2xl flex-col gap-4">
+  @if (loading()) {
+  <section class="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+    @for (i of [1, 2, 3]; track i) {
+    <mh-kpi-card label="" value="" icon="pi pi-circle" [loading]="true" />
+    }
+  </section>
+  } @else if (log(); as l) {
+  <!-- Hero -->
+  <div class="flex flex-col items-center gap-2 pt-2 text-center">
+    <span
+      class="flex size-14 items-center justify-center rounded-full bg-green-100 text-2xl text-green-600 dark:bg-green-500/15">
+      <i class="pi pi-check"></i>
+    </span>
+    <h1 class="m-0 font-heading text-2xl font-semibold">Workout complete</h1>
+    <p class="m-0 text-sm text-muted-color">
+      {{ l.name }}
+      @if (l.completedAt) {
+      · finished {{ l.completedAt | date: 'shortTime' }}
+      }
+    </p>
+  </div>
+
+  <!-- Stat tiles — conditional per modality -->
+  <section class="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+    <mh-kpi-card icon="pi pi-stopwatch" label="Duration" [value]="durationLabel()" />
+    <mh-kpi-card icon="pi pi-check-circle" label="Sets done" [value]="setsDone() + ' / ' + setsPlanned()" />
+    @if (hasVolume()) {
+    <mh-kpi-card icon="pi pi-chart-bar" label="Total volume" [value]="(totalVolumeKg() | number) + ' kg'" />
+    }
+    @if (hasReps()) {
+    <mh-kpi-card icon="pi pi-replay" label="Total reps" [value]="totalReps()" />
+    }
+    @if (hasDistance()) {
+    <mh-kpi-card icon="pi pi-map" label="Distance" [value]="(totalDistanceM() | number) + ' m'" />
+    }
+    @if (prCount() > 0) {
+    <mh-kpi-card icon="pi pi-trophy" label="New 1RM {{ prCount() === 1 ? 'PR' : 'PRs' }}" [value]="prCount()"
+      severity="warn" />
+    }
+  </section>
+
+  @if (prCount() > 0) {
+  <p-card>
+    <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-600">
+      <i class="pi pi-trophy"></i> Personal records
+    </div>
+    <div class="flex flex-col">
+      @for (pr of personalRecords(); track pr.id) {
+      <div class="flex items-center justify-between gap-3 border-t border-surface py-2 text-sm first:border-t-0">
+        <span class="min-w-0 truncate">{{ pr.exerciseName }}</span>
+        <span class="shrink-0 font-semibold tabular-nums">
+          {{ pr.weightKg | number }} kg
+          @if (pr.deltaKg > 0) {
+          <span class="ml-1 text-xs text-green-600">+{{ pr.deltaKg | number }}</span>
+          }
+        </span>
+      </div>
+      }
+    </div>
+  </p-card>
+  }
+
+  <!-- Feeling + notes -->
+  <p-card>
+    <h3 class="m-0 mb-3 font-heading text-sm font-semibold">How did that feel?</h3>
+    <p-selectbutton [options]="feelingOptions" [ngModel]="feelingRating()" (ngModelChange)="feelingRating.set($event)"
+      optionValue="value" [allowEmpty]="true" ariaLabelledBy="feeling" styleClass="w-full [&_.p-togglebutton]:flex-1">
+      <ng-template #item let-opt>
+        <span class="text-xl" [attr.aria-label]="opt.label" [title]="opt.label">{{ opt.glyph }}</span>
+      </ng-template>
+    </p-selectbutton>
+    <textarea pTextarea rows="2" maxlength="2000" fluid class="mt-3"
+      placeholder="Anything to note for your coach? (optional)" [ngModel]="notes()"
+      (ngModelChange)="notes.set($event)"></textarea>
+  </p-card>
+
+  <footer class="flex flex-col gap-2">
+    <p-button label="Save & back to my plan" icon="pi pi-arrow-left" size="large" [loading]="saving()"
+      (onClick)="saveFeedback()" fluid />
+
+    @if (canSaveAsRoutine()) {
+    @if (savedRoutineId()) {
+    <p-button label="Routine saved · view" icon="pi pi-check" severity="success" size="large" [text]="true"
+      (onClick)="goToRoutines()" fluid />
+    } @else {
+    <p-button label="Save as routine" icon="pi pi-clone" severity="secondary" size="large" [text]="true"
+      (onClick)="openSaveAsRoutineDialog()" fluid />
+    <small class="text-center text-xs text-muted-color">
+      Save this shape so you can run it again with one tap.
+    </small>
+    }
+    }
+
+    <p-button label="Share to feed" icon="pi pi-share-alt" severity="secondary" size="large" [text]="true"
+      [disabled]="true" fluid />
+    <small class="text-center text-xs text-muted-color">Share to feed lands in a future slice.</small>
+  </footer>
+  }
+</div>
+
+<!-- Save-as-routine dialog -->
+<p-dialog [(visible)]="saveAsRoutineOpen" [modal]="true" [closable]="!savingRoutine()" [closeOnEscape]="!savingRoutine()"
+  [dismissableMask]="!savingRoutine()" [appendTo]="'body'" [style]="{ width: '440px' }"
+  [breakpoints]="{ '540px': '95vw' }" header="Save as routine">
+  <div class="flex flex-col gap-2.5">
+    <p class="m-0 text-sm leading-relaxed text-muted-color">
+      We'll save this workout's exercises with sensible defaults from what you actually did. You can tweak them later
+      from the routines tab.
+    </p>
+    <label for="rname" class="text-xs font-semibold">Routine name *</label>
+    <input pInputText id="rname" fluid [ngModel]="routineName()" (ngModelChange)="routineName.set($event)"
+      maxlength="200" placeholder="e.g. Push day A" autocomplete="off" />
+    <label for="rfolder" class="text-xs font-semibold">
+      Folder <span class="font-normal text-muted-color">(optional)</span>
+    </label>
+    <input pInputText id="rfolder" fluid [ngModel]="routineFolder()" (ngModelChange)="routineFolder.set($event)"
+      maxlength="100" placeholder="e.g. PPL split" autocomplete="off" />
+  </div>
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="savingRoutine()"
+      (onClick)="saveAsRoutineOpen.set(false)" />
+    <p-button label="Save routine" icon="pi pi-check" [loading]="savingRoutine()" [disabled]="!routineName().trim()"
+      (onClick)="saveAsRoutine()" />
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-right" />

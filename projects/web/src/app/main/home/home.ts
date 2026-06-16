@@ -216,7 +216,7 @@ export class Home implements OnInit {
   resumeWorkout(): void {
     const r = this.resume();
     if (!r) return;
-    this._router.navigate(['/my/workout-log', r.id]);
+    this._router.navigate(['/user/workout-log', r.id]);
   }
 
   openPost(p: BlogPost): void {

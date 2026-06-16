@@ -40,7 +40,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
-import { RoutineFormDialog } from '../../client-workouts/_dialogs/routine-form-dialog/routine-form-dialog';
+import { RoutineFormDialog } from './_dialogs/routine-form-dialog/routine-form-dialog';
 
 type WorkoutTab = 'workouts' | 'routines' | 'exercises';
 
@@ -277,7 +277,7 @@ export class MyWorkouts {
     this._routineService.start(r.id).subscribe({
       next: (log) => {
         this.startingRoutineId.set(null);
-        this._router.navigate(['/my/workout-log', log.id]);
+        this._router.navigate(['/user/workout-log', log.id]);
       },
       error: (err) => {
         this.startingRoutineId.set(null);
@@ -356,11 +356,11 @@ export class MyWorkouts {
   }
 
   openReplay(log: WorkoutLog): void {
-    this._router.navigate(['/my/workout-log', log.id, 'replay']);
+    this._router.navigate(['/user/workout-log', log.id, 'replay']);
   }
 
   goToPlans(): void {
-    this._router.navigate(['/my/plans']);
+    this._router.navigate(['/user/plans']);
   }
 
   openStartFreestyle(): void {
@@ -378,7 +378,7 @@ export class MyWorkouts {
       next: (log) => {
         this.starting.set(false);
         this.startDialogOpen.set(false);
-        this._router.navigate(['/my/workout-log', log.id]);
+        this._router.navigate(['/user/workout-log', log.id]);
       },
       error: (err) => {
         this.starting.set(false);

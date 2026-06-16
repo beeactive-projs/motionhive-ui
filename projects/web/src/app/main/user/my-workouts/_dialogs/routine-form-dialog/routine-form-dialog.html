@@ -1,0 +1,120 @@
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '640px' }" [breakpoints]="{ '720px': '95vw' }"
+  [header]="dialogHeader()">
+  <div class="flex flex-col gap-3.5">
+    <div class="flex flex-col gap-1.5">
+      <label for="rname" class="text-xs font-semibold">Routine name *</label>
+      <input pInputText id="rname" fluid [ngModel]="name()" (ngModelChange)="name.set($event)" maxlength="200"
+        placeholder="e.g. Push day A" autocomplete="off" />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="rfolder" class="text-xs font-semibold">
+        Folder <span class="font-normal text-muted-color">(optional)</span>
+      </label>
+      <input pInputText id="rfolder" fluid [ngModel]="folder()" (ngModelChange)="folder.set($event)" maxlength="100"
+        placeholder="e.g. PPL split" autocomplete="off" />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="rnotes" class="text-xs font-semibold">
+        Notes <span class="font-normal text-muted-color">(optional)</span>
+      </label>
+      <textarea pTextarea id="rnotes" rows="2" maxlength="2000" fluid [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)" placeholder="Anything to remember about this routine…"></textarea>
+    </div>
+
+    <div>
+      <div class="mb-2 flex items-center justify-between">
+        <h4 class="m-0 font-heading text-[13px] font-semibold">Exercises</h4>
+        <p-button label="Add exercise" icon="pi pi-plus" severity="secondary" [text]="true" size="small"
+          (onClick)="openPicker()" />
+      </div>
+
+      @if (exercises().length === 0) {
+      <div
+        class="rounded-lg border border-dashed border-surface bg-surface-50 p-4 text-center text-xs text-muted-color dark:bg-surface-800">
+        No exercises yet — tap "Add exercise" to start building.
+      </div>
+      } @else {
+      <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+        @for (e of exercises(); track e.uiKey; let i = $index) {
+        <li class="rounded-lg border border-surface p-3">
+          <div class="mb-2.5 flex items-center gap-2.5">
+            @if (e.exerciseThumbnailUrl) {
+            <img class="size-9 shrink-0 rounded-md border border-surface object-cover" [src]="e.exerciseThumbnailUrl"
+              [alt]="e.exerciseName" loading="lazy" />
+            } @else {
+            <div
+              class="flex size-9 shrink-0 items-center justify-center rounded-md border border-surface bg-surface-100 text-muted-color dark:bg-surface-800">
+              <i class="pi pi-bolt"></i>
+            </div>
+            }
+            <div class="flex min-w-0 flex-1 items-center gap-2">
+              <span class="font-heading text-[13px] font-bold text-muted-color">{{ i + 1 }}.</span>
+              <span class="truncate text-[13px] font-semibold">{{ e.exerciseName }}</span>
+            </div>
+            <div class="flex shrink-0 gap-0.5">
+              <p-button icon="pi pi-arrow-up" severity="secondary" [text]="true" rounded size="small" pTooltip="Move up"
+                ariaLabel="Move up" [disabled]="i === 0" (onClick)="moveUp(e.uiKey)" />
+              <p-button icon="pi pi-arrow-down" severity="secondary" [text]="true" rounded size="small"
+                pTooltip="Move down" ariaLabel="Move down" [disabled]="i === exercises().length - 1"
+                (onClick)="moveDown(e.uiKey)" />
+              <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Remove"
+                ariaLabel="Remove" (onClick)="removeExercise(e.uiKey)" />
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Sets</label>
+              <p-inputnumber [ngModel]="e.defaultSets"
+                (ngModelChange)="patchExercise(e.uiKey, { defaultSets: $event ?? 3 })" [min]="1" [max]="30"
+                [showButtons]="false" class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Reps min</label>
+              <p-inputnumber [ngModel]="e.targetRepsMin"
+                (ngModelChange)="patchExercise(e.uiKey, { targetRepsMin: $event })" [min]="0" [max]="1000"
+                [allowEmpty]="true" placeholder="—"
+                class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Reps max</label>
+              <p-inputnumber [ngModel]="e.targetRepsMax"
+                (ngModelChange)="patchExercise(e.uiKey, { targetRepsMax: $event })" [min]="0" [max]="1000"
+                [allowEmpty]="true" placeholder="—"
+                class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Weight (kg)</label>
+              <p-inputnumber [ngModel]="e.targetWeightKg"
+                (ngModelChange)="patchExercise(e.uiKey, { targetWeightKg: $event })" [min]="0" [max]="9999"
+                [maxFractionDigits]="2" [allowEmpty]="true" placeholder="—"
+                class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Rest (s)</label>
+              <p-inputnumber [ngModel]="e.restAfterSeconds"
+                (ngModelChange)="patchExercise(e.uiKey, { restAfterSeconds: $event })" [min]="0" [max]="600"
+                [allowEmpty]="true" placeholder="—"
+                class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
+            </div>
+          </div>
+        </li>
+        }
+      </ul>
+      }
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
+    <p-button [label]="submitLabel()" icon="pi pi-check" [loading]="submitting()" [disabled]="!canSubmit()"
+      (onClick)="submit()" />
+  </ng-template>
+</p-dialog>
+
+<mh-exercise-picker-dialog [program]="$any({ id: 'inline' })" [workout]="$any({ id: 'inline', name: 'Routine' })"
+  [emitOnly]="true" [(visible)]="pickerOpen" (picked)="onExercisePicked($event)" />
+
+<p-toast position="top-right" />

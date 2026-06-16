@@ -110,7 +110,7 @@ export class Main {
         label: 'My training',
         items: [
           { label: 'My sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
-          { label: 'My plans', route: '/my/plans', icon: 'pi pi-bookmark' },
+          { label: 'My plans', route: '/user/plans', icon: 'pi pi-bookmark' },
           // Workout history + progress folded into one "Workouts" destination.
           { label: 'Workouts', route: '/user/workouts', icon: 'pi pi-history' },
         ],
