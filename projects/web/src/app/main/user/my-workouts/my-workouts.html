@@ -75,7 +75,7 @@
   } @else if (items().length === 0) {
   <mh-list-empty-state icon="pi pi-history" title="No workouts yet"
     message="Start one freestyle, or open a plan your coach assigned you to log a structured session."
-    actionLabel="Go to my plans" actionIcon="pi pi-bookmark" actionSeverity="contrast" [actionOutlined]="true"
+    actionLabel="Go to my plans" actionIcon="pi pi-bookmark" actionSeverity="secondary" [actionOutlined]="true"
     (action)="goToPlans()" />
   } @else {
   <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
@@ -110,7 +110,7 @@
 
     @if (hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" [outlined]="true" [loading]="loadingMore()" (onClick)="loadMore()" />
+      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="loadingMore()" (onClick)="loadMore()" />
     </div>
     } @else if (items().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
@@ -212,7 +212,7 @@
       <p class="m-0 max-w-md text-sm text-muted-color">
         Browse 800+ system exercises and build your own custom ones in the Exercises area.
       </p>
-      <p-button label="Open exercises" icon="pi pi-external-link" severity="contrast" [outlined]="true"
+      <p-button label="Open exercises" icon="pi pi-external-link" severity="secondary" [outlined]="true"
         (onClick)="goToExercises()" />
     </div>
   </p-card>

@@ -6,7 +6,7 @@
       money.' }}
     </span>
     <p-button [label]="hasStripeAccount() ? 'Finish setup' : 'Connect Stripe'"
-      [icon]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'" severity="warn" [text]="true"
+      [icon]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'"
       size="small" (onClick)="startOnboarding()" />
   </div>
 </p-message>
@@ -15,7 +15,7 @@
 <!-- Actions -->
 @if (hasStripeAccount()) {
 <div class="flex justify-end mb-4">
-  <p-button label="Open Stripe Dashboard" icon="pi pi-external-link" iconPos="right" severity="secondary" [text]="true"
+  <p-button label="Open Stripe Dashboard" icon="pi pi-external-link" iconPos="right" severity="secondary" [outlined]="true"
     size="small" [loading]="dashboardLoading()" (onClick)="openStripeDashboard()" />
 </div>
 }

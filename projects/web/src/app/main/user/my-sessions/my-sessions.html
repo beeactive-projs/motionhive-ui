@@ -103,7 +103,7 @@
   @if (store.error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">{{ store.error() }}</span>
-    <p-button label="Retry" size="small" [outlined]="true" (onClick)="store.load()" />
+    <p-button label="Retry" size="small" severity="secondary" [outlined]="true" (onClick)="store.load()" />
   </p-message>
   } @else if (store.loading() && store.items().length === 0) {
   <div class="flex flex-col gap-2">
@@ -120,7 +120,7 @@
   } @else {
   <mh-list-empty-state icon="pi pi-filter-slash" title="No sessions match your filters"
     message="Try a different filter or clear the search." actionLabel="Clear filters" actionIcon="pi pi-filter-slash"
-    actionSeverity="contrast" [actionOutlined]="true" (action)="clearFilters()" />
+    actionSeverity="secondary" [actionOutlined]="true" (action)="clearFilters()" />
   }
   } @else {
   <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
@@ -138,7 +138,7 @@
 
     @if (store.hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" [outlined]="true" [loading]="store.loading()" (onClick)="store.loadMore()" />
+      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="store.loading()" (onClick)="store.loadMore()" />
     </div>
     }
   </div>
@@ -159,7 +159,7 @@
     @if (canJoin(p) || canCancel(p)) {
     <span trailing class="flex items-center gap-1.5">
       @if (canJoin(p)) {
-      <p-button label="Join" icon="pi pi-video" size="small" severity="success" (onClick)="join(p, $event)" />
+      <p-button label="Join" icon="pi pi-video" size="small" (onClick)="join(p, $event)" />
       }
       @if (canCancel(p)) {
       <p-button icon="pi pi-times" severity="danger" [text]="true" size="small" ariaLabel="Cancel booking"

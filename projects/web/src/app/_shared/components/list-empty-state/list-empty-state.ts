@@ -14,7 +14,7 @@ export class ListEmptyState {
   readonly message = input<string>('');
   readonly actionLabel = input<string>();
   readonly actionIcon = input<string>();
-  readonly actionSeverity = input<'primary' | 'contrast' | 'success' | 'danger'>('primary');
+  readonly actionSeverity = input<'primary' | 'secondary' | 'success' | 'danger'>('primary');
   readonly actionOutlined = input<boolean>(false);
   readonly action = output<void>();
 }

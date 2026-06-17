@@ -51,7 +51,8 @@
               <p-button
                 label="Copy link"
                 icon="pi pi-copy"
-                severity="warn"
+                severity="secondary"
+                [outlined]="true"
                 fluid
                 (onClick)="onCopy()"
               />
@@ -114,7 +115,6 @@
                   icon="pi pi-send"
                   iconPos="right"
                   type="submit"
-                  severity="warn"
                   fluid
                   [loading]="isSending()"
                   [disabled]="form.invalid || isSending()"
@@ -129,7 +129,7 @@
                 <p class="invite-friend__success-body">
                   We'll email them and let them know you sent the invite.
                 </p>
-                <p-button label="Done" severity="warn" fluid (onClick)="onClose()" />
+                <p-button label="Done" severity="secondary" text fluid (onClick)="onClose()" />
               </div>
             }
           </div>

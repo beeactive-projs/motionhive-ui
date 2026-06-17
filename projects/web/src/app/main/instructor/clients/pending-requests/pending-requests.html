@@ -77,14 +77,14 @@
           <td>
             <div class="flex items-center justify-end gap-1">
               @if (isIncoming(row)) {
-              <p-button icon="pi pi-check" rounded text severity="success" tooltipPosition="left" pTooltip="Accept"
+              <p-button icon="pi pi-check" rounded severity="success" tooltipPosition="left" pTooltip="Accept"
                 ariaLabel="Accept" (onClick)="acceptRequest(row)" />
-              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left" pTooltip="Decline"
+              <p-button icon="pi pi-times" rounded outlined severity="danger" tooltipPosition="left" pTooltip="Decline"
                 ariaLabel="Decline" (onClick)="declineRequest(row)" />
               } @else {
               <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
                 pTooltip="Resend invitation" ariaLabel="Resend invitation" (onClick)="resendInvitation(row)" />
-              <p-button icon="pi pi-times" rounded text severity="danger" tooltipPosition="left"
+              <p-button icon="pi pi-times" rounded outlined severity="danger" tooltipPosition="left"
                 pTooltip="Cancel invitation" ariaLabel="Cancel invitation" (onClick)="cancelRequest(row)" />
               }
             </div>
@@ -189,14 +189,14 @@
 
             <div class="border-surface-100 dark:border-surface-800 flex items-center justify-end gap-1 border-t pt-2">
               @if (isIncoming(request)) {
-              <p-button icon="pi pi-check" label="Accept" rounded text size="small" severity="success"
+              <p-button icon="pi pi-check" label="Accept" rounded size="small" severity="success"
                 (onClick)="acceptRequest(request)" />
-              <p-button icon="pi pi-times" label="Decline" rounded text size="small" severity="danger"
+              <p-button icon="pi pi-times" label="Decline" rounded outlined size="small" severity="danger"
                 (onClick)="declineRequest(request)" />
               } @else {
               <p-button icon="pi pi-send" label="Resend" rounded text size="small" severity="secondary"
                 (onClick)="resendInvitation(request)" />
-              <p-button icon="pi pi-times" label="Cancel" rounded text size="small" severity="danger"
+              <p-button icon="pi pi-times" label="Cancel" rounded outlined size="small" severity="danger"
                 (onClick)="cancelRequest(request)" />
               }
             </div>

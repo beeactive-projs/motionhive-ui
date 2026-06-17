@@ -31,7 +31,7 @@
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        " [severity]="needsOnboardingFinish() ? 'warn' : hasStripeAccount() ? 'secondary' : 'primary'"
+        " [severity]="hasStripeAccount() && !needsOnboardingFinish() ? 'secondary' : undefined"
         [outlined]="hasStripeAccount() && !needsOnboardingFinish()" [size]="isTabletDown() ? 'small' : undefined"
         [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
       @if(stripeOnboarded()) {
@@ -197,7 +197,7 @@
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        " severity="warn" [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" class="ml-auto" />
+        " [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" class="ml-auto" />
     </div>
   </p-card>
 </ng-template>

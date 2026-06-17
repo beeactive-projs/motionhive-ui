@@ -62,7 +62,7 @@
   @if (error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">Couldn't load programs: {{ error() }}</span>
-    <p-button label="Retry" size="small" [outlined]="true" (onClick)="retry()" />
+    <p-button label="Retry" size="small" severity="secondary" [outlined]="true" (onClick)="retry()" />
   </p-message>
   } @else if (loading() && !items().length) {
   <div class="grid gap-3.5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">

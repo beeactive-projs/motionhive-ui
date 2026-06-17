@@ -15,7 +15,7 @@
     <div class="flex items-center gap-3">
       <span class="text-sm font-medium">Category:</span>
       @for (option of categoryOptions; track option.label) {
-      <p-button [label]="option.label" [severity]="categoryFilter() === option.value ? 'primary' : 'contrast'"
+      <p-button [label]="option.label" [severity]="categoryFilter() === option.value ? 'primary' : 'secondary'"
         size="small" rounded [text]="categoryFilter() !== option.value"
         (onClick)="onCategoryFilterChange(option.value)" />
       }
@@ -114,7 +114,7 @@
               <i class="pi pi-file-edit text-4xl text-surface-300"></i>
               <h2 class="text-lg font-semibold text-surface-700">No posts yet</h2>
               <p class="text-sm text-surface-500">Create your first post to start publishing content.</p>
-              <p-button label="Write your first post" icon="pi pi-plus" severity="primary"
+              <p-button label="Write your first post" icon="pi pi-plus"
                 styleClass="!rounded-full mt-2" (onClick)="navigateToNew()" />
             </div>
           </td>

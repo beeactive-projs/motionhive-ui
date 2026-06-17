@@ -1,7 +1,7 @@
 <!-- Filters -->
 <div class="flex items-center gap-3 mt-2 mb-4 overflow-x-auto no-scrollbar">
   @for (option of statusOptions; track option.label) {
-  <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'contrast'" size="small"
+  <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'secondary'" size="small"
     rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
     styleClass="py-0.5 min-w-10" />
   }

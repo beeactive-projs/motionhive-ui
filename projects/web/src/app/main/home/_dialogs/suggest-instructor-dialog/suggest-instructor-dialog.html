@@ -90,7 +90,6 @@
                   icon="pi pi-send"
                   iconPos="right"
                   type="submit"
-                  severity="warn"
                   fluid
                   [loading]="isSending()"
                   [disabled]="directForm.invalid || isSending()"
@@ -156,7 +155,6 @@
                   icon="pi pi-send"
                   iconPos="right"
                   type="submit"
-                  severity="warn"
                   fluid
                   [loading]="isSending()"
                   [disabled]="tellTeamForm.invalid || isSending()"
@@ -185,7 +183,7 @@
             We'll reach out and let you know what they say. Suggest as many as you like.
           }
         </p>
-        <p-button label="Done" severity="warn" (onClick)="onClose()" fluid />
+        <p-button label="Done" severity="secondary" text (onClick)="onClose()" fluid />
       </div>
     }
   </div>

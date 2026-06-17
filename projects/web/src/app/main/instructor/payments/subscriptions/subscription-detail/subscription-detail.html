@@ -6,7 +6,7 @@
     icon="pi pi-arrow-left"
     [rounded]="true"
     [text]="true"
-    severity="contrast"
+    severity="secondary"
     pTooltip="Back to memberships"
     tooltipPosition="bottom"
     (onClick)="goBackToList()" />
@@ -160,7 +160,7 @@
               icon="pi pi-times"
               label="Cancel at period end"
               severity="danger"
-              [outlined]="true"
+              [text]="true"
               [loading]="actionLoading()"
               (onClick)="confirmCancelAtEnd()"
               styleClass="w-full" />

@@ -51,7 +51,7 @@
         <div class="mt-2 flex items-center gap-2">
           <p-button label="Approve" icon="pi pi-check" size="small" severity="success" [loading]="isBusy(post)"
             [disabled]="isAnyBusy() && !isBusy(post)" (onClick)="approve(post)" />
-          <p-button label="Reject" icon="pi pi-times" size="small" severity="danger" text [loading]="isBusy(post)"
+          <p-button label="Reject" icon="pi pi-times" size="small" severity="danger" outlined [loading]="isBusy(post)"
             [disabled]="isAnyBusy() && !isBusy(post)" (onClick)="reject(post)" />
         </div>
       </div>

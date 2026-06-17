@@ -48,6 +48,7 @@
             <span class="mh-safety__date">Blocked {{ formattedDate(row.createdAt) }}</span>
           </div>
         </div>
+        <!-- TODO action-system: role? Unblock is restorative, treated as Secondary -->
         <p-button label="Unblock" icon="pi pi-check-circle" severity="secondary" [outlined]="true"
           [loading]="isUnblocking(row)" [disabled]="isUnblocking(row)" (onClick)="unblock(row)" />
       </li>

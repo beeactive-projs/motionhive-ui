@@ -3,7 +3,7 @@
   <!-- Filters -->
   <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
     @for (opt of statusOptions; track opt.value) {
-    <p-button [label]="opt.label" [severity]="statusFilter() === opt.value ? 'primary' : 'contrast'" size="small"
+    <p-button [label]="opt.label" [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'" size="small"
       rounded [text]="statusFilter() !== opt.value" (onClick)="onStatusFilterChange(opt.value)"
       styleClass="py-0.5 min-w-10" />
     }
@@ -67,7 +67,7 @@
           @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
           <div class="flex gap-1 justify-end" (click)="$event.stopPropagation()">
             @if (!sub.cancelAt) {
-            <p-button icon="pi pi-times" size="small" severity="danger" [outlined]="true"
+            <p-button icon="pi pi-times" size="small" severity="danger" [text]="true"
               pTooltip="Cancel at period end" tooltipPosition="left" (onClick)="confirmCancel(sub)" />
             }
             <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"

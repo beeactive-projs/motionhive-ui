@@ -26,8 +26,8 @@
 
     <div class="flex flex-wrap justify-center gap-3 mb-10">
       <p-button label="Go Home" icon="pi pi-home" (onClick)="goHome()" />
-      <p-button label="Try Again" icon="pi pi-refresh" (onClick)="retry()" />
-      <p-button outlined label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" />
+      <p-button label="Try Again" icon="pi pi-refresh" severity="secondary" outlined (onClick)="retry()" />
+      <p-button severity="secondary" outlined label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" />
     </div>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-surface-500">

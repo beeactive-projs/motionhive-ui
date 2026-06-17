@@ -349,7 +349,7 @@ export class ClientProfile {
       message: `Are you sure you want to unarchive ${this.clientName()}?`,
       header: 'Unarchive client',
       icon: 'pi pi-exclamation-triangle',
-      rejectButtonProps: { text: 'true' },
+      rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this.doUnarchive(),
     });
   }

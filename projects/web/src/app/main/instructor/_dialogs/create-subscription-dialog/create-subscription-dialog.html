@@ -44,7 +44,7 @@
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
+      <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
       <p-button label="Create subscription" icon="pi pi-check" [loading]="saving()"
         [disabled]="!formClientUserId || !formProductId" (onClick)="submit()" />
     </div>
