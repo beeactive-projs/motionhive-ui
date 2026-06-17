@@ -29,16 +29,14 @@
 
   <!-- Empty state -->
   @if (!loading() && posts().length === 0) {
-  <div class="flex flex-col items-center gap-4 py-16 text-center">
-    <div class="flex h-20 w-20 items-center justify-center rounded-full bg-surface-200">
-      <i class="pi pi-bookmark text-4xl text-primary-300"></i>
-    </div>
-    <h2 class="text-lg font-semibold">Your feed is empty</h2>
-    <p class="max-w-sm text-sm text-surface-700 dark:text-surface-400">
-      Join groups to see posts in your feed.
-    </p>
-    <p-button label="Discover groups" icon="pi pi-compass" [routerLink]="['../discover']" />
-  </div>
+  <mh-list-empty-state
+    icon="pi pi-bookmark"
+    title="Your feed is empty"
+    message="Join groups to see posts in your feed."
+    actionLabel="Discover groups"
+    actionIcon="pi pi-compass"
+    (action)="goToDiscover()"
+  />
   }
 
   <!-- Feed list -->

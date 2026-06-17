@@ -17,9 +17,10 @@ import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GroupsRefreshService, Post, PostService, showApiError } from 'core';
 import { PostCard } from '../group-detail/_components/post-card/post-card';
+import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-groups-feed',
@@ -28,8 +29,8 @@ import { PostCard } from '../group-detail/_components/post-card/post-card';
     CardModule,
     SkeletonModule,
     ToastModule,
-    RouterLink,
     PostCard,
+    ListEmptyState,
   ],
   providers: [MessageService],
   templateUrl: './groups-feed.html',
@@ -41,6 +42,12 @@ export class GroupsFeed implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
+  private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+
+  goToDiscover(): void {
+    this._router.navigate(['../discover'], { relativeTo: this._route });
+  }
 
   readonly loading = signal(true);
   readonly loadingMore = signal(false);

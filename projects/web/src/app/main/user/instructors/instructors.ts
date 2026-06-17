@@ -18,6 +18,7 @@ import { MyInstructor, ClientRequest, ClientService } from 'core';
 import { DiscoverInstructors } from '../_dialogs/discover-instructors/discover-instructors';
 import { Avatar } from '../../../_shared/components/avatar/avatar';
 import { UserInfo } from '../../../_shared/components/user-info/user-info';
+import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-instructors',
@@ -32,6 +33,7 @@ import { UserInfo } from '../../../_shared/components/user-info/user-info';
     TooltipModule,
     ConfirmDialogModule,
     DiscoverInstructors,
+    ListEmptyState,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './instructors.html',

@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { Button } from 'primeng/button';
+import { Hex } from 'core';
 
 @Component({
   selector: 'mh-list-empty-state',
-  imports: [Button],
+  imports: [Button, Hex],
   templateUrl: './list-empty-state.html',
   styleUrl: './list-empty-state.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -6,7 +6,7 @@
       <p class="text-sm text-surface-700 dark:text-surface-400">Manage your instructor relationships and requests.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="Discover Instructors" icon="pi pi-search" rounded (onClick)="discoverVisible.set(true)" />
+      <p-button label="Discover instructors" icon="pi pi-search" (onClick)="discoverVisible.set(true)" />
     </div>
   </header>
 
@@ -78,15 +78,14 @@
       <ng-template #emptymessage>
         <tr>
           <td colspan="2">
-            <div class="flex flex-col items-center gap-3 py-12 text-center">
-              <i class="pi pi-users text-4xl text-secondary-300"></i>
-              <h2 class="text-lg font-semibold text-secondary-700">No instructors yet</h2>
-              <p class="text-sm text-secondary-500">
-                Find and connect with an instructor to get started.
-              </p>
-              <p-button label="Discover Instructors" icon="pi pi-search"
-                styleClass="!rounded-full mt-2" (onClick)="discoverVisible.set(true)" />
-            </div>
+            <mh-list-empty-state
+              icon="pi pi-users"
+              title="No instructors yet"
+              message="Find and connect with an instructor to get started."
+              actionLabel="Discover instructors"
+              actionIcon="pi pi-search"
+              (action)="discoverVisible.set(true)"
+            />
           </td>
         </tr>
       </ng-template>
