@@ -110,13 +110,9 @@
       <ng-template #emptymessage>
         <tr>
           <td colspan="6">
-            <div class="flex flex-col items-center gap-3 py-12 text-center">
-              <i class="pi pi-file-edit text-4xl text-surface-300"></i>
-              <h2 class="text-lg font-semibold text-surface-700">No posts yet</h2>
-              <p class="text-sm text-surface-500">Create your first post to start publishing content.</p>
-              <p-button label="Write your first post" icon="pi pi-plus"
-                styleClass="!rounded-full mt-2" (onClick)="navigateToNew()" />
-            </div>
+            <mh-list-empty-state icon="pi pi-file-edit" title="No posts yet"
+              message="Create your first post to start publishing content." actionLabel="Write your first post"
+              actionIcon="pi pi-plus" (action)="navigateToNew()" />
           </td>
         </tr>
       </ng-template>

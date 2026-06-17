@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MessagingStore } from 'core';
 import { ConversationList } from '../../components/conversation-list/conversation-list';
@@ -25,6 +25,16 @@ import { NewMessagePicker } from '../../components/new-message-picker/new-messag
 })
 export class InboxPage {
   protected readonly store = inject(MessagingStore);
+
+  /**
+   * On mobile the list and chat are mutually exclusive: when a conversation
+   * is open (or compose mode is on) the right pane takes the screen and the
+   * list hides; otherwise the list takes the screen. Drives the `has-active`
+   * class — desktop ignores it and shows both columns side by side.
+   */
+  protected readonly hasActivePane = computed(
+    () => !!this.store.activeId() || this.store.composeMode(),
+  );
 
   protected onNewMessage(): void {
     this.store.enterComposeMode();

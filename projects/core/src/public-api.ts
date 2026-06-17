@@ -243,6 +243,8 @@ export * from './lib/services/loading/loading.service';
 export * from './lib/components/logo/logo';
 // Hexagon system — one tintable primitive (avatars, icon tiles, badges, accents).
 export * from './lib/components/hex/hex';
+// Segmented control — the Action System pill segmented (single-select view switch).
+export * from './lib/components/segmented/segmented';
 export * from './lib/components/hex/hex.types';
 export * from './lib/components/hex/hex-icons';
 export * from './lib/components/dialog-shell/dialog-shell';

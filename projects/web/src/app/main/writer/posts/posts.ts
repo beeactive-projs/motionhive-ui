@@ -20,6 +20,7 @@ import {
   withCloudinaryTransform,
 } from 'core';
 import { SelectItem } from 'primeng/api';
+import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-posts',
@@ -33,6 +34,7 @@ import { SelectItem } from 'primeng/api';
     ConfirmDialogModule,
     TooltipModule,
     InputTextModule,
+    ListEmptyState,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './posts.html',

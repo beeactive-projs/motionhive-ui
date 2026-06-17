@@ -104,14 +104,10 @@
 
     <ng-template #emptymessage>
       <tr>
-        <td colspan="6" class="text-center py-8">
-          <div class="flex flex-col items-center justify-center gap-2">
-            <i class="pi pi-sync text-4xl text-surface-400"></i>
-            <p class="m-0 font-medium">No memberships found</p>
-            <p class="text-surface-500 text-sm m-0">Subscribe clients to recurring plans to get started.</p>
-            <p-button label="New membership" icon="pi pi-plus" size="small" class="mt-1"
-              (onClick)="showCreateDialog.set(true)" />
-          </div>
+        <td colspan="6">
+          <mh-list-empty-state icon="pi pi-sync" title="No memberships found"
+            message="Subscribe clients to recurring plans to get started." actionLabel="New membership"
+            actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
         </td>
       </tr>
     </ng-template>
@@ -192,13 +188,9 @@
       </div>
     </ng-template>
     <ng-template #empty>
-      <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
-        <i class="pi pi-sync text-4xl text-surface-400"></i>
-        <p class="m-0 font-medium">No memberships yet</p>
-        <p class="text-surface-500 text-sm m-0">Subscribe clients to recurring plans to get started.</p>
-        <p-button label="New membership" icon="pi pi-plus" size="small" class="mt-2"
-          (onClick)="showCreateDialog.set(true)" />
-      </div>
+      <mh-list-empty-state icon="pi pi-sync" title="No memberships yet"
+        message="Subscribe clients to recurring plans to get started." actionLabel="New membership"
+        actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
     </ng-template>
   </p-dataview>
   @if (hasMore()) {

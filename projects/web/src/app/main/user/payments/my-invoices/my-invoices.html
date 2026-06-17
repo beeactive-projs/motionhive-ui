@@ -53,11 +53,8 @@
 
   <ng-template #emptymessage>
     <tr>
-      <td colspan="6" class="text-center py-8">
-        <div class="text-surface-500">
-          <i class="pi pi-file text-3xl mb-2"></i>
-          <p class="mt-2">No invoices yet</p>
-        </div>
+      <td colspan="6">
+        <mh-list-empty-state icon="pi pi-file" title="No invoices yet" />
       </td>
     </tr>
   </ng-template>

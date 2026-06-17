@@ -11,12 +11,14 @@
     <nav class="flex-1 overflow-auto px-3">
       @for (section of visibleSections(); track section.label) {
       @if (showModeToggle() && section.mode) {
-      <div class="mode-switch" role="tablist" aria-label="Workspace">
-        <button type="button" role="tab" class="mode-switch__btn" [class.is-active]="mode() === 'coach'"
-          [attr.aria-selected]="mode() === 'coach'" (click)="setMode('coach')">Coach</button>
-        <button type="button" role="tab" class="mode-switch__btn" [class.is-active]="mode() === 'train'"
-          [attr.aria-selected]="mode() === 'train'" (click)="setMode('train')">Train</button>
-      </div>
+      <mh-segmented
+        class="mode-seg"
+        variant="honey"
+        ariaLabel="Workspace"
+        [options]="modeOptions"
+        [value]="mode()"
+        (valueChange)="setMode($event!)"
+      />
       }
       @if (section.label && !(showModeToggle() && section.mode)) {
       <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider">

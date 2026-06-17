@@ -13,7 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
-import { FeedbackService, Logo, NavItem, NavMode, NavSection } from 'core';
+import { FeedbackService, Logo, NavItem, NavMode, NavSection, Segmented } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
@@ -34,6 +34,7 @@ import { InstallApp } from '../../_shared/components/install-app/install-app';
     NotificationBell,
     SearchModal,
     InstallApp,
+    Segmented,
   ],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',
@@ -56,6 +57,11 @@ export class SidenavLayoutComponent {
   /** Persisted sidebar mode; defaults to "coach" for instructors. */
   readonly mode = signal<NavMode>(this._loadMode());
 
+  readonly modeOptions = [
+    { value: 'coach', label: 'Coach' },
+    { value: 'train', label: 'Train' },
+  ];
+
   /** Toggle only appears when the rail has both a coach and a train section. */
   readonly showModeToggle = computed(
     () =>
@@ -70,8 +76,8 @@ export class SidenavLayoutComponent {
     return this.navSections().filter((s) => !s.mode || s.mode === m);
   });
 
-  setMode(mode: NavMode): void {
-    this.mode.set(mode);
+  setMode(mode: string): void {
+    this.mode.set(mode as NavMode);
     try {
       localStorage.setItem('mh-nav-mode', mode);
     } catch {

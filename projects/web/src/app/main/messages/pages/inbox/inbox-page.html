@@ -11,7 +11,7 @@
   member picker, wire role management, render SYSTEM events.
 -->
 <div class="mh-inbox">
-  <header class="mh-inbox__header">
+  <header class="mh-inbox__header" [class.mh-inbox__header--mobile-hidden]="hasActivePane()">
     <h1 class="mh-inbox__title">Messages</h1>
     @if (store.unreadTotal() > 0) {
       <span class="mh-inbox__unread-chip">{{ store.unreadTotal() }} unread</span>
@@ -35,7 +35,7 @@
     </button>
   </header>
 
-  <div class="mh-inbox__body">
+  <div class="mh-inbox__body" [class.has-active]="hasActivePane()">
     <aside class="mh-inbox__list-column">
       <mh-conversation-list />
     </aside>

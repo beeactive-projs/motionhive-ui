@@ -23,10 +23,7 @@
   @if (loading() && rows().length === 0) {
   <div class="mh-app__loading">Loading…</div>
   } @else if (rows().length === 0) {
-  <div class="mh-app__empty">
-    <i class="pi pi-inbox"></i>
-    <p>You're all caught up — no pending approvals.</p>
-  </div>
+  <mh-list-empty-state icon="pi pi-inbox" title="You're all caught up — no pending approvals." />
   } @else {
   <ul class="mh-app__rows">
     @for (i of rows(); track i.id) {

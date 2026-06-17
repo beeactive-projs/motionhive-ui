@@ -89,17 +89,10 @@
 
     <!-- Empty tree state -->
     @if (totalWorkouts() === 0) {
-    <section
-      class="flex flex-col items-center gap-3 rounded-xl border border-surface bg-(--p-content-background) p-8 text-center">
-      <div class="flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 text-2xl text-muted-color">
-        <i class="pi pi-calendar-plus"></i>
-      </div>
-      <h3 class="m-0 font-heading text-base font-semibold">No workouts yet</h3>
-      <p class="m-0 max-w-md text-sm leading-relaxed text-muted-color">
-        A program is a series of workouts grouped into weeks. Add your first workout to start building this plan.
-      </p>
-      <p-button label="Add workout" icon="pi pi-plus" severity="secondary" outlined (onClick)="openAddWorkout(0)" />
-    </section>
+    <mh-list-empty-state icon="pi pi-calendar-plus" title="No workouts yet"
+      message="A program is a series of workouts grouped into weeks. Add your first workout to start building this plan."
+      actionLabel="Add workout" actionIcon="pi pi-plus" actionSeverity="secondary" [actionOutlined]="true"
+      (action)="openAddWorkout(0)" />
     } @else {
     <!-- Weeks -->
     <div class="flex flex-col gap-5">

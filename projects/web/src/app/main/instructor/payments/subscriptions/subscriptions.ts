@@ -35,6 +35,7 @@ import {
 import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { CreateSubscriptionDialog } from '../../_dialogs/create-subscription-dialog/create-subscription-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-subscriptions',
@@ -52,6 +53,7 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
     DataView,
     CreateSubscriptionDialog,
     ListCard,
+    ListEmptyState,
     Menu,
   ],
   providers: [MessageService, ConfirmationService],

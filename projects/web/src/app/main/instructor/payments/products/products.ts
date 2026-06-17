@@ -35,6 +35,7 @@ import {
 import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { ProductFormDialog } from '../../_dialogs/product-form-dialog/product-form-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-products',
@@ -53,6 +54,7 @@ import { ListCard } from '../../../../_shared/components/list-card/list-card';
     DataView,
     ProductFormDialog,
     ListCard,
+    ListEmptyState,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './products.html',

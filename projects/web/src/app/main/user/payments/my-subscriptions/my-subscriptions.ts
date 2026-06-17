@@ -23,6 +23,7 @@ import {
   getSubscriptionStatusSeverity,
   type Subscription,
 } from 'core';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-my-subscriptions',
@@ -38,6 +39,7 @@ import {
     ConfirmDialogModule,
     CurrencyRonPipe,
     StatusLabelPipe,
+    ListEmptyState,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-subscriptions.html',

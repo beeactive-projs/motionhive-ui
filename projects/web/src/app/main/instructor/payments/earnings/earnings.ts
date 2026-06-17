@@ -25,6 +25,7 @@ import {
   type Payment,
   type PaymentStatus,
 } from 'core';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-earnings',
@@ -38,6 +39,7 @@ import {
     ToastModule,
     MessageModule,
     CurrencyRonPipe,
+    ListEmptyState,
   ],
   providers: [MessageService],
   templateUrl: './earnings.html',

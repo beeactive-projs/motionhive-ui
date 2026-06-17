@@ -123,9 +123,9 @@
   background: var(--surface-50, #fcfaf6);
 }
 
-// Mobile: stack to a single column. The chat-column hides on the
-// inbox route; on /messages/:id (added in F3) the list-column hides.
-// F2 introduces the conditional class — for F1 we just stack.
+// Mobile: one column at a time. The list owns the screen on /messages;
+// an open conversation (or compose) owns it on /messages/:id. `has-active`
+// is driven by the store (active conversation || compose mode).
 @media (max-width: 768px) {
   .mh-inbox__body {
     flex-direction: column;
@@ -134,6 +134,21 @@
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--line, rgba(15, 23, 42, 0.08));
+  }
+
+  // Show the list OR the conversation, never both stacked (the stacked
+  // layout made the whole page scroll and unpinned the chat header).
+  .mh-inbox__body.has-active .mh-inbox__list-column {
+    display: none;
+  }
+  .mh-inbox__body:not(.has-active) .mh-inbox__chat-column {
+    display: none;
+  }
+
+  // When the conversation/compose pane owns the screen the chat header is
+  // the header — drop the inbox title bar to reclaim that height.
+  .mh-inbox__header--mobile-hidden {
+    display: none;
   }
 }
 
