@@ -107,7 +107,11 @@ export class Main {
         ],
       },
       {
+        // Tagged `train` → folds into the Coach/Train sidebar toggle for
+        // instructors. Non-instructors have no `coach` section, so no toggle
+        // renders and this just shows as their normal nav.
         label: 'My training',
+        mode: 'train',
         items: [
           { label: 'My sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
           { label: 'My plans', route: '/user/plans', icon: 'pi pi-bookmark' },
@@ -120,6 +124,7 @@ export class Main {
     if (this.isInstructor()) {
       sections.push({
         label: 'Coaching',
+        mode: 'coach',
         items: [
           // Overview pulled from the rail — the current dashboard is mostly
           // placeholder/mock data. Route + component kept so it can come back

@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { Router } from '@angular/router';
-import { Avatar } from 'primeng/avatar';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { MessageService } from 'primeng/api';
@@ -53,7 +53,7 @@ interface StatusTab {
   imports: [
     DatePipe,
     NgTemplateOutlet,
-    Avatar,
+    HexAvatar,
     ButtonModule,
     Card,
     ListEmptyState,

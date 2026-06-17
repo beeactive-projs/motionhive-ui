@@ -82,11 +82,7 @@
           </div>
 
           <div class="flex items-center gap-2 text-xs text-muted-color">
-            @if (a.instructor?.avatarUrl) {
-            <p-avatar [image]="a.instructor!.avatarUrl!" shape="circle" size="normal" />
-            } @else {
-            <p-avatar [label]="instructorInitials(a)" shape="circle" size="normal" />
-            }
+            <mh-hex-avatar [user]="a.instructor" [size]="30" />
             <span class="truncate">From <span class="font-semibold text-surface-700 dark:text-surface-300">{{
                 instructorName(a) }}</span></span>
           </div>

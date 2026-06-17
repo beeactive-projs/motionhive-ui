@@ -15,6 +15,8 @@ import {
   BlogPost,
   BlogService,
   ClientService,
+  Hex,
+  HexTone,
   InstructorSearchResult,
   MyInstructor,
   ProfileService,
@@ -24,7 +26,6 @@ import {
   type BlogCategory,
   type MyProfile,
 } from 'core';
-import { Hex, HexTone } from '../../_shared/components/hex/hex';
 import { InviteFriendDialog } from './_dialogs/invite-friend-dialog/invite-friend-dialog';
 import { SuggestInstructorDialog } from './_dialogs/suggest-instructor-dialog/suggest-instructor-dialog';
 
@@ -51,10 +52,16 @@ interface CoachRow {
 const BLOG_LIMIT = 3;
 const COACHES_OWN_LIMIT = 2;
 const COACHES_SUGGESTED_LIMIT = 3;
-const COACH_TONES: HexTone[] = ['honey', 'teal', 'navy', 'coral'];
+const COACH_TONES: HexTone[] = ['amber', 'teal', 'navySolid', 'coral'];
 /** Blog articles live on the public marketing site, not in-app. */
 const MARKETING_BLOG_URL = 'https://www.motionhive.fit/blog';
-const CATEGORY_TONES: Record<BlogCategory, HexTone> = {
+/**
+ * Category accent keys — these drive the `[data-tone]` CSS on the journal
+ * chips/placeholders (home.scss), NOT the hex component. Kept independent of
+ * `HexTone` so the two can evolve separately.
+ */
+type CategoryTone = 'honey' | 'teal' | 'navy' | 'coral';
+const CATEGORY_TONES: Record<BlogCategory, CategoryTone> = {
   [BlogCategories.Guide]: 'honey',
   [BlogCategories.Nutrition]: 'teal',
   [BlogCategories.Science]: 'navy',
@@ -235,7 +242,7 @@ export class Home implements OnInit {
     this._router.navigate(['/discover'], { queryParams: { tab: 'coaches' } });
   }
 
-  categoryTone(cat: BlogCategory): HexTone {
+  categoryTone(cat: BlogCategory): CategoryTone {
     return CATEGORY_TONES[cat] ?? 'honey';
   }
 

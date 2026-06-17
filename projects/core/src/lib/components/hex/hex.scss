@@ -1,0 +1,62 @@
+:host {
+  display: inline-flex;
+  position: relative;
+  flex-shrink: 0;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.hx-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible; /* let the ring stroke breathe past the viewBox edge */
+  filter: var(--hx-shadow, none);
+}
+
+.hx-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hx-fg);
+  font-family: var(--font-heading, 'Poppins', ui-sans-serif, sans-serif);
+  font-weight: 600;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.hx-label {
+  font-family: var(--font-heading, 'Poppins', ui-sans-serif, sans-serif);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.hx-icon {
+  display: block;
+}
+
+.hx-status {
+  position: absolute;
+  right: 2%;
+  bottom: 6%;
+  width: 26%;
+  min-width: 8px;
+  max-width: 14px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 0.5px rgba(14, 27, 49, 0.06);
+}
+
+.hx-status--online {
+  background: var(--p-green-500, #10b981);
+}
+.hx-status--busy {
+  background: var(--color-primary-500, #f59e0b);
+}
+.hx-status--offline {
+  background: var(--p-surface-400, #94a3b8);
+}

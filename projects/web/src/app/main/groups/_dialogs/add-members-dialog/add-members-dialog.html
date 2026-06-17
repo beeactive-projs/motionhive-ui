@@ -29,7 +29,7 @@
       <tr [pSelectableRow]="client">
         <td><p-tableCheckbox [value]="client" /></td>
         <td>
-          <mh-user-info [user]="client.client" />
+          <mh-user-info [user]="client.client" [hex]="true" />
         </td>
         <td>{{ client.client?.email }}</td>
       </tr>

@@ -8,13 +8,12 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthStore, Group, GroupService, GroupsRefreshService, showApiError } from 'core';
+import { AuthStore, Group, GroupService, GroupsRefreshService, Hex, showApiError } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { GroupFormDialog } from './_dialogs/group-form-dialog/group-form-dialog';
-import { Avatar } from 'primeng/avatar';
 import { monogramFromName, paletteFor } from './_utils/group-palette.util';
 
 @Component({
@@ -27,7 +26,7 @@ import { monogramFromName, paletteFor } from './_utils/group-palette.util';
     SkeletonModule,
     ToastModule,
     GroupFormDialog,
-    Avatar,
+    Hex,
   ],
   providers: [MessageService],
   templateUrl: './groups.html',
@@ -52,14 +51,13 @@ export class GroupsLayout implements OnInit {
     return monogramFromName(group.name);
   }
 
-  avatarStyle(group: Group): Record<string, string> | null {
-    if (group.logoUrl) return null;
-    const palette = paletteFor(group.id);
-    return {
-      background: `linear-gradient(155deg, var(--p-${palette}-400), var(--p-${palette}-600))`,
-      color: `var(--p-${palette}-50)`,
-      fontWeight: '700',
-    };
+  /** Solid palette fill for the hex badge (gradient isn't valid SVG fill). */
+  badgeBg(group: Group): string {
+    return `var(--p-${paletteFor(group.id)}-500)`;
+  }
+
+  badgeFg(group: Group): string {
+    return `var(--p-${paletteFor(group.id)}-50)`;
   }
 
   ngOnInit(): void {

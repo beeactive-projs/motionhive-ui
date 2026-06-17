@@ -14,7 +14,7 @@ import {
   AccordionHeader,
   AccordionPanel,
 } from 'primeng/accordion';
-import { Avatar } from 'primeng/avatar';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -70,7 +70,7 @@ type WorkoutCta = 'start' | 'resume' | 'view' | 'none';
     AccordionPanel,
     AccordionHeader,
     AccordionContent,
-    Avatar,
+    HexAvatar,
     ButtonModule,
     Card,
     ConfirmDialog,

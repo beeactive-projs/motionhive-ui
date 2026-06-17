@@ -1,2 +1,6 @@
-<p-avatar [image]="image()" [label]="image() ? undefined : initials()" [size]="size()" [class]="styleClass()"
-  [shape]="shape()" />
+@if (circle()) {
+  <p-avatar [image]="image()" [label]="image() ? undefined : initials()" [size]="size()" [class]="styleClass()"
+    [shape]="shape()" />
+} @else {
+  <mh-hex-avatar [user]="user()" [size]="hexSize()" />
+}

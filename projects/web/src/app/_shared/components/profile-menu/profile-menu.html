@@ -1,13 +1,13 @@
 <p-button text rounded [ariaLabel]="'Open profile menu for ' + userName()" (onClick)="toggle($event)">
   <ng-template #icon>
-    <mh-avatar [user]="user()" />
+    <mh-avatar [user]="user()" [circle]="true" />
   </ng-template>
 </p-button>
 
 <p-popover #popover appendTo="body">
   <div class="min-w-52">
     <div class="flex items-center gap-3 py-1">
-      <mh-avatar [user]="user()" size="large" />
+      <mh-avatar [user]="user()" size="large" [circle]="true" />
       <div class="flex flex-col overflow-hidden">
         <span class="font-semibold text-sm truncate">{{ userName() }}</span>
         <span class="text-xs truncate text-muted-color">{{ user()?.email }}</span>

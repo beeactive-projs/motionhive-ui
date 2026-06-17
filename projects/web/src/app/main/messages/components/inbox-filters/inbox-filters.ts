@@ -1,16 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 /**
- * Inbox filter chip row. Four chips — All / Unread / Groups / Coaches.
+ * Inbox filter chip row.
  *
- * v1 implements All + Unread fully (counts computed from
- * `MessagingStore.conversations`). Groups + Coaches are kept for design
- * fidelity but disabled with a tooltip — Groups because group chats
- * don't exist in v1, Coaches because the BE doesn't categorize
- * conversations by relationship type yet.
- *
- * The disabled chips still render the count when relevant (Groups
- * always shows 0; Coaches isn't shown a count).
+ * v1 ships All + Unread (counts computed from
+ * `MessagingStore.conversations`). Groups + Coaches stay in the type union
+ * for forward-compat but are **not rendered** — group chats don't exist
+ * yet and the BE doesn't categorize conversations by relationship type, so
+ * they'd be permanently disabled. Re-add them to `chips()` once supported.
  */
 export type InboxFilter = 'all' | 'unread' | 'groups' | 'coaches';
 
@@ -117,26 +114,11 @@ export class InboxFilters {
   readonly filterChange = output<InboxFilter>();
 
   protected chips(): ChipConfig[] {
+    // Groups + Coaches are intentionally omitted until the BE supports
+    // group chats / relationship-type categorization — see class doc.
     return [
       { key: 'all', label: 'All', count: this.totalCount(), disabled: false },
       { key: 'unread', label: 'Unread', count: this.unreadCount(), disabled: false },
-      // v1: no group conversations exist yet, so the chip would always
-      // be 0 and click-no-op'd. Disabled until F-future.
-      {
-        key: 'groups',
-        label: 'Groups',
-        count: 0,
-        disabled: true,
-        disabledReason: 'Group chats coming soon',
-      },
-      // BE doesn't tag conversations by relationship type yet.
-      {
-        key: 'coaches',
-        label: 'Coaches',
-        count: null,
-        disabled: true,
-        disabledReason: 'Coming soon',
-      },
     ];
   }
 

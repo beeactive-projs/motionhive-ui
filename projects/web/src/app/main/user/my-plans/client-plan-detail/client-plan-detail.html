@@ -28,11 +28,7 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2 text-sm text-muted-color">
-        @if (a.instructor?.avatarUrl) {
-        <p-avatar [image]="a.instructor!.avatarUrl!" shape="circle" />
-        } @else {
-        <p-avatar [label]="instructorInitials()" shape="circle" />
-        }
+        <mh-hex-avatar [user]="a.instructor" [size]="32" />
         <span>From <span class="font-semibold text-surface-800 dark:text-surface-200">{{ instructorName() }}</span></span>
         <span class="opacity-40">·</span>
         <span class="tabular-nums">

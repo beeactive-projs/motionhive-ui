@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { Group, JoinPolicies, TagSeverity } from 'core';
+import { Group, Hex, JoinPolicies, TagSeverity } from 'core';
 import { MenuItem } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -10,7 +9,7 @@ import { GroupDetailContext } from '../../group-detail.context';
 
 @Component({
   selector: 'mh-group-hero',
-  imports: [AvatarModule, BreadcrumbModule, TagModule, Card, Button],
+  imports: [Hex, BreadcrumbModule, TagModule, Card, Button],
   templateUrl: './group-hero.html',
   styleUrl: './group-hero.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -6,8 +6,17 @@
     <ng-template #header>
       <div class="flex items-start gap-3.5 p-[1.125rem] pb-0" [class.pr-2]="mode() === 'manage'">
 
-        <p-avatar [image]="group().logoUrl ?? undefined" [label]="group().logoUrl ? undefined : monogram" shape="square"
-          size="large" class="gp-avatar" [style]="avatarStyle" />
+        <mh-hex
+          orientation="pointy"
+          [size]="60"
+          [round]="7"
+          [img]="group().logoUrl ?? null"
+          [label]="group().logoUrl ? null : monogram"
+          [bg]="badgeBg"
+          [fg]="badgeFg"
+          [sheen]="true"
+          [shadow]="true"
+        />
 
         <div class="min-w-0 flex-1">
           <a class="gp-name-link text-base font-semibold leading-tight truncate block" [routerLink]="cardLink">

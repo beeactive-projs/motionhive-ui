@@ -15,15 +15,8 @@
   text-align: center;
 }
 
-.mh-empty__icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: var(--honey-100, #fef3c7);
-  color: var(--honey-800, #92400e);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.mh-empty__hex {
+  margin-bottom: 4px;
 }
 
 .mh-empty__title {
@@ -42,10 +35,6 @@
 
 // ── Dark mode ────────────────────────────────────────────────────
 :host-context(.dark) {
-  .mh-empty__icon {
-    background: rgba(245, 158, 11, 0.16);
-    color: #fbbf24;
-  }
   .mh-empty__title {
     color: var(--p-surface-50, #f1f5f9);
   }

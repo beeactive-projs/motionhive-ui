@@ -99,13 +99,7 @@
 
       @if (inst.instructor) {
       <div class="mh-show__instructor">
-        @if (inst.instructor.avatarUrl) {
-        <img [src]="inst.instructor.avatarUrl" alt="" class="mh-show__avatar" />
-        } @else {
-        <span class="mh-show__avatar mh-show__avatar--ph">
-          {{ (inst?.instructor?.firstName?.[0] ?? '') + (inst?.instructor?.lastName?.[0] ?? '') }}
-        </span>
-        }
+        <mh-hex-avatar [user]="inst.instructor" [size]="40" />
         <div>
           <small>Coach</small>
           <strong>{{ inst.instructor.firstName }} {{ inst.instructor.lastName }}</strong>

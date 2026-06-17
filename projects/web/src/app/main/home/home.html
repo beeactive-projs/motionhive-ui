@@ -82,20 +82,15 @@
                 <p class="jr-row__ex">{{ p.excerpt }}</p>
                 <div class="jr-row__foot">
                   <div class="jr-author">
-                    @if (p.authorAvatarUrl) {
-                      <img
-                        class="jr-author__avatar"
-                        [src]="p.authorAvatarUrl"
-                        [alt]="p.authorName"
-                        width="22"
-                        height="22"
-                        loading="lazy"
-                      />
-                    } @else {
-                      <mh-hex tone="honey-soft" size="xs">
-                        <span class="jr-author__init">{{ p.authorInitials }}</span>
-                      </mh-hex>
-                    }
+                    <mh-hex
+                      tone="amberSoft"
+                      [size]="26"
+                      [round]="5"
+                      orientation="pointy"
+                      [img]="p.authorAvatarUrl || null"
+                    >
+                      <span class="jr-author__init">{{ p.authorInitials }}</span>
+                    </mh-hex>
                     <span class="jr-author__name">{{ p.authorName }}</span>
                     <span class="jr-author__dot"></span>
                     <span class="jr-author__time">{{ p.readTime }} min read</span>
@@ -140,7 +135,14 @@
                 (click)="s.go()"
                 [disabled]="s.done"
               >
-                <mh-hex [tone]="s.done ? 'teal' : 'honey'" size="md">
+                <mh-hex
+                  [tone]="s.done ? 'teal' : 'amber'"
+                  [size]="46"
+                  [round]="7"
+                  orientation="pointy"
+                  [sheen]="true"
+                  [shadow]="true"
+                >
                   @if (s.done) {
                     <i class="pi pi-check"></i>
                   } @else {
@@ -191,20 +193,17 @@
             @let rows = hasOwnCoaches() ? myCoachRows() : suggestedCoachRows();
             @for (c of rows; track c.name) {
               <button type="button" class="ed-coachrow" (click)="c.go()">
-                @if (c.avatarUrl) {
-                  <img
-                    class="ed-coachrow__avatar"
-                    [src]="c.avatarUrl"
-                    [alt]="c.name"
-                    width="40"
-                    height="40"
-                    loading="lazy"
-                  />
-                } @else {
-                  <mh-hex [tone]="c.tone" size="md">
-                    <span class="ed-coachrow__init">{{ c.initials }}</span>
-                  </mh-hex>
-                }
+                <mh-hex
+                  [tone]="c.tone"
+                  [size]="46"
+                  [round]="7"
+                  orientation="pointy"
+                  [img]="c.avatarUrl || null"
+                  [sheen]="true"
+                  [shadow]="true"
+                >
+                  <span class="ed-coachrow__init">{{ c.initials }}</span>
+                </mh-hex>
                 <div class="ed-coachrow__meta">
                   <h4>{{ c.name }}</h4>
                   <p>{{ c.tag }}</p>

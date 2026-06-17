@@ -13,7 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
-import { FeedbackService, Logo, NavItem, NavSection } from 'core';
+import { FeedbackService, Logo, NavItem, NavMode, NavSection } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
 import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
@@ -51,6 +51,41 @@ export class SidenavLayoutComponent {
   readonly brandName = input('MotionHive');
 
   readonly stripeDashboardClick = output<void>();
+
+  // ── Coach / Train workspace toggle ───────────────────────────────
+  /** Persisted sidebar mode; defaults to "coach" for instructors. */
+  readonly mode = signal<NavMode>(this._loadMode());
+
+  /** Toggle only appears when the rail has both a coach and a train section. */
+  readonly showModeToggle = computed(
+    () =>
+      this.navSections().some((s) => s.mode === 'coach') &&
+      this.navSections().some((s) => s.mode === 'train'),
+  );
+
+  /** Untagged sections always show; tagged ones only in the active mode. */
+  readonly visibleSections = computed(() => {
+    if (!this.showModeToggle()) return this.navSections();
+    const m = this.mode();
+    return this.navSections().filter((s) => !s.mode || s.mode === m);
+  });
+
+  setMode(mode: NavMode): void {
+    this.mode.set(mode);
+    try {
+      localStorage.setItem('mh-nav-mode', mode);
+    } catch {
+      /* storage unavailable (private mode) — in-memory only */
+    }
+  }
+
+  private _loadMode(): NavMode {
+    try {
+      return localStorage.getItem('mh-nav-mode') === 'train' ? 'train' : 'coach';
+    } catch {
+      return 'coach';
+    }
+  }
 
   private readonly _isDesktop = signal(this._lgQuery.matches);
 

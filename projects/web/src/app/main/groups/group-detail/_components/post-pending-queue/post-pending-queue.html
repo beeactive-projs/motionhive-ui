@@ -25,7 +25,7 @@
   <ul class="flex flex-col gap-3 list-none p-0 m-0">
     @for (post of pending(); track post.id) {
     <li class="flex items-start gap-3 rounded-md border border-surface-200 dark:border-surface-700 p-3">
-      <mh-avatar [user]="post.author" styleClass="bg-primary-100 text-primary-700" />
+      <mh-hex-avatar [user]="post.author" [size]="40" />
 
       <div class="flex-1 min-w-0">
         <div class="flex items-center justify-between gap-2">

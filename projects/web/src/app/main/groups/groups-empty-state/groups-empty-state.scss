@@ -7,14 +7,3 @@
 ::ng-deep p-card.gp-empty .p-card-body {
   padding: 1rem;
 }
-
-.gp-empty-art {
-  width: 72px;
-  height: 82px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: linear-gradient(155deg, var(--p-primary-300), var(--p-primary-500));
-  color: var(--p-primary-50);
-}

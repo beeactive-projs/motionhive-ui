@@ -3,13 +3,16 @@
 <p-card class="relative shadow-md">
   <div class="honeycomb-bg"></div>
   <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-    @if (g.logoUrl) {
-    <p-avatar [image]="g.logoUrl" shape="circle" size="xlarge"
-      class="bg-primary-500 border-4 border-double border-surface-100/60 p-10" />
-    } @else {
-    <p-avatar [label]="avatarLabel()" shape="circle" size="xlarge"
-      class="bg-primary-500 border-4 border-double border-surface-100/60 p-10" />
-    }
+    <mh-hex
+      orientation="pointy"
+      [size]="92"
+      [round]="9"
+      [img]="g.logoUrl ?? null"
+      [label]="g.logoUrl ? null : avatarLabel()"
+      tone="amber"
+      [sheen]="true"
+      [shadow]="true"
+    />
 
     <div class="flex flex-col gap-1.5 pb-1 flex-1 min-w-0">
       <div class="">

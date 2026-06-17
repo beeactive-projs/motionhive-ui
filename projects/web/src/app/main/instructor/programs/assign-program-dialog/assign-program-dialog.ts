@@ -19,6 +19,7 @@ import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
 import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 import {
   AssignProgramPayload,
@@ -59,6 +60,7 @@ type ClientOption = SelectItem<string> & {
     Skeleton,
     Textarea,
     Toast,
+    HexAvatar,
   ],
   providers: [MessageService],
   templateUrl: './assign-program-dialog.html',

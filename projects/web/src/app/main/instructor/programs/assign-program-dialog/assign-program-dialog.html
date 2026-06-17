@@ -36,15 +36,12 @@
         [appendTo]="'body'" class="w-full">
         <ng-template let-c #item>
           <div class="flex items-center gap-2.5">
-            @if (c.avatarUrl) {
-            <img [src]="c.avatarUrl" alt=""
-              class="size-8 shrink-0 rounded-full border border-surface-200 object-cover dark:border-surface-700" />
-            } @else {
-            <div
-              class="flex size-8 shrink-0 items-center justify-center rounded-full border border-surface-200 bg-surface-50 text-surface-400 dark:border-surface-700 dark:bg-surface-800">
-              <i class="pi pi-user text-sm"></i>
-            </div>
-            }
+            <mh-hex-avatar
+              [imageUrl]="c.avatarUrl"
+              [initials]="(c.label ?? '?').charAt(0)"
+              [userId]="c.label"
+              [size]="30"
+            />
             <div class="flex min-w-0 flex-col">
               <span class="text-sm font-medium leading-tight text-surface-900 dark:text-surface-100">{{ c.label
                 }}</span>

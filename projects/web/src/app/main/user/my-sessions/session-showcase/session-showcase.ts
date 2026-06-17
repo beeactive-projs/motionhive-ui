@@ -29,6 +29,7 @@ import {
 } from 'core';
 import { BookDialog } from './_dialogs/book-dialog/book-dialog';
 import { BookingConfirmedDialog } from './_dialogs/booking-confirmed-dialog/booking-confirmed-dialog';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -56,6 +57,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     CapacityBar,
     BookDialog,
     BookingConfirmedDialog,
+    HexAvatar,
   ],
   providers: [MessageService],
   templateUrl: './session-showcase.html',

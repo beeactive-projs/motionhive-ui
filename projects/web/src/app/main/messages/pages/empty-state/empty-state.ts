@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Hex } from 'core';
 
 /**
  * EmptyState — shown in the right pane when no conversation is selected
@@ -9,7 +10,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
  */
 @Component({
   selector: 'mh-messages-empty-state',
-  imports: [],
+  imports: [Hex],
   templateUrl: './empty-state.html',
   styleUrl: './empty-state.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

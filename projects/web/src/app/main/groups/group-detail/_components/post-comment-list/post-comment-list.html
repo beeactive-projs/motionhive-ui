@@ -35,7 +35,7 @@
 
       <!-- Top-level comment -->
       <div class="flex items-start gap-2">
-        <mh-avatar [user]="comment.author" styleClass="bg-primary-100 text-primary-700" />
+        <mh-hex-avatar [user]="comment.author" [size]="32" />
         <div class="flex-1 min-w-0">
           <div class="rounded-lg bg-surface-100 dark:bg-surface-800 px-3 py-2">
             <div class="flex items-center justify-between gap-2">
@@ -86,7 +86,7 @@
           <div class="mt-2 flex flex-col gap-2 pl-4 border-l-2 border-surface-200 dark:border-surface-700">
             @for (reply of comment.replies; track trackById($index, reply)) {
             <div class="flex items-start gap-2">
-              <mh-avatar [user]="reply.author" styleClass="bg-primary-100 text-primary-700" />
+              <mh-hex-avatar [user]="reply.author" [size]="32" />
               <div class="flex-1 min-w-0">
                 <div class="rounded-lg bg-surface-100 dark:bg-surface-800 px-3 py-2">
                   <div class="flex items-center justify-between gap-2">

@@ -27,7 +27,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { GroupDetailContext } from '../../group-detail.context';
 import { EmptyMembers } from '../../_components/empty-members/empty-members';
-import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 import { UserInfo } from '../../../../../_shared/components/user-info/user-info';
 import { Badge } from "primeng/badge";
 
@@ -36,7 +36,7 @@ import { Badge } from "primeng/badge";
   imports: [
     DatePipe,
     FormsModule,
-    Avatar,
+    HexAvatar,
     UserInfo,
     Button,
     InputText,

@@ -1,8 +1,15 @@
 <p-card class="gp-empty shadow-md">
   <div class="text-center">
-    <div class="gp-empty-art mx-auto mb-4">
-      <i class="pi pi-users text-2xl"></i>
-    </div>
+    <mh-hex
+      class="mx-auto mb-4 block w-fit"
+      orientation="pointy"
+      tone="amber"
+      icon="users"
+      [size]="80"
+      [round]="9"
+      [sheen]="true"
+      [shadow]="true"
+    />
 
     @if (variant() === 'manage') {
       <h3 class="text-lg font-bold">
