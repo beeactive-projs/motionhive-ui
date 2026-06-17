@@ -63,6 +63,13 @@ export type InboxFilter = 'all' | 'unread' | 'groups' | 'coaches';
 const AUTO_LOAD_DEDUP_WINDOW_MS = 5_000;
 
 /**
+ * How many messages to fetch per page — both the first load and each
+ * scroll-up "load earlier". Kept small so the first paint is fast on mobile;
+ * history streams in a page at a time as the user scrolls up.
+ */
+const MESSAGE_PAGE_SIZE = 25;
+
+/**
  * Default fallback when a 429 response doesn't include `retryAfter`
  * (it usually does, see MessagingRateLimitService on the BE).
  */
@@ -597,7 +604,7 @@ export class MessagingStore {
     this.patchMessages(conversationId, { loading: true });
 
     this._api
-      .listMessages(conversationId, { limit: 50 })
+      .listMessages(conversationId, { limit: MESSAGE_PAGE_SIZE })
       .pipe(
         tap((page) => {
           // The BE returns newest-first. We store oldest-first so the
@@ -872,7 +879,7 @@ export class MessagingStore {
     this.patchMessages(conversationId, { loading: true });
 
     this._api
-      .listMessages(conversationId, { before: state.nextBefore, limit: 50 })
+      .listMessages(conversationId, { before: state.nextBefore, limit: MESSAGE_PAGE_SIZE })
       .pipe(
         tap((page) => {
           const oldestFirst = [...page.items].reverse();

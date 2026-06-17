@@ -9,6 +9,9 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  // Contain scrolling INSIDE the inbox — only the message thread scrolls, so
+  // the chat header + composer stay pinned and the page itself never scrolls.
+  overflow: hidden;
   background: var(--surface-50, #fcfaf6);
 }
 
@@ -143,6 +146,27 @@
   }
   .mh-inbox__body:not(.has-active) .mh-inbox__chat-column {
     display: none;
+  }
+
+  // Nice list → conversation transition: the conversation slides in from
+  // the right when opened. (Back to the list re-renders the list instantly.)
+  .mh-inbox__body.has-active .mh-inbox__chat-column {
+    animation: mh-pane-in 0.22s ease;
+  }
+  @keyframes mh-pane-in {
+    from {
+      transform: translateX(7%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mh-inbox__body.has-active .mh-inbox__chat-column {
+      animation: none;
+    }
   }
 
   // When the conversation/compose pane owns the screen the chat header is
