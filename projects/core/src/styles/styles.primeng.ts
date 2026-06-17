@@ -58,8 +58,28 @@ export const MotionHiveLara = definePreset(Lara, {
     },
     button: {
       root: {
+        // Action System §4 — one radius rule: 8px soft-rect for every button,
+        // every size. (Pills are reserved for toggles/segmented; see tabs.)
+        borderRadius: '8px',
+        // Compact-by-default size scale (≈36px default · 30px sm · 44px lg).
+        // "size=small" was used 324× — proof the base was too big — so the
+        // baseline IS the compact size now and that attribute mostly vanishes.
+        paddingX: '0.875rem',
+        paddingY: '0.5rem',
+        gap: '0.5rem',
         label: {
-          fontWeight: '500',
+          // Action System — slightly heavier label so roles read at a glance.
+          fontWeight: '600',
+        },
+        sm: {
+          fontSize: '0.8125rem',
+          paddingX: '0.6875rem',
+          paddingY: '0.375rem',
+        },
+        lg: {
+          fontSize: '0.9375rem',
+          paddingX: '1.375rem',
+          paddingY: '0.6875rem',
         },
       },
       colorScheme: {
