@@ -13,6 +13,7 @@ import {
   EarningsService,
   StripeOnboardingService,
   StripeOnboardingStore,
+  injectIsTabletDown,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
@@ -71,6 +72,9 @@ export class Payments {
   private readonly _messageService = inject(MessageService);
 
   private readonly _reloadSummary$ = new Subject<void>();
+
+  /** Tablet or smaller — the "compact" surface (smaller copy). */
+  protected readonly isTabletDown = injectIsTabletDown();
 
   readonly Tabs = PaymentTabs;
   readonly dashboardLoading = signal(false);

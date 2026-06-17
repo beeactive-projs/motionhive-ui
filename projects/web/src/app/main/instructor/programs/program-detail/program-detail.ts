@@ -218,8 +218,7 @@ export class ProgramDetail implements OnInit {
     if (!p) return;
     this._confirmationService.confirm({
       header: 'Delete workout?',
-      message: `"${workout.name}" and its exercises will be removed from this program. Client copies of already-assigned programs keep their data.`,
-      icon: 'pi pi-exclamation-triangle',
+      message: `<strong>${workout.name}</strong> and its exercises will be removed from this program.<br /> Client copies of already-assigned programs keep their data.`,
       acceptLabel: 'Delete',
       acceptButtonProps: { severity: 'danger' },
       rejectLabel: 'Cancel',
@@ -273,8 +272,7 @@ export class ProgramDetail implements OnInit {
     const name = ex.exercise?.name ?? 'this exercise';
     this._confirmationService.confirm({
       header: 'Remove exercise?',
-      message: `Remove "${name}" and its prescribed sets from ${workout.name}? Client copies of already-assigned programs keep their data.`,
-      icon: 'pi pi-exclamation-triangle',
+      message: `Remove <strong>${name}</strong> and its prescribed sets from ${workout.name}?<br /> Client copies of already-assigned programs keep their data.`,
       acceptLabel: 'Remove',
       acceptButtonProps: { severity: 'danger' },
       rejectLabel: 'Cancel',
@@ -409,8 +407,7 @@ export class ProgramDetail implements OnInit {
     if (!p) return;
     this._confirmationService.confirm({
       header: 'Delete program?',
-      message: `"${p.name}" will be removed from your library. Existing client assignments keep their copy, but you won't be able to assign it to new clients.`,
-      icon: 'pi pi-exclamation-triangle',
+      message: `<strong>${p.name}</strong> will be removed from your library.<br /> Existing client assignments keep their copy, but you won't be able to assign it to new clients.`,
       acceptLabel: 'Delete',
       acceptButtonProps: { severity: 'danger' },
       rejectLabel: 'Cancel',

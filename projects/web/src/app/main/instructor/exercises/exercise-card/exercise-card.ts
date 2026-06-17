@@ -1,18 +1,17 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
+import { Card } from 'primeng/card';
+import { Tag } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
+  EXERCISE_EQUIPMENT_TAG_CLASS,
   Exercise,
-  ExerciseLevel,
   ExerciseSource,
   ExerciseVisibility,
+  exerciseLevelTag,
+  exerciseMuscleTagClass,
+  MuscleRole,
 } from 'core';
 
 /**
@@ -30,7 +29,7 @@ import {
 @Component({
   selector: 'mh-exercise-card',
   standalone: true,
-  imports: [TooltipModule, TitleCasePipe],
+  imports: [TooltipModule, TitleCasePipe, Tag, Card],
   templateUrl: './exercise-card.html',
   styleUrl: './exercise-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,15 +42,11 @@ export class ExerciseCard {
   readonly select = output<Exercise>();
 
   readonly primaryMuscle = computed(() => {
-    const role = this.exercise().muscleRoles?.find(
-      (m) => m.role === 'PRIMARY',
-    );
+    const role = this.exercise().muscleRoles?.find((m) => m.role === 'PRIMARY');
     return role?.muscle?.commonName ?? null;
   });
 
-  readonly leadEquipment = computed(
-    () => this.exercise().equipment?.[0]?.name ?? null,
-  );
+  readonly leadEquipment = computed(() => this.exercise().equipment?.[0]?.name ?? null);
 
   readonly authorName = computed(() => {
     const owner = this.exercise().owner;
@@ -77,16 +72,12 @@ export class ExerciseCard {
     return null;
   });
 
-  readonly levelLabel = computed(() => {
-    switch (this.exercise().level) {
-      case ExerciseLevel.Beginner:
-        return { text: 'Beginner', icon: 'pi-angle-down', tone: 'beg' };
-      case ExerciseLevel.Intermediate:
-        return { text: 'Intermediate', icon: 'pi-equals', tone: 'int' };
-      case ExerciseLevel.Advanced:
-        return { text: 'Advanced', icon: 'pi-angle-double-up', tone: 'adv' };
-    }
-  });
+  /** Difficulty tag (label + ramped colour) from the shared palette. */
+  readonly levelTag = computed(() => exerciseLevelTag(this.exercise().level));
+
+  /** Shared tag-palette classes, exposed for the template. */
+  readonly primaryMuscleClass = exerciseMuscleTagClass(MuscleRole.Primary);
+  readonly equipmentClass = EXERCISE_EQUIPMENT_TAG_CLASS;
 
   onClick(): void {
     this.select.emit(this.exercise());

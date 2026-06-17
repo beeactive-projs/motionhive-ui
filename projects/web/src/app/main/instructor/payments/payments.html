@@ -2,18 +2,22 @@
 
 <div class="h-full flex flex-col gap-5">
 
-  <!-- Header -->
+  <!-- Header · shared across desktop + mobile -->
   <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-    <div class="flex flex-col gap-1">
-      <div class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Payments</div>
-      <div class="text-xs md:text-sm text-muted-color">
-        Invoices, memberships, and pricing.
-      </div>
+    <div class="space-y-1">
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Payments</h1>
+      @if (isTabletDown()) {
+      <p class="text-xs text-surface-700 dark:text-surface-400">Invoices, memberships, and pricing.</p>
+      } @else {
+      <p class="text-sm text-surface-700 dark:text-surface-400">Issue invoices, manage memberships, and set the pricing
+        your clients pay.</p>
+      }
     </div>
-    <div class="flex gap-3">
+    <div class="flex gap-3 shrink-0">
       @if (onboardingStatusLoading()){
-      <p-skeleton width="7.5rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
-      <p-skeleton width="8rem" height="2rem" class="hidden sm:inline-flex rounded-md" />
+      <p-skeleton width="9rem" [height]="isTabletDown() ? '2.25rem' : '2.5rem'" class="rounded-md" />
+      <p-skeleton width="9rem" [height]="isTabletDown() ? '2.25rem' : '2.5rem'"
+        class="hidden sm:inline-flex rounded-md" />
       } @else {
       <p-button [label]="
           !hasStripeAccount()
@@ -27,12 +31,12 @@
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        " [severity]="needsOnboardingFinish() ? 'warn' : hasStripeAccount() ? 'contrast' : 'primary'"
-        [outlined]="hasStripeAccount() && !needsOnboardingFinish()" size="small" [loading]="dashboardLoading()"
-        (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
+        " [severity]="needsOnboardingFinish() ? 'warn' : hasStripeAccount() ? 'secondary' : 'primary'"
+        [outlined]="hasStripeAccount() && !needsOnboardingFinish()" [size]="isTabletDown() ? 'small' : undefined"
+        [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
       @if(stripeOnboarded()) {
-      <p-button label="Create invoice" icon="pi pi-plus" size="small" [disabled]="!stripeOnboarded()"
-        pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()"
+      <p-button label="Create invoice" icon="pi pi-plus" [size]="isTabletDown() ? 'small' : undefined"
+        [disabled]="!stripeOnboarded()" pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()"
         (onClick)="showCreateDialog.set(true)" fluid class="w-1/2 sm:w-auto" />
       }
       }

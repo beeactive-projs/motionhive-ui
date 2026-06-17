@@ -204,6 +204,7 @@
           }
           @if (!d.isEmailVerified) {
             <p-button label="Force verify" severity="secondary" size="small" (onClick)="forceVerify()" />
+            <p-button label="Resend email" severity="secondary" [text]="true" size="small" (onClick)="resendVerification()" />
           }
           @if (d.deletedAt && isSuperAdmin()) {
             <p-button label="Restore" severity="success" size="small" (onClick)="restore()" />

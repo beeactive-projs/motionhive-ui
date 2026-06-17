@@ -1,297 +1,258 @@
-<div class="home">
-  <!-- 1. Founding banner — hero -->
-  <section class="hero">
-    <div class="hero__honeycomb" aria-hidden="true"></div>
+<div class="hp hp--editorial">
 
-    <div class="hero__brand" aria-hidden="true">
-      <div class="hero__brand-hex"></div>
-      <img class="hero__brand-mark" src="svg/logo-honey.svg" alt="" />
-    </div>
+  <!-- Resume tile — only when there's an in-progress workout -->
+  @if (hasResume() && resume(); as r) {
+    <button type="button" class="resume" (click)="resumeWorkout()">
+      <span class="resume__icon">
+        <i class="pi pi-play-circle"></i>
+      </span>
+      <span class="resume__text">
+        <span class="resume__lbl">Pick up where you left off</span>
+        <span class="resume__name">{{ r.name }}</span>
+      </span>
+      <span class="resume__go">Resume →</span>
+    </button>
+  }
 
-    <div class="hero__content">
-      <p class="hero__eyebrow">
-        <span class="hero__dot"></span> Founding member
-      </p>
-      <h1 class="hero__title">
-        Welcome to the start of MotionHive, {{ firstName() }}.
+  <!-- Hero -->
+  <section class="hp-hero hp-hero--compact">
+    <div class="hp-hero__honey" aria-hidden="true"></div>
+    <div class="hp-hero__content">
+      <h1 class="hp-hero__title">
+        Good to see you, <span>{{ firstName() }}.</span>
       </h1>
-      <p class="hero__body">
-        We're brand new — a few instructors, a handful of sessions, and a community that's just
-        starting to form. The hive grows with everyone who joins.
+      <p class="hp-hero__body">
+        A few coaches, a growing set of sessions, and a community just
+        finding its feet. Here's a calm place to settle in and pick up
+        where you left off.
       </p>
-      <div class="hero__actions">
-        <p-button
-          label="Invite a friend"
-          icon="pi pi-user-plus"
-          severity="warn"
-          (onClick)="onInviteFriend()"
-        />
-        <p-button
-          label="Read founders' note"
-          icon="pi pi-arrow-right"
-          iconPos="right"
-          text
-          severity="warn"
-          (onClick)="onReadFoundersNote()"
-        />
-      </div>
     </div>
   </section>
 
-  <!-- 2. This week's buzz — moved up so the page has a pulse straight after the hero -->
-  <section class="home-section">
-    <mh-section-header
-      eyebrow="This week"
-      title="What's happening in the hive"
-      subtitle="Fresh moves from the platform — every join, every session, every milestone."
-    />
-    <!-- TODO: replace with a real recent-activity stream once the notification module ships. -->
-    <ul class="buzz-list">
-      @for (b of buzz(); track b.text; let i = $index) {
-        <li class="buzz-list__item">
-          <mh-hex [tone]="b.tone" size="md">
-            <i class="pi" [class.pi-bolt]="i % 2 === 0" [class.pi-star]="i % 2 === 1"></i>
-          </mh-hex>
-          <span class="buzz-list__text">{{ b.text }}</span>
-        </li>
-      }
-    </ul>
-  </section>
+  <!-- Two-column body -->
+  <div class="ed-grid">
 
-  <!-- 3. Instructors carousel -->
-  <section class="home-section">
-    <mh-section-header
-      eyebrow="Coaches"
-      title="Meet the coaches building MotionHive"
-      [subtitle]="hasInstructorsCarousel() ? 'Swipe through the people teaching here.' : 'They\'re on the way — be one of the first to follow.'"
-    />
-
-    @if (instructorsLoading()) {
-      <div class="loading-row">
-        <p-progressspinner class="w-8! h-8!" strokeWidth="3" />
-      </div>
-    } @else if (!hasInstructorsCarousel()) {
-      <article class="growth-card">
-        <mh-hex tone="honey-soft" size="xl"><i class="pi pi-users"></i></mh-hex>
-        <div class="growth-card__text">
-          <h3 class="growth-card__title">
-            @if (instructors().length === 0) {
-              We're picking the first instructors right now
-            } @else {
-              The hive is growing — slowly, on purpose
-            }
-          </h3>
-          <p class="growth-card__body">
-            Every coach here is someone we've trained with. Know one we should reach out to? Send
-            them our way.
-          </p>
+    <!-- Main: journal -->
+    <section class="ed-main">
+      <header class="hp-sechead">
+        <div>
+          <p class="hp-eyebrow">From the journal</p>
+          <h2 class="hp-title">Reads from the hive</h2>
         </div>
-        <div class="growth-card__actions">
-          <p-button
-            label="Suggest a coach"
-            icon="pi pi-user-plus"
-            severity="warn"
-            (onClick)="onSuggestSomeone()"
-          />
-        </div>
-      </article>
-    } @else {
-      <p-carousel
-        [value]="instructors()"
-        [numVisible]="4"
-        [numScroll]="1"
-        [responsiveOptions]="carouselResponsive"
-        [showIndicators]="false"
-        [circular]="true"
-        [autoplayInterval]="autoplayInterval"
-        class="hive-carousel"
-      >
-        <ng-template let-ins #item>
-          <div class="hive-carousel__cell">
-            <mh-instructor-card [instructor]="ins" />
-          </div>
-        </ng-template>
-      </p-carousel>
-    }
-  </section>
-
-  <!-- 4. Groups carousel -->
-  <section class="home-section">
-    <mh-section-header
-      eyebrow="Groups"
-      title="Fresh from the hive"
-      [subtitle]="hasGroupsCarousel() ? (isInstructor() ? 'The groups you run.' : 'Groups you\'re part of.') : 'When we hit two groups, they\'ll show up here.'"
-    />
-
-    @if (groupsLoading()) {
-      <div class="loading-row">
-        <p-progressspinner class="w-8! h-8!" strokeWidth="3" />
-      </div>
-    } @else if (!hasGroupsCarousel()) {
-      <article class="growth-card">
-        <mh-hex tone="teal-soft" size="xl"><i class="pi pi-sitemap"></i></mh-hex>
-        <div class="growth-card__text">
-          <h3 class="growth-card__title">
-            @if (groups().length === 0) {
-              No groups yet — but the first ones are forming
-            } @else {
-              One group so far. Two and it's a row.
-            }
-          </h3>
-          <p class="growth-card__body">
-            Groups start because two people want one to exist. Tell us what you'd train for and
-            we'll help spin it up.
-          </p>
-        </div>
-        <div class="growth-card__actions">
-          <p-button
-            label="Suggest a group"
-            icon="pi pi-plus"
-            severity="warn"
-            (onClick)="onSuggestGroup()"
-          />
-        </div>
-      </article>
-    } @else {
-      <p-carousel
-        [value]="groups()"
-        [numVisible]="4"
-        [numScroll]="1"
-        [responsiveOptions]="carouselResponsive"
-        [showIndicators]="false"
-        [circular]="true"
-        [autoplayInterval]="autoplayInterval"
-        class="hive-carousel"
-      >
-        <ng-template let-g #item>
-          <div class="hive-carousel__cell">
-            <mh-group-card
-              [group]="g"
-              [joined]="!isInstructor()"
-              (action)="onGroupAction($event)"
-            />
-          </div>
-        </ng-template>
-      </p-carousel>
-    }
-  </section>
-
-  <!-- 4b. Blog carousel -->
-  <section class="home-section">
-    <mh-section-header
-      eyebrow="From the journal"
-      title="Reads from the hive"
-      [subtitle]="hasPostsCarousel() ? 'Training notes, founder updates, and stories from the platform.' : 'Articles are coming — we\'re writing the first ones now.'"
-      actionLabel="Read all"
-      (actionClick)="onReadAllPosts()"
-    />
-
-    @if (postsLoading()) {
-      <div class="loading-row">
-        <p-progressspinner class="w-8! h-8!" strokeWidth="3" />
-      </div>
-    } @else if (!hasPostsCarousel()) {
-      <article class="growth-card">
-        <mh-hex tone="navy-soft" size="xl"><i class="pi pi-book"></i></mh-hex>
-        <div class="growth-card__text">
-          <h3 class="growth-card__title">No articles published yet</h3>
-          <p class="growth-card__body">
-            We're working on the first wave — training tips, founder notes, and stories from
-            instructors. Check the journal soon.
-          </p>
-        </div>
-        <div class="growth-card__actions">
-          <p-button
-            label="Visit the journal"
-            icon="pi pi-external-link"
-            iconPos="right"
-            severity="warn"
-            (onClick)="onReadAllPosts()"
-          />
-        </div>
-      </article>
-    } @else {
-      <p-carousel
-        [value]="posts()"
-        [numVisible]="3"
-        [numScroll]="1"
-        [responsiveOptions]="carouselResponsive"
-        [showIndicators]="false"
-        [circular]="true"
-        [autoplayInterval]="autoplayInterval"
-        class="hive-carousel"
-      >
-        <ng-template let-post #item>
-          <div class="hive-carousel__cell">
-            <mh-blog-card [post]="post" (readClick)="onReadPost($event)" />
-          </div>
-        </ng-template>
-      </p-carousel>
-    }
-  </section>
-
-  <!-- 5. Help build the hive -->
-  <section class="home-section">
-    <mh-section-header
-      eyebrow="Help out"
-      title="Help build the hive"
-      subtitle="MotionHive is small on purpose. These three things make it bigger — in the right way."
-    />
-    <div class="contrib-grid">
-      <mh-contrib-card
-        icon="pi pi-users"
-        tone="honey"
-        title="Invite a friend"
-        body="Bring someone you'd actually train with. Their first session is on us, yours too."
-        cta="Send invite"
-        (ctaClick)="onInviteFriend()"
-      />
-      <mh-contrib-card
-        icon="pi pi-megaphone"
-        tone="coral"
-        title="Suggest an instructor"
-        body="Know a great coach? We'll reach out and see if they want to teach here."
-        cta="Suggest someone"
-        (ctaClick)="onSuggestSomeone()"
-      />
-      <mh-contrib-card
-        icon="pi pi-bolt"
-        tone="teal"
-        title="Tell us what's missing"
-        body="Vote on what we build next, or write us a feature request — we read every one."
-        cta="Share an idea"
-        (ctaClick)="onShareIdea()"
-      />
-    </div>
-  </section>
-
-  <!-- 6. Roadmap -->
-  <section class="home-section">
-    <article class="roadmap">
-      <header class="roadmap__head">
-        <div class="roadmap__head-text">
-          <p class="roadmap__eyebrow">Honest roadmap</p>
-          <h2 class="roadmap__title">What we're building next</h2>
-          <p class="roadmap__sub">
-            No marketing, no maybes. The four things on the workbench right now.
-          </p>
-        </div>
-        <span class="roadmap__version">v0.4</span>
+        <button type="button" class="hp-textlink" (click)="goToBlog()">
+          Read all →
+        </button>
       </header>
-      <div class="roadmap__list">
-        @for (r of roadmap(); track r.title) {
-          <mh-roadmap-row
-            [when]="r.when"
-            [active]="r.active"
-            [title]="r.title"
-            [sub]="r.sub"
-            [status]="r.status"
-          />
+
+      @if (postsLoading()) {
+        <div class="jr-list" aria-busy="true" aria-label="Loading articles">
+          @for (sk of [1, 2, 3]; track sk) {
+            <div class="jr-row jr-row--skel">
+              <div class="jr-row__main">
+                <p-skeleton width="68px" height="14px" borderRadius="999px" />
+                <p-skeleton width="90%" height="16px" styleClass="mt-2" />
+                <p-skeleton width="100%" height="12px" styleClass="mt-1" />
+                <p-skeleton width="70%" height="12px" styleClass="mt-1" />
+                <div class="jr-skel-foot">
+                  <p-skeleton shape="circle" size="22px" />
+                  <p-skeleton width="80px" height="11px" />
+                  <p-skeleton width="50px" height="11px" />
+                </div>
+              </div>
+              <p-skeleton width="96px" height="96px" borderRadius="10px" />
+            </div>
+          }
+        </div>
+      } @else if (posts().length === 0) {
+        <div class="empty-card">
+          <p>No posts yet. Check back soon — our first reads are landing.</p>
+        </div>
+      } @else {
+        <div class="jr-list">
+          @for (p of posts(); track p.id) {
+            <button type="button" class="jr-row" (click)="openPost(p)">
+              <div class="jr-row__main">
+                <div class="jr-row__head">
+                  <span
+                    class="jr-cat"
+                    [attr.data-tone]="categoryTone(p.category)"
+                  >{{ p.category }}</span>
+                </div>
+                <h3 class="jr-row__title">{{ p.title }}</h3>
+                <p class="jr-row__ex">{{ p.excerpt }}</p>
+                <div class="jr-row__foot">
+                  <div class="jr-author">
+                    @if (p.authorAvatarUrl) {
+                      <img
+                        class="jr-author__avatar"
+                        [src]="p.authorAvatarUrl"
+                        [alt]="p.authorName"
+                        width="22"
+                        height="22"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <mh-hex tone="honey-soft" size="xs">
+                        <span class="jr-author__init">{{ p.authorInitials }}</span>
+                      </mh-hex>
+                    }
+                    <span class="jr-author__name">{{ p.authorName }}</span>
+                    <span class="jr-author__dot"></span>
+                    <span class="jr-author__time">{{ p.readTime }} min read</span>
+                  </div>
+                </div>
+              </div>
+              @if (p.coverImage) {
+                <img
+                  class="jr-row__thumb"
+                  [src]="p.coverImage"
+                  [alt]=""
+                  width="100"
+                  height="100"
+                  loading="lazy"
+                  aria-hidden="true"
+                />
+              } @else {
+                <div
+                  class="jr-row__thumb jr-row__thumb--placeholder"
+                  [attr.data-tone]="categoryTone(p.category)"
+                  aria-hidden="true"
+                ></div>
+              }
+            </button>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Side: Start here + Coaches -->
+    <aside class="ed-side">
+
+      @if (showStepsPanel()) {
+        <div class="ed-panel">
+          <p class="hp-eyebrow">Start here</p>
+          <div class="ed-steps">
+            @for (s of steps(); track s.id; let i = $index) {
+              <button
+                type="button"
+                class="hp-step"
+                [class.is-done]="s.done"
+                (click)="s.go()"
+                [disabled]="s.done"
+              >
+                <mh-hex [tone]="s.done ? 'teal' : 'honey'" size="md">
+                  @if (s.done) {
+                    <i class="pi pi-check"></i>
+                  } @else {
+                    <span class="hp-step__num">{{ i + 1 }}</span>
+                  }
+                </mh-hex>
+                <div class="hp-step__text">
+                  <h3>{{ s.title }}</h3>
+                  <p>{{ s.sub }}</p>
+                </div>
+                @if (!s.done) {
+                  <span class="hp-step__go">→</span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="ed-panel">
+        <div class="ed-panel__head">
+          <p class="hp-eyebrow">
+            {{ hasOwnCoaches() ? 'Your coaches' : 'Some of our coaches' }}
+          </p>
+          <button
+            type="button"
+            class="hp-textlink"
+            (click)="hasOwnCoaches() ? goToMyCoaches() : goToDiscoverCoaches()"
+          >
+            {{ hasOwnCoaches() ? 'See all' : 'Discover more' }} →
+          </button>
+        </div>
+
+        @if (coachesLoading()) {
+          <div class="ed-coachrows" aria-busy="true" aria-label="Loading coaches">
+            @for (sk of [1, 2, 3]; track sk) {
+              <div class="ed-coachrow ed-coachrow--skel">
+                <p-skeleton shape="circle" size="40px" />
+                <div class="ed-coachrow__meta">
+                  <p-skeleton width="60%" height="13px" />
+                  <p-skeleton width="40%" height="11px" styleClass="mt-1" />
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="ed-coachrows">
+            @let rows = hasOwnCoaches() ? myCoachRows() : suggestedCoachRows();
+            @for (c of rows; track c.name) {
+              <button type="button" class="ed-coachrow" (click)="c.go()">
+                @if (c.avatarUrl) {
+                  <img
+                    class="ed-coachrow__avatar"
+                    [src]="c.avatarUrl"
+                    [alt]="c.name"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                  />
+                } @else {
+                  <mh-hex [tone]="c.tone" size="md">
+                    <span class="ed-coachrow__init">{{ c.initials }}</span>
+                  </mh-hex>
+                }
+                <div class="ed-coachrow__meta">
+                  <h4>{{ c.name }}</h4>
+                  <p>{{ c.tag }}</p>
+                </div>
+                <span class="ed-coachrow__go">→</span>
+              </button>
+            }
+            @if (!hasOwnCoaches() && rows.length > 0) {
+              <div class="ed-coach-note">More joining soon.</div>
+            }
+            @if (rows.length === 0) {
+              <button type="button" class="ed-coach-empty" (click)="suggestOpen.set(true)">
+                <div class="ed-coach-empty__title">No coaches to show yet</div>
+                <div class="ed-coach-empty__sub">
+                  Know one who'd be a great fit? Suggest them →
+                </div>
+              </button>
+            }
+          </div>
         }
       </div>
-    </article>
+    </aside>
+  </div>
+
+  <!-- Invite band -->
+  <section class="hp-invite">
+    <div class="hp-invite__honey" aria-hidden="true"></div>
+    <div class="hp-invite__text">
+      <h3>Know someone who'd love it here?</h3>
+      <p>
+        The hive grows by word of mouth. MotionHive is free to join —
+        bring someone you'd actually train with.
+      </p>
+    </div>
+    <div class="hp-invite__actions">
+      <p-button
+        label="Invite a friend"
+        icon="pi pi-send"
+        severity="primary"
+        size="large"
+        (onClick)="inviteOpen.set(true)"
+      />
+      <button type="button" class="hp-textlink" (click)="suggestOpen.set(true)">
+        Suggest an instructor →
+      </button>
+    </div>
   </section>
 </div>
 
 <mh-invite-friend-dialog [(visible)]="inviteOpen" />
-<mh-suggest-instructor-dialog [(visible)]="suggestInstructorOpen" />
+<mh-suggest-instructor-dialog [(visible)]="suggestOpen" />

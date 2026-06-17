@@ -2,81 +2,19 @@
   display: contents;
 }
 
-.duration-row {
-  display: flex;
-  align-items: stretch;
-  gap: 6px;
-
-  :host ::ng-deep .duration-input {
-    flex: 1;
-  }
-
-  :host ::ng-deep .duration-unit .p-togglebutton {
-    border-radius: 6px !important;
-    padding: 0 10px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-}
-
-.dialog-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-}
-
-.row {
-  display: flex;
-  gap: 0.75rem;
-
-  @media (max-width: 540px) {
-    flex-direction: column;
-    gap: 1.1rem;
-  }
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-
-  &.grow {
-    flex: 1;
-  }
-
-  label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--p-text-color);
-
-    .optional {
-      font-weight: 400;
-      color: var(--p-text-muted-color);
+// The unit toggle reshapes PrimeNG's `.p-togglebutton` internals so it
+// matches the adjacent number input's height — Tailwind utilities can't
+// reach those; everything else lives in the template.
+::ng-deep {
+  .program-dialog {
+    .duration-unit {
+      display: flex;
     }
-  }
-
-  .counter {
-    align-self: flex-end;
-    font-size: 0.75rem;
-    color: var(--p-text-muted-color);
-  }
-}
-
-.hint-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0.625rem 0.75rem;
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 8px;
-  color: var(--p-text-muted-color);
-  font-size: 0.8125rem;
-  line-height: 1.4;
-
-  i {
-    color: var(--p-primary-color);
-    margin-top: 1px;
+    .p-togglebutton {
+      height: 100%;
+      padding: 0 0.875rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
   }
 }

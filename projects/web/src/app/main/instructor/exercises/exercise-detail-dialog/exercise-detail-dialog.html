@@ -1,185 +1,172 @@
-<p-dialog
-  [(visible)]="visible"
-  [modal]="true"
-  [appendTo]="'body'"
-  [draggable]="false"
-  [resizable]="false"
-  [dismissableMask]="true"
-  [closeOnEscape]="true"
-  [style]="{ width: '720px', maxWidth: '95vw' }"
-  [contentStyle]="{ maxHeight: '70vh', overflow: 'auto', padding: '1rem 1.25rem' }"
-  [header]="exercise()?.name ?? 'Exercise'"
->
+<p-dialog [(visible)]="visible" [modal]="true" [appendTo]="'body'" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [closeOnEscape]="true" [style]="{ width: '50vw' }" [header]="exercise()?.name ?? 'Exercise'">
   @if (loading()) {
-    <div class="detail-loading">
-      <i class="pi pi-spin pi-spinner"></i> Loading…
-    </div>
+  <div class="flex items-center justify-center gap-2 p-8 text-sm text-surface-500">
+    <i class="pi pi-spin pi-spinner text-lg"></i> Loading…
+  </div>
   } @else if (exercise(); as e) {
-    <div class="detail">
-      <!-- Hero media — cycles through start/end frames every 1.4s -->
-      @let frames = imageFrames();
-      <div class="detail__hero" [class.detail__hero--cycling]="frames.length > 1">
-        @if (frames.length > 0) {
-          @for (frame of frames; track frame.id; let i = $index) {
-            <img
-              [src]="frame.url"
-              [alt]="e.name"
-              [class.is-active]="i === cycleIndex()"
-              loading="lazy"
-            />
-          }
-        } @else if (e.thumbnailUrl) {
-          <img [src]="e.thumbnailUrl" [alt]="e.name" class="is-active" />
-        } @else {
-          <div class="detail__hero-placeholder"><i class="pi pi-image"></i></div>
-        }
+  <div class="flex flex-col gap-5">
+    <!-- Hero media — cycles through start/end frames every 1.4s -->
+    @let frames = imageFrames();
+    <div class="relative aspect-16/10 overflow-hidden rounded-lg bg-surface-100 dark:bg-surface-800">
+      @if (frames.length > 0) {
+      @for (frame of frames; track frame.id; let i = $index) {
+      <img [src]="frame.url" [alt]="e.name"
+        class="absolute inset-0 size-full object-cover transition-opacity duration-300 ease-in-out"
+        [class.opacity-100]="i === cycleIndex()" [class.opacity-0]="i !== cycleIndex()" loading="lazy" />
+      }
+      } @else if (e.thumbnailUrl) {
+      <img [src]="e.thumbnailUrl" [alt]="e.name" class="absolute inset-0 size-full object-cover" />
+      } @else {
+      <div class="absolute inset-0 flex items-center justify-center text-3xl text-surface-400" aria-hidden="true">
+        <i class="pi pi-image"></i>
+      </div>
+      }
 
-        @if (frames.length > 1) {
-          <div class="detail__cycle-dots" aria-hidden="true">
-            @for (frame of frames; track frame.id; let i = $index) {
-              <span class="dot" [class.dot--on]="i === cycleIndex()"></span>
-            }
-          </div>
-        }
-
-        @if (e.youtubeUrl) {
-          <a
-            class="detail__play"
-            [href]="e.youtubeUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open YouTube demo in a new tab"
-          >
-            <i class="pi pi-youtube"></i> YouTube demo
-          </a>
+      @if (frames.length > 1) {
+      <div class="absolute bottom-2 left-1/2 z-2 flex -translate-x-1/2 gap-1.5" aria-hidden="true">
+        @for (frame of frames; track frame.id; let i = $index) {
+        <span class="size-1.5 rounded-full transition-colors" [class.bg-white]="i === cycleIndex()"
+          [class.bg-white/45]="i !== cycleIndex()"></span>
         }
       </div>
-
-      <!-- Meta chips -->
-      <div class="detail__chips">
-        <span class="chip chip--neutral">{{ e.kind | titlecase }}</span>
-        <span class="chip chip--neutral">{{ e.level | titlecase }}</span>
-        @if (e.movementPattern) {
-          <span class="chip chip--neutral">{{ e.movementPattern | titlecase }}</span>
-        }
-        @if (e.mechanic) {
-          <span class="chip chip--neutral">{{ e.mechanic | titlecase }}</span>
-        }
-        @if (e.force) {
-          <span class="chip chip--neutral">{{ e.force | titlecase }}</span>
-        }
-        @if (e.isUnilateral) {
-          <span class="chip chip--accent">Unilateral</span>
-        }
-        @if (e.source === 'SYSTEM') {
-          <span class="chip chip--system"><i class="pi pi-verified"></i> System</span>
-        }
-        @if (e.visibility === 'PUBLIC') {
-          <span class="chip chip--public"><i class="pi pi-globe"></i> Public</span>
-        } @else if (e.visibility === 'PRIVATE') {
-          <span class="chip chip--private"><i class="pi pi-lock"></i> Private</span>
-        }
-      </div>
-
-      <!-- Muscles -->
-      @if (primaryMuscles().length || secondaryMuscles().length || stabilizerMuscles().length) {
-        <section class="detail__section">
-          <h4>Muscles worked</h4>
-          <div class="muscle-list">
-            @for (m of primaryMuscles(); track m) {
-              <span class="m-tag m-tag--pri">{{ m }}</span>
-            }
-            @for (m of secondaryMuscles(); track m) {
-              <span class="m-tag m-tag--sec">{{ m }}</span>
-            }
-            @for (m of stabilizerMuscles(); track m) {
-              <span class="m-tag m-tag--stab">{{ m }}</span>
-            }
-          </div>
-        </section>
       }
 
-      <!-- Equipment -->
-      @if (equipmentList().length) {
-        <section class="detail__section">
-          <h4>Equipment</h4>
-          <div class="muscle-list">
-            @for (eq of equipmentList(); track eq) {
-              <span class="chip chip--neutral">{{ eq }}</span>
-            }
-          </div>
-        </section>
-      }
-
-      <!-- Description -->
-      @if (e.description) {
-        <section class="detail__section">
-          <h4>Description</h4>
-          <p>{{ e.description }}</p>
-        </section>
-      }
-
-      <!-- Instructions -->
-      @if (e.instructions) {
-        <section class="detail__section">
-          <h4>Instructions</h4>
-          <p class="instructions">{{ e.instructions }}</p>
-        </section>
-      }
-
-      <!-- Attribution -->
-      @if (e.owner; as owner) {
-        <section class="detail__section detail__attribution">
-          <div>
-            <div class="attr-label">Created by</div>
-            <div class="attr-name">{{ owner.firstName }} {{ owner.lastName }}</div>
-          </div>
-          @if (e.forkCount > 0) {
-            <div class="attr-forks">
-              <i class="pi pi-share-alt"></i> Forked by {{ e.forkCount }} {{ e.forkCount === 1 ? 'instructor' : 'instructors' }}
-            </div>
-          }
-        </section>
+      @if (e.youtubeUrl) {
+      <a class="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-surface-900 no-underline transition hover:bg-white"
+        [href]="e.youtubeUrl" target="_blank" rel="noopener noreferrer" aria-label="Open YouTube demo in a new tab">
+        <i class="pi pi-youtube text-red-600"></i> YouTube demo
+      </a>
       }
     </div>
+
+    <!-- Meta chips -->
+    <div class="flex flex-wrap items-center gap-2">
+      <p-tag [value]="e.kind | titlecase" [class]="metaClass" rounded />
+      <p-tag [value]="levelTag(e.level).text" [class]="levelTag(e.level).class" rounded />
+      @if (e.movementPattern) {
+      <p-tag [value]="e.movementPattern | titlecase" [class]="metaClass" rounded />
+      }
+      @if (e.mechanic) {
+      <p-tag [value]="e.mechanic | titlecase" [class]="metaClass" rounded />
+      }
+      @if (e.force) {
+      <p-tag [value]="e.force | titlecase" [class]="metaClass" rounded />
+      }
+      @if (e.isUnilateral) {
+      <p-tag value="Unilateral" [class]="metaClass" rounded />
+      }
+      @if (e.source === Sources.System) {
+      <p-tag value="System" icon="pi pi-verified" severity="secondary" rounded />
+      }
+      @if (e.visibility === Visibilities.Public) {
+      <p-tag value="Public" icon="pi pi-globe" severity="info" rounded />
+      } @else if (e.visibility === Visibilities.Private) {
+      <p-tag value="Private" icon="pi pi-lock" class="bg-teal-100 text-teal-800" rounded />
+      }
+    </div>
+
+    <!-- Muscles -->
+    @if (primaryMuscles().length || secondaryMuscles().length || stabilizerMuscles().length) {
+    <section>
+      <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
+        Muscles worked
+      </h4>
+      <div class="flex flex-wrap gap-2">
+        @for (m of primaryMuscles(); track m) {
+        <p-tag [value]="m" [class]="muscleClass(MuscleRoles.Primary)" rounded />
+        }
+        @for (m of secondaryMuscles(); track m) {
+        <p-tag [value]="m" [class]="muscleClass(MuscleRoles.Secondary)" rounded />
+        }
+        @for (m of stabilizerMuscles(); track m) {
+        <p-tag [value]="m" [class]="muscleClass(MuscleRoles.Stabilizer)" rounded />
+        }
+      </div>
+    </section>
+    }
+
+    <!-- Equipment -->
+    @if (equipmentList().length) {
+    <section>
+      <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
+        Equipment
+      </h4>
+      <div class="flex flex-wrap gap-2">
+        @for (eq of equipmentList(); track eq) {
+        <p-tag [value]="eq" [class]="equipmentClass" rounded />
+        }
+      </div>
+    </section>
+    }
+
+    <!-- Description -->
+    @if (e.description) {
+    <section>
+      <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
+        Description
+      </h4>
+      <p class="m-0 text-[13px] leading-relaxed text-surface-800 dark:text-surface-200">{{ e.description }}</p>
+    </section>
+    }
+
+    <!-- Instructions -->
+    @if (e.instructions) {
+    <section>
+      <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
+        Instructions
+      </h4>
+      <p class="m-0 whitespace-pre-wrap text-[13px] leading-relaxed text-surface-800 dark:text-surface-200">
+        {{ e.instructions }}
+      </p>
+    </section>
+    }
+
+    <!-- Attribution -->
+    @if (e.owner; as owner) {
+    <section
+      class="flex items-center justify-between gap-4 rounded-lg border border-surface-200 bg-surface-50 p-3 dark:border-surface-700 dark:bg-surface-800">
+      <div>
+        <div class="text-[10px] font-bold uppercase tracking-wider text-surface-500">Created by</div>
+        <div class="mt-0.5 text-[13px] font-semibold text-surface-900 dark:text-surface-100">
+          {{ owner.firstName }} {{ owner.lastName }}
+        </div>
+      </div>
+      @if (e.forkCount > 0) {
+      <div class="inline-flex items-center gap-1.5 text-xs text-surface-600 dark:text-surface-400">
+        <i class="pi pi-share-alt"></i> Forked by {{ e.forkCount }}
+        {{ e.forkCount === 1 ? 'instructor' : 'instructors' }}
+      </div>
+      }
+    </section>
+    }
+  </div>
   }
 
   <ng-template #footer>
     @if (exercise(); as e) {
-      @if (canEdit()) {
-        <p-button
-          label="Edit"
-          icon="pi pi-pencil"
-          severity="secondary"
-          [text]="true"
-          (onClick)="requestEdit()"
-          [disabled]="busy()"
-        />
-        <p-button
-          [label]="e.visibility === 'PUBLIC' ? 'Make private' : 'Make public'"
-          [icon]="e.visibility === 'PUBLIC' ? 'pi pi-lock' : 'pi pi-globe'"
-          severity="secondary"
-          [text]="true"
-          (onClick)="toggleVisibility()"
-          [loading]="busy()"
-        />
-        <p-button
-          label="Delete"
-          icon="pi pi-trash"
-          severity="danger"
-          [text]="true"
-          (onClick)="confirmDelete()"
-          [disabled]="busy()"
-        />
-      }
-      @if (canFork()) {
-        <p-button
-          label="Fork to my library"
-          icon="pi pi-clone"
-          (onClick)="fork()"
-          [loading]="busy()"
-        />
-      }
+    <div class="flex w-full items-center justify-between gap-2">
+      <!-- Destructive action, kept apart on the left -->
+      <div>
+        @if (canEdit()) {
+        <p-button label="Delete" icon="pi pi-trash" severity="danger" [text]="true" (onClick)="confirmDelete()"
+          [disabled]="busy()" />
+        }
+      </div>
+
+      <!-- Safe + primary actions on the right -->
+      <div class="flex items-center gap-2">
+        @if (canEdit()) {
+        <p-button [label]="e.visibility === Visibilities.Public ? 'Make private' : 'Make public'"
+          [icon]="e.visibility === Visibilities.Public ? 'pi pi-lock' : 'pi pi-globe'" severity="secondary"
+          [text]="true" (onClick)="toggleVisibility()" [loading]="busy()" />
+        <p-button label="Edit" icon="pi pi-pencil" (onClick)="requestEdit()" [disabled]="busy()" />
+        }
+        @if (canFork()) {
+        <p-button label="Fork to my library" icon="pi pi-clone" (onClick)="fork()" [loading]="busy()" />
+        }
+      </div>
+    </div>
     }
   </ng-template>
 </p-dialog>

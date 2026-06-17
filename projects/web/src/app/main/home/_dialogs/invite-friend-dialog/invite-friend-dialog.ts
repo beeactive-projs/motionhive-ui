@@ -58,11 +58,14 @@ export class InviteFriendDialog {
   protected readonly inviteLink = computed(() => {
     const userId = this._authStore.user()?.id ?? '';
     const ref = userId ? `?ref=${encodeURIComponent(userId)}` : '';
+    // Always link to the app's signup route — the marketing site
+    // doesn't host a registration form. In dev `environment.appUrl`
+    // is localhost; in prod we use the canonical app host.
     const base =
       environment.production && typeof window !== 'undefined'
-        ? 'https://motionhive.fit'
+        ? 'https://app.motionhive.fit'
         : environment.appUrl;
-    return `${base}/signup${ref}`;
+    return `${base}/auth/signup${ref}`;
   });
 
   protected readonly canShare = signal(
@@ -137,12 +140,17 @@ export class InviteFriendDialog {
           this.isSending.set(false);
           this.emailSent.set(true);
         },
-        error: () => {
+        error: (err: { status?: number; error?: { message?: string } }) => {
           this.isSending.set(false);
+          const detail =
+            err.status === 429
+              ? "You've sent a lot recently — try again in an hour."
+              : err.error?.message ||
+                'Try again in a moment, or copy the link from the other tab.';
           this._messageService.add({
-            severity: 'warn',
-            summary: 'Email send not ready yet',
-            detail: 'Copy the link instead — we\'ll have email invites soon.',
+            severity: 'error',
+            summary: "Couldn't send the invite",
+            detail,
             life: 5000,
           });
         },

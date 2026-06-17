@@ -176,6 +176,7 @@ export * from './lib/utils/youtube.utils';
 export * from './lib/utils/html.utils';
 export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';
+export * from './lib/utils/exercise-tag.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';

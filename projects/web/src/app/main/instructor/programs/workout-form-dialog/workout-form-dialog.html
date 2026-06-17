@@ -1,119 +1,66 @@
-<p-dialog
-  [(visible)]="visible"
-  [modal]="true"
-  [closable]="!submitting()"
-  [closeOnEscape]="!submitting()"
-  [dismissableMask]="!submitting()"
-  [appendTo]="'body'"
-  [style]="{ width: '520px' }"
-  [breakpoints]="{ '640px': '95vw' }"
-  styleClass="mh-workout-form-dialog"
-  [header]="dialogHeader()">
-  <div class="dialog-body">
-    <div class="field">
-      <label for="wname">Workout name *</label>
-      <input
-        pInputText
-        id="wname"
-        [ngModel]="name()"
-        (ngModelChange)="name.set($event)"
-        maxlength="200"
-        placeholder="e.g. Day 1 — Upper"
-        class="w-full"
-        autocomplete="off"
-      />
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '40rem' }" [header]="dialogHeader()">
+  <div class="flex flex-col gap-3.5">
+    <!-- Name -->
+    <div class="flex flex-col gap-1.5">
+      <label for="wname" class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Workout name <span class="text-red-500">*</span>
+      </label>
+      <input id="wname" pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" maxlength="200"
+        placeholder="e.g. Day 1 — Upper" autocomplete="off" fluid />
     </div>
 
-    <div class="row">
-      <div class="field grow">
-        <label for="week">Week</label>
-        <p-select
-          inputId="week"
-          [options]="weekOptions()"
-          [(ngModel)]="weekIndex"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          styleClass="w-full"
-        />
+    <!-- Week / Day -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label for="week" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Week</label>
+        <p-select inputId="week" [options]="weekOptions()" [ngModel]="weekIndex()"
+          (ngModelChange)="weekIndex.set($event)" optionLabel="label" optionValue="value" [appendTo]="'body'"
+          class="w-full" />
       </div>
-      <div class="field grow">
-        <label for="day">Day</label>
-        <p-select
-          inputId="day"
-          [options]="dayOptions"
-          [(ngModel)]="dayIndex"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          styleClass="w-full"
-        />
+      <div class="flex flex-col gap-1.5">
+        <label for="day" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Day</label>
+        <p-select inputId="day" [options]="dayOptions" [ngModel]="dayIndex()" (ngModelChange)="dayIndex.set($event)"
+          optionLabel="label" optionValue="value" [appendTo]="'body'" class="w-full" />
       </div>
     </div>
 
-    <div class="row">
-      <div class="field grow">
-        <label for="phase">
-          Phase <span class="optional">(optional)</span>
+    <!-- Phase / Duration -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label for="phase"
+          class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+          Phase <span class="font-medium text-surface-400">— optional</span>
         </label>
-        <input
-          pInputText
-          id="phase"
-          [ngModel]="phase()"
-          (ngModelChange)="phase.set($event)"
-          maxlength="50"
-          placeholder="e.g. accumulation"
-          class="w-full"
-          autocomplete="off"
-        />
+        <input id="phase" pInputText [ngModel]="phase()" (ngModelChange)="phase.set($event)" maxlength="50"
+          placeholder="e.g. accumulation" autocomplete="off" fluid />
       </div>
-      <div class="field grow">
-        <label for="duration">
-          Duration <span class="optional">(min)</span>
+      <div class="flex flex-col gap-1.5">
+        <label for="duration"
+          class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+          Duration <span class="font-medium text-surface-400">— min</span>
         </label>
-        <p-inputnumber
-          inputId="duration"
-          [ngModel]="estimatedDurationMinutes()"
-          (ngModelChange)="estimatedDurationMinutes.set($event)"
-          [min]="5"
-          [max]="480"
-          [allowEmpty]="true"
-          placeholder="—"
-          styleClass="w-full"
-        />
+        <p-inputnumber inputId="duration" [ngModel]="estimatedDurationMinutes()"
+          (ngModelChange)="estimatedDurationMinutes.set($event)" [min]="5" [max]="480" [allowEmpty]="true"
+          placeholder="—" class="w-full" />
       </div>
     </div>
 
-    <div class="field">
-      <label for="wnotes">Notes <span class="optional">(optional)</span></label>
-      <textarea
-        pTextarea
-        id="wnotes"
-        [ngModel]="notes()"
-        (ngModelChange)="notes.set($event)"
-        rows="3"
-        maxlength="2000"
-        placeholder="Coaching cues, warm-up notes, intent of the session…"
-        class="w-full"
-      ></textarea>
+    <!-- Notes -->
+    <div class="flex flex-col gap-1.5">
+      <label for="wnotes"
+        class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Notes <span class="font-medium text-surface-400">— optional</span>
+      </label>
+      <textarea id="wnotes" pTextarea rows="3" [ngModel]="notes()" (ngModelChange)="notes.set($event)" maxlength="2000"
+        placeholder="Coaching cues, warm-up notes, intent of the session…" fluid></textarea>
     </div>
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      [disabled]="submitting()"
-      (onClick)="cancel()"
-    />
-    <p-button
-      [label]="submitLabel()"
-      icon="pi pi-check"
-      [loading]="submitting()"
-      [disabled]="!canSubmit()"
-      (onClick)="submit()"
-    />
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
+    <p-button [label]="submitLabel()" icon="pi pi-check" [loading]="submitting()" [disabled]="!canSubmit()"
+      (onClick)="submit()" />
   </ng-template>
 </p-dialog>
 

@@ -229,7 +229,7 @@ export class EditInstructorProfile {
         this._messageService.add({
           severity: 'success',
           summary: 'Profile updated',
-          detail: 'Instructor profile updated successfully.',
+          detail: 'Coaching profile updated successfully.',
         });
         this.saved.emit();
       },

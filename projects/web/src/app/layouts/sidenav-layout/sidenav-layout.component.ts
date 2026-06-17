@@ -19,6 +19,7 @@ import { ProfileMenu } from '../../_shared/components/profile-menu/profile-menu'
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchModal } from '../../_shared/components/search-modal/search-modal';
 import { SearchTriggerService } from '../../_shared/components/search-modal/search-trigger.service';
+import { InstallApp } from '../../_shared/components/install-app/install-app';
 
 @Component({
   selector: 'mh-sidenav-layout',
@@ -32,6 +33,7 @@ import { SearchTriggerService } from '../../_shared/components/search-modal/sear
     ProfileMenu,
     NotificationBell,
     SearchModal,
+    InstallApp,
   ],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',

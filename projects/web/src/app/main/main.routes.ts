@@ -72,14 +72,6 @@ export const mainRoutes: Routes = [
         title: 'My plan - MotionHive',
       },
       {
-        path: 'my/workouts',
-        loadComponent: () =>
-          import('./client-workouts/client-workouts-history/client-workouts-history').then(
-            (m) => m.ClientWorkoutsHistory,
-          ),
-        title: 'Workout history - MotionHive',
-      },
-      {
         path: 'my/workouts/:id/complete',
         loadComponent: () =>
           import('./client-workouts/workout-complete/workout-complete').then(

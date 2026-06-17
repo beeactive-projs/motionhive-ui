@@ -47,8 +47,8 @@
   <ng-template #body let-row>
     <tr>
       @for (col of columns; track col.path) {
-        <td class="max-w-xs truncate" [title]="cell(row, col.path)">
-          {{ cell(row, col.path) }}
+        <td class="max-w-xs truncate" [title]="display(row, col)">
+          {{ display(row, col) }}
         </td>
       }
       @if (isWebhooks() && isSuperAdmin()) {

@@ -13,17 +13,22 @@ import { TitleCasePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Dialog } from 'primeng/dialog';
+import { Tag } from 'primeng/tag';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
   AuthStore,
+  EXERCISE_EQUIPMENT_TAG_CLASS,
+  EXERCISE_META_TAG_CLASS,
   Exercise,
   ExerciseMedia,
   ExerciseMediaKind,
   ExerciseService,
   ExerciseSource,
   ExerciseVisibility,
+  exerciseLevelTag,
+  exerciseMuscleTagClass,
   MuscleRole,
   showApiError,
 } from 'core';
@@ -46,13 +51,7 @@ import {
 @Component({
   selector: 'mh-exercise-detail-dialog',
   standalone: true,
-  imports: [
-    ButtonModule,
-    ConfirmDialog,
-    Dialog,
-    TooltipModule,
-    TitleCasePipe,
-  ],
+  imports: [ButtonModule, ConfirmDialog, Dialog, Tag, TooltipModule, TitleCasePipe],
   providers: [ConfirmationService],
   templateUrl: './exercise-detail-dialog.html',
   styleUrl: './exercise-detail-dialog.scss',
@@ -71,6 +70,16 @@ export class ExerciseDetailDialog {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _authStore = inject(AuthStore);
+
+  readonly Sources = ExerciseSource;
+  readonly Visibilities = ExerciseVisibility;
+  readonly MuscleRoles = MuscleRole;
+
+  // Shared exercise tag palette (single source of truth in core).
+  readonly levelTag = exerciseLevelTag;
+  readonly muscleClass = exerciseMuscleTagClass;
+  readonly equipmentClass = EXERCISE_EQUIPMENT_TAG_CLASS;
+  readonly metaClass = EXERCISE_META_TAG_CLASS;
 
   readonly exercise = signal<Exercise | null>(null);
   readonly loading = signal(false);
@@ -141,9 +150,7 @@ export class ExerciseDetailDialog {
       .map((m) => m.muscle?.commonName ?? '—'),
   );
 
-  readonly equipmentList = computed(() =>
-    (this.exercise()?.equipment ?? []).map((e) => e.name),
-  );
+  readonly equipmentList = computed(() => (this.exercise()?.equipment ?? []).map((e) => e.name));
 
   constructor() {
     // Lazy-load on (visible && id-change). Skip when re-opening the
@@ -224,16 +231,18 @@ export class ExerciseDetailDialog {
     if (!ex) return;
     const forkCopy =
       ex.forkCount > 0
-        ? ` It's been forked by ${ex.forkCount} ${ex.forkCount === 1 ? 'instructor' : 'instructors'} — their copies are independent and stay intact.`
+        ? ` It's already been forked by ${ex.forkCount} ${ex.forkCount === 1 ? 'instructor' : 'instructors'} — their copies are independent and won't be affected.`
         : '';
     this._confirmationService.confirm({
       header: `Delete "${ex.name}"?`,
-      message: `This can't be undone.${forkCopy}`,
-      icon: 'pi pi-trash',
-      acceptLabel: 'Delete exercise',
-      acceptIcon: 'pi pi-trash',
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectLabel: 'Cancel',
+      message: `This permanently removes "${ex.name}" from your exercise library.</br> You won't be able to recover it, and you'll need to recreate it from scratch if you want it back later.${forkCopy}`,
+      acceptButtonProps: { severity: 'danger', label: 'Yes, delete', icon: 'pi pi-trash' },
+      rejectButtonProps: {
+        severity: 'secondary',
+        label: 'No',
+        icon: 'pi pi-times',
+        outlined: true,
+      },
       accept: () => this.runDelete(ex.id),
     });
   }

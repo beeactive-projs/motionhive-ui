@@ -1,0 +1,9 @@
+@if (canInstall()) {
+  <p-button
+    label="Install app"
+    icon="pi pi-download"
+    size="small"
+    severity="secondary"
+    (onClick)="install()"
+  />
+}

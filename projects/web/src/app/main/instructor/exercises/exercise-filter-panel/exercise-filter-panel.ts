@@ -5,6 +5,8 @@ import {
   input,
   output,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Checkbox } from 'primeng/checkbox';
 
 import {
   Equipment,
@@ -40,7 +42,7 @@ export interface LevelFilterOption {
 @Component({
   selector: 'mh-exercise-filter-panel',
   standalone: true,
-  imports: [],
+  imports: [FormsModule, Checkbox],
   templateUrl: './exercise-filter-panel.html',
   styleUrl: './exercise-filter-panel.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

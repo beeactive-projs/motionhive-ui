@@ -10,13 +10,13 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
+import { InputText } from 'primeng/inputtext';
+import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
+import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -27,11 +27,6 @@ import {
   UpdateProgramWorkoutPayload,
   showApiError,
 } from 'core';
-
-interface SelectOption<T> {
-  value: T;
-  label: string;
-}
 
 /**
  * Create / edit a workout (a single "day") within a program.
@@ -45,15 +40,14 @@ interface SelectOption<T> {
  */
 @Component({
   selector: 'mh-workout-form-dialog',
-  standalone: true,
   imports: [
     FormsModule,
-    ButtonModule,
+    Button,
     Dialog,
     InputNumber,
-    InputTextModule,
+    InputText,
     Select,
-    TextareaModule,
+    Textarea,
     Toast,
   ],
   providers: [MessageService],
@@ -86,7 +80,7 @@ export class WorkoutFormDialog {
 
   // ── Options ──────────────────────────────────────────────────────
 
-  readonly dayOptions: SelectOption<number>[] = [
+  readonly dayOptions: SelectItem<number>[] = [
     { value: 0, label: 'Monday' },
     { value: 1, label: 'Tuesday' },
     { value: 2, label: 'Wednesday' },
@@ -96,7 +90,7 @@ export class WorkoutFormDialog {
     { value: 6, label: 'Sunday' },
   ];
 
-  readonly weekOptions = computed<SelectOption<number>[]>(() => {
+  readonly weekOptions = computed<SelectItem<number>[]>(() => {
     const days = this.program().durationDays ?? 84; // 12 weeks default
     const dur = Math.max(1, Math.ceil(days / 7));
     return Array.from({ length: dur }, (_, i) => ({

@@ -20,6 +20,7 @@ import {
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
+  WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
   showApiError,
@@ -166,12 +167,28 @@ export class ClientPlanDetail implements OnInit {
     });
   }
 
-  viewWorkoutStub(w: AssignedWorkout): void {
-    this._messageService.add({
-      severity: 'info',
-      summary: 'Read-only log lands with S11',
-      detail: `Replay of "${w.name}" is coming once the active log ships.`,
-      life: 3000,
+  viewWorkout(w: AssignedWorkout): void {
+    // Skipped workouts never produced a log — tell the user politely
+    // rather than firing a doomed BE lookup.
+    if (w.status === WorkoutLogStatus.Skipped) {
+      this._messageService.add({
+        severity: 'info',
+        summary: 'Nothing to replay',
+        detail: `"${w.name}" was skipped — no session was logged.`,
+        life: 3000,
+      });
+      return;
+    }
+    this._logService.getByAssignedWorkout(w.id).subscribe({
+      next: (log: WorkoutLog) =>
+        this._router.navigate(['/my/workout-log', log.id, 'replay']),
+      error: (err: unknown) =>
+        showApiError(
+          this._messageService,
+          "Couldn't open the workout",
+          'Try again in a moment, or open the workout from /user/workouts.',
+          err,
+        ),
     });
   }
 

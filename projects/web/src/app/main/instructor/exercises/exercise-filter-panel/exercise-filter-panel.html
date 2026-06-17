@@ -1,71 +1,67 @@
-<section class="group">
-  <h4>Kind</h4>
+<section class="pb-2 border-b border-surface-100 dark:border-surface-800 last:border-b-0">
+  <h4 class="m-0 mb-2.5 text-[11px] font-bold uppercase tracking-[0.05em] text-surface-500">Kind</h4>
   @for (opt of kindOptions(); track opt.value) {
-    <label class="opt">
-      <input
-        type="checkbox"
-        [checked]="selectedKinds().has(opt.value)"
-        (change)="toggleKind.emit(opt.value)"
-      />
-      <span class="opt__lbl">{{ opt.label }}</span>
-      @if (facets()?.kind?.[opt.value]; as count) {
-        <span class="opt__cnt">{{ count }}</span>
-      }
-    </label>
+  <div class="flex items-center gap-2 py-1 max-lg:gap-2.5 max-lg:py-1.5">
+    <p-checkbox [binary]="true" [inputId]="'kind-' + opt.value" [ngModel]="selectedKinds().has(opt.value)"
+      (onChange)="toggleKind.emit(opt.value)" />
+    <label [for]="'kind-' + opt.value"
+      class="flex-1 cursor-pointer select-none text-xs text-surface-700 dark:text-surface-300 max-lg:text-[13px]">{{
+      opt.label }}</label>
+    @if (facets()?.kind?.[opt.value]; as count) {
+    <span class="text-[10px] text-surface-400 max-lg:text-[11px]">{{ count }}</span>
+    }
+  </div>
   }
 </section>
 
-<section class="group">
-  <h4>Level</h4>
+<section class="py-3 border-b border-surface-100 dark:border-surface-800 last:border-b-0">
+  <h4 class="m-0 mb-2.5 text-[11px] font-bold uppercase tracking-[0.05em] text-surface-500">Level</h4>
   @for (opt of levelOptions(); track opt.value) {
-    <label class="opt">
-      <input
-        type="checkbox"
-        [checked]="selectedLevels().has(opt.value)"
-        (change)="toggleLevel.emit(opt.value)"
-      />
-      <span class="opt__lbl">{{ opt.label }}</span>
-      @if (facets()?.level?.[opt.value]; as count) {
-        <span class="opt__cnt">{{ count }}</span>
-      }
-    </label>
+  <div class="flex items-center gap-2 py-1 max-lg:gap-2.5 max-lg:py-1.5">
+    <p-checkbox [binary]="true" [inputId]="'level-' + opt.value" [ngModel]="selectedLevels().has(opt.value)"
+      (onChange)="toggleLevel.emit(opt.value)" />
+    <label [for]="'level-' + opt.value"
+      class="flex-1 cursor-pointer select-none text-xs text-surface-700 dark:text-surface-300 max-lg:text-[13px]">{{
+      opt.label }}</label>
+    @if (facets()?.level?.[opt.value]; as count) {
+    <span class="text-[10px] text-surface-400 max-lg:text-[11px]">{{ count }}</span>
+    }
+  </div>
   }
 </section>
 
 @if (hasMuscles()) {
-  <section class="group">
-    <h4>Primary muscle</h4>
-    @for (m of muscles(); track m.id) {
-      <label class="opt">
-        <input
-          type="checkbox"
-          [checked]="selectedMuscleIds().has(m.id)"
-          (change)="toggleMuscle.emit(m.id)"
-        />
-        <span class="opt__lbl">{{ m.commonName }}</span>
-        @if (facets()?.primaryMuscleId?.[m.id]; as count) {
-          <span class="opt__cnt">{{ count }}</span>
-        }
-      </label>
+<section class="py-3 border-b border-surface-100 dark:border-surface-800 last:border-b-0">
+  <h4 class="m-0 mb-2.5 text-[11px] font-bold uppercase tracking-[0.05em] text-surface-500">Primary muscle</h4>
+  @for (m of muscles(); track m.id) {
+  <div class="flex items-center gap-2 py-1 max-lg:gap-2.5 max-lg:py-1.5">
+    <p-checkbox [binary]="true" [inputId]="'muscle-' + m.id" [ngModel]="selectedMuscleIds().has(m.id)"
+      (onChange)="toggleMuscle.emit(m.id)" />
+    <label [for]="'muscle-' + m.id"
+      class="flex-1 cursor-pointer select-none text-xs text-surface-700 dark:text-surface-300 max-lg:text-[13px]">{{
+      m.commonName }}</label>
+    @if (facets()?.primaryMuscleId?.[m.id]; as count) {
+    <span class="text-[10px] text-surface-400 max-lg:text-[11px]">{{ count }}</span>
     }
-  </section>
+  </div>
+  }
+</section>
 }
 
 @if (hasEquipment()) {
-  <section class="group">
-    <h4>Equipment</h4>
-    @for (eq of equipment(); track eq.id) {
-      <label class="opt">
-        <input
-          type="checkbox"
-          [checked]="selectedEquipmentIds().has(eq.id)"
-          (change)="toggleEquipment.emit(eq.id)"
-        />
-        <span class="opt__lbl">{{ eq.name }}</span>
-        @if (facets()?.equipmentId?.[eq.id]; as count) {
-          <span class="opt__cnt">{{ count }}</span>
-        }
-      </label>
+<section class="py-3 border-b border-surface-100 dark:border-surface-800 last:border-b-0">
+  <h4 class="m-0 mb-2.5 text-[11px] font-bold uppercase tracking-[0.05em] text-surface-500">Equipment</h4>
+  @for (eq of equipment(); track eq.id) {
+  <div class="flex items-center gap-2 py-1 max-lg:gap-2.5 max-lg:py-1.5">
+    <p-checkbox [binary]="true" [inputId]="'equipment-' + eq.id" [ngModel]="selectedEquipmentIds().has(eq.id)"
+      (onChange)="toggleEquipment.emit(eq.id)" />
+    <label [for]="'equipment-' + eq.id"
+      class="flex-1 cursor-pointer select-none text-xs text-surface-700 dark:text-surface-300 max-lg:text-[13px]">{{
+      eq.name }}</label>
+    @if (facets()?.equipmentId?.[eq.id]; as count) {
+    <span class="text-[10px] text-surface-400 max-lg:text-[11px]">{{ count }}</span>
     }
-  </section>
+  </div>
+  }
+</section>
 }

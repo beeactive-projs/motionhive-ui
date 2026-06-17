@@ -44,7 +44,9 @@ export class KpiCard {
   });
   protected readonly iconClass = computed(() => {
     const s = this.severity();
-    return s ? ICON_CLASS[s] : 'bg-primary-100 text-primary-700';
+    // Neutral (unset) cards use a neutral surface chip — honey/primary is
+    // reserved for actions, not for stat-card decoration.
+    return s ? ICON_CLASS[s] : 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-300';
   });
   protected readonly valueClass = computed(() => {
     const s = this.severity();

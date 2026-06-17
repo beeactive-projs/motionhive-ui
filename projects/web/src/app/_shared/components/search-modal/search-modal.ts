@@ -65,7 +65,7 @@ export class SearchModal {
   protected readonly categories: CategoryConfig[] = [
     { key: 'all', label: 'All', bucket: null },
     { key: 'people', label: 'People', bucket: 'users' },
-    { key: 'instructors', label: 'Instructors', bucket: 'instructors' },
+    { key: 'instructors', label: 'Coaches', bucket: 'instructors' },
     { key: 'groups', label: 'Groups', bucket: 'groups' },
     { key: 'sessions', label: 'Sessions', bucket: 'sessions' },
     { key: 'tags', label: 'Tags', bucket: 'tags' },
@@ -321,7 +321,7 @@ export class SearchModal {
   protected categoryLabel(type: keyof SearchResponse['byCategory']): string {
     switch (type) {
       case 'instructors':
-        return 'Instructors';
+        return 'Coaches';
       case 'groups':
         return 'Groups';
       case 'sessions':

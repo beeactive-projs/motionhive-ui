@@ -11,10 +11,13 @@ import {
 } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
+import { Skeleton } from 'primeng/skeleton';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -42,13 +45,15 @@ import {
  */
 @Component({
   selector: 'mh-exercise-picker-dialog',
-  standalone: true,
   imports: [
     LowerCasePipe,
     FormsModule,
-    ButtonModule,
+    Button,
     Dialog,
-    InputTextModule,
+    IconField,
+    InputIcon,
+    InputText,
+    Skeleton,
     Toast,
   ],
   providers: [MessageService],

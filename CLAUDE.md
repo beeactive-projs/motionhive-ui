@@ -127,6 +127,20 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
   border-radius: 6px;
   ```
 
+### Brand & color discipline
+
+- **Honey/amber (the primary colour) is reserved for actions and the current selection — never for status.** It carries: primary CTAs (`p-button` default), and the *selected*/active accent (active nav row, active conversation row). It must NOT signal a state. When you're tempted to colour a badge amber to mean "unpaid"/"pending"/"recurring", stop — use a neutral or semantic colour instead, or honey stops reading as "click here".
+- **Status colours are neutral or semantic, not brand:** awaiting/neutral states → `secondary` (neutral slate); success/paid → `success` (green); error/void → `danger` (desaturated). Invoice + subscription status colours have a single source of truth in [`status-severity.ts`](projects/core/src/lib/models/payment/status-severity.ts) — change it there, not per-component.
+- **Brand surface rule — navy on light, honey on dark.** The logo (`mh-logo` in core) and the honeycomb background both follow this: navy mark/pattern on light surfaces, honey on dark. Apply it consistently across `web` and `website`; never hand-set the wordmark colour or invert the honeycomb per app.
+- **Read-only tags must not carry caret/chevron icons** (`pi-angle-down`, `pi-chevron-*`, etc.) — they read as an interactive dropdown. Icons on a static `p-tag` should be semantic (a lock, a globe), not directional.
+- **Exercise tag colours go through the shared palette** in [`exercise-tag.utils.ts`](projects/core/src/lib/utils/exercise-tag.utils.ts): muscle = one sky family ramped by role, equipment = slate, meta = neutral surface, difficulty = a green→yellow→red ramp. Never hand-pick inline `bg-*` tag classes per component.
+
+## Domain terminology
+
+- **The coach-facing role is called a "coach" in all user-visible copy** — labels, headings, placeholders, buttons, toasts, dialog titles. Never "instructor" in visible text.
+- **Code identifiers keep the historical "instructor" name** and must NOT be renamed: the `INSTRUCTOR` role enum, `/coaching` routes, `instructorGuard`, `instructorProfile` and other model/property names, component selectors, and CSS classes. Only the *displayed words* change.
+- **"Sessions" is ambiguous — qualify it.** The trainee-side nav item is "My sessions"; the coach-side one is "Manage sessions". Don't ship a bare "Sessions" label for the coaching surface.
+
 ## Shared types and constants
 
 When a type or constant is used in more than one place, define it once in the `core` library and import it from `'core'` everywhere:

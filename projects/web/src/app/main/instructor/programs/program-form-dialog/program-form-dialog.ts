@@ -10,14 +10,14 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
+import { InputText } from 'primeng/inputtext';
+import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
-import { TextareaModule } from 'primeng/textarea';
+import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -29,11 +29,6 @@ import {
   UpdateProgramPayload,
   showApiError,
 } from 'core';
-
-interface SelectOption<T> {
-  value: T;
-  label: string;
-}
 
 /**
  * Create / edit a program shell (FE-P2a + FE-P2b).
@@ -50,16 +45,15 @@ interface SelectOption<T> {
  */
 @Component({
   selector: 'mh-program-form-dialog',
-  standalone: true,
   imports: [
     FormsModule,
-    ButtonModule,
+    Button,
     Dialog,
     InputNumber,
-    InputTextModule,
+    InputText,
     Select,
     SelectButton,
-    TextareaModule,
+    Textarea,
     Toast,
   ],
   providers: [MessageService],
@@ -96,18 +90,18 @@ export class ProgramFormDialog {
 
   // ── Options ──────────────────────────────────────────────────────
 
-  readonly kindOptions: SelectOption<ProgramKind>[] = [
+  readonly kindOptions: SelectItem<ProgramKind>[] = [
     { value: ProgramKind.Workout, label: 'Workout' },
     // Meal/Habit/Hybrid are intentionally hidden until those modules ship.
   ];
 
-  readonly statusOptions: SelectOption<ProgramStatus>[] = [
+  readonly statusOptions: SelectItem<ProgramStatus>[] = [
     { value: ProgramStatus.Draft, label: 'Draft — only you can see it' },
     { value: ProgramStatus.Published, label: 'Published — ready to assign' },
     { value: ProgramStatus.Archived, label: 'Archived — hidden, not deleted' },
   ];
 
-  readonly periodizationOptions: SelectOption<string>[] = [
+  readonly periodizationOptions: SelectItem<string>[] = [
     { value: '', label: 'None' },
     { value: 'linear', label: 'Linear' },
     { value: 'undulating', label: 'Undulating' },
@@ -115,7 +109,7 @@ export class ProgramFormDialog {
     { value: 'conjugate', label: 'Conjugate' },
   ];
 
-  readonly unitOptions: SelectOption<'weeks' | 'days'>[] = [
+  readonly unitOptions: SelectItem<'weeks' | 'days'>[] = [
     { value: 'weeks', label: 'Weeks' },
     { value: 'days', label: 'Days' },
   ];

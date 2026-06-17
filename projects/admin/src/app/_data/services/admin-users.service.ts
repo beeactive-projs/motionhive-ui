@@ -60,4 +60,11 @@ export class AdminUsersService {
   restore(id: string): Observable<AdminUserDetail> {
     return this._http.post<AdminUserDetail>(`${this._baseUrl}/${id}/restore`, {});
   }
+
+  resendVerification(id: string): Observable<{ sent: boolean }> {
+    return this._http.post<{ sent: boolean }>(
+      `${this._baseUrl}/${id}/resend-verification`,
+      {},
+    );
+  }
 }

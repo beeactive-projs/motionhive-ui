@@ -6,10 +6,18 @@ import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { FeedbackDialog } from './_shared/components/feedback-dialog/feedback-dialog';
 import { WaitlistDialog } from './_shared/components/waitlist-dialog/waitlist-dialog';
 import { ImpersonationBanner } from './_shared/components/impersonation-banner/impersonation-banner';
+import { PwaUpdate } from './_shared/components/pwa-update/pwa-update';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FeedbackDialog, ErrorDialog, WaitlistDialog, ImpersonationBanner],
+  imports: [
+    RouterOutlet,
+    FeedbackDialog,
+    ErrorDialog,
+    WaitlistDialog,
+    ImpersonationBanner,
+    PwaUpdate,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
