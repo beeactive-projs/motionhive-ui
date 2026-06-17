@@ -27,6 +27,46 @@ export const userRoutes: Routes = [
     title: 'Workout history - MotionHive',
   },
   {
+    path: 'plans',
+    loadComponent: () => import('./my-plans/my-plans').then((m) => m.MyPlans),
+    title: 'My plans - MotionHive',
+  },
+  {
+    path: 'plans/:id',
+    loadComponent: () =>
+      import('./my-plans/client-plan-detail/client-plan-detail').then(
+        (m) => m.ClientPlanDetail,
+      ),
+    title: 'My plan - MotionHive',
+  },
+  {
+    // Active workout logger (live session).
+    path: 'workout-log/:id',
+    loadComponent: () =>
+      import('./my-workouts/workout-log-active/workout-log-active').then(
+        (m) => m.WorkoutLogActive,
+      ),
+    title: 'Workout - MotionHive',
+  },
+  {
+    // Read-only workout replay — used by client history + coach (with ?coach=1).
+    path: 'workout-log/:id/replay',
+    loadComponent: () =>
+      import('./my-workouts/workout-log-replay/workout-log-replay').then(
+        (m) => m.WorkoutLogReplay,
+      ),
+    title: 'Workout replay - MotionHive',
+  },
+  {
+    // Post-workout summary + feedback.
+    path: 'workouts/:id/complete',
+    loadComponent: () =>
+      import('./my-workouts/workout-complete/workout-complete').then(
+        (m) => m.WorkoutComplete,
+      ),
+    title: 'Workout complete - MotionHive',
+  },
+  {
     path: 'sessions/discover',
     loadComponent: () =>
       import('./my-sessions/sessions-discover/sessions-discover').then(

@@ -4,7 +4,7 @@
   </ng-template>
 
   <div class="mh-side-card__row">
-    <mh-avatar [user]="group().instructor" size="large" styleClass="mh-side-card__avatar" />
+    <mh-hex-avatar [user]="group().instructor" [size]="48" />
     <div class="mh-side-card__lines">
       <span class="mh-side-card__name">{{ ownerName() }}</span>
       @if (ownerEmail()) {

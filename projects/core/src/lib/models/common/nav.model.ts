@@ -18,7 +18,16 @@ export interface NavItem {
   badge?: Signal<number>;
 }
 
+/**
+ * Sidebar workspace mode. Sections tagged with a mode belong to the
+ * Coach/Train toggle and only render when that mode is active. Untagged
+ * sections (common nav, admin, content) always render.
+ */
+export type NavMode = 'coach' | 'train';
+
 export interface NavSection {
   label: string;
   items: NavItem[];
+  /** When set, this section is shown only while the matching sidebar mode is active. */
+  mode?: NavMode;
 }

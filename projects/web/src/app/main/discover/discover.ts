@@ -17,16 +17,17 @@ import {
   InstructorSearchResult,
   JoinPolicies,
   ProfileService,
+  Hex,
+  HexTone,
   PublicSessionInstance,
   SessionCard,
   SessionsDiscoverStore,
   showApiError,
 } from 'core';
-import { Hex, HexTone } from '../../_shared/components/hex/hex';
 
 type DiscoverTab = 'coaches' | 'sessions' | 'groups';
 
-const TONES: HexTone[] = ['honey', 'teal', 'navy', 'coral'];
+const TONES: HexTone[] = ['amber', 'teal', 'navySolid', 'coral'];
 
 /**
  * Discover — one hub for finding coaches, sessions and groups (Claude

@@ -285,7 +285,7 @@ export class ClientProfile {
   }
 
   openWorkoutReplay(log: WorkoutLog): void {
-    this._router.navigate(['/my/workout-log', log.id, 'replay'], {
+    this._router.navigate(['/user/workout-log', log.id, 'replay'], {
       queryParams: { coach: 1 },
     });
   }

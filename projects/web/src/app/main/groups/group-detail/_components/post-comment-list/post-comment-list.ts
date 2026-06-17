@@ -15,14 +15,14 @@ import { Textarea } from 'primeng/textarea';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AuthStore, PostComment, PostService, showApiError } from 'core';
-import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 
 @Component({
   selector: 'mh-post-comment-list',
   imports: [
     FormsModule,
     DatePipe,
-    Avatar,
+    HexAvatar,
     Button,
     SkeletonModule,
     Textarea,

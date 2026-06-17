@@ -12,11 +12,11 @@ import { Button } from 'primeng/button';
 import { Menu } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { AuthStore, Post } from 'core';
-import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 
 @Component({
   selector: 'mh-post-header',
-  imports: [DatePipe, RouterLink, Avatar, Button, Menu],
+  imports: [DatePipe, RouterLink, HexAvatar, Button, Menu],
   templateUrl: './post-header.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -69,16 +69,6 @@
   }
 }
 
-/* p-avatar host — square gradient tile */
-::ng-deep p-avatar.gp-avatar .p-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 0.75rem;
-  font-size: 20px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
 /* p-tag base — shared tighter typography for all tags in this component */
 :host ::ng-deep .p-tag {
   font-size: 10.5px;

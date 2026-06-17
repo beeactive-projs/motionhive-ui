@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   GroupService,
   GroupsRefreshService,
+  Hex,
   JoinPolicies,
   PublicGroupProfile,
   TagSeverity,
@@ -21,7 +22,6 @@ import {
   showApiError,
 } from 'core';
 import { MenuItem, MessageService } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -32,12 +32,14 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { AboutTab } from '../group-detail/tabs/about-tab/about-tab';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 
 @Component({
   selector: 'mh-group-preview',
   imports: [
     DatePipe,
-    AvatarModule,
+    Hex,
+    HexAvatar,
     BreadcrumbModule,
     Button,
     Card,

@@ -46,7 +46,14 @@
     @for (c of visibleCoaches(); track c.id; let i = $index) {
     <article class="disc__coach">
       <div class="disc__coach-top">
-        <mh-hex [tone]="toneFor(i)" size="xl">{{ coachInitials(c) }}</mh-hex>
+        <mh-hex
+          [tone]="toneFor(i)"
+          [size]="82"
+          [round]="7"
+          orientation="pointy"
+          [sheen]="true"
+          [shadow]="true"
+        >{{ coachInitials(c) }}</mh-hex>
         <div class="disc__coach-id">
           <h3>{{ coachName(c) }}</h3>
           @if (c.specializations?.length) {
@@ -102,7 +109,14 @@
   <div class="disc__grid">
     @for (g of groups(); track g.id; let i = $index) {
     <article class="disc__group">
-      <mh-hex [tone]="toneFor(i)" size="lg">{{ groupInitials(g.name) }}</mh-hex>
+      <mh-hex
+        [tone]="toneFor(i)"
+        [size]="64"
+        [round]="7"
+        orientation="pointy"
+        [sheen]="true"
+        [shadow]="true"
+      >{{ groupInitials(g.name) }}</mh-hex>
       <h3>{{ g.name }}</h3>
       @if (g.tags?.length) {
       <p class="disc__coach-tag">{{ g.tags!.join(' · ') }}</p>

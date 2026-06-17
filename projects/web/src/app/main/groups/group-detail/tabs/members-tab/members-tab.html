@@ -27,7 +27,7 @@
           [class.ring-primary-400]="highlightedRequestId() === r.id"
           style="border-color: var(--p-content-border-color)">
         <div class="flex items-center gap-3 flex-1 min-w-0">
-          <mh-avatar [user]="r.user" />
+          <mh-hex-avatar [user]="r.user" [size]="40" />
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium m-0">{{ requestUserName(r) }}</p>
             @if (r.user?.email) {
@@ -92,7 +92,7 @@
       <ng-template #body let-member>
         <tr>
           <td>
-            <mh-user-info [user]="member.user" />
+            <mh-user-info [user]="member.user" [hex]="true" [hexSize]="40" />
           </td>
           @if (context.isOwner()) {
           <td>{{ member.user?.email || '—' }}</td>

@@ -241,6 +241,10 @@ export * from './lib/services/loading/loading.service';
 
 // Components
 export * from './lib/components/logo/logo';
+// Hexagon system — one tintable primitive (avatars, icon tiles, badges, accents).
+export * from './lib/components/hex/hex';
+export * from './lib/components/hex/hex.types';
+export * from './lib/components/hex/hex-icons';
 export * from './lib/components/dialog-shell/dialog-shell';
 // Mobile-first primitives — sheet/time-row/day-sep/sticky-cta/fab.
 export * from './lib/components/bottom-sheet/bottom-sheet';

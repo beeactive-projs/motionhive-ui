@@ -45,3 +45,5 @@ playwright-report/
 # System files
 .DS_Store
 Thumbs.db
+docs/motionhive-coduri-caen.html
+docs/MotionHive-Coduri-CAEN.pdf

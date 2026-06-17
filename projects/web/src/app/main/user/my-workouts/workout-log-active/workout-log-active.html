@@ -1,0 +1,186 @@
+<!--
+  Active workout log (S11). Mobile-first layout:
+    - Top: status bar with workout name + elapsed timer
+    - Middle: scrollable list of exercise cards (done collapse / current expands)
+    - Bottom: sticky rest card (when resting) + sticky Complete bar
+  Desktop variant uses CSS to widen rows; same component tree.
+-->
+<div class="log-shell" [class.is-completed]="isComplete()">
+  <header class="log-appbar">
+    <p-button icon="pi pi-times" severity="secondary" [text]="true" rounded pTooltip="Back" ariaLabel="Back"
+      (onClick)="confirmComplete()" />
+    <div class="title">
+      <div class="name">{{ log()?.name ?? 'Workout' }}</div>
+      <div class="sub">{{ isFreestyle() ? 'Freestyle session' : 'Assigned session' }}</div>
+    </div>
+    <div class="elapsed">
+      <div class="t">{{ elapsedLabel() }}</div>
+      <div class="lbl">elapsed</div>
+    </div>
+  </header>
+
+  @if (loading()) {
+  <main class="log-body">
+    @for (i of [1, 2]; track i) {
+    <div class="exlog p-3">
+      <div class="flex items-center gap-3">
+        <p-skeleton shape="circle" size="2.5rem" />
+        <div class="flex flex-1 flex-col gap-1.5">
+          <p-skeleton width="45%" height="0.9rem" />
+          <p-skeleton width="25%" height="0.7rem" />
+        </div>
+      </div>
+      <p-skeleton width="100%" height="6rem" styleClass="mt-3" />
+    </div>
+    }
+  </main>
+  } @else if (log(); as l) {
+  <main class="log-body">
+    @if (exercises().length === 0) {
+    <mh-list-empty-state icon="pi pi-bolt" title="Build your workout"
+      message="Add exercises from the catalog, log your sets as you go, and finish when you're done."
+      actionLabel="Add exercise" actionIcon="pi pi-plus" (action)="openAddExercise()" />
+    } @else {
+    @for (ex of exercises(); track ex.id) {
+    <article class="exlog" [class.done]="isExerciseDone(ex)" [class.current]="isCurrentExercise(ex)">
+      <header class="exlog__head">
+        @if (ex.exerciseThumbnailUrlSnapshot) {
+        <img class="thumb" [src]="ex.exerciseThumbnailUrlSnapshot" [alt]="ex.exerciseNameSnapshot" loading="lazy" />
+        } @else {
+        <div class="thumb thumb--fallback"><i class="pi pi-bolt"></i></div>
+        }
+        <div class="meta">
+          <div class="name">{{ ex.exerciseNameSnapshot }}</div>
+          <div class="sub" [class.sub--done]="isExerciseDone(ex)">
+            @if (isExerciseDone(ex)) {
+            <i class="pi pi-check-circle"></i> {{ exerciseProgressLabel(ex) }} done
+            } @else {
+            {{ exerciseProgressLabel(ex) }}
+            }
+          </div>
+        </div>
+        <p-button icon="pi pi-times-circle" severity="secondary" [text]="true" rounded pTooltip="Skip exercise"
+          ariaLabel="Skip exercise" [disabled]="isComplete()" (onClick)="confirmRemoveExercise(ex)" />
+      </header>
+
+      @if (isCurrentExercise(ex) && !isComplete() && lastTimeSummary(ex)) {
+      <div class="lasttime">
+        <i class="pi pi-history"></i>
+        <span><strong>Last time</strong> · {{ lastTimeSummary(ex) }}</span>
+      </div>
+      }
+
+      @if (!isExerciseDone(ex) || ex.sets?.length) {
+      <table class="slog">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th class="tgt">Target</th>
+            <th>kg</th>
+            <th>Reps</th>
+            <th class="check"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of ex.sets ?? []; track s.id) {
+          <tr class="set-row" [class.set-row--done]="s.isCompleted" [class.set-row--current]="isCurrentSet(ex, s)">
+            <td class="num">{{ s.orderIndex + 1 }}</td>
+            <td class="tgt">
+              @if (setTarget(s)) {
+              <span>{{ setTarget(s) }}</span>
+              } @else {
+              <span class="muted">—</span>
+              }
+            </td>
+            <td>
+              <input pInputText type="text" inputmode="decimal" class="numin" [value]="s.weightKg ?? ''"
+                [placeholder]="s.assignedSet?.targetWeightKg ?? s.assignedSet?.resolvedWeightKg ?? 'kg'"
+                [disabled]="isComplete()" (blur)="onWeightBlur(ex, s, $any($event.target).value)" />
+            </td>
+            <td>
+              <input pInputText type="text" inputmode="numeric" class="numin" [value]="s.reps ?? ''"
+                [placeholder]="s.assignedSet?.targetRepsMin ?? 'reps'" [disabled]="isComplete()"
+                (blur)="onRepsBlur(ex, s, $any($event.target).value)" />
+            </td>
+            <td class="check">
+              <p-button [icon]="s.isCompleted ? 'pi pi-check' : 'pi pi-circle'" rounded size="small"
+                [severity]="s.isCompleted ? 'success' : 'secondary'" [outlined]="!s.isCompleted" [disabled]="isComplete()"
+                [ariaLabel]="s.isCompleted ? 'Mark set incomplete' : 'Mark set done'"
+                (onClick)="toggleComplete(ex, s)" />
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (!isComplete()) {
+      <div class="px-3 pb-2.5 pt-2">
+        <p-button label="Add set" icon="pi pi-plus" severity="secondary" [text]="true" size="small" fluid
+          (onClick)="addSet(ex)" />
+      </div>
+      }
+      }
+    </article>
+    }
+
+    @if (!isComplete()) {
+    <p-button label="Add exercise" icon="pi pi-plus" severity="secondary" [outlined]="true" fluid
+      (onClick)="openAddExercise()" />
+    }
+    }
+  </main>
+
+  @if (!isComplete()) {
+  <!-- Sticky rest card — only when resting -->
+  @if (restSecondsLeft() != null) {
+  <aside class="rest-card">
+    <div class="rest-card__main">
+      <div class="big">{{ restLabel() }}</div>
+      @if (restNextSet(); as next) {
+      <div class="nx">
+        Next · <strong>{{ restNextExerciseName() }}</strong>
+        @if (next.assignedSet?.targetWeightKg ?? next.assignedSet?.resolvedWeightKg; as kg) {
+        · {{ kg }} kg
+        }
+        @if (next.assignedSet?.targetRepsMin; as reps) {
+        × {{ reps }}
+        }
+      </div>
+      } @else {
+      <div class="nx">All sets complete · tap finish below</div>
+      }
+    </div>
+    <p-button label="−10" severity="warn" [text]="true" (onClick)="restMinus()" />
+    <p-button label="+10" severity="warn" [text]="true" (onClick)="restPlus()" />
+    <p-button icon="pi pi-forward" severity="warn" pTooltip="Skip rest" ariaLabel="Skip rest" (onClick)="restSkip()" />
+  </aside>
+  }
+
+  <!-- Sticky complete bar -->
+  <footer class="complete-bar">
+    <div class="cb-progress">
+      <p-progressbar [value]="progressPercent()" [showValue]="false" class="flex-1 [&_.p-progressbar]:h-1.5" />
+      <span class="cb-progress__lbl">{{ setsDone() }} / {{ totalSets() }} sets</span>
+    </div>
+    <p-button [label]="isFreestyle() ? 'Finish & save' : 'Complete workout'" icon="pi pi-flag-fill" severity="success"
+      size="large" [loading]="completing()" (onClick)="confirmComplete()" fluid />
+  </footer>
+  } @else {
+  <footer class="complete-bar complete-bar--done">
+    <i class="pi pi-check-circle"></i>
+    <span>Workout completed</span>
+    @if (l.completedAt) {
+    <span class="muted">at {{ l.completedAt | date: 'shortTime' }}</span>
+    }
+  </footer>
+  }
+  }
+</div>
+
+<p-toast position="top-right" />
+<p-confirmdialog [appendTo]="'body'" />
+
+@if (log(); as l) {
+<mh-exercise-picker-dialog [program]="$any({ id: 'inline' })" [workout]="$any({ id: l.id, name: l.name })"
+  [emitOnly]="true" [(visible)]="pickerOpen" (picked)="onExercisePicked($event)" />
+}

@@ -8,12 +8,12 @@ import { Button } from 'primeng/button';
 import { Menu } from 'primeng/menu';
 import { Tooltip } from 'primeng/tooltip';
 import { MenuItem } from 'primeng/api';
-import { Group, JoinPolicies, joinPolicyLabel, joinPolicySeverity, TagSeverity } from 'core';
+import { Group, Hex, JoinPolicies, joinPolicyLabel, joinPolicySeverity, TagSeverity } from 'core';
 import { paletteFor, monogramFromName } from '../_utils/group-palette.util';
 
 @Component({
   selector: 'mh-group-card',
-  imports: [RouterLink, Card, Avatar, AvatarGroup, Tag, Button, Menu, Tooltip],
+  imports: [RouterLink, Card, Avatar, AvatarGroup, Tag, Button, Menu, Tooltip, Hex],
   templateUrl: './group-card.html',
   styleUrl: './group-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,14 +73,13 @@ export class GroupCard {
     return monogramFromName(this.group().name);
   }
 
-  get avatarStyle(): Record<string, string> | null {
-    if (this.group().logoUrl) return null;
-    const palette = paletteFor(this.group().id);
-    return {
-      background: `linear-gradient(155deg, var(--p-${palette}-400), var(--p-${palette}-600))`,
-      color: `var(--p-${palette}-50)`,
-      fontWeight: '700',
-    };
+  /** Solid palette fill for the hex badge (gradient isn't valid SVG fill). */
+  get badgeBg(): string {
+    return `var(--p-${paletteFor(this.group().id)}-500)`;
+  }
+
+  get badgeFg(): string {
+    return `var(--p-${paletteFor(this.group().id)}-50)`;
   }
 
   get policyLabel(): string {

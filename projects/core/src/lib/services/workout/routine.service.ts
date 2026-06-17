@@ -17,7 +17,7 @@ const BASE = '/routines';
 /**
  * Saved workout shapes (per-user templates). CRUD + `start()` — start
  * returns a fresh `WorkoutLog` with no assignment; the FE then navigates
- * to `/my/workout-log/:id` to land on the active log.
+ * to `/user/workout-log/:id` to land on the active log.
  */
 @Injectable({ providedIn: 'root' })
 export class RoutineService {

@@ -6,24 +6,6 @@
   padding: 4px 4px 8px 4px;
 }
 
-.invite-friend__hero {
-  width: 88px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary-500, #f59e0b), var(--color-primary-400, #fb923c));
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  margin-bottom: 12px;
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-}
-
-.invite-friend__bee {
-  font-size: 44px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
-}
-
 .invite-friend__title {
   font-family: var(--font-heading);
   font-size: 20px;

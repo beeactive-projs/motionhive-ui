@@ -20,7 +20,7 @@ import {
   PostService,
   showApiError,
 } from 'core';
-import { Avatar } from '../../../../../_shared/components/avatar/avatar';
+import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 
 const PAGE_SIZE = 50;
 
@@ -28,7 +28,7 @@ type ModerationDecision = ModeratePostPayload['decision'];
 
 @Component({
   selector: 'mh-post-pending-queue',
-  imports: [DatePipe, Avatar, Button, CardModule, SkeletonModule, TagModule],
+  imports: [DatePipe, HexAvatar, Button, CardModule, SkeletonModule, TagModule],
   templateUrl: './post-pending-queue.html',
   styleUrl: './post-pending-queue.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

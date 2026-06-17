@@ -153,6 +153,43 @@ a.mh-nav-active {
   line-height: 1;
 }
 
+// --- Coach / Train workspace toggle (instructor-only) ---
+// Small, simple switch that sits inline between the common nav items and the
+// coach/train items it governs — so it's clear it only swaps that block.
+.mode-switch {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 1px;
+  margin: 0.75rem 0.75rem 0.25rem;
+  padding: 2px;
+  background: var(--p-navy-100, #d9e2ec);
+  border-radius: 0.5rem;
+}
+
+.mode-switch__btn {
+  border: none;
+  background: transparent;
+  border-radius: 0.375rem;
+  padding: 0.2rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover:not(.is-active) {
+    color: var(--color-navy-800, #12233d);
+  }
+
+  &.is-active {
+    background: var(--color-navy-800, #12233d);
+    color: #ffffff;
+  }
+}
+
 // --- Content ---
 .content {
   display: flex;

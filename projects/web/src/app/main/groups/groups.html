@@ -93,8 +93,15 @@
           <a [routerLink]="['/groups', g.id]"
             routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
-            <p-avatar [image]="g.logoUrl ?? undefined" [label]="g.logoUrl ? undefined : monogram(g)" shape="square"
-              size="large" class="gp-avatar" [style]="avatarStyle(g)" />
+            <mh-hex
+              orientation="pointy"
+              [size]="40"
+              [round]="6"
+              [img]="g.logoUrl ?? null"
+              [label]="g.logoUrl ? null : monogram(g)"
+              [bg]="badgeBg(g)"
+              [fg]="badgeFg(g)"
+            />
 
             <span class="min-w-0 flex-1">
               <span class="block truncate font-medium">{{ g.name }}</span>

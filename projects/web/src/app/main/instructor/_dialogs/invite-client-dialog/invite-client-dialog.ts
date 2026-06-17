@@ -20,6 +20,7 @@ import { SelectButton } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { Tooltip } from 'primeng/tooltip';
 import { UserSearchAutocomplete } from '../../../../_shared/components/user-search-autocomplete/user-search-autocomplete';
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 type InviteMode = 'find' | 'email';
 
@@ -36,6 +37,7 @@ type InviteMode = 'find' | 'email';
     TextareaModule,
     Tooltip,
     UserSearchAutocomplete,
+    HexAvatar,
   ],
   templateUrl: './invite-client-dialog.html',
   styleUrl: './invite-client-dialog.scss',
