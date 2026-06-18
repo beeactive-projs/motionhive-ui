@@ -30,12 +30,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       align-items: center;
       justify-content: center;
       min-width: 20px;
-      height: 18px;
+      height: 20px;
       padding: 0 6px;
       border-radius: 999px;
       background: #f97066;
       color: #ffffff;
-      font-size: 10px;
+      font-size: 11.5px;
       font-weight: 700;
       line-height: 1;
     }

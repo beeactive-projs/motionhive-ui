@@ -28,13 +28,15 @@ export class InboxPage {
 
   /**
    * On mobile the list and chat are mutually exclusive: when a conversation
-   * is open (or compose mode is on) the right pane takes the screen and the
-   * list hides; otherwise the list takes the screen. Drives the `has-active`
-   * class — desktop ignores it and shows both columns side by side.
+   * is open the chat takes the screen and the list hides; otherwise the list
+   * takes the screen. Drives the `has-active` class — desktop ignores it and
+   * shows both columns side by side.
+   *
+   * Compose mode is deliberately NOT folded in here: the new-message picker
+   * renders as an overlay (a bottom sheet on mobile, a right-pane panel on
+   * desktop), so the inbox list stays visible behind it.
    */
-  protected readonly hasActivePane = computed(
-    () => !!this.store.activeId() || this.store.composeMode(),
-  );
+  protected readonly hasActivePane = computed(() => !!this.store.activeId());
 
   protected onNewMessage(): void {
     this.store.enterComposeMode();

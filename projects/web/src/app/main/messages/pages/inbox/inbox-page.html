@@ -31,7 +31,7 @@
       aria-label="New message"
     >
       <i class="pi pi-pencil" aria-hidden="true"></i>
-      <span>New message</span>
+      <span class="mh-inbox__btn-label">New message</span>
     </button>
   </header>
 
@@ -41,16 +41,17 @@
     </aside>
 
     <main class="mh-inbox__chat-column">
-      @if (store.composeMode()) {
-        <!--
-          Compose mode rents the right pane. The router-outlet is
-          intentionally NOT rendered while compose is on so a stale
-          /messages/:id route doesn't render under the picker.
-        -->
-        <mh-new-message-picker />
-      } @else {
-        <router-outlet />
-      }
+      <router-outlet />
     </main>
   </div>
+
+  <!--
+    Compose overlay. Desktop: a panel over the right pane. Mobile: a
+    bottom sheet over the dimmed inbox list (the component picks the
+    presentation from the viewport). Rendered outside the body so it
+    floats above both columns and the inbox list stays visible behind.
+  -->
+  @if (store.composeMode()) {
+    <mh-new-message-picker />
+  }
 </div>

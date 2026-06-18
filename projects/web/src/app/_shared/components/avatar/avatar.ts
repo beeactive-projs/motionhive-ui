@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { AvatarModule } from 'primeng/avatar';
-import { AvatarUser } from 'core';
+import { AvatarUser, withCloudinaryTransform } from 'core';
 import { HexAvatar } from '../hex-avatar/hex-avatar';
 
 export type AvatarSize = 'normal' | 'large' | 'xlarge';
@@ -32,8 +32,23 @@ export class Avatar {
   /** Opt back into the legacy circular avatar (default is the brand hex). */
   readonly circle = input<boolean>(false);
 
-  readonly image = computed(() => this.user()?.avatarUrl ?? undefined);
   readonly hexSize = computed(() => HEX_PX[this.size()]);
+
+  readonly image = computed(() => {
+    const raw = this.user()?.avatarUrl;
+    if (!raw) return undefined;
+    // Face-cropped thumbnail (~2× rendered px) instead of the full-res
+    // original — avoids the NG0913 oversized-image performance warning.
+    const px = HEX_PX[this.size()] * 2;
+    return withCloudinaryTransform(raw, {
+      width: px,
+      height: px,
+      crop: 'fill',
+      gravity: 'face',
+      quality: 'auto',
+      format: 'auto',
+    });
+  });
 
   readonly initials = computed(() => {
     const u = this.user();

@@ -1144,24 +1144,47 @@ export class MessagingStore {
   }
 
   /**
-   * Apply a `conversation.read` event. The BE only emits this to the
-   * reader (and only when they read from another device), so the
-   * payload's `userId` should always match the current user. We
-   * defensively check anyway.
+   * Apply a `conversation.read` event. The BE emits this to the *other*
+   * active participants when someone marks a conversation read, carrying
+   * the reader's `userId` + `lastReadAt`.
+   *
+   * - When `userId` is someone else (the common case for a DM): the other
+   *   side just read the thread, so we advance `lastReadByOther` — this
+   *   drives the "Read" receipt on our own messages.
+   * - When `userId` is us (a cross-device echo, if the BE ever sends one):
+   *   clear our local unread badge.
    */
   private applyConversationRead(
     event: Extract<MessagingStreamEvent, { type: 'conversation.read' }>,
   ): void {
-    const { conversationId, userId } = event.payload;
+    const { conversationId, userId, lastReadAt } = event.payload;
     const myId = this._auth.user()?.id ?? null;
-    if (userId !== myId) return;
 
+    if (userId === myId) {
+      this._conversations.update((list) =>
+        list.map((c) =>
+          c.id === conversationId && c.unreadCount > 0
+            ? { ...c, unreadCount: 0 }
+            : c,
+        ),
+      );
+      return;
+    }
+
+    // The other participant read the thread — advance the read marker so
+    // our sent messages flip to "Read". Guard against an out-of-order event
+    // moving the marker backwards.
     this._conversations.update((list) =>
-      list.map((c) =>
-        c.id === conversationId && c.unreadCount > 0
-          ? { ...c, unreadCount: 0 }
-          : c,
-      ),
+      list.map((c) => {
+        if (c.id !== conversationId) return c;
+        if (
+          c.lastReadByOther &&
+          new Date(lastReadAt).getTime() <= new Date(c.lastReadByOther).getTime()
+        ) {
+          return c;
+        }
+        return { ...c, lastReadByOther: lastReadAt };
+      }),
     );
   }
 

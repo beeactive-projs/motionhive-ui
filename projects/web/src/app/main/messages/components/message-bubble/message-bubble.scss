@@ -42,22 +42,24 @@
 }
 
 .mh-bubble__body {
-  padding: 8px 12px;
-  font-size: 13.5px;
-  line-height: 1.45;
+  padding: 9px 14px;
+  font-size: 15px;
+  line-height: 1.4;
   white-space: pre-wrap;
   word-wrap: break-word;
   color: #0f172a;
   background: #fff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.03);
 }
 
 .mh-bubble--me .mh-bubble__body {
   background: #f59e0b;
+  // Warm dark-brown ink reads better on honey than navy (design token).
+  color: #3a2406;
   border-color: transparent;
   // Same inset shadow as the primary button — subtle "pressed" feel.
-  box-shadow: 0 1px 0 rgba(120, 53, 15, 0.12);
+  box-shadow: inset 0 -1px 0 rgba(120, 53, 15, 0.14);
 }
 
 .mh-bubble__body--deleted {
@@ -66,10 +68,33 @@
 }
 
 .mh-bubble__meta {
-  font-size: 10.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
   color: #94a3b8;
-  margin-top: 3px;
+  margin-top: 4px;
   padding-inline: 4px;
+}
+
+// "Me" bubbles align their meta to the right edge of the stack.
+.mh-bubble--me .mh-bubble__meta {
+  flex-direction: row-reverse;
+}
+
+.mh-bubble__meta-sep {
+  opacity: 0.7;
+}
+
+.mh-bubble__tick {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+// Read state: honey-strong tick + label.
+.mh-bubble__meta--read {
+  color: #b45309;
 }
 
 // ── Dark mode ────────────────────────────────────────────────────
@@ -83,14 +108,17 @@
     color: var(--p-surface-50, #f1f5f9);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   }
-  // "Me" bubbles keep the honey fill — readable on dark.
+  // "Me" bubbles keep the honey fill — warm dark ink stays readable.
   .mh-bubble--me .mh-bubble__body {
-    color: #0f172a;
+    color: #2a1903;
   }
   .mh-bubble__body--deleted {
     color: var(--p-surface-400, #94a3b8);
   }
   .mh-bubble__meta {
     color: var(--p-surface-400, #94a3b8);
+  }
+  .mh-bubble__meta--read {
+    color: #fbbf24;
   }
 }

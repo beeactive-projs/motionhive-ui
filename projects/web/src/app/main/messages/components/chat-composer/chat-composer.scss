@@ -27,16 +27,16 @@
 
 .mh-composer__input {
   flex: 1;
-  min-height: 36px;
+  min-height: 40px;
   max-height: 160px;
   border: none;
   background: transparent;
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: 15px;
   color: #0f172a;
   outline: none;
   resize: none;
-  padding: 8px 0;
+  padding: 9px 0;
   line-height: 1.4;
   // Hide scrollbar until it's needed; let height grow with content.
   overflow-y: auto;
@@ -47,13 +47,13 @@
 }
 
 .mh-composer__send {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   border-radius: 999px;
   border: none;
   background: #f59e0b;
-  color: #0f172a;
+  color: #3a2406;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -70,7 +70,7 @@
 }
 
 .mh-composer__send i {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .mh-composer-error {
@@ -113,7 +113,9 @@
 
 @media (max-width: 768px) {
   .mh-composer-wrap {
-    padding: 10px 14px 12px;
+    padding: 10px 12px;
+    // Keep the composer clear of the home indicator / gesture bar.
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
 }
 

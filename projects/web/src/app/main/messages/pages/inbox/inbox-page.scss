@@ -1,18 +1,28 @@
-// Inbox shell — Stage F1 scaffold. Real split-view styling lands in F2.
+// Inbox shell. The host is a flex child of the layout's
+// `<main class="flex flex-col flex-1 overflow-auto">`; it must fill that
+// space and own its OWN scrolling (min-height:0 lets the inner message
+// thread scroll instead of the whole page — otherwise a long thread pushes
+// the composer below the fold on mobile).
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  // Defensive: when the layout's <main> is height-bounded, fill it.
   height: 100%;
 }
 
 .mh-inbox {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   min-height: 0;
   // Contain scrolling INSIDE the inbox — only the message thread scrolls, so
   // the chat header + composer stay pinned and the page itself never scrolls.
   overflow: hidden;
   background: var(--surface-50, #fcfaf6);
+  // Positioning context for the compose overlay (desktop right-pane panel).
+  position: relative;
 }
 
 .mh-inbox__header {
@@ -27,8 +37,9 @@
 .mh-inbox__title {
   margin: 0;
   font-family: var(--font-display, 'Poppins'), 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 19px;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
   color: var(--navy-900, #0f172a);
 }
 
@@ -123,6 +134,10 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  // min-height:0 is essential on mobile, where the body is a COLUMN flex:
+  // without it the chat column grows to its content height, the composer
+  // gets clipped by the inbox's overflow:hidden, and the thread can't scroll.
+  min-height: 0;
   background: var(--surface-50, #fcfaf6);
 }
 
@@ -130,13 +145,37 @@
 // an open conversation (or compose) owns it on /messages/:id. `has-active`
 // is driven by the store (active conversation || compose mode).
 @media (max-width: 768px) {
+  // Full-screen mobile inbox: larger display title, compact icon-only CTA,
+  // and a cream list surface (no white master-column) to match the design.
+  .mh-inbox__header {
+    padding: 14px 16px 10px;
+  }
+  .mh-inbox__title {
+    font-size: 26px;
+  }
+  .mh-inbox__btn--primary {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .mh-inbox__btn-label {
+    // Icon-only on mobile — the pencil glyph carries the "compose" meaning.
+    display: none;
+  }
+  .mh-inbox__btn i {
+    font-size: 16px;
+  }
+
   .mh-inbox__body {
     flex-direction: column;
   }
   .mh-inbox__list-column {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid var(--line, rgba(15, 23, 42, 0.08));
+    border-bottom: none;
+    background: var(--surface-50, #fcfaf6);
   }
 
   // Show the list OR the conversation, never both stacked (the stacked
@@ -208,8 +247,10 @@
     border-right-color: rgba(248, 250, 252, 0.08);
   }
   @media (max-width: 768px) {
+    // Mobile: list shares the full-screen inbox surface (no master column).
     .mh-inbox__list-column {
-      border-bottom-color: rgba(248, 250, 252, 0.08);
+      background: var(--p-surface-900, #0f172a);
+      border-bottom: none;
     }
   }
 }

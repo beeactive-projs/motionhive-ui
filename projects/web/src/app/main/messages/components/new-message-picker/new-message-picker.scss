@@ -1,7 +1,13 @@
+// Desktop / tablet: the picker is a panel floating over the right pane,
+// offset by the list-column width so the inbox list stays visible.
 :host {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 340px;
+  z-index: 20;
   display: flex;
-  flex: 1;
-  min-height: 0;
 }
 
 .mh-picker {
@@ -10,6 +16,34 @@
   flex-direction: column;
   min-height: 0;
   background: #fcfaf6;
+}
+
+// Drag affordance — mobile sheet only (hidden on desktop where the
+// element isn't rendered).
+.mh-picker__grabber {
+  width: 38px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.14);
+  margin: 8px auto 2px;
+  flex-shrink: 0;
+}
+
+.mh-picker__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.34);
+  animation: mh-picker-scrim 0.3s ease;
+}
+
+@keyframes mh-picker-scrim {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mh-picker-sheet {
+  from { transform: translateY(100%); }
+  to { transform: none; }
 }
 
 .mh-picker__header {
@@ -162,10 +196,58 @@
   margin-top: auto; // sticks to the bottom when results are short
 }
 
+// ── Mobile: bottom sheet over the dimmed inbox ───────────────────
+@media (max-width: 768px) {
+  :host {
+    position: fixed;
+    inset: 0;
+    left: 0;
+    z-index: 60;
+  }
+  .mh-picker--sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 9%;
+    border-radius: 22px 22px 0 0;
+    overflow: hidden;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.2);
+    animation: mh-picker-sheet 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  // Seamless sheet surface — drop the white header/rows so the sheet
+  // reads as one cream panel (matches the design).
+  .mh-picker--sheet .mh-picker__header {
+    height: 52px;
+    padding: 0 16px;
+    background: transparent;
+    border-bottom: none;
+  }
+  .mh-picker--sheet .mh-picker__to {
+    background: transparent;
+  }
+  .mh-picker--sheet .mh-picker__results {
+    background: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mh-picker__scrim,
+    .mh-picker--sheet {
+      animation: none;
+    }
+  }
+}
+
 // ── Dark mode ────────────────────────────────────────────────────
 :host-context(.dark) {
   .mh-picker {
     background: var(--p-surface-900, #0f172a);
+  }
+  .mh-picker__scrim {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .mh-picker__grabber {
+    background: rgba(248, 250, 252, 0.18);
   }
   .mh-picker__header,
   .mh-picker__to,

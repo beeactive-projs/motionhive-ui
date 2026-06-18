@@ -36,6 +36,8 @@
         [message]="bubble.message"
         [position]="bubble.position"
         [mine]="bubble.message.senderId === currentUserId()"
+        [otherReadAt]="conversation().lastReadByOther"
+        [showReceipt]="bubble.message.id === lastMineId()"
         [author]="bubble.message.senderId === currentUserId() ? null : conversation().otherUser"
       />
     }

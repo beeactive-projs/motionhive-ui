@@ -1,4 +1,12 @@
-<section class="mh-picker">
+@if (isMobile()) {
+  <!-- Dimmed inbox behind the sheet; tap to dismiss. -->
+  <div class="mh-picker__scrim" (click)="onCancel()" aria-hidden="true"></div>
+}
+
+<section class="mh-picker" [class.mh-picker--sheet]="isMobile()">
+  @if (isMobile()) {
+    <div class="mh-picker__grabber" aria-hidden="true"></div>
+  }
   <header class="mh-picker__header">
     <button
       type="button"

@@ -30,4 +30,10 @@ export interface ConversationListItem {
   muted: boolean;
   /** DIRECT only — the other participant. Null for groups. */
   otherUser: ParticipantSnapshot | null;
+  /**
+   * DIRECT only — ISO timestamp of the other participant's last read.
+   * Powers the read receipt on the caller's own messages. Null for groups,
+   * or when the other side has never read the thread.
+   */
+  lastReadByOther: string | null;
 }

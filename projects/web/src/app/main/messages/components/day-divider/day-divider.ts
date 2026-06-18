@@ -9,40 +9,34 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   standalone: true,
   template: `
     <div class="mh-day" role="separator">
-      <span class="mh-day__line"></span>
       <span class="mh-day__label">{{ label() }}</span>
-      <span class="mh-day__line"></span>
     </div>
   `,
   styles: [`
     :host {
       display: block;
-      margin: 18px 0 14px;
+      margin: 8px 0 14px;
     }
     .mh-day {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-    .mh-day__line {
-      flex: 1;
-      height: 1px;
-      background: rgba(15, 23, 42, 0.08);
+      justify-content: center;
     }
     .mh-day__label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #94a3b8;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #8b93a3;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.07em;
+      background: #f4eee2;
+      padding: 4px 12px;
+      border-radius: 999px;
     }
 
     /* ── Dark mode ─────────────────────────────────────────── */
-    :host-context(.dark) .mh-day__line {
-      background: rgba(248, 250, 252, 0.10);
-    }
     :host-context(.dark) .mh-day__label {
       color: var(--p-surface-400, #94a3b8);
+      background: rgba(248, 250, 252, 0.06);
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,

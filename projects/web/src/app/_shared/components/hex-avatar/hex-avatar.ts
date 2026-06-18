@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { AvatarUser, Hex } from 'core';
+import { AvatarUser, Hex, withCloudinaryTransform } from 'core';
 import { HEX_AVATAR_PALETTE, HexAvatarTone, toneForUserId } from './hex-avatar-tone';
 
 /** Regular point-top hex: width:height = cos(30°):1. */
@@ -69,9 +69,21 @@ export class HexAvatar {
   protected readonly round = computed(() => (this.coreSize() <= 30 ? 5 : 7));
   protected readonly fontSize = computed(() => Math.round(this.size() * 0.36));
 
-  protected readonly resolvedImage = computed(
-    () => this.imageUrl() ?? this.user()?.avatarUrl ?? null,
-  );
+  protected readonly resolvedImage = computed(() => {
+    const raw = this.imageUrl() ?? this.user()?.avatarUrl ?? null;
+    if (!raw) return null;
+    // Request a small, face-cropped thumbnail (≈2× the rendered px for retina)
+    // instead of the full-res original — fixes the NG0913 oversized-image warn.
+    const px = Math.max(64, Math.round(this.size() * 2));
+    return withCloudinaryTransform(raw, {
+      width: px,
+      height: px,
+      crop: 'fill',
+      gravity: 'face',
+      quality: 'auto',
+      format: 'auto',
+    });
+  });
 
   protected readonly resolvedInitials = computed(() => {
     if (this.initials()) return this.initials();

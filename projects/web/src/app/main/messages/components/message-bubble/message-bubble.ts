@@ -38,9 +38,35 @@ export class MessageBubble {
    * by `senderId` against the members list.
    */
   readonly author = input<ParticipantSnapshot | null>(null);
+  /**
+   * The other participant's last-read timestamp (ISO) for DMs. Used to
+   * render the read receipt on the caller's own messages. When the
+   * message's `createdAt` is at or before this, the message is "Read";
+   * otherwise "Sent". Ignored for messages on the "them" side.
+   */
+  readonly otherReadAt = input<string | null>(null);
+  /**
+   * Whether to render the read receipt under this bubble. The thread sets
+   * this only on the caller's single most-recent message — earlier sent
+   * messages are implicitly read, so repeating the receipt is just noise.
+   */
+  readonly showReceipt = input<boolean>(false);
 
   protected readonly isMine = computed(() => this.mine());
   protected readonly isDeleted = computed(() => !!this.message().deletedAt);
+
+  /**
+   * Read-receipt state for my own messages: `'read'` once the other
+   * participant's `lastReadAt` reaches this message, else `'sent'`.
+   * `null` for "them" bubbles and deleted messages (no receipt shown).
+   */
+  protected readonly receipt = computed<'read' | 'sent' | null>(() => {
+    if (!this.mine() || this.isDeleted()) return null;
+    const readAt = this.otherReadAt();
+    if (!readAt) return 'sent';
+    const sentMs = new Date(this.message().createdAt).getTime();
+    return sentMs <= new Date(readAt).getTime() ? 'read' : 'sent';
+  });
 
   /** Avatar shown only on the last bubble of a "them" run. */
   protected readonly showAvatar = computed(() => {
@@ -85,7 +111,7 @@ export class MessageBubble {
     const pos = this.position();
     const mine = this.mine();
     // [topLeft, topRight, bottomRight, bottomLeft]
-    let tl = 16, tr = 16, br = 16, bl = 16;
+    let tl = 18, tr = 18, br = 18, bl = 18;
     if (mine) {
       if (pos === 'middle' || pos === 'first') br = 6;
       if (pos === 'middle' || pos === 'last') tr = 6;

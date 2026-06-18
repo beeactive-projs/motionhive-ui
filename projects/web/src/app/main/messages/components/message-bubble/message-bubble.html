@@ -32,7 +32,29 @@
       {{ message().body }}
     </div>
     @if (showMeta()) {
-      <div class="mh-bubble__meta">{{ timeLabel() }}</div>
+      <div
+        class="mh-bubble__meta"
+        [class.mh-bubble__meta--read]="showReceipt() && receipt() === 'read'"
+      >
+        <span>{{ timeLabel() }}</span>
+        @if (showReceipt() && receipt(); as r) {
+          <span class="mh-bubble__meta-sep" aria-hidden="true">·</span>
+          <svg
+            class="mh-bubble__tick"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M2 12l4 4 8-9" />
+            <path d="M11 16l1 1 9-10" />
+          </svg>
+          <span>{{ r === 'read' ? 'Read' : 'Sent' }}</span>
+        }
+      </div>
     }
   </div>
 </div>
