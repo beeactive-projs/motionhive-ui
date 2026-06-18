@@ -28,16 +28,10 @@ import {
   ActionItem,
   ActionList,
   BottomSheet,
-  DaySeparator,
-  MobileFab,
-  SectionLabel,
-  SessionCard,
   SessionInstanceStatus,
   SessionKind,
   SessionLocationKind,
   SessionsInstructorStore,
-  TimeRow,
-  TimeRowSkeleton,
   dayTone,
   formatSessionDuration,
   formatSessionTime,
@@ -50,6 +44,12 @@ import {
   type SessionTemplate,
   injectIsTablet,
 } from 'core';
+import { DaySeparator } from '../../../_shared/components/day-separator/day-separator';
+import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
+import { SectionLabel } from '../../../_shared/components/section-label/section-label';
+import { SessionCard } from '../../../_shared/components/session-card/session-card';
+import { TimeRow } from '../../../_shared/components/time-row/time-row';
+import { TimeRowSkeleton } from '../../../_shared/components/time-row-skeleton/time-row-skeleton';
 import { KpiCard } from '../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { SessionFormDialog } from './_dialogs/session-form-dialog/session-form-dialog';

@@ -7,11 +7,11 @@ import {
 import { ButtonModule } from 'primeng/button';
 import {
   BottomSheet,
-  DaySeparator,
-  MobileFab,
   StickyCta,
-  TimeRow,
 } from 'core';
+import { DaySeparator } from '../../_shared/components/day-separator/day-separator';
+import { MobileFab } from '../../_shared/components/mobile-fab/mobile-fab';
+import { TimeRow } from '../../_shared/components/time-row/time-row';
 
 /**
  * `mh-primitives-debug` — dev-only kitchen-sink view for the 5 mobile

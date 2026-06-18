@@ -19,13 +19,13 @@ import {
   injectIsTablet,
   injectIsTabletDown,
   InstructorClient,
-  MobileFab,
   InstructorClientStatus,
   InstructorClientStatuses,
   PendingClientLabels,
   showApiError,
   TagSeverity,
 } from 'core';
+import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';

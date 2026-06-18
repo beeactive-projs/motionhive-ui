@@ -216,6 +216,13 @@ export interface SessionParticipant {
   cancelReason: string | null;
   waitlistPosition: number | null;
   user?: SessionInstructorRef; // reusing the compact ref shape
+  /**
+   * Eager-loaded occurrence the booking belongs to. The `listMy` response
+   * embeds the instance + its template (title, type, location, duration,
+   * capacity) and the denormalized `confirmedCount`, so the My-sessions
+   * row can render time/title/price/capacity without extra requests.
+   */
+  instance?: SessionInstance;
 }
 
 // ─── Service request / response shapes ───────────────────────────────────

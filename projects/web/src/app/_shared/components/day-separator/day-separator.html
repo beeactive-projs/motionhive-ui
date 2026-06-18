@@ -1,0 +1,16 @@
+<div
+  class="mh-ds"
+  [class.mh-ds--today]="tone() === 'today'"
+  [class.mh-ds--conflict]="tone() === 'conflict'"
+  [class.mh-ds--sticky]="sticky()"
+  role="heading"
+  aria-level="2"
+>
+  <span class="mh-ds__label">{{ label() }}</span>
+  @if (count() != null) {
+    <span class="mh-ds__count">· {{ count() }} {{ count() === 1 ? 'session' : 'sessions' }}</span>
+  }
+  @if (note()) {
+    <span class="mh-ds__note">· {{ note() }}</span>
+  }
+</div>

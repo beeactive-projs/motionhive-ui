@@ -1,0 +1,29 @@
+<div
+  class="mh-tr"
+  [class.mh-tr--honey]="tone() === 'honey'"
+  [class.mh-tr--teal]="tone() === 'teal'"
+  [class.mh-tr--navy]="tone() === 'navy'"
+  [class.mh-tr--coral]="tone() === 'coral'"
+  [class.mh-tr--muted]="tone() === 'muted'"
+  [class.mh-tr--conflict]="conflict()"
+  [class.mh-tr--static]="!interactive()"
+>
+  <div class="mh-tr__time">
+    <span class="mh-tr__h">{{ time() }}</span>
+    @if (duration()) {
+      <span class="mh-tr__d">{{ duration() }}</span>
+    }
+  </div>
+  <div class="mh-tr__main">
+    <div class="mh-tr__title">{{ title() }}</div>
+    <div class="mh-tr__meta">
+      <ng-content select="[meta]"></ng-content>
+    </div>
+  </div>
+  <div class="mh-tr__trail">
+    <ng-content select="[trailing]"></ng-content>
+    @if (chevron()) {
+      <i class="pi pi-angle-right mh-tr__chev" aria-hidden="true"></i>
+    }
+  </div>
+</div>

@@ -23,9 +23,9 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 
+import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import {
   ListProgramsQuery,
-  MobileFab,
   PaginatedPrograms,
   Program,
   ProgramService,

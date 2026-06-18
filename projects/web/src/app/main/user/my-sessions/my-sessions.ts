@@ -20,19 +20,14 @@ import { ToastModule } from 'primeng/toast';
 import { Popover } from 'primeng/popover';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import {
-  DaySeparator,
-  MobileFab,
+  CurrencyRonPipe,
   MyBookingsIndexStore,
   MyTab,
-  ProviderChip,
-  SectionLabel,
   SessionKind,
   SessionLocationKind,
   SessionParticipant,
   SessionParticipantStatus,
   SessionsMyStore,
-  TimeRow,
-  TimeRowSkeleton,
   dayTone,
   formatSessionDuration,
   formatSessionTime,
@@ -41,9 +36,16 @@ import {
   injectIsTabletDown,
   sessionDayLabel,
 } from 'core';
+import { DaySeparator } from '../../../_shared/components/day-separator/day-separator';
+import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
+import { ProviderChip } from '../../../_shared/components/provider-chip/provider-chip';
+import { SectionLabel } from '../../../_shared/components/section-label/section-label';
+import { TimeRow } from '../../../_shared/components/time-row/time-row';
+import { TimeRowSkeleton } from '../../../_shared/components/time-row-skeleton/time-row-skeleton';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { CancelBookingDialog } from './_dialogs/cancel-booking-dialog/cancel-booking-dialog';
-import { Badge } from "primeng/badge";
+import { Badge } from 'primeng/badge';
+import { Divider } from 'primeng/divider';
 
 interface TabSpec {
   key: MyTab;
@@ -84,7 +86,8 @@ const VALID_TABS = new Set<string>(Object.values(MyTab));
     CancelBookingDialog,
     Badge,
     Popover,
-],
+    CurrencyRonPipe,
+  ],
   providers: [SessionsMyStore, MessageService],
   templateUrl: './my-sessions.html',
   styleUrl: './my-sessions.scss',
@@ -110,7 +113,12 @@ export class MySessions implements OnInit {
 
   protected readonly tabs: TabSpec[] = [
     { key: MyTab.Upcoming, label: 'Upcoming', icon: 'pi pi-calendar', countKey: 'upcoming' },
-    { key: MyTab.PendingApproval, label: 'Pending', icon: 'pi pi-hourglass', countKey: 'pendingApproval' },
+    {
+      key: MyTab.PendingApproval,
+      label: 'Pending',
+      icon: 'pi pi-hourglass',
+      countKey: 'pendingApproval',
+    },
     { key: MyTab.Waitlisted, label: 'Waitlisted', icon: 'pi pi-clock', countKey: 'waitlisted' },
     { key: MyTab.Past, label: 'Past', icon: 'pi pi-history', countKey: 'past' },
     { key: MyTab.Cancelled, label: 'Cancelled', icon: 'pi pi-times-circle', countKey: 'cancelled' },
@@ -158,8 +166,7 @@ export class MySessions implements OnInit {
    */
   protected readonly groupedItems = computed(() => {
     const items = this.filteredItems();
-    const desc =
-      this.store.tab() === MyTab.Past || this.store.tab() === MyTab.Cancelled;
+    const desc = this.store.tab() === MyTab.Past || this.store.tab() === MyTab.Cancelled;
     const groups = new Map<string, { date: Date; items: SessionParticipant[] }>();
     for (const p of items) {
       const s = this.startAt(p);
@@ -222,9 +229,7 @@ export class MySessions implements OnInit {
 
   protected onTabChange(value: string | number | undefined): void {
     const tab =
-      typeof value === 'string' && VALID_TABS.has(value)
-        ? (value as MyTab)
-        : MyTab.Upcoming;
+      typeof value === 'string' && VALID_TABS.has(value) ? (value as MyTab) : MyTab.Upcoming;
     this.store.setTab(tab);
   }
 
@@ -295,30 +300,47 @@ export class MySessions implements OnInit {
   }
 
   protected isOnline(p: SessionParticipant): boolean {
-    return (
-      (p as SessionParticipant & { instance?: { template?: { locationKind?: string } } })
-        .instance?.template?.locationKind === SessionLocationKind.Online
-    );
+    return p.instance?.template?.locationKind === SessionLocationKind.Online;
   }
 
   protected meetingProvider(p: SessionParticipant): string | null {
-    const i = (p as SessionParticipant & { instance?: { template?: { meetingProvider?: string } } }).instance;
-    return i?.template?.meetingProvider ?? null;
+    return p.instance?.template?.meetingProvider ?? null;
   }
 
   protected sessionType(p: SessionParticipant): string | null {
-    const i = (p as SessionParticipant & { instance?: { template?: { type?: string } } }).instance;
-    return i?.template?.type ?? null;
+    return p.instance?.template?.type ?? null;
   }
 
   protected sessionTitle(p: SessionParticipant): string {
-    const i = (p as SessionParticipant & { instance?: { template?: { title?: string }; titleOverride?: string | null } }).instance;
+    const i = p.instance;
     return i?.titleOverride ?? i?.template?.title ?? '(Session)';
   }
 
   protected startAt(p: SessionParticipant): string | null {
-    const i = (p as SessionParticipant & { instance?: { startAt?: string } }).instance;
-    return i?.startAt ?? null;
+    return p.instance?.startAt ?? null;
+  }
+
+  /**
+   * Capacity denominator for the "N / M booked" readout — the
+   * per-occurrence override wins, falling back to the template capacity.
+   * Null for 1-on-1 sessions or when the wire omits it.
+   */
+  protected sessionCapacity(p: SessionParticipant): number | null {
+    const i = p.instance;
+    return i?.capacityOverride ?? i?.template?.capacity ?? null;
+  }
+
+  /** Confirmed signups on the occurrence (denormalized on the instance). */
+  protected confirmedCount(p: SessionParticipant): number {
+    return p.instance?.confirmedCount ?? 0;
+  }
+
+  /** True for group/open sessions that have a known capacity to show. */
+  protected showsCapacity(p: SessionParticipant): boolean {
+    const type = this.sessionType(p);
+    return (
+      this.sessionCapacity(p) != null && (type === SessionKind.Group || type === SessionKind.Open)
+    );
   }
 
   /** Row time label (e.g. "09:00"), em-dash when the start is unknown. */
@@ -329,8 +351,7 @@ export class MySessions implements OnInit {
 
   /** Row duration label (e.g. "60 min"), empty when unknown. */
   protected rowDuration(p: SessionParticipant): string {
-    const mins = (p as SessionParticipant & { instance?: { template?: { durationMinutes?: number } } })
-      .instance?.template?.durationMinutes;
+    const mins = p.instance?.template?.durationMinutes;
     return mins ? this.formatDuration(mins) : '';
   }
 
@@ -351,24 +372,47 @@ export class MySessions implements OnInit {
     s: SessionParticipant['status'],
   ): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
     switch (s) {
-      case SessionParticipantStatus.Confirmed: return 'success';
-      case SessionParticipantStatus.PendingApproval: return 'warn';
-      case SessionParticipantStatus.Waitlisted: return 'info';
+      case SessionParticipantStatus.Confirmed:
+        return 'success';
+      case SessionParticipantStatus.PendingApproval:
+        return 'warn';
+      case SessionParticipantStatus.Waitlisted:
+        return 'info';
       case SessionParticipantStatus.Cancelled:
-      case SessionParticipantStatus.Declined: return 'danger';
-      default: return 'secondary';
+      case SessionParticipantStatus.Declined:
+        return 'danger';
+      default:
+        return 'secondary';
     }
   }
 
   protected statusLabel(s: SessionParticipant['status']): string {
     switch (s) {
-      case SessionParticipantStatus.Confirmed: return 'Confirmed';
-      case SessionParticipantStatus.PendingApproval: return 'Pending approval';
-      case SessionParticipantStatus.Waitlisted: return 'Waitlisted';
-      case SessionParticipantStatus.Cancelled: return 'Cancelled';
-      case SessionParticipantStatus.Declined: return 'Declined';
-      default: return s;
+      case SessionParticipantStatus.Confirmed:
+        return 'Confirmed';
+      case SessionParticipantStatus.PendingApproval:
+        return 'Pending approval';
+      case SessionParticipantStatus.Waitlisted:
+        return 'Waitlisted';
+      case SessionParticipantStatus.Cancelled:
+        return 'Cancelled';
+      case SessionParticipantStatus.Declined:
+        return 'Declined';
+      default:
+        return s;
     }
+  }
+
+  /**
+   * Status tag label, with the queue position appended for waitlisted
+   * rows (e.g. "Waitlisted · #2"). Falls back to the plain label.
+   */
+  protected rowStatusLabel(p: SessionParticipant): string {
+    const base = this.statusLabel(p.status);
+    if (p.status === SessionParticipantStatus.Waitlisted && p.waitlistPosition != null) {
+      return `${base} · #${p.waitlistPosition}`;
+    }
+    return base;
   }
 
   /** Local-zone YYYY-MM-DD so "today" reflects the user's timezone. */

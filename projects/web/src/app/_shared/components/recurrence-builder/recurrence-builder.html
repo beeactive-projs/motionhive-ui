@@ -1,0 +1,103 @@
+<div class="mh-rec">
+  <!-- Frequency -->
+  <div class="mh-rec__row">
+    <span class="mh-rec__label">Repeats</span>
+    <div class="mh-rec__chips">
+      @for (f of frequencies; track f.value) {
+        <button
+          type="button"
+          class="mh-rec__chip"
+          [class.is-active]="rule().frequency === f.value"
+          (click)="setFrequency(f.value)"
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Interval -->
+  <div class="mh-rec__row">
+    <span class="mh-rec__label">Every</span>
+    <p-inputNumber
+      [(ngModel)]="intervalValue"
+      (ngModelChange)="setInterval($event)"
+      [min]="1"
+      [max]="99"
+      [showButtons]="true"
+      inputStyleClass="mh-rec__num"
+    />
+    <span class="mh-rec__hint">{{ periodLabel() }}</span>
+  </div>
+
+  <!-- Days of week (WEEKLY only) -->
+  @if (rule().frequency === 'WEEKLY') {
+    <div class="mh-rec__row">
+      <span class="mh-rec__label">On</span>
+      <div class="mh-rec__dows" role="group" aria-label="Days of week">
+        @for (d of dayLabels; track d.iso) {
+          <button
+            type="button"
+            class="mh-rec__dow"
+            [class.is-active]="isDowSelected(d.iso)"
+            (click)="toggleDow(d.iso)"
+            [attr.aria-pressed]="isDowSelected(d.iso)"
+          >
+            {{ d.short }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- End conditions -->
+  <div class="mh-rec__row mh-rec__row--end">
+    <span class="mh-rec__label">Ends</span>
+    <div class="mh-rec__seg" role="radiogroup">
+      <button
+        type="button"
+        class="mh-rec__seg-btn"
+        [class.is-active]="endMode() === 'never'"
+        (click)="setEndMode('never')"
+      >Never</button>
+      <button
+        type="button"
+        class="mh-rec__seg-btn"
+        [class.is-active]="endMode() === 'date'"
+        (click)="setEndMode('date')"
+      >On date</button>
+      <button
+        type="button"
+        class="mh-rec__seg-btn"
+        [class.is-active]="endMode() === 'count'"
+        (click)="setEndMode('count')"
+      >After N times</button>
+    </div>
+    @if (endMode() === 'date') {
+      <p-datepicker
+        [(ngModel)]="endDateValue"
+        (ngModelChange)="setEndDate($event)"
+        dateFormat="dd M yy"
+        [appendTo]="'body'"
+        placeholder="Pick a date"
+      />
+    }
+    @if (endMode() === 'count') {
+      <p-inputNumber
+        [(ngModel)]="endCountValue"
+        (ngModelChange)="setEndCount($event)"
+        [min]="1"
+        [max]="24"
+        [showButtons]="true"
+        inputStyleClass="mh-rec__num"
+      />
+      <span class="mh-rec__hint">occurrences (max 24)</span>
+    }
+  </div>
+
+  <!-- Plain English -->
+  <div class="mh-rec__summary">
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+    <span>{{ plainEnglish() }}</span>
+  </div>
+</div>

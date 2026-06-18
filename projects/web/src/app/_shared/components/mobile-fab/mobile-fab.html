@@ -1,0 +1,13 @@
+<div
+  class="mh-fab"
+  [class.mh-fab--hidden]="hidden()"
+  [class.mh-fab--force]="force()"
+>
+  <p-button
+    [icon]="icon()"
+    [rounded]="true"
+    [ariaLabel]="label() || 'Create'"
+    styleClass="mh-fab__btn w-13! h-13! p-0!"
+    (onClick)="tap.emit()"
+  />
+</div>

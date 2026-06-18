@@ -1,0 +1,178 @@
+<!-- Mobile (≤600px): card stack. Tables horizontal-scroll on phones,
+     which the design forbids (rule 5). One card per row instead. -->
+<ul class="mh-pt-cards" role="list">
+  @for (p of participants(); track p.id) {
+    <li class="mh-pt-card">
+      <div class="mh-pt-card__top">
+        @if (p.user?.avatarUrl) {
+          <img [src]="p.user!.avatarUrl" alt="" class="mh-pt__avatar" />
+        } @else {
+          <span class="mh-pt__avatar mh-pt__avatar--ph">{{ initials(p) }}</span>
+        }
+        <div class="mh-pt-card__lines">
+          <strong>{{ fullName(p) }}</strong>
+          <small class="mh-pt-card__when">
+            {{ p.bookedAt | date: 'd MMM, HH:mm' }}
+          </small>
+        </div>
+        <p-tag
+          [value]="statusLabel(p.status)"
+          [severity]="statusSeverity(p.status)"
+        />
+      </div>
+      @if (p.bookingNote) {
+        <p class="mh-pt-card__note">"{{ p.bookingNote }}"</p>
+      }
+      @if (mode() === 'roster' && p.status === Status.PendingApproval) {
+        <div class="mh-pt-card__actions">
+          <p-button
+            icon="pi pi-check"
+            label="Approve"
+            severity="success"
+            [outlined]="true"
+            size="small"
+            [loading]="isBusy(p.id)"
+            (onClick)="approve.emit(p.id)"
+          />
+          <p-button
+            icon="pi pi-times"
+            label="Decline"
+            severity="danger"
+            [text]="true"
+            size="small"
+            [loading]="isBusy(p.id)"
+            (onClick)="decline.emit(p.id)"
+          />
+        </div>
+      } @else if (mode() === 'attendance') {
+        <div class="mh-pt-card__actions">
+          <p-button
+            icon="pi pi-check"
+            label="Attended"
+            severity="success"
+            [outlined]="p.attended !== true"
+            size="small"
+            [loading]="isBusy(p.id)"
+            (onClick)="markAttended.emit({ id: p.id, attended: true })"
+          />
+          <p-button
+            icon="pi pi-times"
+            label="No-show"
+            severity="danger"
+            [outlined]="p.attended !== false"
+            [text]="p.attended !== false"
+            size="small"
+            [loading]="isBusy(p.id)"
+            (onClick)="markAttended.emit({ id: p.id, attended: false })"
+          />
+        </div>
+      }
+    </li>
+  } @empty {
+    <li class="mh-pt-card mh-pt-card--empty">No participants yet.</li>
+  }
+</ul>
+
+<p-table
+  [value]="participants()"
+  [paginator]="participants().length > pageSize()"
+  [rows]="pageSize()"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  styleClass="mh-pt"
+  [scrollable]="true"
+  scrollHeight="flex"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Name</th>
+      <th>Booked</th>
+      <th>Status</th>
+      @if (mode() !== 'readonly') {
+        <th class="mh-pt__th-right">Actions</th>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-p>
+    <tr>
+      <td>
+        <div class="mh-pt__name">
+          @if (p.user?.avatarUrl) {
+            <img [src]="p.user.avatarUrl" alt="" class="mh-pt__avatar" />
+          } @else {
+            <span class="mh-pt__avatar mh-pt__avatar--ph">
+              {{ initials(p) }}
+            </span>
+          }
+          <div class="mh-pt__nameLines">
+            <strong>{{ fullName(p) }}</strong>
+            @if (p.bookingNote) {
+              <small>“{{ p.bookingNote }}”</small>
+            }
+          </div>
+        </div>
+      </td>
+      <td>{{ p.bookedAt | date: 'd MMM, HH:mm' }}</td>
+      <td>
+        <p-tag
+          [value]="statusLabel(p.status)"
+          [severity]="statusSeverity(p.status)"
+        />
+      </td>
+      @if (mode() === 'roster') {
+        <td class="mh-pt__td-right">
+          @if (p.status === Status.PendingApproval) {
+            <p-button
+              icon="pi pi-check"
+              severity="success"
+              [outlined]="true"
+              size="small"
+              [loading]="isBusy(p.id)"
+              (onClick)="approve.emit(p.id)"
+              ariaLabel="Approve"
+            />
+            <p-button
+              icon="pi pi-times"
+              severity="danger"
+              [text]="true"
+              size="small"
+              [loading]="isBusy(p.id)"
+              (onClick)="decline.emit(p.id)"
+              ariaLabel="Decline"
+            />
+          }
+        </td>
+      } @else if (mode() === 'attendance') {
+        <td class="mh-pt__td-right">
+          <p-button
+            icon="pi pi-check"
+            severity="success"
+            [outlined]="p.attended !== true"
+            size="small"
+            [loading]="isBusy(p.id)"
+            (onClick)="markAttended.emit({ id: p.id, attended: true })"
+            ariaLabel="Mark attended"
+          />
+          <p-button
+            icon="pi pi-times"
+            severity="danger"
+            [outlined]="p.attended !== false"
+            [text]="p.attended !== false"
+            size="small"
+            [loading]="isBusy(p.id)"
+            (onClick)="markAttended.emit({ id: p.id, attended: false })"
+            ariaLabel="Mark no-show"
+          />
+        </td>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td [attr.colspan]="mode() === 'readonly' ? 3 : 4" class="mh-pt__empty">
+        No participants yet.
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -1,0 +1,141 @@
+:host {
+  display: block;
+}
+
+.mh-pt__name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mh-pt__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--p-surface-200);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--p-text-muted-color);
+}
+
+.mh-pt__avatar--ph {
+  background: var(--p-primary-100);
+  color: var(--p-primary-700);
+}
+
+.mh-pt__nameLines {
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    font-size: 13px;
+    color: var(--p-text-color);
+  }
+
+  small {
+    font-size: 11px;
+    color: var(--p-text-muted-color);
+    font-style: italic;
+  }
+}
+
+.mh-pt__th-right,
+.mh-pt__td-right {
+  text-align: right;
+}
+
+.mh-pt__td-right p-button + p-button {
+  margin-left: 4px;
+}
+
+.mh-pt__empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--p-text-muted-color);
+}
+
+/* Desktop: hide the card stack; the p-table is the canonical surface. */
+.mh-pt-cards {
+  display: none;
+}
+
+/* Mobile (≤600px): swap. Tables horizontal-scrolling on a phone reads
+   as broken; one stacked card per row carries the same information. */
+@media (max-width: 767.98px) {
+  .mh-pt-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  :host ::ng-deep .p-table,
+  :host ::ng-deep .mh-pt {
+    display: none !important;
+  }
+}
+
+.mh-pt-card {
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mh-pt-card--empty {
+  text-align: center;
+  color: var(--p-text-muted-color);
+  padding: 24px 12px;
+}
+
+.mh-pt-card__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mh-pt-card__lines {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    font-size: 14px;
+    color: var(--p-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.mh-pt-card__when {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+}
+
+.mh-pt-card__note {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--p-text-muted-color);
+  background: var(--p-surface-50);
+  border-left: 2px solid var(--p-surface-300);
+  border-radius: 4px;
+}
+
+.mh-pt-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

@@ -11,10 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import {
-  ParticipantsTable,
-  SessionsDetailStore,
-} from 'core';
+import { SessionsDetailStore } from 'core';
+import { ParticipantsTable } from '../../../../_shared/components/participants-table/participants-table';
 import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
 
 /**

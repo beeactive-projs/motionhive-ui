@@ -1,0 +1,30 @@
+<div class="mh-ws" role="group" aria-label="Week navigator">
+  @for (cell of cells(); track cell.iso) {
+    <button
+      type="button"
+      class="mh-ws__cell"
+      [class.is-today]="cell.isToday"
+      [class.is-selected]="cell.isSelected"
+      [class.has-conflict]="cell.hasConflict"
+      [attr.aria-pressed]="cell.isSelected"
+      [attr.aria-label]="cell.aria"
+      (click)="onSelect(cell.date)"
+    >
+      <span class="mh-ws__label">{{ cell.label }}</span>
+      <span class="mh-ws__day">{{ cell.day }}</span>
+      @if (cell.dots.length > 0) {
+        <span class="mh-ws__dots">
+          @for (dot of cell.dots; track $index) {
+            <span
+              class="mh-ws__dot"
+              [class.mh-ws__dot--honey]="dot.tone === 'honey'"
+              [class.mh-ws__dot--teal]="dot.tone === 'teal'"
+              [class.mh-ws__dot--navy]="dot.tone === 'navy'"
+              [class.mh-ws__dot--coral]="dot.tone === 'coral'"
+            ></span>
+          }
+        </span>
+      }
+    </button>
+  }
+</div>

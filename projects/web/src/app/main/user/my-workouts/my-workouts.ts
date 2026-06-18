@@ -24,17 +24,17 @@ import {
   LoggedSet,
   Routine,
   RoutineService,
-  SectionLabel,
-  TimeRow,
-  TimeRowSkeleton,
   WorkoutLog,
   WorkoutLogService,
-  MobileFab,
   formatSessionTime,
   injectIsMobile,
   injectIsTablet,
   showApiError,
 } from 'core';
+import { SectionLabel } from '../../../_shared/components/section-label/section-label';
+import { TimeRow } from '../../../_shared/components/time-row/time-row';
+import { TimeRowSkeleton } from '../../../_shared/components/time-row-skeleton/time-row-skeleton';
+import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';

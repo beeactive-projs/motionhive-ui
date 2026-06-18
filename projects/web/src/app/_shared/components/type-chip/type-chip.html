@@ -1,0 +1,9 @@
+<span
+  class="mh-type"
+  [class.mh-type--group]="type() === Type.Group"
+  [class.mh-type--private]="type() === Type.Private"
+  [class.mh-type--open]="type() === Type.Open"
+>
+  <i [class]="iconClass()" aria-hidden="true"></i>
+  <span>{{ label() }}</span>
+</span>

@@ -26,7 +26,6 @@ import {
   CreateTemplateRequest,
   CreateTemplateResponse,
   RecurrenceRule,
-  RecurrenceBuilder,
   SessionAccess,
   SessionKind,
   SessionLocationKind,
@@ -40,6 +39,7 @@ import {
   injectIsMobile,
   showApiError,
 } from 'core';
+import { RecurrenceBuilder } from '../../../../../_shared/components/recurrence-builder/recurrence-builder';
 import { Observable } from 'rxjs';
 
 /**

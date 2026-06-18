@@ -1,0 +1,30 @@
+@if (cap() == null) {
+  <div class="mh-capacity mh-capacity--uncapped">
+    <span class="mh-capacity__label">{{ signups() }} going · no capacity limit</span>
+  </div>
+} @else {
+  <div class="mh-capacity">
+    <div
+      class="mh-capacity__bar"
+      [attr.aria-valuenow]="signups()"
+      [attr.aria-valuemax]="cap()"
+      role="progressbar"
+    >
+      <div
+        class="mh-capacity__fill"
+        [class.mh-capacity__fill--hot]="signups() / cap()! > 0.75"
+        [class.mh-capacity__fill--full]="signups() >= cap()!"
+        [style.width.%]="fillPct()"
+      ></div>
+    </div>
+    <span class="mh-capacity__label">
+      <strong>{{ signups() }}</strong> / {{ cap() }}
+      @if (spotsLeft() <= 3 && spotsLeft() > 0) {
+        <span class="mh-capacity__hot">· {{ spotsLeft() }} spot{{ spotsLeft() === 1 ? '' : 's' }} left</span>
+      }
+      @if (signups() >= cap()!) {
+        <span class="mh-capacity__hot">· full</span>
+      }
+    </span>
+  </div>
+}

@@ -20,10 +20,10 @@ import {
   injectIsTablet,
   injectIsTabletDown,
   InstructorClient,
-  MobileFab,
   PendingClientLabels,
   showApiError,
 } from 'core';
+import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';

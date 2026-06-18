@@ -1,0 +1,36 @@
+:host { display: contents; }
+
+.mh-fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--p-primary-500) 40%, transparent);
+  z-index: 60;
+  display: none;
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 200ms ease;
+}
+
+/* Only renders on mobile by default. */
+@media (max-width: 767.98px) {
+  .mh-fab { display: block; }
+}
+/* force-mode shows it everywhere: used for the bottom-nav tabbar
+   pages that already lift the FAB above the tabbar themselves. */
+.mh-fab--force { display: block !important; }
+
+.mh-fab--hidden {
+  transform: translateY(96px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The projected p-button fills the 52px circle; bump the glyph to the
+   prominent FAB size (PrimeNG's default button icon is smaller). */
+:host ::ng-deep .mh-fab__btn .p-button-icon {
+  font-size: 20px;
+}

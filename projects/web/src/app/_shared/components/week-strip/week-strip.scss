@@ -1,0 +1,88 @@
+:host {
+  display: block;
+}
+.mh-ws {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding: 6px 4px 10px;
+}
+.mh-ws__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0 8px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--p-text-color);
+  transition: background 120ms ease, color 120ms ease;
+  min-height: 56px;
+  position: relative;
+}
+.mh-ws__cell:hover:not(.is-selected) {
+  background: var(--p-surface-100);
+}
+.mh-ws__cell.is-today {
+  background: var(--p-primary-500);
+  color: var(--p-primary-contrast-color, #fff);
+}
+/* Selected wins over today's accent — the user explicitly picked
+   this day, so the primary tint should follow the selection. */
+.mh-ws__cell.is-selected {
+  background: var(--p-primary-50);
+  color: var(--p-primary-700);
+  box-shadow: 0 0 0 1.5px var(--p-primary-500);
+}
+.mh-ws__cell.is-today.is-selected {
+  background: var(--p-primary-500);
+  color: var(--p-primary-contrast-color, #fff);
+}
+.mh-ws__label {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mh-ws__day {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.mh-ws__dots {
+  display: flex;
+  gap: 2px;
+  min-height: 4px;
+}
+.mh-ws__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--p-text-muted-color);
+  opacity: 0.85;
+}
+.mh-ws__dot--honey {
+  background: var(--p-primary-500);
+}
+.mh-ws__dot--teal {
+  background: var(--p-teal-500, #14b8a6);
+}
+.mh-ws__dot--navy {
+  background: var(--p-blue-700, #1d4ed8);
+}
+.mh-ws__dot--coral {
+  background: var(--p-red-500, #f97066);
+}
+/* When the cell is on the primary background, force dots white so
+   they stay visible. Otherwise the honey dot blends into the honey
+   background and disappears. */
+.mh-ws__cell.is-today .mh-ws__dot,
+.mh-ws__cell.is-today.is-selected .mh-ws__dot {
+  background: #fff;
+}

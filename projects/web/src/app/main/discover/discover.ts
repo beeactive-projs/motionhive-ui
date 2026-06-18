@@ -20,10 +20,10 @@ import {
   Hex,
   HexTone,
   PublicSessionInstance,
-  SessionCard,
   SessionsDiscoverStore,
   showApiError,
 } from 'core';
+import { SessionCard } from '../../_shared/components/session-card/session-card';
 
 type DiscoverTab = 'coaches' | 'sessions' | 'groups';
 

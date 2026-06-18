@@ -1,0 +1,55 @@
+:host { display: block; }
+
+.mh-trs {
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+}
+.mh-trs--honey   { border-left: 3px solid var(--p-primary-500); border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+.mh-trs--teal    { border-left: 3px solid var(--p-teal-500); border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+.mh-trs--navy    { border-left: 3px solid var(--p-blue-700); border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+.mh-trs--coral   { border-left: 3px solid var(--p-red-500); border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+
+.mh-trs__time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.mh-trs__main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Shimmer skeleton block. Uses a moving gradient so the wait
+   feels "alive" without spawning JS animation timers. */
+.mh-trs__skel {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--p-surface-100) 0%,
+    var(--p-surface-200) 50%,
+    var(--p-surface-100) 100%
+  );
+  background-size: 200% 100%;
+  animation: mh-trs-shimmer 1.4s linear infinite;
+}
+.mh-trs__skel--h     { width: 36px; height: 13px; }
+.mh-trs__skel--d     { width: 28px; height: 9px; }
+.mh-trs__skel--title-1 { width: 70%; height: 13px; }
+.mh-trs__skel--title-2 { width: 45%; height: 13px; }
+.mh-trs__skel--meta  { width: 55%; height: 10px; margin-top: 2px; }
+.mh-trs__skel--chev  { width: 12px; height: 12px; border-radius: 50%; }
+
+@keyframes mh-trs-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

@@ -18,17 +18,17 @@ import { MessageService } from 'primeng/api';
 import { catchError, forkJoin, of } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ProviderChip } from '../../../../_shared/components/provider-chip/provider-chip';
+import { AccessChip } from '../../../../_shared/components/access-chip/access-chip';
+import { TypeChip } from '../../../../_shared/components/type-chip/type-chip';
 import {
-  AccessChip,
   DateWindowsMs,
-  ProviderChip,
   SessionInstance,
   SessionInstanceStatus,
   SessionService,
   SessionTemplate,
   SessionTemplateStatus,
   SessionsInstructorStore,
-  TypeChip,
   apiErrorMessage,
   injectIsMobile,
   injectIsTablet,
