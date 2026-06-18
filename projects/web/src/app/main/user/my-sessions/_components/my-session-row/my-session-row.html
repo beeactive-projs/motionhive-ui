@@ -1,0 +1,117 @@
+<p-card>
+  <div class="grid grid-cols-[auto_auto_1fr] md:grid-cols-[auto_auto_1fr_auto] items-center gap-3">
+    <!-- Time block -->
+    <div class="text-center">
+      <span class="block font-heading font-semibold tabular-nums">{{ time() }}</span>
+      @if (duration()) {
+      <span class="block mt-0.5 text-muted-color">{{ duration() }}</span>
+      }
+    </div>
+
+    <!-- Instructor avatar (brand hexagon) -->
+    @if(!mobile()){
+    <mh-avatar [user]="instructor()" size="large" />
+    }
+    <!-- Main info -->
+    <div class="min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h3 class="m-0 font-semibold line-clamp-2">{{ title() }}</h3>
+        @if (type(); as t) {
+        <mh-type-chip [type]="t" />
+        }
+        @if (isOnline() && provider()) {
+        <mh-provider-chip [provider]="provider()" />
+        }
+      </div>
+
+      <!-- Meta line 1 · instructor · location · capacity (desktop-only) -->
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
+        @if (instructorName(); as name) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-user text-sm" aria-hidden="true"></i>{{ name }}
+        </span>
+        }
+        <span class="inline-flex items-center gap-1">
+          <i class="text-sm" [class]="isOnline() ? 'pi pi-video' : 'pi pi-map-marker'" aria-hidden="true"></i>
+          {{ isOnline() ? 'Online' : 'In-person' }}
+        </span>
+        @if (showCapacity()) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-users text-sm" aria-hidden="true"></i>{{ confirmed() }} / {{ capacity() }} booked
+        </span>
+        }
+      </div>
+
+      <!-- Meta line 2 · cancellation policy / reason / booked-on -->
+      @if (!mobile() || cancelReasonText()) {
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
+        @if (!mobile() && cancelPolicy(); as policy) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-check-circle text-sm" aria-hidden="true"></i>{{ policy }}
+        </span>
+        }
+        @if (cancelReasonText(); as reason) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-times-circle text-sm" aria-hidden="true"></i>Cancelled: {{ reason }}
+        </span>
+        }
+        @if (!mobile()) {
+        <span>Booked {{ participant().bookedAt | date: 'd MMM' }}</span>
+        }
+      </div>
+      }
+
+      @if(mobile()){
+      <div class="flex flex-wrap items-center gap-3 shrink-0">
+        <p-tag [value]="statusLabelText()" [class]="statusClass()" [icon]="statusIcon()" rounded />
+        @if (isFree()) {
+        <span class=" font-semibold whitespace-nowrap text-green-500">Free</span>
+        } @else {
+        <span class="font-semibold whitespace-nowrap">
+          {{ participant().snapshotPriceCents | currencyRon: participant().snapshotCurrency }}
+        </span>
+        }
+      </div>
+
+      @if (canJoin()) {
+      <p-button label="Join" icon="pi pi-video" size="small" (onClick)="onJoin($event)" />
+      }
+      }
+    </div>
+
+    <!-- Right side · status + price, then actions -->
+    @if(!mobile()){
+    <div class="flex flex-col items-end gap-1.5 shrink-0">
+      <div class="flex items-center gap-2">
+        <p-tag [value]="statusLabelText()" [class]="statusClass()" [icon]="statusIcon()" rounded />
+        @if (isFree()) {
+        <span class=" font-semibold whitespace-nowrap text-green-500">Free</span>
+        } @else {
+        <span class="font-semibold whitespace-nowrap">
+          {{ participant().snapshotPriceCents | currencyRon: participant().snapshotCurrency }}
+        </span>
+        }
+      </div>
+
+      @if (canJoin() || canCancel()) {
+      <div class="flex items-center gap-1.5">
+        @if (canJoin()) {
+        <p-button label="Join" icon="pi pi-video" size="small" (onClick)="onJoin($event)" />
+        }
+        @if (canCancel()) {
+        <p-button icon="pi pi-times" severity="danger" rounded outlined size="small" ariaLabel="Cancel booking"
+          (onClick)="onCancel($event)" />
+        }
+      </div>
+      }
+    </div>
+    }@else{
+    @if (canCancel()) {
+    <div class="flex flex-col items-end shrink-0">
+      <p-button icon="pi pi-times" severity="danger" rounded outlined size="small" ariaLabel="Cancel booking"
+        (onClick)="onCancel($event)" />
+    </div>
+    }
+    }
+  </div>
+</p-card>

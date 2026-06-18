@@ -150,34 +150,8 @@
 <!-- Row list · shared between the desktop section + mobile day group. -->
 <ng-template #rows let-items>
   @for (p of items; track p.id) {
-  <mh-time-row [time]="rowTime(p)" [duration]="rowDuration(p)" [title]="sessionTitle(p)" [tone]="rowTone(p)"
-    [chevron]="!canJoin(p) && !canCancel(p)" (click)="openSession(p)">
-    <span meta>
-      <p-tag [value]="rowStatusLabel(p)" [severity]="statusSeverity(p.status)" />
-      @if (isOnline(p) && meetingProvider(p); as prov) {
-      <mh-provider-chip [provider]="$any(prov)" />
-      }
-      @if (p.snapshotPriceCents === 0) {
-      <p-tag value="Free" severity="success" />
-      } @else {
-      <span>{{ p.snapshotPriceCents | currencyRon: p.snapshotCurrency }}</span>
-      }
-      @if (!isMobile() && showsCapacity(p)) {
-      <span>{{ confirmedCount(p) }} / {{ sessionCapacity(p) }} booked</span>
-      }
-    </span>
-    @if (canJoin(p) || canCancel(p)) {
-    <span trailing class="flex items-center gap-1.5">
-      @if (canJoin(p)) {
-      <p-button label="Join" icon="pi pi-video" size="small" (onClick)="join(p, $event)" />
-      }
-      @if (canCancel(p)) {
-      <p-button icon="pi pi-times" severity="danger" [text]="true" size="small" ariaLabel="Cancel booking"
-        (onClick)="openCancel(p, $event)" />
-      }
-    </span>
-    }
-  </mh-time-row>
+  <mh-my-session-row [participant]="p" [mobile]="isMobile()" (open)="openSession(p)" (join)="join(p, $event)"
+    (cancel)="openCancel(p, $event)" />
   }
 </ng-template>
 

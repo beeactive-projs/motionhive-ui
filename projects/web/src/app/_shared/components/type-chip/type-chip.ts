@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Tag } from 'primeng/tag';
 import { SessionKind } from 'core';
 
 /**
@@ -10,16 +11,12 @@ import { SessionKind } from 'core';
  */
 @Component({
   selector: 'mh-type-chip',
-  imports: [],
+  imports: [Tag],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './type-chip.html',
-  styleUrl: './type-chip.scss',
 })
 export class TypeChip {
   readonly type = input.required<SessionKind>();
-
-  /** Expose the enum object so the template avoids magic strings. */
-  protected readonly Type = SessionKind;
 
   protected readonly label = computed<string>(() => {
     switch (this.type()) {
@@ -34,7 +31,7 @@ export class TypeChip {
     }
   });
 
-  protected readonly iconClass = computed<string>(() => {
+  protected readonly icon = computed<string>(() => {
     switch (this.type()) {
       case SessionKind.Group:
         return 'pi pi-users';
@@ -44,6 +41,20 @@ export class TypeChip {
         return 'pi pi-globe';
       default:
         return 'pi pi-tag';
+    }
+  });
+
+  /** Lighter-than-severity bg + text color classes, per type. */
+  protected readonly colorClass = computed<string>(() => {
+    switch (this.type()) {
+      case SessionKind.Group:
+        return 'bg-blue-100 text-blue-700';
+      case SessionKind.Open:
+        return 'bg-green-100 text-green-700';
+      case SessionKind.Private:
+        return 'bg-violet-100 text-violet-700';
+      default:
+        return 'bg-slate-100 text-slate-700';
     }
   });
 }
