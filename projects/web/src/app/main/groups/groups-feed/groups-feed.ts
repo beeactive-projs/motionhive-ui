@@ -18,9 +18,11 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GroupsRefreshService, Post, PostService, showApiError } from 'core';
+import { Group, GroupsRefreshService, Post, PostService, showApiError } from 'core';
 import { PostCard } from '../group-detail/_components/post-card/post-card';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
+import { CreatePostDialog } from '../_dialogs/create-post-dialog/create-post-dialog';
+import { DeletePostDialog } from '../_dialogs/delete-post-dialog/delete-post-dialog';
 
 @Component({
   selector: 'mh-groups-feed',
@@ -31,6 +33,8 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
     ToastModule,
     PostCard,
     ListEmptyState,
+    CreatePostDialog,
+    DeletePostDialog,
   ],
   providers: [MessageService],
   templateUrl: './groups-feed.html',
@@ -53,6 +57,38 @@ export class GroupsFeed implements OnInit {
   readonly loadingMore = signal(false);
   readonly posts = signal<Post[]>([]);
   readonly total = signal(0);
+
+  // ── Post edit / delete (author or moderator — see post-header) ──
+  // The edit dialog hides the group picker, so it doesn't need a real
+  // group list; the required input is satisfied with an empty array.
+  readonly noGroups: Group[] = [];
+  readonly showEditDialog = signal(false);
+  readonly postBeingEdited = signal<Post | null>(null);
+  readonly showDeleteDialog = signal(false);
+  readonly postBeingDeleted = signal<Post | null>(null);
+
+  onEditRequested(post: Post): void {
+    this.postBeingEdited.set(post);
+    this.showEditDialog.set(true);
+  }
+
+  onPostUpdated(posts: Post[]): void {
+    const updated = posts[0];
+    if (!updated) return;
+    this.posts.update((list) =>
+      list.map((p) => (p.id === updated.id ? { ...p, ...updated } : p)),
+    );
+  }
+
+  onDeleteRequested(post: Post): void {
+    this.postBeingDeleted.set(post);
+    this.showDeleteDialog.set(true);
+  }
+
+  onDeleted(result: { postId: string }): void {
+    this.posts.update((list) => list.filter((p) => p.id !== result.postId));
+    this.total.update((n) => Math.max(0, n - 1));
+  }
 
   readonly pageSize = 20;
   readonly currentPage = signal(1);

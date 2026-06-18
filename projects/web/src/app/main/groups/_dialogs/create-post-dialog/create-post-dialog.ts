@@ -81,6 +81,10 @@ export class CreatePostDialog {
   readonly preselectedGroupId = input<string | undefined>(undefined);
   readonly userGroups = input.required<Group[]>();
   readonly saved = output<Post[]>();
+  /** When set, the dialog edits this post (content + images) instead of creating one. */
+  readonly post = input<Post | null>(null);
+
+  readonly editMode = computed(() => !!this.post());
 
   readonly maxContent = MAX_CONTENT;
   readonly maxImages = MAX_IMAGES;
@@ -126,12 +130,29 @@ export class CreatePostDialog {
 
   private readonly _resetOnOpen = effect(() => {
     if (this.visible()) {
-      const preselect = this.preselectedGroupId();
-      this.form.reset({
-        content: '',
-        groupIds: preselect ? [preselect] : [],
-      });
-      this.uploads.set([]);
+      const editing = this.post();
+      if (editing) {
+        // Edit mode: prefill content + existing images; the group is fixed.
+        this.form.reset({
+          content: editing.content,
+          groupIds: [editing.groupId],
+        });
+        this.uploads.set(
+          (editing.mediaUrls ?? []).map((url) => ({
+            url,
+            publicId: '',
+            fileName: '',
+            status: 'done' as const,
+          })),
+        );
+      } else {
+        const preselect = this.preselectedGroupId();
+        this.form.reset({
+          content: '',
+          groupIds: preselect ? [preselect] : [],
+        });
+        this.uploads.set([]);
+      }
       this.submitting.set(false);
     }
   });
@@ -236,6 +257,30 @@ export class CreatePostDialog {
     const mediaUrls = this.uploads()
       .filter((u) => u.status === 'done')
       .map((u) => u.url);
+
+    // ── Edit mode: PATCH the single post, emit the updated row ──
+    const editing = this.post();
+    if (editing) {
+      this._postService
+        .updatePost(editing.id, { content: content.trim(), mediaUrls })
+        .subscribe({
+          next: (updated) => {
+            this.submitting.set(false);
+            this.visible.set(false);
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Post updated',
+              detail: 'Your changes are live.',
+            });
+            this.saved.emit([updated]);
+          },
+          error: (err) => {
+            this.submitting.set(false);
+            showApiError(this._messageService, 'Could not update post', '', err);
+          },
+        });
+      return;
+    }
 
     const payload: CreatePostPayload = {
       content: content.trim(),
