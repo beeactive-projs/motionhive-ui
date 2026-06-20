@@ -97,7 +97,7 @@
   </form>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
     <p-button label="Save changes" icon="pi pi-check" [loading]="saving()"
       [disabled]="!canSubmit()" (onClick)="save()" />
   </ng-template>

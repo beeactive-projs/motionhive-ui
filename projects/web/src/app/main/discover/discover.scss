@@ -33,8 +33,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 13px;
   padding: 10px 14px;
   margin: 22px 0 20px;
@@ -59,7 +59,7 @@
 .disc__tabs {
   display: flex;
   gap: 4px;
-  border-bottom: 1px solid var(--p-surface-200);
+  border-bottom: 1px solid var(--p-content-border-color);
   margin-bottom: 18px;
   overflow-x: auto;
 }
@@ -96,14 +96,14 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--p-text-muted-color);
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 999px;
   padding: 7px 14px;
   cursor: pointer;
   transition: 0.14s;
   &:hover {
-    border-color: var(--p-surface-300);
+    border-color: color-mix(in srgb, var(--p-text-color) 28%, transparent);
   }
   &.is-active {
     background: var(--p-primary-color);
@@ -136,8 +136,8 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 16px;
   padding: 20px;
   transition: 0.15s;
@@ -187,8 +187,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 16px;
   padding: 20px;
   transition: 0.15s;
@@ -218,14 +218,14 @@
   white-space: nowrap;
 }
 .disc__btn--soft {
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
   color: var(--p-text-color);
   font-size: 13px;
   padding: 9px 15px;
   border-radius: 9px;
   margin-top: 8px;
   &:hover {
-    background: var(--p-surface-200);
+    background: color-mix(in srgb, var(--p-text-color) 14%, transparent);
   }
   &:disabled {
     opacity: 0.5;
@@ -259,13 +259,13 @@
   color: var(--p-text-muted-color);
   font-size: 14px;
   padding: 48px 16px;
-  border: 1px dashed var(--p-surface-200);
+  border: 1px dashed var(--p-content-border-color);
   border-radius: 16px;
 }
 .disc__card--skeleton {
   height: 150px;
   border-radius: 16px;
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 9%, transparent);
   animation: disc-pulse 1.4s ease-in-out infinite;
 }
 @keyframes disc-pulse {

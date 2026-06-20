@@ -71,7 +71,7 @@
   </div>
   }
   <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" (onClick)="showRequestDialog.set(false)" />
+    <p-button label="Cancel" severity="secondary" text (onClick)="showRequestDialog.set(false)" />
     <p-button label="Send Request" icon="pi pi-send" [loading]="requestingId() !== null" (onClick)="sendRequest()" />
   </ng-template>
 </p-dialog>

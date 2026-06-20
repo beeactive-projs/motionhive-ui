@@ -33,16 +33,16 @@ import { FormsModule } from '@angular/forms';
     .mh-search {
       display: flex;
       align-items: center;
-      gap: 10px;
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: #f7f1e6; // surface-100
+      gap: 9px;
+      height: 38px;
+      padding: 0 13px;
+      border-radius: 12px;
+      background: #f4eee2; // field / surface-100
       cursor: text;
     }
     .mh-search__icon {
       color: #94a3b8;
-      font-size: 14px;
+      font-size: 15px;
     }
     .mh-search__input {
       flex: 1;
@@ -51,7 +51,7 @@ import { FormsModule } from '@angular/forms';
       border: none;
       background: transparent;
       font-family: inherit;
-      font-size: 13px;
+      font-size: 14px;
       color: #0f172a;
       outline: none;
     }

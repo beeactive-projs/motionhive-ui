@@ -88,7 +88,7 @@
         @if (joinRequestStatus() === 'PENDING') {
         <div class="flex items-center gap-2">
           <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" size="small" />
-          <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary" size="small"
+          <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small"
             pTooltip="Cancel request" [loading]="isBusy()"
             (onClick)="discoverAction.emit({ kind: 'cancel', group: group() })" />
         </div>

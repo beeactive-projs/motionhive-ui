@@ -18,13 +18,13 @@
       <input pInputText type="text" [value]="displayUrl()" readonly
         class="flex-1 bg-transparent! border-0! shadow-none! font-mono text-sm" />
       <p-button [label]="copied() ? 'Copied' : 'Copy'" [icon]="copied() ? 'pi pi-check' : 'pi pi-copy'" size="small"
-        rounded (onClick)="copy()" />
+        severity="secondary" [outlined]="true" rounded (onClick)="copy()" />
     </div>
 
     <!-- Share targets -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
       @for (tile of tiles; track tile.id) {
-      <p-button severity="contrast" [outlined]="true" styleClass="share-tile w-full" (onClick)="shareTo(tile.id)">
+      <p-button severity="secondary" [outlined]="true" styleClass="share-tile w-full" (onClick)="shareTo(tile.id)">
         <div class="flex flex-col items-center justify-center gap-2 py-2 w-full">
           <i [class]="tile.icon + ' text-2xl'"></i>
           <span class="text-sm font-medium">{{ tile.label }}</span>

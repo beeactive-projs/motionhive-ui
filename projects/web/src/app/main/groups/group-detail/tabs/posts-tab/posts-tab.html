@@ -6,7 +6,8 @@
 
     @if (context.group(); as g) {
     <mh-post-feed [groupId]="g.id" [canPost]="context.canPost()" [canModerate]="context.canModerate()"
-      (createRequested)="openCreate()" (deleteRequested)="onDeleteRequested($event)" />
+      (createRequested)="openCreate()" (editRequested)="onEditRequested($event)"
+      (deleteRequested)="onDeleteRequested($event)" />
     }
   </div>
 
@@ -18,6 +19,9 @@
 @if (context.group(); as g) {
 <mh-create-post-dialog [(visible)]="context.showCreatePostDialog" [preselectedGroupId]="g.id"
   [userGroups]="context.myGroups()" (saved)="onPostCreated($event)" />
+
+<mh-create-post-dialog [(visible)]="context.showEditPostDialog" [post]="context.postBeingEdited()"
+  [userGroups]="context.myGroups()" (saved)="onPostUpdated($event)" />
 
 <mh-delete-post-dialog [(visible)]="context.showDeletePostDialog" [post]="context.postBeingDeleted()"
   (deleted)="onDeleted($event)" />

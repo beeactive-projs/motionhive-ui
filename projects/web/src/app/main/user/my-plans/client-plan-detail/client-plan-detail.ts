@@ -31,12 +31,12 @@ import {
   ProgramAssignmentService,
   ProgramAssignmentStatus,
   TagSeverity,
-  TimeRow,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
   showApiError,
 } from 'core';
+import { TimeRow } from '../../../../_shared/components/time-row/time-row';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 interface WeekGroup {

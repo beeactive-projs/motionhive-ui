@@ -52,7 +52,7 @@
       <div class="flex flex-wrap items-center gap-2">
         @for (option of goals; track option.value) {
         <p-button type="button" [label]="option.label"
-          [severity]="form.controls.goal.value === option.value ? 'primary' : 'contrast'" size="small" rounded
+          [severity]="form.controls.goal.value === option.value ? 'primary' : 'secondary'" size="small" rounded
           [outlined]="form.controls.goal.value !== option.value" (onClick)="form.controls.goal.setValue(option.value)"
           styleClass="py-0.5" />
         }
@@ -67,7 +67,7 @@
       <div class="flex flex-wrap items-center gap-2">
         @for (option of levels; track option.value) {
         <p-button type="button" [label]="option.label"
-          [severity]="form.controls.level.value === option.value ? 'primary' : 'contrast'" size="small" rounded
+          [severity]="form.controls.level.value === option.value ? 'primary' : 'secondary'" size="small" rounded
           [outlined]="form.controls.level.value !== option.value" (onClick)="form.controls.level.setValue(option.value)"
           styleClass="py-0.5" />
         }
@@ -82,7 +82,7 @@
       <div class="flex flex-wrap items-center gap-2">
         @for (option of formats; track option.value) {
         <p-button type="button" [label]="option.label"
-          [severity]="form.controls.format.value === option.value ? 'primary' : 'contrast'" size="small" rounded
+          [severity]="form.controls.format.value === option.value ? 'primary' : 'secondary'" size="small" rounded
           [outlined]="form.controls.format.value !== option.value"
           (onClick)="form.controls.format.setValue(option.value)" styleClass="py-0.5" />
         }

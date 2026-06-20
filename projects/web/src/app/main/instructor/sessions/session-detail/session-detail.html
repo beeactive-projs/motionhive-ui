@@ -5,7 +5,7 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+      <p-button icon="pi pi-arrow-left" text rounded severity="secondary" size="small" ariaLabel="Back"
         (onClick)="goBack()" />
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ?? 'Session' }}</h1>
@@ -32,7 +32,7 @@
         }
         <p-button label="Edit" icon="pi pi-pencil" outlined severity="secondary"
           [size]="isTablet() ? 'small' : undefined" (onClick)="editOpen.set(true)" />
-        <p-button label="Cancel" icon="pi pi-times" outlined severity="danger"
+        <p-button label="Cancel" icon="pi pi-times" text severity="danger"
           [size]="isTablet() ? 'small' : undefined" (onClick)="cancelOpen.set(true)" />
         }
       } @else {
@@ -110,7 +110,7 @@
           <i class="pi pi-video text-(--p-primary-500)"></i>
           <code class="bg-transparent break-all text-color">{{ inst.meetingUrlOverride ?? tpl.meetingUrl }}</code>
         </div>
-        <p-button label="Copy link" icon="pi pi-copy" [text]="true" size="small" (onClick)="copyMeetingUrl(inst, tpl)" />
+        <p-button label="Copy link" icon="pi pi-copy" severity="secondary" [outlined]="true" size="small" (onClick)="copyMeetingUrl(inst, tpl)" />
       </div>
       } @else if (inst.venueOverride || tpl.venue) {
       @let v = inst.venueOverride ?? tpl.venue!;

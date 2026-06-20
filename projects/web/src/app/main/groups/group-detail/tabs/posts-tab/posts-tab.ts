@@ -45,6 +45,15 @@ export class PostsTab {
     if (local) this.postFeed()?.prependPost(local);
   }
 
+  onEditRequested(post: Post): void {
+    this.context.requestEditPost(post);
+  }
+
+  onPostUpdated(posts: Post[]): void {
+    const updated = posts[0];
+    if (updated) this.postFeed()?.replacePost(updated);
+  }
+
   onDeleteRequested(post: Post): void {
     this.context.requestDeletePost(post);
   }

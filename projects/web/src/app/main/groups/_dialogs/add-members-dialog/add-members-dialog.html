@@ -50,10 +50,10 @@
   }
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" text (onClick)="visible.set(false)" />
+    <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
     <p-button
       [label]="selectedCount() > 0 ? 'Add ' + selectedCount() + ' ' + (selectedCount() === 1 ? 'member' : 'members') : 'Add members'"
-      icon="pi pi-user-plus" severity="primary" [loading]="saving()" [disabled]="selectedCount() === 0 || loading()"
+      icon="pi pi-user-plus" [loading]="saving()" [disabled]="selectedCount() === 0 || loading()"
       (onClick)="saveMembers()" />
   </ng-template>
 </p-dialog>

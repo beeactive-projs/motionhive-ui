@@ -20,12 +20,12 @@ import { Popover } from 'primeng/popover';
 import {
   MyBookingsIndexStore,
   PublicSessionInstance,
-  SessionCard,
   SessionKind,
   SessionLocationKind,
   SessionsDiscoverStore,
   injectIsTabletDown,
 } from 'core';
+import { SessionCard } from '../../../../_shared/components/session-card/session-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 /**

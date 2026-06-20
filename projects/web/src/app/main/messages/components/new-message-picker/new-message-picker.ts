@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
-import { MessagingStore, UserSearchResult, UserService } from 'core';
+import { injectIsMobile, MessagingStore, UserSearchResult, UserService } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { displayName, initialsOf } from '../../utils/participant';
 import { ChatComposer } from '../chat-composer/chat-composer';
@@ -38,6 +38,9 @@ export class NewMessagePicker {
   protected readonly store = inject(MessagingStore);
   private readonly _users = inject(UserService);
   private readonly _destroyRef = inject(DestroyRef);
+
+  /** Bottom-sheet presentation on phones; right-pane panel on larger screens. */
+  protected readonly isMobile = injectIsMobile();
 
   protected readonly query = signal('');
   protected readonly results = signal<UserSearchResult[]>([]);

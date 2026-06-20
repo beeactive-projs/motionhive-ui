@@ -39,9 +39,9 @@
             </div>
           </div>
           <div class="flex gap-2 md:self-center">
-            <p-button label="Decline" severity="secondary" [outlined]="true" size="small"
+            <p-button label="Decline" severity="danger" [outlined]="true" size="small"
               (onClick)="confirmDecline(request)" />
-            <p-button label="Accept" severity="primary" size="small" icon="pi pi-check"
+            <p-button label="Accept" severity="success" size="small" icon="pi pi-check"
               (onClick)="acceptRequest(request)" />
           </div>
         </div>
@@ -91,7 +91,7 @@
           <h2 class="text-lg font-semibold">My coaches</h2>
           <p class="text-sm text-surface-500 m-0">Coaches you're currently working with.</p>
         </div>
-        <p-button label="Discover coaches" icon="pi pi-search" rounded (onClick)="discoverVisible.set(true)" />
+        <p-button label="Discover coaches" icon="pi pi-search" (onClick)="discoverVisible.set(true)" />
       </div>
 
       @if (loadingInstructors()) {
@@ -132,7 +132,7 @@
             </div>
           </div>
           <div class="flex gap-2 md:self-center">
-            <p-button label="End collaboration" icon="pi pi-sign-out" severity="danger" [outlined]="true" size="small"
+            <p-button label="End collaboration" icon="pi pi-sign-out" severity="danger" [text]="true" size="small"
               (onClick)="confirmLeave(item)" />
           </div>
         </div>

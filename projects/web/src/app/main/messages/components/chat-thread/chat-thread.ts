@@ -66,6 +66,22 @@ export class ChatThread implements AfterViewInit, OnChanges {
 
   protected readonly rendered = computed<RenderedBubble[]>(() => groupMessages(this.messages()));
 
+  /**
+   * Id of the caller's single most-recent message in the thread. Only this
+   * bubble shows a read receipt — earlier sent messages are implicitly read
+   * once a later one is, so repeating "Read" on each is noise.
+   */
+  protected readonly lastMineId = computed<string | null>(() => {
+    const me = this.currentUserId();
+    if (!me) return null;
+    const msgs = this.messages();
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      const m = msgs[i];
+      if (m.senderId === me && !m.deletedAt && m.kind === 'TEXT') return m.id;
+    }
+    return null;
+  });
+
   constructor() {
     // Whenever the message list changes, decide what to do with the
     // scroll position AFTER Angular has rendered the new rows.

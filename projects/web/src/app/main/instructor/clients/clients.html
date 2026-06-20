@@ -94,7 +94,7 @@
               <p-button icon="pi pi-inbox" rounded text severity="danger" tooltipPosition="left" pTooltip="Archive"
                 ariaLabel="Archive" (onClick)="confirmArchive(client)" />
               } @else if (client.status === Statuses.Archived) {
-              <p-button icon="pi pi-inbox" rounded text severity="success" tooltipPosition="left" pTooltip="Unarchive"
+              <p-button icon="pi pi-inbox" rounded severity="success" tooltipPosition="left" pTooltip="Unarchive"
                 ariaLabel="Unarchive" (onClick)="confirmUnarchive(client)" />
               }
             </div>
@@ -135,7 +135,7 @@
             @if (statusFilter()) {
             <mh-list-empty-state icon="pi pi-filter-slash" title="No clients match this filter"
               message="No clients with this status. Try a different one, or clear the filter to see everyone."
-              actionLabel="Clear filter" actionIcon="pi pi-filter-slash" actionSeverity="contrast"
+              actionLabel="Clear filter" actionIcon="pi pi-filter-slash" actionSeverity="secondary"
               [actionOutlined]="true" (action)="onStatusFilterChange(undefined)" />
             } @else {
             <mh-list-empty-state icon="pi pi-users" title="No clients yet"
@@ -214,7 +214,7 @@
               <p-button icon="pi pi-inbox" label="Archive" rounded text size="small" severity="danger"
                 (onClick)="confirmArchive(client)" />
               } @else if (client.status === Statuses.Archived) {
-              <p-button icon="pi pi-inbox" label="Unarchive" rounded text size="small" severity="success"
+              <p-button icon="pi pi-inbox" label="Unarchive" rounded size="small" severity="success"
                 (onClick)="confirmUnarchive(client)" />
               }
             </div>
@@ -228,7 +228,7 @@
         @if (statusFilter()) {
         <mh-list-empty-state icon="pi pi-filter-slash" title="No clients match this filter"
           message="No clients with this status. Try a different one, or clear the filter to see everyone."
-          actionLabel="Clear filter" actionIcon="pi pi-filter-slash" actionSeverity="contrast" [actionOutlined]="true"
+          actionLabel="Clear filter" actionIcon="pi pi-filter-slash" actionSeverity="secondary" [actionOutlined]="true"
           (action)="onStatusFilterChange(undefined)" />
         } @else {
         <mh-list-empty-state icon="pi pi-users" title="No clients yet"

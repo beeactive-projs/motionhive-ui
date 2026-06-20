@@ -26,7 +26,7 @@
         [severity]="!store.filters().locationKind && !store.filters().type ? 'primary' : 'secondary'"
         [text]="!!store.filters().locationKind || !!store.filters().type" (onClick)="clearQuickFilters()" />
 
-      <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+      <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
 
       <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
         [severity]="store.filters().locationKind === SessionLocationKind.Online ? 'primary' : 'secondary'"
@@ -37,7 +37,7 @@
         [text]="store.filters().locationKind !== SessionLocationKind.InPerson"
         (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
 
-      <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+      <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
 
       <p-button label="Group" size="small" rounded styleClass="py-0.5 min-w-10"
         [severity]="store.filters().type === SessionKind.Group ? 'primary' : 'secondary'"
@@ -63,7 +63,7 @@
   @if (store.error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">Couldn't load sessions — {{ store.error() }}</span>
-    <p-button label="Retry" [outlined]="true" size="small" (onClick)="store.load()" />
+    <p-button label="Retry" severity="secondary" [outlined]="true" size="small" (onClick)="store.load()" />
   </p-message>
   } @else if (store.loading() && store.items().length === 0) {
   <div class="flex flex-col gap-2">
@@ -75,7 +75,7 @@
   <mh-list-empty-state icon="pi pi-calendar" title="No sessions found"
     message="Try a different search or filter to find a session to book."
     [actionLabel]="hasActiveFilters() ? 'Clear filters' : undefined" actionIcon="pi pi-filter-slash"
-    actionSeverity="contrast" [actionOutlined]="true" (action)="clearFilters()" />
+    actionSeverity="secondary" [actionOutlined]="true" (action)="clearFilters()" />
   } @else {
   <div class="flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto" data-testid="discover-list">
     @for (group of groupedItems(); track group.lead.id) {
@@ -102,7 +102,8 @@
 
     @if (store.hasMore()) {
     <div class="flex items-center justify-center gap-3 p-4">
-      <p-button label="Load more" [outlined]="true" [loading]="store.loading()" (onClick)="store.loadMore()" />
+      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="store.loading()"
+        (onClick)="store.loadMore()" />
       <span class="text-xs text-muted-color">Showing {{ store.items().length }} of {{ store.total() }}</span>
     </div>
     }

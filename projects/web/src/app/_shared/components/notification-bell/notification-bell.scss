@@ -9,6 +9,39 @@
   display: inline-flex;
 }
 
+/* Notification rows. Unread state needs to read clearly in BOTH themes —
+ * the previous `dark:bg-surface-900` tint was the same colour as the panel,
+ * so unread was invisible on dark. We use a honey tint + a left accent bar +
+ * an unread dot, all derived from the primary token so they flip cleanly. */
+.notif-item {
+  /* Reserve the accent-bar width on every row so read/unread stay aligned. */
+  border-left: 3px solid transparent;
+  transition: background-color 0.15s ease;
+}
+
+.notif-item:hover {
+  background: color-mix(in srgb, var(--p-text-color) 6%, transparent);
+}
+
+.notif-item--unread {
+  /* Subtle wash — the accent bar + dot carry the unread signal, so the
+   * tint stays light/transparent (the user found 12% too strong). */
+  background: color-mix(in srgb, var(--p-primary-500) 6%, transparent);
+  border-left-color: var(--p-primary-500);
+}
+
+.notif-item--unread:hover {
+  background: color-mix(in srgb, var(--p-primary-500) 11%, transparent);
+}
+
+.notif-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--p-primary-500);
+  flex-shrink: 0;
+}
+
 /* Tighten the unread badge: PrimeNG's default OverlayBadge sits
  * way off the icon (top: -50%, right: -50%) and is full-size. We
  * pull it back over the bell, shrink the dot, and switch the type

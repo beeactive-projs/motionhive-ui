@@ -146,7 +146,8 @@ import type { CreateTemplateRequest, SessionKind, Venue } from 'core';
         <div class="mh-qcp__footer">
           <p-button
             label="Open full form"
-            [text]="true"
+            severity="secondary"
+            [outlined]="true"
             size="small"
             icon="pi pi-arrow-up-right"
             (click)="onOpenFull()"
@@ -154,7 +155,7 @@ import type { CreateTemplateRequest, SessionKind, Venue } from 'core';
           <p-button
             label="Cancel"
             severity="secondary"
-            [outlined]="true"
+            [text]="true"
             size="small"
             (click)="dismiss.emit()"
           />

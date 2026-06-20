@@ -22,6 +22,7 @@ import {
   type Invoice,
   type InvoiceStatus,
 } from 'core';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
   selector: 'mh-my-invoices',
@@ -35,6 +36,7 @@ import {
     ToastModule,
     CurrencyRonPipe,
     StatusLabelPipe,
+    ListEmptyState,
   ],
   providers: [MessageService],
   templateUrl: './my-invoices.html',

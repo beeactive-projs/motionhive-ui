@@ -1,0 +1,16 @@
+<span
+  class="mh-access"
+  [class.mh-access--open]="access() === Access.Open"
+  [class.mh-access--free]="access() === Access.Free"
+  [class.mh-access--clients]="access() === Access.ClientsOnly"
+  [class.mh-access--group]="access() === Access.GroupOnly"
+  [attr.aria-label]="ariaLabel()"
+>
+  <i [class]="iconClass()" aria-hidden="true"></i>
+  <span>{{ label() }}</span>
+  @if (approvalRequired()) {
+    <span class="mh-access__approval" title="Approval required">
+      <i class="pi pi-shield" aria-hidden="true"></i>
+    </span>
+  }
+</span>

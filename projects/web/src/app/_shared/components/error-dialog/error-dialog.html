@@ -24,7 +24,7 @@
   <p class="text-sm text-surface-600 dark:text-surface-300 leading-relaxed m-0">{{ error()?.message }}</p>
 
   <ng-template #footer>
-    <p-button label="Close" (onClick)="close()" />
+    <p-button label="Close" severity="secondary" text (onClick)="close()" />
   </ng-template>
 
 </p-dialog>

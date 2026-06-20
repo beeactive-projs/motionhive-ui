@@ -38,9 +38,9 @@
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <p-button label="Approve" icon="pi pi-check" size="small" [loading]="isRequestBusy(r.id)"
+          <p-button label="Approve" icon="pi pi-check" size="small" severity="success" [loading]="isRequestBusy(r.id)"
             (onClick)="approveRequest(r)" />
-          <p-button label="Reject" icon="pi pi-times" size="small" severity="warn" [outlined]="true"
+          <p-button label="Reject" icon="pi pi-times" size="small" severity="danger" [outlined]="true"
             [loading]="isRequestBusy(r.id)" (onClick)="rejectRequest(r)" />
         </div>
       </li>

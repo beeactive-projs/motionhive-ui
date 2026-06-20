@@ -12,7 +12,7 @@
       </p>
     </div>
   </p-message>
-  <p-button label="Back to discover" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
+  <p-button label="Back to discover" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()" />
 </div>
 } @else if (group(); as g) {
 <main class="flex flex-col gap-4 max-w-400 mx-auto">
@@ -52,7 +52,7 @@
           <div class="flex md:justify-end items-center gap-2">
             @if (joinRequestPending()) {
             <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" />
-            <p-button icon="pi pi-times" rounded text severity="contrast" size="small" pTooltip="Cancel request"
+            <p-button icon="pi pi-times" rounded text severity="danger" size="small" pTooltip="Cancel request"
               [loading]="joining()" (onClick)="onCancelRequest()" />
             } @else {
             <p-button [label]="joinButtonLabel()" [icon]="joinButtonIcon()" [loading]="joining()"

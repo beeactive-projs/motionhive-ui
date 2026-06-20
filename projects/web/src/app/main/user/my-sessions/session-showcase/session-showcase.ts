@@ -14,19 +14,19 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { catchError, of } from 'rxjs';
 import {
-  AccessChip,
   BlockedSessionInstance,
   BookResponse,
-  CapacityBar,
   MyBookingsIndexStore,
-  ProviderChip,
   PublicSessionInstance,
   SessionParticipantStatus,
   SessionService,
-  TypeChip,
   isBlockedInstance,
   showApiError,
 } from 'core';
+import { AccessChip } from '../../../../_shared/components/access-chip/access-chip';
+import { TypeChip } from '../../../../_shared/components/type-chip/type-chip';
+import { CapacityBar } from '../../../../_shared/components/capacity-bar/capacity-bar';
+import { ProviderChip } from '../../../../_shared/components/provider-chip/provider-chip';
 import { BookDialog } from './_dialogs/book-dialog/book-dialog';
 import { BookingConfirmedDialog } from './_dialogs/booking-confirmed-dialog/booking-confirmed-dialog';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';

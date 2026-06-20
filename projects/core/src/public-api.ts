@@ -243,37 +243,22 @@ export * from './lib/services/loading/loading.service';
 export * from './lib/components/logo/logo';
 // Hexagon system — one tintable primitive (avatars, icon tiles, badges, accents).
 export * from './lib/components/hex/hex';
+// Segmented control — the Action System pill segmented (single-select view switch).
+export * from './lib/components/segmented/segmented';
 export * from './lib/components/hex/hex.types';
 export * from './lib/components/hex/hex-icons';
 export * from './lib/components/dialog-shell/dialog-shell';
-// Mobile-first primitives — sheet/time-row/day-sep/sticky-cta/fab.
+// Mobile-first primitives — sheet/sticky-cta.
 export * from './lib/components/bottom-sheet/bottom-sheet';
-export * from './lib/components/time-row/time-row';
-export * from './lib/components/day-separator/day-separator';
 export * from './lib/components/sticky-cta/sticky-cta';
-export * from './lib/components/mobile-fab/mobile-fab';
 export * from './lib/components/action-list/action-list';
-export * from './lib/components/week-strip/week-strip';
-export * from './lib/components/time-row-skeleton/time-row-skeleton';
-export * from './lib/components/section-label/section-label';
-export * from './lib/components/tri-state-toggle/tri-state-toggle';
-export * from './lib/components/calendar/calendar-event.model';
-export * from './lib/components/calendar/calendar-grid';
-export * from './lib/components/calendar/event-block';
-// Phase B — session-flavored chips, capacity bar, avatar stack, session card.
-export * from './lib/components/access-chip/access-chip';
-export * from './lib/components/type-chip/type-chip';
-export * from './lib/components/provider-chip/provider-chip';
-export * from './lib/components/capacity-bar/capacity-bar';
+// Avatar stack — overlapping participant avatars.
 export * from './lib/components/avatar-stack/avatar-stack';
-export * from './lib/components/session-card/session-card';
 
-// Phase C — date-picker primitive (calendar left rail navigation).
-export * from './lib/components/mini-month/mini-month';
-
-// Phase D — dialog primitives.
-export * from './lib/components/recurrence-builder/recurrence-builder';
-export * from './lib/components/participants-table/participants-table';
+// NOTE: session-domain components (access/type chip, capacity bar, calendar
+// grid, mini-month, week-strip, recurrence builder, participants table) carry
+// user-visible copy and now live in `web` (`_shared/components/*`) so they can
+// be translated via ngx-translate. They are no longer exported from core.
 
 // Stores — Sessions
 export * from './lib/stores/sessions-instructor.store';

@@ -36,6 +36,8 @@ export class GroupDetailContext {
   readonly showCreatePostDialog = signal(false);
   readonly showDeletePostDialog = signal(false);
   readonly postBeingDeleted = signal<Post | null>(null);
+  readonly showEditPostDialog = signal(false);
+  readonly postBeingEdited = signal<Post | null>(null);
 
   readonly isOwner = computed(() => {
     const group = this.group();
@@ -261,6 +263,11 @@ export class GroupDetailContext {
   requestDeletePost(post: Post): void {
     this.postBeingDeleted.set(post);
     this.showDeletePostDialog.set(true);
+  }
+
+  requestEditPost(post: Post): void {
+    this.postBeingEdited.set(post);
+    this.showEditPostDialog.set(true);
   }
 
   private _setRole(member: GroupMember, role: 'MEMBER' | 'MODERATOR'): void {

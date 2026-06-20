@@ -4,7 +4,7 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
+      <p-button icon="pi pi-arrow-left" text rounded severity="secondary" size="small" ariaLabel="Back"
         (onClick)="goBack()" />
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ t?.title ?? 'Recurring
@@ -23,17 +23,17 @@
       <p-button icon="pi pi-calendar" outlined rounded severity="secondary" size="small" ariaLabel="Calendar"
         routerLink="/coaching/sessions/calendar" />
       @if (t.status !== SessionTemplateStatus.Cancelled) {
-      <p-button icon="pi pi-pencil" rounded size="small" ariaLabel="Edit" (onClick)="editOpen.set(true)" />
-      <p-button icon="pi pi-times" outlined rounded severity="danger" size="small" ariaLabel="Cancel series"
+      <p-button icon="pi pi-pencil" outlined rounded severity="secondary" size="small" ariaLabel="Edit" (onClick)="editOpen.set(true)" />
+      <p-button icon="pi pi-times" text rounded severity="danger" size="small" ariaLabel="Cancel series"
         (onClick)="cancelSeries()" />
       }
       } @else {
       <p-button label="Calendar" icon="pi pi-calendar" outlined severity="secondary"
         [size]="isTablet() ? 'small' : undefined" routerLink="/coaching/sessions/calendar" />
       @if (t.status !== SessionTemplateStatus.Cancelled) {
-      <p-button label="Edit" icon="pi pi-pencil" [size]="isTablet() ? 'small' : undefined"
+      <p-button label="Edit" icon="pi pi-pencil" severity="secondary" outlined [size]="isTablet() ? 'small' : undefined"
         (onClick)="editOpen.set(true)" />
-      <p-button label="Cancel series" icon="pi pi-times" outlined severity="danger"
+      <p-button label="Cancel series" icon="pi pi-times" text severity="danger"
         [size]="isTablet() ? 'small' : undefined" (onClick)="cancelSeries()" />
       }
       }
@@ -153,7 +153,7 @@
         class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5"
         aria-label="Bulk actions">
         <h4 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">Bulk actions</h4>
-        <p-button label="End series after this week" icon="pi pi-stop-circle" severity="danger" [outlined]="true"
+        <p-button label="End series after this week" icon="pi pi-stop-circle" severity="danger" [text]="true"
           [disabled]="!firstFutureInstance()" (onClick)="endAfterThisWeek()" styleClass="w-full justify-center" />
         <small class="text-[11px] leading-snug text-muted-color">
           Cancels every occurrence after the next one and ends the series.

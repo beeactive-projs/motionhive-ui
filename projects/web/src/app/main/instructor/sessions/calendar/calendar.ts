@@ -16,22 +16,12 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import {
   BottomSheet,
-  CalendarEvent,
-  CalendarGrid,
-  CalendarRange,
-  CalendarView,
   CreateTemplateRequest,
-  DaySeparator,
-  MiniMonth,
-  MobileFab,
   SessionInstance,
   SessionKind,
   SessionLocationKind,
   SessionTemplate,
   SessionsInstructorStore,
-  TimeRow,
-  WeekStrip,
-  WeekStripDot,
   dayTone,
   formatSessionDuration,
   formatSessionTime,
@@ -39,6 +29,20 @@ import {
   sessionDayLabel,
   sessionTone,
 } from 'core';
+import { CalendarGrid } from '../../../../_shared/components/calendar/calendar-grid';
+import type {
+  CalendarEvent,
+  CalendarRange,
+  CalendarView,
+} from '../../../../_shared/components/calendar/calendar-event.model';
+import { MiniMonth } from '../../../../_shared/components/mini-month/mini-month';
+import {
+  WeekStrip,
+  WeekStripDot,
+} from '../../../../_shared/components/week-strip/week-strip';
+import { DaySeparator } from '../../../../_shared/components/day-separator/day-separator';
+import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
+import { TimeRow } from '../../../../_shared/components/time-row/time-row';
 import { instanceToCalendarEvent } from './mappers';
 import { QuickCreatePopover } from './quick-create-popover';
 import {

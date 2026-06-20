@@ -9,7 +9,7 @@
 @include app.orb-colors();
 
 $hex-size: 10rem;
-$hex-gap: 0.5rem;
+$hex-gap: 0.25rem;
 
 // ===== Hero Badge =====
 .tag-pill {
@@ -45,7 +45,8 @@ $hex-gap: 0.5rem;
   position: absolute;
   width: $hex-size;
   height: $hex-size;
-  clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+  // Rounded-vertex hexagon (see #heroHexRound in home.component.html) — softer than a sharp polygon().
+  clip-path: url(#heroHexRound);
   transition:
     transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
     background 0.4s ease;
@@ -166,14 +167,16 @@ $hex-gap: 0.5rem;
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  background: color-mix(in oklab, var(--p-slate-800) 88%, transparent);
-  color: var(--p-gray-50);
+  // Light theme (primary): frosted WHITE glass so the card belongs to the light page
+  // (same glass language as the hex tiles / who-columns) instead of a dark block on top.
+  background: color-mix(in oklab, var(--p-surface-0) 68%, transparent);
+  color: var(--color-navy-800);
   border-radius: 1rem;
   padding: 1rem 1.25rem;
   width: 15rem;
-  box-shadow: 0 8px 32px color-mix(in oklab, black 25%, transparent);
-  border: 1px solid color-mix(in oklab, white 8%, transparent);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 32px color-mix(in oklab, var(--p-slate-900) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--p-slate-900) 8%, transparent);
+  backdrop-filter: blur(14px);
   z-index: 2;
   cursor: default;
   transition:
@@ -183,7 +186,7 @@ $hex-gap: 0.5rem;
 
   &:hover {
     transform: translateY(-6px) scale(1.03);
-    border-color: color-mix(in oklab, white 15%, transparent);
+    border-color: color-mix(in oklab, var(--p-slate-900) 16%, transparent);
 
     .floating-card-icon {
       transform: scale(1.1);
@@ -191,6 +194,18 @@ $hex-gap: 0.5rem;
     .floating-card-title {
       letter-spacing: 0.01em;
     }
+  }
+}
+
+// Dark theme: charcoal frosted glass — takes the dark page's tone.
+:host-context(.dark) .floating-card {
+  background: color-mix(in oklab, var(--p-slate-800) 88%, transparent);
+  color: var(--p-gray-50);
+  box-shadow: 0 8px 32px color-mix(in oklab, black 25%, transparent);
+  border-color: color-mix(in oklab, white 8%, transparent);
+
+  &:hover {
+    border-color: color-mix(in oklab, white 15%, transparent);
   }
 }
 
@@ -210,14 +225,24 @@ $hex-gap: 0.5rem;
 
 .floating-card-icon--accent {
   background: color-mix(in oklab, var(--p-teal-500) 15%, transparent);
-  color: var(--p-teal-400);
+  color: var(--p-teal-600);
   box-shadow: 0 0 16px color-mix(in oklab, var(--p-teal-500) 10%, transparent);
 }
 
 .floating-card-icon--navy {
   background: color-mix(in oklab, var(--p-fuchsia-500) 15%, transparent);
-  color: var(--p-fuchsia-400);
+  color: var(--p-fuchsia-600);
   box-shadow: 0 0 16px color-mix(in oklab, var(--p-fuchsia-500) 10%, transparent);
+}
+
+// On dark, the icon glyphs go back to the lighter shades for contrast.
+:host-context(.dark) {
+  .floating-card-icon--accent {
+    color: var(--p-teal-400);
+  }
+  .floating-card-icon--navy {
+    color: var(--p-fuchsia-400);
+  }
 }
 
 .floating-card-title {
@@ -231,8 +256,12 @@ $hex-gap: 0.5rem;
 .floating-card-desc {
   font-size: 0.75rem;
   line-height: 1.45;
-  color: var(--p-slate-400);
+  color: var(--p-slate-500);
   margin: 0.25rem 0 0;
+}
+
+:host-context(.dark) .floating-card-desc {
+  color: var(--p-slate-400);
 }
 
 .floating-card-1 {
@@ -278,9 +307,9 @@ $hex-gap: 0.5rem;
   position: relative;
   border-radius: 1.25rem;
   padding: 2.25rem 1.75rem;
-  background: var(--p-surface-0);
-  border: 1px solid color-mix(in oklab, black 6%, transparent);
-  box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-900) 6%, transparent);
+  // See-through tint (no solid fill) — matches the roadmap cards' original transparent look.
+  background: color-mix(in oklab, black 8%, transparent);
+  border: 1px solid color-mix(in oklab, black 12%, transparent);
 }
 
 :host-context(.dark) {
@@ -337,24 +366,12 @@ $hex-gap: 0.5rem;
 }
 
 .who-list li {
-  position: relative;
-  padding-left: 1.65rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
 }
 
-.who-list li::before {
-  content: '\2713';
-  position: absolute;
-  left: 0;
-  top: 0.15rem;
-  width: 1.125rem;
-  height: 1.125rem;
-  clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
-  background: var(--p-primary-500);
-  color: white;
-  font-size: 0.55rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+.who-list li mh-hex {
+  flex-shrink: 0;
+  margin-top: 0.15rem; // optically centre the hex against the first line of text
 }

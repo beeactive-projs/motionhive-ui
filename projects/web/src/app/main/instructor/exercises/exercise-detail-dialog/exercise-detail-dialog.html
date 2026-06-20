@@ -159,8 +159,8 @@
         @if (canEdit()) {
         <p-button [label]="e.visibility === Visibilities.Public ? 'Make private' : 'Make public'"
           [icon]="e.visibility === Visibilities.Public ? 'pi pi-lock' : 'pi pi-globe'" severity="secondary"
-          [text]="true" (onClick)="toggleVisibility()" [loading]="busy()" />
-        <p-button label="Edit" icon="pi pi-pencil" (onClick)="requestEdit()" [disabled]="busy()" />
+          [outlined]="true" (onClick)="toggleVisibility()" [loading]="busy()" />
+        <p-button label="Edit" icon="pi pi-pencil" severity="secondary" [outlined]="true" (onClick)="requestEdit()" [disabled]="busy()" />
         }
         @if (canFork()) {
         <p-button label="Fork to my library" icon="pi pi-clone" (onClick)="fork()" [loading]="busy()" />

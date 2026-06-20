@@ -27,7 +27,7 @@
           <p class="text-sm text-surface-500">
             Your payment is still processing. We'll update your invoice status shortly.
           </p>
-          <p-button label="View my invoices" icon="pi pi-file" [outlined]="true"
+          <p-button label="View my invoices" icon="pi pi-file" severity="secondary" [outlined]="true"
             (onClick)="goToInvoices()" />
         }
         @case ('error') {

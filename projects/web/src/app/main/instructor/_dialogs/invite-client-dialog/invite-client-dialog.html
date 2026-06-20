@@ -48,8 +48,8 @@
 
   </form>
   <ng-template #footer>
-    <p-button label="Cancel" severity="contrast" [text]="true" (onClick)="visible.set(false)" />
-    <p-button label="Send invitation" icon="pi pi-send" severity="primary" [loading]="inviteLoading()"
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+    <p-button label="Send invitation" icon="pi pi-send" [loading]="inviteLoading()"
       [disabled]="!canSubmit()" (onClick)="sendInvitation()" />
   </ng-template>
   } @else {
@@ -68,7 +68,7 @@
     </div>
   </div>
   <ng-template #footer>
-    <p-button label="Done" severity="primary" (onClick)="visible.set(false)" />
+    <p-button label="Done" (onClick)="visible.set(false)" />
   </ng-template>
   }
 

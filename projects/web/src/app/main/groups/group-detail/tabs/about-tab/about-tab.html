@@ -121,12 +121,12 @@
       </p>
       <div class="flex flex-wrap gap-2">
         @if (context.hasActiveJoinToken()) {
-        <p-button label="Copy join link" icon="pi pi-copy" severity="secondary" size="small"
+        <p-button label="Copy join link" icon="pi pi-copy" severity="secondary" [outlined]="true" size="small"
           (onClick)="context.copyJoinLink()" />
-        <p-button label="Revoke link" icon="pi pi-ban" severity="danger" [outlined]="true" size="small"
+        <p-button label="Revoke link" icon="pi pi-ban" severity="danger" [text]="true" size="small"
           (onClick)="context.revokeJoinLink()" />
         } @else {
-        <p-button label="Generate join link" icon="pi pi-link" severity="secondary" size="small"
+        <p-button label="Generate join link" icon="pi pi-link" severity="secondary" [outlined]="true" size="small"
           [loading]="context.generatingLink()" (onClick)="context.generateJoinLink()" />
         }
       </div>

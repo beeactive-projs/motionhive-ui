@@ -1,7 +1,7 @@
 <!-- Filters -->
 <div class="flex items-center gap-3 mt-2 mb-4 overflow-x-auto no-scrollbar">
   @for (option of statusOptions; track option.label) {
-  <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'contrast'" size="small"
+  <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'secondary'" size="small"
     rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
     styleClass="py-0.5 min-w-10" />
   }
@@ -124,14 +124,9 @@
     <ng-template #emptymessage>
       <tr>
         <td colspan="7">
-          <div class="flex flex-col items-center justify-center py-8 text-center">
-            <i class="pi pi-file text-4xl mb-3 text-surface-400"></i>
-            <p class="text-surface-900 dark:text-surface-50 m-0 font-medium">No invoices yet</p>
-            <p class="text-surface-500 text-sm mt-1 mb-3">
-              Create your first invoice to start billing clients.
-            </p>
-            <p-button label="Create invoice" icon="pi pi-plus" size="small" (onClick)="showCreateDialog.set(true)" />
-          </div>
+          <mh-list-empty-state icon="pi pi-file" title="No invoices yet"
+            message="Create your first invoice to start billing clients." actionLabel="Create invoice"
+            actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
         </td>
       </tr>
     </ng-template>
@@ -214,13 +209,9 @@
       </div>
     </ng-template>
     <ng-template #empty>
-      <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
-        <i class="pi pi-file text-4xl text-surface-400"></i>
-        <p class="m-0 font-medium">No invoices yet</p>
-        <p class="text-surface-500 text-sm m-0">Create your first invoice to start billing clients.</p>
-        <p-button label="Create invoice" icon="pi pi-plus" size="small" class="mt-2"
-          (onClick)="showCreateDialog.set(true)" />
-      </div>
+      <mh-list-empty-state icon="pi pi-file" title="No invoices yet"
+        message="Create your first invoice to start billing clients." actionLabel="Create invoice"
+        actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
     </ng-template>
   </p-dataview>
   @if (hasMore()) {

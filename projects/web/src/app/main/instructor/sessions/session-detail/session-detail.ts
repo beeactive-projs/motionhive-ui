@@ -14,23 +14,23 @@ import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import {
-  AccessChip,
   ActionItem,
   ActionList,
   BottomSheet,
-  CapacityBar,
-  ParticipantsTable,
-  ProviderChip,
   SessionInstance,
   SessionInstanceStatus,
   SessionLocationKind,
   SessionTemplate,
   SessionsDetailStore,
   SessionsInstructorStore,
-  TypeChip,
   injectIsMobile,
   injectIsTablet,
 } from 'core';
+import { AccessChip } from '../../../../_shared/components/access-chip/access-chip';
+import { TypeChip } from '../../../../_shared/components/type-chip/type-chip';
+import { CapacityBar } from '../../../../_shared/components/capacity-bar/capacity-bar';
+import { ParticipantsTable } from '../../../../_shared/components/participants-table/participants-table';
+import { ProviderChip } from '../../../../_shared/components/provider-chip/provider-chip';
 import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-dialog';
 import { CancelSessionDialog } from '../_dialogs/cancel-session-dialog/cancel-session-dialog';
 import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';

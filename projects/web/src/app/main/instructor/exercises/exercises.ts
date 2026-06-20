@@ -30,13 +30,13 @@ import {
   ExerciseSortKey,
   ExerciseTaxonomyStore,
   ListExercisesQuery,
-  MobileFab,
   injectIsMobile,
   injectIsTablet,
   injectIsTabletDown,
   showApiError,
 } from 'core';
 
+import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ExerciseCard } from './exercise-card/exercise-card';
 import { ExerciseDetailDialog } from './exercise-detail-dialog/exercise-detail-dialog';
 import { ExerciseFilterPanel } from './exercise-filter-panel/exercise-filter-panel';

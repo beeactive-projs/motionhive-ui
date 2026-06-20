@@ -63,7 +63,7 @@
   } @else if (items().length === 0) {
   <mh-list-empty-state icon="pi pi-bookmark" title="No plans yet"
     message="Once a coach assigns you a program, it'll show up here with your schedule and progress."
-    actionLabel="Find a coach" actionIcon="pi pi-compass" actionSeverity="contrast" [actionOutlined]="true"
+    actionLabel="Find a coach" actionIcon="pi pi-compass"
     (action)="goToDiscover()" />
   } @else {
   <div class="flex flex-col gap-4 pb-24 md:pb-0">
@@ -118,7 +118,7 @@
 
     @if (hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" [outlined]="true" [loading]="loadingMore()" (onClick)="loadMore()" />
+      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="loadingMore()" (onClick)="loadMore()" />
     </div>
     } @else if (items().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"

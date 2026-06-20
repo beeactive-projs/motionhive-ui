@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
   <!-- Header · mirrors the instructor sessions list header -->
   <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1 min-w-0">
@@ -44,7 +44,8 @@
           [severity]="!locationKindFilter() && !typeFilter() ? 'primary' : 'secondary'"
           [text]="!!locationKindFilter() || !!typeFilter()" (onClick)="clearQuickFilters()" />
 
-        <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+        <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
+
 
         <p-button label="Online" icon="pi pi-video" size="small" rounded styleClass="py-0.5 min-w-10"
           [severity]="locationKindFilter() === SessionLocationKind.Online ? 'primary' : 'secondary'"
@@ -55,7 +56,7 @@
           [text]="locationKindFilter() !== SessionLocationKind.InPerson"
           (onClick)="toggleLocation(SessionLocationKind.InPerson)" />
 
-        <span class="h-4.5 w-px bg-(--p-content-border-color)" aria-hidden="true"></span>
+        <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
 
         <p-button label="Group" size="small" rounded styleClass="py-0.5 min-w-10"
           [severity]="typeFilter() === SessionKind.Group ? 'primary' : 'secondary'"
@@ -103,7 +104,7 @@
   @if (store.error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">{{ store.error() }}</span>
-    <p-button label="Retry" size="small" [outlined]="true" (onClick)="store.load()" />
+    <p-button label="Retry" size="small" severity="secondary" [outlined]="true" (onClick)="store.load()" />
   </p-message>
   } @else if (store.loading() && store.items().length === 0) {
   <div class="flex flex-col gap-2">
@@ -120,7 +121,7 @@
   } @else {
   <mh-list-empty-state icon="pi pi-filter-slash" title="No sessions match your filters"
     message="Try a different filter or clear the search." actionLabel="Clear filters" actionIcon="pi pi-filter-slash"
-    actionSeverity="contrast" [actionOutlined]="true" (action)="clearFilters()" />
+    actionSeverity="secondary" [actionOutlined]="true" (action)="clearFilters()" />
   }
   } @else {
   <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
@@ -138,7 +139,8 @@
 
     @if (store.hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" [outlined]="true" [loading]="store.loading()" (onClick)="store.loadMore()" />
+      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="store.loading()"
+        (onClick)="store.loadMore()" />
     </div>
     }
   </div>
@@ -148,26 +150,8 @@
 <!-- Row list · shared between the desktop section + mobile day group. -->
 <ng-template #rows let-items>
   @for (p of items; track p.id) {
-  <mh-time-row [time]="rowTime(p)" [duration]="rowDuration(p)" [title]="sessionTitle(p)" [tone]="rowTone(p)"
-    [chevron]="!canJoin(p) && !canCancel(p)" (click)="openSession(p)">
-    <span meta>
-      <p-tag [value]="statusLabel(p.status)" [severity]="statusSeverity(p.status)" />
-      @if (isOnline(p) && meetingProvider(p); as prov) {
-      <mh-provider-chip [provider]="$any(prov)" />
-      }
-    </span>
-    @if (canJoin(p) || canCancel(p)) {
-    <span trailing class="flex items-center gap-1.5">
-      @if (canJoin(p)) {
-      <p-button label="Join" icon="pi pi-video" size="small" severity="success" (onClick)="join(p, $event)" />
-      }
-      @if (canCancel(p)) {
-      <p-button icon="pi pi-times" severity="danger" [text]="true" size="small" ariaLabel="Cancel booking"
-        (onClick)="openCancel(p, $event)" />
-      }
-    </span>
-    }
-  </mh-time-row>
+  <mh-my-session-row [participant]="p" [mobile]="isMobile()" (open)="openSession(p)" (join)="join(p, $event)"
+    (cancel)="openCancel(p, $event)" />
   }
 </ng-template>
 

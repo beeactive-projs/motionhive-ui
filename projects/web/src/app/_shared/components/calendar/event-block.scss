@@ -1,0 +1,100 @@
+:host {
+  display: contents;
+}
+
+.mh-event-block {
+  position: absolute;
+  /* left + width are set inline from the lane layout (overlapping
+     events split the column horizontally). Default to full-width
+     when only one lane is present. */
+  left: 0;
+  width: 100%;
+  padding: 4px 6px;
+  border-left: 3px solid var(--p-primary-500);
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 120ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.2;
+  min-width: 0;
+
+  &:hover,
+  &:focus-visible {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+    outline: none;
+    z-index: 2;
+  }
+
+  &.mh-event-block--ring-conflict {
+    box-shadow: 0 0 0 2px var(--p-red-500);
+  }
+  &.mh-event-block--ring-active {
+    box-shadow: 0 0 0 2px var(--p-primary-500);
+  }
+  /* On short blocks (< ~1 row) we hide subtitle so the title
+     alone gets the height. User can hover for the full detail. */
+  &.mh-event-block--compact .mh-event-block__sub {
+    display: none;
+  }
+}
+
+.mh-event-block__title-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mh-event-block__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  /* Single line + ellipsis: a 2-line wrap on a narrow column
+     shows broken words like "E2E one-/off" which reads worse
+     than a clean truncation. Full text is in the title tooltip. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mh-event-block__icon {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+}
+.mh-event-block__icon--danger {
+  color: var(--p-red-600);
+}
+
+.mh-event-block__sub {
+  color: var(--p-text-muted-color);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Conflict "!" badge — small coral disc at the top-right of the
+   block. Bordered with the surface color so it reads cleanly even
+   when adjacent blocks share a similar tint. */
+.mh-event-block__conflict-badge {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--p-red-500);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--p-content-background);
+  cursor: help;
+  pointer-events: auto;
+}

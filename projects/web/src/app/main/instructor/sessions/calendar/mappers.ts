@@ -1,4 +1,5 @@
-import type { CalendarEvent, SessionInstance } from 'core';
+import type { SessionInstance } from 'core';
+import type { CalendarEvent } from '../../../../_shared/components/calendar/calendar-event.model';
 
 /**
  * Map a `SessionInstance` (domain entity) → `CalendarEvent` (generic

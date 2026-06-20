@@ -35,6 +35,7 @@ import {
 } from 'core';
 
 import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
 import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
@@ -65,6 +66,7 @@ import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
     ActionList,
     BottomSheet,
     KpiCard,
+    ListEmptyState,
     AssignProgramDialog,
     ExercisePickerDialog,
     ProgramFormDialog,

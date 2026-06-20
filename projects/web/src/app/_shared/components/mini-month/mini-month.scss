@@ -1,0 +1,107 @@
+.mh-mm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+}
+.mh-mm__header {
+  display: grid;
+  grid-template-columns: 28px 1fr 28px;
+  align-items: center;
+}
+.mh-mm__title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--p-text-color);
+}
+.mh-mm__nav {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  &:hover {
+    background: var(--p-surface-100);
+  }
+}
+.mh-mm__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+  text-align: center;
+}
+.mh-mm__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.mh-mm__day {
+  aspect-ratio: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-text-color);
+  cursor: pointer;
+  transition: background 120ms ease;
+  outline: none;
+  position: relative;
+  &:hover {
+    background: var(--p-primary-50);
+  }
+  /* Only show the focus ring for keyboard nav, not mouse clicks
+     (otherwise a leftover ring competes with is-today/is-selected
+     and looks like a third selection state). */
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-500);
+    outline-offset: 1px;
+  }
+  &.is-other-month {
+    color: var(--p-text-muted-color);
+  }
+  /* In-range: connected band across the visible week. Square the
+     inner edges so adjacent in-range cells visually merge; the
+     range-start / range-end keep the outer corner radius. */
+  &.is-in-range {
+    background: color-mix(in srgb, var(--p-primary-500) 12%, transparent);
+    border-radius: 0;
+  }
+  &.is-in-range.is-range-start {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+  &.is-in-range.is-range-end {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  &.is-selected {
+    background: var(--p-primary-100);
+    color: var(--p-primary-800);
+    border-radius: 6px;
+  }
+  /* Today wins visually — bold ring around the filled circle
+     instead of a separate background, so today + selected can
+     coexist on the same cell without a clash. */
+  &.is-today {
+    background: var(--p-primary-500);
+    color: var(--p-primary-contrast-color, #fff);
+    border-radius: 6px;
+  }
+  &.is-today.is-selected {
+    box-shadow: 0 0 0 2px var(--p-primary-200);
+  }
+}

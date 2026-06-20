@@ -65,7 +65,7 @@
             label="Cancel"
             size="small"
             severity="danger"
-            [outlined]="true"
+            [text]="true"
             pTooltip="You'll keep access until the end of the current period"
             tooltipPosition="left"
             [loading]="cancellingId() === sub.id"
@@ -88,11 +88,8 @@
 
   <ng-template #emptymessage>
     <tr>
-      <td colspan="6" class="text-center py-8">
-        <div class="text-surface-500">
-          <i class="pi pi-sync text-3xl mb-2"></i>
-          <p class="mt-2">No subscriptions</p>
-        </div>
+      <td colspan="6">
+        <mh-list-empty-state icon="pi pi-sync" title="No subscriptions" />
       </td>
     </tr>
   </ng-template>

@@ -73,7 +73,7 @@
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 6px;
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 10%, transparent);
   border: 1px solid var(--p-content-border-color);
   color: var(--p-text-muted-color);
   /* Hide the kbd hint on phones — no Esc key to press. */
@@ -95,10 +95,10 @@
     font-weight: 600;
     border-radius: 8px;
     border: 1px solid var(--p-content-border-color);
-    background: var(--p-surface-50);
+    background: color-mix(in srgb, var(--p-text-color) 6%, transparent);
     color: var(--p-text-color);
     cursor: pointer;
-    &:active { background: var(--p-surface-100); }
+    &:active { background: color-mix(in srgb, var(--p-text-color) 8%, transparent); }
   }
 }
 
@@ -131,13 +131,14 @@
 }
 
 .search-modal__tab:hover {
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
 }
 
 .search-modal__tab--active {
-  background: var(--color-primary-100, #ffedd5);
-  border-color: var(--color-primary-300, #fdba74);
-  color: var(--color-primary-800, #92400e);
+  // Translucent honey — flips light/dark instead of a fixed light chip.
+  background: color-mix(in srgb, var(--p-primary-500) 16%, transparent);
+  border-color: color-mix(in srgb, var(--p-primary-500) 40%, transparent);
+  color: var(--p-primary-color);
   font-weight: 600;
 }
 
@@ -200,8 +201,9 @@
   padding: 6px 10px 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--p-content-border-color);
-  background: var(--p-surface-50, #ffffff);
-  color: var(--color-navy-900);
+  // Theme-aware: a subtle raised surface over the modal in both schemes.
+  background: color-mix(in srgb, var(--p-text-color) 5%, var(--p-content-background));
+  color: var(--p-text-color);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -209,7 +211,7 @@
 }
 
 .search-modal__pill:hover {
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 11%, var(--p-content-background));
   transform: translateY(-1px);
 }
 
@@ -219,12 +221,13 @@
 }
 
 .search-modal__pill--trending {
-  background: linear-gradient(135deg, var(--color-primary-100, #ffedd5), var(--color-primary-50, #fff7ed));
-  border-color: var(--color-primary-200, #fed7aa);
+  // Honey tint blended over the modal surface — flips light/dark.
+  background: color-mix(in srgb, var(--p-primary-500) 15%, var(--p-content-background));
+  border-color: color-mix(in srgb, var(--p-primary-500) 35%, transparent);
 }
 
 .search-modal__pill--trending i {
-  color: var(--color-primary-700, #b45309);
+  color: var(--p-primary-color);
 }
 
 .search-modal__pill-x {
@@ -262,7 +265,7 @@
 
 .search-modal__result:hover,
 .search-modal__result:focus-visible {
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
   outline: none;
 }
 
@@ -270,8 +273,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--p-surface-100);
-  color: var(--color-navy-800);
+  background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
+  color: var(--p-text-color);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -307,7 +310,7 @@
 }
 .search-modal__result-avatar[data-type='user'] {
   background: var(--color-navy-100);
-  color: var(--color-navy-800);
+  color: var(--p-text-color);
 }
 
 .search-modal__result-text {
@@ -318,7 +321,7 @@
   font-size: 14px;
   font-weight: 600;
   margin: 0;
-  color: var(--color-navy-900);
+  color: var(--p-text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -367,7 +370,7 @@
   font-size: 15px;
   font-weight: 600;
   margin: 4px 0 0 0;
-  color: var(--color-navy-900);
+  color: var(--p-text-color);
 }
 
 .search-modal__empty-body {
@@ -386,7 +389,7 @@
   gap: 12px;
   padding: 10px 16px;
   border-top: 1px solid var(--p-content-border-color);
-  background: var(--p-surface-50, #ffffff);
+  background: var(--p-content-background);
   font-size: 11px;
   color: var(--p-text-muted-color);
 }
@@ -409,23 +412,18 @@
   font-weight: 600;
   padding: 2px 5px;
   border-radius: 4px;
-  background: var(--p-surface-100);
+  background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
   border: 1px solid var(--p-content-border-color);
 }
 
 .search-modal__count {
   white-space: nowrap;
 }
-
-/* ─────────── Dark mode ─────────── */
-
-:host-context(.dark) {
-  .search-modal__result-title,
-  .search-modal__empty-title {
-    color: var(--p-surface-50);
-  }
-
-  .search-modal__pill {
-    background: var(--p-surface-800);
-  }
-}
+//
+// NOTE: this modal is `appendTo="body"`, so its DOM is moved out of the
+// component host. Angular's `:host-context(.dark)` only matches descendants
+// of the host, so it does NOT reach the moved dialog — that's why dark styling
+// here must come from theme-aware tokens (`--p-content-*`, `--p-text-*`,
+// `color-mix(... var(--p-primary-500) ...)`) in the BASE rules above, which
+// flip with the colour scheme on their own. Do not add a `:host-context(.dark)`
+// block here; it silently won't apply.

@@ -1,0 +1,51 @@
+<div class="mh-mm">
+  <header class="mh-mm__header">
+    <button
+      type="button"
+      class="mh-mm__nav"
+      (click)="prev()"
+      aria-label="Previous month"
+    >
+      <i class="pi pi-chevron-left" aria-hidden="true"></i>
+    </button>
+    <span class="mh-mm__title">
+      {{ viewMonth() | date: 'MMMM yyyy' : '' : 'en-GB' }}
+    </span>
+    <button
+      type="button"
+      class="mh-mm__nav"
+      (click)="next()"
+      aria-label="Next month"
+    >
+      <i class="pi pi-chevron-right" aria-hidden="true"></i>
+    </button>
+  </header>
+
+  <div class="mh-mm__weekdays" aria-hidden="true">
+    <!-- Track by index, not the label — Tue/Thu both render "T" and
+         Sat/Sun both "S" → tracking by value would dupe-key (NG0955). -->
+    @for (d of weekdayLabels; track $index) {
+      <span>{{ d }}</span>
+    }
+  </div>
+
+  <div class="mh-mm__grid" role="grid">
+    @for (day of days(); track day.iso) {
+      <button
+        type="button"
+        class="mh-mm__day"
+        [class.is-other-month]="day.otherMonth"
+        [class.is-today]="day.isToday"
+        [class.is-selected]="day.isSelected"
+        [class.is-in-range]="day.isInRange"
+        [class.is-range-start]="day.isRangeStart"
+        [class.is-range-end]="day.isRangeEnd"
+        [attr.aria-current]="day.isToday ? 'date' : null"
+        (mousedown)="$event.preventDefault()"
+        (click)="select(day.date)"
+      >
+        {{ day.label }}
+      </button>
+    }
+  </div>
+</div>

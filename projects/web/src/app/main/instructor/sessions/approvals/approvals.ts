@@ -15,6 +15,7 @@ import {
   SessionInstance,
   SessionService,
 } from 'core';
+import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 /**
  * Approvals inbox — lists instances with `pendingApprovalCount > 0`.
@@ -36,7 +37,7 @@ import {
 @Component({
   selector: 'mh-instructor-approvals',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule, TagModule],
+  imports: [CommonModule, RouterLink, ButtonModule, TagModule, ListEmptyState],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

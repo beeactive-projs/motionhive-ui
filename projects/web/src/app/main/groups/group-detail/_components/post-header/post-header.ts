@@ -49,6 +49,7 @@ export class PostHeader {
       items.push({
         label: 'Delete',
         icon: 'pi pi-trash',
+        styleClass: 'mh-menu-danger',
         command: () => this.deleteRequested.emit(this.post()),
       });
     }

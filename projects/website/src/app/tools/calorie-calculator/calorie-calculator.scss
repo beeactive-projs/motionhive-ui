@@ -29,16 +29,15 @@
   position: relative;
   border-radius: 1.25rem;
   padding: 2.25rem 1.75rem;
-  background: var(--p-surface-0);
-  border: 1px solid color-mix(in oklab, black 6%, transparent);
-  box-shadow: 0 12px 40px color-mix(in oklab, var(--p-slate-900) 6%, transparent);
+  // See-through tint (no solid fill) — matches the rest of the site's content cards.
+  background: color-mix(in oklab, black 8%, transparent);
+  border: 1px solid color-mix(in oklab, black 12%, transparent);
 }
 
 :host-context(.dark) {
   .who-column {
     background: color-mix(in oklab, white 8%, transparent);
     border-color: color-mix(in oklab, white 12%, transparent);
-    box-shadow: 0 12px 40px color-mix(in oklab, black 30%, transparent);
   }
 
   .who-column-right {
@@ -52,25 +51,6 @@
   @media (min-width: 768px) {
     border-left: 1px solid color-mix(in oklab, var(--p-slate-400) 30%, transparent);
   }
-}
-
-.who-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 999px;
-  margin-bottom: 1rem;
-  color: white;
-}
-
-.who-icon-instructors {
-  background: var(--color-navy-500);
-}
-
-.who-icon-movers {
-  background: var(--p-sky-500);
 }
 
 .who-list {
