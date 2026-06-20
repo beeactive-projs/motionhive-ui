@@ -16,6 +16,7 @@ import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Divider } from 'primeng/divider';
 import { Button } from 'primeng/button';
+import { Hex, HexTone } from 'core';
 
 type UnitSystem = 'metric' | 'imperial';
 type Gender = 'male' | 'female';
@@ -29,7 +30,7 @@ interface BodyFatCategory {
 
 @Component({
   selector: 'mh-calorie-calculator',
-  imports: [DecimalPipe, FormsModule, SelectButton, Select, InputNumber, UIChart, Divider, Button],
+  imports: [DecimalPipe, FormsModule, SelectButton, Select, InputNumber, UIChart, Divider, Button, Hex],
   templateUrl: './calorie-calculator.html',
   styleUrl: './calorie-calculator.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -350,22 +351,25 @@ export class CalorieCalculator {
 
   // ===== FAQ =====
 
-  readonly faqItems = [
+  readonly faqItems: { value: string; icon: string; tone: HexTone; question: string; answer: string }[] = [
     {
       value: 'faq-1',
       icon: 'pi-calculator',
+      tone: 'amber',
       question: $localize`:@@calorie.faq.q1:How accurate is this calorie calculator?`,
       answer: $localize`:@@calorie.faq.a1:This calculator uses the Mifflin-St Jeor equation, which is considered the most accurate formula for estimating Basal Metabolic Rate (BMR) for most people. Studies show it has a margin of error of roughly ±10%. For greater precision, consider a DEXA scan or a clinical resting metabolic rate test.`,
     },
     {
       value: 'faq-2',
       icon: 'pi-plus',
+      tone: 'teal',
       question: $localize`:@@calorie.faq.q2:Should I eat more on HIIT days?`,
       answer: $localize`:@@calorie.faq.a2:Yes — high-intensity interval training significantly elevates calorie expenditure. On hard training days, you may benefit from an extra 200–400 calories. Prioritise complex carbohydrates before your session and protein-rich foods within 30 minutes of finishing to support performance and recovery.`,
     },
     {
       value: 'faq-3',
       icon: 'pi-arrow-down-right',
+      tone: 'coral',
       question: $localize`:@@calorie.faq.q3:What is a safe calorie deficit for weight loss?`,
       answer: $localize`:@@calorie.faq.a3:A deficit of 300–500 calories per day is generally considered safe and sustainable, leading to roughly 0.3–0.5 kg (0.5–1 lb) of fat loss per week. Deficits exceeding 1,000 calories per day risk muscle loss, nutrient deficiencies, and metabolic adaptation that can stall progress.`,
     },

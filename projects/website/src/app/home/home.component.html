@@ -1,3 +1,13 @@
+<!-- Rounded-hexagon clip used by the hero grid (objectBoundingBox → scales with the hex). -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" class="absolute">
+  <defs>
+    <clipPath id="heroHexRound" clipPathUnits="objectBoundingBox">
+      <path
+        d="M0.4394 0.035 Q0.5 0 0.5606 0.035 L0.8724 0.215 Q0.933 0.25 0.933 0.32 L0.933 0.68 Q0.933 0.75 0.8724 0.785 L0.5606 0.965 Q0.5 1 0.4394 0.965 L0.1276 0.785 Q0.067 0.75 0.067 0.68 L0.067 0.32 Q0.067 0.25 0.1276 0.215 Z" />
+    </clipPath>
+  </defs>
+</svg>
+
 <section class="hero-section">
   <div class="max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -107,32 +117,50 @@
 
     <div class="who-grid grid md:grid-cols-2 gap-10 items-stretch">
       <div class="who-column who-column-left">
-        <div class="feature-icon-wrap">
+        <mh-hex orientation="pointy" tone="amber" [size]="48" class="mb-4">
           <i class="pi pi-flag"></i>
-        </div>
+        </mh-hex>
 
         <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-1" i18n="@@home.lead.h3">
           You lead.
         </h3>
         <p class="section-subtext text-sm font-medium mb-4" i18n="@@home.lead.sub">Build your hive.</p>
         <ul class="who-list">
-          <li i18n="@@home.lead.li1">Run sessions and classes on your terms.</li>
-          <li i18n="@@home.lead.li2">Keep your community in one place.</li>
-          <li i18n="@@home.lead.li3">Share updates, not spreadsheets.</li>
+          <li>
+            <mh-hex orientation="pointy" tone="amber" [size]="18" icon="check" />
+            <span i18n="@@home.lead.li1">Run sessions and classes on your terms.</span>
+          </li>
+          <li>
+            <mh-hex orientation="pointy" tone="amber" [size]="18" icon="check" />
+            <span i18n="@@home.lead.li2">Keep your community in one place.</span>
+          </li>
+          <li>
+            <mh-hex orientation="pointy" tone="amber" [size]="18" icon="check" />
+            <span i18n="@@home.lead.li3">Share updates, not spreadsheets.</span>
+          </li>
         </ul>
       </div>
       <div class="who-column who-column-right">
-        <div class="feature-icon-wrap">
+        <mh-hex orientation="pointy" tone="teal" [size]="48" class="mb-4">
           <i class="pi pi-user"></i>
-        </div>
+        </mh-hex>
         <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-1" i18n="@@home.join.h3">
           You show up.
         </h3>
         <p class="section-subtext text-sm font-medium mb-4" i18n="@@home.join.sub">Join the hive.</p>
         <ul class="who-list">
-          <li i18n="@@home.join.li1">Discover what's happening around you.</li>
-          <li i18n="@@home.join.li2">Stay connected to your favourite groups.</li>
-          <li i18n="@@home.join.li3">Browse sessions nearby and jump in.</li>
+          <li>
+            <mh-hex orientation="pointy" tone="teal" [size]="18" icon="check" />
+            <span i18n="@@home.join.li1">Discover what's happening around you.</span>
+          </li>
+          <li>
+            <mh-hex orientation="pointy" tone="teal" [size]="18" icon="check" />
+            <span i18n="@@home.join.li2">Stay connected to your favourite groups.</span>
+          </li>
+          <li>
+            <mh-hex orientation="pointy" tone="teal" [size]="18" icon="check" />
+            <span i18n="@@home.join.li3">Browse sessions nearby and jump in.</span>
+          </li>
         </ul>
       </div>
     </div>
@@ -159,9 +187,9 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
       @for (item of roadmap; track item.title) {
       <div class="feature-card">
-        <div class="feature-icon-wrap">
-          <i [class]="'pi ' + item.icon + ' text-lg'"></i>
-        </div>
+        <mh-hex orientation="pointy" [tone]="item.tone" [size]="48" class="mb-4">
+          <i [class]="'pi ' + item.icon"></i>
+        </mh-hex>
         <h3 class="section-heading text-lg font-heading font-bold mb-1">
           {{ item.title }}
         </h3>

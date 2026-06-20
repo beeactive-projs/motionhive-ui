@@ -289,9 +289,9 @@
 
     <div class="who-grid grid md:grid-cols-2 gap-10 items-stretch">
       <div class="who-column who-column-left">
-        <div class="who-icon who-icon-instructors">
+        <mh-hex orientation="pointy" tone="amber" [size]="48" class="mb-4">
           <i class="pi pi-bolt"></i>
-        </div>
+        </mh-hex>
         <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-3" i18n="@@calorie.edu.tdee.h3">
           Understanding TDEE for active individuals
         </h3>
@@ -304,9 +304,9 @@
 
       </div>
       <div class="who-column who-column-right">
-        <div class="who-icon who-icon-movers">
+        <mh-hex orientation="pointy" tone="teal" [size]="48" class="mb-4">
           <i class="pi pi-sync"></i>
-        </div>
+        </mh-hex>
         <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-3"
           i18n="@@calorie.edu.macros.h3">
           Why macros matter for recovery
@@ -339,9 +339,9 @@
     <div class="grid md:grid-cols-3 gap-6">
       @for (item of faqItems; track item.value) {
       <div class="feature-card">
-        <div class="feature-icon-wrap">
-          <i [class]="'pi '+item.icon+' text-lg'"></i>
-        </div>
+        <mh-hex orientation="pointy" [tone]="item.tone" [size]="48" class="mb-4">
+          <i [class]="'pi '+item.icon"></i>
+        </mh-hex>
         <h3 class="section-heading text-lg font-heading font-bold mb-3">
           {{ item.question }}
         </h3>

@@ -68,13 +68,14 @@
     align-items: flex-start;
     border-radius: 1rem;
     padding: 1.75rem;
+    // See-through tint (no solid fill) — the original transparent look, applied across all cards.
     background: color-mix(in oklab, black 8%, transparent);
-    border-color: color-mix(in oklab, black 12%, transparent);
+    border: 1px solid color-mix(in oklab, black 12%, transparent);
     transition: all 0.35s ease;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 40px color-mix(in oklab, white 30%, transparent);
+      box-shadow: 0 12px 40px color-mix(in oklab, black 12%, transparent);
     }
   }
 

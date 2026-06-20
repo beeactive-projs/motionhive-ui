@@ -1,11 +1,11 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { WaitlistService } from 'core';
+import { Hex, HexTone, WaitlistService } from 'core';
 
 @Component({
   selector: 'mh-home',
-  imports: [ButtonModule, RouterLink],
+  imports: [ButtonModule, RouterLink, Hex],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,27 +17,31 @@ export class HomeComponent {
     this._waitlistService.open('home');
   }
 
-  readonly roadmap = [
+  readonly roadmap: { icon: string; tone: HexTone; title: string; description: string; ready: boolean }[] = [
     {
       icon: 'pi-users',
+      tone: 'amber',
       title: $localize`Hubs & Groups`,
       description: $localize`Create your space, invite your people, and organise everything in one place.`,
       ready: false,
     },
     {
       icon: 'pi-calendar',
+      tone: 'teal',
       title: $localize`Sessions & Scheduling`,
       description: $localize`Plan activities, set recurring sessions, and let people join with one tap.`,
       ready: false,
     },
     {
       icon: 'pi-pen-to-square',
+      tone: 'coral',
       title: $localize`Blog & Updates`,
       description: $localize`Share stories, tips, and news to keep your community in the loop.`,
       ready: true,
     },
     {
       icon: 'pi-user',
+      tone: 'navy',
       title: $localize`Profiles`,
       description: $localize`Your public profile, upcoming sessions, and activity history — all in one place.`,
       ready: false,
