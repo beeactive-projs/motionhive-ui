@@ -98,6 +98,26 @@ export interface SegmentedOption {
         color: var(--color-navy-900, #0e1b31);
         box-shadow: 0 1px 2px rgba(217, 119, 6, 0.25);
       }
+
+      /* Dark theme — the neutral track/active pill use the non-flipping
+         surface scale (surface-100 / surface-0), so on dark the active pill
+         would be white with white text. Flip them: a recessed translucent
+         track + a raised theme surface for the active pill. The honey variant
+         keeps its honey pill (already readable on dark). */
+      :host-context(.dark) {
+        .mh-seg {
+          background: color-mix(in srgb, var(--p-text-color) 8%, transparent);
+        }
+        .mh-seg__btn.is-on {
+          background: var(--p-surface-800, #27272a);
+          color: var(--p-text-color);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+        .mh-seg--honey .mh-seg__btn.is-on {
+          background: var(--p-primary-500);
+          color: var(--color-navy-900, #0e1b31);
+        }
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -727,3 +727,64 @@
   color: var(--hp-muted);
   font-size: 13px;
 }
+
+// ── Dark theme ─────────────────────────────────────────────────────
+// Match the shared card convention used by sessions (`mh-card` /
+// session-card): cards are `--p-content-background` (dark in dark mode),
+// text is `--p-text-color` / `--p-text-muted-color`, borders are
+// `--p-content-border-color`. These theme tokens flip per colour scheme, so
+// home's dark cards read identically to the rest of the app — no bespoke
+// slate/navy. (NOT `--p-surface-0`, which stays white in dark — that's why
+// it would have given white-on-white text.) Only the brand accents keep
+// their hue, as translucent fills. `.dark` lives on <html>.
+:host-context(.dark) {
+  --hp-ink: var(--p-text-color);
+  --hp-muted: var(--p-text-muted-color);
+  --hp-bg: var(--p-surface-950, #09090b);
+  --hp-card: var(--p-content-background); // dark card, like session-card
+  --hp-border: var(--p-content-border-color);
+  --hp-surface-50: var(--p-surface-800); // subtle hover, lighter than card
+  --hp-surface-100: var(--p-surface-700);
+
+  // Brand accents keep their hue but become translucent fills on dark.
+  --hp-honey-50: rgba(245, 158, 11, 0.10);
+  --hp-honey-100: rgba(245, 158, 11, 0.16);
+  --hp-honey-200: rgba(245, 158, 11, 0.32);
+  --hp-honey-700: #fbbf24; // brighter honey reads better on dark
+  --hp-teal-100: rgba(20, 184, 166, 0.16);
+  --hp-teal-700: #5eead4;
+  --hp-coral-100: rgba(251, 113, 133, 0.16);
+
+  // Headings that used the dark-navy token need theme ink on dark.
+  .hp-hero__title,
+  .hp-invite__text h3 {
+    color: var(--hp-ink);
+  }
+
+  // Branded hero/invite panels: a honey tint blended over the dark surface.
+  .hp-hero,
+  .hp-invite {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, #f59e0b 16%, var(--p-content-background)),
+      var(--p-content-background)
+    );
+    border-color: rgba(245, 158, 11, 0.30);
+  }
+
+  // Navy category chip / placeholder → neutral theme surfaces (no blue).
+  .jr-cat[data-tone='navy'] {
+    background: color-mix(in srgb, var(--p-text-color) 12%, transparent);
+    color: var(--hp-ink);
+  }
+  .jr-cat[data-tone='coral'] {
+    color: #fda4af;
+  }
+  .jr-row__thumb--placeholder[data-tone='navy'] {
+    background: linear-gradient(
+      135deg,
+      var(--p-surface-700),
+      var(--p-surface-900)
+    );
+  }
+}

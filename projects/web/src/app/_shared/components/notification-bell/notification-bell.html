@@ -11,7 +11,7 @@
 </span>
 
 <p-popover #popover [appendTo]="'body'" (onShow)="onPopoverShow()" styleClass="notification-popover">
-  <div class="w-80 max-w-[calc(100vw-2rem)]">
+  <div class="w-72 max-w-[calc(100vw-2rem)]">
     <!-- Header -->
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-sm font-semibold m-0">Notifications</h3>
@@ -50,18 +50,20 @@
 
     <!-- List -->
     @else {
-    <ul #scrollContainer class="flex flex-col list-none p-0 m-0 max-h-[60vh] overflow-y-auto">
+    <ul #scrollContainer class="flex flex-col gap-1.5 list-none p-0 m-0 max-h-[60vh] overflow-y-auto">
       @for (item of notifications(); track item.id) {
-      <li class="group flex items-start gap-3 px-2 py-2.5 rounded-lg cursor-pointer
-                   transition-colors hover:bg-surface-100 dark:hover:bg-surface-800"
-        [class.bg-surface-50]="!item.readAt && !item.dismissedAt"
-        [class.dark:bg-surface-900]="!item.readAt && !item.dismissedAt" (click)="onItemClick(item)">
+      <li class="notif-item group flex items-start gap-3 px-2 py-2.5 rounded-lg cursor-pointer"
+        [class.notif-item--unread]="!item.readAt && !item.dismissedAt" (click)="onItemClick(item)">
         <i [class]="iconForSeverity(item.severity) + ' text-lg mt-0.5 shrink-0'"></i>
 
         <div class="flex flex-col flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <span class="text-sm leading-tight truncate" [class.font-semibold]="!item.readAt && !item.dismissedAt">
-              {{ item.title }}
+            <span class="text-sm leading-tight flex items-center gap-2 min-w-0"
+              [class.font-semibold]="!item.readAt && !item.dismissedAt">
+              @if (!item.readAt && !item.dismissedAt) {
+              <span class="notif-dot" aria-label="Unread"></span>
+              }
+              <span class="truncate">{{ item.title }}</span>
             </span>
             <button type="button" class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0
                          text-muted-color hover:text-surface-700 dark:hover:text-surface-200"

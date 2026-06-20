@@ -124,6 +124,14 @@ export class Home implements OnInit {
 
   readonly postsLoading = signal(true);
   readonly coachesLoading = signal(true);
+  /**
+   * Load guards for the "Start here" steps. We only render a step once the
+   * data backing its done-state has arrived — otherwise a fully-onboarded
+   * user briefly sees their finished steps as incomplete. These reuse the
+   * existing loaders; no extra calls.
+   */
+  private readonly _profileLoaded = signal(false);
+  private readonly _templatesLoaded = signal(false);
 
   // ── Derived state ─────────────────────────────────────────────────
 
@@ -198,8 +206,24 @@ export class Home implements OnInit {
     return all.filter((s) => s.show);
   });
 
-  /** Hide the panel entirely when every relevant step is checked. */
-  readonly showStepsPanel = computed(() => this.steps().some((s) => !s.done));
+  /**
+   * The steps' done-states are trustworthy only once their backing data has
+   * loaded: the profile (profile + instructor discriminator), the coaches
+   * list, and — for instructors — the session-templates count.
+   */
+  readonly stepsReady = computed(() => {
+    if (!this._profileLoaded() || this.coachesLoading()) return false;
+    const needsTemplates = !!this._profile()?.instructorProfile;
+    return needsTemplates ? this._templatesLoaded() : true;
+  });
+
+  /**
+   * Hide the panel while its data is still loading (so we never show a
+   * completed step as undone), and once every relevant step is checked.
+   */
+  readonly showStepsPanel = computed(
+    () => this.stepsReady() && this.steps().some((s) => !s.done),
+  );
 
   // ── Dialog state ─────────────────────────────────────────────────
 
@@ -252,15 +276,24 @@ export class Home implements OnInit {
     this._profileSvc.getMyProfile().subscribe({
       next: (p) => {
         this._profile.set(p);
+        this._profileLoaded.set(true);
         // Only the instructor surface exposes /sessions/templates —
         // a non-instructor call returns 403 (and the global error
         // interceptor toasts it). Gate strictly on the actual
         // instructor profile existing, not on derived isInstructor().
         if (p?.instructorProfile) {
           this._loadInstructorTemplatesCount();
+        } else {
+          // No templates call for non-instructors — that step is hidden,
+          // so its data counts as "loaded" for the steps-ready guard.
+          this._templatesLoaded.set(true);
         }
       },
-      error: () => this._profile.set(null),
+      error: () => {
+        this._profile.set(null);
+        this._profileLoaded.set(true);
+        this._templatesLoaded.set(true);
+      },
     });
   }
 
@@ -314,8 +347,14 @@ export class Home implements OnInit {
 
   private _loadInstructorTemplatesCount(): void {
     this._sessionSvc.listTemplates({ page: 1, limit: 1 }).subscribe({
-      next: (res) => this._instructorTemplatesTotal.set(res.total ?? 0),
-      error: () => this._instructorTemplatesTotal.set(0),
+      next: (res) => {
+        this._instructorTemplatesTotal.set(res.total ?? 0);
+        this._templatesLoaded.set(true);
+      },
+      error: () => {
+        this._instructorTemplatesTotal.set(0);
+        this._templatesLoaded.set(true);
+      },
     });
   }
 
