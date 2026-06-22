@@ -16,25 +16,22 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
-import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 
 import {
-  LoggedExercise,
-  LoggedSet,
   Routine,
   RoutineService,
   WorkoutLog,
   WorkoutLogService,
-  formatSessionTime,
+  groupSessionsByBucket,
   injectIsMobile,
   injectIsTablet,
   showApiError,
 } from 'core';
 import { SectionLabel } from '../../../_shared/components/section-label/section-label';
-import { TimeRow } from '../../../_shared/components/time-row/time-row';
 import { TimeRowSkeleton } from '../../../_shared/components/time-row-skeleton/time-row-skeleton';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
+import { WorkoutRow } from './_components/workout-row/workout-row';
 
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -50,34 +47,13 @@ interface TabSpec {
   icon: string;
 }
 
-/** One workout history row, fully projected for `<mh-time-row>`. */
-interface WorkoutRow {
-  log: WorkoutLog;
-  /** Day-of-month number shown in the time-row's primary slot (e.g. "14"). */
-  dayNum: string;
-  /** Short weekday under the day number (e.g. "Sat"). */
-  weekday: string;
-  /** Clock time the workout started (e.g. "09:00"). */
-  clockTime: string;
-  title: string;
-  /** Program name snapshot, or "Freestyle workout" when unassigned. */
-  subtitle: string;
-  /** "45 min" — null when the duration is unknown. */
-  durationLabel: string | null;
-  /** "12 sets". */
-  setsLabel: string;
-  feelingGlyph: string | null;
-  prCount: number;
-  /** "PR" / "3 PRs" badge text — empty when no PRs. */
-  prLabel: string;
-  tone: 'honey' | 'teal';
-}
-
-/** Workouts grouped by calendar month, most recent first. */
-interface MonthGroup {
+/** Workouts grouped into relative buckets (Today / Yesterday / … / month). */
+interface HistoryGroup {
   label: string;
   count: number;
-  rows: WorkoutRow[];
+  /** False for single-day buckets (today/yesterday) → row shows the time, not the date. */
+  multiDay: boolean;
+  logs: WorkoutLog[];
 }
 
 /**
@@ -107,15 +83,14 @@ interface MonthGroup {
     Tab,
     TabPanels,
     TabPanel,
-    Tag,
     Toast,
     TooltipModule,
-    TimeRow,
     TimeRowSkeleton,
     SectionLabel,
     MobileFab,
     ListEmptyState,
     RoutineFormDialog,
+    WorkoutRow,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-workouts.html',
@@ -181,29 +156,19 @@ export class MyWorkouts {
     return Math.round(totalSec / 3600);
   });
 
-  /** History projected into month groups of `<mh-time-row>`-ready rows. */
-  readonly monthGroups = computed<MonthGroup[]>(() => {
-    const map = new Map<string, WorkoutRow[]>();
-    for (const l of this.items()) {
-      const d = new Date(l.startedAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const arr = map.get(key) ?? [];
-      arr.push(this._toRow(l));
-      map.set(key, arr);
-    }
-    return Array.from(map.entries())
-      .sort(([a], [b]) => b.localeCompare(a))
-      .map(([, rows]) => ({
-        label: new Date(rows[0].log.startedAt).toLocaleString('en', {
-          month: 'long',
-          year: 'numeric',
-        }),
-        count: rows.length,
-        rows,
-      }));
-  });
-
-  private readonly _feelingGlyphs = ['😣', '😕', '😐', '🙂', '💪'];
+  /**
+   * History grouped into relative buckets (Today / Yesterday / Earlier this
+   * week / by month), newest-first. Same `'past'` bucketing the sessions
+   * lists use; each log renders via `mh-workout-row`.
+   */
+  readonly historyGroups = computed<HistoryGroup[]>(() =>
+    groupSessionsByBucket(this.items(), (l) => l.startedAt, 'past').map((g) => ({
+      label: g.bucket.label,
+      count: g.items.length,
+      multiDay: g.bucket.multiDay,
+      logs: g.items,
+    })),
+  );
 
   constructor() {
     const initial = this._route.snapshot.queryParamMap.get('tab');
@@ -398,41 +363,7 @@ export class MyWorkouts {
     this._router.navigate(['/exercises']);
   }
 
-  // ── Template helpers ─────────────────────────────────────────────
-
-  feelingGlyph(log: WorkoutLog): string | null {
-    if (log.feelingRating == null) return null;
-    const idx = Math.max(1, Math.min(5, log.feelingRating)) - 1;
-    return this._feelingGlyphs[idx];
-  }
-
   // ── Internals ────────────────────────────────────────────────────
-
-  private _toRow(log: WorkoutLog): WorkoutRow {
-    const d = new Date(log.startedAt);
-    const durationMin =
-      log.durationSeconds != null ? Math.round(log.durationSeconds / 60) : null;
-    const setsDone = (log.exercises ?? []).reduce(
-      (n: number, e: LoggedExercise) =>
-        n + (e.sets ?? []).filter((s: LoggedSet) => s.isCompleted).length,
-      0,
-    );
-    const prCount = log.prCount ?? 0;
-    return {
-      log,
-      dayNum: d.toLocaleDateString('en-GB', { day: 'numeric' }),
-      weekday: d.toLocaleDateString('en-GB', { weekday: 'short' }),
-      clockTime: formatSessionTime(log.startedAt),
-      title: log.name,
-      subtitle: log.assignment?.programNameSnapshot ?? 'Freestyle workout',
-      durationLabel: durationMin != null ? `${durationMin} min` : null,
-      setsLabel: `${setsDone} ${setsDone === 1 ? 'set' : 'sets'}`,
-      feelingGlyph: this.feelingGlyph(log),
-      prCount,
-      prLabel: prCount === 0 ? '' : prCount === 1 ? 'PR' : `${prCount} PRs`,
-      tone: prCount > 0 ? 'teal' : 'honey',
-    };
-  }
 
   private fetch(replace: boolean): void {
     if (replace) this.loading.set(true);

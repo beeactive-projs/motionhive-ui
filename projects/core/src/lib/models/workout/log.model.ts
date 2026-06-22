@@ -21,6 +21,13 @@ export interface WorkoutLog {
   durationSeconds: number | null;
   feelingRating: number | null;
   notes: string | null;
+  /**
+   * Future export hooks — activity-type codes written when this log is
+   * mirrored *out* to Apple Health / Health Connect. Write-only placeholders
+   * on the API today (always null); not an "imported from wearable" marker.
+   */
+  hkActivityType?: string | null;
+  healthConnectExerciseType?: string | null;
   createdAt: string;
   updatedAt: string;
 

@@ -12,8 +12,10 @@ import {
   SessionParticipant,
   SessionParticipantStatus,
   TagSeverity,
+  formatSessionDayShort,
   formatSessionDuration,
   formatSessionTime,
+  sessionLifecycle,
 } from 'core';
 import { Avatar } from '../../../../../_shared/components/avatar/avatar';
 import { TypeChip } from '../../../../../_shared/components/type-chip/type-chip';
@@ -28,11 +30,12 @@ import { ProviderChip } from '../../../../../_shared/components/provider-chip/pr
  *   OVERRIDE     a booking that is no longer live goes grey
  *   PRECEDENCE   inactive  ›  online  ›  in-person   (first match wins)
  *
- *   - `Inactive` (muted grey) — cancelled, declined, or already started/past;
- *                  no longer actionable. Checked first, so a dead booking is
- *                  never tinted by its location.
- *   - `Online`   (teal)       — live & upcoming, attended via a meeting link.
- *   - `InPerson` (honey)      — live & upcoming, attended at a venue.
+ *   - `Inactive` (muted grey) — cancelled, declined, or finished (now past its
+ *                  `endAt`); no longer actionable. Checked first, so a dead
+ *                  booking is never tinted by its location. An *ongoing*
+ *                  session (started but not yet ended) is NOT inactive.
+ *   - `Online`   (teal)       — upcoming or ongoing, attended via a meeting link.
+ *   - `InPerson` (honey)      — upcoming or ongoing, attended at a venue.
  *
  * Each visual channel owns exactly one fact, so nothing is said twice:
  *   - booking *status* (Confirmed/Pending/Waitlisted/…) → the status `p-tag`
@@ -87,6 +90,8 @@ export class MySessionRow {
   readonly participant = input.required<SessionParticipant>();
   /** Mobile viewport flag (from the page's `injectIsMobile()`). */
   readonly mobile = input<boolean>(false);
+  /** Show the row's date (multi-day buckets like "This week" / a month). */
+  readonly showDate = input<boolean>(false);
 
   readonly open = output<void>();
   readonly join = output<MouseEvent>();
@@ -102,11 +107,27 @@ export class MySessionRow {
   });
 
   protected readonly start = computed<string | null>(() => this.instance()?.startAt ?? null);
+  protected readonly end = computed<string | null>(() => this.instance()?.endAt ?? null);
+
+  /**
+   * Where this occurrence sits relative to now — upcoming / ongoing / past.
+   * Note "ongoing" (started, `endAt` still ahead): it must stay live, not be
+   * muted like a finished booking. Drives `tone()`, `canJoin()`, the live badge.
+   */
+  protected readonly lifecycle = computed(() => sessionLifecycle(this.start(), this.end()));
+  protected readonly isOngoing = computed(() => this.lifecycle() === 'ongoing');
+  protected readonly isPast = computed(() => this.lifecycle() === 'past');
 
   /** Row time label (e.g. "09:00"), em-dash when the start is unknown. */
   protected readonly time = computed(() => {
     const s = this.start();
     return s ? formatSessionTime(s) : '—';
+  });
+
+  /** Compact date label (e.g. "Wed 25 Jun") for multi-day buckets. */
+  protected readonly dateLabel = computed(() => {
+    const s = this.start();
+    return s ? formatSessionDayShort(s) : '';
   });
 
   /** Row duration label (e.g. "60 min"), empty when unknown. */
@@ -153,14 +174,15 @@ export class MySessionRow {
     return this.capacity() != null && (t === SessionKind.Group || t === SessionKind.Open);
   });
 
-  /** Left-edge tone — muted for past/cancelled, teal online, honey in-person. */
+  /** Left-edge tone — muted for finished/cancelled, teal online, honey in-person. */
   protected readonly tone = computed<SessionRowTone>(() => {
     const st = this.participant().status;
     if (st === SessionParticipantStatus.Cancelled || st === SessionParticipantStatus.Declined) {
       return SessionRowTone.Inactive;
     }
-    const s = this.start();
-    if (s && new Date(s).getTime() < Date.now()) return SessionRowTone.Inactive;
+    // Only a *finished* session goes grey — one that's merely started (ongoing)
+    // is still live and keeps its location tone.
+    if (this.isPast()) return SessionRowTone.Inactive;
     return this.isOnline() ? SessionRowTone.Online : SessionRowTone.InPerson;
   });
 
@@ -224,8 +246,9 @@ export class MySessionRow {
 
   protected readonly isFree = computed(() => this.participant().snapshotPriceCents === 0);
 
-  /** Show the Cancel button only for active bookings. */
+  /** Show the Cancel button only for active, not-yet-started bookings. */
   protected readonly canCancel = computed(() => {
+    if (this.lifecycle() !== 'upcoming') return false; // ongoing/past → not cancellable
     const st = this.participant().status;
     return (
       st === SessionParticipantStatus.Confirmed ||
@@ -238,8 +261,6 @@ export class MySessionRow {
   protected readonly cancelPolicy = computed<string | null>(() => {
     const p = this.participant();
     if (!this.canCancel() || !p.snapshotCancelCutoffH) return null;
-    const s = this.start();
-    if (s && new Date(s).getTime() < Date.now()) return null; // past → no policy
     return `Free cancellation until ${p.snapshotCancelCutoffH}h before`;
   });
 
@@ -253,8 +274,9 @@ export class MySessionRow {
   });
 
   /**
-   * Show "Join" within ~15 minutes of start (and during the session).
-   * Online-only — in-person doesn't surface a join link.
+   * Show "Join" from ~15 minutes before start through the actual end of the
+   * session (`endAt`). Online-only — in-person doesn't surface a join link.
+   * Falls back to a 4h window only when the occurrence has no `endAt`.
    */
   protected readonly canJoin = computed(() => {
     const p = this.participant();
@@ -262,8 +284,10 @@ export class MySessionRow {
     const s = this.start();
     if (!s) return false;
     const startMs = new Date(s).getTime();
+    const e = this.end();
+    const endMs = e ? new Date(e).getTime() : startMs + 4 * 60 * 60 * 1000;
     const now = Date.now();
-    return now >= startMs - 15 * 60 * 1000 && now <= startMs + 4 * 60 * 60 * 1000;
+    return now >= startMs - 15 * 60 * 1000 && now <= endMs;
   });
 
   // ─── Events ───────────────────────────────────────────────────────────

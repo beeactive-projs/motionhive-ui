@@ -46,6 +46,9 @@ export const MotionHiveLara = definePreset(Lara, {
           hoverColor: '{primary.400}',
           activeColor: '{primary.600}',
         },
+        content: {
+          background: '{surface.800}',
+        },
       },
     },
   },
@@ -60,27 +63,27 @@ export const MotionHiveLara = definePreset(Lara, {
       root: {
         // Action System §4 — one radius rule: 8px soft-rect for every button,
         // every size. (Pills are reserved for toggles/segmented; see tabs.)
-        borderRadius: '8px',
+        //borderRadius: '0.5rem',
         // Compact-by-default size scale (≈36px default · 30px sm · 44px lg).
         // "size=small" was used 324× — proof the base was too big — so the
         // baseline IS the compact size now and that attribute mostly vanishes.
         paddingX: '0.875rem',
-        paddingY: '0.5rem',
-        gap: '0.5rem',
-        label: {
-          // Action System — slightly heavier label so roles read at a glance.
-          fontWeight: '600',
-        },
-        sm: {
-          fontSize: '0.8125rem',
-          paddingX: '0.6875rem',
-          paddingY: '0.375rem',
-        },
-        lg: {
-          fontSize: '0.9375rem',
-          paddingX: '1.375rem',
-          paddingY: '0.6875rem',
-        },
+        // paddingY: '0.5rem',
+        // gap: '0.5rem',
+        // label: {
+        //   // Action System — slightly heavier label so roles read at a glance.
+        //   fontWeight: '600',
+        // },
+        // sm: {
+        //   fontSize: '0.8125rem',
+        //   paddingX: '0.6875rem',
+        //   paddingY: '0.375rem',
+        // },
+        // lg: {
+        //   fontSize: '0.9375rem',
+        //   paddingX: '1.375rem',
+        //   paddingY: '0.6875rem',
+        // },
       },
       colorScheme: {
         light: {
@@ -145,8 +148,13 @@ export const MotionHiveLara = definePreset(Lara, {
       colorScheme: {
         light: {
           root: {
-            // background: '{surface.50}',
+            background: '{surface.50}',
             // shadow: '0 .125rem .25rem rgba(0,0,0,.85)',
+          },
+        },
+        dark: {
+          root: {
+            background: '{surface.900}',
           },
         },
       },

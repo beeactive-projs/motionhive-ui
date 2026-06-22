@@ -7,26 +7,36 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Location } from '@angular/common';
+import { Location, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
 import { Popover } from 'primeng/popover';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 import {
+  BookResponse,
   MyBookingsIndexStore,
   PublicSessionInstance,
   SessionKind,
   SessionLocationKind,
+  SessionParticipantStatus,
   SessionsDiscoverStore,
+  groupSessionsByBucket,
+  injectIsMobile,
   injectIsTabletDown,
 } from 'core';
-import { SessionCard } from '../../../../_shared/components/session-card/session-card';
+import { DaySeparator } from '../../../../_shared/components/day-separator/day-separator';
+import { SectionLabel } from '../../../../_shared/components/section-label/section-label';
+import { TimeRowSkeleton } from '../../../../_shared/components/time-row-skeleton/time-row-skeleton';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
+import { DiscoverSessionRow } from './_components/discover-session-row/discover-session-row';
+import { BookDialog } from '../_dialogs/book-dialog/book-dialog';
+import { BookingConfirmedDialog } from '../_dialogs/booking-confirmed-dialog/booking-confirmed-dialog';
 
 /**
  * Public-ish "find a session" page for logged-in users.
@@ -42,18 +52,24 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   selector: 'mh-sessions-discover',
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     FormsModule,
     ButtonModule,
     IconField,
     InputIcon,
     InputTextModule,
-    SkeletonModule,
     MessageModule,
     Popover,
-    SessionCard,
+    TimeRowSkeleton,
+    SectionLabel,
+    DaySeparator,
     ListEmptyState,
+    DiscoverSessionRow,
+    Toast,
+    BookDialog,
+    BookingConfirmedDialog,
   ],
-  providers: [SessionsDiscoverStore],
+  providers: [SessionsDiscoverStore, MessageService],
   templateUrl: './sessions-discover.html',
   styleUrl: './sessions-discover.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,6 +82,8 @@ export class SessionsDiscover implements OnInit, OnDestroy {
 
   /** Tablet or smaller — collapses the quick filters behind a popover. */
   protected readonly isTabletDown = injectIsTabletDown();
+  /** Mobile viewport — switches day headers + row layout, like my-sessions. */
+  protected readonly isMobile = injectIsMobile();
 
   // Enum consts exposed for template comparisons — never compare against
   // raw string literals (see CLAUDE.md).
@@ -86,34 +104,14 @@ export class SessionsDiscover implements OnInit, OnDestroy {
   }
 
   /**
-   * Group consecutive instances of the same template into a single card.
-   * Discover returns one row per occurrence — a weekly class with 5
-   * upcoming sessions would render as 5 identical cards. We keep the
-   * earliest instance as the card representative + count siblings for
-   * the "+N more" line.
+   * Instances bucketed Today / Tomorrow / This week / by month, ascending
+   * ("what's next"). Discover returns one row per occurrence, so a recurring
+   * class shows once per day it runs; the row carries its own date inside
+   * multi-day buckets.
    */
-  protected readonly groupedItems = computed<
-    { lead: PublicSessionInstance; moreCount: number }[]
-  >(() => {
-    const byTemplate = new Map<string, PublicSessionInstance[]>();
-    for (const inst of this.store.items()) {
-      const list = byTemplate.get(inst.templateId) ?? [];
-      list.push(inst);
-      byTemplate.set(inst.templateId, list);
-    }
-    const groups: { lead: PublicSessionInstance; moreCount: number }[] = [];
-    for (const list of byTemplate.values()) {
-      list.sort(
-        (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime(),
-      );
-      groups.push({ lead: list[0], moreCount: list.length - 1 });
-    }
-    groups.sort(
-      (a, b) =>
-        new Date(a.lead.startAt).getTime() - new Date(b.lead.startAt).getTime(),
-    );
-    return groups;
-  });
+  protected readonly groupedItems = computed(() =>
+    groupSessionsByBucket(this.store.items(), (inst) => inst.startAt, 'future'),
+  );
 
   /** Any quick filter (type / location) or search currently applied. */
   protected readonly hasActiveFilters = computed(() => {
@@ -123,6 +121,14 @@ export class SessionsDiscover implements OnInit, OnDestroy {
 
   protected readonly searchInput = signal('');
   private _searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ─── Booking dialog state (mirrors the session showcase) ────────────────
+  /** The instance whose Book CTA was clicked — feeds both dialogs. */
+  protected readonly selectedInstance = signal<PublicSessionInstance | null>(null);
+  protected readonly bookOpen = signal(false);
+  /** Success modal opens after a successful book. */
+  protected readonly confirmedOpen = signal(false);
+  protected readonly bookedStatus = signal<SessionParticipantStatus>('CONFIRMED');
 
   ngOnInit(): void {
     this.store.load();
@@ -176,5 +182,29 @@ export class SessionsDiscover implements OnInit, OnDestroy {
 
   protected onCardOpen(instance: PublicSessionInstance): void {
     void this._router.navigate(['/user/sessions', instance.id]);
+  }
+
+  /**
+   * Book action — opens the booking dialog inline (same flow as the session
+   * showcase) instead of routing away to the detail page. The row's button is
+   * already gated by `canBook`, so we just stash the instance + open the modal.
+   */
+  protected onBook(instance: PublicSessionInstance): void {
+    this.selectedInstance.set(instance);
+    this.bookOpen.set(true);
+  }
+
+  /** A booking landed — swap to the confirmation modal + refresh the index. */
+  protected onBookSuccess(res: BookResponse): void {
+    this.bookOpen.set(false);
+    this.bookedStatus.set(res.status);
+    this.confirmedOpen.set(true);
+    // Refresh so the row's Book button flips to the "Booked" tag immediately.
+    this.bookings.invalidate();
+    this.bookings.ensureLoaded();
+  }
+
+  protected goToMySessions(): void {
+    void this._router.navigate(['/user/sessions']);
   }
 }

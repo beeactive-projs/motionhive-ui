@@ -25,11 +25,10 @@ import {
   SessionLocationKind,
   SessionParticipant,
   SessionsMyStore,
-  dayTone,
+  groupSessionsByBucket,
   injectIsMobile,
   injectIsTablet,
   injectIsTabletDown,
-  sessionDayLabel,
 } from 'core';
 import { DaySeparator } from '../../../_shared/components/day-separator/day-separator';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
@@ -151,41 +150,19 @@ export class MySessions implements OnInit {
   });
 
   /**
-   * Items grouped by local day. Upcoming / pending / waitlisted sort
-   * ascending ("what's next"); past / cancelled sort descending ("most
-   * recent first"), matching the instructor list's day grouping.
+   * Items bucketed Today / Tomorrow / This week / by month. Upcoming /
+   * pending / waitlisted read ascending ("what's next"); past / cancelled
+   * read descending (Today / Yesterday / Earlier this week / by month). The
+   * row carries its own date inside multi-day buckets.
    */
   protected readonly groupedItems = computed(() => {
-    const items = this.filteredItems();
-    const desc = this.store.tab() === MyTab.Past || this.store.tab() === MyTab.Cancelled;
-    const groups = new Map<string, { date: Date; items: SessionParticipant[] }>();
-    for (const p of items) {
-      const s = this.startAt(p);
-      const d = s ? new Date(s) : new Date(0);
-      const key = this._dayKey(d);
-      if (!groups.has(key)) {
-        const day = new Date(d);
-        day.setHours(0, 0, 0, 0);
-        groups.set(key, { date: day, items: [] });
-      }
-      groups.get(key)!.items.push(p);
-    }
-    const arr = Array.from(groups.values()).sort((a, b) =>
-      desc ? b.date.getTime() - a.date.getTime() : a.date.getTime() - b.date.getTime(),
+    const past = this.store.tab() === MyTab.Past || this.store.tab() === MyTab.Cancelled;
+    return groupSessionsByBucket(
+      this.filteredItems(),
+      (p) => this.startAt(p),
+      past ? 'past' : 'future',
     );
-    for (const g of arr) {
-      g.items.sort((a, b) => {
-        const ta = new Date(this.startAt(a) ?? 0).getTime();
-        const tb = new Date(this.startAt(b) ?? 0).getTime();
-        return desc ? tb - ta : ta - tb;
-      });
-    }
-    return arr;
   });
-
-  // Template-facing aliases for the core/utils day-grouping helpers.
-  protected readonly dayLabel = sessionDayLabel;
-  protected readonly dayTone = dayTone;
 
   ngOnInit(): void {
     this.store.load();
@@ -276,13 +253,5 @@ export class MySessions implements OnInit {
 
   protected startAt(p: SessionParticipant): string | null {
     return p.instance?.startAt ?? null;
-  }
-
-  /** Local-zone YYYY-MM-DD so "today" reflects the user's timezone. */
-  private _dayKey(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
   }
 }

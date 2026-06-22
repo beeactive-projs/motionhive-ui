@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  cursor: pointer;
+  outline: none;
+}
+
+/* p-card has no compact/borderless preset — strip its padding so the card
+   reads as a dense, bordered list row (mirrors mh-my-session-row). */
+
+:host ::ng-deep .p-card-body {
+  padding: 0.875rem;
+}
+
+/* Tone edge — 3px inset left stripe. The row sets a *semantic* [data-tone]
+   (pr / default); this is the single place that maps each meaning to a colour:
+     pr      → teal   (a personal record was set)
+     default → honey  (a normal logged session) */
+:host([data-tone='pr']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-teal-500);
+}
+:host([data-tone='default']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-primary-500);
+}

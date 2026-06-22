@@ -1,0 +1,79 @@
+<p-dialog [header]="headerLabel()" [(visible)]="visible" [modal]="true" [closable]="true" [style]="{ width: '35rem' }">
+  @let inst = instance();
+  @let tpl = inst?.template;
+  @if (inst && tpl) {
+  <div class="flex flex-col gap-4 pt-1">
+    <div class="flex flex-col items-center text-center gap-2">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 text-green-700"
+        aria-hidden="true">
+        <i class="pi pi-check text-[26px] font-bold"></i>
+      </div>
+      <p class="m-0 text-sm leading-snug text-muted-color">
+        @if (isPending()) {
+        {{ tpl.title }} — {{ inst.startAt | date: 'EEE d MMM, HH:mm' }}.
+        The coach will review your request.
+        } @else {
+        {{ tpl.title }} on {{ inst.startAt | date: 'EEE d MMM' }}
+        at {{ inst.startAt | date: 'HH:mm' }}.
+        }
+      </p>
+    </div>
+
+    @if (!isPending()) {
+    <section class="flex flex-col gap-2">
+      <span class="text-xs font-bold uppercase tracking-wide text-surface-500">
+        Add to calendar
+      </span>
+      <div class="grid grid-cols-3 gap-2">
+        <p-button label="Apple / .ics" icon="pi pi-apple" severity="secondary" size="small" [outlined]="true" fluid
+          (onClick)="downloadIcs()" />
+        <p-button label="Google" icon="pi pi-google" severity="secondary" size="small" [outlined]="true" fluid
+          (onClick)="openExternal(googleUrl())" />
+        <p-button label="Outlook" icon="pi pi-microsoft" severity="secondary" size="small" [outlined]="true" fluid
+          (onClick)="openExternal(outlookUrl())" />
+      </div>
+    </section>
+    }
+
+    <section class="flex flex-col gap-2">
+      <span class="text-xs font-bold uppercase tracking-wide text-surface-500">
+        What happens next
+      </span>
+      <ul class="list-none p-0 m-0 flex flex-col gap-2.5">
+        <li class="flex items-start gap-2.5 text-[13px] leading-relaxed text-color">
+          <i class="pi pi-envelope shrink-0 inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary-50 text-primary-700 text-[11px]"
+            aria-hidden="true"></i>
+          <span>
+            @if (isPending()) {
+            You'll get an email when the coach approves.
+            } @else {
+            Confirmation is on its way to your inbox.
+            }
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 text-[13px] leading-relaxed text-color">
+          <i class="pi pi-clock shrink-0 inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary-50 text-primary-700 text-[11px]"
+            aria-hidden="true"></i>
+          <span>
+            Free to cancel until
+            {{ tpl.cancellationCutoffHours }}h before the start.
+          </span>
+        </li>
+        @if (!isPending()) {
+        <li class="flex items-start gap-2.5 text-[13px] leading-relaxed text-color">
+          <i class="pi pi-bell shrink-0 inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary-50 text-primary-700 text-[11px]"
+            aria-hidden="true"></i>
+          <span>We'll send you a reminder 24h and 1h before.</span>
+        </li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Go to My sessions" icon="pi pi-arrow-right" iconPos="right" text (onClick)="goToMy()" />
+    <p-button label="Done" (onClick)="close()" />
+
+  </ng-template>
+  }
+</p-dialog>

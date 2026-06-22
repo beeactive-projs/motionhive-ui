@@ -1,0 +1,56 @@
+<p-dialog header="Confirm booking" [(visible)]="visible" [modal]="true" [style]="{ width: '35rem' }" [closable]="true">
+  @let inst = instance();
+  @let tpl = inst?.template;
+  @if (inst && tpl) {
+  <div class="flex flex-col gap-4 pt-1">
+    <div class="flex items-baseline gap-2.5 font-semibold">
+      <span class="text-xs uppercase tracking-wide text-surface-500">
+        {{ inst.startAt | date: 'EEE d MMM' }}
+      </span>
+      <span class="text-base text-primary-700">
+        {{ inst.startAt | date: 'HH:mm' }} – {{ inst.endAt | date: 'HH:mm' }}
+      </span>
+    </div>
+
+    <h3 class="m-0 text-lg font-bold text-color">{{ inst.titleOverride ?? tpl.title }}</h3>
+
+    <dl class="grid grid-cols-2 gap-2.5 m-0">
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Price</dt>
+        <dd class="m-0 text-sm font-semibold text-color">
+          @if (tpl.priceAmountCents > 0) {
+          {{ tpl.priceAmountCents / 100 | number: '1.0-2' }} {{ tpl.priceCurrency }}
+          } @else {
+          Free
+          }
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Cancel up to</dt>
+        <dd class="m-0 text-sm font-semibold text-color">{{ tpl.cancellationCutoffHours }}h before start</dd>
+      </div>
+      @if (tpl.approvalRequired) {
+      <div class="col-span-2 flex flex-col gap-0.5">
+        <dt class="text-xs uppercase tracking-wide text-surface-500">Approval</dt>
+        <dd class="m-0 text-sm font-semibold text-color">Coach will review your request.</dd>
+      </div>
+      }
+    </dl>
+
+    @if (tpl.approvalRequired) {
+    <div class="flex flex-col gap-1">
+      <label for="bookNote" class="text-sm font-medium text-surface-900 dark:text-surface-100">
+        Note for the coach (optional)
+      </label>
+      <textarea id="bookNote" pTextarea rows="3" fluid [ngModel]="note()" (ngModelChange)="note.set($event)"
+        placeholder="Anything they should know about your goals or experience?"></textarea>
+    </div>
+    }
+  </div>
+  }
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="close()" />
+    <p-button [label]="confirmLabel()" icon="pi pi-check" [loading]="busy()" (onClick)="submit()" />
+  </ng-template>
+</p-dialog>

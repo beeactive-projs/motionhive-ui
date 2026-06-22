@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
   <!-- Header · mirrors the my-sessions list header -->
   <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1 min-w-0">
@@ -79,31 +79,11 @@
     (action)="goToPlans()" />
   } @else {
   <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
-    @for (group of monthGroups(); track group.label) {
+    @for (group of historyGroups(); track group.label) {
     <section class="flex flex-col gap-2">
       <mh-section-label [label]="group.label" [count]="group.count" />
-      @for (row of group.rows; track row.log.id) {
-      <mh-time-row [time]="row.dayNum" [duration]="row.weekday" [title]="row.title" [tone]="row.tone"
-        (click)="openReplay(row.log)">
-        <span meta class="flex flex-wrap items-center gap-1.5">
-          @if (row.prLabel) {
-          <p-tag severity="warn" icon="pi pi-trophy" [value]="row.prLabel"
-            class="[&_.p-tag]:text-[10px]! [&_.p-tag]:py-0! [&_.p-tag]:px-1.5!" />
-          }
-          <span>{{ row.subtitle }}</span>
-          <span class="opacity-50">·</span>
-          <span>{{ row.clockTime }}</span>
-          @if (row.durationLabel) {
-          <span class="opacity-50">·</span>
-          <span>{{ row.durationLabel }}</span>
-          }
-          <span class="opacity-50">·</span>
-          <span>{{ row.setsLabel }}</span>
-          @if (row.feelingGlyph) {
-          <span class="text-sm leading-none">{{ row.feelingGlyph }}</span>
-          }
-        </span>
-      </mh-time-row>
+      @for (log of group.logs; track log.id) {
+      <mh-workout-row [log]="log" [mobile]="isMobile()" [showDate]="group.multiDay" (open)="openReplay(log)" />
       }
     </section>
     }

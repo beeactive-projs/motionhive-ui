@@ -12,8 +12,8 @@ import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
-import { Tooltip } from 'primeng/tooltip';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -53,8 +53,8 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     KpiCard,
     ListEmptyState,
     Skeleton,
+    TableModule,
     Tag,
-    Tooltip,
     Toast,
   ],
   providers: [MessageService],
@@ -141,6 +141,9 @@ export class WorkoutLogReplay implements OnInit {
   exerciseTotal(ex: LoggedExercise): number {
     return (ex.sets ?? []).length;
   }
+
+  /** p-table row identity for a logged set. */
+  protected readonly trackSetById = (_: number, s: LoggedSet): string => s.id;
 
   /**
    * Pretty-print the actuals for a set:

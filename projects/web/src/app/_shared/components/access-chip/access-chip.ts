@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Tag } from 'primeng/tag';
 import { SessionAccess } from 'core';
 
 /**
@@ -8,28 +9,23 @@ import { SessionAccess } from 'core';
  *
  * Inputs:
  *   - `access` — the access kind (OPEN / FREE / CLIENTS_ONLY / GROUP_ONLY)
- *   - `approvalRequired` — orthogonal flag; adds an "approval required" suffix
+ *   - `approvalRequired` — orthogonal flag; appends a shield icon to the chip
  *
- * Visual conventions:
+ * Visual conventions (lighter-than-severity bg + text, per access):
  *   - OPEN — teal (community accent)
  *   - FREE — emerald green (highlights free sessions)
- *   - CLIENTS_ONLY — honey primary (instructor-owned)
- *   - GROUP_ONLY — navy (group accent)
- *   - approvalRequired — coral tint added to the right side of the chip
+ *   - CLIENTS_ONLY — amber (instructor-owned)
+ *   - GROUP_ONLY — blue (group accent)
  */
 @Component({
   selector: 'mh-access-chip',
-  imports: [],
+  imports: [Tag],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './access-chip.html',
-  styleUrl: './access-chip.scss',
 })
 export class AccessChip {
   readonly access = input.required<SessionAccess>();
   readonly approvalRequired = input(false);
-
-  /** Expose the enum object so the template avoids magic strings. */
-  protected readonly Access = SessionAccess;
 
   protected readonly label = computed<string>(() => {
     switch (this.access()) {
@@ -46,7 +42,7 @@ export class AccessChip {
     }
   });
 
-  protected readonly iconClass = computed<string>(() => {
+  protected readonly icon = computed<string>(() => {
     switch (this.access()) {
       case SessionAccess.Open:
         return 'pi pi-globe';
@@ -58,6 +54,22 @@ export class AccessChip {
         return 'pi pi-sitemap';
       default:
         return 'pi pi-tag';
+    }
+  });
+
+  /** Lighter-than-severity bg + text color classes, per access. */
+  protected readonly colorClass = computed<string>(() => {
+    switch (this.access()) {
+      case SessionAccess.Open:
+        return 'bg-teal-100 text-teal-700';
+      case SessionAccess.Free:
+        return 'bg-green-100 text-green-700';
+      case SessionAccess.ClientsOnly:
+        return 'bg-amber-100 text-amber-700';
+      case SessionAccess.GroupOnly:
+        return 'bg-blue-100 text-blue-700';
+      default:
+        return 'bg-slate-100 text-slate-700';
     }
   });
 
