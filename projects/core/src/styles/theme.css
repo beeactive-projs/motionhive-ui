@@ -197,7 +197,8 @@ body {
 }
 
 .dark body {
-  background-color: var(--p-surface-800);
+  /* background-color: var(--p-surface-800); */
+  background-color: var(--p-content-background);
   color: var(--p-surface-50);
 }
 

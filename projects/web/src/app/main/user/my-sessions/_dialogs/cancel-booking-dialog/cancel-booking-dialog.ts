@@ -8,12 +8,12 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
-import { TextareaModule } from 'primeng/textarea';
+import { Message } from 'primeng/message';
+import { Textarea } from 'primeng/textarea';
 import { InputText } from 'primeng/inputtext';
 import {
   CancelBookingResponse,
@@ -31,22 +31,13 @@ import {
  */
 @Component({
   selector: 'mh-cancel-booking-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    Dialog,
-    ButtonModule,
-    TextareaModule,
-    InputText,
-  ],
+  imports: [FormsModule, Dialog, Button, Message, Textarea, InputText],
   templateUrl: './cancel-booking-dialog.html',
-  styleUrl: './cancel-booking-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelBookingDialog {
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
 
   readonly visible = model(false);
   readonly participant = input<SessionParticipant | null>(null);
@@ -71,7 +62,7 @@ export class CancelBookingDialog {
     const p = this.participant();
     if (!p?.instanceId) return;
     this.busy.set(true);
-    this._svc
+    this._sessionService
       .cancelBooking(p.instanceId, {
         reason: this.reason().trim() || undefined,
         message: this.message().trim() || undefined,
@@ -84,7 +75,7 @@ export class CancelBookingDialog {
             res.cancellation === 'WITHIN_WINDOW'
               ? 'Booking cancelled — no charge.'
               : 'Booking cancelled (outside cancel window — charges may still apply).';
-          this._msg.add({
+          this._messageService.add({
             severity: 'success',
             summary: 'Cancelled',
             detail: summary,
@@ -93,7 +84,12 @@ export class CancelBookingDialog {
         },
         error: (err: unknown) => {
           this.busy.set(false);
-          showApiError(this._msg, 'Could not cancel', 'Please try again.', err);
+          showApiError(
+            this._messageService,
+            'Could not cancel',
+            'Please try again.',
+            err,
+          );
         },
       });
   }

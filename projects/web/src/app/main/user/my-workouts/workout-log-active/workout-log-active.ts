@@ -7,15 +7,17 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Card } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBar } from 'primeng/progressbar';
 import { Skeleton } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
 import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -33,6 +35,7 @@ import {
 
 import { ExercisePickerDialog } from '../../../instructor/programs/exercise-picker-dialog/exercise-picker-dialog';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
+import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 
 interface ExerciseState {
   ex: LoggedExercise;
@@ -65,14 +68,17 @@ interface ExerciseState {
   selector: 'mh-workout-log-active',
   standalone: true,
   imports: [
-    DatePipe,
+    NgTemplateOutlet,
     FormsModule,
     ButtonModule,
+    Card,
     ConfirmDialog,
     InputTextModule,
+    KpiCard,
     ListEmptyState,
     ProgressBar,
     Skeleton,
+    TableModule,
     Toast,
     TooltipModule,
     ExercisePickerDialog,

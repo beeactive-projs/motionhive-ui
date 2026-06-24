@@ -6,8 +6,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DatePipe, Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Accordion,
   AccordionContent,
@@ -19,13 +19,18 @@ import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Divider } from 'primeng/divider';
+import { Message } from 'primeng/message';
 import { ProgressBar } from 'primeng/progressbar';
 import { Skeleton } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
+  AssignedExercise,
+  AssignedSet,
   AssignedWorkout,
   ProgramAssignment,
   ProgramAssignmentService,
@@ -36,7 +41,7 @@ import {
   WorkoutLogStatus,
   showApiError,
 } from 'core';
-import { TimeRow } from '../../../../_shared/components/time-row/time-row';
+import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 interface WeekGroup {
@@ -48,12 +53,22 @@ interface WeekGroup {
 type WorkoutState = 'todo' | 'doing' | 'done' | 'skip';
 type WorkoutCta = 'start' | 'resume' | 'view' | 'none';
 
+interface PlanCta {
+  label: string;
+  icon: string;
+  disabled: boolean;
+  kind: 'start' | 'resume' | 'review' | 'paused' | 'cancelled' | 'none';
+}
+
 /**
  * Client plan detail (S10).
  *
- * Hero card with progress, then week-grouped schedule (p-accordion).
- * Each workout is a shared `mh-time-row`: calendar-block date, name +
- * volume, status tag, and a state-driven CTA (Start / Resume / View).
+ * Follows the `session-showcase` two-column layout — back-button header, a
+ * KPI strip, a wide details column (facts + notes + week-grouped schedule)
+ * and a sidebar CTA card — enriched with `workout-log-replay` patterns
+ * (exercise cards + set tables). The schedule now shows each workout's
+ * prescription (exercises → target sets), since the detail endpoint ships
+ * the full tree.
  *
  * Per the locked V1 decisions: dates are guidance not gates (anything
  * not-started can be started early); auto-skip happens BE-side when
@@ -65,7 +80,6 @@ type WorkoutCta = 'start' | 'resume' | 'view' | 'none';
   standalone: true,
   imports: [
     DatePipe,
-    RouterLink,
     Accordion,
     AccordionPanel,
     AccordionHeader,
@@ -74,11 +88,14 @@ type WorkoutCta = 'start' | 'resume' | 'view' | 'none';
     ButtonModule,
     Card,
     ConfirmDialog,
+    Divider,
+    KpiCard,
     ListEmptyState,
+    Message,
     ProgressBar,
     Skeleton,
+    TableModule,
     Tag,
-    TimeRow,
     Toast,
     TooltipModule,
   ],
@@ -90,6 +107,7 @@ type WorkoutCta = 'start' | 'resume' | 'view' | 'none';
 export class ClientPlanDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _location = inject(Location);
   private readonly _service = inject(ProgramAssignmentService);
   private readonly _logService = inject(WorkoutLogService);
   private readonly _messageService = inject(MessageService);
@@ -104,6 +122,8 @@ export class ClientPlanDetail implements OnInit {
   readonly starting = signal<string | null>(null);
   /** Week indexes whose accordion panel is open. */
   readonly openWeeks = signal<number[]>([]);
+  /** Assigned-workout ids whose prescription preview is expanded. */
+  readonly expanded = signal<ReadonlySet<string>>(new Set());
 
   // ── Derived ──────────────────────────────────────────────────────
 
@@ -143,6 +163,52 @@ export class ClientPlanDetail implements OnInit {
       }));
   });
 
+  /** Distinct weeks — the "Weeks" KPI. */
+  readonly weekCount = computed(() => this.weeks().length);
+
+  /**
+   * The workout the primary CTA acts on: a resumable in-progress one wins,
+   * else the next not-started one (week/day order).
+   */
+  readonly nextWorkout = computed<AssignedWorkout | null>(() => {
+    const ws = [...this.workouts()].sort(
+      (a, b) => a.weekIndex - b.weekIndex || a.dayIndex - b.dayIndex,
+    );
+    return (
+      ws.find((w) => w.status === WorkoutLogStatus.InProgress) ??
+      ws.find((w) => w.status == null) ??
+      null
+    );
+  });
+
+  /** Sidebar primary CTA — adapts to plan status + the next workout. */
+  readonly primaryCta = computed<PlanCta | null>(() => {
+    const s = this.assignment()?.status;
+    if (!s) return null;
+    if (s === ProgramAssignmentStatus.Paused) {
+      return { label: 'Plan paused', icon: 'pi pi-pause', disabled: true, kind: 'paused' };
+    }
+    if (s === ProgramAssignmentStatus.Cancelled) {
+      return {
+        label: 'Plan cancelled',
+        icon: 'pi pi-times-circle',
+        disabled: true,
+        kind: 'cancelled',
+      };
+    }
+    if (s === ProgramAssignmentStatus.Completed) {
+      return { label: 'Review plan', icon: 'pi pi-eye', disabled: false, kind: 'review' };
+    }
+    const next = this.nextWorkout();
+    if (!next) {
+      return { label: 'All workouts done', icon: 'pi pi-check', disabled: true, kind: 'none' };
+    }
+    if (next.status === WorkoutLogStatus.InProgress) {
+      return { label: 'Resume workout', icon: 'pi pi-play', disabled: false, kind: 'resume' };
+    }
+    return { label: 'Start next workout', icon: 'pi pi-play', disabled: false, kind: 'start' };
+  });
+
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) {
@@ -152,7 +218,48 @@ export class ClientPlanDetail implements OnInit {
     this.fetch(id);
   }
 
+  // ── Navigation ───────────────────────────────────────────────────
+
+  /** Back to wherever we came from; fall back to the plans list. */
+  goBack(): void {
+    if (this._router.lastSuccessfulNavigation()?.previousNavigation) {
+      this._location.back();
+    } else {
+      void this._router.navigate(['/user/plans']);
+    }
+  }
+
+  // ── Prescription preview toggle ──────────────────────────────────
+
+  isExpanded(w: AssignedWorkout): boolean {
+    return this.expanded().has(w.id);
+  }
+
+  toggleExpanded(w: AssignedWorkout): void {
+    this.expanded.update((set) => {
+      const next = new Set(set);
+      if (next.has(w.id)) next.delete(w.id);
+      else next.add(w.id);
+      return next;
+    });
+  }
+
   // ── Actions ──────────────────────────────────────────────────────
+
+  /** Sidebar CTA — routes to the right workout based on plan/next state. */
+  runPrimary(): void {
+    const cta = this.primaryCta();
+    if (!cta || cta.disabled) return;
+    if (cta.kind === 'review') {
+      const last = [...this.workouts()]
+        .reverse()
+        .find((w) => w.status === WorkoutLogStatus.Completed);
+      if (last) this.viewWorkout(last);
+      return;
+    }
+    const next = this.nextWorkout();
+    if (next) this.startWorkout(next);
+  }
 
   startWorkout(w: AssignedWorkout): void {
     if (this.starting() === w.id) return;
@@ -247,7 +354,7 @@ export class ClientPlanDetail implements OnInit {
     });
   }
 
-  // ── Template helpers ─────────────────────────────────────────────
+  // ── Workout template helpers ─────────────────────────────────────
 
   deriveState(w: AssignedWorkout): WorkoutState {
     if (w.status === WorkoutLogStatus.Completed) return 'done';
@@ -265,20 +372,6 @@ export class ClientPlanDetail implements OnInit {
         return 'resume';
       default:
         return 'start';
-    }
-  }
-
-  /** Left-edge tone for the workout's `mh-time-row`. */
-  workoutTone(w: AssignedWorkout): 'honey' | 'teal' | 'muted' | 'none' {
-    switch (this.deriveState(w)) {
-      case 'doing':
-        return 'honey';
-      case 'done':
-        return 'teal';
-      case 'skip':
-        return 'muted';
-      default:
-        return 'none';
     }
   }
 
@@ -332,7 +425,72 @@ export class ClientPlanDetail implements OnInit {
     return parts.join(' · ');
   }
 
-  // ── Plan status (hero tag) ───────────────────────────────────────
+  // ── Prescription (target) formatting ─────────────────────────────
+
+  exerciseSetCount(ex: AssignedExercise): number {
+    return ex.sets?.length ?? 0;
+  }
+
+  /**
+   * Pretty-print a set's *prescribed targets* (sibling of the replay's
+   * `setActualLabel`, which prints logged results):
+   *   strength → "10–15 reps · 80 kg @ RPE 8"
+   *   cardio   → "30 min" / "5 km"
+   *   nothing  → "—"
+   */
+  setTargetLabel(s: AssignedSet): string {
+    const parts: string[] = [];
+    if (s.targetRepsMin != null && s.targetRepsMax != null) {
+      parts.push(
+        s.targetRepsMin === s.targetRepsMax
+          ? `${s.targetRepsMin} reps`
+          : `${s.targetRepsMin}–${s.targetRepsMax} reps`,
+      );
+    } else if (s.targetRepsMin != null) {
+      parts.push(`${s.targetRepsMin}+ reps`);
+    }
+    if (s.targetWeightKg != null) {
+      parts.push(`${s.targetWeightKg} kg`);
+    } else if (s.targetWeightPercent1rm != null) {
+      parts.push(`${s.targetWeightPercent1rm}% 1RM`);
+    }
+    if (s.targetDurationSeconds != null) {
+      const m = Math.round(s.targetDurationSeconds / 60);
+      parts.push(m > 0 ? `${m} min` : `${s.targetDurationSeconds}s`);
+    }
+    if (s.targetDistanceMeters != null) {
+      parts.push(
+        s.targetDistanceMeters >= 1000
+          ? `${(s.targetDistanceMeters / 1000).toFixed(2)} km`
+          : `${s.targetDistanceMeters} m`,
+      );
+    }
+    let label = parts.join(' · ') || '—';
+    if (s.targetRpe != null) label += ` @ RPE ${s.targetRpe}`;
+    else if (s.targetRir != null) label += ` @ RIR ${s.targetRir}`;
+    return label;
+  }
+
+  /** Rest after a set, e.g. "75s" or "1m 30s". */
+  restLabel(s: AssignedSet): string {
+    const r = s.restAfterSeconds;
+    if (r == null) return '—';
+    if (r < 60) return `${r}s`;
+    const m = Math.floor(r / 60);
+    const sec = r % 60;
+    return sec ? `${m}m ${sec}s` : `${m}m`;
+  }
+
+  /** "STRENGTH" → "Strength", "REST_PAUSE" → "Rest pause". */
+  titleCase(s: string | null | undefined): string {
+    if (!s) return '';
+    return s
+      .split('_')
+      .map((w) => (w ? w.charAt(0) + w.slice(1).toLowerCase() : ''))
+      .join(' ');
+  }
+
+  // ── Plan-level helpers (hero/sidebar) ────────────────────────────
 
   planSeverity(s: ProgramAssignmentStatus): TagSeverity {
     switch (s) {
@@ -366,10 +524,18 @@ export class ClientPlanDetail implements OnInit {
     return s.charAt(0) + s.slice(1).toLowerCase();
   }
 
-  instructorInitials(): string {
-    const i = this.assignment()?.instructor;
-    if (!i) return '?';
-    return `${i.firstName?.[0] ?? ''}${i.lastName?.[0] ?? ''}`.toUpperCase() || '?';
+  /** Sidebar status banner severity — mirrors showcase's booking messages. */
+  planMessageSeverity(s: ProgramAssignmentStatus): 'success' | 'info' | 'warn' | 'secondary' {
+    switch (s) {
+      case ProgramAssignmentStatus.Completed:
+        return 'success';
+      case ProgramAssignmentStatus.Active:
+        return 'info';
+      case ProgramAssignmentStatus.Paused:
+        return 'warn';
+      default:
+        return 'secondary';
+    }
   }
 
   instructorName(): string {

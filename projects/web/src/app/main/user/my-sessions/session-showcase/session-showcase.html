@@ -2,22 +2,23 @@
 @let blocked = blockedInst();
 @let t = tpl();
 
-<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
-  <!-- Header · back button + title + subtitle (mirrors the session detail page) -->
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
+  <!-- Header · back button + title + subtitle (mirrors the discover header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
       <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
         (onClick)="goBack()" />
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ inst?.titleOverride ?? t?.title
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ inst?.titleOverride ??
+          t?.title
           ?? blocked?.template?.title ?? 'Session' }}</h1>
         @if (inst && t) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ inst.startAt | date: 'EEE d MMM, HH:mm' }} · {{ t.durationMinutes }} min
+          {{ inst.startAt | date: 'EEE d MMM y, HH:mm' }} · {{ t.durationMinutes }} min
         </p>
         } @else if (blocked?.template) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ blocked!.startAt | date: 'EEE d MMM, HH:mm' }} · {{ blocked!.template.durationMinutes }} min
+          {{ blocked!.startAt | date: 'EEE d MMM y, HH:mm' }} · {{ blocked!.template.durationMinutes }} min
         </p>
         }
       </div>
@@ -30,142 +31,170 @@
     <i class="pi pi-spinner pi-spin"></i> Loading session…
   </div>
   } @else if (error()) {
-  <p-message severity="error" [closable]="false">
-    <span class="text-(--p-red-700)">{{ error() }}</span>
-  </p-message>
+  <p-message severity="error" icon="pi pi-exclamation-triangle" [closable]="false" class="w-full">{{ error()
+    }}</p-message>
   } @else if (blocked && blocked.template) {
-  <!-- GROUP_ONLY non-member view: soft-locked card. Description / location /
-       signup are redacted behind a frosted overlay; the CTA invites a join. -->
+  <!-- GROUP_ONLY non-member view: members-only card + "join the group" CTA. -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
-    <section
-      class="lg:col-span-2 flex flex-col gap-3.5 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
-      <div class="mh-show__chips">
-        <mh-type-chip [type]="blocked.template.type" />
-        <mh-access-chip [access]="blocked.template.access" [approvalRequired]="false" />
-      </div>
-      @if (blocked.instructor) {
-      <p class="mh-show__instructor-line">
-        with <strong>{{ blocked.instructor.firstName }} {{ blocked.instructor.lastName }}</strong>
-      </p>
-      }
-
-      <div class="mh-show__locked-card">
-        <div class="mh-show__locked-overlay" aria-hidden="true">
-          <i class="pi pi-lock"></i>
-          <strong>Members only</strong>
-          <span>Session details unlock when you join the group.</span>
+    <p-card class="lg:col-span-2 shadow-md">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-2">
+          <mh-type-chip [type]="blocked.template.type" />
+          <mh-access-chip [access]="blocked.template.access" [approvalRequired]="false" />
         </div>
-        <div class="mh-show__locked-blur">
-          <div class="mh-show__locked-row"></div>
-          <div class="mh-show__locked-row mh-show__locked-row--short"></div>
-          <div class="mh-show__locked-row"></div>
-          <div class="mh-show__locked-row mh-show__locked-row--short"></div>
+        @if (blocked.instructor) {
+        <p class="m-0 text-sm text-surface-500">
+          with <strong class="text-color">{{ blocked.instructor.firstName }} {{ blocked.instructor.lastName }}</strong>
+        </p>
+        }
+        <div class="flex flex-col items-center text-center gap-2 py-10">
+          <span class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-50 text-primary-700">
+            <i class="pi pi-lock text-lg"></i>
+          </span>
+          <strong class="text-base">Members only</strong>
+          <span class="text-sm text-surface-500 max-w-xs">Session details unlock when you join the group.</span>
         </div>
       </div>
-    </section>
+    </p-card>
 
-    <section
-      class="flex flex-col gap-2 h-max rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
-      @if (blocked.template.groupId) {
-      <p-button label="Request to join group" icon="pi pi-users" (onClick)="goToGroup()"
-        styleClass="mh-show__book-btn" />
-      }
-      <small class="mh-show__terms">
-        The coach will review group requests before granting access.
-      </small>
-    </section>
+    <p-card class="h-max shadow-md">
+      <div class="flex flex-col gap-3">
+        @if (blocked.template.groupId) {
+        <p-button label="Request to join group" icon="pi pi-users" (onClick)="goToGroup()" fluid />
+        }
+        <small class="text-center text-xs text-surface-500">
+          The coach will review group requests before granting access.
+        </small>
+      </div>
+    </p-card>
   </div>
   } @else if (inst && t) {
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
-    <!-- Hero · chips + description + capacity + instructor -->
-    <section
-      class="lg:col-span-2 flex flex-col gap-3.5 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
-      <div class="mh-show__chips">
-        <mh-type-chip [type]="t.type" />
-        <mh-access-chip [access]="t.access" [approvalRequired]="t.approvalRequired" />
-        @if (t.meetingProvider) {
-        <mh-provider-chip [provider]="t.meetingProvider" />
-        }
-        @if (isFull()) {
-        <span class="mh-show__chip-full"><i class="pi pi-times-circle"></i> Full</span>
-        }
-      </div>
-
-      @if (t.description) {
-      <p class="mh-show__desc">{{ t.description }}</p>
-      }
-
-      <mh-capacity-bar [signups]="inst.confirmedCount" [cap]="inst.capacityOverride ?? t.capacity" />
-
-      @if (inst.instructor) {
-      <div class="mh-show__instructor">
-        <mh-hex-avatar [user]="inst.instructor" [size]="40" />
-        <div>
-          <small>Coach</small>
-          <strong>{{ inst.instructor.firstName }} {{ inst.instructor.lastName }}</strong>
+    <!-- Details card · chips + description + facts + capacity + coach -->
+    <p-card class="lg:col-span-2 shadow-md">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-2">
+          <mh-type-chip [type]="t.type" />
+          <mh-access-chip [access]="t.access" [approvalRequired]="t.approvalRequired" />
+          @if (isOnline() && t.meetingProvider) {
+          <mh-provider-chip [provider]="t.meetingProvider" />
+          }
+          @if (isFull()) {
+          <p-tag value="Full" severity="danger" class="text-xs!" icon="pi pi-times-circle" rounded />
+          }
         </div>
-      </div>
-      }
-    </section>
 
-    <!-- Booking CTA -->
-    <section
-      class="flex flex-col gap-2 h-max rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
+        @if (t.description) {
+        <p class="text-sm leading-relaxed whitespace-pre-line m-0">{{ t.description }}</p>
+        }
+
+        <dl class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
+            <dd class="mt-1 text-sm font-medium flex items-center gap-2">
+              <i class="text-surface-500" [class]="isOnline() ? 'pi pi-video' : 'pi pi-map-marker'"
+                aria-hidden="true"></i>
+              {{ isOnline() ? 'Online' : 'In-person' }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-surface-500">Duration</dt>
+            <dd class="mt-1 text-sm font-medium flex items-center gap-2">
+              <i class="pi pi-clock text-surface-500" aria-hidden="true"></i>{{ t.durationMinutes }} min
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-surface-500">Cancellation</dt>
+            <dd class="mt-1 text-sm font-medium flex items-center gap-2">
+              <i class="pi pi-check-circle text-surface-500" aria-hidden="true"></i>Up to {{ t.cancellationCutoffHours
+              }}h
+              before
+            </dd>
+          </div>
+        </dl>
+
+        @if (showCapacity()) {
+        <mh-capacity-bar [signups]="inst.confirmedCount" [cap]="cap()" />
+        }
+
+        @if (inst.instructor) {
+        <p-divider />
+        <div class="flex items-center gap-3">
+          <mh-avatar [user]="inst.instructor" size="large" />
+          <div>
+            <span class="block text-xs uppercase tracking-wide text-surface-500">Coach</span>
+            <span class="text-sm font-medium">{{ inst.instructor.firstName }} {{ inst.instructor.lastName }}</span>
+          </div>
+        </div>
+        }
+      </div>
+    </p-card>
+
+    <!-- Booking card · price + booking state + CTA -->
+    <p-card class="h-max shadow-md">
       @let booking = myBooking();
-      @let cap = inst.capacityOverride ?? t.capacity;
+      <div class="flex flex-col gap-4">
+        <div class="flex items-baseline justify-between">
+          <span class="text-sm text-surface-500">Price</span>
+          @if (isFree()) {
+          <span class="font-heading font-semibold text-lg text-green-600">Free</span>
+          } @else {
+          <span class="font-heading font-semibold text-lg">{{ priceCents() | currencyRon: currency() }}</span>
+          }
+        </div>
 
-      @if (booking) {
-      <div class="mh-show__booked">
-        <i class="pi pi-check-circle"></i>
-        <div>
-          <strong>
-            @switch (booking.status) {
-            @case ('CONFIRMED') { You're booked }
-            @case ('PENDING_APPROVAL') { Pending coach approval }
-            @case ('WAITLISTED') { You're on the waitlist }
-            @default { Booked }
+        @if (booking) {
+        <p-message severity="success" icon="pi pi-check-circle" [closable]="false" class="w-full">
+          <span class="flex flex-col">
+            <strong>
+              @switch (booking.status) {
+              @case (ParticipantStatuses.Confirmed) { You're booked }
+              @case (ParticipantStatuses.PendingApproval) { Pending coach approval }
+              @case (ParticipantStatuses.Waitlisted) { You're on the waitlist }
+              @default { Booked }
+              }
+            </strong>
+            <small class="text-surface-500">Booked {{ booking.bookedAt | date: 'd MMM' }}</small>
+          </span>
+        </p-message>
+        <p-button label="Go to My sessions" icon="pi pi-arrow-right" (onClick)="goToMySessions()" fluid />
+        @if (canCancelBooking()) {
+        <p-button label="Cancel booking" icon="pi pi-times" severity="danger" [outlined]="true"
+          (onClick)="cancelOpen.set(true)" fluid />
+        }
+        } @else if (isPast()) {
+        <p-message severity="secondary" icon="pi pi-history" [closable]="false" class="w-full">
+          <span class="flex flex-col">
+            <strong>This session has already started</strong>
+            <small class="text-surface-500">Bookings are closed.</small>
+          </span>
+        </p-message>
+        } @else if (isFull()) {
+        <p-message severity="warn" icon="pi pi-clock" [closable]="false" class="w-full">
+          <span class="flex flex-col">
+            <strong>Session is full · {{ inst.confirmedCount }} / {{ cap() }}</strong>
+            @if (waitlistEnabled()) {
+            <small class="text-surface-500">Join the waitlist — you'll get a notification if a spot opens.</small>
+            } @else {
+            <small class="text-surface-500">This session is full and the waitlist is closed.</small>
             }
-          </strong>
-          <small>Booked {{ booking.bookedAt | date: 'd MMM' }}</small>
-        </div>
-      </div>
-      <p-button label="Go to My sessions" icon="pi pi-arrow-right" (onClick)="goToMySessions()"
-        styleClass="mh-show__book-btn" />
-      } @else if (isPast()) {
-      <div class="mh-show__past-card" role="status">
-        <i class="pi pi-history"></i>
-        <div>
-          <strong>This session has already started</strong>
-          <small>Bookings are closed.</small>
-        </div>
-      </div>
-      } @else if (isFull()) {
-      <div class="mh-show__full-card" role="status">
-        <div class="mh-show__full-head">
-          <i class="pi pi-clock"></i>
-          <strong>Session is full · {{ inst.confirmedCount }} / {{ cap }}</strong>
-        </div>
+          </span>
+        </p-message>
         @if (waitlistEnabled()) {
-        <p>Join the waitlist — you'll get a notification if a spot opens.</p>
-        <p-button label="Join waitlist" icon="pi pi-clock" (onClick)="bookOpen.set(true)"
-          styleClass="mh-show__book-btn" />
+        <p-button label="Join waitlist" icon="pi pi-clock" (onClick)="bookOpen.set(true)" fluid />
         } @else {
-        <p>This session is full and the waitlist is closed.</p>
-        <p-button label="Session full" icon="pi pi-times" severity="secondary" [disabled]="true"
-          styleClass="mh-show__book-btn" />
+        <p-button label="Session full" icon="pi pi-times" severity="secondary" [disabled]="true" fluid />
         }
+        } @else {
+        <p-button [label]="t.approvalRequired ? 'Request to join' : 'Book'" icon="pi pi-bookmark"
+          [disabled]="!canBook()" (onClick)="bookOpen.set(true)" fluid />
+        }
+
+        <small class="text-center text-xs text-surface-500">
+          Cancel up to {{ t.cancellationCutoffHours }}h before the session starts.
+        </small>
       </div>
-      } @else {
-      <p-button [label]="t.approvalRequired ? 'Request to join' : 'Book'" icon="pi pi-check"
-        [disabled]="!canBook()" (onClick)="bookOpen.set(true)" styleClass="mh-show__book-btn" />
-      }
-      <small class="mh-show__terms">
-        @if (t.priceAmountCents > 0) {
-        {{ t.priceAmountCents / 100 | number: '1.0-2' }} {{ t.priceCurrency }} ·
-        }
-        Cancel up to {{ t.cancellationCutoffHours }}h before
-      </small>
-    </section>
+    </p-card>
   </div>
 
   <mh-book-dialog [visible]="bookOpen()" (visibleChange)="bookOpen.set($event)" [instance]="inst"
@@ -173,6 +202,9 @@
 
   <mh-booking-confirmed-dialog [visible]="confirmedOpen()" (visibleChange)="confirmedOpen.set($event)" [instance]="inst"
     [status]="bookedStatus()" (goMySessions)="goToMySessions()" />
+
+  <mh-cancel-booking-dialog [visible]="cancelOpen()" (visibleChange)="cancelOpen.set($event)"
+    [participant]="myBooking()" (cancelled)="onCancelled()" />
   }
 </div>
 

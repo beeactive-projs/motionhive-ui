@@ -1,0 +1,27 @@
+:host {
+  display: block;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Dense, bordered list row — strip p-card's default padding (mirrors
+   mh-my-session-row). */
+:host ::ng-deep .p-card-body {
+  padding: 0.875rem;
+}
+
+/* Tone edge — 3px inset left stripe. The row sets a *semantic* [data-tone]
+   (active / done / inactive); this is the single place that maps each
+   meaning to a colour:
+     active   → teal   (in progress)
+     done     → green  (completed)
+     inactive → muted  (pending / paused / cancelled) */
+:host([data-tone='active']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-teal-500);
+}
+:host([data-tone='done']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-green-500);
+}
+:host([data-tone='inactive']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-stone-400);
+}

@@ -125,15 +125,17 @@
   }
   } @else {
   <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
-    @for (group of groupedItems(); track group.date.getTime()) {
+    @for (group of groupedItems(); track group.bucket.key) {
     @if (!isMobile()) {
     <section class="flex flex-col gap-2">
-      <mh-section-label [label]="dayLabel(group.date)" [count]="group.items.length" />
-      <ng-container *ngTemplateOutlet="rows; context: { $implicit: group.items }" />
+      <mh-section-label [label]="group.bucket.label" [count]="group.items.length" />
+      <ng-container
+        *ngTemplateOutlet="rows; context: { $implicit: group.items, showDate: group.bucket.multiDay }" />
     </section>
     } @else {
-    <mh-day-separator [label]="dayLabel(group.date)" [count]="group.items.length" [tone]="dayTone(group.date)" />
-    <ng-container *ngTemplateOutlet="rows; context: { $implicit: group.items }" />
+    <mh-day-separator [label]="group.bucket.label" [count]="group.items.length"
+      [tone]="group.bucket.key === 'today' ? 'today' : 'default'" />
+    <ng-container *ngTemplateOutlet="rows; context: { $implicit: group.items, showDate: group.bucket.multiDay }" />
     }
     }
 
@@ -148,10 +150,10 @@
 </ng-template>
 
 <!-- Row list · shared between the desktop section + mobile day group. -->
-<ng-template #rows let-items>
+<ng-template #rows let-items let-showDate="showDate">
   @for (p of items; track p.id) {
-  <mh-my-session-row [participant]="p" [mobile]="isMobile()" (open)="openSession(p)" (join)="join(p, $event)"
-    (cancel)="openCancel(p, $event)" />
+  <mh-my-session-row [participant]="p" [mobile]="isMobile()" [showDate]="showDate" (open)="openSession(p)"
+    (join)="join(p, $event)" (cancel)="openCancel(p, $event)" />
   }
 </ng-template>
 

@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  cursor: pointer;
+  outline: none;
+}
+
+/* p-card has no compact/borderless preset — strip its padding and shadow so
+   the card reads as a dense, bordered list row (mirrors mh-my-session-row). */
+
+:host ::ng-deep .p-card-body {
+  padding: 0.875rem;
+}
+
+/* Tone edge — 3px inset left stripe. The row sets a *semantic* [data-tone]
+   (online / in-person); this is the single place that maps each meaning to a
+   colour. Discover never lists inactive (past/cancelled) occurrences:
+     online    → teal   (active, upcoming, online)
+     in-person → honey  (active, upcoming, in-person) */
+:host([data-tone='online']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-teal-500);
+}
+:host([data-tone='in-person']) ::ng-deep .p-card {
+  box-shadow: inset 3px 0 0 0 var(--p-primary-500);
+}

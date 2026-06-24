@@ -6,41 +6,41 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Dialog } from 'primeng/dialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
-import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 
 import {
-  LoggedExercise,
-  LoggedSet,
   Routine,
   RoutineService,
   WorkoutLog,
   WorkoutLogService,
-  formatSessionTime,
+  groupSessionsByBucket,
   injectIsMobile,
   injectIsTablet,
   showApiError,
 } from 'core';
 import { SectionLabel } from '../../../_shared/components/section-label/section-label';
-import { TimeRow } from '../../../_shared/components/time-row/time-row';
 import { TimeRowSkeleton } from '../../../_shared/components/time-row-skeleton/time-row-skeleton';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
+import { WorkoutRow } from './_components/workout-row/workout-row';
 
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { RoutineFormDialog } from './_dialogs/routine-form-dialog/routine-form-dialog';
+import { RoutineRow } from './_components/routine-row/routine-row';
 
 type WorkoutTab = 'workouts' | 'routines' | 'exercises';
 
@@ -50,34 +50,21 @@ interface TabSpec {
   icon: string;
 }
 
-/** One workout history row, fully projected for `<mh-time-row>`. */
-interface WorkoutRow {
-  log: WorkoutLog;
-  /** Day-of-month number shown in the time-row's primary slot (e.g. "14"). */
-  dayNum: string;
-  /** Short weekday under the day number (e.g. "Sat"). */
-  weekday: string;
-  /** Clock time the workout started (e.g. "09:00"). */
-  clockTime: string;
-  title: string;
-  /** Program name snapshot, or "Freestyle workout" when unassigned. */
-  subtitle: string;
-  /** "45 min" — null when the duration is unknown. */
-  durationLabel: string | null;
-  /** "12 sets". */
-  setsLabel: string;
-  feelingGlyph: string | null;
-  prCount: number;
-  /** "PR" / "3 PRs" badge text — empty when no PRs. */
-  prLabel: string;
-  tone: 'honey' | 'teal';
-}
-
-/** Workouts grouped by calendar month, most recent first. */
-interface MonthGroup {
+/** Workouts grouped into relative buckets (Today / Yesterday / … / month). */
+interface HistoryGroup {
   label: string;
   count: number;
-  rows: WorkoutRow[];
+  /** False for single-day buckets (today/yesterday) → row shows the time, not the date. */
+  multiDay: boolean;
+  logs: WorkoutLog[];
+}
+
+/** Routines bucketed by folder (named folders A→Z, then "No folder"). */
+interface RoutineGroup {
+  /** null for the catch-all "No folder" bucket. */
+  folder: string | null;
+  label: string;
+  items: Routine[];
 }
 
 /**
@@ -93,7 +80,6 @@ interface MonthGroup {
   selector: 'mh-my-workouts',
   standalone: true,
   imports: [
-    DatePipe,
     NgTemplateOutlet,
     FormsModule,
     ButtonModule,
@@ -107,15 +93,17 @@ interface MonthGroup {
     Tab,
     TabPanels,
     TabPanel,
-    Tag,
     Toast,
     TooltipModule,
-    TimeRow,
     TimeRowSkeleton,
     SectionLabel,
     MobileFab,
     ListEmptyState,
     RoutineFormDialog,
+    RoutineRow,
+    WorkoutRow,
+    IconField,
+    InputIcon,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-workouts.html',
@@ -170,6 +158,43 @@ export class MyWorkouts {
   readonly routineDialogTarget = signal<Routine | null>(null);
   /** id of the routine currently being started — drives per-card spinner. */
   readonly startingRoutineId = signal<string | null>(null);
+  /** Client-side routine search (name + folder + notes). */
+  readonly routineSearch = signal('');
+
+  /** Routines matching the search box (over the loaded set). */
+  readonly filteredRoutines = computed(() => {
+    const q = this.routineSearch().trim().toLowerCase();
+    if (!q) return this.routines();
+    return this.routines().filter((r) => {
+      const name = r.name.toLowerCase();
+      const folder = (r.folder ?? '').toLowerCase();
+      const notes = (r.notes ?? '').toLowerCase();
+      return name.includes(q) || folder.includes(q) || notes.includes(q);
+    });
+  });
+
+  /** Routines grouped by folder — named folders A→Z, "No folder" last. */
+  readonly routineGroups = computed<RoutineGroup[]>(() => {
+    const map = new Map<string, Routine[]>();
+    for (const r of this.filteredRoutines()) {
+      const key = r.folder?.trim() || '';
+      const arr = map.get(key) ?? [];
+      arr.push(r);
+      map.set(key, arr);
+    }
+    const groups: RoutineGroup[] = [...map.entries()]
+      .filter(([k]) => k !== '')
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([folder, items]) => ({ folder, label: folder, items }));
+    const ungrouped = map.get('') ?? [];
+    if (ungrouped.length) {
+      groups.push({ folder: null, label: 'No folder', items: ungrouped });
+    }
+    return groups;
+  });
+
+  /** True once we should show folder section headers (more than one bucket). */
+  readonly routinesGrouped = computed(() => this.routineGroups().length > 1);
 
   readonly hasMore = computed(() => this.items().length < this.total());
 
@@ -181,29 +206,19 @@ export class MyWorkouts {
     return Math.round(totalSec / 3600);
   });
 
-  /** History projected into month groups of `<mh-time-row>`-ready rows. */
-  readonly monthGroups = computed<MonthGroup[]>(() => {
-    const map = new Map<string, WorkoutRow[]>();
-    for (const l of this.items()) {
-      const d = new Date(l.startedAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const arr = map.get(key) ?? [];
-      arr.push(this._toRow(l));
-      map.set(key, arr);
-    }
-    return Array.from(map.entries())
-      .sort(([a], [b]) => b.localeCompare(a))
-      .map(([, rows]) => ({
-        label: new Date(rows[0].log.startedAt).toLocaleString('en', {
-          month: 'long',
-          year: 'numeric',
-        }),
-        count: rows.length,
-        rows,
-      }));
-  });
-
-  private readonly _feelingGlyphs = ['😣', '😕', '😐', '🙂', '💪'];
+  /**
+   * History grouped into relative buckets (Today / Yesterday / Earlier this
+   * week / by month), newest-first. Same `'past'` bucketing the sessions
+   * lists use; each log renders via `mh-workout-row`.
+   */
+  readonly historyGroups = computed<HistoryGroup[]>(() =>
+    groupSessionsByBucket(this.items(), (l) => l.startedAt, 'past').map((g) => ({
+      label: g.bucket.label,
+      count: g.items.length,
+      multiDay: g.bucket.multiDay,
+      logs: g.items,
+    })),
+  );
 
   constructor() {
     const initial = this._route.snapshot.queryParamMap.get('tab');
@@ -304,8 +319,12 @@ export class MyWorkouts {
     });
   }
 
-  routineExerciseCount(r: Routine): number {
-    return r.exercises?.length ?? 0;
+  onRoutineSearch(value: string): void {
+    this.routineSearch.set(value);
+  }
+
+  clearRoutineSearch(): void {
+    this.routineSearch.set('');
   }
 
   private _loadRoutines(): void {
@@ -398,41 +417,7 @@ export class MyWorkouts {
     this._router.navigate(['/exercises']);
   }
 
-  // ── Template helpers ─────────────────────────────────────────────
-
-  feelingGlyph(log: WorkoutLog): string | null {
-    if (log.feelingRating == null) return null;
-    const idx = Math.max(1, Math.min(5, log.feelingRating)) - 1;
-    return this._feelingGlyphs[idx];
-  }
-
   // ── Internals ────────────────────────────────────────────────────
-
-  private _toRow(log: WorkoutLog): WorkoutRow {
-    const d = new Date(log.startedAt);
-    const durationMin =
-      log.durationSeconds != null ? Math.round(log.durationSeconds / 60) : null;
-    const setsDone = (log.exercises ?? []).reduce(
-      (n: number, e: LoggedExercise) =>
-        n + (e.sets ?? []).filter((s: LoggedSet) => s.isCompleted).length,
-      0,
-    );
-    const prCount = log.prCount ?? 0;
-    return {
-      log,
-      dayNum: d.toLocaleDateString('en-GB', { day: 'numeric' }),
-      weekday: d.toLocaleDateString('en-GB', { weekday: 'short' }),
-      clockTime: formatSessionTime(log.startedAt),
-      title: log.name,
-      subtitle: log.assignment?.programNameSnapshot ?? 'Freestyle workout',
-      durationLabel: durationMin != null ? `${durationMin} min` : null,
-      setsLabel: `${setsDone} ${setsDone === 1 ? 'set' : 'sets'}`,
-      feelingGlyph: this.feelingGlyph(log),
-      prCount,
-      prLabel: prCount === 0 ? '' : prCount === 1 ? 'PR' : `${prCount} PRs`,
-      tone: prCount > 0 ? 'teal' : 'honey',
-    };
-  }
 
   private fetch(replace: boolean): void {
     if (replace) this.loading.set(true);
