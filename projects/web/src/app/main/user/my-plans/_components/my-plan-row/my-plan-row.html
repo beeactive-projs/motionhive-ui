@@ -1,0 +1,84 @@
+<p-card>
+  <div class="grid grid-cols-[4.5rem_auto_1fr] md:grid-cols-[4.5rem_auto_1fr_auto] items-center gap-3">
+    <!-- Start-date block -->
+    <div class="text-center">
+      <span class="block text-[11px] text-muted-color whitespace-nowrap">
+        {{ isPending() ? 'Starts' : 'Started' }}
+      </span>
+      <span class="block font-heading text-lg font-semibold leading-none tabular-nums">
+        {{ assignment().startDate | date: 'd' }}
+      </span>
+      <span class="block mt-0.5 text-xs text-muted-color uppercase">{{ assignment().startDate | date: 'MMM' }}</span>
+    </div>
+
+    <!-- Coach avatar (brand hexagon) -->
+    @if (!mobile()) {
+    <mh-hex-avatar [user]="instructor()" [size]="44" />
+    }
+
+    <!-- Main info -->
+    <div class="min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h3 class="m-0 font-semibold line-clamp-2">{{ assignment().programNameSnapshot }}</h3>
+      </div>
+
+      <!-- Meta line · coach + date range (desktop-only) -->
+      @if (!mobile()) {
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-user text-sm" aria-hidden="true"></i>{{ instructorName() }}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-calendar text-sm" aria-hidden="true"></i>
+          {{ isPending() ? 'Starts' : 'Started' }} {{ assignment().startDate | date: 'd MMM' }}
+        </span>
+        @if (assignment().endDate; as end) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-flag text-sm" aria-hidden="true"></i>Ends {{ end | date: 'd MMM' }}
+        </span>
+        } @else {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-flag text-sm" aria-hidden="true"></i>No end date
+        </span>
+        }
+      </div>
+      }
+
+      <!-- Progress -->
+      @if (showProgress()) {
+      <div class="flex items-center gap-2 mt-1.5">
+        <p-progressbar [value]="assignment().completionPercent" [showValue]="false"
+          class="flex-1 max-w-60 [.p-progressbar]:h-2" />
+        <span class="text-xs font-semibold tabular-nums"
+          [class.text-(--p-green-600)]="assignment().completionPercent >= 100">
+          {{ assignment().completionPercent }}%
+        </span>
+      </div>
+      }
+
+      <!-- Notes -->
+      @if (notes(); as note) {
+      <p class="m-0 mt-1 inline-flex items-center gap-1 text-sm text-muted-color min-w-0">
+        <i class="pi pi-comment text-sm shrink-0" aria-hidden="true"></i>
+        <span class="line-clamp-1">{{ note }}</span>
+      </p>
+      }
+
+      <!-- Mobile · status tag + CTA inline -->
+      @if (mobile()) {
+      <div class="flex flex-wrap items-center gap-2 mt-2">
+        <p-tag [value]="statusLabel()" [icon]="statusIcon()" [severity]="statusSeverity()" rounded />
+        <p-button [label]="ctaLabel()" [icon]="ctaIcon()" size="small" (onClick)="onCta($event)" />
+      </div>
+      }
+    </div>
+
+    <!-- Right rail · status + CTA (desktop) -->
+    @if (!mobile()) {
+    <div class="flex flex-col items-end gap-2 shrink-0">
+      <p-tag [value]="statusLabel()" [icon]="statusIcon()" [severity]="statusSeverity()" rounded />
+      <p-button [label]="ctaLabel()" [icon]="ctaIcon()" size="small" (onClick)="onOpen()" />
+    </div>
+    }
+  </div>
+</p-card>

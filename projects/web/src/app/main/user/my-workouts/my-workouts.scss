@@ -4,11 +4,3 @@
   flex: 1;
   min-height: 0;
 }
-
-// Responsive auto-fill card grid — not expressible with default Tailwind
-// utilities (auto-fill + minmax), so it stays as a single SCSS rule.
-.routines-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 12px;
-}

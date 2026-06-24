@@ -7,16 +7,17 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { ProgressBar } from 'primeng/progressbar';
 import { Skeleton } from 'primeng/skeleton';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
-import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 
 import {
@@ -25,11 +26,14 @@ import {
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
-  TagSeverity,
   injectIsMobile,
+  injectIsTabletDown,
   showApiError,
 } from 'core';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
+import { SectionLabel } from '../../../_shared/components/section-label/section-label';
+import { DaySeparator } from '../../../_shared/components/day-separator/day-separator';
+import { MyPlanRow } from './_components/my-plan-row/my-plan-row';
 
 interface StatusTab {
   /** Tab value: the status string, or 'all' for the unfiltered view. */
@@ -38,33 +42,44 @@ interface StatusTab {
   icon: string;
 }
 
+/** A status section on the "All" tab (or the single flat group elsewhere). */
+interface PlanGroup {
+  /** null for the flat (single-status tab) group — no header rendered. */
+  status: ProgramAssignmentStatus | null;
+  label: string;
+  items: ProgramAssignment[];
+}
+
 /**
  * Client "My plans" list (`/user/plans`).
  *
- * Status filter (`p-tabs`) over a card grid of program assignments,
- * built from the shared agenda vocabulary (p-card, p-avatar,
- * p-progressbar, p-tag) so it matches the my-sessions / my-workouts
- * surfaces. Empty state CTA points to Discover — a client with no plans
- * can't create one, so the meaningful action is to find a coach.
+ * Status filter (`p-tabs`) over a one-per-row agenda of program assignments,
+ * mirroring the my-sessions surface: a dedicated `mh-my-plan-row`, a search
+ * field, and (on the All tab) status section grouping. Empty state CTA points
+ * to Discover — a client with no plans can't create one, so the meaningful
+ * action is to find a coach.
  */
 @Component({
   selector: 'mh-my-plans',
   standalone: true,
   imports: [
-    DatePipe,
     NgTemplateOutlet,
-    HexAvatar,
+    FormsModule,
     ButtonModule,
     Card,
+    IconField,
+    InputIcon,
+    InputTextModule,
     ListEmptyState,
-    ProgressBar,
+    SectionLabel,
+    DaySeparator,
+    MyPlanRow,
     Skeleton,
     Tabs,
     TabList,
     Tab,
     TabPanels,
     TabPanel,
-    Tag,
     Toast,
   ],
   providers: [MessageService],
@@ -78,6 +93,7 @@ export class MyPlans {
   private readonly _router = inject(Router);
 
   protected readonly isMobile = injectIsMobile();
+  protected readonly isTabletDown = injectIsTabletDown();
 
   // Enum exposed for template comparisons — never compare against raw
   // string literals (see CLAUDE.md).
@@ -90,6 +106,7 @@ export class MyPlans {
   readonly page = signal(1);
   readonly pageSize = 20;
   readonly statusFilter = signal<ProgramAssignmentStatus | null>(null);
+  readonly searchInput = signal('');
 
   readonly hasMore = computed(() => this.items().length < this.total());
 
@@ -100,6 +117,46 @@ export class MyPlans {
     { key: ProgramAssignmentStatus.Completed, label: 'Completed', icon: 'pi pi-check-circle' },
     { key: ProgramAssignmentStatus.Paused, label: 'Paused', icon: 'pi pi-pause-circle' },
   ];
+
+  /** Status display order for the "All" tab section grouping. */
+  private readonly _groupOrder: { status: ProgramAssignmentStatus; label: string }[] = [
+    { status: ProgramAssignmentStatus.Active, label: 'Active' },
+    { status: ProgramAssignmentStatus.Pending, label: 'Pending' },
+    { status: ProgramAssignmentStatus.Paused, label: 'Paused' },
+    { status: ProgramAssignmentStatus.Completed, label: 'Completed' },
+    { status: ProgramAssignmentStatus.Cancelled, label: 'Cancelled' },
+  ];
+
+  /** Client-side search over the loaded page (program name + coach name). */
+  readonly filteredItems = computed(() => {
+    const q = this.searchInput().trim().toLowerCase();
+    if (!q) return this.items();
+    return this.items().filter((a) => {
+      const name = a.programNameSnapshot.toLowerCase();
+      const coach = `${a.instructor?.firstName ?? ''} ${a.instructor?.lastName ?? ''}`
+        .trim()
+        .toLowerCase();
+      return name.includes(q) || coach.includes(q);
+    });
+  });
+
+  /**
+   * On the All tab, bucket by status in a fixed order (empty buckets dropped).
+   * On a specific-status tab, return a single unlabeled group rendered flat.
+   */
+  readonly groupedItems = computed<PlanGroup[]>(() => {
+    const all = this.filteredItems();
+    if (this.statusFilter() !== null) {
+      return all.length ? [{ status: null, label: '', items: all }] : [];
+    }
+    return this._groupOrder
+      .map(({ status, label }) => ({
+        status,
+        label,
+        items: all.filter((a) => a.status === status),
+      }))
+      .filter((g) => g.items.length > 0);
+  });
 
   constructor() {
     // Reload when the status filter changes — reset to page 1. `fetch()`
@@ -113,67 +170,21 @@ export class MyPlans {
     });
   }
 
-  // ── Tabs ─────────────────────────────────────────────────────────
+  // ── Tabs / search ────────────────────────────────────────────────
 
   /** p-tabs emits string | number; map the active key back to a status. */
   setStatus(value: string | number | undefined): void {
     this.statusFilter.set(
-      value == null || value === 'all'
-        ? null
-        : (value as ProgramAssignmentStatus),
+      value == null || value === 'all' ? null : (value as ProgramAssignmentStatus),
     );
   }
 
-  // ── Template helpers ─────────────────────────────────────────────
-
-  instructorInitials(a: ProgramAssignment): string {
-    const i = a.instructor;
-    if (!i) return '?';
-    const f = (i.firstName?.[0] ?? '').toUpperCase();
-    const l = (i.lastName?.[0] ?? '').toUpperCase();
-    return `${f}${l}` || '?';
+  onSearchInput(value: string): void {
+    this.searchInput.set(value);
   }
 
-  instructorName(a: ProgramAssignment): string {
-    const i = a.instructor;
-    if (!i) return 'your coach';
-    return `${i.firstName} ${i.lastName}`.trim() || 'your coach';
-  }
-
-  /**
-   * Status → tag severity. Neutral/semantic only — honey/amber is
-   * reserved for actions, never status (see CLAUDE.md brand rules).
-   */
-  statusSeverity(s: ProgramAssignmentStatus): TagSeverity {
-    switch (s) {
-      case ProgramAssignmentStatus.Active:
-        return TagSeverity.Info;
-      case ProgramAssignmentStatus.Completed:
-        return TagSeverity.Success;
-      case ProgramAssignmentStatus.Cancelled:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
-
-  statusIcon(s: ProgramAssignmentStatus): string {
-    switch (s) {
-      case ProgramAssignmentStatus.Active:
-        return 'pi pi-bolt';
-      case ProgramAssignmentStatus.Completed:
-        return 'pi pi-check-circle';
-      case ProgramAssignmentStatus.Paused:
-        return 'pi pi-pause';
-      case ProgramAssignmentStatus.Cancelled:
-        return 'pi pi-times-circle';
-      default:
-        return 'pi pi-clock';
-    }
-  }
-
-  statusLabel(s: ProgramAssignmentStatus): string {
-    return s.charAt(0) + s.slice(1).toLowerCase();
+  clearSearch(): void {
+    this.searchInput.set('');
   }
 
   // ── Actions ──────────────────────────────────────────────────────

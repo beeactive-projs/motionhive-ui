@@ -6,12 +6,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Dialog } from 'primeng/dialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
@@ -38,6 +40,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
 import { RoutineFormDialog } from './_dialogs/routine-form-dialog/routine-form-dialog';
+import { RoutineRow } from './_components/routine-row/routine-row';
 
 type WorkoutTab = 'workouts' | 'routines' | 'exercises';
 
@@ -56,6 +59,14 @@ interface HistoryGroup {
   logs: WorkoutLog[];
 }
 
+/** Routines bucketed by folder (named folders A→Z, then "No folder"). */
+interface RoutineGroup {
+  /** null for the catch-all "No folder" bucket. */
+  folder: string | null;
+  label: string;
+  items: Routine[];
+}
+
 /**
  * Client workout history (S13 — `/user/workouts`).
  *
@@ -69,7 +80,6 @@ interface HistoryGroup {
   selector: 'mh-my-workouts',
   standalone: true,
   imports: [
-    DatePipe,
     NgTemplateOutlet,
     FormsModule,
     ButtonModule,
@@ -90,7 +100,10 @@ interface HistoryGroup {
     MobileFab,
     ListEmptyState,
     RoutineFormDialog,
+    RoutineRow,
     WorkoutRow,
+    IconField,
+    InputIcon,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-workouts.html',
@@ -145,6 +158,43 @@ export class MyWorkouts {
   readonly routineDialogTarget = signal<Routine | null>(null);
   /** id of the routine currently being started — drives per-card spinner. */
   readonly startingRoutineId = signal<string | null>(null);
+  /** Client-side routine search (name + folder + notes). */
+  readonly routineSearch = signal('');
+
+  /** Routines matching the search box (over the loaded set). */
+  readonly filteredRoutines = computed(() => {
+    const q = this.routineSearch().trim().toLowerCase();
+    if (!q) return this.routines();
+    return this.routines().filter((r) => {
+      const name = r.name.toLowerCase();
+      const folder = (r.folder ?? '').toLowerCase();
+      const notes = (r.notes ?? '').toLowerCase();
+      return name.includes(q) || folder.includes(q) || notes.includes(q);
+    });
+  });
+
+  /** Routines grouped by folder — named folders A→Z, "No folder" last. */
+  readonly routineGroups = computed<RoutineGroup[]>(() => {
+    const map = new Map<string, Routine[]>();
+    for (const r of this.filteredRoutines()) {
+      const key = r.folder?.trim() || '';
+      const arr = map.get(key) ?? [];
+      arr.push(r);
+      map.set(key, arr);
+    }
+    const groups: RoutineGroup[] = [...map.entries()]
+      .filter(([k]) => k !== '')
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([folder, items]) => ({ folder, label: folder, items }));
+    const ungrouped = map.get('') ?? [];
+    if (ungrouped.length) {
+      groups.push({ folder: null, label: 'No folder', items: ungrouped });
+    }
+    return groups;
+  });
+
+  /** True once we should show folder section headers (more than one bucket). */
+  readonly routinesGrouped = computed(() => this.routineGroups().length > 1);
 
   readonly hasMore = computed(() => this.items().length < this.total());
 
@@ -269,8 +319,12 @@ export class MyWorkouts {
     });
   }
 
-  routineExerciseCount(r: Routine): number {
-    return r.exercises?.length ?? 0;
+  onRoutineSearch(value: string): void {
+    this.routineSearch.set(value);
+  }
+
+  clearRoutineSearch(): void {
+    this.routineSearch.set('');
   }
 
   private _loadRoutines(): void {

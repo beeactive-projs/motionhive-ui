@@ -1,0 +1,62 @@
+<p-card>
+  <div class="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3">
+    <!-- Exercise-count block -->
+    <div class="text-center">
+      <span class="block font-heading text-lg font-semibold leading-none tabular-nums">{{ exerciseCount() }}</span>
+      <span class="block mt-0.5 text-[11px] text-muted-color">{{ exerciseCount() === 1 ? 'move' : 'moves' }}</span>
+    </div>
+
+    <!-- Main info -->
+    <div class="min-w-0">
+      <h3 class="m-0 font-semibold line-clamp-2">{{ routine().name }}</h3>
+
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
+        @if (routine().folder; as folder) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-folder text-sm" aria-hidden="true"></i>{{ folder }}
+        </span>
+        }
+        @if (routine().lastPerformedAt; as last) {
+        <span class="inline-flex items-center gap-1">
+          <i class="pi pi-history text-sm" aria-hidden="true"></i>Last done {{ last | date: 'd MMM' }}
+        </span>
+        } @else {
+        <span class="inline-flex items-center gap-1 italic">
+          <i class="pi pi-circle text-sm not-italic" aria-hidden="true"></i>Never started yet
+        </span>
+        }
+      </div>
+
+      @if (notes(); as note) {
+      <p class="m-0 mt-1 inline-flex items-center gap-1 text-sm text-muted-color min-w-0">
+        <i class="pi pi-comment text-sm shrink-0" aria-hidden="true"></i>
+        <span class="line-clamp-1">{{ note }}</span>
+      </p>
+      }
+
+      <!-- Mobile · actions inline -->
+      @if (mobile()) {
+      <div class="flex flex-wrap items-center gap-2 mt-2">
+        <p-button label="Start" icon="pi pi-bolt" size="small" [loading]="starting()" (onClick)="onStart($event)" />
+        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" rounded size="small" pTooltip="Edit"
+          ariaLabel="Edit routine" (onClick)="onEdit($event)" />
+        <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Delete"
+          ariaLabel="Delete routine" (onClick)="onRemove($event)" />
+      </div>
+      }
+    </div>
+
+    <!-- Right rail · actions (desktop) -->
+    @if (!mobile()) {
+    <div class="flex flex-col items-end gap-2 shrink-0">
+      <div class="flex items-center gap-0.5">
+        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" rounded size="small" pTooltip="Edit"
+          ariaLabel="Edit routine" (onClick)="onEdit($event)" />
+        <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Delete"
+          ariaLabel="Delete routine" (onClick)="onRemove($event)" />
+      </div>
+      <p-button label="Start workout" icon="pi pi-bolt" size="small" [loading]="starting()" (onClick)="onStart($event)" />
+    </div>
+    }
+  </div>
+</p-card>

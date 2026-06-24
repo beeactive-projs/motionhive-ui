@@ -105,16 +105,16 @@
 <!-- ── Routines ─────────────────────────────────────────────────── -->
 <ng-template #routinesContent>
   @if (routinesLoading()) {
-  <div class="routines-grid">
+  <div class="flex flex-col gap-2">
     @for (i of [1, 2, 3]; track i) {
     <p-card>
-      <div class="flex flex-col gap-3">
-        <p-skeleton width="55%" height="1rem" />
-        <p-skeleton width="35%" height="0.75rem" />
-        <p-skeleton width="100%" height="0.75rem" />
-        <div class="flex justify-end">
-          <p-skeleton width="40%" height="2rem" />
+      <div class="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3">
+        <p-skeleton width="100%" height="2.25rem" />
+        <div class="flex flex-col gap-1.5">
+          <p-skeleton width="45%" height="1rem" />
+          <p-skeleton width="65%" height="0.75rem" />
         </div>
+        <p-skeleton width="6rem" height="1.75rem" />
       </div>
     </p-card>
     }
@@ -125,58 +125,47 @@
     actionLabel="Create routine" actionIcon="pi pi-plus" (action)="openCreateRoutine()" />
   } @else {
   <div class="flex flex-col gap-3 pb-24 md:pb-0">
-    <div class="flex justify-end">
+    <!-- Search + new routine -->
+    <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+      <p-iconfield class="flex-1 md:flex-[0_1_320px]">
+        <p-inputicon class="pi pi-search" />
+        <input pInputText type="text" fluid placeholder="Search routines…" aria-label="Search routines"
+          [ngModel]="routineSearch()" (ngModelChange)="onRoutineSearch($event)" />
+        @if (routineSearch() !== '') {
+        <p-inputicon class="pi pi-times cursor-pointer" (click)="clearRoutineSearch()" />
+        }
+      </p-iconfield>
       <p-button label="New routine" icon="pi pi-plus" severity="secondary" [text]="true"
         (onClick)="openCreateRoutine()" />
     </div>
-    <div class="routines-grid">
-      @for (r of routines(); track r.id) {
-      <p-card class="h-full [&_.p-card-body]:h-full [&_.p-card-body]:gap-2.5">
-        <div class="flex h-full flex-col gap-2.5">
-          <div class="flex items-start gap-2.5">
-            <div class="min-w-0 flex-1">
-              <h4 class="m-0 truncate font-heading text-sm font-semibold text-surface-900 dark:text-surface-100">
-                {{ r.name }}
-              </h4>
-              @if (r.folder) {
-              <span class="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-color">
-                <i class="pi pi-folder text-[10px]"></i> {{ r.folder }}
-              </span>
-              }
-            </div>
-            <div class="flex shrink-0 gap-0.5">
-              <p-button icon="pi pi-pencil" severity="secondary" [text]="true" rounded size="small" pTooltip="Edit"
-                ariaLabel="Edit routine" (onClick)="openEditRoutine(r)" />
-              <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Delete"
-                ariaLabel="Delete routine" (onClick)="confirmDeleteRoutine(r)" />
-            </div>
-          </div>
 
-          <div class="flex flex-1 flex-col gap-2">
-            <div class="flex flex-wrap items-center gap-1 text-[11px] text-muted-color">
-              <span>{{ routineExerciseCount(r) }} {{ routineExerciseCount(r) === 1 ? 'exercise' : 'exercises' }}</span>
-              @if (r.lastPerformedAt) {
-              <span class="opacity-40">·</span>
-              <span>Last done {{ r.lastPerformedAt | date: 'mediumDate' }}</span>
-              } @else {
-              <span class="opacity-40">·</span>
-              <span class="italic">Never started yet</span>
-              }
-            </div>
-            @if (r.notes) {
-            <p class="m-0 line-clamp-2 text-xs leading-normal text-muted-color">{{ r.notes }}</p>
-            }
-          </div>
-
-          <div class="flex justify-end">
-            <p-button label="Start workout" icon="pi pi-bolt" size="small" [loading]="startingRoutineId() === r.id"
-              (onClick)="startRoutine(r)" />
-          </div>
-        </div>
-      </p-card>
+    @if (filteredRoutines().length === 0) {
+    <mh-list-empty-state icon="pi pi-search" title="No routines match your search"
+      message="Try a different name or folder, or clear the search to see everything." actionLabel="Clear search"
+      actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearRoutineSearch()" />
+    } @else {
+    <div class="flex flex-col gap-2 md:gap-4.5">
+      @for (group of routineGroups(); track group.label) {
+      @if (routinesGrouped()) {
+      <section class="flex flex-col gap-2">
+        <mh-section-label [label]="group.label" [count]="group.items.length" />
+        <ng-container *ngTemplateOutlet="routineRows; context: { $implicit: group.items }" />
+      </section>
+      } @else {
+      <ng-container *ngTemplateOutlet="routineRows; context: { $implicit: group.items }" />
+      }
       }
     </div>
+    }
   </div>
+  }
+</ng-template>
+
+<!-- Routine row list · shared between grouped + flat rendering. -->
+<ng-template #routineRows let-items>
+  @for (r of items; track r.id) {
+  <mh-routine-row [routine]="r" [mobile]="isMobile()" [starting]="startingRoutineId() === r.id"
+    (start)="startRoutine(r)" (edit)="openEditRoutine(r)" (remove)="confirmDeleteRoutine(r)" />
   }
 </ng-template>
 
