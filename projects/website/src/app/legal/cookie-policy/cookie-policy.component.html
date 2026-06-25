@@ -1,0 +1,264 @@
+<section class="hero-section">
+  <div class="max-w-7xl text-center px-4 sm:px-6 lg:px-8">
+    <div class="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/15 text-red-500 mb-4">
+      <i class="pi pi-cog text-sm"></i>
+      <span class="text-sm font-semibold" i18n="@@cookie.pill">Read</span>
+    </div>
+    <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
+      i18n="@@cookie.h1">
+      Cookie Policy.
+    </h1>
+
+    <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto" i18n="@@cookie.lastUpdated">
+      Last updated: {{ lastUpdated() }}.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Intro -->
+    <section class="legal-section">
+      <p class="legal-body" i18n="@@cookie.intro.p1">
+        This Cookie Policy explains how HIVECRAFT S.R.L., doing business as MotionHive ("Company," "we," "us," and
+        "our"), uses cookies and similar technologies to recognise you when you visit our website at
+        <a href="https://motionhive.fit" class="text-brand hover:underline">https://motionhive.fit</a> and its
+        subdomains, including app.motionhive.fit (the "Website"). It explains what these technologies are and why we use
+        them, as well as your rights to control our use of them.
+      </p>
+      <p class="legal-body mt-3" i18n="@@cookie.intro.p2">
+        In some cases we may use cookies and similar technologies to collect personal information, or information that
+        becomes personal information if we combine it with other information. For more on how we handle personal data,
+        see our <a routerLink="/legal/privacy-policy" class="text-brand hover:underline">Privacy Policy</a>.
+      </p>
+    </section>
+
+    <!-- What are cookies -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.what.h2">What are cookies?</h2>
+      <p class="legal-body" i18n="@@cookie.what.p1">
+        Cookies are small data files that are placed on your computer or mobile device when you visit a website. We also
+        use similar technologies, such as browser local storage, which store small amounts of data in your browser.
+        Cookies are widely used by website owners in order to make their websites work, or to work more efficiently, as
+        well as to provide reporting information.
+      </p>
+      <p class="legal-body mt-3" i18n="@@cookie.what.p2">
+        Cookies set by the website owner (in this case, HIVECRAFT S.R.L.) are called "first-party cookies." Cookies set
+        by parties other than the website owner are called "third-party cookies." Third-party cookies enable
+        third-party features or functionality to be provided on or through the website (for example, analytics or
+        interactive content). The parties that set these third-party cookies can recognise your device both when it
+        visits the website in question and when it visits certain other websites.
+      </p>
+    </section>
+
+    <!-- Why we use cookies -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.why.h2">Why do we use cookies?</h2>
+      <p class="legal-body" i18n="@@cookie.why.p1">
+        We use cookies and similar technologies primarily for reasons that are essential to operating our Website and
+        keeping you signed in, and to remember your preferences. We currently do not use cookies for advertising, and
+        we keep our use of non-essential technologies to a minimum. The specific technologies we use, and the purposes
+        they perform, are described below.
+      </p>
+    </section>
+
+    <!-- Types / table -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.types.h2">The cookies and technologies we use</h2>
+
+      <h3 class="legal-subheading" i18n="@@cookie.types.essential.h3">Strictly necessary</h3>
+      <p class="legal-body" i18n="@@cookie.types.essential.p">
+        These technologies are required for the Website and app to function and cannot be switched off in our systems.
+        They are usually set in response to actions you take, such as signing in or setting your privacy preferences.
+        They are mainly used to authenticate you and keep your session secure on app.motionhive.fit.
+      </p>
+
+      <h3 class="legal-subheading mt-4" i18n="@@cookie.types.functional.h3">Functional</h3>
+      <p class="legal-body" i18n="@@cookie.types.functional.p">
+        These technologies enable the Website to provide enhanced functionality and personalisation, such as
+        remembering your theme, language, and tool inputs. They are not strictly necessary, but they improve your
+        experience.
+      </p>
+
+      <div class="cookie-table-wrap mt-4">
+        <table class="cookie-table">
+          <thead>
+            <tr>
+              <th i18n="@@cookie.table.name">Name</th>
+              <th i18n="@@cookie.table.purpose">Purpose</th>
+              <th i18n="@@cookie.table.category">Category</th>
+              <th i18n="@@cookie.table.type">Type</th>
+              <th i18n="@@cookie.table.expiry">Expiry</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td i18n="@@cookie.table.auth.purpose">Authentication &amp; session</td>
+              <td i18n="@@cookie.table.auth.desc">Keeps you signed in and secures your session on app.motionhive.fit
+                (access token, refresh token, user, roles, and permissions).</td>
+              <td i18n="@@cookie.table.auth.cat">Strictly necessary</td>
+              <td>Local storage</td>
+              <td i18n="@@cookie.table.auth.exp">Until sign-out</td>
+            </tr>
+            <tr>
+              <td><code>mh-active-theme</code></td>
+              <td i18n="@@cookie.table.theme.desc">Remembers your light or dark theme preference.</td>
+              <td i18n="@@cookie.table.theme.cat">Functional</td>
+              <td>Local storage</td>
+              <td i18n="@@cookie.table.theme.exp">Persistent</td>
+            </tr>
+            <tr>
+              <td i18n="@@cookie.table.lang.name">Language preference</td>
+              <td i18n="@@cookie.table.lang.desc">Remembers the language you selected for the Website.</td>
+              <td i18n="@@cookie.table.lang.cat">Functional</td>
+              <td>Local storage</td>
+              <td i18n="@@cookie.table.lang.exp">Persistent</td>
+            </tr>
+            <tr>
+              <td><code>mh-calorie-calculator</code></td>
+              <td i18n="@@cookie.table.calc.desc">Remembers the values you entered in the calorie calculator tool so you
+                do not have to re-enter them.</td>
+              <td i18n="@@cookie.table.calc.cat">Functional</td>
+              <td>Local storage</td>
+              <td i18n="@@cookie.table.calc.exp">Persistent</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="legal-body" i18n="@@cookie.types.note">
+        The exact technologies in use may change as we develop the Services. We will update this policy and the table
+        above to reflect material changes.
+      </p>
+    </section>
+
+    <!-- How to control -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.control.h2">How can I control cookies?</h2>
+      <p class="legal-body" i18n="@@cookie.control.p1">
+        You have the right to decide whether to accept or reject non-essential cookies and similar technologies. Because
+        the technologies we currently use are either strictly necessary or functional (for example, remembering your
+        theme), you can control them mainly through your browser settings and, where a cookie preference centre or
+        consent banner is made available on the Website, through that tool. Strictly necessary technologies cannot be
+        rejected, as they are essential to provide you with the Services.
+      </p>
+      <p class="legal-body mt-3" i18n="@@cookie.control.p2">
+        If you choose to reject or clear functional storage, you may still use our Website, although some preferences
+        (such as your theme or saved tool inputs) may not be remembered, and some functionality may be restricted.
+      </p>
+    </section>
+
+    <!-- Browser controls -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.browser.h2">How can I control cookies in my browser?</h2>
+      <p class="legal-body mb-3" i18n="@@cookie.browser.p1">
+        The way you refuse or clear cookies and local storage varies from browser to browser. You should visit your
+        browser's help menu for more information. The following links explain how to manage cookies in the most popular
+        browsers:
+      </p>
+      <ul class="legal-list">
+        <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer"
+            class="text-brand hover:underline">Google Chrome</a></li>
+        <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer"
+            target="_blank" rel="noopener noreferrer" class="text-brand hover:underline">Mozilla Firefox</a></li>
+        <li><a href="https://support.apple.com/en-us/HT201265" target="_blank" rel="noopener noreferrer"
+            class="text-brand hover:underline">Safari</a></li>
+        <li><a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09"
+            target="_blank" rel="noopener noreferrer" class="text-brand hover:underline">Microsoft Edge</a></li>
+        <li><a href="https://help.opera.com/en/latest/web-preferences/" target="_blank" rel="noopener noreferrer"
+            class="text-brand hover:underline">Opera</a></li>
+      </ul>
+    </section>
+
+    <!-- Other tracking tech -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.beacons.h2">What about other tracking technologies, like web beacons?</h2>
+      <p class="legal-body" i18n="@@cookie.beacons.p1">
+        Cookies are not the only way to recognise or track visitors to a website. We may use other, similar
+        technologies from time to time, like web beacons (sometimes called "tracking pixels" or "clear gifs"). These are
+        tiny graphics files that contain a unique identifier that enables us to recognise when someone has visited our
+        Website or opened an email that includes them — for example, to understand traffic patterns or measure the
+        success of an email campaign. In many instances, these technologies rely on cookies to function properly, so
+        declining cookies will impair their functioning.
+      </p>
+    </section>
+
+    <!-- Advertising -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.ads.h2">Do you serve targeted advertising?</h2>
+      <p class="legal-body" i18n="@@cookie.ads.p1">
+        No. We do not currently serve third-party or targeted advertising on the Website, and we do not allow third
+        parties to place advertising cookies through it. If this changes in the future, we will update this Cookie
+        Policy and, where required, obtain your consent before placing any advertising or tracking cookies.
+      </p>
+    </section>
+
+    <!-- Updates -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.updates.h2">How often will you update this Cookie Policy?</h2>
+      <p class="legal-body" i18n="@@cookie.updates.p1">
+        We may update this Cookie Policy from time to time in order to reflect, for example, changes to the cookies we
+        use or for other operational, legal, or regulatory reasons. Please therefore revisit this Cookie Policy
+        regularly to stay informed about our use of cookies and related technologies. The date at the top of this
+        Cookie Policy indicates when it was last updated.
+      </p>
+    </section>
+
+    <!-- Contact -->
+    <section class="legal-section">
+      <h2 class="legal-heading" i18n="@@cookie.contact.h2">Where can I get further information?</h2>
+      <p class="legal-body mb-4" i18n="@@cookie.contact.intro">
+        If you have any questions about our use of cookies or other technologies, please contact us:
+      </p>
+      <div class="legal-contact-card">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-building text-brand"></i>
+          <span>
+            <strong i18n="@@cookie.contact.company.label">Company:</strong>
+            <span class="ml-1" i18n="@@cookie.contact.company.value">HIVECRAFT S.R.L. (MotionHive)</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="pi pi-envelope text-brand"></i>
+          <span>
+            <strong i18n="@@cookie.contact.email.label">Email:</strong>
+            <a href="mailto:contact@motionhive.fit"
+              class="text-brand hover:underline ml-1">contact&#64;motionhive.fit</a>
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="pi pi-phone text-brand"></i>
+          <span>
+            <strong i18n="@@cookie.contact.phone.label">Phone:</strong>
+            <a href="tel:+40740438838" class="text-brand hover:underline ml-1">+40 740 438 838</a>
+          </span>
+        </div>
+        <div class="flex items-start gap-3">
+          <i class="pi pi-map-marker text-brand mt-1"></i>
+          <span>
+            <strong i18n="@@cookie.contact.address.label">Address:</strong>
+            <span class="ml-1" i18n="@@cookie.contact.address.value">Soporului, nr. 8C, bl. C, sc. 2, et. 1, ap. 58,
+              Cluj-Napoca, Cluj 400482, Romania</span>
+          </span>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- Footer Actions -->
+<section class="footer-section py-7 sm:py-10">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-sm" i18n="@@cookie.footer.also">
+        Also read our
+        <a routerLink="/legal/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</a>
+      </div>
+      <div class="flex gap-3">
+        <p-button i18n-label="@@legal.footer.goToHome" label="Go to Home" icon="pi pi-home" outlined routerLink="/" />
+        <p-button i18n-label="@@legal.footer.scrollToTop" label="Scroll to Top" icon="pi pi-arrow-up"
+          (onClick)="scrollToTop()" />
+      </div>
+    </div>
+  </div>
+</section>
