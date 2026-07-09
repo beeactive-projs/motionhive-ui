@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { FeedbackService, Logo } from 'core';
+import { CookieConsentService } from '../../_shared/cookie-consent/cookie-consent.service';
 
 @Component({
   selector: 'mh-public-footer',
@@ -12,9 +13,14 @@ import { FeedbackService, Logo } from 'core';
 })
 export class PublicFooterComponent {
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _cookieConsent = inject(CookieConsentService);
 
   protected openFeedback(): void {
     this._feedbackService.open();
+  }
+
+  protected openCookiePreferences(): void {
+    void this._cookieConsent.showPreferences();
   }
 
   readonly currentYear = new Date().getFullYear();

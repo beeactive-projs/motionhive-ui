@@ -69,7 +69,7 @@
     <p class="text-lg leading-relaxed mb-8">{{ article.excerpt }}</p>
 
     <!-- Author -->
-    <div class="flex items-center gap-3">
+    <a [href]="authorLink(article.authorHandle)" class="inline-flex items-center gap-3 group/author w-fit">
       @if (article.authorAvatarUrl) {
         <img [src]="article.authorAvatarUrl" [alt]="article.authorName"
           class="w-11 h-11 rounded-full object-cover object-top" loading="lazy" />
@@ -81,9 +81,9 @@
         </div>
       }
       <div>
-        <p class="font-semibold text-sm">{{ article.authorName }}</p>
+        <p class="font-semibold text-sm group-hover/author:text-brand transition-colors">{{ article.authorName }}</p>
       </div>
-    </div>
+    </a>
   </div>
 </section>
 
@@ -110,7 +110,7 @@
 
   <!-- Author Bio Card -->
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-    <div class="author-bio-card">
+    <a [href]="authorLink(article.authorHandle)" class="author-bio-card group/author">
       @if (article.authorAvatarUrl) {
         <img [src]="article.authorAvatarUrl" [alt]="article.authorName"
           class="w-16 h-16 rounded-full object-cover object-top shrink-0" loading="lazy" />
@@ -124,9 +124,10 @@
       <div>
         <p class="text-xs font-semibold uppercase tracking-widest section-subtext mb-1" i18n="@@blog.article.writtenBy">
           Written by</p>
-        <p class="text-lg font-heading font-bold section-heading">{{ article.authorName }}</p>
+        <p class="text-lg font-heading font-bold section-heading group-hover/author:text-brand transition-colors">
+          {{ article.authorName }}</p>
       </div>
-    </div>
+    </a>
   </div>
 </section>
 

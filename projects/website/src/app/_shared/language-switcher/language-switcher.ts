@@ -26,6 +26,10 @@ export class LanguageSwitcher {
   switchLocale(code: LocaleCode): void {
     if (code === this.currentLocale()) return;
 
+    // Remember the explicit choice so the geo middleware never overrides it.
+    // Matches the cookie the edge middleware reads (`mh_lang`).
+    this._document.cookie = `mh_lang=${code}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+
     const path = this._document.location.pathname;
     // Strip any existing locale prefix (/en/ or /ro/)
     const basePath = path.replace(/^\/(en|ro)(\/|$)/, '/') || '/';

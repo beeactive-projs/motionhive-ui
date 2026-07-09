@@ -2598,7 +2598,7 @@
       </trans-unit>
       <trans-unit id="calorie.og.title" datatype="html">
         <source>Free TDEE &amp; macro calculator - MotionHive</source>
-        <target state="translated">alculator gratuit TDEE și macronutrienți - MotionHive</target>
+        <target state="translated">Calculator gratuit TDEE și macronutrienți - MotionHive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
           <context context-type="linenumber">52</context>
@@ -2746,7 +2746,7 @@
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.athletic" datatype="html">
         <source>Athletic</source>
-        <target state="translated">Athletic</target>
+        <target state="translated">Atletic</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
           <context context-type="linenumber">247</context>
@@ -2871,6 +2871,62 @@
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
           <context context-type="linenumber">26,29</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="cc.modal.title" datatype="html">
+        <source>We use cookies</source>
+        <target state="translated">Folosim cookie-uri</target>
+      </trans-unit>
+      <trans-unit id="cc.modal.desc" datatype="html">
+        <source>We use essential cookies to run MotionHive and functional cookies to remember your preferences (like theme and language). We don't use tracking or advertising cookies. See our &lt;a href="/legal/cookie-policy" class="cc__link"&gt;Cookie Policy&lt;/a&gt;.</source>
+        <target state="translated">Folosim cookie-uri esențiale pentru funcționarea MotionHive și cookie-uri funcționale pentru a-ți reține preferințele (precum tema și limba). Nu folosim cookie-uri de urmărire sau de publicitate. Consultă &lt;a href="/legal/cookie-policy" class="cc__link"&gt;Politica de cookie-uri&lt;/a&gt;.</target>
+      </trans-unit>
+      <trans-unit id="cc.acceptAll" datatype="html">
+        <source>Accept all</source>
+        <target state="translated">Acceptă tot</target>
+      </trans-unit>
+      <trans-unit id="cc.rejectAll" datatype="html">
+        <source>Reject all</source>
+        <target state="translated">Respinge tot</target>
+      </trans-unit>
+      <trans-unit id="cc.manage" datatype="html">
+        <source>Manage preferences</source>
+        <target state="translated">Gestionează preferințele</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.title" datatype="html">
+        <source>Cookie preferences</source>
+        <target state="translated">Preferințe cookie-uri</target>
+      </trans-unit>
+      <trans-unit id="cc.save" datatype="html">
+        <source>Save preferences</source>
+        <target state="translated">Salvează preferințele</target>
+      </trans-unit>
+      <trans-unit id="cc.close" datatype="html">
+        <source>Close</source>
+        <target state="translated">Închide</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.necessary.title" datatype="html">
+        <source>Strictly necessary</source>
+        <target state="translated">Strict necesare</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.necessary.desc" datatype="html">
+        <source>Required to run the website and keep you signed in. These cannot be switched off.</source>
+        <target state="translated">Necesare pentru funcționarea site-ului și pentru a te menține autentificat. Acestea nu pot fi dezactivate.</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.functional.title" datatype="html">
+        <source>Functional</source>
+        <target state="translated">Funcționale</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.functional.desc" datatype="html">
+        <source>Remember your preferences, such as theme, language, and saved tool inputs. Not used for tracking.</source>
+        <target state="translated">Rețin preferințele tale, precum tema, limba și datele salvate în instrumente. Nu sunt folosite pentru urmărire.</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.more.title" datatype="html">
+        <source>More information</source>
+        <target state="translated">Mai multe informații</target>
+      </trans-unit>
+      <trans-unit id="cc.pm.more.desc" datatype="html">
+        <source>For any questions about our use of cookies, &lt;a href="mailto:contact@motionhive.fit" class="cc__link"&gt;contact us&lt;/a&gt; or read our &lt;a href="/legal/cookie-policy" class="cc__link"&gt;Cookie Policy&lt;/a&gt;.</source>
+        <target state="translated">Pentru orice întrebări legate de utilizarea cookie-urilor, &lt;a href="mailto:contact@motionhive.fit" class="cc__link"&gt;contactează-ne&lt;/a&gt; sau citește &lt;a href="/legal/cookie-policy" class="cc__link"&gt;Politica de cookie-uri&lt;/a&gt;.</target>
       </trans-unit>
     </body>
   </file>

@@ -14,7 +14,7 @@ import { filter, map } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import { Skeleton } from 'primeng/skeleton';
 import type { BlogPost } from 'core';
-import { BLOG_COVER_PRESETS, BlogService, withCloudinaryTransform } from 'core';
+import { authorBylineUrl, BLOG_COVER_PRESETS, BlogService, withCloudinaryTransform } from 'core';
 import { DatePipe } from '@angular/common';
 import { BlogCategoryPipe } from '../blog-category.pipe';
 
@@ -47,6 +47,12 @@ export class BlogArticleComponent {
 
   readonly post = toSignal<BlogPost | null>(this._post$, { initialValue: null });
   readonly isLoading = computed(() => this.post() === null);
+
+  /**
+   * Byline link target — an external author's public profile when they
+   * have a handle, else the signup page for our own content.
+   */
+  readonly authorLink = authorBylineUrl;
 
   constructor() {
     afterRenderEffect(() => {

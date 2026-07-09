@@ -1,0 +1,84 @@
+/* MotionHive branding for vanilla-cookieconsent — light is the primary theme.
+   Only CSS-variable overrides; all values carry brand-hex fallbacks so the UI
+   renders correctly even where a theme token isn't bridged. */
+#cc-main {
+  /* Shape + type — match the site's cards/buttons */
+  --cc-font-family: inherit;
+  --cc-modal-border-radius: 1rem;
+  --cc-btn-border-radius: 0.5rem;
+
+  /* Surfaces + text */
+  --cc-bg: var(--p-surface-0, #ffffff);
+  --cc-primary-color: var(--color-navy-800, #12233d);
+  --cc-secondary-color: var(--p-surface-500, #64748b);
+  --cc-link-color: var(--color-primary-600, #d97706);
+  --cc-separator-border-color: color-mix(in oklab, var(--color-navy-900, #0e1b31) 10%, transparent);
+  --cc-overlay-bg: color-mix(in oklab, var(--color-navy-900, #0e1b31) 45%, transparent);
+
+  /* Primary button = brand amber */
+  --cc-btn-primary-bg: var(--color-primary-500, #f59e0b);
+  --cc-btn-primary-border-color: var(--color-primary-500, #f59e0b);
+  --cc-btn-primary-color: var(--color-navy-900, #0e1b31);
+  --cc-btn-primary-hover-bg: var(--color-primary-600, #d97706);
+  --cc-btn-primary-hover-border-color: var(--color-primary-600, #d97706);
+  --cc-btn-primary-hover-color: var(--color-navy-900, #0e1b31);
+
+  /* Secondary button = subtle surface */
+  --cc-btn-secondary-bg: var(--p-surface-100, #f1f5f9);
+  --cc-btn-secondary-border-color: transparent;
+  --cc-btn-secondary-color: var(--color-navy-800, #12233d);
+  --cc-btn-secondary-hover-bg: var(--p-surface-200, #e2e8f0);
+  --cc-btn-secondary-hover-border-color: transparent;
+  --cc-btn-secondary-hover-color: var(--color-navy-900, #0e1b31);
+
+  /* Toggles */
+  --cc-toggle-on-bg: var(--color-primary-500, #f59e0b);
+  --cc-toggle-off-bg: var(--p-surface-300, #cbd5e1);
+  --cc-toggle-on-knob-bg: #ffffff;
+  --cc-toggle-off-knob-bg: #ffffff;
+  --cc-toggle-readonly-bg: var(--p-surface-200, #e2e8f0);
+  --cc-toggle-readonly-knob-bg: #ffffff;
+  --cc-toggle-readonly-knob-icon-color: var(--p-surface-200, #e2e8f0);
+  --cc-toggle-enabled-icon-color: var(--color-navy-900, #0e1b31);
+  --cc-toggle-disabled-icon-color: var(--p-surface-400, #94a3b8);
+
+  /* Category blocks */
+  --cc-cookie-category-block-bg: var(--p-surface-50, #f8fafc);
+  --cc-cookie-category-block-border: color-mix(in oklab, var(--color-navy-900, #0e1b31) 8%, transparent);
+  --cc-cookie-category-block-hover-bg: var(--p-surface-100, #f1f5f9);
+  --cc-cookie-category-block-hover-border: color-mix(in oklab, var(--color-navy-900, #0e1b31) 12%, transparent);
+  --cc-cookie-category-expanded-block-bg: var(--p-surface-100, #f1f5f9);
+  --cc-cookie-category-expanded-block-hover-bg: var(--p-surface-200, #e2e8f0);
+
+  --cc-footer-bg: var(--p-surface-50, #f8fafc);
+  --cc-footer-color: var(--p-surface-500, #64748b);
+  --cc-footer-border-color: color-mix(in oklab, var(--color-navy-900, #0e1b31) 8%, transparent);
+}
+
+/* Dark theme — `.cc--darkmode` is toggled in sync with the site theme. */
+.cc--darkmode #cc-main {
+  --cc-bg: var(--color-navy-800, #12233d);
+  --cc-primary-color: #ffffff;
+  --cc-secondary-color: var(--p-surface-400, #94a3b8);
+  --cc-link-color: var(--color-primary-400, #fbbf24);
+  --cc-separator-border-color: color-mix(in oklab, #ffffff 12%, transparent);
+  --cc-overlay-bg: color-mix(in oklab, #000000 60%, transparent);
+
+  --cc-btn-secondary-bg: color-mix(in oklab, #ffffff 8%, transparent);
+  --cc-btn-secondary-color: #ffffff;
+  --cc-btn-secondary-hover-bg: color-mix(in oklab, #ffffff 15%, transparent);
+  --cc-btn-secondary-hover-color: #ffffff;
+
+  --cc-toggle-off-bg: color-mix(in oklab, #ffffff 20%, transparent);
+  --cc-toggle-readonly-bg: color-mix(in oklab, #ffffff 12%, transparent);
+
+  --cc-cookie-category-block-bg: color-mix(in oklab, #ffffff 5%, transparent);
+  --cc-cookie-category-block-border: color-mix(in oklab, #ffffff 10%, transparent);
+  --cc-cookie-category-block-hover-bg: color-mix(in oklab, #ffffff 8%, transparent);
+  --cc-cookie-category-expanded-block-bg: color-mix(in oklab, #ffffff 8%, transparent);
+  --cc-cookie-category-expanded-block-hover-bg: color-mix(in oklab, #ffffff 12%, transparent);
+
+  --cc-footer-bg: color-mix(in oklab, #ffffff 5%, transparent);
+  --cc-footer-color: var(--p-surface-400, #94a3b8);
+  --cc-footer-border-color: color-mix(in oklab, #ffffff 10%, transparent);
+}

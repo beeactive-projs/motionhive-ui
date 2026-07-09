@@ -44,3 +44,27 @@ export function youtubeVideoId(url: string | null | undefined): string | null {
 export function youtubeThumbnailUrl(videoId: string): string {
   return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
 }
+
+/**
+ * Privacy-enhanced embed URL for inline playback via `<iframe>`.
+ *
+ * Uses `youtube-nocookie.com` (no tracking cookies until the user
+ * actually plays) and disables the "related videos from other
+ * channels" grid at the end (`rel=0`). `modestbranding=1` drops the
+ * large YouTube logo in the control bar.
+ *
+ * The returned string is a plain URL — it MUST be run through
+ * `DomSanitizer.bypassSecurityTrustResourceUrl` before binding to an
+ * iframe `[src]` in Angular. That's safe here because `videoId` is
+ * always the output of {@link youtubeVideoId} (an 11-char
+ * `[A-Za-z0-9_-]` token), so no attacker-controlled markup can reach
+ * the URL.
+ *
+ * Pass `autoplay=true` when the iframe is mounted in response to a
+ * user gesture (the click-to-play facade) so playback starts without
+ * a second tap.
+ */
+export function youtubeEmbedUrl(videoId: string, autoplay = false): string {
+  const params = 'rel=0&modestbranding=1&playsinline=1' + (autoplay ? '&autoplay=1' : '');
+  return `https://www.youtube-nocookie.com/embed/${videoId}?${params}`;
+}

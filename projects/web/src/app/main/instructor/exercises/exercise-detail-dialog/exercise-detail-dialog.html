@@ -6,8 +6,12 @@
   </div>
   } @else if (exercise(); as e) {
   <div class="flex flex-col gap-5">
-    <!-- Hero media — cycles through start/end frames every 1.4s -->
+    <!-- Hero media — inline YouTube player for custom demos, else the
+         start/end image cycle for system exercises. -->
     @let frames = imageFrames();
+    @if (e.youtubeUrl) {
+    <mh-youtube-embed [url]="e.youtubeUrl" [title]="e.name" [thumbnailUrl]="e.thumbnailUrl" />
+    } @else {
     <div class="relative aspect-16/10 overflow-hidden rounded-lg bg-surface-100 dark:bg-surface-800">
       @if (frames.length > 0) {
       @for (frame of frames; track frame.id; let i = $index) {
@@ -31,14 +35,8 @@
         }
       </div>
       }
-
-      @if (e.youtubeUrl) {
-      <a class="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-surface-900 no-underline transition hover:bg-white"
-        [href]="e.youtubeUrl" target="_blank" rel="noopener noreferrer" aria-label="Open YouTube demo in a new tab">
-        <i class="pi pi-youtube text-red-600"></i> YouTube demo
-      </a>
-      }
     </div>
+    }
 
     <!-- Meta chips -->
     <div class="flex flex-wrap items-center gap-2">
