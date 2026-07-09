@@ -31,6 +31,7 @@ import {
   exerciseMuscleTagClass,
   MuscleRole,
   showApiError,
+  YoutubeEmbed,
 } from 'core';
 
 /**
@@ -51,7 +52,7 @@ import {
 @Component({
   selector: 'mh-exercise-detail-dialog',
   standalone: true,
-  imports: [ButtonModule, ConfirmDialog, Dialog, Tag, TooltipModule, TitleCasePipe],
+  imports: [ButtonModule, ConfirmDialog, Dialog, Tag, TooltipModule, TitleCasePipe, YoutubeEmbed],
   providers: [ConfirmationService],
   templateUrl: './exercise-detail-dialog.html',
   styleUrl: './exercise-detail-dialog.scss',

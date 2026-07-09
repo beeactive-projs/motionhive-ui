@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FeedbackDialog } from './_shared/feedback-dialog/feedback-dialog';
 import { WaitlistDialog } from './_shared/waitlist-dialog/waitlist-dialog';
+import { CookieConsentService } from './_shared/cookie-consent/cookie-consent.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,10 @@ import { WaitlistDialog } from './_shared/waitlist-dialog/waitlist-dialog';
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {}
+export class App implements OnInit {
+  private readonly cookieConsent = inject(CookieConsentService);
+
+  ngOnInit(): void {
+    this.cookieConsent.init();
+  }
+}

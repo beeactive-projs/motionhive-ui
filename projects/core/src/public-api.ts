@@ -161,6 +161,7 @@ export { isBlockedInstance } from './lib/models/session/session.model';
 
 // Constants
 export * from './lib/constants/api-endpoints.const';
+export * from './lib/constants/app-urls.const';
 export * from './lib/constants/storage-keys.const';
 export * from './lib/constants/timezones.const';
 export * from './lib/constants/date-windows.const';
@@ -254,6 +255,8 @@ export * from './lib/components/sticky-cta/sticky-cta';
 export * from './lib/components/action-list/action-list';
 // Avatar stack — overlapping participant avatars.
 export * from './lib/components/avatar-stack/avatar-stack';
+// YouTube embed — click-to-play facade for inline video playback.
+export * from './lib/components/youtube-embed/youtube-embed';
 
 // NOTE: session-domain components (access/type chip, capacity bar, calendar
 // grid, mini-month, week-strip, recurrence builder, participants table) carry

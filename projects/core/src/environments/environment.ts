@@ -25,6 +25,23 @@ function resolveAppUrl(): string {
   return `${window.location.protocol}//${window.location.host}`;
 }
 
+/**
+ * Origin of the authenticated MotionHive web app — a *separate* deploy
+ * from the marketing site (this bundle also ships to `website`). The
+ * marketing site links across to it for public `/@<handle>` profiles
+ * and the signup page. Resolved by host like `resolveApiUrl()`.
+ *
+ * NOTE: dev deploys currently fall through to the prod app origin —
+ * public profiles are read-only and safe to hit from a dev host. Add a
+ * dedicated `dev-app` branch here if/when one exists.
+ */
+function resolveWebAppUrl(): string {
+  if (typeof window === 'undefined') return 'https://app.motionhive.fit';
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:4200';
+  return 'https://app.motionhive.fit';
+}
+
 export const environment = {
   production: true,
   appUrl: 'http://localhost:4200',
@@ -32,5 +49,6 @@ export const environment = {
   //apiUrl: 'http://localhost:3800',
   googleClientId: '119425399334-29l3eq2mo162t0vlh8qfoqgi2cg0djfp.apps.googleusercontent.com',
   apiUrl: resolveApiUrl(),
+  webAppUrl: resolveWebAppUrl(),
   facebookAppId: '888056193830836',
 };

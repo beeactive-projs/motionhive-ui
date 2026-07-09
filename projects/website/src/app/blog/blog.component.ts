@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import type { BlogPost } from 'core';
 import {
+  authorBylineUrl,
   BLOG_COVER_PRESETS,
   BlogCategories,
   BlogService,
@@ -156,5 +157,17 @@ export class BlogComponent {
   /** Grid-card cover — 16:9 carousel-sized crop. */
   gridCoverUrl(url: string | null | undefined): string {
     return withCloudinaryTransform(url, BLOG_COVER_PRESETS.homeCarousel);
+  }
+
+  /**
+   * The byline sits inside the card-level article link, so on activation
+   * we stop the card navigation and send the reader to the author's
+   * destination instead — their public profile (external authors) or the
+   * signup page (our own "MotionHive Editors" content).
+   */
+  openAuthor(event: Event, handle: string | null): void {
+    event.stopPropagation();
+    event.preventDefault();
+    window.open(authorBylineUrl(handle), '_self');
   }
 }

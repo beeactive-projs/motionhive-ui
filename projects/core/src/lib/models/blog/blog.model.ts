@@ -30,6 +30,13 @@ export interface BlogPost {
   authorUserId: string | null;
   /** Byline for guest-authored posts (no MotionHive account). */
   guestAuthorName: string | null;
+  /**
+   * URL handle of the registered author, when they have one. Null for
+   * guest-authored posts and for registered authors without a handle.
+   * When set, the website links the byline to `/@<authorHandle>` on the
+   * web app; when null the byline links to the signup page.
+   */
+  authorHandle: string | null;
   readTime: number;
   tags: string[];
   language: BlogLanguage;
