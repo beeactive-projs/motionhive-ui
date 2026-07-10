@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   viewChild,
@@ -17,6 +18,7 @@ import type { BlogPost } from 'core';
 import { authorBylineUrl, BLOG_COVER_PRESETS, BlogService, withCloudinaryTransform } from 'core';
 import { DatePipe } from '@angular/common';
 import { BlogCategoryPipe } from '../blog-category.pipe';
+import { SeoService } from '../../_shared/seo.service';
 
 @Component({
   selector: 'mh-blog-article',
@@ -54,7 +56,23 @@ export class BlogArticleComponent {
    */
   readonly authorLink = authorBylineUrl;
 
+  private readonly _seo = inject(SeoService);
+
   constructor() {
+    // Per-article SEO/social tags. Runs when the post resolves — during
+    // prerender that's before serialization (SSR waits for the fetch), and it
+    // fires after the router's generic "Blog - MotionHive" title so the
+    // article's own title wins in the prerendered HTML.
+    effect(() => {
+      const p = this.post();
+      if (!p) return;
+      this._seo.set({
+        title: `${p.title} - MotionHive`,
+        description: p.excerpt,
+        image: p.coverImage || undefined,
+      });
+    });
+
     afterRenderEffect(() => {
       const el = this.coverImage()?.nativeElement;
       if (!el) return;

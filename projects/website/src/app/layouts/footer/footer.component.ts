@@ -39,6 +39,9 @@ export class PublicFooterComponent {
     { label: $localize`Home`, path: '/' },
     { label: $localize`About`, path: '/about' },
     { label: $localize`Blog`, path: '/blog' },
+    // Crawlable link to the tools — the header dropdown is JS-only, so this is
+    // the internal link search engines follow. Add new tools here too.
+    { label: $localize`Calorie calculator`, path: '/tools/calorie-calculator' },
   ];
 
   readonly supportLinks = [

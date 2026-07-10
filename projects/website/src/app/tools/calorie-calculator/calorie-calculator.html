@@ -185,7 +185,14 @@
 
             <!-- Donut chart -->
             <div class="relative shrink-0">
-              <p-chart type="doughnut" [data]="macroChartData()" [options]="macroChartOptions" class="w-55" />
+              <!-- Chart.js needs a real <canvas>; it can't render on the server
+                   (throws NotYetImplemented during prerender) and has no SEO
+                   value. Defer to browser idle with a same-sized placeholder. -->
+              @defer (on idle) {
+                <p-chart type="doughnut" [data]="macroChartData()" [options]="macroChartOptions" class="w-55" />
+              } @placeholder {
+                <div class="w-55 aspect-square rounded-full bg-surface-100 dark:bg-surface-800"></div>
+              }
               <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <span class="text-xs  text-surface-500 dark:text-surface-400" i18n="@@calorie.results.kcal">kcal</span>
                 <span class="font-heading font-extrabold text-xl leading-tight">{{ displayCalories() | number:'1.0-0'

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  PLATFORM_ID,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { HEX_ICONS, HexIconName } from './hex-icons';
@@ -135,6 +143,12 @@ export class Hex {
   readonly ariaLabel = input<string | null>(null);
 
   private readonly sanitizer = inject(DomSanitizer);
+
+  // Icon markup is injected via [innerHTML] on an <svg>, which the server DOM
+  // (domino) can't do — it throws NotYetImplemented and aborts the whole
+  // prerender change-detection pass (blanking unrelated components). Icons are
+  // decorative, so render them in the browser only. See hex.html.
+  protected readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly uid = `mhhex${seq++}`;
   readonly clipId = `${this.uid}c`;
