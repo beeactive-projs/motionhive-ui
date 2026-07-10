@@ -30,6 +30,7 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { Select } from 'primeng/select';
 import { BlogCategoryPipe } from './blog-category.pipe';
+import { SeoService } from '../_shared/seo.service';
 
 const PAGE_SIZE = 9;
 const PAGE_SIZE_ALL = 10;
@@ -80,6 +81,11 @@ export class BlogComponent {
   private readonly _search$ = new Subject<string>();
 
   constructor() {
+    inject(SeoService).set({
+      title: $localize`Blog - MotionHive`,
+      description: $localize`:@@blog.meta.description:Practical guides and stories on group fitness, training, nutrition, and building active communities — from the MotionHive team.`,
+    });
+
     this._search$
       .pipe(debounceTime(350), distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
       .subscribe((query) => {

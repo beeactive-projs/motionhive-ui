@@ -222,12 +222,12 @@
       "i18n": {
         "sourceLocale": {
           "code": "en",
-          "baseHref": "/"
+          "subPath": ""
         },
         "locales": {
           "ro": {
             "translation": "projects/website/src/locale/messages.ro.xlf",
-            "baseHref": "/ro/"
+            "subPath": "ro"
           }
         }
       },
@@ -236,6 +236,8 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "projects/website/src/main.ts",
+            "server": "projects/website/src/main.server.ts",
+            "outputMode": "static",
             "polyfills": [
               "@angular/localize/init"
             ],

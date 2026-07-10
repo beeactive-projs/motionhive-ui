@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Hex, HexTone, WaitlistService } from 'core';
 
+import { SeoService } from '../_shared/seo.service';
+
 @Component({
   selector: 'mh-home',
   imports: [ButtonModule, RouterLink, Hex],
@@ -12,6 +14,13 @@ import { Hex, HexTone, WaitlistService } from 'core';
 })
 export class HomeComponent {
   private readonly _waitlistService = inject(WaitlistService);
+
+  constructor() {
+    inject(SeoService).set({
+      title: $localize`MotionHive — Where active communities come together`,
+      description: $localize`:@@home.meta.description:MotionHive brings active communities together — organisers create hubs, schedule sessions, and share updates; members discover activities and join in one tap. Free to organise, free to join.`,
+    });
+  }
 
   openJoinWaitlist(): void {
     this._waitlistService.open('home');

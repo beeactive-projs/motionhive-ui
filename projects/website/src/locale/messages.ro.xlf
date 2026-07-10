@@ -2190,7 +2190,7 @@
       </trans-unit>
       <trans-unit id="tos.s9.p" datatype="html">
         <source> To the maximum extent permitted by law, MotionHive shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses. </source>
-        <target state="translated"> În măsura maximă permisă de lege, MotionHive nu va fi răspunzătoare pentru nicio daună indirectă, incidentală, specială, consecventă sau punitivă, sau orice pierdere de profituri sau venituri, indiferent dacă este suportată direct sau indirect, sau orice pierdere de date, utilizare, fond comercial sau alte pierderi intangibile. </target>
+        <target state="translated"> În măsura maximă permisă de lege, MotionHive nu va fi răspunzătoare pentru nicio daună indirectă, incidentală, specială, subsecventă sau punitivă, sau orice pierdere de profituri sau venituri, indiferent dacă este suportată direct sau indirect, sau orice pierdere de date, utilizare, fond comercial sau alte pierderi intangibile. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/terms-of-service/terms-of-service.component.html</context>
           <context context-type="linenumber">114</context>
