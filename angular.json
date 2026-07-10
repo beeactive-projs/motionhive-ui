@@ -222,12 +222,12 @@
       "i18n": {
         "sourceLocale": {
           "code": "en",
-          "subPath": ""
+          "baseHref": "/"
         },
         "locales": {
           "ro": {
             "translation": "projects/website/src/locale/messages.ro.xlf",
-            "subPath": "ro"
+            "baseHref": "/ro/"
           }
         }
       },
