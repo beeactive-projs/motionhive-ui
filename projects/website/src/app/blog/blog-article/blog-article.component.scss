@@ -116,13 +116,22 @@
     min-width: 0;
   }
 
-  /* TOC lives in the right column on desktop. */
+  /* TOC lives in the right column on desktop. The cell stretches to the full
+     article height (grid default); make the component host fill it so the
+     sticky rail inside has room to travel — otherwise its containing block
+     shrink-wraps to the rail height and it never sticks. */
   &__toc {
     grid-column: 3;
     justify-self: start;
     max-width: 240px;
     padding-top: 0.25rem;
     padding-left: 1.75rem;
+    display: flex;
+    flex-direction: column;
+
+    mh-article-toc {
+      flex: 1;
+    }
   }
 
   @media (max-width: 1024px) {

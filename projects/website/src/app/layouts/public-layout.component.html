@@ -8,7 +8,10 @@
 
   <mh-public-header class="sticky top-0 z-100" />
 
-  <main class="grow overflow-auto">
+  <!-- No overflow here: `overflow: auto` would make <main> the scroll
+       container for position:sticky descendants (e.g. the article TOC), but
+       the window is what actually scrolls, so sticky would never engage. -->
+  <main class="grow">
     <router-outlet />
   </main>
 
