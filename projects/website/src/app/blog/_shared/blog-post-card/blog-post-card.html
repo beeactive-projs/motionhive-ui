@@ -1,0 +1,27 @@
+@let post = this.post();
+
+<a
+  class="post-card"
+  [class.post-card--grid]="variant() === 'grid'"
+  [routerLink]="['/blog', post.slug]"
+  [attr.aria-label]="'Read article: ' + post.title">
+  <div class="post-card__media">
+    <img [src]="coverUrl()" [alt]="post.title" loading="lazy" width="800" height="450" />
+  </div>
+
+  <div class="post-card__body">
+    <div class="post-card__meta">
+      <span class="category-badge">{{ post.category | blogCategory }}</span>
+      <span class="rt">
+        {{ post.readTime }} <ng-container i18n="@@blog.minRead">min read</ng-container>
+      </span>
+    </div>
+
+    <h3 class="post-card__title">{{ post.title }}</h3>
+    <p class="post-card__excerpt">{{ post.excerpt }}</p>
+
+    @if (variant() === 'grid') {
+      <span class="post-card__date">{{ post.publishedAt | date: 'mediumDate' }}</span>
+    }
+  </div>
+</a>

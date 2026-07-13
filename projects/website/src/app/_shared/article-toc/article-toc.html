@@ -1,0 +1,57 @@
+@if (headings().length) {
+  <!-- Shared list, rendered in both the desktop rail and the mobile drawer. -->
+  <ng-template #list>
+    <ul class="toc__list">
+      @for (h of headings(); track h.id) {
+        <li [class.toc__item--sub]="h.level === 3">
+          <a
+            [href]="'#' + h.id"
+            [class.active]="activeId() === h.id"
+            (click)="onClick($event, h.id)">
+            {{ h.text }}
+          </a>
+        </li>
+      }
+    </ul>
+  </ng-template>
+
+  <!-- Desktop: sticky rail -->
+  <nav class="toc toc--rail" aria-label="On this page" i18n-aria-label="@@blog.toc.aria">
+    <p class="toc__label">
+      <i class="pi pi-list" aria-hidden="true"></i>
+      <span i18n="@@blog.toc.label">On this page</span>
+    </p>
+    <ng-container [ngTemplateOutlet]="list" />
+  </nav>
+
+  <!-- Small screens: floating button -->
+  <button
+    type="button"
+    class="toc-fab"
+    (click)="toggle()"
+    [attr.aria-expanded]="open()"
+    aria-label="On this page"
+    i18n-aria-label="@@blog.toc.aria">
+    <i class="pi pi-list" aria-hidden="true"></i>
+  </button>
+
+  <!-- Small screens: right drawer -->
+  <div class="toc-backdrop" [class.open]="open()" (click)="close()" aria-hidden="true"></div>
+  <nav class="toc-drawer" [class.open]="open()" aria-label="On this page" i18n-aria-label="@@blog.toc.aria">
+    <div class="toc-drawer__head">
+      <p class="toc__label">
+        <i class="pi pi-list" aria-hidden="true"></i>
+        <span i18n="@@blog.toc.label">On this page</span>
+      </p>
+      <button
+        type="button"
+        class="toc-drawer__close"
+        (click)="close()"
+        aria-label="Close"
+        i18n-aria-label="@@blog.toc.close">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <ng-container [ngTemplateOutlet]="list" />
+  </nav>
+}

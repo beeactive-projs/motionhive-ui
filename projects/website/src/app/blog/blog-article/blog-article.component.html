@@ -1,189 +1,131 @@
 @if (isLoading()) {
-<!-- ===== Article Skeleton ===== -->
-<section class="hero-section" aria-busy="true" i18n-aria-label="@@blog.article.ariaLoading"
-  aria-label="Loading article">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10">
-    <p-skeleton width="7rem" height="1.25rem" class="mb-6" />
-    <div class="flex items-center gap-3 mb-5 flex-wrap">
-      <p-skeleton width="5rem" height="1.5rem" borderRadius="2rem" />
-      <p-skeleton width="6rem" height="1.25rem" />
-      <p-skeleton width="6rem" height="1.25rem" />
+  <!-- ===== Article skeleton ===== -->
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 text-center">
+    <div class="flex items-center justify-center gap-3 mb-5">
+      <p-skeleton width="5rem" height="1.5rem" borderRadius="0.5rem" />
+      <p-skeleton width="6rem" height="1.1rem" />
+      <p-skeleton width="5rem" height="1.1rem" />
     </div>
-    <p-skeleton width="90%" height="2.75rem" class="mb-3" />
-    <p-skeleton width="70%" height="2.75rem" class="mb-6" />
-    <p-skeleton width="100%" height="1.25rem" class="mb-2" />
-    <p-skeleton width="88%" height="1.25rem" class="mb-8" />
-    <div class="flex items-center gap-3">
+    <p-skeleton width="100%" height="2.75rem" class="block mb-3" />
+    <p-skeleton width="80%" height="2.75rem" class="block mx-auto mb-6" />
+    <p-skeleton width="90%" height="1.4rem" class="block mx-auto mb-2" />
+    <p-skeleton width="70%" height="1.4rem" class="block mx-auto mb-8" />
+    <div class="flex items-center justify-center gap-3">
       <p-skeleton shape="circle" size="2.75rem" />
-      <p-skeleton width="8rem" height="1rem" />
+      <p-skeleton width="9rem" height="1rem" />
     </div>
   </div>
-</section>
-
-<div class="article-body">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-2 mb-12">
-    <p-skeleton width="100%" height="400px" borderRadius="1.25rem" />
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <p-skeleton width="100%" height="420px" borderRadius="1.25rem" />
   </div>
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 flex flex-col gap-3">
-    <p-skeleton width="100%" height="1rem" />
-    <p-skeleton width="97%" height="1rem" />
-    <p-skeleton width="100%" height="1rem" />
-    <p-skeleton width="88%" height="1rem" />
-    <p-skeleton width="55%" height="1.5rem" class="mt-4" />
-    <p-skeleton width="100%" height="1rem" />
-    <p-skeleton width="95%" height="1rem" />
-    <p-skeleton width="100%" height="1rem" />
-    <p-skeleton width="72%" height="1rem" />
-    <p-skeleton width="50%" height="1.5rem" class="mt-4" />
-    <p-skeleton width="100%" height="1rem" />
-    <p-skeleton width="90%" height="1rem" />
-    <p-skeleton width="65%" height="1rem" />
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 flex flex-col gap-3">
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+      <p-skeleton width="100%" height="1.1rem" />
+    }
   </div>
-</div>
-
 } @else if (post(); as article) {
+  <mh-reading-progress [target]="bodyEl()" />
 
-<!-- ===== Article Header ===== -->
-<section class="hero-section">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-    <!-- Back link -->
-    <p-button i18n-label="@@blog.article.backToBlog" label="Back to Blog" icon="pi pi-arrow-left" iconPos="left"
-      routerLink="/blog" size="small" outlined rounded />
+  <!-- ===== Breadcrumb ===== -->
+  <nav class="crumb max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Breadcrumb">
+    <a routerLink="/blog" i18n="@@blog.breadcrumb.blog">Blog</a>
+    <span class="crumb__sep" aria-hidden="true">/</span>
+    <span>{{ article.category | blogCategory }}</span>
+  </nav>
 
-    <!-- Meta -->
-    <div class="flex items-center gap-3 flex-wrap mt-6 mb-5">
+  <!-- ===== Article header ===== -->
+  <header class="article-head max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="meta">
       <span class="category-badge">{{ article.category | blogCategory }}</span>
-      <span class="text-sm ">{{ article.publishedAt | date: 'mediumDate' }}</span>
-      <span class="text-sm ">
-        <i class="pi pi-clock mr-1 text-xs"></i>{{ article.readTime }} <ng-container i18n="@@blog.minRead">min
-          read</ng-container>
+      <span>{{ article.publishedAt | date: 'd MMMM y' }}</span>
+      <span class="meta__sep" aria-hidden="true"></span>
+      <span>
+        <i class="pi pi-clock" aria-hidden="true"></i>
+        {{ article.readTime }} <ng-container i18n="@@blog.minRead">min read</ng-container>
       </span>
     </div>
 
-    <!-- Title -->
-    <h1 class="text-3xl sm:text-4xl 3xl:text-5xl font-heading font-extrabold leading-[1.1] mb-6">
-      {{ article.title }}
-    </h1>
+    <h1>{{ article.title }}</h1>
+    <p class="standfirst">{{ article.excerpt }}</p>
 
-    <!-- Excerpt -->
-    <p class="text-lg leading-relaxed mb-8">{{ article.excerpt }}</p>
+    <mh-blog-byline [post]="article" variant="inline" />
+  </header>
 
-    <!-- Author -->
-    <a [href]="authorLink(article.authorHandle)" class="inline-flex items-center gap-3 group/author w-fit">
-      @if (article.authorAvatarUrl) {
-        <img [src]="article.authorAvatarUrl" [alt]="article.authorName"
-          class="w-11 h-11 rounded-full object-cover object-top" loading="lazy" />
-      } @else {
-        <div
-          class="w-11 h-11 rounded-full bg-primary-500 text-primary-contrast flex items-center justify-center font-bold text-sm"
-          aria-hidden="true">
-          {{ article.authorInitials }}
-        </div>
-      }
-      <div>
-        <p class="font-semibold text-sm group-hover/author:text-brand transition-colors">{{ article.authorName }}</p>
-      </div>
-    </a>
-  </div>
-</section>
+  <!-- ===== Cover ===== -->
+  <figure class="cover max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <img
+      [src]="heroCoverUrl(article.coverImage)"
+      [alt]="article.title"
+      class="cover__img"
+      loading="eager"
+      width="1200"
+      height="675" />
+  </figure>
 
-<!-- ===== Article Body ===== -->
-<section class="article-body">
-  <!-- Cover Image -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-    <img #coverImage [src]="heroCoverUrl(article.coverImage)" [alt]="article.title" class="article-cover-image"
-      loading="eager" height="675" />
-  </div>
+  <!-- ===== TOC + prose ===== -->
+  <div class="layout mx-auto px-4 sm:px-6 lg:px-8">
+    <article
+      #articleBody
+      class="layout__main"
+      aria-label="Article content"
+      i18n-aria-label="@@blog.article.contentAriaLabel">
+      <mh-article-prose [html]="contentHtml()" />
 
-  <!-- Article Content -->
-  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-12" i18n-aria-label="@@blog.article.contentAriaLabel"
-    aria-label="Article content">
-    <div class="article-content" [innerHTML]="article.content"></div>
-
-    <!-- Tags -->
-    <div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-primary-200 dark:border-primary-700/50">
-      @for (tag of article.tags; track tag) {
-      <span class="tag-pill">#{{ tag }}</span>
-      }
-    </div>
-  </article>
-
-  <!-- Author Bio Card -->
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-    <a [href]="authorLink(article.authorHandle)" class="author-bio-card group/author">
-      @if (article.authorAvatarUrl) {
-        <img [src]="article.authorAvatarUrl" [alt]="article.authorName"
-          class="w-16 h-16 rounded-full object-cover object-top shrink-0" loading="lazy" />
-      } @else {
-        <div
-          class="w-16 h-16 rounded-full bg-primary-500  text-primary-contrast flex items-center justify-center font-extrabold text-xl shrink-0"
-          aria-hidden="true">
-          {{ article.authorInitials }}
-        </div>
-      }
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-widest section-subtext mb-1" i18n="@@blog.article.writtenBy">
-          Written by</p>
-        <p class="text-lg font-heading font-bold section-heading group-hover/author:text-brand transition-colors">
-          {{ article.authorName }}</p>
-      </div>
-    </a>
-  </div>
-</section>
-
-<!-- ===== Related Articles ===== -->
-@if (relatedPosts().length > 0) {
-<section class="related-section py-16" aria-labelledby="related-heading">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 id="related-heading" class="text-2xl sm:text-3xl font-heading font-extrabold section-heading mb-8"
-      i18n="@@blog.article.relatedH2">
-      Related Articles
-    </h2>
-
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (related of relatedPosts(); track related.id) {
-      <a [routerLink]="['/blog', related.slug]" class="related-card"
-        [attr.aria-label]="'Read article: ' + related.title">
-        <div class="related-card__image-wrap">
-          <img [src]="relatedCoverUrl(related.coverImage)" [alt]="related.title" class="related-card__image"
-            loading="lazy" width="800" height="450" />
-        </div>
-        <div class="related-card__content">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="category-badge">{{ related.category | blogCategory }}</span>
-            <span class="text-xs section-subtext">{{ related.readTime }} <ng-container i18n="@@blog.minRead">min
-                read</ng-container></span>
+      <!-- Tags + share -->
+      <div class="endbar">
+        @if (article.tags.length) {
+          <div class="tags">
+            @for (tag of article.tags; track tag) {
+              <span class="tag">#{{ tag }}</span>
+            }
           </div>
-          <h3
-            class="text-base font-heading font-bold section-heading leading-snug mb-2 group-hover:text-brand transition-colors line-clamp-2">
-            {{ related.title }}
-          </h3>
-          <p class="text-sm section-subtext line-clamp-2">{{ related.excerpt }}</p>
+        }
+        <mh-share-bar [url]="articleUrl()" [title]="article.title" />
+      </div>
+
+      <!-- Author bio -->
+      <mh-blog-byline class="biocard" [post]="article" variant="card" [bio]="bylineBio()" />
+    </article>
+
+    <aside class="layout__toc">
+      <mh-article-toc [headings]="headings()" />
+    </aside>
+  </div>
+
+  <!-- ===== Related ===== -->
+  @if (relatedPosts().length) {
+    <section class="related" aria-labelledby="related-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 id="related-heading" class="related__title" i18n="@@blog.article.relatedH2">Keep reading</h2>
+        <div class="related__grid">
+          @for (related of relatedPosts(); track related.id) {
+            <mh-blog-post-card [post]="related" variant="related" />
+          }
         </div>
-      </a>
-      }
-    </div>
-  </div>
-</section>
-}
+      </div>
+    </section>
+  }
 
-<!-- ===== CTA Section ===== -->
-<section class="cta-section">
-  <!-- <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div> -->
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
-    <h2 class="section-heading text-3xl sm:text-4xl font-heading font-extrabold mb-3" i18n="@@blog.article.cta.h2">
-      Follow the <span class="text-brand">journey</span>.
-    </h2>
-    <p class="section-subtext text-lg sm:text-xl mb-8 max-w-xl mx-auto" i18n="@@blog.article.cta.sub">
-      We're building MotionHive in the open. Check out more stories from the hive.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button i18n-label="@@blog.article.backToBlog" label="Back to Blog" icon="pi pi-arrow-left" iconPos="left"
-        routerLink="/blog" size="large" />
+  <!-- ===== End CTA (plain, matches the blog list) ===== -->
+  <section class="cta-section pt-12 sm:pt-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
+      <h2
+        class="section-heading text-3xl sm:text-4xl font-heading font-extrabold mb-3"
+        i18n="@@blog.article.cta.h2">
+        Bring your coaching <span class="text-brand">home.</span>
+      </h2>
+      <p class="section-subtext text-lg sm:text-xl mb-8 max-w-xl mx-auto" i18n="@@blog.article.cta.sub">
+        MotionHive is free for coaches: storefront, programs, payments and community in one place.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <p-button
+          i18n-label="@@blog.article.backToBlog"
+          label="Back to Blog"
+          icon="pi pi-arrow-left"
+          iconPos="left"
+          routerLink="/blog"
+          size="large" />
+      </div>
     </div>
-  </div>
-</section>
-
+  </section>
 }

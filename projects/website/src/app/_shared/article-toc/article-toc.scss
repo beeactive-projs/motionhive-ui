@@ -1,0 +1,236 @@
+:host {
+  display: block;
+}
+
+/* ===== Shared list ===== */
+.toc__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--p-surface-500);
+
+  .pi {
+    font-size: 0.8rem;
+  }
+}
+
+.toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid var(--p-surface-200);
+
+  a {
+    display: block;
+    padding: 0.45rem 0 0.45rem 1rem;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+    font-size: 0.8375rem;
+    line-height: 1.35;
+    color: var(--p-surface-500);
+    text-decoration: none;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      color: var(--p-surface-900);
+    }
+
+    &.active {
+      color: var(--p-primary-700);
+      border-left-color: var(--p-primary-color);
+      font-weight: 600;
+    }
+  }
+}
+
+.toc__item--sub a {
+  padding-left: 1.75rem;
+  font-size: 0.8rem;
+}
+
+/* ===== Desktop sticky rail ===== */
+.toc--rail {
+  position: sticky;
+  top: calc(var(--nav-height) + 1.5rem);
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+/* ===== Mobile: floating button ===== */
+.toc-fab {
+  display: none;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 90;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  place-items: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--p-surface-700);
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  box-shadow: 0 6px 20px color-mix(in oklab, black 18%, transparent);
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    color: var(--p-primary-600);
+  }
+
+  @media (max-width: 1024px) {
+    display: grid;
+  }
+}
+
+/* ===== Mobile: backdrop + drawer ===== */
+.toc-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 1024px) {
+    display: block;
+  }
+}
+
+.toc-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 201;
+  height: 100dvh;
+  width: min(86vw, 340px);
+  padding: 1.25rem 1.35rem;
+  overflow-y: auto;
+  background: var(--p-surface-0);
+  box-shadow: -8px 0 32px color-mix(in oklab, black 22%, transparent);
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 1024px) {
+    display: block;
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .toc__label {
+      margin-bottom: 0;
+    }
+  }
+
+  &__close {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--p-surface-500);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+
+    &:hover {
+      color: var(--p-surface-900);
+      background: var(--p-surface-100);
+    }
+  }
+
+  /* In the drawer the list reads as rows with a soft active pill (no rail). */
+  .toc__list {
+    border-left: none;
+
+    a {
+      margin-left: 0;
+      padding: 0.6rem 0.75rem;
+      border-left: none;
+      border-radius: 0.5rem;
+
+      &.active {
+        border-left: none;
+        color: var(--p-primary-700);
+        background: color-mix(in oklab, var(--p-primary-500) 12%, transparent);
+      }
+    }
+  }
+
+  .toc__item--sub a {
+    padding-left: 1.5rem;
+  }
+}
+
+/* ===== Dark ===== */
+:host-context(.dark) {
+  .toc__list {
+    border-left-color: var(--p-surface-700);
+
+    a:hover {
+      color: var(--p-surface-100);
+    }
+
+    a.active {
+      color: var(--p-primary-400);
+    }
+  }
+
+  .toc-fab {
+    color: var(--p-surface-200);
+    background: color-mix(in oklab, var(--p-surface-0) 12%, var(--p-content-background));
+    border-color: var(--p-surface-700);
+
+    &:hover {
+      color: var(--p-primary-400);
+    }
+  }
+
+  .toc-drawer {
+    background: color-mix(in oklab, var(--p-surface-0) 8%, var(--p-content-background));
+
+    &__close:hover {
+      color: var(--p-surface-100);
+      background: color-mix(in oklab, white 8%, transparent);
+    }
+
+    .toc__list a.active {
+      color: var(--p-primary-400);
+    }
+  }
+}
