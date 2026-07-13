@@ -52,9 +52,11 @@
   }
 }
 
+/* Sub-headings (h3) keep the same left alignment as the sections. A lone
+   nested item read as misaligned rather than as a hierarchy, so the rail
+   stays flat and evenly aligned. */
 .toc__item--sub a {
-  padding-left: 1.75rem;
-  font-size: 0.8rem;
+  padding-left: 1rem;
 }
 
 /* ===== Desktop sticky rail ===== */
@@ -193,7 +195,7 @@
   }
 
   .toc__item--sub a {
-    padding-left: 1.5rem;
+    padding-left: 0.75rem;
   }
 }
 
