@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.share {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.share__btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--p-surface-300);
+  background: var(--p-surface-0);
+  color: var(--p-surface-600);
+  display: grid;
+  place-items: center;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-600);
+  }
+
+  .pi-check {
+    color: var(--p-green-500, #22c55e);
+  }
+}
+
+:host-context(.dark) .share__btn {
+  background: color-mix(in oklab, white 6%, transparent);
+  border-color: var(--p-surface-700);
+  color: var(--p-surface-300);
+
+  &:hover {
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-400);
+  }
+}

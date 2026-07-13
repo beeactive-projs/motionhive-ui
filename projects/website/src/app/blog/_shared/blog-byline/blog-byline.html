@@ -1,0 +1,66 @@
+@let post = this.post();
+@let url = profileUrl();
+
+<!-- Brand hexagon avatar: image when present, gradient + initials otherwise. -->
+<ng-template #avatar>
+  <mh-hex
+    [size]="avatarSize()"
+    [img]="post.authorAvatarUrl"
+    [label]="post.authorAvatarUrl ? null : post.authorInitials"
+    [tone]="post.authorAvatarUrl ? null : 'gradient'"
+    [sheen]="!post.authorAvatarUrl"
+    [ariaLabel]="post.authorName" />
+</ng-template>
+
+@if (variant() === 'card') {
+  <!-- ===== Author bio card ===== -->
+  <div class="byline-card">
+    <ng-container [ngTemplateOutlet]="avatar" />
+    <div class="byline-card__body">
+      <p class="wb" i18n="@@blog.article.writtenBy">Written by</p>
+      <h4 class="nm">
+        @if (url) {
+          <a [href]="url">{{ post.authorName }}</a>
+        } @else {
+          {{ post.authorName }}
+        }
+      </h4>
+      @if (bio(); as b) {
+        <p class="bio">{{ b }}</p>
+      }
+      @if (url) {
+        <a class="plink" [href]="url">
+          <span i18n="@@blog.byline.viewProfile">View coach profile</span>
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+          <span class="handle">{{ handleAt() }}</span>
+        </a>
+      } @else {
+        <a class="plink" routerLink="/blog">
+          <span i18n="@@blog.byline.moreFromBlog">More from the blog</span>
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- ===== Inline byline ===== -->
+  <ng-template #inlineInner>
+    <ng-container [ngTemplateOutlet]="avatar" />
+    <span class="who">
+      <span class="nm">{{ post.authorName }}</span>
+      @if (metaLine()) {
+        <span class="rl">{{ metaLine() }}</span>
+      }
+    </span>
+  </ng-template>
+
+  @if (url) {
+    <a class="byline" [href]="url" [attr.title]="'View ' + post.authorName">
+      <ng-container [ngTemplateOutlet]="inlineInner" />
+    </a>
+  } @else {
+    <span class="byline byline--static">
+      <ng-container [ngTemplateOutlet]="inlineInner" />
+    </span>
+  }
+}

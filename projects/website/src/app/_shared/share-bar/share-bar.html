@@ -1,0 +1,28 @@
+<div class="share" role="group" aria-label="Share this article" i18n-aria-label="@@blog.share.aria">
+  <a
+    class="share__btn"
+    [href]="xUrl()"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Share on X"
+    title="Share on X">
+    <i class="pi pi-twitter" aria-hidden="true"></i>
+  </a>
+  <a
+    class="share__btn"
+    [href]="facebookUrl()"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Share on Facebook"
+    title="Share on Facebook">
+    <i class="pi pi-facebook" aria-hidden="true"></i>
+  </a>
+  <button
+    type="button"
+    class="share__btn"
+    (click)="copyLink()"
+    [attr.aria-label]="copied() ? 'Link copied' : 'Copy link'"
+    [title]="copied() ? 'Link copied' : 'Copy link'">
+    <i class="pi" [class.pi-link]="!copied()" [class.pi-check]="copied()" aria-hidden="true"></i>
+  </button>
+</div>

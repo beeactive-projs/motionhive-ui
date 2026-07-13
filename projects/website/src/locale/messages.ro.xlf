@@ -664,7 +664,7 @@
       </trans-unit>
       <trans-unit id="blog.article.cta.h2" datatype="html">
         <source> Follow the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>journey<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-        <target state="translated">Urmărește <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>călătoria<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
+        <target state="translated">Adu-ți coaching-ul <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>acasă.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
           <context context-type="linenumber">159</context>
@@ -672,7 +672,7 @@
       </trans-unit>
       <trans-unit id="blog.article.cta.sub" datatype="html">
         <source> We're building MotionHive in the open. Check out more stories from the hive. </source>
-        <target state="translated">Construim MotionHive transparent. Descoperă mai multe povești din stup.</target>
+        <target state="translated">MotionHive e gratuit pentru antrenori: magazin, programe, plăți și comunitate într-un singur loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
           <context context-type="linenumber">162</context>
@@ -2927,6 +2927,38 @@
       <trans-unit id="cc.pm.more.desc" datatype="html">
         <source>For any questions about our use of cookies, &lt;a href="mailto:contact@motionhive.fit" class="cc__link"&gt;contact us&lt;/a&gt; or read our &lt;a href="/legal/cookie-policy" class="cc__link"&gt;Cookie Policy&lt;/a&gt;.</source>
         <target state="translated">Pentru orice întrebări legate de utilizarea cookie-urilor, &lt;a href="mailto:contact@motionhive.fit" class="cc__link"&gt;contactează-ne&lt;/a&gt; sau citește &lt;a href="/legal/cookie-policy" class="cc__link"&gt;Politica de cookie-uri&lt;/a&gt;.</target>
+      </trans-unit>
+      <trans-unit id="blog.byline.viewProfile" datatype="html">
+        <source>View coach profile</source>
+        <target state="translated">Vezi profilul antrenorului</target>
+      </trans-unit>
+      <trans-unit id="blog.byline.moreFromBlog" datatype="html">
+        <source>More from the blog</source>
+        <target state="translated">Mai multe pe blog</target>
+      </trans-unit>
+      <trans-unit id="blog.byline.editorialBio" datatype="html">
+        <source>The MotionHive team, writing about coaching, training, and building a business around helping people move.</source>
+        <target state="translated">Echipa MotionHive scrie despre coaching, antrenament și cum construiești o afacere ajutându-i pe oameni să se miște.</target>
+      </trans-unit>
+      <trans-unit id="blog.toc.label" datatype="html">
+        <source>On this page</source>
+        <target state="translated">Pe această pagină</target>
+      </trans-unit>
+      <trans-unit id="blog.toc.aria" datatype="html">
+        <source>On this page</source>
+        <target state="translated">Pe această pagină</target>
+      </trans-unit>
+      <trans-unit id="blog.toc.close" datatype="html">
+        <source>Close</source>
+        <target state="translated">Închide</target>
+      </trans-unit>
+      <trans-unit id="blog.share.aria" datatype="html">
+        <source>Share this article</source>
+        <target state="translated">Distribuie acest articol</target>
+      </trans-unit>
+      <trans-unit id="blog.breadcrumb.blog" datatype="html">
+        <source>Blog</source>
+        <target state="translated">Blog</target>
       </trans-unit>
     </body>
   </file>
