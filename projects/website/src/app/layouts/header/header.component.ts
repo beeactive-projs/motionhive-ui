@@ -1,20 +1,21 @@
-import { Component, signal, inject, ChangeDetectionStrategy, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { map, startWith } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
-import { PopoverModule } from 'primeng/popover';
-import { Popover } from 'primeng/popover';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
-import { ThemeService, WaitlistService, Logo } from 'core';
+import { Hex, Logo, SIGNUP_URL, ThemeService } from 'core';
 import { LanguageSwitcher } from '../../_shared/language-switcher/language-switcher';
+import { FEATURES, type MarketingFeature } from '../../_data/features';
 
-type NavChild = { label: string; path: string; exact: boolean };
-type NavLink = { label: string; path?: string; exact: boolean; children?: NavChild[] };
-
+/**
+ * Public marketing header — one shell used on every page (the design had the
+ * nav copied per-page; this replaces that). Contains the Features mega-menu
+ * (two-pane: feature list + hovered-feature video preview), a Tools dropdown,
+ * theme toggle, language switcher, the signup CTA, and a mobile hamburger →
+ * drawer with an inline Features accordion.
+ */
 @Component({
   selector: 'mh-public-header',
-  imports: [RouterLink, RouterLinkActive, ButtonModule, PopoverModule, Logo, LanguageSwitcher],
+  imports: [RouterLink, RouterLinkActive, Logo, LanguageSwitcher, Hex],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,74 +25,72 @@ type NavLink = { label: string; path?: string; exact: boolean; children?: NavChi
   },
 })
 export class PublicHeaderComponent {
-  private readonly _themeService = inject(ThemeService);
-  private readonly _waitlistService = inject(WaitlistService);
-  private readonly _router = inject(Router);
-  private readonly _navPopover = viewChild.required<Popover>('navPopover');
-  private readonly _currentUrl = toSignal(
-    this._router.events.pipe(startWith(null), map(() => this._router.url)),
-    { initialValue: this._router.url },
-  );
+  private readonly _theme = inject(ThemeService);
+  private readonly _document = inject(DOCUMENT);
 
-  readonly mobileMenuOpen = signal(false);
-  readonly isDark = this._themeService.isDark;
+  readonly isDark = this._theme.isDark;
   readonly scrolled = signal(false);
-  readonly activeDropdownChildren = signal<NavChild[]>([]);
 
-  readonly switchLightLabel = $localize`Switch to light mode`;
-  readonly switchDarkLabel = $localize`Switch to dark mode`;
+  readonly features = FEATURES;
+  readonly signupUrl = SIGNUP_URL;
 
-  readonly navLinks: NavLink[] = [
-    { label: $localize`Home`, path: '/', exact: true },
-    { label: $localize`About`, path: '/about', exact: true },
-    {
-      label: $localize`Tools`,
-      exact: false,
-      children: [
-        { label: $localize`Calorie calculator`, path: '/tools/calorie-calculator', exact: true },
-      ],
-    },
-    { label: $localize`Blog`, path: '/blog', exact: false },
-  ];
+  /** Desktop overlays. */
+  readonly megaOpen = signal(false);
+  readonly toolsOpen = signal(false);
+  /** Feature whose preview shows in the mega-menu's right pane. */
+  readonly activeFeature = signal<MarketingFeature>(FEATURES[0]);
+
+  /** Mobile drawer. */
+  readonly mobileOpen = signal(false);
+  readonly mobileFeaturesOpen = signal(false);
+
+  readonly switchLightLabel = $localize`:@@header.switchLight:Switch to light mode`;
+  readonly switchDarkLabel = $localize`:@@header.switchDark:Switch to dark mode`;
 
   onScroll(): void {
     this.scrolled.set(window.scrollY > 5);
   }
 
   onResize(): void {
-    if (window.innerWidth >= 1024) {
-      this.mobileMenuOpen.set(false);
-    }
+    if (window.innerWidth >= 1024 && this.mobileOpen()) this.closeMobile();
   }
 
   toggleTheme(): void {
-    this._themeService.toggle();
+    this._theme.toggle();
   }
 
-  toggleMobileMenu(): void {
-    this.mobileMenuOpen.update((open) => !open);
+  openMega(): void {
+    this.megaOpen.set(true);
+    this.toolsOpen.set(false);
+  }
+  closeMega(): void {
+    this.megaOpen.set(false);
+  }
+  setActiveFeature(f: MarketingFeature): void {
+    this.activeFeature.set(f);
   }
 
-  closeMobileMenu(): void {
-    this.mobileMenuOpen.set(false);
+  openTools(): void {
+    this.toolsOpen.set(true);
+    this.megaOpen.set(false);
+  }
+  closeTools(): void {
+    this.toolsOpen.set(false);
   }
 
-  openJoinWaitlist(): void {
-    this._waitlistService.open('header');
-    this.mobileMenuOpen.set(false);
+  toggleMobile(): void {
+    this.mobileOpen() ? this.closeMobile() : this._openMobile();
   }
-
-  toggleDropdown(event: MouseEvent, children: NavChild[]): void {
-    this.activeDropdownChildren.set(children);
-    this._navPopover().toggle(event);
+  private _openMobile(): void {
+    this.mobileOpen.set(true);
+    this._document.body.style.overflow = 'hidden';
   }
-
-  closeDropdown(): void {
-    this._navPopover().hide();
+  closeMobile(): void {
+    this.mobileOpen.set(false);
+    this.mobileFeaturesOpen.set(false);
+    this._document.body.style.overflow = '';
   }
-
-  isChildActive(children: NavChild[]): boolean {
-    const url = this._currentUrl();
-    return children.some(child => (child.exact ? url === child.path : url.startsWith(child.path)));
+  toggleMobileFeatures(): void {
+    this.mobileFeaturesOpen.update((o) => !o);
   }
 }

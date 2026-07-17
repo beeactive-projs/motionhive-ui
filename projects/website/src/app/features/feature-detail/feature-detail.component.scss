@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+/* ===== Breadcrumb ===== */
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--p-surface-500);
+
+  a {
+    color: var(--p-surface-500);
+    text-decoration: none;
+    &:hover {
+      color: var(--p-primary-600);
+    }
+  }
+  &__now {
+    color: var(--p-surface-700);
+  }
+}
+
+/* ===== Hero ===== */
+.hero {
+  padding-block: clamp(1.75rem, 4vw, 3rem) 0;
+}
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+.hero__h1 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-size: clamp(2.1rem, 4.5vw, 3.1rem);
+  color: var(--p-surface-900);
+  margin: 0.85rem 0 0;
+}
+.hero__sub {
+  max-width: 46ch;
+  margin: 1rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--p-surface-500);
+}
+.hero__cta {
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+  flex-wrap: wrap;
+}
+
+/* ===== Capabilities ===== */
+.caps {
+  max-width: 46rem;
+  margin: 2.25rem auto 0;
+}
+
+/* ===== Benefits ===== */
+.bgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.3rem;
+  margin-top: 2.5rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+.bcard {
+  padding: 1.75rem;
+
+  &__t {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    margin: 0.9rem 0 0.4rem;
+  }
+  &__b {
+    margin: 0;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    color: var(--p-surface-500);
+  }
+}
+
+/* ===== Related ===== */
+.rgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+  margin-top: 2.5rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+:host-context(.dark) {
+  .hero__h1,
+  .bcard__t {
+    color: var(--p-surface-50);
+  }
+  .hero__sub,
+  .bcard__b {
+    color: var(--p-surface-400);
+  }
+  .crumb__now {
+    color: var(--p-surface-200);
+  }
+}

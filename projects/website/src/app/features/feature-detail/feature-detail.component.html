@@ -1,0 +1,95 @@
+@if (feature(); as f) {
+  <!-- ===== Breadcrumb (matches the BreadcrumbList JSON-LD) ===== -->
+  <nav class="crumb mh-wrap" aria-label="Breadcrumb" i18n-aria-label="@@fd.crumb.aria">
+    <a routerLink="/features" i18n="@@fd.crumb.features">Features</a>
+    <span aria-hidden="true">/</span>
+    <span class="crumb__now">{{ f.name }}</span>
+  </nav>
+
+  <!-- ===== Hero (owns the page's single <h1>) ===== -->
+  <section class="hero">
+    <div class="mh-wrap hero__grid">
+      <div>
+        <mh-kicker [tone]="f.tone">{{ f.name }}</mh-kicker>
+        <h1 class="hero__h1">
+          {{ f.h1Lead }} <span class="text-brand">{{ f.h1Accent }}</span>
+        </h1>
+        <p class="hero__sub">{{ f.intro }}</p>
+        <div class="hero__cta">
+          <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@fd.cta1">Start coaching for free</a>
+          <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/pricing" i18n="@@fd.cta2">See pricing</a>
+        </div>
+      </div>
+      <mh-media-demo [src]="f.preview" [poster]="f.poster" [caption]="f.name" />
+    </div>
+  </section>
+
+  <!-- ===== What you can do ===== -->
+  <section class="mh-band">
+    <div class="mh-wrap">
+      <mh-section-header center>
+        <mh-kicker kicker [tone]="f.tone" i18n="@@fd.cap.kicker">What you can do</mh-kicker>
+        <ng-container heading i18n="@@fd.cap.h">The <span class="text-brand">short version.</span></ng-container>
+      </mh-section-header>
+      <div class="caps">
+        <mh-check-list [items]="f.capabilities" [tone]="f.tone" [columns]="2" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Why coaches love it ===== -->
+  <section class="mh-band">
+    <div class="mh-wrap">
+      <mh-section-header center>
+        <mh-kicker kicker i18n="@@fd.ben.kicker">Why it matters</mh-kicker>
+        <ng-container heading i18n="@@fd.ben.h">What it actually <span class="text-brand">changes.</span></ng-container>
+      </mh-section-header>
+      <div class="bgrid">
+        @for (b of f.benefits; track b.title) {
+          <div class="mh-card bcard">
+            <mh-hex [size]="44" [tone]="f.tone"><span>{{ b.icon }}</span></mh-hex>
+            <h3 class="bcard__t">{{ b.title }}</h3>
+            <p class="bcard__b">{{ b.body }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="mh-band">
+    <div class="mh-wrap">
+      <mh-section-header center>
+        <mh-kicker kicker i18n="@@fd.faq.kicker">Questions</mh-kicker>
+        <ng-container heading i18n="@@fd.faq.h">Good to <span class="text-brand">know.</span></ng-container>
+      </mh-section-header>
+      <mh-faq [items]="f.faq" />
+    </div>
+  </section>
+
+  <!-- ===== Explore more ===== -->
+  <section class="mh-band">
+    <div class="mh-wrap">
+      <mh-section-header center>
+        <mh-kicker kicker i18n="@@fd.rel.kicker">Explore more</mh-kicker>
+        <ng-container heading i18n="@@fd.rel.h">It works better <span class="text-brand">together.</span></ng-container>
+      </mh-section-header>
+      <div class="rgrid">
+        @for (r of related(); track r.slug) {
+          <mh-feature-card [feature]="r" [link]="'/features/' + r.slug" />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Final CTA ===== -->
+  <mh-cta-band variant="amber">
+    <mh-kicker kicker i18n="@@fd.cta.kicker">Free to start</mh-kicker>
+    <ng-container heading i18n="@@fd.cta.h">Try it on your <span class="text-brand">own roster.</span></ng-container>
+    <ng-container sub i18n="@@fd.cta.sub">Set up in minutes. No card, no catch, no platform fee.</ng-container>
+    <div actions>
+      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@fd.cta.btn">Start coaching for free</a>
+      <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/features" i18n="@@fd.cta.btn2">All features</a>
+    </div>
+  </mh-cta-band>
+}

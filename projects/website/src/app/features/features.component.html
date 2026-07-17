@@ -1,0 +1,92 @@
+<!-- ===== Hero (owns the page's single <h1>) ===== -->
+<section class="hero">
+  <div class="mh-wrap hero__head">
+    <mh-kicker i18n="@@features.kicker">Features</mh-kicker>
+    <h1 class="hero__h1" i18n="@@features.h1">
+      Everything you need to <span class="text-brand">coach online.</span>
+    </h1>
+    <p class="hero__sub" i18n="@@features.sub">
+      One place for your storefront, your sessions, your programs and your people. All of it free,
+      with no platform fee.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Overview grid ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <div class="ovgrid">
+      @for (f of features; track f.slug) {
+        <mh-feature-card [feature]="f" [link]="'/features/' + f.slug" />
+      }
+      <a class="mh-card mh-card--hover ovgrid__all" routerLink="/pricing">
+        <mh-hex [size]="46" tone="navy"><span>✦</span></mh-hex>
+        <h3 i18n="@@features.all.t">All of it, free</h3>
+        <p i18n="@@features.all.b">Every feature, unlimited clients, no platform fee.</p>
+        <span class="ovgrid__all-link">
+          <span i18n="@@features.all.link">See pricing</span>
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== For members ===== -->
+<section class="mh-band members">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker tone="teal" i18n="@@features.mem.kicker">For their people</mh-kicker>
+      <ng-container heading i18n="@@features.mem.h">Not just for <span class="text-brand">coaches.</span></ng-container>
+      <ng-container sub i18n="@@features.mem.sub">If you train with a coach on MotionHive, this is what you get.</ng-container>
+    </mh-section-header>
+
+    <div class="mgrid">
+      @for (m of members; track m.title) {
+        <div class="mh-card mcard">
+          <mh-hex [size]="46" [tone]="m.tone"><span>{{ m.icon }}</span></mh-hex>
+          <h3 class="mcard__t">{{ m.title }}</h3>
+          <p class="mcard__b">{{ m.body }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== Roadmap ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker i18n="@@features.rm.kicker">Roadmap</mh-kicker>
+      <ng-container heading i18n="@@features.rm.h">Shipped, and <span class="text-brand">what's next.</span></ng-container>
+      <ng-container sub i18n="@@features.rm.sub">We build in the open. This shifts as we learn what coaches actually need.</ng-container>
+    </mh-section-header>
+
+    <div class="lanes">
+      @for (lane of roadmap; track lane.key) {
+        <div class="mh-card lane" [class]="'lane--' + lane.key">
+          <p class="lane__h">
+            <span class="lane__dot" aria-hidden="true"></span>
+            {{ lane.label }}
+          </p>
+          <ul class="lane__list">
+            @for (item of lane.items; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== Final CTA ===== -->
+<mh-cta-band variant="amber">
+  <mh-kicker kicker i18n="@@features.cta.kicker">Free to start</mh-kicker>
+  <ng-container heading i18n="@@features.cta.h">Put it all <span class="text-brand">to work.</span></ng-container>
+  <ng-container sub i18n="@@features.cta.sub">Set up your storefront in minutes. No card, no catch.</ng-container>
+  <div actions>
+    <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@features.cta.btn">Start coaching for free</a>
+    <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/pricing" i18n="@@features.cta.btn2">See pricing</a>
+  </div>
+</mh-cta-band>

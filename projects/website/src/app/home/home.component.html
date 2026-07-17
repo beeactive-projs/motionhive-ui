@@ -1,225 +1,176 @@
-<!-- Rounded-hexagon clip used by the hero grid (objectBoundingBox → scales with the hex). -->
-<svg width="0" height="0" aria-hidden="true" focusable="false" class="absolute">
-  <defs>
-    <clipPath id="heroHexRound" clipPathUnits="objectBoundingBox">
-      <path
-        d="M0.4394 0.035 Q0.5 0 0.5606 0.035 L0.8724 0.215 Q0.933 0.25 0.933 0.32 L0.933 0.68 Q0.933 0.75 0.8724 0.785 L0.5606 0.965 Q0.5 1 0.4394 0.965 L0.1276 0.785 Q0.067 0.75 0.067 0.68 L0.067 0.32 Q0.067 0.25 0.1276 0.215 Z" />
-    </clipPath>
-  </defs>
-</svg>
-
-<section class="hero-section">
-  <div class="max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-      <!-- Hero Content -->
-      <div class="text-center lg:text-left animate-fade-in">
-        <div class="tag-pill">
-          <i class="pi pi-sparkles"></i>
-          <span i18n="@@home.pill">For those who lead and those who show up</span>
-        </div>
-
-<h1 class="text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
-      i18n="@@home.hero.h1">
-      Where active communities come <span class="text-brand">together</span>.
-</h1>
-
-        <p class="text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0" i18n="@@home.hero.p">
-          Whether you lead a group or just love showing up,this is your space to stay active, connected, and
-          find <span class="text-brand">your people</span>.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-          <p-button i18n-label="@@home.hero.cta" label="Join the waitlist" icon="pi pi-bell" iconPos="right"
-            size="large" (onClick)="openJoinWaitlist()" />
-        </div>
-        <p class="mt-5 text-sm text-surface-400" i18n="@@home.hero.disclaimer">
-          <span class="text-brand">Free to organise. Free to join. Always.</span> We're building something good.
-        </p>
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="mh-wrap hero__grid">
+    <div class="hero__copy">
+      <mh-kicker tone="teal" i18n="@@home.hero.kicker">For coaches and the communities they build</mh-kicker>
+      <h1 class="hero__h1" i18n="@@home.hero.h1">
+        Where coaches build <span class="text-brand">communities.</span>
+      </h1>
+      <p class="hero__sub" i18n="@@home.hero.sub">
+        Run your whole coaching business in one place: a bookable storefront, sessions, programs,
+        payments and community. Free to start, no platform fee.
+      </p>
+      <div class="hero__cta">
+        <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.hero.cta1">Start coaching for free</a>
+        <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/features" i18n="@@home.hero.cta2">See how it works</a>
       </div>
+      <mh-check-list class="hero__guar" [items]="guarantees" tone="amber" />
+    </div>
 
-      <!-- Hero Visual -->
-      <div class="relative animate-slide-up hidden lg:block">
-        <div class="hero-visual">
-          <div class="hero-hex hero-hex-1">
-            <div class="hero-hex-inner">
-              <div class="hero-hex-glow">
-                <i class="hero-hex-icon pi pi-compass"></i>
-              </div>
-              <span class="hero-hex-label" i18n="@@home.hex1">Find groups near you</span>
-            </div>
-          </div>
-          <div class="hero-hex hero-hex-2">
-            <div class="hero-hex-inner">
-              <div class="hero-hex-glow">
-                <i class="hero-hex-icon pi pi-wrench"></i>
-              </div>
-              <span class="hero-hex-label" i18n="@@home.hex2">Schedule & manage sessions</span>
-            </div>
-          </div>
-          <div class="hero-hex hero-hex-3">
-            <div class="hero-hex-inner">
-              <div class="hero-hex-glow">
-                <i class="hero-hex-icon pi pi-user-plus"></i>
-              </div>
-              <span class="hero-hex-label" i18n="@@home.hex3">Grow your community</span>
-            </div>
-          </div>
-          <div class="hero-hex hero-hex-4">
-            <div class="hero-hex-inner">
-              <div class="hero-hex-glow">
-                <i class="hero-hex-icon pi pi-bolt"></i>
-              </div>
-              <span class="hero-hex-label" i18n="@@home.hex4">Track attendance & activity</span>
-            </div>
-          </div>
+    <!-- Floating hex cluster. Label + icon live INSIDE the shape (design spec),
+         each hex filled with its own gradient via mh-hex's gradient stops. -->
+    <div class="hero__art" aria-hidden="true">
+      @for (h of heroHexes; track h.label) {
+        <div class="hxc" [class]="'hxc--' + h.pos">
+          <!-- No [shadow]: drop-shadow is a CSS filter, and combined with the
+               float transform it rasterises the layer and softens the hex
+               edges. The design only shadows the small "0% fee" hex. -->
+          <mh-hex
+            [size]="h.size"
+            orientation="pointy"
+            [gradientFrom]="h.from"
+            [gradientTo]="h.to">
+            <span class="hxc__in">
+              <span class="hxc__ic">{{ h.icon }}</span>
+              <span class="hxc__t">{{ h.label }}</span>
+            </span>
+          </mh-hex>
         </div>
-
-        <!-- Floating stat cards -->
-        <div class="floating-card floating-card-1">
-          <div class="floating-card-icon floating-card-icon--accent">
-            <i class="pi pi-chart-line"></i>
-          </div>
-          <div>
-            <p class="floating-card-title" i18n="@@home.floatCard1.title">Grow your <span
-                class="text-brand">brand</span></p>
-            <p class="floating-card-desc" i18n="@@home.floatCard1.desc">One place to schedule sessions, manage members,
-              and stay organised.</p>
-          </div>
-        </div>
-
-        <div class="floating-card floating-card-2">
-          <div class="floating-card-icon floating-card-icon--navy">
-            <i class="pi pi-users"></i>
-          </div>
-          <div>
-            <p class="floating-card-title" i18n="@@home.floatCard2.title">Find your <span
-                class="text-brand">circle</span></p>
-            <p class="floating-card-desc" i18n="@@home.floatCard2.desc">Browse local fitness groups and book your spot
-              in one tap.</p>
-          </div>
-        </div>
+      }
+      <div class="hxc hxc--badge">
+        <mh-hex [size]="73" orientation="pointy" bg="var(--p-surface-0)" [shadow]="true">
+          <span class="hxc__badge">0% fee</span>
+        </mh-hex>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== Who It's For Section ===== -->
-<section class="who-section py-14 sm:py-20">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-8">
-      <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
-        i18n="@@home.who.h2">
-        How will you <span class="text-brand">MotionHive</span>?
-      </h2>
-      <p class="section-subtext text-lg" i18n="@@home.who.sub">
-        One platform. Two ways in.
-      </p>
-    </div>
-
-    <div class="who-grid grid md:grid-cols-2 gap-10 items-stretch">
-      <div class="who-column who-column-left">
-        <mh-hex orientation="pointy" tone="amber" [size]="48" class="mb-4">
-          <i class="pi pi-flag"></i>
-        </mh-hex>
-
-        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-1" i18n="@@home.lead.h3">
-          You lead.
-        </h3>
-        <p class="section-subtext text-sm font-medium mb-4" i18n="@@home.lead.sub">Build your hive.</p>
-        <ul class="who-list">
-          <li>
-            <mh-hex orientation="pointy" tone="amber" [size]="18" icon="check" />
-            <span i18n="@@home.lead.li1">Run sessions and classes on your terms.</span>
-          </li>
-          <li>
-            <mh-hex orientation="pointy" tone="amber" [size]="18" icon="check" />
-            <span i18n="@@home.lead.li2">Keep your community in one place.</span>
-          </li>
-          <li>
-            <mh-hex orientation="pointy" tone="amber" [size]="18" icon="check" />
-            <span i18n="@@home.lead.li3">Share updates, not spreadsheets.</span>
-          </li>
-        </ul>
-      </div>
-      <div class="who-column who-column-right">
-        <mh-hex orientation="pointy" tone="teal" [size]="48" class="mb-4">
-          <i class="pi pi-user"></i>
-        </mh-hex>
-        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-1" i18n="@@home.join.h3">
-          You show up.
-        </h3>
-        <p class="section-subtext text-sm font-medium mb-4" i18n="@@home.join.sub">Join the hive.</p>
-        <ul class="who-list">
-          <li>
-            <mh-hex orientation="pointy" tone="teal" [size]="18" icon="check" />
-            <span i18n="@@home.join.li1">Discover what's happening around you.</span>
-          </li>
-          <li>
-            <mh-hex orientation="pointy" tone="teal" [size]="18" icon="check" />
-            <span i18n="@@home.join.li2">Stay connected to your favourite groups.</span>
-          </li>
-          <li>
-            <mh-hex orientation="pointy" tone="teal" [size]="18" icon="check" />
-            <span i18n="@@home.join.li3">Browse sessions nearby and jump in.</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+<!-- ===== Proof strip ===== -->
+<section class="proof">
+  <div class="mh-wrap proof__row">
+    @for (f of features; track f.slug) {
+      <span class="chip">
+        <span class="chip__hx" [class.chip__hx--teal]="f.tone === 'teal'" aria-hidden="true"></span>
+        {{ f.name }}
+      </span>
+    }
   </div>
 </section>
 
-<!-- ===== What's Coming Section ===== -->
-<section class="feature-section py-14 sm:py-20">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-8">
-      <div class="tag-pill mb-4">
-        <i class="pi pi-wrench text-sm"></i>
-        <span class="text-sm font-semibold" i18n="@@home.coming.pill">In the making</span>
-      </div>
-      <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
-        i18n="@@home.coming.h2">
-        The hive is <span class="text-brand">taking shape</span>.
-      </h2>
-      <p class="section-subtext text-lg max-w-2xl mx-auto" i18n="@@home.coming.sub">
-        We're building MotionHive piece by piece. Here's what's landing first.
-      </p>
-    </div>
+<!-- ===== Two paths ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker i18n="@@home.paths.kicker">Built for coaches. Loved by their people.</mh-kicker>
+      <ng-container heading i18n="@@home.paths.h">One home, <span class="text-brand">two sides.</span></ng-container>
+      <ng-container sub i18n="@@home.paths.sub">Whether you run the sessions or show up for them, it all lives in the same place.</ng-container>
+    </mh-section-header>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      @for (item of roadmap; track item.title) {
-      <div class="feature-card">
-        <mh-hex orientation="pointy" [tone]="item.tone" [size]="48" class="mb-4">
-          <i [class]="'pi ' + item.icon"></i>
-        </mh-hex>
-        <h3 class="section-heading text-lg font-heading font-bold mb-1">
-          {{ item.title }}
-        </h3>
-        <p class="section-subtext text-sm leading-relaxed flex-1">
-          {{ item.description }}
-        </p>
-        @if (item.ready) {
-        <span class="feature-badge feature-badge-live" i18n="@@home.roadmap.live">Live</span>
-        } @else {
-        <span class="feature-badge feature-badge-soon" i18n="@@home.roadmap.soon">Coming soon</span>
-        }
-      </div>
+    <div class="paths">
+      @for (p of paths; track p.title) {
+        <div class="mh-card path">
+          <mh-hex [size]="52" [tone]="p.tone"><span class="path__ic">{{ p.icon }}</span></mh-hex>
+          <p class="path__role">{{ p.role }}</p>
+          <h3 class="path__title">{{ p.title }}</h3>
+          <mh-check-list [items]="p.points" [tone]="p.tone === 'teal' ? 'teal' : 'amber'" />
+        </div>
       }
     </div>
   </div>
 </section>
 
-<!-- ===== CTA Section ===== -->
-<section class="cta-section">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
-    <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3" i18n="@@home.cta.h2">
-      Get in <span class="text-brand">early</span>.
-    </h2>
-    <p class="section-subtext text-lg sm:text-xl mb-8 max-w-2xl mx-auto" i18n="@@home.cta.sub">
-      MotionHive is just getting started. We're building the hive — follow along on our blog and be the first to know
-      when it opens.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button i18n-label="@@home.cta.btn" label="Read the blog" icon="pi pi-arrow-right" iconPos="right"
-        routerLink="/blog" size="large" />
+<!-- ===== See it work ===== -->
+<section class="mh-band seeit">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker i18n="@@home.see.kicker">See it work</mh-kicker>
+      <ng-container heading i18n="@@home.see.h">Everything you need, <span class="text-brand">nothing you don't.</span></ng-container>
+    </mh-section-header>
+
+    <div class="seeit__demo">
+      <mh-media-demo caption="3-6s loop · a day in MotionHive" i18n-caption="@@home.see.cap" />
+    </div>
+
+    <div class="fgrid">
+      @for (f of features; track f.slug) {
+        <mh-feature-card [feature]="f" />
+      }
+      <a class="mh-card mh-card--hover fgrid__all" routerLink="/features">
+        <mh-hex [size]="46" tone="navy"><span>✦</span></mh-hex>
+        <h3 i18n="@@home.see.allTitle">See all features</h3>
+        <span class="fgrid__all-link">
+          <span i18n="@@home.see.allLink">Explore everything</span>
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </span>
+      </a>
     </div>
   </div>
 </section>
+
+<!-- ===== Free story (dark band) ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <div class="free dark">
+      <mh-kicker tone="amber" i18n="@@home.free.kicker">Building in the open</mh-kicker>
+      <h2 class="free__h" i18n="@@home.free.h">Free<span class="text-brand">.</span> Actually free.</h2>
+      <p class="free__sub" i18n="@@home.free.sub">
+        No trial timer, no per-client pricing, no cut of what you earn. You coach, you keep it.
+      </p>
+      <div class="free__stats">
+        <mh-stat value="∞" label="clients" [onDark]="true" i18n-label="@@home.free.s1" />
+        <mh-stat value="0%" label="platform fee" [onDark]="true" i18n-label="@@home.free.s2" />
+        <mh-stat value="$0" label="to start" [onDark]="true" i18n-label="@@home.free.s3" />
+      </div>
+      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.free.cta">Start coaching for free</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Community ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker tone="teal" i18n="@@home.comm.kicker">Community</mh-kicker>
+      <ng-container heading i18n="@@home.comm.h">A hive, <span class="text-brand">not a spreadsheet.</span></ng-container>
+    </mh-section-header>
+
+    <div class="cgrid">
+      @for (c of community; track c.title) {
+        <div class="mh-card ccard">
+          <mh-hex [size]="46" [tone]="c.tone"><span>{{ c.icon }}</span></mh-hex>
+          <h3 class="ccard__t">{{ c.title }}</h3>
+          <p class="ccard__b">{{ c.body }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== Blog teaser ===== -->
+@if (latestPosts().length) {
+  <section class="mh-band">
+    <div class="mh-wrap">
+      <mh-section-header>
+        <mh-kicker kicker i18n="@@home.blog.kicker">From the blog</mh-kicker>
+        <ng-container heading i18n="@@home.blog.h">Stories from the <span class="text-brand">hive.</span></ng-container>
+      </mh-section-header>
+      <div class="bgrid">
+        @for (p of latestPosts(); track p.id) {
+          <mh-blog-post-card [post]="p" variant="grid" />
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- ===== Final CTA ===== -->
+<mh-cta-band variant="amber">
+  <mh-kicker kicker i18n="@@home.cta.kicker">Bring your coaching home</mh-kicker>
+  <ng-container heading i18n="@@home.cta.h">Your coaching, <span class="text-brand">all in one place.</span></ng-container>
+  <ng-container sub i18n="@@home.cta.sub">Free to start. Set up your storefront in minutes.</ng-container>
+  <div actions>
+    <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.cta.btn">Start coaching for free</a>
+    <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/pricing" i18n="@@home.cta.btn2">See pricing</a>
+  </div>
+</mh-cta-band>

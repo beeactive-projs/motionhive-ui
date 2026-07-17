@@ -1,5 +1,8 @@
 @import '../../core/src/styles/theme.css';
 
+/* Marketing-site shared utilities (buttons, container, section rhythm) */
+@import './styles/marketing.css';
+
 /* Cookie consent (vanilla-cookieconsent) + MotionHive brand overrides */
 @import 'vanilla-cookieconsent/dist/cookieconsent.css';
 @import './styles/cookie-consent.css';

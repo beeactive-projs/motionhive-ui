@@ -25,9 +25,7 @@ import { ReadingProgress } from '../../_shared/reading-progress/reading-progress
 import { ShareBar } from '../../_shared/share-bar/share-bar';
 import { BlogByline } from '../_shared/blog-byline/blog-byline';
 import { BlogPostCard } from '../_shared/blog-post-card/blog-post-card';
-
-/** Canonical marketing origin (mirrors PublicLayoutComponent). */
-const SITE_ORIGIN = 'https://www.motionhive.fit';
+import { SITE_ORIGIN } from '../../_shared/site.const';
 
 @Component({
   selector: 'mh-blog-article',

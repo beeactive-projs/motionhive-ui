@@ -1,377 +1,366 @@
 @use 'variables' as *;
-@use '../app' as app;
 
-@include app.hero-section();
-@include app.honeycomb-bg();
-@include app.cta-section();
-@include app.orb-base();
-@include app.feature-cards();
-@include app.orb-colors();
+:host {
+  display: block;
+}
 
-$hex-size: 10rem;
-$hex-gap: 0.25rem;
+/* ===== Hero ===== */
+.hero {
+  padding-block: clamp(2.5rem, 5vw, 4.5rem);
+}
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2.5rem;
+  align-items: center;
 
-// ===== Hero Badge =====
-.tag-pill {
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+.hero__h1 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  font-size: clamp(2.35rem, 5.5vw, 3.75rem);
+  color: var(--p-surface-900);
+  margin: 0.9rem 0 0;
+}
+.hero__sub {
+  max-width: 44ch;
+  margin: 1.1rem 0 0;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--p-surface-500);
+}
+.hero__cta {
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 1.6rem;
+  flex-wrap: wrap;
+}
+.hero__guar {
+  display: block;
+  margin-top: 1.6rem;
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--p-surface-200);
+}
+
+/* Floating hex cluster — geometry mirrors the design's `.hxc` spec. */
+.hero__art {
+  position: relative;
+  width: 360px;
+  height: 400px;
+  justify-self: center;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.hxc {
+  position: absolute;
+  animation: hxfloat 8s ease-in-out infinite alternate;
+
+  /* Content sits inside the hexagon: icon badge over a 2-line label. */
+  &__in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+    color: #fff;
+  }
+  &__ic {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+  }
+  /* Capped so the label wraps to two lines inside the shape instead of
+     spilling past the hex edges (the hex narrows toward its points). */
+  &__t {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.15;
+    text-align: center;
+    max-width: 5.5rem;
+  }
+  &__badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--p-primary-700);
+  }
+
+  &--1 {
+    top: 0;
+    left: 40px;
+    animation-delay: 0s;
+  }
+  &--2 {
+    top: 70px;
+    left: 210px;
+    animation-delay: 1.1s;
+  }
+  &--3 {
+    top: 228px;
+    left: 40px;
+    animation-delay: 0.6s;
+  }
+  &--4 {
+    top: 198px;
+    left: 230px;
+    animation-delay: 1.7s;
+  }
+  &--badge {
+    top: 142px;
+    left: 170px;
+    z-index: 2;
+    animation-delay: 0.9s;
+  }
+}
+@keyframes hxfloat {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-14px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hxc {
+    animation: none;
+  }
+}
+:host-context(.dark) {
+  .hero__h1 {
+    color: var(--p-surface-50);
+  }
+  .hxc__t {
+    color: var(--p-surface-300);
+  }
+}
+
+/* ===== Proof strip ===== */
+.proof {
+  padding-block: 0.5rem 1.5rem;
+}
+.proof__row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.chip {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 2rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
-  border: 1px solid var(--p-primary-500);
-  color: var(--p-primary-500);
-  background-color: color-mix(in oklab, var(--p-primary-color) 15%, transparent);
-}
-
-:host-context(.dark) .tag-pill {
-  border: 1px solid var(--p-primary-500);
-  color: var(--p-primary-500);
-}
-
-// ===== Hero Visual — Hexagon Grid =====
-.hero-visual {
-  position: relative;
-  width: 100%;
-  height: 28rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-hex {
-  position: absolute;
-  width: $hex-size;
-  height: $hex-size;
-  // Rounded-vertex hexagon (see #heroHexRound in home.component.html) — softer than a sharp polygon().
-  clip-path: url(#heroHexRound);
-  transition:
-    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-    background 0.4s ease;
-  cursor: pointer;
-
-  &:hover {
-    transform: scale(1.1);
-    .hero-hex-glow {
-      transform: scale(1.1);
-    }
-  }
-}
-
-.hero-hex-inner {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-}
-
-// Glowing ring behind icon
-.hero-hex-glow {
-  position: relative;
-  width: 3rem;
-  height: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid;
-  transition:
-    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.4s ease;
-}
-
-.hero-hex-icon {
-  font-size: 1.25rem;
-  transition: transform 0.4s ease;
-}
-
-.hero-hex-label {
-  font-size: 0.675rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  text-align: center;
-  text-transform: uppercase;
-  max-width: 7rem;
-  opacity: 0.75;
-  transition:
-    opacity 0.4s ease,
-    letter-spacing 0.4s ease;
-}
+  color: var(--p-surface-700);
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 0.7rem;
+  padding: 0.5rem 0.85rem;
 
-// Diamond layout: 1 top, 2 middle, 1 bottom
-@mixin hex-color($color) {
-  background-color: color-mix(in oklab, $color 15%, transparent);
-
-  .hero-hex-icon {
-    color: $color;
-  }
-
-  .hero-hex-glow {
-    border-color: color-mix(in oklab, $color 30%, transparent);
-    box-shadow: 0 0 1.25rem color-mix(in oklab, $color 30%, transparent);
-  }
-
-  &:hover {
-    background-color: color-mix(in oklab, $color 30%, transparent);
-
-    .hero-hex-glow {
-      box-shadow: 0 0 1.5rem color-mix(in oklab, $color 30%, transparent);
+  &__hx {
+    width: 12px;
+    height: 14px;
+    background: var(--p-primary-500);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    &--teal {
+      background: var(--color-accent-500);
     }
   }
 }
-
-.hero-hex-1 {
-  top: 1rem;
-  left: calc(50% - #{$hex-size} / 2);
-  @include hex-color(var(--p-sky-500));
+:host-context(.dark) .chip {
+  background: color-mix(in oklab, white 5%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
+  color: var(--p-surface-200);
 }
 
-.hero-hex-2 {
-  top: calc(1rem + #{$hex-size} * 0.75 + #{$hex-gap});
-  left: calc(50% - #{$hex-size});
-  @include hex-color(var(--p-emerald-500));
-}
-
-.hero-hex-3 {
-  top: calc(1rem + #{$hex-size} * 0.75 + #{$hex-gap});
-  left: 50%;
-  @include hex-color(var(--p-purple-500));
-}
-
-.hero-hex-4 {
-  top: calc(1rem + (#{$hex-size} * 0.75 + #{$hex-gap}) * 2);
-  left: calc(50% - #{$hex-size} / 2);
-  @include hex-color(var(--p-orange-500));
-}
-
-// ===== Floating Cards =====
-@mixin card-color($color) {
-  &:hover {
-    box-shadow:
-      0 12px 40px color-mix(in oklab, $color 15%, transparent),
-      0 0 0 1px color-mix(in oklab, $color 10%, transparent);
-
-    .floating-card-icon {
-      box-shadow: 0 0 24px color-mix(in oklab, $color 25%, transparent);
-    }
-  }
-}
-
-.floating-card {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  // Light theme (primary): frosted WHITE glass so the card belongs to the light page
-  // (same glass language as the hex tiles / who-columns) instead of a dark block on top.
-  background: color-mix(in oklab, var(--p-surface-0) 68%, transparent);
-  color: var(--color-navy-800);
-  border-radius: 1rem;
-  padding: 1rem 1.25rem;
-  width: 15rem;
-  box-shadow: 0 10px 32px color-mix(in oklab, var(--p-slate-900) 12%, transparent);
-  border: 1px solid color-mix(in oklab, var(--p-slate-900) 8%, transparent);
-  backdrop-filter: blur(14px);
-  z-index: 2;
-  cursor: default;
-  transition:
-    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
-
-  &:hover {
-    transform: translateY(-6px) scale(1.03);
-    border-color: color-mix(in oklab, var(--p-slate-900) 16%, transparent);
-
-    .floating-card-icon {
-      transform: scale(1.1);
-    }
-    .floating-card-title {
-      letter-spacing: 0.01em;
-    }
-  }
-}
-
-// Dark theme: charcoal frosted glass — takes the dark page's tone.
-:host-context(.dark) .floating-card {
-  background: color-mix(in oklab, var(--p-slate-800) 88%, transparent);
-  color: var(--p-gray-50);
-  box-shadow: 0 8px 32px color-mix(in oklab, black 25%, transparent);
-  border-color: color-mix(in oklab, white 8%, transparent);
-
-  &:hover {
-    border-color: color-mix(in oklab, white 15%, transparent);
-  }
-}
-
-.floating-card-icon {
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.05rem;
-  transition:
-    transform 0.4s ease,
-    box-shadow 0.4s ease;
-}
-
-.floating-card-icon--accent {
-  background: color-mix(in oklab, var(--p-teal-500) 15%, transparent);
-  color: var(--p-teal-600);
-  box-shadow: 0 0 16px color-mix(in oklab, var(--p-teal-500) 10%, transparent);
-}
-
-.floating-card-icon--navy {
-  background: color-mix(in oklab, var(--p-fuchsia-500) 15%, transparent);
-  color: var(--p-fuchsia-600);
-  box-shadow: 0 0 16px color-mix(in oklab, var(--p-fuchsia-500) 10%, transparent);
-}
-
-// On dark, the icon glyphs go back to the lighter shades for contrast.
-:host-context(.dark) {
-  .floating-card-icon--accent {
-    color: var(--p-teal-400);
-  }
-  .floating-card-icon--navy {
-    color: var(--p-fuchsia-400);
-  }
-}
-
-.floating-card-title {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.3;
-  margin: 0;
-  transition: letter-spacing 0.4s ease;
-}
-
-.floating-card-desc {
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--p-slate-500);
-  margin: 0.25rem 0 0;
-}
-
-:host-context(.dark) .floating-card-desc {
-  color: var(--p-slate-400);
-}
-
-.floating-card-1 {
-  bottom: -10px;
-  left: -60px;
-  animation: cardFloat1 5s ease-in-out infinite;
-  @include card-color(var(--p-teal-500));
-}
-
-.floating-card-2 {
-  top: -10px;
-  right: -55px;
-  animation: cardFloat2 5s ease-in-out 1s infinite;
-  @include card-color(var(--color-navy-500));
-}
-
-@keyframes cardFloat1 {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(-0.5deg);
-  }
-}
-
-@keyframes cardFloat2 {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(0.5deg);
-  }
-}
-
-// ===== Who It's For Section =====
-.who-grid {
-  position: relative;
-}
-
-.who-column {
-  position: relative;
-  border-radius: 1.25rem;
-  padding: 2.25rem 1.75rem;
-  // See-through tint (no solid fill) — matches the roadmap cards' original transparent look.
-  background: color-mix(in oklab, black 8%, transparent);
-  border: 1px solid color-mix(in oklab, black 12%, transparent);
-}
-
-:host-context(.dark) {
-  .who-column {
-    background: color-mix(in oklab, white 8%, transparent);
-    border-color: color-mix(in oklab, white 12%, transparent);
-    box-shadow: 0 12px 40px color-mix(in oklab, black 30%, transparent);
-  }
-
-  .who-column-right {
-    @media (min-width: 768px) {
-      border-left-color: color-mix(in oklab, var(--p-slate-400) 15%, transparent);
-    }
-  }
-}
-
-.who-column-right {
-  @media (min-width: 768px) {
-    border-left: 1px solid color-mix(in oklab, var(--p-slate-400) 30%, transparent);
-  }
-}
-
-// .who-icon {
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 2.5rem;
-//   height: 2.5rem;
-//   border-radius: 999px;
-//   margin-bottom: 1rem;
-//   color: white;
-// }
-
-// .who-icon-instructors {
-//   background: var(--color-navy-500);
-// }
-
-// .who-icon-movers {
-//   background: var(--p-sky-500);
-// }
-
-.who-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* ===== Two paths ===== */
+.paths {
   display: grid;
-  gap: 0.4rem;
-  font-size: 0.95rem;
-  color: var(--p-slate-600);
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+  margin-top: 2.75rem;
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+}
+.path {
+  padding: 2rem;
+
+  &__ic {
+    font-size: 1.4rem;
+  }
+  &__role {
+    margin: 1.1rem 0 0.2rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--p-surface-400);
+  }
+  &__title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    margin: 0 0 1.2rem;
+  }
+}
+:host-context(.dark) .path__title {
+  color: var(--p-surface-50);
 }
 
-:host-context(.dark) .who-list {
-  color: var(--p-slate-300);
+/* ===== See it work ===== */
+.seeit__demo {
+  max-width: 60rem;
+  margin: 2.5rem auto 0;
+}
+.fgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+  margin-top: 2.5rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__all {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    text-decoration: none;
+
+    h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--p-surface-900);
+      margin: 0.9rem 0 0;
+    }
+    &-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: auto;
+      padding-top: 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--p-primary-700);
+      i {
+        font-size: 0.72rem;
+      }
+    }
+  }
+}
+:host-context(.dark) .fgrid__all {
+  h3 {
+    color: var(--p-surface-50);
+  }
+  .fgrid__all-link {
+    color: var(--p-primary-400);
+  }
 }
 
-.who-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
+/* ===== Free story (dark band) ===== */
+.free {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-navy-900);
+  border-radius: 1.6rem;
+  padding: clamp(2.5rem, 5vw, 3.75rem);
+  text-align: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: $honeycomb-svg-primary;
+    background-size: 56px 100px;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+  > * {
+    position: relative;
+  }
+
+  &__h {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    color: #fff;
+    margin: 0.7rem 0 0;
+  }
+  &__sub {
+    max-width: 52ch;
+    margin: 0.85rem auto 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  &__stats {
+    display: flex;
+    gap: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2.25rem 0;
+    text-align: left;
+  }
 }
 
-.who-list li mh-hex {
-  flex-shrink: 0;
-  margin-top: 0.15rem; // optically centre the hex against the first line of text
+/* ===== Community ===== */
+.cgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+  margin-top: 2.75rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+.ccard {
+  padding: 1.9rem;
+
+  &__t {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    margin: 1rem 0 0.4rem;
+  }
+  &__b {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--p-surface-500);
+    margin: 0;
+  }
+}
+:host-context(.dark) .ccard__t {
+  color: var(--p-surface-50);
+}
+
+/* ===== Blog teaser ===== */
+.bgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+  margin-top: 2.5rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.device {
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1.1rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px color-mix(in oklab, black 12%, transparent);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--p-surface-50);
+  border-bottom: 1px solid var(--p-surface-200);
+
+  i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--p-surface-300);
+  }
+  .u {
+    margin-left: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--p-surface-500);
+  }
+}
+
+.screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--p-surface-50);
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.ph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-image: repeating-linear-gradient(
+    45deg,
+    color-mix(in oklab, var(--p-surface-500) 6%, transparent) 0 10px,
+    transparent 10px 20px
+  );
+}
+
+.play {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--p-primary-500);
+  color: var(--color-navy-900);
+  font-size: 1.1rem;
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--p-primary-500) 40%, transparent);
+}
+
+.cap {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #fff;
+  background: rgba(19, 24, 39, 0.6);
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+:host-context(.dark) {
+  .device {
+    background: color-mix(in oklab, white 5%, transparent);
+    border-color: var(--p-surface-700);
+  }
+  .bar {
+    background: color-mix(in oklab, white 4%, transparent);
+    border-bottom-color: var(--p-surface-700);
+    i {
+      background: var(--p-surface-600);
+    }
+  }
+  .screen {
+    background: color-mix(in oklab, white 3%, transparent);
+  }
+}

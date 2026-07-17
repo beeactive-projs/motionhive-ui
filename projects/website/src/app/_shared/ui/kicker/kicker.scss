@@ -1,0 +1,56 @@
+:host {
+  display: inline-block;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+}
+
+.hx {
+  flex: none;
+  width: 9px;
+  height: 10px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.kicker--plain {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.kicker--amber {
+  color: var(--p-primary-700);
+  background: color-mix(in oklab, var(--p-primary-500) 12%, transparent);
+}
+.kicker--teal {
+  color: var(--color-accent-700);
+  background: color-mix(in oklab, var(--color-accent-500) 14%, transparent);
+}
+.kicker--muted {
+  color: var(--p-surface-500);
+  background: color-mix(in oklab, var(--p-surface-500) 10%, transparent);
+}
+
+:host-context(.dark) {
+  .kicker--amber {
+    color: var(--p-primary-400);
+  }
+  .kicker--teal {
+    color: var(--color-accent-400);
+  }
+  .kicker--muted {
+    color: var(--p-surface-400);
+  }
+}

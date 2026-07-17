@@ -1,0 +1,96 @@
+<!-- ===== Hero + the one plan =====
+     The hero owns the page's single <h1>; every band below uses
+     mh-section-header (<h2>). Keeps one H1 + a clean heading order per page. -->
+<section class="hero">
+  <div class="mh-wrap">
+    <div class="hero__head">
+      <mh-kicker i18n="@@pricing.kicker">Pricing</mh-kicker>
+      <h1 class="hero__h1" i18n="@@pricing.h1">
+        Free to coach. <span class="text-brand">Actually free.</span>
+      </h1>
+      <p class="hero__sub" i18n="@@pricing.sub">
+        No tiers, no trial timer, no per-client pricing. One plan, and it costs nothing.
+      </p>
+    </div>
+
+    <div class="plan dark">
+      <span class="plan__badge">
+        <mh-kicker tone="amber" i18n="@@pricing.plan.badge">Everything you need to coach</mh-kicker>
+      </span>
+      <div class="plan__price">
+        <span class="plan__amt">$0</span>
+        <span class="plan__per" i18n="@@pricing.plan.per">/ forever</span>
+      </div>
+      <mh-check-list class="plan__list" [items]="planFeatures" tone="amber" [columns]="2" />
+      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@pricing.plan.cta">Start coaching for free</a>
+      <p class="plan__note" i18n="@@pricing.plan.note">No credit card required.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== No catch ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker i18n="@@pricing.nc.kicker">No catch</mh-kicker>
+      <ng-container heading i18n="@@pricing.nc.h">Free that stays <span class="text-brand">free.</span></ng-container>
+    </mh-section-header>
+
+    <div class="ncgrid">
+      @for (n of noCatch; track n.title) {
+        <div class="mh-card nccard">
+          <mh-hex [size]="46" [tone]="n.tone"><span>{{ n.icon }}</span></mh-hex>
+          <h3 class="nccard__t">{{ n.title }}</h3>
+          <p class="nccard__b">{{ n.body }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== Comparison ===== -->
+<section class="mh-band cmp-band">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker i18n="@@pricing.cmp.kicker">How it compares</mh-kicker>
+      <ng-container heading i18n="@@pricing.cmp.h">MotionHive vs <span class="text-brand">the usual apps.</span></ng-container>
+    </mh-section-header>
+
+    <div class="cmp mh-card">
+      <div class="cmp__row cmp__row--head" aria-hidden="true">
+        <span></span>
+        <span class="cmp__mh">MotionHive</span>
+        <span class="cmp__them" i18n="@@pricing.cmp.them">Typical coaching apps</span>
+      </div>
+      @for (r of compare; track r.label) {
+        <div class="cmp__row">
+          <span class="cmp__label">{{ r.label }}</span>
+          <span class="cmp__mh"><i class="pi pi-check" aria-hidden="true"></i> {{ r.mh }}</span>
+          <span class="cmp__them">{{ r.them }}</span>
+        </div>
+      }
+    </div>
+    <p class="cmp__note" i18n="@@pricing.cmp.note">Based on common plans across popular coaching platforms. We do not name competitors.</p>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="mh-band">
+  <div class="mh-wrap">
+    <mh-section-header center>
+      <mh-kicker kicker i18n="@@pricing.faq.kicker">Questions</mh-kicker>
+      <ng-container heading i18n="@@pricing.faq.h">The honest <span class="text-brand">answers.</span></ng-container>
+    </mh-section-header>
+    <mh-faq [items]="faq" />
+  </div>
+</section>
+
+<!-- ===== Final CTA ===== -->
+<mh-cta-band variant="amber">
+  <mh-kicker kicker i18n="@@pricing.cta.kicker">Nothing to lose</mh-kicker>
+  <ng-container heading i18n="@@pricing.cta.h">Start coaching, <span class="text-brand">free.</span></ng-container>
+  <ng-container sub i18n="@@pricing.cta.sub">Set up your storefront in minutes. No card, no catch.</ng-container>
+  <div actions>
+    <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@pricing.cta.btn">Start coaching for free</a>
+  </div>
+</mh-cta-band>

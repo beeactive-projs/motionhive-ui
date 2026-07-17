@@ -1,0 +1,221 @@
+@use 'variables' as *;
+
+:host {
+  display: block;
+}
+
+.hero {
+  padding-block: clamp(2.5rem, 5vw, 4rem) 0;
+}
+
+.hero__head {
+  text-align: center;
+}
+
+.hero__h1 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-size: clamp(2.25rem, 5vw, 3.4rem);
+  color: var(--p-surface-900);
+  margin: 0.85rem 0 0;
+}
+
+.hero__sub {
+  max-width: 52ch;
+  margin: 0.9rem auto 0;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--p-surface-500);
+}
+
+:host-context(.dark) {
+  .hero__h1 {
+    color: var(--p-surface-50);
+  }
+  .hero__sub {
+    color: var(--p-surface-400);
+  }
+}
+
+/* ===== The one plan (dark card) ===== */
+.plan {
+  position: relative;
+  overflow: hidden;
+  max-width: 36rem;
+  margin: 2.75rem auto 0;
+  padding: clamp(2rem, 4vw, 3rem);
+  text-align: center;
+  background: var(--color-navy-900);
+  border-radius: 1.6rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: $honeycomb-svg-primary;
+    background-size: 56px 100px;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+  > * {
+    position: relative;
+  }
+
+  &__badge {
+    display: inline-block;
+    margin-bottom: 1.25rem;
+  }
+  &__price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  &__amt {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: clamp(3.25rem, 8vw, 4.75rem);
+    color: #fff;
+    line-height: 1;
+  }
+  &__per {
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  &__list {
+    display: block;
+    max-width: 30rem;
+    margin: 1.9rem auto;
+    text-align: left;
+  }
+  &__note {
+    margin: 0.9rem 0 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+}
+
+/* ===== No catch ===== */
+.ncgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-top: 2.75rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+}
+.nccard {
+  padding: 1.6rem;
+
+  &__t {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    margin: 0.9rem 0 0.4rem;
+  }
+  &__b {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--p-surface-500);
+    margin: 0;
+  }
+}
+:host-context(.dark) .nccard__t {
+  color: var(--p-surface-50);
+}
+
+/* ===== Comparison table ===== */
+.cmp {
+  max-width: 52rem;
+  margin: 2.5rem auto 0;
+  padding: 0.5rem 1.5rem;
+  overflow: hidden;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--p-surface-200);
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &--head {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--p-surface-500);
+    }
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--p-surface-700);
+  }
+  &__mh {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--p-surface-900);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    i {
+      color: var(--p-green-500, #22c55e);
+      font-size: 0.8rem;
+    }
+  }
+  &__them {
+    font-size: 0.9rem;
+    color: var(--p-surface-400);
+  }
+
+  &__row--head .cmp__mh {
+    color: var(--p-primary-700);
+  }
+}
+.cmp__note {
+  max-width: 52rem;
+  margin: 1rem auto 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--p-surface-400);
+}
+
+@media (max-width: 560px) {
+  .cmp__row {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+    text-align: left;
+  }
+  .cmp__row--head {
+    display: none;
+  }
+}
+
+:host-context(.dark) {
+  .cmp__row {
+    border-bottom-color: var(--p-surface-700);
+  }
+  .cmp__label {
+    color: var(--p-surface-200);
+  }
+  .cmp__mh {
+    color: var(--p-surface-50);
+  }
+  .cmp__row--head .cmp__mh {
+    color: var(--p-primary-400);
+  }
+}

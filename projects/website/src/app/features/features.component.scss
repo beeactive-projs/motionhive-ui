@@ -1,0 +1,187 @@
+:host {
+  display: block;
+}
+
+/* ===== Hero ===== */
+.hero {
+  padding-block: clamp(2.5rem, 5vw, 4rem) 0;
+}
+.hero__head {
+  text-align: center;
+}
+.hero__h1 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-size: clamp(2.2rem, 5vw, 3.25rem);
+  color: var(--p-surface-900);
+  margin: 0.85rem 0 0;
+}
+.hero__sub {
+  max-width: 54ch;
+  margin: 0.9rem auto 0;
+  font-size: 1.12rem;
+  line-height: 1.6;
+  color: var(--p-surface-500);
+}
+
+/* ===== Overview grid ===== */
+.ovgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__all {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    text-decoration: none;
+
+    h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--p-surface-900);
+      margin: 0.9rem 0 0.35rem;
+    }
+    p {
+      flex: 1;
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--p-surface-500);
+    }
+    &-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--p-primary-700);
+      i {
+        font-size: 0.72rem;
+      }
+    }
+  }
+}
+
+/* ===== Members ===== */
+.mgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+  margin-top: 2.75rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+.mcard {
+  padding: 1.9rem;
+
+  &__t {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    margin: 1rem 0 0.4rem;
+  }
+  &__b {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--p-surface-500);
+  }
+}
+
+/* ===== Roadmap lanes ===== */
+.lanes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+  margin-top: 2.75rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+.lane {
+  padding: 1.6rem;
+
+  &__h {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--p-surface-500);
+  }
+  &__dot {
+    width: 9px;
+    height: 10px;
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  }
+  &--now .lane__dot {
+    background: var(--p-green-500, #22c55e);
+  }
+  &--soon .lane__dot {
+    background: var(--p-primary-500);
+  }
+  &--exploring .lane__dot {
+    background: var(--p-surface-400);
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    li {
+      font-size: 0.95rem;
+      color: var(--p-surface-700);
+    }
+  }
+  &--exploring .lane__list li,
+  &--soon .lane__list li {
+    color: var(--p-surface-500);
+  }
+}
+
+:host-context(.dark) {
+  .hero__h1,
+  .mcard__t,
+  .ovgrid__all h3 {
+    color: var(--p-surface-50);
+  }
+  .hero__sub,
+  .mcard__b,
+  .ovgrid__all p {
+    color: var(--p-surface-400);
+  }
+  .ovgrid__all-link {
+    color: var(--p-primary-400);
+  }
+  .lane__list li {
+    color: var(--p-surface-200);
+  }
+  .lane--exploring .lane__list li,
+  .lane--soon .lane__list li {
+    color: var(--p-surface-400);
+  }
+}

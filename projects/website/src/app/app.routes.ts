@@ -17,6 +17,25 @@ export const routes: Routes = [
         title: $localize`About - MotionHive`,
       },
       {
+        path: 'features',
+        loadComponent: () =>
+          import('./features/features.component').then((m) => m.FeaturesComponent),
+        title: $localize`Features - MotionHive`,
+      },
+      {
+        path: 'features/:slug',
+        loadComponent: () =>
+          import('./features/feature-detail/feature-detail.component').then(
+            (m) => m.FeatureDetailComponent,
+          ),
+        title: $localize`Features - MotionHive`,
+      },
+      {
+        path: 'pricing',
+        loadComponent: () => import('./pricing/pricing.component').then((m) => m.PricingComponent),
+        title: $localize`Pricing - MotionHive`,
+      },
+      {
         path: 'blog',
         loadComponent: () => import('./blog/blog.component').then((m) => m.BlogComponent),
         title: $localize`Blog - MotionHive`,

@@ -1,102 +1,47 @@
-<footer class="footer">
-  <!-- Gradient top border -->
-  <div class="footer-top-border" aria-hidden="true"></div>
-
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
-
-    <!-- Main grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-
-      <!-- Brand column -->
-      <div class="sm:col-span-2 lg:col-span-1">
-
-        <!-- Logo -->
-        <a routerLink="/" class="logo-link" i18n-aria-label="@@footer.ariaHome" aria-label="MotionHive home">
-          <mh-logo />
-        </a>
-
-        <p class="text-sm leading-relaxed my-6 max-w-xs" i18n="@@footer.tagline">
-          Where active communities come together. One place to lead, join, and stay moving.
-        </p>
-
-        <!-- Social icons -->
-        <div class="flex gap-4">
-          @for (s of socialLinks; track s.label) {
-          <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label" class="social-icon">
-            <i [class]="'pi ' + s.icon" aria-hidden="true"></i>
+<footer class="site-footer dark">
+  <div class="mh-wrap foot">
+    <div class="foot__brand">
+      <a routerLink="/" class="foot__logo" aria-label="MotionHive home" i18n-aria-label="@@footer.ariaHome">
+        <mh-logo />
+      </a>
+      <p class="foot__tag" i18n="@@footer.tagline">The free home for coaches and the communities they build.</p>
+      <div class="foot__social">
+        @for (s of social; track s.label) {
+          <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label">
+            <i class="pi {{ s.icon }}" aria-hidden="true"></i>
           </a>
-          }
-        </div>
-      </div>
-
-      <!-- Product links -->
-      <div>
-        <h3 class="footer-heading" i18n="@@footer.product">Product</h3>
-        <ul class="space-y-3 hidden md:block">
-          @for (link of productLinks; track link.label) {
-          <li>
-            <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
-          </li>
-          }
-        </ul>
-        <div class="md:hidden flex gap-5">
-          @for (link of productLinks; track link.label) {
-          <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
-          }
-        </div>
-      </div>
-
-      <!-- Support links -->
-      <div>
-        <h3 class="footer-heading" i18n="@@footer.support">Support</h3>
-        <ul class="space-y-3 hidden md:block">
-          @for (link of supportLinks; track link.label) {
-          <li>
-            <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
-          </li>
-          }
-          <li>
-            <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true"
-              styleClass="footer-link p-0" (onClick)="openFeedback()" />
-          </li>
-        </ul>
-        <div class="md:hidden flex gap-5">
-          @for (link of supportLinks; track link.label) {
-          <a [routerLink]="link.path" class="footer-link">{{ link.label }}</a>
-          }
-          <p-button i18n-label="@@footer.shareFeedback" label="Share feedback" [link]="true"
-            styleClass="footer-link p-0" (onClick)="openFeedback()" />
-        </div>
-      </div>
-
-      <!-- Contact column -->
-      <div>
-        <h3 class="footer-heading" i18n="@@footer.getInTouch">Get in Touch</h3>
-        <ul class="space-y-4">
-          <li class="flex items-center gap-3 text-sm">
-            <i class="pi pi-envelope shrink-0" aria-hidden="true"></i>
-            <a href="mailto:support@motionhive.fit" class="footer-link">
-              support&#64;motionhive.fit
-            </a>
-          </li>
-        </ul>
+        }
       </div>
     </div>
 
-    <!-- Bottom bar -->
-    <div class="footer-bottom">
-      <p class="text-sm">
-        &copy; {{ currentYear }} MotionHive. <ng-container i18n="@@footer.allRightsReserved">All rights
-          reserved.</ng-container>
-      </p>
-      <div class="flex items-center gap-6 text-sm">
-        <a routerLink="/legal/terms-of-service" class="footer-link" i18n="@@footer.terms">Terms</a>
-        <a routerLink="/legal/privacy-policy" class="footer-link" i18n="@@footer.privacy">Privacy</a>
-        <a routerLink="/legal/cookie-policy" class="footer-link" i18n="@@footer.cookies">Cookies</a>
-        <button type="button" class="footer-link" (click)="openCookiePreferences()"
-          i18n="@@footer.cookiePrefs">Cookie preferences</button>
-      </div>
-    </div>
+    <nav class="foot__col" aria-label="Product" i18n-aria-label="@@footer.product">
+      <span class="foot__h" i18n="@@footer.product">Product</span>
+      @for (l of product; track l.path) {
+        <a [routerLink]="l.path">{{ l.label }}</a>
+      }
+    </nav>
 
+    <nav class="foot__col" aria-label="Company" i18n-aria-label="@@footer.company">
+      <span class="foot__h" i18n="@@footer.company">Company</span>
+      @for (l of company; track l.path) {
+        <a [routerLink]="l.path">{{ l.label }}</a>
+      }
+      <button type="button" (click)="openFeedback()" i18n="@@footer.feedback">Send feedback</button>
+    </nav>
+
+    <nav class="foot__col" aria-label="Legal" i18n-aria-label="@@footer.legal">
+      <span class="foot__h" i18n="@@footer.legal">Legal</span>
+      @for (l of support; track l.path) {
+        <a [routerLink]="l.path">{{ l.label }}</a>
+      }
+      <button type="button" (click)="openCookiePreferences()" i18n="@@footer.cookies">Cookie preferences</button>
+    </nav>
+  </div>
+
+  <div class="foot__barwrap">
+    <div class="mh-wrap foot__bar">
+      <span>© {{ currentYear }} MotionHive</span>
+      <span i18n="@@footer.made">Made for people who move together.</span>
+    </div>
   </div>
 </footer>

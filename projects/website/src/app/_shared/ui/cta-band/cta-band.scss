@@ -1,0 +1,117 @@
+@use 'variables' as *;
+
+:host {
+  display: block;
+}
+
+.cta {
+  position: relative;
+  overflow: hidden;
+
+  &__inner {
+    max-width: 71.25rem;
+    margin: 0 auto;
+    padding: 4.5rem 1.75rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__h {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+    color: var(--p-surface-900);
+    margin: 0.6rem 0 0;
+  }
+
+  &__sub {
+    max-width: 48ch;
+    margin: 0.85rem auto 0;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--p-surface-500);
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__actions {
+    margin-top: 1.9rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+/* ── amber wash (default) ───────────────────────────── */
+.cta--amber {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--p-primary-500) 8%, transparent),
+    transparent
+  );
+}
+
+/* ── plain: transparent, sits on the page backdrop ──── */
+.cta--plain {
+  background: transparent;
+}
+
+/* ── dark navy band with honeycomb watermark ────────── */
+.cta--dark {
+  background: var(--color-navy-900);
+  border-radius: 1.6rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: $honeycomb-svg-primary;
+    background-size: 56px 100px;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  .cta__h {
+    color: #fff;
+  }
+  .cta__sub {
+    color: rgba(255, 255, 255, 0.72);
+  }
+}
+
+/* ── dark theme ─────────────────────────────────────── */
+:host-context(.dark) {
+  .cta--amber {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--p-primary-500) 12%, transparent),
+      transparent
+    );
+  }
+  .cta__h {
+    color: var(--p-surface-50);
+  }
+  .cta__sub {
+    color: var(--p-surface-400);
+  }
+  .cta--dark {
+    background: #080c16;
+
+    .cta__h {
+      color: #fff;
+    }
+    .cta__sub {
+      color: rgba(255, 255, 255, 0.72);
+    }
+  }
+}

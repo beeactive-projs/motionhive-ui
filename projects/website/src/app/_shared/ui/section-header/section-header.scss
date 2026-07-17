@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.sec {
+  &--center {
+    text-align: center;
+
+    .sec-sub {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
+.sec-h {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  font-size: clamp(1.75rem, 3.2vw, 2.375rem);
+  color: var(--p-surface-900);
+  margin: 0.75rem 0 0;
+}
+
+.sec-sub {
+  max-width: 56ch;
+  margin: 0.85rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--p-surface-500);
+
+  /* Collapse the gap when no sub-copy is projected. */
+  &:empty {
+    display: none;
+  }
+}
+
+:host-context(.dark) {
+  .sec-h {
+    color: var(--p-surface-50);
+  }
+  .sec-sub {
+    color: var(--p-surface-400);
+  }
+}

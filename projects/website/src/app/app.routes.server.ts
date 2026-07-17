@@ -1,6 +1,7 @@
 import { PrerenderFallback, RenderMode, ServerRoute } from '@angular/ssr';
 
 import { environment } from '../../../core/src/environments/environment';
+import { FEATURES } from './_data/features';
 
 /**
  * Per-route render strategy for prerendering (SSG).
@@ -67,6 +68,15 @@ async function fetchPublishedBlogSlugs(): Promise<string[]> {
 }
 
 export const serverRoutes: ServerRoute[] = [
+  {
+    // The 7 feature pages are driven by a static data array, so their slugs are
+    // known at build time with no network call (unlike the blog).
+    path: 'features/:slug',
+    renderMode: RenderMode.Prerender,
+    async getPrerenderParams() {
+      return FEATURES.map((f) => ({ slug: f.slug }));
+    },
+  },
   {
     path: 'blog/:slug',
     renderMode: RenderMode.Prerender,
