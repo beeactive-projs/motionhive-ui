@@ -26,7 +26,7 @@
                 <a
                   class="mega__row"
                   [class.is-active]="activeFeature().slug === f.slug"
-                  routerLink="/features"
+                  [routerLink]="'/features/' + f.slug"
                   (mouseenter)="setActiveFeature(f)"
                   (focus)="setActiveFeature(f)"
                   (click)="closeMega()">
@@ -152,7 +152,7 @@
   @if (mobileFeaturesOpen()) {
     <div class="drawer__sub">
       @for (f of features; track f.slug) {
-        <a class="drawer__feat" routerLink="/features" (click)="closeMobile()">
+        <a class="drawer__feat" [routerLink]="'/features/' + f.slug" (click)="closeMobile()">
           <mh-hex [size]="28" [tone]="f.tone">{{ f.icon }}</mh-hex>
           <span>{{ f.name }}</span>
         </a>

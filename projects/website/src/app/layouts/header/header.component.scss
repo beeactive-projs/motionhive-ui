@@ -90,9 +90,12 @@
   border: 1px solid var(--p-surface-200);
   border-radius: 1rem;
   box-shadow: 0 20px 50px color-mix(in oklab, black 14%, transparent);
-  overflow: hidden;
+  /* NO overflow:hidden — it clips the ::before hover bridge below, which left
+     the gap between the trigger and the menu dead and closed the menu as soon
+     as you reached for a row. Panes round their own corners instead. */
 
-  /* invisible hover bridge so the menu doesn't close crossing the gap */
+  /* Invisible bridge across the gap, so moving from the trigger into the menu
+     never leaves .item--mega and never fires mouseleave. */
   &::before {
     content: '';
     position: absolute;
@@ -166,6 +169,9 @@
     padding: 0.9rem;
     background: color-mix(in oklab, var(--p-surface-500) 5%, transparent);
     border-left: 1px solid var(--p-surface-200);
+    /* Was handled by the parent's overflow:hidden; now self-clipped so the
+       card's rounded right corners stay clean. */
+    border-radius: 0 1rem 1rem 0;
   }
   &__media {
     aspect-ratio: 16 / 10;
