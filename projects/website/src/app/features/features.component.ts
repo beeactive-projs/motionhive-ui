@@ -66,7 +66,7 @@ export class FeaturesComponent {
       items: [
         $localize`:@@features.rm.s1:Mobile app`,
         $localize`:@@features.rm.s2:Nutrition and meal plans`,
-        $localize`:@@features.rm.s3:Comments and reactions`,
+        $localize`:@@features.rm.s3:Group messaging`,
       ],
     },
     {
@@ -86,7 +86,7 @@ export class FeaturesComponent {
 
     seo.set({
       title: $localize`:@@features.meta.title:Features — everything you need to coach online | MotionHive`,
-      description: $localize`:@@features.meta.description:Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no platform fee.`,
+      description: $localize`:@@features.meta.description:Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.`,
     });
 
     seo.setJsonLd('ld-breadcrumb', {

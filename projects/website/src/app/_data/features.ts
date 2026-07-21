@@ -64,11 +64,11 @@ export const FEATURES: MarketingFeature[] = [
     intro: $localize`:@@feat.storefront.intro:Your storefront is the page you send people to. It shows who you are, what you run, and lets someone book without a single back and forth message.`,
     capabilities: [
       $localize`:@@feat.storefront.c1:A public page at your own handle`,
-      $localize`:@@feat.storefront.c2:Show your sessions, programs and prices`,
+      $localize`:@@feat.storefront.c2:Show your sessions, products and prices`,
       $localize`:@@feat.storefront.c3:Let people book without messaging you first`,
       $localize`:@@feat.storefront.c4:One link for your bio, your DMs, anywhere`,
       $localize`:@@feat.storefront.c5:Built for a phone, where your clients already are`,
-      $localize`:@@feat.storefront.c6:Free, with no cut of what you charge`,
+      $localize`:@@feat.storefront.c6:Show ratings from the clients you've worked with`,
     ],
     benefits: [
       {
@@ -103,7 +103,7 @@ export const FEATURES: MarketingFeature[] = [
     ],
     related: ['sessions', 'payments', 'community'],
     metaTitle: $localize`:@@feat.storefront.mt:Coaching storefront: a free bookable page | MotionHive`,
-    metaDescription: $localize`:@@feat.storefront.md:Get a free public coaching page where clients see your sessions and book without messaging you first. Your link, your offer, no platform fee.`,
+    metaDescription: $localize`:@@feat.storefront.md:Get a free public coaching page where clients see your sessions and products and book without messaging you first. Your link, your offer, no subscription.`,
   },
   {
     slug: 'sessions',
@@ -120,7 +120,7 @@ export const FEATURES: MarketingFeature[] = [
       $localize`:@@feat.sessions.c1:One off and recurring sessions`,
       $localize`:@@feat.sessions.c2:Class capacity with a waitlist that auto promotes`,
       $localize`:@@feat.sessions.c3:One to one bookings on your terms`,
-      $localize`:@@feat.sessions.c4:In person or online, with the meeting link attached`,
+      $localize`:@@feat.sessions.c4:At your own venues or online, with the meeting link attached`,
       $localize`:@@feat.sessions.c5:Cancellation windows you decide`,
       $localize`:@@feat.sessions.c6:Reminders so people actually turn up`,
     ],
@@ -157,7 +157,7 @@ export const FEATURES: MarketingFeature[] = [
     ],
     related: ['storefront', 'programs', 'payments'],
     metaTitle: $localize`:@@feat.sessions.mt:Free class and PT scheduling for coaches | MotionHive`,
-    metaDescription: $localize`:@@feat.sessions.md:Free scheduling for coaches: recurring classes, capacity and waitlists, one to one bookings, reminders and cancellation windows. No platform fee.`,
+    metaDescription: $localize`:@@feat.sessions.md:Free scheduling for coaches: recurring classes, capacity and waitlists, one to one bookings, your own venues, reminders and cancellation windows. No subscription.`,
   },
   {
     slug: 'programs',
@@ -272,7 +272,7 @@ export const FEATURES: MarketingFeature[] = [
     name: $localize`:@@feat.payments.name:Payments`,
     icon: '💳',
     tone: 'amber',
-    oneLiner: $localize`:@@feat.payments.one:Get paid, keep what you earn`,
+    oneLiner: $localize`:@@feat.payments.one:Invoices, subscriptions and products in one place`,
     preview: null,
     poster: null,
     h1Lead: $localize`:@@feat.payments.h1a:Get paid without becoming a`,
@@ -284,7 +284,7 @@ export const FEATURES: MarketingFeature[] = [
       $localize`:@@feat.payments.c3:Send an invoice in a couple of clicks`,
       $localize`:@@feat.payments.c4:See who has paid and who has not`,
       $localize`:@@feat.payments.c5:Refunds inside the rules you set`,
-      $localize`:@@feat.payments.c6:Keep what you earn, with no platform fee`,
+      $localize`:@@feat.payments.c6:Create products once and show them on your page`,
     ],
     benefits: [
       {
@@ -298,15 +298,15 @@ export const FEATURES: MarketingFeature[] = [
         body: $localize`:@@feat.payments.b2b:Recurring plans renew without you raising an invoice every month.`,
       },
       {
-        icon: '💰',
-        title: $localize`:@@feat.payments.b3t:Your money stays yours`,
-        body: $localize`:@@feat.payments.b3b:MotionHive takes no cut. Only your payment processor charges its standard fee.`,
+        icon: '🧾',
+        title: $localize`:@@feat.payments.b3t:One place for what you're owed`,
+        body: $localize`:@@feat.payments.b3b:Invoices, memberships and one-off charges live together, so you always know who owes what.`,
       },
     ],
     faq: [
       {
-        q: $localize`:@@feat.payments.q1:Does MotionHive take a cut?`,
-        a: $localize`:@@feat.payments.a1:No. There is no platform fee. Your payment processor charges its standard fee, and that is the only cost.`,
+        q: $localize`:@@feat.payments.q1:What can I charge for?`,
+        a: $localize`:@@feat.payments.a1:Sessions, packages, one-off products and recurring memberships. You create them once and they can show on your page.`,
       },
       {
         q: $localize`:@@feat.payments.q2:When do I get paid?`,
@@ -318,8 +318,8 @@ export const FEATURES: MarketingFeature[] = [
       },
     ],
     related: ['storefront', 'sessions', 'programs'],
-    metaTitle: $localize`:@@feat.payments.mt:Take payments and memberships, no platform fee | MotionHive`,
-    metaDescription: $localize`:@@feat.payments.md:Charge for sessions, packages and memberships, send invoices, and stop chasing transfers. MotionHive takes no platform fee on what you earn.`,
+    metaTitle: $localize`:@@feat.payments.mt:Payments for coaches: invoices, subscriptions, products | MotionHive`,
+    metaDescription: $localize`:@@feat.payments.md:Charge for sessions and packages, run recurring memberships, create products for your page and send invoices, all in one place. No subscription to manage clients.`,
   },
   {
     slug: 'messaging',
@@ -333,18 +333,18 @@ export const FEATURES: MarketingFeature[] = [
     h1Accent: $localize`:@@feat.messaging.h1b:sessions.`,
     intro: $localize`:@@feat.messaging.intro:The small human touches are what keep people coming back. Keep them in the same place as the training, instead of an app where the thread disappears.`,
     capabilities: [
-      $localize`:@@feat.messaging.c1:Message clients one to one`,
-      $localize`:@@feat.messaging.c2:Talk to a whole group at once`,
-      $localize`:@@feat.messaging.c3:The plan sits next to the conversation`,
-      $localize`:@@feat.messaging.c4:Share a clip or a correction in seconds`,
+      $localize`:@@feat.messaging.c1:Message each client one to one`,
+      $localize`:@@feat.messaging.c2:Real-time, so a reply lands right away`,
+      $localize`:@@feat.messaging.c3:One thread per client, not scattered across apps`,
+      $localize`:@@feat.messaging.c4:A quick word between sessions when it matters`,
       $localize`:@@feat.messaging.c5:Nothing buried under family photos`,
-      $localize`:@@feat.messaging.c6:Free, for as many clients as you coach`,
+      $localize`:@@feat.messaging.c6:For as many clients as you coach`,
     ],
     benefits: [
       {
-        icon: '🎯',
-        title: $localize`:@@feat.messaging.b1t:Coaching, not admin`,
-        body: $localize`:@@feat.messaging.b1b:The plan is right there, so a check in takes seconds instead of a search.`,
+        icon: '⚡',
+        title: $localize`:@@feat.messaging.b1t:Feels like a normal chat`,
+        body: $localize`:@@feat.messaging.b1b:Real-time messages, so a check-in lands right away instead of sitting in an inbox.`,
       },
       {
         icon: '🫶',
@@ -363,8 +363,8 @@ export const FEATURES: MarketingFeature[] = [
         a: $localize`:@@feat.messaging.a1:For coaching, yes. Keeping the conversation next to the training is the whole point.`,
       },
       {
-        q: $localize`:@@feat.messaging.q2:Can I message a whole group?`,
-        a: $localize`:@@feat.messaging.a2:Yes. Talk to a group at once, or to one person privately.`,
+        q: $localize`:@@feat.messaging.q2:Is it one to one only?`,
+        a: $localize`:@@feat.messaging.a2:For now, yes. One to one keeps coaching personal; group threads are on the roadmap.`,
       },
       {
         q: $localize`:@@feat.messaging.q3:Is there a client limit?`,
@@ -373,7 +373,7 @@ export const FEATURES: MarketingFeature[] = [
     ],
     related: ['community', 'programs', 'sessions'],
     metaTitle: $localize`:@@feat.messaging.mt:Message clients where the training lives | MotionHive`,
-    metaDescription: $localize`:@@feat.messaging.md:Keep coach and client conversations next to the plan: one to one and group messaging, free, with no client limit.`,
+    metaDescription: $localize`:@@feat.messaging.md:Message your clients one to one, in real time, in the same place as their training. Free, with no client limit.`,
   },
   {
     slug: 'community',
@@ -389,7 +389,7 @@ export const FEATURES: MarketingFeature[] = [
     capabilities: [
       $localize`:@@feat.community.c1:Create groups around what you run`,
       $localize`:@@feat.community.c2:Invite people with a link`,
-      $localize`:@@feat.community.c3:Share updates the whole group sees`,
+      $localize`:@@feat.community.c3:Post updates, with comments and reactions`,
       $localize`:@@feat.community.c4:Approve who joins, if you want to`,
       $localize`:@@feat.community.c5:Sessions and posts in the same place`,
       $localize`:@@feat.community.c6:Works at five clients and at fifty`,

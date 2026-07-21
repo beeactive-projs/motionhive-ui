@@ -8,7 +8,7 @@
       </h1>
       <p class="hero__sub" i18n="@@home.hero.sub">
         Run your whole coaching business in one place: a bookable storefront, sessions, programs,
-        payments and community. Free to start, no platform fee.
+        payments and community. Free to start, no subscription.
       </p>
       <div class="hero__cta">
         <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.hero.cta1">Start coaching for free</a>
@@ -39,7 +39,7 @@
       }
       <div class="hxc hxc--badge">
         <mh-hex [size]="73" orientation="pointy" bg="var(--p-surface-0)" [shadow]="true">
-          <span class="hxc__badge">0% fee</span>
+          <span class="hxc__badge">Free</span>
         </mh-hex>
       </div>
     </div>
@@ -115,11 +115,11 @@
       <mh-kicker tone="amber" i18n="@@home.free.kicker">Building in the open</mh-kicker>
       <h2 class="free__h" i18n="@@home.free.h">Free<span class="text-brand">.</span> Actually free.</h2>
       <p class="free__sub" i18n="@@home.free.sub">
-        No trial timer, no per-client pricing, no cut of what you earn. You coach, you keep it.
+        No trial timer and no per-client pricing. You run your whole coaching for free.
       </p>
       <div class="free__stats">
         <mh-stat value="∞" label="clients" [onDark]="true" i18n-label="@@home.free.s1" />
-        <mh-stat value="0%" label="platform fee" [onDark]="true" i18n-label="@@home.free.s2" />
+        <mh-stat value="0" label="subscriptions" [onDark]="true" i18n-label="@@home.free.s2" />
         <mh-stat value="$0" label="to start" [onDark]="true" i18n-label="@@home.free.s3" />
       </div>
       <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.free.cta">Start coaching for free</a>

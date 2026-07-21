@@ -45,7 +45,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.c2" datatype="html">
-        <source>Show your sessions, programs and prices</source>
+        <source>Show your sessions, products and prices</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">67</context>
@@ -73,7 +73,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.c6" datatype="html">
-        <source>Free, with no cut of what you charge</source>
+        <source>Show ratings from the clients you&apos;ve worked with</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">71</context>
@@ -171,7 +171,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.md" datatype="html">
-        <source>Get a free public coaching page where clients see your sessions and book without messaging you first. Your link, your offer, no platform fee.</source>
+        <source>Get a free public coaching page where clients see your sessions and products and book without messaging you first. Your link, your offer, no subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">106</context>
@@ -234,7 +234,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.sessions.c4" datatype="html">
-        <source>In person or online, with the meeting link attached</source>
+        <source>At your own venues or online, with the meeting link attached</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">123</context>
@@ -346,7 +346,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.sessions.md" datatype="html">
-        <source>Free scheduling for coaches: recurring classes, capacity and waitlists, one to one bookings, reminders and cancellation windows. No platform fee.</source>
+        <source>Free scheduling for coaches: recurring classes, capacity and waitlists, one to one bookings, your own venues, reminders and cancellation windows. No subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">160</context>
@@ -710,7 +710,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.one" datatype="html">
-        <source>Get paid, keep what you earn</source>
+        <source>Invoices, subscriptions and products in one place</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">275</context>
@@ -773,7 +773,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c6" datatype="html">
-        <source>Keep what you earn, with no platform fee</source>
+        <source>Create products once and show them on your page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">287</context>
@@ -808,28 +808,28 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b3t" datatype="html">
-        <source>Your money stays yours</source>
+        <source>One place for what you&apos;re owed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">302</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b3b" datatype="html">
-        <source>MotionHive takes no cut. Only your payment processor charges its standard fee.</source>
+        <source>Invoices, memberships and one-off charges live together, so you always know who owes what.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">303</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.q1" datatype="html">
-        <source>Does MotionHive take a cut?</source>
+        <source>What can I charge for?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">308</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.a1" datatype="html">
-        <source>No. There is no platform fee. Your payment processor charges its standard fee, and that is the only cost.</source>
+        <source>Sessions, packages, one-off products and recurring memberships. You create them once and they can show on your page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">309</context>
@@ -864,14 +864,14 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.mt" datatype="html">
-        <source>Take payments and memberships, no platform fee | MotionHive</source>
+        <source>Payments for coaches: invoices, subscriptions, products | MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">321</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.md" datatype="html">
-        <source>Charge for sessions, packages and memberships, send invoices, and stop chasing transfers. MotionHive takes no platform fee on what you earn.</source>
+        <source>Charge for sessions and packages, run recurring memberships, create products for your page and send invoices, all in one place. No subscription to manage clients.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">322</context>
@@ -913,28 +913,28 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c1" datatype="html">
-        <source>Message clients one to one</source>
+        <source>Message each client one to one</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">336</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c2" datatype="html">
-        <source>Talk to a whole group at once</source>
+        <source>Real-time, so a reply lands right away</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">337</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c3" datatype="html">
-        <source>The plan sits next to the conversation</source>
+        <source>One thread per client, not scattered across apps</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">338</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c4" datatype="html">
-        <source>Share a clip or a correction in seconds</source>
+        <source>A quick word between sessions when it matters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">339</context>
@@ -948,21 +948,21 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c6" datatype="html">
-        <source>Free, for as many clients as you coach</source>
+        <source>For as many clients as you coach</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">341</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b1t" datatype="html">
-        <source>Coaching, not admin</source>
+        <source>Feels like a normal chat</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">346</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b1b" datatype="html">
-        <source>The plan is right there, so a check in takes seconds instead of a search.</source>
+        <source>Real-time messages, so a check-in lands right away instead of sitting in an inbox.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">347</context>
@@ -1011,14 +1011,14 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.q2" datatype="html">
-        <source>Can I message a whole group?</source>
+        <source>Is it one to one only?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">366</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.a2" datatype="html">
-        <source>Yes. Talk to a group at once, or to one person privately.</source>
+        <source>For now, yes. One to one keeps coaching personal; group threads are on the roadmap.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">367</context>
@@ -1046,7 +1046,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.md" datatype="html">
-        <source>Keep coach and client conversations next to the plan: one to one and group messaging, free, with no client limit.</source>
+        <source>Message your clients one to one, in real time, in the same place as their training. Free, with no client limit.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">376</context>
@@ -1102,7 +1102,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c3" datatype="html">
-        <source>Share updates the whole group sees</source>
+        <source>Post updates, with comments and reactions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">392</context>
@@ -2208,7 +2208,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.sub" datatype="html">
-        <source>Set up in minutes. No card, no catch, no platform fee.</source>
+        <source>Set up in minutes. No card, no catch, no subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
           <context context-type="linenumber">89,90</context>
@@ -2243,7 +2243,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.sub" datatype="html">
-        <source> One place for your storefront, your sessions, your programs and your people. All of it free, with no platform fee. </source>
+        <source> One place for your storefront, your sessions, your programs and your people. All of it free, with no subscription. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
           <context context-type="linenumber">9,12</context>
@@ -2257,7 +2257,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.all.b" datatype="html">
-        <source>Every feature, unlimited clients, no platform fee.</source>
+        <source>Every feature, unlimited clients, no subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
           <context context-type="linenumber">25,26</context>
@@ -2418,7 +2418,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.rm.s3" datatype="html">
-        <source>Comments and reactions</source>
+        <source>Group messaging</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.ts</context>
           <context context-type="linenumber">69</context>
@@ -2460,7 +2460,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.meta.description" datatype="html">
-        <source>Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no platform fee.</source>
+        <source>Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.ts</context>
           <context context-type="linenumber">89</context>
@@ -2481,7 +2481,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hero.sub" datatype="html">
-        <source> Run your whole coaching business in one place: a bookable storefront, sessions, programs, payments and community. Free to start, no platform fee. </source>
+        <source> Run your whole coaching business in one place: a bookable storefront, sessions, programs, payments and community. Free to start, no subscription. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">10,13</context>
@@ -2572,7 +2572,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.sub" datatype="html">
-        <source> No trial timer, no per-client pricing, no cut of what you earn. You coach, you keep it. </source>
+        <source> No trial timer and no per-client pricing. You run your whole coaching for free. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">118,120</context>
@@ -2586,7 +2586,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s2" datatype="html">
-        <source>platform fee</source>
+        <source>subscriptions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">122</context>
@@ -2677,7 +2677,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.g2" datatype="html">
-        <source>No platform fee</source>
+        <source>No subscription</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">71</context>
@@ -2747,7 +2747,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p3" datatype="html">
-        <source>Get paid, keep what you earn</source>
+        <source>Get paid for sessions, plans and products</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">91</context>
@@ -2852,7 +2852,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.meta.description" datatype="html">
-        <source>MotionHive is free software for coaches: a bookable storefront, sessions, programs, payments and community in one place. Unlimited clients, no platform fee.</source>
+        <source>MotionHive is free software for coaches: a bookable storefront, sessions, programs, payments and community in one place. Unlimited clients, no subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">146</context>
@@ -4318,7 +4318,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.plan.per" datatype="html">
-        <source>/ forever</source>
+        <source>no subscription</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">22,24</context>
@@ -4451,7 +4451,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.pf5" datatype="html">
-        <source>Payments, keep what you earn</source>
+        <source>Payments: invoices, subscriptions, products</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">39</context>
@@ -4472,7 +4472,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.pf8" datatype="html">
-        <source>No platform fee, ever</source>
+        <source>No subscription to manage your clients</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">42</context>
@@ -4542,7 +4542,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp1.a" datatype="html">
-        <source>$0, forever</source>
+        <source>Free, no subscription</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">75</context>
@@ -4598,21 +4598,21 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp4.l" datatype="html">
-        <source>Keep your earnings</source>
+        <source>Products and memberships</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp4.a" datatype="html">
-        <source>100%, no platform fee</source>
+        <source>Built in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp4.b" datatype="html">
-        <source>Platform cut on top of fees</source>
+        <source>Higher plans or add-on</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">91</context>
@@ -4647,7 +4647,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq1.a" datatype="html">
-        <source>Yes. Every core feature is free, with no client limit and no platform fee. We may add optional paid extras later, but coaching your people stays free.</source>
+        <source>Yes. Managing your clients is free, with no client limit and no subscription. Later we may add optional premium tools on top, but running your coaching stays free.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">103</context>
@@ -4675,21 +4675,21 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq3.a" datatype="html">
-        <source>We are building in the open. The plan is optional paid add-ons over time, never a cut of your core coaching.</source>
+        <source>We are building in the open. The plan is optional premium tools over time, on top of the free core. Managing your clients stays free.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq4.q" datatype="html">
-        <source>Is there a catch on payments?</source>
+        <source>Will it stay free to manage clients?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq4.a" datatype="html">
-        <source>You keep what you earn. Standard payment-processor fees apply (that is the processor, not us), and MotionHive takes no platform fee on top.</source>
+        <source>Yes. If premium ever arrives, it will be extra tools on top, never a paywall on running your coaching or managing the clients you already have.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">115</context>
@@ -4710,14 +4710,14 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.meta.description" datatype="html">
-        <source>MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no platform fee and no trial timer.</source>
+        <source>MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no subscription to manage your clients.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.meta.title" datatype="html">
-        <source>Pricing — free coaching software, no platform fee | MotionHive</source>
+        <source>Pricing: free coaching software, no subscription | MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">131</context>

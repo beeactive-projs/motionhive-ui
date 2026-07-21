@@ -36,10 +36,10 @@ export class PricingComponent {
     $localize`:@@pricing.pf2:Your bookable storefront`,
     $localize`:@@pricing.pf3:Sessions and scheduling`,
     $localize`:@@pricing.pf4:Programs and exercise library`,
-    $localize`:@@pricing.pf5:Payments, keep what you earn`,
+    $localize`:@@pricing.pf5:Payments: invoices, subscriptions, products`,
     $localize`:@@pricing.pf6:Messaging with clients`,
     $localize`:@@pricing.pf7:Groups and community`,
-    $localize`:@@pricing.pf8:No platform fee, ever`,
+    $localize`:@@pricing.pf8:No subscription to manage your clients`,
   ];
 
   readonly noCatch: NoCatch[] = [
@@ -72,7 +72,7 @@ export class PricingComponent {
   readonly compare: CompareRow[] = [
     {
       label: $localize`:@@pricing.cmp1.l:Cost`,
-      mh: $localize`:@@pricing.cmp1.a:$0, forever`,
+      mh: $localize`:@@pricing.cmp1.a:Free, no subscription`,
       them: $localize`:@@pricing.cmp1.b:Monthly subscription`,
     },
     {
@@ -86,9 +86,9 @@ export class PricingComponent {
       them: $localize`:@@pricing.cmp3.b:Higher plans only`,
     },
     {
-      label: $localize`:@@pricing.cmp4.l:Keep your earnings`,
-      mh: $localize`:@@pricing.cmp4.a:100%, no platform fee`,
-      them: $localize`:@@pricing.cmp4.b:Platform cut on top of fees`,
+      label: $localize`:@@pricing.cmp4.l:Products and memberships`,
+      mh: $localize`:@@pricing.cmp4.a:Built in`,
+      them: $localize`:@@pricing.cmp4.b:Higher plans or add-on`,
     },
     {
       label: $localize`:@@pricing.cmp5.l:Community and groups`,
@@ -100,7 +100,7 @@ export class PricingComponent {
   readonly faq: FaqItem[] = [
     {
       q: $localize`:@@pricing.faq1.q:Is it really free?`,
-      a: $localize`:@@pricing.faq1.a:Yes. Every core feature is free, with no client limit and no platform fee. We may add optional paid extras later, but coaching your people stays free.`,
+      a: $localize`:@@pricing.faq1.a:Yes. Managing your clients is free, with no client limit and no subscription. Later we may add optional premium tools on top, but running your coaching stays free.`,
     },
     {
       q: $localize`:@@pricing.faq2.q:Do I need a credit card to start?`,
@@ -108,11 +108,11 @@ export class PricingComponent {
     },
     {
       q: $localize`:@@pricing.faq3.q:How do you make money then?`,
-      a: $localize`:@@pricing.faq3.a:We are building in the open. The plan is optional paid add-ons over time, never a cut of your core coaching.`,
+      a: $localize`:@@pricing.faq3.a:We are building in the open. The plan is optional premium tools over time, on top of the free core. Managing your clients stays free.`,
     },
     {
-      q: $localize`:@@pricing.faq4.q:Is there a catch on payments?`,
-      a: $localize`:@@pricing.faq4.a:You keep what you earn. Standard payment-processor fees apply (that is the processor, not us), and MotionHive takes no platform fee on top.`,
+      q: $localize`:@@pricing.faq4.q:Will it stay free to manage clients?`,
+      a: $localize`:@@pricing.faq4.a:Yes. If premium ever arrives, it will be extra tools on top, never a paywall on running your coaching or managing the clients you already have.`,
     },
     {
       q: $localize`:@@pricing.faq5.q:Can I export my data?`,
@@ -125,10 +125,10 @@ export class PricingComponent {
     const isRo = isRoLocale(inject(DOCUMENT));
     const url = siteUrl('/pricing', isRo);
 
-    const description = $localize`:@@pricing.meta.description:MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no platform fee and no trial timer.`;
+    const description = $localize`:@@pricing.meta.description:MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no subscription to manage your clients.`;
 
     seo.set({
-      title: $localize`:@@pricing.meta.title:Pricing — free coaching software, no platform fee | MotionHive`,
+      title: $localize`:@@pricing.meta.title:Pricing: free coaching software, no subscription | MotionHive`,
       description,
     });
 

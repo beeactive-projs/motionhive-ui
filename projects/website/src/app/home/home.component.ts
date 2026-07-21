@@ -68,7 +68,7 @@ export class HomeComponent {
 
   readonly guarantees = [
     $localize`:@@home.g1:Unlimited clients`,
-    $localize`:@@home.g2:No platform fee`,
+    $localize`:@@home.g2:No subscription`,
     $localize`:@@home.g3:No card needed`,
   ];
 
@@ -88,7 +88,7 @@ export class HomeComponent {
       points: [
         $localize`:@@home.coach.p1:Your public storefront and bookable profile`,
         $localize`:@@home.coach.p2:Programs your clients actually follow`,
-        $localize`:@@home.coach.p3:Get paid, keep what you earn`,
+        $localize`:@@home.coach.p3:Get paid for sessions, plans and products`,
         $localize`:@@home.coach.p4:Your whole roster in one place`,
       ],
     },
@@ -143,7 +143,7 @@ export class HomeComponent {
 
     seo.set({
       title: $localize`:@@home.meta.title:MotionHive — free coaching software for the communities you build`,
-      description: $localize`:@@home.meta.description:MotionHive is free software for coaches: a bookable storefront, sessions, programs, payments and community in one place. Unlimited clients, no platform fee.`,
+      description: $localize`:@@home.meta.description:MotionHive is free software for coaches: a bookable storefront, sessions, programs, payments and community in one place. Unlimited clients, no subscription.`,
     });
 
     // Organization anchors the brand entity; other schemas reference it by @id.
