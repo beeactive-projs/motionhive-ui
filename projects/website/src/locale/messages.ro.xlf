@@ -52,7 +52,7 @@
       </trans-unit>
       <trans-unit id="feat.storefront.c2" datatype="html">
         <source>Show your sessions, products and prices</source>
-        <target state="translated">Îți arăți sesiunile, programele și prețurile</target>
+        <target state="translated">Îți arăți sesiunile, produsele și prețurile</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">67</context>
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="feat.storefront.c6" datatype="html">
         <source>Show ratings from the clients you've worked with</source>
-        <target state="translated">Gratuită, fără comision din cât ceri</target>
+        <target state="translated">Arăți recenzii de la clienții cu care ai lucrat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">71</context>
@@ -196,7 +196,7 @@
       </trans-unit>
       <trans-unit id="feat.storefront.md" datatype="html">
         <source>Get a free public coaching page where clients see your sessions and products and book without messaging you first. Your link, your offer, no subscription.</source>
-        <target state="translated">Primești o pagină publică gratuită unde clienții îți văd sesiunile și rezervă fără să-ți scrie întâi. Linkul tău, oferta ta, fără comision.</target>
+        <target state="translated">Primești o pagină publică gratuită unde clienții îți văd sesiunile și produsele și rezervă fără să-ți scrie întâi. Linkul tău, oferta ta, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">106</context>
@@ -268,7 +268,7 @@
       </trans-unit>
       <trans-unit id="feat.sessions.c4" datatype="html">
         <source>At your own venues or online, with the meeting link attached</source>
-        <target state="translated">La sală sau online, cu linkul de întâlnire atașat</target>
+        <target state="translated">La locațiile tale sau online, cu linkul de întâlnire atașat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">123</context>
@@ -396,7 +396,7 @@
       </trans-unit>
       <trans-unit id="feat.sessions.md" datatype="html">
         <source>Free scheduling for coaches: recurring classes, capacity and waitlists, one to one bookings, your own venues, reminders and cancellation windows. No subscription.</source>
-        <target state="translated">Programare gratuită pentru antrenori: clase recurente, locuri limitate și listă de așteptare, ședințe individuale, memento-uri și termene de anulare. Fără comision.</target>
+        <target state="translated">Programare gratuită pentru antrenori: clase recurente, locuri limitate și listă de așteptare, ședințe individuale, locațiile tale, memento-uri și termene de anulare. Fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">160</context>
@@ -812,7 +812,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.one" datatype="html">
         <source>Invoices, subscriptions and products in one place</source>
-        <target state="translated">Încasezi și păstrezi ce câștigi</target>
+        <target state="translated">Facturi, abonamente și produse într-un singur loc</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">275</context>
@@ -884,7 +884,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.c6" datatype="html">
         <source>Create products once and show them on your page</source>
-        <target state="translated">Păstrezi ce câștigi, fără comision</target>
+        <target state="translated">Creezi produse o dată și le arăți pe pagina ta</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">287</context>
@@ -924,7 +924,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.b3t" datatype="html">
         <source>One place for what you're owed</source>
-        <target state="translated">Banii tăi rămân ai tăi</target>
+        <target state="translated">Un singur loc pentru ce ai de încasat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">302</context>
@@ -932,7 +932,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.b3b" datatype="html">
         <source>Invoices, memberships and one-off charges live together, so you always know who owes what.</source>
-        <target state="translated">MotionHive nu ia niciun comision. Doar procesatorul de plăți își percepe taxa lui standard.</target>
+        <target state="translated">Facturile, abonamentele și plățile unice stau la un loc, așa că știi mereu cine ce datorează.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">303</context>
@@ -940,7 +940,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.q1" datatype="html">
         <source>What can I charge for?</source>
-        <target state="translated">MotionHive ia un comision?</target>
+        <target state="translated">Pentru ce pot cere bani?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">308</context>
@@ -948,7 +948,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.a1" datatype="html">
         <source>Sessions, packages, one-off products and recurring memberships. You create them once and they can show on your page.</source>
-        <target state="translated">Nu. Nu există comision de platformă. Procesatorul de plăți îți percepe taxa lui standard, și ăsta e singurul cost.</target>
+        <target state="translated">Sesiuni, pachete, produse unice și abonamente recurente. Le creezi o dată și pot apărea pe pagina ta.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">309</context>
@@ -988,7 +988,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.mt" datatype="html">
         <source>Payments for coaches: invoices, subscriptions, products | MotionHive</source>
-        <target state="translated">Încasezi plăți și abonamente, fără comision | MotionHive</target>
+        <target state="translated">Plăți pentru antrenori: facturi, abonamente, produse | MotionHive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">321</context>
@@ -996,7 +996,7 @@
       </trans-unit>
       <trans-unit id="feat.payments.md" datatype="html">
         <source>Charge for sessions and packages, run recurring memberships, create products for your page and send invoices, all in one place. No subscription to manage clients.</source>
-        <target state="translated">Ceri bani pe sesiuni, pachete și abonamente, trimiți facturi și nu mai alergi după transferuri. MotionHive nu ia comision din ce câștigi.</target>
+        <target state="translated">Ceri bani pe sesiuni și pachete, rulezi abonamente recurente, creezi produse pentru pagina ta și trimiți facturi, toate într-un singur loc. Fără abonament ca să-ți gestionezi clienții.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">322</context>
@@ -1044,7 +1044,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.c1" datatype="html">
         <source>Message each client one to one</source>
-        <target state="translated">Scrii clienților unu la unu</target>
+        <target state="translated">Scrii fiecărui client unu la unu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">336</context>
@@ -1052,7 +1052,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.c2" datatype="html">
         <source>Real-time, so a reply lands right away</source>
-        <target state="translated">Vorbești cu tot grupul dintr-o dată</target>
+        <target state="translated">În timp real, așa că răspunsul ajunge imediat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">337</context>
@@ -1060,7 +1060,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.c3" datatype="html">
         <source>One thread per client, not scattered across apps</source>
-        <target state="translated">Planul stă lângă conversație</target>
+        <target state="translated">O conversație per client, nu răspândită prin mai multe aplicații</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">338</context>
@@ -1068,7 +1068,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.c4" datatype="html">
         <source>A quick word between sessions when it matters</source>
-        <target state="translated">Trimiți un clip sau o corectură în câteva secunde</target>
+        <target state="translated">Un mesaj scurt între sesiuni, când contează</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">339</context>
@@ -1084,7 +1084,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.c6" datatype="html">
         <source>For as many clients as you coach</source>
-        <target state="translated">Gratuit, pentru câți clienți antrenezi</target>
+        <target state="translated">Pentru câți clienți antrenezi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">341</context>
@@ -1092,7 +1092,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.b1t" datatype="html">
         <source>Feels like a normal chat</source>
-        <target state="translated">Coaching, nu birocrație</target>
+        <target state="translated">Se simte ca un chat obișnuit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">346</context>
@@ -1100,7 +1100,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.b1b" datatype="html">
         <source>Real-time messages, so a check-in lands right away instead of sitting in an inbox.</source>
-        <target state="translated">Planul e chiar acolo, așa că un mesaj de verificare ia câteva secunde, nu o căutare.</target>
+        <target state="translated">Mesaje în timp real, așa că un mesaj de verificare ajunge imediat, nu stă uitat într-o cutie de mesaje.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">347</context>
@@ -1156,7 +1156,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.q2" datatype="html">
         <source>Is it one to one only?</source>
-        <target state="translated">Pot scrie unui grup întreg?</target>
+        <target state="translated">E doar unu la unu?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">366</context>
@@ -1164,7 +1164,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.a2" datatype="html">
         <source>For now, yes. One to one keeps coaching personal; group threads are on the roadmap.</source>
-        <target state="translated">Da. Vorbești cu tot grupul dintr-o dată sau cu o singură persoană, în privat.</target>
+        <target state="translated">Deocamdată, da. Unu la unu păstrează coaching-ul personal; conversațiile de grup sunt pe listă.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">367</context>
@@ -1196,7 +1196,7 @@
       </trans-unit>
       <trans-unit id="feat.messaging.md" datatype="html">
         <source>Message your clients one to one, in real time, in the same place as their training. Free, with no client limit.</source>
-        <target state="translated">Ții conversațiile dintre antrenor și client lângă plan: mesaje unu la unu și de grup, gratuit, fără limită de clienți.</target>
+        <target state="translated">Scrii clienților unu la unu, în timp real, în același loc cu antrenamentul lor. Gratuit, fără limită de clienți.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">376</context>
@@ -1260,7 +1260,7 @@
       </trans-unit>
       <trans-unit id="feat.community.c3" datatype="html">
         <source>Post updates, with comments and reactions</source>
-        <target state="translated">Dai un anunț pe care îl vede tot grupul</target>
+        <target state="translated">Postezi anunțuri, cu comentarii și reacții</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">392</context>
@@ -2104,7 +2104,7 @@
       </trans-unit>
       <trans-unit id="fd.cta.sub" datatype="html">
         <source>Set up in minutes. No card, no catch, no subscription.</source>
-        <target state="translated">Îl configurezi în câteva minute. Fără card, fără capcane, fără comision.</target>
+        <target state="translated">Îl configurezi în câteva minute. Fără card, fără capcane, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
           <context context-type="linenumber">89,90</context>
@@ -2144,7 +2144,7 @@
       </trans-unit>
       <trans-unit id="features.sub" datatype="html">
         <source> One place for your storefront, your sessions, your programs and your people. All of it free, with no subscription. </source>
-        <target state="translated">Un singur loc pentru pagina ta, sesiuni, programe și oamenii tăi. Totul gratuit, fără comision.</target>
+        <target state="translated">Un singur loc pentru pagina ta, sesiuni, programe și oamenii tăi. Totul gratuit, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
           <context context-type="linenumber">9,12</context>
@@ -2160,7 +2160,7 @@
       </trans-unit>
       <trans-unit id="features.all.b" datatype="html">
         <source>Every feature, unlimited clients, no subscription.</source>
-        <target state="translated">Toate funcționalitățile, clienți nelimitați, fără comision.</target>
+        <target state="translated">Toate funcționalitățile, clienți nelimitați, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
           <context context-type="linenumber">25,26</context>
@@ -2344,7 +2344,7 @@
       </trans-unit>
       <trans-unit id="features.rm.s3" datatype="html">
         <source>Group messaging</source>
-        <target state="translated">Comentarii și reacții</target>
+        <target state="translated">Mesaje de grup</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.ts</context>
           <context context-type="linenumber">69</context>
@@ -2392,7 +2392,7 @@
       </trans-unit>
       <trans-unit id="features.meta.description" datatype="html">
         <source>Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.</source>
-        <target state="translated">Pagină cu rezervări, sesiuni, programe, exerciții, plăți, mesaje și comunitate. Toate funcționalitățile MotionHive sunt gratuite, cu clienți nelimitați și fără comision.</target>
+        <target state="translated">Pagină cu rezervări, sesiuni, programe, exerciții, plăți, mesaje și comunitate. Fiecare funcționalitate MotionHive e gratuită, cu clienți nelimitați și fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.ts</context>
           <context context-type="linenumber">89</context>
@@ -2504,7 +2504,7 @@
       </trans-unit>
       <trans-unit id="home.hero.sub" datatype="html">
         <source> Run your whole coaching business in one place: a bookable storefront, sessions, programs, payments and community. Free to start, no subscription. </source>
-        <target state="translated">Îți conduci tot coaching-ul dintr-un singur loc: pagină cu rezervări, sesiuni, programe, plăți și comunitate. Începi gratuit, fără comision.</target>
+        <target state="translated">Îți conduci tot coaching-ul dintr-un singur loc: pagină cu rezervări, sesiuni, programe, plăți și comunitate. Începi gratuit, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">10,13</context>
@@ -2608,7 +2608,7 @@
       </trans-unit>
       <trans-unit id="home.free.sub" datatype="html">
         <source> No trial timer and no per-client pricing. You run your whole coaching for free. </source>
-        <target state="translated">Fără perioadă de probă, fără preț per client, fără comision din ce câștigi. Tu antrenezi, tu păstrezi.</target>
+        <target state="translated">Fără perioadă de probă și fără preț per client. Îți conduci tot coaching-ul gratuit.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">118,120</context>
@@ -2624,7 +2624,7 @@
       </trans-unit>
       <trans-unit id="home.free.s2" datatype="html">
         <source>subscriptions</source>
-        <target state="translated">comision</target>
+        <target state="translated">abonamente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">122</context>
@@ -2728,7 +2728,7 @@
       </trans-unit>
       <trans-unit id="home.g2" datatype="html">
         <source>No subscription</source>
-        <target state="translated">Fără comision</target>
+        <target state="translated">Fără abonament</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">71</context>
@@ -2808,7 +2808,7 @@
       </trans-unit>
       <trans-unit id="home.coach.p3" datatype="html">
         <source>Get paid for sessions, plans and products</source>
-        <target state="translated">Încasezi și păstrezi ce câștigi</target>
+        <target state="translated">Încasezi pentru sesiuni, planuri și produse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">91</context>
@@ -2928,7 +2928,7 @@
       </trans-unit>
       <trans-unit id="home.meta.description" datatype="html">
         <source>MotionHive is free software for coaches: a bookable storefront, sessions, programs, payments and community in one place. Unlimited clients, no subscription.</source>
-        <target state="translated">MotionHive este software gratuit pentru antrenori: pagină cu rezervări, sesiuni, programe, plăți și comunitate într-un singur loc. Clienți nelimitați, fără comision.</target>
+        <target state="translated">MotionHive e software gratuit pentru antrenori: pagină cu rezervări, sesiuni, programe, plăți și comunitate într-un singur loc. Clienți nelimitați, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">146</context>
@@ -4716,7 +4716,7 @@
       </trans-unit>
       <trans-unit id="pricing.plan.per" datatype="html">
         <source>no subscription</source>
-        <target state="translated">/ pentru totdeauna</target>
+        <target state="translated">fără abonament</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">22,24</context>
@@ -4868,7 +4868,7 @@
       </trans-unit>
       <trans-unit id="pricing.pf5" datatype="html">
         <source>Payments: invoices, subscriptions, products</source>
-        <target state="translated">Plăți, păstrezi ce câștigi</target>
+        <target state="translated">Plăți: facturi, abonamente, produse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">39</context>
@@ -4892,7 +4892,7 @@
       </trans-unit>
       <trans-unit id="pricing.pf8" datatype="html">
         <source>No subscription to manage your clients</source>
-        <target state="translated">Fără comision, niciodată</target>
+        <target state="translated">Fără abonament ca să-ți gestionezi clienții</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">42</context>
@@ -4972,7 +4972,7 @@
       </trans-unit>
       <trans-unit id="pricing.cmp1.a" datatype="html">
         <source>Free, no subscription</source>
-        <target state="translated">0 $, pentru totdeauna</target>
+        <target state="translated">Gratuit, fără abonament</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">75</context>
@@ -5036,7 +5036,7 @@
       </trans-unit>
       <trans-unit id="pricing.cmp4.l" datatype="html">
         <source>Products and memberships</source>
-        <target state="translated">Păstrezi ce câștigi</target>
+        <target state="translated">Produse și abonamente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">89</context>
@@ -5044,7 +5044,7 @@
       </trans-unit>
       <trans-unit id="pricing.cmp4.a" datatype="html">
         <source>Built in</source>
-        <target state="translated">100%, fără comision</target>
+        <target state="translated">Incluse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">90</context>
@@ -5052,7 +5052,7 @@
       </trans-unit>
       <trans-unit id="pricing.cmp4.b" datatype="html">
         <source>Higher plans or add-on</source>
-        <target state="translated">Comision peste taxe</target>
+        <target state="translated">Doar la planuri scumpe sau extra</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">91</context>
@@ -5092,7 +5092,7 @@
       </trans-unit>
       <trans-unit id="pricing.faq1.a" datatype="html">
         <source>Yes. Managing your clients is free, with no client limit and no subscription. Later we may add optional premium tools on top, but running your coaching stays free.</source>
-        <target state="translated">Da. Toate funcționalitățile de bază sunt gratuite, fără limită de clienți și fără comision. S-ar putea să adăugăm mai târziu extra-uri plătite, opționale, dar coaching-ul cu oamenii tăi rămâne gratuit.</target>
+        <target state="translated">Da. Gestionarea clienților e gratuită, fără limită de clienți și fără abonament. Mai târziu s-ar putea să adăugăm unelte premium opționale pe deasupra, dar coaching-ul în sine rămâne gratuit.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">103</context>
@@ -5124,7 +5124,7 @@
       </trans-unit>
       <trans-unit id="pricing.faq3.a" datatype="html">
         <source>We are building in the open. The plan is optional premium tools over time, on top of the free core. Managing your clients stays free.</source>
-        <target state="translated">Construim la vedere. Ideea e să adăugăm în timp extra-uri plătite, opționale, niciodată un comision din coaching-ul tău de bază.</target>
+        <target state="translated">Construim la vedere. Ideea e să adăugăm în timp unelte premium opționale, peste nucleul gratuit. Gestionarea clienților rămâne gratuită.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">111</context>
@@ -5132,7 +5132,7 @@
       </trans-unit>
       <trans-unit id="pricing.faq4.q" datatype="html">
         <source>Will it stay free to manage clients?</source>
-        <target state="translated">E vreo capcană la plăți?</target>
+        <target state="translated">Va rămâne gratuit să-mi gestionez clienții?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">114</context>
@@ -5140,7 +5140,7 @@
       </trans-unit>
       <trans-unit id="pricing.faq4.a" datatype="html">
         <source>Yes. If premium ever arrives, it will be extra tools on top, never a paywall on running your coaching or managing the clients you already have.</source>
-        <target state="translated">Păstrezi ce câștigi. Se aplică taxele standard ale procesatorului de plăți (alea sunt ale procesatorului, nu ale noastre), iar MotionHive nu pune niciun comision peste.</target>
+        <target state="translated">Da. Dacă apare vreodată premium, vor fi unelte în plus pe deasupra, niciodată un zid de plată peste coaching-ul tău sau peste clienții pe care îi ai deja.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">115</context>
@@ -5164,7 +5164,7 @@
       </trans-unit>
       <trans-unit id="pricing.meta.description" datatype="html">
         <source>MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no subscription to manage your clients.</source>
-        <target state="translated">MotionHive e gratuit pentru antrenori: clienți nelimitați, pagina ta, sesiuni, programe, plăți și comunitate, fără comision și fără perioadă de probă.</target>
+        <target state="translated">MotionHive e gratuit pentru antrenori: clienți nelimitați, pagina ta, sesiuni, programe, plăți și comunitate, fără abonament ca să-ți gestionezi clienții.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">128</context>
@@ -5172,7 +5172,7 @@
       </trans-unit>
       <trans-unit id="pricing.meta.title" datatype="html">
         <source>Pricing: free coaching software, no subscription | MotionHive</source>
-        <target state="translated">Prețuri: software gratuit de coaching, fără comision | MotionHive</target>
+        <target state="translated">Prețuri: software gratuit de coaching, fără abonament | MotionHive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">131</context>
