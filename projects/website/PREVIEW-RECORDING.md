@@ -142,18 +142,41 @@ Right now `preview`/`poster` are `null` and a "Preview coming soon" placeholder 
 
 ## 6. Demo data (so the app looks full when you record)
 
-The clips must show a *lived-in* account, not empty states. Two personas, one per language.
+The clips must show a *lived-in* account, not empty states.
 
-**How to get it in — the honest split:**
-- **Non-payment sections** (profile, venues, sessions, programs, exercises, groups, posts,
-  messages, reviews) can be seeded straight into the local DB with a script. I can write
-  `beeactive-api/scripts/seed-demo.mjs` (or a SQL file) that inserts everything below. **I need to
-  know: do you record against a local API (`localhost:3800`) or a prod demo account?** That decides
-  the approach.
-- **Payments** are Stripe-backed — invoices/subscriptions/products need real Stripe **test-mode**
-  objects, which the app creates through its own flow. So for the payments clip: switch the app to
-  Stripe test keys and create 2–3 products + a couple of invoices via the UI once, then record.
-  (SQL-inserting fake Stripe IDs would break the payment screens.)
+**How to get it in — DONE (isolated demo DB).** The demo data is seeded by
+`beeactive-api/scripts/seed-test-data.sql` (idempotent, re-runnable). To keep your real
+`beeact` dev DB and Stripe test accounts untouched, everything lives in a **separate
+`beeact_demo` database**. One-time setup (already run once):
+
+```bash
+cd beeactive-api
+# vars for local Postgres (Postgres.app). Password comes from .env.
+export DB_HOST=localhost DB_PORT=5432 DB_USERNAME=postgres DB_DATABASE=beeact_demo
+export DB_PASSWORD="$(grep -E '^DB_PASSWORD=' .env | cut -d= -f2-)"
+export PGPASSWORD="$DB_PASSWORD"; unset DATABASE_URL
+
+createdb beeact_demo 2>/dev/null || true          # or: psql -d postgres -c 'CREATE DATABASE beeact_demo'
+node migrations/run.js --yes                        # full schema + demo accounts (migration 026)
+npx tsx scripts/seed-exercises.ts                   # 873-exercise FED library (real names + clip images)
+psql -d beeact_demo -v ON_ERROR_STOP=1 -f scripts/seed-test-data.sql   # the demo content
+```
+
+**Record against `beeact_demo`:** start the API with that DB, e.g.
+`DB_DATABASE=beeact_demo npm run start:dev`, then log in as the coach.
+
+- **Coach login:** `instructor@motionhive.fit` / `Test1234!` → **Alex Rivera**, `@alexrivera`,
+  public profile, 11 yrs, 3 venues, sessions, programs, a group, and **4 reviews**.
+- **Client login:** `user@motionhive.fit` / `Test1234!` → **Sarah Mitchell** (booked into sessions,
+  has an assigned program + logged workouts, DM thread with the coach).
+- Re-running the seed is safe (idempotent). It reclaims the base exercise slugs from the FED library
+  so the two never collide.
+
+**Payments** are the one exception — invoices/subscriptions/products need real Stripe **test-mode**
+objects, which the app creates through its own flow (the seeded invoice/payment rows use fake
+`stripe_*` ids and render in lists but 500 on any live Stripe action). For the payments clip: point
+`beeact_demo` at your Stripe **test** keys and create 2–3 products + a couple of invoices via the UI
+once, then record. (SQL-inserting fake Stripe IDs would break the payment screens.)
 
 ### The demo content pack (EN + RO)
 
@@ -212,8 +235,29 @@ The clips must show a *lived-in* account, not empty states. Two personas, one pe
 
 ---
 
-## 7. Suggested order of work
-1. You tell me the record environment (local API vs prod demo) → I write the non-payment seed.
-2. You set up Stripe **test** keys locally → create the 3 products + 2 invoices via the app UI.
-3. I wire `preview`/`poster` to be locale-aware with graceful fallback (turnkey drop-in).
-4. You record the 14 clips per §4, compress per §2, drop into `public/videos/`, rebuild.
+## 7. Language (EN vs RO)
+
+The **app UI** localises to Romanian at `/ro` (nav, buttons, labels, empty states), but **row
+data** is stored in one language. Two honest facts shape the RO clips:
+
+- The **exercise library is the Free Exercise DB** (873 rows, English names + images). The exercises
+  clip shows English movement names regardless of UI language. That is the product reality in V1,
+  not a seed gap.
+- The current seed content (coach *Alex Rivera*, session titles, the group post, the DM thread,
+  reviews) is **English**.
+
+So the two options for the RO set:
+- **Fast:** record the same `beeact_demo` account with the app switched to `/ro`. Chrome is Romanian;
+  free-text content stays English. Fine for sessions/exercises/payments; weaker for
+  storefront/community/messaging where the words carry the clip.
+- **Full:** a companion `scripts/seed-test-data.ro.sql` adding a second coach (*Andrei Popescu*) with
+  Romanian venues, session titles, a program, a group + post, a DM thread, and reviews (reusing the
+  English exercise library). Now that the EN seed runs clean on `beeact_demo`, this can be written
+  **and tested live**, not blind. Say the word and I'll build it.
+
+## 8. Suggested order of work
+1. ✅ Demo data seeded into `beeact_demo` (see §6). Log in as Alex Rivera and eyeball each surface.
+2. (RO) Decide fast vs full per §7 → if full, I add + test `seed-test-data.ro.sql`.
+3. You set up Stripe **test** keys locally → create the 3 products + 2 invoices via the app UI.
+4. I wire `preview`/`poster` to be locale-aware with graceful fallback (turnkey drop-in).
+5. You record the 14 clips per §4, compress per §2, drop into `public/videos/`, rebuild.
