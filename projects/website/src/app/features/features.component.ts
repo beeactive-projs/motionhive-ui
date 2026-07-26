@@ -86,7 +86,7 @@ export class FeaturesComponent {
 
     seo.set({
       title: $localize`:@@features.meta.title:Features — everything you need to coach online | MotionHive`,
-      description: $localize`:@@features.meta.description:Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.`,
+      description: $localize`:@@features.meta.description:Profile, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.`,
     });
 
     seo.setJsonLd('ld-breadcrumb', {

@@ -33,7 +33,7 @@ export class PricingComponent {
 
   readonly planFeatures = [
     $localize`:@@pricing.pf1:Unlimited clients`,
-    $localize`:@@pricing.pf2:Your bookable storefront`,
+    $localize`:@@pricing.pf2:Your bookable profile`,
     $localize`:@@pricing.pf3:Sessions and scheduling`,
     $localize`:@@pricing.pf4:Programs and exercise library`,
     $localize`:@@pricing.pf5:Payments: invoices, subscriptions, products`,
@@ -59,7 +59,7 @@ export class PricingComponent {
       icon: '💳',
       tone: 'amber',
       title: $localize`:@@pricing.nc3.t:No card to start`,
-      body: $localize`:@@pricing.nc3.b:Sign up and set up your storefront without entering any payment details.`,
+      body: $localize`:@@pricing.nc3.b:Sign up and set up your profile without entering any payment details.`,
     },
     {
       icon: '🔒',
@@ -104,7 +104,7 @@ export class PricingComponent {
     },
     {
       q: $localize`:@@pricing.faq2.q:Do I need a credit card to start?`,
-      a: $localize`:@@pricing.faq2.a:No. You can sign up and set up your storefront without entering any payment details.`,
+      a: $localize`:@@pricing.faq2.a:No. You can sign up and set up your profile without entering any payment details.`,
     },
     {
       q: $localize`:@@pricing.faq3.q:How do you make money then?`,
@@ -125,7 +125,7 @@ export class PricingComponent {
     const isRo = isRoLocale(inject(DOCUMENT));
     const url = siteUrl('/pricing', isRo);
 
-    const description = $localize`:@@pricing.meta.description:MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no subscription to manage your clients.`;
+    const description = $localize`:@@pricing.meta.description:MotionHive is free for coaches: unlimited clients, your profile, sessions, programs, payments and community, with no subscription to manage your clients.`;
 
     seo.set({
       title: $localize`:@@pricing.meta.title:Pricing: free coaching software, no subscription | MotionHive`,

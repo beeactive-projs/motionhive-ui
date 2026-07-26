@@ -54,7 +54,7 @@
       </div>
 
       <div class="flex items-center shrink-0">
-        <p-button label="Join" [icon]="isGuest() ? 'pi pi-lock' : 'pi pi-arrow-right'" iconPos="left"
+        <p-button label="Join" [icon]="isGuest() ? 'pi pi-lock' : 'pi pi-arrow-right'" iconPos="right"
           rounded size="small" [attr.aria-label]="'Join ' + group.name"
           (onClick)="onJoin(group.id)" />
       </div>

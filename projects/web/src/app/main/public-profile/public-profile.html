@@ -38,7 +38,7 @@
              payload. -->
         <mh-stat-strip [stats]="instructorStats()" />
         <mh-public-profile-about-tab />
-        <mh-public-profile-offerings-tab />
+        <mh-public-profile-offerings-tab (offeringSelect)="onOfferingSelect($event)" />
         <mh-public-profile-groups-tab (lockedJoin)="onLockedAction(Actions.Group)" />
       } @else if (userProfile(); as u) {
         <!-- Non-instructor: long-scroll about + future user sections. -->
@@ -73,7 +73,8 @@
       [(visible)]="contactDialogVisible"
       [instructorUserId]="p.userId"
       [instructorName]="p.displayName || (p.firstName + ' ' + p.lastName)"
-      [instructorAvatar]="instructorAvatar()" />
+      [instructorAvatar]="instructorAvatar()"
+      [prefillMessage]="contactPrefill()" />
   }
 
   <mh-signup-prompt-dialog

@@ -1,3 +1,21 @@
 :host {
   display: block;
 }
+
+/* Match the marketing site's radius standard (.mh-btn = 0.75rem) across the
+   whole public profile, so buttons and pills read consistently with the
+   website instead of PrimeNG's full-pill `rounded`. Scoped to the profile via
+   :host; ::ng-deep reaches the PrimeNG internals rendered by the child
+   sections (offering cards, group cards, tags). The doubled class beats
+   PrimeNG's own `-rounded` specificity. */
+:host ::ng-deep {
+  .p-button,
+  .p-button.p-button-rounded {
+    border-radius: 0.75rem;
+  }
+
+  .p-tag,
+  .p-tag.p-tag-rounded {
+    border-radius: 0.75rem;
+  }
+}

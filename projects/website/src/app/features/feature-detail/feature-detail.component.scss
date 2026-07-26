@@ -30,9 +30,15 @@
 }
 .hero__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Give the demo a bit more room than the copy, and a touch more on large
+     screens. Stacks to full-width on mobile so the clip stays legible. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
   gap: 2.5rem;
   align-items: center;
+
+  @media (min-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  }
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;

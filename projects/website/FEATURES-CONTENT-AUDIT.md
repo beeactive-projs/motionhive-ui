@@ -25,7 +25,7 @@ Backend checked: `beeactive-api/src/modules/*` (controllers, entities, CLAUDE.md
 
 | Feature | Claim | Reality |
 |---|---|---|
-| Storefront | public page at your handle, bookable | `profile` by-handle + `session` bookings ✓ |
+| Profile | public page at your handle, bookable | `profile` by-handle + `session` bookings ✓ |
 | Sessions | recurring, capacity + auto-promote waitlist, 1:1, online + meeting link, cancellation windows, reminders | `session` module (all present per CLAUDE.md) ✓ |
 | Programs | build weeks/days, reuse across clients, sets/reps/load/rest, **swap on a client's copy**, clients tick off, coach sees who trains | `program` + `program-assignment` (copy-on-assign deep clone w/ per-assignment overrides) + `workout-log` ✓ |
 | Exercises | own library, **clips**, cues, tag by muscle/equipment, drop into programs, **fork** | `exercise` (mediaKind YOUTUBE/VIDEO/IMAGE, `instructions`, muscle + equipment, `:id/fork`) ✓ |

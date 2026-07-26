@@ -25,7 +25,7 @@
       <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">Certifications</span>
       <div class="flex flex-wrap gap-2">
         @for (cert of certifications(); track cert.name) {
-        <span class="cert-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium">
+        <span class="cert-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium">
           <i class="pi pi-verified text-xs"></i>
           <span>{{ cert.name }}</span>
         </span>
@@ -39,7 +39,28 @@
       <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">I specialize in</span>
       <div class="flex flex-wrap gap-2">
         @for (spec of specializations(); track spec) {
-        <p-tag [value]="spec" severity="secondary" rounded />
+        <p-tag [value]="prettifySpecialization(spec)" severity="secondary" rounded />
+        }
+      </div>
+    </div>
+    }
+
+    @if (venues().length > 0) {
+    <div class="flex flex-col gap-2">
+      <span class="text-xs font-semibold uppercase tracking-wider text-muted-color">Where I coach</span>
+      <div class="flex flex-col gap-2">
+        @for (v of venues(); track v.id) {
+        <div class="venue-row flex items-center gap-3 px-3 py-2 rounded-lg">
+          <i class="pi shrink-0" [class.pi-video]="v.isOnline" [class.pi-map-marker]="!v.isOnline"></i>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm font-medium truncate">{{ v.name }}</span>
+            @if (venueLocation(v); as loc) {
+            <span class="text-xs text-muted-color truncate">{{ loc }}</span>
+            }
+          </div>
+          <p-tag class="ml-auto shrink-0" [value]="venueKindLabel(v)"
+            [severity]="v.isOnline ? 'info' : 'secondary'" rounded />
+        </div>
         }
       </div>
     </div>

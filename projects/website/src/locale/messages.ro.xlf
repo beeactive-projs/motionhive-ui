@@ -3,8 +3,8 @@
   <file source-language="en" target-language="ro" datatype="plaintext" original="ng2.template">
     <body>
       <trans-unit id="feat.storefront.name" datatype="html">
-        <source>Storefront</source>
-        <target state="translated">Pagina ta</target>
+        <source>Profile</source>
+        <target state="translated">Profil</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">56</context>
@@ -35,8 +35,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.intro" datatype="html">
-        <source>Your storefront is the page you send people to. It shows who you are, what you run, and lets someone book without a single back and forth message.</source>
-        <target state="translated">Pagina ta e locul unde trimiți oamenii. Arată cine ești, ce ții și îi lasă să rezerve fără niciun schimb de mesaje.</target>
+        <source>Your profile is the page you send people to. It shows who you are, what you run, and lets someone book without a single back and forth message.</source>
+        <target state="translated">Profilul tău e pagina unde trimiți oamenii. Arată cine ești, ce ții și îi lasă să rezerve fără niciun schimb de mesaje.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">64</context>
@@ -147,8 +147,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.a1" datatype="html">
-        <source>No. The storefront is the page. If you already have a site, link to it from there.</source>
-        <target state="translated">Nu. Pagina asta e site-ul. Dacă ai deja unul, pui link către el de aici.</target>
+        <source>No. Your profile is the page. If you already have a site, link to it from there.</source>
+        <target state="translated">Nu. Profilul tău e pagina. Dacă ai deja un site, pui link către el de aici.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">93</context>
@@ -171,8 +171,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.q3" datatype="html">
-        <source>Is my storefront public?</source>
-        <target state="translated">Pagina mea e publică?</target>
+        <source>Is my profile public?</source>
+        <target state="translated">Profilul meu e public?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">100</context>
@@ -187,8 +187,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.mt" datatype="html">
-        <source>Coaching storefront: a free bookable page | MotionHive</source>
-        <target state="translated">Pagină de coaching gratuită, cu rezervări | MotionHive</target>
+        <source>Coach profile: a free bookable page | MotionHive</source>
+        <target state="translated">Profil de coach: pagină gratuită, cu rezervări | MotionHive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">105</context>
@@ -2143,7 +2143,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.sub" datatype="html">
-        <source> One place for your storefront, your sessions, your programs and your people. All of it free, with no subscription. </source>
+        <source> One place for your profile, your sessions, your programs and your people. All of it free, with no subscription. </source>
         <target state="translated">Un singur loc pentru pagina ta, sesiuni, programe și oamenii tăi. Totul gratuit, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
@@ -2239,7 +2239,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.cta.sub" datatype="html">
-        <source>Set up your storefront in minutes. No card, no catch.</source>
+        <source>Set up your profile in minutes. No card, no catch.</source>
         <target state="translated">Îți faci pagina în câteva minute. Fără card, fără capcane.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
@@ -2391,7 +2391,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.meta.description" datatype="html">
-        <source>Storefront, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.</source>
+        <source>Profile, sessions, programs, exercises, payments, messaging and community. Every MotionHive feature is free, with unlimited clients and no subscription.</source>
         <target state="translated">Pagină cu rezervări, sesiuni, programe, exerciții, plăți, mesaje și comunitate. Fiecare funcționalitate MotionHive e gratuită, cu clienți nelimitați și fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.ts</context>
@@ -2487,7 +2487,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="blog.article.cta.sub" datatype="html">
-        <source> MotionHive is free for coaches: storefront, programs, payments and community in one place. </source>
+        <source> MotionHive is free for coaches: profile, programs, payments and community in one place. </source>
         <target state="translated">MotionHive e gratuit pentru antrenori: magazin, programe, plăți și comunitate într-un singur loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog-article/blog-article.component.html</context>
@@ -2503,7 +2503,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hero.sub" datatype="html">
-        <source> Run your whole coaching business in one place: a bookable storefront, sessions, programs, payments and community. Free to start, no subscription. </source>
+        <source> Run your whole coaching business in one place: a bookable profile, sessions, programs, payments and community. Free to start, no subscription. </source>
         <target state="translated">Îți conduci tot coaching-ul dintr-un singur loc: pagină cu rezervări, sesiuni, programe, plăți și comunitate. Începi gratuit, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -2695,7 +2695,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.sub" datatype="html">
-        <source>Free to start. Set up your storefront in minutes.</source>
+        <source>Free to start. Set up your profile in minutes.</source>
         <target state="translated">Începi gratuit. Îți faci pagina în câteva minute.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -2791,7 +2791,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p1" datatype="html">
-        <source>Your public storefront and bookable profile</source>
+        <source>Your public, bookable coach profile</source>
         <target state="translated">Pagina ta publică, cu rezervări</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
@@ -2927,7 +2927,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.meta.description" datatype="html">
-        <source>MotionHive is free software for coaches: a bookable storefront, sessions, programs, payments and community in one place. Unlimited clients, no subscription.</source>
+        <source>MotionHive is free software for coaches: a bookable profile, sessions, programs, payments and community in one place. Unlimited clients, no subscription.</source>
         <target state="translated">MotionHive e software gratuit pentru antrenori: pagină cu rezervări, sesiuni, programe, plăți și comunitate într-un singur loc. Clienți nelimitați, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
@@ -4819,7 +4819,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cta.sub" datatype="html">
-        <source>Set up your storefront in minutes. No card, no catch.</source>
+        <source>Set up your profile in minutes. No card, no catch.</source>
         <target state="translated">Îți faci pagina în câteva minute. Fără card, fără capcane.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
@@ -4843,7 +4843,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.pf2" datatype="html">
-        <source>Your bookable storefront</source>
+        <source>Your bookable profile</source>
         <target state="translated">Pagina ta, cu rezervări</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
@@ -4939,7 +4939,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.nc3.b" datatype="html">
-        <source>Sign up and set up your storefront without entering any payment details.</source>
+        <source>Sign up and set up your profile without entering any payment details.</source>
         <target state="translated">Îți faci cont și îți pui pagina la punct fără să treci vreun detaliu de plată.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
@@ -5107,7 +5107,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq2.a" datatype="html">
-        <source>No. You can sign up and set up your storefront without entering any payment details.</source>
+        <source>No. You can sign up and set up your profile without entering any payment details.</source>
         <target state="translated">Nu. Îți faci cont și îți pui pagina la punct fără să treci vreun detaliu de plată.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
@@ -5163,7 +5163,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.meta.description" datatype="html">
-        <source>MotionHive is free for coaches: unlimited clients, your storefront, sessions, programs, payments and community, with no subscription to manage your clients.</source>
+        <source>MotionHive is free for coaches: unlimited clients, your profile, sessions, programs, payments and community, with no subscription to manage your clients.</source>
         <target state="translated">MotionHive e gratuit pentru antrenori: clienți nelimitați, pagina ta, sesiuni, programe, plăți și comunitate, fără abonament ca să-ți gestionezi clienții.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>

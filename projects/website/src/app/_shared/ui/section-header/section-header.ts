@@ -9,7 +9,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@an
  * <mh-section-header center>
  *   <mh-kicker kicker tone="teal" i18n>Features</mh-kicker>
  *   <ng-container heading i18n>Everything you need to <span class="text-brand">coach online.</span></ng-container>
- *   <ng-container sub i18n>One place for your storefront, sessions, programs and payments.</ng-container>
+ *   <ng-container sub i18n>One place for your profile, sessions, programs and payments.</ng-container>
  * </mh-section-header>
  * ```
  */
