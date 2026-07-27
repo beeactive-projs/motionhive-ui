@@ -47,11 +47,14 @@
     </div>
 
     <p-iconfield class="flex-1 md:flex-[0_1_320px]">
-      <p-inputicon class="pi pi-search" />
+      <!-- Swap the glass for a spinner while a fetch is pending so a
+           refining search gives feedback even when old cards stay up. -->
+      <p-inputicon [class]="loading() ? 'pi pi-spinner pi-spin' : 'pi pi-search'" />
       <input pInputText type="text" fluid placeholder="Search programs…" aria-label="Search programs"
         [ngModel]="searchInput()" (ngModelChange)="onSearchChange($event)" />
       @if (searchInput() !== '') {
-      <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchChange('')" />
+      <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" aria-label="Clear search"
+        (click)="onSearchChange('')" (keydown.enter)="onSearchChange('')" />
       }
     </p-iconfield>
   </div>

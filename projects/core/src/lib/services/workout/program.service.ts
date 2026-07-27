@@ -15,6 +15,7 @@ import type {
   PrescribedSet,
   Program,
   ProgramWorkout,
+  ReorderProgramWorkoutsPayload,
   UpdatePrescribedExercisePayload,
   UpdatePrescribedSetPayload,
   UpdateProgramPayload,
@@ -93,6 +94,22 @@ export class ProgramService {
   removeWorkout(programId: string, workoutId: string): Observable<void> {
     return this._http.delete<void>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WORKOUT_BY_ID(programId, workoutId)}`,
+    );
+  }
+
+  /**
+   * Atomic (week, day) repositioning of workouts — one transaction on
+   * the BE, so a drag-reorder can't strand the calendar half-moved.
+   * Returns ALL workouts of the program in the new calendar order
+   * (no nested exercises).
+   */
+  reorderWorkouts(
+    programId: string,
+    payload: ReorderProgramWorkoutsPayload,
+  ): Observable<ProgramWorkout[]> {
+    return this._http.patch<ProgramWorkout[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WORKOUTS_REORDER(programId)}`,
+      payload,
     );
   }
 

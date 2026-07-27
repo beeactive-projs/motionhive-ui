@@ -1,14 +1,28 @@
 <p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
-  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '40rem' }" header="Add exercise" styleClass="exercise-picker">
+  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '40rem' }"
+  [header]="multi() ? 'Add exercises' : 'Add exercise'" styleClass="exercise-picker">
   <div class="flex min-h-80 flex-col gap-3 pt-3">
     <p-iconfield>
-      <p-inputicon class="pi pi-search" />
-      <input pInputText type="search" fluid placeholder="Search exercises…" aria-label="Search exercises"
+      <p-inputicon [class]="loading() ? 'pi pi-spinner pi-spin' : 'pi pi-search'" />
+      <input pInputText type="text" fluid placeholder="Search exercises…" aria-label="Search exercises"
         autocomplete="off" [ngModel]="query()" (ngModelChange)="onSearchChange($event)" />
       @if (query() !== '') {
-      <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchChange('')" />
+      <!-- pi-times-circle (not pi-times) so it doesn't mirror the dialog's ✕ close button. -->
+      <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" aria-label="Clear search"
+        (click)="onSearchChange('')" (keydown.enter)="onSearchChange('')" />
       }
     </p-iconfield>
+
+    @if (multi() && selectedCount() > 0) {
+    <div class="flex items-center justify-between gap-3 rounded-lg bg-surface-100 px-3 py-1.5 dark:bg-surface-800"
+      role="status" aria-live="polite">
+      <span class="text-xs font-semibold text-surface-700 dark:text-surface-200">
+        {{ selectedCount() }} selected
+      </span>
+      <p-button label="Clear" size="small" severity="secondary" [text]="true" [disabled]="submitting()"
+        (onClick)="clearSelection()" />
+    </div>
+    }
 
     @if (loading() && results().length === 0) {
     <!-- Skeleton mirrors the result rows. -->
@@ -30,10 +44,11 @@
       <small class="text-xs text-surface-500">Try a different search term.</small>
     </div>
     } @else {
-    <div class="flex max-h-110 flex-col gap-1.5 overflow-y-auto" role="group" aria-label="Exercises">
+    <div class="flex max-h-110 flex-col gap-1.5 overflow-y-auto transition-opacity" [class.opacity-60]="loading()"
+      role="group" aria-label="Exercises">
       @for (ex of results(); track ex.id) {
-      <p-button fluid [outlined]="true" ariaLabel="{{ ex.name }}"
-        [styleClass]="'picker-row' + (selectedId() === ex.id ? ' picker-row--on' : '')" (onClick)="select(ex.id)">
+      <p-button fluid [outlined]="true" [ariaLabel]="ex.name"
+        [styleClass]="'picker-row' + (isSelected(ex.id) ? ' picker-row--on' : '')" (onClick)="toggle(ex)">
         <span class="flex w-full items-center gap-3 text-left">
           @if (ex.thumbnailUrl) {
           <img [src]="ex.thumbnailUrl" [alt]="ex.name" loading="lazy"
@@ -51,9 +66,16 @@
               {{ ex.equipment[0].name }} }
             </span>
           </span>
-          <i class="pi shrink-0 text-base" [class.pi-circle]="selectedId() !== ex.id"
-            [class.text-surface-300]="selectedId() !== ex.id" [class.pi-check-circle]="selectedId() === ex.id"
-            [class.text-primary]="selectedId() === ex.id"></i>
+          @if (multi()) {
+          <!-- Checkbox-style indicator — selection persists across searches. -->
+          <i class="pi shrink-0 text-base" [class.pi-stop]="!isSelected(ex.id)"
+            [class.text-surface-300]="!isSelected(ex.id)" [class.pi-check-square]="isSelected(ex.id)"
+            [class.text-primary]="isSelected(ex.id)"></i>
+          } @else {
+          <i class="pi shrink-0 text-base" [class.pi-circle]="!isSelected(ex.id)"
+            [class.text-surface-300]="!isSelected(ex.id)" [class.pi-check-circle]="isSelected(ex.id)"
+            [class.text-primary]="isSelected(ex.id)"></i>
+          }
         </span>
       </p-button>
       }
@@ -63,7 +85,7 @@
 
   <ng-template #footer>
     <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
-    <p-button label="Add to workout" icon="pi pi-plus" [loading]="submitting()" [disabled]="!canSubmit()"
+    <p-button [label]="submitLabel()" icon="pi pi-plus" [loading]="submitting()" [disabled]="!canSubmit()"
       (onClick)="submit()" />
   </ng-template>
 </p-dialog>
