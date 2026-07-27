@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   computed,
   effect,
   inject,
@@ -8,12 +9,14 @@ import {
   model,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
+import { Message } from 'primeng/message';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
@@ -25,6 +28,7 @@ import {
   ProgramService,
   ProgramWorkout,
   UpdateProgramWorkoutPayload,
+  noWhitespaceValidator,
   showApiError,
 } from 'core';
 
@@ -41,11 +45,12 @@ import {
 @Component({
   selector: 'mh-workout-form-dialog',
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     Button,
     Dialog,
     InputNumber,
     InputText,
+    Message,
     Select,
     Textarea,
     Toast,
@@ -66,17 +71,23 @@ export class WorkoutFormDialog {
 
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
+  private readonly _formBuilder = inject(FormBuilder);
+
+  private readonly _nameInput =
+    viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   readonly submitting = signal(false);
 
-  // ── Form fields ──────────────────────────────────────────────────
+  // ── Form ─────────────────────────────────────────────────────────
 
-  readonly name = signal('');
-  readonly notes = signal('');
-  readonly weekIndex = signal<number>(0);
-  readonly dayIndex = signal<number>(0);
-  readonly phase = signal<string>('');
-  readonly estimatedDurationMinutes = signal<number | null>(null);
+  readonly form = this._formBuilder.nonNullable.group({
+    name: ['', noWhitespaceValidator],
+    notes: [''],
+    weekIndex: [0],
+    dayIndex: [0],
+    phase: [''],
+    estimatedDurationMinutes: [null as number | null],
+  });
 
   // ── Options ──────────────────────────────────────────────────────
 
@@ -108,9 +119,21 @@ export class WorkoutFormDialog {
   readonly submitLabel = computed(() =>
     this.isEdit() ? 'Save changes' : 'Add workout',
   );
-  readonly canSubmit = computed(
-    () => this.name().trim().length >= 1 && !this.submitting(),
-  );
+
+  // ── Validation ───────────────────────────────────────────────────
+  // A disabled submit button fails silently — instead the button stays
+  // clickable and an invalid submit surfaces the inline error + focus.
+
+  isFieldInvalid(field: 'name'): boolean {
+    const control = this.form.controls[field];
+    return control.invalid && control.touched;
+  }
+
+  getFieldError(field: 'name'): string {
+    const errors = this.form.controls[field].errors;
+    if (errors?.['required']) return 'Workout name is required.';
+    return '';
+  }
 
   constructor() {
     effect(() => {
@@ -126,18 +149,22 @@ export class WorkoutFormDialog {
   }
 
   submit(): void {
-    if (!this.canSubmit()) return;
+    if (this.submitting()) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this._nameInput()?.nativeElement.focus();
+      return;
+    }
+
+    const value = this.form.getRawValue();
     const payload: CreateProgramWorkoutPayload = {
-      name: this.name().trim(),
-      ...(this.notes().trim() ? { notes: this.notes().trim() } : {}),
-      weekIndex: this.weekIndex(),
-      dayIndex: this.dayIndex(),
-      ...(this.phase().trim() ? { phase: this.phase().trim() } : {}),
-      ...(this.estimatedDurationMinutes() != null
-        ? {
-            estimatedDurationMinutes: this
-              .estimatedDurationMinutes() as number,
-          }
+      name: value.name.trim(),
+      ...(value.notes.trim() ? { notes: value.notes.trim() } : {}),
+      weekIndex: value.weekIndex,
+      dayIndex: value.dayIndex,
+      ...(value.phase.trim() ? { phase: value.phase.trim() } : {}),
+      ...(value.estimatedDurationMinutes != null
+        ? { estimatedDurationMinutes: value.estimatedDurationMinutes }
         : {}),
     };
 
@@ -180,19 +207,16 @@ export class WorkoutFormDialog {
   private _hydrate(): void {
     const w = this.workout();
     if (w) {
-      this.name.set(w.name);
-      this.notes.set(w.notes ?? '');
-      this.weekIndex.set(w.weekIndex);
-      this.dayIndex.set(w.dayIndex);
-      this.phase.set(w.phase ?? '');
-      this.estimatedDurationMinutes.set(w.estimatedDurationMinutes);
+      this.form.reset({
+        name: w.name,
+        notes: w.notes ?? '',
+        weekIndex: w.weekIndex,
+        dayIndex: w.dayIndex,
+        phase: w.phase ?? '',
+        estimatedDurationMinutes: w.estimatedDurationMinutes,
+      });
     } else {
-      this.name.set('');
-      this.notes.set('');
-      this.weekIndex.set(this.initialWeek() ?? 0);
-      this.dayIndex.set(0);
-      this.phase.set('');
-      this.estimatedDurationMinutes.set(null);
+      this.form.reset({ weekIndex: this.initialWeek() ?? 0 });
     }
   }
 }

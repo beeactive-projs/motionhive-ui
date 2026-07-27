@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   computed,
   effect,
   inject,
@@ -8,12 +9,20 @@ import {
   model,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
+import { Message } from 'primeng/message';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
@@ -27,8 +36,26 @@ import {
   ProgramService,
   ProgramStatus,
   UpdateProgramPayload,
+  noWhitespaceValidator,
   showApiError,
+  trimmedMinLength,
 } from 'core';
+
+type DurationUnit = 'weeks' | 'days';
+
+const parseTags = (raw: string): string[] =>
+  raw
+    .split(',')
+    .map((t) => t.trim().toLowerCase())
+    .filter((t) => t.length > 0);
+
+/** BE caps goalTags at 10 (`ArrayMaxSize`). */
+const maxTagsValidator =
+  (max: number): ValidatorFn =>
+  (control: AbstractControl): ValidationErrors | null => {
+    const n = parseTags((control.value as string | null) ?? '').length;
+    return n > max ? { maxTags: { max, actual: n } } : null;
+  };
 
 /**
  * Create / edit a program shell (FE-P2a + FE-P2b).
@@ -46,11 +73,12 @@ import {
 @Component({
   selector: 'mh-program-form-dialog',
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     Button,
     Dialog,
     InputNumber,
     InputText,
+    Message,
     Select,
     SelectButton,
     Textarea,
@@ -69,24 +97,27 @@ export class ProgramFormDialog {
 
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
+  private readonly _formBuilder = inject(FormBuilder);
+
+  private readonly _nameInput =
+    viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   readonly submitting = signal(false);
 
-  // ── Form fields ──────────────────────────────────────────────────
+  // ── Form ─────────────────────────────────────────────────────────
+  // Duration is stored on the BE in days; the form lets the author pick
+  // the INPUT unit (weeks default, days for short / "21-day" shapes).
 
-  readonly name = signal('');
-  readonly description = signal('');
-  readonly kind = signal<ProgramKind>(ProgramKind.Workout);
-  readonly status = signal<ProgramStatus>(ProgramStatus.Draft);
-  /**
-   * Storage unit — BE is days. The form lets the author pick the
-   * INPUT unit (weeks default, days for short / "21-day" shapes).
-   */
-  readonly durationUnit = signal<'weeks' | 'days'>('weeks');
-  /** Raw value in whatever unit the author picked. */
-  readonly durationValue = signal<number | null>(null);
-  readonly periodizationModel = signal<string>('');
-  readonly goalTagsRaw = signal<string>('');
+  readonly form = this._formBuilder.nonNullable.group({
+    name: ['', [noWhitespaceValidator, trimmedMinLength(2)]],
+    description: [''],
+    kind: [ProgramKind.Workout as ProgramKind],
+    status: [ProgramStatus.Draft as ProgramStatus],
+    durationUnit: ['weeks' as DurationUnit],
+    durationValue: [null as number | null],
+    periodizationModel: [''],
+    goalTags: ['', maxTagsValidator(10)],
+  });
 
   // ── Options ──────────────────────────────────────────────────────
 
@@ -109,15 +140,15 @@ export class ProgramFormDialog {
     { value: 'conjugate', label: 'Conjugate' },
   ];
 
-  readonly unitOptions: SelectItem<'weeks' | 'days'>[] = [
+  readonly unitOptions: SelectItem<DurationUnit>[] = [
     { value: 'weeks', label: 'Weeks' },
     { value: 'days', label: 'Days' },
   ];
 
   /** Cap derived from the unit. BE accepts 1..728 days = 1..104 weeks. */
-  readonly durationMax = computed(() =>
-    this.durationUnit() === 'weeks' ? 104 : 728,
-  );
+  durationMax(): number {
+    return this.form.controls.durationUnit.value === 'weeks' ? 104 : 728;
+  }
 
   // ── Derived ──────────────────────────────────────────────────────
 
@@ -128,9 +159,33 @@ export class ProgramFormDialog {
   readonly submitLabel = computed(() =>
     this.isEdit() ? 'Save changes' : 'Create program',
   );
-  readonly canSubmit = computed(
-    () => this.name().trim().length >= 2 && !this.submitting(),
-  );
+
+  // ── Validation ───────────────────────────────────────────────────
+  // A disabled submit button fails silently — instead the button stays
+  // clickable and an invalid submit surfaces the inline error + focus.
+
+  isFieldInvalid(field: 'name'): boolean {
+    const control = this.form.controls[field];
+    return control.invalid && control.touched;
+  }
+
+  getFieldError(field: 'name'): string {
+    const errors = this.form.controls[field].errors;
+    if (errors?.['required']) return 'Name is required.';
+    if (errors?.['minlength']) return 'Name must be at least 2 characters.';
+    return '';
+  }
+
+  /**
+   * Shown live (not gated on touched) — it can only trip after the 11th
+   * comma-separated entry, which is deliberate input.
+   */
+  goalTagsError(): string | null {
+    const errors = this.form.controls.goalTags.errors;
+    return errors?.['maxTags']
+      ? `Up to 10 tags allowed — you have ${errors['maxTags'].actual}.`
+      : null;
+  }
 
   constructor() {
     effect(() => {
@@ -149,26 +204,33 @@ export class ProgramFormDialog {
   }
 
   submit(): void {
-    if (!this.canSubmit()) return;
+    if (this.submitting()) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      if (this.form.controls.name.invalid) {
+        this._nameInput()?.nativeElement.focus();
+      }
+      return;
+    }
 
-    const goalTags = this._parseTags(this.goalTagsRaw());
-    const value = this.durationValue();
+    const value = this.form.getRawValue();
+    const goalTags = parseTags(value.goalTags);
     const durationDays =
-      value == null
+      value.durationValue == null
         ? undefined
-        : this.durationUnit() === 'weeks'
-          ? value * 7
-          : value;
+        : value.durationUnit === 'weeks'
+          ? value.durationValue * 7
+          : value.durationValue;
     const payload: CreateProgramPayload = {
-      name: this.name().trim(),
-      ...(this.description().trim()
-        ? { description: this.description().trim() }
+      name: value.name.trim(),
+      ...(value.description.trim()
+        ? { description: value.description.trim() }
         : {}),
-      kind: this.kind(),
-      status: this.status(),
+      kind: value.kind,
+      status: value.status,
       ...(durationDays != null ? { durationDays } : {}),
-      ...(this.periodizationModel().trim()
-        ? { periodizationModel: this.periodizationModel().trim() }
+      ...(value.periodizationModel.trim()
+        ? { periodizationModel: value.periodizationModel.trim() }
         : {}),
       ...(goalTags.length > 0 ? { goalTags } : {}),
     };
@@ -208,43 +270,32 @@ export class ProgramFormDialog {
   // ── Internals ────────────────────────────────────────────────────
 
   private _hydrate(p: Program | null): void {
-    if (p) {
-      this.name.set(p.name);
-      this.description.set(p.description ?? '');
-      this.kind.set(p.kind);
-      this.status.set(p.status);
-      // Hydrate the input unit by preferring weeks when the value
-      // divides evenly (the common case authored as N weeks). Day-
-      // counted programs (e.g. 21 days) snap to days automatically.
-      if (p.durationDays == null) {
-        this.durationUnit.set('weeks');
-        this.durationValue.set(null);
-      } else if (p.durationDays % 7 === 0) {
-        this.durationUnit.set('weeks');
-        this.durationValue.set(p.durationDays / 7);
-      } else {
-        this.durationUnit.set('days');
-        this.durationValue.set(p.durationDays);
-      }
-      this.periodizationModel.set(p.periodizationModel ?? '');
-      this.goalTagsRaw.set((p.goalTags ?? []).join(', '));
-    } else {
-      this.name.set('');
-      this.description.set('');
-      this.kind.set(ProgramKind.Workout);
-      this.status.set(ProgramStatus.Draft);
-      this.durationUnit.set('weeks');
-      this.durationValue.set(null);
-      this.periodizationModel.set('');
-      this.goalTagsRaw.set('');
+    if (!p) {
+      this.form.reset();
+      return;
     }
-  }
-
-  private _parseTags(raw: string): string[] {
-    return raw
-      .split(',')
-      .map((t) => t.trim().toLowerCase())
-      .filter((t) => t.length > 0)
-      .slice(0, 10);
+    // Hydrate the input unit by preferring weeks when the value divides
+    // evenly (the common case authored as N weeks). Day-counted programs
+    // (e.g. 21 days) snap to days automatically.
+    let durationUnit: DurationUnit = 'weeks';
+    let durationValue: number | null = null;
+    if (p.durationDays != null) {
+      if (p.durationDays % 7 === 0) {
+        durationValue = p.durationDays / 7;
+      } else {
+        durationUnit = 'days';
+        durationValue = p.durationDays;
+      }
+    }
+    this.form.reset({
+      name: p.name,
+      description: p.description ?? '',
+      kind: p.kind,
+      status: p.status,
+      durationUnit,
+      durationValue,
+      periodizationModel: p.periodizationModel ?? '',
+      goalTags: (p.goalTags ?? []).join(', '),
+    });
   }
 }
