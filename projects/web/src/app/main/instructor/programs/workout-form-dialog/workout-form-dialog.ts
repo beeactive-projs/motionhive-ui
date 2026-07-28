@@ -9,6 +9,7 @@ import {
   model,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -123,10 +124,18 @@ export class WorkoutFormDialog {
   // ── Validation ───────────────────────────────────────────────────
   // A disabled submit button fails silently — instead the button stays
   // clickable and an invalid submit surfaces the inline error + focus.
+  // Errors need `dirty` (or a submit attempt), not just `touched`: the
+  // dialog auto-focuses the name input on open, so blur alone would
+  // flash "required" the moment the user clicks any other field.
+
+  private readonly _submitAttempted = signal(false);
 
   isFieldInvalid(field: 'name'): boolean {
     const control = this.form.controls[field];
-    return control.invalid && control.touched;
+    return (
+      control.invalid &&
+      (this._submitAttempted() || (control.dirty && control.touched))
+    );
   }
 
   getFieldError(field: 'name'): string {
@@ -136,8 +145,12 @@ export class WorkoutFormDialog {
   }
 
   constructor() {
+    // Hydrate on open only. `untracked` keeps `workout`/`initialWeek`
+    // out of the dependency set so a parent-side signal update while
+    // the dialog is open can never reset the form under the user
+    // (e.g. reverting a just-picked week/day select value).
     effect(() => {
-      if (this.visible()) this._hydrate();
+      if (this.visible()) untracked(() => this._hydrate());
     });
   }
 
@@ -151,6 +164,7 @@ export class WorkoutFormDialog {
   submit(): void {
     if (this.submitting()) return;
     if (this.form.invalid) {
+      this._submitAttempted.set(true);
       this.form.markAllAsTouched();
       this._nameInput()?.nativeElement.focus();
       return;
@@ -205,6 +219,7 @@ export class WorkoutFormDialog {
   // ── Internals ────────────────────────────────────────────────────
 
   private _hydrate(): void {
+    this._submitAttempted.set(false);
     const w = this.workout();
     if (w) {
       this.form.reset({
@@ -213,7 +228,7 @@ export class WorkoutFormDialog {
         weekIndex: w.weekIndex,
         dayIndex: w.dayIndex,
         phase: w.phase ?? '',
-        estimatedDurationMinutes: w.estimatedDurationMinutes,
+        estimatedDurationMinutes: w.estimatedDurationMinutes ?? null,
       });
     } else {
       this.form.reset({ weekIndex: this.initialWeek() ?? 0 });

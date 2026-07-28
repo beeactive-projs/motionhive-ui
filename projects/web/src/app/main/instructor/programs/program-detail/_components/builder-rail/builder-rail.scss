@@ -1,0 +1,55 @@
+// The rail owns its own scrolling: search pinned top, summary pinned
+// bottom, only the outline list scrolls.
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+// Week toggle / workout rows are pButton text-secondary buttons — the
+// theme keeps hover/focus/active states; these rules only reshape the
+// centered single-line button into left-aligned rail rows.
+.mh-rail__weekbtn {
+  justify-content: flex-start;
+  padding: 0.25rem 0.5rem;
+}
+
+.mh-rail__wo {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0.5rem 0.625rem;
+  color: var(--p-text-color);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--radius-lg);
+
+  &:not(:disabled):hover {
+    color: var(--p-text-color);
+  }
+
+  // Honey marks the current selection only (never status) — same recipe
+  // as the sidenav's active row. Repeated for :hover so the theme's
+  // text-button hover tint doesn't wash out the selected state.
+  &--on,
+  &--on:not(:disabled):hover {
+    background: color-mix(in srgb, var(--p-primary-500) 10%, transparent);
+    box-shadow: inset 3px 0 0 0 var(--p-primary-500);
+  }
+}
+
+.mh-rail__summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--p-border-radius-lg);
+  background: var(--p-surface-900);
+  color: var(--p-surface-0);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+:host-context(.dark) .mh-rail__summary {
+  background: var(--p-surface-800);
+}
