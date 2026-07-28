@@ -1,0 +1,216 @@
+<div class="mh-exrow">
+  <div class="mh-exrow__head flex items-center gap-2 px-3 py-2 md:px-4">
+    <span class="w-5 shrink-0 text-center font-heading text-xs font-bold text-muted-color">{{
+      index() + 1
+    }}</span>
+
+    <!-- The whole content area toggles the set table; the icon actions sit
+         outside so they aren't nested inside the toggle button. -->
+    <button
+      pButton
+      type="button"
+      [text]="true"
+      severity="secondary"
+      class="mh-exrow__main min-w-0 flex-1 gap-2.5"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-controls]="'exercise-body-' + exercise().id"
+      [attr.aria-label]="(expanded() ? 'Collapse ' : 'Expand ') + name()"
+      (click)="toggle.emit()"
+    >
+      @if (exercise().exercise?.thumbnailUrl; as thumbnailUrl) {
+        <img
+          class="h-9 w-9 shrink-0 rounded-md bg-surface-100 object-cover dark:bg-surface-800"
+          [src]="thumbnailUrl"
+          [alt]="name()"
+          loading="lazy"
+        />
+      }
+      <span class="min-w-0 flex-1 text-left">
+        <span class="block truncate text-[13px] font-semibold">{{ name() }}</span>
+        @if (restLabel(); as rest) {
+          <span class="block text-[11px] text-muted-color">{{ rest }}</span>
+        }
+      </span>
+      @if (exercise().supersetGroupId != null) {
+        <p-tag [value]="'SS' + exercise().supersetGroupId" severity="warn" />
+      }
+      <span class="hidden shrink-0 text-xs font-medium tabular-nums text-muted-color sm:block">
+        {{ prescription() }}
+      </span>
+    </button>
+
+    <span class="mh-exrow__actions flex shrink-0 items-center">
+      <p-button
+        icon="pi pi-arrow-up"
+        size="small"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        styleClass="mh-reorder-btn"
+        [disabled]="index() === 0"
+        [ariaLabel]="'Move ' + name() + ' up'"
+        pTooltip="Move up"
+        tooltipPosition="left"
+        (onClick)="moveUp.emit()"
+      />
+      <p-button
+        icon="pi pi-arrow-down"
+        size="small"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        styleClass="mh-reorder-btn"
+        [disabled]="index() === count() - 1"
+        [ariaLabel]="'Move ' + name() + ' down'"
+        pTooltip="Move down"
+        tooltipPosition="left"
+        (onClick)="moveDown.emit()"
+      />
+      <p-button
+        icon="pi pi-arrow-right-arrow-left"
+        size="small"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        styleClass="mh-reorder-btn"
+        [disabled]="!canMoveAcross()"
+        [ariaLabel]="'Move ' + name() + ' to another workout'"
+        pTooltip="Move to another workout"
+        tooltipPosition="left"
+        (onClick)="moveTo.emit()"
+      />
+      <p-button
+        icon="pi pi-trash"
+        size="small"
+        severity="danger"
+        [text]="true"
+        [rounded]="true"
+        [ariaLabel]="'Remove ' + name()"
+        pTooltip="Remove exercise"
+        tooltipPosition="left"
+        (onClick)="remove.emit()"
+      />
+      <p-button
+        [icon]="expanded() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+        size="small"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        styleClass="mh-reorder-btn"
+        [ariaLabel]="(expanded() ? 'Collapse ' : 'Expand ') + name() + ' sets'"
+        [attr.aria-expanded]="expanded()"
+        (onClick)="toggle.emit()"
+      />
+    </span>
+  </div>
+
+  <!-- Wrapper stays in the DOM so the toggle's aria-controls target resolves. -->
+  <div [id]="'exercise-body-' + exercise().id">
+    @if (expanded()) {
+      <div class="px-3 pb-3 md:px-4 md:pl-11">
+        <!-- Mobile fallback for the prescription hidden in the collapsed row. -->
+        <p class="m-0 mb-1.5 text-xs font-medium tabular-nums text-muted-color sm:hidden">
+          {{ prescription() }}
+        </p>
+        @if (exercise().notes; as notes) {
+          <p class="m-0 mb-1.5 text-[11px] leading-relaxed text-muted-color">{{ notes }}</p>
+        }
+
+        @if (exercise().sets?.length) {
+          <p-table
+            [value]="exercise().sets ?? []"
+            [rowTrackBy]="trackSetById"
+            size="small"
+            class="text-xs"
+            (onRowReorder)="onRowReorder()"
+          >
+            <ng-template #header>
+              <tr>
+                <th class="w-[1%]"></th>
+                <th>#</th>
+                <th>Type</th>
+                <th>Target</th>
+                <th>Rest</th>
+                <th class="w-[1%]"></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-s let-rowIndex="rowIndex">
+              <tr [pReorderableRow]="rowIndex">
+                <td>
+                  <span
+                    pReorderableRowHandle
+                    class="pi pi-bars cursor-grab text-[10px] text-muted-color"
+                    [attr.aria-label]="'Drag to reorder set ' + (rowIndex + 1)"
+                  ></span>
+                </td>
+                <td>{{ s.orderIndex + 1 }}</td>
+                <td>
+                  <p-tag [value]="s.setType | titlecase" [severity]="setTypeSeverity(s.setType)" />
+                </td>
+                <td>{{ setSummary(s) }}</td>
+                <td>
+                  @if (s.restAfterSeconds != null) {
+                    {{ s.restAfterSeconds }}s
+                  } @else {
+                    —
+                  }
+                </td>
+                <td class="text-right">
+                  <span class="flex items-center gap-2">
+                    <p-button
+                      icon="pi pi-clone"
+                      size="small"
+                      severity="secondary"
+                      [text]="true"
+                      [rounded]="true"
+                      [ariaLabel]="'Duplicate set ' + (rowIndex + 1)"
+                      pTooltip="Duplicate set"
+                      tooltipPosition="left"
+                      (onClick)="duplicateSet.emit(s)"
+                    />
+                    <p-button
+                      icon="pi pi-pencil"
+                      size="small"
+                      severity="secondary"
+                      [text]="true"
+                      [rounded]="true"
+                      [ariaLabel]="'Edit set ' + (rowIndex + 1)"
+                      pTooltip="Edit set"
+                      tooltipPosition="left"
+                      (onClick)="editSet.emit(s)"
+                    />
+                    <p-button
+                      icon="pi pi-trash"
+                      size="small"
+                      severity="danger"
+                      [text]="true"
+                      [rounded]="true"
+                      [ariaLabel]="'Remove set ' + (rowIndex + 1)"
+                      pTooltip="Remove set"
+                      tooltipPosition="left"
+                      (onClick)="removeSet.emit(s)"
+                    />
+                  </span>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        } @else {
+          <div class="text-[11px] italic text-muted-color">No sets prescribed.</div>
+        }
+
+        <div class="mt-2 flex justify-end">
+          <p-button
+            label="Add set"
+            icon="pi pi-plus"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            styleClass="mh-dashed-btn"
+            (onClick)="addSet.emit()"
+          />
+        </div>
+      </div>
+    }
+  </div>
+</div>

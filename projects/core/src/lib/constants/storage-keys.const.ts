@@ -6,4 +6,7 @@
   THEME: 'motionhive_theme',
   PERMISSIONS: 'motionhive_permissions',
   ROLES: 'motionhive_roles',
+  /** Per-program collapse state in the program builder (suffix = program id). */
+  PROGRAM_BUILDER_EXPANDED: (programId: string) =>
+    `motionhive_program_builder_expanded_${programId}`,
 } as const;

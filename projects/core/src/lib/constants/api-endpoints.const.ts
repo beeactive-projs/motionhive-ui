@@ -211,6 +211,7 @@ export const API_ENDPOINTS = {
     BASE: '/programs',
     BY_ID: (id: string) => `/programs/${id}`,
     WORKOUTS: (id: string) => `/programs/${id}/workouts`,
+    WORKOUTS_REORDER: (id: string) => `/programs/${id}/workouts/reorder`,
     WORKOUT_BY_ID: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}`,
     EXERCISES: (id: string, workoutId: string) =>

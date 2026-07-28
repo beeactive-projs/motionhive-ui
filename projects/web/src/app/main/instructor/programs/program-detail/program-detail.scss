@@ -1,8 +1,41 @@
+// Builder shell. The host is a flex child of the layout's
+// `<main class="flex flex-col flex-1 overflow-auto">`; it must fill that
+// space and own its OWN scrolling — the page never scrolls, the rail and
+// the editor pane each scroll independently. Pane sizing/layout lives in
+// Tailwind utilities on the template (`w-1/4` rail / `w-3/4` editor on
+// md+); this file keeps only what utilities can't express.
 :host {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  height: 100%;
+}
+
+.mh-builder {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// Reorder controls (arrows / collapse toggles) are the primary path on
+// touch, where small icon buttons are hard to hit — grow them to the
+// 44px minimum on coarse pointers only, leaving desktop rows compact.
+// ::ng-deep because the class lands on PrimeNG's inner button element
+// (and must reach the builder's child components).
+@media (pointer: coarse) {
+  ::ng-deep .mh-reorder-btn.p-button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+// "Add …" affordances render dashed to read as insertion points, not
+// commands — shared by the rail footer, the editor card and set tables.
+::ng-deep .mh-dashed-btn.p-button {
+  border-style: dashed;
 }
 
 // Archived banner — color-mix keeps the tint theme-aware in light + dark,
@@ -15,6 +48,42 @@
     background: color-mix(in srgb, var(--p-text-muted-color) 8%, transparent);
     color: var(--p-text-color);
     border: 1px solid var(--p-content-border-color);
-    i { color: var(--p-text-muted-color); }
+    i {
+      color: var(--p-text-muted-color);
+    }
+  }
+}
+
+// Mobile: one pane at a time (matches MOBILE_QUERY in viewport.utils and
+// Tailwind's `max-md:` on the body). The outline owns the screen by
+// default; a selected workout (`?workout=` → has-editor) swaps in the
+// editor full-screen.
+@media (max-width: 767.98px) {
+  .mh-builder__body.has-editor .mh-builder__rail {
+    display: none;
+  }
+  .mh-builder__body:not(.has-editor) .mh-builder__editor {
+    display: none;
+  }
+
+  // Outline → editor transition: the editor slides in from the right.
+  // (Back to the outline re-renders the rail instantly.)
+  .mh-builder__body.has-editor .mh-builder__editor {
+    animation: mh-builder-pane-in 0.22s ease;
+  }
+  @keyframes mh-builder-pane-in {
+    from {
+      transform: translateX(7%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mh-builder__body.has-editor .mh-builder__editor {
+      animation: none;
+    }
   }
 }

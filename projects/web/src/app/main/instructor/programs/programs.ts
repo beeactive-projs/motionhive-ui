@@ -10,16 +10,16 @@ import {
 import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
+import { InputText } from 'primeng/inputtext';
 import { Menu } from 'primeng/menu';
-import { MessageModule } from 'primeng/message';
+import { Message } from 'primeng/message';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { SkeletonModule } from 'primeng/skeleton';
+import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 
@@ -33,6 +33,7 @@ import {
   TagSeverity,
   UpdateProgramPayload,
   apiErrorMessage,
+  getProgramStatusSeverity,
   injectIsMobile,
   injectIsTablet,
   injectIsTabletDown,
@@ -43,10 +44,11 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
 import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
 
 /**
- * Programs list (FE-P1, read surface).
+ * Programs list.
  *
  * The create CTA opens the metadata dialog; nested workout/set authoring
- * happens on the program-detail page.
+ * happens on the program-detail page. Card kebabs carry the status
+ * transitions (publish / archive / restore) and delete.
  *
  * Layout mirrors the sessions list: a Tailwind shell, a projected
  * `#filtersRow` holding the status pills + search, and a single content
@@ -62,15 +64,15 @@ import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
     TitleCasePipe,
     FormsModule,
     RouterLink,
-    ButtonModule,
+    Button,
     Card,
     ConfirmDialog,
     IconField,
     InputIcon,
-    InputTextModule,
+    InputText,
     Menu,
-    MessageModule,
-    SkeletonModule,
+    Message,
+    Skeleton,
     Tag,
     Toast,
     ListEmptyState,
@@ -174,7 +176,7 @@ export class Programs {
       this.search();
       this.statusFilter();
       this.page.set(1);
-      this.fetch(true);
+      this._fetch(true);
     });
   }
 
@@ -193,7 +195,7 @@ export class Programs {
   loadMore(): void {
     if (this.loading() || this.loadingMore() || !this.hasMore()) return;
     this.page.update((p) => p + 1);
-    this.fetch(false);
+    this._fetch(false);
   }
 
   openCreate(): void {
@@ -207,7 +209,7 @@ export class Programs {
   }
 
   retry(): void {
-    this.fetch(true);
+    this._fetch(true);
   }
 
   /** Bubbled up from the form dialog on create OR edit. */
@@ -271,14 +273,7 @@ export class Programs {
   }
 
   statusSeverity(s: ProgramStatus): TagSeverity {
-    switch (s) {
-      case ProgramStatus.Published:
-        return TagSeverity.Success;
-      case ProgramStatus.Archived:
-        return TagSeverity.Contrast;
-      default:
-        return TagSeverity.Secondary;
-    }
+    return getProgramStatusSeverity(s);
   }
 
   /** Human duration label — weeks when the day count divides evenly. */
@@ -399,7 +394,7 @@ export class Programs {
     });
   }
 
-  private fetch(replace: boolean): void {
+  private _fetch(replace: boolean): void {
     const query: ListProgramsQuery = {
       page: this.page(),
       limit: this.pageSize,

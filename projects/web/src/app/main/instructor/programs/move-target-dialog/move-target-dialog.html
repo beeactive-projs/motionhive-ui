@@ -1,0 +1,41 @@
+<p-dialog [(visible)]="visible" [modal]="true" [appendTo]="'body'" [style]="{ width: '26rem' }"
+  [breakpoints]="{ '640px': '95vw' }" [header]="dialogHeader()">
+  <div class="flex flex-col gap-3.5 pt-1">
+    <p class="m-0 text-sm text-muted-color">
+      Where should <strong class="text-color">{{ itemLabel() }}</strong> go?
+    </p>
+
+    @if (mode() === 'workout') {
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label for="moveWeek" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Week</label>
+        <p-select inputId="moveWeek" [options]="weekOptions()" [ngModel]="targetWeek()"
+          (ngModelChange)="targetWeek.set($event)" optionLabel="label" optionValue="value" [appendTo]="'body'"
+          class="w-full" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="moveDay" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Day</label>
+        <p-select inputId="moveDay" [options]="dayOptions()" [ngModel]="targetDay()"
+          (ngModelChange)="targetDay.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled"
+          [appendTo]="'body'" class="w-full" />
+      </div>
+    </div>
+    <p class="m-0 text-2xs text-muted-color">Days already holding a workout are disabled.</p>
+    } @else {
+    <div class="flex flex-col gap-1.5">
+      <label for="moveWorkout" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Destination
+        workout</label>
+      <p-select inputId="moveWorkout" [options]="workoutOptions()" [ngModel]="targetWorkoutId()"
+        (ngModelChange)="targetWorkoutId.set($event)" optionLabel="label" optionValue="value" [appendTo]="'body'"
+        class="w-full" placeholder="Pick a workout" />
+    </div>
+    <p class="m-0 text-2xs text-muted-color">The exercise lands at the end of the destination workout — fine-tune with
+      the Move… menu afterwards.</p>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancel()" />
+    <p-button label="Move" icon="pi pi-arrow-right" [disabled]="!canSubmit()" (onClick)="submit()" />
+  </ng-template>
+</p-dialog>

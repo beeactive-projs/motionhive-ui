@@ -41,6 +41,7 @@ export * from './lib/models/exercise/equipment.model';
 // Models - Workout (program / assignment / log)
 export * from './lib/models/workout/workout.enums';
 export * from './lib/models/workout/program.model';
+export * from './lib/models/workout/status-severity';
 export * from './lib/models/workout/assignment.model';
 export * from './lib/models/workout/log.model';
 export * from './lib/models/workout/routine.model';
@@ -178,6 +179,7 @@ export * from './lib/utils/html.utils';
 export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';
 export * from './lib/utils/exercise-tag.utils';
+export * from './lib/utils/form.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';
