@@ -54,7 +54,8 @@ import {
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>
         <div class="lightbox__stage" (click)="$event.stopPropagation()">
-          <video [src]="src()!" [poster]="poster() || ''" autoplay muted loop playsinline controls></video>
+          <video [src]="src()!" [poster]="poster() || ''" autoplay muted loop playsinline controls
+            controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture></video>
         </div>
       </div>
     }

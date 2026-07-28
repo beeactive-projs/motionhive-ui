@@ -169,7 +169,7 @@
         <a [routerLink]="['/coaching/invoices', invoice.id]" class="no-underline text-inherit">
           <mh-list-card [status]="isOverdue(invoice) ? 'overdue' : invoice.status"
             [statusSeverity]="isOverdue(invoice) ? 'danger' : statusSeverity(invoice.status)"
-            [avatarInitials]="clientInitials(invoice)" [title]="clientDisplay(invoice)" [subtitle]="invoiceDisplayNumber(invoice) +
+            [avatarImage]="invoice.client?.avatarUrl" [avatarInitials]="clientInitials(invoice)" [title]="clientDisplay(invoice)" [subtitle]="invoiceDisplayNumber(invoice) +
                   (invoice.status === Statuses.Paid && invoice.paidAt
                     ? ' · Paid'
                     : invoice.dueDate ? ' · Due' : '')" [clickable]="true" [accent]="cardAccent(invoice)">

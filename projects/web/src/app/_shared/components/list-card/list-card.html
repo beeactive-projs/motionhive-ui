@@ -13,7 +13,9 @@
   <!-- Middle row: avatar + title/subtitle, amount on the right -->
   <div class="flex items-start justify-between gap-3">
     <div class="flex items-start gap-3 min-w-0 flex-1">
-      <p-avatar [label]="avatarInitials() ?? undefined" [icon]="avatarInitials() ? undefined : avatarIcon()"
+      <p-avatar [image]="avatarImage() ?? undefined"
+        [label]="avatarImage() ? undefined : (avatarInitials() ?? undefined)"
+        [icon]="avatarImage() || avatarInitials() ? undefined : avatarIcon()"
         shape="circle" class="bg-primary-500/10 text-primary-700 dark:text-primary-400 font-semibold shrink-0" />
       <div class="flex flex-col min-w-0 gap-0.5 pt-0.5">
         <span class="text-sm font-semibold truncate">{{ title() }}</span>
