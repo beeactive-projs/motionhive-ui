@@ -5,6 +5,17 @@
   min-height: 0;
 }
 
+// Reorder controls (arrows / Move menu / collapse toggles) are the primary
+// path on touch, where small icon buttons are hard to hit — grow them to the
+// 44px minimum on coarse pointers only, leaving desktop rows compact.
+// ::ng-deep because the class lands on PrimeNG's inner button element.
+@media (pointer: coarse) {
+  ::ng-deep .mh-reorder-btn.p-button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
 // Archived banner — color-mix keeps the tint theme-aware in light + dark,
 // which Tailwind arbitrary values can't express cleanly. Layout is handled
 // by utility classes in the template (mirrors session-detail's banners).

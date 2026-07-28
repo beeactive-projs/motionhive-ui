@@ -1,224 +1,133 @@
-<p-dialog
-  [(visible)]="visible"
-  [modal]="true"
-  [closable]="!submitting()"
-  [closeOnEscape]="!submitting()"
-  [dismissableMask]="!submitting()"
-  [appendTo]="'body'"
-  [style]="{ width: '520px' }"
-  [breakpoints]="{ '640px': '95vw' }"
-  styleClass="mh-set-form-dialog"
-  [header]="dialogHeader()">
-  <div class="dialog-body">
-    <div class="exercise-banner">
-      <i class="pi pi-bolt"></i>
+<p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
+  [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '520px' }"
+  [breakpoints]="{ '640px': '95vw' }" styleClass="mh-set-form-dialog" [header]="dialogHeader()">
+  <form [formGroup]="form" class="flex flex-col gap-3.5">
+    <div
+      class="flex items-center gap-2 rounded-lg border border-surface bg-(--p-content-background) px-3 py-2 text-[13px] font-semibold">
+      <i class="pi pi-bolt text-primary"></i>
       <span>{{ exercise().exercise?.name ?? 'Exercise' }}</span>
     </div>
 
-    <div class="field">
-      <label for="setType">Set type</label>
-      <p-select
-        inputId="setType"
-        [options]="setTypeOptions"
-        [(ngModel)]="setType"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        styleClass="w-full"
-      />
+    <!-- Set type / Number of sets -->
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div class="flex flex-col gap-1.5">
+        <label for="setType" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Set type</label>
+        <p-select inputId="setType" [options]="setTypeOptions" formControlName="setType" optionLabel="label"
+          optionValue="value" [appendTo]="'body'" class="w-full" />
+      </div>
+      @if (!isEdit()) {
+      <div class="flex flex-col gap-1.5">
+        <label for="numSets" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Number of
+          sets</label>
+        <p-inputnumber inputId="numSets" formControlName="numberOfSets" [min]="1" [max]="20" [showButtons]="true"
+          class="w-full" />
+      </div>
+      }
     </div>
 
-    <div class="row">
-      <div class="field grow">
-        <label for="repsMin">Reps (min)</label>
-        <p-inputnumber
-          inputId="repsMin"
-          [ngModel]="repsMin()"
-          (ngModelChange)="repsMin.set($event)"
-          [min]="0"
-          [max]="1000"
-          [allowEmpty]="true"
-          placeholder="—"
-          styleClass="w-full"
-        />
+    <!-- Reps range -->
+    <div class="flex flex-col gap-1.5">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="repsMin" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Reps (min)</label>
+          <p-inputnumber inputId="repsMin" formControlName="repsMin" [min]="0" [max]="1000" [allowEmpty]="true"
+            placeholder="—" class="w-full" [attr.aria-invalid]="repsRangeError() !== null"
+            [attr.aria-describedby]="repsRangeError() ? 'reps-error' : null" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="repsMax" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Reps (max)</label>
+          <p-inputnumber inputId="repsMax" formControlName="repsMax" [min]="0" [max]="1000" [allowEmpty]="true"
+            placeholder="—" class="w-full" [attr.aria-invalid]="repsRangeError() !== null"
+            [attr.aria-describedby]="repsRangeError() ? 'reps-error' : null" />
+        </div>
       </div>
-      <div class="field grow">
-        <label for="repsMax">Reps (max)</label>
-        <p-inputnumber
-          inputId="repsMax"
-          [ngModel]="repsMax()"
-          (ngModelChange)="repsMax.set($event)"
-          [min]="0"
-          [max]="1000"
-          [allowEmpty]="true"
-          placeholder="—"
-          styleClass="w-full"
-        />
-      </div>
+      @if (repsRangeError()) {
+      <p-message id="reps-error" severity="error" size="small" variant="simple">{{ repsRangeError() }}</p-message>
+      }
     </div>
 
-    <div class="row">
-      <div class="field grow">
-        <label for="weightKg">Weight (kg)</label>
-        <p-inputnumber
-          inputId="weightKg"
-          [ngModel]="weightKg()"
-          (ngModelChange)="weightKg.set($event)"
-          [min]="0"
-          [max]="9999"
-          [maxFractionDigits]="2"
-          [allowEmpty]="true"
-          placeholder="—"
-          styleClass="w-full"
-        />
+    <!-- Weight / Rest -->
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div class="flex flex-col gap-1.5">
+        <label for="weightKg" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Weight (kg)</label>
+        <p-inputnumber inputId="weightKg" formControlName="weightKg" [min]="0" [max]="9999" [maxFractionDigits]="2"
+          [allowEmpty]="true" placeholder="—" class="w-full" />
       </div>
-      <div class="field grow">
-        <label for="rest">Rest after (s)</label>
-        <p-inputnumber
-          inputId="rest"
-          [ngModel]="restSeconds()"
-          (ngModelChange)="restSeconds.set($event)"
-          [min]="0"
-          [allowEmpty]="true"
-          placeholder="—"
-          styleClass="w-full"
-        />
+      <div class="flex flex-col gap-1.5">
+        <label for="rest" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Rest after (s)</label>
+        <p-inputnumber inputId="rest" formControlName="restSeconds" [min]="0" [allowEmpty]="true" placeholder="—"
+          class="w-full" />
       </div>
     </div>
 
-    <div class="field">
-      <label for="snotes">Notes <span class="optional">(optional)</span></label>
-      <textarea
-        pTextarea
-        id="snotes"
-        [ngModel]="notes()"
-        (ngModelChange)="notes.set($event)"
-        rows="2"
-        maxlength="2000"
-        placeholder="Cue, focus, regression…"
-        class="w-full"
-      ></textarea>
+    <!-- Notes -->
+    <div class="flex flex-col gap-1.5">
+      <label for="snotes"
+        class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+        Notes <span class="font-medium text-surface-400">— optional</span>
+      </label>
+      <textarea id="snotes" pTextarea rows="2" formControlName="notes" maxlength="2000"
+        placeholder="Cue, focus, regression…" fluid></textarea>
     </div>
 
-    <button
-      type="button"
-      class="advanced-toggle"
-      (click)="toggleAdvanced()"
-    >
-      <i
-        class="pi"
-        [class.pi-chevron-right]="!showAdvanced()"
-        [class.pi-chevron-down]="showAdvanced()"
-      ></i>
-      Advanced (intensity, time, distance, tempo)
-    </button>
+    <p-button label="Advanced (intensity, time, distance, tempo)"
+      [icon]="showAdvanced() ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" size="small" [text]="true"
+      class="self-start" [attr.aria-expanded]="showAdvanced()" (onClick)="toggleAdvanced()" />
 
     @if (showAdvanced()) {
-      <div class="advanced">
-        <div class="row">
-          <div class="field grow">
-            <label for="pct">% 1RM</label>
-            <p-inputnumber
-              inputId="pct"
-              [ngModel]="weightPercent1rm()"
-              (ngModelChange)="weightPercent1rm.set($event)"
-              [min]="0"
-              [max]="100"
-              [maxFractionDigits]="1"
-              [allowEmpty]="true"
-              placeholder="—"
-              suffix="%"
-              styleClass="w-full"
-            />
-          </div>
-          <div class="field grow">
-            <label for="rpe">RPE (1–10)</label>
-            <p-inputnumber
-              inputId="rpe"
-              [ngModel]="rpe()"
-              (ngModelChange)="rpe.set($event)"
-              [min]="1"
-              [max]="10"
-              [maxFractionDigits]="1"
-              [allowEmpty]="true"
-              placeholder="—"
-              styleClass="w-full"
-            />
-          </div>
-          <div class="field grow">
-            <label for="rir">RIR</label>
-            <p-inputnumber
-              inputId="rir"
-              [ngModel]="rir()"
-              (ngModelChange)="rir.set($event)"
-              [min]="0"
-              [allowEmpty]="true"
-              placeholder="—"
-              styleClass="w-full"
-            />
-          </div>
+    <div class="flex flex-col gap-3.5 border-t border-dashed border-surface pt-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="pct" class="text-xs font-semibold text-surface-800 dark:text-surface-200">% 1RM</label>
+          <p-inputnumber inputId="pct" formControlName="weightPercent1rm" [min]="0" [max]="100"
+            [maxFractionDigits]="1" [allowEmpty]="true" placeholder="—" suffix="%" class="w-full" />
         </div>
-
-        <div class="row">
-          <div class="field grow">
-            <label for="dur">Duration (s)</label>
-            <p-inputnumber
-              inputId="dur"
-              [ngModel]="durationSeconds()"
-              (ngModelChange)="durationSeconds.set($event)"
-              [min]="0"
-              [allowEmpty]="true"
-              placeholder="—"
-              styleClass="w-full"
-            />
-          </div>
-          <div class="field grow">
-            <label for="dist">Distance (m)</label>
-            <p-inputnumber
-              inputId="dist"
-              [ngModel]="distanceMeters()"
-              (ngModelChange)="distanceMeters.set($event)"
-              [min]="0"
-              [allowEmpty]="true"
-              placeholder="—"
-              styleClass="w-full"
-            />
-          </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="rpe" class="text-xs font-semibold text-surface-800 dark:text-surface-200">RPE (1–10)</label>
+          <p-inputnumber inputId="rpe" formControlName="rpe" [min]="1" [max]="10" [maxFractionDigits]="1"
+            [allowEmpty]="true" placeholder="—" class="w-full" />
         </div>
-
-        <div class="field">
-          <label for="tempo">
-            Tempo <span class="optional">(e.g. 3-1-1-0)</span>
-          </label>
-          <input
-            id="tempo"
-            type="text"
-            [ngModel]="tempo()"
-            (ngModelChange)="tempo.set($event)"
-            placeholder="e.g. 3-1-1-0"
-            class="p-inputtext w-full"
-            autocomplete="off"
-          />
+        <div class="flex flex-col gap-1.5">
+          <label for="rir" class="text-xs font-semibold text-surface-800 dark:text-surface-200">RIR</label>
+          <p-inputnumber inputId="rir" formControlName="rir" [min]="0" [allowEmpty]="true" placeholder="—"
+            class="w-full" />
         </div>
       </div>
+
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="dur" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Duration (s)</label>
+          <p-inputnumber inputId="dur" formControlName="durationSeconds" [min]="0" [allowEmpty]="true" placeholder="—"
+            class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="dist" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Distance (m)</label>
+          <p-inputnumber inputId="dist" formControlName="distanceMeters" [min]="0" [allowEmpty]="true" placeholder="—"
+            class="w-full" />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="tempo"
+          class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
+          Tempo <span class="font-medium text-surface-400">— e.g. 3-1-1-0</span>
+        </label>
+        <input id="tempo" pInputText formControlName="tempo" maxlength="7" placeholder="e.g. 3-1-1-0"
+          autocomplete="off" fluid [class.ng-invalid]="isFieldInvalid('tempo')"
+          [class.ng-dirty]="isFieldInvalid('tempo')" [attr.aria-invalid]="isFieldInvalid('tempo')"
+          [attr.aria-describedby]="isFieldInvalid('tempo') ? 'tempo-error' : null" />
+        @if (isFieldInvalid('tempo')) {
+        <p-message id="tempo-error" severity="error" size="small" variant="simple">{{ getFieldError('tempo')
+          }}</p-message>
+        }
+      </div>
+    </div>
     }
-  </div>
+  </form>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      [disabled]="submitting()"
-      (onClick)="cancel()"
-    />
-    <p-button
-      [label]="submitLabel()"
-      icon="pi pi-check"
-      [loading]="submitting()"
-      [disabled]="!canSubmit()"
-      (onClick)="submit()"
-    />
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
+    <p-button [label]="submitLabel()" icon="pi pi-check" [loading]="submitting()" (onClick)="submit()" />
   </ng-template>
 </p-dialog>
 

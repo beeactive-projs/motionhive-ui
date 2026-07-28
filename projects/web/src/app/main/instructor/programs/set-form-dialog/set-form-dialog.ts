@@ -9,14 +9,25 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
-import { MessageService } from 'primeng/api';
+import { InputText } from 'primeng/inputtext';
+import { Message } from 'primeng/message';
+import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
+import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
+import { from } from 'rxjs';
+import { concatMap, tap } from 'rxjs/operators';
 
 import {
   CreatePrescribedSetPayload,
@@ -30,10 +41,17 @@ import {
   showApiError,
 } from 'core';
 
-interface SelectOption<T> {
-  value: T;
-  label: string;
-}
+/** BE rejects any other shape (`Matches(/^\d-\d-\d-\d$/)` on the DTO). */
+const TEMPO_PATTERN = /^\d-\d-\d-\d$/;
+
+/** Cross-field: both reps bounds filled but inverted. */
+const repsRangeValidator: ValidatorFn = (
+  group: AbstractControl,
+): ValidationErrors | null => {
+  const min = group.get('repsMin')?.value;
+  const max = group.get('repsMax')?.value;
+  return min != null && max != null && min > max ? { repsRange: true } : null;
+};
 
 /**
  * Create / edit a prescribed set inside an exercise (FE-P2e).
@@ -42,17 +60,22 @@ interface SelectOption<T> {
  * rest, optional notes. RPE/RIR/percent_1rm/duration/distance/tempo are
  * BE-supported but hidden behind an "Advanced" toggle to keep the
  * default form scannable.
+ *
+ * Create mode has a "Number of sets" count: one submit POSTs N
+ * identical sets sequentially (no bulk endpoint on the BE; sequential
+ * keeps the BE's `orderIndex = max + 1` assignment race-free).
  */
 @Component({
   selector: 'mh-set-form-dialog',
-  standalone: true,
   imports: [
-    FormsModule,
-    ButtonModule,
+    ReactiveFormsModule,
+    Button,
     Dialog,
     InputNumber,
+    InputText,
+    Message,
     Select,
-    TextareaModule,
+    Textarea,
     Toast,
   ],
   providers: [MessageService],
@@ -67,35 +90,42 @@ export class SetFormDialog {
   /** When set → edit mode. When null → create mode. */
   readonly set = input<PrescribedSet | null>(null);
   readonly visible = model<boolean>(false);
-  readonly saved = output<PrescribedSet>();
+  /** All sets touched by one submit — N created rows, or the edited one. */
+  readonly saved = output<PrescribedSet[]>();
 
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
+  private readonly _formBuilder = inject(FormBuilder);
 
   readonly submitting = signal(false);
   readonly showAdvanced = signal(false);
 
-  // ── Core fields ──────────────────────────────────────────────────
+  // ── Form ─────────────────────────────────────────────────────────
+  // `numberOfSets` is create-mode only (not rendered in edit) — one
+  // submit POSTs that many identical sets.
 
-  readonly setType = signal<ExerciseSetType>(ExerciseSetType.Normal);
-  readonly repsMin = signal<number | null>(null);
-  readonly repsMax = signal<number | null>(null);
-  readonly weightKg = signal<number | null>(null);
-  readonly restSeconds = signal<number | null>(null);
-  readonly notes = signal<string>('');
-
-  // ── Advanced fields ──────────────────────────────────────────────
-
-  readonly weightPercent1rm = signal<number | null>(null);
-  readonly durationSeconds = signal<number | null>(null);
-  readonly distanceMeters = signal<number | null>(null);
-  readonly rpe = signal<number | null>(null);
-  readonly rir = signal<number | null>(null);
-  readonly tempo = signal<string>('');
+  readonly form = this._formBuilder.nonNullable.group(
+    {
+      numberOfSets: [1 as number | null],
+      setType: [ExerciseSetType.Normal as ExerciseSetType],
+      repsMin: [null as number | null],
+      repsMax: [null as number | null],
+      weightKg: [null as number | null],
+      restSeconds: [null as number | null],
+      notes: [''],
+      weightPercent1rm: [null as number | null],
+      durationSeconds: [null as number | null],
+      distanceMeters: [null as number | null],
+      rpe: [null as number | null],
+      rir: [null as number | null],
+      tempo: ['', Validators.pattern(TEMPO_PATTERN)],
+    },
+    { validators: repsRangeValidator },
+  );
 
   // ── Options ──────────────────────────────────────────────────────
 
-  readonly setTypeOptions: SelectOption<ExerciseSetType>[] = [
+  readonly setTypeOptions: SelectItem<ExerciseSetType>[] = [
     { value: ExerciseSetType.Normal, label: 'Normal' },
     { value: ExerciseSetType.Warmup, label: 'Warm-up' },
     { value: ExerciseSetType.Working, label: 'Working' },
@@ -112,10 +142,36 @@ export class SetFormDialog {
   readonly dialogHeader = computed(() =>
     this.isEdit() ? 'Edit set' : 'Add set',
   );
-  readonly submitLabel = computed(() =>
-    this.isEdit() ? 'Save changes' : 'Add set',
-  );
-  readonly canSubmit = computed(() => !this.submitting());
+
+  submitLabel(): string {
+    if (this.isEdit()) return 'Save changes';
+    const n = this.form.controls.numberOfSets.value ?? 1;
+    return n > 1 ? `Add ${n} sets` : 'Add set';
+  }
+
+  // ── Validation ───────────────────────────────────────────────────
+  // A disabled submit button fails silently — instead the button stays
+  // clickable and an invalid submit marks everything touched so the
+  // inline errors surface.
+
+  /** Cross-field: shown live — both fields filled is an intentional range. */
+  repsRangeError(): string | null {
+    return this.form.errors?.['repsRange']
+      ? "Min reps can't exceed max reps."
+      : null;
+  }
+
+  isFieldInvalid(field: 'tempo'): boolean {
+    const control = this.form.controls[field];
+    return control.invalid && control.touched;
+  }
+
+  getFieldError(field: 'tempo'): string {
+    const errors = this.form.controls[field].errors;
+    if (errors?.['pattern'])
+      return 'Tempo must be four dash-separated digits, e.g. 3-1-1-0.';
+    return '';
+  }
 
   constructor() {
     effect(() => {
@@ -135,73 +191,120 @@ export class SetFormDialog {
   }
 
   submit(): void {
-    if (!this.canSubmit()) return;
+    if (this.submitting()) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      // The tempo field lives behind the Advanced toggle — reveal it so
+      // the inline error can't be hidden.
+      if (this.form.controls.tempo.invalid) this.showAdvanced.set(true);
+      return;
+    }
 
-    const min = this.repsMin();
-    const max = this.repsMax();
+    const value = this.form.getRawValue();
     const payload: CreatePrescribedSetPayload = {
-      setType: this.setType(),
-      ...(min != null ? { targetRepsMin: min } : {}),
-      ...(max != null ? { targetRepsMax: max } : {}),
-      ...(this.weightKg() != null
-        ? { targetWeightKg: this.weightKg() as number }
+      setType: value.setType,
+      ...(value.repsMin != null ? { targetRepsMin: value.repsMin } : {}),
+      ...(value.repsMax != null ? { targetRepsMax: value.repsMax } : {}),
+      ...(value.weightKg != null ? { targetWeightKg: value.weightKg } : {}),
+      ...(value.restSeconds != null
+        ? { restAfterSeconds: value.restSeconds }
         : {}),
-      ...(this.restSeconds() != null
-        ? { restAfterSeconds: this.restSeconds() as number }
+      ...(value.notes.trim() ? { notes: value.notes.trim() } : {}),
+      ...(value.weightPercent1rm != null
+        ? { targetWeightPercent1rm: value.weightPercent1rm }
         : {}),
-      ...(this.notes().trim() ? { notes: this.notes().trim() } : {}),
-      ...(this.weightPercent1rm() != null
-        ? { targetWeightPercent1rm: this.weightPercent1rm() as number }
+      ...(value.durationSeconds != null
+        ? { targetDurationSeconds: value.durationSeconds }
         : {}),
-      ...(this.durationSeconds() != null
-        ? { targetDurationSeconds: this.durationSeconds() as number }
+      ...(value.distanceMeters != null
+        ? { targetDistanceMeters: value.distanceMeters }
         : {}),
-      ...(this.distanceMeters() != null
-        ? { targetDistanceMeters: this.distanceMeters() as number }
-        : {}),
-      ...(this.rpe() != null ? { targetRpe: this.rpe() as number } : {}),
-      ...(this.rir() != null ? { targetRir: this.rir() as number } : {}),
-      ...(this.tempo().trim() ? { tempo: this.tempo().trim() } : {}),
+      ...(value.rpe != null ? { targetRpe: value.rpe } : {}),
+      ...(value.rir != null ? { targetRir: value.rir } : {}),
+      ...(value.tempo.trim() ? { tempo: value.tempo.trim() } : {}),
     };
 
     this.submitting.set(true);
     const existing = this.set();
-    const req$ = existing
-      ? this._programService.updateSet(
+
+    if (existing) {
+      this._programService
+        .updateSet(
           this.program().id,
           this.workout().id,
           this.exercise().id,
           existing.id,
           payload as UpdatePrescribedSetPayload,
         )
-      : this._programService.addSet(
-          this.program().id,
-          this.workout().id,
-          this.exercise().id,
-          payload,
-        );
-
-    req$.subscribe({
-      next: (s) => {
-        this.submitting.set(false);
-        this._messageService.add({
-          severity: 'success',
-          summary: existing ? 'Set updated' : 'Set added',
-          life: 2000,
+        .subscribe({
+          next: (s) => {
+            this.submitting.set(false);
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Set updated',
+              life: 2000,
+            });
+            this.saved.emit([s]);
+            this.visible.set(false);
+          },
+          error: (err) => {
+            this.submitting.set(false);
+            showApiError(
+              this._messageService,
+              "Couldn't save set",
+              'Please check the form and try again.',
+              err,
+            );
+          },
         });
-        this.saved.emit(s);
-        this.visible.set(false);
-      },
-      error: (err) => {
-        this.submitting.set(false);
-        showApiError(
-          this._messageService,
-          existing ? "Couldn't save set" : "Couldn't add set",
-          'Please check the form and try again.',
-          err,
-        );
-      },
-    });
+      return;
+    }
+
+    // Create mode — N identical sets, sequentially (see class doc).
+    const count = Math.max(1, Math.min(20, value.numberOfSets ?? 1));
+    const created: PrescribedSet[] = [];
+    from(Array.from({ length: count }))
+      .pipe(
+        concatMap(() =>
+          this._programService
+            .addSet(
+              this.program().id,
+              this.workout().id,
+              this.exercise().id,
+              payload,
+            )
+            .pipe(tap((s) => created.push(s))),
+        ),
+      )
+      .subscribe({
+        complete: () => {
+          this.submitting.set(false);
+          this._messageService.add({
+            severity: 'success',
+            summary:
+              created.length === 1
+                ? 'Set added'
+                : `${created.length} sets added`,
+            life: 2000,
+          });
+          this.saved.emit([...created]);
+          this.visible.set(false);
+        },
+        error: (err) => {
+          this.submitting.set(false);
+          // Keep the dialog open so the user can adjust the count and
+          // retry; what did land is emitted so the parent stays in sync.
+          if (created.length > 0) this.saved.emit([...created]);
+          showApiError(
+            this._messageService,
+            "Couldn't add all sets",
+            created.length > 0
+              ? `${created.length} of ${count} sets were added before the error.`
+              : 'Please check the form and try again.',
+            err,
+          );
+        },
+      });
   }
 
   // ── Internals ────────────────────────────────────────────────────
@@ -209,18 +312,21 @@ export class SetFormDialog {
   private _hydrate(): void {
     const s = this.set();
     if (s) {
-      this.setType.set(s.setType);
-      this.repsMin.set(s.targetRepsMin);
-      this.repsMax.set(s.targetRepsMax);
-      this.weightKg.set(s.targetWeightKg);
-      this.restSeconds.set(s.restAfterSeconds);
-      this.notes.set(s.notes ?? '');
-      this.weightPercent1rm.set(s.targetWeightPercent1rm);
-      this.durationSeconds.set(s.targetDurationSeconds);
-      this.distanceMeters.set(s.targetDistanceMeters);
-      this.rpe.set(s.targetRpe);
-      this.rir.set(s.targetRir);
-      this.tempo.set(s.tempo ?? '');
+      this.form.reset({
+        numberOfSets: 1,
+        setType: s.setType,
+        repsMin: s.targetRepsMin,
+        repsMax: s.targetRepsMax,
+        weightKg: s.targetWeightKg,
+        restSeconds: s.restAfterSeconds,
+        notes: s.notes ?? '',
+        weightPercent1rm: s.targetWeightPercent1rm,
+        durationSeconds: s.targetDurationSeconds,
+        distanceMeters: s.targetDistanceMeters,
+        rpe: s.targetRpe,
+        rir: s.targetRir,
+        tempo: s.tempo ?? '',
+      });
       // Auto-expand advanced if the set already uses any advanced field.
       this.showAdvanced.set(
         s.targetWeightPercent1rm != null ||
@@ -231,18 +337,7 @@ export class SetFormDialog {
           !!s.tempo,
       );
     } else {
-      this.setType.set(ExerciseSetType.Normal);
-      this.repsMin.set(null);
-      this.repsMax.set(null);
-      this.weightKg.set(null);
-      this.restSeconds.set(null);
-      this.notes.set('');
-      this.weightPercent1rm.set(null);
-      this.durationSeconds.set(null);
-      this.distanceMeters.set(null);
-      this.rpe.set(null);
-      this.rir.set(null);
-      this.tempo.set('');
+      this.form.reset();
       this.showAdvanced.set(false);
     }
   }

@@ -170,6 +170,20 @@ export interface CreateProgramWorkoutPayload {
 
 export type UpdateProgramWorkoutPayload = Partial<CreateProgramWorkoutPayload>;
 
+/**
+ * Atomic calendar repositioning — one entry per moved workout;
+ * untouched workouts keep their current slot. The BE applies all
+ * moves in a single transaction and returns every workout of the
+ * program with recomputed `sequenceNumber` (calendar order).
+ */
+export interface ReorderProgramWorkoutsPayload {
+  items: {
+    id: string;
+    weekIndex: number;
+    dayIndex: number;
+  }[];
+}
+
 export interface CreatePrescribedExercisePayload {
   exerciseId: string;
   supersetGroupId?: number;

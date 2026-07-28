@@ -25,6 +25,7 @@ import {
   GroupMemberPostPolicies,
   Post,
   PostService,
+  noWhitespaceValidator,
   showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
@@ -47,13 +48,6 @@ type PostFormField = 'content' | 'groupIds';
 const MAX_IMAGES = 4;
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_CONTENT = 5000;
-
-const noWhitespaceValidator: ValidatorFn = (
-  control: AbstractControl,
-): ValidationErrors | null => {
-  const value = control.value as string | null | undefined;
-  return value && value.trim().length > 0 ? null : { required: true };
-};
 
 const minSelectedValidator =
   (min: number): ValidatorFn =>

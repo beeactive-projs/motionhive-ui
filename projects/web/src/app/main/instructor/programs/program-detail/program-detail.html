@@ -8,12 +8,10 @@
         <div class="flex items-center gap-2">
           <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
             {{ program()?.name ?? 'Program' }}
-
           </h1>
           @if (program(); as p) {
           <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
           }
-
         </div>
         @if (program(); as p) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
@@ -98,121 +96,182 @@
     <div class="flex flex-col gap-5">
       @for (w of weeks(); track w.week) {
       <section class="flex flex-col gap-3">
-        <header class="flex items-center justify-between gap-3">
+        <header class="flex flex-wrap items-center justify-between gap-3">
           <h2 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">Week {{ w.week + 1 }}</h2>
-          <p-button label="Add workout" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
-            (onClick)="openAddWorkout(w.week)" />
+          <div class="flex items-center gap-1.5">
+            <p-button [label]="isWeekCollapsed(w.workouts) ? 'Expand all' : 'Collapse all'"
+              [icon]="isWeekCollapsed(w.workouts) ? 'pi pi-chevron-down' : 'pi pi-chevron-up'" size="small"
+              severity="secondary" [text]="true"
+              [attr.aria-label]="(isWeekCollapsed(w.workouts) ? 'Expand' : 'Collapse') + ' all workouts in week ' + (w.week + 1)"
+              (onClick)="toggleWeekExpanded(w.workouts)" />
+            <p-button label="Add workout" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
+              (onClick)="openAddWorkout(w.week)" />
+          </div>
         </header>
 
         <div class="flex flex-col gap-3.5">
-          @for (workout of w.workouts; track workout.id) {
+          @for (workout of w.workouts; track workout.id; let wi = $index) {
           <article class="rounded-xl border border-surface bg-(--p-content-background) p-4 md:p-5">
             <header class="flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2.5 min-w-0">
                 <p-tag [value]="'Day ' + (workout.dayIndex + 1)" />
                 <h3 class="m-0 font-heading text-[15px] font-semibold truncate">{{ workout.name }}</h3>
+                @if (!isWorkoutExpanded(workout.id)) {
+                <span class="shrink-0 text-xs text-muted-color">
+                  {{ workout.exercises?.length ?? 0 }}
+                  {{ (workout.exercises?.length ?? 0) === 1 ? 'exercise' : 'exercises' }}
+                  · {{ workoutSetCount(workout) }} {{ workoutSetCount(workout) === 1 ? 'set' : 'sets' }}
+                </span>
+                }
               </div>
               <div class="flex items-center gap-1.5">
                 @if (workout.phase) {
-                <p-chip [label]="workout.phase | titlecase" class="bg-blue-300 text-blue-800" size="small" />
+                <p-chip [label]="workout.phase | titlecase" />
                 }
                 @if (workout.estimatedDurationMinutes) {
-                <p-chip [label]="'~' + workout.estimatedDurationMinutes + 'm'" icon="pi pi-clock"
-                  class="bg-sky-200 text-sky-800" size="small" />
+                <p-chip [label]="'~' + workout.estimatedDurationMinutes + 'm'" icon="pi pi-clock" />
                 }
+                <p-button icon="pi pi-sort-alt" size="small" severity="secondary" [text]="true" [rounded]="true"
+                  styleClass="mh-reorder-btn" [ariaLabel]="'Move ' + workout.name" pTooltip="Move…"
+                  tooltipPosition="left" (onClick)="openWorkoutMoveMenu($event, w.week, wi, w.workouts.length, workout)" />
                 <p-button icon="pi pi-pencil" size="small" severity="secondary" [text]="true" [rounded]="true"
-                  pTooltip="Edit workout" tooltipPosition="left" (onClick)="openEditWorkout(workout)" />
+                  [ariaLabel]="'Edit ' + workout.name" pTooltip="Edit workout" tooltipPosition="left"
+                  (onClick)="openEditWorkout(workout)" />
                 <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
-                  pTooltip="Delete workout" tooltipPosition="left" (onClick)="confirmDeleteWorkout(workout)" />
+                  [ariaLabel]="'Delete ' + workout.name" pTooltip="Delete workout" tooltipPosition="left"
+                  (onClick)="confirmDeleteWorkout(workout)" />
+                <p-button [icon]="isWorkoutExpanded(workout.id) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                  size="small" severity="secondary" [text]="true" [rounded]="true" styleClass="mh-reorder-btn"
+                  [ariaLabel]="(isWorkoutExpanded(workout.id) ? 'Collapse ' : 'Expand ') + workout.name"
+                  [attr.aria-expanded]="isWorkoutExpanded(workout.id)"
+                  [attr.aria-controls]="'workout-body-' + workout.id" (onClick)="toggleWorkoutExpanded(workout)" />
               </div>
             </header>
 
-            @if (workout.notes) {
-            <p class="m-0 mt-2 text-xs leading-relaxed text-muted-color">{{ workout.notes }}</p>
-            }
+            <!-- Collapsible body — the wrapper div stays in the DOM so the
+                 toggle's aria-controls target always resolves. -->
+            <div [id]="'workout-body-' + workout.id">
+              @if (isWorkoutExpanded(workout.id)) {
+              @if (workout.notes) {
+              <p class="m-0 mt-2 text-xs leading-relaxed text-muted-color">{{ workout.notes }}</p>
+              }
 
-            @if (!workout.exercises || workout.exercises.length === 0) {
+              @if (!workout.exercises || workout.exercises.length === 0) {
             <div
-              class="mt-3 flex items-center justify-between gap-3 rounded-lg bg-surface-100 p-3 text-xs text-muted-color">
+              class="mt-3 flex items-center justify-between gap-3 rounded-lg bg-surface-100 dark:bg-surface-800 p-3 text-xs text-muted-color">
               <span>No exercises added.</span>
               <p-button label="Add exercise" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
                 (onClick)="openExercisePicker(workout)" />
             </div>
             } @else {
             <div class="mt-3 flex flex-col gap-2.5">
-              @for (ex of workout.exercises; track ex.id; let idx = $index) {
-              <div class="flex gap-3 border-t border-surface-100 pt-2.5 first:border-t-0 first:pt-1">
-                <div class="w-6 shrink-0 text-center font-heading text-xs font-bold text-muted-color">{{ idx + 1 }}
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2.5">
-                    @if (ex.exercise?.thumbnailUrl) {
-                    <img class="h-9 w-9 shrink-0 rounded-md bg-surface-100 object-cover"
-                      [src]="ex.exercise!.thumbnailUrl!" [alt]="ex.exercise!.name" loading="lazy" />
-                    }
-                    <div class="flex-1 min-w-0 text-[13px] font-semibold truncate">{{ ex.exercise?.name ?? '—' }}</div>
-                    @if (ex.supersetGroupId != null) {
-                    <p-tag [value]="'SS' + ex.supersetGroupId" severity="warn" />
-                    }
-                    <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
-                      pTooltip="Remove exercise" tooltipPosition="left"
-                      (onClick)="confirmDeleteExercise(workout, ex)" />
+                @for (ex of workout.exercises; track ex.id; let idx = $index) {
+                <div class="flex gap-2 border-t border-surface-100 pt-2.5 first:border-t-0 first:pt-1">
+                  <div class="w-6 shrink-0 self-start pt-2 text-center font-heading text-xs font-bold text-muted-color">
+                    {{ idx + 1 }}
                   </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      @if (ex.exercise; as exercise) {
+                      @if (exercise.thumbnailUrl; as thumbnailUrl) {
+                      <img class="h-9 w-9 shrink-0 rounded-md bg-surface-100 dark:bg-surface-800 object-cover"
+                        [src]="thumbnailUrl" [alt]="exercise.name" loading="lazy" />
+                      }
+                      }
+                      <div class="flex-1 min-w-0 text-[13px] font-semibold truncate">{{ ex.exercise?.name ?? '—' }}
+                      </div>
+                      @if (!isExerciseExpanded(ex.id)) {
+                      <span class="shrink-0 text-[11px] text-muted-color">
+                        {{ ex.sets?.length ?? 0 }} {{ (ex.sets?.length ?? 0) === 1 ? 'set' : 'sets' }}
+                      </span>
+                      }
+                      @if (ex.supersetGroupId != null) {
+                      <p-tag [value]="'SS' + ex.supersetGroupId" severity="warn" />
+                      }
+                      <p-button icon="pi pi-sort-alt" size="small" severity="secondary" [text]="true" [rounded]="true"
+                        styleClass="mh-reorder-btn" [ariaLabel]="'Move ' + (ex.exercise?.name ?? 'exercise')"
+                        pTooltip="Move…" tooltipPosition="left"
+                        (onClick)="openExerciseMoveMenu($event, workout, idx, workout.exercises.length, ex)" />
+                      <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
+                        [ariaLabel]="'Remove ' + (ex.exercise?.name ?? 'exercise')" pTooltip="Remove exercise"
+                        tooltipPosition="left" (onClick)="confirmDeleteExercise(workout, ex)" />
+                      <p-button [icon]="isExerciseExpanded(ex.id) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                        size="small" severity="secondary" [text]="true" [rounded]="true" styleClass="mh-reorder-btn"
+                        [ariaLabel]="(isExerciseExpanded(ex.id) ? 'Collapse ' : 'Expand ') + (ex.exercise?.name ?? 'exercise')"
+                        [attr.aria-expanded]="isExerciseExpanded(ex.id)"
+                        [attr.aria-controls]="'exercise-body-' + ex.id" (onClick)="toggleExerciseExpanded(ex)" />
+                    </div>
 
-                  @if (ex.notes) {
-                  <p class="m-0 mt-1.5 text-[11px] leading-relaxed text-muted-color">{{ ex.notes }}</p>
-                  }
+                    <div [id]="'exercise-body-' + ex.id">
+                      @if (isExerciseExpanded(ex.id)) {
+                      @if (ex.notes) {
+                      <p class="m-0 mt-1.5 text-[11px] leading-relaxed text-muted-color">{{ ex.notes }}</p>
+                      }
 
-                  @if (ex.sets?.length) {
-                  <p-table [value]="ex.sets ?? []" [rowTrackBy]="trackSetById" size="small" class="mt-2 text-xs">
-                    <ng-template #header>
-                      <tr>
-                        <th>#</th>
-                        <th>Type</th>
-                        <th>Target</th>
-                        <th>Rest</th>
-                        <th style="width: 1%;"></th>
-                      </tr>
-                    </ng-template>
-                    <ng-template #body let-s>
-                      <tr>
-                        <td>{{ s.orderIndex + 1 }}</td>
-                        <td><p-tag [value]="s.setType | titlecase" [severity]="setTypeSeverity(s.setType)" /></td>
-                        <td>{{ setSummary(s) }}</td>
-                        <td>
-                          @if (s.restAfterSeconds != null) { {{ s.restAfterSeconds }}s } @else { — }
-                        </td>
-                        <td class="text-right">
-                          <span class="flex items-center gap-2">
-                            <p-button icon="pi pi-pencil" size="small" severity="secondary" [text]="true"
-                              [rounded]="true" pTooltip="Edit set" tooltipPosition="left"
-                              (onClick)="openEditSet(workout, ex, s)" />
-                            <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" [rounded]="true"
-                              pTooltip="Remove set" tooltipPosition="left"
-                              (onClick)="confirmDeleteSet(workout, ex, s)" />
-                          </span>
-                        </td>
-                      </tr>
-                    </ng-template>
-                  </p-table>
-                  } @else {
-                  <div class="mt-2 text-[11px] italic text-muted-color">No sets prescribed.</div>
-                  }
+                    @if (ex.sets?.length) {
+                    <p-table [value]="ex.sets ?? []" [rowTrackBy]="trackSetById" size="small" class="mt-2 text-xs"
+                      (onRowReorder)="onSetsReordered(workout, ex, $event)">
+                      <ng-template #header>
+                        <tr>
+                          <th class="w-[1%]"></th>
+                          <th>#</th>
+                          <th>Type</th>
+                          <th>Target</th>
+                          <th>Rest</th>
+                          <th class="w-[1%]"></th>
+                        </tr>
+                      </ng-template>
+                      <ng-template #body let-s let-rowIndex="rowIndex">
+                        <tr [pReorderableRow]="rowIndex">
+                          <td>
+                            <span pReorderableRowHandle class="pi pi-bars cursor-grab text-[10px] text-muted-color"
+                              [attr.aria-label]="'Drag to reorder set ' + (rowIndex + 1)"></span>
+                          </td>
+                          <td>{{ s.orderIndex + 1 }}</td>
+                          <td><p-tag [value]="s.setType | titlecase" [severity]="setTypeSeverity(s.setType)" /></td>
+                          <td>{{ setSummary(s) }}</td>
+                          <td>
+                            @if (s.restAfterSeconds != null) { {{ s.restAfterSeconds }}s } @else { — }
+                          </td>
+                          <td class="text-right">
+                            <span class="flex items-center gap-2">
+                              <p-button icon="pi pi-clone" size="small" severity="secondary" [text]="true"
+                                [rounded]="true" [ariaLabel]="'Duplicate set ' + (rowIndex + 1)"
+                                pTooltip="Duplicate set" tooltipPosition="left"
+                                (onClick)="duplicateSet(workout, ex, s)" />
+                              <p-button icon="pi pi-pencil" size="small" severity="secondary" [text]="true"
+                                [rounded]="true" [ariaLabel]="'Edit set ' + (rowIndex + 1)" pTooltip="Edit set"
+                                tooltipPosition="left" (onClick)="openEditSet(workout, ex, s)" />
+                              <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true"
+                                [rounded]="true" [ariaLabel]="'Remove set ' + (rowIndex + 1)" pTooltip="Remove set"
+                                tooltipPosition="left" (onClick)="confirmDeleteSet(workout, ex, s)" />
+                            </span>
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                    } @else {
+                    <div class="mt-2 text-[11px] italic text-muted-color">No sets prescribed.</div>
+                    }
 
-                  <div class="mt-1.5 flex justify-end">
-                    <p-button label="Add set" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
-                      (onClick)="openAddSet(workout, ex)" />
+                    <div class="mt-1.5 flex justify-end">
+                      <p-button label="Add set" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
+                        (onClick)="openAddSet(workout, ex)" />
+                    </div>
+                      }
+                    </div>
                   </div>
                 </div>
-              </div>
-              }
+                }
 
               <div class="flex justify-center">
                 <p-button label="Add exercise" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true"
                   (onClick)="openExercisePicker(workout)" />
               </div>
             </div>
-            }
+              }
+              }
+            </div>
           </article>
           }
         </div>
@@ -233,7 +292,7 @@
 @if (isMobile()) {
 <mh-bottom-sheet [open]="actionsOpen()" (openChange)="actionsOpen.set($event)" size="small" [showClose]="false">
   @if (program()) {
-  <mh-action-list [items]="detailActions()" (select)="onDetailAction($event)" />
+  <mh-action-list [items]="detailActions" (select)="onDetailAction($event)" />
   }
 </mh-bottom-sheet>
 }
@@ -246,13 +305,20 @@
   [(visible)]="workoutDialogOpen" (saved)="onWorkoutSaved($event)" />
 @if (exercisePickerTarget(); as picked) {
 <mh-exercise-picker-dialog [program]="p" [workout]="picked" [(visible)]="exercisePickerOpen"
-  (added)="onExerciseAdded($event)" />
+  (added)="onExercisesAdded($event)" />
 }
 @if (setDialogTarget(); as target) {
 <mh-set-form-dialog [program]="p" [workout]="target.workout" [exercise]="target.exercise" [set]="target.set"
-  [(visible)]="setDialogOpen" (saved)="onSetSaved($event)" />
+  [(visible)]="setDialogOpen" (saved)="onSetsSaved($event)" />
+}
+@if (moveTargetSourceWorkout(); as source) {
+<mh-move-target-dialog [program]="p" [mode]="moveTargetMode()" [sourceWorkout]="source"
+  [exercise]="moveTargetExercise()" [(visible)]="moveTargetDialogOpen" (chosen)="onMoveTargetChosen($event)" />
 }
 }
+
+<!-- Shared "Move…" menu for workout + exercise kebabs, rebuilt per open. -->
+<p-menu #moveMenu [model]="moveMenuItems()" [popup]="true" [appendTo]="'body'" />
 
 <p-toast position="top-right" />
 <p-confirmdialog [appendTo]="'body'" />
