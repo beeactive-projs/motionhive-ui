@@ -7,8 +7,7 @@
         Workout name <span class="text-red-500">*</span>
       </label>
       <input #nameInput id="wname" pInputText formControlName="name" maxlength="200" placeholder="e.g. Day 1 — Upper"
-        autocomplete="off" fluid [class.ng-invalid]="isFieldInvalid('name')" [class.ng-dirty]="isFieldInvalid('name')"
-        [attr.aria-invalid]="isFieldInvalid('name')"
+        autocomplete="off" fluid [invalid]="isFieldInvalid('name')" [attr.aria-invalid]="isFieldInvalid('name')"
         [attr.aria-describedby]="isFieldInvalid('name') ? 'wname-error' : null" />
       @if (isFieldInvalid('name')) {
       <p-message id="wname-error" severity="error" size="small" variant="simple">{{ getFieldError('name') }}</p-message>

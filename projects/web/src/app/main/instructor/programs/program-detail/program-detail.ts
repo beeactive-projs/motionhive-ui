@@ -3,31 +3,28 @@ import {
   Component,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { Location, TitleCasePipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { Button } from 'primeng/button';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Menu } from 'primeng/menu';
 import { Toast } from 'primeng/toast';
 import { Tag } from 'primeng/tag';
-import { TableModule, TableRowReorderEvent } from 'primeng/table';
-import { Chip } from 'primeng/chip';
 import { Tooltip } from 'primeng/tooltip';
-import { forkJoin, from, of, throwError } from 'rxjs';
-import { catchError, concatMap, map, toArray } from 'rxjs/operators';
+import { Observable, defer, forkJoin, from, of, throwError } from 'rxjs';
+import { catchError, concatMap, finalize, map, toArray } from 'rxjs/operators';
 
 import {
   ActionItem,
   ActionList,
   BottomSheet,
   CreatePrescribedSetPayload,
-  ExerciseSetType,
   PrescribedExercise,
   PrescribedSet,
   Program,
@@ -42,20 +39,22 @@ import {
   showApiError,
 } from 'core';
 
-import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
-import {
-  MoveTargetChoice,
-  MoveTargetDialog,
-} from '../move-target-dialog/move-target-dialog';
+import { MoveTargetChoice, MoveTargetDialog } from '../move-target-dialog/move-target-dialog';
 import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
 import { SetFormDialog } from '../set-form-dialog/set-form-dialog';
 import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
+import { BuilderRail } from './_components/builder-rail/builder-rail';
+import { WeekGroup, workoutSetCount } from './_components/builder.utils';
+import { WorkoutEditor } from './_components/workout-editor/workout-editor';
 
 /**
- * Program detail — the coach-side program builder.
+ * Program detail — the coach-side program builder, as a two-pane layout:
+ * a persistent outline rail (weeks → workouts) on the left and exactly
+ * one workout being edited on the right. On mobile the panes swap in
+ * place (one at a time), driven by the `?workout=` query param.
  *
  * Full nested tree from `GET /programs/:id`. Owner-only on the BE,
  * so we don't gate roles here — the BE 404s cross-instructor probes.
@@ -67,16 +66,11 @@ import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
     TitleCasePipe,
     Button,
     ConfirmDialog,
-    Menu,
     Toast,
     Tag,
-    // No standalone export for Table + its reorder directives — module fallback.
-    TableModule,
-    Chip,
     Tooltip,
     ActionList,
     BottomSheet,
-    KpiCard,
     ListEmptyState,
     AssignProgramDialog,
     ExercisePickerDialog,
@@ -84,6 +78,8 @@ import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
     ProgramFormDialog,
     SetFormDialog,
     WorkoutFormDialog,
+    BuilderRail,
+    WorkoutEditor,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './program-detail.html',
@@ -127,17 +123,7 @@ export class ProgramDetail implements OnInit {
   } | null>(null);
   readonly deleting = signal(false);
 
-  // ── Collapse state (Part A) ──────────────────────────────────────
-  // Absent id = expanded (default), `false` = collapsed. Persisted per
-  // program in localStorage so big programs stay compact across visits.
-
-  readonly expandedWorkouts = signal<Record<string, boolean>>({});
-  readonly expandedExercises = signal<Record<string, boolean>>({});
-
-  // ── Move menu + cross-container dialog (Part B) ──────────────────
-
-  readonly moveMenuItems = signal<MenuItem[]>([]);
-  private readonly _moveMenu = viewChild<Menu>('moveMenu');
+  // ── Cross-container move dialog ──────────────────────────────────
 
   readonly moveTargetDialogOpen = signal(false);
   readonly moveTargetMode = signal<'workout' | 'exercise'>('workout');
@@ -145,41 +131,87 @@ export class ProgramDetail implements OnInit {
   readonly moveTargetSourceWorkout = signal<ProgramWorkout | null>(null);
   readonly moveTargetExercise = signal<PrescribedExercise | null>(null);
 
-  // Group workouts by week for rendering.
-  readonly weeks = computed<{ week: number; workouts: ProgramWorkout[] }[]>(() => {
-    const all = this.program()?.workouts ?? [];
-    const map = new Map<number, ProgramWorkout[]>();
-    for (const w of all) {
-      const arr = map.get(w.weekIndex) ?? [];
-      arr.push(w);
-      map.set(w.weekIndex, arr);
-    }
-    return Array.from(map.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([week, workouts]) => ({
-        week,
-        workouts: workouts.sort((a, b) => a.dayIndex - b.dayIndex),
-      }));
+  // ── Rail collapse state — persisted per program in localStorage ──
+
+  readonly collapsedWeeks = signal<ReadonlySet<number>>(new Set());
+
+  // ── Saving pill — counts container-initiated mutations in flight ─
+  // Dialog-internal saves (workout form, set form, picker) sit under a
+  // modal with their own spinners, so they're deliberately not counted.
+
+  private readonly _pendingMutations = signal(0);
+  readonly saving = computed(() => this._pendingMutations() > 0);
+
+  // ── Selection — synced to the `?workout=` query param ────────────
+
+  private readonly _queryParams = toSignal(this._route.queryParamMap, {
+    initialValue: this._route.snapshot.queryParamMap,
   });
 
+  readonly orderedWorkouts = computed<ProgramWorkout[]>(() =>
+    [...(this.program()?.workouts ?? [])].sort(
+      (a, b) => a.weekIndex - b.weekIndex || a.dayIndex - b.dayIndex,
+    ),
+  );
+
+  /** Non-null only when `?workout=<id>` resolves to a real workout. */
+  readonly explicitWorkoutId = computed(() => {
+    const id = this._queryParams()?.get('workout');
+    return id && this.orderedWorkouts().some((w) => w.id === id) ? id : null;
+  });
+
+  /** Desktop falls back to the first workout; mobile shows the rail instead. */
+  readonly activeWorkout = computed<ProgramWorkout | null>(() => {
+    const explicit = this.explicitWorkoutId();
+    if (explicit) return this.orderedWorkouts().find((w) => w.id === explicit) ?? null;
+    return this.isMobile() ? null : (this.orderedWorkouts()[0] ?? null);
+  });
+
+  // ── Derived data for the rail + header ───────────────────────────
+
+  /**
+   * All weeks INCLUDING empty ones, so empty weeks can receive workouts.
+   * Count = max(duration-derived, highest week in use) — a duration
+   * shrink never hides weeks that still hold workouts. Open-ended
+   * programs (durationDays = null) show only the weeks in use.
+   */
+  readonly weeks = computed<WeekGroup[]>(() => {
+    const p = this.program();
+    const all = p?.workouts ?? [];
+    const byWeek = new Map<number, ProgramWorkout[]>();
+    for (const w of all) {
+      const arr = byWeek.get(w.weekIndex) ?? [];
+      arr.push(w);
+      byWeek.set(w.weekIndex, arr);
+    }
+    const maxUsed = all.length ? Math.max(...all.map((w) => w.weekIndex)) + 1 : 0;
+    const fromDuration = p?.durationDays ? Math.ceil(p.durationDays / 7) : 0;
+    return Array.from({ length: Math.max(fromDuration, maxUsed) }, (_, week) => ({
+      week,
+      workouts: (byWeek.get(week) ?? []).sort((a, b) => a.dayIndex - b.dayIndex),
+    }));
+  });
+
+  readonly weekCount = computed(() => this.weeks().length);
   readonly totalWorkouts = computed(() => this.program()?.workouts?.length ?? 0);
 
-  readonly totalExercises = computed(() => {
-    let n = 0;
-    for (const w of this.program()?.workouts ?? []) {
-      n += w.exercises?.length ?? 0;
-    }
-    return n;
+  /** Position of the active workout in its week — drives move up/down. */
+  readonly activeWorkoutPosition = computed(() => {
+    const w = this.activeWorkout();
+    const group = w ? this.weeks().find((g) => g.week === w.weekIndex) : undefined;
+    const idx = group?.workouts.findIndex((x) => x.id === w?.id) ?? -1;
+    return {
+      indexInWeek: Math.max(0, idx),
+      weekWorkoutCount: group?.workouts.length ?? 0,
+    };
   });
 
-  readonly totalSets = computed(() => {
-    let n = 0;
-    for (const w of this.program()?.workouts ?? []) {
-      for (const e of w.exercises ?? []) {
-        n += e.sets?.length ?? 0;
-      }
-    }
-    return n;
+  /** Total sets in the active workout's week — the header meta line. */
+  readonly selectedWeekSetCount = computed(() => {
+    const w = this.activeWorkout();
+    const group = w ? this.weeks().find((g) => g.week === w.weekIndex) : undefined;
+    if (!group) return null;
+    return group.workouts.reduce((n, x) => n + workoutSetCount(x), 0);
   });
 
   /** Action-sheet rows for the mobile ⋮ menu — mirror the desktop header buttons. */
@@ -188,6 +220,33 @@ export class ProgramDetail implements OnInit {
     { id: 'assign', icon: 'pi pi-user-plus', label: 'Assign to client' },
     { id: 'delete', icon: 'pi pi-trash', label: 'Delete program…', danger: true },
   ];
+
+  /** Reveal key already handled — `id:weekIndex`, so a cross-week move re-reveals. */
+  private _lastReveal: string | null = null;
+
+  constructor() {
+    // Reveal the selected workout's week in the rail — covers deep links
+    // and cross-week moves landing in a collapsed week. Keyed so the coach
+    // can still collapse the active week manually without it snapping open.
+    effect(() => {
+      const w = this.activeWorkout();
+      if (!w) {
+        this._lastReveal = null;
+        return;
+      }
+      const key = `${w.id}:${w.weekIndex}`;
+      if (key === this._lastReveal) return;
+      this._lastReveal = key;
+      if (this.collapsedWeeks().has(w.weekIndex)) {
+        this.collapsedWeeks.update((cur) => {
+          const next = new Set(cur);
+          next.delete(w.weekIndex);
+          return next;
+        });
+        this._saveRailState();
+      }
+    });
+  }
 
   ngOnInit(): void {
     // The codebase reads route params via ActivatedRoute snapshot
@@ -198,6 +257,83 @@ export class ProgramDetail implements OnInit {
     const id = this._route.snapshot.paramMap.get('id');
     if (id) this._fetch(id);
     else this._router.navigate(['/coaching/programs']);
+  }
+
+  // ── Selection ────────────────────────────────────────────────────
+
+  selectWorkout(id: string, replaceUrl = false): void {
+    void this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { workout: id },
+      queryParamsHandling: 'merge',
+      replaceUrl,
+    });
+  }
+
+  /** Mobile back to the outline; also the "no neighbor left" fallback. */
+  closeEditor(replaceUrl = false): void {
+    void this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { workout: null },
+      queryParamsHandling: 'merge',
+      replaceUrl,
+    });
+  }
+
+  moveActiveWorkout(delta: -1 | 1): void {
+    const w = this.activeWorkout();
+    if (!w) return;
+    const pos = this.activeWorkoutPosition();
+    this.moveWorkout(w.weekIndex, pos.indexInWeek, pos.indexInWeek + delta);
+  }
+
+  // ── Rail collapse state ──────────────────────────────────────────
+
+  toggleWeekCollapsed(week: number): void {
+    this.collapsedWeeks.update((cur) => {
+      const next = new Set(cur);
+      if (next.has(week)) next.delete(week);
+      else next.add(week);
+      return next;
+    });
+    this._saveRailState();
+  }
+
+  private _saveRailState(): void {
+    const p = this.program();
+    if (!p) return;
+    try {
+      // Prune to weeks that still exist so stale indexes don't accumulate.
+      const weekCount = this.weeks().length;
+      localStorage.setItem(
+        STORAGE_KEYS.PROGRAM_BUILDER_EXPANDED(p.id),
+        JSON.stringify({ collapsedWeeks: [...this.collapsedWeeks()].filter((w) => w < weekCount) }),
+      );
+    } catch {
+      // Storage unavailable (private mode / quota) — collapse state
+      // simply won't survive a reload.
+    }
+  }
+
+  private _restoreRailState(programId: string): void {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.PROGRAM_BUILDER_EXPANDED(programId));
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { collapsedWeeks?: unknown };
+      // The pre-redesign schema stored per-id workout/exercise maps —
+      // it parses to `undefined` here and falls through to "all expanded".
+      if (!Array.isArray(parsed.collapsedWeeks)) return;
+      const weekCount = this.weeks().length;
+      this.collapsedWeeks.set(
+        new Set(
+          parsed.collapsedWeeks.filter(
+            (w): w is number => typeof w === 'number' && w >= 0 && w < weekCount,
+          ),
+        ),
+      );
+    } catch {
+      // Corrupt entry — fall back to everything expanded.
+    }
   }
 
   // ── Program edit ─────────────────────────────────────────────────
@@ -232,6 +368,7 @@ export class ProgramDetail implements OnInit {
   onWorkoutSaved(saved: ProgramWorkout): void {
     const p = this.program();
     if (!p) return;
+    const isCreate = this.workoutDialogTarget() === null;
     const existing = p.workouts ?? [];
     const idx = existing.findIndex((w) => w.id === saved.id);
     // PATCH responses don't include nested exercises — preserve them.
@@ -243,14 +380,16 @@ export class ProgramDetail implements OnInit {
       idx >= 0 ? existing.map((w, i) => (i === idx ? merged : w)) : [...existing, merged];
     this.program.set({ ...p, workouts: next });
     this.workoutDialogOpen.set(false);
+    // Jump the editor to the freshly created workout.
+    if (isCreate) this.selectWorkout(saved.id);
   }
 
   /**
-   * Reorder a workout within its week — driven by the Move… menu. The
-   * week's occupied day slots stay fixed (a Mon/Wed/Fri week stays
-   * Mon/Wed/Fri) — moving permutes which workout sits on which of
-   * those days, and the BE applies the whole permutation in one
-   * transaction. Cross-week moves go through the Move dialog.
+   * Reorder a workout within its week — driven by the editor's up/down
+   * buttons. The week's occupied day slots stay fixed (a Mon/Wed/Fri
+   * week stays Mon/Wed/Fri) — moving permutes which workout sits on
+   * which of those days, and the BE applies the whole permutation in
+   * one transaction. Cross-week moves go through the Move dialog.
    */
   moveWorkout(week: number, from: number, to: number): void {
     const p = this.program();
@@ -282,7 +421,7 @@ export class ProgramDetail implements OnInit {
       ),
     });
 
-    this._programService.reorderWorkouts(p.id, { items: moved }).subscribe({
+    this._track(this._programService.reorderWorkouts(p.id, { items: moved })).subscribe({
       next: (all) => {
         // Merge the authoritative slots + recomputed sequenceNumber,
         // preserving the nested exercises the reorder response omits.
@@ -328,10 +467,19 @@ export class ProgramDetail implements OnInit {
   private _deleteWorkout(workout: ProgramWorkout): void {
     const p = this.program();
     if (!p) return;
-    this._programService.removeWorkout(p.id, workout.id).subscribe({
+    // Neighbor selection must be computed BEFORE the tree loses the workout.
+    const ordered = this.orderedWorkouts();
+    const idx = ordered.findIndex((w) => w.id === workout.id);
+    const neighbor = ordered[idx + 1] ?? ordered[idx - 1] ?? null;
+    const wasSelected = this.explicitWorkoutId() === workout.id;
+    this._track(this._programService.removeWorkout(p.id, workout.id)).subscribe({
       next: () => {
         const next = (p.workouts ?? []).filter((w) => w.id !== workout.id);
         this.program.set({ ...p, workouts: next });
+        if (wasSelected) {
+          if (neighbor) this.selectWorkout(neighbor.id, true);
+          else this.closeEditor(true);
+        }
         this._messageService.add({
           severity: 'success',
           summary: 'Workout deleted',
@@ -367,7 +515,7 @@ export class ProgramDetail implements OnInit {
     this.program.set({ ...p, workouts: next });
   }
 
-  /** Reorder an exercise within its workout — driven by the Move… menu. */
+  /** Reorder an exercise within its workout — driven by the row's up/down buttons. */
   moveExercise(workout: ProgramWorkout, from: number, to: number): void {
     const list = workout.exercises ?? [];
     const target = Math.max(0, Math.min(list.length - 1, to));
@@ -396,11 +544,13 @@ export class ProgramDetail implements OnInit {
       ),
     });
     if (changed.length === 0) return;
-    forkJoin(
-      changed.map((e) =>
-        this._programService.updateExercise(p.id, workout.id, e.id, {
-          orderIndex: e.orderIndex,
-        }),
+    this._track(
+      forkJoin(
+        changed.map((e) =>
+          this._programService.updateExercise(p.id, workout.id, e.id, {
+            orderIndex: e.orderIndex,
+          }),
+        ),
       ),
     ).subscribe({
       error: (err) => {
@@ -428,7 +578,7 @@ export class ProgramDetail implements OnInit {
   private _deleteExercise(workout: ProgramWorkout, ex: PrescribedExercise): void {
     const p = this.program();
     if (!p) return;
-    this._programService.removeExercise(p.id, workout.id, ex.id).subscribe({
+    this._track(this._programService.removeExercise(p.id, workout.id, ex.id)).subscribe({
       next: () => {
         const next = (p.workouts ?? []).map((w) =>
           w.id === workout.id
@@ -518,7 +668,9 @@ export class ProgramDetail implements OnInit {
   duplicateSet(workout: ProgramWorkout, ex: PrescribedExercise, set: PrescribedSet): void {
     const p = this.program();
     if (!p) return;
-    this._programService.addSet(p.id, workout.id, ex.id, this._setToPayload(set)).subscribe({
+    this._track(
+      this._programService.addSet(p.id, workout.id, ex.id, this._setToPayload(set)),
+    ).subscribe({
       next: (created) => {
         const cur = this.program();
         if (!cur) return;
@@ -545,12 +697,9 @@ export class ProgramDetail implements OnInit {
     });
   }
 
-  /**
-   * Row drag inside the sets table. PrimeNG has already reordered the
-   * bound array in place — it IS the target order.
-   */
-  onSetsReordered(workout: ProgramWorkout, ex: PrescribedExercise, _event: TableRowReorderEvent): void {
-    this._applySetOrder(workout, ex, ex.sets ?? []);
+  /** Row drag inside a row's set table — `ordered` IS the target order. */
+  onSetsReordered(workout: ProgramWorkout, ex: PrescribedExercise, ordered: PrescribedSet[]): void {
+    this._applySetOrder(workout, ex, ordered);
   }
 
   /**
@@ -582,11 +731,13 @@ export class ProgramDetail implements OnInit {
       ),
     });
     if (changed.length === 0) return;
-    forkJoin(
-      changed.map((s) =>
-        this._programService.updateSet(p.id, workout.id, ex.id, s.id, {
-          orderIndex: s.orderIndex,
-        }),
+    this._track(
+      forkJoin(
+        changed.map((s) =>
+          this._programService.updateSet(p.id, workout.id, ex.id, s.id, {
+            orderIndex: s.orderIndex,
+          }),
+        ),
       ),
     ).subscribe({
       error: (err) => {
@@ -620,7 +771,7 @@ export class ProgramDetail implements OnInit {
   private _deleteSet(workout: ProgramWorkout, ex: PrescribedExercise, set: PrescribedSet): void {
     const p = this.program();
     if (!p) return;
-    this._programService.removeSet(p.id, workout.id, ex.id, set.id).subscribe({
+    this._track(this._programService.removeSet(p.id, workout.id, ex.id, set.id)).subscribe({
       next: () => {
         const next = (p.workouts ?? []).map((w) =>
           w.id === workout.id
@@ -650,76 +801,7 @@ export class ProgramDetail implements OnInit {
     });
   }
 
-  // ── Move menu + cross-container moves (Part B) ───────────────────
-
-  openWorkoutMoveMenu(
-    event: MouseEvent,
-    week: number,
-    index: number,
-    count: number,
-    workout: ProgramWorkout,
-  ): void {
-    this.moveMenuItems.set([
-      ...this._orderMenuItems(index, count, (to) => this.moveWorkout(week, index, to)),
-      { separator: true },
-      {
-        label: 'Move to another week/day…',
-        icon: 'pi pi-calendar',
-        command: () => this.openMoveWorkoutDialog(workout),
-      },
-    ]);
-    this._moveMenu()?.toggle(event);
-  }
-
-  openExerciseMoveMenu(
-    event: MouseEvent,
-    workout: ProgramWorkout,
-    index: number,
-    count: number,
-    ex: PrescribedExercise,
-  ): void {
-    this.moveMenuItems.set([
-      ...this._orderMenuItems(index, count, (to) => this.moveExercise(workout, index, to)),
-      { separator: true },
-      {
-        label: 'Move to another workout…',
-        icon: 'pi pi-arrow-right-arrow-left',
-        disabled: (this.program()?.workouts?.length ?? 0) < 2,
-        command: () => this.openMoveExerciseDialog(workout, ex),
-      },
-    ]);
-    this._moveMenu()?.toggle(event);
-  }
-
-  /** Up / down / top / bottom — shared shape for both menu flavours. */
-  private _orderMenuItems(index: number, count: number, move: (to: number) => void): MenuItem[] {
-    return [
-      {
-        label: 'Move up',
-        icon: 'pi pi-arrow-up',
-        disabled: index === 0,
-        command: () => move(index - 1),
-      },
-      {
-        label: 'Move down',
-        icon: 'pi pi-arrow-down',
-        disabled: index === count - 1,
-        command: () => move(index + 1),
-      },
-      {
-        label: 'Move to top',
-        icon: 'pi pi-angle-double-up',
-        disabled: index === 0,
-        command: () => move(0),
-      },
-      {
-        label: 'Move to bottom',
-        icon: 'pi pi-angle-double-down',
-        disabled: index === count - 1,
-        command: () => move(count - 1),
-      },
-    ];
-  }
+  // ── Cross-container moves ────────────────────────────────────────
 
   openMoveWorkoutDialog(workout: ProgramWorkout): void {
     this.moveTargetMode.set('workout');
@@ -750,7 +832,9 @@ export class ProgramDetail implements OnInit {
   private _moveWorkoutToSlot(workout: ProgramWorkout, weekIndex: number, dayIndex: number): void {
     const p = this.program();
     if (!p) return;
-    this._programService.updateWorkout(p.id, workout.id, { weekIndex, dayIndex }).subscribe({
+    this._track(
+      this._programService.updateWorkout(p.id, workout.id, { weekIndex, dayIndex }),
+    ).subscribe({
       next: (updated) => {
         const cur = this.program();
         if (!cur) return;
@@ -789,165 +873,76 @@ export class ProgramDetail implements OnInit {
     if (!p || targetWorkoutId === source.id) return;
     const sets = ex.sets ?? [];
 
-    this._programService
-      .addExercise(p.id, targetWorkoutId, {
-        exerciseId: ex.exerciseId,
-        ...(ex.notes ? { notes: ex.notes } : {}),
-        ...(ex.alternateExerciseId ? { alternateExerciseId: ex.alternateExerciseId } : {}),
-      })
-      .pipe(
-        concatMap((created) =>
-          from(sets).pipe(
-            concatMap((s) =>
-              this._programService.addSet(p.id, targetWorkoutId, created.id, this._setToPayload(s)),
-            ),
-            toArray(),
-            map((createdSets) => ({ created, createdSets })),
-            catchError((err) =>
-              this._programService.removeExercise(p.id, targetWorkoutId, created.id).pipe(
-                catchError(() => of(void 0)),
-                concatMap(() => throwError(() => err)),
+    this._track(
+      this._programService
+        .addExercise(p.id, targetWorkoutId, {
+          exerciseId: ex.exerciseId,
+          ...(ex.notes ? { notes: ex.notes } : {}),
+          ...(ex.alternateExerciseId ? { alternateExerciseId: ex.alternateExerciseId } : {}),
+        })
+        .pipe(
+          concatMap((created) =>
+            from(sets).pipe(
+              concatMap((s) =>
+                this._programService.addSet(
+                  p.id,
+                  targetWorkoutId,
+                  created.id,
+                  this._setToPayload(s),
+                ),
+              ),
+              toArray(),
+              map((createdSets) => ({ created, createdSets })),
+              catchError((err) =>
+                this._programService.removeExercise(p.id, targetWorkoutId, created.id).pipe(
+                  catchError(() => of(void 0)),
+                  concatMap(() => throwError(() => err)),
+                ),
               ),
             ),
           ),
+          concatMap(({ created, createdSets }) =>
+            this._programService
+              .removeExercise(p.id, source.id, ex.id)
+              .pipe(map(() => ({ created, createdSets }))),
+          ),
         ),
-        concatMap(({ created, createdSets }) =>
-          this._programService
-            .removeExercise(p.id, source.id, ex.id)
-            .pipe(map(() => ({ created, createdSets }))),
-        ),
-      )
-      .subscribe({
-        next: ({ created, createdSets }) => {
-          const cur = this.program();
-          if (!cur) return;
-          const moved: PrescribedExercise = {
-            ...created,
-            exercise: ex.exercise,
-            sets: createdSets,
-          };
-          this.program.set({
-            ...cur,
-            workouts: (cur.workouts ?? []).map((w) => {
-              if (w.id === source.id) {
-                return { ...w, exercises: (w.exercises ?? []).filter((e) => e.id !== ex.id) };
-              }
-              if (w.id === targetWorkoutId) {
-                return { ...w, exercises: [...(w.exercises ?? []), moved] };
-              }
-              return w;
-            }),
-          });
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Exercise moved',
-            detail: ex.exercise?.name ?? undefined,
-            life: 2500,
-          });
-        },
-        error: (err) => {
-          showApiError(this._messageService, "Couldn't move exercise", 'Please try again.', err);
-          this._refetch();
-        },
-      });
-  }
-
-  // ── Collapse state (Part A) ──────────────────────────────────────
-
-  isWorkoutExpanded(id: string): boolean {
-    return this.expandedWorkouts()[id] !== false;
-  }
-
-  isExerciseExpanded(id: string): boolean {
-    return this.expandedExercises()[id] !== false;
-  }
-
-  toggleWorkoutExpanded(workout: ProgramWorkout): void {
-    this.expandedWorkouts.update((cur) => ({
-      ...cur,
-      [workout.id]: !this.isWorkoutExpanded(workout.id),
-    }));
-    this._saveExpandedState();
-  }
-
-  toggleExerciseExpanded(ex: PrescribedExercise): void {
-    this.expandedExercises.update((cur) => ({
-      ...cur,
-      [ex.id]: !this.isExerciseExpanded(ex.id),
-    }));
-    this._saveExpandedState();
-  }
-
-  /** True once every workout in the week is collapsed — flips the toggle. */
-  isWeekCollapsed(workouts: ProgramWorkout[]): boolean {
-    return workouts.every((w) => !this.isWorkoutExpanded(w.id));
-  }
-
-  /** Week-level toggle: collapse all while anything is open, else expand all. */
-  toggleWeekExpanded(workouts: ProgramWorkout[]): void {
-    this._setWeekExpanded(workouts, this.isWeekCollapsed(workouts));
-  }
-
-  private _setWeekExpanded(workouts: ProgramWorkout[], expanded: boolean): void {
-    this.expandedWorkouts.update((cur) => {
-      const next = { ...cur };
-      for (const w of workouts) next[w.id] = expanded;
-      return next;
+    ).subscribe({
+      next: ({ created, createdSets }) => {
+        const cur = this.program();
+        if (!cur) return;
+        const moved: PrescribedExercise = {
+          ...created,
+          exercise: ex.exercise,
+          sets: createdSets,
+        };
+        this.program.set({
+          ...cur,
+          workouts: (cur.workouts ?? []).map((w) => {
+            if (w.id === source.id) {
+              return { ...w, exercises: (w.exercises ?? []).filter((e) => e.id !== ex.id) };
+            }
+            if (w.id === targetWorkoutId) {
+              return { ...w, exercises: [...(w.exercises ?? []), moved] };
+            }
+            return w;
+          }),
+        });
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Exercise moved',
+          detail: ex.exercise?.name ?? undefined,
+          life: 2500,
+        });
+      },
+      error: (err) => {
+        showApiError(this._messageService, "Couldn't move exercise", 'Please try again.', err);
+        this._refetch();
+      },
     });
-    this._saveExpandedState();
   }
 
-  /** Sets prescribed across a whole workout — the collapsed-header summary. */
-  workoutSetCount(workout: ProgramWorkout): number {
-    let n = 0;
-    for (const e of workout.exercises ?? []) n += e.sets?.length ?? 0;
-    return n;
-  }
-
-  private _saveExpandedState(): void {
-    const p = this.program();
-    if (!p) return;
-    try {
-      // Store only the collapsed entries, pruned to ids still in the
-      // tree, so deleted workouts don't accumulate forever.
-      const workoutIds = new Set((p.workouts ?? []).map((w) => w.id));
-      const exerciseIds = new Set(
-        (p.workouts ?? []).flatMap((w) => (w.exercises ?? []).map((e) => e.id)),
-      );
-      const collapsedOnly = (
-        state: Record<string, boolean>,
-        keep: Set<string>,
-      ): Record<string, boolean> =>
-        Object.fromEntries(
-          Object.entries(state).filter(([id, v]) => v === false && keep.has(id)),
-        );
-      localStorage.setItem(
-        STORAGE_KEYS.PROGRAM_BUILDER_EXPANDED(p.id),
-        JSON.stringify({
-          workouts: collapsedOnly(this.expandedWorkouts(), workoutIds),
-          exercises: collapsedOnly(this.expandedExercises(), exerciseIds),
-        }),
-      );
-    } catch {
-      // Storage unavailable (private mode / quota) — collapse state
-      // simply won't survive a reload.
-    }
-  }
-
-  private _restoreExpandedState(programId: string): void {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEYS.PROGRAM_BUILDER_EXPANDED(programId));
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as {
-        workouts?: Record<string, boolean>;
-        exercises?: Record<string, boolean>;
-      };
-      this.expandedWorkouts.set(parsed.workouts ?? {});
-      this.expandedExercises.set(parsed.exercises ?? {});
-    } catch {
-      // Corrupt entry — fall back to everything expanded.
-    }
-  }
+  // ── Program-level actions ────────────────────────────────────────
 
   openAssign(): void {
     if (!this.program()) return;
@@ -976,7 +971,7 @@ export class ProgramDetail implements OnInit {
 
   private _deleteProgram(id: string): void {
     this.deleting.set(true);
-    this._programService.remove(id).subscribe({
+    this._track(this._programService.remove(id)).subscribe({
       next: () => {
         this.deleting.set(false);
         this._messageService.add({
@@ -1030,50 +1025,15 @@ export class ProgramDetail implements OnInit {
     return getProgramStatusSeverity(s);
   }
 
-  readonly trackSetById = (_: number, s: PrescribedSet): string => s.id;
-
-  setTypeSeverity(s: ExerciseSetType): TagSeverity {
-    switch (s) {
-      case ExerciseSetType.Warmup:
-        return TagSeverity.Info;
-      case ExerciseSetType.Failure:
-      case ExerciseSetType.Dropset:
-        return TagSeverity.Danger;
-      default:
-        return TagSeverity.Secondary;
-    }
-  }
-
-  /** Human duration label — weeks when the day count divides evenly. */
-  durationLabel(days: number): string {
-    if (days % 7 === 0) {
-      const weeks = days / 7;
-      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
-    }
-    return `${days} ${days === 1 ? 'day' : 'days'}`;
-  }
-
-  setSummary(s: PrescribedSet): string {
-    const parts: string[] = [];
-    if (s.targetRepsMin != null && s.targetRepsMax != null) {
-      parts.push(
-        s.targetRepsMin === s.targetRepsMax
-          ? `${s.targetRepsMin} reps`
-          : `${s.targetRepsMin}–${s.targetRepsMax} reps`,
-      );
-    } else if (s.targetRepsMin != null) {
-      parts.push(`${s.targetRepsMin}+ reps`);
-    }
-    if (s.targetWeightKg != null) parts.push(`${s.targetWeightKg} kg`);
-    else if (s.targetWeightPercent1rm != null) parts.push(`${s.targetWeightPercent1rm}% 1RM`);
-    if (s.targetDurationSeconds != null) parts.push(`${s.targetDurationSeconds}s`);
-    if (s.targetDistanceMeters != null) parts.push(`${s.targetDistanceMeters}m`);
-    if (s.targetRpe != null) parts.push(`RPE ${s.targetRpe}`);
-    if (s.targetRir != null) parts.push(`${s.targetRir} RIR`);
-    return parts.length ? parts.join(' · ') : '—';
-  }
-
   // ── Internals ────────────────────────────────────────────────────
+
+  /** Count a container-initiated mutation for the header saving pill. */
+  private _track<T>(source: Observable<T>): Observable<T> {
+    return defer(() => {
+      this._pendingMutations.update((n) => n + 1);
+      return source.pipe(finalize(() => this._pendingMutations.update((n) => Math.max(0, n - 1))));
+    });
+  }
 
   /** Pull the full tree again — used to resync after a failed reorder. */
   private _refetch(): void {
@@ -1086,7 +1046,7 @@ export class ProgramDetail implements OnInit {
     this._programService.get(id).subscribe({
       next: (p) => {
         this.program.set(p);
-        this._restoreExpandedState(p.id);
+        this._restoreRailState(p.id);
         this.loading.set(false);
       },
       error: (err) => {
