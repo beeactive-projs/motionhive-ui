@@ -39,17 +39,71 @@
 }
 
 .mh-rail__summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
   border-radius: var(--p-border-radius-lg);
   background: var(--p-surface-900);
   color: var(--p-surface-0);
-  font-size: 11px;
-  font-weight: 600;
 }
 
 :host-context(.dark) .mh-rail__summary {
   background: var(--p-surface-800);
+}
+
+// ── Drag & drop ────────────────────────────────────────────────────
+.mh-rail__grip {
+  cursor: grab;
+  color: var(--p-text-muted-color);
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// Collapsed week: the drop list overlays the header row. Entering it
+// swaps the row placeholder for a tint filling the header — "drops
+// into this week" — since a full-size row can't fit the overlay.
+.mh-rail__wolist--overlay .cdk-drag-placeholder {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--p-primary-500) 15%, transparent);
+
+  > * {
+    display: none;
+  }
+}
+
+// A connected list that can accept the dragged workout. Outline only —
+// borders would shift layout and stale-date CDK's cached hit-rects.
+.cdk-drop-list-receiving {
+  border-radius: var(--radius-lg);
+  outline: 1px dashed var(--p-primary-400);
+  outline-offset: 1px;
+  background: color-mix(in srgb, var(--p-primary-500) 5%, transparent);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+// Body-appended drag previews — the clone leaves the rail's background,
+// so it needs its own surface + elevation.
+li.cdk-drag-preview .mh-rail__wo {
+  background: var(--p-content-background);
+  box-shadow: var(--p-overlay-shadow);
+}
+
+.mh-rail__weekpreview {
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--radius-lg);
+  background: var(--p-content-background);
+  box-shadow: var(--p-overlay-shadow);
+  color: var(--p-text-color);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cdk-drag-animating,
+  .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+    transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
 }
