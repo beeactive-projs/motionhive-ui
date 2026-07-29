@@ -72,10 +72,11 @@
        `has-editor` drives the mobile one-pane flip. -->
   <div class="mh-builder__body flex min-h-0 flex-1 border-t border-surface max-md:flex-col"
     [class.has-editor]="explicitWorkoutId() !== null">
-    <aside class="mh-builder__rail flex min-h-0 w-full flex-col py-3 md:w-1/4 md:border-r md:border-surface md:pr-3">
+    <aside class="mh-builder__rail flex min-h-0 w-full flex-col py-3 md:w-1/4 md:border-r md:border-surface md:px-3">
       <mh-builder-rail [weeks]="weeks()" [selectedWorkoutId]="activeWorkout()?.id ?? null"
         [collapsedWeeks]="collapsedWeeks()" [totalWorkouts]="totalWorkouts()" (selectWorkout)="selectWorkout($event)"
-        (toggleWeek)="toggleWeekCollapsed($event)" (addWorkout)="openAddWorkout($event)" />
+        (toggleWeek)="toggleWeekCollapsed($event)" (addWorkout)="openAddWorkout($event)"
+        (workoutDropped)="onRailWorkoutDropped($event)" (weekDropped)="onRailWeekDropped($event)" />
     </aside>
 
     <section class="mh-builder__editor min-h-0 w-full min-w-0 overflow-y-auto py-3 md:w-3/4 md:pl-4">

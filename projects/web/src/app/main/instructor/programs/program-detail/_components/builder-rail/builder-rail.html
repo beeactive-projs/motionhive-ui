@@ -1,71 +1,191 @@
 <!-- Search -->
 <p-iconfield class="shrink-0">
   <p-inputicon class="pi pi-search" />
-  <input pInputText type="text" fluid placeholder="Search this program" aria-label="Search this program"
-    autocomplete="off" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)"
-    (keydown.escape)="clearSearch()" />
+  <input
+    pInputText
+    type="text"
+    fluid
+    placeholder="Search this program"
+    aria-label="Search this program"
+    autocomplete="off"
+    [ngModel]="searchQuery()"
+    (ngModelChange)="onSearchChange($event)"
+    (keydown.escape)="clearSearch()"
+  />
   @if (searchActive()) {
-  <!-- pi-times-circle (not pi-times) so it doesn't read as a generic close button. -->
-  <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" aria-label="Clear search"
-    (click)="clearSearch()" (keydown.enter)="clearSearch()" />
+    <!-- pi-times-circle (not pi-times) so it doesn't read as a generic close button. -->
+    <p-inputicon
+      class="pi pi-times-circle cursor-pointer"
+      role="button"
+      tabindex="0"
+      aria-label="Clear search"
+      (click)="clearSearch()"
+      (keydown.enter)="clearSearch()"
+    />
   }
 </p-iconfield>
 
 <!-- Outline -->
-<nav class="mt-2 min-h-0 flex-1 overflow-y-auto pr-1" aria-label="Program outline">
+<nav class="mt-2 min-h-0 flex-1 overflow-y-auto pr-1" aria-label="Program outline" cdkScrollable>
   @if (searchActive() && visibleWeeks().length === 0) {
-  <div class="flex flex-col items-center gap-2 py-6 text-center text-xs text-muted-color">
-    <span>No workouts match “{{ searchQuery().trim() }}”.</span>
-    <p-button label="Clear search" size="small" severity="secondary" [text]="true" (onClick)="clearSearch()" />
-  </div>
+    <div class="flex flex-col items-center gap-2 py-6 text-center text-xs text-muted-color">
+      <span>No workouts match “{{ searchQuery().trim() }}”.</span>
+      <p-button
+        label="Clear search"
+        size="small"
+        severity="secondary"
+        [text]="true"
+        (onClick)="clearSearch()"
+      />
+    </div>
   }
 
-  @for (g of visibleWeeks(); track g.week) {
-  <section class="mb-2 p-1">
-    <div class="flex items-center gap-0.5">
-      <button pButton type="button" [text]="true" severity="secondary" class="mh-rail__weekbtn min-w-0 flex-1"
-        [attr.aria-expanded]="isWeekOpen(g.week)" (click)="toggleWeek.emit(g.week)">
-        <i class="pi text-[11px]" [class.pi-chevron-down]="isWeekOpen(g.week)"
-          [class.pi-chevron-right]="!isWeekOpen(g.week)" aria-hidden="true"></i>
-        <span class="text-[11px] font-bold uppercase tracking-wide">Week {{ g.week + 1 }}</span>
-        <span class="ml-auto text-[11px] tabular-nums">{{ g.workouts.length }}</span>
-      </button>
-      <p-button icon="pi pi-plus" size="small" severity="secondary" [text]="true" [rounded]="true"
-        [ariaLabel]="'Add workout to week ' + (g.week + 1)" pTooltip="Add workout" tooltipPosition="right"
-        (onClick)="addWorkout.emit(g.week)" />
-    </div>
+  <ul
+    class="m-0 list-none p-0"
+    cdkDropList
+    [cdkDropListData]="visibleWeeks()"
+    cdkDropListLockAxis="y"
+    [cdkDropListDisabled]="searchActive()"
+    (cdkDropListDropped)="onWeekDrop($event)"
+  >
+    @for (g of visibleWeeks(); track g.week) {
+      <li
+        class="relative mb-2 p-1"
+        cdkDrag
+        [cdkDragStartDelay]="dragStartDelay"
+        [class.opacity-45]="
+          workoutDragActive() && dragSourceWeek() !== g.week && g.workouts.length >= 7
+        "
+      >
+        <!-- Compact preview: dragging an expanded week must not clone a tall section. -->
+        <div
+          *cdkDragPreview
+          class="mh-rail__weekpreview px-3 py-2 text-xs font-bold uppercase tracking-wide"
+        >
+          Week {{ g.week + 1 }} · {{ g.workouts.length }}
+          {{ g.workouts.length === 1 ? 'workout' : 'workouts' }}
+        </div>
 
-    @if (isWeekOpen(g.week)) {
-    <div class="mt-1 flex flex-col gap-2 pb-1">
-      @for (w of g.workouts; track w.id) {
-      <button pButton type="button" [text]="true" severity="secondary" class="mh-rail__wo"
-        [class.mh-rail__wo--on]="w.id === selectedWorkoutId()"
-        [attr.aria-current]="w.id === selectedWorkoutId() ? 'true' : null" (click)="selectWorkout.emit(w.id)">
-        <span class="flex w-full min-w-0 items-center gap-2">
-          <span class="min-w-0 flex-1 truncate text-left text-[13px] font-semibold">{{
-            w.name
-            }}</span>
-          <p-tag [value]="'Day ' + (w.dayIndex + 1)" severity="secondary" />
-        </span>
-        <span class="mt-0.5 block w-full text-left text-[11px] text-muted-color">{{
-          workoutMeta(w)
-          }}</span>
-      </button>
-      } @empty {
-      <p class="m-0 px-2.5 py-1 text-[11px] italic text-muted-color">No workouts yet.</p>
-      }
-    </div>
+        <div class="flex items-center gap-0.5">
+          @if (!searchActive()) {
+            <i
+              cdkDragHandle
+              class="mh-rail__grip pi pi-bars inline-flex shrink-0 items-center justify-center p-1 text-xs pointer-coarse:min-h-11 pointer-coarse:min-w-11"
+              aria-hidden="true"
+              pTooltip="Drag to reorder week"
+              tooltipPosition="right"
+            ></i>
+          }
+          <button
+            pButton
+            type="button"
+            [text]="true"
+            severity="secondary"
+            class="mh-rail__weekbtn min-w-0 flex-1"
+            [attr.aria-expanded]="isWeekOpen(g.week)"
+            (click)="toggleWeek.emit(g.week)"
+          >
+            <i
+              class="pi text-xs"
+              [class.pi-chevron-down]="isWeekOpen(g.week)"
+              [class.pi-chevron-right]="!isWeekOpen(g.week)"
+              aria-hidden="true"
+            ></i>
+            <span class="text-xs font-bold uppercase tracking-wide">Week {{ g.week + 1 }}</span>
+            <span class="ml-auto text-xs tabular-nums">{{ g.workouts.length }}</span>
+          </button>
+          <p-button
+            icon="pi pi-plus"
+            size="small"
+            severity="secondary"
+            [text]="true"
+            [rounded]="true"
+            [ariaLabel]="'Add workout to week ' + (g.week + 1)"
+            pTooltip="Add workout"
+            tooltipPosition="right"
+            (onClick)="addWorkout.emit(g.week)"
+          />
+        </div>
+
+        <!-- Always in the DOM so every week is a valid drop target. Open: the
+           rows list. Collapsed: an invisible overlay on the header row — its
+           geometry exists BEFORE a drag starts, so the hit-rects CDK caches
+           at drag start stay valid (only pointer-events toggles mid-drag,
+           never layout). -->
+        <ul
+          class="m-0 list-none p-0"
+          [id]="'mh-rail-wolist-' + g.week"
+          [class.mt-1]="isWeekOpen(g.week)"
+          [class.flex]="isWeekOpen(g.week)"
+          [class.flex-col]="isWeekOpen(g.week)"
+          [class.gap-2]="isWeekOpen(g.week)"
+          [class.pb-1]="isWeekOpen(g.week)"
+          [class.mh-rail__wolist--overlay]="!isWeekOpen(g.week)"
+          [class.absolute]="!isWeekOpen(g.week)"
+          [class.inset-0]="!isWeekOpen(g.week)"
+          [class.pointer-events-none]="!isWeekOpen(g.week) && !workoutDragActive()"
+          [class.z-10]="!isWeekOpen(g.week) && workoutDragActive()"
+          cdkDropList
+          [cdkDropListData]="g"
+          [cdkDropListConnectedTo]="workoutListIds()"
+          cdkDropListLockAxis="y"
+          [cdkDropListEnterPredicate]="canEnterWeek"
+          [cdkDropListDisabled]="searchActive()"
+          (cdkDropListDropped)="onWorkoutDrop($event)"
+        >
+          @if (isWeekOpen(g.week)) {
+            @for (w of g.workouts; track w.id) {
+              <li
+                cdkDrag
+                [cdkDragData]="w"
+                [cdkDragStartDelay]="dragStartDelay"
+                (cdkDragStarted)="onWorkoutDragStarted(g.week)"
+                (cdkDragEnded)="onWorkoutDragEnded()"
+              >
+                <button
+                  pButton
+                  type="button"
+                  [text]="true"
+                  severity="secondary"
+                  class="mh-rail__wo w-full"
+                  [class.mh-rail__wo--on]="w.id === selectedWorkoutId()"
+                  [attr.aria-current]="w.id === selectedWorkoutId() ? 'true' : null"
+                  (click)="selectWorkout.emit(w.id)"
+                >
+                  <span class="flex w-full min-w-0 items-center gap-2">
+                    <span class="min-w-0 flex-1 truncate text-left text-sm font-semibold">{{
+                      w.name
+                    }}</span>
+                    <p-tag [value]="'Day ' + (w.dayIndex + 1)" severity="secondary" />
+                  </span>
+                  <span class="mt-0.5 block w-full text-left text-xs text-muted-color">{{
+                    workoutMeta(w)
+                  }}</span>
+                </button>
+              </li>
+            } @empty {
+              <li class="m-0 px-2.5 py-1 text-xs italic text-muted-color">No workouts yet.</li>
+            }
+          }
+        </ul>
+      </li>
     }
-  </section>
-  }
+  </ul>
 </nav>
 
 <!-- Footer -->
 <div class="mt-2 flex shrink-0 flex-col gap-2">
-  <p-button [label]="totalWorkouts() === 0 ? 'Add workout' : 'Add workout in another week'" icon="pi pi-plus"
-    size="small" severity="secondary" [outlined]="true" fluid styleClass="mh-dashed-btn"
-    (onClick)="addWorkout.emit(null)" />
-  <div class="mh-rail__summary">
+  <p-button
+    [label]="totalWorkouts() === 0 ? 'Add workout' : 'Add workout in another week'"
+    icon="pi pi-plus"
+    size="small"
+    severity="secondary"
+    [outlined]="true"
+    fluid
+    styleClass="mh-dashed-btn"
+    (onClick)="addWorkout.emit(null)"
+  />
+  <div class="mh-rail__summary flex items-center gap-2 px-3 py-2 text-xs font-semibold">
     <i class="pi pi-calendar text-xs" aria-hidden="true"></i>
     <span>
       {{ weeks().length }} {{ weeks().length === 1 ? 'week' : 'weeks' }} · {{ totalWorkouts() }}
