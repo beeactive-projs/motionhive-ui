@@ -17,30 +17,43 @@
       <mh-check-list class="hero__guar" [items]="guarantees" tone="amber" />
     </div>
 
-    <!-- Floating hex cluster. Label + icon live INSIDE the shape (design spec),
-         each hex filled with its own gradient via mh-hex's gradient stops. -->
+    <!-- Pre-redesign hexagon diamond (restored from develop): rounded-hex clip
+         + glowing icon ring + label. `--hh` per hex drives tint + ring glow. -->
+    <svg width="0" height="0" aria-hidden="true" focusable="false" class="hero__clip">
+      <defs>
+        <clipPath id="heroHexRound" clipPathUnits="objectBoundingBox">
+          <path d="M0.4394 0.035 Q0.5 0 0.5606 0.035 L0.8724 0.215 Q0.933 0.25 0.933 0.32 L0.933 0.68 Q0.933 0.75 0.8724 0.785 L0.5606 0.965 Q0.5 1 0.4394 0.965 L0.1276 0.785 Q0.067 0.75 0.067 0.68 L0.067 0.32 Q0.067 0.25 0.1276 0.215 Z" />
+        </clipPath>
+      </defs>
+    </svg>
     <div class="hero__art" aria-hidden="true">
       @for (h of heroHexes; track h.label) {
-        <div class="hxc" [class]="'hxc--' + h.pos">
-          <!-- No [shadow]: drop-shadow is a CSS filter, and combined with the
-               float transform it rasterises the layer and softens the hex
-               edges. The design only shadows the small "0% fee" hex. -->
-          <mh-hex
-            [size]="h.size"
-            orientation="pointy"
-            [gradientFrom]="h.from"
-            [gradientTo]="h.to">
-            <span class="hxc__in">
-              <span class="hxc__ic">{{ h.icon }}</span>
-              <span class="hxc__t">{{ h.label }}</span>
-            </span>
-          </mh-hex>
+        <div [class]="'hero-hex hero-hex-' + h.pos" [style.--hh]="h.color">
+          <div class="hero-hex-inner">
+            <div class="hero-hex-glow"><i [class]="'hero-hex-icon pi ' + h.icon"></i></div>
+            <span class="hero-hex-label">{{ h.label }}</span>
+          </div>
         </div>
       }
-      <div class="hxc hxc--badge">
-        <mh-hex [size]="73" orientation="pointy" bg="var(--p-surface-0)" [shadow]="true">
-          <span class="hxc__badge">Free</span>
-        </mh-hex>
+
+      <!-- Floating frosted-glass cards over the cluster (restored from develop). -->
+      <div class="floating-card floating-card-1">
+        <div class="floating-card-icon floating-card-icon--accent">
+          <i class="pi pi-chart-line" aria-hidden="true"></i>
+        </div>
+        <div>
+          <p class="floating-card-title" i18n="@@home.fc1t">Grow your <span class="text-brand">coaching</span></p>
+          <p class="floating-card-desc" i18n="@@home.fc1d">One place for sessions, programs, payments and your whole roster.</p>
+        </div>
+      </div>
+      <div class="floating-card floating-card-2">
+        <div class="floating-card-icon floating-card-icon--navy">
+          <i class="pi pi-users" aria-hidden="true"></i>
+        </div>
+        <div>
+          <p class="floating-card-title" i18n="@@home.fc2t">Build your <span class="text-brand">community</span></p>
+          <p class="floating-card-desc" i18n="@@home.fc2d">Bring your people together instead of scattered chats and spreadsheets.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -51,7 +64,8 @@
   <div class="mh-wrap proof__row">
     @for (f of features; track f.slug) {
       <span class="chip">
-        <span class="chip__hx" [class.chip__hx--teal]="f.tone === 'teal'" aria-hidden="true"></span>
+        <mh-hex class="chip__hx" [size]="14" orientation="pointy"
+          [bg]="f.tone === 'teal' ? 'var(--color-accent-500, #14b8a6)' : 'var(--p-primary-500, #f59e0b)'" />
         {{ f.name }}
       </span>
     }

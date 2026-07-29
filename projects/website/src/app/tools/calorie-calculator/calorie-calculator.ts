@@ -54,7 +54,7 @@ export class CalorieCalculator {
     });
     this._meta.updateTag({
       property: 'og:description',
-      content: $localize`:@@calorie.og.description:Find your maintenance calories, macro split, and body fat percentage — free, instant, no sign-up required.`,
+      content: $localize`:@@calorie.og.description:Find your maintenance calories, macro split and body fat percentage. Free, instant, no sign-up required.`,
     });
 
     try {
@@ -119,12 +119,12 @@ export class CalorieCalculator {
       label: $localize`:@@calorie.activity.sedentary:Sedentary (little or no exercise)`,
       value: 1.2,
     },
-    { label: $localize`:@@calorie.activity.light:Lightly active (1–3 days/week)`, value: 1.375 },
+    { label: $localize`:@@calorie.activity.light:Lightly active (1-3 days/week)`, value: 1.375 },
     {
-      label: $localize`:@@calorie.activity.moderate:Moderately active (3–5 days/week)`,
+      label: $localize`:@@calorie.activity.moderate:Moderately active (3-5 days/week)`,
       value: 1.55,
     },
-    { label: $localize`:@@calorie.activity.very:Very active (6–7 days/week)`, value: 1.725 },
+    { label: $localize`:@@calorie.activity.very:Very active (6-7 days/week)`, value: 1.725 },
     { label: $localize`:@@calorie.activity.extra:Extra active (very hard exercise)`, value: 1.9 },
   ];
 
@@ -241,25 +241,25 @@ export class CalorieCalculator {
         return {
           label: $localize`:@@calorie.bodyfat.cat.essential:Essential`,
           color: 'var(--p-blue-500)',
-          range: '2–5%',
+          range: '2-5%',
         };
       if (pct < 14)
         return {
           label: $localize`:@@calorie.bodyfat.cat.athletic:Athletic`,
           color: 'var(--p-green-500)',
-          range: '6–13%',
+          range: '6-13%',
         };
       if (pct < 18)
         return {
           label: $localize`:@@calorie.bodyfat.cat.fitness:Fitness`,
           color: 'var(--p-green-400)',
-          range: '14–17%',
+          range: '14-17%',
         };
       if (pct < 25)
         return {
           label: $localize`:@@calorie.bodyfat.cat.average:Average`,
           color: 'var(--p-yellow-500)',
-          range: '18–24%',
+          range: '18-24%',
         };
       return {
         label: $localize`:@@calorie.bodyfat.cat.obese:Obese`,
@@ -271,25 +271,25 @@ export class CalorieCalculator {
         return {
           label: $localize`:@@calorie.bodyfat.cat.essential:Essential`,
           color: 'var(--p-blue-500)',
-          range: '10–13%',
+          range: '10-13%',
         };
       if (pct < 21)
         return {
           label: $localize`:@@calorie.bodyfat.cat.athletic:Athletic`,
           color: 'var(--p-green-500)',
-          range: '14–20%',
+          range: '14-20%',
         };
       if (pct < 25)
         return {
           label: $localize`:@@calorie.bodyfat.cat.fitness:Fitness`,
           color: 'var(--p-green-400)',
-          range: '21–24%',
+          range: '21-24%',
         };
       if (pct < 32)
         return {
           label: $localize`:@@calorie.bodyfat.cat.average:Average`,
           color: 'var(--p-yellow-500)',
-          range: '25–31%',
+          range: '25-31%',
         };
       return {
         label: $localize`:@@calorie.bodyfat.cat.obese:Obese`,
@@ -357,21 +357,21 @@ export class CalorieCalculator {
       icon: 'pi-calculator',
       tone: 'amber',
       question: $localize`:@@calorie.faq.q1:How accurate is this calorie calculator?`,
-      answer: $localize`:@@calorie.faq.a1:This calculator uses the Mifflin-St Jeor equation, which is considered the most accurate formula for estimating Basal Metabolic Rate (BMR) for most people. Studies show it has a margin of error of roughly ±10%. For greater precision, consider a DEXA scan or a clinical resting metabolic rate test.`,
+      answer: $localize`:@@calorie.faq.a1:This calculator uses the Mifflin-St Jeor equation, the most accurate formula for estimating Basal Metabolic Rate (BMR) for most people. Its margin of error is roughly ±10%. For a more precise number, book a DEXA scan or a clinical resting metabolic rate test.`,
     },
     {
       value: 'faq-2',
       icon: 'pi-plus',
       tone: 'teal',
       question: $localize`:@@calorie.faq.q2:Should I eat more on HIIT days?`,
-      answer: $localize`:@@calorie.faq.a2:Yes — high-intensity interval training significantly elevates calorie expenditure. On hard training days, you may benefit from an extra 200–400 calories. Prioritise complex carbohydrates before your session and protein-rich foods within 30 minutes of finishing to support performance and recovery.`,
+      answer: $localize`:@@calorie.faq.a2:Yes. High-intensity training burns noticeably more calories, so on hard days an extra 200 to 400 calories helps. Eat complex carbs before your session and protein within 30 minutes of finishing to support performance and recovery.`,
     },
     {
       value: 'faq-3',
       icon: 'pi-arrow-down-right',
       tone: 'coral',
       question: $localize`:@@calorie.faq.q3:What is a safe calorie deficit for weight loss?`,
-      answer: $localize`:@@calorie.faq.a3:A deficit of 300–500 calories per day is generally considered safe and sustainable, leading to roughly 0.3–0.5 kg (0.5–1 lb) of fat loss per week. Deficits exceeding 1,000 calories per day risk muscle loss, nutrient deficiencies, and metabolic adaptation that can stall progress.`,
+      answer: $localize`:@@calorie.faq.a3:A deficit of 300 to 500 calories a day is safe and sustainable for most people, which is roughly 0.3 to 0.5 kg (about 0.5 to 1 lb) of fat loss a week. Going beyond 1,000 calories a day risks muscle loss, nutrient gaps and a slower metabolism that stalls progress.`,
     },
   ];
 }

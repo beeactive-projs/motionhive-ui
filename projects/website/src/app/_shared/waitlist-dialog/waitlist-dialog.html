@@ -10,8 +10,7 @@
       </div>
       <div>
         <p i18n="@@waitlist.header.title" class="font-heading font-bold text-base leading-tight">Stay in the loop</p>
-        <p i18n="@@waitlist.header.sub" class="text-xs  mt-0.5">Be the first to know when MotionHive
-          launches</p>
+        <p i18n="@@waitlist.header.sub" class="text-xs  mt-0.5">Product news and the occasional update</p>
       </div>
     </div>
   </ng-template>
@@ -19,7 +18,7 @@
   @if (!submitted()) {
   <form [formGroup]="form" class="flex flex-col gap-4">
     <p i18n="@@waitlist.desc" class="text-sm  leading-relaxed m-0">
-      We're building something special. Drop your email and we'll notify you the moment we're live.
+      Building MotionHive in the open. Drop your email for product news and the occasional update.
     </p>
 
     <div class="flex flex-col gap-1.5">
@@ -43,8 +42,7 @@
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <label i18n="@@waitlist.role.label" class="text-xs font-semibold">How will you
-        MotionHive?</label>
+      <label i18n="@@waitlist.role.label" class="text-xs font-semibold">How will you use MotionHive?</label>
       <div class="flex gap-2">
         @for (r of roles; track r.key) {
         <p-button class="flex-1" [outlined]="form.controls.role.value !== r.key"
@@ -64,7 +62,7 @@
     </div>
     <h4 i18n="@@waitlist.success.h4" class="font-heading font-bold text-xl mb-2">You're in!</h4>
     <p i18n="@@waitlist.success.p" class=" text-sm leading-relaxed">
-      We'll reach out as soon as MotionHive is ready. Thanks for believing in what we're building.
+      You're on the list. Thanks for following along.
     </p>
   </div>
   }

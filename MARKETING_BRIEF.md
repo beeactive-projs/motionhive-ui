@@ -249,6 +249,15 @@ Marketing must stay accurate. As of now, the platform does **not** have:
 - **Live video / calling inside the app** — "online" sessions are delivered via the coach's
   meeting link, not an in-app video product.
 - **Large scale / big numbers** — we're early; don't imply a huge existing user base.
+- **Data export / "take your clients and content and leave anytime"** — full portability is
+  NOT a shipped feature. Do not promise export or "no lock-in." (A GDPR personal-data export
+  exists on the account, but that is not the same as exporting your whole business.)
+- **"Launching soon" / waitlist / "be the first to know when we launch"** — MotionHive is
+  **live**. People can sign up and use it today. The primary CTA is "Start coaching for free"
+  pointing at signup. Do not frame the product as pre-launch or gate it behind a waitlist.
+  The waitlist dialog, if shown, is for optional product-update emails, not early access.
+- **Absolute forever-promises about pricing** (e.g. "never a paywall, ever") — reassure with
+  "the free core stays free" instead of locking us into an absolute we may regret.
 
 When in doubt, describe the *job it does for the user* rather than a specific number or a
 roadmap feature.

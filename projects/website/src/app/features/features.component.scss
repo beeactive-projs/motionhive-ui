@@ -129,19 +129,9 @@
     font-weight: 600;
     color: var(--p-surface-500);
   }
+  /* Marker is the shared <mh-hex> (color set per lane in the template). */
   &__dot {
-    width: 9px;
-    height: 10px;
-    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  }
-  &--now .lane__dot {
-    background: var(--p-green-500, #22c55e);
-  }
-  &--soon .lane__dot {
-    background: var(--p-primary-500);
-  }
-  &--exploring .lane__dot {
-    background: var(--p-surface-400);
+    flex: none;
   }
 
   &__list {

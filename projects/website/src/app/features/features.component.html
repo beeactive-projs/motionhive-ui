@@ -66,7 +66,8 @@
       @for (lane of roadmap; track lane.key) {
         <div class="mh-card lane" [class]="'lane--' + lane.key">
           <p class="lane__h">
-            <span class="lane__dot" aria-hidden="true"></span>
+            <mh-hex class="lane__dot" [size]="12" orientation="pointy"
+              [bg]="lane.key === 'now' ? 'var(--p-green-500, #22c55e)' : lane.key === 'soon' ? 'var(--p-primary-500, #f59e0b)' : 'var(--p-surface-400, #94a3b8)'" />
             {{ lane.label }}
           </p>
           <ul class="lane__list">

@@ -16,7 +16,7 @@ export class AboutComponent {
   constructor() {
     inject(SeoService).set({
       title: $localize`About - MotionHive`,
-      description: $localize`:@@about.meta.description:MotionHive is where active communities come together — a home for organisers to run their groups and for members to find activities and stay in motion. Learn what we're building and why.`,
+      description: $localize`:@@about.meta.description:MotionHive is a home for active communities: organisers run their groups, members find activities and stay in motion. See what we're building and why.`,
     });
   }
 }

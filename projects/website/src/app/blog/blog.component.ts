@@ -83,7 +83,7 @@ export class BlogComponent {
   constructor() {
     inject(SeoService).set({
       title: $localize`Blog - MotionHive`,
-      description: $localize`:@@blog.meta.description:Practical guides and stories on group fitness, training, nutrition, and building active communities — from the MotionHive team.`,
+      description: $localize`:@@blog.meta.description:Practical guides and stories on group fitness, training, nutrition and building active communities, from the MotionHive team.`,
     });
 
     this._search$

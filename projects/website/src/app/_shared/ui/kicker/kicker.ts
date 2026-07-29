@@ -1,15 +1,20 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Hex } from 'core';
 
 /**
  * Eyebrow / kicker — the small mono, uppercase pill with a hex bullet that
  * sits above every section heading. Tone maps to the brand palette (amber
  * for core, teal for community/social, muted for neutral/"coming soon").
  * Label is projected so callers keep i18n on their own text.
+ *
+ * The bullet is the shared `mh-hex` (bg=currentColor → it takes the pill's
+ * text color), so it's the same hexagon primitive used across the site.
  */
 @Component({
   selector: 'mh-kicker',
+  imports: [Hex],
   template: `<span class="kicker" [class]="'kicker--' + tone()" [class.kicker--plain]="!pill()">
-    <span class="hx" aria-hidden="true"></span>
+    <mh-hex class="hx" [size]="11" orientation="pointy" bg="currentColor" />
     <ng-content />
   </span>`,
   styleUrl: './kicker.scss',

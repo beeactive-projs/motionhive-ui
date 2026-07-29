@@ -9,7 +9,7 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./home/home.component').then((m) => m.HomeComponent),
-        title: $localize`MotionHive — Where active communities come together`,
+        title: $localize`MotionHive: where active communities come together`,
       },
       {
         path: 'about',

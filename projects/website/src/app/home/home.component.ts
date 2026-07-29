@@ -17,17 +17,16 @@ import { Stat } from '../_shared/ui/stat/stat';
 import { BlogPostCard } from '../blog/_shared/blog-post-card/blog-post-card';
 
 /**
- * Hero cluster hex. Gradient stops + geometry mirror the design's `.hxc`
- * spec (150x166, per-tone gradient, label inside the shape).
+ * Hero cluster hex — the pre-redesign diamond of 4 (top / two middle /
+ * bottom): an airy tinted `mh-hex` with a glowing icon ring + label inside.
+ * `color` drives both the light hex tint and the ring glow (via `--hh`).
  */
 interface HeroHex {
   icon: string;
   label: string;
-  /** Long-axis size passed to mh-hex (pointy → this is the height). */
-  size: number;
-  from: string;
-  to: string;
-  /** Position class suffix: 1..4. */
+  /** Base color: light hex tint + glowing icon ring. */
+  color: string;
+  /** Position class suffix: 1 top, 2 middle-left, 3 middle-right, 4 bottom. */
   pos: number;
 }
 interface Path {
@@ -73,10 +72,10 @@ export class HomeComponent {
   ];
 
   readonly heroHexes: HeroHex[] = [
-    { icon: '📅', label: $localize`:@@home.hx1:Book sessions`, size: 166, from: '#F9B33C', to: '#EF8E08', pos: 1 },
-    { icon: '📋', label: $localize`:@@home.hx2:Build programs`, size: 166, from: '#2A3350', to: '#161C2E', pos: 2 },
-    { icon: '👥', label: $localize`:@@home.hx3:Your hive`, size: 166, from: '#18B4AE', to: '#0B857F', pos: 3 },
-    { icon: '💳', label: $localize`:@@home.hx4:Get paid`, size: 133, from: '#F79178', to: '#EC5F3E', pos: 4 },
+    { icon: 'pi-calendar', label: $localize`:@@home.hx1:Book sessions`, color: 'var(--p-sky-500, #0ea5e9)', pos: 1 },
+    { icon: 'pi-book', label: $localize`:@@home.hx2:Build programs`, color: 'var(--p-emerald-500, #10b981)', pos: 2 },
+    { icon: 'pi-users', label: $localize`:@@home.hx3:Your hive`, color: 'var(--p-purple-500, #a855f7)', pos: 3 },
+    { icon: 'pi-wallet', label: $localize`:@@home.hx4:Get paid`, color: 'var(--p-orange-500, #f97316)', pos: 4 },
   ];
 
   readonly paths: Path[] = [
@@ -88,7 +87,7 @@ export class HomeComponent {
       points: [
         $localize`:@@home.coach.p1:Your public, bookable coach profile`,
         $localize`:@@home.coach.p2:Programs your clients actually follow`,
-        $localize`:@@home.coach.p3:Get paid for sessions, plans and products`,
+        $localize`:@@home.coach.p3:Get paid for sessions, memberships and products`,
         $localize`:@@home.coach.p4:Your whole roster in one place`,
       ],
     },
@@ -98,7 +97,7 @@ export class HomeComponent {
       title: $localize`:@@home.member.title:You show up.`,
       role: $localize`:@@home.member.role:For their people`,
       points: [
-        $localize`:@@home.member.p1:Find coaches and book in one tap`,
+        $localize`:@@home.member.p1:Find coaches and book in seconds`,
         $localize`:@@home.member.p2:Follow your plan, track your training`,
         $localize`:@@home.member.p3:Message your coach between sessions`,
         $localize`:@@home.member.p4:Join the group, not a spreadsheet`,
@@ -142,7 +141,7 @@ export class HomeComponent {
     const isRo = isRoLocale(inject(DOCUMENT));
 
     seo.set({
-      title: $localize`:@@home.meta.title:MotionHive — free coaching software for the communities you build`,
+      title: $localize`:@@home.meta.title:MotionHive: free coaching software for the communities you build`,
       description: $localize`:@@home.meta.description:MotionHive is free software for coaches: a bookable profile, sessions, programs, payments and community in one place. Unlimited clients, no subscription.`,
     });
 

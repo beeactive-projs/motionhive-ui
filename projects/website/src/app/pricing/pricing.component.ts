@@ -62,10 +62,10 @@ export class PricingComponent {
       body: $localize`:@@pricing.nc3.b:Sign up and set up your profile without entering any payment details.`,
     },
     {
-      icon: '🔒',
+      icon: '💰',
       tone: 'navy',
-      title: $localize`:@@pricing.nc4.t:Your data is yours`,
-      body: $localize`:@@pricing.nc4.b:Export anytime. We do not hold your clients or content hostage.`,
+      title: $localize`:@@pricing.nc4.t:Keep your earnings`,
+      body: $localize`:@@pricing.nc4.b:Our platform fee is 0% by default, so what you earn stays yours.`,
     },
   ];
 
@@ -112,11 +112,7 @@ export class PricingComponent {
     },
     {
       q: $localize`:@@pricing.faq4.q:Will it stay free to manage clients?`,
-      a: $localize`:@@pricing.faq4.a:Yes. If premium ever arrives, it will be extra tools on top, never a paywall on running your coaching or managing the clients you already have.`,
-    },
-    {
-      q: $localize`:@@pricing.faq5.q:Can I export my data?`,
-      a: $localize`:@@pricing.faq5.a:Yes. Your clients and content are yours; you can export them and leave anytime.`,
+      a: $localize`:@@pricing.faq4.a:Yes. The free core stays free. If premium ever arrives, it will be extra tools on top, not a gate on the coaching you already run.`,
     },
   ];
 
