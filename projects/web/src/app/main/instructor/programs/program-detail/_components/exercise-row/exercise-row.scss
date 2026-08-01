@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.mh-exrow__head {
+  transition: background 0.12s;
+
+  &:hover {
+    background: var(--p-content-hover-background);
+  }
+}
+
+// The content area is a pButton text-secondary button so the whole row is
+// keyboard-toggleable with theme focus states; these rules reshape the
+// centered button into a plain left-aligned row. The row-level hover above
+// carries the highlight, so the button's own hover tint is suppressed.
+.mh-exrow__main {
+  justify-content: flex-start;
+  padding: 0;
+  color: var(--p-text-color);
+
+  &:not(:disabled):hover {
+    background: transparent;
+    color: var(--p-text-color);
+  }
+}
+
+// De-emphasize the icon cluster until the row is hovered or focused —
+// hover-capable fine pointers only; touch keeps them fully visible.
+@media (hover: hover) and (pointer: fine) {
+  .mh-exrow__actions {
+    opacity: 0.45;
+    transition: opacity 0.12s;
+  }
+
+  .mh-exrow__head:hover .mh-exrow__actions,
+  .mh-exrow__head:focus-within .mh-exrow__actions {
+    opacity: 1;
+  }
+}
