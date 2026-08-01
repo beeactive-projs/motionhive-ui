@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { Hex } from 'core';
 
 import { SeoService } from '../_shared/seo.service';
 
 @Component({
   selector: 'mh-about',
-  imports: [RouterLink, ButtonModule, Hex],
+  imports: [RouterLink, Hex],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -15,7 +14,7 @@ import { SeoService } from '../_shared/seo.service';
 export class AboutComponent {
   constructor() {
     inject(SeoService).set({
-      title: $localize`About - MotionHive`,
+      title: $localize`:@@about.meta.title:About MotionHive: free coaching software, built in the open`,
       description: $localize`:@@about.meta.description:MotionHive is a home for active communities: organisers run their groups, members find activities and stay in motion. See what we're building and why.`,
     });
   }

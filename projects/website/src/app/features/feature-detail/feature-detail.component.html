@@ -16,7 +16,7 @@
         </h1>
         <p class="hero__sub">{{ f.intro }}</p>
         <div class="hero__cta">
-          <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@fd.cta1">Start coaching for free</a>
+          <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@fd.cta1">Create your free account</a>
           <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/pricing" i18n="@@fd.cta2">See pricing</a>
         </div>
       </div>
@@ -28,8 +28,7 @@
   <section class="mh-band">
     <div class="mh-wrap">
       <mh-section-header center>
-        <mh-kicker kicker [tone]="f.tone" i18n="@@fd.cap.kicker">What you can do</mh-kicker>
-        <ng-container heading i18n="@@fd.cap.h">The <span class="text-brand">short version.</span></ng-container>
+        <ng-container heading i18n="@@fd.cap.h">What you can do.</ng-container>
       </mh-section-header>
       <div class="caps">
         <mh-check-list [items]="f.capabilities" [tone]="f.tone" [columns]="2" />
@@ -41,8 +40,7 @@
   <section class="mh-band">
     <div class="mh-wrap">
       <mh-section-header center>
-        <mh-kicker kicker i18n="@@fd.ben.kicker">Why it matters</mh-kicker>
-        <ng-container heading i18n="@@fd.ben.h">What it actually <span class="text-brand">changes.</span></ng-container>
+        <ng-container heading i18n="@@fd.ben.h">What it actually changes.</ng-container>
       </mh-section-header>
       <div class="bgrid">
         @for (b of f.benefits; track b.title) {
@@ -60,8 +58,7 @@
   <section class="mh-band">
     <div class="mh-wrap">
       <mh-section-header center>
-        <mh-kicker kicker i18n="@@fd.faq.kicker">Questions</mh-kicker>
-        <ng-container heading i18n="@@fd.faq.h">Good to <span class="text-brand">know.</span></ng-container>
+        <ng-container heading i18n="@@fd.faq.h">Questions.</ng-container>
       </mh-section-header>
       <mh-faq [items]="f.faq" />
     </div>
@@ -71,8 +68,7 @@
   <section class="mh-band">
     <div class="mh-wrap">
       <mh-section-header center>
-        <mh-kicker kicker i18n="@@fd.rel.kicker">Explore more</mh-kicker>
-        <ng-container heading i18n="@@fd.rel.h">It works better <span class="text-brand">together.</span></ng-container>
+        <ng-container heading i18n="@@fd.rel.h">Explore more features.</ng-container>
       </mh-section-header>
       <div class="rgrid">
         @for (r of related(); track r.slug) {
@@ -88,7 +84,7 @@
     <ng-container heading i18n="@@fd.cta.h">Try it on your <span class="text-brand">own roster.</span></ng-container>
     <ng-container sub i18n="@@fd.cta.sub">Set up in minutes. No card, no catch, no subscription.</ng-container>
     <div actions>
-      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@fd.cta.btn">Start coaching for free</a>
+      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@fd.cta.btn">Create your free account</a>
       <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/features" i18n="@@fd.cta.btn2">All features</a>
     </div>
   </mh-cta-band>

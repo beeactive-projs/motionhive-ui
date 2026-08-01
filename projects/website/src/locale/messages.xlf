@@ -702,529 +702,704 @@
           <context context-type="linenumber">268</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="feat.progress.name" datatype="html">
+        <source>Progress</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">272</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.one" datatype="html">
+        <source>Log every workout, see your progress</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">275</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.h1a" datatype="html">
+        <source>See yourself getting</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">278</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.h1b" datatype="html">
+        <source>stronger.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">279</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.intro" datatype="html">
+        <source>Log each workout as you go, then look back and see how far you have come. Your sets, your reps and your personal bests, all in one place.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">280</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.c1" datatype="html">
+        <source>Log sets, reps and weight as you train</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">282</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.c2" datatype="html">
+        <source>Pick up an unfinished workout where you left off</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">283</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.c3" datatype="html">
+        <source>See your history for every exercise</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">284</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.c4" datatype="html">
+        <source>Track personal bests and one rep maxes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">285</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.c5" datatype="html">
+        <source>Follow the plan your coach assigned</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">286</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.c6" datatype="html">
+        <source>Built for your phone, right at the rack</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">287</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.b1t" datatype="html">
+        <source>Proof you are improving</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">292</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.b1b" datatype="html">
+        <source>The numbers do not lie. Watch your weights climb week over week.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">293</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.b2t" datatype="html">
+        <source>Never lose your place</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">297</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.b2b" datatype="html">
+        <source>Start a workout, get interrupted, and pick it back up later without missing a set.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">298</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.b3t" datatype="html">
+        <source>Your whole history, one tap away</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">302</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.b3b" datatype="html">
+        <source>Every session you have logged is there when you want to compare.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">303</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.q1" datatype="html">
+        <source>Do I need a coach to use it?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">308</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.a1" datatype="html">
+        <source>No. Log your own workouts, or follow a plan your coach assigned. Both work.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">309</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.q2" datatype="html">
+        <source>Can I see my old workouts?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">312</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.a2" datatype="html">
+        <source>Yes. Your full history stays with you, exercise by exercise.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">313</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.q3" datatype="html">
+        <source>Does it track personal bests?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">316</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.a3" datatype="html">
+        <source>Yes, including your estimated one rep max as your numbers go up.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">317</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.mt" datatype="html">
+        <source>Track your workouts and progress, free | MotionHive</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">321</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="feat.progress.md" datatype="html">
+        <source>Log every set, rep and weight, resume unfinished workouts, and watch your progress and personal bests over time. Free, in one place.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
+          <context context-type="linenumber">322</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="feat.payments.name" datatype="html">
         <source>Payments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">326</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.one" datatype="html">
         <source>Invoices, subscriptions and products in one place</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">329</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.h1a" datatype="html">
         <source>Get paid without becoming a</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">278</context>
+          <context context-type="linenumber">332</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.h1b" datatype="html">
         <source>debt collector.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">333</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.intro" datatype="html">
         <source>One place for what people owe you. Charge for sessions, packages or a membership, and stop chasing bank transfers on a Sunday night.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c1" datatype="html">
         <source>Take card payments for sessions and packages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">336</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c2" datatype="html">
         <source>Recurring memberships that renew themselves</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">337</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c3" datatype="html">
         <source>Send an invoice in a couple of clicks</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">284</context>
+          <context context-type="linenumber">338</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c4" datatype="html">
         <source>See who has paid and who has not</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">285</context>
+          <context context-type="linenumber">339</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c5" datatype="html">
         <source>Refunds inside the rules you set</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">286</context>
+          <context context-type="linenumber">340</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.c6" datatype="html">
         <source>Create products once and show them on your page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">287</context>
+          <context context-type="linenumber">341</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b1t" datatype="html">
         <source>No more month end chasing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">292</context>
+          <context context-type="linenumber">346</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b1b" datatype="html">
         <source>Reminders go out on their own, so you stay the coach instead of the collector.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">293</context>
+          <context context-type="linenumber">347</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b2t" datatype="html">
         <source>Memberships that just run</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">297</context>
+          <context context-type="linenumber">351</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b2b" datatype="html">
         <source>Recurring plans renew without you raising an invoice every month.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">298</context>
+          <context context-type="linenumber">352</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b3t" datatype="html">
         <source>One place for what you&apos;re owed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">356</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.b3b" datatype="html">
         <source>Invoices, memberships and one-off charges live together, so you always know who owes what.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">303</context>
+          <context context-type="linenumber">357</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.q1" datatype="html">
         <source>What can I charge for?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">362</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.a1" datatype="html">
         <source>Sessions, packages, one-off products and recurring memberships. You create them once and they can show on your page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">309</context>
+          <context context-type="linenumber">363</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.q2" datatype="html">
         <source>When do I get paid?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">312</context>
+          <context context-type="linenumber">366</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.a2" datatype="html">
         <source>Payouts follow your payment processor schedule and land straight in your account.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">313</context>
+          <context context-type="linenumber">367</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.q3" datatype="html">
         <source>Can I charge in my own currency?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">316</context>
+          <context context-type="linenumber">370</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.a3" datatype="html">
         <source>Yes. Your prices and payouts follow the currency your account settles in.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">371</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.mt" datatype="html">
         <source>Payments for coaches: invoices, subscriptions, products | MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">321</context>
+          <context context-type="linenumber">375</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.md" datatype="html">
         <source>Charge for sessions and packages, run recurring memberships, create products for your page and send invoices, all in one place. No subscription to manage clients.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">322</context>
+          <context context-type="linenumber">376</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.name" datatype="html">
         <source>Messaging</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">380</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.one" datatype="html">
         <source>Stay close between sessions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">383</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.h1a" datatype="html">
         <source>Stay close between</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">386</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.h1b" datatype="html">
         <source>sessions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">387</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.intro" datatype="html">
         <source>The small human touches are what keep people coming back. Keep them in the same place as the training, instead of an app where the thread disappears.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">334</context>
+          <context context-type="linenumber">388</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c1" datatype="html">
         <source>Message each client one to one</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">336</context>
+          <context context-type="linenumber">390</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c2" datatype="html">
         <source>Real-time, so a reply lands right away</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">391</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c3" datatype="html">
         <source>One thread per client, not scattered across apps</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">338</context>
+          <context context-type="linenumber">392</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c4" datatype="html">
         <source>A quick word between sessions when it matters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">393</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c5" datatype="html">
         <source>Nothing buried under family photos</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">340</context>
+          <context context-type="linenumber">394</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.c6" datatype="html">
         <source>For as many clients as you coach</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">395</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b1t" datatype="html">
         <source>Feels like a normal chat</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">400</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b1b" datatype="html">
         <source>Real-time messages, so a check-in lands right away instead of sitting in an inbox.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">401</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b2t" datatype="html">
         <source>People feel seen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">351</context>
+          <context context-type="linenumber">405</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b2b" datatype="html">
         <source>A quick note about last week&apos;s cranky knee is what keeps clients around.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">352</context>
+          <context context-type="linenumber">406</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b3t" datatype="html">
         <source>One inbox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">356</context>
+          <context context-type="linenumber">410</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.b3b" datatype="html">
         <source>Stop losing threads across three apps and a comment section.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">411</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.q1" datatype="html">
         <source>Does this replace WhatsApp?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">362</context>
+          <context context-type="linenumber">416</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.a1" datatype="html">
         <source>For coaching, yes. Keeping the conversation next to the training is the whole point.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">363</context>
+          <context context-type="linenumber">417</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.q2" datatype="html">
         <source>Is it one to one only?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">366</context>
+          <context context-type="linenumber">420</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.a2" datatype="html">
         <source>For now, yes. One to one keeps coaching personal; group threads are on the roadmap.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">421</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.q3" datatype="html">
         <source>Is there a client limit?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">370</context>
+          <context context-type="linenumber">424</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.a3" datatype="html">
         <source>No. Message as many people as you coach.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">371</context>
+          <context context-type="linenumber">425</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.mt" datatype="html">
         <source>Message clients where the training lives | MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">375</context>
+          <context context-type="linenumber">429</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.md" datatype="html">
         <source>Message your clients one to one, in real time, in the same place as their training. Free, with no client limit.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">376</context>
+          <context context-type="linenumber">430</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.name" datatype="html">
         <source>Community</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">380</context>
+          <context context-type="linenumber">434</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.one" datatype="html">
         <source>Groups and the hive, not a spreadsheet</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">383</context>
+          <context context-type="linenumber">437</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.h1a" datatype="html">
         <source>A hive, not a</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">386</context>
+          <context context-type="linenumber">440</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.h1b" datatype="html">
         <source>spreadsheet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">441</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.intro" datatype="html">
         <source>People stay for the room, not only the program. Groups give your clients somewhere to belong instead of being a list of names in a file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">442</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c1" datatype="html">
         <source>Create groups around what you run</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">390</context>
+          <context context-type="linenumber">444</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c2" datatype="html">
         <source>Invite people with a link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">391</context>
+          <context context-type="linenumber">445</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c3" datatype="html">
         <source>Post updates, with comments and reactions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">392</context>
+          <context context-type="linenumber">446</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c4" datatype="html">
         <source>Approve who joins, if you want to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">393</context>
+          <context context-type="linenumber">447</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c5" datatype="html">
         <source>Sessions and posts in the same place</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">394</context>
+          <context context-type="linenumber">448</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.c6" datatype="html">
         <source>Works at five clients and at fifty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">395</context>
+          <context context-type="linenumber">449</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.b1t" datatype="html">
         <source>Retention comes from the room</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">400</context>
+          <context context-type="linenumber">454</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.b1b" datatype="html">
         <source>People stick around for the others, not only for you.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">455</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.b2t" datatype="html">
         <source>Say it once</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">405</context>
+          <context context-type="linenumber">459</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.b2b" datatype="html">
         <source>One update reaches the group instead of ten separate messages.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">406</context>
+          <context context-type="linenumber">460</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.b3t" datatype="html">
         <source>It scales with you</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">410</context>
+          <context context-type="linenumber">464</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.b3b" datatype="html">
         <source>The same space works for a handful of regulars and for a full community.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">411</context>
+          <context context-type="linenumber">465</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.q1" datatype="html">
         <source>Can I control who joins?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">470</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.a1" datatype="html">
         <source>Yes. Use an open link, or review each request before you let someone in.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">417</context>
+          <context context-type="linenumber">471</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.q2" datatype="html">
         <source>Is a group the same as a class?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">474</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.a2" datatype="html">
         <source>No. The group is the room. Sessions are what you run inside it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">421</context>
+          <context context-type="linenumber">475</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.q3" datatype="html">
         <source>Can members talk to each other?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">424</context>
+          <context context-type="linenumber">478</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.a3" datatype="html">
         <source>Yes, and that is the point. The room is what keeps people coming back.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">425</context>
+          <context context-type="linenumber">479</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.mt" datatype="html">
         <source>Groups and community for coaches, free | MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">429</context>
+          <context context-type="linenumber">483</context>
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.md" datatype="html">
         <source>Give clients a room to belong to: groups, invite links, updates and join approvals. Free for coaches, with no client limit.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
-          <context context-type="linenumber">430</context>
+          <context context-type="linenumber">484</context>
         </context-group>
       </trans-unit>
       <trans-unit id="blog.toc.aria" datatype="html">
@@ -1826,17 +2001,13 @@
         <source>Read the blog</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">125,128</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6541183069530121501" datatype="html">
-        <source>About - MotionHive</source>
+      <trans-unit id="about.meta.title" datatype="html">
+        <source>About MotionHive: free coaching software, built in the open</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.ts</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
       </trans-unit>
@@ -1844,54 +2015,14 @@
         <source>MotionHive is a home for active communities: organisers run their groups, members find activities and stay in motion. See what we&apos;re building and why.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.ts</context>
-          <context context-type="linenumber">19</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="1898254323883537881" datatype="html">
-        <source>MotionHive: where active communities come together</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6732453625719388166" datatype="html">
-        <source>Features - MotionHive</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">23</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">31</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5435043129115017710" datatype="html">
-        <source>Pricing - MotionHive</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3097447979653612646" datatype="html">
-        <source>Blog - MotionHive</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">41</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">47</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5271741071140739855" datatype="html">
         <source>Free TDEE &amp; macro calculator - MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/app.routes.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="blog.article.writtenBy" datatype="html">
@@ -2099,7 +2230,14 @@
         <source>Back to Home</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
-          <context context-type="linenumber">259</context>
+          <context context-type="linenumber">259,262</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="blog.meta.title" datatype="html">
+        <source>MotionHive Blog: coaching, training and nutrition guides</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/blog/blog.component.ts</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="blog.meta.description" datatype="html">
@@ -2124,7 +2262,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta1" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
           <context context-type="linenumber">19,20</context>
@@ -2137,95 +2275,67 @@
           <context context-type="linenumber">20,22</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="fd.cap.kicker" datatype="html">
-        <source>What you can do</source>
+      <trans-unit id="fd.cap.h" datatype="html">
+        <source>What you can do.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
           <context context-type="linenumber">31,32</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="fd.cap.h" datatype="html">
-        <source>The <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>short version.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">32,33</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="fd.ben.kicker" datatype="html">
-        <source>Why it matters</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">44,45</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="fd.ben.h" datatype="html">
-        <source>What it actually <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>changes.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+        <source>What it actually changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">45,46</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="fd.faq.kicker" datatype="html">
-        <source>Questions</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">63,64</context>
+          <context context-type="linenumber">43,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.faq.h" datatype="html">
-        <source>Good to <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>know.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+        <source>Questions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">64,65</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="fd.rel.kicker" datatype="html">
-        <source>Explore more</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">74,75</context>
+          <context context-type="linenumber">61,62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.rel.h" datatype="html">
-        <source>It works better <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>together.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+        <source>Explore more features.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">75,76</context>
+          <context context-type="linenumber">71,72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.kicker" datatype="html">
         <source>Free to start</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">87,88</context>
+          <context context-type="linenumber">83,84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.h" datatype="html">
         <source>Try it on your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>own roster.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">88,89</context>
+          <context context-type="linenumber">84,85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.sub" datatype="html">
         <source>Set up in minutes. No card, no catch, no subscription.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">89,90</context>
+          <context context-type="linenumber">85,86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.btn" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">91,92</context>
+          <context context-type="linenumber">87,88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fd.cta.btn2" datatype="html">
         <source>All features</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
-          <context context-type="linenumber">92,94</context>
+          <context context-type="linenumber">88,90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="features.kicker" datatype="html">
@@ -2334,7 +2444,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="features.cta.btn" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/features.component.html</context>
           <context context-type="linenumber">90,91</context>
@@ -2488,7 +2598,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.hero.cta1" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">14,15</context>
@@ -2501,186 +2611,200 @@
           <context context-type="linenumber">15,17</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="home.hxb1" datatype="html">
-        <source>No subscription</source>
+      <trans-unit id="home.fc1t" datatype="html">
+        <source>Grow your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>coaching<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">45,46</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="home.hxb2" datatype="html">
-        <source>Unlimited clients</source>
+      <trans-unit id="home.fc1d" datatype="html">
+        <source>Sessions, programs and payments in one place.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">53,54</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.fc2t" datatype="html">
+        <source>Build your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>community<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="home.fc2d" datatype="html">
+        <source>Your people in one space, not scattered chats.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
+          <context context-type="linenumber">55,57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.paths.kicker" datatype="html">
         <source>Built for coaches. Loved by their people.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">78,79</context>
+          <context context-type="linenumber">79,80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.paths.h" datatype="html">
         <source>One home, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>two sides.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">79,80</context>
+          <context context-type="linenumber">80,81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.paths.sub" datatype="html">
         <source>Whether you run the sessions or show up for them, it all lives in the same place.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">80,81</context>
+          <context context-type="linenumber">81,82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.kicker" datatype="html">
         <source>See it work</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">100,101</context>
+          <context context-type="linenumber">101,102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.h" datatype="html">
         <source>Everything you need, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>nothing you don&apos;t.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">101,102</context>
+          <context context-type="linenumber">102,103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.cap" datatype="html">
         <source>A day in MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.allTitle" datatype="html">
         <source>See all features</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">115,116</context>
+          <context context-type="linenumber">116,117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.allLink" datatype="html">
         <source>Explore everything</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">117,118</context>
+          <context context-type="linenumber">118,119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.kicker" datatype="html">
         <source>Building in the open</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">129,130</context>
+          <context context-type="linenumber">130,131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.h" datatype="html">
         <source>Free<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> Actually free.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">130,131</context>
+          <context context-type="linenumber">131,132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.sub" datatype="html">
         <source> No trial timer and no per-client pricing. You run your whole coaching for free. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">132,134</context>
+          <context context-type="linenumber">133,135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s1" datatype="html">
         <source>clients</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s2" datatype="html">
         <source>subscriptions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s3" datatype="html">
         <source>to start</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.cta" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">139,142</context>
+          <context context-type="linenumber">140,143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm.kicker" datatype="html">
         <source>Community</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">148,149</context>
+          <context context-type="linenumber">149,150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm.h" datatype="html">
         <source>A hive, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>not a spreadsheet.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">149,150</context>
+          <context context-type="linenumber">150,151</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.blog.kicker" datatype="html">
         <source>From the blog</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">169,170</context>
+          <context context-type="linenumber">170,171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.blog.h" datatype="html">
         <source>Stories from the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>hive.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">170,171</context>
+          <context context-type="linenumber">171,172</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.kicker" datatype="html">
         <source>Bring your coaching home</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">183,184</context>
+          <context context-type="linenumber">184,185</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.h" datatype="html">
         <source>Your coaching, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>all in one place.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">184,185</context>
+          <context context-type="linenumber">185,186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.sub" datatype="html">
         <source>Free to start. Set up your profile in minutes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">185,186</context>
+          <context context-type="linenumber">186,187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.btn" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">187,188</context>
+          <context context-type="linenumber">188,189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.btn2" datatype="html">
         <source>See pricing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">188,190</context>
+          <context context-type="linenumber">189,191</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.g1" datatype="html">
@@ -2761,7 +2885,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p3" datatype="html">
-        <source>Get paid for sessions, memberships and products</source>
+        <source>Get paid and keep your earnings, 0% platform fee</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
           <context context-type="linenumber">90</context>
@@ -3073,7 +3197,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="header.startCoaching" datatype="html">
-        <source> Start coaching for free </source>
+        <source> Create your free account </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/layouts/header/header.component.html</context>
           <context context-type="linenumber">113,117</context>
@@ -4339,7 +4463,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.plan.cta" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">25,26</context>
@@ -4430,7 +4554,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cta.btn" datatype="html">
-        <source>Start coaching for free</source>
+        <source>Create your free account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">94,97</context>
@@ -4947,318 +5071,304 @@
           <context context-type="linenumber">262,264</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="calorie.educational.pill" datatype="html">
-        <source>Fueling the fire</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">286,288</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="calorie.educational.h2" datatype="html">
-        <source> The science of <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>sustained performance<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+        <source> How your body actually uses food. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">290,292</context>
+          <context context-type="linenumber">284,286</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.educational.sub" datatype="html">
-        <source> Master your metabolism and macronutrient ratios. </source>
+        <source> Your metabolism and macros, made simple. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">293,297</context>
+          <context context-type="linenumber">287,291</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.tdee.h3" datatype="html">
         <source> What TDEE means for active people </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">303,305</context>
+          <context context-type="linenumber">297,299</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.tdee.body" datatype="html">
         <source> Total Daily Energy Expenditure (TDEE) is the calories your body burns in a day. If you train often, that number swings a lot depending on how hard you go. The Mifflin-St Jeor equation gives you a solid starting point. After two weeks, adjust your target by 100 to 200 kcal based on how your weight actually moves. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">306,309</context>
+          <context context-type="linenumber">300,303</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.macros.h3" datatype="html">
         <source> Why macros matter for recovery </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">318,320</context>
+          <context context-type="linenumber">312,314</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.edu.macros.body" datatype="html">
         <source> Hitting your calorie target comes first. Your macro split then decides whether those calories rebuild muscle, refill glycogen, or support your hormones. A 40/30/30 split of carbs, protein and fat works well for most group fitness athletes. Push protein higher, up to 35 to 40%, if your main goal is body recomposition. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">321,324</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="calorie.faq.pill" datatype="html">
-        <source>FAQ</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">337,339</context>
+          <context context-type="linenumber">315,318</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.h2" datatype="html">
-        <source> Frequently asked <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;&gt;"/>questions<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>. </source>
+        <source> Questions. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.html</context>
-          <context context-type="linenumber">341,343</context>
+          <context context-type="linenumber">331,333</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.description" datatype="html">
         <source>Calculate your Total Daily Energy Expenditure (TDEE) and macros for free. Built for group fitness athletes using the Mifflin-St Jeor equation.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.keywords" datatype="html">
         <source>TDEE calculator, calorie calculator, macro calculator, body fat calculator, group fitness, weight loss, bulking, Mifflin-St Jeor</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.og.title" datatype="html">
         <source>Free TDEE &amp; macro calculator - MotionHive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.og.description" datatype="html">
         <source>Find your maintenance calories, macro split and body fat percentage. Free, instant, no sign-up required.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.unit.metric" datatype="html">
         <source>Metric</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.unit.imperial" datatype="html">
         <source>Imperial</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.gender.male" datatype="html">
         <source>Male</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">108</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.gender.female" datatype="html">
         <source>Female</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.cut" datatype="html">
         <source>Slimming</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.maintain" datatype="html">
         <source>Maintaining</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.bulk" datatype="html">
         <source>Mass</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.sedentary" datatype="html">
         <source>Sedentary (little or no exercise)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.light" datatype="html">
         <source>Lightly active (1-3 days/week)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.moderate" datatype="html">
         <source>Moderately active (3-5 days/week)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.very" datatype="html">
         <source>Very active (6-7 days/week)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.activity.extra" datatype="html">
         <source>Extra active (very hard exercise)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.desc.cut" datatype="html">
         <source>500 kcal below maintenance</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">177</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.desc.bulk" datatype="html">
         <source>300 kcal above maintenance</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.goal.desc.maintain" datatype="html">
         <source>Matches your energy expenditure</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.essential" datatype="html">
         <source>Essential</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">273</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.athletic" datatype="html">
         <source>Athletic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">278</context>
+          <context context-type="linenumber">279</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.fitness" datatype="html">
         <source>Fitness</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">284</context>
+          <context context-type="linenumber">285</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.average" datatype="html">
         <source>Average</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">260</context>
+          <context context-type="linenumber">261</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">290</context>
+          <context context-type="linenumber">291</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.bodyfat.cat.obese" datatype="html">
         <source>Obese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">265</context>
+          <context context-type="linenumber">266</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">296</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.chart.proteins" datatype="html">
         <source>Proteins</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">324</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.chart.carbs" datatype="html">
         <source>Carbohydrates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">325</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.chart.fats" datatype="html">
         <source>Fats</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">325</context>
+          <context context-type="linenumber">326</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.q1" datatype="html">
         <source>How accurate is this calorie calculator?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">359</context>
+          <context context-type="linenumber">357</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.a1" datatype="html">
         <source>This calculator uses the Mifflin-St Jeor equation, the most accurate formula for estimating Basal Metabolic Rate (BMR) for most people. Its margin of error is roughly ±10%. For a more precise number, book a DEXA scan or a clinical resting metabolic rate test.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">358</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.q2" datatype="html">
         <source>Should I eat more on HIIT days?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">366</context>
+          <context context-type="linenumber">361</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.a2" datatype="html">
         <source>Yes. High-intensity training burns noticeably more calories, so on hard days an extra 200 to 400 calories helps. Eat complex carbs before your session and protein within 30 minutes of finishing to support performance and recovery.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">362</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.q3" datatype="html">
         <source>What is a safe calorie deficit for weight loss?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">365</context>
         </context-group>
       </trans-unit>
       <trans-unit id="calorie.faq.a3" datatype="html">
         <source>A deficit of 300 to 500 calories a day is safe and sustainable for most people, which is roughly 0.3 to 0.5 kg (about 0.5 to 1 lb) of fat loss a week. Going beyond 1,000 calories a day risks muscle loss, nutrient gaps and a slower metabolism that stalls progress.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/tools/calorie-calculator/calorie-calculator.ts</context>
-          <context context-type="linenumber">374</context>
+          <context context-type="linenumber">366</context>
         </context-group>
       </trans-unit>
     </body>

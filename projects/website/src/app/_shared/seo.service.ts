@@ -1,5 +1,6 @@
 import { DOCUMENT, inject, Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
+import { SITE_LOGO_URL } from './site.const';
 
 export interface SeoInput {
   /** Full document/OG title. When set, also updates `<title>`. */
@@ -46,10 +47,12 @@ export class SeoService {
     this._meta.updateTag({ property: 'og:description', content: input.description });
     this._meta.updateTag({ name: 'twitter:description', content: input.description });
 
-    if (input.image) {
-      this._meta.updateTag({ property: 'og:image', content: input.image });
-      this._meta.updateTag({ name: 'twitter:image', content: input.image });
-    }
+    // Every page gets a social card; fall back to the brand logo when a page
+    // does not supply its own image, and always declare the large-image card.
+    const image = input.image ?? SITE_LOGO_URL;
+    this._meta.updateTag({ property: 'og:image', content: image });
+    this._meta.updateTag({ name: 'twitter:image', content: image });
+    this._meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
   }
 
   /**

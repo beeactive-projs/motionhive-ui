@@ -8,9 +8,14 @@
 .hero {
   padding-block: clamp(2.5rem, 5vw, 4.5rem);
 }
+.hero {
+  /* The floating card overflows the art column to clear the big hexes; clip
+     horizontal overflow so it never adds a page scrollbar. */
+  overflow-x: clip;
+}
 .hero__grid {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: 0.85fr 1.15fr;
   gap: 2.5rem;
   align-items: center;
 
@@ -60,8 +65,8 @@ $hex-gap: 0.25rem;
 }
 .hero__art {
   position: relative;
-  width: 22rem;
-  height: 28rem;
+  width: 28rem;
+  height: 34rem;
   justify-self: center;
 
   @media (max-width: 900px) {
@@ -179,14 +184,16 @@ $hex-gap: 0.25rem;
     }
   }
 }
+/* Clear of the diamond: card 1 fully below the bottom hex, card 2 hugging the
+   right edge above/right of the top hex (anchored to edges, not guessed left). */
 .floating-card-1 {
-  bottom: 0.5rem;
-  left: -2.5rem;
+  top: 27rem;
+  left: -2rem;
   animation: cardFloat1 5s ease-in-out infinite;
 }
 .floating-card-2 {
-  top: -0.5rem;
-  right: -2.5rem;
+  top: 0.5rem;
+  right: -6rem;
   animation: cardFloat2 5s ease-in-out 1s infinite;
 }
 .floating-card-icon {

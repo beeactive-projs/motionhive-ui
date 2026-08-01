@@ -268,6 +268,60 @@ export const FEATURES: MarketingFeature[] = [
     metaDescription: $localize`:@@feat.exercises.md:Give every exercise one home: your clips, your cues, your tags, dropped straight into programs. Free for coaches, unlimited clients.`,
   },
   {
+    slug: 'progress',
+    name: $localize`:@@feat.progress.name:Progress`,
+    icon: '📈',
+    tone: 'teal',
+    oneLiner: $localize`:@@feat.progress.one:Log every workout, see your progress`,
+    preview: null,
+    poster: null,
+    h1Lead: $localize`:@@feat.progress.h1a:See yourself getting`,
+    h1Accent: $localize`:@@feat.progress.h1b:stronger.`,
+    intro: $localize`:@@feat.progress.intro:Log each workout as you go, then look back and see how far you have come. Your sets, your reps and your personal bests, all in one place.`,
+    capabilities: [
+      $localize`:@@feat.progress.c1:Log sets, reps and weight as you train`,
+      $localize`:@@feat.progress.c2:Pick up an unfinished workout where you left off`,
+      $localize`:@@feat.progress.c3:See your history for every exercise`,
+      $localize`:@@feat.progress.c4:Track personal bests and one rep maxes`,
+      $localize`:@@feat.progress.c5:Follow the plan your coach assigned`,
+      $localize`:@@feat.progress.c6:Built for your phone, right at the rack`,
+    ],
+    benefits: [
+      {
+        icon: '📈',
+        title: $localize`:@@feat.progress.b1t:Proof you are improving`,
+        body: $localize`:@@feat.progress.b1b:The numbers do not lie. Watch your weights climb week over week.`,
+      },
+      {
+        icon: '⏸️',
+        title: $localize`:@@feat.progress.b2t:Never lose your place`,
+        body: $localize`:@@feat.progress.b2b:Start a workout, get interrupted, and pick it back up later without missing a set.`,
+      },
+      {
+        icon: '🗂️',
+        title: $localize`:@@feat.progress.b3t:Your whole history, one tap away`,
+        body: $localize`:@@feat.progress.b3b:Every session you have logged is there when you want to compare.`,
+      },
+    ],
+    faq: [
+      {
+        q: $localize`:@@feat.progress.q1:Do I need a coach to use it?`,
+        a: $localize`:@@feat.progress.a1:No. Log your own workouts, or follow a plan your coach assigned. Both work.`,
+      },
+      {
+        q: $localize`:@@feat.progress.q2:Can I see my old workouts?`,
+        a: $localize`:@@feat.progress.a2:Yes. Your full history stays with you, exercise by exercise.`,
+      },
+      {
+        q: $localize`:@@feat.progress.q3:Does it track personal bests?`,
+        a: $localize`:@@feat.progress.a3:Yes, including your estimated one rep max as your numbers go up.`,
+      },
+    ],
+    related: ['programs', 'exercises', 'sessions'],
+    metaTitle: $localize`:@@feat.progress.mt:Track your workouts and progress, free | MotionHive`,
+    metaDescription: $localize`:@@feat.progress.md:Log every set, rep and weight, resume unfinished workouts, and watch your progress and personal bests over time. Free, in one place.`,
+  },
+  {
     slug: 'payments',
     name: $localize`:@@feat.payments.name:Payments`,
     icon: '💳',

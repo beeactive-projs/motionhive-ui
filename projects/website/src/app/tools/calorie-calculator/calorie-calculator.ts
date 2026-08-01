@@ -16,7 +16,8 @@ import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Divider } from 'primeng/divider';
 import { Button } from 'primeng/button';
-import { Hex, HexTone } from 'core';
+import { Hex } from 'core';
+import { Faq } from '../../_shared/ui/faq/faq';
 
 type UnitSystem = 'metric' | 'imperial';
 type Gender = 'male' | 'female';
@@ -30,7 +31,7 @@ interface BodyFatCategory {
 
 @Component({
   selector: 'mh-calorie-calculator',
-  imports: [DecimalPipe, FormsModule, SelectButton, Select, InputNumber, UIChart, Divider, Button, Hex],
+  imports: [DecimalPipe, FormsModule, SelectButton, Select, InputNumber, UIChart, Divider, Button, Hex, Faq],
   templateUrl: './calorie-calculator.html',
   styleUrl: './calorie-calculator.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -351,27 +352,18 @@ export class CalorieCalculator {
 
   // ===== FAQ =====
 
-  readonly faqItems: { value: string; icon: string; tone: HexTone; question: string; answer: string }[] = [
+  readonly faqItems: { q: string; a: string }[] = [
     {
-      value: 'faq-1',
-      icon: 'pi-calculator',
-      tone: 'amber',
-      question: $localize`:@@calorie.faq.q1:How accurate is this calorie calculator?`,
-      answer: $localize`:@@calorie.faq.a1:This calculator uses the Mifflin-St Jeor equation, the most accurate formula for estimating Basal Metabolic Rate (BMR) for most people. Its margin of error is roughly ±10%. For a more precise number, book a DEXA scan or a clinical resting metabolic rate test.`,
+      q: $localize`:@@calorie.faq.q1:How accurate is this calorie calculator?`,
+      a: $localize`:@@calorie.faq.a1:This calculator uses the Mifflin-St Jeor equation, the most accurate formula for estimating Basal Metabolic Rate (BMR) for most people. Its margin of error is roughly ±10%. For a more precise number, book a DEXA scan or a clinical resting metabolic rate test.`,
     },
     {
-      value: 'faq-2',
-      icon: 'pi-plus',
-      tone: 'teal',
-      question: $localize`:@@calorie.faq.q2:Should I eat more on HIIT days?`,
-      answer: $localize`:@@calorie.faq.a2:Yes. High-intensity training burns noticeably more calories, so on hard days an extra 200 to 400 calories helps. Eat complex carbs before your session and protein within 30 minutes of finishing to support performance and recovery.`,
+      q: $localize`:@@calorie.faq.q2:Should I eat more on HIIT days?`,
+      a: $localize`:@@calorie.faq.a2:Yes. High-intensity training burns noticeably more calories, so on hard days an extra 200 to 400 calories helps. Eat complex carbs before your session and protein within 30 minutes of finishing to support performance and recovery.`,
     },
     {
-      value: 'faq-3',
-      icon: 'pi-arrow-down-right',
-      tone: 'coral',
-      question: $localize`:@@calorie.faq.q3:What is a safe calorie deficit for weight loss?`,
-      answer: $localize`:@@calorie.faq.a3:A deficit of 300 to 500 calories a day is safe and sustainable for most people, which is roughly 0.3 to 0.5 kg (about 0.5 to 1 lb) of fat loss a week. Going beyond 1,000 calories a day risks muscle loss, nutrient gaps and a slower metabolism that stalls progress.`,
+      q: $localize`:@@calorie.faq.q3:What is a safe calorie deficit for weight loss?`,
+      a: $localize`:@@calorie.faq.a3:A deficit of 300 to 500 calories a day is safe and sustainable for most people, which is roughly 0.3 to 0.5 kg (about 0.5 to 1 lb) of fat loss a week. Going beyond 1,000 calories a day risks muscle loss, nutrient gaps and a slower metabolism that stalls progress.`,
     },
   ];
 }

@@ -9,18 +9,15 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./home/home.component').then((m) => m.HomeComponent),
-        title: $localize`MotionHive: where active communities come together`,
       },
       {
         path: 'about',
         loadComponent: () => import('./about/about.component').then((m) => m.AboutComponent),
-        title: $localize`About - MotionHive`,
       },
       {
         path: 'features',
         loadComponent: () =>
           import('./features/features.component').then((m) => m.FeaturesComponent),
-        title: $localize`Features - MotionHive`,
       },
       {
         path: 'features/:slug',
@@ -28,23 +25,19 @@ export const routes: Routes = [
           import('./features/feature-detail/feature-detail.component').then(
             (m) => m.FeatureDetailComponent,
           ),
-        title: $localize`Features - MotionHive`,
       },
       {
         path: 'pricing',
         loadComponent: () => import('./pricing/pricing.component').then((m) => m.PricingComponent),
-        title: $localize`Pricing - MotionHive`,
       },
       {
         path: 'blog',
         loadComponent: () => import('./blog/blog.component').then((m) => m.BlogComponent),
-        title: $localize`Blog - MotionHive`,
       },
       {
         path: 'blog/:slug',
         loadComponent: () =>
           import('./blog/blog-article/blog-article.component').then((m) => m.BlogArticleComponent),
-        title: $localize`Blog - MotionHive`,
       },
       {
         path: 'tools/calorie-calculator',

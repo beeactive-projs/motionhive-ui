@@ -279,18 +279,12 @@
 <section class="who-section py-14 sm:py-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-8">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 mb-4">
-        <span class="material-symbols-outlined text-sm text-red-500">
-          mode_heat
-        </span>
-        <span class="text-sm font-semibold text-red-500" i18n="@@calorie.educational.pill">Fueling the fire</span>
-      </div>
       <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
         i18n="@@calorie.educational.h2">
-        The science of <span class="text-brand">sustained performance</span>
+        How your body actually uses food.
       </h2>
       <p class="section-subtext text-lg" i18n="@@calorie.educational.sub">
-        Master your metabolism and macronutrient ratios.
+        Your metabolism and macros, made simple.
       </p>
     </div>
 
@@ -332,30 +326,14 @@
 <section class="feature-section py-14 sm:py-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-8">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 mb-4">
-        <i class="pi pi-question-circle text-sm text-primary-500"></i>
-        <span class="text-sm font-semibold text-primary-500" i18n="@@calorie.faq.pill">FAQ</span>
-      </div>
       <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
         i18n="@@calorie.faq.h2">
-        Frequently asked <span class="text-brand">questions</span>.
+        Questions.
       </h2>
     </div>
 
-    <div class="grid md:grid-cols-3 gap-6">
-      @for (item of faqItems; track item.value) {
-      <div class="feature-card">
-        <mh-hex orientation="pointy" [tone]="item.tone" [size]="48" class="mb-4">
-          <i [class]="'pi '+item.icon"></i>
-        </mh-hex>
-        <h3 class="section-heading text-lg font-heading font-bold mb-3">
-          {{ item.question }}
-        </h3>
-        <p class="section-subtext text-sm leading-relaxed flex-1">
-          {{ item.answer }}
-        </p>
-      </div>
-      }
+    <div class="max-w-3xl mx-auto">
+      <mh-faq [items]="faqItems" />
     </div>
   </div>
 </section>
