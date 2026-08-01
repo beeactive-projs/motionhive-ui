@@ -12,7 +12,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "npm run check:reusability && ng test",
     "check:reusability": "node scripts/check-reusability.mjs",
-    "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && xliffmerge --profile xliffmerge.json"
+    "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && node scripts/xliffmerge.cjs --profile xliffmerge.json"
   },
   "prettier": {
     "printWidth": 100,

@@ -15,6 +15,7 @@ import {
   PublicProfileStore,
   ViewerMode,
   type AvatarUser,
+  type Product,
   type ProfileBadge,
   type ProfileStat,
 } from 'core';
@@ -83,7 +84,6 @@ export class PublicProfile implements OnInit {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _messageService = inject(MessageService);
-  private readonly _currentYear = new Date().getFullYear();
 
   readonly Actions = LockedAction;
 
@@ -94,6 +94,9 @@ export class PublicProfile implements OnInit {
 
   /** Contact-instructor dialog visibility (existing `RequestToBeClientDialog`). */
   readonly contactDialogVisible = signal(false);
+
+  /** Seeds the contact dialog's message when opened from an offering CTA. */
+  readonly contactPrefill = signal('');
 
   /** Guest sign-up wall. Opened by `onLockedAction()` for Book / Save / Group intents. */
   readonly signupPromptVisible = signal(false);
@@ -139,9 +142,6 @@ export class PublicProfile implements OnInit {
     else if (city) parts.push(city);
     if (p?.yearsOfExperience && p.yearsOfExperience > 0) {
       parts.push(`${p.yearsOfExperience} yrs experience`);
-    }
-    if (p?.rating && p.rating.total > 0) {
-      parts.push(`★ ${p.rating.average.toFixed(1)} (${p.rating.total})`);
     }
     return parts.join(' · ');
   });
@@ -228,12 +228,6 @@ export class PublicProfile implements OnInit {
     const p = this.profile();
     if (!p) return [];
     const stats: ProfileStat[] = [];
-    if (p.rating && p.rating.total > 0) {
-      stats.push({
-        value: `${p.rating.average.toFixed(1)}★`,
-        label: p.rating.total === 1 ? '1 review' : `${p.rating.total} reviews`,
-      });
-    }
     if (p.yearsOfExperience != null && p.yearsOfExperience > 0) {
       stats.push({
         value: `${p.yearsOfExperience}+`,
@@ -270,15 +264,6 @@ export class PublicProfile implements OnInit {
     const p = this.profile();
     if (!p) return [];
     const badges: ProfileBadge[] = [];
-    if (p.rating && p.rating.average >= 4.8 && p.rating.total >= 30) {
-      badges.push({
-        id: 'top-rated',
-        icon: 'star',
-        label: `Top rated ${this._currentYear}`,
-        sub: `${p.rating.average.toFixed(1)} over ${p.rating.total} reviews`,
-        tone: 'gold',
-      });
-    }
     // First two certifications as navy shield badges.
     for (const cert of (p.certifications ?? []).slice(0, 2)) {
       badges.push({
@@ -357,6 +342,26 @@ export class PublicProfile implements OnInit {
       return;
     }
     void this._router.navigate(['offerings'], { relativeTo: this._route });
+  }
+
+  /**
+   * CTA on an offering card ("Get started" / "Choose plan"). There's no
+   * self-serve checkout — offerings are a showcase — so this mirrors the
+   * Book/contact flow: guests hit the sign-up wall (register), signed-in
+   * clients open the contact dialog pre-filled with the chosen offering, and
+   * the coach follows up with an invoice or subscription. Owners no-op
+   * (previewing their own profile).
+   */
+  onOfferingSelect(product: Product): void {
+    if (this.viewerMode() === ViewerMode.Guest) {
+      this.onLockedAction(LockedAction.Book);
+      return;
+    }
+    if (this.viewerMode() === ViewerMode.Owner) return;
+    this.contactPrefill.set(
+      `Hi, I'm interested in "${product.name}". Could you tell me how to get started?`,
+    );
+    this.contactDialogVisible.set(true);
   }
 
   /**

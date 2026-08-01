@@ -1,0 +1,34 @@
+:host {
+  display: block;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  &__v {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 2.1rem;
+    line-height: 1;
+    color: var(--p-primary-600);
+  }
+  &__l {
+    font-size: 0.9rem;
+    color: var(--p-surface-500);
+  }
+
+  &--dark {
+    .stat__v {
+      color: var(--p-primary-500);
+    }
+    .stat__l {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+:host-context(.dark) .stat:not(.stat--dark) .stat__l {
+  color: var(--p-surface-400);
+}

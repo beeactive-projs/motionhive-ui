@@ -16,9 +16,7 @@ import { filter, startWith, throttleTime } from 'rxjs/operators';
 
 import { PublicHeaderComponent } from './header/header.component';
 import { PublicFooterComponent } from './footer/footer.component';
-
-/** Canonical host for the marketing site (used for canonical + hreflang URLs). */
-const SITE_ORIGIN = 'https://www.motionhive.fit';
+import { SITE_ORIGIN } from '../_shared/site.const';
 
 @Component({
   selector: 'mh-public-layout',

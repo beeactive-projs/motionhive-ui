@@ -9,11 +9,11 @@
     </div>
     <h1 class="animate-fade-in text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6"
       i18n="@@about.h1">
-      Built for people who <span class="text-brand">show up</span>.
+      Built for coaches, and the people who <span class="text-brand">show up.</span>
     </h1>
 
     <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto" i18n="@@about.intro">
-      MotionHive exists because staying active together shouldn't require five different apps.
+      MotionHive exists because running your coaching shouldn't take five different apps.
     </p>
   </div>
 </section>
@@ -27,25 +27,23 @@
     </div>
     <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3"
       i18n="@@about.problem.h2">
-      Why this exists?
+      Why we built it.
     </h2>
     <p class="section-subtext text-lg max-w-2xl mb-5" i18n="@@about.problem.p1">
-      If you've ever organised a group activity — a class, a run, a weekly session — you know
-      how it goes. WhatsApp for scheduling, spreadsheets for attendance, Instagram for updates,
-      and half the group still out of the loop.
+      If you coach, you know how it goes. WhatsApp for scheduling, a spreadsheet for who paid,
+      Instagram for updates, and half your clients still miss the session.
     </p>
     <p class="section-subtext text-lg max-w-2xl mb-5" i18n="@@about.problem.p2">
-      There's no single place where the person leading and the people showing up can just stay
-      in sync. No noise, no switching between apps, no chaos.
+      There's no single place where you and the people you train can just stay in sync. No noise,
+      no jumping between apps, no chasing bank transfers at the end of the month.
     </p>
     <p class="section-subtext text-lg max-w-2xl mb-5" i18n="@@about.problem.p3">
-      That's what <strong class="text-brand">MotionHive</strong> is. One platform for active
-      communities — whether you're running a yoga class, a hiking group, a martial arts club,
-      or anything that gets people moving together.
+      That's what <strong class="text-brand">MotionHive</strong> is. One home for independent
+      coaches, whether you run a yoga class, a strength gym, a running club, or 1:1 sessions online.
     </p>
     <p class="section-subtext text-lg max-w-2xl mb-5" i18n="@@about.problem.p4">
-      It's early and we're building it in the open. No inflated numbers, no empty promises.
-      Just the thing that should've existed a long time ago.
+      It's early, and we build it in the open. No inflated numbers, no empty promises. Just the
+      tool coaches should have had a long time ago.
     </p>
   </div>
 </section>
@@ -75,7 +73,7 @@
         <h3 class="section-heading text-lg font-heading font-bold mb-1" i18n="@@about.believe.c1.h">Community first.
         </h3>
         <p class="section-subtext text-sm leading-relaxed" i18n="@@about.believe.c1.p">
-          The best motivation isn't an app notification — it's the people you show up with.
+          The best motivation isn't an app notification. It's the people you show up with.
         </p>
       </div>
       <div class="feature-card">
@@ -94,7 +92,7 @@
         <h3 class="section-heading text-lg font-heading font-bold mb-1" i18n="@@about.believe.c3.h">Not just fitness.
         </h3>
         <p class="section-subtext text-sm leading-relaxed" i18n="@@about.believe.c3.p">
-          Yoga, hiking, martial arts, dance — if people come together to move, it belongs here.
+          Yoga, hiking, martial arts, dance. If people come together to move, it belongs here.
         </p>
       </div>
       <div class="feature-card">
@@ -116,14 +114,14 @@
 <section class="cta-section">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
     <h2 class="section-heading text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold mb-3" i18n="@@about.cta.h2">
-      Follow the <span class="text-brand">journey</span>.
+      Bring your coaching <span class="text-brand">home</span>.
     </h2>
     <p class="section-subtext text-lg sm:text-xl mb-8 max-w-2xl mx-auto" i18n="@@about.cta.sub">
-      We write about what we're building, the decisions we make, and what's coming next.
+      Set up your profile, add your first session, and share one link. Free to start, no subscription.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <p-button i18n-label="@@about.cta.btn" label="Read the blog" icon="pi pi-arrow-right" iconPos="right"
-        routerLink="/blog" size="large" />
+      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@about.cta.btn2">Create your free account</a>
+      <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/blog" i18n="@@about.cta.btn">Read the blog</a>
     </div>
   </div>
 </section>

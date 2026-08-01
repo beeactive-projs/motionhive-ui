@@ -1,9 +1,5 @@
 <mh-sidenav-layout [navSections]="navSections()" [isInstructor]="isInstructor()"
   (stripeDashboardClick)="openStripeDashboard()">
 
-  @if (requestLoading()) {
-  <mh-loader />
-  }
-
   <router-outlet />
 </mh-sidenav-layout>

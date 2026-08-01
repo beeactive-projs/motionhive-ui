@@ -1,0 +1,152 @@
+/* -------------------------------------------------------------------------
+ * Marketing-site shared utilities — reused across nav, home, pricing,
+ * features. Plain CSS, token-based (no hardcoded palette), theme-aware via
+ * the `.dark` class. Buttons here are the marketing CTA system (styled <a>
+ * or <button>); the app/blog keep using PrimeNG p-button.
+ * ---------------------------------------------------------------------- */
+
+/* Content container — 1140px, 28px gutter (design --maxw). */
+.mh-wrap {
+  max-width: 71.25rem;
+  margin-inline: auto;
+  padding-inline: 1.75rem;
+}
+.mh-wrap--sm {
+  max-width: 51rem;
+}
+
+/* Vertical section rhythm. */
+.mh-band {
+  padding-block: clamp(3.25rem, 6vw, 4.75rem);
+}
+
+/* Card — one visual language for every surface (feature tiles, path cards,
+   community cards, plan card, etc.). Add .mh-card--hover for the lift. */
+.mh-card {
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1rem;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.mh-card--hover:hover {
+  transform: translateY(-3px);
+  border-color: var(--p-primary-color);
+  box-shadow: 0 12px 30px color-mix(in oklab, black 8%, transparent);
+}
+.dark .mh-card {
+  background: color-mix(in oklab, white 5%, transparent);
+  border-color: color-mix(in oklab, white 12%, transparent);
+}
+.dark .mh-card--hover:hover {
+  box-shadow: 0 12px 30px color-mix(in oklab, black 30%, transparent);
+}
+
+/* Buttons
+ * Radius follows the app's Action System §4 "one radius rule": 8px soft-rect
+ * on every button, every size (MotionHiveLara preset). Labels stay sentence
+ * case, weight 600 — the app does not uppercase buttons.
+ *
+ * Hover is a staggered liquid fill. `isolation: isolate` makes each button a
+ * stacking context so the two ::before/::after layers (z-index: -1) paint over
+ * the button's own background but under the label; `overflow: hidden` clips
+ * them to the radius. Primary fills top→down (deepening amber); ghost fills the
+ * reverse way, bottom→up (into amber). */
+.mh-btn {
+  /* One soft amber that both variants share for the hover fill. */
+  --mh-btn-fill: color-mix(in oklab, var(--p-primary-500) 60%, var(--p-primary-600));
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0.72rem 1.35rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.35s ease;
+}
+.mh-btn:hover {
+  transform: translateY(-1px);
+}
+.mh-btn--lg {
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+}
+
+/* Shared bloom: both variants fill with the same soft amber, grown from the
+ * centre outward. `border-radius: inherit` + scale(0 → 1) means the layer
+ * blooms as a rounded shape and lands flush with the button, no corner gaps.
+ * The first (translucent) layer leads, the second settles a beat later. */
+.mh-btn::before,
+.mh-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--mh-btn-fill);
+  border-radius: inherit;
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mh-btn::before {
+  opacity: 0.5;
+}
+.mh-btn::after {
+  transition-delay: 0.12s;
+}
+.mh-btn:hover::before,
+.mh-btn:hover::after {
+  transform: scale(1);
+}
+
+.mh-btn--primary {
+  background: var(--p-primary-500);
+  color: var(--color-navy-900);
+  box-shadow: 0 4px 14px color-mix(in oklab, var(--p-primary-500) 28%, transparent);
+}
+.mh-btn--primary:hover {
+  color: var(--color-navy-900);
+}
+
+.mh-btn--ghost {
+  background: transparent;
+  color: var(--p-surface-700);
+  border-color: var(--p-surface-300);
+}
+.mh-btn--ghost:hover {
+  color: var(--color-navy-900);
+  border-color: var(--p-primary-500);
+}
+
+.dark .mh-btn--ghost {
+  color: var(--p-surface-200);
+  border-color: var(--p-surface-600);
+}
+/* Amber fill is light in both themes, so the hovered label goes navy either way. */
+.dark .mh-btn--ghost:hover {
+  color: var(--color-navy-900);
+  border-color: var(--p-primary-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mh-btn::before,
+  .mh-btn::after {
+    transition: none;
+  }
+}

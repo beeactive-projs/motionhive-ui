@@ -62,6 +62,8 @@ export class ContactInstructorDialog {
   /** Shown in the header. First-name preferred; falls back to full name. */
   readonly instructorName = input<string>('this instructor');
   readonly instructorAvatar = input<AvatarUser | null>(null);
+  /** Optional seed for the message field (e.g. when opened from an offering). */
+  readonly prefillMessage = input<string>('');
 
   readonly submitting = signal(false);
 
@@ -110,6 +112,12 @@ export class ContactInstructorDialog {
     // for an authed user. Guests see empty fields.
     effect(() => {
       if (!this.visible()) return;
+      // Seed the message from an offering CTA — only when empty so we never
+      // clobber what the viewer has already typed.
+      const prefill = this.prefillMessage();
+      if (prefill && !this.form.controls.message.value) {
+        this.form.controls.message.setValue(prefill);
+      }
       const me = this._authStore.user();
       if (!me) return;
       const fullName = `${me.firstName ?? ''} ${me.lastName ?? ''}`.trim();

@@ -16,7 +16,7 @@ the idea of a *hive*: many people, moving together.
 
 **Elevator pitch:** Most fitness tools are either a cold booking calendar or a faceless
 marketplace. MotionHive gives independent coaches a home that feels human — their own
-storefront, real sessions (online or in person), training programs, direct messaging with
+bookable profile, real sessions (online or in person), training programs, direct messaging with
 clients, and built-in payments — while members get a calm place to find a coach they'd
 actually train with and stay consistent.
 
@@ -71,15 +71,15 @@ guidance, returners who want accountability, and enthusiasts who want programmin
 ## 4. Core value propositions
 
 **For coaches:**
-1. **Your own storefront** — a public profile at `motionhive.fit/@yourhandle` with bio,
+1. **Your own profile** — a public, bookable page at `motionhive.fit/@yourhandle` with bio,
    specialties, certifications, and venues.
 2. **Run real sessions** — one-off or recurring, online or in person, group or 1-on-1, with
    bookings, waitlists, approvals, and automatic reminders.
 3. **Program your clients** — build workouts and multi-week programs/routines from an
    exercise library and assign them to clients.
 4. **Keep clients close** — direct messaging, client relationships, and a community of groups.
-5. **Get paid, keep your earnings** — built-in payments (memberships, invoices, paid
-   sessions) with **0% default platform fee**.
+5. **Get paid in one place** — built-in payments (memberships, invoices, paid sessions)
+   via Stripe Connect. (A small fee applies on payments; see §8. Never surfaced on marketing.)
 
 **For members:**
 1. **Find your people** — discover coaches, sessions, and groups in one place.
@@ -110,7 +110,7 @@ Grouped by audience. Everything below is real, shipped functionality.
 - **Unified Discover hub** — browse Coaches, Sessions, and Groups in one place, with
   filters (e.g. Strength, Mobility, Boxing, Yoga, HIIT, Pilates).
 - **Global search** (⌘K) across coaches, groups, sessions, and tags.
-- **Public coach profiles** at `/@handle` — storefront with bio, specialties,
+- **Public coach profiles** at `/@handle` — a public, bookable page with bio, specialties,
   certifications, location/venues.
 
 ### Sessions (coaching delivery)
@@ -145,7 +145,7 @@ Grouped by audience. Everything below is real, shipped functionality.
 - Coaches onboard to **Stripe Connect** and get paid directly; **multi-country** support.
 - **Memberships/subscriptions**, **invoices**, and paid products.
 - **Refunds** (14-day window), earnings views, dispute handling.
-- **0 bps default platform fee** (configurable) — "keep what you earn."
+- Platform fee on payments is configurable per instructor. **Internal only — never claim "0%" or "keep what you earn" on marketing (see §8 and §13).**
 - EU consumer-rights compliant billing.
 
 ### Engagement & retention
@@ -160,10 +160,11 @@ Grouped by audience. Everything below is real, shipped functionality.
 
 ## 7. Key differentiators (lead with these)
 
-1. **Coach-first, not marketplace-first.** Coaches get a real home and storefront, not just
+1. **Coach-first, not marketplace-first.** Coaches get a real home and profile, not just
    a listing. They keep their brand and their clients.
-2. **Keep your earnings — 0% default platform fee.** A genuine, concrete edge vs platforms
-   that take 15–30%.
+2. **Free to use, no subscription.** No monthly fee, no per-client pricing, unlike tools that
+   charge whether you earn or not. (We take a small fee on payments, but that is NOT the
+   marketing angle; see §8 and §13.)
 3. **One place for the whole job:** sessions + programs + messaging + payments. Not a
    booking tool bolted to a payment link to a chat app.
 4. **Online or in person, group or 1-on-1** — flexible to how coaches actually work.
@@ -176,8 +177,11 @@ Grouped by audience. Everything below is real, shipped functionality.
 ## 8. Monetization & positioning
 
 - **Free to join** for both coaches and members.
-- Coaches monetize through MotionHive's payments (sessions, memberships, invoices); MotionHive
-  takes **0% by default** today.
+- **The tool is free** to register and run: manage clients, unlimited clients, no subscription.
+  MotionHive makes money by taking a **small commission on payments** processed through the
+  platform (Stripe Connect). This is intentionally **NOT surfaced on the marketing site** — it
+  is disclosed at payment onboarding and in the Terms. Marketing frames the product as "free to
+  use, no subscription" and must **never** claim "0%", "keep your earnings", "keep 100%", or "no cut."
 - **Stage:** early-stage and community-building. Marketing should celebrate being early and
   curated ("a growing set of sessions, a community finding its feet") rather than claim mass
   scale. Growth is intended to be **word-of-mouth** ("the hive grows by word of mouth").
@@ -187,7 +191,7 @@ Grouped by audience. Everything below is real, shipped functionality.
 ## 9. Story-able user journeys (great for ads, demos, emails)
 
 1. **Coach goes pro in an afternoon:** claim your handle → set up your profile and a venue →
-   create your first session → share your storefront link → take your first booking and get
+   create your first session → share your profile link → take your first booking and get
    paid.
 2. **Member finds their coach:** open Discover → filter by what you want (e.g. Mobility) →
    read a coach's profile → book a session → get a reminder → show up.
@@ -202,8 +206,8 @@ Grouped by audience. Everything below is real, shipped functionality.
 Use these as campaign pillars (adapt voice to the calm/human tone):
 
 - **"Run your coaching from one calm place."** (coaches; all-in-one)
-- **"Keep what you earn."** (coaches; 0% fee)
-- **"Your storefront, your clients, your brand."** (coaches; ownership)
+- **"No subscription. Run your coaching for free."** (coaches; free-to-use, not a fee claim)
+- **"Your profile, your clients, your brand."** (coaches; ownership)
 - **"Find a coach you'd actually train with."** (members; trust)
 - **"A plan that meets you where you are."** (members; programs + consistency)
 - **"Train together."** (community / referral)
@@ -249,6 +253,19 @@ Marketing must stay accurate. As of now, the platform does **not** have:
 - **Live video / calling inside the app** — "online" sessions are delivered via the coach's
   meeting link, not an in-app video product.
 - **Large scale / big numbers** — we're early; don't imply a huge existing user base.
+- **Data export / "take your clients and content and leave anytime"** — full portability is
+  NOT a shipped feature. Do not promise export or "no lock-in." (A GDPR personal-data export
+  exists on the account, but that is not the same as exporting your whole business.)
+- **"Launching soon" / waitlist / "be the first to know when we launch"** — MotionHive is
+  **live**. People can sign up and use it today. The primary CTA is "Start coaching for free"
+  pointing at signup. Do not frame the product as pre-launch or gate it behind a waitlist.
+  The waitlist dialog, if shown, is for optional product-update emails, not early access.
+- **Absolute forever-promises about pricing** (e.g. "never a paywall, ever") — reassure with
+  "the free core stays free" instead of locking us into an absolute we may regret.
+- **"0% platform fee" / "keep your earnings" / "keep 100%" / "no cut" / "we take nothing."**
+  MotionHive now takes a small commission on payments. The marketing site stays **silent** on
+  the fee (it is disclosed at Stripe onboarding and in the Terms) and frames the product as
+  "free to use, no subscription." Never claim zero fee or full earnings retention.
 
 When in doubt, describe the *job it does for the user* rather than a specific number or a
 roadmap feature.
@@ -261,12 +278,12 @@ roadmap feature.
 - **Audiences:** independent fitness coaches/instructors + members/clients (dual-mode).
 - **Surfaces:** marketing site (`www.motionhive.fit`), web app (`app.motionhive.fit`),
   installable PWA, blog.
-- **Live features:** discovery & search, coach storefronts, sessions (online/in-person,
+- **Live features:** discovery & search, coach profiles, sessions (online/in-person,
   group/1-on-1, recurring, waitlists, reminders, venues), workouts & programs & exercise
   library with client assignment + logging, groups & posts, direct messaging with read
   receipts/safety, payments via Stripe Connect (memberships/invoices/refunds), notifications
   (in-app + email), onboarding "Start here," referrals/invites.
-- **Pricing:** free to join; **0% default platform fee** on coach earnings.
+- **Pricing:** free to use, no subscription, unlimited clients. (A small payment commission exists but is never surfaced on marketing; never claim 0% / keep-earnings.)
 - **Brand:** the hive; hexagon; honey/navy/teal/coral; warm, calm, human, light-first.
 - **Stage:** early, community-building, word-of-mouth growth.
 - **Don't claim:** native apps, push/SMS, group chat, in-app video, big scale.

@@ -35,6 +35,7 @@ import {
 import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { CreateSubscriptionDialog } from '../../_dialogs/create-subscription-dialog/create-subscription-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
+import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
 @Component({
@@ -55,6 +56,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     ListCard,
     ListEmptyState,
     Menu,
+    UserInfo,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './subscriptions.html',

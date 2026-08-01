@@ -21,6 +21,7 @@ export interface InvoiceClientSummary {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  avatarUrl: string | null;
 }
 
 export interface Invoice {

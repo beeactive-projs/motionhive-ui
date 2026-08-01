@@ -16,6 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Tooltip } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Avatar } from '../../../../../_shared/components/avatar/avatar';
 import {
   SubscriptionService,
   SubscriptionStatuses,
@@ -52,6 +53,7 @@ import {
     Tooltip,
     CurrencyRonPipe,
     StatusLabelPipe,
+    Avatar,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './subscription-detail.html',

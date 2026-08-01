@@ -9,23 +9,35 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./home/home.component').then((m) => m.HomeComponent),
-        title: $localize`MotionHive — Where active communities come together`,
       },
       {
         path: 'about',
         loadComponent: () => import('./about/about.component').then((m) => m.AboutComponent),
-        title: $localize`About - MotionHive`,
+      },
+      {
+        path: 'features',
+        loadComponent: () =>
+          import('./features/features.component').then((m) => m.FeaturesComponent),
+      },
+      {
+        path: 'features/:slug',
+        loadComponent: () =>
+          import('./features/feature-detail/feature-detail.component').then(
+            (m) => m.FeatureDetailComponent,
+          ),
+      },
+      {
+        path: 'pricing',
+        loadComponent: () => import('./pricing/pricing.component').then((m) => m.PricingComponent),
       },
       {
         path: 'blog',
         loadComponent: () => import('./blog/blog.component').then((m) => m.BlogComponent),
-        title: $localize`Blog - MotionHive`,
       },
       {
         path: 'blog/:slug',
         loadComponent: () =>
           import('./blog/blog-article/blog-article.component').then((m) => m.BlogArticleComponent),
-        title: $localize`Blog - MotionHive`,
       },
       {
         path: 'tools/calorie-calculator',

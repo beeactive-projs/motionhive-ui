@@ -1,0 +1,61 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.fcard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem;
+  text-decoration: none;
+
+  &__name {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+    margin: 0.9rem 0 0.35rem;
+    transition: color 0.15s ease;
+  }
+  &__one {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--p-surface-500);
+    margin: 0;
+  }
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--p-primary-700);
+
+    i {
+      font-size: 0.72rem;
+      transition: transform 0.15s ease;
+    }
+  }
+
+  &:hover {
+    .fcard__name {
+      color: var(--p-primary-700);
+    }
+    .fcard__link i {
+      transform: translateX(3px);
+    }
+  }
+}
+
+:host-context(.dark) {
+  .fcard__name {
+    color: var(--p-surface-50);
+  }
+  .fcard__link,
+  .fcard:hover .fcard__name {
+    color: var(--p-primary-400);
+  }
+}

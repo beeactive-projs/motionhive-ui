@@ -122,6 +122,15 @@ export class Hex {
   /** Dashed ring (0 = solid). */
   readonly dash = input<number>(0);
 
+  /**
+   * Custom gradient stops. Setting both fills the hex with a linear gradient
+   * (top-left → bottom-right), overriding `tone`/`bg` — this is what the
+   * marketing hero cluster uses for its per-colour gradient hexes. Leave unset
+   * for a flat tone, or use `tone="gradient"` for the default amber→navy.
+   */
+  readonly gradientFrom = input<string | null>(null);
+  readonly gradientTo = input<string | null>(null);
+
   /** Initials / number / single glyph. */
   readonly label = input<string | null>(null);
   /** Label font-size override in px (auto-scales with size otherwise). */
@@ -155,8 +164,9 @@ export class Hex {
   readonly gradId = `${this.uid}g`;
   readonly sheenId = `${this.uid}s`;
   readonly clipUrl = `url(#${this.clipId})`;
-  readonly gradFrom = GRADIENT_FROM;
-  readonly gradTo = GRADIENT_TO;
+  /** Gradient stops actually rendered — custom inputs win over the defaults. */
+  readonly gradFrom = computed(() => this.gradientFrom() ?? GRADIENT_FROM);
+  readonly gradTo = computed(() => this.gradientTo() ?? GRADIENT_TO);
 
   private readonly verts = computed(() => hexVerts(this.orientation()));
   readonly path = computed(() => roundedPath(this.verts(), this.round()));
@@ -171,7 +181,9 @@ export class Hex {
     const fg = this.fg() ?? base.fg;
     const ring = this.ring() ?? base.ring;
     const ringW = this.ringW() ?? base.ringW;
-    return { bg, fg, ring, ringW, gradient: bg === '__grad' };
+    // Explicit stops force a gradient fill regardless of tone/bg.
+    const custom = !!(this.gradientFrom() && this.gradientTo());
+    return { bg, fg, ring, ringW, gradient: bg === '__grad' || custom };
   });
 
   /** `--hx-bg` custom property (gradient/transparent draw via the path, not the var). */

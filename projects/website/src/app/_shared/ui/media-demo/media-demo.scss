@@ -1,0 +1,194 @@
+:host {
+  display: block;
+}
+
+.device {
+  background: var(--p-surface-0);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1.1rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px color-mix(in oklab, black 12%, transparent);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--p-surface-50);
+  border-bottom: 1px solid var(--p-surface-200);
+
+  i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--p-surface-300);
+  }
+  .u {
+    margin-left: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--p-surface-500);
+  }
+}
+
+.screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--p-surface-50);
+
+  video {
+    width: 100%;
+    height: 100%;
+    /* Fills the 16:9 frame. Record the clip at 16:9 so nothing is cropped. */
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.ph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-image: repeating-linear-gradient(
+    45deg,
+    color-mix(in oklab, var(--p-surface-500) 6%, transparent) 0 10px,
+    transparent 10px 20px
+  );
+}
+
+.play {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--p-primary-500);
+  color: var(--color-navy-900);
+  font-size: 1.1rem;
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--p-primary-500) 40%, transparent);
+}
+
+.cap {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #fff;
+  background: rgba(19, 24, 39, 0.6);
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+:host-context(.dark) {
+  .device {
+    background: color-mix(in oklab, white 5%, transparent);
+    border-color: var(--p-surface-700);
+  }
+  .bar {
+    background: color-mix(in oklab, white 4%, transparent);
+    border-bottom-color: var(--p-surface-700);
+    i {
+      background: var(--p-surface-600);
+    }
+  }
+  .screen {
+    background: color-mix(in oklab, white 3%, transparent);
+  }
+}
+
+/* ===== Enlarge affordance ===== */
+/* Hover-reveal on desktop, always visible on touch (no hover to reveal it). */
+.expand {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0.6rem;
+  background: rgba(19, 24, 39, 0.55);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    background: rgba(19, 24, 39, 0.78);
+  }
+}
+.screen:hover .expand,
+.expand:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .expand {
+    opacity: 1;
+  }
+}
+
+/* ===== Full-screen lightbox ===== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 4vw, 3rem);
+  background: rgba(10, 12, 20, 0.85);
+  backdrop-filter: blur(3px);
+  animation: mh-lb-fade 0.16s ease;
+}
+@keyframes mh-lb-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.lightbox__stage {
+  /* Grow with the viewport but never overflow width OR height — keeps 16:9
+     and stays fully on-screen from phone to ultrawide. */
+  width: min(94vw, 1200px, calc(86vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    display: block;
+  }
+}
+.lightbox__close {
+  position: absolute;
+  top: clamp(0.6rem, 2vw, 1.1rem);
+  right: clamp(0.6rem, 2vw, 1.1rem);
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.26);
+  }
+}

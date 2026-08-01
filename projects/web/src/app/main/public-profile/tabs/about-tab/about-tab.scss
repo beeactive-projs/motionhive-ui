@@ -13,3 +13,17 @@
   color: var(--p-primary-200);
   border-color: color-mix(in srgb, var(--p-primary-500) 30%, var(--p-surface-700));
 }
+
+.venue-row {
+  background: var(--p-surface-50);
+  border: 1px solid var(--p-surface-200);
+
+  i {
+    color: var(--p-primary-500);
+  }
+}
+
+:host-context(.dark) .venue-row {
+  background: color-mix(in srgb, var(--p-surface-0) 4%, transparent);
+  border-color: color-mix(in srgb, var(--p-surface-0) 12%, transparent);
+}
