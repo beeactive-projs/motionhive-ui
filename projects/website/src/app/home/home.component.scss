@@ -400,8 +400,19 @@ $hex-gap: 0.25rem;
       color: var(--p-primary-700);
       i {
         font-size: 0.72rem;
+        transition: transform 0.2s ease;
       }
     }
+    /* Arrow nudges forward on hover — small, inviting cue toward all features. */
+    &:hover &-link i {
+      transform: translateX(3px);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fgrid__all:hover .fgrid__all-link i {
+    transform: none;
   }
 }
 :host-context(.dark) .fgrid__all {

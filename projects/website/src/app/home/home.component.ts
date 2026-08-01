@@ -33,7 +33,6 @@ interface Path {
   icon: string;
   tone: HexTone;
   title: string;
-  role: string;
   points: string[];
 }
 interface CommunityCard {
@@ -83,11 +82,10 @@ export class HomeComponent {
       icon: '🏋️',
       tone: 'amber',
       title: $localize`:@@home.coach.title:You coach.`,
-      role: $localize`:@@home.coach.role:For coaches`,
       points: [
         $localize`:@@home.coach.p1:Your public, bookable coach profile`,
         $localize`:@@home.coach.p2:Programs your clients actually follow`,
-        $localize`:@@home.coach.p3:Get paid and keep your earnings, 0% platform fee`,
+        $localize`:@@home.coach.p3:Get paid for sessions, memberships and products`,
         $localize`:@@home.coach.p4:Your whole roster in one place`,
       ],
     },
@@ -95,7 +93,6 @@ export class HomeComponent {
       icon: '🙌',
       tone: 'teal',
       title: $localize`:@@home.member.title:You show up.`,
-      role: $localize`:@@home.member.role:For their people`,
       points: [
         $localize`:@@home.member.p1:Find coaches and book in seconds`,
         $localize`:@@home.member.p2:Follow your plan, track your training`,

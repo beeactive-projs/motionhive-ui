@@ -62,10 +62,10 @@ export class PricingComponent {
       body: $localize`:@@pricing.nc3.b:Sign up and set up your profile without entering any payment details.`,
     },
     {
-      icon: '💰',
+      icon: '✨',
       tone: 'navy',
-      title: $localize`:@@pricing.nc4.t:Keep your earnings`,
-      body: $localize`:@@pricing.nc4.b:Our platform fee is 0% by default, so what you earn stays yours.`,
+      title: $localize`:@@pricing.nc4.t:Everything included`,
+      body: $localize`:@@pricing.nc4.b:Every feature is in the free plan. Nothing locked behind a paywall.`,
     },
   ];
 
@@ -100,19 +100,19 @@ export class PricingComponent {
   readonly faq: FaqItem[] = [
     {
       q: $localize`:@@pricing.faq1.q:Is it really free?`,
-      a: $localize`:@@pricing.faq1.a:Yes. Managing your clients is free, with no client limit and no subscription. Later we may add optional premium tools on top, but running your coaching stays free.`,
+      a: $localize`:@@pricing.faq1.a:Yes. Managing your clients is free: no subscription, no client limit, no card to start.`,
     },
     {
       q: $localize`:@@pricing.faq2.q:Do I need a credit card to start?`,
       a: $localize`:@@pricing.faq2.a:No. You can sign up and set up your profile without entering any payment details.`,
     },
     {
-      q: $localize`:@@pricing.faq3.q:How do you make money then?`,
-      a: $localize`:@@pricing.faq3.a:We are building in the open. The plan is optional premium tools over time, on top of the free core. Managing your clients stays free.`,
+      q: $localize`:@@pricing.faq3.q:Can I bring my existing clients?`,
+      a: $localize`:@@pricing.faq3.a:Yes. Invite them with a link and they join free. No migration headache.`,
     },
     {
       q: $localize`:@@pricing.faq4.q:Will it stay free to manage clients?`,
-      a: $localize`:@@pricing.faq4.a:Yes. The free core stays free. If premium ever arrives, it will be extra tools on top, not a gate on the coaching you already run.`,
+      a: $localize`:@@pricing.faq4.a:Yes. The core stays free: manage your clients and run your coaching, no subscription.`,
     },
   ];
 

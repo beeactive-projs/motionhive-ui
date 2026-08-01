@@ -27,7 +27,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.storefront.h1b" datatype="html">
-        <source>actually book.</source>
+        <source>book on sight.</source>
         <target state="translated">clienți.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
@@ -427,7 +427,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.programs.h1b" datatype="html">
-        <source>actually follow.</source>
+        <source>stick to.</source>
         <target state="translated">într-un singur loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
@@ -1011,7 +1011,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.payments.one" datatype="html">
-        <source>Invoices, subscriptions and products in one place</source>
+        <source>Get paid without chasing bank transfers</source>
         <target state="translated">Facturi, abonamente și produse într-un singur loc</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
@@ -1211,7 +1211,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.one" datatype="html">
-        <source>Stay close between sessions</source>
+        <source>Message clients 1:1, where the training lives</source>
         <target state="translated">Rămâi aproape între sesiuni</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
@@ -1219,7 +1219,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.h1a" datatype="html">
-        <source>Stay close between</source>
+        <source>A message at the right</source>
         <target state="translated">Clienții tăi,</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
@@ -1227,7 +1227,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.messaging.h1b" datatype="html">
-        <source>sessions.</source>
+        <source>moment.</source>
         <target state="translated">la un mesaj distanță.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
@@ -1411,8 +1411,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="feat.community.one" datatype="html">
-        <source>Groups and the hive, not a spreadsheet</source>
-        <target state="translated">Grupuri și stup, nu un tabel</target>
+        <source>Groups that keep clients coming back</source>
+        <target state="translated">Grupuri care îți țin clienții aproape</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/_data/features.ts</context>
           <context context-type="linenumber">437</context>
@@ -1819,7 +1819,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="about.h1" datatype="html">
-        <source> Built for people who <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>show up<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <source> Built for coaches, and the people who <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>show up.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
         <target> Construit pentru oamenii care aleg să <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>nu renunțe.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
@@ -1827,7 +1827,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="about.intro" datatype="html">
-        <source> MotionHive exists because staying active together shouldn't require five different apps. </source>
+        <source> MotionHive exists because running your coaching shouldn't take five different apps. </source>
         <target state="translated">MotionHive există pentru că a rămâne activ împreună n-ar trebui să ceară cinci aplicații diferite.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
@@ -1851,7 +1851,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="about.problem.p1" datatype="html">
-        <source> If you've ever organised a group activity (a class, a run, a weekly session), you know how it goes. WhatsApp for scheduling, spreadsheets for attendance, Instagram for updates, and half the group still out of the loop. </source>
+        <source> If you coach, you know how it goes. WhatsApp for scheduling, a spreadsheet for who paid, Instagram for updates, and half your clients still miss the session. </source>
         <target state="translated">Dacă ai organizat vreodată o activitate de grup, o clasă, o alergare sau o sesiune săptămânală, știi care-i treaba. WhatsApp pentru programare, Excel pentru prezență, Instagram pentru actualizări și tot mai sunt oameni care nu știu unde, când și cum.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
@@ -1859,27 +1859,27 @@
         </context-group>
       </trans-unit>
       <trans-unit id="about.problem.p2" datatype="html">
-        <source> There's no single place where the person leading and the people showing up can just stay in sync. No noise, no switching between apps, no chaos. </source>
+        <source> There's no single place where you and the people you train can just stay in sync. No noise, no jumping between apps, no chasing bank transfers at the end of the month. </source>
         <target> Nu există un singur loc unde persoana care organizează și cei care participă pot rămâne sincronizați. Fără gălăgie, fără să sari de la o aplicație la alta, fără haos. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.problem.p3" datatype="html">
-        <source> That's what <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> is. One platform for active communities, whether you're running a yoga class, a hiking group, a martial arts club, or anything that gets people moving together. </source>
+        <source> That's what <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/> is. One home for independent coaches, whether you run a yoga class, a strength gym, a running club, or 1:1 sessions online. </source>
         <target state="translated">Asta este <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong class=&quot;text-brand&quot;>"/>MotionHive<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>. O platformă pentru comunitățile active, fie că organizezi o clasă de yoga, un grup de drumeții, un club de arte marțiale sau orice altceva care îi face pe oameni să se miște împreună.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.problem.p4" datatype="html">
-        <source> It's early and we're building it in the open. No inflated numbers, no empty promises. Just the thing that should've existed a long time ago. </source>
+        <source> It's early, and we build it in the open. No inflated numbers, no empty promises. Just the tool coaches should have had a long time ago. </source>
         <target> Suntem la început și construim transparent. Fără cifre umflate, fără promisiuni goale. Ce ar fi trebuit să existe de ani de zile. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.pill" datatype="html">
@@ -1887,7 +1887,7 @@
         <target>Ce ne motivează</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.h2" datatype="html">
@@ -1895,7 +1895,7 @@
         <target> Ce credem. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.sub" datatype="html">
@@ -1903,7 +1903,7 @@
         <target> Câteva principii care modelează tot ce construim. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c1.h" datatype="html">
@@ -1911,7 +1911,7 @@
         <target>Comunitatea pe primul loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c1.p" datatype="html">
@@ -1919,7 +1919,7 @@
         <target state="translated">Cea mai bună motivație nu e o notificare din aplicație, ci oamenii cu care vii.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c2.h" datatype="html">
@@ -1927,7 +1927,7 @@
         <target state="translated">Simplu și clar.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c2.p" datatype="html">
@@ -1935,7 +1935,7 @@
         <target> Dacă durează mai mult de un minut să înțelegi cum funcționează, am construit-o greșit. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c3.h" datatype="html">
@@ -1943,7 +1943,7 @@
         <target>Nu doar fitness.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">92</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c3.p" datatype="html">
@@ -1951,7 +1951,7 @@
         <target state="translated">Yoga, drumeții, arte marțiale, dans. Dacă oamenii se adună ca să se miște, locul lor e aici.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c4.h" datatype="html">
@@ -1959,7 +1959,7 @@
         <target>Construim transparent.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.believe.c4.p" datatype="html">
@@ -1967,23 +1967,31 @@
         <target state="translated">Fără cifre false. Împărtășim ce este gata, ce urmează și ce învățăm pe parcurs.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.cta.h2" datatype="html">
-        <source> Follow the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>build<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
+        <source> Bring your coaching <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>home<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
         <target> Urmărește <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>progresul<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.cta.sub" datatype="html">
-        <source> We write about what we're building, the decisions we make, and what's coming next. </source>
+        <source> Set up your profile, add your first session, and share one link. Free to start, no subscription. </source>
         <target> Scriem despre ce construim, deciziile pe care le luăm și ce urmează. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.cta.btn2" datatype="html">
+        <source>Create your free account</source>
+        <target state="new">Create your free account</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
+          <context context-type="linenumber">123,124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.cta.btn" datatype="html">
@@ -1991,7 +1999,7 @@
         <target state="translated">Citește blogul</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.meta.title" datatype="html">
@@ -1999,15 +2007,19 @@
         <target state="translated">Despre MotionHive: software gratuit de coaching</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">projects/website/src/app/about/about.component.ts</context>
+          <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.meta.description" datatype="html">
-        <source>MotionHive is a home for active communities: organisers run their groups, members find activities and stay in motion. See what we're building and why.</source>
+        <source>MotionHive is free software for independent coaches: run your bookable profile, sessions, programs, payments and community in one place. See why we built it.</source>
         <target state="translated">MotionHive e casa comunităților active: organizatorii își conduc grupurile, iar membrii găsesc activități și rămân în mișcare. Vezi ce construim și de ce.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/about/about.component.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5271741071140739855" datatype="html">
@@ -2028,7 +2040,7 @@
       </trans-unit>
       <trans-unit id="blog.h1" datatype="html">
         <source> Stories from the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>hive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </source>
-        <target> Povești din <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>stup<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>. </target>
+        <target state="translated">Povești din <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>comunitate<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/blog/blog.component.html</context>
           <context context-type="linenumber">11</context>
@@ -2191,7 +2203,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="fd.ben.h" datatype="html">
-        <source>What it actually changes.</source>
+        <source>What it changes.</source>
         <target state="translated">Ce schimbă de fapt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/features/feature-detail/feature-detail.component.html</context>
@@ -2663,24 +2675,24 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home.fc1d" datatype="html">
-        <source>Sessions, programs and payments in one place.</source>
-        <target state="translated">Sesiuni, programe și plăți într-un singur loc.</target>
+        <source>Less admin, more clients.</source>
+        <target state="translated">Mai puțin haos, mai mulți clienți.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">46,48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.fc2t" datatype="html">
-        <source>Build your <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>community<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Îți construiești <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>comunitatea<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <source>Keep your people <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>close<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target state="translated">Îți ții oamenii <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>aproape<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">54,55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.fc2d" datatype="html">
-        <source>Your people in one space, not scattered chats.</source>
-        <target state="translated">Oamenii tăi într-un singur loc, nu în conversații răzlețe.</target>
+        <source>Clients who come back.</source>
+        <target state="translated">Clienți care revin.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">55,57</context>
@@ -2688,22 +2700,22 @@
       </trans-unit>
       <trans-unit id="home.paths.kicker" datatype="html">
         <source>Built for coaches. Loved by their people.</source>
-        <target state="translated">Făcut pentru antrenori. Iubit de oamenii lor.</target>
+        <target state="translated">Gândit pentru antrenori. Îndrăgit de clienții lor.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.paths.h" datatype="html">
-        <source>One home, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>two sides.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Un singur loc, pentru amândoi.</target>
+        <source>One home, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>two perspectives.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target state="translated">O platformă, două perspective.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.paths.sub" datatype="html">
-        <source>Whether you run the sessions or show up for them, it all lives in the same place.</source>
+        <source>You run the sessions, or you show up for them. Either way, it all lives in one place.</source>
         <target state="translated">Fie că ții tu sesiunile, fie că vii la ele, totul stă în același loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
@@ -2712,18 +2724,18 @@
       </trans-unit>
       <trans-unit id="home.see.kicker" datatype="html">
         <source>See it work</source>
-        <target state="translated">Vezi-l în acțiune</target>
+        <target state="translated">Uite cum funcționează.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.h" datatype="html">
-        <source>Everything you need, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>nothing you don't.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Tot ce îți trebuie, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>nimic în plus.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <source>All your coaching, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>together.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target state="translated">Tot coaching-ul tău, la un loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.cap" datatype="html">
@@ -2731,7 +2743,7 @@
         <target state="translated">O zi în MotionHive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.allTitle" datatype="html">
@@ -2739,7 +2751,7 @@
         <target state="translated">Vezi toate funcționalitățile</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.see.allLink" datatype="html">
@@ -2747,7 +2759,7 @@
         <target state="translated">Explorează tot</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.kicker" datatype="html">
@@ -2755,23 +2767,23 @@
         <target state="translated">Construim la vedere</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.h" datatype="html">
-        <source>Free<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> Actually free.</source>
-        <target state="translated">Gratuit<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> Chiar gratuit.</target>
+        <source>Free<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/> No subscription.</source>
+        <target state="translated">Gratuit. Fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.sub" datatype="html">
-        <source> No trial timer and no per-client pricing. You run your whole coaching for free. </source>
-        <target state="translated">Fără perioadă de probă și fără preț per client. Îți conduci tot coaching-ul gratuit.</target>
+        <source> No trial timer and no per-client pricing. Register and manage your clients for free. </source>
+        <target state="translated">Fără perioadă de probă și fără preț per client. Te înregistrezi și îți gestionezi clienții gratuit.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s1" datatype="html">
@@ -2779,7 +2791,7 @@
         <target state="translated">clienți</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s2" datatype="html">
@@ -2787,7 +2799,7 @@
         <target state="translated">abonamente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.s3" datatype="html">
@@ -2795,7 +2807,7 @@
         <target state="translated">ca să începi</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.free.cta" datatype="html">
@@ -2803,7 +2815,7 @@
         <target state="translated">Creează-ți contul gratuit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">139</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm.kicker" datatype="html">
@@ -2811,15 +2823,15 @@
         <target state="translated">Comunitate</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">149</context>
+          <context context-type="linenumber">148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm.h" datatype="html">
-        <source>A hive, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>not a spreadsheet.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Un stup, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>nu un tabel.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <source>Your people, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>in one room.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target state="translated">Oamenii tăi, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>într-un singur loc.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.blog.kicker" datatype="html">
@@ -2827,23 +2839,23 @@
         <target state="translated">De pe blog</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">169</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.blog.h" datatype="html">
         <source>Stories from the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>hive.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Povești din <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>stup.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <target state="translated">Povești din <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>comunitate.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.kicker" datatype="html">
-        <source>Bring your coaching home</source>
-        <target state="translated">Adu-ți coaching-ul acasă</target>
+        <source>Ready when you are</source>
+        <target state="translated">Gata de start?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.h" datatype="html">
@@ -2851,7 +2863,7 @@
         <target state="translated">Coaching-ul tău, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>într-un singur loc.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.sub" datatype="html">
@@ -2859,7 +2871,7 @@
         <target state="translated">Începi gratuit. Îți faci pagina în câteva minute.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">185</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.btn" datatype="html">
@@ -2867,7 +2879,7 @@
         <target state="translated">Creează-ți contul gratuit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.cta.btn2" datatype="html">
@@ -2875,7 +2887,7 @@
         <target state="translated">Vezi prețurile</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.html</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">188</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.g1" datatype="html">
@@ -2883,7 +2895,7 @@
         <target state="translated">Clienți nelimitați</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.g2" datatype="html">
@@ -2891,7 +2903,7 @@
         <target state="translated">Fără abonament</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">69</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.g3" datatype="html">
@@ -2899,7 +2911,7 @@
         <target state="translated">Fără card</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.hx1" datatype="html">
@@ -2907,7 +2919,7 @@
         <target state="translated">Rezervă sesiuni</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.hx2" datatype="html">
@@ -2915,15 +2927,15 @@
         <target state="translated">Creează programe</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.hx3" datatype="html">
         <source>Your hive</source>
-        <target state="translated">Stupul tău</target>
+        <target state="translated">Comunitatea ta</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.hx4" datatype="html">
@@ -2931,23 +2943,15 @@
         <target state="translated">Încasează</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.title" datatype="html">
         <source>You coach.</source>
-        <target state="translated">Tu antrenezi.</target>
+        <target state="translated">Antrenezi.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">85</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="home.coach.role" datatype="html">
-        <source>For coaches</source>
-        <target state="translated">Pentru antrenori</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p1" datatype="html">
@@ -2955,7 +2959,7 @@
         <target state="translated">Profilul tău public, cu rezervări</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p2" datatype="html">
@@ -2963,15 +2967,15 @@
         <target state="translated">Programe pe care clienții chiar le urmează</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">89</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p3" datatype="html">
-        <source>Get paid and keep your earnings, 0% platform fee</source>
-        <target state="translated">Încasezi și îți păstrezi câștigurile, 0% comision</target>
+        <source>Get paid for sessions, memberships and products</source>
+        <target state="translated">Încasezi pentru sesiuni, abonamente și produse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.coach.p4" datatype="html">
@@ -2979,23 +2983,15 @@
         <target state="translated">Toți clienții tăi într-un singur loc</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.member.title" datatype="html">
         <source>You show up.</source>
-        <target state="translated">Tu vii la antrenament.</target>
+        <target state="translated">Progresezi.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">97</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="home.member.role" datatype="html">
-        <source>For their people</source>
-        <target state="translated">Pentru oamenii lor</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.member.p1" datatype="html">
@@ -3003,7 +2999,7 @@
         <target state="translated">Găsești antrenori și rezervi în câteva secunde</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.member.p2" datatype="html">
@@ -3011,7 +3007,7 @@
         <target state="translated">Îți urmezi planul și îți vezi progresul</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.member.p3" datatype="html">
@@ -3019,7 +3015,7 @@
         <target state="translated">Vorbești cu antrenorul între sesiuni</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.member.p4" datatype="html">
@@ -3027,15 +3023,15 @@
         <target state="translated">Intri într-un grup, nu într-un tabel</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm1.t" datatype="html">
         <source>Groups and the hive</source>
-        <target state="translated">Grupuri și stup</target>
+        <target state="translated">Grupuri și comunitate</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm1.b" datatype="html">
@@ -3043,7 +3039,7 @@
         <target state="translated">Îți aduni oamenii într-un singur spațiu, nu în conversații răzlețe și tabele.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm2.t" datatype="html">
@@ -3051,7 +3047,7 @@
         <target state="translated">Rămâi aproape</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm2.b" datatype="html">
@@ -3059,7 +3055,7 @@
         <target state="translated">Scrii, împărtășești și ții ritmul între sesiuni.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm3.t" datatype="html">
@@ -3067,7 +3063,7 @@
         <target state="translated">Crește odată cu tine</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.comm3.b" datatype="html">
@@ -3075,7 +3071,7 @@
         <target state="translated">Începi cu câțiva clienți și ajungi la o comunitate întreagă, în același loc.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.meta.title" datatype="html">
@@ -3083,7 +3079,7 @@
         <target state="translated">MotionHive: software gratuit de coaching pentru comunitatea pe care o construiești</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">141</context>
         </context-group>
       </trans-unit>
       <trans-unit id="home.meta.description" datatype="html">
@@ -3091,7 +3087,7 @@
         <target state="translated">MotionHive e software gratuit pentru antrenori: profil cu rezervări, sesiuni, programe, plăți și comunitate într-un singur loc. Clienți nelimitați, fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/home/home.component.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">142</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.ariaHome" datatype="html">
@@ -4851,8 +4847,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.h1" datatype="html">
-        <source> Free to coach. <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Actually free.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Gratuit ca să antrenezi. <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Chiar gratuit.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <source> Free to coach. <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>No tiers, no trial.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
+        <target state="translated">Gratuit ca să antrenezi. <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>Un singur plan.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">9,11</context>
@@ -4860,7 +4856,7 @@
       </trans-unit>
       <trans-unit id="pricing.sub" datatype="html">
         <source> No tiers, no trial timer, no per-client pricing. One plan, and it costs nothing. </source>
-        <target state="translated">Fără pachete, fără perioadă de probă, fără preț per client. Un singur plan, și nu costă nimic.</target>
+        <target state="translated">Fără planuri plătite, fără perioadă de probă, fără preț per client. Și nu costă nimic.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
           <context context-type="linenumber">12,14</context>
@@ -4898,28 +4894,12 @@
           <context context-type="linenumber">26,29</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="pricing.nc.kicker" datatype="html">
-        <source>No catch</source>
-        <target state="translated">Fără capcane</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">35,36</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="pricing.nc.h" datatype="html">
         <source>Free that stays <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>free.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
         <target state="translated">Gratuit care rămâne <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>gratuit.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">36,37</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="pricing.cmp.kicker" datatype="html">
-        <source>How it compares</source>
-        <target state="translated">Cum se compară</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">55,56</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp.h" datatype="html">
@@ -4927,7 +4907,7 @@
         <target state="translated">MotionHive față de <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>aplicațiile obișnuite.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">56,57</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp.them" datatype="html">
@@ -4935,7 +4915,7 @@
         <target state="translated">Aplicații obișnuite de coaching</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">63,65</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cmp.note" datatype="html">
@@ -4943,23 +4923,15 @@
         <target state="translated">Pe baza planurilor uzuale de pe platformele populare de coaching. Nu numim concurenți.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">73,77</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="pricing.faq.kicker" datatype="html">
-        <source>Questions</source>
-        <target state="translated">Întrebări frecvente</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">81,82</context>
+          <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq.h" datatype="html">
-        <source>The honest <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>answers.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></source>
-        <target state="translated">Răspunsurile <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>pe față.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
+        <source>Questions.</source>
+        <target state="translated">Întrebări.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">82,83</context>
+          <context context-type="linenumber">79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cta.kicker" datatype="html">
@@ -4967,7 +4939,7 @@
         <target state="translated">Nu ai ce pierde</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">90,91</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cta.h" datatype="html">
@@ -4975,7 +4947,7 @@
         <target state="translated">Începe să antrenezi, <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-brand&quot;>"/>gratuit.<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span>"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">91,92</context>
+          <context context-type="linenumber">88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cta.sub" datatype="html">
@@ -4983,7 +4955,7 @@
         <target state="translated">Îți faci pagina în câteva minute. Fără card, fără capcane.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">92,93</context>
+          <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.cta.btn" datatype="html">
@@ -4991,7 +4963,7 @@
         <target state="translated">Creează-ți contul gratuit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.html</context>
-          <context context-type="linenumber">94,97</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.pf1" datatype="html">
@@ -5084,7 +5056,7 @@
       </trans-unit>
       <trans-unit id="pricing.nc2.b" datatype="html">
         <source>This is not a 14-day tease. Free is the plan, not the bait.</source>
-        <target state="translated">Nu e o momeală de 14 zile. Gratuit e planul, nu cârligul.</target>
+        <target state="translated">Fără cronometru de 14 zile. Planul este gratuit.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">56</context>
@@ -5107,16 +5079,16 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.nc4.t" datatype="html">
-        <source>Keep your earnings</source>
-        <target state="translated">Îți păstrezi câștigurile</target>
+        <source>Everything included</source>
+        <target state="translated">Totul e inclus.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.nc4.b" datatype="html">
-        <source>Our platform fee is 0% by default, so what you earn stays yours.</source>
-        <target state="translated">Comisionul nostru este 0% în mod implicit, așa că ce câștigi rămâne al tău.</target>
+        <source>Every feature is in the free plan. Nothing locked behind a paywall.</source>
+        <target state="translated">Fiecare funcție, în planul gratuit. Nimic blocat în spatele unui abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">68</context>
@@ -5251,8 +5223,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq1.a" datatype="html">
-        <source>Yes. Managing your clients is free, with no client limit and no subscription. Later we may add optional premium tools on top, but running your coaching stays free.</source>
-        <target state="translated">Da. Gestionarea clienților e gratuită, fără limită de clienți și fără abonament. Mai târziu s-ar putea să adăugăm unelte premium opționale pe deasupra, dar coaching-ul în sine rămâne gratuit.</target>
+        <source>Yes. Managing your clients is free: no subscription, no client limit, no card to start.</source>
+        <target state="translated">Da. Gestionarea clienților e gratuită: fără abonament, fără limită de clienți, fără card la început.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">103</context>
@@ -5275,16 +5247,16 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq3.q" datatype="html">
-        <source>How do you make money then?</source>
-        <target state="translated">Atunci cum faceți bani?</target>
+        <source>Can I bring my existing clients?</source>
+        <target state="translated">Pot să-mi aduc clienții actuali?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq3.a" datatype="html">
-        <source>We are building in the open. The plan is optional premium tools over time, on top of the free core. Managing your clients stays free.</source>
-        <target state="translated">Construim la vedere. Ideea e să adăugăm în timp unelte premium opționale, peste nucleul gratuit. Gestionarea clienților rămâne gratuită.</target>
+        <source>Yes. Invite them with a link and they join free. No migration headache.</source>
+        <target state="translated">Da. Îi inviți cu un link și își fac cont gratuit. Fără bătăi de cap la mutare.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">111</context>
@@ -5299,8 +5271,8 @@
         </context-group>
       </trans-unit>
       <trans-unit id="pricing.faq4.a" datatype="html">
-        <source>Yes. The free core stays free. If premium ever arrives, it will be extra tools on top, not a gate on the coaching you already run.</source>
-        <target state="translated">Da. Nucleul gratuit rămâne gratuit. Dacă apare vreodată premium, vor fi unelte în plus pe deasupra, nu o barieră peste ce faci deja.</target>
+        <source>Yes. The core stays free: manage your clients and run your coaching, no subscription.</source>
+        <target state="translated">Da. Nucleul rămâne gratuit: îți gestionezi clienții și îți conduci coaching-ul fără abonament.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/pricing/pricing.component.ts</context>
           <context context-type="linenumber">115</context>

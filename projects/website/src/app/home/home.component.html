@@ -43,7 +43,7 @@
         </div>
         <div>
           <p class="floating-card-title" i18n="@@home.fc1t">Grow your <span class="text-brand">coaching</span></p>
-          <p class="floating-card-desc" i18n="@@home.fc1d">Sessions, programs and payments in one place.</p>
+          <p class="floating-card-desc" i18n="@@home.fc1d">Less admin, more clients.</p>
         </div>
       </div>
       <div class="floating-card floating-card-2">
@@ -51,8 +51,8 @@
           <i class="pi pi-users" aria-hidden="true"></i>
         </div>
         <div>
-          <p class="floating-card-title" i18n="@@home.fc2t">Build your <span class="text-brand">community</span></p>
-          <p class="floating-card-desc" i18n="@@home.fc2d">Your people in one space, not scattered chats.</p>
+          <p class="floating-card-title" i18n="@@home.fc2t">Keep your people <span class="text-brand">close</span></p>
+          <p class="floating-card-desc" i18n="@@home.fc2d">Clients who come back.</p>
         </div>
       </div>
     </div>
@@ -77,15 +77,14 @@
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.paths.kicker">Built for coaches. Loved by their people.</mh-kicker>
-      <ng-container heading i18n="@@home.paths.h">One home, <span class="text-brand">two sides.</span></ng-container>
-      <ng-container sub i18n="@@home.paths.sub">Whether you run the sessions or show up for them, it all lives in the same place.</ng-container>
+      <ng-container heading i18n="@@home.paths.h">One home, <span class="text-brand">two perspectives.</span></ng-container>
+      <ng-container sub i18n="@@home.paths.sub">You run the sessions, or you show up for them. Either way, it all lives in one place.</ng-container>
     </mh-section-header>
 
     <div class="paths">
       @for (p of paths; track p.title) {
         <div class="mh-card path">
           <mh-hex [size]="52" [tone]="p.tone"><span class="path__ic">{{ p.icon }}</span></mh-hex>
-          <p class="path__role">{{ p.role }}</p>
           <h3 class="path__title">{{ p.title }}</h3>
           <mh-check-list [items]="p.points" [tone]="p.tone === 'teal' ? 'teal' : 'amber'" />
         </div>
@@ -99,7 +98,7 @@
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.see.kicker">See it work</mh-kicker>
-      <ng-container heading i18n="@@home.see.h">Everything you need, <span class="text-brand">nothing you don't.</span></ng-container>
+      <ng-container heading i18n="@@home.see.h">All your coaching, <span class="text-brand">together.</span></ng-container>
     </mh-section-header>
 
     <div class="seeit__demo">
@@ -128,9 +127,9 @@
   <div class="mh-wrap">
     <div class="free dark">
       <mh-kicker tone="amber" i18n="@@home.free.kicker">Building in the open</mh-kicker>
-      <h2 class="free__h" i18n="@@home.free.h">Free<span class="text-brand">.</span> Actually free.</h2>
+      <h2 class="free__h" i18n="@@home.free.h">Free<span class="text-brand">.</span> No subscription.</h2>
       <p class="free__sub" i18n="@@home.free.sub">
-        No trial timer and no per-client pricing. You run your whole coaching for free.
+        No trial timer and no per-client pricing. Register and manage your clients for free.
       </p>
       <div class="free__stats">
         <mh-stat value="∞" label="clients" [onDark]="true" i18n-label="@@home.free.s1" />
@@ -147,7 +146,7 @@
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker tone="teal" i18n="@@home.comm.kicker">Community</mh-kicker>
-      <ng-container heading i18n="@@home.comm.h">A hive, <span class="text-brand">not a spreadsheet.</span></ng-container>
+      <ng-container heading i18n="@@home.comm.h">Your people, <span class="text-brand">in one room.</span></ng-container>
     </mh-section-header>
 
     <div class="cgrid">
@@ -181,7 +180,7 @@
 
 <!-- ===== Final CTA ===== -->
 <mh-cta-band variant="amber">
-  <mh-kicker kicker i18n="@@home.cta.kicker">Bring your coaching home</mh-kicker>
+  <mh-kicker kicker i18n="@@home.cta.kicker">Ready when you are</mh-kicker>
   <ng-container heading i18n="@@home.cta.h">Your coaching, <span class="text-brand">all in one place.</span></ng-container>
   <ng-container sub i18n="@@home.cta.sub">Free to start. Set up your profile in minutes.</ng-container>
   <div actions>
