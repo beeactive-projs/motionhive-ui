@@ -173,7 +173,8 @@
           avoid applicable platform fees.</li>
         <li i18n="@@tos.s4.li13">Misrepresent your identity, credentials, certifications, or qualifications, or provide
           services that require a license or certification that you do not hold.</li>
-        <li i18n="@@tos.s4.li14">Record, stream, or photograph sessions without the consent of the other participants.</li>
+        <li i18n="@@tos.s4.li14">Record, stream, or photograph sessions without the consent of the other participants.
+        </li>
         <li i18n="@@tos.s4.li15">Use copyrighted music or content in sessions (including streamed or online sessions)
           without holding the appropriate licenses.</li>
         <li i18n="@@tos.s4.li16">Sell or otherwise transfer your profile or account.</li>
@@ -267,9 +268,11 @@
           Stripe's terms and policies. You agree to provide current, complete, and accurate payment information.</li>
         <li i18n="@@tos.s9.li2">Prices are set by the relevant instructor. MotionHive may charge a platform fee on
           transactions facilitated through the Services.</li>
-        <li i18n="@@tos.s9.li3">Subscriptions and memberships are billed in advance on a recurring basis until cancelled.
+        <li i18n="@@tos.s9.li3">Subscriptions and memberships are billed in advance on a recurring basis until
+          cancelled.
           You may cancel at any time, and cancellation takes effect at the end of the current billing period.</li>
-        <li i18n="@@tos.s9.li4">Refunds, where applicable, are handled in accordance with our refund practices, including
+        <li i18n="@@tos.s9.li4">Refunds, where applicable, are handled in accordance with our refund practices,
+          including
           a 14-day refund window for eligible purchases.</li>
       </ul>
       <p class="legal-body mt-3" i18n="@@tos.s9.p1">
@@ -476,7 +479,8 @@
           <i class="pi pi-envelope text-brand"></i>
           <span>
             <strong i18n="@@tos.s22.email.label">Email:</strong>
-            <a href="mailto:contact@motionhive.fit" class="text-brand hover:underline ml-1">contact&#64;motionhive.fit</a>
+            <a href="mailto:contact@motionhive.fit"
+              class="text-brand hover:underline ml-1">contact&#64;motionhive.fit</a>
           </span>
         </div>
         <div class="flex items-center gap-3">
@@ -502,15 +506,16 @@
 <!-- Footer Actions -->
 <section class="footer-section py-7 sm:py-10">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="text-sm" i18n="@@tos.footer.also">
         Also read our
         <a routerLink="/legal/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</a>
       </div>
-      <div class="flex gap-3">
-        <p-button i18n-label="@@legal.footer.goToHome" label="Go to Home" icon="pi pi-home" outlined routerLink="/" />
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <p-button i18n-label="@@legal.footer.goToHome" label="Go to Home" icon="pi pi-home" outlined routerLink="/"
+          fluid />
         <p-button i18n-label="@@legal.footer.scrollToTop" label="Scroll to Top" icon="pi pi-arrow-up"
-          (onClick)="scrollToTop()" />
+          (onClick)="scrollToTop()" fluid />
       </div>
     </div>
   </div>
