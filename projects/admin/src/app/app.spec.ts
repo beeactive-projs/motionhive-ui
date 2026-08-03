@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { App } from './app';
-import { CookieConsentService } from './_shared/cookie-consent/cookie-consent.service';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -14,8 +14,8 @@ describe('App', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        // vanilla-cookieconsent manipulates the real DOM; keep it out of jsdom.
-        { provide: CookieConsentService, useValue: { init: () => undefined } },
+        // The shell's p-toast resolves the app-level MessageService.
+        MessageService,
       ],
     }).compileComponents();
   });
