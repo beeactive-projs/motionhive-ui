@@ -1,4 +1,10 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
@@ -10,7 +16,13 @@ import { MotionHiveLara } from '../../../core/src/styles/styles.primeng';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+    provideRouter(
+      routes,
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' }),
+    ),
+    // Fragment links (e.g. the privacy policy TOC) scroll under the sticky
+    // header without this offset (header bar is 4.4rem tall).
+    provideAppInitializer(() => inject(ViewportScroller).setOffset([0, 80])),
     // withFetch(): use the Fetch API so HttpClient works during prerender (Node
     // has no XMLHttpRequest). provideClientHydration reuses the prerendered DOM
     // in the browser and — via its default HTTP transfer cache — replays the

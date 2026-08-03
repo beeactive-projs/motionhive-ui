@@ -45,6 +45,14 @@
       color: var(--p-primary-500);
     }
   }
+  ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+
+    li::marker {
+      color: var(--p-primary-500);
+    }
+  }
 }
 
 :host-context(.dark) :host::ng-deep {

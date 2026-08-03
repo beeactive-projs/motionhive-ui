@@ -10,7 +10,7 @@
     </h1>
 
     <p class="animate-fade-in text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto" i18n="@@cookie.lastUpdated">
-      Last updated: {{ lastUpdated() }}.
+      Last updated: {{ lastUpdated() | date: 'longDate' }}.
     </p>
   </div>
 </section>
@@ -98,21 +98,21 @@
               <td i18n="@@cookie.table.auth.desc">Keeps you signed in and secures your session on app.motionhive.fit
                 (access token, refresh token, user, roles, and permissions).</td>
               <td i18n="@@cookie.table.auth.cat">Strictly necessary</td>
-              <td>Local storage</td>
+              <td i18n="@@cookie.table.type.localstorage">Local storage</td>
               <td i18n="@@cookie.table.auth.exp">Until sign-out</td>
             </tr>
             <tr>
               <td><code>mh-active-theme</code></td>
               <td i18n="@@cookie.table.theme.desc">Remembers your light or dark theme preference.</td>
               <td i18n="@@cookie.table.theme.cat">Functional</td>
-              <td>Local storage</td>
+              <td i18n="@@cookie.table.type.localstorage">Local storage</td>
               <td i18n="@@cookie.table.theme.exp">Persistent</td>
             </tr>
             <tr>
               <td i18n="@@cookie.table.lang.name">Language preference</td>
               <td i18n="@@cookie.table.lang.desc">Remembers the language you selected for the Website.</td>
               <td i18n="@@cookie.table.lang.cat">Functional</td>
-              <td>Local storage</td>
+              <td i18n="@@cookie.table.type.localstorage">Local storage</td>
               <td i18n="@@cookie.table.lang.exp">Persistent</td>
             </tr>
             <tr>
@@ -120,7 +120,7 @@
               <td i18n="@@cookie.table.calc.desc">Remembers the values you entered in the calorie calculator tool so you
                 do not have to re-enter them.</td>
               <td i18n="@@cookie.table.calc.cat">Functional</td>
-              <td>Local storage</td>
+              <td i18n="@@cookie.table.type.localstorage">Local storage</td>
               <td i18n="@@cookie.table.calc.exp">Persistent</td>
             </tr>
           </tbody>
