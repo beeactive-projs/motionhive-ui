@@ -1,19 +1,19 @@
-:host {
-  display: inline-block;
-}
+// :host {
+//   display: inline-block;
+// }
 
 .kicker {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.725rem;
   font-weight: 600;
-  letter-spacing: 0.09em;
+  // letter-spacing: 0.09em;
   text-transform: uppercase;
-  line-height: 1;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
+  // line-height: 1;
+  padding: 0.5rem 0.625rem;
+  border-radius: 50rem;
 }
 
 .hx {

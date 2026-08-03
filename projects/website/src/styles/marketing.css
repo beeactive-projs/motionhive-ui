@@ -82,6 +82,12 @@
 .mh-btn:hover {
   transform: translateY(-1px);
 }
+/* Below Tailwind's `sm` breakpoint (40rem) buttons span the full row. */
+@media (max-width: 39.9375rem) {
+  .mh-btn {
+    width: 100%;
+  }
+}
 .mh-btn--lg {
   padding: 0.85rem 1.25rem;
   font-size: 1rem;
@@ -125,7 +131,10 @@
 }
 
 .mh-btn--ghost {
-  background: transparent;
+  /* Solid theme background (not transparent) so the button stays legible over
+   * imagery/patterns. The token matches the body: white in light, dark surface
+   * in dark — no per-theme override needed. */
+  background: var(--p-content-background);
   color: var(--p-surface-700);
   border-color: var(--p-surface-300);
 }

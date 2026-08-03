@@ -14,7 +14,12 @@ import { Hex } from 'core';
   selector: 'mh-kicker',
   imports: [Hex],
   template: `<span class="kicker" [class]="'kicker--' + tone()" [class.kicker--plain]="!pill()">
-    <mh-hex class="hx" [size]="11" orientation="pointy" bg="currentColor" />
+    <mh-hex
+      class="hx hidden! sm:inline-block!"
+      [size]="11"
+      orientation="pointy"
+      bg="currentColor"
+    />
     <ng-content />
   </span>`,
   styleUrl: './kicker.scss',

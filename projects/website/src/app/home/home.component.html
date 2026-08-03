@@ -11,8 +11,9 @@
         payments and community. Free to start, no subscription.
       </p>
       <div class="hero__cta">
-        <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.hero.cta1">Create your free account</a>
-        <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/features" i18n="@@home.hero.cta2">See how it works</a>
+        <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.hero.cta1">Create your free
+          account</a>
+        <a class="mh-btn mh-btn--ghost mh-btn--lg" routerLink="/features" i18n="@@home.hero.cta2">How it works</a>
       </div>
       <mh-check-list class="hero__guar" [items]="guarantees" tone="amber" />
     </div>
@@ -22,18 +23,19 @@
     <svg width="0" height="0" aria-hidden="true" focusable="false" class="hero__clip">
       <defs>
         <clipPath id="heroHexRound" clipPathUnits="objectBoundingBox">
-          <path d="M0.4394 0.035 Q0.5 0 0.5606 0.035 L0.8724 0.215 Q0.933 0.25 0.933 0.32 L0.933 0.68 Q0.933 0.75 0.8724 0.785 L0.5606 0.965 Q0.5 1 0.4394 0.965 L0.1276 0.785 Q0.067 0.75 0.067 0.68 L0.067 0.32 Q0.067 0.25 0.1276 0.215 Z" />
+          <path
+            d="M0.4394 0.035 Q0.5 0 0.5606 0.035 L0.8724 0.215 Q0.933 0.25 0.933 0.32 L0.933 0.68 Q0.933 0.75 0.8724 0.785 L0.5606 0.965 Q0.5 1 0.4394 0.965 L0.1276 0.785 Q0.067 0.75 0.067 0.68 L0.067 0.32 Q0.067 0.25 0.1276 0.215 Z" />
         </clipPath>
       </defs>
     </svg>
     <div class="hero__art" aria-hidden="true">
       @for (h of heroHexes; track h.label) {
-        <div [class]="'hero-hex hero-hex-' + h.pos" [style.--hh]="h.color">
-          <div class="hero-hex-inner">
-            <div class="hero-hex-glow"><i [class]="'hero-hex-icon pi ' + h.icon"></i></div>
-            <span class="hero-hex-label">{{ h.label }}</span>
-          </div>
+      <div [class]="'hero-hex hero-hex-' + h.pos" [style.--hh]="h.color">
+        <div class="hero-hex-inner">
+          <div class="hero-hex-glow"><i [class]="'hero-hex-icon pi ' + h.icon"></i></div>
+          <span class="hero-hex-label">{{ h.label }}</span>
         </div>
+      </div>
       }
 
       <!-- Floating frosted-glass cards over the cluster (restored from develop). -->
@@ -42,7 +44,7 @@
           <i class="pi pi-chart-line" aria-hidden="true"></i>
         </div>
         <div>
-          <p class="floating-card-title" i18n="@@home.fc1t">Grow your <span class="text-brand">coaching</span></p>
+          <p class="floating-card-title" i18n="@@home.fc1t">Grow your coaching</p>
           <p class="floating-card-desc" i18n="@@home.fc1d">Less admin, more clients.</p>
         </div>
       </div>
@@ -51,7 +53,7 @@
           <i class="pi pi-users" aria-hidden="true"></i>
         </div>
         <div>
-          <p class="floating-card-title" i18n="@@home.fc2t">Keep your people <span class="text-brand">close</span></p>
+          <p class="floating-card-title" i18n="@@home.fc2t">Keep your people close</p>
           <p class="floating-card-desc" i18n="@@home.fc2d">Clients who come back.</p>
         </div>
       </div>
@@ -63,11 +65,11 @@
 <section class="proof">
   <div class="mh-wrap proof__row">
     @for (f of features; track f.slug) {
-      <span class="chip">
-        <mh-hex class="chip__hx" [size]="14" orientation="pointy"
-          [bg]="f.tone === 'teal' ? 'var(--color-accent-500, #14b8a6)' : 'var(--p-primary-500, #f59e0b)'" />
-        {{ f.name }}
-      </span>
+    <span class="chip">
+      <mh-hex class="chip__hx" [size]="14" orientation="pointy"
+        [bg]="f.tone === 'teal' ? 'var(--color-accent-500, #14b8a6)' : 'var(--p-primary-500, #f59e0b)'" />
+      {{ f.name }}
+    </span>
     }
   </div>
 </section>
@@ -77,17 +79,20 @@
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.paths.kicker">Built for coaches. Loved by their people.</mh-kicker>
-      <ng-container heading i18n="@@home.paths.h">One home, <span class="text-brand">two perspectives.</span></ng-container>
-      <ng-container sub i18n="@@home.paths.sub">You run the sessions, or you show up for them. Either way, it all lives in one place.</ng-container>
+      <ng-container heading i18n="@@home.paths.h">One home, two perspectives.</ng-container>
+      <ng-container sub i18n="@@home.paths.sub">You run the sessions, or you show up for them. Either way, it all lives
+        in one place.</ng-container>
     </mh-section-header>
 
     <div class="paths">
       @for (p of paths; track p.title) {
-        <div class="mh-card path">
+      <div class="mh-card path">
+        <div class="path__head">
           <mh-hex [size]="52" [tone]="p.tone"><span class="path__ic">{{ p.icon }}</span></mh-hex>
           <h3 class="path__title">{{ p.title }}</h3>
-          <mh-check-list [items]="p.points" [tone]="p.tone === 'teal' ? 'teal' : 'amber'" />
         </div>
+        <mh-check-list [items]="p.points" [tone]="p.tone === 'teal' ? 'teal' : 'amber'" />
+      </div>
       }
     </div>
   </div>
@@ -98,21 +103,24 @@
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker i18n="@@home.see.kicker">See it work</mh-kicker>
-      <ng-container heading i18n="@@home.see.h">All your coaching, <span class="text-brand">together.</span></ng-container>
+      <ng-container heading i18n="@@home.see.h">All your coaching, together.</ng-container>
     </mh-section-header>
 
     <div class="seeit__demo">
-      <mh-media-demo src="/videos/home.en.mp4" poster="/videos/home.en.jpg"
-        caption="A day in MotionHive" i18n-caption="@@home.see.cap" />
+      <mh-media-demo src="/videos/home.en.mp4" poster="/videos/home.en.jpg" caption="A day in MotionHive"
+        i18n-caption="@@home.see.cap" />
     </div>
 
     <div class="fgrid">
       @for (f of features; track f.slug) {
-        <mh-feature-card [feature]="f" />
+      <mh-feature-card [feature]="f" />
       }
       <a class="mh-card mh-card--hover fgrid__all" routerLink="/features">
-        <mh-hex [size]="46" tone="navy"><span>✦</span></mh-hex>
-        <h3 i18n="@@home.see.allTitle">See all features</h3>
+        <div class="fgrid__head">
+          <mh-hex [size]="46" tone="navy"><span>✦</span></mh-hex>
+          <h3 class="fgrid__title" i18n="@@home.see.allTitle">See all features</h3>
+        </div>
+
         <span class="fgrid__all-link">
           <span i18n="@@home.see.allLink">Explore everything</span>
           <i class="pi pi-arrow-right" aria-hidden="true"></i>
@@ -127,7 +135,7 @@
   <div class="mh-wrap">
     <div class="free dark">
       <mh-kicker tone="amber" i18n="@@home.free.kicker">Building in the open</mh-kicker>
-      <h2 class="free__h" i18n="@@home.free.h">Free<span class="text-brand">.</span> No subscription.</h2>
+      <h2 class="free__h" i18n="@@home.free.h">Free. No subscription.</h2>
       <p class="free__sub" i18n="@@home.free.sub">
         No trial timer and no per-client pricing. Register and manage your clients for free.
       </p>
@@ -136,7 +144,8 @@
         <mh-stat value="0" label="subscriptions" [onDark]="true" i18n-label="@@home.free.s2" />
         <mh-stat value="$0" label="to start" [onDark]="true" i18n-label="@@home.free.s3" />
       </div>
-      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.free.cta">Create your free account</a>
+      <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.free.cta">Create your free
+        account</a>
     </div>
   </div>
 </section>
@@ -146,16 +155,18 @@
   <div class="mh-wrap">
     <mh-section-header center>
       <mh-kicker kicker tone="teal" i18n="@@home.comm.kicker">Community</mh-kicker>
-      <ng-container heading i18n="@@home.comm.h">Your people, <span class="text-brand">in one room.</span></ng-container>
+      <ng-container heading i18n="@@home.comm.h">Your people, in one room.</ng-container>
     </mh-section-header>
 
     <div class="cgrid">
       @for (c of community; track c.title) {
-        <div class="mh-card ccard">
+      <div class="mh-card ccard">
+        <div class="ccard__head">
           <mh-hex [size]="46" [tone]="c.tone"><span>{{ c.icon }}</span></mh-hex>
           <h3 class="ccard__t">{{ c.title }}</h3>
-          <p class="ccard__b">{{ c.body }}</p>
         </div>
+        <p class="ccard__b">{{ c.body }}</p>
+      </div>
       }
     </div>
   </div>
@@ -163,25 +174,26 @@
 
 <!-- ===== Blog teaser ===== -->
 @if (latestPosts().length) {
-  <section class="mh-band">
-    <div class="mh-wrap">
-      <mh-section-header>
-        <mh-kicker kicker i18n="@@home.blog.kicker">From the blog</mh-kicker>
-        <ng-container heading i18n="@@home.blog.h">Stories from the <span class="text-brand">hive.</span></ng-container>
-      </mh-section-header>
-      <div class="bgrid">
-        @for (p of latestPosts(); track p.id) {
-          <mh-blog-post-card [post]="p" variant="grid" />
-        }
-      </div>
+<section class="mh-band">
+  <div class="mh-wrap">
+    <mh-section-header>
+      <mh-kicker kicker i18n="@@home.blog.kicker">From the blog</mh-kicker>
+      <ng-container heading i18n="@@home.blog.h">Stories from the hive.</ng-container>
+    </mh-section-header>
+    <div class="bgrid">
+      @for (p of latestPosts(); track p.id) {
+      <mh-blog-post-card [post]="p" variant="grid" />
+      }
     </div>
-  </section>
+  </div>
+</section>
 }
 
 <!-- ===== Final CTA ===== -->
 <mh-cta-band variant="amber">
   <mh-kicker kicker i18n="@@home.cta.kicker">Ready when you are</mh-kicker>
-  <ng-container heading i18n="@@home.cta.h">Your coaching, <span class="text-brand">all in one place.</span></ng-container>
+  <ng-container heading i18n="@@home.cta.h">Your coaching, all in one
+    place.</ng-container>
   <ng-container sub i18n="@@home.cta.sub">Free to start. Set up your profile in minutes.</ng-container>
   <div actions>
     <a class="mh-btn mh-btn--primary mh-btn--lg" [href]="signupUrl" i18n="@@home.cta.btn">Create your free account</a>
