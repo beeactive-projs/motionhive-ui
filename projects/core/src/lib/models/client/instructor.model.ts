@@ -67,4 +67,29 @@ export interface PublicInstructorProfile {
   showPhone: boolean;
   joinedAt: string;
   rating: { average: number; total: number } | null;
+  venues: PublicVenue[];
+}
+
+/** Venue kinds — mirrors the API `VenueKind` enum. */
+export type PublicVenueKind =
+  | 'GYM'
+  | 'STUDIO'
+  | 'PARK'
+  | 'OUTDOOR'
+  | 'CLIENT_HOME'
+  | 'ONLINE'
+  | 'OTHER';
+
+/**
+ * Public, safe subset of a venue for the profile's "Where I coach" section.
+ * No street address or meeting URL — just where and what type.
+ */
+export interface PublicVenue {
+  id: string;
+  kind: PublicVenueKind;
+  isOnline: boolean;
+  name: string;
+  city: string | null;
+  region: string | null;
+  countryCode: string | null;
 }

@@ -1,5 +1,20 @@
 @import '../../core/src/styles/theme.css';
 
+/* Marketing-site shared utilities (buttons, container, section rhythm) */
+@import './styles/marketing.css';
+
 /* Cookie consent (vanilla-cookieconsent) + MotionHive brand overrides */
 @import 'vanilla-cookieconsent/dist/cookieconsent.css';
 @import './styles/cookie-consent.css';
+
+/* Standard: the amber brand accent is reserved for the hero H1 of each page.
+   Off by default; re-enabled only inside the hero H1, so every mid-page section
+   heading, final-CTA heading and decorative accent stays plain ink. `inherit`
+   colours correctly in both light and dark. See WEBSITE-STANDARDS.md §1. */
+/* .text-brand {
+  color: inherit;
+}
+.hero__h1 .text-brand,
+.hero-section h1 .text-brand {
+  color: var(--p-primary-color);
+} */

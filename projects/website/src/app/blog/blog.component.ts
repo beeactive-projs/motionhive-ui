@@ -82,8 +82,8 @@ export class BlogComponent {
 
   constructor() {
     inject(SeoService).set({
-      title: $localize`Blog - MotionHive`,
-      description: $localize`:@@blog.meta.description:Practical guides and stories on group fitness, training, nutrition, and building active communities — from the MotionHive team.`,
+      title: $localize`:@@blog.meta.title:MotionHive Blog: coaching, training and nutrition guides`,
+      description: $localize`:@@blog.meta.description:Practical guides and stories on group fitness, training, nutrition and building active communities, from the MotionHive team.`,
     });
 
     this._search$
@@ -146,10 +146,19 @@ export class BlogComponent {
         search: this.searchQuery() || undefined,
       })
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((response) => {
-        this.posts.set(response.items);
-        this.totalRecords.set(response.total);
-        this.isLoading.set(false);
+      .subscribe({
+        next: (response) => {
+          this.posts.set(response.items);
+          this.totalRecords.set(response.total);
+          this.isLoading.set(false);
+        },
+        // API unreachable (e.g. a transient blip during a build) — degrade to
+        // an empty list instead of throwing and crashing the prerender.
+        error: () => {
+          this.posts.set([]);
+          this.totalRecords.set(0);
+          this.isLoading.set(false);
+        },
       });
   }
 

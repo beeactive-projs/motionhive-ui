@@ -49,7 +49,7 @@ export class ProfileMenu {
     const handle = this._authStore.user()?.handle;
     const groups: AccountMenuGroup[] = [];
 
-    // Public storefront — only meaningful once a handle is claimed.
+    // Public profile — only meaningful once a handle is claimed.
     if (handle) {
       groups.push({
         label: '',
@@ -58,7 +58,7 @@ export class ProfileMenu {
             label: 'View public profile',
             icon: 'pi pi-compass',
             routerLink: ['/@' + handle],
-            hint: 'your storefront',
+            hint: 'your public page',
           },
         ],
       });

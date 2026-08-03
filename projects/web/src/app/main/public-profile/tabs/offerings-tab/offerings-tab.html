@@ -24,7 +24,7 @@
   } @else {
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
     @for (product of offerings(); track product.id) {
-    <mh-offering-card [product]="product" />
+    <mh-offering-card [product]="product" (choose)="offeringSelect.emit(product)" />
     }
   </div>
   }

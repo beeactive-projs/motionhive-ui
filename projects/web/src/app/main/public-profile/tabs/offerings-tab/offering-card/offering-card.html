@@ -8,13 +8,19 @@
     </div>
   </ng-template>
 
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-2 h-full">
     @if (product().description) {
     <p class="m-0 text-sm text-muted-color leading-relaxed">{{ product().description }}</p>
     }
-    <div class="flex items-baseline gap-2 mt-2">
-      <span class="text-2xl font-semibold leading-tight">{{ priceLabel() }}</span>
-      <span class="text-xs text-muted-color">{{ billingLabel() }}</span>
+    <div class="flex items-center justify-between flex-wrap gap-x-3 gap-y-2 mt-auto pt-2">
+      <div class="flex items-baseline gap-2 min-w-0">
+        <span class="text-2xl font-semibold leading-tight">{{ priceLabel() }}</span>
+        <span class="text-xs text-muted-color">{{ billingLabel() }}</span>
+      </div>
+      <div class="offering-cta shrink-0">
+        <p-button [label]="ctaLabel()" icon="pi pi-arrow-right" iconPos="right"
+          rounded size="small" (onClick)="choose.emit()" />
+      </div>
     </div>
   </div>
 </p-card>

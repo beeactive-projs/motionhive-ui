@@ -1,33 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {
-  AuthStore,
-  LoadingService,
-  MessagingStore,
-  NavSection,
-  StripeOnboardingService,
-} from 'core';
-import { Loader } from '../_shared/components/loader/loader';
+import { AuthStore, MessagingStore, NavSection, StripeOnboardingService } from 'core';
 import { SidenavLayoutComponent } from '../layouts/sidenav-layout/sidenav-layout.component';
 
 @Component({
   selector: 'mh-main',
-  imports: [RouterOutlet, SidenavLayoutComponent, Loader],
+  imports: [RouterOutlet, SidenavLayoutComponent],
   templateUrl: './main.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Main {
   private readonly _authStore = inject(AuthStore);
   private readonly _stripeOnboarding = inject(StripeOnboardingService);
-  private readonly _loadingService = inject(LoadingService);
   private readonly _messagingStore = inject(MessagingStore);
 
   readonly isInstructor = this._authStore.isInstructor;
   readonly isSuperAdmin = this._authStore.isSuperAdmin;
   readonly isWriter = this._authStore.isWriter;
   readonly isUser = this._authStore.isUser;
-
-  protected readonly requestLoading = this._loadingService.requestLoading;
 
   // readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
   //   const sections: NavSection[] = [];

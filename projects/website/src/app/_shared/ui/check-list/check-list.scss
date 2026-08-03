@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  &--cols {
+    @media (min-width: 640px) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem 1.75rem;
+    }
+  }
+
+  li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.97rem;
+    line-height: 1.5;
+    color: var(--p-surface-600);
+  }
+
+  /* The marker is now the shared <mh-hex> primitive, which draws itself.
+     Here we only handle its alignment in the row. */
+  .mk {
+    flex: none;
+    margin-top: 0.15rem;
+  }
+}
+
+:host-context(.dark) .checks li {
+  color: var(--p-surface-300);
+}

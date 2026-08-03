@@ -12,6 +12,34 @@ export interface WeekGroup {
   workouts: ProgramWorkout[];
 }
 
+/**
+ * Day slot for a workout dropped into ANOTHER week at visual position
+ * `toIndex` (`occupiedDays` = the target week's days, moved workout
+ * excluded). The target week's day pattern never shifts — the dropped
+ * workout takes the free day that best preserves the drop position.
+ * Returns null when the week is full (7 workouts).
+ */
+export function nearestFreeDay(occupiedDays: number[], toIndex: number): number | null {
+  const days = [...occupiedDays].sort((a, b) => a - b);
+  const occupied = new Set(days);
+  const free = Array.from({ length: 7 }, (_, d) => d).filter((d) => !occupied.has(d));
+  if (free.length === 0) return null;
+
+  const idx = Math.max(0, Math.min(days.length, toIndex));
+  const prev = idx > 0 ? days[idx - 1] : -1; // day of the row above the drop
+  const next = idx < days.length ? days[idx] : 7; // day of the row below
+
+  // A free day strictly between the neighbors keeps the visual order
+  // exactly; the earliest such day is the deterministic pick.
+  const inWindow = free.filter((d) => d > prev && d < next);
+  if (inWindow.length > 0) return inWindow[0];
+
+  // Neighbors sit on adjacent days — no gap. Best effort: the free day
+  // closest to the drop point; ties resolve to the earlier day.
+  const ideal = Math.max(0, Math.min(6, prev + 1));
+  return free.reduce((best, d) => (Math.abs(d - ideal) < Math.abs(best - ideal) ? d : best));
+}
+
 /** One-line target summary for a prescribed set — "8–12 reps · 60 kg · RPE 8". */
 export function setSummary(s: PrescribedSet): string {
   const parts: string[] = [];

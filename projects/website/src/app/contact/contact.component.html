@@ -3,13 +3,13 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fade-in">
     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-400/15 mb-4">
       <i class="pi pi-envelope text-accent-300 text-sm"></i>
-      <span class="text-sm font-semibold text-accent-300" i18n="@@contact.pill">Contact Us</span>
+      <span class="text-sm font-semibold text-accent-300" i18n="@@contact.pill">Contact us</span>
     </div>
 
     <h1
       class="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white leading-[1.1] tracking-tight mb-6">
       <ng-container i18n="@@contact.h1.part1">Get in</ng-container>
-      <span class="text-brand"> <ng-container i18n="@@contact.h1.part2">Touch</ng-container></span>
+      <span class="text-brand"> <ng-container i18n="@@contact.h1.part2">touch</ng-container></span>
     </h1>
 
     <p class="text-lg sm:text-xl text-navy-400 max-w-2xl mx-auto leading-relaxed" i18n="@@contact.intro">
@@ -26,7 +26,7 @@
       <!-- ===== Form ===== -->
       <div class="contact-form-card">
         <h2 class="text-2xl font-heading font-extrabold text-navy-900 dark:text-white mb-6" i18n="@@contact.form.h2">
-          Send us a Message
+          Send us a message
         </h2>
 
         @if (submitSuccess()) {
@@ -42,7 +42,7 @@
           <!-- Name -->
           <div class="flex flex-col gap-1.5">
             <label for="name" class="text-sm font-semibold text-navy-700 dark:text-navy-300" i18n="@@contact.form.name">
-              Full Name
+              Full name
             </label>
             <input pInputText id="name" formControlName="name" i18n-placeholder="@@contact.form.namePlaceholder"
               placeholder="Your name" [invalid]="isFieldInvalid('name')" class="w-full" />
@@ -56,7 +56,7 @@
           <div class="flex flex-col gap-1.5">
             <label for="email" class="text-sm font-semibold text-navy-700 dark:text-navy-300"
               i18n="@@contact.form.email">
-              Email Address
+              Email address
             </label>
             <input pInputText id="email" type="email" formControlName="email"
               i18n-placeholder="@@contact.form.emailPlaceholder" placeholder="your@email.com"
@@ -97,7 +97,7 @@
           </div>
 
           <!-- Submit -->
-          <p-button type="submit" i18n="@@contact.form.submit" label="Send Message" icon="pi pi-send" iconPos="right"
+          <p-button type="submit" i18n="@@contact.form.submit" label="Send message" icon="pi pi-send" iconPos="right"
             [loading]="isLoading()" [disabled]="isLoading()" severity="warn" size="large" styleClass="w-full" />
         </form>
       </div>
@@ -107,12 +107,11 @@
         <div class="mb-8">
           <div
             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 dark:bg-primary-400/15 mb-4">
-            <span class="text-sm font-semibold text-primary-700 dark:text-primary-300" i18n="@@contact.info.pill">Get in
-              Touch</span>
+            <span class="text-sm font-semibold text-primary-700 dark:text-primary-300" i18n="@@contact.info.pill">Get in touch</span>
           </div>
           <h2 class="text-2xl sm:text-3xl font-heading font-extrabold text-navy-900 dark:text-white mb-3"
             i18n="@@contact.info.h2">
-            We're Here to Help
+            We're here to help
           </h2>
           <p class="text-navy-500 dark:text-navy-400 leading-relaxed" i18n="@@contact.info.sub">
             Reach out through any channel below. Our team typically responds within one business day.
@@ -163,9 +162,9 @@
             </div>
             <div>
               <p class="text-sm font-semibold text-navy-900 dark:text-white mb-1" i18n="@@contact.info.hours.label">
-                Business Hours</p>
+                Business hours</p>
               <p class="text-sm text-navy-500 dark:text-navy-400 leading-relaxed">
-                <span class="block" i18n="@@contact.info.hours.line1">Mon–Fri: 9:00 AM – 6:00 PM</span>
+                <span class="block" i18n="@@contact.info.hours.line1">Monday to Friday, 9am to 6pm</span>
                 <span class="block" i18n="@@contact.info.hours.line2">Weekends: Closed</span>
               </p>
             </div>

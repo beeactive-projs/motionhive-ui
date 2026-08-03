@@ -46,8 +46,12 @@ import { MoveTargetChoice, MoveTargetDialog } from '../move-target-dialog/move-t
 import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
 import { SetFormDialog } from '../set-form-dialog/set-form-dialog';
 import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
-import { BuilderRail } from './_components/builder-rail/builder-rail';
-import { WeekGroup, workoutSetCount } from './_components/builder.utils';
+import {
+  BuilderRail,
+  RailWeekDrop,
+  RailWorkoutDrop,
+} from './_components/builder-rail/builder-rail';
+import { WeekGroup, nearestFreeDay, workoutSetCount } from './_components/builder.utils';
 import { WorkoutEditor } from './_components/workout-editor/workout-editor';
 
 /**
@@ -386,10 +390,11 @@ export class ProgramDetail implements OnInit {
 
   /**
    * Reorder a workout within its week — driven by the editor's up/down
-   * buttons. The week's occupied day slots stay fixed (a Mon/Wed/Fri
-   * week stays Mon/Wed/Fri) — moving permutes which workout sits on
-   * which of those days, and the BE applies the whole permutation in
-   * one transaction. Cross-week moves go through the Move dialog.
+   * buttons and same-week rail drags. The week's occupied day slots stay
+   * fixed (a Mon/Wed/Fri week stays Mon/Wed/Fri) — moving permutes which
+   * workout sits on which of those days, and the BE applies the whole
+   * permutation in one transaction. Cross-week moves go through the
+   * Move dialog or a cross-week rail drag.
    */
   moveWorkout(week: number, from: number, to: number): void {
     const p = this.program();
@@ -410,21 +415,109 @@ export class ProgramDetail implements OnInit {
       dayIndex: days[i],
     }));
     const moved = items.filter((it, i) => reordered[i].dayIndex !== it.dayIndex);
-    if (moved.length === 0) return;
+    this._persistSlots(moved);
+  }
 
-    // Optimistic: assign the permuted slots locally (weeks() re-sorts).
-    const dayById = new Map(moved.map((it) => [it.id, it.dayIndex]));
+  // ── Rail drag & drop ─────────────────────────────────────────────
+
+  onRailWorkoutDropped(e: RailWorkoutDrop): void {
+    if (e.fromWeek === e.toWeek) this.moveWorkout(e.fromWeek, e.fromIndex, e.toIndex);
+    else this._moveWorkoutCrossWeek(e);
+  }
+
+  onRailWeekDropped(e: RailWeekDrop): void {
+    this._reorderWeeks(e.fromIndex, e.toIndex);
+  }
+
+  /**
+   * Cross-week drag — the workout lands at the drop position and takes
+   * the nearest free day that keeps that visual order; the target
+   * week's day pattern is untouched.
+   */
+  private _moveWorkoutCrossWeek(e: RailWorkoutDrop): void {
+    const p = this.program();
+    const target = this.weeks().find((g) => g.week === e.toWeek);
+    const workout = (p?.workouts ?? []).find((w) => w.id === e.workoutId);
+    if (!p || !target || !workout) return;
+
+    const day = nearestFreeDay(
+      target.workouts.map((w) => w.dayIndex),
+      e.toIndex,
+    );
+    if (day === null) {
+      // The rail's enter predicate normally blocks full weeks — this
+      // covers a stale layout (e.g. another session filled the week).
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'Week is full',
+        detail: 'A week holds at most 7 workouts.',
+        life: 2500,
+      });
+      return;
+    }
+
+    // Reveal the destination so the workout doesn't vanish into a collapsed week.
+    if (this.collapsedWeeks().has(e.toWeek)) this.toggleWeekCollapsed(e.toWeek);
+
+    this._persistSlots([{ id: workout.id, weekIndex: e.toWeek, dayIndex: day }], {
+      summary: 'Workout moved',
+      detail: `${workout.name} → week ${e.toWeek + 1}, day ${day + 1}.`,
+    });
+  }
+
+  /**
+   * Weeks are buckets, not entities — reordering rewrites `weekIndex`
+   * on every workout of every week whose position changed, in one
+   * atomic reorder call. Day patterns are untouched.
+   */
+  private _reorderWeeks(from: number, to: number): void {
+    const p = this.program();
+    const groups = this.weeks();
+    if (!p || from === to) return;
+    if (from < 0 || to < 0 || from >= groups.length || to >= groups.length) return;
+
+    const order = groups.map((g) => g.week); // order[newPos] = oldWeek
+    moveItemInArray(order, from, to);
+    const newWeekByOld = new Map(order.map((oldWeek, newPos) => [oldWeek, newPos] as const));
+
+    const items = (p.workouts ?? [])
+      .filter((w) => newWeekByOld.get(w.weekIndex) !== w.weekIndex)
+      .map((w) => ({ id: w.id, weekIndex: newWeekByOld.get(w.weekIndex)!, dayIndex: w.dayIndex }));
+
+    this._persistSlots(items); // no-op when only empty buckets moved
+
+    // Collapse flags are positional — they must travel with their buckets.
+    this.collapsedWeeks.update(
+      (cur) => new Set([...cur].map((week) => newWeekByOld.get(week) ?? week)),
+    );
+    this._saveRailState();
+  }
+
+  /**
+   * Optimistically apply (week, day) slots locally, then persist them
+   * atomically via the reorder endpoint. Shared by within-week reorder,
+   * cross-week drag and week reorder. `next` merges the authoritative
+   * slots + recomputed sequenceNumber, preserving the nested exercises
+   * the reorder response omits.
+   */
+  private _persistSlots(
+    items: { id: string; weekIndex: number; dayIndex: number }[],
+    success?: { summary: string; detail: string },
+  ): void {
+    const p = this.program();
+    if (!p || items.length === 0) return;
+
+    const slotById = new Map(items.map((it) => [it.id, it]));
     this.program.set({
       ...p,
-      workouts: (p.workouts ?? []).map((w) =>
-        dayById.has(w.id) ? { ...w, dayIndex: dayById.get(w.id)! } : w,
-      ),
+      workouts: (p.workouts ?? []).map((w) => {
+        const slot = slotById.get(w.id);
+        return slot ? { ...w, weekIndex: slot.weekIndex, dayIndex: slot.dayIndex } : w;
+      }),
     });
 
-    this._track(this._programService.reorderWorkouts(p.id, { items: moved })).subscribe({
+    this._track(this._programService.reorderWorkouts(p.id, { items })).subscribe({
       next: (all) => {
-        // Merge the authoritative slots + recomputed sequenceNumber,
-        // preserving the nested exercises the reorder response omits.
         const cur = this.program();
         if (!cur) return;
         const byId = new Map(all.map((w) => [w.id, w]));
@@ -442,6 +535,7 @@ export class ProgramDetail implements OnInit {
               : w;
           }),
         });
+        if (success) this._messageService.add({ severity: 'success', life: 2500, ...success });
       },
       error: (err) => {
         showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);

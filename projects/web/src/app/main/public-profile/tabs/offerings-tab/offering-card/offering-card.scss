@@ -1,7 +1,47 @@
 :host {
   display: block;
+  height: 100%;
+  container-type: inline-size;
 }
 
 ::ng-deep .offering-card--popular .p-card {
   border-top: 3px solid var(--p-primary-color);
+}
+
+/* Fill the grid cell so every card in the row is as tall as the tallest, and
+   let the content column stretch so the price + CTA sit flush at the bottom
+   (via mt-auto in the template) — descriptions of different lengths then line
+   up instead of leaving the shorter cards ragged. */
+::ng-deep .p-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .p-card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .p-card-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* When the card is too narrow to keep the price and CTA on one line, the CTA
+   wraps. A lonely little pill looks off, so below that width make it a
+   full-width block. Container query (not a viewport breakpoint) because the
+   profile's side rail changes the column width independently of screen size. */
+@container (max-width: 320px) {
+  .offering-cta {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+
+  .offering-cta ::ng-deep .p-button {
+    width: 100%;
+    justify-content: center;
+  }
 }

@@ -32,10 +32,7 @@
     <ng-template #body let-sub>
       <tr class="cursor-pointer" (click)="openDetail(sub)">
         <td>
-          <span class="font-medium truncate">{{ clientDisplay(sub) }}</span>
-          @if (clientEmail(sub); as email) {
-          <p class="text-xs text-muted-color mt-0.5 mb-0 truncate">{{ email }}</p>
-          }
+          <mh-user-info [user]="sub.client" [showEmail]="true" />
         </td>
         <td>
           <span class="font-medium truncate" [pTooltip]="planDisplay(sub)" tooltipPosition="top">{{ planName(sub)
@@ -149,7 +146,7 @@
       <div class="flex flex-col gap-3 pt-1">
         @for (sub of items; track trackById($index, sub)) {
         <mh-list-card [status]="sub.status" [statusSeverity]="statusSeverity(sub.status)"
-          [avatarInitials]="clientInitials(sub)" [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)"
+          [avatarImage]="sub.client?.avatarUrl" [avatarInitials]="clientInitials(sub)" [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)"
           [accent]="cardAccent(sub)" [clickable]="true" (click)="openActionMenu(sub, $event, actionMenu)">
           <div amount class="flex flex-col items-end">
             <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
