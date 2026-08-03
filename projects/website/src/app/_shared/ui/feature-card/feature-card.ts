@@ -14,8 +14,10 @@ import type { MarketingFeature } from '../../../_data/features';
   imports: [RouterLink, Hex],
   template: `
     <a class="fcard mh-card mh-card--hover" [routerLink]="resolvedLink()">
-      <mh-hex [size]="46" [tone]="feature().tone">{{ feature().icon }}</mh-hex>
-      <h3 class="fcard__name">{{ feature().name }}</h3>
+      <div class="fcard__head">
+        <mh-hex [size]="46" [tone]="feature().tone">{{ feature().icon }}</mh-hex>
+        <h3 class="fcard__name">{{ feature().name }}</h3>
+      </div>
       <p class="fcard__one">{{ feature().oneLiner }}</p>
       <span class="fcard__link">
         <span i18n="@@featureCard.see">See how it works</span>

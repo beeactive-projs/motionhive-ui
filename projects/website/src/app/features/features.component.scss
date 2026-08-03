@@ -32,6 +32,20 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 1.1rem;
 
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+  }
+
   @media (max-width: 960px) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -45,13 +59,6 @@
     padding: 1.5rem;
     text-decoration: none;
 
-    h3 {
-      font-family: var(--font-heading);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--p-surface-900);
-      margin: 0.9rem 0 0.35rem;
-    }
     p {
       flex: 1;
       margin: 0;
@@ -86,14 +93,20 @@
   }
 }
 .mcard {
-  padding: 1.9rem;
+  padding: 1.5rem;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
 
   &__t {
     font-family: var(--font-heading);
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--p-surface-900);
-    margin: 1rem 0 0.4rem;
   }
   &__b {
     margin: 0;

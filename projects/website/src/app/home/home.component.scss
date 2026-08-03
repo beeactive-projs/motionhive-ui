@@ -346,12 +346,17 @@ $hex-gap: 0.25rem;
     font-weight: 600;
     color: var(--p-surface-400);
   }
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
   &__title {
     font-family: var(--font-heading);
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--p-surface-900);
-    margin: 0 0 1.2rem;
   }
 }
 :host-context(.dark) .path__title {
@@ -376,19 +381,33 @@ $hex-gap: 0.25rem;
     grid-template-columns: 1fr;
   }
 
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--p-surface-900);
+  }
+
   &__all {
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
     text-decoration: none;
 
-    h3 {
-      font-family: var(--font-heading);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--p-surface-900);
-      margin: 0.9rem 0 0;
-    }
+    // h3 {
+    //   font-family: var(--font-heading);
+    //   font-size: 1.1rem;
+    //   font-weight: 700;
+    //   color: var(--p-surface-900);
+    //   margin: 0.9rem 0 0;
+    // }
     &-link {
       display: inline-flex;
       align-items: center;
@@ -430,7 +449,7 @@ $hex-gap: 0.25rem;
   overflow: hidden;
   background: var(--color-navy-900);
   border-radius: 1.6rem;
-  padding: clamp(2.5rem, 5vw, 3.75rem);
+  padding: clamp(2rem, 5vw, 3.75rem);
   text-align: center;
 
   &::before {
@@ -467,6 +486,11 @@ $hex-gap: 0.25rem;
     flex-wrap: wrap;
     margin: 2.25rem 0;
     text-align: left;
+
+    @media (max-width: 39.99rem) {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
   }
 }
 
@@ -482,14 +506,21 @@ $hex-gap: 0.25rem;
   }
 }
 .ccard {
-  padding: 1.9rem;
+  padding: 1.5rem;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
 
   &__t {
     font-family: var(--font-heading);
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--p-surface-900);
-    margin: 1rem 0 0.4rem;
+    margin: 0;
   }
   &__b {
     font-size: 0.95rem;

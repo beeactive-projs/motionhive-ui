@@ -290,12 +290,14 @@
 
     <div class="who-grid grid md:grid-cols-2 gap-10 items-stretch">
       <div class="who-column who-column-left">
-        <mh-hex orientation="pointy" tone="amber" [size]="48" class="mb-4">
-          <i class="pi pi-bolt"></i>
-        </mh-hex>
-        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-3" i18n="@@calorie.edu.tdee.h3">
-          What TDEE means for active people
-        </h3>
+        <div class="flex items-center gap-3 mb-3">
+          <mh-hex orientation="pointy" tone="amber" [size]="48" class="shrink-0">
+            <i class="pi pi-bolt"></i>
+          </mh-hex>
+          <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold" i18n="@@calorie.edu.tdee.h3">
+            What TDEE means for active people
+          </h3>
+        </div>
         <p class="section-subtext text-sm leading-relaxed flex-1" i18n="@@calorie.edu.tdee.body">
           Total Daily Energy Expenditure (TDEE) is the calories your body burns in a day. If you train often, that
           number swings a lot depending on how hard you go. The Mifflin-St Jeor equation gives you a solid starting
@@ -304,13 +306,15 @@
 
       </div>
       <div class="who-column who-column-right">
-        <mh-hex orientation="pointy" tone="teal" [size]="48" class="mb-4">
-          <i class="pi pi-sync"></i>
-        </mh-hex>
-        <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold mb-3"
-          i18n="@@calorie.edu.macros.h3">
-          Why macros matter for recovery
-        </h3>
+        <div class="flex items-center gap-3 mb-3">
+          <mh-hex orientation="pointy" tone="teal" [size]="48" class="shrink-0">
+            <i class="pi pi-sync"></i>
+          </mh-hex>
+          <h3 class="section-heading text-2xl sm:text-3xl font-heading font-extrabold"
+            i18n="@@calorie.edu.macros.h3">
+            Why macros matter for recovery
+          </h3>
+        </div>
         <p class="section-subtext text-sm leading-relaxed flex-1" i18n="@@calorie.edu.macros.body">
           Hitting your calorie target comes first. Your macro split then decides whether those calories
           rebuild muscle, refill glycogen, or support your hormones. A 40/30/30 split of carbs, protein and

@@ -2,13 +2,14 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@an
 
 /**
  * Section header — the kicker + H2 + optional sub-copy block that opens every
- * content band. Everything is projected so callers own their i18n and can put
- * the one amber keyword (`.text-brand`) + trailing period in the heading:
+ * content band. Everything is projected so callers own their i18n and the
+ * trailing period in the heading. The amber `.text-brand` accent is reserved
+ * for the hero H1 — never use it in section headings:
  *
  * ```html
  * <mh-section-header center>
  *   <mh-kicker kicker tone="teal" i18n>Features</mh-kicker>
- *   <ng-container heading i18n>Everything you need to <span class="text-brand">coach online.</span></ng-container>
+ *   <ng-container heading i18n>Everything you need to coach online.</ng-container>
  *   <ng-container sub i18n>One place for your profile, sessions, programs and payments.</ng-container>
  * </mh-section-header>
  * ```

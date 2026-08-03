@@ -71,10 +71,30 @@ export class HomeComponent {
   ];
 
   readonly heroHexes: HeroHex[] = [
-    { icon: 'pi-calendar', label: $localize`:@@home.hx1:Book sessions`, color: 'var(--p-sky-500, #0ea5e9)', pos: 1 },
-    { icon: 'pi-book', label: $localize`:@@home.hx2:Build programs`, color: 'var(--p-emerald-500, #10b981)', pos: 2 },
-    { icon: 'pi-users', label: $localize`:@@home.hx3:Your hive`, color: 'var(--p-purple-500, #a855f7)', pos: 3 },
-    { icon: 'pi-wallet', label: $localize`:@@home.hx4:Get paid`, color: 'var(--p-orange-500, #f97316)', pos: 4 },
+    {
+      icon: 'pi-calendar',
+      label: $localize`:@@home.hx1:Book sessions`,
+      color: 'var(--p-sky-500, #0ea5e9)',
+      pos: 1,
+    },
+    {
+      icon: 'pi-book',
+      label: $localize`:@@home.hx2:Build programs`,
+      color: 'var(--p-emerald-500, #10b981)',
+      pos: 2,
+    },
+    {
+      icon: 'pi-users',
+      label: $localize`:@@home.hx3:Your hive`,
+      color: 'var(--p-purple-500, #a855f7)',
+      pos: 3,
+    },
+    {
+      icon: 'pi-wallet',
+      label: $localize`:@@home.hx4:Get paid`,
+      color: 'var(--p-orange-500, #f97316)',
+      pos: 4,
+    },
   ];
 
   readonly paths: Path[] = [

@@ -87,12 +87,19 @@
 .bcard {
   padding: 1.75rem;
 
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
   &__t {
     font-family: var(--font-heading);
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--p-surface-900);
-    margin: 0.9rem 0 0.4rem;
+    margin: 0;
   }
   &__b {
     margin: 0;

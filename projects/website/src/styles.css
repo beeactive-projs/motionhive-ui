@@ -11,10 +11,10 @@
    Off by default; re-enabled only inside the hero H1, so every mid-page section
    heading, final-CTA heading and decorative accent stays plain ink. `inherit`
    colours correctly in both light and dark. See WEBSITE-STANDARDS.md §1. */
-.text-brand {
+/* .text-brand {
   color: inherit;
 }
 .hero__h1 .text-brand,
 .hero-section h1 .text-brand {
   color: var(--p-primary-color);
-}
+} */
