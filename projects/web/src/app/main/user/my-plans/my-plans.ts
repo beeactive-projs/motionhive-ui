@@ -10,7 +10,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -65,7 +65,7 @@ interface PlanGroup {
   imports: [
     NgTemplateOutlet,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Card,
     IconField,
     InputIcon,

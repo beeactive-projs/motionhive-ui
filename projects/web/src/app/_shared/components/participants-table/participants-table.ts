@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SessionParticipant, SessionParticipantStatus } from 'core';
@@ -24,7 +24,7 @@ import { SessionParticipant, SessionParticipantStatus } from 'core';
  */
 @Component({
   selector: 'mh-participants-table',
-  imports: [CommonModule, TableModule, ButtonModule, TagModule],
+  imports: [CommonModule, TableModule, ButtonDirective, TagModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './participants-table.html',
   styleUrl: './participants-table.scss',

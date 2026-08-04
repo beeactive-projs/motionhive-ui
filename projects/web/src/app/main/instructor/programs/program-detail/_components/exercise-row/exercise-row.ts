@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 // No standalone export for Table + its reorder directives — module fallback.
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
@@ -23,7 +23,7 @@ import {
  */
 @Component({
   selector: 'mh-exercise-row',
-  imports: [TitleCasePipe, Button, ButtonDirective, TableModule, Tag, Tooltip],
+  imports: [TitleCasePipe, ButtonDirective, TableModule, Tag, Tooltip],
   templateUrl: './exercise-row.html',
   styleUrl: './exercise-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

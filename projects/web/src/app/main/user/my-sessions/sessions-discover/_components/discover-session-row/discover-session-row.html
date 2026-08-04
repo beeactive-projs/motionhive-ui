@@ -58,8 +58,10 @@
       </div>
 
       @if (!booked()) {
-      <p-button [label]="bookLabel()" icon="pi pi-bookmark" [disabled]="!canBook()" size="small" class="mt-2"
-        (onClick)="onBook($event)" />
+      <button pButton type="button" [disabled]="!canBook()" size="small" class="mt-2" (click)="onBook($event)">
+        <i class="pi pi-bookmark"></i>
+        {{ bookLabel() }}
+      </button>
       }
       }
     </div>
@@ -78,8 +80,10 @@
       @if (booked()) {
       <p-tag value="Booked" class="bg-green-50 text-green-800" icon="pi pi-bookmark-fill" rounded />
       } @else {
-      <p-button [label]="bookLabel()" icon="pi pi-bookmark" [disabled]="!canBook()" size="small"
-        (onClick)="onBook($event)" />
+      <button pButton type="button" [disabled]="!canBook()" size="small" (click)="onBook($event)">
+        <i class="pi pi-bookmark"></i>
+        {{ bookLabel() }}
+      </button>
       }
     </div>
     }

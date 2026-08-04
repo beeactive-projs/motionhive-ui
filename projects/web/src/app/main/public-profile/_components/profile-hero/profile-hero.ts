@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { RouterLink } from '@angular/router';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
@@ -51,7 +51,7 @@ export interface PublicProfileHero {
 
 @Component({
   selector: 'mh-profile-hero',
-  imports: [Avatar, Button, Card, BadgeStrip, RouterLink],
+  imports: [Avatar, ButtonDirective, Card, BadgeStrip, RouterLink],
   templateUrl: './profile-hero.html',
   styleUrl: './profile-hero.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

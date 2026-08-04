@@ -12,7 +12,7 @@ import {
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, tap, of, catchError } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -45,7 +45,7 @@ const MIN_QUERY_LENGTH = 2;
 
 @Component({
   selector: 'mh-search-modal',
-  imports: [ButtonModule, DialogModule, InputTextModule, ProgressSpinnerModule],
+  imports: [ButtonDirective, DialogModule, InputTextModule, ProgressSpinnerModule],
   templateUrl: './search-modal.html',
   styleUrl: './search-modal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

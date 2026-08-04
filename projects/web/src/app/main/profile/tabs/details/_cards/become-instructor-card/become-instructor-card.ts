@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AvatarModule } from 'primeng/avatar';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
 import { BecomeInstructor } from '../../../../../user/_dialogs/become-instructor/become-instructor';
@@ -12,7 +12,7 @@ import { BecomeInstructor } from '../../../../../user/_dialogs/become-instructor
  */
 @Component({
   selector: 'mh-become-instructor-card',
-  imports: [Card, Divider, Button, AvatarModule, BecomeInstructor],
+  imports: [Card, Divider, ButtonDirective, AvatarModule, BecomeInstructor],
   templateUrl: './become-instructor-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

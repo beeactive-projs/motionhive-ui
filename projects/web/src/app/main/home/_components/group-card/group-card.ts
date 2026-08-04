@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Group } from 'core';
 import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
 
@@ -10,7 +10,7 @@ import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
  */
 @Component({
   selector: 'mh-group-card',
-  imports: [ButtonModule, Hex],
+  imports: [ButtonDirective, Hex],
   templateUrl: './group-card.html',
   styleUrl: './group-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 /** The `beforeinstallprompt` event isn't in the TS DOM lib yet. */
 interface BeforeInstallPromptEvent extends Event {
@@ -15,7 +15,7 @@ interface BeforeInstallPromptEvent extends Event {
  */
 @Component({
   selector: 'mh-install-app',
-  imports: [Button],
+  imports: [ButtonDirective],
   templateUrl: './install-app.html',
   styleUrl: './install-app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { Routine } from 'core';
@@ -32,7 +32,7 @@ type RoutineRowTone = (typeof RoutineRowTone)[keyof typeof RoutineRowTone];
 @Component({
   selector: 'mh-routine-row',
   standalone: true,
-  imports: [DatePipe, Button, Card, TooltipModule],
+  imports: [DatePipe, ButtonDirective, Card, TooltipModule],
   templateUrl: './routine-row.html',
   styleUrl: './routine-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

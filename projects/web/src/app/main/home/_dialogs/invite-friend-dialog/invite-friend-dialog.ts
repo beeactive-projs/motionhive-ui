@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { take } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
@@ -35,7 +35,7 @@ import { AuthStore, InvitationService, environment } from 'core';
   selector: 'mh-invite-friend-dialog',
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
+    ButtonDirective,
     DialogModule,
     InputTextModule,
     TextareaModule,

@@ -4,8 +4,9 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" text rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ t?.title ?? 'Recurring
           session' }}</h1>
@@ -20,21 +21,64 @@
     @if (t) {
     <div class="flex gap-2 md:gap-3 shrink-0">
       @if (isMobile()) {
-      <p-button icon="pi pi-calendar" outlined rounded severity="secondary" size="small" ariaLabel="Calendar"
-        routerLink="/coaching/sessions/calendar" />
+      <button pButton
+        type="button"
+        outlined
+        rounded
+        severity="secondary"
+        size="small"
+        routerLink="/coaching/sessions/calendar"
+        aria-label="Calendar"
+        iconOnly
+      >
+        <i class="pi pi-calendar"></i>
+      </button>
       @if (t.status !== SessionTemplateStatus.Cancelled) {
-      <p-button icon="pi pi-pencil" outlined rounded severity="secondary" size="small" ariaLabel="Edit" (onClick)="editOpen.set(true)" />
-      <p-button icon="pi pi-times" text rounded severity="danger" size="small" ariaLabel="Cancel series"
-        (onClick)="cancelSeries()" />
+      <button pButton
+        type="button"
+        outlined
+        rounded
+        severity="secondary"
+        size="small"
+        (click)="editOpen.set(true)"
+        aria-label="Edit"
+        iconOnly
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
+      <button pButton
+        type="button"
+        text
+        rounded
+        severity="danger"
+        size="small"
+        (click)="cancelSeries()"
+        aria-label="Cancel series"
+        iconOnly
+      >
+        <i class="pi pi-times"></i>
+      </button>
       }
       } @else {
-      <p-button label="Calendar" icon="pi pi-calendar" outlined severity="secondary"
-        [size]="isTablet() ? 'small' : undefined" routerLink="/coaching/sessions/calendar" />
+      <button pButton
+        type="button"
+        outlined
+        severity="secondary"
+        [size]="isTablet() ? 'small' : undefined"
+        routerLink="/coaching/sessions/calendar"
+      >
+        <i class="pi pi-calendar"></i>
+        Calendar
+      </button>
       @if (t.status !== SessionTemplateStatus.Cancelled) {
-      <p-button label="Edit" icon="pi pi-pencil" severity="secondary" outlined [size]="isTablet() ? 'small' : undefined"
-        (onClick)="editOpen.set(true)" />
-      <p-button label="Cancel series" icon="pi pi-times" text severity="danger"
-        [size]="isTablet() ? 'small' : undefined" (onClick)="cancelSeries()" />
+      <button pButton type="button" severity="secondary" outlined [size]="isTablet() ? 'small' : undefined" (click)="editOpen.set(true)">
+        <i class="pi pi-pencil"></i>
+        Edit
+      </button>
+      <button pButton type="button" text severity="danger" [size]="isTablet() ? 'small' : undefined" (click)="cancelSeries()">
+        <i class="pi pi-times"></i>
+        Cancel series
+      </button>
       }
       }
     </div>
@@ -139,13 +183,15 @@
         <div class="flex flex-wrap items-center gap-3">
           <label class="inline-flex items-center gap-2 text-[13px] text-color">
             <span>Add</span>
-            <p-inputNumber [ngModel]="regenCount()" (ngModelChange)="regenCount.set($event ?? 1)" [min]="1" [max]="12"
+            <p-inputnumber [ngModel]="regenCount()" (ngModelChange)="regenCount.set($event ?? 1)" [min]="1" [max]="12"
               [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal" inputStyleClass="w-18 text-center"
               decrementButtonClass="p-button-text" incrementButtonClass="p-button-text" />
             <span>more</span>
           </label>
-          <p-button [label]="'Generate ' + regenCount() + ' more'" icon="pi pi-refresh" [loading]="busyRegen()"
-            (onClick)="regenerate()" />
+          <button pButton type="button" (click)="regenerate()" [disabled]="busyRegen()">
+            <i class="pi" [class]="busyRegen() ? 'pi-spinner pi-spin' : 'pi-refresh'"></i>
+            {{ 'Generate ' + regenCount() + ' more' }}
+          </button>
         </div>
       </div>
 
@@ -153,8 +199,17 @@
         class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5"
         aria-label="Bulk actions">
         <h4 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">Bulk actions</h4>
-        <p-button label="End series after this week" icon="pi pi-stop-circle" severity="danger" [text]="true"
-          [disabled]="!firstFutureInstance()" (onClick)="endAfterThisWeek()" styleClass="w-full justify-center" />
+        <button pButton
+          type="button"
+          severity="danger"
+          [text]="true"
+          [disabled]="!firstFutureInstance()"
+          fluid
+          (click)="endAfterThisWeek()"
+        >
+          <i class="pi pi-stop-circle"></i>
+          End series after this week
+        </button>
         <small class="text-[11px] leading-snug text-muted-color">
           Cancels every occurrence after the next one and ends the series.
         </small>
@@ -269,4 +324,4 @@
 </div>
 
 <p-toast position="top-right" />
-<p-confirmDialog />
+<p-confirmdialog />

@@ -50,7 +50,10 @@
   }
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="close()" />
-    <p-button [label]="confirmLabel()" icon="pi pi-check" [loading]="busy()" (onClick)="submit()" />
+    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+    <button pButton type="button" (click)="submit()" [disabled]="busy()">
+      <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      {{ confirmLabel() }}
+    </button>
   </ng-template>
 </p-dialog>

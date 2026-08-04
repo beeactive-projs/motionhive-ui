@@ -56,7 +56,7 @@
   color: var(--p-text-muted-color);
 }
 
-/* Widen the input itself + give the p-inputNumber wrapper a
+/* Widen the input itself + give the p-inputnumber wrapper a
    minimum width so the stepper buttons don't squeeze the digit
    out of view. Default 64px input + default PrimeNG stepper
    padding meant a 2-digit value rendered as an apostrophe-wide
@@ -68,12 +68,12 @@
   padding-right: 8px;
 }
 
-:host ::ng-deep p-inputNumber {
+:host ::ng-deep p-inputnumber {
   display: inline-flex;
   min-width: 120px;
 }
 
-:host ::ng-deep p-inputNumber .p-inputnumber {
+:host ::ng-deep p-inputnumber .p-inputnumber {
   width: 100%;
 }
 

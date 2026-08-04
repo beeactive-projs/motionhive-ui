@@ -4,7 +4,7 @@
       Posts ({{ total() }})
     </h2>
     @if (canPost()) {
-    <p-button label="New post" icon="pi pi-plus" size="small" (onClick)="createRequested.emit()" />
+    <button pButton type="button" size="small" (click)="createRequested.emit()"><i class="pi pi-plus"></i> New post</button>
     }
   </div>
 
@@ -47,7 +47,10 @@
       </p>
       @if (canPost()) {
       <div class="flex flex-wrap gap-2 justify-center">
-        <p-button label="Create the first post" icon="pi pi-plus" size="small" (onClick)="createRequested.emit()" />
+        <button pButton type="button" size="small" (click)="createRequested.emit()">
+          <i class="pi pi-plus"></i>
+          Create the first post
+        </button>
       </div>
       }
     </div>

@@ -16,7 +16,7 @@ import { DatePipe } from '@angular/common';
 import { debounceTime, Subject, Subscription, startWith } from 'rxjs';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
@@ -88,7 +88,7 @@ interface StoredDraft {
     ReactiveFormsModule,
     DatePipe,
     Avatar,
-    Button,
+    ButtonDirective,
     Checkbox,
     CurrencyRonPipe,
     DatePicker,
@@ -335,7 +335,7 @@ export class CreateInvoiceDialog {
    * `(onChange)` is idempotent and doesn't trigger extra auto-saves.
    *
    * We write each field via its own setValue inside a microtask. This
-   * side-steps a PrimeNG `p-inputNumber` display-sync quirk where a
+   * side-steps a PrimeNG `p-inputnumber` display-sync quirk where a
    * batched `patchValue` from inside a sibling control's valueChanges
    * doesn't always propagate to the internal input DOM until the user
    * interacts with it. setValue per-control + a deferred tick forces

@@ -48,23 +48,15 @@
               (focus)="onLinkFocus($event)"
             />
             <div class="invite-friend__actions">
-              <p-button
-                label="Copy link"
-                icon="pi pi-copy"
-                severity="secondary"
-                [outlined]="true"
-                fluid
-                (onClick)="onCopy()"
-              />
+              <button pButton type="button" severity="secondary" [outlined]="true" fluid (click)="onCopy()">
+                <i class="pi pi-copy"></i>
+                Copy link
+              </button>
               @if (canShare()) {
-                <p-button
-                  label="Share"
-                  icon="pi pi-share-alt"
-                  severity="secondary"
-                  [outlined]="true"
-                  fluid
-                  (onClick)="onShare()"
-                />
+                <button pButton type="button" severity="secondary" [outlined]="true" fluid (click)="onShare()">
+                  <i class="pi pi-share-alt"></i>
+                  Share
+                </button>
               }
             </div>
             <p class="invite-friend__footnote">
@@ -110,15 +102,10 @@
                   ></textarea>
                 </div>
 
-                <p-button
-                  label="Send invite"
-                  icon="pi pi-send"
-                  iconPos="right"
-                  type="submit"
-                  fluid
-                  [loading]="isSending()"
-                  [disabled]="form.invalid || isSending()"
-                />
+                <button pButton type="submit" fluid [disabled]="form.invalid || isSending()">
+                  Send invite
+                  <i class="pi" [class]="isSending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+                </button>
               </form>
             } @else {
               <div class="invite-friend__success">
@@ -129,7 +116,7 @@
                 <p class="invite-friend__success-body">
                   We'll email them and let them know you sent the invite.
                 </p>
-                <p-button label="Done" severity="secondary" text fluid (onClick)="onClose()" />
+                <button pButton type="button" severity="secondary" text fluid (click)="onClose()">Done</button>
               </div>
             }
           </div>

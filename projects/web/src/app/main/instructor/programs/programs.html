@@ -11,8 +11,10 @@
       }
     </div>
     @if (!isMobile()) {
-    <p-button label="Create program" icon="pi pi-plus" (onClick)="openCreate()"
-      [size]="isTablet() ? 'small' : undefined" />
+    <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openCreate()">
+      <i class="pi pi-plus"></i>
+      Create program
+    </button>
     }
   </header>
 
@@ -40,9 +42,17 @@
   <div class="flex flex-wrap items-center justify-between gap-3" role="search">
     <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Status filter">
       @for (tab of statusTabs; track tab.label) {
-      <p-button [label]="tab.label" size="small" rounded styleClass="py-0.5 min-w-10"
-        [severity]="statusFilter() === tab.status ? 'primary' : 'secondary'" [text]="statusFilter() !== tab.status"
-        (onClick)="setStatus(tab.status)" />
+      <button pButton
+        type="button"
+        size="small"
+        rounded
+        [severity]="statusFilter() === tab.status ? 'primary' : 'secondary'"
+        [text]="statusFilter() !== tab.status"
+        (click)="setStatus(tab.status)"
+        class="py-0.5 min-w-10"
+      >
+        {{ tab.label }}
+      </button>
       }
     </div>
 
@@ -65,7 +75,7 @@
   @if (error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">Couldn't load programs: {{ error() }}</span>
-    <p-button label="Retry" size="small" severity="secondary" [outlined]="true" (onClick)="retry()" />
+    <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="retry()">Retry</button>
   </p-message>
   } @else if (loading() && !items().length) {
   <div class="grid gap-3.5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
@@ -91,8 +101,19 @@
             <div class="flex items-center gap-2">
               <h3 class="flex-1 m-0 font-heading text-sm font-semibold leading-snug line-clamp-2">{{ p.name }}</h3>
               <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
-              <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true" [rounded]="true" size="small"
-                ariaLabel="Program actions" [loading]="mutatingIds().has(p.id)" (onClick)="openCardMenu($event, p)" />
+              <button pButton
+                type="button"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                (click)="openCardMenu($event, p)"
+                aria-label="Program actions"
+                [disabled]="mutatingIds().has(p.id)"
+                iconOnly
+              >
+                <i class="pi" [class]="mutatingIds().has(p.id) ? 'pi-spinner pi-spin' : 'pi-ellipsis-v'"></i>
+              </button>
             </div>
 
             @if (p.description) {
@@ -122,8 +143,10 @@
 
     @if (hasMore()) {
     <div class="flex justify-center pt-1">
-      <p-button [label]="loadingMore() ? 'Loading…' : 'Load more'" [loading]="loadingMore()" severity="secondary"
-        [outlined]="true" (onClick)="loadMore()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
+        @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+        {{ loadingMore() ? 'Loading…' : 'Load more' }}
+      </button>
     </div>
     }
   </div>

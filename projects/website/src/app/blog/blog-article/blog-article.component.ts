@@ -12,7 +12,7 @@ import { DOCUMENT, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { catchError, of, shareReplay, switchMap } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Skeleton } from 'primeng/skeleton';
 import type { BlogPost } from 'core';
 import { authorBylineUrl, BLOG_COVER_PRESETS, BlogService, withCloudinaryTransform } from 'core';
@@ -31,7 +31,7 @@ import { SITE_ORIGIN } from '../../_shared/site.const';
   selector: 'mh-blog-article',
   imports: [
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     DatePipe,
     Skeleton,
     BlogCategoryPipe,

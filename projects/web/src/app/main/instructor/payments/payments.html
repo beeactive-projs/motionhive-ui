@@ -19,25 +19,45 @@
       <p-skeleton width="9rem" [height]="isTabletDown() ? '2.25rem' : '2.5rem'"
         class="hidden sm:inline-flex rounded-md" />
       } @else {
-      <p-button [label]="
-          !hasStripeAccount()
-            ? 'Set up payments'
-            : needsOnboardingFinish()
-              ? 'Finish setup'
-              : 'Open Stripe'
-        " [icon]="
+      <button pButton
+        type="button"
+        [severity]="hasStripeAccount() && !needsOnboardingFinish() ? 'secondary' : undefined"
+        [outlined]="hasStripeAccount() && !needsOnboardingFinish()"
+        [size]="isTabletDown() ? 'small' : undefined"
+        fluid
+        class="w-1/2 sm:w-auto"
+        (click)="openStripeOnboarding()"
+        [disabled]="dashboardLoading()"
+      >
+        <i [class]="dashboardLoading() ? 'pi pi-spinner pi-spin' : (
           !hasStripeAccount()
             ? 'pi pi-plus'
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        " [severity]="hasStripeAccount() && !needsOnboardingFinish() ? 'secondary' : undefined"
-        [outlined]="hasStripeAccount() && !needsOnboardingFinish()" [size]="isTabletDown() ? 'small' : undefined"
-        [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" fluid class="w-1/2 sm:w-auto" />
+        )"></i>
+        {{ 
+          !hasStripeAccount()
+            ? 'Set up payments'
+            : needsOnboardingFinish()
+              ? 'Finish setup'
+              : 'Open Stripe'
+         }}
+      </button>
       @if(stripeOnboarded()) {
-      <p-button label="Create invoice" icon="pi pi-plus" [size]="isTabletDown() ? 'small' : undefined"
-        [disabled]="!stripeOnboarded()" pTooltip="Complete Stripe setup first" [tooltipDisabled]="stripeOnboarded()"
-        (onClick)="showCreateDialog.set(true)" fluid class="w-1/2 sm:w-auto" />
+      <button pButton
+        type="button"
+        [size]="isTabletDown() ? 'small' : undefined"
+        [disabled]="!stripeOnboarded()"
+        pTooltip="Complete Stripe setup first"
+        [tooltipDisabled]="stripeOnboarded()"
+        fluid
+        class="w-1/2 sm:w-auto"
+        (click)="showCreateDialog.set(true)"
+      >
+        <i class="pi pi-plus"></i>
+        Create invoice
+      </button>
       }
       }
     </div>
@@ -185,19 +205,22 @@
           <p class="text-sm mt-1">{{ description }}</p>
         </div>
       </div>
-      <p-button [label]="
-          !hasStripeAccount()
-            ? 'Set up payments'
-            : needsOnboardingFinish()
-              ? 'Finish setup'
-              : 'Open Stripe'
-        " [icon]="
+      <button pButton type="button" class="ml-auto" (click)="openStripeOnboarding()" [disabled]="dashboardLoading()">
+        <i [class]="dashboardLoading() ? 'pi pi-spinner pi-spin' : (
           !hasStripeAccount()
             ? 'pi pi-plus'
             : needsOnboardingFinish()
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
-        " [loading]="dashboardLoading()" (onClick)="openStripeOnboarding()" class="ml-auto" />
+        )"></i>
+        {{ 
+          !hasStripeAccount()
+            ? 'Set up payments'
+            : needsOnboardingFinish()
+              ? 'Finish setup'
+              : 'Open Stripe'
+         }}
+      </button>
     </div>
   </p-card>
 </ng-template>

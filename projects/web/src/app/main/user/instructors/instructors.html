@@ -6,7 +6,7 @@
       <p class="text-sm text-surface-700 dark:text-surface-400">Manage your instructor relationships and requests.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="Discover instructors" icon="pi pi-search" (onClick)="discoverVisible.set(true)" />
+      <button pButton type="button" (click)="discoverVisible.set(true)"><i class="pi pi-search"></i> Discover instructors</button>
     </div>
   </header>
 
@@ -33,8 +33,17 @@
               }
             </div>
           </div>
-          <p-button icon="pi pi-times" severity="danger" [rounded]="true" [text]="true" pTooltip="Cancel Request"
-            (onClick)="confirmCancel(request)" />
+          <button pButton
+            type="button"
+            severity="danger"
+            [rounded]="true"
+            [text]="true"
+            pTooltip="Cancel Request"
+            (click)="confirmCancel(request)"
+            iconOnly
+          >
+            <i class="pi pi-times"></i>
+          </button>
         </div>
         }
       </div>
@@ -96,4 +105,4 @@
 <mh-discover-instructors [(visible)]="discoverVisible" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

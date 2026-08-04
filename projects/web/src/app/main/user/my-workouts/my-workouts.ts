@@ -9,7 +9,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Dialog } from 'primeng/dialog';
 import { IconField } from 'primeng/iconfield';
@@ -82,7 +82,7 @@ interface RoutineGroup {
   imports: [
     NgTemplateOutlet,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Card,
     ConfirmDialog,
     Dialog,

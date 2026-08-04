@@ -12,7 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ClientService, UserRoles, UserSearchResult, showApiError } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
@@ -29,7 +29,7 @@ type InviteMode = 'find' | 'email';
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    Button,
+    ButtonDirective,
     Dialog,
     InputText,
     Message,

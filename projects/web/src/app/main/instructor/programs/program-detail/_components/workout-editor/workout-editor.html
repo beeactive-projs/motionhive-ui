@@ -2,15 +2,18 @@
   <header class="flex flex-wrap items-start justify-between gap-3">
     <div class="flex min-w-0 items-start gap-2">
       @if (showBack()) {
-        <p-button
-          icon="pi pi-arrow-left"
+        <button pButton
+          type="button"
           outlined
           rounded
           severity="secondary"
           size="small"
-          ariaLabel="Back to program outline"
-          (onClick)="back.emit()"
-        />
+          (click)="back.emit()"
+          aria-label="Back to program outline"
+          iconOnly
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
       }
       <div class="min-w-0">
         <p class="m-0 text-[11px] font-bold uppercase tracking-wide text-muted-color">
@@ -34,66 +37,81 @@
       @if (durationEstimate(); as minutes) {
         <p-chip [label]="'~' + minutes + 'm'" icon="pi pi-clock" />
       }
-      <p-button
-        icon="pi pi-arrow-up"
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
         [disabled]="indexInWeek() === 0"
-        [ariaLabel]="'Move ' + workout().name + ' up in week ' + weekNumber()"
         pTooltip="Move up in week"
         tooltipPosition="left"
-        (onClick)="moveUp.emit()"
-      />
-      <p-button
-        icon="pi pi-arrow-down"
+        (click)="moveUp.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Move ' + workout().name + ' up in week ' + weekNumber()"
+        iconOnly
+      >
+        <i class="pi pi-arrow-up"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
         [disabled]="indexInWeek() === weekWorkoutCount() - 1"
-        [ariaLabel]="'Move ' + workout().name + ' down in week ' + weekNumber()"
         pTooltip="Move down in week"
         tooltipPosition="left"
-        (onClick)="moveDown.emit()"
-      />
-      <p-button
-        icon="pi pi-calendar"
+        (click)="moveDown.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Move ' + workout().name + ' down in week ' + weekNumber()"
+        iconOnly
+      >
+        <i class="pi pi-arrow-down"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
-        [ariaLabel]="'Move ' + workout().name + ' to another week or day'"
         pTooltip="Move to another week/day"
         tooltipPosition="left"
-        (onClick)="moveToWeek.emit()"
-      />
-      <p-button
-        icon="pi pi-pencil"
+        (click)="moveToWeek.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Move ' + workout().name + ' to another week or day'"
+        iconOnly
+      >
+        <i class="pi pi-calendar"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        [ariaLabel]="'Edit ' + workout().name"
         pTooltip="Edit workout"
         tooltipPosition="left"
-        (onClick)="edit.emit()"
-      />
-      <p-button
-        icon="pi pi-trash"
+        (click)="edit.emit()"
+        [attr.aria-label]="'Edit ' + workout().name"
+        iconOnly
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="danger"
         [text]="true"
         [rounded]="true"
-        [ariaLabel]="'Delete ' + workout().name"
         pTooltip="Delete workout"
         tooltipPosition="left"
-        (onClick)="remove.emit()"
-      />
+        (click)="remove.emit()"
+        [attr.aria-label]="'Delete ' + workout().name"
+        iconOnly
+      >
+        <i class="pi pi-trash"></i>
+      </button>
     </div>
   </header>
 
@@ -137,16 +155,18 @@
         />
       }
       <div class="p-3">
-        <p-button
-          label="Add exercise"
-          icon="pi pi-plus"
+        <button pButton
+          type="button"
           size="small"
           severity="secondary"
           [outlined]="true"
           fluid
-          styleClass="mh-dashed-btn"
-          (onClick)="addExercise.emit()"
-        />
+          (click)="addExercise.emit()"
+          class="mh-dashed-btn"
+        >
+          <i class="pi pi-plus"></i>
+          Add exercise
+        </button>
       </div>
     </div>
   }

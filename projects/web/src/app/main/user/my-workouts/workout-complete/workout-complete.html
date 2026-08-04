@@ -76,24 +76,32 @@
   </p-card>
 
   <footer class="flex flex-col gap-2">
-    <p-button label="Save & back to my plan" icon="pi pi-arrow-left" size="large" [loading]="saving()"
-      (onClick)="saveFeedback()" fluid />
+    <button pButton type="button" size="large" fluid (click)="saveFeedback()" [disabled]="saving()">
+      <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-arrow-left'"></i>
+      Save & back to my plan
+    </button>
 
     @if (canSaveAsRoutine()) {
     @if (savedRoutineId()) {
-    <p-button label="Routine saved · view" icon="pi pi-check" severity="success" size="large" [text]="true"
-      (onClick)="goToRoutines()" fluid />
+    <button pButton type="button" severity="success" size="large" [text]="true" fluid (click)="goToRoutines()">
+      <i class="pi pi-check"></i>
+      Routine saved · view
+    </button>
     } @else {
-    <p-button label="Save as routine" icon="pi pi-clone" severity="secondary" size="large" [text]="true"
-      (onClick)="openSaveAsRoutineDialog()" fluid />
+    <button pButton type="button" severity="secondary" size="large" [text]="true" fluid (click)="openSaveAsRoutineDialog()">
+      <i class="pi pi-clone"></i>
+      Save as routine
+    </button>
     <small class="text-center text-xs text-muted-color">
       Save this shape so you can run it again with one tap.
     </small>
     }
     }
 
-    <p-button label="Share to feed" icon="pi pi-share-alt" severity="secondary" size="large" [text]="true"
-      [disabled]="true" fluid />
+    <button pButton type="button" severity="secondary" size="large" [text]="true" [disabled]="true" fluid>
+      <i class="pi pi-share-alt"></i>
+      Share to feed
+    </button>
     <small class="text-center text-xs text-muted-color">Share to feed lands in a future slice.</small>
   </footer>
   }
@@ -118,10 +126,13 @@
       maxlength="100" placeholder="e.g. PPL split" autocomplete="off" />
   </div>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="savingRoutine()"
-      (onClick)="saveAsRoutineOpen.set(false)" />
-    <p-button label="Save routine" icon="pi pi-check" [loading]="savingRoutine()" [disabled]="!routineName().trim()"
-      (onClick)="saveAsRoutine()" />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="savingRoutine()" (click)="saveAsRoutineOpen.set(false)">
+      Cancel
+    </button>
+    <button pButton type="button" [disabled]="(!routineName().trim()) || savingRoutine()" (click)="saveAsRoutine()">
+      <i class="pi" [class]="savingRoutine() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      Save routine
+    </button>
   </ng-template>
 </p-dialog>
 

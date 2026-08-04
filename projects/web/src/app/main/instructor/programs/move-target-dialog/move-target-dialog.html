@@ -35,7 +35,7 @@
   </div>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancel()" />
-    <p-button label="Move" icon="pi pi-arrow-right" [disabled]="!canSubmit()" (onClick)="submit()" />
+    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">Cancel</button>
+    <button pButton type="button" [disabled]="!canSubmit()" (click)="submit()"><i class="pi pi-arrow-right"></i> Move</button>
   </ng-template>
 </p-dialog>

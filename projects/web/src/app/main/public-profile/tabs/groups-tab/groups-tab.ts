@@ -18,7 +18,7 @@ import {
   TagSeverity,
 } from 'core';
 import { Avatar as PrimeAvatar } from 'primeng/avatar';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
@@ -26,7 +26,7 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-public-profile-groups-tab',
-  imports: [Avatar, PrimeAvatar, Button, Card, SkeletonModule, TagModule],
+  imports: [Avatar, PrimeAvatar, ButtonDirective, Card, SkeletonModule, TagModule],
   templateUrl: './groups-tab.html',
   styleUrl: './groups-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

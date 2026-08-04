@@ -11,7 +11,7 @@ import { Location, TitleCasePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
@@ -68,7 +68,7 @@ import { WorkoutEditor } from './_components/workout-editor/workout-editor';
   selector: 'mh-program-detail',
   imports: [
     TitleCasePipe,
-    Button,
+    ButtonDirective,
     ConfirmDialog,
     Toast,
     Tag,

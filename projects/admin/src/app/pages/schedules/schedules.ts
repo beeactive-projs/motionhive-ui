@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
@@ -27,7 +27,7 @@ import { JobsOverview, TriggerableJob } from '../../_data/models/ops.models';
   imports: [
     FormsModule,
     TableModule,
-    ButtonModule,
+    ButtonDirective,
     TagModule,
     SelectModule,
     InputTextModule,

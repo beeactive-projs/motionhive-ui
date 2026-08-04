@@ -12,7 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -42,7 +42,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   selector: 'mh-subscriptions',
   imports: [
     DatePipe,
-    Button,
+    ButtonDirective,
     TableModule,
     Tag,
     SkeletonModule,

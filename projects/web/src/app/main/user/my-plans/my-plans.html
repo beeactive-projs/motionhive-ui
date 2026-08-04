@@ -99,8 +99,10 @@
 
     @if (hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="loadingMore()"
-        (onClick)="loadMore()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
+        @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+        Load more
+      </button>
     </div>
     } @else if (items().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
 
 /**
@@ -9,7 +9,7 @@ import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
  */
 @Component({
   selector: 'mh-contrib-card',
-  imports: [ButtonModule, Hex],
+  imports: [ButtonDirective, Hex],
   templateUrl: './contrib-card.html',
   styleUrl: './contrib-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

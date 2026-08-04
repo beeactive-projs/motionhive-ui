@@ -4,14 +4,22 @@
   </ng-template>
 
   <div class="mh-side-card__column-actions">
-    <p-button label="Add members" icon="pi pi-user-plus" fluid (onClick)="onAddMembers()" />
+    <button pButton type="button" fluid (click)="onAddMembers()"><i class="pi pi-user-plus"></i> Add members</button>
     @if (hasActiveLink()) {
-    <p-button label="Copy join link" icon="pi pi-link" severity="secondary" outlined fluid (onClick)="onJoinLink()" />
+    <button pButton type="button" severity="secondary" outlined fluid (click)="onJoinLink()">
+      <i class="pi pi-link"></i>
+      Copy join link
+    </button>
     } @else {
-    <p-button label="Generate join link" icon="pi pi-link" severity="secondary" outlined fluid [loading]="generating()"
-      (onClick)="onJoinLink()" />
+    <button pButton type="button" severity="secondary" outlined fluid (click)="onJoinLink()" [disabled]="generating()">
+      <i class="pi" [class]="generating() ? 'pi-spinner pi-spin' : 'pi-link'"></i>
+      Generate join link
+    </button>
     }
-    <p-button label="Edit group" icon="pi pi-pencil" severity="secondary" outlined fluid (onClick)="onEditGroup()" />
+    <button pButton type="button" severity="secondary" outlined fluid (click)="onEditGroup()">
+      <i class="pi pi-pencil"></i>
+      Edit group
+    </button>
   </div>
 
   @if (hint(); as h) {

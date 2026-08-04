@@ -14,25 +14,39 @@
       @if (isMobile()) {
       @if (incomingRequestsCount() > 0) {
       <p-overlaybadge [value]="incomingRequestsCount()" severity="danger" badgeSize="small">
-        <p-button icon="pi pi-hourglass" outlined rounded severity="secondary" (onClick)="goToPendingRequests()"
-          size="small" />
+        <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToPendingRequests()" iconOnly>
+          <i class="pi pi-hourglass"></i>
+        </button>
       </p-overlaybadge>
       } @else {
-      <p-button icon="pi pi-hourglass" outlined rounded severity="secondary" (onClick)="goToPendingRequests()"
-        size="small" />
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToPendingRequests()" iconOnly>
+        <i class="pi pi-hourglass"></i>
+      </button>
       }
       } @else {
       @if (incomingRequestsCount() > 0) {
       <p-overlaybadge [value]="incomingRequestsCount()" severity="danger" badgeSize="small">
-        <p-button label="Requests" icon="pi pi-hourglass" outlined severity="secondary"
-          (onClick)="goToPendingRequests()" [size]="isTablet() ? 'small' : undefined" />
+        <button pButton
+          type="button"
+          outlined
+          severity="secondary"
+          [size]="isTablet() ? 'small' : undefined"
+          (click)="goToPendingRequests()"
+        >
+          <i class="pi pi-hourglass"></i>
+          Requests
+        </button>
       </p-overlaybadge>
       } @else {
-      <p-button label="Requests" icon="pi pi-hourglass" outlined severity="secondary" (onClick)="goToPendingRequests()"
-        [size]="isTablet() ? 'small' : undefined" />
+      <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="goToPendingRequests()">
+        <i class="pi pi-hourglass"></i>
+        Requests
+      </button>
       }
-      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()"
-        [size]="isTablet() ? 'small' : undefined" />
+      <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openInviteDialog()">
+        <i class="pi pi-user-plus"></i>
+        Invite client
+      </button>
       }
     </div>
   </header>
@@ -41,9 +55,17 @@
   <div class="flex items-center gap-3">
     <span class="text-sm font-medium">Status:</span>
     @for (option of statusOptions; track option.label) {
-    <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'secondary'" size="small"
-      rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
-      styleClass="py-0.5 min-w-10" />
+    <button pButton
+      type="button"
+      [severity]="statusFilter() === option.value ? 'primary' : 'secondary'"
+      size="small"
+      rounded
+      [text]="statusFilter() !== option.value"
+      (click)="onStatusFilterChange(option.value)"
+      class="py-0.5 min-w-10"
+    >
+      {{ option.label }}
+    </button>
     }
   </div>
 
@@ -89,13 +111,45 @@
           <td>
             <div class="flex items-center justify-end gap-1">
               @if (client.status === Statuses.Active) {
-              <p-button icon="pi pi-pencil" rounded text severity="secondary" tooltipPosition="left"
-                pTooltip="Edit notes" ariaLabel="Edit notes" (onClick)="openNotesDialog(client)" />
-              <p-button icon="pi pi-inbox" rounded text severity="danger" tooltipPosition="left" pTooltip="Archive"
-                ariaLabel="Archive" (onClick)="confirmArchive(client)" />
+              <button pButton
+                type="button"
+                rounded
+                text
+                severity="secondary"
+                tooltipPosition="left"
+                pTooltip="Edit notes"
+                (click)="openNotesDialog(client)"
+                aria-label="Edit notes"
+                iconOnly
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button pButton
+                type="button"
+                rounded
+                text
+                severity="danger"
+                tooltipPosition="left"
+                pTooltip="Archive"
+                (click)="confirmArchive(client)"
+                aria-label="Archive"
+                iconOnly
+              >
+                <i class="pi pi-inbox"></i>
+              </button>
               } @else if (client.status === Statuses.Archived) {
-              <p-button icon="pi pi-inbox" rounded severity="success" tooltipPosition="left" pTooltip="Unarchive"
-                ariaLabel="Unarchive" (onClick)="confirmUnarchive(client)" />
+              <button pButton
+                type="button"
+                rounded
+                severity="success"
+                tooltipPosition="left"
+                pTooltip="Unarchive"
+                (click)="confirmUnarchive(client)"
+                aria-label="Unarchive"
+                iconOnly
+              >
+                <i class="pi pi-inbox"></i>
+              </button>
               }
             </div>
           </td>
@@ -209,13 +263,19 @@
             @if (client.status === Statuses.Active || client.status === Statuses.Archived) {
             <div class="border-surface-100 dark:border-surface-800 flex items-center justify-end gap-1 border-t pt-2">
               @if (client.status === Statuses.Active) {
-              <p-button icon="pi pi-pencil" label="Notes" rounded text size="small" severity="secondary"
-                (onClick)="openNotesDialog(client)" />
-              <p-button icon="pi pi-inbox" label="Archive" rounded text size="small" severity="danger"
-                (onClick)="confirmArchive(client)" />
+              <button pButton type="button" rounded text size="small" severity="secondary" (click)="openNotesDialog(client)">
+                <i class="pi pi-pencil"></i>
+                Notes
+              </button>
+              <button pButton type="button" rounded text size="small" severity="danger" (click)="confirmArchive(client)">
+                <i class="pi pi-inbox"></i>
+                Archive
+              </button>
               } @else if (client.status === Statuses.Archived) {
-              <p-button icon="pi pi-inbox" label="Unarchive" rounded size="small" severity="success"
-                (onClick)="confirmUnarchive(client)" />
+              <button pButton type="button" rounded size="small" severity="success" (click)="confirmUnarchive(client)">
+                <i class="pi pi-inbox"></i>
+                Unarchive
+              </button>
               }
             </div>
             }
@@ -260,4 +320,4 @@
 <mh-edit-client-notes-dialog [(visible)]="showNotesDialog" [client]="editingClient()" (saved)="loadClients()" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

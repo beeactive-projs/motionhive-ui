@@ -11,8 +11,10 @@
     </div>
   </div>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
-    <p-button label="Save notes" icon="pi pi-check" [loading]="notesLoading()"
-      (onClick)="saveNotes()" />
+    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" (click)="saveNotes()" [disabled]="notesLoading()">
+      <i class="pi" [class]="notesLoading() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      Save notes
+    </button>
   </ng-template>
 </p-dialog>

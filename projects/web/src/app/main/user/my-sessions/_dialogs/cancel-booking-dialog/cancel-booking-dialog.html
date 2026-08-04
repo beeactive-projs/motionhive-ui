@@ -26,7 +26,10 @@
   }
 
   <ng-template #footer>
-    <p-button label="Keep booking" severity="secondary" [text]="true" (onClick)="close()" />
-    <p-button label="Cancel booking" icon="pi pi-times" severity="danger" [loading]="busy()" (onClick)="submit()" />
+    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Keep booking</button>
+    <button pButton type="button" severity="danger" (click)="submit()" [disabled]="busy()">
+      <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+      Cancel booking
+    </button>
   </ng-template>
 </p-dialog>

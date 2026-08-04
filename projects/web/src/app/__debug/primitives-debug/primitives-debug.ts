@@ -4,7 +4,7 @@ import {
   Component,
   signal,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import {
   BottomSheet,
   StickyCta,
@@ -27,7 +27,7 @@ import { TimeRow } from '../../_shared/components/time-row/time-row';
   standalone: true,
   imports: [
     CommonModule,
-    ButtonModule,
+    ButtonDirective,
     BottomSheet,
     TimeRow,
     DaySeparator,
@@ -94,11 +94,7 @@ import { TimeRow } from '../../_shared/components/time-row/time-row';
           <span meta>
             <span class="chip-text">8/12 · Herăstrău</span>
           </span>
-          <p-button
-            trailing
-            label="Check in"
-            size="small"
-          />
+          <button pButton type="button" trailing size="small">Check in</button>
         </mh-time-row>
 
         <p class="caption">non-interactive (muted past)</p>
@@ -144,16 +140,10 @@ import { TimeRow } from '../../_shared/components/time-row/time-row';
       <section class="block">
         <h2>BottomSheet</h2>
         <div class="btn-row">
-          <p-button
-            label="Open filter sheet (large, with foot)"
-            (onClick)="filterSheet.set(true)"
-          />
-          <p-button
-            label="Open action sheet (small, no title)"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="actionSheet.set(true)"
-          />
+          <button pButton type="button" (click)="filterSheet.set(true)">Open filter sheet (large, with foot)</button>
+          <button pButton type="button" severity="secondary" [outlined]="true" (click)="actionSheet.set(true)">
+            Open action sheet (small, no title)
+          </button>
         </div>
       </section>
 
@@ -178,13 +168,7 @@ import { TimeRow } from '../../_shared/components/time-row/time-row';
       title="Filters"
       subtitle="Type · Location · Status"
     >
-      <p-button
-        head-actions
-        label="Reset"
-        severity="secondary"
-        [text]="true"
-        size="small"
-      />
+      <button pButton type="button" head-actions severity="secondary" [text]="true" size="small">Reset</button>
       <div class="filter-body">
         <p class="label">Type</p>
         <div class="pill-row">
@@ -205,17 +189,8 @@ import { TimeRow } from '../../_shared/components/time-row/time-row';
         </div>
       </div>
       <ng-container foot>
-        <p-button
-          label="Cancel"
-          severity="secondary"
-          [outlined]="true"
-          (onClick)="filterSheet.set(false)"
-        />
-        <p-button
-          label="Apply · 2 filters"
-          (onClick)="filterSheet.set(false)"
-          styleClass="primary-flex"
-        />
+        <button pButton type="button" severity="secondary" [outlined]="true" (click)="filterSheet.set(false)">Cancel</button>
+        <button pButton type="button" (click)="filterSheet.set(false)" class="primary-flex">Apply · 2 filters</button>
       </ng-container>
     </mh-bottom-sheet>
 
@@ -242,10 +217,7 @@ import { TimeRow } from '../../_shared/components/time-row/time-row';
         <strong>50 RON</strong>
         <span>Invoiced manually</span>
       </div>
-      <p-button
-        label="Book my spot"
-        icon="pi pi-check"
-      />
+      <button pButton type="button"><i class="pi pi-check"></i> Book my spot</button>
     </mh-sticky-cta>
 
     <!-- Mobile FAB -->

@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
@@ -77,7 +77,7 @@ const BLANK_FORM: VenueForm = {
   imports: [
     FormsModule,
     Dialog,
-    ButtonModule,
+    ButtonDirective,
     InputText,
     TextareaModule,
     Select,

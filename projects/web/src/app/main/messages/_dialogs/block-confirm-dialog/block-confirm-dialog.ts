@@ -7,7 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { MessagingStore, UserBlockReason } from 'core';
@@ -25,7 +25,7 @@ import { MessagingStore, UserBlockReason } from 'core';
 @Component({
   selector: 'mh-block-confirm-dialog',
   standalone: true,
-  imports: [Button, Dialog],
+  imports: [ButtonDirective, Dialog],
   templateUrl: './block-confirm-dialog.html',
   styleUrl: './block-confirm-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

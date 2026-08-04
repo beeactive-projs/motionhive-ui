@@ -11,8 +11,10 @@
       }
     </div>
     @if (isInstructor() && !isMobile()) {
-    <p-button label="Create exercise" icon="pi pi-plus" (onClick)="openCreate()"
-      [size]="isTablet() ? 'small' : undefined" />
+    <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openCreate()">
+      <i class="pi pi-plus"></i>
+      Create exercise
+    </button>
     }
   </header>
 
@@ -34,7 +36,7 @@
 
         @if (activeFilterCount() > 0) {
         <div class="pt-2">
-          <p-button label="Clear filters" severity="secondary" size="small" [text]="true" (onClick)="clearFilters()" />
+          <button pButton type="button" severity="secondary" size="small" [text]="true" (click)="clearFilters()">Clear filters</button>
         </div>
         }
       </p-card>
@@ -67,9 +69,11 @@
           Build movements specific to your coaching style, or fork a public one to make it your own.
         </p>
         <div class="mt-1 flex flex-col items-center gap-2">
-          <p-button label="Create your first exercise" icon="pi pi-plus" (onClick)="openCreate()" />
-          <p-button label="Browse the catalog to fork" icon="pi pi-compass" severity="secondary" [outlined]="true"
-            (onClick)="setOwnership(Ownership.PublicOthers)" />
+          <button pButton type="button" (click)="openCreate()"><i class="pi pi-plus"></i> Create your first exercise</button>
+          <button pButton type="button" severity="secondary" [outlined]="true" (click)="setOwnership(Ownership.PublicOthers)">
+            <i class="pi pi-compass"></i>
+            Browse the catalog to fork
+          </button>
         </div>
       </div>
       } @else {
@@ -83,7 +87,7 @@
         <p class="m-0 max-w-sm text-sm text-surface-600 dark:text-surface-400">Loosen a filter or search differently to
           see more.</p>
         @if (activeFilterCount() > 0) {
-        <p-button label="Clear all filters" severity="secondary" [text]="true" (onClick)="clearFilters()" />
+        <button pButton type="button" severity="secondary" [text]="true" (click)="clearFilters()">Clear all filters</button>
         }
       </div>
       }
@@ -96,8 +100,10 @@
 
       @if (hasMore()) {
       <div class="flex justify-center pt-4">
-        <p-button [label]="loadingMore() ? 'Loading…' : 'Load more'" [loading]="loadingMore()" severity="secondary"
-          [outlined]="true" (onClick)="loadMore()" />
+        <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
+          @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+          {{ loadingMore() ? 'Loading…' : 'Load more' }}
+        </button>
       </div>
       }
       }
@@ -119,9 +125,17 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-3" role="search">
     <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Ownership filter">
       @for (tab of ownershipTabs; track tab.value) {
-      <p-button [label]="tab.label" size="small" rounded styleClass="py-0.5 min-w-10"
-        [severity]="ownership() === tab.value ? 'primary' : 'secondary'" [text]="ownership() !== tab.value"
-        (onClick)="setOwnership(tab.value)" />
+      <button pButton
+        type="button"
+        size="small"
+        rounded
+        [severity]="ownership() === tab.value ? 'primary' : 'secondary'"
+        [text]="ownership() !== tab.value"
+        (click)="setOwnership(tab.value)"
+        class="py-0.5 min-w-10"
+      >
+        {{ tab.label }}
+      </button>
       }
     </div>
 
@@ -135,14 +149,17 @@
         }
       </p-iconfield>
 
-      <p-button [label]="sortLabel()" icon="pi pi-sort-alt" severity="secondary" [text]="true" size="small"
-        (onClick)="sortMenu.toggle($event)" aria-haspopup="true" />
+      <button pButton type="button" severity="secondary" [text]="true" size="small" aria-haspopup="true" (click)="sortMenu.toggle($event)">
+        <i class="pi pi-sort-alt"></i>
+        {{ sortLabel() }}
+      </button>
       <p-menu #sortMenu [model]="sortItems" [popup]="true" [appendTo]="'body'" />
 
       @if (isTabletDown()) {
-      <p-button [label]="activeFilterCount() > 0 ? 'Filters · ' + activeFilterCount() : 'Filters'"
-        icon="pi pi-sliders-h" severity="secondary" [text]="true" size="small"
-        (onClick)="filterDrawerVisible.set(true)" />
+      <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="filterDrawerVisible.set(true)">
+        <i class="pi pi-sliders-h"></i>
+        {{ activeFilterCount() > 0 ? 'Filters · ' + activeFilterCount() : 'Filters' }}
+      </button>
       }
     </div>
   </div>
@@ -159,10 +176,20 @@
 
   <ng-template #footer>
     <div class="flex items-center gap-2">
-      <p-button label="Clear all" severity="secondary" [text]="true" (onClick)="clearFilters()"
-        [disabled]="activeFilterCount() === 0" class="w-auto" />
-      <p-button [label]="loading() ? 'Loading…' : 'Show ' + total() + ' results'" icon="pi pi-check"
-        (onClick)="filterDrawerVisible.set(false)" fluid class="flex-1" />
+      <button pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [disabled]="activeFilterCount() === 0"
+        class="w-auto"
+        (click)="clearFilters()"
+      >
+        Clear all
+      </button>
+      <button pButton type="button" fluid class="flex-1" (click)="filterDrawerVisible.set(false)">
+        <i class="pi pi-check"></i>
+        {{ loading() ? 'Loading…' : 'Show ' + total() + ' results' }}
+      </button>
     </div>
   </ng-template>
 </p-drawer>

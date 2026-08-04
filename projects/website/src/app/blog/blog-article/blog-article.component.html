@@ -118,13 +118,10 @@
         MotionHive is free for coaches: profile, programs, payments and community in one place.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <p-button
-          i18n-label="@@blog.article.backToBlog"
-          label="Back to Blog"
-          icon="pi pi-arrow-left"
-          iconPos="left"
-          routerLink="/blog"
-          size="large" />
+        <button pButton type="button" routerLink="/blog" size="large">
+          <i class="pi pi-arrow-left"></i>
+          <span i18n="@@blog.article.backToBlog">Back to Blog</span>
+        </button>
       </div>
     </div>
   </section>

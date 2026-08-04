@@ -15,7 +15,7 @@ import {
   AccordionPanel,
 } from 'primeng/accordion';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -85,7 +85,7 @@ interface PlanCta {
     AccordionHeader,
     AccordionContent,
     HexAvatar,
-    ButtonModule,
+    ButtonDirective,
     Card,
     ConfirmDialog,
     Divider,

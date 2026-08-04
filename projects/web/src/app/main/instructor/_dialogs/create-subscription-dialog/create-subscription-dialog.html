@@ -29,7 +29,7 @@
     <!-- Trial days (optional) -->
     <div class="flex flex-col gap-2">
       <label for="subTrial" class="text-sm font-medium">Free trial (optional)</label>
-      <p-inputNumber id="subTrial" [(ngModel)]="formTrialDays" [min]="0" [max]="90" suffix=" days"
+      <p-inputnumber id="subTrial" [(ngModel)]="formTrialDays" [min]="0" [max]="90" suffix=" days"
         placeholder="No free trial" fluid />
       <span class="text-xs text-surface-500">
         Number of days the client can use the plan before being charged. Leave empty to bill immediately.
@@ -44,9 +44,11 @@
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
-      <p-button label="Create subscription" icon="pi pi-check" [loading]="saving()"
-        [disabled]="!formClientUserId || !formProductId" (onClick)="submit()" />
+      <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+      <button pButton type="button" [disabled]="(!formClientUserId || !formProductId) || saving()" (click)="submit()">
+        <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+        Create subscription
+      </button>
     </div>
   </ng-template>
 </p-dialog>

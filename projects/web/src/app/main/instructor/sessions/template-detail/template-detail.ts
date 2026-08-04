@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
@@ -58,7 +58,7 @@ import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-
     CommonModule,
     FormsModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     InputNumberModule,
     AccessChip,
     TypeChip,

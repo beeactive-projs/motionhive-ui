@@ -19,7 +19,7 @@
   <!-- Interval -->
   <div class="mh-rec__row">
     <span class="mh-rec__label">Every</span>
-    <p-inputNumber
+    <p-inputnumber
       [(ngModel)]="intervalValue"
       (ngModelChange)="setInterval($event)"
       [min]="1"
@@ -83,7 +83,7 @@
       />
     }
     @if (endMode() === 'count') {
-      <p-inputNumber
+      <p-inputnumber
         [(ngModel)]="endCountValue"
         (ngModelChange)="setEndCount($event)"
         [min]="1"

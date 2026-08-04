@@ -20,8 +20,9 @@
         </div>
         <div class="flex items-center gap-1">
           @if (menuItems().length > 0) {
-          <p-button icon="pi pi-ellipsis-h" rounded text severity="secondary" size="small"
-            (onClick)="postMenu.toggle($event)" />
+          <button pButton type="button" rounded text severity="secondary" size="small" (click)="postMenu.toggle($event)" iconOnly>
+            <i class="pi pi-ellipsis-h"></i>
+          </button>
           <p-menu #postMenu [model]="menuItems()" [appendTo]="'body'" [popup]="true" />
           }
         </div>

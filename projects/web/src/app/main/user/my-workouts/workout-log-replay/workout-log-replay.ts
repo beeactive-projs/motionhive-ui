@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
@@ -48,7 +48,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   imports: [
     DatePipe,
     DecimalPipe,
-    ButtonModule,
+    ButtonDirective,
     Card,
     KpiCard,
     ListEmptyState,

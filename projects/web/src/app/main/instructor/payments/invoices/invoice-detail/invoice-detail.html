@@ -1,5 +1,5 @@
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />
 <mh-send-invoice-email-dialog
   [(visible)]="showSendDialog"
   [invoice]="invoice()"
@@ -76,82 +76,77 @@
         <div class="flex flex-wrap gap-2">
           @switch (inv.status) {
             @case (Statuses.Draft) {
-              <p-button
-                label="Send invoice"
-                icon="pi pi-send"
-                size="small"
-                [loading]="actionLoading()"
-                (onClick)="openSendDialog()"
-              />
-              <p-button
-                label="Void"
-                icon="pi pi-ban"
+              <button pButton type="button" size="small" (click)="openSendDialog()" [disabled]="actionLoading()">
+                <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+                Send invoice
+              </button>
+              <button pButton
+                type="button"
                 severity="danger"
                 [text]="true"
                 size="small"
-                [loading]="actionLoading()"
-                (onClick)="confirmVoid()"
-              />
+                (click)="confirmVoid()"
+                [disabled]="actionLoading()"
+              >
+                <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-ban'"></i>
+                Void
+              </button>
             }
             @case (Statuses.Open) {
-              <p-button
-                label="Resend email"
-                icon="pi pi-send"
-                severity="secondary"
-                [outlined]="true"
-                size="small"
-                (onClick)="openSendDialog()"
-              />
-              <p-button
-                label="Copy payment link"
-                icon="pi pi-link"
+              <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="openSendDialog()">
+                <i class="pi pi-send"></i>
+                Resend email
+              </button>
+              <button pButton
+                type="button"
                 severity="secondary"
                 [outlined]="true"
                 size="small"
                 [disabled]="!inv.hostedInvoiceUrl"
-                (onClick)="copyPaymentLink()"
-              />
-              <p-button
-                label="Mark paid"
-                icon="pi pi-check"
-                severity="success"
-                size="small"
-                [loading]="actionLoading()"
-                (onClick)="confirmMarkPaid()"
-              />
-              <p-button
-                label="Void"
-                icon="pi pi-ban"
+                (click)="copyPaymentLink()"
+              >
+                <i class="pi pi-link"></i>
+                Copy payment link
+              </button>
+              <button pButton type="button" severity="success" size="small" (click)="confirmMarkPaid()" [disabled]="actionLoading()">
+                <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+                Mark paid
+              </button>
+              <button pButton
+                type="button"
                 severity="danger"
                 [text]="true"
                 size="small"
-                [loading]="actionLoading()"
-                (onClick)="confirmVoid()"
-              />
+                (click)="confirmVoid()"
+                [disabled]="actionLoading()"
+              >
+                <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-ban'"></i>
+                Void
+              </button>
             }
             @case (Statuses.Paid) {
               @if (inv.invoicePdf) {
                 <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
-                  <p-button
-                    label="Download invoice PDF"
-                    icon="pi pi-download"
-                    severity="secondary"
-                    [outlined]="true"
-                    size="small"
-                  />
+                  <button pButton type="button" severity="secondary" [outlined]="true" size="small">
+                    <i class="pi pi-download"></i>
+                    Download invoice PDF
+                  </button>
                 </a>
               }
             }
           }
           @if (overflowMenu().length > 0) {
-            <p-button
-              icon="pi pi-ellipsis-h"
+            <button pButton
+              type="button"
               severity="secondary"
               [outlined]="true"
               size="small"
               pTooltip="More"
-              (onClick)="overflow.toggle($event)"
-            />
+              (click)="overflow.toggle($event)"
+              iconOnly
+            >
+              <i class="pi pi-ellipsis-h"></i>
+            </button>
             <p-menu #overflow [model]="overflowMenu()" [popup]="true" appendTo="body" />
           }
         </div>
@@ -313,13 +308,9 @@
                     [value]="inv.hostedInvoiceUrl"
                     class="flex-1 min-w-0 text-xs font-mono px-2 py-1.5 rounded bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 focus:outline-none"
                   />
-                  <p-button
-                    label="Copy"
-                    size="small"
-                    severity="secondary"
-                    [outlined]="true"
-                    (onClick)="copyPaymentLink()"
-                  />
+                  <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="copyPaymentLink()">
+                    Copy
+                  </button>
                 </div>
                 @if (inv.finalizedAt) {
                   <span class="text-xs text-surface-500">

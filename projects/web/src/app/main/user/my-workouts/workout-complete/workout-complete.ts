@@ -9,7 +9,7 @@ import {
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { MessageService } from 'primeng/api';
 import { Dialog } from 'primeng/dialog';
@@ -59,7 +59,7 @@ interface FeelingOption {
     DatePipe,
     DecimalPipe,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Card,
     Dialog,
     InputTextModule,

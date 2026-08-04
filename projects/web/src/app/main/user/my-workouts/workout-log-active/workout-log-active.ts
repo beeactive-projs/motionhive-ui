@@ -10,7 +10,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Card } from 'primeng/card';
@@ -70,7 +70,7 @@ interface ExerciseState {
   imports: [
     NgTemplateOutlet,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Card,
     ConfirmDialog,
     InputTextModule,

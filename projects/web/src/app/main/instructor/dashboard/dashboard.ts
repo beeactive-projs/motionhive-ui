@@ -4,7 +4,6 @@ import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { AvatarModule } from 'primeng/avatar';
-import { ButtonModule } from 'primeng/button';
 import { Avatar } from '../../../_shared/components/avatar/avatar';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
@@ -49,7 +48,6 @@ interface RecentActivity {
     TitleCasePipe,
     AvatarModule,
     Avatar,
-    ButtonModule,
     CardModule,
     ChartModule,
     DividerModule,

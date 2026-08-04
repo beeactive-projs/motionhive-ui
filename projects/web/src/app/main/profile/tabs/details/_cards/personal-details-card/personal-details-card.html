@@ -5,9 +5,20 @@
         <i class="pi pi-id-card text-primary-600"></i>
         <h2 class="text-base font-semibold m-0">Personal details</h2>
       </div>
-      <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" severity="secondary"
-        pTooltip="Edit personal details" tooltipPosition="left" ariaLabel="Edit personal details"
-        (onClick)="edit.emit()" />
+      <button pButton
+        type="button"
+        [text]="true"
+        [rounded]="true"
+        size="small"
+        severity="secondary"
+        pTooltip="Edit personal details"
+        tooltipPosition="left"
+        (click)="edit.emit()"
+        aria-label="Edit personal details"
+        iconOnly
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
     </div>
     <p-divider />
   </ng-template>

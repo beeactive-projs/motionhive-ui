@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Post } from 'core';
 import { PostReactionBar } from '../post-reaction-bar/post-reaction-bar';
 import { PostCommentList } from '../post-comment-list/post-comment-list';
@@ -19,7 +19,7 @@ import { PostHeader } from '../post-header/post-header';
   selector: 'mh-post-card',
   imports: [
     CardModule,
-    Button,
+    ButtonDirective,
     PostHeader,
     PostReactionBar,
     PostCommentList,

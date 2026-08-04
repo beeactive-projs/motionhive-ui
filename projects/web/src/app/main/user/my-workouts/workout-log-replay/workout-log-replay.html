@@ -2,8 +2,9 @@
   <!-- Header · back button + title + subtitle (mirrors the session showcase header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ log()?.name ?? 'Workout' }}
         </h1>

@@ -13,7 +13,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
@@ -47,7 +47,7 @@ import {
   selector: 'mh-workout-form-dialog',
   imports: [
     ReactiveFormsModule,
-    Button,
+    ButtonDirective,
     Dialog,
     InputNumber,
     InputText,

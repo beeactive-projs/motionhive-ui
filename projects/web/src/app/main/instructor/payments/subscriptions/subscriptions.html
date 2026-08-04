@@ -3,13 +3,21 @@
   <!-- Filters -->
   <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
     @for (opt of statusOptions; track opt.value) {
-    <p-button [label]="opt.label" [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'" size="small"
-      rounded [text]="statusFilter() !== opt.value" (onClick)="onStatusFilterChange(opt.value)"
-      styleClass="py-0.5 min-w-10" />
+    <button pButton
+      type="button"
+      [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'"
+      size="small"
+      rounded
+      [text]="statusFilter() !== opt.value"
+      (click)="onStatusFilterChange(opt.value)"
+      class="py-0.5 min-w-10"
+    >
+      {{ opt.label }}
+    </button>
     }
   </div>
 
-  <p-button label="New membership" icon="pi pi-plus" size="small" (onClick)="showCreateDialog.set(true)" />
+  <button pButton type="button" size="small" (click)="showCreateDialog.set(true)"><i class="pi pi-plus"></i> New membership</button>
 </header>
 
 
@@ -64,11 +72,31 @@
           @if (sub.status === Statuses.Active || sub.status === Statuses.Trialing) {
           <div class="flex gap-1 justify-end" (click)="$event.stopPropagation()">
             @if (!sub.cancelAt) {
-            <p-button icon="pi pi-times" size="small" severity="danger" [text]="true"
-              pTooltip="Cancel at period end" tooltipPosition="left" (onClick)="confirmCancel(sub)" />
+            <button pButton
+              type="button"
+              size="small"
+              severity="danger"
+              [text]="true"
+              pTooltip="Cancel at period end"
+              tooltipPosition="left"
+              (click)="confirmCancel(sub)"
+              iconOnly
+            >
+              <i class="pi pi-times"></i>
+            </button>
             }
-            <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true" pTooltip="Cancel immediately"
-              tooltipPosition="left" (onClick)="confirmCancelImmediately(sub)" />
+            <button pButton
+              type="button"
+              size="small"
+              severity="danger"
+              [text]="true"
+              pTooltip="Cancel immediately"
+              tooltipPosition="left"
+              (click)="confirmCancelImmediately(sub)"
+              iconOnly
+            >
+              <i class="pi pi-trash"></i>
+            </button>
           </div>
           }
         </td>
@@ -199,4 +227,4 @@
 <mh-create-subscription-dialog [(visible)]="showCreateDialog" (saved)="reload()" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

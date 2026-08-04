@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
@@ -32,7 +32,7 @@ import {
   selector: 'mh-product-form-dialog',
   imports: [
     FormsModule,
-    Button,
+    ButtonDirective,
     Dialog,
     InputText,
     InputNumber,

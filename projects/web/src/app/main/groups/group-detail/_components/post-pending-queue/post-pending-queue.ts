@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
@@ -28,7 +28,7 @@ type ModerationDecision = ModeratePostPayload['decision'];
 
 @Component({
   selector: 'mh-post-pending-queue',
-  imports: [DatePipe, HexAvatar, Button, CardModule, SkeletonModule, TagModule],
+  imports: [DatePipe, HexAvatar, ButtonDirective, CardModule, SkeletonModule, TagModule],
   templateUrl: './post-pending-queue.html',
   styleUrl: './post-pending-queue.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

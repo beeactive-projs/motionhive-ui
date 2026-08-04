@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import {
@@ -38,7 +38,7 @@ import {
 @Component({
   selector: 'mh-follow-up-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, Dialog, ButtonModule, TextareaModule],
+  imports: [CommonModule, FormsModule, Dialog, ButtonDirective, TextareaModule],
   template: `
     <p-dialog
       [header]="header()"
@@ -97,14 +97,11 @@ import {
       </div>
 
       <ng-template pTemplate="footer">
-        <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="close()" />
-        <p-button
-          label="Send"
-          icon="pi pi-send"
-          [loading]="busy()"
-          [disabled]="!message().trim()"
-          (onClick)="send()"
-        />
+        <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+        <button pButton type="button" [disabled]="(!message().trim()) || busy()" (click)="send()">
+          <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+          Send
+        </button>
       </ng-template>
     </p-dialog>
   `,

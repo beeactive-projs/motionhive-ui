@@ -20,9 +20,7 @@
         start with your most active 3 to 5 clients.
       </p>
       <div class="flex gap-2.5 justify-center">
-        <p-button label="Create your first group"
-                  icon="pi pi-plus"
-                  (onClick)="createGroup.emit()"/>
+        <button pButton type="button" (click)="createGroup.emit()"><i class="pi pi-plus"></i> Create your first group</button>
       </div>
     } @else {
       <h3 class="text-lg font-bold">

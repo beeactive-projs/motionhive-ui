@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Group } from 'core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 
 @Component({
   selector: 'mh-group-owner-card',
-  imports: [HexAvatar, Button, CardModule],
+  imports: [HexAvatar, ButtonDirective, CardModule],
   templateUrl: './group-owner-card.html',
   styleUrl: './group-owner-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

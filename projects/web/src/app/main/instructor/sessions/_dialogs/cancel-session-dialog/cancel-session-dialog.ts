@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { InputText } from 'primeng/inputtext';
@@ -50,7 +50,7 @@ import {
     CommonModule,
     FormsModule,
     Dialog,
-    ButtonModule,
+    ButtonDirective,
     TextareaModule,
     InputText,
     BottomSheet,

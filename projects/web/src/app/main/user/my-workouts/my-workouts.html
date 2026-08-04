@@ -19,8 +19,10 @@
     </div>
     @if (!isMobile()) {
     <div class="flex gap-3 shrink-0">
-      <p-button label="Start workout" icon="pi pi-bolt" [size]="isTablet() ? 'small' : undefined"
-        (onClick)="openStartFreestyle()" />
+      <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openStartFreestyle()">
+        <i class="pi pi-bolt"></i>
+        Start workout
+      </button>
     </div>
     }
   </header>
@@ -90,7 +92,10 @@
 
     @if (hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="loadingMore()" (onClick)="loadMore()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
+        @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+        Load more
+      </button>
     </div>
     } @else if (items().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
@@ -135,8 +140,10 @@
         <p-inputicon class="pi pi-times cursor-pointer" (click)="clearRoutineSearch()" />
         }
       </p-iconfield>
-      <p-button label="New routine" icon="pi pi-plus" severity="secondary" [text]="true"
-        (onClick)="openCreateRoutine()" />
+      <button pButton type="button" severity="secondary" [text]="true" (click)="openCreateRoutine()">
+        <i class="pi pi-plus"></i>
+        New routine
+      </button>
     </div>
 
     @if (filteredRoutines().length === 0) {
@@ -181,8 +188,10 @@
       <p class="m-0 max-w-md text-sm text-muted-color">
         Browse 800+ system exercises and build your own custom ones in the Exercises area.
       </p>
-      <p-button label="Open exercises" icon="pi pi-external-link" severity="secondary" [outlined]="true"
-        (onClick)="goToExercises()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" (click)="goToExercises()">
+        <i class="pi pi-external-link"></i>
+        Open exercises
+      </button>
     </div>
   </p-card>
 </ng-template>
@@ -202,10 +211,13 @@
       maxlength="200" placeholder="e.g. Saturday session" autocomplete="off" />
   </div>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="starting()"
-      (onClick)="startDialogOpen.set(false)" />
-    <p-button label="Start" icon="pi pi-bolt" [loading]="starting()" [disabled]="!newWorkoutName().trim()"
-      (onClick)="startFreestyle()" />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="starting()" (click)="startDialogOpen.set(false)">
+      Cancel
+    </button>
+    <button pButton type="button" [disabled]="(!newWorkoutName().trim()) || starting()" (click)="startFreestyle()">
+      <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>
+      Start
+    </button>
   </ng-template>
 </p-dialog>
 

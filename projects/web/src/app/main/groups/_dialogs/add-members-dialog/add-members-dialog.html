@@ -2,7 +2,7 @@
 
   @if (loading()) {
   <div class="flex flex-col items-center gap-3 py-8">
-    <p-progressSpinner strokeWidth="4" class="w-10 h-10" />
+    <p-progress-spinner strokeWidth="4" class="w-10 h-10" />
     <span class="text-sm text-surface-500">Loading clients...</span>
   </div>
   } @else {
@@ -19,7 +19,7 @@
 
     <ng-template #header>
       <tr>
-        <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+        <th style="width: 3rem"><p-table-header-checkbox /></th>
         <th>Name</th>
         <th>Email</th>
       </tr>
@@ -27,7 +27,7 @@
 
     <ng-template #body let-client>
       <tr [pSelectableRow]="client">
-        <td><p-tableCheckbox [value]="client" /></td>
+        <td><p-table-checkbox [value]="client" /></td>
         <td>
           <mh-user-info [user]="client.client" [hex]="true" />
         </td>
@@ -50,10 +50,10 @@
   }
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
-    <p-button
-      [label]="selectedCount() > 0 ? 'Add ' + selectedCount() + ' ' + (selectedCount() === 1 ? 'member' : 'members') : 'Add members'"
-      icon="pi pi-user-plus" [loading]="saving()" [disabled]="selectedCount() === 0 || loading()"
-      (onClick)="saveMembers()" />
+    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" [disabled]="(selectedCount() === 0 || loading()) || saving()" (click)="saveMembers()">
+      <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-user-plus'"></i>
+      {{ selectedCount() > 0 ? 'Add ' + selectedCount() + ' ' + (selectedCount() === 1 ? 'member' : 'members') : 'Add members' }}
+    </button>
   </ng-template>
 </p-dialog>

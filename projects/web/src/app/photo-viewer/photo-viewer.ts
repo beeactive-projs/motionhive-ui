@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
 import { MessageService } from 'primeng/api';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -26,7 +26,7 @@ interface GalleriaItem {
 @Component({
   selector: 'mh-photo-viewer',
   imports: [
-    Button,
+    ButtonDirective,
     GalleriaModule,
     ProgressSpinner,
     Toast,

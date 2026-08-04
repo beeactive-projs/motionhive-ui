@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { DividerModule } from 'primeng/divider';
 import { AuthStore, AuthService, BillingCountsStore, FeedbackService } from 'core';
@@ -21,7 +21,7 @@ interface AccountMenuGroup {
 
 @Component({
   selector: 'mh-profile-menu',
-  imports: [RouterLink, Avatar, ButtonModule, PopoverModule, DividerModule],
+  imports: [RouterLink, Avatar, ButtonDirective, PopoverModule, DividerModule],
   templateUrl: './profile-menu.html',
   styleUrl: './profile-menu.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

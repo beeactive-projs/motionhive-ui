@@ -97,8 +97,10 @@
           </div>
 
           <!-- Submit -->
-          <p-button type="submit" i18n="@@contact.form.submit" label="Send message" icon="pi pi-send" iconPos="right"
-            [loading]="isLoading()" [disabled]="isLoading()" severity="warn" size="large" styleClass="w-full" />
+          <button pButton type="submit" [disabled]="isLoading()" severity="warn" size="large" fluid>
+            <span i18n="@@contact.form.submit">Send message</span>
+            <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+          </button>
         </form>
       </div>
 

@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 // PrimeNG
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
@@ -47,7 +47,7 @@ type VerifyState = 'verifying' | 'success' | 'invalid' | 'missing';
   selector: 'mh-verify-email',
   imports: [
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     MessageModule,
     ProgressSpinnerModule,
     ThemeToggleComponent,

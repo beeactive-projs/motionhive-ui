@@ -7,7 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 /**
  * `mh-mobile-fab` — floating action button for the single primary
@@ -34,7 +34,7 @@ import { Button } from 'primeng/button';
 @Component({
   selector: 'mh-mobile-fab',
   standalone: true,
-  imports: [Button],
+  imports: [ButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './mobile-fab.html',
   styleUrl: './mobile-fab.scss',

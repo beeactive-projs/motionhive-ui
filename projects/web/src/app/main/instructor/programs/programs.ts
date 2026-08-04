@@ -10,7 +10,7 @@ import {
 import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { IconField } from 'primeng/iconfield';
@@ -64,7 +64,7 @@ import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
     TitleCasePipe,
     FormsModule,
     RouterLink,
-    Button,
+    ButtonDirective,
     Card,
     ConfirmDialog,
     IconField,

@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, model, inject, signal } from '@angu
 import { FormBuilder, FormArray, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,7 +23,7 @@ import {
   selector: 'mh-become-instructor',
   imports: [
     DialogModule,
-    ButtonModule,
+    ButtonDirective,
     CheckboxModule,
     InputTextModule,
     TextareaModule,

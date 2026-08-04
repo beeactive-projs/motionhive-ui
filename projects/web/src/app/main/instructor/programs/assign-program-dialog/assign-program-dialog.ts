@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
 import { MessageService, SelectItem } from 'primeng/api';
@@ -53,7 +53,7 @@ type ClientOption = SelectItem<string> & {
   imports: [
     DatePipe,
     FormsModule,
-    Button,
+    ButtonDirective,
     DatePicker,
     Dialog,
     Select,

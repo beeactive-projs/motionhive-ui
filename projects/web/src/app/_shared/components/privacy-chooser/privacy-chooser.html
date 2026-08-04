@@ -4,9 +4,21 @@
   <span class="sr-only">{{ currentLabel() }} (locked)</span>
 </span>
 } @else {
-<p-button [icon]="currentIcon()" [text]="true" [rounded]="true" size="small" severity="secondary"
-  [disabled]="disabled()" [ariaLabel]="'Visibility: ' + currentLabel() + '. Change.'" [pTooltip]="currentLabel()"
-  tooltipPosition="top" (onClick)="toggle($event)" />
+<button pButton
+  type="button"
+  [text]="true"
+  [rounded]="true"
+  size="small"
+  severity="secondary"
+  [disabled]="disabled()"
+  [pTooltip]="currentLabel()"
+  tooltipPosition="top"
+  (click)="toggle($event)"
+  [attr.aria-label]="'Visibility: ' + currentLabel() + '. Change.'"
+  iconOnly
+>
+  <i [class]="currentIcon()"></i>
+</button>
 
 <p-popover #popover appendTo="body">
   <div class="privacy-chooser-options" role="listbox">

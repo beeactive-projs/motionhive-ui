@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -29,7 +29,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   imports: [
     DatePipe,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     TableModule,
     TagModule,
     SkeletonModule,

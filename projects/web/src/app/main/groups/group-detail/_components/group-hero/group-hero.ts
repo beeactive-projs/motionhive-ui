@@ -4,12 +4,12 @@ import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { GroupDetailContext } from '../../group-detail.context';
 
 @Component({
   selector: 'mh-group-hero',
-  imports: [Hex, BreadcrumbModule, TagModule, Card, Button],
+  imports: [Hex, BreadcrumbModule, TagModule, Card, ButtonDirective],
   templateUrl: './group-hero.html',
   styleUrl: './group-hero.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

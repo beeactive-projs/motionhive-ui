@@ -37,7 +37,7 @@ export class ListCard {
   readonly statusSeverity = input<TagSeverity>(TagSeverity.Secondary);
 
   /** Optional avatar image URL. Wins over initials/icon when present. */
-  readonly avatarImage = input<string | null>(null);
+  readonly avatarImage = input<string | null | undefined>(null);
   /** Optional avatar initials (first+last letter, e.g. "TU"). Falls
    *  back to `avatarIcon` when no initials are provided. */
   readonly avatarInitials = input<string | null>(null);

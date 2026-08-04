@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { countryNameFromCode } from 'core';
 import type { PublicUserProfile, ViewerMode } from 'core';
 import { ViewerMode as ViewerModes } from 'core';
@@ -28,7 +28,7 @@ import { ViewerMode as ViewerModes } from 'core';
  */
 @Component({
   selector: 'mh-user-side-panel',
-  imports: [DatePipe, Card, Button],
+  imports: [DatePipe, Card, ButtonDirective],
   templateUrl: './user-side-panel.html',
   styleUrl: './user-side-panel.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

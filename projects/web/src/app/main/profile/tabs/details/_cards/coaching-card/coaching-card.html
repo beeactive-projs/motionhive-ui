@@ -10,9 +10,20 @@
         <p-tag rounded value="Not accepting" severity="secondary" class="text-xs!" />
         }
       </div>
-      <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" severity="secondary"
-        pTooltip="Edit coaching profile" tooltipPosition="left" ariaLabel="Edit coaching profile"
-        (onClick)="showEditInstructor.set(true)" />
+      <button pButton
+        type="button"
+        [text]="true"
+        [rounded]="true"
+        size="small"
+        severity="secondary"
+        pTooltip="Edit coaching profile"
+        tooltipPosition="left"
+        (click)="showEditInstructor.set(true)"
+        aria-label="Edit coaching profile"
+        iconOnly
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
     </div>
     <p-divider />
   </ng-template>

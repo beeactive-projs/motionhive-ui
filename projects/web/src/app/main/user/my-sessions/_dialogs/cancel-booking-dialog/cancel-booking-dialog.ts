@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Message } from 'primeng/message';
 import { Textarea } from 'primeng/textarea';
@@ -31,7 +31,7 @@ import {
  */
 @Component({
   selector: 'mh-cancel-booking-dialog',
-  imports: [FormsModule, Dialog, Button, Message, Textarea, InputText],
+  imports: [FormsModule, Dialog, ButtonDirective, Message, Textarea, InputText],
   templateUrl: './cancel-booking-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

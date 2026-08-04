@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
 import { ErrorDialogService } from 'core';
 
 @Component({
   selector: 'mh-error-dialog',
-  imports: [DialogModule, ButtonModule],
+  imports: [DialogModule, ButtonDirective],
   templateUrl: './error-dialog.html',
   styleUrl: './error-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

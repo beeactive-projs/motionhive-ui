@@ -9,7 +9,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 // PrimeNG imports
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 
@@ -22,7 +22,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     PasswordModule,
     MessageModule,
     ThemeToggleComponent,

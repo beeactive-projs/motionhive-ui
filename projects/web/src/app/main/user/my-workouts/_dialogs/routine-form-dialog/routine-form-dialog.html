@@ -27,8 +27,10 @@
     <div>
       <div class="mb-2 flex items-center justify-between">
         <h4 class="m-0 font-heading text-[13px] font-semibold">Exercises</h4>
-        <p-button label="Add exercise" icon="pi pi-plus" severity="secondary" [text]="true" size="small"
-          (onClick)="openPicker()" />
+        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="openPicker()">
+          <i class="pi pi-plus"></i>
+          Add exercise
+        </button>
       </div>
 
       @if (exercises().length === 0) {
@@ -55,13 +57,47 @@
               <span class="truncate text-[13px] font-semibold">{{ e.exerciseName }}</span>
             </div>
             <div class="flex shrink-0 gap-0.5">
-              <p-button icon="pi pi-arrow-up" severity="secondary" [text]="true" rounded size="small" pTooltip="Move up"
-                ariaLabel="Move up" [disabled]="i === 0" (onClick)="moveUp(e.uiKey)" />
-              <p-button icon="pi pi-arrow-down" severity="secondary" [text]="true" rounded size="small"
-                pTooltip="Move down" ariaLabel="Move down" [disabled]="i === exercises().length - 1"
-                (onClick)="moveDown(e.uiKey)" />
-              <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Remove"
-                ariaLabel="Remove" (onClick)="removeExercise(e.uiKey)" />
+              <button pButton
+                type="button"
+                severity="secondary"
+                [text]="true"
+                rounded
+                size="small"
+                pTooltip="Move up"
+                [disabled]="i === 0"
+                (click)="moveUp(e.uiKey)"
+                aria-label="Move up"
+                iconOnly
+              >
+                <i class="pi pi-arrow-up"></i>
+              </button>
+              <button pButton
+                type="button"
+                severity="secondary"
+                [text]="true"
+                rounded
+                size="small"
+                pTooltip="Move down"
+                [disabled]="i === exercises().length - 1"
+                (click)="moveDown(e.uiKey)"
+                aria-label="Move down"
+                iconOnly
+              >
+                <i class="pi pi-arrow-down"></i>
+              </button>
+              <button pButton
+                type="button"
+                severity="danger"
+                [text]="true"
+                rounded
+                size="small"
+                pTooltip="Remove"
+                (click)="removeExercise(e.uiKey)"
+                aria-label="Remove"
+                iconOnly
+              >
+                <i class="pi pi-trash"></i>
+              </button>
             </div>
           </div>
           <div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -108,9 +144,11 @@
   </div>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
-    <p-button [label]="submitLabel()" icon="pi pi-check" [loading]="submitting()" [disabled]="!canSubmit()"
-      (onClick)="submit()" />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
+      <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      {{ submitLabel() }}
+    </button>
   </ng-template>
 </p-dialog>
 

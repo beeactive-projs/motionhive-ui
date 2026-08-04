@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import type { PublicInstructorProfile, ViewerMode } from 'core';
 import { countryNameFromCode, ViewerMode as ViewerModes } from 'core';
@@ -39,7 +39,7 @@ interface GlanceRow {
  */
 @Component({
   selector: 'mh-profile-side-rail',
-  imports: [DatePipe, Card, Button],
+  imports: [DatePipe, Card, ButtonDirective],
   templateUrl: './profile-side-rail.html',
   styleUrl: './profile-side-rail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

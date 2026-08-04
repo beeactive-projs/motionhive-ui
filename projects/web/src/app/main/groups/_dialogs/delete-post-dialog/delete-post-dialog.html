@@ -13,12 +13,11 @@
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" text [disabled]="submitting()" (onClick)="cancel()" />
-      <p-button
-        label="Delete"
-        severity="danger"
-        [loading]="submitting()"
-        (onClick)="submit()" />
+      <button pButton type="button" severity="secondary" text [disabled]="submitting()" (click)="cancel()">Cancel</button>
+      <button pButton type="button" severity="danger" (click)="submit()" [disabled]="submitting()">
+        @if (submitting()) {<i class="pi pi-spinner pi-spin"></i>}
+        Delete
+      </button>
     </div>
   </ng-template>
 </p-dialog>

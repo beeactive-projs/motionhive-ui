@@ -12,7 +12,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ProfileService, apiErrorMessage } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
@@ -28,7 +28,7 @@ const HANDLE_REGEX = /^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
 
 @Component({
   selector: 'mh-edit-handle',
-  imports: [FormsModule, Button, Dialog, InputText, Message],
+  imports: [FormsModule, ButtonDirective, Dialog, InputText, Message],
   templateUrl: './edit-handle.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

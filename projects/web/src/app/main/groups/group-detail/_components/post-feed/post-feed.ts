@@ -12,7 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { take } from 'rxjs';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
@@ -22,7 +22,7 @@ import { Divider } from "primeng/divider";
 
 @Component({
   selector: 'mh-post-feed',
-  imports: [Button, CardModule, SkeletonModule, PostCard, Divider],
+  imports: [ButtonDirective, CardModule, SkeletonModule, PostCard, Divider],
   templateUrl: './post-feed.html',
   styleUrl: './post-feed.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

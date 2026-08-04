@@ -27,8 +27,10 @@
         <td class="text-xs text-[var(--p-text-muted-color)]">{{ lastRun()[j.key] || '—' }}</td>
         <td class="text-right">
           @if (isSuperAdmin()) {
-            <p-button label="Run now" size="small" severity="secondary"
-              [loading]="triggering() === j.key" (onClick)="run(j)" />
+            <button pButton type="button" size="small" severity="secondary" (click)="run(j)" [disabled]="triggering() === j.key">
+              @if (triggering() === j.key) {<i class="pi pi-spinner pi-spin"></i>}
+              Run now
+            </button>
           }
         </td>
       </tr>

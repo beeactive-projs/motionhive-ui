@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -61,7 +61,7 @@ interface DraftExercise {
   standalone: true,
   imports: [
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Dialog,
     InputNumber,
     InputTextModule,

@@ -18,7 +18,7 @@ import {
   showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -31,7 +31,7 @@ import { UserInfo } from '../../../../_shared/components/user-info/user-info';
   selector: 'mh-add-members-dialog',
   imports: [
     FormsModule,
-    Button,
+    ButtonDirective,
     Dialog,
     InputText,
     UserInfo,

@@ -119,12 +119,10 @@
   </div>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="close()" />
-    <p-button
-      [label]="isEdit() ? 'Save changes' : 'Add venue'"
-      icon="pi pi-check"
-      [loading]="saving()"
-      (onClick)="save()"
-    />
+    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+    <button pButton type="button" (click)="save()" [disabled]="saving()">
+      <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      {{ isEdit() ? 'Save changes' : 'Add venue' }}
+    </button>
   </ng-template>
 </p-dialog>

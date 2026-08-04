@@ -12,7 +12,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CreateGroupPayload, Group, GroupService, JoinPolicy, UpdateGroupPayload } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Chip } from 'primeng/chip';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
@@ -27,7 +27,7 @@ interface JoinPolicyOption {
 
 @Component({
   selector: 'mh-group-form-dialog',
-  imports: [FormsModule, Button, Chip, Dialog, InputText, Select, TextareaModule, ToggleSwitch],
+  imports: [FormsModule, ButtonDirective, Chip, Dialog, InputText, Select, TextareaModule, ToggleSwitch],
   templateUrl: './group-form-dialog.html',
   styleUrl: './group-form-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -50,16 +50,25 @@
 
       <div class="cta-row flex flex-wrap items-center gap-2 mt-1">
         @if (isOwner()) {
-        <p-button label="Share my profile" icon="pi pi-share-alt" (onClick)="share.emit()" />
-        <p-button label="Edit profile" icon="pi pi-pencil" severity="secondary" outlined routerLink="/profile" />
+        <button pButton type="button" (click)="share.emit()"><i class="pi pi-share-alt"></i> Share my profile</button>
+        <button pButton type="button" severity="secondary" outlined routerLink="/profile"><i class="pi pi-pencil"></i> Edit profile</button>
         } @else if (showInstructorCtas()) {
-        <p-button [label]="contactLabel()" icon="pi pi-envelope" (onClick)="message.emit()" />
-        <p-button label="Book a session" icon="pi pi-calendar" severity="secondary" outlined (onClick)="book.emit()" />
-        <p-button icon="pi pi-bookmark" severity="secondary" text ariaLabel="Save profile" (onClick)="save.emit()" />
-        <p-button icon="pi pi-share-alt" severity="secondary" text ariaLabel="Share profile" (onClick)="share.emit()" />
+        <button pButton type="button" (click)="message.emit()"><i class="pi pi-envelope"></i> {{ contactLabel() }}</button>
+        <button pButton type="button" severity="secondary" outlined (click)="book.emit()">
+          <i class="pi pi-calendar"></i>
+          Book a session
+        </button>
+        <button pButton type="button" severity="secondary" text (click)="save.emit()" aria-label="Save profile" iconOnly>
+          <i class="pi pi-bookmark"></i>
+        </button>
+        <button pButton type="button" severity="secondary" text (click)="share.emit()" aria-label="Share profile" iconOnly>
+          <i class="pi pi-share-alt"></i>
+        </button>
         } @else if (showUserCtas()) {
-        <p-button label="Message" icon="pi pi-envelope" (onClick)="message.emit()" />
-        <p-button icon="pi pi-share-alt" severity="secondary" text ariaLabel="Share profile" (onClick)="share.emit()" />
+        <button pButton type="button" (click)="message.emit()"><i class="pi pi-envelope"></i> Message</button>
+        <button pButton type="button" severity="secondary" text (click)="share.emit()" aria-label="Share profile" iconOnly>
+          <i class="pi pi-share-alt"></i>
+        </button>
         }
       </div>
     </div>

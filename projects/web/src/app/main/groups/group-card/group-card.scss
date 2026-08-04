@@ -92,20 +92,20 @@
   border-radius: 6px;
 }
 
-/* p-button host — kebab sits at top-right of its flex row */
-::ng-deep p-button.gp-kebab {
+/* kebab sits at top-right of its flex row */
+.p-button.gp-kebab {
   align-self: flex-start;
   margin-left: auto;
 }
 
-/* p-button host — visit link: tighten inner button padding */
-::ng-deep p-button.gp-visit .p-button {
+/* visit link: tighten button padding */
+.p-button.gp-visit {
   padding: 0;
   font-size: 13px;
   font-weight: 600;
 }
 
-/* p-avatarGroup circles — scoped via footer wrapper */
+/* p-avatar-group circles — scoped via footer wrapper */
 :host ::ng-deep .gp-foot .p-avatar {
   width: 26px;
   height: 26px;

@@ -2,11 +2,14 @@
   <div class="flex flex-col gap-4 pb-6">
 
     <!-- Back -->
-    <!-- <p-button icon="pi pi-arrow-left" label="Clients" [text]="true" size="small" styleClass="pl-0 self-start"
-      (onClick)="goBack()" /> -->
+    <!-- <button pButton type="button" [text]="true" size="small" (click)="goBack()" class="pl-0 self-start">
+      <i class="pi pi-arrow-left"></i>
+      Clients
+    </button> -->
 
-    <p-button icon="pi pi-arrow-left" rounded text severity="secondary" (onClick)="goBack()"
-      pTooltip="Back to Groups" />
+    <button pButton type="button" rounded text severity="secondary" pTooltip="Back to Groups" (click)="goBack()" iconOnly>
+      <i class="pi pi-arrow-left"></i>
+    </button>
 
     @if (client(); as c) {
     <div class="flex flex-col lg:flex-row gap-4 items-start">
@@ -59,14 +62,20 @@
           <div class="my-4 border-t border-surface-200 dark:border-surface-700"></div>
           <div class="flex flex-col gap-1">
             @if (c.status === Statuses.Active) {
-            <p-button label="Edit notes" icon="pi pi-pencil" severity="secondary" fluid [outlined]="true"
-              (onClick)="openNotesDialog()" />
-            <p-button label="Archive client" icon="pi pi-inbox" severity="danger" fluid [text]="true"
-              (onClick)="confirmArchive()" />
+            <button pButton type="button" severity="secondary" fluid [outlined]="true" (click)="openNotesDialog()">
+              <i class="pi pi-pencil"></i>
+              Edit notes
+            </button>
+            <button pButton type="button" severity="danger" fluid [text]="true" (click)="confirmArchive()">
+              <i class="pi pi-inbox"></i>
+              Archive client
+            </button>
             }
             @if (c.status === Statuses.Archived) {
-            <p-button label="Unarchive client" icon="pi pi-inbox" severity="success" fluid
-              (onClick)="confirmUnarchive()" />
+            <button pButton type="button" severity="success" fluid (click)="confirmUnarchive()">
+              <i class="pi pi-inbox"></i>
+              Unarchive client
+            </button>
             }
           </div>
           }
@@ -80,9 +89,18 @@
         <!-- Tab strip -->
         <div class="flex items-center gap-2 flex-wrap">
           @for (tab of tabs; track tab.value) {
-          <p-button [label]="tab.label" [icon]="tab.icon"
-            [severity]="activeTab() === tab.value ? 'primary' : 'secondary'" [text]="activeTab() !== tab.value"
-            size="small" rounded styleClass="py-0.5" (onClick)="activeTab.set(tab.value)" />
+          <button pButton
+            type="button"
+            [severity]="activeTab() === tab.value ? 'primary' : 'secondary'"
+            [text]="activeTab() !== tab.value"
+            size="small"
+            rounded
+            (click)="activeTab.set(tab.value)"
+            class="py-0.5"
+          >
+            <i [class]="tab.icon"></i>
+            {{ tab.label }}
+          </button>
           }
         </div>
 
@@ -97,8 +115,9 @@
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-semibold">Notes</h3>
               @if (c.status === Statuses.Active) {
-              <p-button icon="pi pi-pencil" [text]="true" size="small" severity="secondary"
-                (onClick)="openNotesDialog()" />
+              <button pButton type="button" [text]="true" size="small" severity="secondary" (click)="openNotesDialog()" iconOnly>
+                <i class="pi pi-pencil"></i>
+              </button>
               }
             </div>
             @if (c.notes) {
@@ -206,35 +225,42 @@
               </div>
               <div class="flex items-center gap-1 shrink-0">
                 @if (a.status === 'ACTIVE') {
-                <p-button
-                  icon="pi pi-pause"
-                  label="Pause"
+                <button pButton
+                  type="button"
                   severity="secondary"
                   [outlined]="true"
                   size="small"
-                  [loading]="assignmentMutatingId() === a.id"
-                  (onClick)="pauseAssignment(a)"
-                />
+                  (click)="pauseAssignment(a)"
+                  [disabled]="assignmentMutatingId() === a.id"
+                >
+                  <i class="pi" [class]="assignmentMutatingId() === a.id ? 'pi-spinner pi-spin' : 'pi-pause'"></i>
+                  Pause
+                </button>
                 } @else if (a.status === 'PAUSED') {
-                <p-button
-                  icon="pi pi-play"
-                  label="Resume"
+                <button pButton
+                  type="button"
                   severity="success"
                   size="small"
-                  [loading]="assignmentMutatingId() === a.id"
-                  (onClick)="resumeAssignment(a)"
-                />
+                  (click)="resumeAssignment(a)"
+                  [disabled]="assignmentMutatingId() === a.id"
+                >
+                  <i class="pi" [class]="assignmentMutatingId() === a.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
+                  Resume
+                </button>
                 }
                 @if (!isAssignmentTerminal(a)) {
-                <p-button
-                  icon="pi pi-times"
+                <button pButton
+                  type="button"
                   pTooltip="Cancel plan"
                   severity="danger"
                   [text]="true"
                   size="small"
                   [disabled]="assignmentMutatingId() === a.id"
-                  (onClick)="confirmCancelAssignment(a)"
-                />
+                  (click)="confirmCancelAssignment(a)"
+                  iconOnly
+                >
+                  <i class="pi pi-times"></i>
+                </button>
                 }
               </div>
             </li>
@@ -312,7 +338,7 @@
       <i class="pi pi-user text-4xl text-surface-300"></i>
       <h2 class="text-lg font-semibold text-surface-500">Client not found</h2>
       <p class="text-sm text-surface-400">Navigate from the clients list to view a profile.</p>
-      <p-button label="Go to clients" icon="pi pi-arrow-left" (onClick)="goBack()" />
+      <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Go to clients</button>
     </div>
     }
 
@@ -322,4 +348,4 @@
 <mh-edit-client-notes-dialog [(visible)]="showNotesDialog" [client]="client()" (saved)="onNotesSaved()" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

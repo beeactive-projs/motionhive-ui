@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { StripeOnboardingService } from 'core';
 
 @Component({
   selector: 'mh-onboarding-refresh',
-  imports: [CardModule, ProgressSpinnerModule, ButtonModule],
+  imports: [CardModule, ProgressSpinnerModule, ButtonDirective],
   templateUrl: './onboarding-refresh.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

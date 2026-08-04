@@ -8,7 +8,7 @@ import {
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
@@ -60,7 +60,6 @@ export interface RailWeekDrop {
     CdkDropList,
     CdkScrollable,
     FormsModule,
-    Button,
     ButtonDirective,
     IconField,
     InputIcon,

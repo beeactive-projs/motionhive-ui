@@ -4,8 +4,19 @@
   <!-- Header · close + title + subtitle (mirrors the session showcase) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-times" outlined rounded severity="secondary" size="small" ariaLabel="Finish & exit"
-        pTooltip="Finish & exit" (onClick)="confirmComplete()" />
+      <button pButton
+        type="button"
+        outlined
+        rounded
+        severity="secondary"
+        size="small"
+        pTooltip="Finish & exit"
+        (click)="confirmComplete()"
+        aria-label="Finish & exit"
+        iconOnly
+      >
+        <i class="pi pi-times"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ l?.name ?? 'Workout' }}</h1>
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
@@ -81,9 +92,20 @@
               {{ exerciseProgressLabel(ex) }}{{ isExerciseDone(ex) ? ' done' : '' }}
             </div>
           </div>
-          <p-button icon="pi pi-times-circle" severity="secondary" [text]="true" rounded size="small"
-            pTooltip="Skip exercise" ariaLabel="Skip exercise" [disabled]="isComplete()"
-            (onClick)="confirmRemoveExercise(ex)" />
+          <button pButton
+            type="button"
+            severity="secondary"
+            [text]="true"
+            rounded
+            size="small"
+            pTooltip="Skip exercise"
+            [disabled]="isComplete()"
+            (click)="confirmRemoveExercise(ex)"
+            aria-label="Skip exercise"
+            iconOnly
+          >
+            <i class="pi pi-times-circle"></i>
+          </button>
         </div>
 
         <!-- Last-time hint (current exercise) -->
@@ -122,10 +144,19 @@
                   [disabled]="isComplete()" (blur)="onRepsBlur(ex, s, $any($event.target).value)" />
               </td>
               <td class="text-center">
-                <p-button [icon]="s.isCompleted ? 'pi pi-check' : 'pi pi-circle'" rounded size="small"
-                  [severity]="s.isCompleted ? 'success' : 'secondary'" [outlined]="!s.isCompleted"
-                  [disabled]="isComplete()" [ariaLabel]="s.isCompleted ? 'Mark set incomplete' : 'Mark set done'"
-                  (onClick)="toggleComplete(ex, s)" />
+                <button pButton
+                  type="button"
+                  rounded
+                  size="small"
+                  [severity]="s.isCompleted ? 'success' : 'secondary'"
+                  [outlined]="!s.isCompleted"
+                  [disabled]="isComplete()"
+                  (click)="toggleComplete(ex, s)"
+                  [attr.aria-label]="s.isCompleted ? 'Mark set incomplete' : 'Mark set done'"
+                  iconOnly
+                >
+                  <i [class]="s.isCompleted ? 'pi pi-check' : 'pi pi-circle'"></i>
+                </button>
               </td>
             </tr>
           </ng-template>
@@ -133,8 +164,10 @@
 
         @if (!isComplete()) {
         <div class="p-2">
-          <p-button label="Add set" icon="pi pi-plus" severity="secondary" [text]="true" size="small" fluid
-            (onClick)="addSet(ex)" />
+          <button pButton type="button" severity="secondary" [text]="true" size="small" fluid (click)="addSet(ex)">
+            <i class="pi pi-plus"></i>
+            Add set
+          </button>
         </div>
         }
         }
@@ -142,8 +175,10 @@
       }
 
       @if (!isComplete()) {
-      <p-button label="Add exercise" icon="pi pi-plus" severity="secondary" [outlined]="true" fluid
-        (onClick)="openAddExercise()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" fluid (click)="openAddExercise()">
+        <i class="pi pi-plus"></i>
+        Add exercise
+      </button>
       }
       }
     </div>
@@ -214,10 +249,21 @@
         }
       </div>
       <div class="flex shrink-0 items-center gap-0.5">
-        <p-button label="−10" severity="secondary" [text]="true" size="small" (onClick)="restMinus()" />
-        <p-button label="+10" severity="secondary" [text]="true" size="small" (onClick)="restPlus()" />
-        <p-button icon="pi pi-forward" severity="secondary" [text]="true" rounded size="small" pTooltip="Skip rest"
-          ariaLabel="Skip rest" (onClick)="restSkip()" />
+        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="restMinus()">−10</button>
+        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="restPlus()">+10</button>
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Skip rest"
+          (click)="restSkip()"
+          aria-label="Skip rest"
+          iconOnly
+        >
+          <i class="pi pi-forward"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -225,8 +271,10 @@
 </ng-template>
 
 <ng-template #completeAction>
-  <p-button [label]="isFreestyle() ? 'Finish & save' : 'Complete workout'" icon="pi pi-flag-fill" severity="success"
-    [loading]="completing()" (onClick)="confirmComplete()" fluid />
+  <button pButton type="button" severity="success" fluid (click)="confirmComplete()" [disabled]="completing()">
+    <i class="pi" [class]="completing() ? 'pi-spinner pi-spin' : 'pi-flag-fill'"></i>
+    {{ isFreestyle() ? 'Finish & save' : 'Complete workout' }}
+  </button>
 </ng-template>
 
 <p-toast position="top-right" />

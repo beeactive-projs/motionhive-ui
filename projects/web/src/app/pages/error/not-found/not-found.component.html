@@ -25,15 +25,13 @@
     </p>
 
     <div class="flex flex-wrap justify-center gap-2 mb-10">
-      <p-button routerLink="/auth/login" icon="pi pi-sign-in" label="Sign In">
-      </p-button>
-      <p-button routerLink="/auth/signup" icon="pi pi-user-plus" label="Sign Up" severity="secondary" outlined>
-      </p-button>
+      <button pButton type="button" routerLink="/auth/login"><i class="pi pi-sign-in"></i> Sign In</button>
+      <button pButton type="button" routerLink="/auth/signup" severity="secondary" outlined><i class="pi pi-user-plus"></i> Sign Up</button>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-3 justify-center">
-      <p-button severity="secondary" outlined label="Back to Homepage" icon="pi pi-home" (onClick)="goHome()" />
-      <p-button severity="secondary" outlined label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" />
+      <button pButton type="button" severity="secondary" outlined (click)="goHome()"><i class="pi pi-home"></i> Back to Homepage</button>
+      <button pButton type="button" severity="secondary" outlined (click)="goBack()"><i class="pi pi-arrow-left"></i> Go Back</button>
     </div>
 
   </div>

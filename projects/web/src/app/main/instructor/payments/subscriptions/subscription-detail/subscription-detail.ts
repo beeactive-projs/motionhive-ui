@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -44,7 +44,7 @@ import {
   imports: [
     DatePipe,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     InputText,
     TagModule,
     SkeletonModule,

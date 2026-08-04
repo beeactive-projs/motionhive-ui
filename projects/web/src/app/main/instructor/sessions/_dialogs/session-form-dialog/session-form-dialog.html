@@ -220,7 +220,7 @@
 
         <div class="mh-sf__field">
           <label>Duration (min)</label>
-          <p-inputNumber
+          <p-inputnumber
             [ngModel]="form().durationMinutes"
             (ngModelChange)="updateField('durationMinutes', $event ?? 60)"
             [min]="5"
@@ -283,7 +283,7 @@
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
           <label>Capacity (blank = unlimited)</label>
-          <p-inputNumber
+          <p-inputnumber
             [ngModel]="form().capacity"
             (ngModelChange)="updateField('capacity', $event)"
             [min]="1"
@@ -295,7 +295,7 @@
 
         <div class="mh-sf__field">
           <label>Cancel cutoff (hours)</label>
-          <p-inputNumber
+          <p-inputnumber
             [ngModel]="form().cancellationCutoffHours"
             (ngModelChange)="updateField('cancellationCutoffHours', $event ?? 24)"
             [min]="0"
@@ -328,7 +328,7 @@
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
           <label>Amount</label>
-          <p-inputNumber
+          <p-inputnumber
             [ngModel]="form().priceAmountCents / 100"
             (ngModelChange)="updateField('priceAmountCents', ($event ?? 0) * 100)"
             mode="decimal"
@@ -358,17 +358,9 @@
 
 <!-- ─── Footer buttons (shared) ─────────────────────────────────── -->
 <ng-template #formFoot>
-  <p-button
-    label="Cancel"
-    severity="secondary"
-    [text]="true"
-    (onClick)="close()"
-  />
-  <p-button
-    [label]="isEdit() ? 'Save changes' : 'Create session'"
-    [loading]="saving()"
-    icon="pi pi-check"
-    (onClick)="save()"
-    styleClass="mh-sf__primary"
-  />
+  <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+  <button pButton type="button" (click)="save()" class="mh-sf__primary" [disabled]="saving()">
+    <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+    {{ isEdit() ? 'Save changes' : 'Create session' }}
+  </button>
 </ng-template>

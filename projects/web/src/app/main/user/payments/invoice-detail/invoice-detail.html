@@ -59,13 +59,10 @@
         <div class="flex flex-wrap gap-2">
           @if (inv.invoicePdf) {
             <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
-              <p-button
-                label="Download invoice PDF"
-                icon="pi pi-download"
-                severity="secondary"
-                [outlined]="true"
-                size="small"
-              />
+              <button pButton type="button" severity="secondary" [outlined]="true" size="small">
+                <i class="pi pi-download"></i>
+                Download invoice PDF
+              </button>
             </a>
           }
         </div>
@@ -209,15 +206,10 @@
               </span>
             </label>
 
-            <p-button
-              label="Pay now"
-              icon="pi pi-credit-card"
-              size="small"
-              [loading]="payLoading()"
-              [disabled]="!consentChecked"
-              (onClick)="payInvoice()"
-              styleClass="w-full"
-            />
+            <button pButton type="button" size="small" [disabled]="(!consentChecked) || payLoading()" fluid (click)="payInvoice()">
+              <i class="pi" [class]="payLoading() ? 'pi-spinner pi-spin' : 'pi-credit-card'"></i>
+              Pay now
+            </button>
           </section>
         }
 

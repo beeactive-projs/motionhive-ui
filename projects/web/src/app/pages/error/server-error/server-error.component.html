@@ -25,9 +25,9 @@
     </p>
 
     <div class="flex flex-wrap justify-center gap-3 mb-10">
-      <p-button label="Go Home" icon="pi pi-home" (onClick)="goHome()" />
-      <p-button label="Try Again" icon="pi pi-refresh" severity="secondary" outlined (onClick)="retry()" />
-      <p-button severity="secondary" outlined label="Go Back" icon="pi pi-arrow-left" (onClick)="goBack()" />
+      <button pButton type="button" (click)="goHome()"><i class="pi pi-home"></i> Go Home</button>
+      <button pButton type="button" severity="secondary" outlined (click)="retry()"><i class="pi pi-refresh"></i> Try Again</button>
+      <button pButton type="button" severity="secondary" outlined (click)="goBack()"><i class="pi pi-arrow-left"></i> Go Back</button>
     </div>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-surface-500">

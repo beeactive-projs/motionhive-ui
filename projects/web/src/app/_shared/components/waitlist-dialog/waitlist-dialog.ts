@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { take } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
@@ -13,7 +13,7 @@ import { WaitlistService, WaitlistRole } from 'core';
   selector: 'mh-waitlist-dialog',
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
+    ButtonDirective,
     DialogModule,
     InputTextModule,
     MessageModule,

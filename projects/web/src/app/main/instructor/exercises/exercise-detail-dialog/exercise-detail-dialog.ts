@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Dialog } from 'primeng/dialog';
 import { Tag } from 'primeng/tag';
@@ -52,7 +52,7 @@ import {
 @Component({
   selector: 'mh-exercise-detail-dialog',
   standalone: true,
-  imports: [ButtonModule, ConfirmDialog, Dialog, Tag, TooltipModule, TitleCasePipe, YoutubeEmbed],
+  imports: [ButtonDirective, ConfirmDialog, Dialog, Tag, TooltipModule, TitleCasePipe, YoutubeEmbed],
   providers: [ConfirmationService],
   templateUrl: './exercise-detail-dialog.html',
   styleUrl: './exercise-detail-dialog.scss',

@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ProgressBar } from 'primeng/progressbar';
 import { Tag } from 'primeng/tag';
@@ -47,7 +47,7 @@ type PlanRowTone = (typeof PlanRowTone)[keyof typeof PlanRowTone];
 @Component({
   selector: 'mh-my-plan-row',
   standalone: true,
-  imports: [DatePipe, Button, Card, ProgressBar, Tag, HexAvatar],
+  imports: [DatePipe, ButtonDirective, Card, ProgressBar, Tag, HexAvatar],
   templateUrl: './my-plan-row.html',
   styleUrl: './my-plan-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

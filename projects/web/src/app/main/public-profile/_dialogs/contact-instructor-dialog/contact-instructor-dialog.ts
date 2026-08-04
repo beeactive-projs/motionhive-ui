@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
@@ -46,7 +46,7 @@ interface PillOption<T extends string> {
  */
 @Component({
   selector: 'mh-contact-instructor-dialog',
-  imports: [ReactiveFormsModule, Dialog, Button, InputText, Message, Textarea, Avatar, PhoneInput],
+  imports: [ReactiveFormsModule, Dialog, ButtonDirective, InputText, Message, Textarea, Avatar, PhoneInput],
   providers: [MessageService],
   templateUrl: './contact-instructor-dialog.html',
   styleUrl: './contact-instructor-dialog.scss',

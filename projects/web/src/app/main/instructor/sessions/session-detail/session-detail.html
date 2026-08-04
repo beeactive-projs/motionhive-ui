@@ -5,8 +5,9 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" text rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ?? 'Session' }}</h1>
         @if (inst && tpl) {
@@ -21,19 +22,49 @@
       @if (inst && tpl) {
       @if (inst.status === SessionStatus.Scheduled) {
         @if (isMobile()) {
-        <p-button icon="pi pi-ellipsis-v" outlined rounded severity="secondary" size="small" ariaLabel="More actions"
-          (onClick)="openActionsSheet()" />
+        <button pButton
+          type="button"
+          outlined
+          rounded
+          severity="secondary"
+          size="small"
+          (click)="openActionsSheet()"
+          aria-label="More actions"
+          iconOnly
+        >
+          <i class="pi pi-ellipsis-v"></i>
+        </button>
         } @else {
-        <p-button label="Calendar" icon="pi pi-calendar" outlined severity="secondary"
-          [size]="isTablet() ? 'small' : undefined" routerLink="/coaching/sessions/calendar" />
+        <button pButton
+          type="button"
+          outlined
+          severity="secondary"
+          [size]="isTablet() ? 'small' : undefined"
+          routerLink="/coaching/sessions/calendar"
+        >
+          <i class="pi pi-calendar"></i>
+          Calendar
+        </button>
         @if (canMessageParticipants()) {
-        <p-button label="Message" icon="pi pi-send" outlined severity="secondary"
-          [size]="isTablet() ? 'small' : undefined" (onClick)="messageOpen.set(true)" />
+        <button pButton
+          type="button"
+          outlined
+          severity="secondary"
+          [size]="isTablet() ? 'small' : undefined"
+          (click)="messageOpen.set(true)"
+        >
+          <i class="pi pi-send"></i>
+          Message
+        </button>
         }
-        <p-button label="Edit" icon="pi pi-pencil" outlined severity="secondary"
-          [size]="isTablet() ? 'small' : undefined" (onClick)="editOpen.set(true)" />
-        <p-button label="Cancel" icon="pi pi-times" text severity="danger"
-          [size]="isTablet() ? 'small' : undefined" (onClick)="cancelOpen.set(true)" />
+        <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="editOpen.set(true)">
+          <i class="pi pi-pencil"></i>
+          Edit
+        </button>
+        <button pButton type="button" text severity="danger" [size]="isTablet() ? 'small' : undefined" (click)="cancelOpen.set(true)">
+          <i class="pi pi-times"></i>
+          Cancel
+        </button>
         }
       } @else {
       <p-tag [value]="statusLabel(inst.status)"
@@ -110,7 +141,10 @@
           <i class="pi pi-video text-(--p-primary-500)"></i>
           <code class="bg-transparent break-all text-color">{{ inst.meetingUrlOverride ?? tpl.meetingUrl }}</code>
         </div>
-        <p-button label="Copy link" icon="pi pi-copy" severity="secondary" [outlined]="true" size="small" (onClick)="copyMeetingUrl(inst, tpl)" />
+        <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="copyMeetingUrl(inst, tpl)">
+          <i class="pi pi-copy"></i>
+          Copy link
+        </button>
       </div>
       } @else if (inst.venueOverride || tpl.venue) {
       @let v = inst.venueOverride ?? tpl.venue!;

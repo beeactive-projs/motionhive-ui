@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { DividerModule } from 'primeng/divider';
@@ -35,7 +35,7 @@ import { BellNotification, NotificationStore } from 'core';
 @Component({
   selector: 'mh-notification-bell',
   imports: [
-    ButtonModule,
+    ButtonDirective,
     PopoverModule,
     OverlayBadgeModule,
     DividerModule,

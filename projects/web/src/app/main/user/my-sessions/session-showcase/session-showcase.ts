@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
 import { Message } from 'primeng/message';
@@ -56,7 +56,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   imports: [
     DatePipe,
     CurrencyRonPipe,
-    Button,
+    ButtonDirective,
     Card,
     Divider,
     Message,

@@ -23,7 +23,7 @@ import {
   showApiError,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Tag } from 'primeng/tag';
@@ -37,7 +37,7 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
   imports: [
     DatePipe,
     Avatar,
-    Button,
+    ButtonDirective,
     Card,
     Tag,
     Toast,

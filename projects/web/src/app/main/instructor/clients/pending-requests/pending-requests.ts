@@ -26,7 +26,7 @@ import {
 import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -44,7 +44,7 @@ import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-c
   imports: [
     DatePipe,
     BreadcrumbModule,
-    ButtonModule,
+    ButtonDirective,
     TableModule,
     TagModule,
     UserInfo,

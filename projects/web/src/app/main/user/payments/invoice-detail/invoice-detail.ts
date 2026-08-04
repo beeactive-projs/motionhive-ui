@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -48,7 +48,7 @@ interface ActivityEntry {
     DatePipe,
     RouterLink,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     TagModule,
     SkeletonModule,
     ToastModule,

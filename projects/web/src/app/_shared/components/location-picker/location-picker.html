@@ -7,13 +7,7 @@
       {{ format(loc) }}
     </span>
     @if (!disabled()) {
-      <p-button
-        label="Change"
-        severity="secondary"
-        [text]="true"
-        size="small"
-        (onClick)="clear()"
-      />
+      <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="clear()">Change</button>
     } @else {
       <i class="pi pi-lock text-surface-400 text-sm" aria-label="Locked"></i>
     }

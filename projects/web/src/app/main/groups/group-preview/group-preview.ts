@@ -23,7 +23,7 @@ import {
 } from 'core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { Message } from 'primeng/message';
@@ -41,7 +41,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
     Hex,
     HexAvatar,
     BreadcrumbModule,
-    Button,
+    ButtonDirective,
     Card,
     DividerModule,
     Message,

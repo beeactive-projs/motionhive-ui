@@ -24,17 +24,11 @@
 
   <ng-template #footer>
     <div class="flex gap-2 justify-end">
-      <p-button
-        label="Cancel"
-        severity="secondary"
-        text
-        [disabled]="submitting()"
-        (onClick)="cancel()" />
-      <p-button
-        label="Send request"
-        icon="pi pi-send"
-        [loading]="submitting()"
-        (onClick)="send()" />
+      <button pButton type="button" severity="secondary" text [disabled]="submitting()" (click)="cancel()">Cancel</button>
+      <button pButton type="button" (click)="send()" [disabled]="submitting()">
+        <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+        Send request
+      </button>
     </div>
   </ng-template>
 </p-dialog>

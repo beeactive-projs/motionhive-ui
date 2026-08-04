@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { BLOG_COVER_PRESETS, BlogPost, withCloudinaryTransform } from 'core';
 
 /**
@@ -10,7 +10,7 @@ import { BLOG_COVER_PRESETS, BlogPost, withCloudinaryTransform } from 'core';
  */
 @Component({
   selector: 'mh-blog-card',
-  imports: [ButtonModule],
+  imports: [ButtonDirective],
   templateUrl: './blog-card.html',
   styleUrl: './blog-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -2,13 +2,13 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, signal, OnDestroy }
 import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { StripeOnboardingService, deriveStripeAccountStatus, StripeAccountStatuses } from 'core';
 
 @Component({
   selector: 'mh-onboarding-return',
-  imports: [CardModule, ProgressSpinnerModule, ButtonModule, TagModule],
+  imports: [CardModule, ProgressSpinnerModule, ButtonDirective, TagModule],
   templateUrl: './onboarding-return.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import {
   DateWindowsMs,
@@ -37,7 +37,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
 @Component({
   selector: 'mh-instructor-approvals',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule, TagModule, ListEmptyState],
+  imports: [CommonModule, RouterLink, ButtonDirective, TagModule, ListEmptyState],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

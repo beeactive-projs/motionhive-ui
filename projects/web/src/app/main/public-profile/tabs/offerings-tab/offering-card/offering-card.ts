@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { getProductBillingLabel } from 'core';
@@ -16,7 +16,7 @@ interface ProductWithMeta extends Product {
  */
 @Component({
   selector: 'mh-offering-card',
-  imports: [Button, Card, TagModule],
+  imports: [ButtonDirective, Card, TagModule],
   templateUrl: './offering-card.html',
   styleUrl: './offering-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

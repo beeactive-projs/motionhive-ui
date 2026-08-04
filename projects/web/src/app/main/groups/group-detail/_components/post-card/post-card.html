@@ -45,8 +45,10 @@
     <!-- Action bar -->
     <div class="flex items-center gap-2 pt-1">
       <mh-post-reaction-bar [post]="post()" />
-      <p-button icon="pi pi-comment" [label]="post().commentCount > 0 ? post().commentCount.toString() : 'Comment'" text
-        severity="secondary" size="small" rounded (onClick)="toggleComments()" />
+      <button pButton type="button" text severity="secondary" size="small" rounded (click)="toggleComments()">
+        <i class="pi pi-comment"></i>
+        {{ post().commentCount > 0 ? post().commentCount.toString() : 'Comment' }}
+      </button>
     </div>
 
     <!-- Comments section (collapsible) -->

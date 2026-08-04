@@ -7,7 +7,7 @@ import {
   model,
   signal,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
@@ -39,7 +39,7 @@ interface ShareTile {
  */
 @Component({
   selector: 'mh-share-dialog',
-  imports: [Dialog, Button, InputText, Toast],
+  imports: [Dialog, ButtonDirective, InputText, Toast],
   providers: [MessageService],
   templateUrl: './share-dialog.html',
   styleUrl: './share-dialog.scss',

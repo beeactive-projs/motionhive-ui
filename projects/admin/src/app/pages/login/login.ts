@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
@@ -30,7 +30,7 @@ import {
   selector: 'mh-admin-login',
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
+    ButtonDirective,
     InputTextModule,
     PasswordModule,
     MessageModule,

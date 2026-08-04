@@ -11,7 +11,7 @@ MotionHive fitness platform frontend. Angular monorepo with three projects:
 - **`website`** — public marketing site (home, about, blog, contact, legal pages, tools like calorie calculator, feedback/waitlist dialogs). Uses `PublicLayout`. **Separate Angular application**, not a section of `web`.
 - **Future: Ionic mobile app** — planned, not yet scaffolded. When it lands, anything shared across web + website + mobile belongs in `core`.
 
-**Tech Stack**: Angular 21, PrimeNG 21 (Lara preset), Tailwind CSS 4 + PrimeUI, ngx-translate, Vitest
+**Tech Stack**: Angular 22, PrimeNG 22 (Lara preset), Tailwind CSS 4 + PrimeUI, ngx-translate, Vitest
 
 ## Commands
 
@@ -129,7 +129,7 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 
 ### Brand & color discipline
 
-- **Honey/amber (the primary colour) is reserved for actions and the current selection — never for status.** It carries: primary CTAs (`p-button` default), and the *selected*/active accent (active nav row, active conversation row). It must NOT signal a state. When you're tempted to colour a badge amber to mean "unpaid"/"pending"/"recurring", stop — use a neutral or semantic colour instead, or honey stops reading as "click here".
+- **Honey/amber (the primary colour) is reserved for actions and the current selection — never for status.** It carries: primary CTAs (`pButton` default), and the *selected*/active accent (active nav row, active conversation row). It must NOT signal a state. When you're tempted to colour a badge amber to mean "unpaid"/"pending"/"recurring", stop — use a neutral or semantic colour instead, or honey stops reading as "click here".
 - **Status colours are neutral or semantic, not brand:** awaiting/neutral states → `secondary` (neutral slate); success/paid → `success` (green); error/void → `danger` (desaturated). Invoice + subscription status colours have a single source of truth in [`status-severity.ts`](projects/core/src/lib/models/payment/status-severity.ts) — change it there, not per-component.
 - **Brand surface rule — navy on light, honey on dark.** The logo (`mh-logo` in core) and the honeycomb background both follow this: navy mark/pattern on light surfaces, honey on dark. Apply it consistently across `web` and `website`; never hand-set the wordmark colour or invert the honeycomb per app.
 - **Read-only tags must not carry caret/chevron icons** (`pi-angle-down`, `pi-chevron-*`, etc.) — they read as an interactive dropdown. Icons on a static `p-tag` should be semantic (a lock, a globe), not directional.
@@ -205,8 +205,8 @@ method(): TagSeverity {
 
 Do not add custom CSS for things Tailwind can handle (flex, gap, padding, font-size, font-weight, overflow, text-overflow, whitespace, cursor, width, transitions, etc.). Keep `.scss` files minimal — only add rules that genuinely cannot be expressed with utility classes.
 
-**Never use plain HTML interactive elements when a PrimeNG equivalent exists — no exceptions, even when wrapping other components or building custom UI:**
-`<button>` → `p-button`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `<textarea pTextArea>`, `<a>` (interactive) → `p-button` with `routerLink`
+**Never use unstyled HTML interactive elements when a PrimeNG equivalent exists — no exceptions, even when wrapping other components or building custom UI:**
+`<button>` → `<button pButton>`, `<input>` → `p-inputtext` / `p-inputnumber` / `p-checkbox` / `p-radiobutton` / `p-datepicker`, `<select>` → `p-select`, `<textarea>` → `<textarea pTextArea>`, `<a>` (interactive) → `<button pButton routerLink="...">`
 
 ### File & Naming
 
@@ -235,7 +235,7 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 | Interceptor    | `<name>Interceptor` (fn) | `authInterceptor` |
 
 - Selector prefix: `mh-` (`mh-clients`, `mh-dashboard`, `mh-user-profile`) — set in `angular.json` for all three projects
-- Always separate files: `.html` and `.scss` alongside `.ts` — no inline templates or styles
+- Always separate files: `.html` and `.scss` alongside `.ts` — no inline templates or styles. **Project override**: generic Angular guidance prefers inline templates for small components; this repo deliberately does not — always use separate files, referenced by paths relative to the component `.ts` file.
 
 ### Member Naming
 
@@ -259,23 +259,32 @@ Classes use **PascalCase**. Components have **no type suffix**; all other artifa
 - **Private Subjects** (backing a public observable): camelCase + `Subject` suffix, no `_` (`private currentUserSubject = new BehaviorSubject(...)`)
 - **Guards/interceptors** — `inject()` calls are function-scoped `const` locals, no `_` prefix needed
 
-### Angular-Specific Rules
+### TypeScript Rules
 
-- All components are standalone (do NOT set `standalone: true` — it's the default in Angular 21)
-- `changeDetection: ChangeDetectionStrategy.OnPush` on every component
+- Strict type checking; prefer type inference when the type is obvious
+- Avoid `any` — use `unknown` when the type is uncertain
+
+### Angular-Specific Rules (Angular 22)
+
+- Keep components small and focused on a single responsibility
+- All components are standalone (do NOT set `standalone: true` — it's the default)
+- Do NOT set `changeDetection: ChangeDetectionStrategy.OnPush` — `OnPush` is the default in Angular v22+. Don't add it to new components; remove it opportunistically when touching existing ones.
 - Use `inject()` function, not constructor injection
 - Use `input()` and `output()` functions, not `@Input`/`@Output` decorators
 - Use `model()` for two-way bindings, not `@Input` + `@Output XChange` pairs
 - Use `viewChild()` / `viewChildren()` instead of `@ViewChild` / `@ViewChildren`
 - Use `signal()`, `computed()`, `update()`, `set()` — never `mutate` on signals
-- Use `effect()` sparingly — only for side effects that truly depend on signals
+- Use `linkedSignal()` for state derived from multiple reactive sources that must stay synchronized
+- Use `effect()` sparingly — only for side effects that truly depend on signals; keep state transformations pure and predictable
 - Use `afterNextRender()` for DOM-dependent operations (replaces `AfterViewInit`); `ngOnInit` is fine for data init
 - Use native control flow (`@if`, `@for`, `@switch`), not `*ngIf`/`*ngFor`/`*ngSwitch`
 - Use `class` bindings, not `ngClass`; `style` bindings, not `ngStyle`
 - Use `host` object in decorator, not `@HostBinding`/`@HostListener`
-- Use `NgOptimizedImage` for all static images (not inline base64)
-- Reactive forms preferred over template-driven
-- Services: `providedIn: 'root'`, return `Observable` from HttpClient
+- Use `NgOptimizedImage` for all static images (not inline base64; `NgOptimizedImage` does not work for inline base64 images)
+- Keep templates simple — no complex logic; don't assume globals like `new Date()` are available in template expressions
+- Use the `async` pipe when binding an observable directly in a template
+- Forms: prefer **Signal Forms** (`@angular/forms/signals`) for new forms — stable in v22+, signal-based state, type-safe field access, schema-based validation. When not using Signal Forms, prefer reactive forms over template-driven ones.
+- Services: single responsibility each; prefer the `@Service` decorator over `@Injectable({ providedIn: 'root' })` for new singleton services (Angular v22+); return `Observable` from HttpClient
 - Subscriptions: `takeUntilDestroyed(destroyRef)` for long-lived streams, `take(1)` for one-shot HTTP calls
 
 ### PrimeNG
@@ -286,13 +295,41 @@ Prefer the **standalone component** export over the `*Module` barrel. Fall back 
 
 ```ts
 // preferred
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Dialog } from 'primeng/dialog';
 
 // fallback — only when no standalone export is available
-import { ButtonModule } from 'primeng/button';
+import { SelectButtonModule } from 'primeng/selectbutton';
 ```
+
+#### Buttons — `[pButton]` directive, never `<p-button>` (deprecated in v22)
+
+PrimeNG 22 deprecates the `Button` component (`<p-button>`), `pButtonLabel` and `pButtonIcon`. Use the `ButtonDirective` on a native `<button>` with icon/label as direct children:
+
+```html
+<!-- icon + label; (click), native [disabled], explicit type="button" (native default is submit!) -->
+<button pButton type="button" severity="secondary" size="small" (click)="save()">
+  <i class="pi pi-check"></i>
+  Save changes
+</button>
+
+<!-- icon-only: iconOnly is required (it is not inferred from content) + aria-label -->
+<button pButton type="button" iconOnly rounded text aria-label="Close" (click)="close()">
+  <i class="pi pi-times"></i>
+</button>
+
+<!-- loading state: the directive's [loading] input is deprecated — use disabled + spinner ternary -->
+<button pButton type="submit" [disabled]="form.invalid || saving()">
+  <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+  Send
+</button>
+```
+
+- Always set `type="button"` unless the button submits a form — native `<button>` defaults to `type="submit"`.
+- Use native `(click)`/`(focus)`/`(blur)` and `aria-label`; there is no `label`/`icon`/`onClick`/`ariaLabel` input on the directive.
+- Icon/label spacing comes from the button's flex `gap` — no extra classes needed. Icon placement (before/after the text) replaces the old `iconPos`.
+- Classes go straight on the `<button>` (`class="..."`); there is no separate host element or `styleClass` anymore. In SCSS, target `.p-button` — never the removed `p-button` element or `.p-button-label`/`.p-button-icon` wrappers.
 
 - Template references: `#header`, `#body`, `#footer` (not `pTemplate`)
 - Tables: `[lazy]="true"` + `(onLazyLoad)` with `#loadingbody` (p-skeleton) and `#emptymessage`
@@ -307,7 +344,7 @@ import { ButtonModule } from 'primeng/button';
 The following components support a `fluid` boolean input. Use it instead of adding `class="w-full"`:
 
 ```html
-<p-button fluid />
+<button pButton fluid></button>
 <input pInputText fluid />
 <p-password fluid />
 <textarea pTextarea fluid></textarea>
@@ -328,10 +365,11 @@ These components do **not** have a `fluid` input — use `class="w-full"` on the
 <p-inputnumber class="w-full" />
 ```
 
-#### PrimeNG 21 component names (v18+ renames — never use the old names)
+#### PrimeNG 22 component names (renames + deprecations — never use the old names)
 
-| Old (deprecated) | Current (v21+) |
+| Old (deprecated) | Current (v22)  |
 |------------------|----------------|
+| `p-button`       | `<button pButton>` |
 | `p-dropdown`     | `p-select`     |
 | `p-calendar`     | `p-datepicker` |
 | `p-sidebar`      | `p-drawer`     |

@@ -68,7 +68,7 @@
       @if (mobile()) {
       <div class="flex flex-wrap items-center gap-2 mt-2">
         <p-tag [value]="statusLabel()" [icon]="statusIcon()" [severity]="statusSeverity()" rounded />
-        <p-button [label]="ctaLabel()" [icon]="ctaIcon()" size="small" (onClick)="onCta($event)" />
+        <button pButton type="button" size="small" (click)="onCta($event)"><i [class]="ctaIcon()"></i> {{ ctaLabel() }}</button>
       </div>
       }
     </div>
@@ -77,7 +77,7 @@
     @if (!mobile()) {
     <div class="flex flex-col items-end gap-2 shrink-0">
       <p-tag [value]="statusLabel()" [icon]="statusIcon()" [severity]="statusSeverity()" rounded />
-      <p-button [label]="ctaLabel()" [icon]="ctaIcon()" size="small" (onClick)="onOpen()" />
+      <button pButton type="button" size="small" (click)="onOpen()"><i [class]="ctaIcon()"></i> {{ ctaLabel() }}</button>
     </div>
     }
   </div>

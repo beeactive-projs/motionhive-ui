@@ -8,7 +8,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -34,7 +34,7 @@ const ALL_ROLES = ['SUPER_ADMIN', 'ADMIN', 'SUPPORT', 'INSTRUCTOR', 'WRITER', 'U
     FormsModule,
     TableModule,
     TagModule,
-    ButtonModule,
+    ButtonDirective,
     DrawerModule,
     InputTextModule,
     SelectModule,

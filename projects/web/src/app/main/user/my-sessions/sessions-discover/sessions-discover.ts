@@ -10,7 +10,7 @@ import {
 import { Location, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -54,7 +54,7 @@ import { BookingConfirmedDialog } from '../_dialogs/booking-confirmed-dialog/boo
   imports: [
     NgTemplateOutlet,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     IconField,
     InputIcon,
     InputTextModule,

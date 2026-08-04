@@ -4,7 +4,7 @@ import { Card } from 'primeng/card';
 import { Avatar } from 'primeng/avatar';
 import { AvatarGroup } from 'primeng/avatargroup';
 import { Tag } from 'primeng/tag';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Menu } from 'primeng/menu';
 import { Tooltip } from 'primeng/tooltip';
 import { MenuItem } from 'primeng/api';
@@ -13,7 +13,7 @@ import { paletteFor, monogramFromName } from '../_utils/group-palette.util';
 
 @Component({
   selector: 'mh-group-card',
-  imports: [RouterLink, Card, Avatar, AvatarGroup, Tag, Button, Menu, Tooltip, Hex],
+  imports: [RouterLink, Card, Avatar, AvatarGroup, Tag, ButtonDirective, Menu, Tooltip, Hex],
   templateUrl: './group-card.html',
   styleUrl: './group-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

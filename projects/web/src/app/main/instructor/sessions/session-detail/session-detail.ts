@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
@@ -42,7 +42,7 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
   imports: [
     CommonModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     AccessChip,
     TypeChip,
     ProviderChip,

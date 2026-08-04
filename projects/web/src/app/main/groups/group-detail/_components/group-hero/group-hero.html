@@ -29,8 +29,7 @@
         </div>
         <div class="flex md:justify-end">
           @if (canLeave()) {
-          <p-button label="Leave group" text severity="danger" icon="pi pi-sign-out"
-            (onClick)="onLeaveGroup()" />
+          <button pButton type="button" text severity="danger" (click)="onLeaveGroup()"><i class="pi pi-sign-out"></i> Leave group</button>
           }
         </div>
       </div>

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import type { ButtonSeverity } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,7 +17,7 @@ import { FeedbackService, AuthStore, FeedbackCategory, FeedbackCategories } from
   selector: 'mh-feedback-dialog',
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
+    ButtonDirective,
     DialogModule,
     InputTextModule,
     TextareaModule,

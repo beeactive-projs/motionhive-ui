@@ -37,11 +37,36 @@
       <!-- Mobile · actions inline -->
       @if (mobile()) {
       <div class="flex flex-wrap items-center gap-2 mt-2">
-        <p-button label="Start" icon="pi pi-bolt" size="small" [loading]="starting()" (onClick)="onStart($event)" />
-        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" rounded size="small" pTooltip="Edit"
-          ariaLabel="Edit routine" (onClick)="onEdit($event)" />
-        <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Delete"
-          ariaLabel="Delete routine" (onClick)="onRemove($event)" />
+        <button pButton type="button" size="small" (click)="onStart($event)" [disabled]="starting()">
+          <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>
+          Start
+        </button>
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Edit"
+          (click)="onEdit($event)"
+          aria-label="Edit routine"
+          iconOnly
+        >
+          <i class="pi pi-pencil"></i>
+        </button>
+        <button pButton
+          type="button"
+          severity="danger"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Delete"
+          (click)="onRemove($event)"
+          aria-label="Delete routine"
+          iconOnly
+        >
+          <i class="pi pi-trash"></i>
+        </button>
       </div>
       }
     </div>
@@ -50,12 +75,37 @@
     @if (!mobile()) {
     <div class="flex flex-col items-end gap-2 shrink-0">
       <div class="flex items-center gap-0.5">
-        <p-button icon="pi pi-pencil" severity="secondary" [text]="true" rounded size="small" pTooltip="Edit"
-          ariaLabel="Edit routine" (onClick)="onEdit($event)" />
-        <p-button icon="pi pi-trash" severity="danger" [text]="true" rounded size="small" pTooltip="Delete"
-          ariaLabel="Delete routine" (onClick)="onRemove($event)" />
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Edit"
+          (click)="onEdit($event)"
+          aria-label="Edit routine"
+          iconOnly
+        >
+          <i class="pi pi-pencil"></i>
+        </button>
+        <button pButton
+          type="button"
+          severity="danger"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Delete"
+          (click)="onRemove($event)"
+          aria-label="Delete routine"
+          iconOnly
+        >
+          <i class="pi pi-trash"></i>
+        </button>
       </div>
-      <p-button label="Start workout" icon="pi pi-bolt" size="small" [loading]="starting()" (onClick)="onStart($event)" />
+      <button pButton type="button" size="small" (click)="onStart($event)" [disabled]="starting()">
+        <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>
+        Start workout
+      </button>
     </div>
     }
   </div>

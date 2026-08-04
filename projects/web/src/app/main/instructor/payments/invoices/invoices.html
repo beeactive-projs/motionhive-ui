@@ -1,9 +1,17 @@
 <!-- Filters -->
 <div class="flex items-center gap-3 mt-2 mb-4 overflow-x-auto no-scrollbar">
   @for (option of statusOptions; track option.label) {
-  <p-button [label]="option.label" [severity]="statusFilter() === option.value ? 'primary' : 'secondary'" size="small"
-    rounded [text]="statusFilter() !== option.value" (onClick)="onStatusFilterChange(option.value)"
-    styleClass="py-0.5 min-w-10" />
+  <button pButton
+    type="button"
+    [severity]="statusFilter() === option.value ? 'primary' : 'secondary'"
+    size="small"
+    rounded
+    [text]="statusFilter() !== option.value"
+    (click)="onStatusFilterChange(option.value)"
+    class="py-0.5 min-w-10"
+  >
+    {{ option.label }}
+  </button>
   }
 </div>
 
@@ -60,34 +68,115 @@
           <div class="flex gap-3 justify-end">
             @switch (invoice.status) {
             @case (Statuses.Draft) {
-            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
-              pTooltip="Edit" (onClick)="openEdit(invoice)" />
-            <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
-              pTooltip="Send" (onClick)="openSendDialog(invoice)" />
-            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
-              tooltipPosition="left" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              tooltipPosition="left"
+              pTooltip="Edit"
+              (click)="openEdit(invoice)"
+              iconOnly
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              tooltipPosition="left"
+              pTooltip="Send"
+              (click)="openSendDialog(invoice)"
+              iconOnly
+            >
+              <i class="pi pi-send"></i>
+            </button>
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              tooltipPosition="left"
+              pTooltip="Void"
+              (click)="confirmVoid(invoice)"
+              iconOnly
+            >
+              <i class="pi pi-ban"></i>
+            </button>
             }
             @case (Statuses.Open) {
-            <p-button icon="pi pi-send" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
-              pTooltip="Resend email" (onClick)="openSendDialog(invoice)" />
-            <p-button icon="pi pi-check" [rounded]="true" [text]="true" size="small" severity="success"
-              tooltipPosition="left" pTooltip="Mark paid" (onClick)="confirmMarkPaid(invoice)" />
-            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
-              tooltipPosition="left" pTooltip="Void" (onClick)="confirmVoid(invoice)" />
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              tooltipPosition="left"
+              pTooltip="Resend email"
+              (click)="openSendDialog(invoice)"
+              iconOnly
+            >
+              <i class="pi pi-send"></i>
+            </button>
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="success"
+              tooltipPosition="left"
+              pTooltip="Mark paid"
+              (click)="confirmMarkPaid(invoice)"
+              iconOnly
+            >
+              <i class="pi pi-check"></i>
+            </button>
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              tooltipPosition="left"
+              pTooltip="Void"
+              (click)="confirmVoid(invoice)"
+              iconOnly
+            >
+              <i class="pi pi-ban"></i>
+            </button>
             }
             @case (Statuses.Paid) {
             @if (invoice.invoicePdf) {
             <a [href]="invoice.invoicePdf" target="_blank" rel="noopener">
-              <p-button icon="pi pi-download" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
-                pTooltip="Download PDF" />
+              <button pButton
+                type="button"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                tooltipPosition="left"
+                pTooltip="Download PDF"
+                iconOnly
+              >
+                <i class="pi pi-download"></i>
+              </button>
             </a>
             }
             }
             }
             @if (invoice.hostedInvoiceUrl) {
             <a [href]="invoice.hostedInvoiceUrl" target="_blank" rel="noopener">
-              <p-button icon="pi pi-external-link" [rounded]="true" [text]="true" size="small" tooltipPosition="left"
-                pTooltip="View hosted page" />
+              <button pButton
+                type="button"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                tooltipPosition="left"
+                pTooltip="View hosted page"
+                iconOnly
+              >
+                <i class="pi pi-external-link"></i>
+              </button>
             </a>
             }
           </div>
@@ -226,4 +315,4 @@
 <mh-send-invoice-email-dialog [(visible)]="showSendDialog" [invoice]="sendDialogInvoice()" (sent)="reload()" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

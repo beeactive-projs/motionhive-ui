@@ -7,7 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import {
@@ -19,7 +19,7 @@ import {
 
 @Component({
   selector: 'mh-delete-post-dialog',
-  imports: [Button, Dialog],
+  imports: [ButtonDirective, Dialog],
   templateUrl: './delete-post-dialog.html',
   styleUrl: './delete-post-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

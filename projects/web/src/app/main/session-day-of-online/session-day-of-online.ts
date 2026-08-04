@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { interval, switchMap } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import {
@@ -39,7 +39,7 @@ import {
 @Component({
   selector: 'mh-session-day-of-online',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule, ToastModule],
+  imports: [CommonModule, RouterLink, ButtonDirective, ToastModule],
   providers: [MessageService],
   template: `
     <div class="mh-dof">
@@ -49,12 +49,7 @@ import {
         <div class="mh-dof__error">
           <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
           <span>{{ error() }}</span>
-          <p-button
-            label="Back to my sessions"
-            severity="secondary"
-            [outlined]="true"
-            routerLink="/user/sessions"
-          />
+          <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/user/sessions">Back to my sessions</button>
         </div>
       } @else if (info()) {
         <header class="mh-dof__hero" [class.is-active]="isActive()" [class.is-expired]="isExpired()">
@@ -92,26 +87,18 @@ import {
               </small>
             </div>
           </div>
-          <p-button
-            [label]="'Join ' + providerLabel()"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            severity="primary"
-            (onClick)="join()"
-            styleClass="mh-dof__join-btn"
-          />
+          <button pButton type="button" severity="primary" (click)="join()" class="mh-dof__join-btn">
+            {{ 'Join ' + providerLabel() }}
+            <i class="pi pi-arrow-right"></i>
+          </button>
         } @else if (isExpired()) {
           <p class="mh-dof__expired">
             Late? The join link stayed valid for 15 minutes after the start.
             After that it expires. Message your instructor if you still need access.
           </p>
-          <p-button
-            label="Back to my sessions"
-            severity="secondary"
-            [outlined]="true"
-            routerLink="/user/sessions"
-            styleClass="mh-dof__join-btn"
-          />
+          <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/user/sessions" class="mh-dof__join-btn">
+            Back to my sessions
+          </button>
         } @else {
           <p class="mh-dof__pre-hint">
             The Join button activates 5 minutes before the start.

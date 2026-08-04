@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -60,7 +60,7 @@ import { ExerciseFormDialog } from './exercise-form-dialog/exercise-form-dialog'
   imports: [
     NgTemplateOutlet,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Card,
     IconField,
     InputIcon,

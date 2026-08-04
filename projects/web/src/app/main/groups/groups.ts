@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore, Group, GroupService, GroupsRefreshService, Hex, showApiError } from 'core';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { GroupFormDialog } from './_dialogs/group-form-dialog/group-form-dialog';
@@ -22,7 +22,7 @@ import { monogramFromName, paletteFor } from './_utils/group-palette.util';
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    ButtonModule,
+    ButtonDirective,
     SkeletonModule,
     ToastModule,
     GroupFormDialog,

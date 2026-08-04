@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { Router } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { LockedAction, type AvatarUser } from 'core';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
@@ -48,7 +48,7 @@ const FALLBACK_COPY: PromptCopy = {
  */
 @Component({
   selector: 'mh-signup-prompt-dialog',
-  imports: [Dialog, Button, Avatar],
+  imports: [Dialog, ButtonDirective, Avatar],
   templateUrl: './signup-prompt-dialog.html',
   styleUrl: './signup-prompt-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

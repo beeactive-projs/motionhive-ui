@@ -17,23 +17,12 @@
 
     <div class="mt-auto">
       @if (profileLink(); as link) {
-        <p-button
-          label="View profile"
-          icon="pi pi-arrow-right"
-          iconPos="right"
-          size="small"
-          severity="secondary"
-          [outlined]="true"
-          fluid
-          [routerLink]="link" />
+        <button pButton type="button" size="small" severity="secondary" [outlined]="true" fluid [routerLink]="link">
+          View profile
+          <i class="pi pi-arrow-right"></i>
+        </button>
       } @else {
-        <p-button
-          label="View profile"
-          size="small"
-          severity="secondary"
-          [outlined]="true"
-          fluid
-          [disabled]="true" />
+        <button pButton type="button" size="small" severity="secondary" [outlined]="true" fluid [disabled]="true">View profile</button>
       }
     </div>
   </div>

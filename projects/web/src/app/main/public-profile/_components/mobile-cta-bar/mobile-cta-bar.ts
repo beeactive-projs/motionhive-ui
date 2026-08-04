@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { PublicProfileStore } from 'core';
 import type { PublicInstructorProfile } from 'core';
 
@@ -15,7 +15,7 @@ import type { PublicInstructorProfile } from 'core';
  */
 @Component({
   selector: 'mh-mobile-cta-bar',
-  imports: [Button],
+  imports: [ButtonDirective],
   templateUrl: './mobile-cta-bar.html',
   styleUrl: './mobile-cta-bar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'mh-contact',
-  imports: [ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, MessageModule],
+  imports: [ReactiveFormsModule, ButtonDirective, InputTextModule, TextareaModule, MessageModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

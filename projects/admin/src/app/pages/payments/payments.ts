@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
@@ -68,7 +68,7 @@ const COLUMNS: Record<PaymentsResource, ColumnDef[]> = {
   imports: [
     FormsModule,
     TableModule,
-    ButtonModule,
+    ButtonDirective,
     SelectButtonModule,
     InputTextModule,
   ],

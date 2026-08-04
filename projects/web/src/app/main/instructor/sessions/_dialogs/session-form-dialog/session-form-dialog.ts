@@ -13,7 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -135,7 +135,7 @@ function blankForm(): SessionForm {
     CommonModule,
     FormsModule,
     Dialog,
-    ButtonModule,
+    ButtonDirective,
     InputText,
     InputNumberModule,
     Select,

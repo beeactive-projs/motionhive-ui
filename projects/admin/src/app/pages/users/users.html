@@ -33,7 +33,7 @@
     <p-checkbox [(ngModel)]="includeDeleted" [binary]="true" inputId="incdel" />
     <label for="incdel" class="text-sm text-[var(--p-text-color)]">Include deleted</label>
   </div>
-  <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()" />
+  <button pButton type="button" (click)="applyFilters()"><i class="pi pi-filter"></i> Apply</button>
 </div>
 
 <!-- Table -->
@@ -86,12 +86,9 @@
       </td>
       <td>{{ u.createdAt | date: 'mediumDate' }}</td>
       <td>
-        <p-button
-          icon="pi pi-eye"
-          severity="secondary"
-          [text]="true"
-          (onClick)="openDetail(u.id)"
-        />
+        <button pButton type="button" severity="secondary" [text]="true" (click)="openDetail(u.id)" iconOnly>
+          <i class="pi pi-eye"></i>
+        </button>
       </td>
     </tr>
   </ng-template>
@@ -193,21 +190,20 @@
       <div class="flex flex-col gap-2">
         <div class="text-xs font-semibold uppercase text-[var(--p-text-muted-color)]">Status</div>
         <div class="flex flex-wrap gap-2">
-          <p-button
-            [label]="d.isActive ? 'Deactivate' : 'Activate'"
-            [severity]="d.isActive ? 'warn' : 'success'"
-            size="small"
-            (onClick)="toggleActive()"
-          />
+          <button pButton type="button" [severity]="d.isActive ? 'warn' : 'success'" size="small" (click)="toggleActive()">
+            {{ d.isActive ? 'Deactivate' : 'Activate' }}
+          </button>
           @if (d.locked) {
-            <p-button label="Unlock" severity="secondary" size="small" (onClick)="unlock()" />
+            <button pButton type="button" severity="secondary" size="small" (click)="unlock()">Unlock</button>
           }
           @if (!d.isEmailVerified) {
-            <p-button label="Force verify" severity="secondary" size="small" (onClick)="forceVerify()" />
-            <p-button label="Resend email" severity="secondary" [text]="true" size="small" (onClick)="resendVerification()" />
+            <button pButton type="button" severity="secondary" size="small" (click)="forceVerify()">Force verify</button>
+            <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="resendVerification()">
+              Resend email
+            </button>
           }
           @if (d.deletedAt && isSuperAdmin()) {
-            <p-button label="Restore" severity="success" size="small" (onClick)="restore()" />
+            <button pButton type="button" severity="success" size="small" (click)="restore()">Restore</button>
           }
         </div>
       </div>
@@ -236,7 +232,7 @@
               appendTo="body"
               styleClass="w-40"
             />
-            <p-button label="Add" size="small" [disabled]="!roleToAssign" (onClick)="assignRole()" />
+            <button pButton type="button" size="small" [disabled]="!roleToAssign" (click)="assignRole()">Add</button>
           </div>
         </div>
       }
@@ -253,13 +249,10 @@
             placeholder="Reason (audited)"
             class="w-full"
           />
-          <p-button
-            label="Open session as this user"
-            icon="pi pi-user"
-            severity="contrast"
-            size="small"
-            (onClick)="impersonate()"
-          />
+          <button pButton type="button" severity="contrast" size="small" (click)="impersonate()">
+            <i class="pi pi-user"></i>
+            Open session as this user
+          </button>
           <span class="text-xs text-[var(--p-text-muted-color)]">
             Opens the app in a new tab with a 30-minute token. Every impersonation is logged.
           </span>

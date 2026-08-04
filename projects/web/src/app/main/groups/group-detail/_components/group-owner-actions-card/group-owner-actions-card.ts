@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Message } from 'primeng/message';
 import { GroupDetailContext } from '../../group-detail.context';
 
 @Component({
   selector: 'mh-group-owner-actions-card',
-  imports: [Button, CardModule, Message],
+  imports: [ButtonDirective, CardModule, Message],
   templateUrl: './group-owner-actions-card.html',
   styleUrl: './group-owner-actions-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -12,7 +12,7 @@
       </p>
     </div>
   </p-message>
-  <p-button label="Back to discover" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()" />
+  <button pButton type="button" severity="secondary" text (click)="goBack()"><i class="pi pi-arrow-left"></i> Back to discover</button>
 </div>
 } @else if (group(); as g) {
 <main class="flex flex-col gap-4 max-w-400 mx-auto">
@@ -51,12 +51,30 @@
           </div>
           <div class="flex md:justify-end items-center gap-2">
             @if (joinRequestPending()) {
-            <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" />
-            <p-button icon="pi pi-times" rounded text severity="danger" size="small" pTooltip="Cancel request"
-              [loading]="joining()" (onClick)="onCancelRequest()" />
+            <button pButton type="button" [outlined]="true" [disabled]="true"><i class="pi pi-clock"></i> Request pending</button>
+            <button pButton
+              type="button"
+              rounded
+              text
+              severity="danger"
+              size="small"
+              pTooltip="Cancel request"
+              (click)="onCancelRequest()"
+              [disabled]="joining()"
+              iconOnly
+            >
+              <i class="pi" [class]="joining() ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+            </button>
             } @else {
-            <p-button [label]="joinButtonLabel()" [icon]="joinButtonIcon()" [loading]="joining()"
-              [disabled]="joinButtonDisabled()" (onClick)="onJoin()" [severity]="joinButtonSeverity()" />
+            <button pButton
+              type="button"
+              [disabled]="(joinButtonDisabled()) || joining()"
+              [severity]="joinButtonSeverity()"
+              (click)="onJoin()"
+            >
+              <i [class]="joining() ? 'pi pi-spinner pi-spin' : (joinButtonIcon())"></i>
+              {{ joinButtonLabel() }}
+            </button>
             }
           </div>
         </div>

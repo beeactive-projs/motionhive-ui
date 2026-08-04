@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, effect, model, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -15,7 +15,7 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
   imports: [
     FormsModule,
     DialogModule,
-    ButtonModule,
+    ButtonDirective,
     InputTextModule,
     Avatar,
     SkeletonModule,

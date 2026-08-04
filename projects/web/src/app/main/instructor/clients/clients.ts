@@ -27,7 +27,7 @@ import {
 } from 'core';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DataView } from 'primeng/dataview';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
@@ -46,7 +46,7 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
   selector: 'mh-clients',
   imports: [
     DatePipe,
-    ButtonModule,
+    ButtonDirective,
     TableModule,
     TagModule,
     UserInfo,

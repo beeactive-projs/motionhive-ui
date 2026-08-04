@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
@@ -67,7 +67,7 @@ const COLUMNS: Record<DomainResource, Col[]> = {
   imports: [
     FormsModule,
     TableModule,
-    ButtonModule,
+    ButtonDirective,
     SelectButtonModule,
     SelectModule,
     InputTextModule,

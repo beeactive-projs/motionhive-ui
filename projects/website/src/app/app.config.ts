@@ -5,13 +5,18 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import {
+  provideClientHydration,
+  withEventReplay,
+  withNoIncrementalHydration,
+} from '@angular/platform-browser';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
 import { MotionHiveLara } from '../../../core/src/styles/styles.primeng';
+import { environment } from 'core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     // server's blog fetches instead of re-fetching, so first paint matches the
     // prerendered HTML (no skeleton/content hydration mismatch).
     provideHttpClient(withFetch()),
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(withEventReplay(), withNoIncrementalHydration()),
     providePrimeNG({
       theme: {
         preset: MotionHiveLara,
@@ -41,6 +46,7 @@ export const appConfig: ApplicationConfig = {
           },
         },
       },
+      license: environment.primeUiLicenseKey,
     }),
   ],
 };
