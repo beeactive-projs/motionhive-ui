@@ -1,7 +1,6 @@
-<button pButton type="button" text rounded (click)="toggle($event)" [attr.aria-label]="'Open profile menu for ' + userName()">
-  <ng-template #icon>
-    <mh-avatar [user]="user()" [circle]="true" />
-  </ng-template>
+<button pButton type="button" text rounded (click)="toggle($event)"
+  [attr.aria-label]="'Open profile menu for ' + userName()">
+  <mh-avatar [user]="user()" [circle]="true" />
 </button>
 
 <p-popover #popover appendTo="body">
