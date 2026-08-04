@@ -1,0 +1,96 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Clients</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="statusFilter() ?? AllFilter" (ionChange)="onStatusFilterChange($event)">
+      <ion-segment-button [value]="AllFilter">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Statuses.Active">
+        <ion-label>Active</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Statuses.Archived">
+        <ion-label>Archived</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Clients</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (loading()) {
+    <ion-list>
+      @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+        <ion-item>
+          <ion-avatar slot="start">
+            <ion-skeleton-text [animated]="true" />
+          </ion-avatar>
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 50%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (loadError()) {
+    <div class="ion-padding ion-text-center">
+      <ion-icon name="alert-circle-outline" size="large" color="medium" aria-hidden="true" />
+      <h2>Couldn't load clients</h2>
+      <p>Something went wrong. Check your connection and try again.</p>
+      <ion-button (click)="loadClients()">Try again</ion-button>
+    </div>
+  } @else if (clients().length === 0) {
+    @if (statusFilter()) {
+      <div class="ion-padding ion-text-center">
+        <ion-icon name="funnel-outline" size="large" color="medium" aria-hidden="true" />
+        <h2>No clients match this filter</h2>
+        <p>No clients with this status. Try a different one, or clear the filter to see everyone.</p>
+        <ion-button fill="outline" (click)="clearFilter()">Clear filter</ion-button>
+      </div>
+    } @else {
+      <div class="ion-padding ion-text-center">
+        <ion-icon name="people-outline" size="large" color="medium" aria-hidden="true" />
+        <h2>No clients yet</h2>
+        <p>Invite your first client to start building your roster.</p>
+      </div>
+    }
+  } @else {
+    <ion-list>
+      @for (client of clients(); track client.id) {
+        <ion-item>
+          <ion-avatar slot="start">
+            @if (client.client?.avatarUrl; as avatarUrl) {
+              <img [src]="avatarUrl" [alt]="clientName(client)" />
+            } @else {
+              <span>{{ clientInitials(client) }}</span>
+            }
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ clientName(client) }}</h2>
+            <p>{{ clientEmail(client) }}</p>
+            @if (client.startedAt) {
+              <p>Started {{ client.startedAt | date: 'dd MMM yyyy' }}</p>
+            }
+          </ion-label>
+          <ion-badge slot="end" [color]="statusColor(client.status)">
+            {{ clientStatusLabel(client) }}
+          </ion-badge>
+        </ion-item>
+      }
+    </ion-list>
+
+    <ion-infinite-scroll (ionInfinite)="onLoadMore($event)" [disabled]="!hasMore()">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
+</ion-content>

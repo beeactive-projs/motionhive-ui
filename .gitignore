@@ -42,6 +42,11 @@ test-results/
 playwright-report/
 .claude/
 
+# Capacitor native shells (templates ship their own .gitignore; extras below)
+/android/app/release
+/ios/App/Pods
+/ios/DerivedData
+
 # System files
 .DS_Store
 Thumbs.db

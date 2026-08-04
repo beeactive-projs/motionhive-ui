@@ -1,0 +1,19 @@
+/* Core CSS required for Ionic components to work properly */
+@import '@ionic/angular/css/core.css';
+
+/* Basic CSS for apps built with Ionic */
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+
+/* Optional Ionic CSS utilities */
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/display.css';
+
+/* Dark palette — class-driven: ThemeService toggles `ion-palette-dark` on <html> */
+@import '@ionic/angular/css/palettes/dark.class.css';
+
+/* MotionHive brand theme */
+@import './theme/variables.css';

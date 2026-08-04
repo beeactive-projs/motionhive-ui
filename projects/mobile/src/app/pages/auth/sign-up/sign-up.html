@@ -1,0 +1,127 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/auth/login" />
+    </ion-buttons>
+    <ion-title>Create account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="auth-container">
+    @if (errorMessage()) {
+      <ion-text color="danger" role="alert" class="ion-padding-horizontal">
+        <p>{{ errorMessage() }}</p>
+      </ion-text>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <ion-list [inset]="true">
+        <ion-item>
+          <ion-input
+            label="First name"
+            labelPlacement="stacked"
+            type="text"
+            formControlName="firstName"
+            placeholder="John"
+            autocomplete="given-name"
+            enterkeyhint="next"
+            [errorText]="getFieldError('firstName')"
+            [class.ion-invalid]="isFieldInvalid('firstName')"
+            [class.ion-touched]="isFieldInvalid('firstName')"
+          />
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Last name"
+            labelPlacement="stacked"
+            type="text"
+            formControlName="lastName"
+            placeholder="Doe"
+            autocomplete="family-name"
+            enterkeyhint="next"
+            [errorText]="getFieldError('lastName')"
+            [class.ion-invalid]="isFieldInvalid('lastName')"
+            [class.ion-touched]="isFieldInvalid('lastName')"
+          />
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Email address"
+            labelPlacement="stacked"
+            type="email"
+            inputmode="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            enterkeyhint="next"
+            [errorText]="getFieldError('email')"
+            [class.ion-invalid]="isFieldInvalid('email')"
+            [class.ion-touched]="isFieldInvalid('email')"
+          />
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Password"
+            labelPlacement="stacked"
+            type="password"
+            formControlName="password"
+            placeholder="Min. 8 characters"
+            autocomplete="new-password"
+            enterkeyhint="next"
+            [errorText]="getFieldError('password')"
+            [class.ion-invalid]="isFieldInvalid('password')"
+            [class.ion-touched]="isFieldInvalid('password')"
+          >
+            <ion-input-password-toggle slot="end" />
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Confirm password"
+            labelPlacement="stacked"
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+            enterkeyhint="done"
+            [errorText]="getConfirmPasswordError()"
+            [class.ion-invalid]="isConfirmPasswordInvalid()"
+            [class.ion-touched]="isConfirmPasswordInvalid()"
+          >
+            <ion-input-password-toggle slot="end" />
+          </ion-input>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-checkbox formControlName="isInstructor" labelPlacement="end" justify="start">
+            <ion-label class="ion-text-wrap">
+              Register as coach
+              <p>Coaches can create and manage sessions and clients</p>
+            </ion-label>
+          </ion-checkbox>
+        </ion-item>
+      </ion-list>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="isLoading()"
+        class="ion-margin-horizontal ion-margin-top"
+      >
+        @if (isLoading()) {
+          <ion-spinner name="crescent" />
+        } @else {
+          Create account
+        }
+      </ion-button>
+    </form>
+
+    <div class="ion-text-center ion-padding">
+      <ion-text color="medium">
+        <p class="ion-no-margin">
+          By signing up, you agree to our terms of service and privacy policy.
+        </p>
+      </ion-text>
+    </div>
+  </div>
+</ion-content>
