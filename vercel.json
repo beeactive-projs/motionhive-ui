@@ -1,6 +1,4 @@
 {
-  "buildCommand": "ng build core && ng build website --configuration production && node scripts/patch-ro-index.mjs",
-  "outputDirectory": "dist/website/browser",
   "redirects": [
     {
       "source": "/en",
