@@ -158,7 +158,7 @@
             <small class="text-surface-500">Booked {{ booking.bookedAt | date: 'd MMM' }}</small>
           </span>
         </p-message>
-        <button pButton type="button" fluid (click)="goToMySessions()"><i class="pi pi-arrow-right"></i> Go to My sessions</button>
+        <button pButton type="button" fluid (click)="goToMySessions()"><i class="pi pi-arrow-right"></i> Go to Sessions</button>
         @if (canCancelBooking()) {
         <button pButton type="button" severity="danger" [outlined]="true" fluid (click)="cancelOpen.set(true)">
           <i class="pi pi-times"></i>

@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
   <header class="flex flex-wrap gap-3 items-center justify-between">
     <div class="space-y-1 min-w-0">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Training</h1>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Workouts</h1>
       <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">{{ subtitle() }}</p>
     </div>
     <p-selectbutton [options]="lensOptions()" [ngModel]="lens()" (ngModelChange)="setLens($event)" optionLabel="label"

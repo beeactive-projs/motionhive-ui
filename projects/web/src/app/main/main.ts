@@ -103,12 +103,12 @@ export class Main {
         label: 'My training',
         mode: 'train',
         items: [
-          { label: 'My sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
+          { label: 'Sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
           // One destination for your own training: Today / Plans /
           // History. It replaced three items that were one loop cut
           // into thirds — Progress was arithmetic over the very log
           // that Workouts listed, so they were the same data twice.
-          { label: 'Training', route: '/user/training', icon: 'pi pi-bolt' },
+          { label: 'Workouts', route: '/user/training', icon: 'pi pi-bolt' },
         ],
       },
     ];
@@ -126,7 +126,7 @@ export class Main {
           // the same list, switched inside the page, not two nav items.
           { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-id-card' },
           // "Manage sessions" (not bare "Sessions") to disambiguate from the
-          // trainee-side "My sessions" item above in the My training section.
+          // trainee-side "Sessions" item in the My training section above.
           { label: 'Manage sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
           { label: 'Programs', route: '/coaching/programs', icon: 'pi pi-objects-column' },
           { label: 'Exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },

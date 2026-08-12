@@ -53,7 +53,7 @@ type TrainingLens = 'today' | 'plans' | 'routines' | 'exercises';
  * different zoom levels sitting in different places; History now shows
  * the summary directly above the list it summarises.
  *
- * "My sessions" deliberately stays outside this: booking a class with a
+ * "Sessions" deliberately stays outside this: booking a class with a
  * coach is a different activity from training, not another view of it.
  */
 @Component({

@@ -19,7 +19,7 @@ export const userRoutes: Routes = [
   {
     path: 'sessions',
     loadComponent: () => import('./my-sessions/my-sessions').then((m) => m.MySessions),
-    title: 'My sessions - MotionHive',
+    title: 'Sessions - MotionHive',
   },
   {
     path: 'workouts',
@@ -37,7 +37,7 @@ export const userRoutes: Routes = [
   {
     path: 'training',
     loadComponent: () => import('./training/training').then((m) => m.Training),
-    title: 'Training - MotionHive',
+    title: 'Workouts - MotionHive',
   },
   {
     path: 'progress',
