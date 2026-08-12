@@ -8,7 +8,16 @@
 
     <!-- Main info -->
     <div class="min-w-0">
-      <h3 class="m-0 font-semibold line-clamp-2">{{ routine().name }}</h3>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="text-left hover:opacity-80" (click)="open.emit()"
+        [attr.aria-label]="'Open ' + routine().name">
+        <h3 class="m-0 font-semibold line-clamp-2">{{ routine().name }}</h3>
+      </button>
+        @if (isSystem()) {
+        <!-- Says whose it is, so "why can't I edit this?" never arises. -->
+        <p-tag value="MotionHive" icon="pi pi-verified" severity="info" rounded class="text-[10px]!" />
+        }
+      </div>
 
       <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
         @if (routine().folder; as folder) {
@@ -47,35 +56,41 @@
           [text]="true"
           rounded
           size="small"
-          pTooltip="Edit"
-          (click)="onEdit($event)"
-          aria-label="Edit routine"
+          pTooltip="View — see the exercises without changing them"
+          (click)="onOpen($event)"
+          aria-label="View routine"
           iconOnly
         >
-          <i class="pi pi-pencil"></i>
+          <i class="pi pi-eye"></i>
         </button>
         <button pButton
           type="button"
-          severity="danger"
+          severity="secondary"
           [text]="true"
           rounded
           size="small"
-          pTooltip="Delete"
-          (click)="onRemove($event)"
-          aria-label="Delete routine"
+          pTooltip="Schedule — put this on your calendar as a plan"
+          (click)="onSchedule($event)"
+          aria-label="Schedule this routine as a plan"
           iconOnly
         >
-          <i class="pi pi-trash"></i>
+          <i class="pi pi-calendar-plus"></i>
         </button>
-      </div>
-      }
-    </div>
-
-    <!-- Right rail · actions (desktop) -->
-    @if (!mobile()) {
-    <div class="flex flex-col items-end gap-2 shrink-0">
-      <div class="flex items-center gap-0.5">
+        @if (isSystem()) {
         <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Save a copy I can edit"
+          (click)="onDuplicate($event)"
+          aria-label="Save a copy of this routine"
+          iconOnly
+        >
+          <i class="pi pi-copy"></i>
+        </button>
+        } @else {        <button pButton
           type="button"
           severity="secondary"
           [text]="true"
@@ -101,6 +116,82 @@
         >
           <i class="pi pi-trash"></i>
         </button>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Right rail · actions (desktop) -->
+    @if (!mobile()) {
+    <div class="flex flex-col items-end gap-2 shrink-0">
+      <div class="flex items-center gap-0.5">
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="View — see the exercises without changing them"
+          (click)="onOpen($event)"
+          aria-label="View routine"
+          iconOnly
+        >
+          <i class="pi pi-eye"></i>
+        </button>
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Schedule — put this on your calendar as a plan"
+          (click)="onSchedule($event)"
+          aria-label="Schedule this routine as a plan"
+          iconOnly
+        >
+          <i class="pi pi-calendar-plus"></i>
+        </button>
+        @if (isSystem()) {
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Save a copy I can edit"
+          (click)="onDuplicate($event)"
+          aria-label="Save a copy of this routine"
+          iconOnly
+        >
+          <i class="pi pi-copy"></i>
+        </button>
+        } @else {        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Edit"
+          (click)="onEdit($event)"
+          aria-label="Edit routine"
+          iconOnly
+        >
+          <i class="pi pi-pencil"></i>
+        </button>
+        <button pButton
+          type="button"
+          severity="danger"
+          [text]="true"
+          rounded
+          size="small"
+          pTooltip="Delete"
+          (click)="onRemove($event)"
+          aria-label="Delete routine"
+          iconOnly
+        >
+          <i class="pi pi-trash"></i>
+        </button>
+        }
       </div>
       <button pButton type="button" size="small" (click)="onStart($event)" [disabled]="starting()">
         <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>

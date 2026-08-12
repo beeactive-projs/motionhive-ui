@@ -17,7 +17,7 @@
         appendTo="body"
         fluid
       >
-        <ng-template pTemplate="selectedItem" let-selected>
+        <ng-template #selectedItem let-selected>
           @if (selected) {
             <span class="flex items-center gap-2">
               <i [class]="selected.icon"></i>
@@ -25,7 +25,7 @@
             </span>
           }
         </ng-template>
-        <ng-template pTemplate="item" let-option>
+        <ng-template #item let-option>
           <div class="flex flex-col">
             <span class="flex items-center gap-2 font-medium">
               <i [class]="option.icon"></i>

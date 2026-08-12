@@ -1,6 +1,6 @@
 @let l = log();
 
-<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto pb-40 lg:pb-0">
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
   <!-- Header · close + title + subtitle (mirrors the session showcase) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
@@ -28,12 +28,7 @@
   </header>
 
   @if (loading()) {
-  <!-- Loading · KPI + card skeletons -->
-  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-4">
-    @for (i of [1, 2, 3, 4]; track i) {
-    <mh-kpi-card label="" value="" icon="pi pi-circle" [loading]="true" />
-    }
-  </section>
+  <!-- Loading · exercise card skeletons, matching the loaded layout -->
   <div class="flex flex-col gap-3 lg:gap-4">
     @for (i of [1, 2]; track i) {
     <p-card class="shadow-md">
@@ -52,14 +47,12 @@
   </div>
   } @else if (l) {
 
-  <!-- KPI strip -->
-  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-4" aria-label="Workout overview">
-    <mh-kpi-card icon="pi pi-stopwatch" label="Elapsed" [value]="elapsedLabel()" />
-    <mh-kpi-card icon="pi pi-check-circle" label="Sets done" [value]="setsDone() + '/' + totalSets()" />
-    <mh-kpi-card icon="pi pi-chart-line" label="Progress" [value]="progressPercent() + '%'" />
-    <mh-kpi-card icon="pi pi-bolt" label="Exercises" [value]="exercises().length" />
-  </section>
-
+  <!--
+    No stat strip. Elapsed already sits in the header, progress and sets
+    live in the rail (and in the sticky bar on mobile), and the exercise
+    count is the list itself. Four cards restating them pushed the actual
+    work below the fold.
+  -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
     <!-- Left · exercise cards -->
     <div class="lg:col-span-2 flex flex-col gap-3 lg:gap-4 min-w-0">
@@ -70,11 +63,13 @@
       } @else {
       @for (ex of exercises(); track ex.id) {
       <div class="rounded-lg border border-surface overflow-hidden transition-colors"
-        [class.border-primary]="isCurrentExercise(ex) && !isComplete()" [class.opacity-70]="isExerciseDone(ex)">
+        [class.border-primary]="isCurrentExercise(ex) && !isComplete() && !ex.isSkipped"
+        [class.opacity-70]="isExerciseDone(ex)" [class.opacity-55]="ex.isSkipped">
         <!-- Exercise header -->
         <div class="flex items-center gap-2.5 border-b border-surface p-2.5">
           @if (ex.exerciseThumbnailUrlSnapshot) {
           <img class="size-9 shrink-0 rounded-lg border border-surface object-cover"
+            [class.grayscale]="ex.isSkipped"
             [src]="ex.exerciseThumbnailUrlSnapshot" [alt]="ex.exerciseNameSnapshot" loading="lazy" />
           } @else {
           <div
@@ -83,29 +78,78 @@
           </div>
           }
           <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100">
+            <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100"
+              [class.line-through]="ex.isSkipped">
               {{ ex.exerciseNameSnapshot }}
             </div>
-            <div class="mt-0.5 inline-flex items-center gap-1 text-[11.5px]"
-              [class.text-green-600]="isExerciseDone(ex)" [class.text-muted-color]="!isExerciseDone(ex)">
-              @if (isExerciseDone(ex)) { <i class="pi pi-check-circle text-[10px]"></i> }
-              {{ exerciseProgressLabel(ex) }}{{ isExerciseDone(ex) ? ' done' : '' }}
+            <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]">
+              @if (ex.isSkipped) {
+              <p-tag value="Skipped" icon="pi pi-ban" severity="secondary" rounded class="text-xs!" />
+              <span class="text-muted-color">not counted</span>
+              } @else {
+              <span class="inline-flex items-center gap-1"
+                [class.text-green-600]="isExerciseDone(ex)" [class.text-muted-color]="!isExerciseDone(ex)">
+                @if (isExerciseDone(ex)) { <i class="pi pi-check-circle text-[10px]"></i> }
+                {{ exerciseProgressLabel(ex) }}{{ isExerciseDone(ex) ? ' done' : '' }}
+              </span>
+              }
+              @if (ex.swappedFromExerciseId) {
+              <p-tag value="Swapped in" icon="pi pi-sync" severity="info" rounded class="text-xs!" />
+              }
             </div>
           </div>
-          <button pButton
-            type="button"
-            severity="secondary"
-            [text]="true"
-            rounded
-            size="small"
-            pTooltip="Skip exercise"
-            [disabled]="isComplete()"
-            (click)="confirmRemoveExercise(ex)"
-            aria-label="Skip exercise"
-            iconOnly
-          >
-            <i class="pi pi-times-circle"></i>
-          </button>
+
+          @if (!isComplete()) {
+            @if (ex.isSkipped) {
+            <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="undoSkip(ex)">
+              <i class="pi pi-undo"></i>
+              Undo
+            </button>
+            } @else {
+            <button pButton
+              type="button"
+              severity="secondary"
+              [text]="true"
+              rounded
+              size="small"
+              pTooltip="Swap exercise"
+              (click)="openSwapExercise(ex)"
+              aria-label="Swap exercise"
+              iconOnly
+            >
+              <i class="pi pi-sync"></i>
+            </button>
+            @if (canRemove(ex)) {
+            <button pButton
+              type="button"
+              severity="secondary"
+              [text]="true"
+              rounded
+              size="small"
+              pTooltip="Remove exercise"
+              (click)="confirmRemoveExercise(ex)"
+              aria-label="Remove exercise"
+              iconOnly
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+            } @else {
+            <button pButton
+              type="button"
+              severity="secondary"
+              [text]="true"
+              rounded
+              size="small"
+              pTooltip="Skip exercise"
+              (click)="skipExercise(ex)"
+              aria-label="Skip exercise"
+              iconOnly
+            >
+              <i class="pi pi-times-circle"></i>
+            </button>
+            }
+            }
+          }
         </div>
 
         <!-- Last-time hint (current exercise) -->
@@ -116,15 +160,18 @@
         </div>
         }
 
-        <!-- Set table -->
-        @if (!isExerciseDone(ex) || ex.sets?.length) {
+        <!-- Set table · columns follow the exercise kind -->
+        @if (!ex.isSkipped && (!isExerciseDone(ex) || ex.sets?.length)) {
         <p-table [value]="ex.sets ?? []" size="small">
           <ng-template #header>
             <tr>
               <th class="w-10 text-center">#</th>
               <th class="w-1/4">Target</th>
-              <th class="text-center">kg</th>
-              <th class="text-center">Reps</th>
+              @if (isWeightVisible(ex)) { <th class="text-center">kg</th> }
+              @if (showsField(ex, 'reps')) { <th class="text-center">Reps</th> }
+              @if (showsField(ex, 'distance')) { <th class="text-center">km</th> }
+              @if (showsField(ex, 'duration')) { <th class="text-center">Time</th> }
+              @if (showsField(ex, 'distance')) { <th class="text-center">Pace</th> }
               <th class="w-14 text-center">Done</th>
             </tr>
           </ng-template>
@@ -132,17 +179,46 @@
             <tr [class.opacity-60]="isComplete()">
               <td class="text-center font-semibold text-muted-color">{{ s.orderIndex + 1 }}</td>
               <td class="tabular-nums text-muted-color">{{ setTarget(s) || '—' }}</td>
+
+              @if (isWeightVisible(ex)) {
               <td class="text-center">
                 <input pInputText type="text" inputmode="decimal" class="w-16 text-center tabular-nums font-semibold"
                   [value]="s.weightKg ?? ''"
                   [placeholder]="$any(s.assignedSet?.targetWeightKg ?? s.assignedSet?.resolvedWeightKg ?? 'kg')"
                   [disabled]="isComplete()" (blur)="onWeightBlur(ex, s, $any($event.target).value)" />
               </td>
+              }
+
+              @if (showsField(ex, 'reps')) {
               <td class="text-center">
                 <input pInputText type="text" inputmode="numeric" class="w-16 text-center tabular-nums font-semibold"
-                  [value]="s.reps ?? ''" [placeholder]="$any(s.assignedSet?.targetRepsMin ?? 'reps')"
+                  [value]="s.reps ?? ''"
+                  [placeholder]="$any((s.assignedSet?.targetRepsMin ?? 'reps') + repsSuffix(ex))"
                   [disabled]="isComplete()" (blur)="onRepsBlur(ex, s, $any($event.target).value)" />
               </td>
+              }
+
+              @if (showsField(ex, 'distance')) {
+              <td class="text-center">
+                <input pInputText type="text" inputmode="decimal" class="w-16 text-center tabular-nums font-semibold"
+                  [value]="distanceKm(s)" placeholder="km" [disabled]="isComplete()"
+                  (blur)="onDistanceBlur(ex, s, $any($event.target).value)" />
+              </td>
+              }
+
+              @if (showsField(ex, 'duration')) {
+              <td class="text-center">
+                <input pInputText type="text" inputmode="numeric" class="w-16 text-center tabular-nums font-semibold"
+                  [value]="secondsToClock(s.durationSeconds)" placeholder="0:00" [disabled]="isComplete()"
+                  (blur)="onDurationBlur(ex, s, $any($event.target).value)" />
+              </td>
+              }
+
+              @if (showsField(ex, 'distance')) {
+              <!-- Derived, never typed. -->
+              <td class="text-center tabular-nums text-muted-color text-[12px]">{{ paceLabel(s) || '—' }}</td>
+              }
+
               <td class="text-center">
                 <button pButton
                   type="button"
@@ -163,11 +239,18 @@
         </p-table>
 
         @if (!isComplete()) {
-        <div class="p-2">
+        <div class="flex gap-2 p-2">
           <button pButton type="button" severity="secondary" [text]="true" size="small" fluid (click)="addSet(ex)">
             <i class="pi pi-plus"></i>
             Add set
           </button>
+          @if (canRevealWeight(ex)) {
+          <button pButton type="button" severity="secondary" [text]="true" size="small"
+            class="shrink-0 whitespace-nowrap" (click)="revealWeight(ex)">
+            <i class="pi pi-plus"></i>
+            Add weight
+          </button>
+          }
         </div>
         }
         }
@@ -209,6 +292,17 @@
       </p-card>
     </aside>
   </div>
+  }
+
+  <!--
+    Reserves room for the fixed mobile chrome. It has to be a real
+    element, not padding: the content overflows this flex item, so
+    padding-bottom lands at the box edge above the overflow and holds
+    nothing back. It grows while the rest timer card is on screen.
+  -->
+  @if (l && !isComplete()) {
+  <div class="lg:hidden shrink-0" [class.h-40]="restSecondsLeft() == null"
+    [class.h-72]="restSecondsLeft() != null" aria-hidden="true"></div>
   }
 </div>
 
@@ -271,10 +365,22 @@
 </ng-template>
 
 <ng-template #completeAction>
-  <button pButton type="button" severity="success" fluid (click)="confirmComplete()" [disabled]="completing()">
-    <i class="pi" [class]="completing() ? 'pi-spinner pi-spin' : 'pi-flag-fill'"></i>
-    {{ isFreestyle() ? 'Finish & save' : 'Complete workout' }}
-  </button>
+  <div class="flex flex-col gap-1">
+    <button pButton type="button" severity="success" fluid (click)="confirmComplete()" [disabled]="completing()">
+      <i class="pi" [class]="completing() ? 'pi-spinner pi-spin' : 'pi-flag-fill'"></i>
+      {{ isFreestyle() ? 'Finish & save' : 'Complete workout' }}
+    </button>
+    <!--
+      The way out for "I changed my mind". Skipping is a statement that
+      you decided not to train, which is not the same thing and leaves a
+      gap in the history you did not intend.
+    -->
+    <button pButton type="button" severity="danger" [text]="true" size="small" fluid (click)="confirmDiscard()"
+      [disabled]="discarding()">
+      <i class="pi" [class]="discarding() ? 'pi-spinner pi-spin' : 'pi-trash'"></i>
+      Cancel workout
+    </button>
+  </div>
 </ng-template>
 
 <p-toast position="top-right" />

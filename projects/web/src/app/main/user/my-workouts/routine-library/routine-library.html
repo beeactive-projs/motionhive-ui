@@ -1,0 +1,105 @@
+  @if (routinesLoading()) {
+  <div class="flex flex-col gap-2">
+    @for (i of [1, 2, 3]; track i) {
+    <p-card>
+      <div class="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3">
+        <p-skeleton width="100%" height="2.25rem" />
+        <div class="flex flex-col gap-1.5">
+          <p-skeleton width="45%" height="1rem" />
+          <p-skeleton width="65%" height="0.75rem" />
+        </div>
+        <p-skeleton width="6rem" height="1.75rem" />
+      </div>
+    </p-card>
+    }
+  </div>
+  } @else {
+  <div class="flex flex-col gap-3 pb-24 md:pb-0">
+    <!-- Search + new routine -->
+    <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+      <p-iconfield class="flex-1 md:flex-[0_1_320px]">
+        <p-inputicon class="pi pi-search" />
+        <input pInputText type="text" fluid placeholder="Search routines…" aria-label="Search routines"
+          [ngModel]="routineSearch()" (ngModelChange)="onRoutineSearch($event)" />
+        @if (routineSearch() !== '') {
+        <p-inputicon class="pi pi-times cursor-pointer" (click)="clearRoutineSearch()" />
+        }
+      </p-iconfield>
+      <div class="flex items-center gap-2">
+        <!--
+          Yours vs MotionHive's. Starters are runnable by anyone but
+          owned by nobody, so the split has to be visible rather than
+          something you infer from a badge halfway down the list.
+        -->
+        <p-selectbutton [options]="libraryOptions" [ngModel]="library()" (ngModelChange)="setLibrary($event)"
+          optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="Routine library" />
+        <button pButton type="button" severity="secondary" [text]="true" (click)="openCreateRoutine()">
+          <i class="pi pi-plus"></i>
+          New routine
+        </button>
+      </div>
+    </div>
+
+    @if (filteredRoutines().length === 0) {
+    <!--
+      Rendered inside the toolbar, never instead of it. Filtering to
+      "Mine" with nothing saved used to replace the whole surface,
+      including the filter that got you there — a dead end you could
+      only leave by navigating away.
+    -->
+    @if (routineSearch().trim()) {
+    <mh-list-empty-state icon="pi pi-search" title="No routines match your search"
+      message="Try a different name or folder, or clear the search to see everything." actionLabel="Clear search"
+      actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearRoutineSearch()" />
+    } @else if (library() === 'mine') {
+    <mh-list-empty-state icon="pi pi-clone" title="You haven't saved a routine yet"
+      message="Start from one of the MotionHive routines and save a copy, or build your own from scratch."
+      actionLabel="Browse MotionHive routines" actionIcon="pi pi-verified" actionSeverity="secondary"
+      [actionOutlined]="true" (action)="setLibrary('system')" />
+    } @else {
+    <mh-list-empty-state icon="pi pi-clone" title="No routines yet"
+      message="Save a workout shape — name, exercises, default sets — and start it again with one tap."
+      actionLabel="Create routine" actionIcon="pi pi-plus" (action)="openCreateRoutine()" />
+    }
+    } @else {
+    <div class="flex flex-col gap-2 md:gap-4.5">
+      @for (group of routineGroups(); track group.label) {
+      @if (routinesGrouped()) {
+      <section class="flex flex-col gap-2">
+        <mh-section-label [label]="group.label" [count]="group.items.length" />
+        <ng-container *ngTemplateOutlet="routineRows; context: { $implicit: group.items }" />
+      </section>
+      } @else {
+      <ng-container *ngTemplateOutlet="routineRows; context: { $implicit: group.items }" />
+      }
+      }
+    </div>
+    @if (routinesHasMore() && !routineSearch().trim()) {
+    <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-3"
+      [disabled]="routinesLoading()" (click)="loadMoreRoutines()">
+      <i class="pi" [class]="routinesLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
+      Load more ({{ routines().length }} of {{ routinesTotal() }})
+    </button>
+    }
+    }
+  </div>
+  }
+
+<!-- Routine row list · shared between grouped + flat rendering. -->
+<ng-template #routineRows let-items>
+  @for (r of items; track r.id) {
+  <mh-routine-row [routine]="r" [mobile]="isMobile()" [starting]="startingRoutineId() === r.id"
+    (open)="openRoutine(r)" (start)="startRoutine(r)" (schedule)="openScheduleRoutine(r)" (edit)="openEditRoutine(r)"
+    (remove)="confirmDeleteRoutine(r)" (duplicate)="duplicateRoutine(r)" />
+  }
+</ng-template>
+
+<!-- Routine create / edit -->
+<mh-routine-form-dialog [routine]="routineDialogTarget()" [(visible)]="routineDialogOpen"
+  (saved)="onRoutineSaved($event)" />
+
+<!-- Self-assignment: put a routine on the calendar. -->
+<mh-schedule-routine-dialog [routine]="scheduleTarget()" [(visible)]="scheduleDialogOpen"
+  (scheduled)="onRoutineScheduled()" />
+
+<p-confirmdialog />

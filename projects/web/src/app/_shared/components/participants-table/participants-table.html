@@ -83,7 +83,7 @@
   [scrollable]="true"
   scrollHeight="flex"
 >
-  <ng-template pTemplate="header">
+  <ng-template #header>
     <tr>
       <th>Name</th>
       <th>Booked</th>
@@ -94,7 +94,7 @@
     </tr>
   </ng-template>
 
-  <ng-template pTemplate="body" let-p>
+  <ng-template #body let-p>
     <tr>
       <td>
         <div class="mh-pt__name">
@@ -181,7 +181,7 @@
     </tr>
   </ng-template>
 
-  <ng-template pTemplate="emptymessage">
+  <ng-template #emptymessage>
     <tr>
       <td [attr.colspan]="mode() === 'readonly' ? 3 : 4" class="mh-pt__empty">
         No participants yet.

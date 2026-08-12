@@ -152,21 +152,53 @@ export class WorkoutLogReplay implements OnInit {
    *   cardio → "30 min" or "5 km"
    *   nothing logged → "—"
    */
+  /**
+   * What was actually done, in the units the movement is measured in.
+   *
+   * Builds from every field present rather than returning on the first
+   * match: a 5km run in 26:30 is "5.00 km · 26:30", not "26 min" with
+   * the distance quietly dropped.
+   */
   setActualLabel(s: LoggedSet): string {
+    const parts: string[] = [];
+
     if (s.reps != null && s.weightKg != null) {
-      return `${s.reps} × ${s.weightKg} kg`;
+      parts.push(`${s.reps} × ${s.weightKg} kg`);
+    } else if (s.reps != null) {
+      parts.push(`${s.reps} reps`);
+    } else if (s.weightKg != null) {
+      parts.push(`${s.weightKg} kg`);
     }
-    if (s.reps != null) return `${s.reps} reps`;
-    if (s.durationSeconds != null) {
-      const m = Math.round(s.durationSeconds / 60);
-      return m > 0 ? `${m} min` : `${s.durationSeconds}s`;
-    }
+
     if (s.distanceMeters != null) {
-      return s.distanceMeters >= 1000
-        ? `${(s.distanceMeters / 1000).toFixed(2)} km`
-        : `${s.distanceMeters} m`;
+      parts.push(
+        s.distanceMeters >= 1000
+          ? `${(s.distanceMeters / 1000).toFixed(2)} km`
+          : `${s.distanceMeters} m`,
+      );
     }
-    return '—';
+
+    if (s.durationSeconds != null) {
+      const m = Math.floor(s.durationSeconds / 60);
+      const sec = s.durationSeconds % 60;
+      parts.push(`${m}:${String(sec).padStart(2, '0')}`);
+    }
+
+    return parts.length ? parts.join(' · ') : '—';
+  }
+
+  /**
+   * The swap is only meaningful with the original named, and the log
+   * keeps a snapshot of it, so fall back to a plain marker when the
+   * catalog row behind the original has since gone.
+   */
+  swapLabel(ex: LoggedExercise): string {
+    const from = this.swappedFromName(ex);
+    return from ? `Swapped from ${from}` : 'Swapped in';
+  }
+
+  private swappedFromName(ex: LoggedExercise): string | null {
+    return ex.swappedFromExercise?.name ?? null;
   }
 
   /** True if this exercise produced a 1RM PR in this session. */

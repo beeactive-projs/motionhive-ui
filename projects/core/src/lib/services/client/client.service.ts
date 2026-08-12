@@ -32,6 +32,15 @@ export class ClientService {
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }
 
+  /**
+   * One client, in the same shape as a row from `getClients`. Keyed on
+   * the client's user id, so a profile URL survives a refresh or a link
+   * shared from the roster.
+   */
+  getClient(clientId: string): Observable<InstructorClient> {
+    return this._http.get<InstructorClient>(`${this.baseUrl}/${clientId}`);
+  }
+
   filterClients(event: TableLazyLoadEvent): Observable<ClientListResponse> {
     return this._http.post<ClientListResponse>(`${this.baseUrl}/filter`, event, {
       context: silentRequest(),

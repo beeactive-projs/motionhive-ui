@@ -74,6 +74,23 @@ export class MyPlanRow {
 
   protected readonly instructor = computed(() => this.assignment().instructor ?? null);
 
+  /** True when you put this on the calendar yourself. */
+  protected readonly isSelfScheduled = computed(
+    () => this.assignment().assignmentKind === 'SELF',
+  );
+
+  /**
+   * Where the plan came from. A routine you scheduled is not a coach's
+   * work, and labelling it "your coach" put your own name under someone
+   * else's job title.
+   */
+  protected readonly originLabel = computed(() => {
+    if (this.isSelfScheduled()) return 'From your routine';
+    const i = this.instructor();
+    const name = i ? `${i.firstName} ${i.lastName}`.trim() : '';
+    return name ? `From ${name}` : 'From your coach';
+  });
+
   protected readonly instructorName = computed(() => {
     const i = this.instructor();
     if (!i) return 'your coach';

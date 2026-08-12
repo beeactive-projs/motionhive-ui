@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
-import { Tooltip } from 'primeng/tooltip';
 import {
   LoggedExercise,
   LoggedSet,
@@ -39,7 +38,7 @@ type WorkoutRowTone = (typeof WorkoutRowTone)[keyof typeof WorkoutRowTone];
 @Component({
   selector: 'mh-workout-row',
   standalone: true,
-  imports: [Card, Tag, Tooltip],
+  imports: [Card, Tag],
   templateUrl: './workout-row.html',
   styleUrl: './workout-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,10 +79,40 @@ export class WorkoutRow {
     return s != null ? `${Math.round(s / 60)} min` : '';
   });
 
-  /** Program name snapshot, or "Freestyle workout" when unassigned. */
-  protected readonly subtitle = computed(
-    () => this.log().assignment?.programNameSnapshot ?? 'Freestyle workout',
-  );
+  /**
+   * Where this session came from. Three real answers, not two:
+   * a coach's plan, one of your routines, or nothing at all. Routine
+   * sessions used to read "Freestyle workout" because the log stored
+   * no link back to the routine that produced them.
+   */
+  protected readonly provenance = computed<{
+    label: string;
+    kind: 'plan' | 'routine' | 'freestyle';
+    targetId: string | null;
+  }>(() => {
+    const log = this.log();
+    const plan = log.assignment?.programNameSnapshot;
+    if (plan) {
+      return { label: plan, kind: 'plan', targetId: log.programAssignmentId ?? null };
+    }
+    const routine = log.sourceProgram;
+    if (routine) {
+      return { label: routine.name, kind: 'routine', targetId: routine.id };
+    }
+    return { label: 'Freestyle', kind: 'freestyle', targetId: null };
+  });
+
+  protected readonly subtitle = computed(() => this.provenance().label);
+
+  /** Emitted instead of opening the replay, so the row keeps one job. */
+  readonly openSource = output<{ kind: 'plan' | 'routine'; id: string }>();
+
+  protected onOpenSource(event: MouseEvent): void {
+    event.stopPropagation();
+    const p = this.provenance();
+    if (p.kind === 'freestyle' || !p.targetId) return;
+    this.openSource.emit({ kind: p.kind, id: p.targetId });
+  }
 
   /** Number of exercises logged this session. */
   protected readonly exerciseCount = computed(() => this.log().exercises?.length ?? 0);

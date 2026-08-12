@@ -1,4 +1,5 @@
 import type { AssignedSet } from './assignment.model';
+import type { ExerciseKind } from '../exercise/exercise.enums';
 import type {
   ExerciseSetType,
   WorkoutLogStatus,
@@ -10,6 +11,13 @@ import type {
  * tree below is hydrated on `start` from the assignment snapshot.
  */
 export interface WorkoutLog {
+  /**
+   * The routine this session was started from. Null for assigned work
+   * (see `assignment`) and for genuinely freestyle sessions — those two
+   * used to be indistinguishable because neither stored anything.
+   */
+  sourceProgram?: { id: string; name: string; isSingleWorkout: boolean } | null;
+  sourceProgramId?: string | null;
   id: string;
   userId: string;
   programAssignmentId: string | null;
@@ -74,15 +82,48 @@ export interface LoggedExercise {
   /** Optional grouping with other exercises (e.g. SUPERSET A). */
   supersetGroupId?: number | null;
   notes: string | null;
+  /**
+   * Explicit skip. Distinct from untouched (present, nothing completed)
+   * and from absent (never added). Skipped exercises drop out of the
+   * progress denominator but stay visible to the coach.
+   */
+  isSkipped: boolean;
+  /** Set when substituted mid-workout; anchors to the original. */
+  swappedFromExerciseId: string | null;
+  /** Eager-loaded so a swap can be named, not just flagged. */
+  swappedFromExercise?: { id: string; name: string } | null;
   exercise?: {
     id: string;
     name: string;
     slug: string;
-    kind: string;
+    kind: ExerciseKind;
     level: string;
     thumbnailUrl: string | null;
+    /** Split squats, single-arm work: reps read as per-side. */
+    isUnilateral?: boolean;
   } | null;
   sets?: LoggedSet[];
+}
+
+/** The input columns a set row shows, in display order. */
+export type SetField = 'weight' | 'reps' | 'duration' | 'distance';
+
+const FIELDS_BY_KIND: Record<ExerciseKind, SetField[]> = {
+  STRENGTH: ['weight', 'reps'],
+  BODYWEIGHT: ['reps'],
+  DURATION: ['duration'],
+  DISTANCE: ['distance', 'duration'],
+  CARDIO: ['distance', 'duration'],
+  MOBILITY: ['duration'],
+};
+
+/**
+ * Fields to render for a logged exercise. Falls back to the strength
+ * shape when the catalog row is missing, which happens on freestyle
+ * logs whose exercise was later deleted.
+ */
+export function setFieldsFor(kind: string | null | undefined): SetField[] {
+  return FIELDS_BY_KIND[(kind ?? 'STRENGTH') as ExerciseKind] ?? FIELDS_BY_KIND.STRENGTH;
 }
 
 export interface LoggedSet {

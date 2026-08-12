@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -86,6 +86,7 @@ import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
 })
 export class Programs {
   private readonly _programService = inject(ProgramService);
+  private readonly _router = inject(Router);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _messageService = inject(MessageService);
 
@@ -225,6 +226,13 @@ export class Programs {
     if (!exists) this.total.update((t) => t + 1);
     this.editTarget.set(null);
     this.formDialogOpen.set(false);
+
+    // A brand-new program is an empty shell, and the next thing you
+    // always do is fill it. Dropping back to the list meant hunting for
+    // the card you just created before you could start.
+    if (!exists) {
+      void this._router.navigate(['/coaching/programs', p.id]);
+    }
   }
 
   // ── Card actions (kebab menu) ────────────────────────────────────

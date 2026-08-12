@@ -1,0 +1,143 @@
+@let t = today();
+
+<p-card>
+  <!--
+    Week strip · the same one the mobile calendar agenda uses. It always
+    emitted taps; nothing was listening, so the days looked interactive
+    and did nothing. Arrows page whole weeks so the future is reachable.
+  -->
+  @if (hasPlan()) {
+  <div class="mb-3">
+    <div class="mb-1 flex items-center justify-between gap-2">
+      <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
+        aria-label="Previous week" (click)="shiftWeek(-1)">
+        <i class="pi pi-chevron-left text-xs"></i>
+      </button>
+      <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">
+        {{ dayLabel() }}
+        @if (!isToday()) {
+        · <button type="button" class="underline hover:opacity-80" (click)="goToToday()">back to today</button>
+        }
+      </span>
+      <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
+        aria-label="Next week" (click)="shiftWeek(1)">
+        <i class="pi pi-chevron-right text-xs"></i>
+      </button>
+    </div>
+    <div class="-mx-1">
+      <mh-week-strip [weekStart]="weekStart()" [selectedDate]="selectedDate()" [dotsByDate]="weekDots()"
+        (selectedDateChange)="dateSelected.emit($event)" />
+    </div>
+  </div>
+  }
+
+  @switch (mode()) {
+
+  <!-- An unfinished log outranks everything: pick it back up. -->
+  @case ('in-progress') {
+  <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+    <div class="min-w-0 flex-1">
+      <p-tag value="In progress" icon="pi pi-clock" severity="warn" rounded class="text-xs!" />
+      <h2 class="mt-1.5 mb-0 truncate font-heading text-lg font-semibold">
+        {{ inProgress()?.name }}
+      </h2>
+      <p class="m-0 mt-0.5 text-xs text-muted-color">Left partway through. Carry on where you stopped.</p>
+    </div>
+    <button pButton type="button" class="w-full sm:w-auto" (click)="resume.emit(inProgress()!)">
+      <i class="pi pi-play"></i>
+      Resume workout
+    </button>
+  </div>
+  }
+
+  <!-- Today's prescribed work. Name leads, plan demotes to context. -->
+  @case ('assigned') {
+  <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+    <div class="min-w-0 flex-1">
+      <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">{{ dayLabel() }}</span>
+      <h2 class="mt-0.5 mb-0 truncate font-heading text-lg font-semibold">{{ t?.name }}</h2>
+      @if (contextLine()) {
+      <p class="m-0 mt-0.5 truncate text-xs text-muted-color">{{ contextLine() }}</p>
+      }
+      @if (estimateLabel()) {
+      <p class="m-0 mt-0.5 text-xs text-muted-color">{{ estimateLabel() }}</p>
+      }
+    </div>
+    @if (canStart()) {
+    <button pButton type="button" class="w-full sm:w-auto" (click)="startAssigned.emit(t!)">
+      <i class="pi pi-bolt"></i>
+      Start workout
+    </button>
+    } @else if (timeframe() === 'future') {
+    <p-tag value="Scheduled" icon="pi pi-calendar" severity="secondary" rounded class="text-xs!" />
+    } @else {
+    <p-tag value="Not done" icon="pi pi-times-circle" severity="warn" rounded class="text-xs!" />
+    }
+  </div>
+  }
+
+  <!-- Already done today. Say so, and don't push another one. -->
+  @case ('done') {
+  <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+    <div class="min-w-0 flex-1">
+      <p-tag value="Done today" icon="pi pi-check" severity="success" rounded class="text-xs!" />
+      <h2 class="mt-1.5 mb-0 truncate font-heading text-lg font-semibold">{{ t?.name }}</h2>
+      <p class="m-0 mt-0.5 text-xs text-muted-color">
+        {{ canStart() ? "That's today's work logged." : 'Logged.' }}@if (canStart() && nextUp(); as n) { Next up {{ n.name }}.}
+      </p>
+    </div>
+    @if (canStart()) {
+    <button pButton type="button" severity="secondary" [outlined]="true" class="w-full sm:w-auto" (click)="startFreestyle.emit()">
+      <i class="pi pi-plus"></i>
+      Train anyway
+    </button>
+    }
+  </div>
+  }
+
+  <!-- Rest is a state, not a blank. -->
+  @case ('rest') {
+  <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+    <div class="min-w-0 flex-1">
+      <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">{{ dayLabel() }}</span>
+      <h2 class="mt-0.5 mb-0 font-heading text-lg font-semibold">Rest day</h2>
+      <p class="m-0 mt-0.5 text-xs text-muted-color">
+        Nothing scheduled.{{ canStart() ? ' Recovery is part of the plan.' : '' }}@if (canStart() && nextUp(); as n) { Next up {{ n.name }}.}
+      </p>
+    </div>
+    @if (canStart()) {
+    <button pButton type="button" severity="secondary" [outlined]="true" class="w-full sm:w-auto" (click)="startFreestyle.emit()">
+      <i class="pi pi-bolt"></i>
+      Train anyway
+    </button>
+    }
+  </div>
+  }
+
+  <!-- No coach, no plan. Point at training, never at hiring someone. -->
+  @case ('no-plan') {
+  <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+    <div class="min-w-0 flex-1">
+      <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">{{ dayLabel() }}</span>
+      <h2 class="mt-0.5 mb-0 font-heading text-lg font-semibold">Your call today</h2>
+      <p class="m-0 mt-0.5 text-xs text-muted-color">
+        {{ routineCount() > 0
+          ? 'Start one of your routines, or go freestyle and add exercises as you go.'
+          : 'Start a workout and add exercises as you go. Save it as a routine when you are done.' }}
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <!--
+        The old "My routines" button switched tabs. There are no tabs
+        now — the routine list sits directly below this card — so it
+        emitted into nothing and did nothing when clicked.
+      -->
+      <button pButton type="button" (click)="startFreestyle.emit()">
+        <i class="pi pi-bolt"></i>
+        Start workout
+      </button>
+    </div>
+  </div>
+  }
+  }
+</p-card>

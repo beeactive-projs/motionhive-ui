@@ -10,6 +10,16 @@
   .picker-row.p-button {
     display: block;
     width: 100%;
+    // A flex item normally refuses to shrink below its content
+    // (`min-height: auto`), but that floor only applies while `overflow`
+    // is visible. `.p-button` sets `overflow: hidden` for the ripple,
+    // which removes it — so in the results list (a flex column capped at
+    // max-h-110) a full page of 50 rows was compressed from ~62px to
+    // ~18px each and rendered as unreadable slivers. Shrinking happens
+    // before scrolling, so `overflow-y: auto` on the container does not
+    // save it. Sibling lists built from <li> are unaffected because they
+    // keep visible overflow and therefore keep the floor.
+    flex-shrink: 0;
     justify-content: flex-start;
     text-align: left;
     padding: 0.5rem 0.625rem;

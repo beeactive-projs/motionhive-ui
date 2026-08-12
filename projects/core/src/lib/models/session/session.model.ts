@@ -303,6 +303,8 @@ export interface ListInstancesQuery {
   dateTo?: string;
   instructorId?: string;
   templateId?: string;
+  /** Narrow your own calendar to one person's bookings. */
+  clientId?: string;
   status?: SessionInstanceStatus;
   page?: number;
   limit?: number;

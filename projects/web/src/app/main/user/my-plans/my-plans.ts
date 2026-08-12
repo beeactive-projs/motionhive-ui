@@ -17,8 +17,8 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
+import { TooltipModule } from 'primeng/tooltip';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
-import { Toast } from 'primeng/toast';
 
 import {
   ListAssignmentsQuery,
@@ -75,14 +75,13 @@ interface PlanGroup {
     DaySeparator,
     MyPlanRow,
     Skeleton,
+    TooltipModule,
     Tabs,
     TabList,
     Tab,
     TabPanels,
     TabPanel,
-    Toast,
   ],
-  providers: [MessageService],
   templateUrl: './my-plans.html',
   styleUrl: './my-plans.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,6 +104,7 @@ export class MyPlans {
   readonly loadingMore = signal(false);
   readonly page = signal(1);
   readonly pageSize = 20;
+  /** Opens on All — every plan, whatever its state. */
   readonly statusFilter = signal<ProgramAssignmentStatus | null>(null);
   readonly searchInput = signal('');
 
@@ -127,18 +127,12 @@ export class MyPlans {
     { status: ProgramAssignmentStatus.Cancelled, label: 'Cancelled' },
   ];
 
-  /** Client-side search over the loaded page (program name + coach name). */
-  readonly filteredItems = computed(() => {
-    const q = this.searchInput().trim().toLowerCase();
-    if (!q) return this.items();
-    return this.items().filter((a) => {
-      const name = a.programNameSnapshot.toLowerCase();
-      const coach = `${a.instructor?.firstName ?? ''} ${a.instructor?.lastName ?? ''}`
-        .trim()
-        .toLowerCase();
-      return name.includes(q) || coach.includes(q);
-    });
-  });
+  /**
+   * The server does the searching now. This used to filter only the
+   * page already in memory, so a plan on page 2 was simply unfindable —
+   * the box looked like it worked and quietly lied.
+   */
+  readonly filteredItems = computed(() => this.items());
 
   /**
    * On the All tab, bucket by status in a fixed order (empty buckets dropped).
@@ -181,10 +175,15 @@ export class MyPlans {
 
   onSearchInput(value: string): void {
     this.searchInput.set(value);
+    this.page.set(1);
+    this.fetch(true);
   }
 
   clearSearch(): void {
+    if (!this.searchInput()) return;
     this.searchInput.set('');
+    this.page.set(1);
+    this.fetch(true);
   }
 
   // ── Actions ──────────────────────────────────────────────────────
@@ -199,6 +198,17 @@ export class MyPlans {
     void this._router.navigate(['/user/plans', a.id]);
   }
 
+  /**
+   * A plan is a routine on the calendar, so the way to make one starts
+   * in the routine library. The empty state used to offer only "find a
+   * coach", which is not the only way to have a plan.
+   */
+  goToRoutines(): void {
+    void this._router.navigate(['/user/training'], {
+      queryParams: { view: 'routines' },
+    });
+  }
+
   goToDiscover(): void {
     void this._router.navigate(['/user/sessions/discover']);
   }
@@ -210,6 +220,7 @@ export class MyPlans {
       page: this.page(),
       limit: this.pageSize,
       status: this.statusFilter() ?? undefined,
+      search: this.searchInput().trim() || undefined,
     };
 
     if (replace) this.loading.set(true);

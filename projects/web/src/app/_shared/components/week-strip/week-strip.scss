@@ -26,20 +26,21 @@
 .mh-ws__cell:hover:not(.is-selected) {
   background: var(--p-surface-100);
 }
+/* Today is a landmark: outlined, so you can always find your way back
+   without it competing with the day you are actually looking at. */
 .mh-ws__cell.is-today {
-  background: var(--p-primary-500);
-  color: var(--p-primary-contrast-color, #fff);
-}
-/* Selected wins over today's accent — the user explicitly picked
-   this day, so the primary tint should follow the selection. */
-.mh-ws__cell.is-selected {
-  background: var(--p-primary-50);
   color: var(--p-primary-700);
-  box-shadow: 0 0 0 1.5px var(--p-primary-500);
+  box-shadow: inset 0 0 0 1.5px var(--p-primary-300);
 }
+/* Selected genuinely wins now. The comment below used to claim this and
+   the rule underneath did the opposite — today stayed solid while the
+   picked day got only an outline, so the strip emphasised the wrong
+   one the moment you looked at any other day. */
+.mh-ws__cell.is-selected,
 .mh-ws__cell.is-today.is-selected {
   background: var(--p-primary-500);
   color: var(--p-primary-contrast-color, #fff);
+  box-shadow: none;
 }
 .mh-ws__label {
   font-size: 10px;

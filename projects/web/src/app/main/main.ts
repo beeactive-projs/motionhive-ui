@@ -104,9 +104,11 @@ export class Main {
         mode: 'train',
         items: [
           { label: 'My sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
-          { label: 'My plans', route: '/user/plans', icon: 'pi pi-bookmark' },
-          // Workout history + progress folded into one "Workouts" destination.
-          { label: 'Workouts', route: '/user/workouts', icon: 'pi pi-history' },
+          // One destination for your own training: Today / Plans /
+          // History. It replaced three items that were one loop cut
+          // into thirds — Progress was arithmetic over the very log
+          // that Workouts listed, so they were the same data twice.
+          { label: 'Training', route: '/user/training', icon: 'pi pi-bolt' },
         ],
       },
     ];
@@ -119,6 +121,9 @@ export class Main {
           // Overview pulled from the rail — the current dashboard is mostly
           // placeholder/mock data. Route + component kept so it can come back
           // as a real coaching dashboard once it has live data to show.
+          // One destination for people. The roster (who is slipping) and
+          // the directory (invite / notes / archive) are two lenses on
+          // the same list, switched inside the page, not two nav items.
           { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-id-card' },
           // "Manage sessions" (not bare "Sessions") to disambiguate from the
           // trainee-side "My sessions" item above in the My training section.

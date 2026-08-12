@@ -1,0 +1,58 @@
+<!-- Server-side: the list is paged, so a browser-side filter would
+     only ever search the page you happen to be looking at. -->
+<div class="mb-3" role="search">
+  <p-iconfield>
+    <p-inputicon class="pi pi-search" />
+    <input pInputText type="search" fluid placeholder="Search your workouts…" aria-label="Search workouts"
+      [ngModel]="search()" (ngModelChange)="onSearch($event)" />
+    @if (search() !== '') {
+    <p-inputicon class="pi pi-times cursor-pointer" (click)="clearSearch()" />
+    }
+  </p-iconfield>
+</div>
+
+@if (loading()) {
+<div class="flex flex-col gap-2">
+  @for (i of [1, 2, 3]; track i) {
+  <mh-time-row-skeleton tone="honey" />
+  }
+</div>
+} @else if (items().length === 0 && search().trim()) {
+<mh-list-empty-state icon="pi pi-search" title="No workouts match that"
+  message="Try a different name, or clear the search to see everything." actionLabel="Clear search"
+  actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearSearch()" />
+} @else if (items().length === 0) {
+<!--
+  Points at training, not at hiring a coach. Plenty of people here never
+  have one, and the summary above has already said how the week is going.
+-->
+<mh-list-empty-state icon="pi pi-history" title="No workouts yet"
+  message="Log your first one and it shows up here, with your sets, records and how it felt."
+  actionLabel="Start a workout" actionIcon="pi pi-bolt" (action)="startWorkout.emit()" />
+} @else {
+<div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
+  @for (group of historyGroups(); track group.label) {
+  <section class="flex flex-col gap-2">
+    <mh-section-label [label]="group.label" [count]="group.count" />
+    @for (log of group.logs; track log.id) {
+    <mh-workout-row [log]="log" [mobile]="isMobile()" [showDate]="group.multiDay" (open)="openReplay(log)" (openSource)="openSource($event)" />
+    }
+  </section>
+  }
+
+  @if (hasMore()) {
+  <div class="flex justify-center p-4">
+    <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()"
+      [disabled]="loadingMore()">
+      @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+      Load more
+    </button>
+  </div>
+  } @else {
+  <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
+    role="status">
+    That's everything — {{ total() }} workout{{ total() === 1 ? '' : 's' }} total.
+  </div>
+  }
+</div>
+}

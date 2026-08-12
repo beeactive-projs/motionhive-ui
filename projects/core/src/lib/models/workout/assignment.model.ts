@@ -11,6 +11,12 @@ import type {
  * client's authoritative copy.
  */
 export interface ProgramAssignment {
+  /**
+   * COACH — an instructor assigned it. SELF — you scheduled one of your
+   * own routines. Without this a self-scheduled plan rendered your own
+   * name under a "coach" label.
+   */
+  assignmentKind?: 'COACH' | 'SELF';
   id: string;
   instructorId: string;
   clientId: string;
@@ -126,6 +132,8 @@ export interface ListAssignmentsQuery {
   status?: ProgramAssignmentStatus;
   /** Instructor-side only — narrows to one client. */
   clientId?: string;
+  /** Case-insensitive match on the assigned program name. */
+  search?: string;
 }
 
 export interface PaginatedAssignments {

@@ -45,6 +45,9 @@ export * from './lib/models/workout/status-severity';
 export * from './lib/models/workout/assignment.model';
 export * from './lib/models/workout/log.model';
 export * from './lib/models/workout/routine.model';
+export * from './lib/models/workout/progress.model';
+export * from './lib/models/workout/training-day.model';
+export * from './lib/models/workout/roster.model';
 
 // Models - Client
 export * from './lib/models/client/client.enums';
@@ -212,6 +215,8 @@ export * from './lib/services/workout/program.service';
 export * from './lib/services/workout/program-assignment.service';
 export * from './lib/services/workout/workout-log.service';
 export * from './lib/services/workout/routine.service';
+export * from './lib/services/workout/progress.service';
+export * from './lib/services/workout/roster.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
 export * from './lib/services/session/session.service';

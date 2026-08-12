@@ -306,7 +306,7 @@ export class ClientPlanDetail implements OnInit {
         showApiError(
           this._messageService,
           "Couldn't open the workout",
-          'Try again in a moment, or open the workout from /user/workouts.',
+          'Try again in a moment, or open the workout from Training.',
           err,
         ),
     });

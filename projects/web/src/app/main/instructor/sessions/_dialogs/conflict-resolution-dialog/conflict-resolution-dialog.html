@@ -98,7 +98,7 @@
     }
   </div>
 
-  <ng-template pTemplate="footer">
+  <ng-template #footer>
     @if (remaining() > 0) {
       <span class="mh-conflict__remaining">{{ remaining() }} conflict(s) remaining</span>
     }

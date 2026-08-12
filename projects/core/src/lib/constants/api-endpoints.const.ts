@@ -232,6 +232,11 @@ export const API_ENDPOINTS = {
     BASE: '/program-assignments',
     BY_ID: (id: string) => `/program-assignments/${id}`,
     MY: '/my/program-assignments',
+    /** The Workouts front door: today + this week + active plans. */
+    MY_TODAY: '/my/workouts/today',
+    /** Self-scheduling one of your own routines across the week. */
+    MY_SCHEDULED_ROUTINES: '/my/scheduled-routines',
+    /** Self-assignment: schedule your own routine across the week. */
   },
   WORKOUT_LOGS: {
     BASE: '/workout-logs',
@@ -244,6 +249,11 @@ export const API_ENDPOINTS = {
       `/workout-logs/${id}/exercises/${exId}`,
     ADD_SET: (id: string, exId: string) =>
       `/workout-logs/${id}/exercises/${exId}/sets`,
+    SAVE_AS_ROUTINE: (id: string) => `/workout-logs/${id}/save-as-routine`,
+    SKIP_EXERCISE: (id: string, exId: string) =>
+      `/workout-logs/${id}/exercises/${exId}/skip`,
+    SWAP_EXERCISE: (id: string, exId: string) =>
+      `/workout-logs/${id}/exercises/${exId}/swap`,
     LAST_FOR_EXERCISE: (exerciseId: string) =>
       `/workout-logs/last-for-exercise/${exerciseId}`,
     BY_ASSIGNED_WORKOUT: (assignedWorkoutId: string) =>
@@ -252,6 +262,8 @@ export const API_ENDPOINTS = {
     COACH_LIST_FOR_CLIENT: (clientId: string) =>
       `/coach/clients/${clientId}/workout-logs`,
     COACH_BY_ID: (id: string) => `/coach/workout-logs/${id}`,
+    /** Roster-level adherence for the coach. */
+    COACH_ROSTER: '/coach/roster',
   },
   ONE_REP_MAXES: {
     BASE: '/one-rep-maxes',

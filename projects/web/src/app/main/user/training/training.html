@@ -1,0 +1,62 @@
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
+  <header class="flex flex-wrap gap-3 items-center justify-between">
+    <div class="space-y-1 min-w-0">
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Training</h1>
+      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">{{ subtitle() }}</p>
+    </div>
+    <p-selectbutton [options]="lensOptions()" [ngModel]="lens()" (ngModelChange)="setLens($event)" optionLabel="label"
+      optionValue="value" [allowEmpty]="false" size="small" aria-label="Training view" />
+  </header>
+
+  <!--
+    Each lens mounts only while selected. They own their own fetches, so
+    keeping all three alive would load every surface on every visit.
+  -->
+  <div class="flex flex-col flex-1 min-h-0">
+    @switch (lens()) {
+      @case ('plans') {
+      <mh-my-plans />
+      }
+      @case ('routines') {
+      <mh-routine-library />
+      }
+      @case ('exercises') {
+      <!--
+        Reference material, not a record of your training — but it earns
+        a place here because this is where you reach for it: building a
+        routine, or checking what a movement is before you do it.
+      -->
+      <mh-exercises />
+      }
+      @default {
+      <div class="flex flex-col gap-5 flex-1 min-h-0 overflow-y-auto">
+        <mh-today-panel />
+
+        <!--
+          Statistics fold away. They answer "how is it trending", which
+          is a different question from "what am I doing today" and does
+          not need answering every time you open the app — but stacking
+          the charts under the day made this one long page.
+        -->
+        <p-accordion [value]="statsOpen() ? '0' : null" (valueChange)="onStatsToggle($event)">
+          <p-accordion-panel value="0">
+            <p-accordion-header>
+              <span class="font-heading text-sm font-semibold">How it is adding up</span>
+            </p-accordion-header>
+            <p-accordion-content>
+              <mh-user-progress />
+            </p-accordion-content>
+          </p-accordion-panel>
+        </p-accordion>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="font-heading text-sm font-semibold">Every workout</h2>
+          <mh-workout-history />
+        </section>
+      </div>
+      }
+    }
+  </div>
+</div>
+
+<p-toast position="top-right" />

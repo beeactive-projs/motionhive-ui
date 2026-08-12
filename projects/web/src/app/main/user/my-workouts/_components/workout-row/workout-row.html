@@ -23,9 +23,23 @@
 
       <!-- Meta line · program · exercises · sets · feeling -->
       <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
+        <!--
+          Says which of the three things this was, and opens it when
+          there is something to open. Freestyle stays plain text: there
+          is genuinely nowhere to go, and a dead link is worse than none.
+        -->
+        @if (provenance().kind === 'freestyle') {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-bookmark text-sm" aria-hidden="true"></i>{{ subtitle() }}
+          <i class="pi pi-bolt text-sm" aria-hidden="true"></i>Freestyle
         </span>
+        } @else {
+        <button type="button" class="inline-flex items-center gap-1 underline decoration-dotted underline-offset-2 hover:text-primary-600"
+          (click)="onOpenSource($event)"
+          [attr.aria-label]="(provenance().kind === 'plan' ? 'Open plan ' : 'Open routine ') + provenance().label">
+          <i class="pi text-sm" aria-hidden="true"
+            [class]="provenance().kind === 'plan' ? 'pi-bookmark' : 'pi-clone'"></i>{{ subtitle() }}
+        </button>
+        }
         @if (exerciseCount() > 0) {
         <span class="inline-flex items-center gap-1">
           <i class="pi pi-bolt text-sm" aria-hidden="true"></i>{{ exerciseCount() }}
@@ -38,8 +52,7 @@
         </span>
         }
         @if (hasNotes()) {
-        <span class="inline-flex items-center" [pTooltip]="notesText()" tooltipPosition="top"
-          aria-label="Session notes">
+        <span class="inline-flex items-center gap-1" aria-label="You left a note">
           <i class="pi pi-comment text-sm" aria-hidden="true"></i>
         </span>
         }
@@ -47,6 +60,15 @@
         <span class="text-base leading-none">{{ feelingGlyph() }}</span>
         }
       </div>
+
+      <!--
+        The note was a tooltip on a small icon: unreachable on touch,
+        and easy to miss everywhere else. It is something you wrote to
+        your future self, so it reads on the row.
+      -->
+      @if (hasNotes()) {
+      <p class="mt-1 line-clamp-2 text-sm italic text-muted-color">“{{ notesText() }}”</p>
+      }
     </div>
 
     <!-- Trailing chevron -->

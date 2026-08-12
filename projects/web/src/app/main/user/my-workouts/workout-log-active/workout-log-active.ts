@@ -18,6 +18,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBar } from 'primeng/progressbar';
 import { Skeleton } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
+import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -27,21 +28,16 @@ import {
   LogSetPayload,
   LoggedExercise,
   LoggedSet,
+  SetField,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
+  setFieldsFor,
   showApiError,
 } from 'core';
 
 import { ExercisePickerDialog } from '../../../instructor/programs/exercise-picker-dialog/exercise-picker-dialog';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
-import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
-
-interface ExerciseState {
-  ex: LoggedExercise;
-  lastTime: LoggedSet[] | null; // null = not loaded yet
-  loadingLastTime: boolean;
-}
 
 /**
  * Active workout log (S11) — the screen the client lives on for 45–90
@@ -74,11 +70,11 @@ interface ExerciseState {
     Card,
     ConfirmDialog,
     InputTextModule,
-    KpiCard,
     ListEmptyState,
     ProgressBar,
     Skeleton,
     TableModule,
+    Tag,
     Toast,
     TooltipModule,
     ExercisePickerDialog,
@@ -99,6 +95,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   readonly log = signal<WorkoutLog | null>(null);
   readonly loading = signal(false);
   readonly completing = signal(false);
+  readonly discarding = signal(false);
 
   /** Elapsed seconds since startedAt — updates every second. */
   readonly elapsedSeconds = signal(0);
@@ -116,6 +113,8 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   readonly pickerOpen = signal(false);
   /** Set when swapping (vs add-new). Null = add new exercise. */
   readonly swapTargetExerciseId = signal<string | null>(null);
+  /** Bodyweight exercises where the client asked for a weight field. */
+  readonly weightRevealed = signal<Set<string>>(new Set());
 
   /** Last-time hints per logged-exercise id. */
   readonly lastTimeCache = signal<Map<string, LoggedSet[]>>(new Map());
@@ -126,8 +125,15 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     () => this.log()?.exercises ?? [],
   );
 
+  /**
+   * Sets that count toward progress. A skipped exercise leaves the
+   * screen but leaves the denominator too, so "7 / 15" reflects what
+   * you actually intend to do rather than what was prescribed.
+   */
   readonly allSets = computed<LoggedSet[]>(() =>
-    this.exercises().flatMap((e) => e.sets ?? []),
+    this.exercises()
+      .filter((e) => !e.isSkipped)
+      .flatMap((e) => e.sets ?? []),
   );
 
   readonly totalSets = computed(() => this.allSets().length);
@@ -249,18 +255,90 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Skip, with an undo instead of a confirm. Skipping is cheap and
+   * reversible now that it flips a flag rather than deleting the row,
+   * so a modal asking "are you sure" mid-set is friction for nothing.
+   */
+  skipExercise(ex: LoggedExercise): void {
+    this._setSkipped(ex, true, () => {
+      this._messageService.add({
+        severity: 'info',
+        summary: `Skipped ${ex.exerciseNameSnapshot}`,
+        detail: 'It stays on your log, just not counted.',
+        life: 6000,
+        data: { undoExerciseId: ex.id },
+      });
+    });
+  }
+
+  undoSkip(ex: LoggedExercise): void {
+    this._setSkipped(ex, false);
+  }
+
+  /**
+   * Remove rather than skip when the plan never asked for this exercise
+   * and nothing has been logged against it. You can't decline work
+   * nobody set you, so tagging a mis-added freestyle exercise "Skipped"
+   * would be the wrong verb and would clutter the coach's view.
+   *
+   * Once a set is logged it flips back to skip, because removing would
+   * throw away work that actually happened.
+   */
+  canRemove(ex: LoggedExercise): boolean {
+    if (ex.assignedExerciseId) return false;
+    return !(ex.sets ?? []).some((s) => s.isCompleted);
+  }
+
   confirmRemoveExercise(ex: LoggedExercise): void {
     const cur = this.log();
     if (!cur || this.isComplete()) return;
     this._confirmationService.confirm({
-      header: 'Skip this exercise?',
-      message: `Remove "${ex.exerciseNameSnapshot}" and its sets from this session?`,
-      icon: 'pi pi-times-circle',
-      acceptLabel: 'Skip',
+      header: 'Remove this exercise?',
+      message: `"${ex.exerciseNameSnapshot}" and its empty sets come off this workout.`,
+      icon: 'pi pi-trash',
+      acceptLabel: 'Remove',
       acceptButtonProps: { severity: 'danger' },
       rejectLabel: 'Keep',
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._removeExercise(ex),
+    });
+  }
+
+  private _setSkipped(
+    ex: LoggedExercise,
+    skipped: boolean,
+    onDone?: () => void,
+  ): void {
+    const cur = this.log();
+    if (!cur || this.isComplete()) return;
+    this._service.setExerciseSkipped(cur.id, ex.id, skipped).subscribe({
+      next: (saved) => {
+        this._mergeExercise(ex.id, { isSkipped: saved.isSkipped });
+        onDone?.();
+      },
+      error: (err) =>
+        showApiError(
+          this._messageService,
+          skipped ? "Couldn't skip that" : "Couldn't undo the skip",
+          'Please retry.',
+          err,
+        ),
+    });
+  }
+
+  /** Patch one logged exercise in place, preserving its set rows. */
+  private _mergeExercise(
+    loggedExerciseId: string,
+    patch: Partial<LoggedExercise>,
+  ): void {
+    const cur = this.log();
+    if (!cur) return;
+    this.log.set({
+      ...cur,
+      exercises: (cur.exercises ?? []).map((e) =>
+        e.id === loggedExerciseId ? { ...e, ...patch } : e,
+      ),
     });
   }
 
@@ -279,20 +357,39 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     const cur = this.log();
     if (!cur) return;
     const swapTarget = this.swapTargetExerciseId();
-    if (swapTarget) {
-      this._service.removeExercise(cur.id, swapTarget).subscribe({
-        next: () => this._appendExerciseFromPicker(ex.id),
-        error: (err) =>
-          showApiError(
-            this._messageService,
-            "Couldn't swap exercise",
-            'Please retry.',
-            err,
-          ),
-      });
-    } else {
+    if (!swapTarget) {
       this._appendExerciseFromPicker(ex.id);
+      return;
     }
+
+    // A real swap, not remove-then-add. The set rows and anything
+    // already logged into them survive, and the substitution is
+    // recorded so the coach sees what changed.
+    this._service.swapExercise(cur.id, swapTarget, ex.id).subscribe({
+      next: (saved) => {
+        this._mergeExercise(swapTarget, {
+          exerciseId: saved.exerciseId,
+          exerciseNameSnapshot: saved.exerciseNameSnapshot,
+          exerciseThumbnailUrlSnapshot: saved.exerciseThumbnailUrlSnapshot,
+          swappedFromExerciseId: saved.swappedFromExerciseId,
+          exercise: saved.exercise,
+        });
+        this.swapTargetExerciseId.set(null);
+        this._messageService.add({
+          severity: 'success',
+          summary: `Swapped to ${saved.exerciseNameSnapshot}`,
+          detail: 'Your logged sets carried over.',
+          life: 3000,
+        });
+      },
+      error: (err) =>
+        showApiError(
+          this._messageService,
+          "Couldn't swap exercise",
+          'Please retry.',
+          err,
+        ),
+    });
   }
 
   private _appendExerciseFromPicker(exerciseId: string): void {
@@ -321,6 +418,51 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   }
 
   // ── Complete ─────────────────────────────────────────────────────
+
+  /**
+   * "I changed my mind." Deliberately worded so nobody confuses it with
+   * skipping: skipping records that you chose not to train, this
+   * removes the workout entirely.
+   */
+  confirmDiscard(): void {
+    const cur = this.log();
+    if (!cur || this.isComplete()) return;
+    this._confirmationService.confirm({
+      header: 'Cancel this workout?',
+      message:
+        this.setsDone() > 0
+          ? `This deletes the workout and the ${this.setsDone()} set${this.setsDone() === 1 ? '' : 's'} you logged. It won't show as skipped — it will be as if you never started.`
+          : "This deletes the workout. It won't show as skipped — it will be as if you never started.",
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Cancel workout',
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: 'Keep going',
+      rejectButtonProps: { severity: 'secondary', text: true },
+      accept: () => this._discardWorkout(),
+    });
+  }
+
+  private _discardWorkout(): void {
+    const cur = this.log();
+    if (!cur) return;
+    this.discarding.set(true);
+    this._stopRest();
+    this._service.discard(cur.id).subscribe({
+      next: () => {
+        this.discarding.set(false);
+        void this._router.navigate(['/user/training']);
+      },
+      error: (err) => {
+        this.discarding.set(false);
+        showApiError(
+          this._messageService,
+          "Couldn't cancel workout",
+          'Please retry.',
+          err,
+        );
+      },
+    });
+  }
 
   confirmComplete(): void {
     const cur = this.log();
@@ -395,6 +537,105 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     this._stopRest();
   }
 
+  // ── Polymorphic set rows ─────────────────────────────────────────
+
+  /**
+   * Which input columns this exercise's rows show. A plank asks for a
+   * time, a run asks for distance and time, a pull-up asks for reps
+   * only. Driven by the catalog `kind`, so nothing has to be typed into
+   * a field that makes no sense for the movement.
+   */
+  fieldsFor(ex: LoggedExercise): SetField[] {
+    return setFieldsFor(ex.exercise?.kind);
+  }
+
+  showsField(ex: LoggedExercise, field: SetField): boolean {
+    return this.fieldsFor(ex).includes(field);
+  }
+
+  /**
+   * Bodyweight work hides weight until asked for, so weighted pull-ups
+   * are possible without cluttering push-ups.
+   */
+  canRevealWeight(ex: LoggedExercise): boolean {
+    return (
+      ex.exercise?.kind === 'BODYWEIGHT' && !this.showsField(ex, 'weight')
+    );
+  }
+
+  revealWeight(ex: LoggedExercise): void {
+    this.weightRevealed.update((s) => new Set(s).add(ex.id));
+  }
+
+  isWeightVisible(ex: LoggedExercise): boolean {
+    return this.showsField(ex, 'weight') || this.weightRevealed().has(ex.id);
+  }
+
+  /** Reps on split squats and single-arm work read as per-side. */
+  repsSuffix(ex: LoggedExercise): string {
+    return ex.exercise?.isUnilateral ? ' each' : '';
+  }
+
+  /** mm:ss for display; the API stores plain seconds. */
+  secondsToClock(v: number | null): string {
+    if (v == null) return '';
+    const m = Math.floor(v / 60);
+    const s = v % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  /** Accepts "45", "0:45" or "1:05". Returns null on anything else. */
+  clockToSeconds(raw: string): number | null {
+    const t = raw.trim();
+    if (t === '') return null;
+    if (!t.includes(':')) {
+      const n = Number(t);
+      return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+    }
+    const [m, s] = t.split(':');
+    const mm = Number(m);
+    const ss = Number(s);
+    if (!Number.isFinite(mm) || !Number.isFinite(ss)) return null;
+    return Math.max(0, Math.round(mm * 60 + ss));
+  }
+
+  onDurationBlur(ex: LoggedExercise, set: LoggedSet, raw: string): void {
+    if (this.isComplete()) return;
+    const v = this.clockToSeconds(raw);
+    if (v === set.durationSeconds) return;
+    this.patchSet(ex, set, v == null ? {} : { durationSeconds: v });
+    set.durationSeconds = v;
+  }
+
+  /** Distance is entered in km and stored in metres (locked unit rule). */
+  onDistanceBlur(ex: LoggedExercise, set: LoggedSet, raw: string): void {
+    if (this.isComplete()) return;
+    const t = raw.trim();
+    const km = t === '' ? null : Number(t);
+    const v =
+      km == null || !Number.isFinite(km) || km < 0
+        ? null
+        : Math.round(km * 1000);
+    if (v === set.distanceMeters) return;
+    this.patchSet(ex, set, v == null ? {} : { distanceMeters: v });
+    set.distanceMeters = v;
+  }
+
+  distanceKm(set: LoggedSet): string {
+    return set.distanceMeters == null
+      ? ''
+      : String(Math.round(set.distanceMeters / 10) / 100);
+  }
+
+  /** Derived, never typed: pace only means something with both halves. */
+  paceLabel(set: LoggedSet): string {
+    const m = set.distanceMeters;
+    const s = set.durationSeconds;
+    if (!m || !s || m <= 0) return '';
+    const secPerKm = Math.round(s / (m / 1000));
+    return `${this.secondsToClock(secPerKm)} /km`;
+  }
+
   // ── Template helpers ─────────────────────────────────────────────
 
   setTarget(s: LoggedSet): string {
@@ -429,18 +670,13 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   }
 
   isCurrentExercise(ex: LoggedExercise): boolean {
-    if (this.isExerciseDone(ex)) return false;
+    if (ex.isSkipped || this.isExerciseDone(ex)) return false;
     const exs = this.exercises();
-    const firstActiveIdx = exs.findIndex((e) => !this.isExerciseDone(e));
+    // Skipped exercises are passed over when working out what's next.
+    const firstActiveIdx = exs.findIndex(
+      (e) => !e.isSkipped && !this.isExerciseDone(e),
+    );
     return firstActiveIdx >= 0 && exs[firstActiveIdx].id === ex.id;
-  }
-
-  /** True for the first not-yet-completed set of the current exercise. */
-  isCurrentSet(ex: LoggedExercise, set: LoggedSet): boolean {
-    if (set.isCompleted || !this.isCurrentExercise(ex)) return false;
-    const sets = ex.sets ?? [];
-    const firstOpen = sets.find((x) => !x.isCompleted);
-    return firstOpen?.id === set.id;
   }
 
   /** Lazy load the "Last time" hint when a card is the current one. */

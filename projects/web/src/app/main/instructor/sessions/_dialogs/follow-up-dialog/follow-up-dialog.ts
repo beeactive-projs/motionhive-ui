@@ -96,7 +96,7 @@ import {
         </div>
       </div>
 
-      <ng-template pTemplate="footer">
+      <ng-template #footer>
         <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
         <button pButton type="button" [disabled]="(!message().trim()) || busy()" (click)="send()">
           <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-send'"></i>

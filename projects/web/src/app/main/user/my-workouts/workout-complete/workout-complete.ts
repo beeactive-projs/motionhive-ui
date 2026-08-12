@@ -19,11 +19,8 @@ import { TextareaModule } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 
 import {
-  CreateRoutineExercisePayload,
-  CreateRoutinePayload,
   LoggedExercise,
   LoggedSet,
-  RoutineService,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
@@ -77,7 +74,6 @@ export class WorkoutComplete implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _service = inject(WorkoutLogService);
-  private readonly _routineService = inject(RoutineService);
   private readonly _messageService = inject(MessageService);
 
   readonly log = signal<WorkoutLog | null>(null);
@@ -89,6 +85,12 @@ export class WorkoutComplete implements OnInit {
   // ── Save-as-routine dialog ──────────────────────────────────────
   readonly saveAsRoutineOpen = signal(false);
   readonly savingRoutine = signal(false);
+  /** Carry today's numbers across, or keep the shape only. */
+  readonly routineMode = signal<'TARGETS' | 'STRUCTURE'>('TARGETS');
+  readonly routineModeOptions = [
+    { label: 'From what I did', value: 'TARGETS' as const },
+    { label: 'Structure only', value: 'STRUCTURE' as const },
+  ];
   readonly routineName = signal('');
   readonly routineFolder = signal('');
   /** Tracks whether the user has already saved this log as a routine, so
@@ -207,108 +209,102 @@ export class WorkoutComplete implements OnInit {
       });
   }
 
+  /** Whether there is anything to save. Drives the Skip affordance. */
+  readonly hasFeedback = computed(
+    () => this.feelingRating() != null || this.notes().trim().length > 0,
+  );
+
+  /** Coached work is visible to that coach; solo work is not. */
+  readonly isCoached = computed(() => !!this.log()?.programAssignmentId);
+
+  readonly notesPlaceholder = computed(() =>
+    this.isCoached()
+      ? 'Anything to note for your coach? (optional)'
+      : 'Anything worth remembering next time? (optional)',
+  );
+
+  readonly notesAudience = computed(() =>
+    this.isCoached()
+      ? 'Your coach can see this note and how it felt.'
+      : 'Only you can see this. Solo sessions are not shared with a coach.',
+  );
+
+  /** Leave without persisting the note or the rating. */
+  skipFeedback(): void {
+    this.backToPlan();
+  }
+
+  /**
+   * Back to Training, which is where you started and where the session
+   * you just finished now appears. This used to land on "My plans",
+   * which is not a tab any more — you finished a workout and arrived
+   * somewhere with no obvious way back.
+   */
   backToPlan(): void {
-    const cur = this.log();
-    if (cur?.programAssignmentId) {
-      this._router.navigate(['/user/plans', cur.programAssignmentId]);
-    } else {
-      this._router.navigate(['/user/plans']);
-    }
+    void this._router.navigate(['/user/training']);
   }
 
   // ── Save as routine ─────────────────────────────────────────────
 
-  /** Only offered when at least one exercise has a usable exerciseId. */
-  readonly canSaveAsRoutine = computed(() => {
-    const sources = this._routineExerciseSources();
-    return sources.length > 0;
-  });
+  /**
+   * Only offered when something is actually repeatable: at least one
+   * exercise still points at a catalog row and wasn't skipped.
+   */
+  readonly canSaveAsRoutine = computed(() =>
+    this.exercises().some((ex) => !!ex.exerciseId && !ex.isSkipped),
+  );
 
   openSaveAsRoutineDialog(): void {
     const cur = this.log();
     if (!cur) return;
     this.routineName.set(cur.name);
     this.routineFolder.set('');
+    this.routineMode.set('TARGETS');
     this.saveAsRoutineOpen.set(true);
   }
 
   saveAsRoutine(): void {
+    const cur = this.log();
     const name = this.routineName().trim();
-    if (!name || this.savingRoutine()) return;
-    const exercises = this._routineExerciseSources();
-    if (exercises.length === 0) return;
-
-    const payload: CreateRoutinePayload = {
-      name,
-      ...(this.routineFolder().trim() ? { folder: this.routineFolder().trim() } : {}),
-      exercises,
-    };
+    if (!cur || !name || this.savingRoutine()) return;
 
     this.savingRoutine.set(true);
-    this._routineService.create(payload).subscribe({
-      next: (saved) => {
-        this.savingRoutine.set(false);
-        this.saveAsRoutineOpen.set(false);
-        this.savedRoutineId.set(saved.id);
-        this._messageService.add({
-          severity: 'success',
-          summary: 'Routine saved',
-          detail: `"${saved.name}" is in your routines tab.`,
-          life: 3000,
-        });
-      },
-      error: (err) => {
-        this.savingRoutine.set(false);
-        showApiError(this._messageService, "Couldn't save routine", 'Please retry.', err);
-      },
-    });
+    this._service
+      .saveAsRoutine(cur.id, {
+        name,
+        ...(this.routineFolder().trim()
+          ? { folder: this.routineFolder().trim() }
+          : {}),
+        mode: this.routineMode(),
+      })
+      .subscribe({
+        next: (saved) => {
+          this.savingRoutine.set(false);
+          this.saveAsRoutineOpen.set(false);
+          this.savedRoutineId.set(saved.id);
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Routine saved',
+            detail: `"${saved.name}" is in your routines tab.`,
+            life: 3000,
+          });
+        },
+        error: (err) => {
+          this.savingRoutine.set(false);
+          showApiError(
+            this._messageService,
+            "Couldn't save routine",
+            'Please retry.',
+            err,
+          );
+        },
+      });
   }
 
   goToRoutines(): void {
-    this._router.navigate(['/user/workouts'], { queryParams: { tab: 'routines' } });
-  }
-
-  /**
-   * Build CreateRoutineExercisePayload[] from the log:
-   *  - Skip exercises without a canonical exerciseId (legacy custom rows).
-   *  - defaultSets = completed set count (fall back to total sets, min 1).
-   *  - targetReps min/max from the completed reps range.
-   *  - targetWeightKg = max weight across completed sets.
-   *  - restAfterSeconds = mode/first non-null rest from completed sets.
-   */
-  private _routineExerciseSources(): CreateRoutineExercisePayload[] {
-    const out: CreateRoutineExercisePayload[] = [];
-    for (const ex of this.exercises()) {
-      if (!ex.exerciseId) continue;
-      const allSets = ex.sets ?? [];
-      const done = allSets.filter((s) => s.isCompleted);
-      const ref = done.length > 0 ? done : allSets;
-      if (ref.length === 0) {
-        out.push({ exerciseId: ex.exerciseId, defaultSets: 3 });
-        continue;
-      }
-
-      const repsList = ref.map((s) => s.reps).filter((r): r is number => r != null);
-      const weightList = ref.map((s) => s.weightKg).filter((w): w is number => w != null);
-      const restList = ref.map((s) => s.restAfterSeconds).filter((r): r is number => r != null);
-
-      const payload: CreateRoutineExercisePayload = {
-        exerciseId: ex.exerciseId,
-        defaultSets: Math.max(1, Math.min(30, ref.length)),
-      };
-      if (repsList.length > 0) {
-        payload.targetRepsMin = Math.min(...repsList);
-        payload.targetRepsMax = Math.max(...repsList);
-      }
-      if (weightList.length > 0) {
-        payload.targetWeightKg = Math.max(...weightList);
-      }
-      if (restList.length > 0) {
-        payload.restAfterSeconds = restList[0];
-      }
-      out.push(payload);
-    }
-    return out;
+    // Routines are always on screen in the Today lens now; the old
+    // `?tab=routines` pointed at a tab that no longer exists.
+    this._router.navigate(['/user/training']);
   }
 
   // ── Internals ────────────────────────────────────────────────────

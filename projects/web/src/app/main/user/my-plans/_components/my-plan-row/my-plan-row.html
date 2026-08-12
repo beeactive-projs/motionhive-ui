@@ -13,7 +13,18 @@
 
     <!-- Coach avatar (brand hexagon) -->
     @if (!mobile()) {
+    <!--
+      A plan you scheduled yourself has no coach, and the avatar fell
+      back to a "?" hex. Show the routine mark instead of a person who
+      does not exist.
+    -->
+    @if (isSelfScheduled()) {
+    <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary-900/30">
+      <i class="pi pi-clone"></i>
+    </span>
+    } @else {
     <mh-hex-avatar [user]="instructor()" [size]="44" />
+    }
     }
 
     <!-- Main info -->
@@ -26,7 +37,8 @@
       @if (!mobile()) {
       <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-muted-color text-sm">
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-user text-sm" aria-hidden="true"></i>{{ instructorName() }}
+          <i class="pi text-sm" aria-hidden="true"
+            [class]="isSelfScheduled() ? 'pi-clone' : 'pi-user'"></i>{{ originLabel() }}
         </span>
         <span class="inline-flex items-center gap-1">
           <i class="pi pi-calendar text-sm" aria-hidden="true"></i>

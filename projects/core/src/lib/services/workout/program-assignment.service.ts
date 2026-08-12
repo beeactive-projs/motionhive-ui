@@ -11,6 +11,10 @@ import type {
   ProgramAssignment,
   UpdateAssignmentPayload,
 } from '../../models/workout/assignment.model';
+import type {
+  ScheduleRoutinePayload,
+  TrainingDay,
+} from '../../models/workout/training-day.model';
 
 /**
  * ProgramAssignmentService — REST wrapper over /program-assignments
@@ -39,6 +43,7 @@ export class ProgramAssignmentService {
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.status) p = p.set('status', query.status);
     if (query.clientId) p = p.set('clientId', query.clientId);
+    if (query.search?.trim()) p = p.set('search', query.search.trim());
     return this._http.get<PaginatedAssignments>(this._base, { params: p });
   }
 
@@ -67,6 +72,7 @@ export class ProgramAssignmentService {
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.status) p = p.set('status', query.status);
+    if (query.search?.trim()) p = p.set('search', query.search.trim());
     return this._http.get<PaginatedAssignments>(this._myBase, { params: p });
   }
 
@@ -85,6 +91,34 @@ export class ProgramAssignmentService {
    * Returns the updated assigned-workout so the FE can optimistically
    * patch its tree.
    */
+  /**
+   * Today, this week, and every active plan in one read. Powers the
+   * Workouts front door.
+   *
+   * `date` is the caller's calendar date, because "today" belongs to
+   * the person training, not the server.
+   */
+  trainingDay(date?: string): Observable<TrainingDay> {
+    let params = new HttpParams();
+    if (date) params = params.set('date', date);
+    return this._http.get<TrainingDay>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.MY_TODAY}`,
+      { params },
+    );
+  }
+
+  /**
+   * Schedule one of your own routines across the week. Self-assignment,
+   * so it lands in the same place a coach's plan would and shows up on
+   * the Workouts front door alongside it.
+   */
+  scheduleRoutine(payload: ScheduleRoutinePayload): Observable<ProgramAssignment> {
+    return this._http.post<ProgramAssignment>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAM_ASSIGNMENTS.MY_SCHEDULED_ROUTINES}`,
+      payload,
+    );
+  }
+
   skipAssignedWorkout(assignedWorkoutId: string): Observable<{ id: string; status: string }> {
     return this._http.post<{ id: string; status: string }>(
       `${environment.apiUrl}/my/assigned-workouts/${assignedWorkoutId}/skip`,

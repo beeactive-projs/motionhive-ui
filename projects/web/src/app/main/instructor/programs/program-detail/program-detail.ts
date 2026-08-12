@@ -190,7 +190,12 @@ export class ProgramDetail implements OnInit {
     }
     const maxUsed = all.length ? Math.max(...all.map((w) => w.weekIndex)) + 1 : 0;
     const fromDuration = p?.durationDays ? Math.ceil(p.durationDays / 7) : 0;
-    return Array.from({ length: Math.max(fromDuration, maxUsed) }, (_, week) => ({
+    // Always at least one week. Duration is optional on the create form,
+    // so a fresh shell has none, and without this the builder rail opens
+    // completely empty with nowhere to put the first workout. Week 1 is
+    // structure, not invented data: it does not set `durationDays`,
+    // which drives the assignment end date.
+    return Array.from({ length: Math.max(fromDuration, maxUsed, 1) }, (_, week) => ({
       week,
       workouts: (byWeek.get(week) ?? []).sort((a, b) => a.dayIndex - b.dayIndex),
     }));
