@@ -1,0 +1,20 @@
+.searching {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+ion-list.mh-card-list {
+  margin-inline: 0;
+}
+
+.selected {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+// The country lock is a blocker, not a footnote — it explains a disabled Save.
+.locked {
+  color: var(--ion-color-danger);
+}

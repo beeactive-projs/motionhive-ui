@@ -1,0 +1,38 @@
+<ng-template #body>
+  @if (url(); as link) {
+    <ion-note class="subtitle">
+      Drop this link in your Instagram bio, your story, or anywhere people can find you.
+    </ion-note>
+
+    <div class="link-box">
+      <span class="link-text">{{ link }}</span>
+      <ion-button size="small" (click)="copyLink()">Copy</ion-button>
+    </div>
+
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item button [detail]="false" lines="full" (click)="share()">
+        <ion-icon slot="start" name="share-social-outline" aria-hidden="true" />
+        <ion-label>Share via…</ion-label>
+      </ion-item>
+      <ion-item button [detail]="false" lines="none" (click)="openLink()">
+        <ion-icon slot="start" name="open-outline" aria-hidden="true" />
+        <ion-label>Open profile</ion-label>
+      </ion-item>
+    </ion-list>
+  } @else {
+    <mh-empty-state
+      icon="at-outline"
+      heading="Claim a handle first"
+      message="Your handle is the short link people use to find you. Pick one on your profile and you can share it from here."
+    />
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Share this profile"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.5]"
+  [initialBreakpoint]="0.5"
+/>

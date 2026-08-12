@@ -1,0 +1,4 @@
+// The action rows sit flush inside the sheet, which already has its own padding.
+ion-list.mh-card-list {
+  margin-inline: 0;
+}

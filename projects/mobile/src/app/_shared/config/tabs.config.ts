@@ -1,0 +1,110 @@
+import { NavMode, NavModes } from 'core';
+import {
+  barbellOutline,
+  calendarOutline,
+  chatbubblesOutline,
+  compassOutline,
+  ellipsisHorizontal,
+  homeOutline,
+  peopleOutline,
+  personAddOutline,
+  personCircleOutline,
+} from 'ionicons/icons';
+
+import { MoreTile, TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
+
+/**
+ * Every icon the shell renders, in one place so `addIcons()` and the kebab
+ * name strings below cannot drift apart.
+ */
+export const TAB_ICONS = {
+  barbellOutline,
+  calendarOutline,
+  chatbubblesOutline,
+  compassOutline,
+  ellipsisHorizontal,
+  homeOutline,
+  peopleOutline,
+  personAddOutline,
+  personCircleOutline,
+};
+
+// Tabs shared by both modes — same id, so Ionic keeps one stack across a swap.
+const HOME: TabItem = { id: TabIds.Home, label: 'Home', icon: 'home-outline' };
+const MESSAGES: TabItem = {
+  id: TabIds.Messages,
+  label: 'Messages',
+  icon: 'chatbubbles-outline',
+};
+
+const ACCOUNT_TILE: MoreTile = {
+  label: 'Account',
+  icon: 'person-circle-outline',
+  route: '/tabs/home/account',
+};
+
+export const COACH_TAB_SET: TabSet = {
+  mode: NavModes.Coach,
+  defaultTab: TabIds.Home,
+  tabs: [
+    HOME,
+    { id: TabIds.Clients, label: 'Clients', icon: 'people-outline' },
+    { id: TabIds.Sessions, label: 'Sessions', icon: 'calendar-outline' },
+    MESSAGES,
+  ],
+  // Programs, Exercises and Payments belong here per the design, but they have
+  // no route yet — a tile that lands on the wrong page is worse than no tile.
+  // They join in M2 alongside their pages.
+  more: [
+    {
+      label: 'Requests',
+      icon: 'person-add-outline',
+      route: '/tabs/clients/requests',
+      requiresInstructor: true,
+    },
+    { label: 'Discover', icon: 'compass-outline', route: '/tabs/discover' },
+    ACCOUNT_TILE,
+  ],
+};
+
+export const TRAIN_TAB_SET: TabSet = {
+  mode: NavModes.Train,
+  defaultTab: TabIds.Home,
+  tabs: [
+    HOME,
+    { id: TabIds.Workouts, label: 'Workouts', icon: 'barbell-outline' },
+    { id: TabIds.Discover, label: 'Discover', icon: 'compass-outline' },
+    MESSAGES,
+  ],
+  // My plans, My sessions and Profile join in M2 with their pages. Until then
+  // the sheet earns its place through the mode switch and the profile row.
+  more: [ACCOUNT_TILE],
+};
+
+export const TAB_SETS: Record<NavMode, TabSet> = {
+  [NavModes.Coach]: COACH_TAB_SET,
+  [NavModes.Train]: TRAIN_TAB_SET,
+};
+
+/**
+ * The mode the shell should actually render. Someone without the INSTRUCTOR
+ * role has no second mode, so a stale stored `coach` must not give them a
+ * coach tab bar they cannot use.
+ *
+ * This is the whole reason a single dual-mode shell also covers the
+ * single-audience cases: a non-coach simply never leaves train mode.
+ */
+export function resolveMode(canSwitchMode: boolean, storedMode: NavMode): NavMode {
+  return canSwitchMode ? storedMode : NavModes.Train;
+}
+
+/**
+ * The active tab id — Ionic keys a page's navigation stack on the first URL
+ * segment after `/tabs`, so that segment is what the tab bar must highlight.
+ * Nested pages (`/tabs/clients/requests`) therefore keep their parent tab lit.
+ */
+export function activeTabIdFromUrl(url: string): TabId | undefined {
+  const path = url.split('?')[0]?.split('#')[0] ?? '';
+  const segments = path.split('/').filter(Boolean);
+  return segments[0] === 'tabs' ? (segments[1] as TabId | undefined) : undefined;
+}

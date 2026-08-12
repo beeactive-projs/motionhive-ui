@@ -1,0 +1,14 @@
+<div class="ion-padding ion-text-center">
+  <ion-icon [name]="icon()" size="large" color="medium" aria-hidden="true" />
+  <h2>{{ heading() }}</h2>
+
+  @if (message(); as text) {
+    <ion-text color="medium">
+      <p>{{ text }}</p>
+    </ion-text>
+  }
+
+  @if (actionLabel(); as label) {
+    <ion-button [fill]="actionFill()" (click)="action.emit()">{{ label }}</ion-button>
+  }
+</div>

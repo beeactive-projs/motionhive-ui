@@ -1,0 +1,42 @@
+<ng-template #body>
+  <ion-select
+    label="Country"
+    labelPlacement="stacked"
+    fill="outline"
+    interface="modal"
+    [value]="country()"
+    (ionChange)="country.set($event.detail.value)"
+  >
+    @for (option of countries; track option.code) {
+      <ion-select-option [value]="option.code">{{ option.label }}</ion-select-option>
+    }
+  </ion-select>
+
+  <ion-input
+    class="ion-margin-top"
+    label="Phone number"
+    labelPlacement="stacked"
+    fill="outline"
+    type="tel"
+    inputmode="tel"
+    placeholder="Leave empty to remove"
+    [value]="nationalNumber()"
+    [class.ion-invalid]="invalid()"
+    [class.ion-touched]="invalid()"
+    errorText="That doesn't look like a valid number for the selected country."
+    (ionInput)="onNumberInput($event.detail.value ?? '')"
+  />
+
+  <p class="mh-helper">Your phone number stays private — it's only used for account security.</p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Phone number"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.5, 0.95]"
+  [initialBreakpoint]="0.5"
+  (save)="save()"
+/>

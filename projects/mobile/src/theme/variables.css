@@ -11,6 +11,59 @@
  */
 
 :root {
+  /*
+   * Type — the same three families as web: Inter for UI, Poppins for headings,
+   * JetBrains Mono for the uppercase kickers. Loaded in index.html.
+   */
+  --ion-font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mh-font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --mh-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+
+  /*
+   * Light surfaces — slate page, white cards. Ionic's default light background
+   * is pure white, which makes a white card invisible; the design's card-based
+   * screens need the page one step darker than the things sitting on it.
+   * (Values: slate page bg + white card, per the design tokens.)
+   */
+  --ion-background-color: #f8fafc;
+  --ion-background-color-rgb: 248, 250, 252;
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+  --ion-tab-bar-background: #ffffff;
+  --ion-border-color: #e2e8f0;
+
+  /*
+   * Ink is Midnight Navy, not black. Ionic leaves `--ion-text-color` undefined
+   * in light mode (components inline `var(--ion-text-color, #000)`), so any
+   * `var(--ion-text-color)` of ours would otherwise resolve to nothing.
+   */
+  --ion-text-color: #0e1b31;
+  --ion-text-color-rgb: 14, 27, 49;
+
+  /*
+   * Honey is too light to be read as text on its own tint. This is the deep
+   * amber the design uses for links and labels sitting on honey surfaces.
+   */
+  --mh-color-honey-deep: #b45309;
+
+  /*
+   * The hairline between rows inside a card — one step lighter than
+   * `--ion-border-color`, which outlines the card itself. Slate 100.
+   */
+  --mh-color-divider: #f1f5f9;
+
+  /*
+   * Soft status chips. A saturated fill with white text cannot reach the 4.5:1
+   * that badge-sized text needs (white on Sky 500 is 2.8:1), so the small
+   * status pills use the tint-plus-deep-ink pairing instead — the same idiom
+   * the design already uses for specialization chips. Scale steps 100 + 700.
+   */
+  --mh-chip-info-background: #e0f2fe;
+  --mh-chip-info-color: #0369a1;
+  --mh-chip-success-background: #d1fae5;
+  --mh-chip-success-color: #047857;
+
   /* Primary — Honey Amber (primary[500]) */
   --ion-color-primary: #f59e0b;
   --ion-color-primary-rgb: 245, 158, 11;
@@ -50,6 +103,71 @@
   --ion-color-danger-contrast-rgb: 255, 255, 255;
   --ion-color-danger-shade: #d23c3c;
   --ion-color-danger-tint: #f15757;
+
+  /*
+   * Info — Sky (info[500]). Ionic has no `info` slot; the workspace palette
+   * does, so it keeps that name here rather than inventing a second one.
+   * Shade/tint are the neighbouring ramp steps (600 / 400), not Ionic's
+   * mix() output — the ramp is the source of truth.
+   */
+  --ion-color-info: #0ea5e9;
+  --ion-color-info-rgb: 14, 165, 233;
+  --ion-color-info-contrast: #ffffff;
+  --ion-color-info-contrast-rgb: 255, 255, 255;
+  --ion-color-info-shade: #0284c7;
+  --ion-color-info-tint: #38bdf8;
+
+  /* Violet (violet[500]) — the one hue no other scale covers. */
+  --ion-color-violet: #8b5cf6;
+  --ion-color-violet-rgb: 139, 92, 246;
+  --ion-color-violet-contrast: #ffffff;
+  --ion-color-violet-contrast-rgb: 255, 255, 255;
+  --ion-color-violet-shade: #7c3aed;
+  --ion-color-violet-tint: #a78bfa;
+
+  /*
+   * Neutrals — Slate, not Ionic's default grays. The surfaces above already
+   * come from the Slate ramp (#f8fafc, #e2e8f0), so Ionic's #92949c / #222428
+   * read as a second, colder gray sitting on top of them. Steps 500 and 700,
+   * with their neighbours as shade/tint.
+   */
+  --ion-color-medium: #64748b;
+  --ion-color-medium-rgb: 100, 116, 139;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #475569;
+  --ion-color-medium-tint: #94a3b8;
+
+  --ion-color-dark: #334155;
+  --ion-color-dark-rgb: 51, 65, 85;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #1e293b;
+  --ion-color-dark-tint: #475569;
+}
+
+/*
+ * Ionic resolves `color="info"` through these generic slots, so a custom
+ * colour that skips this block silently does nothing on ion-badge, ion-button
+ * and friends. (`mh-hex-avatar` reads `--ion-color-*` directly and works
+ * without it.)
+ */
+.ion-color-info {
+  --ion-color-base: var(--ion-color-info) !important;
+  --ion-color-base-rgb: var(--ion-color-info-rgb) !important;
+  --ion-color-contrast: var(--ion-color-info-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-info-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-info-shade) !important;
+  --ion-color-tint: var(--ion-color-info-tint) !important;
+}
+
+.ion-color-violet {
+  --ion-color-base: var(--ion-color-violet) !important;
+  --ion-color-base-rgb: var(--ion-color-violet-rgb) !important;
+  --ion-color-contrast: var(--ion-color-violet-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-violet-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-violet-shade) !important;
+  --ion-color-tint: var(--ion-color-violet-tint) !important;
 }
 
 /*
@@ -61,6 +179,38 @@
  * palettes/dark.class.css).
  */
 .ion-palette-dark {
+  /* On navy, the deep amber goes unread — the design's dark-surface accent is
+     the light honey tint instead. */
+  --mh-color-honey-deep: #fcd34d;
+
+  /* Slate 100 would glare on a navy card; the divider tracks the border here. */
+  --mh-color-divider: #162b48;
+
+  /* Chips invert: deep fill, light ink (scale steps 900 + 200). */
+  --mh-chip-info-background: #0c4a6e;
+  --mh-chip-info-color: #bae6fd;
+  --mh-chip-success-background: #064e3b;
+  --mh-chip-success-color: #a7f3d0;
+
+  /*
+   * The saturated hues hold up on navy, so only the neutrals shift: Slate 500
+   * and 700 are too close to the card background to read as tiles, so both
+   * step up two rungs.
+   */
+  --ion-color-medium: #94a3b8;
+  --ion-color-medium-rgb: 148, 163, 184;
+  --ion-color-medium-contrast: #0e1b31;
+  --ion-color-medium-contrast-rgb: 14, 27, 49;
+  --ion-color-medium-shade: #64748b;
+  --ion-color-medium-tint: #cbd5e1;
+
+  --ion-color-dark: #64748b;
+  --ion-color-dark-rgb: 100, 116, 139;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #475569;
+  --ion-color-dark-tint: #94a3b8;
+
   --ion-background-color: #0e1b31;
   --ion-background-color-rgb: 14, 27, 49;
   --ion-text-color: #f0f4f8;

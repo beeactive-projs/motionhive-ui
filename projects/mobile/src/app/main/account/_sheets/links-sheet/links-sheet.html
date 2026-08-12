@@ -1,0 +1,15 @@
+<ng-template #body>
+  <mh-social-links-fields [(links)]="links" />
+
+  <p class="mh-helper">Links show on your public profile when social links are set to public.</p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Links"
+  [body]="body"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.85, 0.95]"
+  [initialBreakpoint]="0.85"
+  (save)="save()"
+/>

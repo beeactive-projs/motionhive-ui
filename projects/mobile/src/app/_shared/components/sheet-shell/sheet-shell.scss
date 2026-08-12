@@ -1,0 +1,21 @@
+// Both are documented `ion-modal` variables; the sheet sits on the card surface
+// rather than the page slate so its rows read as raised.
+ion-modal {
+  --border-radius: 1.25rem 1.25rem 0 0;
+  --background: var(--ion-card-background);
+}
+
+// The design centres the sheet title. `ion-title` centres itself on iOS but is
+// start-aligned on md, and exposes no alignment input.
+ion-title {
+  padding-inline: 3rem;
+  font-family: var(--mh-font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+ion-footer ion-toolbar {
+  --background: var(--ion-card-background);
+  --border-width: 0;
+}

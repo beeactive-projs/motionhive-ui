@@ -1,0 +1,33 @@
+<ion-item
+  [button]="!disabled()"
+  [detail]="detail() && !disabled()"
+  [disabled]="disabled()"
+  lines="none"
+  (click)="select.emit()"
+>
+  @if (icon(); as name) {
+    <mh-hex-avatar
+      slot="start"
+      size="sm"
+      [name]="label()"
+      [icon]="name"
+      [color]="iconColor()"
+      [tone]="iconTone()"
+    />
+  }
+
+  <ion-label>
+    {{ label() }}
+    @if (note(); as hint) {
+      <p>{{ hint }}</p>
+    }
+  </ion-label>
+
+  @if (badge(); as text) {
+    <ion-badge slot="end">{{ text }}</ion-badge>
+  } @else if (displayValue(); as text) {
+    <ion-note slot="end" [class.value-mono]="valueMono()" [class.value-empty]="!hasValue()">
+      {{ text }}
+    </ion-note>
+  }
+</ion-item>

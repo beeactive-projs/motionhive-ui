@@ -2,12 +2,9 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   InfiniteScrollCustomEvent,
-  IonAvatar,
   IonBadge,
-  IonButton,
   IonContent,
   IonHeader,
-  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonItem,
@@ -37,16 +34,18 @@ import {
   PendingClientLabels,
 } from 'core';
 
+import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
+
 @Component({
   selector: 'mh-clients',
   imports: [
     DatePipe,
-    IonAvatar,
+    EmptyState,
+    HexAvatar,
     IonBadge,
-    IonButton,
     IonContent,
     IonHeader,
-    IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonItem,
@@ -154,14 +153,6 @@ export class Clients implements OnInit {
 
   clientEmail(client: InstructorClient): string {
     return client.client?.email || client.invitedEmail || '—';
-  }
-
-  clientInitials(client: InstructorClient): string {
-    const user = client.client;
-    if (user) {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
-    }
-    return (client.invitedEmail?.charAt(0) ?? '?').toUpperCase();
   }
 
   clientStatusLabel(client: InstructorClient): string {

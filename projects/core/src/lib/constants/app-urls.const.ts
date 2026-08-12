@@ -13,6 +13,16 @@ export const WEB_APP_URL = environment.webAppUrl;
 export const SIGNUP_URL = `${WEB_APP_URL}/auth/signup`;
 
 /**
+ * Public marketing site — a third deploy, separate from both the API and the
+ * web app, so it is not derived from `environment`. Blog articles are only
+ * published here; every app that surfaces them links out to this origin.
+ */
+export const MARKETING_SITE_URL = 'https://www.motionhive.fit';
+
+/** Blog index on the marketing site; append `/<slug>` for a single article. */
+export const MARKETING_BLOG_URL = `${MARKETING_SITE_URL}/blog`;
+
+/**
  * Destination for a blog author's byline.
  *
  * - Registered external author (has a handle) → their public profile at

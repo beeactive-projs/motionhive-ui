@@ -64,3 +64,21 @@ export function countryNameFromCode(code: string | null | undefined): string | n
   if (!code) return null;
   return STRIPE_CONNECT_COUNTRIES.find((c) => c.code === code)?.name ?? code;
 }
+
+/** Offset from ASCII 'A' to the Regional Indicator Symbol block. */
+const REGIONAL_INDICATOR_OFFSET = 0x1f1e6 - 'A'.charCodeAt(0);
+
+/**
+ * The flag emoji for an ISO 3166-1 alpha-2 code — 'RO' becomes 🇷🇴.
+ *
+ * Derived from the code rather than shipped as assets: a flag is just its two
+ * letters in the Regional Indicator block. Returns an empty string for anything
+ * that is not two letters, so a bad code renders as nothing rather than as
+ * mojibake.
+ */
+export function countryFlagEmoji(code: string | null | undefined): string {
+  if (!code || !/^[a-zA-Z]{2}$/.test(code)) return '';
+  return [...code.toUpperCase()]
+    .map((char) => String.fromCodePoint(char.charCodeAt(0) + REGIONAL_INDICATOR_OFFSET))
+    .join('');
+}

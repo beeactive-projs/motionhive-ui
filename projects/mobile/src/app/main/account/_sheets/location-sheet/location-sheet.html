@@ -1,0 +1,49 @@
+<ng-template #body>
+  <ion-searchbar
+    placeholder="Search for a place"
+    [debounce]="0"
+    (ionInput)="onSearch($event.detail.value ?? '')"
+  />
+
+  @if (searching()) {
+    <div class="searching">
+      <ion-spinner name="crescent" />
+    </div>
+  } @else if (results().length) {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (place of results(); track place.displayName) {
+        <ion-item button [detail]="false" lines="full" (click)="pick(place)">
+          <ion-icon slot="start" name="location-outline" aria-hidden="true" />
+          <ion-label class="ion-text-wrap">
+            {{ place.city ?? place.displayName }}
+            <p>{{ place.country }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  @if (selected(); as place) {
+    <p class="selected">Selected: {{ place.city ?? place.displayName }}, {{ place.country }}</p>
+  }
+
+  @if (blockedByCountryLock()) {
+    <p class="mh-helper locked">
+      You can update your city, but your country is locked because payments are set up on your
+      account.
+    </p>
+  } @else {
+    <p class="mh-helper">Your city shows on your public profile. Your exact address never does.</p>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Location"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.75, 0.95]"
+  [initialBreakpoint]="0.75"
+  (save)="save()"
+/>

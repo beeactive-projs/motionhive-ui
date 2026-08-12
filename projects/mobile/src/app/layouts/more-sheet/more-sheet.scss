@@ -1,0 +1,6 @@
+// Stack the icon above its label inside the tile — ion-item lays its label
+// out as a text row, and there is no input for a vertical tile.
+ion-col ion-label ion-icon {
+  display: block;
+  margin: 0 auto;
+}

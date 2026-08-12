@@ -1,0 +1,82 @@
+// The hexagon itself — no Ionic primitive produces this shape. Drawn as SVG
+// rather than clip-path because the corners are rounded (clip-path can't).
+:host {
+  display: inline-flex;
+  position: relative;
+  width: 2.5rem;
+  aspect-ratio: 100 / 86.6;
+  flex: none;
+  color: var(--hex-ink);
+  font-weight: 600;
+  line-height: 0;
+}
+
+:host([data-size='xs']) {
+  width: 0.875rem;
+}
+
+:host([data-size='sm']) {
+  width: 1.875rem;
+  font-size: 0.7rem;
+}
+
+:host([data-size='lg']) {
+  width: 3.25rem;
+  font-size: 1rem;
+}
+
+:host([data-size='xl']) {
+  width: 5rem;
+  font-size: 1.5rem;
+}
+
+:host([data-size='2xl']) {
+  width: 6.125rem;
+  font-size: 1.75rem;
+}
+
+.hex {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hex path {
+  fill: var(--hex-fill);
+}
+
+// Initials and icons sit over the shape, centred on it.
+.hex-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+ion-icon {
+  font-size: 1.25rem;
+}
+
+// The glyph tracks the hexagon rather than sitting lost inside a large tile.
+:host([data-size='sm']) ion-icon {
+  font-size: 0.9375rem;
+}
+
+:host([data-size='xl']) ion-icon {
+  font-size: 2.25rem;
+}
+
+:host([data-size='2xl']) ion-icon {
+  font-size: 2.75rem;
+}
+
+.mh-visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

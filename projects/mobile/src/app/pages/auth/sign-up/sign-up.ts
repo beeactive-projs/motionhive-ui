@@ -167,7 +167,7 @@ export class SignUp {
 
   private navigateToApp(): void {
     const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl');
-    this._navController.navigateRoot(returnUrl || '/tabs/clients');
+    this._navController.navigateRoot(returnUrl || '/tabs/home');
   }
 
   private capitalize(str: string): string {

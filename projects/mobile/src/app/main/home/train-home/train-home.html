@@ -1,0 +1,141 @@
+<div class="ion-padding-horizontal ion-padding-top">
+  <h1>Good to see you, {{ greetingName() }}.</h1>
+  <ion-text color="medium">
+    <p>A calm place to settle in and pick up where you left off.</p>
+  </ion-text>
+</div>
+
+<!--
+  Today's workout — absent entirely when nothing is in progress, no placeholder.
+  Navy card so the one thing you came here to do is the darkest object on the
+  screen, with the honey button as its single action.
+-->
+@if (store.resume(); as log) {
+  <ion-card color="secondary">
+    <ion-card-header>
+      <ion-card-subtitle color="primary">Pick up where you left off</ion-card-subtitle>
+      <ion-card-title>{{ log.name }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button expand="block" (click)="resumeWorkout()">Resume workout</ion-button>
+    </ion-card-content>
+  </ion-card>
+}
+
+<ion-list>
+  <ion-item button [detail]="true" (click)="openSessions()">
+    <ion-icon slot="start" name="calendar-outline" color="primary" aria-hidden="true" />
+    @if (store.sessionsLoading()) {
+      <ion-label>
+        <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+        <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
+      </ion-label>
+    } @else {
+      <ion-label class="ion-text-wrap">
+        <h2>{{ sessionsSummary() }}</h2>
+        <p>{{ sessionsHint() }}</p>
+      </ion-label>
+    }
+  </ion-item>
+</ion-list>
+
+@if (store.showSteps()) {
+  <ion-list>
+    <mh-section-header eyebrow="Start here" title="Get set up" />
+    @for (step of store.steps(); track step.id) {
+      <ion-item
+        [button]="!step.done"
+        [detail]="!step.done"
+        [disabled]="step.done"
+        (click)="openStep(step)"
+      >
+        @if (step.done) {
+          <ion-icon slot="start" name="checkmark-circle" color="success" aria-hidden="true" />
+        } @else {
+          <ion-icon slot="start" name="sparkles-outline" color="primary" aria-hidden="true" />
+        }
+        <ion-label>
+          <h2>{{ step.title }}</h2>
+          <p>{{ step.sub }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+}
+
+<ion-list>
+  <mh-section-header
+    [title]="store.hasOwnCoaches() ? 'Your coaches' : 'Some of our coaches'"
+    [linkLabel]="store.hasOwnCoaches() ? 'See all' : 'Discover more'"
+    (linkClick)="openCoaches()"
+  />
+
+  @if (store.coachesLoading()) {
+    @for (_ of [1, 2, 3]; track $index) {
+      <ion-item>
+        <ion-skeleton-text slot="start" [animated]="true" style="width: 40px; height: 35px" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 65%" /></p>
+        </ion-label>
+      </ion-item>
+    }
+  } @else if (store.coaches().length === 0) {
+    <mh-empty-state
+      icon="sparkles-outline"
+      heading="No coaches to show yet"
+      message="Once coaches join, they'll show up here."
+    />
+  } @else {
+    @for (coach of store.coaches(); track coach.key) {
+      <ion-item button [detail]="true" (click)="openCoaches()">
+        <mh-hex-avatar slot="start" [name]="coach.name" [imageUrl]="coach.avatarUrl" />
+        <ion-label>
+          <h2>{{ coach.name }}</h2>
+          <p>{{ coach.tag }}</p>
+        </ion-label>
+      </ion-item>
+    }
+    @if (!store.hasOwnCoaches()) {
+      <ion-item lines="none">
+        <ion-note>More joining soon.</ion-note>
+      </ion-item>
+    }
+  }
+</ion-list>
+
+<ion-list>
+  <mh-section-header
+    eyebrow="From the journal"
+    title="Reads from the hive"
+    linkLabel="Read all"
+    (linkClick)="openBlog()"
+  />
+
+  @if (store.postsLoading()) {
+    @for (_ of [1, 2, 3]; track $index) {
+      <ion-item>
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 80%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 50%" /></p>
+        </ion-label>
+      </ion-item>
+    }
+  } @else if (store.posts().length === 0) {
+    <ion-card>
+      <ion-card-content>
+        No posts yet. Check back soon — our first reads are landing.
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    @for (post of store.posts(); track post.id) {
+      <ion-item button [detail]="true" (click)="openPost(post)">
+        <ion-label class="ion-text-wrap">
+          <ion-note color="primary">{{ post.category }}</ion-note>
+          <h2>{{ post.title }}</h2>
+          <p>{{ post.authorName }} · {{ post.readTime }} min read</p>
+        </ion-label>
+      </ion-item>
+    }
+  }
+</ion-list>

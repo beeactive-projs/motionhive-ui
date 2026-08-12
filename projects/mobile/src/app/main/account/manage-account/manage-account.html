@@ -1,0 +1,75 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/account" />
+    </ion-buttons>
+    <ion-title>Manage account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">Preferences</ion-note>
+  <!-- Plain items throughout: `mh-settings-row` owns its own divider keyed on
+       `:last-of-type`, so mixing it with bare `ion-item`s in one list puts the
+       last hairline in the wrong place. -->
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="full">
+      <ion-icon slot="start" name="language-outline" color="medium" aria-hidden="true" />
+      <ion-label>Language</ion-label>
+      <ion-note slot="end">{{ languageLabel() }}</ion-note>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-select
+        label="Timezone"
+        [value]="timezone()"
+        [disabled]="savingTimezone()"
+        interface="modal"
+        placeholder="Not set"
+        (ionFocus)="timezonesMounted.set(true)"
+        (ionChange)="onTimezoneChange($event)"
+      >
+        @if (timezonesMounted()) {
+          @for (option of timezones; track option.value) {
+            <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+          }
+        }
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">Appearance</ion-note>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-radio-group [value]="themePreference()" (ionChange)="onThemeChange($event.detail.value)">
+      <ion-item lines="full">
+        <ion-radio [value]="ThemePreferences.System">System</ion-radio>
+      </ion-item>
+      <ion-item lines="full">
+        <ion-radio [value]="ThemePreferences.Light">Light</ion-radio>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-radio [value]="ThemePreferences.Dark">Dark</ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+
+  <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">Account</ion-note>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item button [detail]="false" [disabled]="signingOut()" lines="full" (click)="onSignOut()">
+      <ion-icon slot="start" name="log-out-outline" color="danger" aria-hidden="true" />
+      <ion-label color="danger">Log out</ion-label>
+    </ion-item>
+    <!-- No delete-account endpoint exists yet. Disabled rather than hidden so
+         the capability reads as coming rather than missing. -->
+    <ion-item [detail]="false" [disabled]="true" lines="none">
+      <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+      <ion-label color="danger">Delete account</ion-label>
+      <ion-badge slot="end" color="medium">Soon</ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <ion-note class="footer-note" color="medium">
+    Deleting your account removes your profile, programs and messages permanently. This can't be
+    undone.
+  </ion-note>
+</ion-content>

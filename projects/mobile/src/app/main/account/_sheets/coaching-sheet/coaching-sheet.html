@@ -1,0 +1,86 @@
+<ng-template #body>
+  <ion-input
+    label="Display name"
+    labelPlacement="stacked"
+    fill="outline"
+    [maxlength]="displayNameMaxLength"
+    [value]="displayName()"
+    (ionInput)="displayName.set($event.detail.value ?? '')"
+  />
+
+  <ion-input
+    class="field"
+    label="Years of experience"
+    labelPlacement="stacked"
+    fill="outline"
+    type="number"
+    inputmode="numeric"
+    [min]="0"
+    [max]="maxYears"
+    [value]="yearsOfExperience()"
+    (ionInput)="yearsOfExperience.set($event.detail.value ? +$event.detail.value : null)"
+  />
+
+  <ion-textarea
+    class="field"
+    label="Bio"
+    labelPlacement="stacked"
+    fill="outline"
+    [rows]="4"
+    [autoGrow]="true"
+    [maxlength]="bioMaxLength"
+    [value]="bio()"
+    (ionInput)="bio.set($event.detail.value ?? '')"
+  />
+
+  <ion-input
+    class="field"
+    label="Specializations"
+    labelPlacement="stacked"
+    fill="outline"
+    placeholder="strength_training, hiit, yoga"
+    [value]="specializations()"
+    (ionInput)="specializations.set($event.detail.value ?? '')"
+  />
+  <p class="mh-helper">Separate each one with a comma.</p>
+
+  <ion-list [inset]="true" class="mh-card-list field">
+    <ion-item lines="full">
+      <ion-toggle
+        [checked]="isAcceptingClients()"
+        (ionChange)="isAcceptingClients.set($event.detail.checked)"
+      >
+        <ion-label class="ion-text-wrap">
+          Accepting clients
+          <p>Shows on your public profile so people know they can reach out.</p>
+        </ion-label>
+      </ion-toggle>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-toggle
+        [checked]="showSocialLinks()"
+        (ionChange)="showSocialLinks.set($event.detail.checked)"
+      >
+        <ion-label class="ion-text-wrap">
+          Show social links
+          <p>Your links stay hidden while this is off.</p>
+        </ion-label>
+      </ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <div class="field">
+    <mh-social-links-fields [(links)]="links" />
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Coaching profile"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.9, 0.95]"
+  [initialBreakpoint]="0.9"
+  (save)="save()"
+/>

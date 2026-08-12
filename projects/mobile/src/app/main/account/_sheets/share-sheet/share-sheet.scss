@@ -1,0 +1,32 @@
+.subtitle {
+  display: block;
+  margin-bottom: 0.875rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+// The link is the payload of this sheet, so it gets a surface of its own.
+.link-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 0.75rem;
+  background: var(--ion-background-color);
+}
+
+.link-text {
+  flex: 1;
+  overflow: hidden;
+  font-family: var(--mh-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+ion-list.mh-card-list {
+  margin-inline: 0;
+}

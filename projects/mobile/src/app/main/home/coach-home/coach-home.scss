@@ -1,0 +1,36 @@
+// Rows inside the agenda card sit on the page colour, inset from the card edge
+// — the design's dashed/filled inner row. `--background` and `--border-radius`
+// are both documented ion-item variables.
+.agenda-row {
+  --background: var(--ion-background-color);
+  --border-radius: 12px;
+  --min-height: 48px;
+
+  margin: 0 12px 12px;
+}
+
+// Honey-tinted banner, through the documented card/item background variables.
+// The nested item paints its own surface, so it has to opt out of it.
+.requests {
+  --background: rgba(var(--ion-color-primary-rgb), 0.08);
+
+  border-color: rgba(var(--ion-color-primary-rgb), 0.24);
+
+  ion-item {
+    --background: transparent;
+  }
+
+  // Honey on a honey tint is unreadable; the deep amber is the design's own
+  // answer for text on this surface.
+  ion-note {
+    color: var(--mh-color-honey-deep);
+    font-weight: 600;
+  }
+}
+
+// The grid supplies the 16px page gutter and the 10px gutter between tiles, so
+// the cards inside it drop their own margins (see stat-tile.scss).
+ion-grid {
+  --ion-grid-padding: 11px;
+  --ion-grid-column-padding: 5px;
+}
