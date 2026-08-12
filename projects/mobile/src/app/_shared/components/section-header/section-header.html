@@ -1,0 +1,12 @@
+<ion-list-header>
+  <ion-label>
+    @if (eyebrow(); as text) {
+      <ion-note color="primary">{{ text }}</ion-note>
+    }
+    <h2>{{ title() }}</h2>
+  </ion-label>
+
+  @if (linkLabel(); as label) {
+    <ion-button fill="clear" size="small" (click)="linkClick.emit()">{{ label }}</ion-button>
+  }
+</ion-list-header>

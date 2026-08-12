@@ -1,0 +1,61 @@
+// The divider Ionic will not draw for us — see the class comment for why the
+// inset list's own borders cannot be used here.
+:host {
+  display: block;
+  border-block-end: 1px solid var(--mh-color-divider);
+}
+
+:host(:last-of-type) {
+  border-block-end: 0;
+}
+
+ion-item {
+  --background: var(--ion-card-background);
+  --min-height: 0;
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.875rem;
+  --inner-padding-top: 0.75rem;
+  --inner-padding-bottom: 0.75rem;
+  // Ionic dims the chevron to 25% by default, which drops it below the
+  // design's weight and below the 3:1 a control needs.
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+
+  font-size: 0.85rem;
+}
+
+// The trailing value is secondary to the label but must stay legible.
+//
+// It must also never win the space fight: a long value (a coach's bio on the
+// About row) otherwise wraps to three lines and squeezes the label out of the
+// row entirely. One line, ellipsised, and never more than half the row.
+ion-note {
+  max-width: 55%;
+  overflow: hidden;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// Whatever the value does, the label keeps its own line and its own space.
+ion-label {
+  flex-shrink: 0;
+}
+
+// Soft status chip, not a saturated fill: white on Emerald 500 is 2.2:1, well
+// under the 4.5:1 badge-sized text needs. Same pairing as the hero chips.
+ion-badge {
+  --background: var(--mh-chip-success-background);
+  --color: var(--mh-chip-success-color);
+
+  border-radius: 999px;
+  font-size: 0.625rem;
+}
+
+.value-mono {
+  font-family: var(--mh-font-mono);
+}
+
+.value-empty {
+  font-style: italic;
+}

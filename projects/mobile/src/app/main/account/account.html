@@ -1,0 +1,111 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>Account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.loading() && !account()) {
+  <div class="hero">
+    <ion-skeleton-text [animated]="true" class="hero-avatar-skeleton" />
+    <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.25rem" />
+    <ion-skeleton-text [animated]="true" style="width: 35%" />
+  </div>
+  } @else {
+  <!-- Hero -->
+  <div class="hero">
+    <button type="button" class="hero-avatar" aria-label="Change your photo" (click)="photoSheetOpen.set(true)">
+      <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
+    </button>
+
+    <h2 class="hero-name">{{ store.fullName() }}</h2>
+
+    @if (handle(); as tag) {
+    <div class="hero-handle">
+      <ion-note class="handle-chip">{{ '@' + tag }}</ion-note>
+      <ion-button fill="clear" size="small" aria-label="Copy profile link" (click)="copyHandle()">
+        <ion-icon slot="icon-only" name="copy-outline" />
+      </ion-button>
+    </div>
+    }
+
+    @if (isInstructor()) {
+    <div class="hero-badges">
+      <ion-badge class="chip-info">Coach</ion-badge>
+      @if (isVerified()) {
+      <ion-badge class="chip-success">
+        <ion-icon name="checkmark-circle" aria-hidden="true" />
+        Verified
+      </ion-badge>
+      }
+    </div>
+    }
+
+    <div class="hero-actions">
+      <ion-button expand="block" [disabled]="!handle()" (click)="openPublicProfile()">
+        View profile
+      </ion-button>
+      <ion-button expand="block" fill="outline" [disabled]="!handle()"
+        (click)="shareSheetOpen.set(true)">
+        Share
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Profile -->
+  <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">Profile</ion-note>
+  <ion-list [inset]="true" class="mh-card-list">
+    <mh-settings-row label="Profile" icon="person-outline" iconColor="primary" value="Name, photo, handle"
+      (select)="go('profile')" />
+    @if (isInstructor()) {
+    <mh-settings-row label="Coaching profile" icon="ribbon-outline" iconColor="info" iconTone="shade"
+      [badge]="acceptingBadge()" (select)="go('coaching')" />
+    }
+  </ion-list>
+
+  <!-- Preferences -->
+  <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">Preferences</ion-note>
+  <ion-list [inset]="true" class="mh-card-list">
+    <mh-settings-row label="Notifications" icon="notifications-outline" iconColor="danger"
+      (select)="go('notifications')" />
+    <mh-settings-row label="Appearance" icon="color-palette-outline" iconColor="violet" [value]="themeLabel()"
+      (select)="go('manage')" />
+    <mh-settings-row label="Language" icon="language-outline" iconColor="medium" [value]="languageLabel()"
+      (select)="go('manage')" />
+    <mh-settings-row label="Timezone" icon="time-outline" iconColor="medium" [value]="timezoneLabel()"
+      (select)="go('manage')" />
+  </ion-list>
+
+  <!-- Privacy & account -->
+  <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
+    Privacy &amp; account
+  </ion-note>
+  <ion-list [inset]="true" class="mh-card-list">
+    <mh-settings-row label="Blocked users" icon="ban-outline" iconColor="success" iconTone="shade"
+      (select)="go('blocked')" />
+    <mh-settings-row label="Manage account" icon="log-in-outline" iconColor="dark" value="Log out, delete"
+      (select)="go('manage')" />
+  </ion-list>
+
+  <ion-list [inset]="true" class="mh-card-list">
+    <mh-settings-row label="Sign out" icon="log-out-outline" iconColor="danger" [detail]="false"
+      [disabled]="signingOut()" (select)="onSignOut()" />
+  </ion-list>
+
+  @if (memberSince(); as since) {
+  <ion-text color="medium">
+    <p class="footer-note">Member since {{ since }}</p>
+  </ion-text>
+  }
+  }
+
+  <mh-photo-sheet [(open)]="photoSheetOpen" />
+  <mh-share-sheet [(open)]="shareSheetOpen" [handle]="handle()" />
+</ion-content>

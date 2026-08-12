@@ -1,0 +1,35 @@
+// The role pill, per the design: honey-tinted capsule, amber hexagon dot, plain
+// sentence-case label. Every value comes from the palette, not a literal.
+//
+// It must stay `fill="clear"`. A *solid* button inside a toolbar is styled by
+// Ionic as an inverted chip — `color: var(--ion-toolbar-background, var(--color))`
+// — so the label would come out white against this tint and `--color` would be
+// ignored. The clear variant leaves the background to `--background` and honours
+// `--color`, which is what the pill needs.
+.role-pill {
+  --background: rgba(var(--ion-color-primary-rgb), 0.12);
+  --background-hover: rgba(var(--ion-color-primary-rgb), 0.2);
+  --background-activated: rgba(var(--ion-color-primary-rgb), 0.24);
+  // Text colour, not amber: amber on an amber tint fails AA, and it flips with
+  // the palette so the pill still reads in dark mode.
+  --color: var(--ion-text-color);
+  --padding-start: 10px;
+  --padding-end: 10px;
+
+  // Android buttons are uppercase and widely tracked by default; the design's
+  // pill is a label, not a shout. `.button-native` inherits all four.
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+
+  mh-hex-avatar {
+    margin-inline-end: 6px;
+  }
+
+  // Ionic sizes slotted icons at 1.35em — far too heavy for the design's
+  // 10x6 chevron.
+  ion-icon {
+    font-size: 0.9rem;
+  }
+}

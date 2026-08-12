@@ -1,0 +1,8 @@
+// ion-note renders inline by default; the eyebrow needs its own line above
+// the title. Nothing else here — ion-list-header owns the row layout.
+ion-note {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

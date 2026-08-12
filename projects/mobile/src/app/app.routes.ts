@@ -1,6 +1,15 @@
 import { Routes } from '@angular/router';
 import { authGuard } from 'core';
 
+import { coachGuard } from './_shared/guards/coach.guard';
+
+/**
+ * Pages that are reachable but do not own a tab (Settings, Requests) are nested
+ * under the tab they belong to rather than sitting beside it. Ionic derives a
+ * page's navigation stack from the first URL segment after `/tabs`, so a
+ * top-level `/tabs/settings` would open a stack with no matching tab button and
+ * leave the bar showing nothing selected for the whole visit.
+ */
 export const routes: Routes = [
   {
     path: 'auth',
@@ -12,20 +21,52 @@ export const routes: Routes = [
     loadComponent: () => import('./layouts/tabs/tabs').then((m) => m.Tabs),
     children: [
       {
+        path: 'home',
+        loadComponent: () => import('./main/home/home').then((m) => m.Home),
+      },
+      {
+        path: 'home/account',
+        loadChildren: () =>
+          import('./main/account/account.routes').then((m) => m.accountRoutes),
+      },
+      {
+        // Only an instructor holds a second role, so only an instructor has
+        // anything to switch between.
+        path: 'home/switch-role',
+        canActivate: [coachGuard],
+        loadComponent: () =>
+          import('./main/home/switch-role/switch-role').then((m) => m.SwitchRole),
+      },
+      {
+        path: 'messages',
+        loadComponent: () => import('./main/messages/messages').then((m) => m.Messages),
+      },
+      {
         path: 'clients',
+        canActivate: [coachGuard],
         loadComponent: () => import('./main/clients/clients').then((m) => m.Clients),
       },
       {
-        path: 'requests',
+        path: 'clients/requests',
+        canActivate: [coachGuard],
         loadComponent: () => import('./main/requests/requests').then((m) => m.Requests),
       },
       {
-        path: 'settings',
-        loadComponent: () => import('./main/settings/settings').then((m) => m.Settings),
+        path: 'sessions',
+        canActivate: [coachGuard],
+        loadComponent: () => import('./main/sessions/sessions').then((m) => m.Sessions),
       },
-      { path: '', redirectTo: 'clients', pathMatch: 'full' },
+      {
+        path: 'workouts',
+        loadComponent: () => import('./main/workouts/workouts').then((m) => m.Workouts),
+      },
+      {
+        path: 'discover',
+        loadComponent: () => import('./main/discover/discover').then((m) => m.Discover),
+      },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },
-  { path: '', redirectTo: 'tabs/clients', pathMatch: 'full' },
-  { path: '**', redirectTo: 'tabs/clients' },
+  { path: '', redirectTo: 'tabs/home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'tabs/home' },
 ];

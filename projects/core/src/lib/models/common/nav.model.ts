@@ -1,5 +1,6 @@
 import type { Signal } from '@angular/core';
 import type { UserRole } from '../user/role.enums';
+import type { NavMode } from './nav.enums';
 
 export interface NavItem {
   label: string;
@@ -17,13 +18,6 @@ export interface NavItem {
    */
   badge?: Signal<number>;
 }
-
-/**
- * Sidebar workspace mode. Sections tagged with a mode belong to the
- * Coach/Train toggle and only render when that mode is active. Untagged
- * sections (common nav, admin, content) always render.
- */
-export type NavMode = 'coach' | 'train';
 
 export interface NavSection {
   label: string;

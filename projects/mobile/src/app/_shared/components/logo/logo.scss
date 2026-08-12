@@ -1,0 +1,10 @@
+// Brand surface rule: navy mark on light surfaces, honey on dark. Nothing
+// else here — the SVG carries its own size.
+svg {
+  display: block;
+  fill: var(--ion-color-secondary);
+}
+
+:host-context(.ion-palette-dark) svg {
+  fill: var(--ion-color-primary);
+}

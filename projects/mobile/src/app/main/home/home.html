@@ -1,0 +1,87 @@
+<!--
+  Logo · role pill · avatar. The pill is the only role switcher in the app —
+  it pushes the switch-role page rather than toggling in place, so the choice
+  is made on a screen that can explain what changes.
+-->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <mh-logo class="ion-margin-end" />
+
+      @if (canSwitchMode()) {
+        <ion-button
+          class="role-pill"
+          fill="clear"
+          shape="round"
+          size="small"
+          [attr.aria-label]="'Switch role, currently ' + role().label"
+          (click)="openRoleSwitch()"
+        >
+          <mh-hex-avatar slot="start" size="xs" color="primary" />
+          {{ role().label }}
+          <ion-icon slot="end" name="chevron-down" aria-hidden="true" />
+        </ion-button>
+      }
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button aria-label="Your profile" (click)="openProfile()">
+        <mh-hex-avatar size="sm" [name]="userName()" [imageUrl]="avatarUrl()" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!--
+  The greeting lives in the body rather than a `collapse="condense"` large
+  title: condensed headers are iOS-only, so on Android the heading would
+  silently disappear.
+-->
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  <!--
+    Which body to render is a question about roles, so nothing renders until
+    the session says which roles this account holds. Guessing would flash the
+    trainee home at a coach on every cold start.
+  -->
+  @if (!roleKnown()) {
+    <div class="ion-padding-horizontal ion-padding-top">
+      <ion-skeleton-text [animated]="true" style="width: 110px; height: 8px" />
+      <ion-skeleton-text [animated]="true" style="width: 200px; height: 16px" />
+    </div>
+
+    <ion-card>
+      <ion-item lines="none">
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 35%" /></p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <ion-grid>
+      <ion-row>
+        @for (_ of [1, 2]; track $index) {
+          <ion-col size="6">
+            <ion-card>
+              <ion-item lines="none">
+                <ion-label>
+                  <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
+                  <h2><ion-skeleton-text [animated]="true" style="width: 90%" /></h2>
+                  <p><ion-skeleton-text [animated]="true" style="width: 100%" /></p>
+                </ion-label>
+              </ion-item>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  } @else if (mode() === NavModes.Coach) {
+    <mh-coach-home />
+  } @else {
+    <mh-train-home />
+  }
+</ion-content>

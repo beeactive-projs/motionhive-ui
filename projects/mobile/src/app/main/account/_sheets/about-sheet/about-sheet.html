@@ -1,0 +1,26 @@
+<ng-template #body>
+  <ion-textarea
+    label="About"
+    labelPlacement="stacked"
+    fill="outline"
+    [rows]="5"
+    [autoGrow]="true"
+    [counter]="true"
+    [maxlength]="maxLength"
+    placeholder="What should people know about how you coach?"
+    [value]="bio()"
+    (ionInput)="bio.set($event.detail.value ?? '')"
+  />
+
+  <p class="mh-helper">A short bio shown on your public profile.</p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="About"
+  [body]="body"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.55, 0.95]"
+  [initialBreakpoint]="0.55"
+  (save)="save()"
+/>

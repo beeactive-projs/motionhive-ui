@@ -1,0 +1,36 @@
+<ng-template #body>
+  <ion-input
+    label="Handle"
+    labelPlacement="stacked"
+    fill="outline"
+    autocapitalize="off"
+    autocorrect="off"
+    spellcheck="false"
+    [maxlength]="maxLength"
+    [value]="handle()"
+    [class.ion-invalid]="validationError() !== null"
+    [class.ion-touched]="validationError() !== null"
+    [errorText]="validationError() ?? ''"
+    (ionInput)="handle.set($event.detail.value ?? '')"
+  >
+    <span slot="start" class="prefix">&#64;</span>
+  </ion-input>
+
+  <ion-note class="preview">{{ preview() }}</ion-note>
+
+  <p class="mh-helper">
+    Your handle is the short link to your profile. If people saved the old one, it stops working
+    when you change it.
+  </p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Handle"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.5, 0.95]"
+  [initialBreakpoint]="0.5"
+  (save)="save()"
+/>

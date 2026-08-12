@@ -1,0 +1,96 @@
+<div class="ion-padding-horizontal ion-padding-top">
+  <!-- Uppercased in CSS, not in the string: assistive tech reads the real
+       words, and the kicker still shouts like the design's mono caps. -->
+  <ion-note class="mh-kicker ion-text-uppercase" color="medium">
+    {{ today() | date: 'EEEE, MMM d' }}
+  </ion-note>
+  <h1>Your coaching day</h1>
+</div>
+
+<!--
+  Agenda card. The kicker row is an `ion-item`, not `ion-card-header`: the
+  header stacks its children, and the design puts the kicker and the Calendar
+  link on one line.
+-->
+<ion-card>
+  <ion-item lines="none">
+    <ion-label>
+      <ion-note class="mh-kicker ion-text-uppercase" color="medium">
+        Agenda · {{ today() | date: 'MMM d' }}
+      </ion-note>
+    </ion-label>
+    <ion-button slot="end" fill="clear" size="small" (click)="openSessions()">Calendar</ion-button>
+  </ion-item>
+
+  @if (store.agendaLoading()) {
+    @for (_ of [1, 2]; track $index) {
+      <ion-item class="agenda-row" lines="none">
+        <ion-skeleton-text slot="start" [animated]="true" style="width: 34px" />
+        <ion-label>
+          <ion-skeleton-text [animated]="true" style="width: 55%" />
+        </ion-label>
+      </ion-item>
+    }
+  } @else if (!store.hasAgenda()) {
+    <!--
+      An inset row on the page colour, per the design: an empty day is the
+      common case for a coach who schedules weekly, and it sits above the cards
+      that actually need the room.
+    -->
+    <ion-item class="agenda-row" lines="none">
+      <ion-note slot="start" aria-hidden="true">—</ion-note>
+      <ion-label color="medium" class="ion-text-wrap">No sessions scheduled today.</ion-label>
+      <ion-button slot="end" size="small" (click)="openSessions()">
+        <ion-icon slot="start" name="add" aria-hidden="true" />
+        New
+      </ion-button>
+    </ion-item>
+  } @else {
+    <!-- Time in the start slot, title beside it — the design's agenda row. -->
+    @for (instance of store.agenda(); track instance.id) {
+      <ion-item class="agenda-row" lines="none" button [detail]="true" (click)="openSessions()">
+        <ion-note slot="start">{{ instance.startAt | date: 'HH:mm' }}</ion-note>
+        <ion-label class="ion-text-wrap">{{ instance.template?.title }}</ion-label>
+      </ion-item>
+    }
+  }
+</ion-card>
+
+<!--
+  Requests banner — honey-tinted per the design. The tint comes from the
+  palette's own rgb triplet through `ion-card`'s documented `--background`, so
+  it follows a theme change instead of pinning a hex.
+-->
+@if (store.showRequestsBanner()) {
+  <ion-card class="requests" [button]="true" (click)="openRequests()">
+    <ion-item lines="none">
+      <ion-label class="ion-text-wrap">
+        <h2>{{ requestsSummary() }}</h2>
+        <p>Waiting for your approval.</p>
+      </ion-label>
+      <ion-note slot="end">Review</ion-note>
+    </ion-item>
+  </ion-card>
+}
+
+<ion-grid>
+  <ion-row>
+    <ion-col size="6">
+      <mh-stat-tile
+        label="Outstanding"
+        [value]="outstanding()"
+        [hint]="outstandingHint()"
+        [hintColor]="hasOverdue() ? 'danger' : null"
+        [loading]="store.earningsLoading()"
+      />
+    </ion-col>
+    <ion-col size="6">
+      <mh-stat-tile
+        label="Active clients"
+        [value]="'' + store.activeClients()"
+        hint="Currently training with you"
+        [loading]="store.clientsLoading()"
+      />
+    </ion-col>
+  </ion-row>
+</ion-grid>
