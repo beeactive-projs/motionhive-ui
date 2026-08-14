@@ -4,8 +4,9 @@
   <!-- Header · back button + title + subtitle (mirrors the session showcase) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
           {{ a?.programNameSnapshot ?? 'Plan' }}
@@ -160,21 +161,47 @@
                   <div class="flex items-center gap-1">
                     @switch (workoutCta(w)) {
                     @case ('start') {
-                    <p-button label="Start" icon="pi pi-play" size="small" [disabled]="isPaused()"
-                      [loading]="starting() === w.id" (onClick)="startWorkout(w)" />
-                    <p-button icon="pi pi-forward" size="small" severity="secondary" [text]="true" [rounded]="true"
-                      [disabled]="isPaused()" pTooltip="Skip workout" ariaLabel="Skip workout"
-                      (onClick)="confirmSkip(w)" />
+                    <button pButton type="button" size="small" [disabled]="(isPaused()) || starting() === w.id" (click)="startWorkout(w)">
+                      <i class="pi" [class]="starting() === w.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
+                      Start
+                    </button>
+                    <button pButton
+                      type="button"
+                      size="small"
+                      severity="secondary"
+                      [text]="true"
+                      [rounded]="true"
+                      [disabled]="isPaused()"
+                      pTooltip="Skip workout"
+                      (click)="confirmSkip(w)"
+                      aria-label="Skip workout"
+                      iconOnly
+                    >
+                      <i class="pi pi-forward"></i>
+                    </button>
                     }
                     @case ('resume') {
-                    <p-button label="Resume" icon="pi pi-play" size="small" [disabled]="isPaused()"
-                      [loading]="starting() === w.id" (onClick)="startWorkout(w)" />
-                    <p-button icon="pi pi-forward" size="small" severity="secondary" [text]="true" [rounded]="true"
-                      [disabled]="isPaused()" pTooltip="Skip workout" ariaLabel="Skip workout"
-                      (onClick)="confirmSkip(w)" />
+                    <button pButton type="button" size="small" [disabled]="(isPaused()) || starting() === w.id" (click)="startWorkout(w)">
+                      <i class="pi" [class]="starting() === w.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
+                      Resume
+                    </button>
+                    <button pButton
+                      type="button"
+                      size="small"
+                      severity="secondary"
+                      [text]="true"
+                      [rounded]="true"
+                      [disabled]="isPaused()"
+                      pTooltip="Skip workout"
+                      (click)="confirmSkip(w)"
+                      aria-label="Skip workout"
+                      iconOnly
+                    >
+                      <i class="pi pi-forward"></i>
+                    </button>
                     }
                     @case ('view') {
-                    <p-button label="View" size="small" severity="secondary" [text]="true" (onClick)="viewWorkout(w)" />
+                    <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="viewWorkout(w)">View</button>
                     }
                     }
                   </div>
@@ -182,10 +209,18 @@
 
                 <!-- Prescription preview toggle -->
                 @if ((w.exercises?.length ?? 0) > 0) {
-                <p-button [label]="isExpanded(w) ? 'Hide exercises' : 'Show exercises'"
-                  [icon]="isExpanded(w) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" iconPos="right"
-                  severity="secondary" [text]="true" size="small" fluid
-                  styleClass="justify-between rounded-none border-t border-surface" (onClick)="toggleExpanded(w)" />
+                <button pButton
+                  type="button"
+                  severity="secondary"
+                  [text]="true"
+                  size="small"
+                  fluid
+                  (click)="toggleExpanded(w)"
+                  class="justify-between rounded-none border-t border-surface"
+                >
+                  {{ isExpanded(w) ? 'Hide exercises' : 'Show exercises' }}
+                  <i [class]="isExpanded(w) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+                </button>
 
                 @if (isExpanded(w)) {
                 <div class="flex flex-col gap-2 border-t border-surface bg-surface-50/60 p-3 dark:bg-surface-800/40">
@@ -300,8 +335,10 @@
         </p-message>
 
         @if (primaryCta(); as cta) {
-        <p-button [label]="cta.label" [icon]="cta.icon" [disabled]="cta.disabled" [loading]="starting() !== null"
-          (onClick)="runPrimary()" fluid />
+        <button pButton type="button" [disabled]="(cta.disabled) || starting() !== null" fluid (click)="runPrimary()">
+          <i [class]="starting() !== null ? 'pi pi-spinner pi-spin' : (cta.icon)"></i>
+          {{ cta.label }}
+        </button>
         @if (cta.kind === 'start' || cta.kind === 'resume') {
         @if (nextWorkout(); as nw) {
         <small class="text-center text-xs text-surface-500">Next up · {{ nw.name }}</small>

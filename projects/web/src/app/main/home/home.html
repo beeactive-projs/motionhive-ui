@@ -239,12 +239,7 @@
       </p>
     </div>
     <div class="hp-invite__actions">
-      <p-button
-        label="Invite a friend"
-        icon="pi pi-send"
-        size="large"
-        (onClick)="inviteOpen.set(true)"
-      />
+      <button pButton type="button" size="large" (click)="inviteOpen.set(true)"><i class="pi pi-send"></i> Invite a friend</button>
       <button type="button" class="hp-textlink" (click)="suggestOpen.set(true)">
         Suggest an instructor →
       </button>

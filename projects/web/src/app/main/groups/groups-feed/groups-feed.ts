@@ -12,7 +12,6 @@ import {
 } from '@angular/core';
 import { take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -27,7 +26,6 @@ import { DeletePostDialog } from '../_dialogs/delete-post-dialog/delete-post-dia
 @Component({
   selector: 'mh-groups-feed',
   imports: [
-    ButtonModule,
     CardModule,
     SkeletonModule,
     ToastModule,

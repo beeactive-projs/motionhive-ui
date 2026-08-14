@@ -15,7 +15,7 @@ import {
   AutoCompleteCompleteEvent,
   AutoCompleteSelectEvent,
 } from 'primeng/autocomplete';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 
@@ -57,7 +57,7 @@ const NOMINATIM_EMAIL = 'contact@motionhive.fit';
 
 @Component({
   selector: 'mh-location-picker',
-  imports: [AutoComplete, ButtonModule, IconField, InputIcon],
+  imports: [AutoComplete, ButtonDirective, IconField, InputIcon],
   templateUrl: './location-picker.html',
   styleUrl: './location-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

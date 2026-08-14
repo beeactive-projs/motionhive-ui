@@ -11,7 +11,7 @@ import {
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Textarea } from 'primeng/textarea';
 import {
@@ -30,7 +30,7 @@ import {
  */
 @Component({
   selector: 'mh-book-dialog',
-  imports: [DatePipe, DecimalPipe, FormsModule, Dialog, Button, Textarea],
+  imports: [DatePipe, DecimalPipe, FormsModule, Dialog, ButtonDirective, Textarea],
   templateUrl: './book-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

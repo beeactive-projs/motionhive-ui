@@ -29,16 +29,19 @@
         fluid
       />
       @if (query().length > 0) {
-        <p-button
-          icon="pi pi-times"
+        <button pButton
+          type="button"
           severity="secondary"
           text
           rounded
           size="small"
-          (onClick)="onClear()"
-          ariaLabel="Clear search"
-          styleClass="search-modal__clear-btn"
-        />
+          (click)="onClear()"
+          class="search-modal__clear-btn"
+          aria-label="Clear search"
+          iconOnly
+        >
+          <i class="pi pi-times"></i>
+        </button>
       }
       <kbd class="search-modal__esc">Esc</kbd>
       <!-- Mobile-only close button. Phones have no Esc key, so the Esc

@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, DestroyRef, inject, OnInit, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthStore, Group, GroupService, GroupsRefreshService } from 'core';
 import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog';
@@ -14,7 +14,7 @@ import { GroupsEmptyState } from '../groups-empty-state/groups-empty-state';
 @Component({
   selector: 'mh-your-groups',
   imports: [
-    Button,
+    ButtonDirective,
     Toast,
     ConfirmDialog,
     GroupFormDialog,

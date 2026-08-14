@@ -12,7 +12,7 @@ import {
   countryNameFromCode,
   resolveFieldPrivacy,
 } from 'core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
@@ -26,7 +26,7 @@ import { ProfileFactRow } from '../../../../../../_shared/components/profile-fac
  */
 @Component({
   selector: 'mh-personal-details-card',
-  imports: [Card, Divider, Button, TooltipModule, ProfileFactRow],
+  imports: [Card, Divider, ButtonDirective, TooltipModule, ProfileFactRow],
   templateUrl: './personal-details-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

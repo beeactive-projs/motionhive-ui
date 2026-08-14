@@ -50,10 +50,12 @@
       </div>
     </ng-template>
     <div class="flex flex-col gap-2">
-      <p-button fluid label="Share profile" icon="pi pi-share-alt" severity="secondary" outlined
-        (onClick)="share.emit()" />
+      <button pButton type="button" fluid severity="secondary" outlined (click)="share.emit()">
+        <i class="pi pi-share-alt"></i>
+        Share profile
+      </button>
       @if (!isOwner()) {
-      <p-button fluid label="Send a message" icon="pi pi-envelope" (onClick)="message.emit()" />
+      <button pButton type="button" fluid (click)="message.emit()"><i class="pi pi-envelope"></i> Send a message</button>
       }
     </div>
   </p-card>

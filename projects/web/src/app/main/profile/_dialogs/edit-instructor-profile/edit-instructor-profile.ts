@@ -25,7 +25,7 @@ import {
   showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
@@ -76,7 +76,7 @@ function optionalUrl(control: AbstractControl): ValidationErrors | null {
   selector: 'mh-edit-instructor-profile',
   imports: [
     ReactiveFormsModule,
-    Button,
+    ButtonDirective,
     Dialog,
     InputText,
     InputNumber,

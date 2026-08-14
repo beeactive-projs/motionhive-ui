@@ -14,9 +14,14 @@
     </p>
 
     <div class="flex flex-wrap gap-2 justify-center">
-      <p-button label="Generate join link" icon="pi pi-link" size="small" (onClick)="generateLinkRequested.emit()" />
-      <p-button label="Add manually" icon="pi pi-plus" severity="secondary" [outlined]="true" size="small"
-        (onClick)="addManuallyRequested.emit()" />
+      <button pButton type="button" size="small" (click)="generateLinkRequested.emit()">
+        <i class="pi pi-link"></i>
+        Generate join link
+      </button>
+      <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="addManuallyRequested.emit()">
+        <i class="pi pi-plus"></i>
+        Add manually
+      </button>
     </div>
   </div>
 </p-card>

@@ -1,8 +1,15 @@
 <!-- Status filter -->
 <div class="flex gap-2 mb-4 flex-wrap">
   @for (opt of statusOptions; track opt.value) {
-  <p-button [label]="opt.label" size="small" [outlined]="statusFilter() !== opt.value"
-    [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'" (onClick)="onStatusFilterChange(opt.value)" />
+  <button pButton
+    type="button"
+    size="small"
+    [outlined]="statusFilter() !== opt.value"
+    [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'"
+    (click)="onStatusFilterChange(opt.value)"
+  >
+    {{ opt.label }}
+  </button>
   }
 </div>
 
@@ -35,7 +42,7 @@
       <td>{{ inv.dueDate ? (inv.dueDate | date:'dd MMM yyyy') : '—' }}</td>
       <td>
         <a [routerLink]="['/profile/invoices', inv.id]">
-          <p-button icon="pi pi-eye" size="small" [text]="true" />
+          <button pButton type="button" size="small" [text]="true" iconOnly><i class="pi pi-eye"></i></button>
         </a>
       </td>
     </tr>

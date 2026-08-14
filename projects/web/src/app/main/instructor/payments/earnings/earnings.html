@@ -5,9 +5,10 @@
       {{ hasStripeAccount() ? 'Finish Stripe setup to start receiving money.' : 'Set up payouts to start receiving
       money.' }}
     </span>
-    <p-button [label]="hasStripeAccount() ? 'Finish setup' : 'Connect Stripe'"
-      [icon]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'"
-      size="small" (onClick)="startOnboarding()" />
+    <button pButton type="button" size="small" (click)="startOnboarding()">
+      <i [class]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'"></i>
+      {{ hasStripeAccount() ? 'Finish setup' : 'Connect Stripe' }}
+    </button>
   </div>
 </p-message>
 }
@@ -15,8 +16,17 @@
 <!-- Actions -->
 @if (hasStripeAccount()) {
 <div class="flex justify-end mb-4">
-  <p-button label="Open Stripe Dashboard" icon="pi pi-external-link" iconPos="right" severity="secondary" [outlined]="true"
-    size="small" [loading]="dashboardLoading()" (onClick)="openStripeDashboard()" />
+  <button pButton
+    type="button"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (click)="openStripeDashboard()"
+    [disabled]="dashboardLoading()"
+  >
+    Open Stripe Dashboard
+    <i class="pi" [class]="dashboardLoading() ? 'pi-spinner pi-spin' : 'pi-external-link'"></i>
+  </button>
 </div>
 }
 

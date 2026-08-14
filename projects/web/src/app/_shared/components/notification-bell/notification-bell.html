@@ -1,12 +1,34 @@
 <span #bellAnchor class="inline-flex">
   @if (badgeValue(); as value) {
   <p-overlaybadge [value]="value" severity="danger" badgeSize="small">
-    <p-button outlined rounded pTooltip="Notifications" tooltipPosition="bottom" ariaLabel="Open notifications"
-      icon="pi pi-bell" (onClick)="toggle($event)" size="small" />
+    <button pButton
+      type="button"
+      outlined
+      rounded
+      pTooltip="Notifications"
+      tooltipPosition="bottom"
+      size="small"
+      (click)="toggle($event)"
+      aria-label="Open notifications"
+      iconOnly
+    >
+      <i class="pi pi-bell"></i>
+    </button>
   </p-overlaybadge>
   } @else {
-  <p-button outlined rounded pTooltip="Notifications" tooltipPosition="bottom" ariaLabel="Open notifications"
-    icon="pi pi-bell" (onClick)="toggle($event)" size="small" />
+  <button pButton
+    type="button"
+    outlined
+    rounded
+    pTooltip="Notifications"
+    tooltipPosition="bottom"
+    size="small"
+    (click)="toggle($event)"
+    aria-label="Open notifications"
+    iconOnly
+  >
+    <i class="pi pi-bell"></i>
+  </button>
   }
 </span>
 
@@ -16,7 +38,7 @@
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-sm font-semibold m-0">Notifications</h3>
       @if (hasUnread()) {
-      <p-button label="Mark all read" text size="small" styleClass="text-xs p-1 h-auto" (onClick)="markAllRead()" />
+      <button pButton type="button" text size="small" (click)="markAllRead()" class="text-xs p-1 h-auto">Mark all read</button>
       }
     </div>
 

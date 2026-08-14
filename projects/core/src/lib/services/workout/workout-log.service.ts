@@ -12,6 +12,7 @@ import type {
   StartWorkoutPayload,
   WorkoutLog,
 } from '../../models/workout/log.model';
+import type { Routine } from '../../models/workout/routine.model';
 
 export interface PaginatedWorkoutLogs {
   items: WorkoutLog[];
@@ -23,6 +24,12 @@ export interface PaginatedWorkoutLogs {
 export interface ListWorkoutLogsQuery {
   page?: number;
   limit?: number;
+  /** Inclusive lower bound on startedAt. */
+  dateFrom?: string;
+  /** Exclusive upper bound on startedAt. */
+  dateTo?: string;
+  /** Case-insensitive match on the session name. */
+  search?: string;
 }
 
 /**
@@ -56,6 +63,16 @@ export class WorkoutLogService {
     );
   }
 
+  /**
+   * Cancel a workout in progress: the log and everything logged in it
+   * are deleted. Not the same as skipping, which records a decision.
+   */
+  discard(id: string): Observable<void> {
+    return this._http.delete<void>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.BY_ID(id)}`,
+    );
+  }
+
   complete(
     id: string,
     payload: CompleteWorkoutPayload = {},
@@ -75,6 +92,9 @@ export class WorkoutLogService {
     let p = new HttpParams();
     if (query.page !== undefined) p = p.set('page', String(query.page));
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
+    if (query.dateFrom) p = p.set('dateFrom', query.dateFrom);
+    if (query.dateTo) p = p.set('dateTo', query.dateTo);
+    if (query.search?.trim()) p = p.set('search', query.search.trim());
     return this._http.get<PaginatedWorkoutLogs>(this._base, { params: p });
   }
 
@@ -138,6 +158,53 @@ export class WorkoutLogService {
   ): Observable<void> {
     return this._http.delete<void>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.REMOVE_EXERCISE(workoutLogId, loggedExerciseId)}`,
+    );
+  }
+
+  /**
+   * Turn a finished workout into a repeatable routine. TARGETS bakes
+   * what was actually lifted into next time's targets; STRUCTURE keeps
+   * the exercises and set counts and drops the loads.
+   */
+  saveAsRoutine(
+    workoutLogId: string,
+    payload: { name: string; folder?: string; mode?: 'TARGETS' | 'STRUCTURE' },
+  ): Observable<Routine> {
+    return this._http.post<Routine>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SAVE_AS_ROUTINE(workoutLogId)}`,
+      payload,
+    );
+  }
+
+  /**
+   * Skip an exercise, or undo it. Distinct from removing: a skipped row
+   * stays so the coach can tell it apart from one that was never there.
+   * Pass `false` to undo, which is what the undo strip does.
+   */
+  setExerciseSkipped(
+    workoutLogId: string,
+    loggedExerciseId: string,
+    skipped: boolean,
+  ): Observable<LoggedExercise> {
+    return this._http.patch<LoggedExercise>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SKIP_EXERCISE(workoutLogId, loggedExerciseId)}`,
+      { skipped },
+    );
+  }
+
+  /**
+   * Substitute a different movement mid-session. Set rows and anything
+   * already logged into them survive; the swap is recorded so the coach
+   * sees the substitution rather than an unexplained change.
+   */
+  swapExercise(
+    workoutLogId: string,
+    loggedExerciseId: string,
+    exerciseId: string,
+  ): Observable<LoggedExercise> {
+    return this._http.patch<LoggedExercise>(
+      `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.SWAP_EXERCISE(workoutLogId, loggedExerciseId)}`,
+      { exerciseId },
     );
   }
 

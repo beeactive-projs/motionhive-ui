@@ -48,19 +48,10 @@
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      [disabled]="submitting()"
-      (onClick)="cancel()"
-    />
-    <p-button
-      label="Submit report"
-      icon="pi pi-flag"
-      [loading]="submitting()"
-      [disabled]="!canSubmit()"
-      (onClick)="submit()"
-    />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
+      <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-flag'"></i>
+      Submit report
+    </button>
   </ng-template>
 </p-dialog>

@@ -64,28 +64,42 @@
     <!-- @if (!isInstructor()) {
       <div class="become-coach-cta">
         <p class="become-coach-cta__text">Start coaching on MotionHive</p>
-        <p-button label="Become a coach" icon="pi pi-arrow-right" iconPos="right" severity="secondary" [outlined]="true"
-          size="small" routerLink="/profile" [queryParams]="{ tab: 'instructor' }" />
+        <button pButton
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          routerLink="/profile"
+          [queryParams]="{ tab: 'instructor' }"
+        >
+          Become a coach
+          <i class="pi pi-arrow-right"></i>
+        </button>
       </div>
       } -->
 
     <!--
-    <p-button label="Share feedback" icon="pi pi-comment" fluid styleClass="justify-start" (onClick)="openFeedback()"
-      link /> -->
+    <button pButton type="button" fluid link (click)="openFeedback()" class="justify-start">
+      <i class="pi pi-comment"></i>
+      Share feedback
+    </button> -->
 
   </aside>
 
   <div class="content" [class.sidebar-open]="sidebarOpen()">
     <p-toolbar>
       <ng-template #start>
-        <p-button icon="pi pi-bars" class="mr-3" size="small" text rounded (onClick)="toggleSidebar()" />
+        <button pButton type="button" class="mr-3" size="small" text rounded (click)="toggleSidebar()" iconOnly>
+          <i class="pi pi-bars"></i>
+        </button>
         <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()" aria-label="Open search">
           <i class="pi pi-search search-trigger__icon"></i>
           <span class="search-trigger__placeholder">Search coaches, groups, sessions…</span>
           <kbd class="search-trigger__kbd">⌘K</kbd>
         </button>
-        <p-button icon="pi pi-search" class="sm:hidden" size="small" text rounded (onClick)="openSearch()"
-          ariaLabel="Open search" />
+        <button pButton type="button" class="sm:hidden" size="small" text rounded (click)="openSearch()" aria-label="Open search" iconOnly>
+          <i class="pi pi-search"></i>
+        </button>
       </ng-template>
       <ng-template #center>
         <ng-content select="[toolbarCenter]" />

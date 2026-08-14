@@ -1,0 +1,175 @@
+@let d = data();
+
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!--
+    A section of Training ▸ History, not a page: the shell owns the
+    title, so this row carries only the one-line read and the range.
+  -->
+  <header class="flex flex-wrap gap-3 items-center justify-between">
+    <div class="space-y-1 min-w-0">
+      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
+        @if (isEmpty()) {
+        Your records and trends will build up here as you train.
+        } @else if (isEarly()) {
+        Your baseline is in. Keep logging and the trends appear.
+        } @else {
+        {{ lifetimeWorkouts() }} workouts logged{{ trainingHours() > 0 ? ' · ' + trainingHours() + 'h training time' : '' }}.
+        }
+      </p>
+    </div>
+    @if (!isEmpty()) {
+    <p-selectbutton [options]="rangeOptions" [ngModel]="range()" (ngModelChange)="setRange($event)"
+      optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="Time range" />
+    }
+  </header>
+
+  @if (loading() && !d) {
+  <div class="flex flex-col gap-3">
+    <p-skeleton width="100%" height="7rem" />
+    <p-skeleton width="100%" height="12rem" />
+  </div>
+  }
+
+  @else if (isEmpty()) {
+  <!-- Never trained. Point at training, not at a chart. -->
+  <mh-list-empty-state icon="pi pi-chart-line" title="No progress yet"
+    message="Log your first workout and your records, volume and streaks start showing up here."
+    actionLabel="Start a workout" actionIcon="pi pi-bolt" (action)="goToWorkouts()" />
+  }
+
+  @else if (d) {
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
+    <!-- Left · the story -->
+    <div class="lg:col-span-2 flex flex-col gap-3 lg:gap-4 min-w-0">
+
+      <!--
+        Three tiles, not four: the same KPI-strip component the sessions
+        list and completion screen use, showing only numbers that aren't
+        already on screen elsewhere.
+      -->
+      <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3" aria-label="Training summary">
+        <mh-kpi-card icon="pi pi-check-circle" label="Workouts" [value]="workouts()"
+          [sub]="workoutsDeltaLabel()" />
+        <mh-kpi-card icon="pi pi-chart-bar" label="Volume kg" [value]="volumeLabel()"
+          [sub]="volumeDeltaLabel()" />
+        <mh-kpi-card icon="pi pi-bolt" label="Streak" [value]="streakLabel()"
+          [sub]="bestStreakLabel()" [severity]="d.streak.currentWeeks > 0 ? 'success' : undefined" />
+      </section>
+
+      <!-- Volume trend. Arrives once there's something to trend. -->
+      @if (showsTrend()) {
+      <p-card>
+        <div>
+          <div class="mb-2 flex items-baseline justify-between">
+            <span class="text-sm font-semibold">Weekly volume</span>
+            <span class="text-[11px] text-muted-color">{{ weeklyPerWeek() }} workouts / week avg</span>
+          </div>
+          <!--
+            Each column is full height so the hover target is the whole
+            week, not just the bar. The bar itself sits at the bottom.
+          -->
+          <div class="flex h-28 items-stretch gap-1 pb-5" role="img" aria-label="Weekly training volume">
+            @for (w of volumeBars(); track w.weekStart; let last = $last) {
+            <div class="group relative flex flex-1 flex-col justify-end">
+              <div class="w-full rounded-t transition-colors"
+                [style.height.%]="w.heightPercent"
+                [class]="w.volumeKg === 0
+                  ? 'bg-surface-200 dark:bg-surface-700'
+                  : (last ? 'bg-primary-500' : 'bg-primary-200 dark:bg-primary-900/50')"></div>
+              <!-- Weeks with sessions but no loaded volume would otherwise
+                   read as "you did nothing". -->
+              <span class="absolute inset-x-0 -bottom-5 text-center text-[10px] tabular-nums text-muted-color">
+                {{ w.workouts }}
+              </span>
+              <div class="pointer-events-none absolute -top-6 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded bg-surface-900 px-1.5 py-0.5 text-[10px] text-surface-0 group-hover:block dark:bg-surface-100 dark:text-surface-900">
+                {{ w.volumeKg }} kg · {{ w.workouts }} workouts
+              </div>
+            </div>
+            }
+          </div>
+          <div class="mt-1 text-[10.5px] text-muted-color">Workouts per week below each bar.</div>
+        </div>
+      </p-card>
+      }
+
+      <!-- Consistency · arrives at 3 workouts -->
+      @if (showsConsistency()) {
+      <p-card>
+        <div class="mb-2 flex items-baseline justify-between">
+          <span class="text-sm font-semibold">Consistency</span>
+          <span class="text-[11px] text-muted-color">last 28 days</span>
+        </div>
+        <div class="flex flex-wrap gap-1">
+          @for (day of consistencyDays(); track day.date) {
+          <div class="size-4 rounded-sm" [title]="day.date + ' · ' + day.workouts + ' workouts'"
+            [class]="day.workouts > 0 ? 'bg-primary-500' : 'bg-surface-200 dark:bg-surface-700'"></div>
+          }
+        </div>
+      </p-card>
+      }
+
+      <!-- The near-empty case: frame the baseline as the achievement it is. -->
+      @if (isEarly()) {
+      <p-card>
+        <div class="flex flex-col gap-2">
+          <h3 class="m-0 font-heading text-base font-semibold">Nice, your baseline is in.</h3>
+          <p class="m-0 text-sm text-muted-color leading-relaxed">
+            Every first lift is a personal record, so what you just logged is the number to beat.
+            Log a few more and your trends and streaks show up here.
+          </p>
+          <div>
+            <button pButton type="button" size="small" (click)="goToWorkouts()">
+              <i class="pi pi-bolt"></i>
+              Log workout #{{ lifetimeWorkouts() + 1 }}
+            </button>
+          </div>
+        </div>
+      </p-card>
+      }
+    </div>
+
+    <!-- Right · records rail. Desktop gets a rail, never wider content. -->
+    <aside class="flex flex-col gap-3 h-max lg:sticky lg:top-4">
+      <p-card>
+        <div class="mb-2 flex items-baseline justify-between">
+          <span class="text-sm font-semibold">Records</span>
+          @if (records().length) {
+          <span class="text-[11px] text-muted-color">estimated 1RM</span>
+          }
+        </div>
+
+        @if (!records().length) {
+        <p class="m-0 text-sm text-muted-color leading-relaxed">
+          Log a set with a weight on it and your first record lands here.
+        </p>
+        } @else {
+        <div class="flex flex-col">
+          @for (r of records(); track r.exerciseId) {
+          <button type="button"
+            class="flex items-center gap-2.5 border-b border-surface py-2.5 text-left last:border-0 hover:opacity-80"
+            (click)="openExercise(r.exerciseId)">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
+              <i class="pi pi-star-fill text-[11px]"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-[13px] font-semibold">{{ r.exerciseName }}</span>
+              <span class="block text-[11px] text-muted-color">{{ r.recordedAt | date: 'd MMM y' }}</span>
+            </span>
+            <span class="shrink-0 text-right">
+              <span class="block font-heading text-sm font-semibold tabular-nums">{{ r.weightKg }} kg</span>
+              @if (r.deltaKg > 0 && r.deltaKg < r.weightKg) {
+              <span class="block text-[11px] font-semibold text-green-600">+{{ r.deltaKg }}</span>
+              } @else {
+              <span class="block text-[11px] text-muted-color">first</span>
+              }
+            </span>
+          </button>
+          }
+        </div>
+        }
+      </p-card>
+    </aside>
+  </div>
+  }
+</div>
+

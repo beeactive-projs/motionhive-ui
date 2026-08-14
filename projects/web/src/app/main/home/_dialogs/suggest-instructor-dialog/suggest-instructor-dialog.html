@@ -85,15 +85,10 @@
                   ></textarea>
                 </div>
 
-                <p-button
-                  label="Send invite"
-                  icon="pi pi-send"
-                  iconPos="right"
-                  type="submit"
-                  fluid
-                  [loading]="isSending()"
-                  [disabled]="directForm.invalid || isSending()"
-                />
+                <button pButton type="submit" fluid [disabled]="directForm.invalid || isSending()">
+                  Send invite
+                  <i class="pi" [class]="isSending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+                </button>
               </form>
             </div>
           </p-tabpanel>
@@ -150,15 +145,10 @@
                   ></textarea>
                 </div>
 
-                <p-button
-                  label="Send suggestion"
-                  icon="pi pi-send"
-                  iconPos="right"
-                  type="submit"
-                  fluid
-                  [loading]="isSending()"
-                  [disabled]="tellTeamForm.invalid || isSending()"
-                />
+                <button pButton type="submit" fluid [disabled]="tellTeamForm.invalid || isSending()">
+                  Send suggestion
+                  <i class="pi" [class]="isSending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+                </button>
               </form>
             </div>
           </p-tabpanel>
@@ -183,7 +173,7 @@
             We'll reach out and let you know what they say. Suggest as many as you like.
           }
         </p>
-        <p-button label="Done" severity="secondary" text (onClick)="onClose()" fluid />
+        <button pButton type="button" severity="secondary" text fluid (click)="onClose()">Done</button>
       </div>
     }
   </div>

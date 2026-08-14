@@ -97,8 +97,10 @@
   </form>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
-    <p-button label="Save changes" icon="pi pi-check" [loading]="saving()"
-      [disabled]="!canSubmit()" (onClick)="save()" />
+    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" [disabled]="(!canSubmit()) || saving()" (click)="save()">
+      <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      Save changes
+    </button>
   </ng-template>
 </p-dialog>

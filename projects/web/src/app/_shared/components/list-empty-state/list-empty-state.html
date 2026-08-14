@@ -16,13 +16,9 @@
     }
   </div>
   @if (actionLabel()) {
-  <p-button
-    [label]="actionLabel()!"
-    [icon]="actionIcon() ?? ''"
-    [severity]="actionSeverity()"
-    [outlined]="actionOutlined()"
-    styleClass="mt-1"
-    (onClick)="action.emit()"
-  />
+  <button pButton type="button" [severity]="actionSeverity()" [outlined]="actionOutlined()" (click)="action.emit()" class="mt-1">
+    <i [class]="actionIcon() ?? ''"></i>
+    {{ actionLabel()! }}
+  </button>
   }
 </div>

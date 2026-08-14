@@ -19,17 +19,50 @@ export const userRoutes: Routes = [
   {
     path: 'sessions',
     loadComponent: () => import('./my-sessions/my-sessions').then((m) => m.MySessions),
-    title: 'My sessions - MotionHive',
+    title: 'Sessions - MotionHive',
   },
   {
     path: 'workouts',
-    loadComponent: () => import('./my-workouts/my-workouts').then((m) => m.MyWorkouts),
-    title: 'Workout history - MotionHive',
+    redirectTo: 'training',
+    pathMatch: 'full',
+  },
+  {
+    path: 'routines/:id',
+    loadComponent: () =>
+      import('./my-workouts/routine-detail/routine-detail').then(
+        (m) => m.RoutineDetail,
+      ),
+    title: 'Routine - MotionHive',
+  },
+  {
+    path: 'training',
+    loadComponent: () => import('./training/training').then((m) => m.Training),
+    title: 'Workouts - MotionHive',
+  },
+  {
+    path: 'progress',
+    // History folded into the Overview lens, which is the default, so a
+    // bare redirect lands in the right place without a query param.
+    redirectTo: 'training',
+    pathMatch: 'full',
+  },
+  {
+    path: 'progress/exercises/:exerciseId',
+    loadComponent: () =>
+      import('./progress/exercise-progress/exercise-progress').then(
+        (m) => m.ExerciseProgressPage,
+      ),
+    title: 'Exercise progress - MotionHive',
   },
   {
     path: 'plans',
-    loadComponent: () => import('./my-plans/my-plans').then((m) => m.MyPlans),
-    title: 'My plans - MotionHive',
+    // Plans is a lens of Training again, so the page form would be a
+    // second copy of the same list.
+    redirectTo: () =>
+      inject(Router).createUrlTree(['/user/training'], {
+        queryParams: { view: 'plans' },
+      }),
+    pathMatch: 'full',
   },
   {
     path: 'plans/:id',

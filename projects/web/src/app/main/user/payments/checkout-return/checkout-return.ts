@@ -6,14 +6,14 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ClientPaymentService, InvoiceStatuses, type Invoice } from 'core';
 
 @Component({
   selector: 'mh-checkout-return',
-  imports: [ButtonModule, CardModule, ProgressSpinnerModule],
+  imports: [ButtonDirective, CardModule, ProgressSpinnerModule],
   templateUrl: './checkout-return.html',
   styleUrl: './checkout-return.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

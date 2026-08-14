@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 
 // PrimeNG imports
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 
@@ -16,7 +16,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     InputTextModule,
     MessageModule,
     ThemeToggleComponent,

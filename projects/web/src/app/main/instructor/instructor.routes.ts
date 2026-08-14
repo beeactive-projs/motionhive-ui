@@ -7,6 +7,13 @@ export const instructorRoutes: Routes = [
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
     title: 'Overview - MotionHive',
   },
+  // The roster is a lens on /coaching/clients now, not a page. Kept as a
+  // redirect so existing links and bookmarks still land somewhere useful.
+  {
+    path: 'roster',
+    redirectTo: 'clients',
+    pathMatch: 'full',
+  },
   {
     path: 'clients',
     loadComponent: () => import('./clients/clients').then((m) => m.Clients),

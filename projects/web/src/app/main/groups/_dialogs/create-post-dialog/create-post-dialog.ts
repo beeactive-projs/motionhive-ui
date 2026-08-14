@@ -29,7 +29,7 @@ import {
   showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Message } from 'primeng/message';
 import { MultiSelect } from 'primeng/multiselect';
@@ -60,7 +60,7 @@ const minSelectedValidator =
 
 @Component({
   selector: 'mh-create-post-dialog',
-  imports: [ReactiveFormsModule, Button, Dialog, Message, MultiSelect, Textarea],
+  imports: [ReactiveFormsModule, ButtonDirective, Dialog, Message, MultiSelect, Textarea],
   templateUrl: './create-post-dialog.html',
   styleUrl: './create-post-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

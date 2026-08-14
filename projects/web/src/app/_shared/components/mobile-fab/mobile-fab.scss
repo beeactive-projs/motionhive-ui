@@ -29,8 +29,8 @@
   pointer-events: none;
 }
 
-/* The projected p-button fills the 52px circle; bump the glyph to the
+/* The button fills the 52px circle; bump the glyph to the
    prominent FAB size (PrimeNG's default button icon is smaller). */
-:host ::ng-deep .mh-fab__btn .p-button-icon {
+.mh-fab__btn i {
   font-size: 20px;
 }

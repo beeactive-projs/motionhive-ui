@@ -15,7 +15,7 @@ import {
   UpdatePreferencesPayload,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -36,7 +36,7 @@ import { Tooltip } from 'primeng/tooltip';
 @Component({
   selector: 'mh-profile-notifications',
   imports: [
-    ButtonModule,
+    ButtonDirective,
     CardModule,
     SkeletonModule,
     ToggleSwitchModule,

@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -57,7 +57,7 @@ const VALID_TABS = new Set<string>(Object.values(MyTab));
     CommonModule,
     FormsModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     IconField,
     InputIcon,
     InputTextModule,

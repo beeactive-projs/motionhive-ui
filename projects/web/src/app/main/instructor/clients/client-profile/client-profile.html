@@ -2,11 +2,14 @@
   <div class="flex flex-col gap-4 pb-6">
 
     <!-- Back -->
-    <!-- <p-button icon="pi pi-arrow-left" label="Clients" [text]="true" size="small" styleClass="pl-0 self-start"
-      (onClick)="goBack()" /> -->
+    <!-- <button pButton type="button" [text]="true" size="small" (click)="goBack()" class="pl-0 self-start">
+      <i class="pi pi-arrow-left"></i>
+      Clients
+    </button> -->
 
-    <p-button icon="pi pi-arrow-left" rounded text severity="secondary" (onClick)="goBack()"
-      pTooltip="Back to Groups" />
+    <button pButton type="button" rounded text severity="secondary" pTooltip="Back to Groups" (click)="goBack()" iconOnly>
+      <i class="pi pi-arrow-left"></i>
+    </button>
 
     @if (client(); as c) {
     <div class="flex flex-col lg:flex-row gap-4 items-start">
@@ -30,7 +33,7 @@
           <!-- Info rows -->
           <div class="flex flex-col gap-3 text-sm">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-surface-500 shrink-0">Member since</span>
+              <span class="text-surface-500 shrink-0">Client since</span>
               <span class="font-medium text-right">
                 {{ c.startedAt ? (c.startedAt | date: 'dd MMM yyyy') : '—' }}
               </span>
@@ -59,14 +62,24 @@
           <div class="my-4 border-t border-surface-200 dark:border-surface-700"></div>
           <div class="flex flex-col gap-1">
             @if (c.status === Statuses.Active) {
-            <p-button label="Edit notes" icon="pi pi-pencil" severity="secondary" fluid [outlined]="true"
-              (onClick)="openNotesDialog()" />
-            <p-button label="Archive client" icon="pi pi-inbox" severity="danger" fluid [text]="true"
-              (onClick)="confirmArchive()" />
+            <button pButton type="button" fluid (click)="messageClient()">
+              <i class="pi pi-comment"></i>
+              Message
+            </button>
+            <button pButton type="button" severity="secondary" fluid [outlined]="true" (click)="openNotesDialog()">
+              <i class="pi pi-pencil"></i>
+              Edit notes
+            </button>
+            <button pButton type="button" severity="danger" fluid [text]="true" (click)="confirmArchive()">
+              <i class="pi pi-inbox"></i>
+              Archive client
+            </button>
             }
             @if (c.status === Statuses.Archived) {
-            <p-button label="Unarchive client" icon="pi pi-inbox" severity="success" fluid
-              (onClick)="confirmUnarchive()" />
+            <button pButton type="button" severity="success" fluid (click)="confirmUnarchive()">
+              <i class="pi pi-inbox"></i>
+              Unarchive client
+            </button>
             }
           </div>
           }
@@ -80,9 +93,18 @@
         <!-- Tab strip -->
         <div class="flex items-center gap-2 flex-wrap">
           @for (tab of tabs; track tab.value) {
-          <p-button [label]="tab.label" [icon]="tab.icon"
-            [severity]="activeTab() === tab.value ? 'primary' : 'secondary'" [text]="activeTab() !== tab.value"
-            size="small" rounded styleClass="py-0.5" (onClick)="activeTab.set(tab.value)" />
+          <button pButton
+            type="button"
+            [severity]="activeTab() === tab.value ? 'primary' : 'secondary'"
+            [text]="activeTab() !== tab.value"
+            size="small"
+            rounded
+            (click)="activeTab.set(tab.value)"
+            class="py-0.5"
+          >
+            <i [class]="tab.icon"></i>
+            {{ tab.label }}
+          </button>
           }
         </div>
 
@@ -97,8 +119,9 @@
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-semibold">Notes</h3>
               @if (c.status === Statuses.Active) {
-              <p-button icon="pi pi-pencil" [text]="true" size="small" severity="secondary"
-                (onClick)="openNotesDialog()" />
+              <button pButton type="button" [text]="true" size="small" severity="secondary" (click)="openNotesDialog()" iconOnly>
+                <i class="pi pi-pencil"></i>
+              </button>
               }
             </div>
             @if (c.notes) {
@@ -146,11 +169,68 @@
 
         @case (1) {
         <p-card class="shadow-md">
-          <div class="flex flex-col items-center gap-3 py-16 text-center">
-            <i class="pi pi-calendar text-4xl text-surface-300"></i>
-            <h3 class="text-lg font-semibold text-surface-500">Sessions</h3>
-            <p class="text-sm text-surface-400">Session history will be available once this feature is ready.</p>
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-sm font-semibold">Sessions</span>
+            <div class="flex items-center gap-2">
+              @if (sessionsTotal()) {
+              <span class="text-[11px] text-muted-color">
+                {{ sessions().length }} of {{ sessionsTotal() }}
+              </span>
+              }
+              <p-selectbutton [options]="sessionScopes" [ngModel]="sessionsScope()"
+                (ngModelChange)="setSessionScope($event)" optionLabel="label" optionValue="value"
+                [allowEmpty]="false" size="small" aria-label="Session scope" />
+            </div>
           </div>
+
+          @if (sessionsLoading()) {
+          <p-skeleton width="100%" height="8rem" />
+          } @else if (!sessions().length) {
+          <div class="flex flex-col items-center gap-3 py-12 text-center">
+            <i class="pi pi-calendar text-4xl text-surface-300"></i>
+            <p class="text-sm text-surface-400">
+              @if (sessionsScope() === 'upcoming') {
+              {{ clientName() }} has nothing booked in the next 3 months.
+              } @else {
+              {{ clientName() }} attended none of your sessions in the last 3 months.
+              }
+            </p>
+          </div>
+          } @else {
+          <ul class="flex flex-col gap-2 list-none m-0 p-0">
+            @for (s of sessions(); track s.id) {
+            <li
+              class="flex items-center gap-3 px-3 py-2 rounded-md border border-surface-200 hover:bg-surface-100 transition-colors cursor-pointer"
+              (click)="openSession(s)"
+            >
+              <div class="w-14 text-center">
+                <div class="text-[10px] uppercase font-semibold text-surface-400">{{ s.startAt | date: 'EEE' }}</div>
+                <div class="text-lg font-bold leading-none">{{ s.startAt | date: 'd' }}</div>
+                <div class="text-[10px] text-surface-400">{{ s.startAt | date: 'MMM y' }}</div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-sm truncate">{{ sessionTitle(s) }}</div>
+                <div class="text-xs text-surface-400 truncate">
+                  {{ s.startAt | date: 'HH:mm' }}
+                  @if (sessionVenue(s); as v) { · {{ v }} }
+                </div>
+              </div>
+              <div class="flex shrink-0 items-center gap-2">
+                <p-tag [value]="participantLabel(s)" [severity]="participantSeverity(s)" rounded
+                  class="text-[11px]" />
+                <i class="pi pi-chevron-right text-[11px] text-muted-color"></i>
+              </div>
+            </li>
+            }
+          </ul>
+          @if (sessionsHasMore()) {
+          <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-2"
+            [disabled]="sessionsLoading()" (click)="loadMoreSessions()">
+            <i class="pi" [class]="sessionsLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
+            Load more
+          </button>
+          }
+          }
         </p-card>
         }
 
@@ -159,33 +239,55 @@
           <div class="flex flex-col items-center gap-3 py-16 text-center">
             <i class="pi pi-chart-line text-4xl text-surface-300"></i>
             <h3 class="text-lg font-semibold text-surface-500">Progress</h3>
-            <p class="text-sm text-surface-400">Progress data will be available once this feature is ready.</p>
+            <p class="text-sm text-surface-400">Open a logged workout to see what {{ clientName() }} actually did. A per-client progress summary is not built yet.</p>
           </div>
         </p-card>
         }
 
         @case (4) {
         <p-card class="shadow-md">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="font-semibold">Assigned plans</h3>
-            @if (assignments().length > 0) {
-            <span class="text-xs text-surface-400">{{ assignments().length }} plan{{ assignments().length === 1 ? '' : 's' }}</span>
-            }
+          <div class="mb-3 flex flex-col gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <!-- Coach vocabulary: they assign programs. The client experiences
+                   the same row as their plan. -->
+              <h3 class="font-semibold">Assigned programs</h3>
+              <div class="flex items-center gap-2">
+                @if (assignmentsTotal() > 0) {
+                <span class="text-xs text-surface-400">
+                  {{ assignments().length }} of {{ assignmentsTotal() }}
+                </span>
+                }
+                <p-selectbutton [options]="assignmentScopes" [ngModel]="assignmentsScope()"
+                  (ngModelChange)="setAssignmentScope($event)" optionLabel="label" optionValue="value"
+                  [allowEmpty]="false" size="small" aria-label="Program scope" />
+              </div>
+            </div>
+            <input pInputText type="search" placeholder="Search programs by name…" class="w-full" fluid
+              [ngModel]="assignmentsSearch()" (ngModelChange)="onAssignmentSearch($event)" />
           </div>
 
-          @if (assignmentsLoading()) {
+          @if (assignmentsLoading() && !assignments().length) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-spin pi-spinner text-2xl text-surface-400"></i>
-            <p class="text-sm text-surface-400">Loading plans…</p>
+            <p class="text-sm text-surface-400">Loading programs…</p>
           </div>
           } @else if (assignments().length === 0) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-bookmark text-4xl text-surface-300"></i>
-            <h4 class="text-base font-semibold text-surface-500">No plans assigned yet</h4>
+            @if (assignmentsSearch().trim() || assignmentsScope() !== 'all') {
+            <h4 class="text-base font-semibold text-surface-500">Nothing matches</h4>
+            <p class="text-sm text-surface-400">
+              No {{ assignmentsScope() === 'history' ? 'finished' : 'current' }} programs
+              @if (assignmentsSearch().trim()) { for “{{ assignmentsSearch().trim() }}” }
+              — try All.
+            </p>
+            } @else {
+            <h4 class="text-base font-semibold text-surface-500">No programs assigned yet</h4>
             <p class="text-sm text-surface-400">
               Assign a program from the Programs area to schedule
               structured workouts for this client.
             </p>
+            }
           </div>
           } @else {
           <ul class="flex flex-col gap-2 list-none m-0 p-0">
@@ -197,7 +299,7 @@
                   <p-tag [value]="a.status" [severity]="assignmentStatusSeverity(a)" rounded />
                 </div>
                 <div class="text-xs text-surface-400 mt-1">
-                  Started {{ a.startDate | date: 'mediumDate' }}
+                  {{ hasStarted(a) ? 'Started' : 'Starts' }} {{ a.startDate | date: 'mediumDate' }}
                   @if (a.endDate) {
                   · ends {{ a.endDate | date: 'mediumDate' }}
                   }
@@ -206,40 +308,54 @@
               </div>
               <div class="flex items-center gap-1 shrink-0">
                 @if (a.status === 'ACTIVE') {
-                <p-button
-                  icon="pi pi-pause"
-                  label="Pause"
+                <button pButton
+                  type="button"
                   severity="secondary"
                   [outlined]="true"
                   size="small"
-                  [loading]="assignmentMutatingId() === a.id"
-                  (onClick)="pauseAssignment(a)"
-                />
+                  (click)="pauseAssignment(a)"
+                  [disabled]="assignmentMutatingId() === a.id"
+                >
+                  <i class="pi" [class]="assignmentMutatingId() === a.id ? 'pi-spinner pi-spin' : 'pi-pause'"></i>
+                  Pause
+                </button>
                 } @else if (a.status === 'PAUSED') {
-                <p-button
-                  icon="pi pi-play"
-                  label="Resume"
+                <button pButton
+                  type="button"
                   severity="success"
                   size="small"
-                  [loading]="assignmentMutatingId() === a.id"
-                  (onClick)="resumeAssignment(a)"
-                />
+                  (click)="resumeAssignment(a)"
+                  [disabled]="assignmentMutatingId() === a.id"
+                >
+                  <i class="pi" [class]="assignmentMutatingId() === a.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
+                  Resume
+                </button>
                 }
                 @if (!isAssignmentTerminal(a)) {
-                <p-button
-                  icon="pi pi-times"
-                  pTooltip="Cancel plan"
+                <button pButton
+                  type="button"
+                  pTooltip="Cancel program"
                   severity="danger"
                   [text]="true"
                   size="small"
                   [disabled]="assignmentMutatingId() === a.id"
-                  (onClick)="confirmCancelAssignment(a)"
-                />
+                  (click)="confirmCancelAssignment(a)"
+                  iconOnly
+                >
+                  <i class="pi pi-times"></i>
+                </button>
                 }
               </div>
             </li>
             }
           </ul>
+          @if (assignmentsHasMore()) {
+          <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-2"
+            [disabled]="assignmentsLoading()" (click)="loadMoreAssignments()">
+            <i class="pi" [class]="assignmentsLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
+            Load more
+          </button>
+          }
           }
         </p-card>
         }
@@ -248,12 +364,12 @@
         <p-card class="shadow-md">
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-semibold">Logged workouts</h3>
-            @if (workouts().length > 0) {
-            <span class="text-xs text-surface-400">{{ workouts().length }} session{{ workouts().length === 1 ? '' : 's' }}</span>
+            @if (workoutsTotal() > 0) {
+            <span class="text-xs text-surface-400">{{ workouts().length }} of {{ workoutsTotal() }}</span>
             }
           </div>
 
-          @if (workoutsLoading()) {
+          @if (workoutsLoading() && !workouts().length) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-spin pi-spinner text-2xl text-surface-400"></i>
             <p class="text-sm text-surface-400">Loading workouts…</p>
@@ -264,7 +380,7 @@
             <h4 class="text-base font-semibold text-surface-500">No workouts logged yet</h4>
             <p class="text-sm text-surface-400">
               Sessions this client completes will appear here, including
-              freestyle workouts and sessions from your assigned plans.
+              freestyle workouts and sessions from the programs you assigned.
             </p>
           </div>
           } @else {
@@ -294,11 +410,18 @@
               </div>
               <div class="text-xs text-surface-500 whitespace-nowrap">
                 <span class="mr-3"><i class="pi pi-stopwatch text-[10px] mr-1"></i>{{ workoutDurationMin(w) ?? '—' }}{{ workoutDurationMin(w) != null ? ' min' : '' }}</span>
-                <span><i class="pi pi-check text-[10px] mr-1"></i>{{ workoutSetCount(w) }} sets</span>
+                <span><i class="pi pi-check text-[10px] mr-1"></i>{{ workoutSetCount(w) }} {{ workoutSetCount(w) === 1 ? 'set' : 'sets' }}</span>
               </div>
             </li>
             }
           </ul>
+          @if (workoutsHasMore()) {
+          <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-2"
+            [disabled]="workoutsLoading()" (click)="loadMoreWorkouts()">
+            <i class="pi" [class]="workoutsLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
+            Load more
+          </button>
+          }
           }
         </p-card>
         }
@@ -307,12 +430,18 @@
       </div>
     </div>
 
+    } @else if (loading()) {
+    <div class="flex flex-col gap-4">
+      <p-skeleton width="100%" height="8rem" />
+      <p-skeleton width="100%" height="3rem" />
+      <p-skeleton width="100%" height="16rem" />
+    </div>
     } @else {
     <div class="flex flex-col items-center justify-center gap-4 py-24 text-center">
       <i class="pi pi-user text-4xl text-surface-300"></i>
       <h2 class="text-lg font-semibold text-surface-500">Client not found</h2>
-      <p class="text-sm text-surface-400">Navigate from the clients list to view a profile.</p>
-      <p-button label="Go to clients" icon="pi pi-arrow-left" (onClick)="goBack()" />
+      <p class="text-sm text-surface-400">This person is not one of your clients, or the link is out of date.</p>
+      <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Go to clients</button>
     </div>
     }
 
@@ -322,4 +451,4 @@
 <mh-edit-client-notes-dialog [(visible)]="showNotesDialog" [client]="client()" (saved)="onNotesSaved()" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

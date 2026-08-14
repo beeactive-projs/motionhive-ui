@@ -19,7 +19,7 @@ import {
   TagSeverity,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
@@ -38,7 +38,7 @@ import { Badge } from "primeng/badge";
     FormsModule,
     HexAvatar,
     UserInfo,
-    Button,
+    ButtonDirective,
     InputText,
     SkeletonModule,
     TableModule,

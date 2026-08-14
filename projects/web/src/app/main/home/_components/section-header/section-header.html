@@ -9,13 +9,9 @@
     }
   </div>
   @if (actionLabel()) {
-    <p-button
-      [label]="actionLabel()!"
-      icon="pi pi-arrow-right"
-      iconPos="right"
-      size="small"
-      link
-      (onClick)="actionClick.emit()"
-    />
+    <button pButton type="button" size="small" link (click)="actionClick.emit()">
+      {{ actionLabel()! }}
+      <i class="pi pi-arrow-right"></i>
+    </button>
   }
 </header>

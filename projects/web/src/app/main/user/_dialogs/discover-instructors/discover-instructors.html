@@ -4,7 +4,9 @@
   <div class="flex gap-2 mb-4">
     <input pInputText type="text" class="flex-1" placeholder="Search by name, specialization, or city..."
       [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" (keyup.enter)="search()" />
-    <p-button icon="pi pi-search" [loading]="searching()" (onClick)="search()" />
+    <button pButton type="button" (click)="search()" [disabled]="searching()" iconOnly>
+      <i class="pi" [class]="searching() ? 'pi-spinner pi-spin' : 'pi-search'"></i>
+    </button>
   </div>
 
   <!-- Results -->
@@ -40,8 +42,16 @@
         <p class="text-xs text-secondary-400 truncate">{{ instructor.city }}</p>
         }
       </div>
-      <p-button label="Request" icon="pi pi-send" size="small" [rounded]="true"
-        [loading]="requestingId() === instructor.userId" (onClick)="openRequestDialog(instructor)" />
+      <button pButton
+        type="button"
+        size="small"
+        [rounded]="true"
+        (click)="openRequestDialog(instructor)"
+        [disabled]="requestingId() === instructor.userId"
+      >
+        <i class="pi" [class]="requestingId() === instructor.userId ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+        Request
+      </button>
     </div>
     }
   </div>
@@ -71,8 +81,11 @@
   </div>
   }
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" text (onClick)="showRequestDialog.set(false)" />
-    <p-button label="Send Request" icon="pi pi-send" [loading]="requestingId() !== null" (onClick)="sendRequest()" />
+    <button pButton type="button" severity="secondary" text (click)="showRequestDialog.set(false)">Cancel</button>
+    <button pButton type="button" (click)="sendRequest()" [disabled]="requestingId() !== null">
+      <i class="pi" [class]="requestingId() !== null ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+      Send Request
+    </button>
   </ng-template>
 </p-dialog>
 

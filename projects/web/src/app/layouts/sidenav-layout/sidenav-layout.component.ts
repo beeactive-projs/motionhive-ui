@@ -11,7 +11,7 @@ import {
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { FeedbackService, Logo, NavItem, NavMode, NavSection, Segmented } from 'core';
 import { ThemeToggleComponent } from '../../_shared/components/theme-toggle/theme-toggle.component';
@@ -26,7 +26,7 @@ import { InstallApp } from '../../_shared/components/install-app/install-app';
   imports: [
     RouterLink,
     RouterLinkActive,
-    ButtonModule,
+    ButtonDirective,
     ToolbarModule,
     ThemeToggleComponent,
     Logo,

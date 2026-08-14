@@ -12,7 +12,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 // PrimeNG imports
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -39,7 +39,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     InputTextModule,
     PasswordModule,
     CheckboxModule,

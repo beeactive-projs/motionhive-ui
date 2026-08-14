@@ -1,0 +1,32 @@
+<svg class="hex" [attr.viewBox]="viewBox" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  @if (showImage()) {
+    <defs>
+      <clipPath [attr.id]="clipId">
+        <path [attr.d]="path" />
+      </clipPath>
+    </defs>
+    <image
+      [attr.href]="imageUrl()"
+      x="0"
+      y="0"
+      width="100"
+      height="100"
+      preserveAspectRatio="xMidYMid slice"
+      [attr.clip-path]="clipUrl"
+    />
+  } @else {
+    <path [attr.d]="path" />
+  }
+</svg>
+
+@if (icon(); as glyph) {
+  <span class="hex-content">
+    <ion-icon [name]="glyph" aria-hidden="true" />
+  </span>
+} @else if (!showImage() && initials()) {
+  <span class="hex-content" aria-hidden="true">{{ initials() }}</span>
+}
+
+@if (name()) {
+  <span class="mh-visually-hidden">{{ name() }}</span>
+}

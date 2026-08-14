@@ -15,7 +15,7 @@ import {
   UserRoles,
   countryNameFromCode,
 } from 'core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -32,7 +32,7 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
  */
 @Component({
   selector: 'mh-profile-hero-card',
-  imports: [Card, Avatar, Button, TagModule, TooltipModule, DatePipe],
+  imports: [Card, Avatar, ButtonDirective, TagModule, TooltipModule, DatePipe],
   templateUrl: './profile-hero-card.html',
   styleUrl: './profile-hero-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

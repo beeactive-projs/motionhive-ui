@@ -1,9 +1,12 @@
-<p-button
-  [icon]="reacted() ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-up'"
-  [label]="count() > 0 ? count().toString() : 'Like'"
+<button pButton
+  type="button"
   [text]="!reacted()"
   [severity]="reacted() ? 'primary' : 'secondary'"
   size="small"
   rounded
   [disabled]="busy()"
-  (onClick)="toggle()" />
+  (click)="toggle()"
+>
+  <i [class]="reacted() ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-up'"></i>
+  {{ count() > 0 ? count().toString() : 'Like' }}
+</button>

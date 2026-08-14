@@ -147,21 +147,30 @@
       <!-- Destructive action, kept apart on the left -->
       <div>
         @if (canEdit()) {
-        <p-button label="Delete" icon="pi pi-trash" severity="danger" [text]="true" (onClick)="confirmDelete()"
-          [disabled]="busy()" />
+        <button pButton type="button" severity="danger" [text]="true" [disabled]="busy()" (click)="confirmDelete()">
+          <i class="pi pi-trash"></i>
+          Delete
+        </button>
         }
       </div>
 
       <!-- Safe + primary actions on the right -->
       <div class="flex items-center gap-2">
         @if (canEdit()) {
-        <p-button [label]="e.visibility === Visibilities.Public ? 'Make private' : 'Make public'"
-          [icon]="e.visibility === Visibilities.Public ? 'pi pi-lock' : 'pi pi-globe'" severity="secondary"
-          [outlined]="true" (onClick)="toggleVisibility()" [loading]="busy()" />
-        <p-button label="Edit" icon="pi pi-pencil" severity="secondary" [outlined]="true" (onClick)="requestEdit()" [disabled]="busy()" />
+        <button pButton type="button" severity="secondary" [outlined]="true" (click)="toggleVisibility()" [disabled]="busy()">
+          <i [class]="busy() ? 'pi pi-spinner pi-spin' : (e.visibility === Visibilities.Public ? 'pi pi-lock' : 'pi pi-globe')"></i>
+          {{ e.visibility === Visibilities.Public ? 'Make private' : 'Make public' }}
+        </button>
+        <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="busy()" (click)="requestEdit()">
+          <i class="pi pi-pencil"></i>
+          Edit
+        </button>
         }
         @if (canFork()) {
-        <p-button label="Fork to my library" icon="pi pi-clone" (onClick)="fork()" [loading]="busy()" />
+        <button pButton type="button" (click)="fork()" [disabled]="busy()">
+          <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-clone'"></i>
+          Fork to my library
+        </button>
         }
       </div>
     </div>
@@ -169,4 +178,4 @@
   </ng-template>
 </p-dialog>
 
-<p-confirmDialog [appendTo]="'body'" />
+<p-confirmdialog [appendTo]="'body'" />

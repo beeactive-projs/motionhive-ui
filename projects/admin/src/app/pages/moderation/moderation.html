@@ -1,7 +1,7 @@
 <h1 class="mb-4 text-2xl font-semibold text-[var(--p-text-color)]">Moderation</h1>
 
 <div class="mb-4 flex flex-wrap items-center gap-3">
-  <p-selectButton
+  <p-selectbutton
     [(ngModel)]="section"
     [options]="sectionOptions()"
     optionLabel="label"
@@ -13,7 +13,7 @@
   <!-- Per-section filters -->
   @if (current.searchable) {
     <input pInputText [(ngModel)]="q" (keyup.enter)="reload()" placeholder="search" class="w-56" />
-    <p-button label="Search" icon="pi pi-search" size="small" (onClick)="reload()" />
+    <button pButton type="button" size="small" (click)="reload()"><i class="pi pi-search"></i> Search</button>
   }
   @if (section === 'reports') {
     <p-select [(ngModel)]="reportStatus" (onChange)="reload()" [options]="reportStatuses"
@@ -60,20 +60,24 @@
       <td class="whitespace-nowrap text-right">
         @switch (section) {
           @case ('reports') {
-            <p-button label="Resolve" size="small" severity="secondary" [text]="true" (onClick)="resolveReport(row, 'RESOLVED')" />
-            <p-button label="Dismiss" size="small" severity="secondary" [text]="true" (onClick)="resolveReport(row, 'DISMISSED')" />
+            <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="resolveReport(row, 'RESOLVED')">
+              Resolve
+            </button>
+            <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="resolveReport(row, 'DISMISSED')">
+              Dismiss
+            </button>
           }
           @case ('velocity') {
-            <p-button label="Review" size="small" severity="secondary" [text]="true" (onClick)="reviewAlarm(row)" />
+            <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="reviewAlarm(row)">Review</button>
           }
           @case ('posts') {
             @if (canDeleteContent()) {
-              <p-button label="Delete" size="small" severity="danger" [text]="true" (onClick)="deleteContent(row)" />
+              <button pButton type="button" size="small" severity="danger" [text]="true" (click)="deleteContent(row)">Delete</button>
             }
           }
           @case ('reviews') {
             @if (canDeleteContent()) {
-              <p-button label="Delete" size="small" severity="danger" [text]="true" (onClick)="deleteContent(row)" />
+              <button pButton type="button" size="small" severity="danger" [text]="true" (click)="deleteContent(row)">Delete</button>
             }
           }
         }
@@ -89,4 +93,4 @@
   </ng-template>
 </p-table>
 
-<p-confirmDialog />
+<p-confirmdialog />

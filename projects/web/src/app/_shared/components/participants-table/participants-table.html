@@ -25,46 +25,47 @@
       }
       @if (mode() === 'roster' && p.status === Status.PendingApproval) {
         <div class="mh-pt-card__actions">
-          <p-button
-            icon="pi pi-check"
-            label="Approve"
+          <button pButton
+            type="button"
             severity="success"
             [outlined]="true"
             size="small"
-            [loading]="isBusy(p.id)"
-            (onClick)="approve.emit(p.id)"
-          />
-          <p-button
-            icon="pi pi-times"
-            label="Decline"
-            severity="danger"
-            [text]="true"
-            size="small"
-            [loading]="isBusy(p.id)"
-            (onClick)="decline.emit(p.id)"
-          />
+            (click)="approve.emit(p.id)"
+            [disabled]="isBusy(p.id)"
+          >
+            <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+            Approve
+          </button>
+          <button pButton type="button" severity="danger" [text]="true" size="small" (click)="decline.emit(p.id)" [disabled]="isBusy(p.id)">
+            <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+            Decline
+          </button>
         </div>
       } @else if (mode() === 'attendance') {
         <div class="mh-pt-card__actions">
-          <p-button
-            icon="pi pi-check"
-            label="Attended"
+          <button pButton
+            type="button"
             severity="success"
             [outlined]="p.attended !== true"
             size="small"
-            [loading]="isBusy(p.id)"
-            (onClick)="markAttended.emit({ id: p.id, attended: true })"
-          />
-          <p-button
-            icon="pi pi-times"
-            label="No-show"
+            (click)="markAttended.emit({ id: p.id, attended: true })"
+            [disabled]="isBusy(p.id)"
+          >
+            <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+            Attended
+          </button>
+          <button pButton
+            type="button"
             severity="danger"
             [outlined]="p.attended !== false"
             [text]="p.attended !== false"
             size="small"
-            [loading]="isBusy(p.id)"
-            (onClick)="markAttended.emit({ id: p.id, attended: false })"
-          />
+            (click)="markAttended.emit({ id: p.id, attended: false })"
+            [disabled]="isBusy(p.id)"
+          >
+            <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+            No-show
+          </button>
         </div>
       }
     </li>
@@ -82,7 +83,7 @@
   [scrollable]="true"
   scrollHeight="flex"
 >
-  <ng-template pTemplate="header">
+  <ng-template #header>
     <tr>
       <th>Name</th>
       <th>Booked</th>
@@ -93,7 +94,7 @@
     </tr>
   </ng-template>
 
-  <ng-template pTemplate="body" let-p>
+  <ng-template #body let-p>
     <tr>
       <td>
         <div class="mh-pt__name">
@@ -122,53 +123,65 @@
       @if (mode() === 'roster') {
         <td class="mh-pt__td-right">
           @if (p.status === Status.PendingApproval) {
-            <p-button
-              icon="pi pi-check"
+            <button pButton
+              type="button"
               severity="success"
               [outlined]="true"
               size="small"
-              [loading]="isBusy(p.id)"
-              (onClick)="approve.emit(p.id)"
-              ariaLabel="Approve"
-            />
-            <p-button
-              icon="pi pi-times"
+              (click)="approve.emit(p.id)"
+              aria-label="Approve"
+              [disabled]="isBusy(p.id)"
+              iconOnly
+            >
+              <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+            </button>
+            <button pButton
+              type="button"
               severity="danger"
               [text]="true"
               size="small"
-              [loading]="isBusy(p.id)"
-              (onClick)="decline.emit(p.id)"
-              ariaLabel="Decline"
-            />
+              (click)="decline.emit(p.id)"
+              aria-label="Decline"
+              [disabled]="isBusy(p.id)"
+              iconOnly
+            >
+              <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+            </button>
           }
         </td>
       } @else if (mode() === 'attendance') {
         <td class="mh-pt__td-right">
-          <p-button
-            icon="pi pi-check"
+          <button pButton
+            type="button"
             severity="success"
             [outlined]="p.attended !== true"
             size="small"
-            [loading]="isBusy(p.id)"
-            (onClick)="markAttended.emit({ id: p.id, attended: true })"
-            ariaLabel="Mark attended"
-          />
-          <p-button
-            icon="pi pi-times"
+            (click)="markAttended.emit({ id: p.id, attended: true })"
+            aria-label="Mark attended"
+            [disabled]="isBusy(p.id)"
+            iconOnly
+          >
+            <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+          </button>
+          <button pButton
+            type="button"
             severity="danger"
             [outlined]="p.attended !== false"
             [text]="p.attended !== false"
             size="small"
-            [loading]="isBusy(p.id)"
-            (onClick)="markAttended.emit({ id: p.id, attended: false })"
-            ariaLabel="Mark no-show"
-          />
+            (click)="markAttended.emit({ id: p.id, attended: false })"
+            aria-label="Mark no-show"
+            [disabled]="isBusy(p.id)"
+            iconOnly
+          >
+            <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+          </button>
         </td>
       }
     </tr>
   </ng-template>
 
-  <ng-template pTemplate="emptymessage">
+  <ng-template #emptymessage>
     <tr>
       <td [attr.colspan]="mode() === 'readonly' ? 3 : 4" class="mh-pt__empty">
         No participants yet.

@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Group } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Message } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -26,7 +26,7 @@ import { GroupDetailContext } from './group-detail.context';
   selector: 'mh-group-detail',
   imports: [
     RouterOutlet,
-    Button,
+    ButtonDirective,
     SkeletonModule,
     ToastModule,
     ConfirmDialogModule,

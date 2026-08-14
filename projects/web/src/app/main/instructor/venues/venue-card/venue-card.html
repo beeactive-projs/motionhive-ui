@@ -35,49 +35,61 @@
 
   @if (showActions()) {
     <div class="flex items-center gap-0.5 shrink-0">
-      <p-button
-        icon="pi pi-pencil"
+      <button pButton
+        type="button"
         severity="secondary"
         [text]="true"
         [rounded]="true"
         size="small"
         pTooltip="Edit"
         tooltipPosition="top"
-        (onClick)="onEdit()"
-      />
+        (click)="onEdit()"
+        iconOnly
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
       @if (v.isActive) {
-        <p-button
-          icon="pi pi-inbox"
+        <button pButton
+          type="button"
           severity="secondary"
           [text]="true"
           [rounded]="true"
           size="small"
           pTooltip="Archive"
           tooltipPosition="top"
-          (onClick)="onArchive()"
-        />
+          (click)="onArchive()"
+          iconOnly
+        >
+          <i class="pi pi-inbox"></i>
+        </button>
       } @else {
-        <p-button
-          icon="pi pi-refresh"
+        <button pButton
+          type="button"
           severity="success"
           [text]="true"
           [rounded]="true"
           size="small"
           pTooltip="Restore"
           tooltipPosition="top"
-          (onClick)="onRestore()"
-        />
+          (click)="onRestore()"
+          iconOnly
+        >
+          <i class="pi pi-refresh"></i>
+        </button>
       }
-      <p-button
-        icon="pi pi-trash"
+      <button pButton
+        type="button"
         severity="danger"
         [text]="true"
         [rounded]="true"
         size="small"
         pTooltip="Delete"
         tooltipPosition="top"
-        (onClick)="onRemove()"
-      />
+        (click)="onRemove()"
+        iconOnly
+      >
+        <i class="pi pi-trash"></i>
+      </button>
     </div>
   }
 </div>

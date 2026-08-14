@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -31,7 +31,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   selector: 'mh-earnings',
   imports: [
     DatePipe,
-    ButtonModule,
+    ButtonDirective,
     CardModule,
     TableModule,
     TagModule,

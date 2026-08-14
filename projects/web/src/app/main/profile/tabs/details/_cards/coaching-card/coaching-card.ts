@@ -19,7 +19,7 @@ import {
   showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
@@ -41,7 +41,7 @@ import { VenuesSection } from '../../venues-section/venues-section';
     RouterLink,
     Card,
     Divider,
-    Button,
+    ButtonDirective,
     TagModule,
     TooltipModule,
     ToggleSwitch,

@@ -12,7 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ClientRequest, ClientService, MyInstructor } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -25,7 +25,7 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
   selector: 'mh-profile-coaches',
   imports: [
     Avatar,
-    ButtonModule,
+    ButtonDirective,
     CardModule,
     ConfirmDialog,
     SkeletonModule,

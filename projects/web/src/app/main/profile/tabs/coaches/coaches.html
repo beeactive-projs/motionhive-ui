@@ -1,5 +1,5 @@
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />
 
 <div class="flex flex-col gap-4">
   <!-- Incoming requests from instructors (Accept / Decline) -->
@@ -39,10 +39,13 @@
             </div>
           </div>
           <div class="flex gap-2 md:self-center">
-            <p-button label="Decline" severity="danger" [outlined]="true" size="small"
-              (onClick)="confirmDecline(request)" />
-            <p-button label="Accept" severity="success" size="small" icon="pi pi-check"
-              (onClick)="acceptRequest(request)" />
+            <button pButton type="button" severity="danger" [outlined]="true" size="small" (click)="confirmDecline(request)">
+              Decline
+            </button>
+            <button pButton type="button" severity="success" size="small" (click)="acceptRequest(request)">
+              <i class="pi pi-check"></i>
+              Accept
+            </button>
           </div>
         </div>
         }
@@ -74,8 +77,17 @@
               }
             </div>
           </div>
-          <p-button icon="pi pi-times" severity="danger" [rounded]="true" [text]="true" pTooltip="Cancel request"
-            (onClick)="confirmCancelOutgoing(request)" />
+          <button pButton
+            type="button"
+            severity="danger"
+            [rounded]="true"
+            [text]="true"
+            pTooltip="Cancel request"
+            (click)="confirmCancelOutgoing(request)"
+            iconOnly
+          >
+            <i class="pi pi-times"></i>
+          </button>
         </div>
         }
       </div>
@@ -91,7 +103,7 @@
           <h2 class="text-lg font-semibold">My coaches</h2>
           <p class="text-sm text-surface-500 m-0">Coaches you're currently working with.</p>
         </div>
-        <p-button label="Discover coaches" icon="pi pi-search" (onClick)="discoverVisible.set(true)" />
+        <button pButton type="button" (click)="discoverVisible.set(true)"><i class="pi pi-search"></i> Discover coaches</button>
       </div>
 
       @if (loadingInstructors()) {
@@ -132,8 +144,10 @@
             </div>
           </div>
           <div class="flex gap-2 md:self-center">
-            <p-button label="End collaboration" icon="pi pi-sign-out" severity="danger" [text]="true" size="small"
-              (onClick)="confirmLeave(item)" />
+            <button pButton type="button" severity="danger" [text]="true" size="small" (click)="confirmLeave(item)">
+              <i class="pi pi-sign-out"></i>
+              End collaboration
+            </button>
           </div>
         </div>
         }

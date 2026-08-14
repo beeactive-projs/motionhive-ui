@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ClientService, showApiError } from 'core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { TextareaModule } from 'primeng/textarea';
@@ -24,7 +24,7 @@ import { TextareaModule } from 'primeng/textarea';
  */
 @Component({
   selector: 'mh-request-to-be-client-dialog',
-  imports: [FormsModule, Dialog, Button, TextareaModule],
+  imports: [FormsModule, Dialog, ButtonDirective, TextareaModule],
   providers: [MessageService],
   templateUrl: './request-to-be-client-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

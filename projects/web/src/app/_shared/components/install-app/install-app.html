@@ -1,10 +1,6 @@
 @if (canInstall()) {
-  <p-button
-    label="Install app"
-    icon="pi pi-download"
-    size="small"
-    severity="secondary"
-    outlined
-    (onClick)="install()"
-  />
+  <button pButton type="button" size="small" severity="secondary" outlined (click)="install()">
+    <i class="pi pi-download"></i>
+    Install app
+  </button>
 }

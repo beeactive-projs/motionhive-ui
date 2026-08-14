@@ -3,11 +3,14 @@
   [class.mh-fab--hidden]="hidden()"
   [class.mh-fab--force]="force()"
 >
-  <p-button
-    [icon]="icon()"
+  <button pButton
+    type="button"
     [rounded]="true"
-    [ariaLabel]="label() || 'Create'"
-    styleClass="mh-fab__btn w-13! h-13! p-0!"
-    (onClick)="tap.emit()"
-  />
+    (click)="tap.emit()"
+    class="mh-fab__btn w-13! h-13! p-0!"
+    [attr.aria-label]="label() || 'Create'"
+    iconOnly
+  >
+    <i [class]="icon()"></i>
+  </button>
 </div>

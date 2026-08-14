@@ -49,8 +49,10 @@
           </div>
         </div>
         <!-- TODO action-system: role? Unblock is restorative, treated as Secondary -->
-        <p-button label="Unblock" icon="pi pi-check-circle" severity="secondary" [outlined]="true"
-          [loading]="isUnblocking(row)" [disabled]="isUnblocking(row)" (onClick)="unblock(row)" />
+        <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="isUnblocking(row)" (click)="unblock(row)">
+          <i class="pi" [class]="isUnblocking(row) ? 'pi-spinner pi-spin' : 'pi-check-circle'"></i>
+          Unblock
+        </button>
       </li>
       }
     </ul>

@@ -1,0 +1,39 @@
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- No header: the Training shell supplies the title, and the hero
+       already carries the primary "Start workout". -->
+  <mh-today-hero [trainingDay]="trainingDay()" [inProgress]="inProgressLog()" [routineCount]="routineCount()"
+    [loading]="trainingDayLoading()" [selectedDate]="selectedDate()" (resume)="resumeWorkout($event)"
+    (startAssigned)="startAssigned($event)" (startFreestyle)="openStartFreestyle()"
+    (dateSelected)="onDateSelected($event)" (weekShift)="onWeekShift($event)" />
+
+  <!-- No "also logged today" list: history below starts at today, so a
+       morning session would render twice on one screen. -->
+</div>
+
+@if (isMobile()) {
+<!-- Mobile FAB (single primary action). -->
+<mh-mobile-fab icon="pi pi-bolt" label="Start workout" (tap)="openStartFreestyle()" />
+}
+
+<!-- Freestyle start dialog -->
+<p-dialog [(visible)]="startDialogOpen" [modal]="true" [closable]="!starting()" [closeOnEscape]="!starting()"
+  [dismissableMask]="!starting()" [appendTo]="'body'" [style]="{ width: '440px' }" [breakpoints]="{ '540px': '95vw' }"
+  header="Start a workout">
+  <div class="flex flex-col gap-2.5">
+    <p class="m-0 text-sm text-muted-color leading-relaxed">
+      No assigned plan today? Start a freestyle session. You'll add exercises as you go.
+    </p>
+    <label for="name" class="text-xs font-semibold">Workout name</label>
+    <input pInputText id="name" fluid [ngModel]="newWorkoutName()" (ngModelChange)="newWorkoutName.set($event)"
+      maxlength="200" placeholder="e.g. Saturday session" autocomplete="off" />
+  </div>
+  <ng-template #footer>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="starting()" (click)="startDialogOpen.set(false)">
+      Cancel
+    </button>
+    <button pButton type="button" [disabled]="(!newWorkoutName().trim()) || starting()" (click)="startFreestyle()">
+      <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>
+      Start
+    </button>
+  </ng-template>
+</p-dialog>

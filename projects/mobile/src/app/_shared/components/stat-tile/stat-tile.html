@@ -1,0 +1,19 @@
+<ion-card>
+  <ion-card-content>
+    <!-- Uppercase is the ios card-subtitle default; the class keeps md matching
+         the design's mono kicker too. -->
+    <ion-card-subtitle class="ion-text-uppercase">{{ label() }}</ion-card-subtitle>
+
+    @if (loading()) {
+      <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.5rem" />
+      <ion-skeleton-text [animated]="true" style="width: 85%" />
+    } @else {
+      <ion-card-title [color]="valueColor()">{{ value() }}</ion-card-title>
+      @if (hint(); as text) {
+        <ion-text [color]="hintColor()">
+          <p>{{ text }}</p>
+        </ion-text>
+      }
+    }
+  </ion-card-content>
+</ion-card>

@@ -18,9 +18,11 @@
         </p>
       </div>
       <div class="flex flex-col gap-2 mt-1">
-        <p-button fluid [label]="contactLabel()" icon="pi pi-envelope" (onClick)="message.emit()" />
-        <p-button fluid label="Book a session" icon="pi pi-calendar" severity="secondary" outlined
-          (onClick)="book.emit()" />
+        <button pButton type="button" fluid (click)="message.emit()"><i class="pi pi-envelope"></i> {{ contactLabel() }}</button>
+        <button pButton type="button" fluid severity="secondary" outlined (click)="book.emit()">
+          <i class="pi pi-calendar"></i>
+          Book a session
+        </button>
       </div>
     </div>
   </p-card>
@@ -80,8 +82,14 @@
   <div class="flex flex-col gap-2 px-2 pt-1">
     <span class="text-sm text-muted-color">Liking this profile?</span>
     <div class="flex items-center gap-2">
-      <p-button label="Share" icon="pi pi-share-alt" severity="secondary" text size="small" (onClick)="share.emit()" />
-      <p-button label="Copy link" icon="pi pi-copy" severity="secondary" text size="small" (onClick)="onCopyLink()" />
+      <button pButton type="button" severity="secondary" text size="small" (click)="share.emit()">
+        <i class="pi pi-share-alt"></i>
+        Share
+      </button>
+      <button pButton type="button" severity="secondary" text size="small" (click)="onCopyLink()">
+        <i class="pi pi-copy"></i>
+        Copy link
+      </button>
     </div>
   </div>
 </div>

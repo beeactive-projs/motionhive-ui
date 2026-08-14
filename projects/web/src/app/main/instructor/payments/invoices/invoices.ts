@@ -23,7 +23,7 @@ import {
   type InvoiceStatus,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { DataView } from 'primeng/dataview';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -43,7 +43,7 @@ import { SendInvoiceEmailDialog } from '../../_dialogs/send-invoice-email-dialog
   imports: [
     DatePipe,
     RouterLink,
-    Button,
+    ButtonDirective,
     TableModule,
     Tag,
     SkeletonModule,

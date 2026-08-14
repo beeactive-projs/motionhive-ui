@@ -15,7 +15,7 @@
     <!-- Amount -->
     <div class="flex flex-col gap-1">
       <label for="refundAmount" class="text-sm font-medium">Refund amount</label>
-      <p-inputNumber id="refundAmount" [(ngModel)]="formAmount" mode="currency"
+      <p-inputnumber id="refundAmount" [(ngModel)]="formAmount" mode="currency"
         [currency]="p.currency.toUpperCase()"
         [minFractionDigits]="2" [min]="0.01" [max]="maxRefundable" class="w-full" />
     </div>
@@ -38,8 +38,11 @@
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
-      <p-button label="Issue refund" icon="pi pi-check" severity="danger" [loading]="saving()" (onClick)="submit()" />
+      <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+      <button pButton type="button" severity="danger" (click)="submit()" [disabled]="saving()">
+        <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+        Issue refund
+      </button>
     </div>
   </ng-template>
 </p-dialog>

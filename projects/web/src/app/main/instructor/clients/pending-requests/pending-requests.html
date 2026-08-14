@@ -14,12 +14,18 @@
     </div>
     <div class="flex gap-3">
       @if (isMobile()) {
-      <p-button icon="pi pi-users" outlined rounded severity="secondary" (onClick)="goToClients()" size="small" />
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToClients()" iconOnly>
+        <i class="pi pi-users"></i>
+      </button>
       } @else {
-      <p-button label="Clients" icon="pi pi-users" outlined severity="secondary" (onClick)="goToClients()"
-        [size]="isTablet() ? 'small' : undefined" />
-      <p-button label="Invite client" icon="pi pi-user-plus" (onClick)="openInviteDialog()"
-        [size]="isTablet() ? 'small' : undefined" />
+      <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="goToClients()">
+        <i class="pi pi-users"></i>
+        Clients
+      </button>
+      <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openInviteDialog()">
+        <i class="pi pi-user-plus"></i>
+        Invite client
+      </button>
       }
     </div>
   </header>
@@ -27,9 +33,17 @@
   <!-- <div class="flex items-center gap-3">
     <span class="text-sm font-medium">Direction:</span>
     @for (option of typeOptions; track option.label) {
-    <p-button [label]="option.label" [severity]="typeFilter() === option.value ? 'primary' : 'contrast'" size="small"
-      rounded [text]="typeFilter() !== option.value" (onClick)="onTypeFilterChange(option.value)"
-      styleClass="py-0.5 min-w-10" />
+    <button pButton
+      type="button"
+      [severity]="typeFilter() === option.value ? 'primary' : 'contrast'"
+      size="small"
+      rounded
+      [text]="typeFilter() !== option.value"
+      (click)="onTypeFilterChange(option.value)"
+      class="py-0.5 min-w-10"
+    >
+      {{ option.label }}
+    </button>
     }
   </div> -->
 
@@ -77,15 +91,58 @@
           <td>
             <div class="flex items-center justify-end gap-1">
               @if (isIncoming(row)) {
-              <p-button icon="pi pi-check" rounded severity="success" tooltipPosition="left" pTooltip="Accept"
-                ariaLabel="Accept" (onClick)="acceptRequest(row)" />
-              <p-button icon="pi pi-times" rounded outlined severity="danger" tooltipPosition="left" pTooltip="Decline"
-                ariaLabel="Decline" (onClick)="declineRequest(row)" />
+              <button pButton
+                type="button"
+                rounded
+                severity="success"
+                tooltipPosition="left"
+                pTooltip="Accept"
+                (click)="acceptRequest(row)"
+                aria-label="Accept"
+                iconOnly
+              >
+                <i class="pi pi-check"></i>
+              </button>
+              <button pButton
+                type="button"
+                rounded
+                outlined
+                severity="danger"
+                tooltipPosition="left"
+                pTooltip="Decline"
+                (click)="declineRequest(row)"
+                aria-label="Decline"
+                iconOnly
+              >
+                <i class="pi pi-times"></i>
+              </button>
               } @else {
-              <p-button icon="pi pi-send" rounded text severity="secondary" tooltipPosition="left"
-                pTooltip="Resend invitation" ariaLabel="Resend invitation" (onClick)="resendInvitation(row)" />
-              <p-button icon="pi pi-times" rounded outlined severity="danger" tooltipPosition="left"
-                pTooltip="Cancel invitation" ariaLabel="Cancel invitation" (onClick)="cancelRequest(row)" />
+              <button pButton
+                type="button"
+                rounded
+                text
+                severity="secondary"
+                tooltipPosition="left"
+                pTooltip="Resend invitation"
+                (click)="resendInvitation(row)"
+                aria-label="Resend invitation"
+                iconOnly
+              >
+                <i class="pi pi-send"></i>
+              </button>
+              <button pButton
+                type="button"
+                rounded
+                outlined
+                severity="danger"
+                tooltipPosition="left"
+                pTooltip="Cancel invitation"
+                (click)="cancelRequest(row)"
+                aria-label="Cancel invitation"
+                iconOnly
+              >
+                <i class="pi pi-times"></i>
+              </button>
               }
             </div>
           </td>
@@ -189,15 +246,23 @@
 
             <div class="border-surface-100 dark:border-surface-800 flex items-center justify-end gap-1 border-t pt-2">
               @if (isIncoming(request)) {
-              <p-button icon="pi pi-check" label="Accept" rounded size="small" severity="success"
-                (onClick)="acceptRequest(request)" />
-              <p-button icon="pi pi-times" label="Decline" rounded outlined size="small" severity="danger"
-                (onClick)="declineRequest(request)" />
+              <button pButton type="button" rounded size="small" severity="success" (click)="acceptRequest(request)">
+                <i class="pi pi-check"></i>
+                Accept
+              </button>
+              <button pButton type="button" rounded outlined size="small" severity="danger" (click)="declineRequest(request)">
+                <i class="pi pi-times"></i>
+                Decline
+              </button>
               } @else {
-              <p-button icon="pi pi-send" label="Resend" rounded text size="small" severity="secondary"
-                (onClick)="resendInvitation(request)" />
-              <p-button icon="pi pi-times" label="Cancel" rounded outlined size="small" severity="danger"
-                (onClick)="cancelRequest(request)" />
+              <button pButton type="button" rounded text size="small" severity="secondary" (click)="resendInvitation(request)">
+                <i class="pi pi-send"></i>
+                Resend
+              </button>
+              <button pButton type="button" rounded outlined size="small" severity="danger" (click)="cancelRequest(request)">
+                <i class="pi pi-times"></i>
+                Cancel
+              </button>
               }
             </div>
           </div>
@@ -230,5 +295,5 @@
 }
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />
 <mh-invite-client-dialog [(visible)]="showInviteDialog" (saved)="loadRequests()" />

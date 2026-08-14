@@ -70,9 +70,17 @@
         placeholder="Cue, focus, regression…" fluid></textarea>
     </div>
 
-    <p-button label="Advanced (intensity, time, distance, tempo)"
-      [icon]="showAdvanced() ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" size="small" [text]="true"
-      class="self-start" [attr.aria-expanded]="showAdvanced()" (onClick)="toggleAdvanced()" />
+    <button pButton
+      type="button"
+      size="small"
+      [text]="true"
+      class="self-start"
+      [attr.aria-expanded]="showAdvanced()"
+      (click)="toggleAdvanced()"
+    >
+      <i [class]="showAdvanced() ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+      Advanced (intensity, time, distance, tempo)
+    </button>
 
     @if (showAdvanced()) {
     <div class="flex flex-col gap-3.5 border-t border-dashed border-surface pt-3">
@@ -126,8 +134,11 @@
   </form>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
-    <p-button [label]="submitLabel()" icon="pi pi-check" [loading]="submitting()" (onClick)="submit()" />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" (click)="submit()" [disabled]="submitting()">
+      <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      {{ submitLabel() }}
+    </button>
   </ng-template>
 </p-dialog>
 

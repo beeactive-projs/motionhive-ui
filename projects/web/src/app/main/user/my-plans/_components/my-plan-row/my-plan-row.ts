@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ProgressBar } from 'primeng/progressbar';
 import { Tag } from 'primeng/tag';
@@ -47,7 +47,7 @@ type PlanRowTone = (typeof PlanRowTone)[keyof typeof PlanRowTone];
 @Component({
   selector: 'mh-my-plan-row',
   standalone: true,
-  imports: [DatePipe, Button, Card, ProgressBar, Tag, HexAvatar],
+  imports: [DatePipe, ButtonDirective, Card, ProgressBar, Tag, HexAvatar],
   templateUrl: './my-plan-row.html',
   styleUrl: './my-plan-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,6 +73,23 @@ export class MyPlanRow {
   protected readonly status = computed(() => this.assignment().status);
 
   protected readonly instructor = computed(() => this.assignment().instructor ?? null);
+
+  /** True when you put this on the calendar yourself. */
+  protected readonly isSelfScheduled = computed(
+    () => this.assignment().assignmentKind === 'SELF',
+  );
+
+  /**
+   * Where the plan came from. A routine you scheduled is not a coach's
+   * work, and labelling it "your coach" put your own name under someone
+   * else's job title.
+   */
+  protected readonly originLabel = computed(() => {
+    if (this.isSelfScheduled()) return 'From your routine';
+    const i = this.instructor();
+    const name = i ? `${i.firstName} ${i.lastName}`.trim() : '';
+    return name ? `From ${name}` : 'From your coach';
+  });
 
   protected readonly instructorName = computed(() => {
     const i = this.instructor();

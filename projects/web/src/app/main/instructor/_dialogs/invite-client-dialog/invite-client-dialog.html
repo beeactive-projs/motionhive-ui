@@ -23,8 +23,18 @@
           <span class="font-medium text-sm truncate">{{ displayName(selectedUser()!) }}</span>
           <span class="text-xs text-surface-500 truncate">{{ selectedUser()!.email }}</span>
         </div>
-        <p-button icon="pi pi-times" [text]="true" [rounded]="true" size="small" severity="secondary"
-          (onClick)="onUserCleared()" aria-label="Change selection" />
+        <button pButton
+          type="button"
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          severity="secondary"
+          aria-label="Change selection"
+          (click)="onUserCleared()"
+          iconOnly
+        >
+          <i class="pi pi-times"></i>
+        </button>
       </div>
       }
     </div>
@@ -48,9 +58,11 @@
 
   </form>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
-    <p-button label="Send invitation" icon="pi pi-send" [loading]="inviteLoading()"
-      [disabled]="!canSubmit()" (onClick)="sendInvitation()" />
+    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" [disabled]="(!canSubmit()) || inviteLoading()" (click)="sendInvitation()">
+      <i class="pi" [class]="inviteLoading() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+      Send invitation
+    </button>
   </ng-template>
   } @else {
   <div class="flex flex-col gap-4">
@@ -61,14 +73,22 @@
       <label class="text-sm font-medium">Referral link</label>
       <div class="flex gap-2">
         <input pInputText fluid [value]="referralLink()" [readonly]="true" class="text-xs" />
-        <p-button [icon]="linkCopied() ? 'pi pi-check' : 'pi pi-copy'"
-          [severity]="linkCopied() ? 'success' : 'secondary'" [outlined]="true" (onClick)="copyLink()"
-          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'" tooltipPosition="top" />
+        <button pButton
+          type="button"
+          [severity]="linkCopied() ? 'success' : 'secondary'"
+          [outlined]="true"
+          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'"
+          tooltipPosition="top"
+          (click)="copyLink()"
+          iconOnly
+        >
+          <i [class]="linkCopied() ? 'pi pi-check' : 'pi pi-copy'"></i>
+        </button>
       </div>
     </div>
   </div>
   <ng-template #footer>
-    <p-button label="Done" (onClick)="visible.set(false)" />
+    <button pButton type="button" (click)="visible.set(false)">Done</button>
   </ng-template>
   }
 

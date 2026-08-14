@@ -1,0 +1,151 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/account" />
+    </ion-buttons>
+    <ion-title>Coaching profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [disabled]="!profile()" (click)="editSheetOpen.set(true)">Edit</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (profile(); as coach) {
+    <div class="status">
+      @if (coach.isAcceptingClients) {
+        <ion-badge color="success">
+          <ion-icon name="checkmark-circle" aria-hidden="true" />
+          Accepting clients
+        </ion-badge>
+      } @else {
+        <ion-badge color="medium">Not accepting clients</ion-badge>
+      }
+    </div>
+
+    <ion-card>
+      <ion-card-content>
+        <div class="pair-row">
+          <div>
+            <ion-note class="mh-kicker ion-text-uppercase" color="medium">Display name</ion-note>
+            <p class="fact">{{ coach.displayName || '—' }}</p>
+          </div>
+          <div>
+            <ion-note class="mh-kicker ion-text-uppercase" color="medium">Experience</ion-note>
+            <p class="fact">
+              {{ coach.yearsOfExperience !== null ? coach.yearsOfExperience + ' years' : '—' }}
+            </p>
+          </div>
+        </div>
+
+        <ion-note class="mh-kicker ion-text-uppercase block" color="medium">Bio</ion-note>
+        <p class="bio">{{ coach.bio || 'No bio yet.' }}</p>
+
+        @if (specializations().length) {
+          <ion-note class="mh-kicker ion-text-uppercase block" color="medium">
+            Specializations
+          </ion-note>
+          <div class="chips">
+            @for (item of specializations(); track item) {
+              <ion-chip color="info" [outline]="true">{{ item }}</ion-chip>
+            }
+          </div>
+        }
+
+        @if (socialLinks().length) {
+          <div class="links-head">
+            <ion-note class="mh-kicker ion-text-uppercase" color="medium">Social links</ion-note>
+            <ion-badge [color]="coach.showSocialLinks ? 'success' : 'medium'">
+              {{ coach.showSocialLinks ? 'Public' : 'Hidden' }}
+            </ion-badge>
+          </div>
+          @for (link of socialLinks(); track link.key) {
+            <p class="link">
+              <ion-icon [name]="link.icon" aria-hidden="true" />
+              {{ link.url }}
+            </p>
+          }
+        }
+      </ion-card-content>
+    </ion-card>
+
+    <mh-section-header title="Services on your public profile" />
+    @if (loadingProducts()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of [1, 2]; track $index) {
+          <ion-item lines="full">
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (products().length === 0) {
+      <ion-note class="empty-note" color="medium">
+        No services yet. Pricing is managed on the web app.
+      </ion-note>
+    } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (product of products(); track product.id) {
+          <ion-item lines="full">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ product.name }}</h3>
+              <p>
+                {{ product.amountCents / 100 | currencyRon }} · {{ billingLabel(product) }}
+              </p>
+            </ion-label>
+            <ion-badge slot="end" [color]="product.showOnProfile ? 'success' : 'medium'">
+              {{ product.showOnProfile ? 'Visible' : 'Hidden' }}
+            </ion-badge>
+          </ion-item>
+        }
+      </ion-list>
+      <ion-note class="empty-note" color="medium">Pricing is managed on the web app.</ion-note>
+    }
+
+    <mh-section-header title="Venues" />
+    @if (loadingVenues()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item lines="none">
+          <ion-label>
+            <h3><ion-skeleton-text [animated]="true" style="width: 40%" /></h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    } @else if (venues().length === 0) {
+      <ion-note class="empty-note" color="medium">
+        No venues yet. Venues are managed on the web app.
+      </ion-note>
+    } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (venue of venues(); track venue.id) {
+          <ion-item lines="full">
+            <mh-hex-avatar
+              slot="start"
+              size="sm"
+              [name]="venue.name"
+              icon="location-outline"
+              color="primary"
+            />
+            <ion-label class="ion-text-wrap">
+              <h3>{{ venue.name }}</h3>
+              <p>{{ venue.city ?? 'Online' }}</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+      <ion-note class="empty-note" color="medium">Venues are managed on the web app.</ion-note>
+    }
+
+    <mh-coaching-sheet [(open)]="editSheetOpen" />
+  } @else {
+    <ion-card>
+      <ion-card-content>
+        <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.2rem" />
+        <ion-skeleton-text [animated]="true" style="width: 90%" />
+        <ion-skeleton-text [animated]="true" style="width: 75%" />
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>

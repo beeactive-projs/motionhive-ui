@@ -2,8 +2,9 @@
   <!-- Header · back button + title + subtitle (mirrors the session showcase header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ log()?.name ?? 'Workout' }}
         </h1>
@@ -62,7 +63,9 @@
 
     @if (l.notes) {
     <p-card class="shadow-md">
-      <h4 class="m-0 mb-1 font-heading text-xs font-semibold uppercase tracking-wide text-muted-color">Notes</h4>
+      <h4 class="m-0 mb-1 font-heading text-xs font-semibold uppercase tracking-wide text-muted-color">
+        {{ isCoachView() ? 'What they noted' : 'What you noted' }}
+      </h4>
       <p class="m-0 whitespace-pre-line text-sm leading-relaxed">{{ l.notes }}</p>
     </p-card>
     }
@@ -86,11 +89,23 @@
           </div>
           }
           <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100">
+            <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100"
+              [class.line-through]="ex.isSkipped">
               {{ ex.exerciseNameSnapshot }}
             </div>
             <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-muted-color">
+              @if (ex.isSkipped) {
+              <!-- Without this a declined exercise reads exactly like one
+                   that was never in the workout. -->
+              <p-tag severity="secondary" icon="pi pi-ban" value="Skipped"
+                class="[&_.p-tag]:text-[10px]! [&_.p-tag]:py-0! [&_.p-tag]:px-1.5!" />
+              } @else {
               <span>{{ exerciseSetsDone(ex) }} / {{ exerciseTotal(ex) }} sets</span>
+              }
+              @if (ex.swappedFromExerciseId) {
+              <p-tag severity="info" icon="pi pi-sync" [value]="swapLabel(ex)"
+                class="[&_.p-tag]:text-[10px]! [&_.p-tag]:py-0! [&_.p-tag]:px-1.5!" />
+              }
               @if (prForExercise(ex); as p) {
               <p-tag severity="warn" icon="pi pi-trophy" [value]="prTagLabel(p)"
                 class="[&_.p-tag]:text-[10px]! [&_.p-tag]:py-0! [&_.p-tag]:px-1.5!" />
@@ -99,7 +114,7 @@
           </div>
         </div>
 
-        @if ((ex.sets ?? []).length > 0) {
+        @if (!ex.isSkipped && (ex.sets ?? []).length > 0) {
         <p-table [value]="ex.sets ?? []" [rowTrackBy]="trackSetById" size="small">
           <ng-template #header>
             <tr>

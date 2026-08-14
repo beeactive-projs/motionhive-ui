@@ -8,7 +8,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
@@ -105,7 +105,7 @@ const REPORT_CATEGORIES = ['SPAM', 'SCAM', 'HARASSMENT', 'IMPERSONATION', 'SEXUA
   imports: [
     FormsModule,
     TableModule,
-    ButtonModule,
+    ButtonDirective,
     SelectButtonModule,
     SelectModule,
     InputTextModule,

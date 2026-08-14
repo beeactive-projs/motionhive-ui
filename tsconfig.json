@@ -4,10 +4,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "core": [
-        "./dist/core",
-        "./projects/core/src/public-api"
-      ]
+      "core": ["./dist/core", "./projects/core/src/public-api"]
     },
     "strict": true,
     "noImplicitOverride": true,
@@ -52,6 +49,12 @@
     },
     {
       "path": "./projects/admin/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/mobile/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/mobile/tsconfig.spec.json"
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { InstructorSearchResult } from 'core';
@@ -16,7 +16,7 @@ import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
  */
 @Component({
   selector: 'mh-instructor-card',
-  imports: [RouterLink, ButtonModule, Card, TagModule, Hex],
+  imports: [RouterLink, ButtonDirective, Card, TagModule, Hex],
   templateUrl: './instructor-card.html',
   styleUrl: './instructor-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

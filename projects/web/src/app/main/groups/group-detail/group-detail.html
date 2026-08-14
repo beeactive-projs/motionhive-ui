@@ -18,7 +18,7 @@
       <p class="m-0 text-sm">The group you are looking for does not exist or has been deleted.</p>
     </div>
   </p-message>
-  <p-button label="Back to groups" icon="pi pi-arrow-left" (onClick)="goBack()" />
+  <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Back to groups</button>
 </div>
 }
 
@@ -28,4 +28,4 @@
 <mh-group-form-dialog [(visible)]="showEditDialog" [group]="editingGroup()" (saved)="onGroupSaved()" />
 }
 
-<p-confirmDialog />
+<p-confirmdialog />

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { AvatarModule } from 'primeng/avatar';
+import { AvatarModule, type AvatarShape } from 'primeng/avatar';
 import { AvatarUser, withCloudinaryTransform } from 'core';
 import { HexAvatar } from '../hex-avatar/hex-avatar';
 
@@ -27,7 +27,7 @@ const HEX_PX: Record<AvatarSize, number> = { normal: 36, large: 48, xlarge: 72 }
 export class Avatar {
   readonly user = input<AvatarUser | null | undefined>(null);
   readonly size = input<AvatarSize>('normal');
-  readonly shape = input<'square' | 'circle' | undefined>('circle');
+  readonly shape = input<AvatarShape>('circle');
   readonly styleClass = input<string>('');
   /** Opt back into the legacy circular avatar (default is the brand hex). */
   readonly circle = input<boolean>(false);

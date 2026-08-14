@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { take } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
@@ -32,7 +32,7 @@ import {
   selector: 'mh-suggest-instructor-dialog',
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
+    ButtonDirective,
     DialogModule,
     InputTextModule,
     TextareaModule,

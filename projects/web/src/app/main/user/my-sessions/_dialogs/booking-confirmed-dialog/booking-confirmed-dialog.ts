@@ -8,7 +8,7 @@ import {
   output,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import {
@@ -27,7 +27,7 @@ import {
  */
 @Component({
   selector: 'mh-booking-confirmed-dialog',
-  imports: [DatePipe, Dialog, Button],
+  imports: [DatePipe, Dialog, ButtonDirective],
   templateUrl: './booking-confirmed-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

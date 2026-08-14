@@ -1,8 +1,7 @@
-<p-button text rounded [ariaLabel]="'Open profile menu for ' + userName()" (onClick)="toggle($event)">
-  <ng-template #icon>
-    <mh-avatar [user]="user()" [circle]="true" />
-  </ng-template>
-</p-button>
+<button pButton type="button" text rounded (click)="toggle($event)"
+  [attr.aria-label]="'Open profile menu for ' + userName()">
+  <mh-avatar [user]="user()" [circle]="true" />
+</button>
 
 <p-popover #popover appendTo="body">
   <div class="min-w-52">
@@ -45,13 +44,17 @@
     }
     <p-divider />
 
-    <p-button label="Share feedback" icon="pi pi-comment" text fluid styleClass="justify-start"
-      (onClick)="openFeedback()" />
+    <button pButton type="button" text fluid (click)="openFeedback()" class="justify-start">
+      <i class="pi pi-comment"></i>
+      Share feedback
+    </button>
 
 
     <p-divider />
 
-    <p-button label="Log out" icon="pi pi-sign-out" text fluid severity="danger" styleClass="justify-start"
-      (onClick)="signOut()" />
+    <button pButton type="button" text fluid severity="danger" (click)="signOut()" class="justify-start">
+      <i class="pi pi-sign-out"></i>
+      Log out
+    </button>
   </div>
 </p-popover>

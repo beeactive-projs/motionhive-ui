@@ -6,7 +6,7 @@
       <p class="text-sm text-surface-700 dark:text-surface-400">Manage and publish blog posts.</p>
     </div>
     <div class="flex flex-wrap">
-      <p-button label="New post" icon="pi pi-plus" rounded (onClick)="navigateToNew()" />
+      <button pButton type="button" rounded (click)="navigateToNew()"><i class="pi pi-plus"></i> New post</button>
     </div>
   </header>
 
@@ -15,9 +15,16 @@
     <div class="flex items-center gap-3">
       <span class="text-sm font-medium">Category:</span>
       @for (option of categoryOptions; track option.label) {
-      <p-button [label]="option.label" [severity]="categoryFilter() === option.value ? 'primary' : 'secondary'"
-        size="small" rounded [text]="categoryFilter() !== option.value"
-        (onClick)="onCategoryFilterChange(option.value)" />
+      <button pButton
+        type="button"
+        [severity]="categoryFilter() === option.value ? 'primary' : 'secondary'"
+        size="small"
+        rounded
+        [text]="categoryFilter() !== option.value"
+        (click)="onCategoryFilterChange(option.value)"
+      >
+        {{ option.label }}
+      </button>
       }
     </div>
     <div class="relative">
@@ -79,10 +86,28 @@
           <td>{{ post.createdAt | date: 'mediumDate' }}</td>
           <td>
             <div class="flex items-center justify-center gap-1">
-              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Edit post"
-                (onClick)="navigateToEdit(post)" />
-              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" pTooltip="Delete post"
-                (onClick)="confirmDelete(post)" />
+              <button pButton
+                type="button"
+                [rounded]="true"
+                [text]="true"
+                severity="secondary"
+                pTooltip="Edit post"
+                (click)="navigateToEdit(post)"
+                iconOnly
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button pButton
+                type="button"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                pTooltip="Delete post"
+                (click)="confirmDelete(post)"
+                iconOnly
+              >
+                <i class="pi pi-trash"></i>
+              </button>
             </div>
           </td>
         </tr>
@@ -121,4 +146,4 @@
 </div>
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

@@ -2,8 +2,9 @@
   <!-- Slim header · back + title + status + saving pill + meta line; actions right -->
   <header class="flex items-center justify-between gap-3 pb-3">
     <div class="flex min-w-0 items-center gap-2 md:gap-3">
-      <p-button icon="pi pi-arrow-left" outlined rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="min-w-0 space-y-1">
         <div class="flex min-w-0 items-center gap-2">
           <h1 class="truncate font-heading text-lg font-semibold md:text-xl">
@@ -36,15 +37,38 @@
     @if (program(); as p) {
     <div class="flex shrink-0 items-center gap-2 md:gap-3">
       @if (isMobile()) {
-      <p-button icon="pi pi-ellipsis-v" outlined rounded severity="secondary" size="small" ariaLabel="More actions"
-        (onClick)="openActionsSheet()" />
+      <button pButton
+        type="button"
+        outlined
+        rounded
+        severity="secondary"
+        size="small"
+        (click)="openActionsSheet()"
+        aria-label="More actions"
+        iconOnly
+      >
+        <i class="pi pi-ellipsis-v"></i>
+      </button>
       } @else {
-      <p-button label="Edit" icon="pi pi-pencil" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined"
-        (onClick)="openEdit()" />
-      <p-button label="Assign to client" icon="pi pi-user-plus" [size]="isTablet() ? 'small' : undefined"
-        (onClick)="openAssign()" />
-      <p-button label="Delete" icon="pi pi-trash" text severity="danger" [loading]="deleting()"
-        [size]="isTablet() ? 'small' : undefined" (onClick)="confirmDelete()" />
+      <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="openEdit()">
+        <i class="pi pi-pencil"></i>
+        Edit
+      </button>
+      <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openAssign()">
+        <i class="pi pi-user-plus"></i>
+        Assign to client
+      </button>
+      <button pButton
+        type="button"
+        text
+        severity="danger"
+        [size]="isTablet() ? 'small' : undefined"
+        (click)="confirmDelete()"
+        [disabled]="deleting()"
+      >
+        <i class="pi" [class]="deleting() ? 'pi-spinner pi-spin' : 'pi-trash'"></i>
+        Delete
+      </button>
       }
     </div>
     }

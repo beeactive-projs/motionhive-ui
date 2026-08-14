@@ -59,7 +59,7 @@
     </nav>
 
     @if (isInstructor()) {
-    <p-button label="Create new group" icon="pi pi-plus" fluid (onClick)="openCreate()" />
+    <button pButton type="button" fluid (click)="openCreate()"><i class="pi pi-plus"></i> Create new group</button>
     }
 
     <hr class="border-0 border-t border-surface my-1" />

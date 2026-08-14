@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
+import { Tag } from 'primeng/tag';
 import { Card } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { Routine } from 'core';
@@ -32,7 +33,7 @@ type RoutineRowTone = (typeof RoutineRowTone)[keyof typeof RoutineRowTone];
 @Component({
   selector: 'mh-routine-row',
   standalone: true,
-  imports: [DatePipe, Button, Card, TooltipModule],
+  imports: [Tag, DatePipe, ButtonDirective, Card, TooltipModule],
   templateUrl: './routine-row.html',
   styleUrl: './routine-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,11 +48,26 @@ export class RoutineRow {
   /** Per-row spinner while this routine is being started. */
   readonly starting = input<boolean>(false);
 
+  /** Open the routine to see what is in it before committing. */
+  readonly open = output<void>();
   readonly start = output<void>();
   readonly edit = output<void>();
   readonly remove = output<void>();
+  /** Put this routine on the calendar (self-assignment). */
+  readonly schedule = output<void>();
+  /** Copy a MotionHive starter into my library so I can change it. */
+  readonly duplicate = output<void>();
 
-  protected readonly exerciseCount = computed(() => this.routine().exercises?.length ?? 0);
+  /**
+   * MotionHive's own. Runnable and copyable by anyone, editable by
+   * nobody — one person's edit would rewrite it for every user.
+   */
+  protected readonly isSystem = computed(() => this.routine().source === 'SYSTEM');
+
+  // List rows carry a server-computed count; the tree is detail-only.
+  protected readonly exerciseCount = computed(
+    () => this.routine().exercises?.length ?? this.routine().exerciseCount ?? 0,
+  );
 
   protected readonly notes = computed(() => this.routine().notes?.trim() || null);
 
@@ -64,13 +80,29 @@ export class RoutineRow {
     this.start.emit();
   }
 
+  protected onOpen(event: MouseEvent): void {
+    event.stopPropagation();
+    this.open.emit();
+  }
+
+  protected onSchedule(event: MouseEvent): void {
+    event.stopPropagation();
+    this.schedule.emit();
+  }
+
   protected onEdit(event: MouseEvent): void {
     event.stopPropagation();
     this.edit.emit();
+  }
+
+  protected onDuplicate(event: MouseEvent): void {
+    event.stopPropagation();
+    this.duplicate.emit();
   }
 
   protected onRemove(event: MouseEvent): void {
     event.stopPropagation();
     this.remove.emit();
   }
+
 }

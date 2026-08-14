@@ -43,19 +43,10 @@
   </div>
 
   <ng-template #footer>
-    <p-button
-      label="Cancel"
-      severity="secondary"
-      [text]="true"
-      (onClick)="visible.set(false)"
-      [disabled]="saving()"
-    />
-    <p-button
-      label="Save"
-      icon="pi pi-check"
-      [disabled]="!!validationError() || unchanged() || saving()"
-      [loading]="saving()"
-      (onClick)="save()"
-    />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="saving()" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" [disabled]="!!validationError() || unchanged() || saving()" (click)="save()">
+      <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      Save
+    </button>
   </ng-template>
 </p-dialog>

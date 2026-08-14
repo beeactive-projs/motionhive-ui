@@ -7,7 +7,7 @@ import {
   computed,
 } from '@angular/core';
 import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -24,7 +24,7 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
   selector: 'mh-instructors',
   imports: [
     CardModule,
-    ButtonModule,
+    ButtonDirective,
     TableModule,
     Avatar,
     UserInfo,

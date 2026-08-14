@@ -1,0 +1,18 @@
+@for (platform of platforms; track platform.key) {
+  <ion-input
+    class="social-field"
+    labelPlacement="stacked"
+    fill="outline"
+    type="url"
+    inputmode="url"
+    autocapitalize="off"
+    autocorrect="off"
+    spellcheck="false"
+    [label]="platform.label"
+    [placeholder]="platform.placeholder"
+    [value]="valueFor(platform.key)"
+    (ionInput)="update(platform.key, $event.detail.value ?? '')"
+  >
+    <ion-icon slot="start" [name]="icons[platform.key]" aria-hidden="true" />
+  </ion-input>
+}

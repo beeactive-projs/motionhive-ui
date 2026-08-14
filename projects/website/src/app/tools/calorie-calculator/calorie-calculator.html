@@ -27,9 +27,9 @@
     </p>
 
     <!-- button — clearer action -->
-    <p-button i18n-label="@@calorie.calculator.cta" label="Calculate my calories ↓"
-      (onClick)="calculatorSection.scrollIntoView({ behavior: 'smooth' })">
-    </p-button>
+    <button pButton type="button" (click)="calculatorSection.scrollIntoView({ behavior: 'smooth' })">
+      <span i18n="@@calorie.calculator.cta">Calculate my calories ↓</span>
+    </button>
 
   </div>
 </section>

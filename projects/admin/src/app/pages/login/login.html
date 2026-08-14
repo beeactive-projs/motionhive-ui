@@ -39,15 +39,13 @@
       </div>
 
       @if (error()) {
-        <p-message severity="error" [text]="error()!" />
+        <p-message severity="error">{{ error() }}</p-message>
       }
 
-      <p-button
-        type="submit"
-        label="Sign in"
-        styleClass="w-full"
-        [loading]="submitting()"
-      />
+      <button pButton type="submit" fluid [disabled]="submitting()">
+        @if (submitting()) {<i class="pi pi-spinner pi-spin"></i>}
+        Sign in
+      </button>
     </form>
   </div>
 </div>

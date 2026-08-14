@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import {
   AuthStore,
@@ -91,7 +91,7 @@ const CATEGORY_TONES: Record<BlogCategory, CategoryTone> = {
   selector: 'mh-home',
   standalone: true,
   imports: [
-    ButtonModule,
+    ButtonDirective,
     SkeletonModule,
     Hex,
     InviteFriendDialog,

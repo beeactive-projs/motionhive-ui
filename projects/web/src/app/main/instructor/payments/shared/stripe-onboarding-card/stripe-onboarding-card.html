@@ -21,8 +21,10 @@
         from your clients. Setup takes about 3 minutes.
       </p>
     </div>
-    <p-button label="Connect with Stripe" icon="pi pi-external-link" iconPos="right" [loading]="actionLoading()"
-      (onClick)="startOnboarding()" />
+    <button pButton type="button" (click)="startOnboarding()" [disabled]="actionLoading()">
+      Connect with Stripe
+      <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-external-link'"></i>
+    </button>
   </div>
 </p-card>
 }
@@ -40,8 +42,10 @@
       </p>
     </div>
     <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
-    <p-button label="Resume onboarding" icon="pi pi-external-link" iconPos="right"
-      [loading]="actionLoading()" (onClick)="startOnboarding()" />
+    <button pButton type="button" (click)="startOnboarding()" [disabled]="actionLoading()">
+      Resume onboarding
+      <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-external-link'"></i>
+    </button>
   </div>
 </p-card>
 }
@@ -64,8 +68,10 @@
       {{ status()!.account!.requirementsCurrentlyDue!.length }} requirement(s) outstanding
     </p-message>
     }
-    <p-button label="Complete requirements" icon="pi pi-external-link" iconPos="right" [loading]="actionLoading()"
-      (onClick)="startOnboarding()" />
+    <button pButton type="button" (click)="startOnboarding()" [disabled]="actionLoading()">
+      Complete requirements
+      <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-external-link'"></i>
+    </button>
   </div>
 </p-card>
 }
@@ -166,8 +172,10 @@
       </p>
     </div>
     <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
-    <p-button label="Reconnect with Stripe" icon="pi pi-external-link" iconPos="right" [loading]="actionLoading()"
-      (onClick)="startOnboarding()" />
+    <button pButton type="button" (click)="startOnboarding()" [disabled]="actionLoading()">
+      Reconnect with Stripe
+      <i class="pi" [class]="actionLoading() ? 'pi-spinner pi-spin' : 'pi-external-link'"></i>
+    </button>
   </div>
 </p-card>
 }

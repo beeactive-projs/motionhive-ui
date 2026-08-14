@@ -21,7 +21,7 @@ import {
   showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { LocationPicker } from '../../../../_shared/components/location-picker/location-picker';
@@ -67,7 +67,7 @@ function locationFromAccount(
 
 @Component({
   selector: 'mh-edit-personal-info',
-  imports: [FormsModule, Button, Dialog, InputText, LocationPicker, PhoneInput],
+  imports: [FormsModule, ButtonDirective, Dialog, InputText, LocationPicker, PhoneInput],
   templateUrl: './edit-personal-info.html',
   styleUrl: './edit-personal-info.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -147,16 +147,18 @@
                   }
                 </div>
                 @if (lineItems.length > 1) {
-                  <p-button
+                  <button pButton
                     type="button"
-                    icon="pi pi-times"
                     [rounded]="true"
                     [text]="true"
                     severity="secondary"
                     size="small"
                     pTooltip="Remove"
-                    (onClick)="removeLineItem(i)"
-                  />
+                    (click)="removeLineItem(i)"
+                    iconOnly
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
                 }
               </div>
 
@@ -181,15 +183,17 @@
                   <div class="flex flex-col gap-1">
                     <label class="text-xs text-surface-500">Quantity</label>
                     <div class="flex items-center gap-1 max-w-56">
-                      <p-button
+                      <button pButton
                         type="button"
-                        icon="pi pi-minus"
                         severity="secondary"
                         [rounded]="true"
                         [text]="true"
                         size="small"
-                        (onClick)="decQuantity(i)"
-                      />
+                        (click)="decQuantity(i)"
+                        iconOnly
+                      >
+                        <i class="pi pi-minus"></i>
+                      </button>
                       <input
                         type="number"
                         min="1"
@@ -199,15 +203,17 @@
                         [value]="item.get('quantity')?.value ?? 1"
                         (input)="onQuantityChange(i, +($any($event.target).value))"
                       />
-                      <p-button
+                      <button pButton
                         type="button"
-                        icon="pi pi-plus"
                         severity="secondary"
                         [rounded]="true"
                         [text]="true"
                         size="small"
-                        (onClick)="incQuantity(i)"
-                      />
+                        (click)="incQuantity(i)"
+                        iconOnly
+                      >
+                        <i class="pi pi-plus"></i>
+                      </button>
                     </div>
                   </div>
                   <!-- Discoverable swap-out: outlined button + helper
@@ -219,17 +225,18 @@
                     <span class="text-xs text-surface-500 leading-tight">
                       Need a one-off price or description for this invoice?
                     </span>
-                    <p-button
+                    <button pButton
                       type="button"
-                      icon="pi pi-pencil"
-                      label="Edit as custom"
                       severity="secondary"
                       [outlined]="true"
                       size="small"
                       pTooltip="Unlock all fields. The pricing item stays untouched."
                       tooltipPosition="top"
-                      (onClick)="unlinkPricing(i)"
-                    />
+                      (click)="unlinkPricing(i)"
+                    >
+                      <i class="pi pi-pencil"></i>
+                      Edit as custom
+                    </button>
                   </div>
                 </div>
               } @else {
@@ -281,7 +288,7 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div class="flex flex-col gap-1">
                     <label class="text-xs text-surface-500">Unit price</label>
-                    <p-inputNumber
+                    <p-inputnumber
                       formControlName="amount"
                       mode="currency"
                       [currency]="displayCurrency()"
@@ -297,15 +304,17 @@
                   <div class="flex flex-col gap-1">
                     <label class="text-xs text-surface-500">Quantity</label>
                     <div class="flex items-center gap-1">
-                      <p-button
+                      <button pButton
                         type="button"
-                        icon="pi pi-minus"
                         severity="secondary"
                         [rounded]="true"
                         [text]="true"
                         size="small"
-                        (onClick)="decQuantity(i)"
-                      />
+                        (click)="decQuantity(i)"
+                        iconOnly
+                      >
+                        <i class="pi pi-minus"></i>
+                      </button>
                       <input
                         type="number"
                         min="1"
@@ -315,15 +324,17 @@
                         [value]="item.get('quantity')?.value ?? 1"
                         (input)="onQuantityChange(i, +($any($event.target).value))"
                       />
-                      <p-button
+                      <button pButton
                         type="button"
-                        icon="pi pi-plus"
                         severity="secondary"
                         [rounded]="true"
                         [text]="true"
                         size="small"
-                        (onClick)="incQuantity(i)"
-                      />
+                        (click)="incQuantity(i)"
+                        iconOnly
+                      >
+                        <i class="pi pi-plus"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -337,15 +348,10 @@
           }
 
           <div class="flex gap-2">
-            <p-button
-              type="button"
-              label="Add line item"
-              icon="pi pi-plus"
-              severity="secondary"
-              [outlined]="true"
-              size="small"
-              (onClick)="addLineItem()"
-            />
+            <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="addLineItem()">
+              <i class="pi pi-plus"></i>
+              Add line item
+            </button>
           </div>
         </div>
       </section>
@@ -458,23 +464,11 @@
       <!-- Action row -->
       <div class="flex items-center gap-2 justify-end">
         @if (isEditMode()) {
-          <p-button
-            type="button"
-            label="Cancel"
-            severity="secondary"
-            [text]="true"
-            size="small"
-            (onClick)="visible.set(false)"
-          />
-          <p-button
-            type="button"
-            icon="pi pi-check"
-            label="Save changes"
-            size="small"
-            [loading]="saving()"
-            [disabled]="loadingForEdit()"
-            (onClick)="submit()"
-          />
+          <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="visible.set(false)">Cancel</button>
+          <button pButton type="button" size="small" [disabled]="(loadingForEdit()) || saving()" (click)="submit()">
+            <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+            Save changes
+          </button>
         } @else {
           <!-- All action buttons are disabled while saving() is true.
                Without this, a fast user can click "Save as draft" then
@@ -482,70 +476,71 @@
                create TWO invoices in Stripe + DB. The button-level
                re-entrancy guard in submit() catches it server-side too,
                but disabling them here is the friendly UX. -->
-          <p-button
+          <button pButton
             type="button"
-            label="Close"
             severity="secondary"
             [text]="true"
             size="small"
             pTooltip="Changes are kept as a draft"
             tooltipPosition="top"
             [disabled]="saving()"
-            (onClick)="visible.set(false)"
-          />
+            (click)="visible.set(false)"
+          >
+            Close
+          </button>
           <!-- Save-as-draft: full label on desktop, short on mobile.
                We render two buttons conditionally on breakpoint because
                p-button's `label` input accepts a static string — we can't
                reactively swap the label inside the same instance. -->
-          <p-button
+          <button pButton
             type="button"
-            icon="pi pi-save"
-            label="Save as draft"
             severity="secondary"
             [outlined]="true"
             size="small"
-            styleClass="hidden sm:inline-flex"
-            [loading]="saving() && !form.controls.sendImmediately.value"
-            [disabled]="saving()"
-            (onClick)="saveAsDraft()"
-          />
-          <p-button
+            [disabled]="(saving()) || saving() && !form.controls.sendImmediately.value"
+            (click)="saveAsDraft()"
+            class="hidden sm:inline-flex"
+          >
+            <i class="pi" [class]="saving() && !form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-save'"></i>
+            Save as draft
+          </button>
+          <button pButton
             type="button"
-            icon="pi pi-save"
-            label="Draft"
             severity="secondary"
             [outlined]="true"
             size="small"
-            styleClass="sm:hidden"
             pTooltip="Save as draft"
             tooltipPosition="top"
-            [loading]="saving() && !form.controls.sendImmediately.value"
-            [disabled]="saving()"
-            (onClick)="saveAsDraft()"
-          />
+            [disabled]="(saving()) || saving() && !form.controls.sendImmediately.value"
+            (click)="saveAsDraft()"
+            class="sm:hidden"
+          >
+            <i class="pi" [class]="saving() && !form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-save'"></i>
+            Draft
+          </button>
           <!-- Send: full label with amount on desktop, short on mobile -->
-          <p-button
+          <button pButton
             type="button"
-            icon="pi pi-send"
-            [label]="form.controls.sendImmediately.value
+            size="small"
+            [disabled]="(saving()) || saving() && !!form.controls.sendImmediately.value"
+            (click)="submit()"
+            class="hidden sm:inline-flex"
+          >
+            <i class="pi" [class]="saving() && !!form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+            {{ form.controls.sendImmediately.value
               ? 'Send invoice · ' + ((totalCents() / 100).toFixed(2)) + ' ' + displayCurrency()
-              : 'Create invoice'"
-            size="small"
-            styleClass="hidden sm:inline-flex"
-            [loading]="saving() && !!form.controls.sendImmediately.value"
-            [disabled]="saving()"
-            (onClick)="submit()"
-          />
-          <p-button
+              : 'Create invoice' }}
+          </button>
+          <button pButton
             type="button"
-            icon="pi pi-send"
-            [label]="form.controls.sendImmediately.value ? 'Send' : 'Create'"
             size="small"
-            styleClass="sm:hidden"
-            [loading]="saving() && !!form.controls.sendImmediately.value"
-            [disabled]="saving()"
-            (onClick)="submit()"
-          />
+            [disabled]="(saving()) || saving() && !!form.controls.sendImmediately.value"
+            (click)="submit()"
+            class="sm:hidden"
+          >
+            <i class="pi" [class]="saving() && !!form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+            {{ form.controls.sendImmediately.value ? 'Send' : 'Create' }}
+          </button>
         }
       </div>
     </div>

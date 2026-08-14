@@ -2,15 +2,18 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <p-button icon="pi pi-arrow-left" text rounded severity="secondary" size="small" ariaLabel="Back"
-        (onClick)="goBack()" />
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+        <i class="pi pi-arrow-left"></i>
+      </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Approvals</h1>
       </div>
     </div>
     <div class="flex gap-2 md:gap-3 shrink-0">
-      <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" [loading]="loading()"
-        (onClick)="load()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" (click)="load()" [disabled]="loading()">
+        <i class="pi" [class]="loading() ? 'pi-spinner pi-spin' : 'pi-refresh'"></i>
+        Refresh
+      </button>
     </div>
   </header>
 

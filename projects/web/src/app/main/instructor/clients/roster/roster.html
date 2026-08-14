@@ -1,0 +1,127 @@
+@let d = data();
+
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!--
+    A section, not a page: the Clients page owns the title and the
+    lens switch. All this row carries is the one-line read and the
+    window it was measured over.
+  -->
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400">
+      @if (needsAttention().length) {
+      {{ needsAttention().length }} of {{ clients().length }} clients could use a nudge.
+      } @else if (clients().length) {
+      Everyone is on track.
+      } @else {
+      Your clients and how they are training.
+      }
+    </p>
+    @if (!isEmpty()) {
+    <p-selectbutton [options]="windowOptions" [ngModel]="window()" (ngModelChange)="setWindow($event)"
+      optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="Time window" />
+    }
+  </div>
+
+  @if (loading() && !d) {
+  <div class="flex flex-col gap-3">
+    <p-skeleton width="100%" height="6rem" />
+    <p-skeleton width="100%" height="14rem" />
+  </div>
+  }
+
+  @else if (isEmpty()) {
+  <mh-list-empty-state icon="pi pi-users" title="No clients yet"
+    message="Once someone becomes your client, their training shows up here so you can see who is on track." />
+  }
+
+  @else if (d) {
+  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3" aria-label="Roster summary">
+    <mh-kpi-card icon="pi pi-users" label="Clients" [value]="d.totals.clients" />
+    <mh-kpi-card icon="pi pi-chart-line" label="Adherence" [value]="adherenceLabel()"
+      sub="across clients with work due" />
+    <mh-kpi-card icon="pi pi-flag" label="Needs attention" [value]="d.totals.needsAttention"
+      [severity]="d.totals.needsAttention > 0 ? 'warn' : 'success'" />
+  </section>
+
+  <!--
+    Needs-attention first and visually louder. This is the whole point
+    of the screen: not having to open each client to find the problem.
+  -->
+  @if (needsAttention().length) {
+  <p-card>
+    <div class="mb-2 flex items-baseline justify-between">
+      <span class="text-sm font-semibold">Needs attention</span>
+      <span class="text-[11px] text-muted-color">most urgent first</span>
+    </div>
+    <div class="flex flex-col">
+      @for (c of needsAttention(); track c.clientId) {
+      <button type="button"
+        class="flex items-center gap-3 border-b border-surface py-3 text-left last:border-0 hover:opacity-80"
+        (click)="openClient(c)">
+        @if (c.avatarUrl) {
+        <img [src]="c.avatarUrl" [alt]="c.name" loading="lazy"
+          class="size-10 shrink-0 rounded-full border border-surface object-cover" />
+        } @else {
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-500/15">
+          <i class="pi pi-exclamation-circle"></i>
+        </span>
+        }
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-sm font-semibold">{{ c.name }}</span>
+          <span class="block truncate text-[12px] font-semibold text-amber-600">{{ attentionLabel(c) }}</span>
+          <span class="block truncate text-[11px] text-muted-color">{{ attentionDetail(c) }}</span>
+        </span>
+        <span class="shrink-0 text-right">
+          <span class="block font-heading text-sm font-semibold tabular-nums">{{ adherenceFor(c) }}</span>
+          <span class="block text-[11px] text-muted-color">adherence</span>
+        </span>
+        <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
+          (click)="messageClient(c, $event)" [attr.aria-label]="'Message ' + c.name" iconOnly>
+          <i class="pi pi-comment"></i>
+        </button>
+      </button>
+      }
+    </div>
+  </p-card>
+  }
+
+  @if (onTrack().length) {
+  <p-card>
+    <div class="mb-2 flex items-baseline justify-between">
+      <span class="text-sm font-semibold">On track</span>
+      <span class="text-[11px] text-muted-color">{{ onTrack().length }} client{{ onTrack().length === 1 ? '' : 's' }}</span>
+    </div>
+    <div class="flex flex-col">
+      @for (c of onTrack(); track c.clientId) {
+      <button type="button"
+        class="flex items-center gap-3 border-b border-surface py-2.5 text-left last:border-0 hover:opacity-80"
+        (click)="openClient(c)">
+        @if (c.avatarUrl) {
+        <img [src]="c.avatarUrl" [alt]="c.name" loading="lazy"
+          class="size-9 shrink-0 rounded-full border border-surface object-cover" />
+        } @else {
+        <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-100 text-muted-color dark:bg-surface-700">
+          <i class="pi pi-user text-sm"></i>
+        </span>
+        }
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-[13px] font-semibold">{{ c.name }}</span>
+          <span class="block truncate text-[11px] text-muted-color">{{ subtitleFor(c) }}</span>
+        </span>
+        <span class="shrink-0 text-right">
+          <span class="block font-heading text-sm font-semibold tabular-nums">{{ adherenceFor(c) }}</span>
+          @if (c.daysSinceLastWorkout !== null) {
+          <span class="block text-[11px] text-muted-color">
+            {{ c.daysSinceLastWorkout === 0 ? 'trained today' : c.daysSinceLastWorkout + 'd ago' }}
+          </span>
+          }
+        </span>
+        <i class="pi pi-chevron-right shrink-0 text-[11px] text-muted-color"></i>
+      </button>
+      }
+    </div>
+  </p-card>
+  }
+  }
+</div>
+

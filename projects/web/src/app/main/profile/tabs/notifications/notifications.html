@@ -11,11 +11,16 @@
     </div>
     <div class="flex items-center gap-2">
       @if (hasChanges()) {
-      <p-button label="Discard" severity="secondary" text size="small" (onClick)="discard()" />
-      <p-button label="Save changes" icon="pi pi-check" size="small" [loading]="saving()" (onClick)="save()" />
+      <button pButton type="button" severity="secondary" text size="small" (click)="discard()">Discard</button>
+      <button pButton type="button" size="small" (click)="save()" [disabled]="saving()">
+        <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+        Save changes
+      </button>
       } @else {
-      <p-button label="Reset all to default" icon="pi pi-refresh" severity="secondary" text size="small"
-        (onClick)="resetAll()" />
+      <button pButton type="button" severity="secondary" text size="small" (click)="resetAll()">
+        <i class="pi pi-refresh"></i>
+        Reset all to default
+      </button>
       }
     </div>
   </div>

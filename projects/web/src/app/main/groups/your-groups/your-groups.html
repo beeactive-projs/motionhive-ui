@@ -15,7 +15,7 @@
     </div>
     @if (isInstructor()) {
       <div class="flex flex-wrap">
-        <p-button label="New group" icon="pi pi-plus" (onClick)="openCreateDialog()"/>
+        <button pButton type="button" (click)="openCreateDialog()"><i class="pi pi-plus"></i> New group</button>
       </div>
     }
   </header>
@@ -49,4 +49,4 @@
 }
 
 <p-toast/>
-<p-confirmDialog/>
+<p-confirmdialog/>

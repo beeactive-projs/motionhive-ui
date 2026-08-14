@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { MessagingService, UserBlock } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -40,7 +40,7 @@ import {
   selector: 'mh-profile-safety',
   standalone: true,
   imports: [
-    Button,
+    ButtonDirective,
     CardModule,
     SkeletonModule,
     ToastModule,

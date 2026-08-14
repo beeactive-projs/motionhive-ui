@@ -24,7 +24,7 @@ import {
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { AutoComplete, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Chip } from 'primeng/chip';
 import { InputNumber } from 'primeng/inputnumber';
@@ -52,7 +52,7 @@ const SUGGESTED_TAGS = [
     FormsModule,
     Message,
     Card,
-    Button,
+    ButtonDirective,
     InputText,
     TextareaModule,
     InputNumber,

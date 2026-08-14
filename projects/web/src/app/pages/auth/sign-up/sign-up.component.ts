@@ -17,7 +17,7 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -42,7 +42,7 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     InputTextModule,
     PasswordModule,
     CheckboxModule,

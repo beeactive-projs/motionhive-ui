@@ -1,0 +1,78 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="auth-container auth-container--center">
+    <div class="ion-padding-horizontal">
+      <h1>Welcome back</h1>
+      <p>Sign in to manage your clients and requests.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <ion-text color="danger" role="alert" class="ion-padding-horizontal">
+        <p>{{ errorMessage() }}</p>
+      </ion-text>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <ion-list [inset]="true">
+        <ion-item>
+          <ion-input
+            label="Email address"
+            labelPlacement="stacked"
+            type="email"
+            inputmode="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            enterkeyhint="next"
+            [errorText]="getFieldError('email')"
+            [class.ion-invalid]="isFieldInvalid('email')"
+            [class.ion-touched]="isFieldInvalid('email')"
+          />
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Password"
+            labelPlacement="stacked"
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            enterkeyhint="go"
+            [errorText]="getFieldError('password')"
+            [class.ion-invalid]="isFieldInvalid('password')"
+            [class.ion-touched]="isFieldInvalid('password')"
+          >
+            <ion-input-password-toggle slot="end" />
+          </ion-input>
+        </ion-item>
+      </ion-list>
+
+      <div class="ion-text-end">
+        <ion-button fill="clear" size="small" routerLink="/auth/reset-password">
+          Forgot password?
+        </ion-button>
+      </div>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="isLoading()"
+        class="ion-margin-horizontal ion-margin-top"
+      >
+        @if (isLoading()) {
+          <ion-spinner name="crescent" />
+        } @else {
+          Sign in
+        }
+      </ion-button>
+    </form>
+
+    <div class="ion-text-center ion-margin-top">
+      <ion-text color="medium">
+        <p class="ion-no-margin">Don't have an account?</p>
+      </ion-text>
+      <ion-button fill="clear" routerLink="/auth/signup" [queryParams]="queryParams">
+        Create one for free
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

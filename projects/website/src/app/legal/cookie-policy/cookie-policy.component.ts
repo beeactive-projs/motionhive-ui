@@ -1,11 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 @Component({
   selector: 'mh-cookie-policy',
-  imports: [DatePipe, RouterLink, ButtonModule],
+  imports: [DatePipe, RouterLink, ButtonDirective],
   templateUrl: './cookie-policy.component.html',
   styleUrl: './cookie-policy.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

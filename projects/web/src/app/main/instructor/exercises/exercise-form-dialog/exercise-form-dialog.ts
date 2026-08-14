@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
@@ -75,7 +75,7 @@ interface MultiOption<T> {
   standalone: true,
   imports: [
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     Dialog,
     InputTextModule,
     MultiSelect,

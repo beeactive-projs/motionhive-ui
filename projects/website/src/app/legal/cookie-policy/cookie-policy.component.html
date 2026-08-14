@@ -255,9 +255,14 @@
         <a routerLink="/legal/privacy-policy" class="text-brand hover:underline font-medium">Privacy Policy</a>
       </div>
       <div class="flex gap-3">
-        <p-button i18n-label="@@legal.footer.goToHome" label="Go to Home" icon="pi pi-home" outlined routerLink="/" />
-        <p-button i18n-label="@@legal.footer.scrollToTop" label="Scroll to Top" icon="pi pi-arrow-up"
-          (onClick)="scrollToTop()" />
+        <button pButton type="button" outlined routerLink="/">
+          <i class="pi pi-home"></i>
+          <span i18n="@@legal.footer.goToHome">Go to Home</span>
+        </button>
+        <button pButton type="button" (click)="scrollToTop()">
+          <i class="pi pi-arrow-up"></i>
+          <span i18n="@@legal.footer.scrollToTop">Scroll to Top</span>
+        </button>
       </div>
     </div>
   </div>

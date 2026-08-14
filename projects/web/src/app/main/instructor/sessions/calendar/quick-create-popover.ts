@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { VenueService } from 'core';
@@ -45,7 +45,7 @@ import type { CreateTemplateRequest, SessionKind, Venue } from 'core';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonModule,
+    ButtonDirective,
     InputTextModule,
     Select,
   ],
@@ -144,28 +144,12 @@ import type { CreateTemplateRequest, SessionKind, Venue } from 'core';
         </div>
 
         <div class="mh-qcp__footer">
-          <p-button
-            label="Open full form"
-            severity="secondary"
-            [outlined]="true"
-            size="small"
-            icon="pi pi-arrow-up-right"
-            (click)="onOpenFull()"
-          />
-          <p-button
-            label="Cancel"
-            severity="secondary"
-            [text]="true"
-            size="small"
-            (click)="dismiss.emit()"
-          />
-          <p-button
-            type="submit"
-            label="Create"
-            size="small"
-            icon="pi pi-check"
-            [disabled]="form.invalid"
-          />
+          <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="onOpenFull()">
+            <i class="pi pi-arrow-up-right"></i>
+            Open full form
+          </button>
+          <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="dismiss.emit()">Cancel</button>
+          <button pButton type="submit" size="small" [disabled]="form.invalid"><i class="pi pi-check"></i> Create</button>
         </div>
       </form>
     </div>

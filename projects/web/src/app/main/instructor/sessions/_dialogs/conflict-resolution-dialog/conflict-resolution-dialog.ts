@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import {
@@ -44,7 +44,7 @@ import {
 @Component({
   selector: 'mh-conflict-resolution-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, Dialog, ButtonModule, DatePickerModule],
+  imports: [CommonModule, FormsModule, Dialog, ButtonDirective, DatePickerModule],
   templateUrl: './conflict-resolution-dialog.html',
   styleUrl: './conflict-resolution-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

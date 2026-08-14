@@ -49,7 +49,7 @@
       @switch (state()) {
         @case ('verifying') {
           <div class="flex flex-col items-center gap-4 py-8">
-            <p-progressSpinner
+            <p-progress-spinner
               styleClass="w-12 h-12"
               strokeWidth="3"
               ariaLabel="Verifying your email"
@@ -67,14 +67,10 @@
             </p-message>
           </div>
           <div class="flex flex-col">
-            <p-button
-              routerLink="/auth/login"
-              label="Go to sign in"
-              icon="pi pi-arrow-right"
-              iconPos="right"
-              fluid
-              size="large">
-            </p-button>
+            <button pButton type="button" routerLink="/auth/login" fluid size="large">
+              Go to sign in
+              <i class="pi pi-arrow-right"></i>
+            </button>
           </div>
         }
 
@@ -104,14 +100,10 @@
             </p-message>
           </div>
           <div class="flex flex-col">
-            <p-button
-              routerLink="/auth/login"
-              label="Go to sign in"
-              icon="pi pi-arrow-right"
-              iconPos="right"
-              fluid
-              size="large">
-            </p-button>
+            <button pButton type="button" routerLink="/auth/login" fluid size="large">
+              Go to sign in
+              <i class="pi pi-arrow-right"></i>
+            </button>
           </div>
         }
       }

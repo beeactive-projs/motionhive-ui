@@ -1,0 +1,13 @@
+.prefix {
+  margin-inline-end: 0.25rem;
+  color: var(--ion-color-medium);
+  font-weight: 600;
+}
+
+// The live URL is the point of this field, so it reads as the link it will be.
+.preview {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--mh-font-mono);
+  font-size: 0.7rem;
+}

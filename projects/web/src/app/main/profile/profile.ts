@@ -27,7 +27,7 @@ import { MessageService } from 'primeng/api';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CardModule } from 'primeng/card';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ProfileHeroCard } from './_components/profile-hero-card/profile-hero-card';
 import { Details } from './tabs/details/details';
@@ -80,7 +80,7 @@ const LEGACY_TAB_ALIASES: Record<string, ProfileTab> = {
     TabPanel,
     SkeletonModule,
     CardModule,
-    Button,
+    ButtonDirective,
     ToastModule,
     ProfileHeroCard,
     Details,

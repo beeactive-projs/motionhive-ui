@@ -5,7 +5,7 @@ import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter, interval } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 /**
  * Listens for a newly deployed app version (downloaded in the background by the
@@ -14,7 +14,7 @@ import { Button } from 'primeng/button';
  */
 @Component({
   selector: 'mh-pwa-update',
-  imports: [Toast, Button],
+  imports: [Toast, ButtonDirective],
   templateUrl: './pwa-update.html',
   styleUrl: './pwa-update.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

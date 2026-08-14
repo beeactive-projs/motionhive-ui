@@ -21,7 +21,7 @@ import {
   BlogService,
   withCloudinaryTransform,
 } from 'core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { Skeleton } from 'primeng/skeleton';
@@ -39,7 +39,7 @@ const PAGE_SIZE_ALL = 10;
   selector: 'mh-blog',
   imports: [
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     FormsModule,
     DatePipe,
     Skeleton,

@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
 import {
@@ -74,7 +74,7 @@ type SessionRowTone = (typeof SessionRowTone)[keyof typeof SessionRowTone];
 @Component({
   selector: 'mh-my-session-row',
   standalone: true,
-  imports: [DatePipe, Button, Card, Tag, Avatar, TypeChip, ProviderChip, CurrencyRonPipe],
+  imports: [DatePipe, ButtonDirective, Card, Tag, Avatar, TypeChip, ProviderChip, CurrencyRonPipe],
   templateUrl: './my-session-row.html',
   styleUrl: './my-session-row.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

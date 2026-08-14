@@ -1,7 +1,9 @@
 <!-- Header -->
 <div class="flex justify-end mb-4">
-  <p-button label="Manage billing" icon="pi pi-cog" size="small" [outlined]="true" [loading]="portalLoading()"
-    (onClick)="openCustomerPortal()" />
+  <button pButton type="button" size="small" [outlined]="true" (click)="openCustomerPortal()" [disabled]="portalLoading()">
+    <i class="pi" [class]="portalLoading() ? 'pi-spinner pi-spin' : 'pi-cog'"></i>
+    Manage billing
+  </button>
 </div>
 
 <!-- Info card -->
@@ -60,17 +62,19 @@
       </td>
       <td class="text-end">
         @if (canCancel(sub)) {
-          <p-button
-            icon="pi pi-times"
-            label="Cancel"
+          <button pButton
+            type="button"
             size="small"
             severity="danger"
             [text]="true"
             pTooltip="You'll keep access until the end of the current period"
             tooltipPosition="left"
-            [loading]="cancellingId() === sub.id"
-            [disabled]="cancellingId() !== null"
-            (onClick)="confirmCancel(sub)" />
+            [disabled]="(cancellingId() !== null) || cancellingId() === sub.id"
+            (click)="confirmCancel(sub)"
+          >
+            <i class="pi" [class]="cancellingId() === sub.id ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+            Cancel
+          </button>
         }
       </td>
     </tr>
@@ -96,4 +100,4 @@
 </p-table>
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

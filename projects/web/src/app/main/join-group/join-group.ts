@@ -1,19 +1,19 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { GroupService, AuthStore } from 'core';
 
 @Component({
   selector: 'mh-join-group',
-  imports: [ProgressSpinnerModule, ButtonModule, CardModule],
+  imports: [ProgressSpinnerModule, ButtonDirective, CardModule],
   template: `
     <div class="flex items-center justify-center min-h-screen">
       <p-card class="w-full max-w-md">
         @if (loading()) {
           <div class="flex flex-col items-center gap-4 p-8">
-            <p-progressSpinner ariaLabel="Joining group" />
+            <p-progress-spinner ariaLabel="Joining group" />
             <p class="text-lg">Joining group...</p>
           </div>
         } @else if (error()) {
@@ -21,14 +21,14 @@ import { GroupService, AuthStore } from 'core';
             <i class="pi pi-times-circle text-5xl text-red-500" aria-hidden="true"></i>
             <h2 class="text-xl font-semibold">Unable to Join</h2>
             <p class="text-surface-500">{{ error() }}</p>
-            <p-button label="Go to Dashboard" (onClick)="goToDashboard()" />
+            <button pButton type="button" (click)="goToDashboard()">Go to Dashboard</button>
           </div>
         } @else {
           <div class="flex flex-col items-center gap-4 p-8 text-center">
             <i class="pi pi-check-circle text-5xl text-green-500" aria-hidden="true"></i>
             <h2 class="text-xl font-semibold">You're In!</h2>
             <p class="text-surface-500">You have successfully joined the group.</p>
-            <p-button label="Go to Dashboard" (onClick)="goToDashboard()" />
+            <button pButton type="button" (click)="goToDashboard()">Go to Dashboard</button>
           </div>
         }
       </p-card>

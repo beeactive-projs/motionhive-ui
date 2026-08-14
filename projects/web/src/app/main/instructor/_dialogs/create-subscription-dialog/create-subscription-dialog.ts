@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Select } from 'primeng/select';
 import { InputNumber } from 'primeng/inputnumber';
@@ -37,7 +37,7 @@ interface ProductOption {
 
 @Component({
   selector: 'mh-create-subscription-dialog',
-  imports: [FormsModule, Button, Dialog, Select, InputNumber, CurrencyRonPipe],
+  imports: [FormsModule, ButtonDirective, Dialog, Select, InputNumber, CurrencyRonPipe],
   templateUrl: './create-subscription-dialog.html',
   styleUrl: './create-subscription-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

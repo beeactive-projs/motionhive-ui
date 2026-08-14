@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Group, JoinPolicies, TagSeverity } from 'core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
@@ -29,7 +29,7 @@ export type AboutTabGroup = Pick<
 
 @Component({
   selector: 'mh-group-about-tab',
-  imports: [DatePipe, Button, CardModule, DividerModule, TagModule],
+  imports: [DatePipe, ButtonDirective, CardModule, DividerModule, TagModule],
   templateUrl: './about-tab.html',
   styleUrl: './about-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

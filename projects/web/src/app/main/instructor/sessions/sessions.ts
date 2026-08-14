@@ -15,7 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -63,7 +63,7 @@ const VALID_TABS = new Set<string>(Object.values(TemplateTab));
     NgTemplateOutlet,
     TitleCasePipe,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     IconField,
     InputIcon,
     InputTextModule,

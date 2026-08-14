@@ -10,7 +10,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -76,7 +76,7 @@ import {
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
+    ButtonDirective,
     MessageModule,
     SkeletonModule,
     ToastModule,

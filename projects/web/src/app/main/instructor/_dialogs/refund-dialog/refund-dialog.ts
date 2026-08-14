@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
@@ -25,7 +25,7 @@ import {
 
 @Component({
   selector: 'mh-refund-dialog',
-  imports: [FormsModule, Button, Dialog, InputNumber, Select, TextareaModule, CurrencyRonPipe],
+  imports: [FormsModule, ButtonDirective, Dialog, InputNumber, Select, TextareaModule, CurrencyRonPipe],
   templateUrl: './refund-dialog.html',
   styleUrl: './refund-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

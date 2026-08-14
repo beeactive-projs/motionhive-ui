@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -52,7 +52,7 @@ import {
   imports: [
     LowerCasePipe,
     FormsModule,
-    Button,
+    ButtonDirective,
     Dialog,
     IconField,
     InputIcon,

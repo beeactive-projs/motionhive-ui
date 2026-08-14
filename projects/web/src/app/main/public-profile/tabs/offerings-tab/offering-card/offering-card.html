@@ -18,8 +18,10 @@
         <span class="text-xs text-muted-color">{{ billingLabel() }}</span>
       </div>
       <div class="offering-cta shrink-0">
-        <p-button [label]="ctaLabel()" icon="pi pi-arrow-right" iconPos="right"
-          rounded size="small" (onClick)="choose.emit()" />
+        <button pButton type="button" rounded size="small" (click)="choose.emit()">
+          {{ ctaLabel() }}
+          <i class="pi pi-arrow-right"></i>
+        </button>
       </div>
     </div>
   </div>

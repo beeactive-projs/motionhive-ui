@@ -1,0 +1,62 @@
+.status {
+  margin: 0.75rem 1rem 0.5rem;
+}
+
+// Display name and experience read as a pair, the way the design lays them out.
+.pair-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.block {
+  display: block;
+  margin-top: 0.875rem;
+}
+
+.fact {
+  margin: 0.1875rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bio {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.links-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  margin-top: 0.875rem;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.375rem 0 0;
+  overflow: hidden;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// Says where a read-only list is actually managed, so the page doesn't read as
+// broken for want of an edit button.
+.empty-note {
+  display: block;
+  margin: 0.5rem 1.5rem 1rem;
+  font-size: 0.65rem;
+  line-height: 1.5;
+}

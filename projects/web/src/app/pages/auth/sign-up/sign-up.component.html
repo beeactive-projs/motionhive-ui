@@ -181,20 +181,23 @@
 
         <!-- Submit Button -->
         <div class="flex flex-col">
-          <p-button type="submit" [loading]="isLoading()" [disabled]="isLoading()" label="Create account"
-            icon="pi pi-user-plus" iconPos="right" fluid size="large"></p-button>
+          <button pButton type="submit" [disabled]="isLoading()" fluid size="large">
+            Create account
+            <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-user-plus'"></i>
+          </button>
         </div>
         <p-divider [align]="'center'" type="solid">
           or sign up with
         </p-divider>
         <div class="flex gap-3">
           <div class="social-btn-wrapper flex-1">
-            <p-button type="button" styleClass="social-btn" label="Google" icon="pi pi-google" fluid
-              size="large"></p-button>
+            <button pButton type="button" fluid size="large" class="social-btn"><i class="pi pi-google"></i> Google</button>
             <div #googleBtn class="google-btn-overlay"></div>
           </div>
-          <p-button type="button" class="flex-1" styleClass="social-btn" label="Facebook" icon="pi pi-facebook" fluid
-            size="large" (onClick)="onFacebookLogin()"></p-button>
+          <button pButton type="button" class="flex-1 social-btn" fluid size="large" (click)="onFacebookLogin()">
+            <i class="pi pi-facebook"></i>
+            Facebook
+          </button>
         </div>
         <div class="flex flex-col gap-2 text-center">
           <p class="text-xs text-surface-600 dark:text-surface-300 leading-relaxed">

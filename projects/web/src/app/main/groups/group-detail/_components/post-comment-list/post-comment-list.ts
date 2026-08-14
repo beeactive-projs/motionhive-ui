@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Textarea } from 'primeng/textarea';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -23,7 +23,7 @@ import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avat
     FormsModule,
     DatePipe,
     HexAvatar,
-    Button,
+    ButtonDirective,
     SkeletonModule,
     Textarea,
     ConfirmDialogModule,

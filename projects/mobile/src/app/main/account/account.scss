@@ -1,0 +1,104 @@
+// The hero is the one block on this screen that is not a list, so it carries
+// the only layout rules here. Everything below it is `mh-card-list` + rows.
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0.75rem 1.25rem 1.25rem;
+  padding: 1.375rem 1.25rem 1.125rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 1.125rem;
+  background: var(--ion-card-background);
+  text-align: center;
+}
+
+.hero-avatar {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.hero-avatar-skeleton {
+  width: 6.125rem;
+  height: 5.3rem;
+}
+
+.hero-name {
+  margin: 0;
+  font-size: 1.1875rem;
+  font-weight: 700;
+}
+
+.hero-handle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+// The handle reads as a chip rather than a caption — it is the thing people
+// copy, so it gets an edge.
+.handle-chip {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 999px;
+  background: var(--ion-background-color);
+  font-family: var(--mh-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 0.375rem;
+}
+
+// Soft status chips — see the contrast note on the chip tokens in variables.css.
+.chip-info,
+.chip-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+}
+
+.chip-info {
+  --background: var(--mh-chip-info-background);
+  --color: var(--mh-chip-info-color);
+}
+
+.chip-success {
+  --background: var(--mh-chip-success-background);
+  --color: var(--mh-chip-success-color);
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-self: stretch;
+  margin-top: 0.25rem;
+
+  ion-button {
+    flex: 1;
+  }
+
+  // The secondary action is a quiet white button with the page's border and
+  // ink, not a tinted one — `color="medium"` would grey the label out.
+  ion-button[fill='outline'] {
+    --border-color: var(--ion-border-color);
+    --color: var(--ion-text-color);
+  }
+}
+
+.section-label {
+  display: block;
+  margin: 0 1.5rem 0.4375rem;
+}
+
+.footer-note {
+  margin: 0.5rem 1.25rem 2.5rem;
+  font-size: 0.65rem;
+  text-align: center;
+}

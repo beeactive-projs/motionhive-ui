@@ -1,0 +1,16 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/clients" />
+    </ion-buttons>
+    <ion-title>Requests</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <mh-empty-state
+    icon="person-add-outline"
+    heading="Requests are coming"
+    message="Invitations you send and incoming client requests will show up here."
+  />
+</ion-content>

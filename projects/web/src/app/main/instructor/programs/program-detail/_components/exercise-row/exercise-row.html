@@ -40,67 +40,82 @@
     </button>
 
     <span class="mh-exrow__actions flex shrink-0 items-center">
-      <p-button
-        icon="pi pi-arrow-up"
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
         [disabled]="index() === 0"
-        [ariaLabel]="'Move ' + name() + ' up'"
         pTooltip="Move up"
         tooltipPosition="left"
-        (onClick)="moveUp.emit()"
-      />
-      <p-button
-        icon="pi pi-arrow-down"
+        (click)="moveUp.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Move ' + name() + ' up'"
+        iconOnly
+      >
+        <i class="pi pi-arrow-up"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
         [disabled]="index() === count() - 1"
-        [ariaLabel]="'Move ' + name() + ' down'"
         pTooltip="Move down"
         tooltipPosition="left"
-        (onClick)="moveDown.emit()"
-      />
-      <p-button
-        icon="pi pi-arrow-right-arrow-left"
+        (click)="moveDown.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Move ' + name() + ' down'"
+        iconOnly
+      >
+        <i class="pi pi-arrow-down"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
         [disabled]="!canMoveAcross()"
-        [ariaLabel]="'Move ' + name() + ' to another workout'"
         pTooltip="Move to another workout"
         tooltipPosition="left"
-        (onClick)="moveTo.emit()"
-      />
-      <p-button
-        icon="pi pi-trash"
+        (click)="moveTo.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Move ' + name() + ' to another workout'"
+        iconOnly
+      >
+        <i class="pi pi-arrow-right-arrow-left"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="danger"
         [text]="true"
         [rounded]="true"
-        [ariaLabel]="'Remove ' + name()"
         pTooltip="Remove exercise"
         tooltipPosition="left"
-        (onClick)="remove.emit()"
-      />
-      <p-button
-        [icon]="expanded() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+        (click)="remove.emit()"
+        [attr.aria-label]="'Remove ' + name()"
+        iconOnly
+      >
+        <i class="pi pi-trash"></i>
+      </button>
+      <button pButton
+        type="button"
         size="small"
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        styleClass="mh-reorder-btn"
-        [ariaLabel]="(expanded() ? 'Collapse ' : 'Expand ') + name() + ' sets'"
         [attr.aria-expanded]="expanded()"
-        (onClick)="toggle.emit()"
-      />
+        (click)="toggle.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="(expanded() ? 'Collapse ' : 'Expand ') + name() + ' sets'"
+        iconOnly
+      >
+        <i [class]="expanded() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+      </button>
     </span>
   </div>
 
@@ -157,39 +172,48 @@
                 </td>
                 <td class="text-right">
                   <span class="flex items-center gap-2">
-                    <p-button
-                      icon="pi pi-clone"
+                    <button pButton
+                      type="button"
                       size="small"
                       severity="secondary"
                       [text]="true"
                       [rounded]="true"
-                      [ariaLabel]="'Duplicate set ' + (rowIndex + 1)"
                       pTooltip="Duplicate set"
                       tooltipPosition="left"
-                      (onClick)="duplicateSet.emit(s)"
-                    />
-                    <p-button
-                      icon="pi pi-pencil"
+                      (click)="duplicateSet.emit(s)"
+                      [attr.aria-label]="'Duplicate set ' + (rowIndex + 1)"
+                      iconOnly
+                    >
+                      <i class="pi pi-clone"></i>
+                    </button>
+                    <button pButton
+                      type="button"
                       size="small"
                       severity="secondary"
                       [text]="true"
                       [rounded]="true"
-                      [ariaLabel]="'Edit set ' + (rowIndex + 1)"
                       pTooltip="Edit set"
                       tooltipPosition="left"
-                      (onClick)="editSet.emit(s)"
-                    />
-                    <p-button
-                      icon="pi pi-trash"
+                      (click)="editSet.emit(s)"
+                      [attr.aria-label]="'Edit set ' + (rowIndex + 1)"
+                      iconOnly
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button pButton
+                      type="button"
                       size="small"
                       severity="danger"
                       [text]="true"
                       [rounded]="true"
-                      [ariaLabel]="'Remove set ' + (rowIndex + 1)"
                       pTooltip="Remove set"
                       tooltipPosition="left"
-                      (onClick)="removeSet.emit(s)"
-                    />
+                      (click)="removeSet.emit(s)"
+                      [attr.aria-label]="'Remove set ' + (rowIndex + 1)"
+                      iconOnly
+                    >
+                      <i class="pi pi-trash"></i>
+                    </button>
                   </span>
                 </td>
               </tr>
@@ -200,15 +224,10 @@
         }
 
         <div class="mt-2 flex justify-end">
-          <p-button
-            label="Add set"
-            icon="pi pi-plus"
-            size="small"
-            severity="secondary"
-            [outlined]="true"
-            styleClass="mh-dashed-btn"
-            (onClick)="addSet.emit()"
-          />
+          <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="addSet.emit()" class="mh-dashed-btn">
+            <i class="pi pi-plus"></i>
+            Add set
+          </button>
         </div>
       </div>
     }

@@ -2,12 +2,21 @@
   <!-- Filters -->
   <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
     @for (opt of typeOptions; track opt.label) {
-    <p-button [label]="opt.label" [severity]="typeFilter() === opt.value ? 'primary' : 'secondary'" size="small" rounded
-      [text]="typeFilter() !== opt.value" (onClick)="onTypeFilterChange(opt.value)" styleClass="py-0.5 min-w-10" />
+    <button pButton
+      type="button"
+      [severity]="typeFilter() === opt.value ? 'primary' : 'secondary'"
+      size="small"
+      rounded
+      [text]="typeFilter() !== opt.value"
+      (click)="onTypeFilterChange(opt.value)"
+      class="py-0.5 min-w-10"
+    >
+      {{ opt.label }}
+    </button>
     }
   </div>
 
-  <p-button label="Create product" icon="pi pi-plus" size="small" (onClick)="openCreateDialog()" />
+  <button pButton type="button" size="small" (click)="openCreateDialog()"><i class="pi pi-plus"></i> Create product</button>
 </header>
 
 
@@ -53,16 +62,37 @@
             [severity]="activeSeverity(product.isActive)" class="w-full" rounded />
         </td>
         <td class="text-center">
-          <p-toggleSwitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
+          <p-toggleswitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
             (ngModelChange)="toggleShowOnProfile(product, $event)" />
         </td>
         <td>
           <div class="flex gap-1">
-            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small" pTooltip="Edit"
-              tooltipPosition="left" (onClick)="openEditDialog(product)" />
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              pTooltip="Edit"
+              tooltipPosition="left"
+              (click)="openEditDialog(product)"
+              iconOnly
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
             @if (product.isActive) {
-            <p-button icon="pi pi-ban" [rounded]="true" [text]="true" size="small" severity="danger"
-              pTooltip="Deactivate" tooltipPosition="left" (onClick)="confirmDeactivate(product)" />
+            <button pButton
+              type="button"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              severity="danger"
+              pTooltip="Deactivate"
+              tooltipPosition="left"
+              (click)="confirmDeactivate(product)"
+              iconOnly
+            >
+              <i class="pi pi-ban"></i>
+            </button>
             }
           </div>
         </td>
@@ -159,7 +189,7 @@
               <i class="pi" [class.pi-eye]="product.showOnProfile" [class.pi-eye-slash]="!product.showOnProfile"></i>
               <span>{{ product.showOnProfile ? 'On profile' : 'Hidden' }}</span>
             </div>
-            <p-toggleSwitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
+            <p-toggleswitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
               (ngModelChange)="toggleShowOnProfile(product, $event)" />
           </div>
         </mh-list-card>
@@ -196,4 +226,4 @@
 <mh-product-form-dialog [(visible)]="showProductFormDialog" [product]="editingProduct()" (saved)="reload()" />
 
 <p-toast />
-<p-confirmDialog />
+<p-confirmdialog />

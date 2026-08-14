@@ -19,8 +19,9 @@
       <span class="text-xs font-semibold text-surface-700 dark:text-surface-200">
         {{ selectedCount() }} selected
       </span>
-      <p-button label="Clear" size="small" severity="secondary" [text]="true" [disabled]="submitting()"
-        (onClick)="clearSelection()" />
+      <button pButton type="button" size="small" severity="secondary" [text]="true" [disabled]="submitting()" (click)="clearSelection()">
+        Clear
+      </button>
     </div>
     }
 
@@ -47,8 +48,14 @@
     <div class="flex max-h-110 flex-col gap-1.5 overflow-y-auto transition-opacity" [class.opacity-60]="loading()"
       role="group" aria-label="Exercises">
       @for (ex of results(); track ex.id) {
-      <p-button fluid [outlined]="true" [ariaLabel]="ex.name"
-        [styleClass]="'picker-row' + (isSelected(ex.id) ? ' picker-row--on' : '')" (onClick)="toggle(ex)">
+      <button pButton
+        type="button"
+        fluid
+        [outlined]="true"
+        (click)="toggle(ex)"
+        [class]="'picker-row' + (isSelected(ex.id) ? ' picker-row--on' : '')"
+        [attr.aria-label]="ex.name"
+      >
         <span class="flex w-full items-center gap-3 text-left">
           @if (ex.thumbnailUrl) {
           <img [src]="ex.thumbnailUrl" [alt]="ex.name" loading="lazy"
@@ -77,16 +84,18 @@
             [class.text-primary]="isSelected(ex.id)"></i>
           }
         </span>
-      </p-button>
+      </button>
       }
     </div>
     }
   </div>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
-    <p-button [label]="submitLabel()" icon="pi pi-plus" [loading]="submitting()" [disabled]="!canSubmit()"
-      (onClick)="submit()" />
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
+      <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-plus'"></i>
+      {{ submitLabel() }}
+    </button>
   </ng-template>
 </p-dialog>
 

@@ -1,0 +1,17 @@
+/*
+ * Shared auth-page layout. Ionic has no utility for capping a form's
+ * width on tablets or vertically centering a lone column — these two
+ * rules are the only custom CSS the auth pages need.
+ */
+.auth-container {
+  width: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.auth-container--center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+}

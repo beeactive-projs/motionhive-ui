@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Textarea } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
@@ -29,7 +29,7 @@ const MAX_NOTES_LENGTH = 1000;
 @Component({
   selector: 'mh-report-conversation-dialog',
   standalone: true,
-  imports: [FormsModule, Button, Dialog, Textarea],
+  imports: [FormsModule, ButtonDirective, Dialog, Textarea],
   templateUrl: './report-conversation-dialog.html',
   styleUrl: './report-conversation-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -39,8 +39,19 @@
         </div>
 
         @if (mode() === 'manage') {
-        <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true" [rounded]="true" size="small"
-          class="gp-kebab" ariaLabel="Group actions" (onClick)="onKebab($event)" />
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          class="gp-kebab"
+          (click)="onKebab($event)"
+          aria-label="Group actions"
+          iconOnly
+        >
+          <i class="pi pi-ellipsis-v"></i>
+        </button>
         <p-menu #menu [model]="menuItems" [popup]="true" [appendTo]="'body'" />
         }
       </div>
@@ -69,7 +80,7 @@
 
         @if (mode() === 'manage') {
         <!-- Member avatar stack -->
-        <p-avatarGroup>
+        <p-avatar-group>
           @for (a of recentAvatars; track $index) {
           <p-avatar [label]="a.label" shape="circle" size="normal" [style]="{ background: a.bg, color: a.fg }" />
           }
@@ -77,30 +88,51 @@
           <p-avatar [label]="'+' + (group().memberCount - recentAvatars.length)" shape="circle" size="normal"
             class="gp-avatar-more" />
           }
-        </p-avatarGroup>
+        </p-avatar-group>
 
-        <p-button label="Visit group" icon="pi pi-arrow-right" iconPos="right" [link]="true" size="small"
-          class="gp-visit" [routerLink]="cardLink" />
+        <button pButton type="button" [link]="true" size="small" class="gp-visit" [routerLink]="cardLink">
+          Visit group
+          <i class="pi pi-arrow-right"></i>
+        </button>
 
         } @else {
         <!-- Discover mode: join / cancel / invite-only -->
         <span></span>
         @if (joinRequestStatus() === 'PENDING') {
         <div class="flex items-center gap-2">
-          <p-button label="Request pending" icon="pi pi-clock" [outlined]="true" [disabled]="true" size="small" />
-          <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small"
-            pTooltip="Cancel request" [loading]="isBusy()"
-            (onClick)="discoverAction.emit({ kind: 'cancel', group: group() })" />
+          <button pButton type="button" [outlined]="true" [disabled]="true" size="small">
+            <i class="pi pi-clock"></i>
+            Request pending
+          </button>
+          <button pButton
+            type="button"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            size="small"
+            pTooltip="Cancel request"
+            (click)="discoverAction.emit({ kind: 'cancel', group: group() })"
+            [disabled]="isBusy()"
+            iconOnly
+          >
+            <i class="pi" [class]="isBusy() ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+          </button>
         </div>
         } @else if (group().joinPolicy === JoinPolicies.Open) {
-        <p-button label="Join" icon="pi pi-plus" size="small" [loading]="isBusy()"
-          (onClick)="discoverAction.emit({ kind: 'join', group: group() })" />
+        <button pButton type="button" size="small" (click)="discoverAction.emit({ kind: 'join', group: group() })" [disabled]="isBusy()">
+          <i class="pi" [class]="isBusy() ? 'pi-spinner pi-spin' : 'pi-plus'"></i>
+          Join
+        </button>
         } @else if (group().joinPolicy === JoinPolicies.Approval) {
-        <p-button label="Request to join" icon="pi pi-send" size="small" [loading]="isBusy()"
-          (onClick)="discoverAction.emit({ kind: 'join', group: group() })" />
+        <button pButton type="button" size="small" (click)="discoverAction.emit({ kind: 'join', group: group() })" [disabled]="isBusy()">
+          <i class="pi" [class]="isBusy() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+          Request to join
+        </button>
         } @else {
-        <p-button label="Invite only" icon="pi pi-lock" severity="secondary" [outlined]="true" [disabled]="true"
-          size="small" />
+        <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="true" size="small">
+          <i class="pi pi-lock"></i>
+          Invite only
+        </button>
         }
         }
 

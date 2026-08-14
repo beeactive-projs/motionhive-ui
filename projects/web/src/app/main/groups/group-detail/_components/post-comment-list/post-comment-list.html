@@ -13,12 +13,15 @@
       (ngModelChange)="newComment.set($event)"
       maxlength="2000"
       class="flex-1"></textarea>
-    <p-button
-      label="Post"
+    <button pButton
+      type="button"
       size="small"
-      [disabled]="!newComment().trim() || posting()"
-      [loading]="posting() && !replyingTo()"
-      (onClick)="postComment()" />
+      [disabled]="(!newComment().trim() || posting()) || posting() && !replyingTo()"
+      (click)="postComment()"
+    >
+      @if (posting() && !replyingTo()) {<i class="pi pi-spinner pi-spin"></i>}
+      Post
+    </button>
   </div>
 
   @if (loading()) {
@@ -71,12 +74,11 @@
               maxlength="2000"
               class="flex-1"></textarea>
             <div class="flex flex-col gap-1">
-              <p-button label="Reply" size="small"
-                [disabled]="!replyContent().trim() || posting()"
-                [loading]="posting()"
-                (onClick)="postReply(comment.id)" />
-              <p-button label="Cancel" size="small" severity="secondary" text
-                (onClick)="cancelReply()" />
+              <button pButton type="button" size="small" [disabled]="!replyContent().trim() || posting()" (click)="postReply(comment.id)">
+                @if (posting()) {<i class="pi pi-spinner pi-spin"></i>}
+                Reply
+              </button>
+              <button pButton type="button" size="small" severity="secondary" text (click)="cancelReply()">Cancel</button>
             </div>
           </div>
           }
@@ -115,17 +117,12 @@
   </div>
 
   @if (hasMore()) {
-  <p-button
-    label="Load more comments"
-    severity="secondary"
-    text
-    size="small"
-    [loading]="loading()"
-    [disabled]="loading()"
-    (onClick)="loadMore()"
-    styleClass="self-start" />
+  <button pButton type="button" severity="secondary" text size="small" [disabled]="loading()" (click)="loadMore()" class="self-start">
+    @if (loading()) {<i class="pi pi-spinner pi-spin"></i>}
+    Load more comments
+  </button>
   }
   }
 </div>
-<p-confirmDialog />
+<p-confirmdialog />
 }

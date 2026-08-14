@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
@@ -43,7 +43,7 @@ const DAY_NAMES = [
  */
 @Component({
   selector: 'mh-move-target-dialog',
-  imports: [FormsModule, Button, Dialog, Select],
+  imports: [FormsModule, ButtonDirective, Dialog, Select],
   templateUrl: './move-target-dialog.html',
   styleUrl: './move-target-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

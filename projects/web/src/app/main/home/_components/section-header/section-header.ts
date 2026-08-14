@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 
 /**
  * Standard section header used across the home page. Eyebrow above,
@@ -10,7 +10,7 @@ import { ButtonModule } from 'primeng/button';
  */
 @Component({
   selector: 'mh-section-header',
-  imports: [ButtonModule],
+  imports: [ButtonDirective],
   templateUrl: './section-header.html',
   styleUrl: './section-header.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

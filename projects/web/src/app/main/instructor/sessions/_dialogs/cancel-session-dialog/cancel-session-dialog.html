@@ -13,7 +13,7 @@
     styleClass="mh-cancel"
   >
     <ng-container *ngTemplateOutlet="cancelBody" />
-    <ng-template pTemplate="footer">
+    <ng-template #footer>
       <ng-container *ngTemplateOutlet="cancelFoot" />
     </ng-template>
   </p-dialog>
@@ -113,18 +113,9 @@
 
 <!-- ─── Foot (shared) ──────────────────────────────────────────── -->
 <ng-template #cancelFoot>
-  <p-button
-    label="Keep"
-    severity="secondary"
-    [text]="true"
-    (onClick)="close()"
-  />
-  <p-button
-    label="Cancel session"
-    icon="pi pi-times"
-    severity="danger"
-    [loading]="busy()"
-    (onClick)="submit()"
-    styleClass="mh-cancel__primary"
-  />
+  <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Keep</button>
+  <button pButton type="button" severity="danger" (click)="submit()" class="mh-cancel__primary" [disabled]="busy()">
+    <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-times'"></i>
+    Cancel session
+  </button>
 </ng-template>

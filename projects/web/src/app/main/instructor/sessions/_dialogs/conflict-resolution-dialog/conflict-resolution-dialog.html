@@ -48,21 +48,27 @@
                     dateFormat="dd M yy"
                     appendTo="body"
                   />
-                  <p-button
-                    icon="pi pi-check"
+                  <button pButton
+                    type="button"
                     severity="success"
                     [rounded]="true"
-                    (onClick)="confirmReschedule(inst.id)"
-                    ariaLabel="Confirm reschedule"
-                  />
-                  <p-button
-                    icon="pi pi-times"
+                    (click)="confirmReschedule(inst.id)"
+                    aria-label="Confirm reschedule"
+                    iconOnly
+                  >
+                    <i class="pi pi-check"></i>
+                  </button>
+                  <button pButton
+                    type="button"
                     severity="secondary"
                     [text]="true"
                     [rounded]="true"
-                    (onClick)="cancelReschedule(inst.id)"
-                    ariaLabel="Cancel reschedule"
-                  />
+                    (click)="cancelReschedule(inst.id)"
+                    aria-label="Cancel reschedule"
+                    iconOnly
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
                 </div>
               }
               @case ('done') {
@@ -75,22 +81,14 @@
               }
               @default {
                 <div class="mh-conflict__actions">
-                  <p-button
-                    label="Reschedule"
-                    icon="pi pi-calendar"
-                    severity="secondary"
-                    [outlined]="true"
-                    size="small"
-                    (onClick)="startReschedule(inst.id)"
-                  />
-                  <p-button
-                    label="Cancel"
-                    icon="pi pi-times"
-                    severity="danger"
-                    [text]="true"
-                    size="small"
-                    (onClick)="cancelOne(inst.id)"
-                  />
+                  <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="startReschedule(inst.id)">
+                    <i class="pi pi-calendar"></i>
+                    Reschedule
+                  </button>
+                  <button pButton type="button" severity="danger" [text]="true" size="small" (click)="cancelOne(inst.id)">
+                    <i class="pi pi-times"></i>
+                    Cancel
+                  </button>
                 </div>
               }
             }
@@ -100,10 +98,10 @@
     }
   </div>
 
-  <ng-template pTemplate="footer">
+  <ng-template #footer>
     @if (remaining() > 0) {
       <span class="mh-conflict__remaining">{{ remaining() }} conflict(s) remaining</span>
     }
-    <p-button label="Done" icon="pi pi-check" (onClick)="close()" />
+    <button pButton type="button" (click)="close()"><i class="pi pi-check"></i> Done</button>
   </ng-template>
 </p-dialog>

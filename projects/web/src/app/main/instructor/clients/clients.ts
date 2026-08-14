@@ -10,7 +10,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClientRequestTypes,
   ClientService,
@@ -27,10 +28,11 @@ import {
 } from 'core';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DataView } from 'primeng/dataview';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
+import { SelectButton } from 'primeng/selectbutton';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -41,12 +43,16 @@ import { EditClientNotesDialog } from '../_dialogs/edit-client-notes-dialog/edit
 import { InviteClientDialog } from '../_dialogs/invite-client-dialog/invite-client-dialog';
 import { UserInfo } from '../../../_shared/components/user-info/user-info';
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
+import { CoachRoster } from './roster/roster';
+
+/** The two ways a coach looks at the same list of people. */
+type ClientsLens = 'attention' | 'all';
 
 @Component({
   selector: 'mh-clients',
   imports: [
     DatePipe,
-    ButtonModule,
+    ButtonDirective,
     TableModule,
     TagModule,
     UserInfo,
@@ -59,6 +65,9 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
     InviteClientDialog,
     EditClientNotesDialog,
     ListEmptyState,
+    FormsModule,
+    CoachRoster,
+    SelectButton,
     MobileFab,
   ],
   providers: [MessageService, ConfirmationService],
@@ -68,6 +77,7 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
 })
 export class Clients implements OnInit {
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
@@ -95,6 +105,19 @@ export class Clients implements OnInit {
   private _io?: IntersectionObserver;
 
   readonly rows = 10;
+
+  /**
+   * Which lens is showing. Defaults to the roster: a coach opening this
+   * page wants to know who is slipping, not to read an alphabetical
+   * directory. `?view=all` deep-links the table so the switch survives
+   * a refresh or a shared link.
+   */
+  readonly lens = signal<ClientsLens>('attention');
+
+  readonly lensOptions: { label: string; value: ClientsLens }[] = [
+    { label: 'Needs attention', value: 'attention' },
+    { label: 'All clients', value: 'all' },
+  ];
 
   statusFilter = signal<InstructorClientStatus | undefined>(undefined);
   readonly statusOptions: { label: string; value: InstructorClientStatus | undefined }[] = [
@@ -140,6 +163,7 @@ export class Clients implements OnInit {
   }
 
   ngOnInit(): void {
+    this._readLensFromUrl();
     this.loadPendingCount();
   }
 
@@ -218,6 +242,44 @@ export class Clients implements OnInit {
         },
         error: () => this.loading.set(false),
       });
+  }
+
+  private _readLensFromUrl(): void {
+    if (this._route.snapshot.queryParamMap.get('view') === 'all') {
+      this.lens.set('all');
+    }
+  }
+
+  setLens(lens: ClientsLens): void {
+    if (lens === this.lens()) return;
+    this.lens.set(lens);
+    // Reflected in the URL, not stored: the view a coach is looking at
+    // should be shareable and survive a refresh.
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: { view: lens === 'all' ? 'all' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  /**
+   * Whether this row has a profile to open.
+   *
+   * The list merges two sources: real `instructor_client` relationships
+   * and pending `client_request` rows. Only the former has a profile.
+   * `requestType` is the discriminator, not `status` — a request row
+   * carries a `clientId` for an existing user and would otherwise look
+   * openable, then 404. A PENDING relationship row is fine to open.
+   */
+  isOpenable(client: InstructorClient): boolean {
+    return !!client.clientId && !client.requestType;
+  }
+
+  /** Open the full profile — plans, workouts, progress, sessions. */
+  openClient(client: InstructorClient): void {
+    if (!this.isOpenable(client)) return;
+    this._router.navigate(['/coaching/clients', client.clientId]);
   }
 
   onStatusFilterChange(status: InstructorClientStatus | undefined): void {

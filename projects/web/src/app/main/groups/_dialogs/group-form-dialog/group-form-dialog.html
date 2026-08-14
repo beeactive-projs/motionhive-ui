@@ -26,7 +26,7 @@
         <span class="text-sm font-medium">Public group</span>
         <p class="text-xs">Visible in group discovery</p>
       </div>
-      <p-toggleSwitch [(ngModel)]="formIsPublic" />
+      <p-toggleswitch [(ngModel)]="formIsPublic" />
     </div>
 
     <!-- Tags -->
@@ -35,7 +35,9 @@
       <div class="flex gap-2">
         <input type="text" pInputText fluid [(ngModel)]="formTagInput" placeholder="Add a tag and press Enter"
           (keydown)="onTagKeydown($event)" />
-        <p-button icon="pi pi-plus" severity="secondary" [disabled]="!formTagInput.trim()" (onClick)="addTag()" />
+        <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()" iconOnly>
+          <i class="pi pi-plus"></i>
+        </button>
       </div>
       @if (formTags.length > 0) {
       <div class="flex flex-wrap gap-1">
@@ -48,8 +50,10 @@
   </div>
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" text (onClick)="visible.set(false)" />
-    <p-button [label]="group() ? 'Save changes' : 'Create group'" icon="pi pi-check"
-      [loading]="saving()" [disabled]="!formName.trim()" (onClick)="saveGroup()" />
+    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" [disabled]="(!formName.trim()) || saving()" (click)="saveGroup()">
+      <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+      {{ group() ? 'Save changes' : 'Create group' }}
+    </button>
   </ng-template>
 </p-dialog>

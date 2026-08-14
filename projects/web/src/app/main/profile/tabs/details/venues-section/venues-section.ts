@@ -7,7 +7,6 @@ import {
   signal,
 } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Venue, VenueService, showApiError } from 'core';
@@ -25,7 +24,6 @@ import { VenueFormDialog } from '../../../../instructor/venues/venue-form-dialog
 @Component({
   selector: 'mh-venues-section',
   imports: [
-    ButtonModule,
     ConfirmDialog,
     SkeletonModule,
     VenueCard,

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { Venue, countryNameFromCode } from 'core';
@@ -17,7 +17,7 @@ import { VENUE_KIND_META } from '../venue-kind.utils';
  */
 @Component({
   selector: 'mh-venue-card',
-  imports: [ButtonModule, Tag, TooltipModule],
+  imports: [ButtonDirective, Tag, TooltipModule],
   templateUrl: './venue-card.html',
   styleUrl: './venue-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

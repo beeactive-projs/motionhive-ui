@@ -45,12 +45,18 @@
       <label i18n="@@waitlist.role.label" class="text-xs font-semibold">How will you use MotionHive?</label>
       <div class="flex gap-2">
         @for (r of roles; track r.key) {
-        <p-button class="flex-1" [outlined]="form.controls.role.value !== r.key"
-          [severity]="form.controls.role.value === r.key ? 'primary' : 'contrast'" size="small" fluid
-          (onClick)="form.controls.role.setValue(r.key)">
+        <button pButton
+          type="button"
+          class="flex-1"
+          [outlined]="form.controls.role.value !== r.key"
+          [severity]="form.controls.role.value === r.key ? 'primary' : 'contrast'"
+          size="small"
+          fluid
+          (click)="form.controls.role.setValue(r.key)"
+        >
           <i [class]="r.icon + ' text-sm'"></i>
           <span class="text-xs font-semibold">{{ r.label }}</span>
-        </p-button>
+        </button>
         }
       </div>
     </div>
@@ -70,14 +76,21 @@
   <ng-template #footer>
     @if (!submitted()) {
     <div class="flex flex-col sm:flex-row sm:justify-end gap-4 sm:gap-2 grow">
-      <p-button label="Notify me" i18n-label="@@waitlist.btn.notify" icon="pi pi-bell" iconPos="right"
-        (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()"
-        class="order-1 sm:order-2 w-full sm:w-auto" fluid />
-      <p-button label="Maybe later" i18n-label="@@waitlist.btn.later" text severity="contrast" (onClick)="onClose()"
-        class="order-2 sm:order-1 w-full sm:w-auto" fluid />
+      <button pButton
+        type="button"
+        [disabled]="form.invalid || isLoading()"
+        class="order-1 sm:order-2 w-full sm:w-auto"
+        (click)="onSubmit()"
+      >
+        <span i18n="@@waitlist.btn.notify">Notify me</span>
+        <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-bell'"></i>
+      </button>
+      <button pButton type="button" text severity="contrast" class="order-2 sm:order-1 w-full sm:w-auto" (click)="onClose()">
+        <span i18n="@@waitlist.btn.later">Maybe later</span>
+      </button>
     </div>
     } @else {
-    <p-button label="Close" i18n-label="@@waitlist.btn.close" (onClick)="onClose()" />
+    <button pButton type="button" (click)="onClose()"><span i18n="@@waitlist.btn.close">Close</span></button>
     }
   </ng-template>
 

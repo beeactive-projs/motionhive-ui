@@ -21,14 +21,20 @@
     <!-- Type toggle buttons -->
     <div class="flex gap-2">
       @for (t of types; track t.key) {
-      <p-button [outlined]="form.controls.type.value !== t.key"
-        [severity]="form.controls.type.value === t.key ? t.severity : 'contrast'" size="small"
-        class="w-full justify-center" fluid (onClick)="form.controls.type.setValue(t.key)">
+      <button pButton
+        type="button"
+        [outlined]="form.controls.type.value !== t.key"
+        [severity]="form.controls.type.value === t.key ? t.severity : 'contrast'"
+        size="small"
+        class="w-full justify-center"
+        fluid
+        (click)="form.controls.type.setValue(t.key)"
+      >
         <span class="flex flex-col md:flex-row items-center gap-1">
           <span class="material-symbols-outlined" style="font-size: 1.1rem; line-height: 1;">{{ t.icon }}</span>
           <span class="text-xs font-semibold">{{ t.label }}</span>
         </span>
-      </p-button>
+      </button>
       }
     </div>
 
@@ -72,14 +78,21 @@
   <ng-template #footer>
     @if (!submitted()) {
     <div class="flex flex-col sm:flex-row sm:justify-end gap-4 sm:gap-2 grow">
-      <p-button label="Send feedback" i18n-label="@@feedback.btn.send" icon="pi pi-send" iconPos="right"
-        (onClick)="onSubmit()" [loading]="isLoading()" [disabled]="form.invalid || isLoading()"
-        class="order-1 sm:order-2 w-full sm:w-auto" fluid />
-      <p-button label="Cancel" i18n-label="@@feedback.btn.cancel" text severity="contrast" (onClick)="onClose()"
-        class="order-2 sm:order-1 w-full sm:w-auto" fluid />
+      <button pButton
+        type="button"
+        [disabled]="form.invalid || isLoading()"
+        class="order-1 sm:order-2 w-full sm:w-auto"
+        (click)="onSubmit()"
+      >
+        <span i18n="@@feedback.btn.send">Send feedback</span>
+        <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
+      </button>
+      <button pButton type="button" text severity="contrast" class="order-2 sm:order-1 w-full sm:w-auto" (click)="onClose()">
+        <span i18n="@@feedback.btn.cancel">Cancel</span>
+      </button>
     </div>
     } @else {
-    <p-button label="Close" i18n-label="@@waitlist.btn.close" (onClick)="onClose()" />
+    <button pButton type="button" (click)="onClose()"><span i18n="@@waitlist.btn.close">Close</span></button>
     }
   </ng-template>
 

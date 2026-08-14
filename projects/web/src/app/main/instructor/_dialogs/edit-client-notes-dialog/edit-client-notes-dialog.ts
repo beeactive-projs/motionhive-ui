@@ -11,14 +11,14 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ClientService, InstructorClient } from 'core';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 
 @Component({
   selector: 'mh-edit-client-notes-dialog',
-  imports: [FormsModule, Button, Dialog, TextareaModule, UserInfo],
+  imports: [FormsModule, ButtonDirective, Dialog, TextareaModule, UserInfo],
   templateUrl: './edit-client-notes-dialog.html',
   styleUrl: './edit-client-notes-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

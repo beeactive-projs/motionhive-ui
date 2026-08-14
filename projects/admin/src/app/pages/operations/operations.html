@@ -1,7 +1,7 @@
 <div class="mb-4 flex items-center justify-between">
   <h1 class="text-2xl font-semibold text-[var(--p-text-color)]">Operations</h1>
   <div class="flex items-center gap-2">
-    <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" size="small" (onClick)="refreshAll()" />
+    <button pButton type="button" severity="secondary" size="small" (click)="refreshAll()"><i class="pi pi-refresh"></i> Refresh</button>
     @if (bullBoardUrl()) {
       <a [href]="bullBoardUrl()" target="_blank" rel="noopener"
         class="flex items-center gap-2 rounded-lg border border-[var(--p-content-border-color)] px-3 py-1.5 text-sm font-medium text-[var(--p-text-color)] hover:bg-[var(--p-surface-100)]">
@@ -47,7 +47,7 @@
   <div class="mb-3 flex flex-wrap items-center gap-3">
     <p-select [(ngModel)]="selectedQueue" [options]="queueOptions()" optionLabel="label" optionValue="value"
       (onChange)="onJobControlChange()" appendTo="body" styleClass="w-44" />
-    <p-selectButton [(ngModel)]="jobState" [options]="stateOptions" optionLabel="label" optionValue="value"
+    <p-selectbutton [(ngModel)]="jobState" [options]="stateOptions" optionLabel="label" optionValue="value"
       [allowEmpty]="false" (onChange)="onJobControlChange()" />
   </div>
   <p-table [value]="jobs()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="jobsTotal()"
@@ -67,8 +67,17 @@
         <td class="max-w-xs truncate text-xs text-[var(--p-red-500)]" [title]="j.failedReason">{{ j.failedReason }}</td>
         <td class="text-right">
           @if (canRetry(j)) {
-            <p-button label="Retry" size="small" severity="secondary" [text]="true"
-              [loading]="retrying() === j.id" (onClick)="retry(j)" />
+            <button pButton
+              type="button"
+              size="small"
+              severity="secondary"
+              [text]="true"
+              (click)="retry(j)"
+              [disabled]="retrying() === j.id"
+            >
+              @if (retrying() === j.id) {<i class="pi pi-spinner pi-spin"></i>}
+              Retry
+            </button>
           }
         </td>
       </tr>

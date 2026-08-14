@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -41,7 +41,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   selector: 'mh-products',
   imports: [
     FormsModule,
-    Button,
+    ButtonDirective,
     TableModule,
     Tag,
     SkeletonModule,

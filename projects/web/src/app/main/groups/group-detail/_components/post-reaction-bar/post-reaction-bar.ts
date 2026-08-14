@@ -6,13 +6,13 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { Post, PostService, showApiError } from 'core';
 
 @Component({
   selector: 'mh-post-reaction-bar',
-  imports: [Button],
+  imports: [ButtonDirective],
   templateUrl: './post-reaction-bar.html',
   styleUrl: './post-reaction-bar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

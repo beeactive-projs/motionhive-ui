@@ -5,6 +5,17 @@ import { danger, info, navy, primary, success, warning } from './theme-colors';
 export const MotionHiveLara = definePreset(Lara, {
   primitive: {},
 
+  // Custom ramps outside PrimeNG's semantic schema (themes v3 rejects unknown
+  // semantic keys). `extend` emits the same path-based `--p-success-500` /
+  // `--p-navy-900` variables the SCSS and Tailwind bridge rely on.
+  extend: {
+    success,
+    info,
+    warning,
+    danger,
+    navy,
+  },
+
   semantic: {
     formField: {
       paddingX: '0.625rem',
@@ -25,11 +36,6 @@ export const MotionHiveLara = definePreset(Lara, {
     },
 
     primary,
-    success,
-    info,
-    warning,
-    danger,
-    navy,
     colorScheme: {
       light: {
         primary: {

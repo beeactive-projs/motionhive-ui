@@ -1,0 +1,50 @@
+<p-dialog [(visible)]="visible" [modal]="true" [appendTo]="'body'" [closable]="!submitting()"
+  [closeOnEscape]="!submitting()" [dismissableMask]="!submitting()" [style]="{ width: '440px' }"
+  [breakpoints]="{ '540px': '95vw' }" header="Add to your week">
+
+  <div class="flex flex-col gap-3">
+    <p class="m-0 text-sm leading-relaxed text-muted-color">
+      Put <strong class="text-color">{{ routine()?.name }}</strong> on the days you train.
+      It shows up on your Workouts page like any other plan.
+    </p>
+
+    <div class="flex flex-col gap-1.5">
+      <span class="text-xs font-semibold">Which days</span>
+      <div class="flex flex-wrap gap-1.5">
+        @for (d of weekdays; track d.iso) {
+        <p-togglebutton [ngModel]="isDaySelected(d.iso)" (ngModelChange)="toggleDay(d.iso, $event)"
+          [onLabel]="d.label" [offLabel]="d.label" styleClass="min-w-14" [ariaLabel]="d.label" />
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <span class="text-xs font-semibold">How long</span>
+      <p-selectbutton [options]="repeatOptions" [ngModel]="repeatMode()" (ngModelChange)="repeatMode.set($event)"
+        optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="How long" />
+    </div>
+
+    @if (repeatMode() === 'BLOCK') {
+    <div class="flex items-center gap-2">
+      <label for="weeks" class="text-xs font-semibold">Weeks</label>
+      <p-inputnumber inputId="weeks" [ngModel]="repeatWeeks()" (ngModelChange)="repeatWeeks.set($event)"
+        [min]="1" [max]="104" [showButtons]="true" buttonLayout="horizontal" [step]="1"
+        inputStyleClass="w-14 text-center" />
+    </div>
+    }
+
+    <p class="m-0 rounded-lg bg-surface-50 p-2.5 text-[12.5px] text-muted-color dark:bg-surface-800">
+      {{ summary() }}
+    </p>
+  </div>
+
+  <ng-template #footer>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">
+      Cancel
+    </button>
+    <button pButton type="button" [disabled]="!canSubmit()" (click)="submit()">
+      <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-calendar-plus'"></i>
+      Add to week
+    </button>
+  </ng-template>
+</p-dialog>

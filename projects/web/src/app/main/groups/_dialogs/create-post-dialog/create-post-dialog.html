@@ -51,8 +51,17 @@
           Images (optional, up to {{ maxImages }})
         </label>
         <input #fileInput type="file" accept="image/*" multiple class="hidden" (change)="onFileSelected($event)" />
-        <p-button label="Add images" icon="pi pi-image" severity="secondary" [text]="true" size="small"
-          [disabled]="uploads().length >= maxImages" (onClick)="fileInput.click()" />
+        <button pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          size="small"
+          [disabled]="uploads().length >= maxImages"
+          (click)="fileInput.click()"
+        >
+          <i class="pi pi-image"></i>
+          Add images
+        </button>
       </div>
 
       @if (uploads().length > 0) {
@@ -72,9 +81,18 @@
             <span class="text-xs text-danger-500 mt-1">Failed</span>
           </div>
           }
-          <p-button icon="pi pi-times" size="small" [rounded]="true" severity="secondary"
-            styleClass="!absolute !right-1 !top-1 !h-6 !w-6 !min-w-6 !bg-black/60 !text-white !border-0 hover:!bg-black/80"
-            (onClick)="removeUpload(upload)" aria-label="Remove image" />
+          <button pButton
+            type="button"
+            size="small"
+            [rounded]="true"
+            severity="secondary"
+            aria-label="Remove image"
+            (click)="removeUpload(upload)"
+            class="!absolute !right-1 !top-1 !h-6 !w-6 !min-w-6 !bg-black/60 !text-white !border-0 hover:!bg-black/80"
+            iconOnly
+          >
+            <i class="pi pi-times"></i>
+          </button>
         </div>
         }
       </div>
@@ -85,9 +103,11 @@
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="submitting()" (onClick)="cancel()" />
-      <p-button [label]="editMode() ? 'Save changes' : 'Post'" [icon]="editMode() ? 'pi pi-check' : 'pi pi-send'"
-        [disabled]="!canSubmit()" [loading]="submitting()" (onClick)="submit()" />
+      <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+      <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
+        <i [class]="submitting() ? 'pi pi-spinner pi-spin' : (editMode() ? 'pi pi-check' : 'pi pi-send')"></i>
+        {{ editMode() ? 'Save changes' : 'Post' }}
+      </button>
     </div>
   </ng-template>
 </p-dialog>

@@ -19,7 +19,7 @@ import {
   type ProfileBadge,
   type ProfileStat,
 } from 'core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -55,7 +55,7 @@ import { ShareDialog } from '../../_shared/components/share-dialog/share-dialog'
 @Component({
   selector: 'mh-public-profile',
   imports: [
-    Button,
+    ButtonDirective,
     Message,
     SkeletonModule,
     ToastModule,

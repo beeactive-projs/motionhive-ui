@@ -128,6 +128,26 @@ export const danger: ColorScale = {
   950: '#450a0a',
 };
 
+/* ─────────────────────────────────────────────
+   Violet
+   Used for: the timezone tile on mobile's account
+   screens. The one hue in the design system that
+   no other scale already covers.
+   ───────────────────────────────────────────── */
+export const violet: ColorScale = {
+  50: '#f5f3ff',
+  100: '#ede9fe',
+  200: '#ddd6fe',
+  300: '#c4b5fd',
+  400: '#a78bfa',
+  500: '#8b5cf6',
+  600: '#7c3aed',
+  700: '#6d28d9',
+  800: '#5b21b6',
+  900: '#4c1d95',
+  950: '#2e1065',
+};
+
 export const navy: ColorScale = {
   50: '#f0f4f8',
   100: '#d9e2ec',

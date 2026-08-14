@@ -22,13 +22,9 @@
       <span class="blog-card__read">{{ readTimeLabel() }}</span>
     </div>
 
-    <p-button
-      label="Read more"
-      icon="pi pi-arrow-right"
-      iconPos="right"
-      size="small"
-      link
-      (onClick)="onRead(); $event.stopPropagation()"
-    />
+    <button pButton type="button" size="small" link (click)="onRead(); $event.stopPropagation()">
+      Read more
+      <i class="pi pi-arrow-right"></i>
+    </button>
   </div>
 </article>

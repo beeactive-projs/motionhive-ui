@@ -14,7 +14,7 @@
         <p class="m-0 text-sm">{{ err }}</p>
       </div>
     </p-message>
-    <p-button label="Back to explore" icon="pi pi-arrow-left" (onClick)="goBack()" />
+    <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Back to explore</button>
   </div>
 } @else if (heroProfile(); as hero) {
   <!-- Shell-level 2-column layout: hero + content on the left, sticky

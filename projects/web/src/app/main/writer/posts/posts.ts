@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@ang
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -27,7 +27,7 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
   imports: [
     DatePipe,
     TableModule,
-    ButtonModule,
+    ButtonDirective,
     TagModule,
     SkeletonModule,
     ToastModule,

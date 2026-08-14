@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Chip } from 'primeng/chip';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
@@ -18,7 +18,7 @@ import { ExerciseRow } from '../exercise-row/exercise-row';
  */
 @Component({
   selector: 'mh-workout-editor',
-  imports: [TitleCasePipe, Button, Chip, Tag, Tooltip, ExerciseRow, ListEmptyState],
+  imports: [TitleCasePipe, ButtonDirective, Chip, Tag, Tooltip, ExerciseRow, ListEmptyState],
   templateUrl: './workout-editor.html',
   styleUrl: './workout-editor.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

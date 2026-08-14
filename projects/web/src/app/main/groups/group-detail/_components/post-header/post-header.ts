@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Menu } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { AuthStore, Post } from 'core';
@@ -16,7 +16,7 @@ import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avat
 
 @Component({
   selector: 'mh-post-header',
-  imports: [DatePipe, RouterLink, HexAvatar, Button, Menu],
+  imports: [DatePipe, RouterLink, HexAvatar, ButtonDirective, Menu],
   templateUrl: './post-header.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -2,16 +2,11 @@
   class="cta-bar lg:hidden fixed bottom-0 inset-x-0 z-40 flex gap-2 px-4 py-3"
   role="region"
   aria-label="Quick actions">
-  <p-button
-    fluid
-    label="Book a session"
-    icon="pi pi-calendar"
-    (onClick)="book.emit()"
-    [disabled]="!offerings()?.length" />
-  <p-button
-    icon="pi pi-envelope"
-    severity="secondary"
-    outlined
-    ariaLabel="Message coach"
-    (onClick)="message.emit()" />
+  <button pButton type="button" fluid [disabled]="!offerings()?.length" (click)="book.emit()">
+    <i class="pi pi-calendar"></i>
+    Book a session
+  </button>
+  <button pButton type="button" severity="secondary" outlined (click)="message.emit()" aria-label="Message coach" iconOnly>
+    <i class="pi pi-envelope"></i>
+  </button>
 </div>

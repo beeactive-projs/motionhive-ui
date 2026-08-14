@@ -6,7 +6,7 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { TooltipModule } from 'primeng/tooltip';
 import {
@@ -25,7 +25,7 @@ import {
  */
 @Component({
   selector: 'mh-privacy-chooser',
-  imports: [ButtonModule, PopoverModule, TooltipModule],
+  imports: [ButtonDirective, PopoverModule, TooltipModule],
   templateUrl: './privacy-chooser.html',
   styleUrl: './privacy-chooser.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

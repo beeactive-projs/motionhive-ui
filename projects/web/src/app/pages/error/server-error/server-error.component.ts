@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Logo } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'mh-server-error',
-  imports: [ButtonModule, ThemeToggleComponent, Logo],
+  imports: [ButtonDirective, ThemeToggleComponent, Logo],
   templateUrl: './server-error.component.html',
   styleUrl: './server-error.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

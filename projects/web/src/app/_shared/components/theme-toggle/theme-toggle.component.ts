@@ -1,19 +1,22 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { Button } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ThemeService } from 'core';
 
 @Component({
   selector: 'mh-theme-toggle',
-  imports: [Button],
+  imports: [ButtonDirective],
   template: `
-    <p-button
-      [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+    <button pButton
+      type="button"
       rounded
       outlined
       size="small"
-      (onClick)="_themeService.toggle()"
-      [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
-    />
+      (click)="_themeService.toggle()"
+      [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      iconOnly
+    >
+      <i [class]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+    </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

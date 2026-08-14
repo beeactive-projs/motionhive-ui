@@ -7,7 +7,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { showApiError } from 'core';
 import { AdminAuditService } from '../../_data/services/admin-audit.service';
@@ -16,7 +16,7 @@ import { getPath } from '../../_data/cell.util';
 
 @Component({
   selector: 'mh-admin-audit',
-  imports: [FormsModule, TableModule, InputTextModule, ButtonModule],
+  imports: [FormsModule, TableModule, InputTextModule, ButtonDirective],
   templateUrl: './audit.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

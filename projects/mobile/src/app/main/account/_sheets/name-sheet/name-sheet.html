@@ -1,0 +1,33 @@
+<ng-template #body>
+  <ion-input
+    label="First name"
+    labelPlacement="stacked"
+    fill="outline"
+    autocapitalize="words"
+    [value]="firstName()"
+    (ionInput)="firstName.set($event.detail.value ?? '')"
+  />
+
+  <ion-input
+    class="ion-margin-top"
+    label="Last name"
+    labelPlacement="stacked"
+    fill="outline"
+    autocapitalize="words"
+    [value]="lastName()"
+    (ionInput)="lastName.set($event.detail.value ?? '')"
+  />
+
+  <p class="mh-helper">This is how your name appears on your profile and in messages.</p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Name"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.5, 0.95]"
+  [initialBreakpoint]="0.5"
+  (save)="save()"
+/>

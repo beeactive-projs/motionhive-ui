@@ -30,13 +30,7 @@
   @if (searchActive() && visibleWeeks().length === 0) {
     <div class="flex flex-col items-center gap-2 py-6 text-center text-xs text-muted-color">
       <span>No workouts match “{{ searchQuery().trim() }}”.</span>
-      <p-button
-        label="Clear search"
-        size="small"
-        severity="secondary"
-        [text]="true"
-        (onClick)="clearSearch()"
-      />
+      <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="clearSearch()">Clear search</button>
     </div>
   }
 
@@ -94,17 +88,20 @@
             <span class="text-xs font-bold uppercase tracking-wide">Week {{ g.week + 1 }}</span>
             <span class="ml-auto text-xs tabular-nums">{{ g.workouts.length }}</span>
           </button>
-          <p-button
-            icon="pi pi-plus"
+          <button pButton
+            type="button"
             size="small"
             severity="secondary"
             [text]="true"
             [rounded]="true"
-            [ariaLabel]="'Add workout to week ' + (g.week + 1)"
             pTooltip="Add workout"
             tooltipPosition="right"
-            (onClick)="addWorkout.emit(g.week)"
-          />
+            (click)="addWorkout.emit(g.week)"
+            [attr.aria-label]="'Add workout to week ' + (g.week + 1)"
+            iconOnly
+          >
+            <i class="pi pi-plus"></i>
+          </button>
         </div>
 
         <!-- Always in the DOM so every week is a valid drop target. Open: the
@@ -175,16 +172,18 @@
 
 <!-- Footer -->
 <div class="mt-2 flex shrink-0 flex-col gap-2">
-  <p-button
-    [label]="totalWorkouts() === 0 ? 'Add workout' : 'Add workout in another week'"
-    icon="pi pi-plus"
+  <button pButton
+    type="button"
     size="small"
     severity="secondary"
     [outlined]="true"
     fluid
-    styleClass="mh-dashed-btn"
-    (onClick)="addWorkout.emit(null)"
-  />
+    (click)="addWorkout.emit(null)"
+    class="mh-dashed-btn"
+  >
+    <i class="pi pi-plus"></i>
+    {{ totalWorkouts() === 0 ? 'Add workout' : 'Add workout in another week' }}
+  </button>
   <div class="mh-rail__summary flex items-center gap-2 px-3 py-2 text-xs font-semibold">
     <i class="pi pi-calendar text-xs" aria-hidden="true"></i>
     <span>

@@ -25,12 +25,18 @@
         Add to calendar
       </span>
       <div class="grid grid-cols-3 gap-2">
-        <p-button label="Apple / .ics" icon="pi pi-apple" severity="secondary" size="small" [outlined]="true" fluid
-          (onClick)="downloadIcs()" />
-        <p-button label="Google" icon="pi pi-google" severity="secondary" size="small" [outlined]="true" fluid
-          (onClick)="openExternal(googleUrl())" />
-        <p-button label="Outlook" icon="pi pi-microsoft" severity="secondary" size="small" [outlined]="true" fluid
-          (onClick)="openExternal(outlookUrl())" />
+        <button pButton type="button" severity="secondary" size="small" [outlined]="true" fluid (click)="downloadIcs()">
+          <i class="pi pi-apple"></i>
+          Apple / .ics
+        </button>
+        <button pButton type="button" severity="secondary" size="small" [outlined]="true" fluid (click)="openExternal(googleUrl())">
+          <i class="pi pi-google"></i>
+          Google
+        </button>
+        <button pButton type="button" severity="secondary" size="small" [outlined]="true" fluid (click)="openExternal(outlookUrl())">
+          <i class="pi pi-microsoft"></i>
+          Outlook
+        </button>
       </div>
     </section>
     }
@@ -71,8 +77,8 @@
   </div>
 
   <ng-template #footer>
-    <p-button label="Go to My sessions" icon="pi pi-arrow-right" iconPos="right" text (onClick)="goToMy()" />
-    <p-button label="Done" (onClick)="close()" />
+    <button pButton type="button" text (click)="goToMy()">Go to Sessions <i class="pi pi-arrow-right"></i></button>
+    <button pButton type="button" (click)="close()">Done</button>
 
   </ng-template>
   }

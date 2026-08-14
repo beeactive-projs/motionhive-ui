@@ -1,17 +1,37 @@
-<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
-  <!-- Header · mirrors the my-sessions list header -->
-  <header class="flex gap-4 items-center justify-between">
+<div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0">
+  <!-- A lens of Training; the shell owns the page title. -->
+  <header class="flex flex-wrap gap-3 items-center justify-between">
     <div class="space-y-1 min-w-0">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">My plans</h1>
       <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
         @if (total() === 0 && !loading()) {
-          Training programs your coaches assign you will live here.
+          What you are working through, whether a coach set it or you scheduled it yourself.
         } @else if (total() === 1) {
-          1 plan from your coaches.
+          1 plan on your calendar.
         } @else {
-          {{ total() }} plans from your coaches.
+          {{ total() }} plans on your calendar.
         }
       </p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <!--
+        Two nouns close enough to collide, so state the difference
+        rather than hoping the labels carry it. Client-side copy only —
+        "program" is the coach's word for the thing they author, and
+        mixing both vocabularies in one sentence is what made this
+        confusing in the first place.
+      -->
+      <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
+        aria-label="What is the difference between a plan and a routine?"
+        pTooltip="A routine is one workout you saved, ready whenever you are. A plan is training with dates on it — either what a coach set for you, or a routine of yours set to repeat."
+        tooltipPosition="bottom" iconOnly>
+        <i class="pi pi-question-circle"></i>
+      </button>
+      <!--
+        No create button here yet. "Schedule a routine" was the wrong
+        verb for this surface — it named the mechanism rather than the
+        thing — and a multi-week plan has no builder on the trainee side
+        to point at. A button that opens nothing is worse than none.
+      -->
     </div>
   </header>
 
@@ -72,8 +92,8 @@
   } @else if (filteredItems().length === 0) {
   @if (items().length === 0) {
   <mh-list-empty-state icon="pi pi-bookmark" title="No plans yet"
-    message="Once a coach assigns you a program, it'll show up here with your schedule and progress."
-    actionLabel="Find a coach" actionIcon="pi pi-compass" (action)="goToDiscover()" />
+    message="Plans are training with dates on it, spanning weeks. A coach can set one for you, or you can repeat one of your routines from the Routines tab."
+    actionLabel="Schedule a routine" actionIcon="pi pi-calendar-plus" (action)="goToRoutines()" />
   } @else {
   <mh-list-empty-state icon="pi pi-search" title="No plans match your search"
     message="Try a different name, or clear the search to see everything." actionLabel="Clear search"
@@ -99,8 +119,10 @@
 
     @if (hasMore()) {
     <div class="flex justify-center p-4">
-      <p-button label="Load more" severity="secondary" [outlined]="true" [loading]="loadingMore()"
-        (onClick)="loadMore()" />
+      <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
+        @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
+        Load more
+      </button>
     </div>
     } @else if (items().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
@@ -119,4 +141,3 @@
   }
 </ng-template>
 
-<p-toast position="top-right" />

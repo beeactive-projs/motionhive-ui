@@ -1,7 +1,7 @@
 <h1 class="mb-4 text-2xl font-semibold text-[var(--p-text-color)]">Payments</h1>
 
 <div class="mb-4 flex flex-wrap items-center gap-3">
-  <p-selectButton
+  <p-selectbutton
     [(ngModel)]="resource"
     [options]="resourceOptions"
     optionLabel="label"
@@ -16,7 +16,7 @@
     placeholder="status filter"
     class="w-48"
   />
-  <p-button label="Filter" icon="pi pi-filter" size="small" (onClick)="applyStatus()" />
+  <button pButton type="button" size="small" (click)="applyStatus()"><i class="pi pi-filter"></i> Filter</button>
 </div>
 
 <p-table
@@ -54,13 +54,16 @@
       @if (isWebhooks() && isSuperAdmin()) {
         <td class="text-right">
           @if (canReprocess(row)) {
-            <p-button
-              label="Reprocess"
+            <button pButton
+              type="button"
               size="small"
               severity="secondary"
-              [loading]="reprocessing() === cell(row, 'id')"
-              (onClick)="reprocess(row)"
-            />
+              (click)="reprocess(row)"
+              [disabled]="reprocessing() === cell(row, 'id')"
+            >
+              @if (reprocessing() === cell(row, 'id')) {<i class="pi pi-spinner pi-spin"></i>}
+              Reprocess
+            </button>
           }
         </td>
       }

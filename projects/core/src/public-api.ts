@@ -45,6 +45,9 @@ export * from './lib/models/workout/status-severity';
 export * from './lib/models/workout/assignment.model';
 export * from './lib/models/workout/log.model';
 export * from './lib/models/workout/routine.model';
+export * from './lib/models/workout/progress.model';
+export * from './lib/models/workout/training-day.model';
+export * from './lib/models/workout/roster.model';
 
 // Models - Client
 export * from './lib/models/client/client.enums';
@@ -62,6 +65,7 @@ export * from './lib/models/post/post.model';
 export * from './lib/models/common/api-response.model';
 export * from './lib/models/common/pagination.model';
 export * from './lib/models/common/ui.enums';
+export * from './lib/models/common/nav.enums';
 export * from './lib/models/common/nav.model';
 
 // Models - Blog
@@ -167,6 +171,9 @@ export * from './lib/constants/storage-keys.const';
 export * from './lib/constants/timezones.const';
 export * from './lib/constants/date-windows.const';
 export * from './lib/constants/countries.const';
+export * from './lib/constants/handle.const';
+export * from './lib/constants/social-platforms.const';
+export * from './lib/constants/avatar-upload.const';
 
 // Utils
 export * from './lib/utils/url.utils';
@@ -188,6 +195,7 @@ export * from './lib/services/auth/google-auth.service';
 export * from './lib/services/auth/facebook-auth.service';
 export * from './lib/services/user/user.service';
 export * from './lib/services/profile/profile.service';
+export * from './lib/services/geo/place-search.service';
 export * from './lib/services/client/client.service';
 export * from './lib/services/group/group.service';
 export * from './lib/services/group/groups-refresh.service';
@@ -212,6 +220,8 @@ export * from './lib/services/workout/program.service';
 export * from './lib/services/workout/program-assignment.service';
 export * from './lib/services/workout/workout-log.service';
 export * from './lib/services/workout/routine.service';
+export * from './lib/services/workout/progress.service';
+export * from './lib/services/workout/roster.service';
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/messaging';
 export * from './lib/services/session/session.service';
@@ -225,6 +235,7 @@ export * from './lib/directives/stripe-iframe.directive';
 
 // Stores
 export * from './lib/stores/auth.store';
+export * from './lib/stores/app-mode.store';
 export * from './lib/stores/exercise-taxonomy.store';
 export * from './lib/stores/recent-searches.store';
 export * from './lib/stores/stripe-onboarding.store';

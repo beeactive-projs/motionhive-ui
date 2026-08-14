@@ -86,7 +86,7 @@
       </div>
 
       @if (canJoin()) {
-      <p-button label="Join" icon="pi pi-video" size="small" (onClick)="onJoin($event)" />
+      <button pButton type="button" size="small" (click)="onJoin($event)"><i class="pi pi-video"></i> Join</button>
       }
       }
     </div>
@@ -108,11 +108,21 @@
       @if (canJoin() || canCancel()) {
       <div class="flex items-center gap-1.5">
         @if (canJoin()) {
-        <p-button label="Join" icon="pi pi-video" size="small" (onClick)="onJoin($event)" />
+        <button pButton type="button" size="small" (click)="onJoin($event)"><i class="pi pi-video"></i> Join</button>
         }
         @if (canCancel()) {
-        <p-button icon="pi pi-times" severity="danger" rounded outlined size="small" ariaLabel="Cancel booking"
-          (onClick)="onCancel($event)" />
+        <button pButton
+          type="button"
+          severity="danger"
+          rounded
+          outlined
+          size="small"
+          (click)="onCancel($event)"
+          aria-label="Cancel booking"
+          iconOnly
+        >
+          <i class="pi pi-times"></i>
+        </button>
         }
       </div>
       }
@@ -120,8 +130,18 @@
     }@else{
     @if (canCancel()) {
     <div class="flex flex-col items-end shrink-0">
-      <p-button icon="pi pi-times" severity="danger" rounded outlined size="small" ariaLabel="Cancel booking"
-        (onClick)="onCancel($event)" />
+      <button pButton
+        type="button"
+        severity="danger"
+        rounded
+        outlined
+        size="small"
+        (click)="onCancel($event)"
+        aria-label="Cancel booking"
+        iconOnly
+      >
+        <i class="pi pi-times"></i>
+      </button>
     </div>
     }
     }

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { SessionsDetailStore } from 'core';
@@ -31,7 +31,7 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
   standalone: true,
   imports: [
     CommonModule,
-    ButtonModule,
+    ButtonDirective,
     ParticipantsTable,
     FollowUpDialog,
     ToastModule,

@@ -3,7 +3,7 @@
     <div class="flex flex-col items-center text-center py-6 gap-4">
       @switch (state()) {
         @case ('loading') {
-          <p-progressSpinner styleClass="w-16 h-16" />
+          <p-progress-spinner styleClass="w-16 h-16" />
           <h2 class="font-heading font-semibold text-xl m-0">Processing your payment...</h2>
           <p class="text-sm text-surface-500">
             This may take a few seconds. Please don't close this window.
@@ -17,7 +17,7 @@
           <p class="text-sm text-surface-500">
             Your invoice has been paid. A receipt will be sent to your email.
           </p>
-          <p-button label="View my invoices" icon="pi pi-file" (onClick)="goToInvoices()" />
+          <button pButton type="button" (click)="goToInvoices()"><i class="pi pi-file"></i> View my invoices</button>
         }
         @case ('pending') {
           <div class="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
@@ -27,8 +27,10 @@
           <p class="text-sm text-surface-500">
             Your payment is still processing. We'll update your invoice status shortly.
           </p>
-          <p-button label="View my invoices" icon="pi pi-file" severity="secondary" [outlined]="true"
-            (onClick)="goToInvoices()" />
+          <button pButton type="button" severity="secondary" [outlined]="true" (click)="goToInvoices()">
+            <i class="pi pi-file"></i>
+            View my invoices
+          </button>
         }
         @case ('error') {
           <div class="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
@@ -38,7 +40,7 @@
           <p class="text-sm text-surface-500">
             We couldn't verify your payment. Please check your invoices.
           </p>
-          <p-button label="View my invoices" icon="pi pi-file" (onClick)="goToInvoices()" />
+          <button pButton type="button" (click)="goToInvoices()"><i class="pi pi-file"></i> View my invoices</button>
         }
       }
     </div>

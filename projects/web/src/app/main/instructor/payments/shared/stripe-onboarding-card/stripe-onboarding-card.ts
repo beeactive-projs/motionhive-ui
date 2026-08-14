@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -19,7 +19,7 @@ import {
   selector: 'mh-stripe-onboarding-card',
   imports: [
     RouterLink,
-    ButtonModule,
+    ButtonDirective,
     CardModule,
     TagModule,
     SkeletonModule,

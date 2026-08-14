@@ -51,10 +51,17 @@
       <label class="text-sm font-medium">What's your main goal?</label>
       <div class="flex flex-wrap items-center gap-2">
         @for (option of goals; track option.value) {
-        <p-button type="button" [label]="option.label"
-          [severity]="form.controls.goal.value === option.value ? 'primary' : 'secondary'" size="small" rounded
-          [outlined]="form.controls.goal.value !== option.value" (onClick)="form.controls.goal.setValue(option.value)"
-          styleClass="py-0.5" />
+        <button pButton
+          type="button"
+          [severity]="form.controls.goal.value === option.value ? 'primary' : 'secondary'"
+          size="small"
+          rounded
+          [outlined]="form.controls.goal.value !== option.value"
+          (click)="form.controls.goal.setValue(option.value)"
+          class="py-0.5"
+        >
+          {{ option.label }}
+        </button>
         }
       </div>
       @if (invalid('goal')) {
@@ -66,10 +73,17 @@
       <label class="text-sm font-medium">Where are you starting from?</label>
       <div class="flex flex-wrap items-center gap-2">
         @for (option of levels; track option.value) {
-        <p-button type="button" [label]="option.label"
-          [severity]="form.controls.level.value === option.value ? 'primary' : 'secondary'" size="small" rounded
-          [outlined]="form.controls.level.value !== option.value" (onClick)="form.controls.level.setValue(option.value)"
-          styleClass="py-0.5" />
+        <button pButton
+          type="button"
+          [severity]="form.controls.level.value === option.value ? 'primary' : 'secondary'"
+          size="small"
+          rounded
+          [outlined]="form.controls.level.value !== option.value"
+          (click)="form.controls.level.setValue(option.value)"
+          class="py-0.5"
+        >
+          {{ option.label }}
+        </button>
         }
       </div>
       @if (invalid('level')) {
@@ -81,10 +95,17 @@
       <label class="text-sm font-medium">How would you like to train?</label>
       <div class="flex flex-wrap items-center gap-2">
         @for (option of formats; track option.value) {
-        <p-button type="button" [label]="option.label"
-          [severity]="form.controls.format.value === option.value ? 'primary' : 'secondary'" size="small" rounded
+        <button pButton
+          type="button"
+          [severity]="form.controls.format.value === option.value ? 'primary' : 'secondary'"
+          size="small"
+          rounded
           [outlined]="form.controls.format.value !== option.value"
-          (onClick)="form.controls.format.setValue(option.value)" styleClass="py-0.5" />
+          (click)="form.controls.format.setValue(option.value)"
+          class="py-0.5"
+        >
+          {{ option.label }}
+        </button>
         }
       </div>
       @if (invalid('format')) {
@@ -112,8 +133,10 @@
             class="text-primary-600 hover:underline">Privacy</a>
         </span>
       </p>
-      <p-button label="Send message" icon="pi pi-arrow-right" iconPos="right" type="submit" [loading]="submitting()"
-        [disabled]="form.invalid" (onClick)="onSubmit()" />
+      <button pButton type="submit" [disabled]="(form.invalid) || submitting()" (click)="onSubmit()">
+        Send message
+        <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-arrow-right'"></i>
+      </button>
     </div>
   </ng-template>
 </p-dialog>
