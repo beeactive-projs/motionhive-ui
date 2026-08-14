@@ -399,26 +399,20 @@
      to see instructions, muscles, equipment, motion cycle. -->
 <mh-exercise-detail-dialog [exerciseId]="viewingExerciseId()" [readOnly]="true" [(visible)]="viewOpen" />
 
-<!-- Finish dialog: three ways out of an in-progress workout in one place.
-     Primary label flips (Complete workout / Mark as skipped) based on
-     whether any sets were logged. Cancel workout hard-deletes the log
-     (as if you never started). Keep going closes the dialog. -->
+<!-- Finish dialog: primary action + keep going. Cancel workout used to
+     live here too but it made the modal cramped on mobile (3 buttons
+     wrapping into each other) — the bottom-of-page Cancel button
+     stays as the discard shortcut. -->
 <p-dialog [(visible)]="finishOpen" [modal]="true" [closable]="true" [dismissableMask]="true"
   [style]="{ width: '440px' }" [breakpoints]="{ '540px': '95vw' }" [appendTo]="'body'" [header]="finishHeader()">
   <div class="flex flex-col gap-3 text-sm">
     <p class="m-0">{{ finishMessage() }}</p>
-    <p class="m-0 text-xs text-muted-color">{{ finishCancelMessage() }}</p>
   </div>
   <ng-template #footer>
     <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 w-full">
       <button pButton type="button" severity="secondary" [text]="true" (click)="onFinishKeepGoing()"
         [disabled]="completing() || discarding()">
         Keep going
-      </button>
-      <button pButton type="button" severity="danger" [outlined]="true" (click)="onFinishCancel()"
-        [disabled]="completing() || discarding()">
-        <i class="pi" [class]="discarding() ? 'pi-spinner pi-spin' : 'pi-trash'"></i>
-        Cancel workout
       </button>
       <button pButton type="button" [severity]="setsDone() === 0 ? 'secondary' : 'success'"
         (click)="onFinishPrimary()" [disabled]="completing() || discarding()">

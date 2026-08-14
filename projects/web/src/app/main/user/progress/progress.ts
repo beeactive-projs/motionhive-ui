@@ -4,6 +4,7 @@ import {
   OnInit,
   computed,
   inject,
+  output,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
@@ -65,6 +66,14 @@ export class Progress implements OnInit {
   readonly data = signal<ProgressOverview | null>(null);
   readonly loading = signal(false);
   readonly range = signal<ProgressRange>('12w');
+  /**
+   * Emitted when the user taps one of the empty-state/early-state
+   * Start Workout CTAs. The parent (training shell) is expected to
+   * open the freestyle-start flow — this component doesn't own that
+   * dialog and can't just navigate the user, because /user/training
+   * IS the current route.
+   */
+  readonly startWorkout = output<void>();
 
   readonly rangeOptions = [
     { label: '4 weeks', value: '4w' as ProgressRange },

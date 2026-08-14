@@ -37,7 +37,12 @@
       }
       @default {
       <div class="flex flex-col gap-5 flex-1 min-h-0 overflow-y-auto">
-        <mh-today-panel />
+        <!-- #today gives sibling children (progress, history) a way to
+             trigger the freestyle-start dialog without any parent-level
+             signal plumbing. Their Start Workout CTAs used to just
+             re-route to the current page (a no-op); now they open the
+             real dialog that lives inside today-panel. -->
+        <mh-today-panel #today />
 
         <!--
           Statistics fold away. They answer "how is it trending", which
@@ -51,14 +56,14 @@
               <span class="font-heading text-sm font-semibold">How it is adding up</span>
             </p-accordion-header>
             <p-accordion-content>
-              <mh-user-progress />
+              <mh-user-progress (startWorkout)="today.openStartFreestyle()" />
             </p-accordion-content>
           </p-accordion-panel>
         </p-accordion>
 
         <section class="flex flex-col gap-2">
           <h2 class="font-heading text-sm font-semibold">Every workout</h2>
-          <mh-workout-history />
+          <mh-workout-history (startWorkout)="today.openStartFreestyle()" />
         </section>
       </div>
       }

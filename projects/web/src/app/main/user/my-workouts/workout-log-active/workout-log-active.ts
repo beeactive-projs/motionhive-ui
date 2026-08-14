@@ -499,11 +499,6 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     this._completeWorkout(empty);
   }
 
-  onFinishCancel(): void {
-    this.finishOpen.set(false);
-    this._discardWorkout();
-  }
-
   onFinishKeepGoing(): void {
     this.finishOpen.set(false);
   }
@@ -516,18 +511,13 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   );
   readonly finishMessage = computed(() => {
     if (this.setsDone() === 0) {
-      return "You haven't logged any sets yet. Mark it as skipped, cancel it, or keep going.";
+      return "You haven't logged any sets yet. Mark it as skipped, or keep going.";
     }
     const remaining = this.totalSets() - this.setsDone();
     return remaining > 0
-      ? `You have ${remaining} unchecked ${remaining === 1 ? 'set' : 'sets'}. What do you want to do?`
+      ? `You have ${remaining} unchecked ${remaining === 1 ? 'set' : 'sets'}. Finish the workout?`
       : 'Every set is checked off. Mark it complete?';
   });
-  readonly finishCancelMessage = computed(() =>
-    this.setsDone() > 0
-      ? `Cancel deletes the workout and the ${this.setsDone()} set${this.setsDone() === 1 ? '' : 's'} you logged — as if you never started.`
-      : "Cancel deletes the workout — as if you never started.",
-  );
 
   private _completeWorkout(_allowEmpty: boolean): void {
     const cur = this.log();

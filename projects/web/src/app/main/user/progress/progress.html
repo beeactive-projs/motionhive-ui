@@ -34,7 +34,7 @@
   <!-- Never trained. Point at training, not at a chart. -->
   <mh-list-empty-state icon="pi pi-chart-line" title="No progress yet"
     message="Log your first workout and your records, volume and streaks start showing up here."
-    actionLabel="Start a workout" actionIcon="pi pi-bolt" (action)="goToWorkouts()" />
+    actionLabel="Start a workout" actionIcon="pi pi-bolt" (action)="startWorkout.emit()" />
   }
 
   @else if (d) {
@@ -118,7 +118,7 @@
             Log a few more and your trends and streaks show up here.
           </p>
           <div>
-            <button pButton type="button" size="small" (click)="goToWorkouts()">
+            <button pButton type="button" size="small" (click)="startWorkout.emit()">
               <i class="pi pi-bolt"></i>
               Log workout #{{ lifetimeWorkouts() + 1 }}
             </button>
