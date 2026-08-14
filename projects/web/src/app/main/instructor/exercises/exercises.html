@@ -122,11 +122,12 @@
   filter over a single list, so it renders as pills rather than tabs.
 -->
 <ng-template #filtersRow>
-  <!-- Sticky pins the ownership pills + search bar below the training-shell
-       header. `top-20` sits below the outer sticky's pinned bottom edge.
-       Solid bg so it fully occludes rows scrolling underneath. -->
+  <!-- Sticky pins the ownership pills + search bar flush below the
+       training-shell header. `top-16` desktop / `top-24` mobile match
+       the outer's pinned bottom edge (outer wraps taller on mobile).
+       Solid bg so both layers fully occlude scrolling rows underneath. -->
   <div
-    class="sticky top-20 z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0 dark:bg-surface-950"
+    class="sticky top-24 md:top-16 z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0 dark:bg-surface-950"
     role="search">
     <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Ownership filter">
       @for (tab of ownershipTabs; track tab.value) {
