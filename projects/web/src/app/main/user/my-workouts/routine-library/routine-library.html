@@ -15,8 +15,10 @@
   </div>
   } @else {
   <div class="flex flex-col gap-3 pb-24 md:pb-0">
-    <!-- Search + new routine -->
-    <div class="flex flex-wrap items-center justify-between gap-3" role="search">
+    <!-- Search + new routine. Sticks below the training-shell header. -->
+    <div
+      class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0/95 dark:bg-surface-950/95 backdrop-blur-sm"
+      role="search">
       <p-iconfield class="flex-1 md:flex-[0_1_320px]">
         <p-inputicon class="pi pi-search" />
         <input pInputText type="text" fluid placeholder="Search routines…" aria-label="Search routines"
