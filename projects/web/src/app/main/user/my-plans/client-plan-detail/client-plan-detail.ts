@@ -41,6 +41,7 @@ import {
   WorkoutLogStatus,
   showApiError,
 } from 'core';
+import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
@@ -89,6 +90,7 @@ interface PlanCta {
     Card,
     ConfirmDialog,
     Divider,
+    ExerciseDetailDialog,
     KpiCard,
     ListEmptyState,
     Message,
@@ -120,6 +122,13 @@ export class ClientPlanDetail implements OnInit {
   readonly assignment = signal<ProgramAssignment | null>(null);
   readonly loading = signal(false);
   readonly starting = signal<string | null>(null);
+  readonly viewingExerciseId = signal<string | null>(null);
+  readonly viewOpen = signal(false);
+  openExerciseInfo(id: string | null | undefined): void {
+    if (!id) return;
+    this.viewingExerciseId.set(id);
+    this.viewOpen.set(true);
+  }
   /** Week indexes whose accordion panel is open. */
   readonly openWeeks = signal<number[]>([]);
   /** Assigned-workout ids whose prescription preview is expanded. */

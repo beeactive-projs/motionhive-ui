@@ -68,9 +68,10 @@
         <!-- Exercise header -->
         <div class="flex items-center gap-2.5 border-b border-surface p-2.5">
           @if (ex.exerciseThumbnailUrlSnapshot) {
-          <img class="size-9 shrink-0 rounded-lg border border-surface object-cover"
+          <img class="size-9 shrink-0 rounded-lg border border-surface object-cover cursor-pointer"
             [class.grayscale]="ex.isSkipped"
-            [src]="ex.exerciseThumbnailUrlSnapshot" [alt]="ex.exerciseNameSnapshot" loading="lazy" />
+            [src]="ex.exerciseThumbnailUrlSnapshot" [alt]="ex.exerciseNameSnapshot" loading="lazy"
+            (click)="openExerciseInfo(ex.exerciseId)" />
           } @else {
           <div
             class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-muted-color dark:bg-surface-700">
@@ -78,10 +79,13 @@
           </div>
           }
           <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100"
-              [class.line-through]="ex.isSkipped">
+            <button type="button"
+              class="block w-full text-left truncate text-sm font-semibold text-surface-900 dark:text-surface-100 cursor-pointer underline decoration-transparent hover:decoration-current underline-offset-2"
+              [class.line-through]="ex.isSkipped"
+              (click)="openExerciseInfo(ex.exerciseId)"
+              [attr.aria-label]="'View ' + ex.exerciseNameSnapshot + ' details'">
               {{ ex.exerciseNameSnapshot }}
-            </div>
+            </button>
             <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]">
               @if (ex.isSkipped) {
               <p-tag value="Skipped" icon="pi pi-ban" severity="secondary" rounded class="text-xs!" />
@@ -390,3 +394,7 @@
 <mh-exercise-picker-dialog [program]="$any({ id: 'inline' })" [workout]="$any({ id: l.id, name: l.name })"
   [emitOnly]="true" [(visible)]="pickerOpen" (picked)="onExercisePicked($event)" />
 }
+
+<!-- Read-only exercise info during a session. Tap the name or thumbnail
+     to see instructions, muscles, equipment, motion cycle. -->
+<mh-exercise-detail-dialog [exerciseId]="viewingExerciseId()" [readOnly]="true" [(visible)]="viewOpen" />

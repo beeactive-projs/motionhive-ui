@@ -24,6 +24,7 @@ import {
   WorkoutLogService,
   showApiError,
 } from 'core';
+import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
@@ -50,6 +51,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     DecimalPipe,
     ButtonDirective,
     Card,
+    ExerciseDetailDialog,
     KpiCard,
     ListEmptyState,
     Skeleton,
@@ -69,6 +71,13 @@ export class WorkoutLogReplay implements OnInit {
   private readonly _messageService = inject(MessageService);
 
   readonly log = signal<WorkoutLog | null>(null);
+  readonly viewingExerciseId = signal<string | null>(null);
+  readonly viewOpen = signal(false);
+  openExerciseInfo(id: string | null | undefined): void {
+    if (!id) return;
+    this.viewingExerciseId.set(id);
+    this.viewOpen.set(true);
+  }
   readonly loading = signal(false);
   readonly isCoachView = signal(false);
 

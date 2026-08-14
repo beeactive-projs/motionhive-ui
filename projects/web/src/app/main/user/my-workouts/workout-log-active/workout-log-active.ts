@@ -36,6 +36,7 @@ import {
   showApiError,
 } from 'core';
 
+import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { ExercisePickerDialog } from '../../../instructor/programs/exercise-picker-dialog/exercise-picker-dialog';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
@@ -77,6 +78,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     Tag,
     Toast,
     TooltipModule,
+    ExerciseDetailDialog,
     ExercisePickerDialog,
   ],
   providers: [MessageService, ConfirmationService],
@@ -113,6 +115,14 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   readonly pickerOpen = signal(false);
   /** Set when swapping (vs add-new). Null = add new exercise. */
   readonly swapTargetExerciseId = signal<string | null>(null);
+  /** Exercise-detail dialog for "what am I doing here?" during a session. */
+  readonly viewingExerciseId = signal<string | null>(null);
+  readonly viewOpen = signal(false);
+  openExerciseInfo(id: string | null | undefined): void {
+    if (!id) return;
+    this.viewingExerciseId.set(id);
+    this.viewOpen.set(true);
+  }
   /** Bodyweight exercises where the client asked for a weight field. */
   readonly weightRevealed = signal<Set<string>>(new Set());
 

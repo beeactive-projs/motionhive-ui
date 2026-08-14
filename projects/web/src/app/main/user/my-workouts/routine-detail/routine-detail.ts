@@ -19,6 +19,7 @@ import { Toast } from 'primeng/toast';
 
 import { Routine, RoutineExercise, RoutineService, showApiError } from 'core';
 
+import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { RoutineFormDialog } from '../_dialogs/routine-form-dialog/routine-form-dialog';
 
@@ -29,6 +30,7 @@ import { RoutineFormDialog } from '../_dialogs/routine-form-dialog/routine-form-
   imports: [
     ButtonDirective,
     Card,
+    ExerciseDetailDialog,
     ListEmptyState,
     RoutineFormDialog,
     Skeleton,
@@ -50,6 +52,15 @@ export class RoutineDetail {
   readonly loading = signal(true);
   readonly starting = signal(false);
   readonly editOpen = signal(false);
+  // Exercise-detail dialog for "what's this movement?" — read-only.
+  readonly viewingExerciseId = signal<string | null>(null);
+  readonly viewOpen = signal(false);
+
+  openExerciseInfo(id: string | null | undefined): void {
+    if (!id) return;
+    this.viewingExerciseId.set(id);
+    this.viewOpen.set(true);
+  }
 
   /** MotionHive's own: runnable and copyable, never editable in place. */
   readonly isSystem = computed(() => this.routine()?.source === 'SYSTEM');

@@ -228,8 +228,9 @@
                   <div class="rounded-lg border border-surface bg-surface-0 dark:bg-surface-900">
                     <div class="flex items-center gap-2.5 border-b border-surface p-2.5">
                       @if (ex.exercise?.thumbnailUrl) {
-                      <img class="size-9 shrink-0 rounded-lg border border-surface object-cover"
-                        [src]="ex.exercise!.thumbnailUrl" [alt]="ex.exercise!.name" loading="lazy" />
+                      <img class="size-9 shrink-0 rounded-lg border border-surface object-cover cursor-pointer"
+                        [src]="ex.exercise!.thumbnailUrl" [alt]="ex.exercise!.name" loading="lazy"
+                        (click)="openExerciseInfo(ex.exerciseId)" />
                       } @else {
                       <div
                         class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-muted-color dark:bg-surface-700">
@@ -237,9 +238,12 @@
                       </div>
                       }
                       <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100">
+                        <button type="button"
+                          class="block w-full text-left truncate text-sm font-semibold text-surface-900 dark:text-surface-100 cursor-pointer underline decoration-transparent hover:decoration-current underline-offset-2"
+                          (click)="openExerciseInfo(ex.exerciseId)"
+                          [attr.aria-label]="'View ' + (ex.exercise?.name ?? 'exercise') + ' details'">
                           {{ ex.exercise?.name ?? 'Exercise' }}
-                        </div>
+                        </button>
                         <div class="mt-0.5 text-[11.5px] text-muted-color">
                           {{ titleCase(ex.exercise?.kind) }}
                           @if (ex.exercise?.level) { <span class="opacity-40">·</span> {{ titleCase(ex.exercise?.level)
@@ -353,3 +357,4 @@
 
 <p-toast position="top-right" />
 <p-confirmdialog [appendTo]="'body'" />
+<mh-exercise-detail-dialog [exerciseId]="viewingExerciseId()" [readOnly]="true" [(visible)]="viewOpen" />

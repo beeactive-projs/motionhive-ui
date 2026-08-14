@@ -61,6 +61,15 @@ import {
 export class ExerciseDetailDialog {
   readonly visible = model(false);
   readonly exerciseId = input<string | null>(null);
+  /**
+   * When true, hides every mutation affordance (Edit, Delete, Visibility
+   * flip, Fork) regardless of the caller's ownership. Set from every
+   * consumer surface that shows an exercise inside a routine or workout
+   * context — a client viewing a coach's exercise from a routine should
+   * never see an Edit button, even if some role check would otherwise
+   * grant one.
+   */
+  readonly readOnly = input<boolean>(false);
 
   readonly editRequested = output<Exercise>();
   readonly deleted = output<void>();
@@ -116,6 +125,7 @@ export class ExerciseDetailDialog {
 
   readonly canFork = computed(() => {
     const ex = this.exercise();
+    if (this.readOnly()) return false;
     return (
       // Forking writes a copy into a personal library — instructor-only
       // on the BE. Clients browse read-only, so don't offer them Fork.
@@ -127,9 +137,10 @@ export class ExerciseDetailDialog {
     );
   });
 
-  readonly canEdit = this.isMine;
-  readonly canDelete = this.isMine;
-  readonly canToggleVisibility = this.isMine;
+  // readOnly hard-gates every mutation regardless of ownership.
+  readonly canEdit = computed(() => !this.readOnly() && this.isMine());
+  readonly canDelete = computed(() => !this.readOnly() && this.isMine());
+  readonly canToggleVisibility = computed(() => !this.readOnly() && this.isMine());
 
   // ── Muscle / equipment projections (unchanged from V1) ───────────
 

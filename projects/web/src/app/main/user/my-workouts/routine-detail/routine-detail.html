@@ -81,20 +81,28 @@
           </span>
           @if (e.exercise?.thumbnailUrl) {
           <img [src]="e.exercise?.thumbnailUrl" [alt]="e.exercise?.name ?? ''" loading="lazy"
-            class="size-10 shrink-0 rounded object-cover" />
+            class="size-10 shrink-0 rounded object-cover cursor-pointer"
+            (click)="openExerciseInfo(e.exerciseId)" />
           }
-          <span class="min-w-0 flex-1">
-            <span class="block truncate text-sm font-medium">{{ e.exercise?.name ?? 'Exercise' }}</span>
+          <button type="button"
+            class="min-w-0 flex-1 text-left cursor-pointer"
+            (click)="openExerciseInfo(e.exerciseId)"
+            [attr.aria-label]="'View ' + (e.exercise?.name ?? 'exercise') + ' details'">
+            <span class="block truncate text-sm font-medium underline decoration-transparent hover:decoration-current underline-offset-2">{{ e.exercise?.name ?? 'Exercise' }}</span>
             @if (e.notes) {
             <span class="block truncate text-xs text-muted-color">{{ e.notes }}</span>
             }
-          </span>
+          </button>
           <span class="shrink-0 text-right text-sm text-muted-color tabular-nums">
             {{ setSummary(e) }}
             @if (detailLine(e); as extra) {
             <span class="block text-xs">{{ extra }}</span>
             }
           </span>
+          <button pButton type="button" [text]="true" [rounded]="true" severity="secondary" size="small"
+            (click)="openExerciseInfo(e.exerciseId)" pTooltip="View exercise" aria-label="View exercise details">
+            <i class="pi pi-info-circle"></i>
+          </button>
         </div>
 
         <!--
@@ -119,5 +127,11 @@
 </div>
 
 <mh-routine-form-dialog [routine]="routine()" [(visible)]="editOpen" (saved)="onSaved($event)" />
+
+<!-- Read-only exercise info popup. Same dialog used everywhere an
+     exercise row can be tapped: the readOnly flag hides Edit / Delete /
+     Fork so a client viewing a coach's exercise from a routine doesn't
+     accidentally hit a mutation button. -->
+<mh-exercise-detail-dialog [exerciseId]="viewingExerciseId()" [readOnly]="true" [(visible)]="viewOpen" />
 
 <p-toast position="top-right" />

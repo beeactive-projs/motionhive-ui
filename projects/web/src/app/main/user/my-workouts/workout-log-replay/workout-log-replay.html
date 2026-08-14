@@ -80,8 +80,9 @@
       <p-card class="shadow-md [&_.p-card-body]:p-0!">
         <div class="flex items-center gap-2.5 border-b border-surface p-3">
           @if (ex.exerciseThumbnailUrlSnapshot) {
-          <img class="size-10 shrink-0 rounded-lg border border-surface object-cover"
-            [src]="ex.exerciseThumbnailUrlSnapshot" [alt]="ex.exerciseNameSnapshot" loading="lazy" />
+          <img class="size-10 shrink-0 rounded-lg border border-surface object-cover cursor-pointer"
+            [src]="ex.exerciseThumbnailUrlSnapshot" [alt]="ex.exerciseNameSnapshot" loading="lazy"
+            (click)="openExerciseInfo(ex.exerciseId)" />
           } @else {
           <div
             class="flex size-10 shrink-0 items-center justify-center rounded-lg  bg-primary-100 text-muted-color dark:bg-surface-700">
@@ -89,10 +90,13 @@
           </div>
           }
           <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100"
-              [class.line-through]="ex.isSkipped">
+            <button type="button"
+              class="block w-full text-left truncate text-sm font-semibold text-surface-900 dark:text-surface-100 cursor-pointer underline decoration-transparent hover:decoration-current underline-offset-2"
+              [class.line-through]="ex.isSkipped"
+              (click)="openExerciseInfo(ex.exerciseId)"
+              [attr.aria-label]="'View ' + ex.exerciseNameSnapshot + ' details'">
               {{ ex.exerciseNameSnapshot }}
-            </div>
+            </button>
             <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-muted-color">
               @if (ex.isSkipped) {
               <!-- Without this a declined exercise reads exactly like one
@@ -154,3 +158,4 @@
 </div>
 
 <p-toast position="top-right" />
+<mh-exercise-detail-dialog [exerciseId]="viewingExerciseId()" [readOnly]="true" [(visible)]="viewOpen" />
