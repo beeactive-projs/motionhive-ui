@@ -63,7 +63,7 @@
     "libphonenumber-js": "^1.13.10",
     "postcss": "^8.5.25",
     "primeicons": "^7.0.0",
-    "primeng": "^22.0.0",
+    "primeng": "^22.1.0-rc.2",
     "quill": "^2.0.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.3.3",
