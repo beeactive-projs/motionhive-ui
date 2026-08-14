@@ -47,7 +47,6 @@ interface KindCard {
 interface LevelOption {
   value: ExerciseLevel;
   label: string;
-  icon: string;
 }
 
 interface MultiOption<T> {
@@ -200,21 +199,9 @@ export class ExerciseFormDialog {
   ];
 
   readonly levelOptions: LevelOption[] = [
-    {
-      value: ExerciseLevel.Beginner,
-      label: 'Beginner',
-      icon: 'pi-angle-down',
-    },
-    {
-      value: ExerciseLevel.Intermediate,
-      label: 'Intermediate',
-      icon: 'pi-equals',
-    },
-    {
-      value: ExerciseLevel.Advanced,
-      label: 'Advanced',
-      icon: 'pi-angle-double-up',
-    },
+    { value: ExerciseLevel.Beginner, label: 'Beginner' },
+    { value: ExerciseLevel.Intermediate, label: 'Intermediate' },
+    { value: ExerciseLevel.Advanced, label: 'Advanced' },
   ];
 
   readonly patternOptions: MultiOption<MovementPattern>[] = [

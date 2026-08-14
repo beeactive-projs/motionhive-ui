@@ -136,11 +136,10 @@
               (click)="level.set(opt.value)"
               [class]="'kind-card' + (level() === opt.value ? ' kind-card--on' : '')"
             >
-              <span class="flex w-full items-center gap-1.5 text-xs font-bold text-surface-900 dark:text-surface-100">
-                <i class="pi {{ opt.icon }} text-primary-600"></i>
+              <span class="flex w-full items-center justify-center gap-1.5 text-xs font-bold text-surface-900 dark:text-surface-100">
                 <span>{{ opt.label }}</span>
                 @if (level() === opt.value) {
-                <i class="pi pi-check-circle ml-auto text-primary"></i>
+                <i class="pi pi-check-circle ml-1 text-primary"></i>
                 }
               </span>
             </button>
