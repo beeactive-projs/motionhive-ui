@@ -1,8 +1,8 @@
 import {
-  afterNextRender,
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
+  effect,
   ElementRef,
   input,
   signal,
@@ -81,12 +81,25 @@ export class MediaDemo {
   private readonly _closeBtn = viewChild<ElementRef<HTMLButtonElement>>('closeBtn');
 
   constructor() {
-    // The `autoplay` attribute doesn't reliably fire once the prerendered page
-    // hydrates (the clip renders black on refresh). Kick playback explicitly
-    // after render — muted, so the browser allows it. Browser-only.
-    afterNextRender(() => {
+    // Autoplay is unreliable across hydration. Two things bite on the very
+    // first (prerendered) load that don't on client-side navigation:
+    //   1. The `muted` ATTRIBUTE survives hydration but the `muted` PROPERTY
+    //      isn't reliably set — and the browser's autoplay policy checks the
+    //      property, so play() gets blocked (NotAllowedError) and the clip
+    //      just sits on its poster. Set el.muted = true explicitly.
+    //   2. A one-shot afterNextRender can fire before the <video> (inside the
+    //      @if) is queried. An effect on the viewChild signal kicks playback
+    //      whenever the element resolves — first load AND navigation — and we
+    //      retry on `canplay` for slow buffers.
+    // Runs browser-only: `_video()` is null during SSR.
+    effect((onCleanup) => {
       const el = this._video()?.nativeElement;
-      if (el) void el.play().catch(() => undefined);
+      if (!el) return;
+      el.muted = true;
+      const play = (): void => void el.play().catch(() => undefined);
+      play();
+      el.addEventListener('canplay', play);
+      onCleanup(() => el.removeEventListener('canplay', play));
     });
   }
 
