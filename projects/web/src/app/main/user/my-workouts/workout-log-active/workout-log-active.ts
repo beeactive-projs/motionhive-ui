@@ -14,6 +14,7 @@ import { ButtonDirective } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Card } from 'primeng/card';
+import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBar } from 'primeng/progressbar';
 import { Skeleton } from 'primeng/skeleton';
@@ -70,6 +71,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     ButtonDirective,
     Card,
     ConfirmDialog,
+    Dialog,
     InputTextModule,
     ListEmptyState,
     ProgressBar,
@@ -118,6 +120,8 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   /** Exercise-detail dialog for "what am I doing here?" during a session. */
   readonly viewingExerciseId = signal<string | null>(null);
   readonly viewOpen = signal(false);
+  /** Custom 3-button finish dialog (Complete/Skip · Cancel · Keep going). */
+  readonly finishOpen = signal(false);
   openExerciseInfo(id: string | null | undefined): void {
     if (!id) return;
     this.viewingExerciseId.set(id);
@@ -474,39 +478,56 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * The X in the header used to open a 2-button PrimeNG ConfirmDialog
+   * (Complete / Keep going, or Mark skipped / Keep going for empty
+   * workouts) — no way to cancel/discard from there, the danger button
+   * lived separately at the bottom of the page. Now opens a single
+   * custom dialog that offers all three: the primary action (Complete
+   * OR Mark skipped depending on state), Cancel workout, and Keep going.
+   */
   confirmComplete(): void {
     const cur = this.log();
     if (!cur || this.isComplete()) return;
+    this.finishOpen.set(true);
+  }
+
+  /** Primary CTA on the finish dialog — either Complete or Mark skipped. */
+  onFinishPrimary(): void {
+    const empty = this.setsDone() === 0;
+    this.finishOpen.set(false);
+    this._completeWorkout(empty);
+  }
+
+  onFinishCancel(): void {
+    this.finishOpen.set(false);
+    this._discardWorkout();
+  }
+
+  onFinishKeepGoing(): void {
+    this.finishOpen.set(false);
+  }
+
+  readonly finishPrimaryLabel = computed(() =>
+    this.setsDone() === 0 ? 'Mark as skipped' : 'Complete workout',
+  );
+  readonly finishHeader = computed(() =>
+    this.setsDone() === 0 ? 'Nothing logged yet' : 'Finish this workout?',
+  );
+  readonly finishMessage = computed(() => {
     if (this.setsDone() === 0) {
-      this._confirmationService.confirm({
-        header: 'No sets logged',
-        message:
-          "You haven't logged any sets yet. Mark this workout as skipped instead, or keep going?",
-        icon: 'pi pi-info-circle',
-        acceptLabel: 'Mark as skipped',
-        acceptButtonProps: { severity: 'secondary' },
-        rejectLabel: 'Keep going',
-        rejectButtonProps: { severity: 'secondary', text: true },
-        accept: () => this._completeWorkout(/* allowEmpty */ true),
-      });
-      return;
+      return "You haven't logged any sets yet. Mark it as skipped, cancel it, or keep going.";
     }
     const remaining = this.totalSets() - this.setsDone();
-    const message =
-      remaining > 0
-        ? `You have ${remaining} unchecked ${remaining === 1 ? 'set' : 'sets'}. Complete anyway?`
-        : 'Mark this workout as complete?';
-    this._confirmationService.confirm({
-      header: 'Complete workout?',
-      message,
-      icon: 'pi pi-check-circle',
-      acceptLabel: 'Complete',
-      acceptButtonProps: { severity: 'success' },
-      rejectLabel: 'Keep going',
-      rejectButtonProps: { severity: 'secondary', text: true },
-      accept: () => this._completeWorkout(false),
-    });
-  }
+    return remaining > 0
+      ? `You have ${remaining} unchecked ${remaining === 1 ? 'set' : 'sets'}. What do you want to do?`
+      : 'Every set is checked off. Mark it complete?';
+  });
+  readonly finishCancelMessage = computed(() =>
+    this.setsDone() > 0
+      ? `Cancel deletes the workout and the ${this.setsDone()} set${this.setsDone() === 1 ? '' : 's'} you logged — as if you never started.`
+      : "Cancel deletes the workout — as if you never started.",
+  );
 
   private _completeWorkout(_allowEmpty: boolean): void {
     const cur = this.log();
