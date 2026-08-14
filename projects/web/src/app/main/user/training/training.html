@@ -1,10 +1,12 @@
 <div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
   <!-- Sticky pins the H1 + lens toggle so the primary tabs stay reachable
-       while scrolling long lists (workouts history, exercise catalog, etc.).
-       Negative margins + matching padding push the background edge-to-edge
-       inside the <main> scroll container, which has its own p-4. -->
+       while scrolling long lists. `-top-4` compensates for the <main class="p-4">
+       padding-top so the pinned bar sits flush against the toolbar with
+       no visible gap — sticky measures top from the containing block's
+       padding-box, so top-0 alone leaves a 16px strip. Horizontal
+       -mx-4 + px-4 pushes the background edge-to-edge. -->
   <header
-    class="sticky top-0 z-30 flex flex-wrap gap-3 items-center justify-between -mx-4 px-4 -mt-4 pt-4 pb-3 bg-surface-0/95 dark:bg-surface-950/95 backdrop-blur-sm border-b border-surface-200 dark:border-surface-800">
+    class="sticky -top-4 z-30 flex flex-wrap gap-3 items-center justify-between -mx-4 px-4 pt-4 pb-3 bg-surface-0 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-800">
     <div class="space-y-1 min-w-0">
       <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Workouts</h1>
       <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">{{ subtitle() }}</p>

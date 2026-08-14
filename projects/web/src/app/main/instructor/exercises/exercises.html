@@ -123,10 +123,10 @@
 -->
 <ng-template #filtersRow>
   <!-- Sticky pins the ownership pills + search bar below the training-shell
-       header. Removed on non-mobile grid render paths where the surrounding
-       container has its own overflow. -->
+       header. `top-20` sits below the outer sticky's pinned bottom edge.
+       Solid bg so it fully occludes rows scrolling underneath. -->
   <div
-    class="sticky top-16 z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0/95 dark:bg-surface-950/95 backdrop-blur-sm"
+    class="sticky top-20 z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0 dark:bg-surface-950"
     role="search">
     <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Ownership filter">
       @for (tab of ownershipTabs; track tab.value) {

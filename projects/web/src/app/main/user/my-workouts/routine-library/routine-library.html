@@ -15,9 +15,12 @@
   </div>
   } @else {
   <div class="flex flex-col gap-3 pb-24 md:pb-0">
-    <!-- Search + new routine. Sticks below the training-shell header. -->
+    <!-- Search + new routine. Sticks below the training-shell header
+         (outer header pins at ~80px total when compact). Solid bg so
+         it fully occludes rows scrolling underneath — semi-transparent
+         let the outer bleed through when both are pinned. -->
     <div
-      class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0/95 dark:bg-surface-950/95 backdrop-blur-sm"
+      class="sticky top-20 z-20 flex flex-wrap items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0 dark:bg-surface-950"
       role="search">
       <p-iconfield class="flex-1 md:flex-[0_1_320px]">
         <p-inputicon class="pi pi-search" />
