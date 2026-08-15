@@ -1,0 +1,33 @@
+<div class="row" [style.margin-bottom]="marginBottom()">
+  @if (!isMine()) {
+    <div class="gutter">
+      @if (showAvatar()) {
+        <mh-hex-avatar
+          size="sm"
+          [name]="authorName()"
+          [imageUrl]="authorAvatarUrl()"
+          [color]="tone()"
+        />
+      }
+    </div>
+  }
+
+  <div class="stack">
+    <div class="bubble" [class.deleted]="isDeleted()" [style.border-radius]="radius()">
+      {{ message().body }}
+    </div>
+
+    @if (showMeta()) {
+      <div class="meta">
+        <span>{{ timeLabel() }}</span>
+        @if (showReceipt() && !isDeleted()) {
+          <ion-icon
+            name="checkmark-done"
+            [class.read]="isRead()"
+            [attr.aria-label]="isRead() ? 'Read' : 'Sent'"
+          />
+        }
+      </div>
+    }
+  </div>
+</div>

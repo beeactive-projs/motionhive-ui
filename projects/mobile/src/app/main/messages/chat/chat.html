@@ -1,0 +1,81 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/messages" />
+    </ion-buttons>
+
+    <ion-title>
+      <div class="peer">
+        <mh-hex-avatar
+          size="sm"
+          aria-hidden="true"
+          [name]="title()"
+          [imageUrl]="avatarUrl()"
+          [color]="tone()"
+        />
+        <span class="name">{{ title() }}</span>
+      </div>
+    </ion-title>
+
+    @if (!isDraft()) {
+      <ion-buttons slot="end">
+        <ion-button aria-label="Conversation details" (click)="openDetails()">
+          <ion-icon slot="icon-only" name="information-circle-outline" />
+        </ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="thread">
+  @if (hasOlder()) {
+    <div class="ion-text-center ion-padding-vertical">
+      <ion-button fill="clear" size="small" [disabled]="loading()" (click)="loadOlder()">
+        @if (loading()) {
+          <ion-spinner name="crescent" />
+        } @else {
+          Load earlier messages
+        }
+      </ion-button>
+    </div>
+  }
+
+  @if (loading() && !hasLoaded()) {
+    <div class="ion-text-center ion-padding-vertical">
+      <ion-spinner name="crescent" />
+    </div>
+  }
+
+  @if (isDraft()) {
+    <ion-note class="mh-note-block ion-text-center">
+      This is the start of your conversation with {{ title() }}.
+    </ion-note>
+  } @else if (isEmpty()) {
+    <ion-note class="mh-note-block ion-text-center">No messages yet. Say hello.</ion-note>
+  }
+
+  @for (bubble of bubbles(); track bubble.message.id) {
+    @if (bubble.startsNewDay) {
+      <div class="day">
+        <span>{{ dayLabel(bubble.dayKey) }}</span>
+      </div>
+    }
+
+    <mh-message-bubble
+      [message]="bubble.message"
+      [position]="bubble.position"
+      [isMine]="isMine(bubble.message.senderId)"
+      [author]="otherUser()"
+      [otherReadAt]="otherReadAt()"
+      [showReceipt]="bubble.message.id === lastOwnMessageId()"
+    />
+  }
+</ion-content>
+
+<ion-footer [translucent]="true">
+  <mh-chat-composer
+    [conversationId]="conversationId()"
+    [recipientId]="recipientId()"
+    [placeholder]="placeholder()"
+  />
+</ion-footer>

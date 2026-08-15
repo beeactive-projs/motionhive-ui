@@ -45,7 +45,6 @@ import { MoreSheet } from '../more-sheet/more-sheet';
   selector: 'mh-tabs',
   imports: [IonBadge, IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs, MoreSheet],
   templateUrl: './tabs.html',
-  styleUrl: './tabs.scss',
 })
 export class Tabs {
   private readonly _authStore = inject(AuthStore);
@@ -75,6 +74,19 @@ export class Tabs {
     { initialValue: activeTabIdFromUrl(this._router.url) },
   );
 
+  /**
+   * Routes that hide the bar, via `data: { hideTabBar: true }`. Opt-in: nested
+   * pages keep it by default, and only a screen that owns the bottom edge (the
+   * chat composer, under the keyboard) asks for it.
+   */
+  readonly hideTabBar = toSignal(
+    this._router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this._readHideTabBar()),
+    ),
+    { initialValue: this._readHideTabBar() },
+  );
+
   private readonly _tabSet = computed(() => TAB_SETS[this.mode()]);
 
   /** Live counters can't live in a plain const, so they are spliced in here. */
@@ -94,5 +106,18 @@ export class Tabs {
 
   openMore(): void {
     this.moreOpen.set(true);
+  }
+
+  /**
+   * The flag lives on the leaf route. Walks `routerState.root` rather than this
+   * component's own `ActivatedRoute` — under `IonicRouteStrategy` the injected
+   * route is a detached instance whose `firstChild` stays null even with a
+   * child on screen. `snapshot` is an optional read because the leaf has none
+   * yet mid-construction; the `NavigationEnd` tick re-reads it.
+   */
+  private _readHideTabBar(): boolean {
+    let route = this._router.routerState.root;
+    while (route.firstChild) route = route.firstChild;
+    return route.snapshot?.data['hideTabBar'] === true;
   }
 }

@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/messages" />
+    </ion-buttons>
+    <ion-title>Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="hero">
+    <mh-hex-avatar
+      size="2xl"
+      aria-hidden="true"
+      [name]="name()"
+      [imageUrl]="avatarUrl()"
+      [color]="tone()"
+    />
+    <h1>{{ name() }}</h1>
+  </div>
+
+  <div class="mh-section-label">Conversation</div>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="none">
+      <ion-toggle
+        justify="space-between"
+        [checked]="muted()"
+        [disabled]="muting() || !conversation()"
+        (ionChange)="toggleMute()"
+      >
+        <ion-label>
+          <h3>Mute notifications</h3>
+          <p>You'll still see the unread badge.</p>
+        </ion-label>
+      </ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <div class="mh-section-label">Privacy</div>
+  <ion-list [inset]="true" class="mh-card-list">
+    <mh-settings-row
+      label="Block {{ name() }}"
+      icon="ban-outline"
+      iconColor="danger"
+      [disabled]="!conversation()"
+      (select)="confirmBlock()"
+    />
+  </ion-list>
+
+  <ion-note class="mh-note-block ion-text-center">
+    Blocking stops messages both ways.<br />
+    Manage blocked people in Account → Blocked users.
+  </ion-note>
+</ion-content>

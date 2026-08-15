@@ -12,8 +12,13 @@ import {
   input,
   output,
 } from '@angular/core';
-import { ConversationListItem, MessageView } from 'core';
-import { dayDividerLabel, groupMessages, RenderedBubble } from '../../utils/group-messages';
+import {
+  ConversationListItem,
+  dayDividerLabel,
+  groupMessages,
+  MessageView,
+  RenderedBubble,
+} from 'core';
 import { DayDivider } from '../day-divider/day-divider';
 import { MessageBubble } from '../message-bubble/message-bubble';
 import { SystemEvent } from '../system-event/system-event';

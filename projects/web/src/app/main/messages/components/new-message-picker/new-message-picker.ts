@@ -10,9 +10,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
-import { injectIsMobile, MessagingStore, UserSearchResult, UserService } from 'core';
+import {
+  displayName,
+  initialsOf,
+  injectIsMobile,
+  MessagingStore,
+  UserSearchResult,
+  UserService,
+} from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { displayName, initialsOf } from '../../utils/participant';
 import { ChatComposer } from '../chat-composer/chat-composer';
 
 /**

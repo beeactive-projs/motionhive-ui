@@ -1,0 +1,40 @@
+/* `ion-title` centres a text node; it has no API for an avatar beside the name. */
+.peer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.peer .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Bubbles are the cards here, so the thread sits on the page background. */
+.thread {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.875rem;
+  --padding-bottom: 0.375rem;
+}
+
+.day {
+  display: flex;
+  justify-content: center;
+  margin: 0.375rem 0 0.875rem;
+}
+
+/* The date pill. */
+.day span {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--mh-color-divider);
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,12 @@
+/* An inbox is a wall of rows, not cards on a page. Without this the list stops
+   at the last row and the slate page shows through, reading as a cut-off list. */
+.flat-list {
+  --background: var(--ion-card-background);
+}
+
+/* The count riding inside a segment button's label. */
+.count {
+  margin-left: 0.25rem;
+  opacity: 0.55;
+  font-weight: 700;
+}

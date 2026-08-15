@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { ConversationListItem } from 'core';
+import { ConversationListItem, displayName, initialsOf } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { displayName, initialsOf } from '../../utils/participant';
 
 /**
  * Fixed top bar above the message thread.

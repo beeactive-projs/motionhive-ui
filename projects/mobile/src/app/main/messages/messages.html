@@ -1,13 +1,153 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Messages</ion-title>
-  </ion-toolbar>
-</ion-header>
+@if (searchOpen()) {
+  <!-- Search owns the toolbar: a title, two actions, a field and a filter row
+       do not fit above the fold on a phone. -->
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Search messages & people"
+        inputmode="search"
+        [debounce]="0"
+        [value]="people.query()"
+        (ionInput)="onQueryChange($event.detail.value ?? '')"
+      />
+      <ion-buttons slot="end">
+        <ion-button (click)="closeSearch()">Cancel</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+} @else {
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-title>Messages</ion-title>
+      <ion-buttons slot="end">
+        <ion-button aria-label="Search messages" (click)="openSearch()">
+          <ion-icon slot="icon-only" name="search-outline" />
+        </ion-button>
+        <ion-button aria-label="New message" (click)="openCompose()">
+          <ion-icon slot="icon-only" name="create-outline" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
 
-<ion-content [fullscreen]="true">
-  <mh-empty-state
-    icon="chatbubbles-outline"
-    heading="Messages are coming"
-    message="Conversations with your coaches and clients will live here."
-  />
+    @if (!isEmpty()) {
+      <ion-toolbar>
+        <ion-segment [value]="store.filter()" (ionChange)="onFilterChange($event)">
+          @for (option of filters; track option.value) {
+            <ion-segment-button [value]="option.value">
+              <ion-label>
+                {{ option.label }}
+                @if (store.filterCounts()[option.value]; as count) {
+                  <span class="count">{{ count }}</span>
+                }
+              </ion-label>
+            </ion-segment-button>
+          }
+        </ion-segment>
+      </ion-toolbar>
+    }
+  </ion-header>
+}
+
+<!-- The list runs edge to edge on white; search results and the empty states
+     are cards and centred art, which need the slate page behind them. -->
+<ion-content [fullscreen]="true" [class.flat-list]="showFlatList()">
+  @if (!searchOpen()) {
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-title size="large">Messages</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher-content />
+    </ion-refresher>
+  }
+
+  @if (store.streamStatus() === 'closed') {
+    <ion-note class="mh-note-block">Reconnecting…</ion-note>
+  }
+
+  @if (showSkeleton()) {
+    <ion-list>
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="full">
+          <ion-skeleton-text
+            slot="start"
+            [animated]="true"
+            style="width: 2.875rem; height: 3.25rem"
+          />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 75%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (people.isActive()) {
+    @if (isSearchEmpty()) {
+      <mh-empty-state
+        icon="search-outline"
+        heading="No results"
+        message="Nothing matched that. Try a different name or word."
+      />
+    }
+
+    @if (people.results().length > 0) {
+      <div class="mh-section-label">People</div>
+      <ion-list>
+        @for (person of people.results(); track person.id) {
+          <ion-item button detail="true" lines="full" (click)="openPerson(person)">
+            <mh-hex-avatar
+              slot="start"
+              size="md"
+              aria-hidden="true"
+              [name]="nameOf(person)"
+              [imageUrl]="person.avatarUrl"
+              [color]="toneFor(person.id)"
+            />
+            <ion-label>
+              <h3>{{ nameOf(person) }}</h3>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    @if (store.visibleConversations().length > 0) {
+      <div class="mh-section-label">Messages</div>
+      <ion-list>
+        @for (conversation of store.visibleConversations(); track conversation.id) {
+          <mh-conversation-row
+            [conversation]="conversation"
+            (select)="openConversation(conversation.id)"
+          />
+        }
+      </ion-list>
+    }
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="chatbubbles-outline"
+      heading="No messages yet"
+      message="Conversations with your coaches and clients will show up here."
+      actionLabel="New message"
+      (action)="openCompose()"
+    />
+  } @else if (isFilteredEmpty()) {
+    <mh-empty-state
+      icon="checkmark-circle"
+      heading="All caught up"
+      message="You have no unread messages."
+    />
+  } @else {
+    <ion-list>
+      @for (conversation of store.visibleConversations(); track conversation.id) {
+        <mh-conversation-row
+          [conversation]="conversation"
+          (select)="openConversation(conversation.id)"
+        />
+      }
+    </ion-list>
+  }
 </ion-content>
+
+<mh-new-message-sheet />

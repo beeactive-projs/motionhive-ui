@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, TemplateRef, input, model, output } from '@angular/core';
+import { Component, TemplateRef, input, model, output, viewChild } from '@angular/core';
 import {
   IonButton,
   IonButtons,
@@ -66,11 +66,24 @@ export class SheetShell {
 
   readonly save = output<void>();
 
+  private readonly _modal = viewChild(IonModal);
+
   constructor() {
     addIcons({ close });
   }
 
   dismiss(): void {
     this.open.set(false);
+  }
+
+  /**
+   * Close and await the dismissal, for callers that navigate in the same turn.
+   * `dismiss()` only flips the signal, and a leaving page never gets the change
+   * detection pass that applies `[isOpen]` — the modal would stay presented
+   * over the new route.
+   */
+  async close(): Promise<void> {
+    this.open.set(false);
+    await this._modal()?.dismiss();
   }
 }

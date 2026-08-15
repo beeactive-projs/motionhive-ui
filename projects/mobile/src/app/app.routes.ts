@@ -39,7 +39,8 @@ export const routes: Routes = [
       },
       {
         path: 'messages',
-        loadComponent: () => import('./main/messages/messages').then((m) => m.Messages),
+        loadChildren: () =>
+          import('./main/messages/messages.routes').then((m) => m.messagesRoutes),
       },
       {
         path: 'clients',

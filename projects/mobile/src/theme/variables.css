@@ -126,6 +126,30 @@
   --ion-color-violet-tint: #a78bfa;
 
   /*
+   * Teal and Coral exist for one job: the avatar palette. A conversation list
+   * is a wall of hexagons, and with only the semantic colours to draw from
+   * every other row would be honey or navy. The design settled on a four-tone
+   * set (honey, teal, navy, coral) and these are the two it adds — same
+   * `violet` precedent above, same generic-slot block below.
+   *
+   * Both take navy ink, not white: white on Teal 400 is 1.9:1 and on Coral
+   * 2.4:1, nowhere near the 3:1 a glyph needs. Navy clears 7:1 on both.
+   */
+  --ion-color-teal: #2dd4bf;
+  --ion-color-teal-rgb: 45, 212, 191;
+  --ion-color-teal-contrast: #0e1b31;
+  --ion-color-teal-contrast-rgb: 14, 27, 49;
+  --ion-color-teal-shade: #14b8a6;
+  --ion-color-teal-tint: #5eead4;
+
+  --ion-color-coral: #fb8062;
+  --ion-color-coral-rgb: 251, 128, 98;
+  --ion-color-coral-contrast: #0e1b31;
+  --ion-color-coral-contrast-rgb: 14, 27, 49;
+  --ion-color-coral-shade: #ea6a4b;
+  --ion-color-coral-tint: #fc9880;
+
+  /*
    * Neutrals — Slate, not Ionic's default grays. The surfaces above already
    * come from the Slate ramp (#f8fafc, #e2e8f0), so Ionic's #92949c / #222428
    * read as a second, colder gray sitting on top of them. Steps 500 and 700,
@@ -168,6 +192,24 @@
   --ion-color-contrast-rgb: var(--ion-color-violet-contrast-rgb) !important;
   --ion-color-shade: var(--ion-color-violet-shade) !important;
   --ion-color-tint: var(--ion-color-violet-tint) !important;
+}
+
+.ion-color-teal {
+  --ion-color-base: var(--ion-color-teal) !important;
+  --ion-color-base-rgb: var(--ion-color-teal-rgb) !important;
+  --ion-color-contrast: var(--ion-color-teal-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-teal-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-teal-shade) !important;
+  --ion-color-tint: var(--ion-color-teal-tint) !important;
+}
+
+.ion-color-coral {
+  --ion-color-base: var(--ion-color-coral) !important;
+  --ion-color-base-rgb: var(--ion-color-coral-rgb) !important;
+  --ion-color-contrast: var(--ion-color-coral-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-coral-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-coral-shade) !important;
+  --ion-color-tint: var(--ion-color-coral-tint) !important;
 }
 
 /*

@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { MessageView, ParticipantSnapshot } from 'core';
+import { BubblePosition, displayName, initialsOf, MessageView, ParticipantSnapshot } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import { BubblePosition } from '../../utils/group-messages';
-import { displayName, initialsOf } from '../../utils/participant';
 
 /**
  * Single message bubble. Renders both "me" and "them" sides based on

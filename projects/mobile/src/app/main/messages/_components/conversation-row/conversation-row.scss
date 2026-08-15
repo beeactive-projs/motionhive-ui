@@ -1,0 +1,39 @@
+/* `ion-item` lays its slots out in a row and has no variable for a stacked one,
+   which the timestamp-over-unread-pill end slot needs. */
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  align-self: flex-start;
+  padding-top: 0.35rem;
+}
+
+ion-item {
+  --padding-start: 1.25rem;
+  --inner-padding-end: 1.25rem;
+  --padding-top: 0.25rem;
+  --padding-bottom: 0.25rem;
+}
+
+/* `ion-label` styles h2/p from a single `--color`, so unread state has no
+   per-line hook and has to be set here. The global h1,h2,h3 rule also puts
+   Poppins on the name, which the row spec wants in Inter. */
+ion-label h2 {
+  font-family: var(--ion-font-family);
+  font-weight: 600;
+}
+
+:host(.mh-unread) ion-label h2 {
+  font-weight: 700;
+}
+
+:host(.mh-unread) ion-label p {
+  color: var(--ion-color-dark);
+  font-weight: 500;
+}
+
+:host(.mh-unread) .meta ion-note {
+  color: var(--mh-color-honey-deep);
+  font-weight: 600;
+}

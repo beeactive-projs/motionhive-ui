@@ -1,0 +1,44 @@
+@if (store.sendError(); as error) {
+  <div class="error">
+    <ion-note color="danger">{{ error }}</ion-note>
+    <ion-button fill="clear" size="small" aria-label="Dismiss" (click)="dismissError()">
+      <ion-icon slot="icon-only" name="close" />
+    </ion-button>
+  </div>
+}
+
+@if (isTooLong()) {
+  <div class="error">
+    <ion-note color="danger">That message is too long. Trim it and try again.</ion-note>
+  </div>
+}
+
+<div class="bar">
+  <ion-textarea
+    class="field"
+    fill="solid"
+    [autoGrow]="true"
+    [rows]="1"
+    [maxlength]="null"
+    [placeholder]="placeholder()"
+    [disabled]="!recipientId()"
+    [value]="value()"
+    (ionInput)="onInput($event.detail.value ?? '')"
+  />
+
+  <ion-button
+    class="send"
+    shape="round"
+    [disabled]="!canSend()"
+    [attr.aria-label]="isRateLimited() ? 'Sending paused' : 'Send'"
+    (click)="send()"
+  >
+    @if (sending()) {
+      <ion-spinner name="crescent" />
+    } @else if (isRateLimited()) {
+      {{ limitedSeconds() }}
+    } @else {
+      <ion-icon slot="icon-only" name="send" />
+    }
+  </ion-button>
+</div>

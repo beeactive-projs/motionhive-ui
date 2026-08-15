@@ -1,0 +1,13 @@
+/* Centred portrait block. Ionic has no hero primitive; the avatar and heading
+   bring their own styling. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1.25rem 0.5rem;
+}
+
+.hero h1 {
+  text-align: center;
+}

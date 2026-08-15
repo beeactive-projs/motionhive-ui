@@ -1,0 +1,47 @@
+.bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.field {
+  flex: 1;
+  /* Ionic's solid fill draws a form-field underline; a composer is a pill.
+     Zero border width kills the line, `--highlight-height` the focus one. */
+  --border-radius: 1.375rem;
+  --border-width: 0;
+  --border-color: transparent;
+  --padding-start: 0.875rem;
+  --padding-end: 0.875rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  --background: var(--mh-color-divider);
+  --highlight-height: 0;
+  /* Past this the keyboard and the bar leave no thread visible. */
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.send {
+  flex: none;
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0 1rem;
+}
+
+.error ion-note {
+  flex: 1;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}

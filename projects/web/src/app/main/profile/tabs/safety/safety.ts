@@ -5,17 +5,13 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { MessagingService, UserBlock } from 'core';
+import { displayName, initialsOf, MessagingService, UserBlock } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
-import {
-  displayName,
-  initialsOf,
-} from '../../../messages/utils/participant';
 
 /**
  * Profile → Safety tab.

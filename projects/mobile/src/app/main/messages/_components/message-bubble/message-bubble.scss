@@ -1,0 +1,77 @@
+/* Ionic ships no chat primitive, so the bubbles are written out here — the same
+   exemption `mh-hex-avatar` takes for the hexagon. Colours still come from the
+   theme; there is no literal hex in this file. */
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+:host(.mine) .row {
+  flex-direction: row-reverse;
+}
+
+/* Reserved even when empty, so every bubble in a "them" run lines up with the
+   avatar under the last one instead of stepping left. */
+.gutter {
+  flex: none;
+  width: 1.75rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 74%;
+}
+
+:host(.mine) .stack {
+  align-items: flex-end;
+}
+
+.bubble {
+  padding: 0.6rem 0.875rem;
+  background: var(--ion-card-background);
+  border: 1px solid var(--ion-border-color);
+  color: var(--ion-text-color);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  /* Preserve the sender's own line breaks; wrap anything unbroken (a pasted
+     URL) rather than letting it push the bubble past its max-width. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Mine is honey with navy ink and no border — the fill carries the edge. */
+:host(.mine) .bubble {
+  background: var(--ion-color-primary);
+  border-color: transparent;
+  color: var(--ion-color-primary-contrast);
+}
+
+/* A tombstone is the BE's '[deleted]' string; it reads as absence, not speech. */
+.bubble.deleted {
+  background: var(--mh-color-divider);
+  border-color: transparent;
+  color: var(--ion-color-medium);
+  font-style: italic;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0.25rem 0.25rem 0;
+  color: var(--ion-color-medium);
+  font-size: 0.66rem;
+}
+
+.meta ion-icon {
+  font-size: 0.85rem;
+}
+
+/* Delivered is grey, read is amber — the whole receipt is that one colour. */
+.meta ion-icon.read {
+  color: var(--mh-color-honey-deep);
+}

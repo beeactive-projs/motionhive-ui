@@ -174,6 +174,7 @@ export * from './lib/constants/countries.const';
 export * from './lib/constants/handle.const';
 export * from './lib/constants/social-platforms.const';
 export * from './lib/constants/avatar-upload.const';
+export * from './lib/constants/messaging-routes.const';
 
 // Utils
 export * from './lib/utils/url.utils';
@@ -187,6 +188,7 @@ export * from './lib/utils/viewport.utils';
 export * from './lib/utils/session-format.utils';
 export * from './lib/utils/exercise-tag.utils';
 export * from './lib/utils/form.utils';
+export * from './lib/utils/messaging.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';

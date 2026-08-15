@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, finalize, tap, throwError } from 'rxjs';
+import { MESSAGING_ROUTES } from '../constants/messaging-routes.const';
 import {
   ConversationListItem,
   MessageView,
@@ -105,6 +106,8 @@ export class MessagingStore {
   private readonly _auth = inject(AuthStore);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
+  /** Where messaging is mounted in the host app — see `MESSAGING_ROUTES`. */
+  private readonly _routes = inject(MESSAGING_ROUTES);
 
   // ─── Internal state ───────────────────────────────────────────
   private readonly _conversations = signal<ConversationListItem[]>([]);
@@ -269,6 +272,23 @@ export class MessagingStore {
     });
   });
 
+  /**
+   * The DM with a given user, if one is already loaded. Callers starting a new
+   * message use it to reopen the existing thread instead of a blank draft.
+   *
+   * Only sees loaded conversations, so it can miss one further down a long
+   * inbox. That is cosmetic: the BE keys DMs on a unique `direct_key` and
+   * returns the existing conversation on send either way.
+   */
+  findDirectWith(userId: string): ConversationListItem | null {
+    return (
+      this._conversations().find(
+        (conversation) =>
+          conversation.type === 'DIRECT' && conversation.otherUser?.id === userId,
+      ) ?? null
+    );
+  }
+
   readonly activeConversation = computed(() => {
     const id = this._activeId();
     if (!id) return null;
@@ -336,6 +356,7 @@ export class MessagingStore {
       const sameUser = userId === this.lastAuthedUserId;
       if (sameAuthState && sameUser) return;
 
+      const previousUserId = this.lastAuthedUserId;
       this.lastAuthState = isAuthed;
       this.lastAuthedUserId = userId;
 
@@ -346,7 +367,12 @@ export class MessagingStore {
       // If the user id changed while we were already authed (no
       // false transition in between), purge state from the previous
       // identity before re-loading.
-      if (!sameUser) {
+      //
+      // Only when there WAS a previous identity. On a cold boot this effect
+      // runs after the first screen has mounted, and an unconditional reset
+      // would wipe what it just set up — a deep link into a conversation loses
+      // its `activeId`, so the thread on screen is not treated as open.
+      if (!sameUser && previousUserId !== null) {
         this.reset();
       }
       this.onLogin();
@@ -423,7 +449,7 @@ export class MessagingStore {
   openConversation(id: string): void {
     this._activeId.set(id);
     this.loadMessages(id);
-    void this._router.navigate(['/messages', id]);
+    void this._router.navigate([...this._routes, id]);
   }
 
   /**
@@ -518,7 +544,7 @@ export class MessagingStore {
               // If we were viewing this thread, navigate away.
               if (this._activeId() === conversationId) {
                 this._activeId.set(null);
-                void this._router.navigate(['/messages']);
+                void this._router.navigate([...this._routes]);
               }
             }
             resolve(true);
@@ -757,12 +783,20 @@ export class MessagingStore {
                 ),
               });
             } else {
-              // New conversation: seed the messages cache with the
-              // first message so the thread renders without an extra
-              // round-trip.
+              // New conversation: seed the messages cache with the first
+              // message so the thread renders without an extra round-trip.
+              //
+              // Append rather than replace. This branch also runs when the
+              // recipient turned out to have an existing thread we hadn't
+              // loaded (the BE resolves DMs by a unique key), and overwriting
+              // would drop its history behind a `hasLoaded` that suppresses
+              // the refetch.
+              const cached = this.messagesFor(realConvId).items;
               this.patchMessages(realConvId, {
-                items: [res.message],
-                hasLoaded: true,
+                items: cached.some((m) => m.id === res.message.id)
+                  ? cached
+                  : [...cached, res.message],
+                hasLoaded: cached.length > 0 ? this.messagesFor(realConvId).hasLoaded : true,
               });
             }
 
@@ -787,11 +821,16 @@ export class MessagingStore {
               this._threatFlagsByConv.update((all) => omitKey(all, realConvId));
             }
 
-            // For new conversations, route into the thread.
+            // For new conversations, route into the thread. `replaceUrl`
+            // matters: the draft screen we're leaving is addressed by
+            // recipient, not conversation, so backing onto it would offer an
+            // empty thread that sends as if it were still the first message.
             if (!conversationId) {
               this._composeMode.set(false);
               this._activeId.set(realConvId);
-              void this._router.navigate(['/messages', realConvId]);
+              void this._router.navigate([...this._routes, realConvId], {
+                replaceUrl: true,
+              });
             }
 
             resolve(realConvId);
@@ -917,19 +956,28 @@ export class MessagingStore {
    * Pass `force: true` to bypass the dedup window (used by F2 manual
    * refresh, F6 SSE-triggered refreshes).
    */
-  loadConversations(opts: { force?: boolean } = {}): void {
-    if (this._loading()) return;
+  loadConversations(opts: { force?: boolean; done?: () => void } = {}): void {
+    // `done` fires on every path, including the three no-ops below — a
+    // pull-to-refresh spinner waiting on it would otherwise never stop.
+    const done = opts.done ?? (() => undefined);
+
+    if (this._loading()) {
+      done();
+      return;
+    }
 
     const now = Date.now();
 
     if (now < this.rateLimitedUntilAt) {
       // BE asked us to back off. Honour it silently.
+      done();
       return;
     }
 
     if (!opts.force && now - this.lastLoadAttemptAt < AUTO_LOAD_DEDUP_WINDOW_MS) {
       // Loaded too recently. Treat the call as a no-op so a noisy
       // auth boot doesn't stampede the BE.
+      done();
       return;
     }
 
@@ -966,7 +1014,10 @@ export class MessagingStore {
           // if an unexpected error escapes.
           return EMPTY;
         }),
-        finalize(() => this._loading.set(false)),
+        finalize(() => {
+          this._loading.set(false);
+          done();
+        }),
       )
       .subscribe();
   }

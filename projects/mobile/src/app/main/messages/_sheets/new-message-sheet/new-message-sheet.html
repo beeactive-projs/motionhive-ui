@@ -1,0 +1,63 @@
+<ng-template #body>
+  <ion-searchbar
+    placeholder="Search people"
+    inputmode="search"
+    [debounce]="0"
+    [value]="people.query()"
+    (ionInput)="people.setQuery($event.detail.value ?? '')"
+  />
+
+  @if (!people.isActive()) {
+    <ion-note class="mh-note-block">
+      Search for a coach, a client or anyone else on MotionHive to start a conversation.
+    </ion-note>
+  } @else if (people.isSearching()) {
+    <ion-list>
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none">
+          <ion-skeleton-text
+            slot="start"
+            [animated]="true"
+            style="width: 2.5rem; height: 2.8rem"
+          />
+          <ion-label>
+            <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (people.isEmpty()) {
+    <mh-empty-state
+      icon="person-outline"
+      heading="Nobody found"
+      message="Check the spelling, or try their last name."
+    />
+  } @else {
+    <ion-list>
+      @for (person of people.results(); track person.id) {
+        <ion-item button detail="false" lines="none" (click)="openPerson(person)">
+          <mh-hex-avatar
+            slot="start"
+            size="md"
+            aria-hidden="true"
+            [name]="nameOf(person)"
+            [imageUrl]="person.avatarUrl"
+            [color]="toneFor(person.id)"
+          />
+          <ion-label>
+            <h3>{{ nameOf(person) }}</h3>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="New message"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9"
+/>
