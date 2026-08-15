@@ -112,7 +112,8 @@
         (moveDown)="moveActiveWorkout(1)" (moveToWeek)="openMoveWorkoutDialog(w)" (edit)="openEditWorkout(w)"
         (remove)="confirmDeleteWorkout(w)" (addExercise)="openExercisePicker(w)"
         (reorderExercise)="moveExercise(w, $event.from, $event.to)" (moveExerciseTo)="openMoveExerciseDialog(w, $event)"
-        (removeExercise)="confirmDeleteExercise(w, $event)" (addSet)="openAddSet(w, $event)"
+        (removeExercise)="confirmDeleteExercise(w, $event)" (viewExercise)="openExerciseInfo($event)"
+        (addSet)="openAddSet(w, $event)"
         (editSet)="openEditSet(w, $event.exercise, $event.set)"
         (duplicateSet)="duplicateSet(w, $event.exercise, $event.set)"
         (removeSet)="confirmDeleteSet(w, $event.exercise, $event.set)"
@@ -159,3 +160,10 @@
 
 <p-toast position="top-right" />
 <p-confirmdialog [appendTo]="'body'" />
+
+<!-- Read-only exercise detail — opened from the info button on each
+     prescribed-exercise row inside the workout editor. Same dialog used
+     everywhere; readOnly hides the edit / delete / fork actions so the
+     coach reviewing an exercise in a program doesn't accidentally
+     mutate the underlying catalog row. -->
+<mh-exercise-detail-dialog [exerciseId]="viewingExerciseId()" [readOnly]="true" [(visible)]="viewOpen" />

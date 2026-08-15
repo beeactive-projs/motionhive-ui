@@ -40,6 +40,7 @@ export class ExerciseRow {
   readonly moveDown = output<void>();
   readonly moveTo = output<void>();
   readonly remove = output<void>();
+  readonly viewExercise = output<void>();
   readonly addSet = output<void>();
   readonly editSet = output<PrescribedSet>();
   readonly duplicateSet = output<PrescribedSet>();

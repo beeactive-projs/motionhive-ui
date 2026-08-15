@@ -91,6 +91,21 @@
       <button pButton
         type="button"
         size="small"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="View exercise"
+        tooltipPosition="left"
+        (click)="viewExercise.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'View ' + name() + ' details'"
+        iconOnly
+      >
+        <i class="pi pi-info-circle"></i>
+      </button>
+      <button pButton
+        type="button"
+        size="small"
         severity="danger"
         [text]="true"
         [rounded]="true"

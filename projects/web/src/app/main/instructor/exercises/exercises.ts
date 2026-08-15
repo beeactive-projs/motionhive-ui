@@ -152,16 +152,29 @@ export class Exercises {
     );
   });
 
-  readonly ownershipTabs: { value: ExerciseOwnershipFilter; label: string }[] =
-    [
+  /**
+   * Ownership filter tabs. Plain USERs (not instructors) can't create
+   * their own exercises, so "My exercises" and "Public · others" —
+   * which only make sense once you're publishing your own catalog —
+   * are hidden for them. They still see All + System, which covers
+   * the entire browsable set from their perspective.
+   */
+  readonly ownershipTabs = computed<
+    { value: ExerciseOwnershipFilter; label: string }[]
+  >(() => {
+    const base: { value: ExerciseOwnershipFilter; label: string }[] = [
       { value: ExerciseOwnershipFilter.All, label: 'All' },
       { value: ExerciseOwnershipFilter.System, label: 'System' },
-      { value: ExerciseOwnershipFilter.Mine, label: 'My exercises' },
-      {
+    ];
+    if (this.isInstructor()) {
+      base.push({ value: ExerciseOwnershipFilter.Mine, label: 'My exercises' });
+      base.push({
         value: ExerciseOwnershipFilter.PublicOthers,
         label: 'Public · others',
-      },
-    ];
+      });
+    }
+    return base;
+  });
 
   readonly kindOptions: { value: ExerciseKind; label: string }[] = [
     { value: ExerciseKind.Strength, label: 'Strength' },

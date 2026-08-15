@@ -40,6 +40,7 @@ import {
 } from 'core';
 
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
+import { ExerciseDetailDialog } from '../../exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
 import { MoveTargetChoice, MoveTargetDialog } from '../move-target-dialog/move-target-dialog';
@@ -77,6 +78,7 @@ import { WorkoutEditor } from './_components/workout-editor/workout-editor';
     BottomSheet,
     ListEmptyState,
     AssignProgramDialog,
+    ExerciseDetailDialog,
     ExercisePickerDialog,
     MoveTargetDialog,
     ProgramFormDialog,
@@ -107,6 +109,15 @@ export class ProgramDetail implements OnInit {
 
   readonly program = signal<Program | null>(null);
   readonly loading = signal(false);
+  // Read-only exercise-detail dialog wired into the workout editor rows.
+  readonly viewingExerciseId = signal<string | null>(null);
+  readonly viewOpen = signal(false);
+  openExerciseInfo(pe: PrescribedExercise): void {
+    const id = pe.exerciseId ?? pe.exercise?.id ?? null;
+    if (!id) return;
+    this.viewingExerciseId.set(id);
+    this.viewOpen.set(true);
+  }
   /** Mobile overflow sheet (Edit / Assign / Delete). */
   readonly actionsOpen = signal(false);
   readonly assignDialogOpen = signal(false);

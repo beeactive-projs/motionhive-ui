@@ -147,6 +147,7 @@
           (moveDown)="reorderExercise.emit({ from: i, to: i + 1 })"
           (moveTo)="moveExerciseTo.emit(ex)"
           (remove)="removeExercise.emit(ex)"
+          (viewExercise)="viewExercise.emit(ex)"
           (addSet)="addSet.emit(ex)"
           (editSet)="editSet.emit({ exercise: ex, set: $event })"
           (duplicateSet)="duplicateSet.emit({ exercise: ex, set: $event })"

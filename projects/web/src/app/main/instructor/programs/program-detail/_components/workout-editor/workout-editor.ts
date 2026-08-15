@@ -43,6 +43,7 @@ export class WorkoutEditor {
   readonly reorderExercise = output<{ from: number; to: number }>();
   readonly moveExerciseTo = output<PrescribedExercise>();
   readonly removeExercise = output<PrescribedExercise>();
+  readonly viewExercise = output<PrescribedExercise>();
   readonly addSet = output<PrescribedExercise>();
   readonly editSet = output<{ exercise: PrescribedExercise; set: PrescribedSet }>();
   readonly duplicateSet = output<{ exercise: PrescribedExercise; set: PrescribedSet }>();
