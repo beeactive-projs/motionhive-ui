@@ -1,0 +1,119 @@
+/* The colour band under the header. Keyed to where the session happens, and
+   muted once it can no longer be attended. */
+.band {
+  height: 5rem;
+  background: var(--mh-chip-warning-background);
+  border-bottom: 1px solid var(--ion-border-color);
+  position: relative;
+}
+
+.band.online {
+  background: rgb(var(--ion-color-teal-rgb) / 0.16);
+}
+
+.band.past,
+.band.cancelled {
+  background: var(--mh-color-divider);
+}
+
+.band .chips {
+  position: absolute;
+  left: 1.25rem;
+  bottom: 0.75rem;
+  display: flex;
+  gap: 0.375rem;
+}
+
+.band ion-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.skeleton-band {
+  background: var(--mh-color-divider);
+}
+
+.body {
+  /* Bottom clears the sticky CTA, or the last section sits under it. */
+  padding: 1rem 0 7rem;
+}
+
+.body h1 {
+  padding: 0 1.5rem;
+}
+
+/* The bar and its count sit on one line, which ion-progress-bar has no slot for. */
+.spots {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0 1.5rem;
+}
+
+.spots ion-progress-bar {
+  flex: 1;
+  --background: var(--mh-color-divider);
+  --progress-background: var(--ion-color-primary);
+  height: 0.375rem;
+  border-radius: var(--mh-radius-pill);
+}
+
+.spots .count {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* The meeting link wraps rather than stretching the row. */
+.url {
+  overflow-wrap: anywhere;
+  font-size: 0.68rem;
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem;
+}
+
+.cta .price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.cta .price strong {
+  font-family: var(--mh-font-heading);
+  font-size: 0.95rem;
+}
+
+.cta .price span {
+  color: var(--ion-color-medium);
+  font-size: 0.62rem;
+}
+
+.cta .action {
+  flex: 1;
+  margin: 0;
+}
+
+/* Queue position. `waitlistPosition` is never written server-side, so this is
+   the row's index in arrival order — the same order the BE promotes in. */
+.queue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-inline-end: 0.75rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-medium);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.waitlist-action {
+  padding: 0.5rem 1.5rem 0;
+}

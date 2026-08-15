@@ -16,9 +16,13 @@ function toCamelCase(name: string): string {
 }
 
 /**
- * Static icon names in the templates: `name="…"` on an `ion-icon`, plus the
- * `icon="…"` inputs `mh-empty-state` and `mh-settings-row` take. Bound `[name]`
- * comes from a component field and is that component's business.
+ * Icon names the templates reference:
+ *   - static `name="…"` / `icon="…"` attributes
+ *   - kebab-case literals inside a bound `[name]="…"` / `[icon]="…"`, which is
+ *     how a row picks between two icons on a condition
+ *
+ * A name built by concatenation would slip through, but nothing here does that
+ * and the alternative is a hand-kept list that silently rots.
  */
 function iconNamesInTemplates(): string[] {
   const names = new Set<string>();
@@ -26,6 +30,11 @@ function iconNamesInTemplates(): string[] {
   for (const html of Object.values(templates)) {
     for (const match of html.matchAll(/\b(?:name|icon)="([a-z][a-z0-9-]*)"/g)) {
       names.add(match[1]);
+    }
+    for (const binding of html.matchAll(/\[(?:name|icon)\]="([^"]*)"/g)) {
+      for (const literal of binding[1].matchAll(/'([a-z][a-z0-9-]*)'/g)) {
+        names.add(literal[1]);
+      }
     }
   }
 

@@ -13,7 +13,12 @@
           [imageUrl]="avatarUrl()"
           [color]="tone()"
         />
-        <span class="name">{{ title() }}</span>
+        <div class="who">
+          <span class="name">{{ title() }}</span>
+          @if (handle(); as tag) {
+            <span class="handle">&#64;{{ tag }}</span>
+          }
+        </div>
       </div>
     </ion-title>
 

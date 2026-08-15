@@ -1,5 +1,5 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ActionSheetController,
@@ -52,6 +52,7 @@ import { MESSAGING_ICONS } from '../messages.config';
 })
 export class ChatDetails {
   private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _actionSheetController = inject(ActionSheetController);
   private readonly _feedbackService = inject(FeedbackService);
@@ -86,6 +87,13 @@ export class ChatDetails {
       // which case there is no conversation to render — ask for it.
       if (id && !this.conversation()) this.store.loadConversations();
     });
+  }
+
+  readonly handle = computed(() => this.otherUser()?.handle ?? null);
+
+  openProfile(): void {
+    const handle = this.handle();
+    if (handle) void this._router.navigate(['/tabs/messages/person', handle]);
   }
 
   async toggleMute(): Promise<void> {

@@ -1,0 +1,25 @@
+<ion-item button detail="false" lines="none" (click)="select.emit()">
+  <div class="when" slot="start">
+    <span class="time">{{ time() }}</span>
+    @if (duration()) {
+      <span class="duration">{{ duration() }}</span>
+    }
+  </div>
+
+  <ion-label>
+    <h2>{{ title() }}</h2>
+    <div class="tags">
+      @if (isLive()) {
+        <ion-badge color="success">Live</ion-badge>
+      } @else if (typeLabel()) {
+        <ion-badge [color]="hasConflict() ? 'danger' : 'light'">{{ typeLabel() }}</ion-badge>
+      }
+      @if (pendingCount() > 0) {
+        <ion-badge color="warning">{{ pendingCount() }} pending</ion-badge>
+      }
+      <ion-note>{{ meta() }}</ion-note>
+    </div>
+  </ion-label>
+
+  <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+</ion-item>

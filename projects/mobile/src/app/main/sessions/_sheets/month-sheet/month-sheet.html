@@ -1,0 +1,49 @@
+<ng-template #body>
+  <div class="nav">
+    <ion-button fill="clear" aria-label="Previous month" (click)="step(-1)">
+      <ion-icon slot="icon-only" name="chevron-back" />
+    </ion-button>
+    <span class="label">{{ monthLabel() }}</span>
+    <ion-button fill="clear" aria-label="Next month" (click)="step(1)">
+      <ion-icon slot="icon-only" name="chevron-forward" />
+    </ion-button>
+  </div>
+
+  <div class="grid heading">
+    @for (label of weekdayLabels; track $index) {
+      <span class="weekday">{{ label }}</span>
+    }
+  </div>
+
+  <div class="grid">
+    @for (cell of cells(); track cell.key) {
+      <button
+        type="button"
+        class="cell"
+        [class.muted]="!cell.inMonth"
+        [class.today]="cell.isToday"
+        (click)="pick(cell)"
+      >
+        <span class="day">{{ cell.day }}</span>
+        <span class="dots">
+          @for (tone of cell.dots; track $index) {
+            <i [attr.data-tone]="tone"></i>
+          }
+        </span>
+      </button>
+    }
+  </div>
+
+  <ion-note class="mh-note-block">
+    Dots show sessions in the loaded range. Pick a day to jump the agenda there.
+  </ion-note>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Jump to"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.72]"
+  [initialBreakpoint]="0.72"
+/>

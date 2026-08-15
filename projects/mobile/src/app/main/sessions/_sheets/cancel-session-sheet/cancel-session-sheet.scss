@@ -1,0 +1,15 @@
+/* Radio rows read as cards here, so the selected scope is obvious at a glance
+   on a destructive screen. `ion-radio` has no card treatment of its own. */
+.option {
+  --background: var(--ion-card-background);
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.875rem;
+  margin-bottom: 0.5rem;
+  border: 1.5px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}
+
+.option.selected {
+  border-color: var(--ion-color-danger);
+  --background: rgb(var(--ion-color-danger-rgb) / 0.05);
+}

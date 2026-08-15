@@ -1,4 +1,5 @@
 import {
+  alertCircleOutline,
   banOutline,
   chatbubblesOutline,
   checkmarkCircle,
@@ -6,6 +7,8 @@ import {
   close,
   createOutline,
   informationCircleOutline,
+  notificationsOffOutline,
+  notificationsOutline,
   personOutline,
   searchOutline,
   send,
@@ -17,6 +20,7 @@ import {
  * reference an icon nobody registered.
  */
 export const MESSAGING_ICONS = {
+  alertCircleOutline,
   banOutline,
   chatbubblesOutline,
   checkmarkCircle,
@@ -24,6 +28,8 @@ export const MESSAGING_ICONS = {
   close,
   createOutline,
   informationCircleOutline,
+  notificationsOffOutline,
+  notificationsOutline,
   personOutline,
   searchOutline,
   send,

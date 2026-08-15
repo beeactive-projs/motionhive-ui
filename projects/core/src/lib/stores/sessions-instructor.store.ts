@@ -390,10 +390,14 @@ export class SessionsInstructorStore {
    *
    * On error, surfaces via `rangeError` and clears the visible set.
    */
-  loadRange(range: { start: Date; end: Date }): void {
+  loadRange(range: { start: Date; end: Date }, opts: { force?: boolean } = {}): void {
     if (this._rangeLoading()) return;
     // Key on BOTH bounds — week vs day on the same Monday would otherwise share an entry.
     const key = `${range.start.getTime()}-${range.end.getTime()}`;
+
+    // A refresh keeps the same bounds, so without this the cache answers every
+    // time and the calendar can never pick up a create, cancel or reschedule.
+    if (opts.force) this._rangeCache.delete(key);
 
     // Cache hit?
     const cached = this._rangeCache.get(key);

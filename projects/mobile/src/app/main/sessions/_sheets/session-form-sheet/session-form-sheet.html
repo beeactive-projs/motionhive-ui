@@ -1,0 +1,186 @@
+<ng-template #body>
+  <div class="mh-section-label">Type</div>
+  <div class="tiles three">
+    @for (option of typeOptions; track option.value) {
+      <button
+        type="button"
+        class="tile"
+        [class.selected]="type() === option.value"
+        (click)="type.set(option.value)"
+      >
+        <ion-icon [name]="option.icon" aria-hidden="true" />
+        <span>{{ option.label }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="mh-section-label">Title</div>
+  <ion-input
+    fill="outline"
+    placeholder="Morning yoga flow"
+    autocapitalize="sentences"
+    [value]="title()"
+    (ionInput)="title.set($event.detail.value ?? '')"
+  />
+
+  <div class="mh-section-label">When</div>
+  <ion-item lines="none" class="field">
+    <ion-label>Starts</ion-label>
+    <ion-datetime-button slot="end" datetime="session-start" />
+  </ion-item>
+
+  <!-- Detached from the item on purpose: Ionic relocates a modal when it
+       presents, so it cannot live inside the row it belongs to. -->
+  <ion-modal class="mh-date-modal" [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="session-start"
+        presentation="date-time"
+        [showDefaultButtons]="true"
+        [value]="startAt()"
+        (ionChange)="onStartChange($event.detail.value)"
+      />
+    </ng-template>
+  </ion-modal>
+
+  <ion-item lines="none" class="field">
+    <ion-select
+      label="Duration"
+      interface="popover"
+      [interfaceOptions]="{ cssClass: 'mh-select-popover' }"
+      [value]="durationMinutes()"
+      (ionChange)="durationMinutes.set($event.detail.value)"
+    >
+      @for (minutes of durations; track minutes) {
+        <ion-select-option [value]="minutes">{{ durationLabel(minutes) }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item lines="none" class="field">
+    <ion-toggle
+      justify="space-between"
+      [checked]="isRecurring()"
+      (ionChange)="isRecurring.set($event.detail.checked)"
+    >
+      <ion-label>
+        <h3>{{ isRecurring() ? 'Repeats weekly' : "Doesn't repeat" }}</h3>
+        <p>Toggle to set up a series</p>
+      </ion-label>
+    </ion-toggle>
+  </ion-item>
+
+  @if (isRecurring()) {
+    <div class="days">
+      @for (day of weekdays; track day.value) {
+        <button
+          type="button"
+          class="day"
+          [class.selected]="daysOfWeek().includes(day.value)"
+          [attr.aria-pressed]="daysOfWeek().includes(day.value)"
+          (click)="toggleDay(day.value)"
+        >
+          {{ day.label }}
+        </button>
+      }
+    </div>
+
+    <div class="mh-section-label">Ends after</div>
+    <div class="chips">
+      @for (count of occurrenceChoices; track count) {
+        <ion-chip
+          [outline]="endAfterOccurrences() !== count"
+          [color]="endAfterOccurrences() === count ? 'primary' : 'medium'"
+          [attr.aria-pressed]="endAfterOccurrences() === count"
+          (click)="endAfterOccurrences.set(count)"
+        >
+          {{ count }}
+        </ion-chip>
+      }
+    </div>
+
+    <ion-note class="summary">{{ recurrenceSummary() }}</ion-note>
+  }
+
+  <div class="mh-section-label">Where</div>
+  <div class="tiles two">
+    @for (option of locationOptions; track option.value) {
+      <button
+        type="button"
+        class="tile"
+        [class.selected]="locationKind() === option.value"
+        (click)="locationKind.set(option.value)"
+      >
+        <ion-icon [name]="option.icon" aria-hidden="true" />
+        <span>{{ option.label }}</span>
+      </button>
+    }
+  </div>
+
+  @if (isOnline()) {
+    <ion-input
+      fill="outline"
+      type="url"
+      inputmode="url"
+      placeholder="https://meet.google.com/…"
+      [value]="meetingUrl()"
+      (ionInput)="meetingUrl.set($event.detail.value ?? '')"
+    />
+    <p class="mh-helper">Signups see this link once they're confirmed.</p>
+  } @else if (venues().length > 0) {
+    <ion-item lines="none" class="field">
+      <ion-select
+        label="Venue"
+        interface="action-sheet"
+        placeholder="No venue"
+        [value]="venueId()"
+        (ionChange)="venueId.set($event.detail.value)"
+      >
+        <ion-select-option [value]="null">No venue</ion-select-option>
+        @for (venue of venues(); track venue.id) {
+          <ion-select-option [value]="venue.id">{{ venue.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+  }
+
+  <div class="mh-section-label">Capacity &amp; price</div>
+  <div class="pair">
+    @if (showCapacity()) {
+      <ion-input
+        fill="outline"
+        type="number"
+        inputmode="numeric"
+        label="Spots"
+        labelPlacement="stacked"
+        [value]="capacity()"
+        (ionInput)="capacity.set(toNumber($event.detail.value))"
+      />
+    }
+    <ion-input
+      fill="outline"
+      type="number"
+      inputmode="decimal"
+      label="Price"
+      labelPlacement="stacked"
+      placeholder="0"
+      [value]="priceAmount()"
+      (ionInput)="priceAmount.set(toNumber($event.detail.value))"
+    />
+  </div>
+  <p class="mh-helper">
+    Price is shown to signups. Taking payment isn't wired up yet, so nothing is charged.
+  </p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="New session"
+  saveLabel="Create session"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.95]"
+  [initialBreakpoint]="0.95"
+  (save)="save()"
+/>

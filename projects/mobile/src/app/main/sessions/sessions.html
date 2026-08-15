@@ -1,13 +1,198 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Manage sessions</ion-title>
+    <ion-title>Sessions</ion-title>
+    <ion-buttons slot="end">
+      <ion-button aria-label="New session" (click)="openCreate()">
+        <ion-icon slot="icon-only" name="add-outline" />
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  @if (showChrome()) {
+    <ion-toolbar>
+      <!-- Summary first, then the strip: the numbers answer "how busy am I",
+           the strip answers "when". -->
+      <div class="summary">
+        <span><b>{{ totalThisWindow() }}</b> upcoming</span>
+        <span class="sep">·</span>
+        <span><b>{{ signupCount() }}</b> signups</span>
+        @if (conflictCount() > 0) {
+          <span class="sep">·</span>
+          <span class="conflict">{{ conflictCount() }} conflict</span>
+        }
+      </div>
+
+      <!-- Two rows: three controls do not fit one 402px line without the
+           month label truncating. -->
+      <div class="controls">
+        <button type="button" class="month" (click)="openMonth()">
+          {{ monthLabel() }}
+          <ion-icon name="chevron-forward" aria-hidden="true" />
+        </button>
+        <button type="button" class="today" (click)="goToday()">Today</button>
+        <ion-chip
+          [outline]="filterCount() === 0"
+          [color]="filterCount() > 0 ? 'primary' : 'medium'"
+          (click)="openFilters()"
+        >
+          Filters@if (filterCount() > 0) { · {{ filterCount() }} }
+        </ion-chip>
+        @if (filterCount() > 0) {
+          <ion-chip [outline]="true" color="medium" (click)="clearFilters()">Clear</ion-chip>
+        }
+      </div>
+
+      <div class="view-row">
+        <ion-segment
+          class="view"
+          [value]="view()"
+          (ionChange)="setView($event.detail.value)"
+        >
+          <ion-segment-button value="agenda"><ion-label>Agenda</ion-label></ion-segment-button>
+          <ion-segment-button value="day"><ion-label>Day</ion-label></ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <div class="week">
+        @for (day of weekDays(); track day.key) {
+          <button
+            type="button"
+            class="day"
+            [class.today]="day.isToday"
+            [class.selected]="day.key === selectedDayKey()"
+            (click)="pickDay(day.date_)"
+          >
+            <span class="initial">{{ day.initial }}</span>
+            <span class="date">{{ day.date }}</span>
+            <span class="dots">
+              @for (dot of day.dots; track $index) {
+                <i></i>
+              }
+            </span>
+          </button>
+        }
+      </div>
+    </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <mh-empty-state
-    icon="calendar-outline"
-    heading="Sessions are coming"
-    message="Scheduling, signups and attendance will live here."
-  />
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Sessions</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load your sessions"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
+    <!-- Mirrors the agenda row shape so nothing shifts when data lands. -->
+    <ion-list class="agenda">
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none" class="skeleton">
+          <div slot="start" class="when">
+            <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.9rem" />
+          </div>
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="calendar-outline"
+      heading="No sessions scheduled"
+      message="Create your first session and it will show up here, with signups and reminders handled for you."
+      actionLabel="New session"
+      (action)="openCreate()"
+    />
+  } @else if (isFilteredEmpty()) {
+    <mh-empty-state
+      icon="calendar-outline"
+      heading="Nothing matches"
+      message="No sessions in this range match the filters you set."
+      actionLabel="Clear filters"
+      (action)="clearFilters()"
+    />
+  } @else if (view() === 'day') {
+    <div class="day-heading">
+      <span class="mh-kicker">{{ selectedDayLabel() }}</span>
+      <ion-note>
+        {{ dayInstances().length }}
+        {{ dayInstances().length === 1 ? 'session' : 'sessions' }}
+      </ion-note>
+    </div>
+    <mh-day-rail
+      [instances]="dayInstances()"
+      (select)="open($event)"
+      (pickHour)="createAt($event)"
+    />
+  } @else {
+    <div class="agenda">
+      @for (day of days(); track day.key) {
+        <div class="day-header" [class.today]="day.isToday">
+          <span class="mh-kicker">{{ day.label }}</span>
+          <ion-note>
+            {{ day.instances.length }}
+            {{ day.instances.length === 1 ? 'session' : 'sessions' }}
+            @if (day.conflicts > 0) {
+              <span class="conflict">· {{ day.conflicts }} conflict</span>
+            }
+          </ion-note>
+        </div>
+
+        @for (instance of day.instances; track instance.id) {
+          <mh-session-row
+            [instance]="instance"
+            (select)="open(instance)"
+            (longPress)="openQuickActions(instance)"
+          />
+        }
+      }
+    </div>
+  }
+
+  <!-- The header button is the discoverable route in; the FAB is the one your
+       thumb can reach after scrolling. -->
+  @if (showChrome()) {
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+      <ion-fab-button aria-label="New session" (click)="openCreate()">
+        <ion-icon name="add-outline" />
+      </ion-fab-button>
+    </ion-fab>
+  }
 </ion-content>
+
+<mh-session-form-sheet
+  [(open)]="createOpen"
+  [initialStart]="createStart()"
+  (created)="onCreated()"
+/>
+
+<mh-message-signups-sheet [(open)]="messageOpen" [instanceId]="messageInstanceId()" />
+
+<mh-session-filter-sheet
+  [(open)]="filterOpen"
+  [filters]="filters()"
+  (applied)="onFiltersApplied($event)"
+/>
+
+<mh-month-sheet
+  [(open)]="monthOpen"
+  [instances]="store.rangeInstances()"
+  [anchor]="selectedDay()"
+  (daySelected)="pickDay($event)"
+  (monthChanged)="onMonthChanged($event)"
+/>

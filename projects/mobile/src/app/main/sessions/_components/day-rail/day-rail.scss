@@ -1,0 +1,107 @@
+/* An hour rail is absolute positioning by nature — a block's offset and height
+   encode its start and duration. Ionic has no primitive for this. */
+
+.warning {
+  display: block;
+  padding: 0 1.5rem 0.5rem;
+  color: var(--ion-color-danger);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.rail {
+  position: relative;
+  margin: 0 1.25rem 6rem;
+}
+
+/* The row is the tap target for creating at that hour, so it is a button —
+   blocks sit above it and take their own taps. */
+.hour {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.hour .label {
+  width: 2.75rem;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  /* Nudged up so the label sits on its gridline rather than under it. */
+  transform: translateY(-0.35rem);
+}
+
+.hour .line {
+  flex: 1;
+  height: 1px;
+  margin-top: -1px;
+  background: var(--ion-border-color);
+}
+
+/* Blocks live to the right of the hour-label gutter, so their width and offset
+   are fractions of what is left over — not of the whole rail, which would
+   overflow by the gutter width. */
+.block {
+  --gutter: 3.25rem;
+  position: absolute;
+  left: calc(var(--gutter) + (100% - var(--gutter)) * var(--col-left) / 100%);
+  width: calc((100% - var(--gutter)) * var(--col-width) / 100% - 0.375rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  overflow: hidden;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-left: 3px solid var(--spine);
+  border-radius: 0.25rem var(--mh-radius-control) var(--mh-radius-control) 0.25rem;
+  background: var(--ion-card-background);
+  text-align: start;
+}
+
+.block[data-tone='honey'] {
+  --spine: var(--ion-color-primary);
+}
+.block[data-tone='teal'] {
+  --spine: var(--ion-color-teal);
+}
+.block[data-tone='navy'] {
+  --spine: var(--ion-color-info);
+}
+.block[data-tone='coral'] {
+  --spine: var(--ion-color-danger);
+  box-shadow: 0 0 0 2px rgb(var(--ion-color-danger-rgb) / 0.28);
+}
+
+.block[data-tone='muted'] {
+  --spine: var(--ion-color-medium);
+}
+
+.block .title {
+  overflow: hidden;
+  width: 100%;
+  color: var(--ion-text-color);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.block .time {
+  color: var(--ion-color-medium);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.block ion-badge {
+  margin-top: 0.1rem;
+  font-size: 0.55rem;
+  text-transform: none;
+}

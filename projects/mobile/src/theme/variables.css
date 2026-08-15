@@ -64,6 +64,20 @@
   --mh-chip-success-background: #d1fae5;
   --mh-chip-success-color: #047857;
 
+  /* The fill behind a selected chip, tile or day. Pairs with honey-deep ink. */
+  --mh-chip-warning-background: #fff7ed;
+
+  /*
+   * Corner radius, three steps and a pill.
+   *
+   * Ionic's form controls default to 4px, which reads as a different design
+   * language next to a 12px tile — so every control is pinned to `control`
+   * in styles.css and components use these rather than their own numbers.
+   */
+  --mh-radius-control: 0.75rem;
+  --mh-radius-card: 1rem;
+  --mh-radius-pill: 999px;
+
   /* Primary — Honey Amber (primary[500]) */
   --ion-color-primary: #f59e0b;
   --ion-color-primary-rgb: 245, 158, 11;
@@ -229,6 +243,7 @@
   --mh-color-divider: #162b48;
 
   /* Chips invert: deep fill, light ink (scale steps 900 + 200). */
+  --mh-chip-warning-background: #422006;
   --mh-chip-info-background: #0c4a6e;
   --mh-chip-info-color: #bae6fd;
   --mh-chip-success-background: #064e3b;

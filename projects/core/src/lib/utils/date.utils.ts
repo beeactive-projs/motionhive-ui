@@ -33,3 +33,13 @@ export function sameDay(a: Date, b: Date): boolean {
     a.getDate() === b.getDate()
   );
 }
+
+/**
+ * Local calendar day as `yyyy-mm-dd`. Not `iso.slice(0, 10)` — that is the UTC
+ * day, so west of Greenwich an evening lands on tomorrow's key.
+ */
+export function localDayKey(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}

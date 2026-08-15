@@ -6,6 +6,8 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonItem,
   IonLabel,
   IonList,
@@ -18,6 +20,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  InfiniteScrollCustomEvent,
   RefresherCustomEvent,
   SegmentCustomEvent,
   ViewWillEnter,
@@ -27,6 +30,7 @@ import { addIcons } from 'ionicons';
 import { InboxFilter, MessagingStore, UserSearchResult, displayName } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { FeedbackService } from '../../_shared/services/feedback.service';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { AvatarTone, avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
@@ -57,6 +61,8 @@ import { MESSAGING_ICONS } from './messages.config';
     IonContent,
     IonHeader,
     IonIcon,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     IonItem,
     IonLabel,
     IonList,
@@ -77,6 +83,7 @@ import { MESSAGING_ICONS } from './messages.config';
 export class Messages implements ViewWillEnter {
   readonly store = inject(MessagingStore);
   private readonly _router = inject(Router);
+  private readonly _feedbackService = inject(FeedbackService);
 
   readonly people = injectPeopleSearch();
 
@@ -105,6 +112,9 @@ export class Messages implements ViewWillEnter {
   /** First load only. Once rows exist, a refresh happens under them. */
   readonly showSkeleton = computed(() => this.store.loading() && !this.store.hasLoaded());
 
+  /** Nothing loaded and the last attempt failed — the only state that offers a retry. */
+  readonly showLoadError = computed(() => this.store.loadFailed() && !this.store.hasLoaded());
+
   readonly isEmpty = computed(
     () =>
       this.store.hasLoaded() &&
@@ -125,7 +135,10 @@ export class Messages implements ViewWillEnter {
   readonly showFlatList = computed(
     () =>
       this.showSkeleton() ||
-      (!this.people.isActive() && !this.isEmpty() && !this.isFilteredEmpty()),
+      (!this.people.isActive() &&
+        !this.showLoadError() &&
+        !this.isEmpty() &&
+        !this.isFilteredEmpty()),
   );
 
   constructor() {
@@ -181,6 +194,28 @@ export class Messages implements ViewWillEnter {
 
   openCompose(): void {
     this.store.enterComposeMode();
+  }
+
+  onLoadMore(event: InfiniteScrollCustomEvent): void {
+    this.store.loadMoreConversations({ done: () => void event.target.complete() });
+  }
+
+  markRead(id: string): void {
+    this.store.markReadOnEntry(id);
+  }
+
+  async toggleMute(id: string): Promise<void> {
+    const wasMuted = this.store.conversations().find((c) => c.id === id)?.muted ?? false;
+    const ok = await this.store.toggleMute(id);
+    if (!ok) {
+      void this._feedbackService.error(null, 'Could not update notifications.');
+      return;
+    }
+    void this._feedbackService.success(wasMuted ? 'Unmuted' : 'Muted');
+  }
+
+  retry(): void {
+    this.store.loadConversations({ force: true });
   }
 
   onRefresh(event: RefresherCustomEvent): void {

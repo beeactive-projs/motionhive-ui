@@ -1,0 +1,250 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/sessions" />
+    </ion-buttons>
+    <ion-title>{{ title() }}</ion-title>
+    @if (instance()) {
+      <ion-buttons slot="end">
+        <ion-button aria-label="Session actions" (click)="openActions()">
+          <ion-icon slot="icon-only" name="ellipsis-horizontal" />
+        </ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (store.error(); as error) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load this session"
+      [message]="error"
+      actionLabel="Try again"
+      (action)="store.reload()"
+    />
+  } @else if (store.loading() && !instance()) {
+    <div class="band skeleton-band"></div>
+    <div class="body">
+      <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.4rem" />
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item lines="full">
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  } @else if (instance()) {
+    <!-- The band is the screen's one piece of colour, keyed to where the
+         session happens and whether it still stands. -->
+    <div
+      class="band"
+      [class.online]="isOnline()"
+      [class.past]="lifecycle() === 'past'"
+      [class.cancelled]="isCancelled()"
+    >
+      <div class="chips">
+        @if (isCancelled()) {
+          <ion-badge color="danger">Cancelled</ion-badge>
+        } @else if (lifecycle() === 'ongoing') {
+          <ion-badge color="success">Live now</ion-badge>
+        }
+        <ion-badge color="light">{{ isOnline() ? 'Online' : 'In-person' }}</ion-badge>
+        @if (recurrenceLabel(); as repeats) {
+          <ion-badge color="light">{{ repeats }}</ion-badge>
+        }
+      </div>
+    </div>
+
+    <div class="body">
+      <h1>{{ title() }}</h1>
+
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item lines="full">
+          <ion-icon slot="start" name="calendar-outline" color="medium" aria-hidden="true" />
+          <ion-label>
+            <h3>{{ dayLabel() }}</h3>
+            @if (recurrenceLabel(); as repeats) {
+              <p>{{ repeats }}</p>
+            }
+          </ion-label>
+        </ion-item>
+
+        <ion-item lines="full">
+          <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+          <ion-label>
+            <h3>{{ timeRange() }}</h3>
+            <p>{{ durationLabel() }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon
+            slot="start"
+            [name]="isOnline() ? 'videocam-outline' : 'location-outline'"
+            color="primary"
+            aria-hidden="true"
+          />
+          <ion-label>
+            <h3>{{ locationLabel() }}</h3>
+            @if (isOnline() && meetingUrl()) {
+              <p class="url">{{ meetingUrl() }}</p>
+            }
+          </ion-label>
+          @if (isOnline() && meetingUrl(); as url) {
+            <ion-button slot="end" fill="outline" size="small" [href]="url" target="_blank">
+              Join
+            </ion-button>
+          }
+        </ion-item>
+      </ion-list>
+
+      <div class="mh-section-label">Spots</div>
+      <div class="spots">
+        <ion-progress-bar [value]="fillPercent() / 100" />
+        <span class="count">{{ spotsLabel() }}</span>
+      </div>
+
+      <div class="mh-section-label">
+        Attendees
+        @if (counts().pending > 0) {
+          <ion-badge color="warning">{{ counts().pending }} pending</ion-badge>
+        }
+      </div>
+
+      @if (lifecycle() !== 'upcoming' && attendees().length > 0) {
+        <ion-note class="mh-note-block">Tick who turned up. Tap a name for their profile.</ion-note>
+      }
+
+      @if (attendees().length === 0) {
+        <ion-note class="mh-note-block">Nobody has signed up yet.</ion-note>
+      } @else {
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (participant of attendees(); track participant.id) {
+            <ion-item
+              lines="full"
+              [button]="hasProfile(participant)"
+              [detail]="hasProfile(participant) && !canMarkAttendance()"
+              (click)="openProfile(participant)"
+            >
+              <mh-hex-avatar
+                slot="start"
+                size="md"
+                aria-hidden="true"
+                [name]="nameOf(participant)"
+                [imageUrl]="participant.user?.avatarUrl ?? null"
+                [color]="toneFor(participant)"
+              />
+              <ion-label>
+                <h3>{{ nameOf(participant) }}</h3>
+              </ion-label>
+
+              @if (isPending(participant)) {
+                <ion-buttons slot="end">
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    color="medium"
+                    [disabled]="store.isParticipantBusy(participant.id)"
+                    (click)="decline(participant); $event.stopPropagation()"
+                  >
+                    Decline
+                  </ion-button>
+                  <ion-button
+                    fill="solid"
+                    size="small"
+                    color="primary"
+                    [disabled]="store.isParticipantBusy(participant.id)"
+                    (click)="approve(participant); $event.stopPropagation()"
+                  >
+                    Approve
+                  </ion-button>
+                </ion-buttons>
+              } @else if (canMarkAttendance()) {
+                <ion-checkbox
+                  slot="end"
+                  aria-label="Attended"
+                  [checked]="participant.attended === true"
+                  [disabled]="store.isParticipantBusy(participant.id)"
+                  (ionChange)="setAttendance(participant, $event.detail.checked)"
+                  (click)="$event.stopPropagation()"
+                />
+              } @else {
+                <ion-badge slot="end" [color]="statusColor(participant)">
+                  {{ statusLabel(participant) }}
+                </ion-badge>
+              }
+            </ion-item>
+          }
+        </ion-list>
+      }
+
+      @if (waitlist().length > 0) {
+        <div class="mh-section-label">
+          Waitlist
+          <ion-badge color="medium">{{ waitlist().length }}</ion-badge>
+        </div>
+
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (participant of waitlist(); track participant.id; let i = $index) {
+            <ion-item lines="full">
+              <span slot="start" class="queue">{{ i + 1 }}</span>
+              <ion-label>
+                <h3>{{ nameOf(participant) }}</h3>
+                <p>Waiting since {{ waitingSince(participant) }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+
+        <ion-note class="mh-note-block">
+          The next in line is moved in automatically when someone cancels, up to
+          two hours before the start.
+        </ion-note>
+
+        <div class="waitlist-action">
+          <ion-button expand="block" fill="outline" (click)="messageWaitlist()">
+            Message waitlist
+          </ion-button>
+        </div>
+      }
+    </div>
+  }
+</ion-content>
+
+@if (instance() && showCta()) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <div class="cta">
+        @if (price(); as amount) {
+          <div class="price">
+            <strong>{{ amount }}</strong>
+            <span>per spot</span>
+          </div>
+        }
+        <ion-button expand="block" class="action" (click)="messageSignups()">
+          Message signups
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}
+
+<mh-message-signups-sheet
+  [(open)]="messageOpen"
+  [instanceId]="instance()?.id ?? null"
+  [audience]="messageAudience()"
+  [userIds]="messageRecipients()"
+  [recipientLabel]="messageLabel()"
+/>
+
+<mh-cancel-session-sheet
+  [(open)]="cancelOpen"
+  [instance]="instance()"
+  [template]="template()"
+  (cancelled)="onCancelled()"
+/>

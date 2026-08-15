@@ -6,10 +6,24 @@
   min-width: 0;
 }
 
+.peer .who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
 .peer .name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.peer .handle {
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
 }
 
 /* Bubbles are the cards here, so the thread sits on the page background. */
@@ -29,7 +43,7 @@
 /* The date pill. */
 .day span {
   padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--mh-radius-pill);
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
   font-family: var(--mh-font-mono);

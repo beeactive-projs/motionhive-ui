@@ -1,0 +1,94 @@
+/* Selectable tiles. `ion-segment` is the near-miss here — it is a single row of
+   text, and these carry an icon over a label in a grid. */
+.tiles {
+  display: grid;
+  gap: 0.4375rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiles.three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.tiles.two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.625rem 0.25rem;
+  border: 1.5px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-card-background);
+  color: var(--ion-color-medium);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.tile.selected {
+  border-color: var(--ion-color-primary);
+  background: var(--mh-chip-warning-background);
+  color: var(--mh-color-honey-deep);
+  font-weight: 600;
+}
+
+.tile ion-icon {
+  font-size: 1.05rem;
+}
+
+/* Weekday circles. */
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.day {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-medium);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.day.selected {
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+}
+
+.summary {
+  display: block;
+  padding: 0 0.25rem 0.5rem;
+  font-size: 0.72rem;
+}
+
+/* Rows that behave as fields rather than list items. */
+.field {
+  --background: var(--ion-card-background);
+  --padding-start: 0.8125rem;
+  --inner-padding-end: 0.8125rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+}
+
+/* Auto-flow, not `1fr 1fr`: a 1-on-1 hides the Spots field and a fixed
+   two-column grid would leave the gap behind. */
+.pair {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.4375rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}

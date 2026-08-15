@@ -48,7 +48,7 @@ ion-badge {
   --background: var(--mh-chip-success-background);
   --color: var(--mh-chip-success-color);
 
-  border-radius: 999px;
+  border-radius: var(--mh-radius-pill);
   font-size: 0.625rem;
 }
 

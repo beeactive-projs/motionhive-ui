@@ -1,4 +1,5 @@
 import { DOCUMENT, Service, computed, effect, inject, signal } from '@angular/core';
+import { Style, StatusBar } from '@capacitor/status-bar';
 
 export const ThemePreferences = {
   Light: 'light',
@@ -31,7 +32,14 @@ export class ThemeService {
   constructor() {
     this._systemDarkQuery.addEventListener('change', (event) => this._systemDark.set(event.matches));
     effect(() => {
-      this._document.documentElement.classList.toggle('ion-palette-dark', this.isDark());
+      const isDark = this.isDark();
+      this._document.documentElement.classList.toggle('ion-palette-dark', isDark);
+      // The status bar sits outside the WebView, so the palette class cannot
+      // reach it — switching to dark in-app otherwise leaves black icons on a
+      // navy toolbar. `Style.Dark` means "light content", i.e. for a dark bar.
+      void StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light }).catch(() => {
+        // Not a native platform.
+      });
     });
   }
 

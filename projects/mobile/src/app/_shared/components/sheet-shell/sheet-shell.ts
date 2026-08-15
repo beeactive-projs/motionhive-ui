@@ -57,6 +57,8 @@ export class SheetShell {
   /** The sheet's fields, declared by the consumer as `<ng-template #body>`. */
   readonly body = input.required<TemplateRef<unknown>>();
   readonly saveLabel = input('Save');
+  /** Ionic palette name for the confirm button — `danger` for destructive sheets. */
+  readonly saveColor = input('primary');
   readonly canSave = input(true);
   readonly saving = input(false);
   /** Off for the sheets that are a list of actions rather than a form. */

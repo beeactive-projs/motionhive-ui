@@ -78,6 +78,8 @@ export interface UserSearchResult {
   firstName: string | null;
   lastName: string | null;
   avatarUrl: string | null;
+  /** Null until the user picks one. Addresses their public profile. */
+  handle: string | null;
 }
 
 /**

@@ -43,6 +43,7 @@ import { MESSAGING_ICONS } from '../../messages.config';
     SheetShell,
   ],
   templateUrl: './new-message-sheet.html',
+  styleUrl: './new-message-sheet.scss',
 })
 export class NewMessageSheet {
   private readonly _router = inject(Router);

@@ -1,0 +1,197 @@
+/* Summary line above the week strip. */
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0 1.25rem 0.5rem;
+  color: var(--ion-color-medium);
+  font-size: 0.75rem;
+}
+
+.summary b {
+  color: var(--ion-text-color);
+  font-weight: 700;
+}
+
+.summary .sep {
+  color: var(--ion-color-medium-tint);
+}
+
+.conflict {
+  color: var(--ion-color-danger);
+  font-weight: 600;
+}
+
+/* Week strip. A seven-column grid is the shape; Ionic's grid is for page
+   layout and brings gutters this does not want. */
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.125rem;
+  padding: 0 1.25rem 0.625rem;
+}
+
+.week .day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0;
+  border: none;
+  border-radius: var(--mh-radius-control);
+  background: transparent;
+}
+
+.week .day.today {
+  background: var(--ion-color-primary);
+}
+
+.week .initial {
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.week .date {
+  font-family: var(--mh-font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.week .day.today .initial,
+.week .day.today .date {
+  color: var(--ion-color-primary-contrast);
+}
+
+/* Density dots — how busy a day is, without a number. */
+.week .dots {
+  display: flex;
+  gap: 0.1rem;
+  height: 0.25rem;
+}
+
+.week .dots i {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-color-primary);
+}
+
+.week .day.today .dots i {
+  background: var(--ion-color-primary-contrast);
+}
+
+.agenda {
+  padding: 0 1.25rem 6rem;
+}
+
+/* Sticky so the day you are reading stays labelled while you scroll it. */
+.day-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.75rem 0 0.5rem;
+  background: var(--ion-background-color);
+}
+
+.day-header .mh-kicker {
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+}
+
+.day-header.today .mh-kicker {
+  color: var(--mh-color-honey-deep);
+}
+
+.day-header ion-note {
+  font-size: 0.68rem;
+}
+
+.skeleton {
+  --background: var(--ion-card-background);
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}
+
+/* Month label, Today, and the agenda/day toggle. */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0 1.25rem 0.5rem;
+}
+
+.controls .month {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: start;
+  white-space: nowrap;
+}
+
+.controls .month ion-icon {
+  font-size: 0.75rem;
+  /* Points down: this opens a sheet below, not a forward navigation. */
+  transform: rotate(90deg);
+}
+
+.controls .today {
+  padding: 0.3rem 0.7rem;
+  border: none;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-dark);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* The toggle gets its own row and spans it — a full-width segment is the
+   Ionic idiom, and it stops the month label being squeezed out. */
+.view-row {
+  padding: 0 1.25rem 0.625rem;
+}
+
+.view-row .view {
+  --background: var(--mh-color-divider);
+}
+
+.view-row .view ion-segment-button {
+  min-height: 1.85rem;
+  font-size: 0.72rem;
+}
+
+
+/* A tapped day that is not today still needs to read as chosen. */
+.week .day.selected:not(.today) {
+  background: var(--mh-chip-warning-background);
+}
+
+.day-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.75rem 1.5rem 0.5rem;
+}
+
+.day-heading .mh-kicker {
+  color: var(--mh-color-honey-deep);
+  text-transform: uppercase;
+}
+
+.day-heading ion-note {
+  font-size: 0.68rem;
+}

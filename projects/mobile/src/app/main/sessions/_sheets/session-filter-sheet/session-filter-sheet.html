@@ -1,0 +1,67 @@
+<ng-template #body>
+  <ion-searchbar
+    placeholder="Search sessions"
+    inputmode="search"
+    [debounce]="0"
+    [value]="draft().q"
+    (ionInput)="setQuery($event.detail.value ?? '')"
+  />
+
+  <div class="mh-section-label">Type</div>
+  <div class="chips">
+    @for (option of typeOptions; track option.value) {
+      <ion-chip
+        [outline]="draft().type !== option.value"
+        [color]="draft().type === option.value ? 'primary' : 'medium'"
+        [attr.aria-pressed]="draft().type === option.value"
+        (click)="toggleType(option.value)"
+      >
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Where</div>
+  <div class="chips">
+    @for (option of locationOptions; track option.value) {
+      <ion-chip
+        [outline]="draft().locationKind !== option.value"
+        [color]="draft().locationKind === option.value ? 'primary' : 'medium'"
+        [attr.aria-pressed]="draft().locationKind === option.value"
+        (click)="toggleLocation(option.value)"
+      >
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Only show</div>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="none">
+      <ion-toggle
+        justify="space-between"
+        [checked]="draft().conflictsOnly"
+        (ionChange)="setConflictsOnly($event.detail.checked)"
+      >
+        <ion-label>
+          <h3>Overlapping sessions</h3>
+          <p>Sessions that clash with another booking.</p>
+        </ion-label>
+      </ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  @if (count() > 0) {
+    <ion-note class="mh-note-block clear" (click)="clear()">Clear all filters</ion-note>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Filters"
+  [saveLabel]="count() > 0 ? 'Apply · ' + count() : 'Apply'"
+  [body]="body"
+  [breakpoints]="[0, 0.8]"
+  [initialBreakpoint]="0.8"
+  (save)="apply()"
+/>

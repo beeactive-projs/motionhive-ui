@@ -28,6 +28,12 @@ export const messagesRoutes: Routes = [
     data: { hideTabBar: true },
   },
   {
+    // Before `:id`, or the parameterised route swallows "person".
+    path: 'person/:handle',
+    loadComponent: () => import('../person/person').then((m) => m.Person),
+    title: 'Profile - MotionHive',
+  },
+  {
     path: ':id',
     loadComponent: () => import('./chat/chat').then((m) => m.Chat),
     title: 'Chat - MotionHive',

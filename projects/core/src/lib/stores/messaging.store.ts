@@ -63,6 +63,9 @@ export type InboxFilter = 'all' | 'unread' | 'groups' | 'coaches';
  */
 const AUTO_LOAD_DEDUP_WINDOW_MS = 5_000;
 
+/** Conversations per request. The first page is also the refresh page. */
+const CONVERSATION_PAGE_SIZE = 50;
+
 /**
  * How many messages to fetch per page — both the first load and each
  * scroll-up "load earlier". Kept small so the first paint is fast on mobile;
@@ -113,6 +116,15 @@ export class MessagingStore {
   private readonly _conversations = signal<ConversationListItem[]>([]);
   private readonly _loading = signal(false);
   private readonly _hasLoaded = signal(false);
+  /**
+   * True when the last conversation fetch failed and we have nothing to show.
+   * A failed *refresh* over existing rows leaves this false — the stale list is
+   * better than an error page, and the rows are still usable.
+   */
+  private readonly _loadFailed = signal(false);
+  /** Server-reported total, for deciding whether another page exists. */
+  private readonly _total = signal(0);
+  private readonly _loadingMore = signal(false);
   private readonly _activeId = signal<string | null>(null);
   private readonly _filter = signal<InboxFilter>('all');
   private readonly _searchQuery = signal<string>('');
@@ -226,6 +238,10 @@ export class MessagingStore {
   readonly conversations = this._conversations.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly hasLoaded = this._hasLoaded.asReadonly();
+  readonly loadFailed = this._loadFailed.asReadonly();
+  readonly loadingMore = this._loadingMore.asReadonly();
+  /** Another page exists on the server. */
+  readonly hasMore = computed(() => this._conversations().length < this._total());
   readonly activeId = this._activeId.asReadonly();
   readonly filter = this._filter.asReadonly();
   readonly searchQuery = this._searchQuery.asReadonly();
@@ -947,6 +963,47 @@ export class MessagingStore {
   // ─── Data actions ─────────────────────────────────────────────
 
   /**
+   * Append the next page of conversations.
+   *
+   * Separate from `loadConversations` on purpose: that one *replaces* the list
+   * and is what a refresh, a login and the SSE reconciler all call. Appending
+   * through it would fight every one of them.
+   *
+   * `done` always fires so an infinite-scroll spinner cannot hang.
+   */
+  loadMoreConversations(opts: { done?: () => void } = {}): void {
+    const done = opts.done ?? (() => undefined);
+
+    if (this._loading() || this._loadingMore() || !this.hasMore()) {
+      done();
+      return;
+    }
+
+    // Page from what we hold rather than a counter: SSE inserts and removals
+    // change the list under us, and a stale page number would skip or repeat.
+    const nextPage = Math.floor(this._conversations().length / CONVERSATION_PAGE_SIZE) + 1;
+    this._loadingMore.set(true);
+
+    this._api
+      .listConversations(nextPage, CONVERSATION_PAGE_SIZE)
+      .pipe(
+        tap((page) => {
+          this._total.set(page.total);
+          this._conversations.update((current) => {
+            const seen = new Set(current.map((c) => c.id));
+            return [...current, ...page.items.filter((c) => !seen.has(c.id))];
+          });
+        }),
+        catchError(() => EMPTY),
+        finalize(() => {
+          this._loadingMore.set(false);
+          done();
+        }),
+      )
+      .subscribe();
+  }
+
+  /**
    * Refresh the conversation list. Idempotent in three ways:
    *   - Skipped if a request is already in flight.
    *   - Skipped if we loaded within the dedup window AND this isn't
@@ -985,11 +1042,13 @@ export class MessagingStore {
     this._loading.set(true);
 
     this._api
-      .listConversations(1, 50)
+      .listConversations(1, CONVERSATION_PAGE_SIZE)
       .pipe(
         tap((page) => {
           this._conversations.set(page.items);
+          this._total.set(page.total);
           this._hasLoaded.set(true);
+          this._loadFailed.set(false);
           // Clear any prior 429 window on a successful load.
           this.rateLimitedUntilAt = 0;
         }),
@@ -1010,6 +1069,9 @@ export class MessagingStore {
           return throwError(() => err);
         }),
         catchError(() => {
+          // Only an empty inbox needs an error screen; a failed refresh keeps
+          // the rows it already has.
+          if (!this._hasLoaded()) this._loadFailed.set(true);
           // Final safety net so the signal doesn't get stuck loading
           // if an unexpected error escapes.
           return EMPTY;

@@ -15,6 +15,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { Keyboard } from '@capacitor/keyboard';
 import { addIcons } from 'ionicons';
 
 import {
@@ -101,6 +102,8 @@ export class Chat implements ViewWillLeave {
 
   readonly avatarUrl = computed(() => this.otherUser()?.avatarUrl ?? null);
 
+  readonly handle = computed(() => this.otherUser()?.handle ?? null);
+
   /** Who a send addresses — the thread's other participant, or the draft target. */
   readonly recipientId = computed(
     () => this.otherUser()?.id ?? this._draftRecipientId(),
@@ -183,6 +186,8 @@ export class Chat implements ViewWillLeave {
         this._draftRecipientName.set(params.get('name') ?? '');
       });
 
+    this._watchKeyboard();
+
     // A thread grows at both ends: new messages at the bottom, history at the
     // top when "load earlier" fetches a page. Only the first should move the
     // view — scrolling down after a prepend throws the reader back to the
@@ -242,6 +247,24 @@ export class Chat implements ViewWillLeave {
   }
 
   /**
+   * Follow the thread when the keyboard opens.
+   *
+   * `resize: 'body'` shrinks the viewport and the composer rides up with it,
+   * but nothing re-anchors the scroll — so the message you were replying to
+   * ends up behind the keyboard. The scroll effect cannot cover this: opening a
+   * keyboard is not a change to the message list.
+   */
+  private _watchKeyboard(): void {
+    // No Keyboard plugin on the web build, where the browser handles this
+    // itself — the listener is native-only and its absence is not an error.
+    const listener = Keyboard.addListener('keyboardDidShow', () => {
+      void this._content()?.scrollToBottom(0);
+    }).catch(() => null);
+
+    this._destroyRef.onDestroy(() => void listener.then((handle) => handle?.remove()));
+  }
+
+  /**
    * The store treats the active conversation as "on screen": it holds back the
    * unread count and marks incoming messages read. Leaving has to clear that,
    * or messages that arrive after you walk away are read on your behalf and
@@ -268,6 +291,11 @@ export class Chat implements ViewWillLeave {
       this._heightBeforeOlder = (await content.getScrollElement()).scrollHeight;
     }
     this.store.loadOlderMessages(id);
+  }
+
+  openProfile(): void {
+    const handle = this.handle();
+    if (handle) void this._router.navigate(['/tabs/messages/person', handle]);
   }
 
   openDetails(): void {

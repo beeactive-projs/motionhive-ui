@@ -1,0 +1,35 @@
+<ng-template #body>
+  <ion-note class="mh-note-block">Goes to {{ recipientLabel() }}.</ion-note>
+
+  <ion-textarea
+    fill="outline"
+    [autoGrow]="true"
+    [rows]="4"
+    [maxlength]="2000"
+    [counter]="true"
+    placeholder="Write your message…"
+    [value]="message()"
+    (ionInput)="message.set($event.detail.value ?? '')"
+  />
+
+  <div class="mh-section-label">Quick fills</div>
+  <div class="suggestions">
+    @for (suggestion of suggestions; track suggestion) {
+      <button type="button" class="suggestion" (click)="use(suggestion)">
+        {{ suggestion }}
+      </button>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Message signups"
+  saveLabel="Send"
+  [body]="body"
+  [canSave]="canSend()"
+  [saving]="sending()"
+  [breakpoints]="[0, 0.7]"
+  [initialBreakpoint]="0.7"
+  (save)="send()"
+/>

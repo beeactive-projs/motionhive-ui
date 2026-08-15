@@ -1,0 +1,88 @@
+/* The row is a card with a coloured spine. `ion-item` has variables for its
+   padding and background but none for a per-row leading border or a stacked
+   start slot, so those two are written out. */
+
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+ion-item {
+  --background: var(--ion-card-background);
+  --border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.875rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-left: 3px solid var(--spine);
+  border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
+}
+
+/* Spine colour, from core's shared tone vocabulary. */
+:host([data-tone='honey']) ion-item {
+  --spine: var(--ion-color-primary);
+}
+:host([data-tone='teal']) ion-item {
+  --spine: var(--ion-color-teal);
+}
+:host([data-tone='navy']) ion-item {
+  --spine: var(--ion-color-info);
+}
+:host([data-tone='coral']) ion-item {
+  --spine: var(--ion-color-danger);
+  box-shadow: 0 0 0 2px rgb(var(--ion-color-danger-rgb) / 0.28);
+}
+
+:host([data-tone='muted']) ion-item {
+  --spine: var(--ion-color-medium);
+}
+
+.when {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 3rem;
+  margin-inline-end: 0.75rem;
+}
+
+.time {
+  font-family: var(--mh-font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  /* Times sit in a column; proportional digits make it wobble. */
+  font-variant-numeric: tabular-nums;
+}
+
+.duration {
+  margin-top: 0.05rem;
+  color: var(--ion-color-medium);
+  font-size: 0.62rem;
+  font-weight: 500;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  min-width: 0;
+}
+
+.tags ion-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.tags ion-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.68rem;
+}
+
+ion-label h2 {
+  font-family: var(--ion-font-family);
+  font-weight: 600;
+}

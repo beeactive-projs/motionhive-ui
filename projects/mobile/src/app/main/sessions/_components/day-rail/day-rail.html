@@ -1,0 +1,40 @@
+@if (conflictCount() > 0) {
+  <ion-note class="warning">
+    {{ conflictCount() }} {{ conflictCount() === 1 ? 'session overlaps' : 'sessions overlap' }} another.
+  </ion-note>
+}
+
+<div class="rail" [style.height.px]="railHeight()">
+  @for (hour of hours(); track hour.hour; let i = $index) {
+    <button
+      type="button"
+      class="hour"
+      [style.top.px]="i * hourHeight"
+      [style.height.px]="hourHeight"
+      [attr.aria-label]="'New session at ' + hour.label"
+      (click)="pickHour.emit(hour.hour)"
+    >
+      <span class="label">{{ hour.label }}</span>
+      <span class="line"></span>
+    </button>
+  }
+
+  @for (block of blocks(); track block.instance.id) {
+    <button
+      type="button"
+      class="block"
+      [attr.data-tone]="block.tone"
+      [style.top.px]="block.top"
+      [style.height.px]="block.height"
+      [style.--col-left]="block.leftPercent + '%'"
+      [style.--col-width]="block.widthPercent + '%'"
+      (click)="select.emit(block.instance)"
+    >
+      <span class="title">{{ block.title }}</span>
+      <span class="time">{{ block.time }}</span>
+      @if (block.hasConflict) {
+        <ion-badge color="danger">Overlap</ion-badge>
+      }
+    </button>
+  }
+</div>

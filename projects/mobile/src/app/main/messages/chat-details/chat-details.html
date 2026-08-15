@@ -17,7 +17,16 @@
       [color]="tone()"
     />
     <h1>{{ name() }}</h1>
+    @if (handle(); as tag) {
+      <ion-note class="handle">&#64;{{ tag }}</ion-note>
+    }
   </div>
+
+  @if (handle()) {
+    <ion-list [inset]="true" class="mh-card-list">
+      <mh-settings-row label="View profile" icon="person-outline" (select)="openProfile()" />
+    </ion-list>
+  }
 
   <div class="mh-section-label">Conversation</div>
   <ion-list [inset]="true" class="mh-card-list">

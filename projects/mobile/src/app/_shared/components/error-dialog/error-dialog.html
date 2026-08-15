@@ -1,0 +1,9 @@
+@if (error(); as info) {
+  <ion-alert
+    [isOpen]="isOpen()"
+    [header]="info.title"
+    [message]="info.message"
+    [buttons]="buttons"
+    (didDismiss)="dismiss()"
+  />
+}

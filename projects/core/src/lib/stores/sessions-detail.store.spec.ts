@@ -112,6 +112,15 @@ describe('SessionsDetailStore', () => {
 
   afterEach(() => httpMock.verify());
 
+  /**
+   * The store follows a successful load with a template fetch: the template
+   * nested on an instance is an allowlisted subset with no recurrence fields.
+   * Only issued once the forkJoin resolves, so flush it after both arms.
+   */
+  function flushTemplate(): void {
+    httpMock.expectOne(`${BASE}/sessions/templates/tmpl-1`).flush(fakeTemplate());
+  }
+
   function flushLoad(): void {
     const instReq = httpMock.expectOne(`${BASE}/sessions/instances/inst-1`);
     instReq.flush(fakeInstance());
@@ -128,6 +137,7 @@ describe('SessionsDetailStore', () => {
       page: 1,
       pageSize: 100,
     });
+    flushTemplate();
   }
 
   it('load() pulls instance + participants in parallel', () => {

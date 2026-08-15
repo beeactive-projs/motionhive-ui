@@ -46,6 +46,9 @@
           />
           <ion-label>
             <h3>{{ nameOf(person) }}</h3>
+            @if (person.handle; as tag) {
+              <p class="handle">&#64;{{ tag }}</p>
+            }
           </ion-label>
         </ion-item>
       }

@@ -88,6 +88,7 @@ export class SessionsDetailStore {
           if (instance) {
             this._instance.set(instance);
             if (instance.template) this._template.set(instance.template);
+            this._loadFullTemplate(instance.templateId);
           }
           this._participants.set(participants.items);
         },
@@ -98,6 +99,24 @@ export class SessionsDetailStore {
   reload(): void {
     const i = this._instance();
     if (i) this.load(i.id);
+  }
+
+  /**
+   * The template nested on an instance is an allowlisted subset — it carries no
+   * `isRecurring` or `recurrenceRule`, so nothing downstream can tell a one-off
+   * from a series. Fetching the template itself fills those in; failure is
+   * silent because everything else on the screen still works without it.
+   */
+  private _loadFullTemplate(templateId: string): void {
+    this._svc
+      .getTemplate(templateId)
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((template) => {
+        if (template) this._template.set(template);
+      });
   }
 
   // ─── Mutations ────────────────────────────────────────────────────

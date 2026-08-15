@@ -3,7 +3,7 @@
 // are both documented ion-item variables.
 .agenda-row {
   --background: var(--ion-background-color);
-  --border-radius: 12px;
+  --border-radius: var(--mh-radius-control);
   --min-height: 48px;
 
   margin: 0 12px 12px;

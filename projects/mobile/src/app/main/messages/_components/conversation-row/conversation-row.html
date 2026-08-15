@@ -1,29 +1,49 @@
-<ion-item button detail="false" lines="full" (click)="select.emit()">
-  <!--
-    Decorative here: the name it would announce is the very next thing in the
-    row, so without this a screen reader reads it twice. `name` still feeds the
-    initials fallback.
-  -->
-  <mh-hex-avatar
-    slot="start"
-    size="lg"
-    aria-hidden="true"
-    [name]="title()"
-    [imageUrl]="avatarUrl()"
-    [color]="tone()"
-  />
+<ion-item-sliding #sliding>
+  <ion-item button detail="false" lines="full" (click)="select.emit()">
+    <!--
+      Decorative here: the name it would announce is the very next thing in the
+      row, so without this a screen reader reads it twice. `name` still feeds the
+      initials fallback.
+    -->
+    <mh-hex-avatar
+      slot="start"
+      size="lg"
+      aria-hidden="true"
+      [name]="title()"
+      [imageUrl]="avatarUrl()"
+      [color]="tone()"
+    />
 
-  <ion-label>
-    <h2>{{ title() }}</h2>
-    <p>{{ preview() }}</p>
-  </ion-label>
+    <ion-label>
+      <h2>{{ title() }}</h2>
+      <p>{{ preview() }}</p>
+    </ion-label>
 
-  <div class="meta" slot="end">
-    <ion-note>{{ time() }}</ion-note>
+    <div class="meta" slot="end">
+      <ion-note>{{ time() }}</ion-note>
+      @if (isUnread()) {
+        <ion-badge color="danger" [attr.aria-label]="unreadLabel() + ' unread'">
+          {{ unreadLabel() }}
+        </ion-badge>
+      }
+    </div>
+  </ion-item>
+
+  <ion-item-options side="end">
     @if (isUnread()) {
-      <ion-badge color="danger" [attr.aria-label]="unreadLabel() + ' unread'">
-        {{ unreadLabel() }}
-      </ion-badge>
+      <ion-item-option color="primary" (click)="emitAndClose(sliding, markRead)">
+        <ion-icon slot="icon-only" name="checkmark-done" aria-label="Mark read" />
+      </ion-item-option>
     }
-  </div>
-</ion-item>
+    <ion-item-option
+      [color]="isMuted() ? 'medium' : 'secondary'"
+      (click)="emitAndClose(sliding, toggleMute)"
+    >
+      <ion-icon
+        slot="icon-only"
+        [name]="isMuted() ? 'notifications-outline' : 'notifications-off-outline'"
+        [attr.aria-label]="isMuted() ? 'Unmute' : 'Mute'"
+      />
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>

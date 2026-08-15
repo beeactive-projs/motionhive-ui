@@ -55,7 +55,8 @@ export const routes: Routes = [
       {
         path: 'sessions',
         canActivate: [coachGuard],
-        loadComponent: () => import('./main/sessions/sessions').then((m) => m.Sessions),
+        loadChildren: () =>
+          import('./main/sessions/sessions.routes').then((m) => m.sessionsRoutes),
       },
       {
         path: 'workouts',

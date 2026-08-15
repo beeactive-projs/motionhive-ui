@@ -31,7 +31,7 @@
 ion-card {
   margin: 0 1rem 0.75rem;
   border: 1px solid var(--ion-border-color);
-  border-radius: 1rem;
+  border-radius: var(--mh-radius-card);
   box-shadow: none;
 }
 
@@ -49,7 +49,7 @@ ion-list.list-inset.mh-card-list {
   margin: 0 1.25rem 0.875rem;
   padding: 0;
   border: 1px solid var(--ion-border-color);
-  border-radius: 1rem;
+  border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
 }
 
@@ -115,4 +115,56 @@ h1 {
   color: var(--ion-color-medium);
   font-size: 0.72rem;
   line-height: 1.55;
+}
+
+/* Date pickers.
+   An `ion-datetime` in a bare `ion-modal` inherits the sheet's full-bleed size
+   and lands top-left on a white slab. Ionic sizes this one through modal
+   variables, and the modal is relocated on present so the rule has to be
+   global rather than scoped to whichever screen opened it. */
+ion-modal.mh-date-modal {
+  --width: 20rem;
+  --height: auto;
+  --max-width: calc(100% - 2rem);
+  --border-radius: var(--mh-radius-card);
+  --background: var(--ion-card-background);
+  --box-shadow: 0 0.5rem 2.5rem rgb(var(--ion-text-color-rgb) / 0.25);
+  align-items: center;
+  justify-content: center;
+}
+
+ion-modal.mh-date-modal ion-datetime {
+  /* Without this the picker stretches to the modal and clips its own footer. */
+  height: auto;
+}
+
+/* One radius for everything you can tap or type into. Ionic ships 4px on form
+   controls and buttons, which clashes with the 12px cards and tiles around
+   them; this is the single place that decides it.
+
+   `!important` because Ionic ships these components with scoped CSS, so its
+   own `.input-fill-outline.sc-ion-input-md-h` rule outranks any selector we
+   can write against the element. Same reason the `.ion-color-*` blocks in
+   variables.css use it. */
+ion-input,
+ion-textarea,
+ion-select,
+ion-searchbar,
+ion-button {
+  --border-radius: var(--mh-radius-control) !important;
+}
+
+/* Chips and anything explicitly round keep their pill. */
+ion-chip {
+  --border-radius: var(--mh-radius-pill);
+}
+
+/* Select popovers. The default is a bare list pinned to the trigger; a long
+   one (durations run to eight hours) needs a height cap so it scrolls instead
+   of running off the screen. Global because Ionic relocates the popover. */
+ion-popover.mh-select-popover {
+  --width: 14rem;
+  --max-height: 60vh;
+  --border-radius: var(--mh-radius-card);
+  --box-shadow: 0 0.5rem 2rem rgb(var(--ion-text-color-rgb) / 0.2);
 }

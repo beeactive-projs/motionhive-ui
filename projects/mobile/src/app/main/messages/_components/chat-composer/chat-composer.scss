@@ -8,8 +8,12 @@
 .field {
   flex: 1;
   /* Ionic's solid fill draws a form-field underline; a composer is a pill.
-     Zero border width kills the line, `--highlight-height` the focus one. */
-  --border-radius: 1.375rem;
+     Zero border width kills the line, `--highlight-height` the focus one.
+
+     `!important` to opt out of the app-wide control radius in styles.css —
+     this is the one field that is deliberately rounder than the standard, and
+     that rule has to be `!important` to beat Ionic's own scoped CSS. */
+  --border-radius: 1.375rem !important;
   --border-width: 0;
   --border-color: transparent;
   --padding-start: 0.875rem;

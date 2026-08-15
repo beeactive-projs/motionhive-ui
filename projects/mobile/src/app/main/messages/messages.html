@@ -67,7 +67,15 @@
     <ion-note class="mh-note-block">Reconnecting…</ion-note>
   }
 
-  @if (showSkeleton()) {
+  @if (showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load your messages"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
     <ion-list>
       @for (_ of skeletonRows; track $index) {
         <ion-item lines="full">
@@ -107,6 +115,9 @@
             />
             <ion-label>
               <h3>{{ nameOf(person) }}</h3>
+              @if (person.handle; as tag) {
+                <p class="handle">&#64;{{ tag }}</p>
+              }
             </ion-label>
           </ion-item>
         }
@@ -120,6 +131,8 @@
           <mh-conversation-row
             [conversation]="conversation"
             (select)="openConversation(conversation.id)"
+            (markRead)="markRead(conversation.id)"
+            (toggleMute)="toggleMute(conversation.id)"
           />
         }
       </ion-list>
@@ -144,9 +157,15 @@
         <mh-conversation-row
           [conversation]="conversation"
           (select)="openConversation(conversation.id)"
+          (markRead)="markRead(conversation.id)"
+          (toggleMute)="toggleMute(conversation.id)"
         />
       }
     </ion-list>
+
+    <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
   }
 </ion-content>
 

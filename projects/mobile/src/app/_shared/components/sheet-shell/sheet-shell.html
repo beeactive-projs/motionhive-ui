@@ -31,7 +31,12 @@
             <ion-button fill="clear" color="medium" [disabled]="saving()" (click)="dismiss()">
               Cancel
             </ion-button>
-            <ion-button fill="solid" [disabled]="!canSave() || saving()" (click)="save.emit()">
+            <ion-button
+              fill="solid"
+              [color]="saveColor()"
+              [disabled]="!canSave() || saving()"
+              (click)="save.emit()"
+            >
               @if (saving()) {
                 <ion-spinner name="crescent" />
               } @else {

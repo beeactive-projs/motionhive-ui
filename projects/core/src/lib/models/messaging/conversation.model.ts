@@ -13,6 +13,8 @@ export interface ParticipantSnapshot {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  /** Null until the user picks one. Addresses their public profile. */
+  handle: string | null;
 }
 
 export interface ConversationListItem {

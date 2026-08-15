@@ -1,0 +1,58 @@
+<ng-template #body>
+  @if (isRecurring()) {
+    <ion-note class="mh-note-block">
+      This is part of a recurring series. Choose what to cancel.
+    </ion-note>
+
+    <ion-radio-group
+      [value]="scope()"
+      (ionChange)="scope.set($event.detail.value)"
+    >
+      @for (option of scopeOptions(); track option.value) {
+        <ion-item lines="none" class="option" [class.selected]="scope() === option.value">
+          <ion-radio [value]="option.value" justify="start" labelPlacement="end">
+            <ion-label>
+              <h3>{{ option.label }}</h3>
+              <p>{{ option.detail }}</p>
+            </ion-label>
+          </ion-radio>
+        </ion-item>
+      }
+    </ion-radio-group>
+  }
+
+  <div class="mh-section-label">
+    @if (signupCount() > 0) {
+      Message to {{ signupCount() }}
+      {{ signupCount() === 1 ? 'signup' : 'signups' }} · optional
+    } @else {
+      Message · optional
+    }
+  </div>
+
+  <ion-textarea
+    fill="outline"
+    [autoGrow]="true"
+    [rows]="3"
+    [maxlength]="500"
+    placeholder="Sorry — have to cancel. Let's regroup next week."
+    [value]="message()"
+    (ionInput)="message.set($event.detail.value ?? '')"
+  />
+
+  <p class="mh-helper">
+    Everyone who signed up is notified either way. This adds your reason.
+  </p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Cancel session"
+  saveLabel="Cancel session"
+  saveColor="danger"
+  [body]="body"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.75]"
+  [initialBreakpoint]="0.75"
+  (save)="confirm()"
+/>

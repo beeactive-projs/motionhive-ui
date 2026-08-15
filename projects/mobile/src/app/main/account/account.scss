@@ -8,7 +8,7 @@
   margin: 0.75rem 1.25rem 1.25rem;
   padding: 1.375rem 1.25rem 1.125rem;
   border: 1px solid var(--ion-border-color);
-  border-radius: 1.125rem;
+  border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   text-align: center;
 }
@@ -42,7 +42,7 @@
 .handle-chip {
   padding: 0.25rem 0.625rem;
   border: 1px solid var(--ion-border-color);
-  border-radius: 999px;
+  border-radius: var(--mh-radius-pill);
   background: var(--ion-background-color);
   font-family: var(--mh-font-mono);
   font-size: 0.7rem;
@@ -60,7 +60,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  border-radius: 999px;
+  border-radius: var(--mh-radius-pill);
   font-size: 0.625rem;
 }
 
