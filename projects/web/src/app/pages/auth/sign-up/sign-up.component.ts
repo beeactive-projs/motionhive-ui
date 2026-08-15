@@ -31,7 +31,9 @@ import {
   GoogleAuthService,
   InvitationDetails,
   Logo,
+  PRIVACY_POLICY_URL,
   RegisterRequest,
+  TERMS_OF_SERVICE_URL,
   UserRoles,
   UserService,
 } from 'core';
@@ -65,6 +67,11 @@ export class SignUpComponent {
   private readonly _userService = inject(UserService);
   private readonly _router = inject(Router);
   protected readonly _route = inject(ActivatedRoute);
+
+  // Legal pages live on the marketing site — link out absolutely (the app
+  // has no /legal routes).
+  protected readonly termsUrl = TERMS_OF_SERVICE_URL;
+  protected readonly privacyUrl = PRIVACY_POLICY_URL;
 
   private readonly _invitationToken = signal<string | null>(null);
   readonly invitationDetails = signal<{

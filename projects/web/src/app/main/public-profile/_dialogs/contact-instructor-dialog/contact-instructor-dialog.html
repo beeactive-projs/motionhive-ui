@@ -129,7 +129,7 @@
         <i class="pi pi-shield"></i>
         <span class="truncate">
           {{ firstName() }} only sees your name, email and message.
-          <a href="https://www.motionhive.fit/legal/privacy-policy" target="_blank"
+          <a [href]="privacyUrl" target="_blank" rel="noopener"
             class="text-primary-600 hover:underline">Privacy</a>
         </span>
       </p>

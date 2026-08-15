@@ -28,6 +28,8 @@ import {
   GoogleAuthService,
   LoginRequest,
   Logo,
+  PRIVACY_POLICY_URL,
+  TERMS_OF_SERVICE_URL,
   ThemeService,
 } from 'core';
 import { Divider } from 'primeng/divider';
@@ -63,6 +65,11 @@ export class LoginComponent {
   private readonly _router = inject(Router);
   private readonly _themeService = inject(ThemeService);
   protected readonly _route = inject(ActivatedRoute);
+
+  // Legal pages live on the marketing site — link out absolutely (the app
+  // has no /legal routes).
+  protected readonly termsUrl = TERMS_OF_SERVICE_URL;
+  protected readonly privacyUrl = PRIVACY_POLICY_URL;
 
   // Signals for component state
   isLoading = signal(false);

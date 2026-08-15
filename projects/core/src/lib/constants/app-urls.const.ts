@@ -23,6 +23,15 @@ export const MARKETING_SITE_URL = 'https://www.motionhive.fit';
 export const MARKETING_BLOG_URL = `${MARKETING_SITE_URL}/blog`;
 
 /**
+ * Legal pages. They live ONLY on the marketing site — the web app has no
+ * `/legal/*` routes — so anything in the app (login, signup, consent copy)
+ * must link out with these absolute URLs, not a `routerLink`.
+ */
+export const TERMS_OF_SERVICE_URL = `${MARKETING_SITE_URL}/legal/terms-of-service`;
+export const PRIVACY_POLICY_URL = `${MARKETING_SITE_URL}/legal/privacy-policy`;
+export const COOKIE_POLICY_URL = `${MARKETING_SITE_URL}/legal/cookie-policy`;
+
+/**
  * Destination for a blog author's byline.
  *
  * - Registered external author (has a handle) → their public profile at

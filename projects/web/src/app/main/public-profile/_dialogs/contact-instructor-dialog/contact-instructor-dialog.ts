@@ -21,6 +21,7 @@ import {
   LeadFormat,
   LeadGoal,
   LeadLevel,
+  PRIVACY_POLICY_URL,
   type AvatarUser,
   type InstructorLeadPayload,
 } from 'core';
@@ -56,6 +57,8 @@ export class ContactInstructorDialog {
   private readonly _fb = inject(FormBuilder);
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
+
+  protected readonly privacyUrl = PRIVACY_POLICY_URL;
 
   readonly visible = model<boolean>(false);
   readonly instructorUserId = input.required<string>();

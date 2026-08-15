@@ -206,12 +206,12 @@
         <div class="flex flex-col gap-2 text-center">
           <p class="text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
             By signing up, you agree to our
-            <a routerLink="/legal/terms-of-service"
+            <a [href]="termsUrl" target="_blank" rel="noopener"
               class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
               Terms of Service
             </a>
             and
-            <a routerLink="/legal/privacy-policy"
+            <a [href]="privacyUrl" target="_blank" rel="noopener"
               class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
               Privacy Policy
             </a>
