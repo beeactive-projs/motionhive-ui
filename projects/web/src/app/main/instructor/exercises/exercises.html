@@ -129,6 +129,11 @@
   <div
     class="sticky top-24 md:top-16 z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 -mx-4 px-4 py-2 bg-surface-0 dark:bg-surface-950"
     role="search">
+    @if (isInstructor()) {
+    <!-- Instructors: 4 ownership pills. USERs don't get these — they
+         can't create exercises, so "Mine" is always empty and "System"
+         is redundant with "All" from their perspective (which is
+         system + coaches' public exercises). -->
     <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Ownership filter">
       @for (tab of ownershipTabs(); track tab.value) {
       <button pButton
@@ -144,6 +149,7 @@
       </button>
       }
     </div>
+    }
 
     <div class="flex flex-1 items-center gap-2 md:justify-end">
       <p-iconfield class="flex-1 md:flex-[0_1_280px]">
