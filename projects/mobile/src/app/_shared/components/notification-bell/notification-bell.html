@@ -1,0 +1,6 @@
+<ion-button [attr.aria-label]="'Notifications, ' + unread() + ' unread'" [routerLink]="target()">
+  <ion-icon slot="icon-only" name="notifications-outline" />
+  @if (unread() > 0) {
+  <ion-badge color="danger">{{ badge() }}</ion-badge>
+  }
+</ion-button>

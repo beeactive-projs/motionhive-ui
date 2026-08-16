@@ -32,6 +32,7 @@ import { InboxFilter, MessagingStore, UserSearchResult, displayName } from 'core
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
+import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { AvatarTone, avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
@@ -76,6 +77,7 @@ import { MESSAGING_ICONS } from './messages.config';
     IonTitle,
     IonToolbar,
     NewMessageSheet,
+    NotificationBell,
   ],
   templateUrl: './messages.html',
   styleUrl: './messages.scss',

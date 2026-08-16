@@ -1,0 +1,145 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>Notifications</ion-title>
+    <ion-buttons slot="end">
+      @if (store.hasUnread()) {
+      <ion-button (click)="markAllRead()">Mark all read</ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!--
+    All · Unread · one chip per category, on a single scrolling rail. A
+    dropdown would hide seven of the eight categories behind a tap; this way
+    the whole filter set is one swipe away, and the active chip carries its
+    own tint so the list never looks unfiltered when it is not.
+  -->
+  @if (!isEmpty() || hasFilter()) {
+  <ion-toolbar>
+    <div class="filters">
+      <ion-chip [outline]="hasFilter()" [class.on]="!hasFilter()" (click)="showAll()">
+        All
+      </ion-chip>
+
+      <ion-chip
+        [outline]="!store.unreadOnly()"
+        [class.on]="store.unreadOnly()"
+        (click)="showUnread()"
+      >
+        Unread @if (store.unreadCount(); as count) {
+        <span class="count">{{ count }}</span>
+        }
+      </ion-chip>
+
+      <span class="divider" aria-hidden="true"></span>
+
+      @for (category of categories; track category.value) {
+      <ion-chip
+        class="category"
+        [style.--mh-chip-on-background]="'var(--ion-color-' + category.color + '-wash)'"
+        [style.--mh-chip-on-color]="'var(--ion-color-' + category.color + '-wash-contrast)'"
+        [outline]="store.category() !== category.value"
+        [class.on]="store.category() === category.value"
+        (click)="toggleCategory(category.value)"
+      >
+        <ion-icon [name]="category.icon" aria-hidden="true" />
+        {{ category.label }}
+        @if (store.category() === category.value) {
+        <ion-icon name="close" aria-hidden="true" />
+        }
+      </ion-chip>
+      }
+    </div>
+  </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (showLoadError()) {
+  <mh-empty-state
+    icon="alert-circle-outline"
+    heading="Couldn't load notifications"
+    message="Check your connection and try again."
+    actionLabel="Try again"
+    (action)="retry()"
+  />
+  } @else if (showSkeleton()) {
+  <!-- Same geometry as a real row — tile, title, body, time — so content
+         swaps in without shifting anything. -->
+  <ion-list>
+    @for (_ of skeletonRows; track $index) {
+    <ion-item lines="none">
+      <ion-skeleton-text slot="start" [animated]="true" style="width: 2.125rem; height: 2.375rem" />
+      <ion-label>
+        <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+        <p><ion-skeleton-text [animated]="true" style="width: 80%" /></p>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+  } @else if (isEmpty()) { @if (hasFilter()) {
+  <mh-empty-state
+    icon="checkmark-done-outline"
+    [heading]="
+      activeCategoryStyle() ? 'Nothing in ' + activeCategoryStyle()!.label : 'All caught up'
+    "
+    message="Nothing to show with this filter on."
+    actionLabel="Clear filter"
+    actionFill="outline"
+    (action)="showAll()"
+  />
+  } @else {
+  <mh-empty-state
+    icon="notifications-outline"
+    heading="Nothing here yet"
+    message="Session reminders, new signups, messages and payments will show up here as they happen."
+    actionLabel="Notification settings"
+    actionFill="outline"
+    (action)="openSettings()"
+  />
+  } } @else { @if (days().length > 0) { @for (day of days(); track day.key) {
+  <div class="mh-section-label">{{ day.label }}</div>
+  <ion-list>
+    @for (item of day.items; track item.id) {
+    <mh-notification-row
+      [notification]="item"
+      (select)="open(item)"
+      (toggleRead)="toggleRead(item)"
+      (dismiss)="dismiss(item)"
+      (remove)="remove(item)"
+    />
+    }
+  </ion-list>
+  } } @else {
+  <ion-list>
+    @for (item of store.notifications(); track item.id) {
+    <mh-notification-row
+      [notification]="item"
+      (select)="open(item)"
+      (toggleRead)="toggleRead(item)"
+      (dismiss)="dismiss(item)"
+      (remove)="remove(item)"
+    />
+    }
+  </ion-list>
+  }
+
+  <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
+  }
+</ion-content>
+
+<mh-notification-detail-sheet
+  [(open)]="detailOpen"
+  [notification]="detail()"
+  (toggleRead)="toggleReadFromDetail()"
+  (remove)="removeFromDetail()"
+/>

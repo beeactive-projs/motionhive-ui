@@ -183,6 +183,7 @@ export const API_ENDPOINTS = {
     READ_ALL: '/notifications/read-all',
     VIEWED: '/notifications/viewed',
     READ: (receiptId: string) => `/notifications/${receiptId}/read`,
+    UNREAD: (receiptId: string) => `/notifications/${receiptId}/unread`,
     CLICKED: (receiptId: string) => `/notifications/${receiptId}/clicked`,
     DISMISS: (receiptId: string) => `/notifications/${receiptId}/dismiss`,
     BY_ID: (receiptId: string) => `/notifications/${receiptId}`,

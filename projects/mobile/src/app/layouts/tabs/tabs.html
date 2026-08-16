@@ -26,3 +26,7 @@
 </ion-tabs>
 
 <mh-more-sheet [(open)]="moreOpen" [tiles]="moreTiles()" />
+
+<!-- Outside <ion-tabs> so it survives tab switches and floats over whichever
+     page is on screen. -->
+<mh-notification-banner />

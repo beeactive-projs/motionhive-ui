@@ -182,6 +182,36 @@
   --ion-color-dark-contrast-rgb: 255, 255, 255;
   --ion-color-dark-shade: #1e293b;
   --ion-color-dark-tint: #475569;
+
+  /*
+   * Wash — the pale end of each ramp (step 100) paired with a dark ink from
+   * step 700/800. Ionic's `-tint` is one step lighter than the base and stays
+   * saturated, which is a different job: `wash` is for tiles that sit inside
+   * a list and must not shout, where the glyph carries the colour and the
+   * fill only hints at it. Every pair clears 4.5:1.
+   */
+  --ion-color-primary-wash: #fef3c7;
+  --ion-color-primary-wash-contrast: #92400e;
+  --ion-color-warning-wash: #fef3c7;
+  --ion-color-warning-wash-contrast: #92400e;
+  --ion-color-success-wash: #dcfce7;
+  --ion-color-success-wash-contrast: #15803d;
+  --ion-color-danger-wash: #fee2e2;
+  --ion-color-danger-wash-contrast: #b91c1c;
+  --ion-color-info-wash: #e0f2fe;
+  --ion-color-info-wash-contrast: #0369a1;
+  --ion-color-violet-wash: #ede9fe;
+  --ion-color-violet-wash-contrast: #6d28d9;
+  --ion-color-teal-wash: #ccfbf1;
+  --ion-color-teal-wash-contrast: #0f766e;
+  --ion-color-coral-wash: #ffe4dc;
+  --ion-color-coral-wash-contrast: #c2410c;
+  --ion-color-medium-wash: #f1f5f9;
+  --ion-color-medium-wash-contrast: #475569;
+  --ion-color-dark-wash: #e2e8f0;
+  --ion-color-dark-wash-contrast: #0e1b31;
+  --ion-color-secondary-wash: #e2e8f0;
+  --ion-color-secondary-wash-contrast: #0e1b31;
 }
 
 /*
@@ -241,6 +271,30 @@
 
   /* Slate 100 would glare on a navy card; the divider tracks the border here. */
   --mh-color-divider: #162b48;
+
+  /* Wash inverts the same way chips do: deep fill, light ink. */
+  --ion-color-primary-wash: #422006;
+  --ion-color-primary-wash-contrast: #fcd34d;
+  --ion-color-warning-wash: #422006;
+  --ion-color-warning-wash-contrast: #fcd34d;
+  --ion-color-success-wash: #064e3b;
+  --ion-color-success-wash-contrast: #a7f3d0;
+  --ion-color-danger-wash: #4c0519;
+  --ion-color-danger-wash-contrast: #fecaca;
+  --ion-color-info-wash: #0c4a6e;
+  --ion-color-info-wash-contrast: #bae6fd;
+  --ion-color-violet-wash: #2e1065;
+  --ion-color-violet-wash-contrast: #ddd6fe;
+  --ion-color-teal-wash: #134e4a;
+  --ion-color-teal-wash-contrast: #99f6e4;
+  --ion-color-coral-wash: #4a1d0c;
+  --ion-color-coral-wash-contrast: #fdba9b;
+  --ion-color-medium-wash: #1e293b;
+  --ion-color-medium-wash-contrast: #cbd5e1;
+  --ion-color-dark-wash: #1e293b;
+  --ion-color-dark-wash-contrast: #e2e8f0;
+  --ion-color-secondary-wash: #1e293b;
+  --ion-color-secondary-wash-contrast: #e2e8f0;
 
   /* Chips invert: deep fill, light ink (scale steps 900 + 200). */
   --mh-chip-warning-background: #422006;

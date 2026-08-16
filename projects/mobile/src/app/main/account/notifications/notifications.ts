@@ -24,11 +24,10 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import {
-  ACCOUNT_ICONS,
-  NOTIFICATION_CATEGORY_STYLES,
-  NOTIFICATION_STYLE_FALLBACK,
-  NotificationCategoryStyle,
-} from '../account.config';
+  CategoryStyle,
+  categoryStyle,
+} from '../../../_shared/config/notification-categories.config';
+import { ACCOUNT_ICONS } from '../account.config';
 
 /**
  * Which categories also send email. In-app is always on — the bell is the inbox.
@@ -97,8 +96,18 @@ export class AccountNotifications implements OnInit {
       });
   }
 
-  styleFor(category: NotificationCategory): NotificationCategoryStyle {
-    return NOTIFICATION_CATEGORY_STYLES[category] ?? NOTIFICATION_STYLE_FALLBACK;
+  styleFor(category: NotificationCategory): CategoryStyle {
+    return categoryStyle(category);
+  }
+
+  /**
+   * Where the always-on copy of this category lands. Everything goes to the
+   * bell except direct messages, which are suppressed there on purpose — the
+   * Messages tab and its badge are that inbox, so claiming "in-app" for them
+   * would point at a screen they never reach.
+   */
+  inAppLabel(category: NotificationCategory): string {
+    return category === NotificationCategory.Messaging ? 'Messages' : 'In-app';
   }
 
   isPending(category: NotificationCategory): boolean {

@@ -39,6 +39,7 @@ export class NotificationService {
     if (params.page !== undefined) httpParams = httpParams.set('page', String(params.page));
     if (params.limit !== undefined) httpParams = httpParams.set('limit', String(params.limit));
     if (params.unreadOnly) httpParams = httpParams.set('unreadOnly', 'true');
+    if (params.category) httpParams = httpParams.set('category', params.category);
 
     // Bell list refresh — silent, the popover has its own skeleton.
     return this._http.get<PaginatedResponse<BellNotification>>(
@@ -61,6 +62,14 @@ export class NotificationService {
   markAsRead(receiptId: string): Observable<void> {
     return this._http.patch<void>(
       this.baseUrl + API_ENDPOINTS.NOTIFICATIONS.READ(receiptId),
+      {},
+    );
+  }
+
+  /** Undo for `markAsRead`. Also clears clicked_at server-side. */
+  markAsUnread(receiptId: string): Observable<void> {
+    return this._http.patch<void>(
+      this.baseUrl + API_ENDPOINTS.NOTIFICATIONS.UNREAD(receiptId),
       {},
     );
   }

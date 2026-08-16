@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+ion-item {
+  --background: var(--ion-card-background);
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.875rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  --inner-border-width: 0;
+}
+
+mh-hex-avatar {
+  margin-inline-end: 0.75rem;
+  margin-top: 0.125rem;
+  align-self: flex-start;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  min-width: 0;
+}
+
+/* Red is reserved for unread and never used as a category tint. */
+.dot {
+  flex: none;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 999px;
+  background: var(--ion-color-danger);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ion-color-dark);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.head ion-note {
+  flex: none;
+  font-size: 0.68rem;
+}
+
+/* `ion-label` styles its own p from one colour, so unread state is set here. */
+.body {
+  margin-top: 0.125rem;
+  color: var(--ion-color-medium);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+:host(.mh-unread) .title {
+  color: var(--ion-text-color);
+  font-weight: 700;
+}
+
+:host(.mh-unread) .body {
+  color: var(--ion-color-dark);
+}

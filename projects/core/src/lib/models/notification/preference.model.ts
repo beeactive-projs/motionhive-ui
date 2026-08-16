@@ -5,12 +5,14 @@
  * per-event-type — six choices instead of thirty.
  */
 export enum NotificationCategory {
+  Messaging = 'MESSAGING',
   Sessions = 'SESSIONS',
   Coaching = 'COACHING',
+  Workouts = 'WORKOUTS',
   Groups = 'GROUPS',
   Payments = 'PAYMENTS',
-  Account = 'ACCOUNT',
   Posts = 'POSTS',
+  Account = 'ACCOUNT',
 }
 
 /**

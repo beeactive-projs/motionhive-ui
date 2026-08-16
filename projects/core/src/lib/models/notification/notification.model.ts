@@ -1,3 +1,4 @@
+import { NotificationCategory } from './preference.model';
 import { NotificationSeverity, NotificationType } from './notification.enums';
 
 /**
@@ -33,6 +34,11 @@ export interface BellNotification {
   id: string;
   notificationId: string;
   type: NotificationType | string;
+  /**
+   * Derived from `type` server-side. Sent because the client has no way to map
+   * 47 types onto 8 categories; drives the row icon and the category filter.
+   */
+  category: NotificationCategory;
   title: string;
   body: string;
   data: NotificationData | null;
@@ -55,4 +61,6 @@ export interface ListNotificationsParams {
   page?: number;
   limit?: number;
   unreadOnly?: boolean;
+  /** Narrow to a single category. Omit for everything. */
+  category?: NotificationCategory;
 }

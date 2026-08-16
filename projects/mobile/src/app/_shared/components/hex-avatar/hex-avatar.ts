@@ -18,6 +18,7 @@ export type HexAvatarSize = (typeof HexAvatarSizes)[keyof typeof HexAvatarSizes]
 export const HexAvatarTones = {
   Base: 'base',
   Shade: 'shade',
+  Wash: 'wash',
 } as const;
 
 export type HexAvatarTone = (typeof HexAvatarTones)[keyof typeof HexAvatarTones];
@@ -57,7 +58,7 @@ let seq = 0;
   host: {
     '[attr.data-size]': 'size()',
     '[style.--hex-fill]': 'fillVariable()',
-    '[style.--hex-ink]': '"var(--ion-color-" + color() + "-contrast)"',
+    '[style.--hex-ink]': 'inkVariable()',
   },
 })
 export class HexAvatar {
@@ -80,6 +81,9 @@ export class HexAvatar {
    * Which step of the colour to fill with. A white glyph needs 3:1 against its
    * tile to pass WCAG AA, and the 500 step of Sky (2.8:1) and Emerald (2.2:1)
    * both miss it — `shade` drops those two to the 600 step, which clears it.
+   *
+   * `wash` inverts the relationship: a pale fill with dark ink, for tiles that
+   * repeat down a list and would otherwise turn it into a colour chart.
    */
   readonly tone = input<HexAvatarTone>(HexAvatarTones.Base);
 
@@ -88,10 +92,27 @@ export class HexAvatar {
   readonly clipId = `mh-hex-${seq++}`;
   readonly clipUrl = `url(#${this.clipId})`;
 
-  readonly fillVariable = computed(() => {
-    const suffix = this.tone() === HexAvatarTones.Shade ? '-shade' : '';
-    return `var(--ion-color-${this.color()}${suffix})`;
+  private readonly toneSuffix = computed(() => {
+    switch (this.tone()) {
+      case HexAvatarTones.Shade:
+        return '-shade';
+      case HexAvatarTones.Wash:
+        return '-wash';
+      default:
+        return '';
+    }
   });
+
+  readonly fillVariable = computed(
+    () => `var(--ion-color-${this.color()}${this.toneSuffix()})`,
+  );
+
+  /** Wash carries its own ink; the solid tones both take the base contrast. */
+  readonly inkVariable = computed(() =>
+    this.tone() === HexAvatarTones.Wash
+      ? `var(--ion-color-${this.color()}-wash-contrast)`
+      : `var(--ion-color-${this.color()}-contrast)`,
+  );
 
   readonly initials = computed(() => {
     const parts = this.name().trim().split(/\s+/).filter(Boolean);

@@ -1,6 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Clients</ion-title>
+    <ion-buttons slot="end">
+      <mh-notification-bell />
+    </ion-buttons>
   </ion-toolbar>
   <ion-toolbar>
     <ion-segment [value]="statusFilter() ?? AllFilter" (ionChange)="onStatusFilterChange($event)">

@@ -20,6 +20,7 @@ import {
   TAB_ICONS,
   TAB_SETS,
 } from '../../_shared/config/tabs.config';
+import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
 import { TabIds } from '../../_shared/models/tab.model';
 import { MoreSheet } from '../more-sheet/more-sheet';
 
@@ -43,7 +44,16 @@ import { MoreSheet } from '../more-sheet/more-sheet';
  */
 @Component({
   selector: 'mh-tabs',
-  imports: [IonBadge, IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs, MoreSheet],
+  imports: [
+    IonBadge,
+    IonIcon,
+    IonLabel,
+    IonTabBar,
+    IonTabButton,
+    IonTabs,
+    MoreSheet,
+    NotificationBanner,
+  ],
   templateUrl: './tabs.html',
 })
 export class Tabs {

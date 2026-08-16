@@ -2,6 +2,25 @@ import { Routes } from '@angular/router';
 import { authGuard } from 'core';
 
 import { coachGuard } from './_shared/guards/coach.guard';
+import { TabIds } from './_shared/models/tab.model';
+
+/**
+ * The notification centre, mounted once under every tab.
+ *
+ * The bell sits in each tab's root header, and Ionic keys a page's stack on
+ * the first segment after `/tabs` — so a single `/tabs/notifications` address
+ * would drop the user out of the tab they opened it from. One route per tab
+ * keeps the origin tab lit, at the cost of this loop.
+ *
+ * These must come first: `sessions` and `messages` load child routes with a
+ * `:id` parameter that would otherwise swallow `notifications`.
+ */
+const notificationRoutes: Routes = Object.values(TabIds).map((tab) => ({
+  path: `${tab}/notifications`,
+  loadComponent: () =>
+    import('./main/notifications/notifications').then((m) => m.Notifications),
+  title: 'Notifications - MotionHive',
+}));
 
 /**
  * Pages that are reachable but do not own a tab (Settings, Requests) are nested
@@ -20,6 +39,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./layouts/tabs/tabs').then((m) => m.Tabs),
     children: [
+      ...notificationRoutes,
       {
         path: 'home',
         loadComponent: () => import('./main/home/home').then((m) => m.Home),

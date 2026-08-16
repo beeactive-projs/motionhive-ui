@@ -1,0 +1,43 @@
+<ion-item-sliding #sliding>
+  <ion-item-options side="start">
+    <ion-item-option color="primary" (click)="emitAndClose(sliding, toggleRead)">
+      <ion-icon slot="icon-only" name="checkmark-done-outline" />
+    </ion-item-option>
+  </ion-item-options>
+
+  <ion-item button detail="false" lines="none" (click)="select.emit()">
+    <mh-hex-avatar
+      slot="start"
+      size="sm"
+      tone="wash"
+      aria-hidden="true"
+      [icon]="style().icon"
+      [color]="style().color"
+    />
+
+    <ion-label>
+      <div class="head">
+        @if (isUnread()) {
+        <span class="dot" aria-label="Unread"></span>
+        }
+        <span class="title">{{ notification().title }}</span>
+        <ion-note>{{ time() }}</ion-note>
+      </div>
+      <p class="body">{{ notification().body }}</p>
+    </ion-label>
+
+    @if (hasTarget()) {
+    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+    }
+  </ion-item>
+
+  <ion-item-options side="end">
+    <ion-item-option color="medium" (click)="emitAndClose(sliding, dismiss)">
+      Dismiss
+    </ion-item-option>
+    <!-- Not `expandable`: a full swipe must not reach an action you cannot undo. -->
+    <ion-item-option color="danger" (click)="emitAndClose(sliding, remove)">
+      <ion-icon slot="icon-only" name="trash-outline" />
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>

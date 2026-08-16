@@ -2,6 +2,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { catchError, EMPTY, finalize, tap } from 'rxjs';
 import { NotificationService } from '../services/notification/notification.service';
+import { NotificationCategory } from '../models/notification/preference.model';
 import { BellNotification } from '../models/notification/notification.model';
 import { AuthStore } from './auth.store';
 
@@ -39,11 +40,16 @@ export class NotificationStore {
   private readonly loadingSignal = signal(false);
   private readonly loadingMoreSignal = signal(false);
   private readonly hasLoadedListSignal = signal(false);
+  private readonly loadFailedSignal = signal(false);
+  private readonly countLoadedSignal = signal(false);
   private readonly totalSignal = signal(0);
   private readonly currentPageSignal = signal(1);
 
 
   readonly pageSize = 20;
+
+  private readonly unreadOnlySignal = signal(false);
+  private readonly categorySignal = signal<NotificationCategory | null>(null);
 
   // ─── Public readonly surface ──────────────────────────────────
   readonly unreadCount = this.unreadCountSignal.asReadonly();
@@ -51,9 +57,27 @@ export class NotificationStore {
   readonly loading = this.loadingSignal.asReadonly();
   readonly loadingMore = this.loadingMoreSignal.asReadonly();
   readonly hasLoadedList = this.hasLoadedListSignal.asReadonly();
+  readonly loadFailed = this.loadFailedSignal.asReadonly();
+  /**
+   * Whether `unreadCount` holds a real server value yet. The signal starts at
+   * 0, which is indistinguishable from "the server says 0" — anything reacting
+   * to the count *changing* (the arrival banner) needs to know which it is.
+   */
+  readonly countLoaded = this.countLoadedSignal.asReadonly();
   readonly total = this.totalSignal.asReadonly();
   readonly hasUnread = computed(() => this.unreadCount() > 0);
   readonly hasMore = computed(() => this.notifications().length < this.total());
+
+  readonly unreadOnly = this.unreadOnlySignal.asReadonly();
+  readonly category = this.categorySignal.asReadonly();
+
+  /** The filter both `loadList` and `loadMore` send. */
+  private activeFilter() {
+    return {
+      ...(this.unreadOnlySignal() ? { unreadOnly: true } : {}),
+      ...(this.categorySignal() ? { category: this.categorySignal()! } : {}),
+    };
+  }
 
   private pollTimer?: ReturnType<typeof setInterval>;
   private visibilityListener?: () => void;
@@ -121,7 +145,10 @@ export class NotificationStore {
     this._service
       .unreadCount()
       .pipe(
-        tap(({ count }) => this.unreadCountSignal.set(count)),
+        tap(({ count }) => {
+          this.unreadCountSignal.set(count);
+          this.countLoadedSignal.set(true);
+        }),
         // Swallow errors — polling failures shouldn't blow up the UI.
         // 401s are handled by the auth interceptor; other errors are
         // transient and the next tick recovers.
@@ -140,11 +167,25 @@ export class NotificationStore {
    * dropdown-open so analytics get the signal even for items that
    * just arrived between opens.
    */
-  loadList(opts: { markViewedAfter?: boolean } = {}) {
+  loadList(
+    opts: {
+      markViewedAfter?: boolean;
+      unreadOnly?: boolean;
+      category?: NotificationCategory | null;
+      /** Fires on success or failure — for pull-to-refresh spinners. */
+      done?: () => void;
+    } = {},
+  ) {
+    // Held on the store, not passed per call, so `loadMore` pages within the
+    // same filter instead of appending unfiltered rows underneath.
+    if (opts.unreadOnly !== undefined) this.unreadOnlySignal.set(opts.unreadOnly);
+    if (opts.category !== undefined) this.categorySignal.set(opts.category);
+
     this.loadingSignal.set(true);
+    this.loadFailedSignal.set(false);
     this.currentPageSignal.set(1);
     this._service
-      .list({ page: 1, limit: this.pageSize })
+      .list({ page: 1, limit: this.pageSize, ...this.activeFilter() })
       .pipe(
         tap((response) => {
           this.notificationsSignal.set(response.items);
@@ -154,8 +195,14 @@ export class NotificationStore {
             this.markVisibleAsViewed();
           }
         }),
-        catchError(() => EMPTY),
-        finalize(() => this.loadingSignal.set(false)),
+        catchError(() => {
+          this.loadFailedSignal.set(true);
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.loadingSignal.set(false);
+          opts.done?.();
+        }),
       )
       .subscribe();
   }
@@ -169,12 +216,15 @@ export class NotificationStore {
    * Dedupes by id before appending so a notification that arrived
    * via polling between page fetches doesn't render twice.
    */
-  loadMore() {
-    if (this.loadingMoreSignal() || !this.hasMore()) return;
+  loadMore(opts: { done?: () => void } = {}) {
+    if (this.loadingMoreSignal() || !this.hasMore()) {
+      opts.done?.();
+      return;
+    }
     this.loadingMoreSignal.set(true);
     const nextPage = this.currentPageSignal() + 1;
     this._service
-      .list({ page: nextPage, limit: this.pageSize })
+      .list({ page: nextPage, limit: this.pageSize, ...this.activeFilter() })
       .pipe(
         tap((response) => {
           const seen = new Set(this.notificationsSignal().map((n) => n.id));
@@ -184,7 +234,10 @@ export class NotificationStore {
           this.currentPageSignal.set(nextPage);
         }),
         catchError(() => EMPTY),
-        finalize(() => this.loadingMoreSignal.set(false)),
+        finalize(() => {
+          this.loadingMoreSignal.set(false);
+          opts.done?.();
+        }),
       )
       .subscribe();
   }
@@ -206,6 +259,28 @@ export class NotificationStore {
     }
     this._service
       .markAsRead(receiptId)
+      .pipe(catchError(() => this.recoverFromError()))
+      .subscribe();
+  }
+
+  /**
+   * Undo for `markRead`. Bumps the badge back up so the count and the row
+   * agree without waiting for the next poll.
+   */
+  markUnread(receiptId: string) {
+    let wasRead = false;
+    this.notificationsSignal.update((items) =>
+      items.map((n) => {
+        if (n.id !== receiptId) return n;
+        if (n.readAt) wasRead = true;
+        return { ...n, readAt: null, clickedAt: null };
+      }),
+    );
+    if (wasRead) {
+      this.unreadCountSignal.update((c) => c + 1);
+    }
+    this._service
+      .markAsUnread(receiptId)
       .pipe(catchError(() => this.recoverFromError()))
       .subscribe();
   }
@@ -334,6 +409,8 @@ export class NotificationStore {
     this.unreadCountSignal.set(0);
     this.notificationsSignal.set([]);
     this.hasLoadedListSignal.set(false);
+    this.loadFailedSignal.set(false);
+    this.countLoadedSignal.set(false);
     this.totalSignal.set(0);
     this.currentPageSignal.set(1);
   }

@@ -1,0 +1,42 @@
+<ng-template #body>
+  @if (notification(); as item) {
+  <div class="head">
+    <mh-hex-avatar
+      size="lg"
+      tone="wash"
+      aria-hidden="true"
+      [icon]="style()?.icon ?? 'notifications-outline'"
+      [color]="style()?.color ?? 'medium'"
+    />
+
+    <div class="mh-kicker eyebrow">{{ eyebrow() }}</div>
+    <h2>{{ item.title }}</h2>
+    <p class="body">{{ item.body }}</p>
+  </div>
+
+  <div class="actions">
+    <ion-button fill="outline" color="medium" expand="block" (click)="toggleRead.emit()">
+      <ion-icon slot="start" name="checkmark-done-outline" />
+      {{ isUnread() ? 'Mark read' : 'Mark unread' }}
+    </ion-button>
+    <ion-button fill="outline" color="danger" expand="block" (click)="remove.emit()">
+      <ion-icon slot="start" name="trash-outline" />
+      Delete
+    </ion-button>
+  </div>
+
+  @if (elsewhere(); as place) {
+  <ion-note class="footnote">
+    {{ place }} lives on the web for now. This will open in the app once it ships here.
+  </ion-note>
+  } }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Notification"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+/>

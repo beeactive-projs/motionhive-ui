@@ -1,0 +1,22 @@
+@if (current(); as item) {
+  <div class="banner" role="status">
+    <button type="button" class="body" (click)="open()">
+      <mh-hex-avatar
+        size="sm"
+        tone="wash"
+        aria-hidden="true"
+        [icon]="style()?.icon ?? 'notifications-outline'"
+        [color]="style()?.color ?? 'medium'"
+      />
+
+      <span class="text">
+        <span class="title">{{ item.title }}</span>
+        <span class="detail">{{ item.body }}</span>
+      </span>
+    </button>
+
+    <button type="button" class="close" aria-label="Dismiss" (click)="dismiss()">
+      <ion-icon name="close-outline" />
+    </button>
+  </div>
+}

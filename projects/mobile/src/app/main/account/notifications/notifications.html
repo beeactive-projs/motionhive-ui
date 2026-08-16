@@ -9,7 +9,7 @@
 
 <ion-content [fullscreen]="true">
   <ion-note class="intro" color="medium">
-    You'll always see these in the bell. Choose which categories also send you an email.
+    You always see these in the app. Choose which categories also reach you by email.
   </ion-note>
 
   @if (loading()) {
@@ -48,11 +48,15 @@
             [name]="row.label"
             [icon]="styleFor(row.category).icon"
             [color]="styleFor(row.category).color"
-            tone="shade"
+            tone="wash"
           />
           <ion-label class="ion-text-wrap">
             <h3>{{ row.label }}</h3>
             <p>{{ row.description }}</p>
+            <p class="channels">
+              <span class="on">{{ inAppLabel(row.category) }}</span>
+              <span [class.on]="row.channels.email">Email</span>
+            </p>
           </ion-label>
           <ion-toggle
             slot="end"

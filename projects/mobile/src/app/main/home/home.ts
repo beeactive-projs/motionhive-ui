@@ -24,6 +24,7 @@ import { AppModeStore, AuthStore, NavMode, NavModes } from 'core';
 
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { Logo } from '../../_shared/components/logo/logo';
+import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { ROLE_ICONS, ROLES } from '../../_shared/config/roles.config';
 import { CoachHome } from './coach-home/coach-home';
 import { TrainHome } from './train-home/train-home';
@@ -54,6 +55,7 @@ import { TrainHome } from './train-home/train-home';
     IonSkeletonText,
     IonToolbar,
     Logo,
+    NotificationBell,
     TrainHome,
   ],
   templateUrl: './home.html',

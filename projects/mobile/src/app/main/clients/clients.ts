@@ -3,6 +3,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   InfiniteScrollCustomEvent,
   IonBadge,
+  IonButtons,
   IonContent,
   IonHeader,
   IonInfiniteScroll,
@@ -36,6 +37,7 @@ import {
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
+import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 
 @Component({
   selector: 'mh-clients',
@@ -44,6 +46,7 @@ import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
     EmptyState,
     HexAvatar,
     IonBadge,
+    IonButtons,
     IonContent,
     IonHeader,
     IonInfiniteScroll,
@@ -58,6 +61,7 @@ import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    NotificationBell,
   ],
   templateUrl: './clients.html',
   styleUrl: './clients.scss',

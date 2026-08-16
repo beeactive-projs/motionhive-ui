@@ -1,0 +1,73 @@
+/* Horizontal filter rail. Scrolls under the fold rather than wrapping to a
+   second line — the header is already two toolbars tall. */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.75rem 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filters ion-chip {
+  flex: none;
+  margin: 0;
+  height: 1.875rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.filters ion-chip ion-icon {
+  font-size: 0.9rem;
+}
+
+/* Separates the read-state filters from the category ones — they combine, so
+   they should not read as one row of mutually exclusive options. */
+.divider {
+  flex: none;
+  width: 1px;
+  height: 1.125rem;
+  margin: 0 0.25rem;
+  background: var(--mh-color-divider);
+}
+
+.count {
+  margin-inline-start: 0.3rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: var(--ion-color-danger);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+/* An active chip wears its category's own tint, so a filtered list is never
+   mistaken for the full one. */
+.filters ion-chip.on {
+  --background: var(--ion-color-primary);
+  --color: #fff;
+}
+
+/* The active category chip wears its own colour, set per chip in the template
+   so the eight cases don't need eight rules here. */
+.filters ion-chip.category.on {
+  --background: var(--mh-chip-on-background);
+  --color: var(--mh-chip-on-color);
+}
+
+.filters ion-chip.on .count {
+  background: rgb(255 255 255 / 0.28);
+}
+
+.mh-section-label {
+  padding-top: 1rem;
+}
+
+ion-list {
+  background: transparent;
+  padding: 0;
+}
