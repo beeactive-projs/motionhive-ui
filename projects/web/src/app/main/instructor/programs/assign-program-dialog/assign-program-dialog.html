@@ -22,10 +22,16 @@
       </div>
     </div>
     } @else if (clients().length === 0) {
-    <div class="flex flex-col items-center gap-1 px-2 py-6 text-center">
+    <div class="flex flex-col items-center gap-2 px-2 py-6 text-center">
       <i class="pi pi-users mb-1 text-3xl text-surface-300"></i>
       <p class="m-0 text-sm font-medium text-surface-700 dark:text-surface-200">No active clients yet.</p>
-      <small class="text-xs text-surface-500">Invite clients from the Clients page before assigning a program.</small>
+      <small class="mb-2 text-xs text-surface-500">
+        Invite a client or approve a pending request before assigning a program.
+      </small>
+      <button pButton type="button" size="small" (click)="goToClients()">
+        <i class="pi pi-user-plus"></i>
+        Go to Clients
+      </button>
     </div>
     } @else {
     <!-- Client -->

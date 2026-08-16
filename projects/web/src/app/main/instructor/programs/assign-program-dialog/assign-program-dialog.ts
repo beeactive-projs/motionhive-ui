@@ -8,9 +8,11 @@ import {
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
@@ -75,6 +77,7 @@ export class AssignProgramDialog {
   private readonly _assignmentService = inject(ProgramAssignmentService);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
+  private readonly _router = inject(Router);
 
   readonly clients = signal<ClientOption[]>([]);
   readonly loadingClients = signal(false);
@@ -91,19 +94,37 @@ export class AssignProgramDialog {
     () => !!this.clientId() && !!this.startDate() && !this.submitting(),
   );
 
+  /**
+   * Set once per dialog "open" transition. Prevents the infinite refetch
+   * loop we hit when the API returns [] — the old effect keyed off
+   * `clients().length === 0`, but `clients.set([])` fired the signal
+   * again and the effect re-ran, calling _loadClients() forever.
+   */
+  private _wasVisible = false;
+
   constructor() {
-    // Load clients lazily when the dialog opens.
+    // Only trigger on false → true transitions. `untracked()` inside so
+    // the effect never re-runs from writing signals it shouldn't depend on.
     effect(() => {
-      if (this.visible() && this.clients().length === 0) {
-        this._loadClients();
-      }
-      if (!this.visible()) {
-        // Reset form on close so the next open starts fresh.
-        this.clientId.set(null);
-        this.startDate.set(this._today());
-        this.notes.set('');
-      }
+      const open = this.visible();
+      untracked(() => {
+        if (open && !this._wasVisible) {
+          this._wasVisible = true;
+          this._loadClients();
+        } else if (!open && this._wasVisible) {
+          this._wasVisible = false;
+          // Reset form so the next open starts fresh.
+          this.clientId.set(null);
+          this.startDate.set(this._today());
+          this.notes.set('');
+        }
+      });
     });
+  }
+
+  goToClients(): void {
+    this.visible.set(false);
+    void this._router.navigate(['/coaching/clients']);
   }
 
   // ── Actions ──────────────────────────────────────────────────────
