@@ -37,6 +37,7 @@ import {
 } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { DayRail } from './_components/day-rail/day-rail';
 import { SessionRow } from './_components/session-row/session-row';
 import { MessageSignupsSheet } from './_sheets/message-signups-sheet/message-signups-sheet';
@@ -48,7 +49,9 @@ import {
   SessionFilterSheet,
   activeFilterCount,
 } from './_sheets/session-filter-sheet/session-filter-sheet';
-import { AGENDA_DAYS_AHEAD, SESSION_ICONS } from './sessions.config';
+import { AGENDA_DAYS_AHEAD, SESSION_ICONS, WEEKDAY_LETTERS } from './sessions.config';
+
+type LoadOptions = { force?: boolean; done?: () => void };
 
 interface AgendaDay {
   key: string;
@@ -92,6 +95,7 @@ interface AgendaDay {
     DayRail,
     MessageSignupsSheet,
     MonthSheet,
+    NotificationBell,
     SessionFilterSheet,
     SessionFormSheet,
     SessionRow,
@@ -124,19 +128,12 @@ export class Sessions implements ViewWillEnter {
 
   /** The window currently loaded. The month sheet can widen it. */
   private readonly _windowStart = signal(startOfDay(new Date()));
+  private readonly _windowEnd = signal(
+    endOfDay(new Date(Date.now() + AGENDA_DAYS_AHEAD * 24 * 60 * 60 * 1000)),
+  );
 
   /** The Monday of the week the strip is showing. */
   readonly weekStartDate = computed(() => weekStart(this.selectedDay()));
-
-  constructor() {
-    addIcons(SESSION_ICONS);
-  }
-
-  // Not ngOnInit: Ionic keeps the page alive in the tab stack, so that would
-  // run once per app session. The store caches the window.
-  ionViewWillEnter(): void {
-    this._load();
-  }
 
   /** The loaded window, narrowed by the filter sheet. */
   readonly visibleInstances = computed(() => {
@@ -211,10 +208,9 @@ export class Sessions implements ViewWillEnter {
       const key = localDayKey(date);
       return {
         key,
-        initial: ['M', 'T', 'W', 'T', 'F', 'S', 'S'][offset],
-        date: date.getDate(),
-        // The Date itself, for tapping through to the day rail.
-        date_: date,
+        initial: WEEKDAY_LETTERS[offset],
+        dayOfMonth: date.getDate(),
+        date,
         isToday: key === todayKey,
         // Three is enough to read as "busy" without the row growing.
         dots: Array.from({ length: Math.min(counts.get(key) ?? 0, 3) }),
@@ -261,7 +257,7 @@ export class Sessions implements ViewWillEnter {
     () => this.store.rangeLoading() && this.store.rangeInstances().length === 0,
   );
 
-  readonly showError = computed(
+  readonly showLoadError = computed(
     () => !!this.store.rangeError() && this.store.rangeInstances().length === 0,
   );
 
@@ -274,7 +270,17 @@ export class Sessions implements ViewWillEnter {
 
   /** Chrome is hidden on the true-empty and error screens, but not when a
       filter is what emptied the list — you need the controls to undo it. */
-  readonly showChrome = computed(() => !this.isEmpty() && !this.showError());
+  readonly showChrome = computed(() => !this.isEmpty() && !this.showLoadError());
+
+  constructor() {
+    addIcons(SESSION_ICONS);
+  }
+
+  // Not ngOnInit: Ionic keeps the page alive in the tab stack, so that would
+  // run once per app session. The store caches the window.
+  ionViewWillEnter(): void {
+    this._load();
+  }
 
   open(instance: SessionInstance): void {
     void this._router.navigate(['/tabs/sessions', instance.id]);
@@ -385,31 +391,18 @@ export class Sessions implements ViewWillEnter {
   }
 
   onRefresh(event: RefresherCustomEvent): void {
-    this._load({ force: true });
-    // `loadRange` exposes no completion callback; close on the loading signal
-    // settling rather than leaving the spinner up.
-    const started = Date.now();
-    const poll = setInterval(() => {
-      if (!this.store.rangeLoading() || Date.now() - started > 8000) {
-        clearInterval(poll);
-        void event.target.complete();
-      }
-    }, 150);
+    this._load({ force: true, done: () => void event.target.complete() });
   }
 
   retry(): void {
     this._load({ force: true });
   }
 
-  private readonly _windowEnd = signal(
-    endOfDay(new Date(Date.now() + AGENDA_DAYS_AHEAD * 24 * 60 * 60 * 1000)),
-  );
-
-  private _load(opts: { force?: boolean } = {}): void {
+  private _load(opts: LoadOptions = {}): void {
     this._loadWindow(this._windowStart(), this._windowEnd(), opts);
   }
 
-  private _loadWindow(start: Date, end: Date, opts: { force?: boolean } = {}): void {
+  private _loadWindow(start: Date, end: Date, opts: LoadOptions = {}): void {
     this._windowStart.set(start);
     this._windowEnd.set(end);
     this.store.loadRange({ start, end }, opts);

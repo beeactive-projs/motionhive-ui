@@ -74,6 +74,29 @@ describe('SESSION_ICONS', () => {
   });
 });
 
+describe('formatWeekdayList', () => {
+  // The recurrence editor and the detail screen used to join this list
+  // differently, so one series read two ways depending on the screen.
+  it('reads as prose, in ISO order regardless of input order', async () => {
+    const { formatWeekdayList } = await import('./sessions.config');
+    expect(formatWeekdayList([1])).toBe('Mon');
+    expect(formatWeekdayList([3, 1])).toBe('Mon & Wed');
+    expect(formatWeekdayList([5, 1, 3])).toBe('Mon, Wed & Fri');
+    expect(formatWeekdayList([7])).toBe('Sun');
+  });
+
+  it('returns empty for no days, so callers can pick their own copy', async () => {
+    const { formatWeekdayList } = await import('./sessions.config');
+    expect(formatWeekdayList([])).toBe('');
+  });
+
+  // 0=Sunday is the JS convention and the one bug this whole area invites.
+  it('ignores values outside 1..7 rather than rendering undefined', async () => {
+    const { formatWeekdayList } = await import('./sessions.config');
+    expect(formatWeekdayList([0, 1, 8])).toBe('Mon');
+  });
+});
+
 describe('option constants', () => {
   // The BE expects ISO 8601 weekdays. Getting this wrong shifts an entire
   // recurring series by a day, which is invisible until someone turns up on

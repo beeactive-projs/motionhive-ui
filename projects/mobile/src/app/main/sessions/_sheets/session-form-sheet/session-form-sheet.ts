@@ -32,6 +32,7 @@ import {
   SESSION_ICONS,
   SESSION_TYPE_OPTIONS,
   WEEKDAYS,
+  formatWeekdayList,
 } from '../../sessions.config';
 
 /**
@@ -136,14 +137,8 @@ export class SessionFormSheet {
 
   /** Plain-English summary, so the rule is legible before it is committed. */
   readonly recurrenceSummary = computed(() => {
-    const days = this.daysOfWeek();
-    if (days.length === 0) return 'Pick at least one day';
-    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const chosen = [...days].sort((a, b) => a - b).map((d) => names[d - 1]);
-    const list =
-      chosen.length === 1
-        ? chosen[0]
-        : `${chosen.slice(0, -1).join(', ')} & ${chosen[chosen.length - 1]}`;
+    const list = formatWeekdayList(this.daysOfWeek());
+    if (!list) return 'Pick at least one day';
     return `Every ${list} · ${this.endAfterOccurrences()} sessions`;
   });
 

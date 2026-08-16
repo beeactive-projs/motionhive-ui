@@ -5,7 +5,7 @@ import { addIcons } from 'ionicons';
 import { SessionInstance, localDayKey } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-import { SESSION_ICONS, instanceTone } from '../../sessions.config';
+import { SESSION_ICONS, WEEKDAY_LETTERS, instanceTone } from '../../sessions.config';
 
 interface MonthCell {
   key: string;
@@ -39,7 +39,7 @@ export class MonthSheet {
   /** Asks the page to load a window covering this month. */
   readonly monthChanged = output<Date>();
 
-  readonly weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  readonly weekdayLabels = WEEKDAY_LETTERS;
 
   /** First of the month being shown. */
   readonly cursor = signal(startOfMonth(new Date()));

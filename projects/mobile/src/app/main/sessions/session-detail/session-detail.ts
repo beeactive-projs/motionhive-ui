@@ -38,7 +38,7 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { AvatarTone, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { CancelSessionSheet } from '../_sheets/cancel-session-sheet/cancel-session-sheet';
 import { MessageSignupsSheet } from '../_sheets/message-signups-sheet/message-signups-sheet';
-import { SESSION_ICONS } from '../sessions.config';
+import { SESSION_ICONS, formatWeekdayList } from '../sessions.config';
 
 /**
  * One occurrence: when, where, who is coming, and the one action that makes
@@ -131,10 +131,8 @@ export class SessionDetail {
   readonly recurrenceLabel = computed(() => {
     const template = this.template();
     if (!template?.isRecurring) return null;
-    const days = template.recurrenceRule?.daysOfWeek ?? [];
-    if (days.length === 0) return 'Repeats';
-    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return `Repeats ${days.map((d) => names[d - 1]).join(' & ')}`;
+    const days = formatWeekdayList(template.recurrenceRule?.daysOfWeek ?? []);
+    return days ? `Repeats ${days}` : 'Repeats';
   });
 
   readonly locationLabel = computed(() => {
@@ -200,6 +198,24 @@ export class SessionDetail {
       .sort((a, b) => new Date(a.bookedAt).getTime() - new Date(b.bookedAt).getTime()),
   );
 
+  /** Marking who turned up only makes sense once the session has started. */
+  readonly canMarkAttendance = computed(() => this.lifecycle() !== 'upcoming');
+
+  /** Who the message sheet is addressed to this time. */
+  readonly messageAudience = signal<'all' | 'userIds'>('all');
+  readonly messageOpen = signal(false);
+
+  readonly messageRecipients = computed(() =>
+    this.messageAudience() === 'userIds'
+      ? this.waitlist().map((p) => p.userId)
+      : [],
+  );
+
+  readonly messageLabel = computed(() =>
+    this.messageAudience() === 'userIds'
+      ? `the ${this.waitlist().length} people waiting`
+      : 'everyone booked in',
+  );
 
   constructor() {
     addIcons(SESSION_ICONS);
@@ -256,9 +272,6 @@ export class SessionDetail {
     this.store.setAttendance(participant.id, attended);
   }
 
-  /** Marking who turned up only makes sense once the session has started. */
-  readonly canMarkAttendance = computed(() => this.lifecycle() !== 'upcoming');
-
   openProfile(participant: SessionParticipant): void {
     const handle = participant.user?.handle;
     if (handle) void this._router.navigate(['/tabs/sessions/person', handle]);
@@ -268,22 +281,6 @@ export class SessionDetail {
   hasProfile(participant: SessionParticipant): boolean {
     return !!participant.user?.handle;
   }
-
-  /** Who the message sheet is addressed to this time. */
-  readonly messageAudience = signal<'all' | 'userIds'>('all');
-  readonly messageOpen = signal(false);
-
-  readonly messageRecipients = computed(() =>
-    this.messageAudience() === 'userIds'
-      ? this.waitlist().map((p) => p.userId)
-      : [],
-  );
-
-  readonly messageLabel = computed(() =>
-    this.messageAudience() === 'userIds'
-      ? `the ${this.waitlist().length} people waiting`
-      : 'everyone booked in',
-  );
 
   messageSignups(): void {
     this.messageAudience.set('all');

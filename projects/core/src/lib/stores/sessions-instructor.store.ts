@@ -390,8 +390,16 @@ export class SessionsInstructorStore {
    *
    * On error, surfaces via `rangeError` and clears the visible set.
    */
-  loadRange(range: { start: Date; end: Date }, opts: { force?: boolean } = {}): void {
-    if (this._rangeLoading()) return;
+  loadRange(
+    range: { start: Date; end: Date },
+    opts: { force?: boolean; done?: () => void } = {},
+  ): void {
+    // `done` fires on every exit — cache hit, in-flight, success and failure —
+    // so a pull-to-refresh spinner is never left spinning.
+    if (this._rangeLoading()) {
+      opts.done?.();
+      return;
+    }
     // Key on BOTH bounds — week vs day on the same Monday would otherwise share an entry.
     const key = `${range.start.getTime()}-${range.end.getTime()}`;
 
@@ -404,6 +412,7 @@ export class SessionsInstructorStore {
     if (cached) {
       this._rangeInstances.set(cached);
       this._rangeError.set(null);
+      opts.done?.();
       return;
     }
 
@@ -435,7 +444,10 @@ export class SessionsInstructorStore {
         }),
       )
       .subscribe({
-        complete: () => this._rangeLoading.set(false),
+        complete: () => {
+          this._rangeLoading.set(false);
+          opts.done?.();
+        },
       });
   }
 

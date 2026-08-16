@@ -63,14 +63,36 @@ export const LOCATION_KIND_OPTIONS = [
  * shifts a whole series by a day.
  */
 export const WEEKDAYS = [
-  { value: 1, label: 'M' },
-  { value: 2, label: 'T' },
-  { value: 3, label: 'W' },
-  { value: 4, label: 'T' },
-  { value: 5, label: 'F' },
-  { value: 6, label: 'S' },
-  { value: 7, label: 'S' },
+  { value: 1, label: 'M', short: 'Mon' },
+  { value: 2, label: 'T', short: 'Tue' },
+  { value: 3, label: 'W', short: 'Wed' },
+  { value: 4, label: 'T', short: 'Thu' },
+  { value: 5, label: 'F', short: 'Fri' },
+  { value: 6, label: 'S', short: 'Sat' },
+  { value: 7, label: 'S', short: 'Sun' },
 ] as const;
+
+/** The single-letter column headers, for anything laying out a week. */
+export const WEEKDAY_LETTERS = WEEKDAYS.map((day) => day.label);
+
+/**
+ * "Mon", "Mon & Wed", "Mon, Wed & Fri" — ISO weekday numbers as prose.
+ *
+ * The recurrence editor and the detail screen describe the same rule, and
+ * before this they each had their own list-joining: one always used "&", the
+ * other used commas, so creating a series and then opening it showed two
+ * different sentences for one thing.
+ */
+export function formatWeekdayList(days: readonly number[]): string {
+  const names = [...days]
+    .sort((a, b) => a - b)
+    .map((value) => WEEKDAYS.find((day) => day.value === value)?.short)
+    .filter((name) => name !== undefined);
+
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
+}
 
 /**
  * What a cancel applies to. Values match core's `CancelScope`; the copy is

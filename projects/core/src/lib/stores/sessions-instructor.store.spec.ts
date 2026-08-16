@@ -293,6 +293,44 @@ describe('SessionsInstructorStore', () => {
     expect(store.rangeLoading()).toBe(false);
   });
 
+  // The agenda's pull-to-refresh hangs its spinner on this callback. Every
+  // exit has to fire it — a missed path leaves the spinner up forever, which
+  // is what the page used to work around with a polling timer.
+  it('loadRange() calls done on success, on cache hit, and while one is in flight', () => {
+    const range = {
+      start: new Date('2026-12-01T00:00:00Z'),
+      end: new Date('2026-12-08T00:00:00Z'),
+    };
+    let calls = 0;
+    const done = () => calls++;
+
+    store.loadRange(range, { done });
+    // A second call before the first resolves must not swallow its caller.
+    store.loadRange(range, { done });
+    expect(calls).toBe(1);
+
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
+      .flush({ items: [], total: 0, page: 1, pageSize: 100 });
+    expect(calls).toBe(2);
+
+    store.loadRange(range, { done });
+    httpMock.expectNone((r) => r.url === `${BASE}/sessions/instances`);
+    expect(calls).toBe(3);
+  });
+
+  it('loadRange() calls done when the request fails', () => {
+    let called = false;
+    store.loadRange(
+      { start: new Date('2027-01-01T00:00:00Z'), end: new Date('2027-01-08T00:00:00Z') },
+      { done: () => (called = true) },
+    );
+    httpMock
+      .expectOne((r) => r.url === `${BASE}/sessions/instances`)
+      .error(new ProgressEvent('Network'), { status: 500 });
+    expect(called).toBe(true);
+  });
+
   it('prependInstanceOptimistic adds; removeInstance takes it out', () => {
     store.loadRange({
       start: new Date('2026-12-01T00:00:00Z'),

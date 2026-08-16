@@ -2,6 +2,7 @@
   <ion-toolbar>
     <ion-title>Sessions</ion-title>
     <ion-buttons slot="end">
+      <mh-notification-bell />
       <ion-button aria-label="New session" (click)="openCreate()">
         <ion-icon slot="icon-only" name="add-outline" />
       </ion-button>
@@ -60,10 +61,10 @@
             class="day"
             [class.today]="day.isToday"
             [class.selected]="day.key === selectedDayKey()"
-            (click)="pickDay(day.date_)"
+            (click)="pickDay(day.date)"
           >
             <span class="initial">{{ day.initial }}</span>
-            <span class="date">{{ day.date }}</span>
+            <span class="date">{{ day.dayOfMonth }}</span>
             <span class="dots">
               @for (dot of day.dots; track $index) {
                 <i></i>
@@ -87,7 +88,7 @@
     <ion-refresher-content />
   </ion-refresher>
 
-  @if (showError()) {
+  @if (showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
       heading="Couldn't load your sessions"
