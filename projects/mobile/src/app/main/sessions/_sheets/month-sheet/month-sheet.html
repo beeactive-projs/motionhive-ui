@@ -7,6 +7,7 @@
     <ion-button fill="clear" aria-label="Next month" (click)="step(1)">
       <ion-icon slot="icon-only" name="chevron-forward" />
     </ion-button>
+    <button type="button" class="today" (click)="goToday()">Today</button>
   </div>
 
   <div class="grid heading">
@@ -22,6 +23,8 @@
         class="cell"
         [class.muted]="!cell.inMonth"
         [class.today]="cell.isToday"
+        [class.staged]="cell.key === stagedKey()"
+        [attr.aria-pressed]="cell.key === stagedKey()"
         (click)="pick(cell)"
       >
         <span class="day">{{ cell.day }}</span>
@@ -34,16 +37,23 @@
     }
   </div>
 
-  <ion-note class="mh-note-block">
-    Dots show sessions in the loaded range. Pick a day to jump the agenda there.
-  </ion-note>
+  <div class="legend">
+    @for (entry of legend; track entry.label) {
+      <span class="entry">
+        <i [attr.data-tone]="entry.tone"></i>
+        {{ entry.label }}
+      </span>
+    }
+  </div>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
   title="Jump to"
   [body]="body"
-  [showFooter]="false"
-  [breakpoints]="[0, 0.72]"
-  [initialBreakpoint]="0.72"
+  [saveLabel]="jumpLabel()"
+  [canSave]="staged() !== null"
+  [breakpoints]="[0, 0.8]"
+  [initialBreakpoint]="0.8"
+  (save)="jump()"
 />

@@ -8,7 +8,7 @@ import {
   sessionLifecycle,
 } from 'core';
 
-import { instanceTone } from '../../sessions.config';
+import { instanceMeta, instanceTone } from '../../sessions.config';
 
 /** Hold this long for the quick-actions sheet. */
 const LONG_PRESS_MS = 500;
@@ -86,25 +86,8 @@ export class SessionRow {
     () => sessionLifecycle(this.instance().startAt, this.instance().endAt) === 'ongoing',
   );
 
-  /** Capacity is the per-occurrence override when there is one. */
-  private readonly _capacity = computed(
-    () => this.instance().capacityOverride ?? this._template()?.capacity ?? null,
-  );
-
-  /** "8/12 · Herăstrău", or whichever halves exist. */
-  readonly meta = computed(() => {
-    const parts: string[] = [];
-    const capacity = this._capacity();
-    const confirmed = this.instance().confirmedCount;
-    parts.push(capacity === null ? `${confirmed} booked` : `${confirmed}/${capacity}`);
-
-    const place = this.isOnline()
-      ? (this._template()?.meetingProvider ?? 'Online')
-      : (this.instance().venueOverride?.name ?? this._template()?.venue?.name ?? '');
-    if (place) parts.push(place);
-
-    return parts.join(' · ');
-  });
+  /** "8/12 · Herăstrău" — shared with the rail so the two cannot disagree. */
+  readonly meta = computed(() => instanceMeta(this.instance()));
 
   readonly pendingCount = computed(() => this.instance().pendingApprovalCount);
 

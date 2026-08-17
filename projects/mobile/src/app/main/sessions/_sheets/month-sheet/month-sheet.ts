@@ -1,11 +1,17 @@
 import { Component, computed, effect, input, model, output, signal } from '@angular/core';
-import { IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { SessionInstance, localDayKey } from 'core';
+import { SessionInstance, localDayKey, startOfDay } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-import { SESSION_ICONS, WEEKDAY_LETTERS, instanceTone } from '../../sessions.config';
+import {
+  MONTH_LEGEND,
+  SESSION_ICONS,
+  WEEKDAY_LETTERS,
+  dayFromKey,
+  instanceTone,
+} from '../../sessions.config';
 
 interface MonthCell {
   key: string;
@@ -25,7 +31,7 @@ interface MonthCell {
  */
 @Component({
   selector: 'mh-month-sheet',
-  imports: [IonButton, IonIcon, IonNote, SheetShell],
+  imports: [IonButton, IonIcon, SheetShell],
   templateUrl: './month-sheet.html',
   styleUrl: './month-sheet.scss',
 })
@@ -40,9 +46,20 @@ export class MonthSheet {
   readonly monthChanged = output<Date>();
 
   readonly weekdayLabels = WEEKDAY_LETTERS;
+  readonly legend = MONTH_LEGEND;
 
   /** First of the month being shown. */
   readonly cursor = signal(startOfMonth(new Date()));
+
+  /**
+   * The day tapped, held until the CTA commits it.
+   *
+   * Staged rather than applied on tap: jumping the agenda the instant a finger
+   * lands makes every mis-tap a navigation, and the sheet dismissing underneath
+   * you gives no chance to correct it. The footer says exactly which day it is
+   * about to jump to.
+   */
+  readonly staged = signal<Date | null>(null);
 
   constructor() {
     addIcons(SESSION_ICONS);
@@ -50,8 +67,25 @@ export class MonthSheet {
     effect(() => {
       if (!this.open()) return;
       this.cursor.set(startOfMonth(this.anchor()));
+      this.staged.set(startOfDay(this.anchor()));
     });
   }
+
+  readonly stagedKey = computed(() => {
+    const staged = this.staged();
+    return staged ? localDayKey(staged) : null;
+  });
+
+  readonly jumpLabel = computed(() => {
+    const staged = this.staged();
+    if (!staged) return 'Jump';
+    const label = staged.toLocaleDateString('en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
+    return `Jump to ${label}`;
+  });
 
   readonly monthLabel = computed(() =>
     this.cursor().toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
@@ -103,9 +137,23 @@ export class MonthSheet {
     this.monthChanged.emit(next);
   }
 
+  /** Jump the grid back to the current month without committing a day. */
+  goToday(): void {
+    const today = startOfDay(new Date());
+    this.cursor.set(startOfMonth(today));
+    this.staged.set(today);
+    this.monthChanged.emit(today);
+  }
+
   pick(cell: MonthCell): void {
-    const [year, month, day] = cell.key.split('-').map(Number);
-    this.daySelected.emit(new Date(year, month - 1, day));
+    this.staged.set(dayFromKey(cell.key));
+  }
+
+  /** The CTA is what actually moves the agenda. */
+  jump(): void {
+    const staged = this.staged();
+    if (!staged) return;
+    this.daySelected.emit(staged);
     this.open.set(false);
   }
 }

@@ -1,12 +1,16 @@
 import { Component, computed, input, output } from '@angular/core';
-import { IonBadge, IonNote } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 
 import { SessionInstance, formatSessionTime } from 'core';
 
-import { instanceTone } from '../../sessions.config';
+import { instanceBaseTone, instanceMeta } from '../../sessions.config';
 
-/** Pixels per hour. Tall enough that a 30-minute block is still tappable. */
-const HOUR_HEIGHT = 56;
+/**
+ * Pixels per hour. A 30-minute block is 22px of fill plus its border, which
+ * still clears the 44px tap target because the block's own padding grows it —
+ * anything shorter and a half-hour session becomes a line you cannot press.
+ */
+const HOUR_HEIGHT = 44;
 
 /** Hours drawn when nothing is scheduled — a plausible working day. */
 const DEFAULT_FIRST_HOUR = 7;
@@ -20,9 +24,11 @@ interface RailBlock {
   widthPercent: number;
   leftPercent: number;
   hasConflict: boolean;
+  /** What it is, not whether it clashes — the ring carries that. */
   tone: string;
   title: string;
-  time: string;
+  /** "07:30 · 11/20 · Meet" */
+  meta: string;
 }
 
 /**
@@ -35,7 +41,7 @@ interface RailBlock {
  */
 @Component({
   selector: 'mh-day-rail',
-  imports: [IonBadge, IonNote],
+  imports: [IonIcon],
   templateUrl: './day-rail.html',
   styleUrl: './day-rail.scss',
 })
@@ -128,14 +134,17 @@ export class DayRail {
         widthPercent: 100 / column.total,
         leftPercent: (100 / column.total) * column.index,
         hasConflict,
-        tone: instanceTone(instance),
+        // Base tone, so an overlapping pair still reads as "1-on-1 against a
+        // group class" while the ring says they clash. Two facts, two channels.
+        tone: instanceBaseTone(instance),
         title: instance.titleOverride ?? template?.title ?? 'Session',
-        time: formatSessionTime(instance.startAt),
+        meta: `${formatSessionTime(instance.startAt)} · ${instanceMeta(instance)}`,
       };
     });
   });
 
-  readonly conflictCount = computed(() => this.blocks().filter((b) => b.hasConflict).length);
+  // The conflict count moved to the page header, where it sits next to the
+  // day's totals instead of floating above the rail on its own line.
 
   readonly railHeight = computed(() => this.hours().length * HOUR_HEIGHT);
 }

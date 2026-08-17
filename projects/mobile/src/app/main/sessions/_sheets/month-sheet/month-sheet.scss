@@ -1,13 +1,27 @@
 .nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.25rem;
   padding-bottom: 0.25rem;
 }
 
 .nav .label {
+  flex: 1;
   font-family: var(--mh-font-heading);
   font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Moves the grid, does not commit a day — so it is a quiet pill, not the CTA
+   in the footer, which is the thing that actually navigates. */
+.nav .today {
+  flex: none;
+  padding: 0.35rem 0.7rem;
+  border: none;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-dark);
+  font-size: 0.72rem;
   font-weight: 600;
 }
 
@@ -35,10 +49,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.15rem;
   aspect-ratio: 1;
   padding: 0.25rem 0;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--mh-radius-control);
   background: transparent;
 }
@@ -54,11 +69,19 @@
   color: var(--ion-color-medium-tint);
 }
 
+/* Same split as the week strip: the honey fill follows what you have chosen,
+   today keeps a ring. A day is routinely both, and they answer different
+   questions. */
 .cell.today {
+  border-color: var(--ion-color-primary);
+}
+
+.cell.staged {
+  border-color: transparent;
   background: var(--ion-color-primary);
 }
 
-.cell.today .day {
+.cell.staged .day {
   color: var(--ion-color-primary-contrast);
   font-weight: 700;
 }
@@ -69,25 +92,53 @@
   height: 0.25rem;
 }
 
-.cell .dots i {
+.cell .dots i,
+.legend .entry i {
   width: 0.25rem;
   height: 0.25rem;
   border-radius: var(--mh-radius-pill);
   background: var(--ion-color-primary);
 }
 
-.cell .dots i[data-tone='teal'] {
-  background: var(--ion-color-teal);
+.cell .dots i[data-tone='teal'],
+.legend .entry i[data-tone='teal'] {
+  background: var(--ion-color-teal-shade);
 }
 
-.cell .dots i[data-tone='navy'] {
+.cell .dots i[data-tone='navy'],
+.legend .entry i[data-tone='navy'] {
   background: var(--ion-color-info);
 }
 
-.cell .dots i[data-tone='coral'] {
+.cell .dots i[data-tone='coral'],
+.legend .entry i[data-tone='coral'] {
   background: var(--ion-color-danger);
 }
 
-.cell.today .dots i {
+.cell .dots i[data-tone='muted'],
+.legend .entry i[data-tone='muted'] {
+  background: var(--ion-color-medium);
+}
+
+.cell.staged .dots i {
   background: var(--ion-color-primary-contrast);
+}
+
+/* What the dots mean. Without it the grid is a colour chart with no key. */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ion-border-color);
+}
+
+.legend .entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ion-color-medium);
+  font-size: 0.7rem;
+  font-weight: 600;
 }

@@ -11,6 +11,7 @@ import {
 
 import {
   addOutline,
+  alertCircle,
   alertCircleOutline,
   calendarOutline,
   chevronBack,
@@ -34,6 +35,7 @@ import {
  */
 export const SESSION_ICONS = {
   addOutline,
+  alertCircle,
   alertCircleOutline,
   calendarOutline,
   chevronBack,
@@ -144,6 +146,67 @@ export const CANCEL_SCOPE_OPTIONS = [
 export function instanceTone(instance: SessionInstance): SessionTone {
   return instance.template ? sessionTone(instance.template, instance) : 'honey';
 }
+
+/**
+ * Tone from what the session *is*, ignoring whether it clashes.
+ *
+ * The hour rail needs both facts at once — an overlapping pair still has to
+ * read as "a 1-on-1 against a group class" while the clash is called out — so
+ * there the fill carries the type and a ring carries the conflict. Everywhere
+ * a row can only say one thing, `instanceTone` is right and the clash wins.
+ *
+ * Implemented by hiding the conflict from core's `sessionTone` rather than
+ * restating its priority order, which would drift the moment that order moves.
+ */
+export function instanceBaseTone(instance: SessionInstance): SessionTone {
+  if (!instance.template) return 'honey';
+  return sessionTone(instance.template, { ...instance, conflictingInstanceIds: null });
+}
+
+/** Capacity as the coach reads it: "8/12", or "8 booked" when uncapped. */
+export function instanceCapacityLabel(instance: SessionInstance): string {
+  const capacity = instance.capacityOverride ?? instance.template?.capacity ?? null;
+  const confirmed = instance.confirmedCount;
+  return capacity === null ? `${confirmed} booked` : `${confirmed}/${capacity}`;
+}
+
+/** Where it happens — the meeting provider online, else the venue name. */
+export function instancePlaceLabel(instance: SessionInstance): string {
+  if (instance.template?.locationKind === 'ONLINE') {
+    return instance.template.meetingProvider ?? 'Online';
+  }
+  return instance.venueOverride?.name ?? instance.template?.venue?.name ?? '';
+}
+
+/**
+ * "8/12 · Herăstrău" — the sub-line under a session title.
+ *
+ * Shared by the agenda row and the rail block so the two views of the same
+ * occurrence cannot describe it differently.
+ */
+export function instanceMeta(instance: SessionInstance): string {
+  const place = instancePlaceLabel(instance);
+  const parts = [instanceCapacityLabel(instance)];
+  if (place) parts.push(place);
+  return parts.join(' · ');
+}
+
+/**
+ * What the dots on the month grid mean.
+ *
+ * Deliberately not the design's Group / 1-on-1 / Open / Conflict. The tones
+ * come from core's `sessionTone`, which tests location *before* type and has no
+ * tone of its own for Open — an Open session is honey, exactly like a Group
+ * one, so a legend promising to tell them apart would be lying. This describes
+ * the colours that actually appear. Changing `sessionTone` to match the design
+ * instead is a web-wide decision, not a mobile one.
+ */
+export const MONTH_LEGEND: readonly { tone: SessionTone; label: string }[] = [
+  { tone: 'honey', label: 'Group' },
+  { tone: 'navy', label: '1-on-1' },
+  { tone: 'teal', label: 'Online' },
+  { tone: 'coral', label: 'Conflict' },
+];
 
 // ─── Filters ──────────────────────────────────────────────────────────────
 

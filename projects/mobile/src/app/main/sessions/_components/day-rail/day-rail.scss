@@ -1,17 +1,9 @@
 /* An hour rail is absolute positioning by nature — a block's offset and height
    encode its start and duration. Ionic has no primitive for this. */
 
-.warning {
-  display: block;
-  padding: 0 1.5rem 0.5rem;
-  color: var(--ion-color-danger);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
 .rail {
   position: relative;
-  margin: 0 1.25rem 6rem;
+  margin: 0.5rem 1.25rem 6rem;
 }
 
 /* The row is the tap target for creating at that hour, so it is a button —
@@ -50,6 +42,8 @@
    overflow by the gutter width. */
 .block {
   --gutter: 3.25rem;
+  --tint: var(--ion-color-primary-wash);
+  --ink: var(--ion-color-primary-wash-contrast);
   position: absolute;
   left: calc(var(--gutter) + (100% - var(--gutter)) * var(--col-left) / 100%);
   width: calc((100% - var(--gutter)) * var(--col-width) / 100% - 0.375rem);
@@ -58,50 +52,62 @@
   align-items: flex-start;
   gap: 0.1rem;
   overflow: hidden;
-  padding: 0.375rem 0.5rem;
-  border: 1px solid var(--ion-border-color);
-  border-left: 3px solid var(--spine);
+  padding: 0.3rem 0.5rem;
+  border-left: 3px solid var(--ink);
   border-radius: 0.25rem var(--mh-radius-control) var(--mh-radius-control) 0.25rem;
-  background: var(--ion-card-background);
+  /* Filled rather than outlined: at 44px an hour, a white card on a white page
+     leaves the rail reading as empty until you find the hairlines. */
+  background: var(--tint);
   text-align: start;
 }
 
-.block[data-tone='honey'] {
-  --spine: var(--ion-color-primary);
-}
+/* Wash pairs, not hand-picked colours — every pair is contrast-checked. */
 .block[data-tone='teal'] {
-  --spine: var(--ion-color-teal);
+  --tint: var(--ion-color-teal-wash);
+  --ink: var(--ion-color-teal-wash-contrast);
 }
+
 .block[data-tone='navy'] {
-  --spine: var(--ion-color-info);
-}
-.block[data-tone='coral'] {
-  --spine: var(--ion-color-danger);
-  box-shadow: 0 0 0 2px rgb(var(--ion-color-danger-rgb) / 0.28);
+  --tint: var(--ion-color-info-wash);
+  --ink: var(--ion-color-info-wash-contrast);
 }
 
 .block[data-tone='muted'] {
-  --spine: var(--ion-color-medium);
+  --tint: var(--ion-color-medium-wash);
+  --ink: var(--ion-color-medium-wash-contrast);
+}
+
+/* The clash is a ring, so the fill is still free to say what the session is.
+   Both members of an overlapping pair carry it — a ring on only one of them
+   reads as "this one is wrong", which is not what an overlap means. */
+.block.conflict {
+  box-shadow: 0 0 0 2px var(--ion-color-danger);
 }
 
 .block .title {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   overflow: hidden;
   width: 100%;
   color: var(--ion-text-color);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.block .time {
-  color: var(--ion-color-medium);
-  font-size: 0.62rem;
-  font-variant-numeric: tabular-nums;
+.block .title ion-icon {
+  flex: none;
+  font-size: 0.85rem;
 }
 
-.block ion-badge {
-  margin-top: 0.1rem;
-  font-size: 0.55rem;
-  text-transform: none;
+.block .meta {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--ion-color-medium-shade);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
