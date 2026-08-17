@@ -26,6 +26,37 @@ export function formatSessionDuration(minutes: number): string {
 }
 
 /**
+ * How long one occurrence runs, in minutes.
+ *
+ * Measured from the instants, not `template.durationMinutes`: a list endpoint
+ * can return instances without their template (the same reason `sessionTone`
+ * takes a nullable one), and `endAt` is always present. The template is only
+ * the fallback for a malformed pair.
+ */
+export function sessionMinutes(instance: SessionInstance): number {
+  const span =
+    (new Date(instance.endAt).getTime() - new Date(instance.startAt).getTime()) /
+    60_000;
+  if (Number.isFinite(span) && span > 0) return Math.round(span);
+  return instance.template?.durationMinutes ?? 0;
+}
+
+/**
+ * "6h" / "6h 30m" / "45m" — a summed workload, e.g. "5 sessions · 6h scheduled".
+ *
+ * Deliberately not `formatSessionDuration`, which renders a single session's
+ * length as "60min" for a row chip. Totals read in hours; rows read in minutes.
+ */
+export function formatTotalDuration(minutes: number): string {
+  const total = Math.max(0, Math.round(minutes));
+  const hours = Math.floor(total / 60);
+  const rest = total % 60;
+  if (hours === 0) return `${rest}m`;
+  if (rest === 0) return `${hours}h`;
+  return `${hours}h ${rest}m`;
+}
+
+/**
  * Lifecycle of a single occurrence relative to *now*, computed from its
  * start and end instants:
  *
@@ -52,6 +83,41 @@ export function sessionLifecycle(
   if (!Number.isNaN(end) && now >= end) return 'past';
   // Unknown start → nothing to attend yet; otherwise it's started and not ended.
   return Number.isNaN(start) ? 'upcoming' : 'ongoing';
+}
+
+/**
+ * "in 18 min" — how long until an occurrence starts, or `null` when there is
+ * nothing useful to say.
+ *
+ * The forward-looking counterpart to `formatRelativeShort`, which only reads
+ * backwards and collapses every future instant to "now". Returns `null` in
+ * three cases, all meaning "don't render a countdown": the session has already
+ * started (ask `sessionLifecycle` instead — "live now" is a different label),
+ * the timestamp is unusable, or it is more than eight hours out, where a
+ * countdown is noise next to the date already on the row.
+ *
+ * Resolution is deliberately coarse — minutes only inside the last hour. That
+ * is what lets callers hold a clock they refresh on view-enter/resume rather
+ * than running a timer: past the hour mark, a stale value still reads correctly.
+ *
+ * `now` is injectable for testing; defaults to the current clock.
+ */
+export function formatTimeUntil(
+  startIso: string | null | undefined,
+  now: number = Date.now(),
+): string | null {
+  const start = startIso ? new Date(startIso).getTime() : NaN;
+  if (Number.isNaN(start)) return null;
+
+  const diff = start - now;
+  if (diff <= 0) return null;
+  if (diff < 60_000) return 'starting now';
+
+  const minutes = Math.round(diff / 60_000);
+  if (minutes < 60) return `in ${minutes} min`;
+
+  const hours = Math.round(diff / 3_600_000);
+  return hours <= 8 ? `in ${hours} h` : null;
 }
 
 /** "Wed 25 Jun" — compact weekday + day + short month, en-GB. */

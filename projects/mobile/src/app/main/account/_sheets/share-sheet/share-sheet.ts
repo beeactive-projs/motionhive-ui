@@ -3,11 +3,12 @@ import { IonButton, IonIcon, IonItem, IonLabel, IonList, IonNote } from '@ionic/
 import { addIcons } from 'ionicons';
 import { copyOutline, openOutline, shareSocialOutline } from 'ionicons/icons';
 
-import { WEB_APP_URL } from 'core';
+import { publicProfileUrl } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
+import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../../_shared/utils/share';
 
 /**
  * Share the public profile link.
@@ -16,8 +17,8 @@ import { FeedbackService } from '../../../../_shared/services/feedback.service';
  * Capacitor WebView the origin is `capacitor://localhost`, which would produce
  * a dead link. (Web's profile page has exactly that bug; don't copy it.)
  *
- * `navigator.share` is frequently missing from the Android System WebView, so
- * the share row falls back to copying rather than assuming it exists.
+ * The share/copy mechanics live in `_shared/utils/share` — the sessions screens
+ * share a link the same way, and the WebView caveats are the same there.
  */
 @Component({
   selector: 'mh-share-sheet',
@@ -42,7 +43,7 @@ export class ShareSheet {
 
   readonly url = computed(() => {
     const handle = this.handle();
-    return handle ? `${WEB_APP_URL}/@${handle}` : null;
+    return handle ? publicProfileUrl(handle) : null;
   });
 
   constructor() {
@@ -52,7 +53,7 @@ export class ShareSheet {
   async copyLink(): Promise<void> {
     const url = this.url();
     if (!url) return;
-    if (await this._writeToClipboard(url)) {
+    if (await copyToClipboard(url)) {
       await this._feedbackService.success('Link copied');
     } else {
       await this._feedbackService.error(null, 'Could not copy the link.');
@@ -63,29 +64,17 @@ export class ShareSheet {
     const url = this.url();
     if (!url) return;
 
-    if (typeof navigator.share === 'function') {
-      try {
-        await navigator.share({ title: 'My MotionHive profile', url });
-        return;
-      } catch (error) {
-        // A user-cancelled share is an AbortError, not a failure worth a toast.
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-      }
+    const outcome = await shareOrCopy({ title: 'My MotionHive profile', url });
+    // Shared: the OS already gave feedback. Cancelled: the user said no.
+    if (outcome === ShareOutcomes.Copied) {
+      await this._feedbackService.success('Link copied');
+    } else if (outcome === ShareOutcomes.Failed) {
+      await this._feedbackService.error(null, 'Could not share the link.');
     }
-    await this.copyLink();
   }
 
   openLink(): void {
     const url = this.url();
     if (url) window.open(url, '_blank', 'noopener');
-  }
-
-  private async _writeToClipboard(text: string): Promise<boolean> {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      return false;
-    }
   }
 }

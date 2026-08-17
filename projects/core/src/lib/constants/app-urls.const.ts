@@ -32,13 +32,26 @@ export const PRIVACY_POLICY_URL = `${MARKETING_SITE_URL}/legal/privacy-policy`;
 export const COOKIE_POLICY_URL = `${MARKETING_SITE_URL}/legal/cookie-policy`;
 
 /**
+ * A coach's public profile — the one URL in this product that a stranger can
+ * open without an account, so it is the share target for anything
+ * profile-shaped.
+ *
+ * Note the web app also serves a `/public/@<handle>` route it calls canonical;
+ * `/@<handle>` reaches the same page because a guard bounces guests there.
+ * Every existing call site builds the short form, so this keeps it rather than
+ * splitting the convention — switching them all is a separate change.
+ */
+export function publicProfileUrl(handle: string): string {
+  return `${WEB_APP_URL}/@${handle}`;
+}
+
+/**
  * Destination for a blog author's byline.
  *
- * - Registered external author (has a handle) → their public profile at
- *   `${WEB_APP_URL}/@<handle>`.
+ * - Registered external author (has a handle) → their public profile.
  * - MotionHive's own content (guest byline / no handle) → the signup
  *   page, nudging readers to join.
  */
 export function authorBylineUrl(handle: string | null | undefined): string {
-  return handle ? `${WEB_APP_URL}/@${handle}` : SIGNUP_URL;
+  return handle ? publicProfileUrl(handle) : SIGNUP_URL;
 }
