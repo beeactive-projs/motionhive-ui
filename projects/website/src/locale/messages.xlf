@@ -4832,11 +4832,10 @@
       </trans-unit>
       <trans-unit id="privacy.s13.p5" datatype="html">
         <source>To exercise these rights, you can contact us by emailing us at <x id="START_LINK" ctype="x-a" equiv-text="&lt;a
-          href=&quot;mailto:privacy@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, by visiting <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://www.motionhive.fit/contact&quot;
-          class=&quot;text-brand hover:underline&quot;&gt;"/>https://www.motionhive.fit/contact<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, or by referring to the contact details at the bottom of this document. You can opt out from the selling of your personal information, targeted advertising, or profiling by disabling cookies in cookie preference settings.</source>
+          href=&quot;mailto:privacy@motionhive.fit&quot; class=&quot;text-brand hover:underline&quot;&gt;"/>privacy@motionhive.fit<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>, or by referring to the contact details at the bottom of this document. You can opt out from the selling of your personal information, targeted advertising, or profiling by disabling cookies in cookie preference settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">projects/website/src/app/legal/privacy-policy/privacy-policy.component.html</context>
-          <context context-type="linenumber">501,506</context>
+          <context context-type="linenumber">501,504</context>
         </context-group>
       </trans-unit>
       <trans-unit id="privacy.s13.p6" datatype="html">
