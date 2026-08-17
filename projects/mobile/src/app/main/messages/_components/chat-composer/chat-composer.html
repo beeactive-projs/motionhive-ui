@@ -16,7 +16,6 @@
 <div class="bar">
   <ion-textarea
     class="field"
-    fill="solid"
     [autoGrow]="true"
     [rows]="1"
     [maxlength]="null"
@@ -28,6 +27,7 @@
 
   <ion-button
     class="send"
+    color="primary"
     shape="round"
     [disabled]="!canSend()"
     [attr.aria-label]="isRateLimited() ? 'Sending paused' : 'Send'"

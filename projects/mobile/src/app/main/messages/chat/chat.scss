@@ -34,6 +34,24 @@
   --padding-bottom: 0.375rem;
 }
 
+/* The send bar. The composer needs a toolbar around it rather than sitting
+   loose in the footer: the toolbar is what carries the surface colour, and
+   Ionic only pads the bottom safe area on an `ion-toolbar` that is the
+   footer's last child — a bare child sits under the home indicator. A hairline
+   holds the bar apart from the thread scrolling under it, so md's three-layer
+   drop shadow comes off (`ion-no-border` on the footer). Padding is zeroed
+   because the composer owns its own gutter. */
+ion-footer ion-toolbar {
+  --background: var(--ion-card-background);
+  --border-width: 1px 0 0;
+  --border-color: var(--ion-border-color);
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --min-height: 0;
+}
+
 .day {
   display: flex;
   justify-content: center;

@@ -77,10 +77,12 @@
   }
 </ion-content>
 
-<ion-footer [translucent]="true">
-  <mh-chat-composer
-    [conversationId]="conversationId()"
-    [recipientId]="recipientId()"
-    [placeholder]="placeholder()"
-  />
+<ion-footer class="ion-no-border">
+  <ion-toolbar>
+    <mh-chat-composer
+      [conversationId]="conversationId()"
+      [recipientId]="recipientId()"
+      [placeholder]="placeholder()"
+    />
+  </ion-toolbar>
 </ion-footer>

@@ -1,39 +1,53 @@
+/* Bottom-aligned so the button stays level with the last line as the field
+   grows. The gutter matches the thread's, so the bar lines up with the bubbles
+   above it. */
 .bar {
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 1rem;
 }
 
 .field {
   flex: 1;
-  /* Ionic's solid fill draws a form-field underline; a composer is a pill.
-     Zero border width kills the line, `--highlight-height` the focus one.
+  /* A composer is a pill, and `fill="solid"` cannot be one: Ionic hard-codes
+     the two bottom corners of a solid fill to 0 for the Material underline,
+     and floors it at 56px. Unfilled, the bare textarea publishes exactly the
+     two variables the pill needs — `--background` and a radius that applies to
+     all four corners — and keeps its own 44px height. `--highlight-height`
+     kills md's focus underline, the last thing that read as a form field.
 
      `!important` to opt out of the app-wide control radius in styles.css —
      this is the one field that is deliberately rounder than the standard, and
      that rule has to be `!important` to beat Ionic's own scoped CSS. */
   --border-radius: 1.375rem !important;
-  --border-width: 0;
-  --border-color: transparent;
   --padding-start: 0.875rem;
   --padding-end: 0.875rem;
-  --padding-top: 0.5rem;
-  --padding-bottom: 0.5rem;
+  /* Symmetric, unlike the 18/8 Ionic uses to clear a floating label: half of
+     the 44px height less the line box, so one line sits centred in the pill. */
+  --padding-top: 0.8125rem;
+  --padding-bottom: 0.8125rem;
   --background: var(--mh-color-divider);
   --highlight-height: 0;
+  font-size: 0.9375rem;
   /* Past this the keyboard and the bar leave no thread visible. */
   max-height: 40vh;
   overflow-y: auto;
 }
 
+/* A circle the same 44px as the pill beside it. `color="primary"` is load-
+   bearing, not decoration: inside a toolbar Ionic repaints an uncoloured solid
+   button as an inverted chip — ink for the fill, toolbar background for the
+   label — which would put white on honey at 2.2:1. The colour class opts out
+   of that rule and restores the palette's own black-on-honey. */
 .send {
   flex: none;
   --padding-start: 0;
   --padding-end: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin: 0 0 0.25rem;
+  --box-shadow: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0;
   font-weight: 600;
 }
 
@@ -41,7 +55,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.75rem 0 1rem;
+  padding: 0.5rem 1rem 0;
 }
 
 .error ion-note {
