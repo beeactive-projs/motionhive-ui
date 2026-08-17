@@ -6,6 +6,7 @@ import {
   SESSION_ACTIONS,
   SESSION_ICONS,
   SESSION_TYPE_OPTIONS,
+  SessionActionIds,
 } from './sessions.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -102,6 +103,73 @@ describe('formatWeekdayList', () => {
   });
 });
 
+describe('formatRecurrenceSummary', () => {
+  it('reads as the design does — how often, then when it stops', async () => {
+    const { formatRecurrenceSummary } = await import('./sessions.config');
+    expect(
+      formatRecurrenceSummary({
+        frequency: 'WEEKLY',
+        interval: 1,
+        daysOfWeek: [2, 4],
+        endAfterOccurrences: 24,
+      }),
+    ).toBe('Every Tue & Thu · 24 occurrences');
+  });
+
+  // A series with no end is not endless — the BE materialises a batch and tops
+  // it up later — so the sentence has to stop at the frequency.
+  it('says nothing about the end when the rule carries none', async () => {
+    const { formatRecurrenceSummary } = await import('./sessions.config');
+    expect(
+      formatRecurrenceSummary({ frequency: 'WEEKLY', interval: 1, daysOfWeek: [1] }),
+    ).toBe('Every Mon');
+  });
+
+  it('handles the non-weekly frequencies and intervals', async () => {
+    const { formatRecurrenceSummary } = await import('./sessions.config');
+    expect(formatRecurrenceSummary({ frequency: 'DAILY', interval: 1 })).toBe('Every day');
+    expect(formatRecurrenceSummary({ frequency: 'MONTHLY', interval: 2 })).toBe(
+      'Every 2 months',
+    );
+    expect(
+      formatRecurrenceSummary({ frequency: 'WEEKLY', interval: 2, daysOfWeek: [3] }),
+    ).toBe('Every 2 weeks on Wed');
+  });
+
+  it('ends on a date when that is how the rule ends', async () => {
+    const { formatRecurrenceSummary } = await import('./sessions.config');
+    expect(
+      formatRecurrenceSummary({
+        frequency: 'WEEKLY',
+        interval: 1,
+        daysOfWeek: [5],
+        endDate: '2026-06-30',
+      }),
+    ).toBe('Every Fri · until 30 Jun');
+  });
+
+  it('returns empty for a one-off, so callers can skip the line', async () => {
+    const { formatRecurrenceSummary } = await import('./sessions.config');
+    expect(formatRecurrenceSummary(null)).toBe('');
+  });
+});
+
+describe('sessionTypeLabel', () => {
+  // The chip on the detail band and the tile on the create sheet name the same
+  // thing, so they read from the same list.
+  it('names a type the way the create sheet does', async () => {
+    const { sessionTypeLabel } = await import('./sessions.config');
+    expect(sessionTypeLabel('GROUP')).toBe('Group');
+    expect(sessionTypeLabel('PRIVATE')).toBe('1-on-1');
+    expect(sessionTypeLabel('OPEN')).toBe('Open');
+  });
+
+  it('falls back rather than rendering an enum at a user', async () => {
+    const { sessionTypeLabel } = await import('./sessions.config');
+    expect(sessionTypeLabel(null)).toBe('Session');
+  });
+});
+
 describe('option constants', () => {
   // The BE expects ISO 8601 weekdays. Getting this wrong shifts an entire
   // recurring series by a day, which is invisible until someone turns up on
@@ -120,6 +188,31 @@ describe('option constants', () => {
       'thisAndFuture',
       'series',
     ]);
+  });
+
+  // A colour Ionic cannot resolve is not an error — the glyph silently falls
+  // back to the item's ink, so a typo here shows up as one row quietly losing
+  // its tint rather than as a failure.
+  it('tints every verb with a palette colour Ionic knows', () => {
+    const palette = ['primary', 'success', 'info', 'medium', 'danger'];
+    for (const action of SESSION_ACTIONS) {
+      expect(palette).toContain(action.color);
+    }
+  });
+
+  // Honey is the brand's "act here" colour, so exactly one row may wear it —
+  // the primary verb. A second honey row and neither reads as primary.
+  it('spends honey on the primary verb alone', () => {
+    const honey = SESSION_ACTIONS.filter((action) => action.color === 'primary');
+    expect(honey.map((action) => action.id)).toEqual([SessionActionIds.Open]);
+  });
+
+  // Red label and red glyph both key off `destructive`, and cancel is the only
+  // verb that cannot be undone.
+  it('marks cancel, and only cancel, destructive', () => {
+    const destructive = SESSION_ACTIONS.filter((action) => action.destructive);
+    expect(destructive.map((action) => action.id)).toEqual([SessionActionIds.Cancel]);
+    expect(destructive[0].color).toBe('danger');
   });
 });
 

@@ -228,7 +228,7 @@ export class Sessions implements ViewWillEnter {
 
     const anchor = dateRange ?? monthRange ?? base;
     const extras = [dateRange, monthRange, base].filter(
-      (window): window is DayWindow => window !== null && window !== anchor,
+      (window): window is DayWindow => window !== null && window !== anchor
     );
 
     return fitWindow(anchor, extras);
@@ -263,7 +263,7 @@ export class Sessions implements ViewWillEnter {
   private readonly _nextUp = computed(() => {
     const now = this._clockService.now();
     const next = this.visibleInstances().find(
-      (instance) => new Date(instance.startAt).getTime() > now,
+      (instance) => new Date(instance.startAt).getTime() > now
     );
     if (!next) return null;
     const note = formatTimeUntil(next.startAt, now);
@@ -274,7 +274,7 @@ export class Sessions implements ViewWillEnter {
   readonly dayInstances = computed(() => {
     const key = localDayKey(this.selectedDay());
     return this.visibleInstances().filter(
-      (instance) => localDayKey(new Date(instance.startAt)) === key,
+      (instance) => localDayKey(new Date(instance.startAt)) === key
     );
   });
 
@@ -303,10 +303,9 @@ export class Sessions implements ViewWillEnter {
         label: sessionDayLabel(new Date(instances[0].startAt)),
         isToday: key === todayKey,
         instances: instances.sort(
-          (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime(),
+          (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
         ),
-        conflicts: instances.filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0)
-          .length,
+        conflicts: instances.filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0).length,
         nextNote: nextUp?.key === key ? nextUp.note : null,
       }));
   });
@@ -366,16 +365,11 @@ export class Sessions implements ViewWillEnter {
   readonly weekCount = computed(() => this._weekInstances().length);
 
   readonly conflictCount = computed(
-    () =>
-      this._weekInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0)
-        .length,
+    () => this._weekInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0).length
   );
 
   readonly signupCount = computed(() =>
-    this._weekInstances().reduce(
-      (sum, i) => sum + i.confirmedCount + i.pendingApprovalCount,
-      0,
-    ),
+    this._weekInstances().reduce((sum, i) => sum + i.confirmedCount + i.pendingApprovalCount, 0)
   );
 
   readonly selectedDayKey = computed(() => localDayKey(this.selectedDay()));
@@ -384,12 +378,12 @@ export class Sessions implements ViewWillEnter {
     this.selectedDay().toLocaleDateString(undefined, {
       weekday: 'long',
       day: 'numeric',
-      month: 'long',
-    }),
+      month: 'short',
+    })
   );
 
   readonly monthLabel = computed(() =>
-    this.selectedDay().toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
+    this.selectedDay().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
   );
 
   /** "5 sessions · 6h scheduled" — the day view's right-hand summary. */
@@ -402,9 +396,7 @@ export class Sessions implements ViewWillEnter {
 
   /** "1 conflict at 17:00" — the day view's left-hand warning, or null. */
   readonly dayConflictLabel = computed(() => {
-    const clashing = this.dayInstances().filter(
-      (i) => (i.conflictingInstanceIds?.length ?? 0) > 0,
-    );
+    const clashing = this.dayInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0);
     if (clashing.length === 0) return null;
     const noun = clashing.length === 1 ? 'conflict' : 'conflicts';
     return `${clashing.length} ${noun} at ${formatSessionTime(clashing[0].startAt)}`;
@@ -412,23 +404,22 @@ export class Sessions implements ViewWillEnter {
 
   /** Filters or a search hid everything, but the window itself is not empty. */
   readonly isFilteredEmpty = computed(
-    () =>
-      this.store.rangeInstances().length > 0 && this.visibleInstances().length === 0,
+    () => this.store.rangeInstances().length > 0 && this.visibleInstances().length === 0
   );
 
   readonly showSkeleton = computed(
-    () => this.store.rangeLoading() && this.store.rangeInstances().length === 0,
+    () => this.store.rangeLoading() && this.store.rangeInstances().length === 0
   );
 
   readonly showLoadError = computed(
-    () => !!this.store.rangeError() && this.store.rangeInstances().length === 0,
+    () => !!this.store.rangeError() && this.store.rangeInstances().length === 0
   );
 
   readonly isEmpty = computed(
     () =>
       !this.store.rangeLoading() &&
       !this.store.rangeError() &&
-      this.store.rangeInstances().length === 0,
+      this.store.rangeInstances().length === 0
   );
 
   /** Chrome is hidden on the true-empty and error screens, but not when a
@@ -592,7 +583,9 @@ export class Sessions implements ViewWillEnter {
     if (!handle) return;
 
     const title = instance.titleOverride ?? instance.template?.title ?? 'Session';
-    const when = `${formatSessionDayShort(instance.startAt)}, ${formatSessionTime(instance.startAt)}`;
+    const when = `${formatSessionDayShort(instance.startAt)}, ${formatSessionTime(
+      instance.startAt
+    )}`;
 
     const outcome = await shareOrCopy({
       title,

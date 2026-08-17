@@ -1,4 +1,5 @@
 import {
+  RecurrenceRule,
   SessionInstance,
   SessionKind,
   SessionLocationKind,
@@ -21,16 +22,16 @@ import {
   chevronForward,
   closeCircleOutline,
   copyOutline,
-  ellipsisHorizontal,
+  ellipsisVertical,
   funnelOutline,
   globeOutline,
   locationOutline,
+  notificationsOutline,
   peopleOutline,
   personOutline,
   searchOutline,
   sendOutline,
   shareOutline,
-  timeOutline,
   videocamOutline,
 } from 'ionicons/icons';
 
@@ -51,16 +52,16 @@ export const SESSION_ICONS = {
   chevronForward,
   closeCircleOutline,
   copyOutline,
-  ellipsisHorizontal,
+  ellipsisVertical,
   funnelOutline,
   globeOutline,
   locationOutline,
+  notificationsOutline,
   peopleOutline,
   personOutline,
   searchOutline,
   sendOutline,
   shareOutline,
-  timeOutline,
   videocamOutline,
 };
 
@@ -141,6 +142,51 @@ export function formatWeekdayList(days: readonly number[]): string {
   return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
 }
 
+/** "Group" / "1-on-1" / "Open" — the type as the create sheet named it. */
+export function sessionTypeLabel(type: SessionKind | null | undefined): string {
+  return SESSION_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? 'Session';
+}
+
+/** How often it comes round: "Every Tue & Thu", "Every 2 weeks", "Every day". */
+function frequencyPhrase(rule: RecurrenceRule): string {
+  const every = rule.interval > 1 ? `Every ${rule.interval}` : 'Every';
+
+  if (rule.frequency === 'DAILY') return rule.interval > 1 ? `${every} days` : 'Every day';
+  if (rule.frequency === 'MONTHLY') {
+    return rule.interval > 1 ? `${every} months` : 'Every month';
+  }
+
+  const days = formatWeekdayList(rule.daysOfWeek ?? []);
+  if (!days) return rule.interval > 1 ? `${every} weeks` : 'Every week';
+  return rule.interval > 1 ? `${every} weeks on ${days}` : `Every ${days}`;
+}
+
+/**
+ * "Every Tue & Thu · 24 occurrences" — a whole recurrence rule as one line.
+ *
+ * The end is only stated when the rule carries one. A series with neither an
+ * end date nor a count is not endless — the BE materialises a batch of rows and
+ * tops them up later — so promising "forever" here would be the wrong claim.
+ */
+export function formatRecurrenceSummary(rule: RecurrenceRule | null | undefined): string {
+  if (!rule) return '';
+
+  const parts = [frequencyPhrase(rule)];
+
+  if (rule.endAfterOccurrences) {
+    parts.push(`${rule.endAfterOccurrences} occurrences`);
+  } else if (rule.endDate) {
+    const end = new Date(rule.endDate);
+    if (!Number.isNaN(end.getTime())) {
+      parts.push(
+        `until ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`,
+      );
+    }
+  }
+
+  return parts.join(' · ');
+}
+
 /**
  * The verbs on a session row, in priority order, destructive last.
  *
@@ -165,24 +211,67 @@ export const SessionActionIds = {
 export type SessionActionId =
   (typeof SessionActionIds)[keyof typeof SessionActionIds];
 
+/**
+ * Glyph colour per verb, so a column of six rows is scannable rather than a
+ * wall of one hue.
+ *
+ * Honey lands on `Open` alone. It is the sheet's primary action — the same
+ * thing tapping the row does — and the brand rule reserves honey for exactly
+ * that. The two verbs with a meaning of their own take it (attendance is
+ * green, sending is sky), the plumbing verbs stay neutral, and destructive is
+ * red. None of these encode a *state*, which is the line honey must not cross.
+ */
 export const SESSION_ACTIONS: readonly {
   id: SessionActionId;
   label: string;
   icon: string;
+  /** Ionic palette name for the leading glyph. */
+  color: string;
   destructive?: boolean;
 }[] = [
-  { id: SessionActionIds.Open, label: 'Open session', icon: 'arrow-forward-circle-outline' },
-  { id: SessionActionIds.CheckIn, label: 'Check in attendees', icon: 'checkmark-circle-outline' },
-  { id: SessionActionIds.Message, label: 'Message all signups', icon: 'send-outline' },
-  { id: SessionActionIds.Duplicate, label: 'Duplicate', icon: 'copy-outline' },
-  { id: SessionActionIds.Share, label: 'Share booking link', icon: 'share-outline' },
+  {
+    id: SessionActionIds.Open,
+    label: 'Open session',
+    icon: 'arrow-forward-circle-outline',
+    color: 'primary',
+  },
+  {
+    id: SessionActionIds.CheckIn,
+    label: 'Check in attendees',
+    icon: 'checkmark-circle-outline',
+    color: 'success',
+  },
+  {
+    id: SessionActionIds.Message,
+    label: 'Message all signups',
+    icon: 'send-outline',
+    color: 'info',
+  },
+  { id: SessionActionIds.Duplicate, label: 'Duplicate', icon: 'copy-outline', color: 'medium' },
+  { id: SessionActionIds.Share, label: 'Share booking link', icon: 'share-outline', color: 'medium' },
   {
     id: SessionActionIds.Cancel,
     label: 'Cancel session…',
     icon: 'close-circle-outline',
+    color: 'danger',
     destructive: true,
   },
 ];
+
+/**
+ * Which screen opened the verb sheet.
+ *
+ * The list is shared, but two of its verbs only make sense from a distance:
+ * "Open session" and "Check in attendees" both mean "take me to the detail
+ * screen", which is a dead end when you are already on it. The sheet drops
+ * them rather than the detail screen swallowing the taps.
+ */
+export const SessionSurfaces = {
+  Agenda: 'agenda',
+  Detail: 'detail',
+} as const;
+
+export type SessionSurface = (typeof SessionSurfaces)[keyof typeof SessionSurfaces];
 
 /**
  * When a series stops. `never` still generates a first batch of occurrences —

@@ -1,10 +1,18 @@
 /* Which session this is about. Without it a list of verbs is ambiguous the
-   moment two sessions sit next to each other on the same day. */
+   moment two sessions sit next to each other on the same day.
+
+   It stands in for the title bar this sheet does not have, so it carries both
+   of that bar's jobs: the top gap that keeps text clear of the grabber Ionic
+   draws over the content, and the hairline closing it off. The rule runs the
+   full width of the sheet — cancelling the content padding and re-applying it
+   as its own — because a divider stopping short reads as an underline. */
 .head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.75rem;
-  padding: 0 0.25rem 0.25rem;
+  margin-inline: calc(var(--ion-padding, 16px) * -1);
+  padding: 0.5rem var(--ion-padding, 16px) 0.75rem;
+  border-bottom: 1px solid var(--mh-color-divider);
 }
 
 .head .time {
@@ -32,6 +40,20 @@
   margin-top: 0.15rem;
   color: var(--ion-color-medium);
   text-transform: uppercase;
+}
+
+/* The verbs are the sheet's own surface, not a card floating on it: the rows
+   bleed to the edges so the tap target is the full width, and their glyphs
+   land on the same margin as the head above. (The shell's `flushBody` is the
+   other half of this — without it the rows would sit on the page slate.) */
+ion-list {
+  margin-inline: calc(var(--ion-padding, 16px) * -1);
+}
+
+/* Ionic's md spacing puts 32px between a start icon and its label, which opens
+   a gap wide enough to read as two columns in a list this short. */
+ion-item ion-icon {
+  margin-inline-end: 1rem;
 }
 
 /* Destructive last and red — the only row that cannot be undone. */

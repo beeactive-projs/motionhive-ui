@@ -15,7 +15,10 @@ import {
   SESSION_ICONS,
   SessionActionId,
   SessionActionIds,
-  instanceMeta,
+  SessionSurface,
+  SessionSurfaces,
+  instanceCapacityLabel,
+  instancePlaceLabel,
 } from '../../sessions.config';
 
 /**
@@ -42,6 +45,8 @@ export class SessionActionsSheet {
   readonly instance = input<SessionInstance | null>(null);
   /** Hides Share when the coach has not claimed a handle — there is no link yet. */
   readonly canShare = input(false);
+  /** Which screen opened it — the detail screen offers fewer verbs. */
+  readonly surface = input<SessionSurface>(SessionSurfaces.Agenda);
 
   readonly action = output<SessionActionId>();
 
@@ -60,12 +65,21 @@ export class SessionActionsSheet {
     return instance ? formatSessionTime(instance.startAt) : '';
   });
 
-  /** "TODAY · HERĂSTRĂU · 8/12" — uppercased in CSS, not here. */
+  /**
+   * "TODAY · HERĂSTRĂU · 8/12" — uppercased in CSS, not here.
+   *
+   * Composed here rather than through `instanceMeta`, which leads with capacity
+   * because that is what a dense agenda row needs first. With the session named
+   * on the line above, the question this sheet answers is "which one of the two
+   * at Herăstrău?", so place comes before the count.
+   */
   readonly meta = computed(() => {
     const instance = this.instance();
     if (!instance) return '';
     const day = sessionDayLabel(new Date(instance.startAt)).split(' · ')[0];
-    return `${day} · ${instanceMeta(instance)}`;
+    return [day, instancePlaceLabel(instance), instanceCapacityLabel(instance)]
+      .filter(Boolean)
+      .join(' · ');
   });
 
   /**
@@ -74,6 +88,10 @@ export class SessionActionsSheet {
    * Check-in is hidden before the session starts — there is nobody to tick off
    * yet — and messaging is hidden with no signups, since it would send to an
    * empty room. Everything left is backed, so nothing here is a dead end.
+   *
+   * Both navigational verbs go on the detail screen: "open" and "check in" mean
+   * "take me to this session", and it is already open, with attendance a
+   * section further down the same page.
    */
   readonly visibleActions = computed(() => {
     const instance = this.instance();
@@ -82,11 +100,14 @@ export class SessionActionsSheet {
     const started = sessionLifecycle(instance.startAt, instance.endAt) !== 'upcoming';
     const signups = instance.confirmedCount + instance.pendingApprovalCount;
     const cancelled = instance.status === 'CANCELLED';
+    const onDetail = this.surface() === SessionSurfaces.Detail;
 
     return SESSION_ACTIONS.filter((action) => {
       switch (action.id) {
+        case SessionActionIds.Open:
+          return !onDetail;
         case SessionActionIds.CheckIn:
-          return started && !cancelled;
+          return started && !cancelled && !onDetail;
         case SessionActionIds.Message:
           return signups > 0;
         case SessionActionIds.Share:

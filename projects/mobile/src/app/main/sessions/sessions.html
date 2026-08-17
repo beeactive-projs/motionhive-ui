@@ -1,164 +1,138 @@
 @if (searchOpen()) {
-  <!-- Search owns the toolbar: a title, three actions, a field and two filter
+<!-- Search owns the toolbar: a title, three actions, a field and two filter
        rows do not fit above the fold on a phone. Same as the inbox. -->
-  <ion-header [translucent]="true">
-    <ion-toolbar>
-      <ion-searchbar
-        placeholder="Search sessions"
-        inputmode="search"
-        [debounce]="0"
-        [value]="query()"
-        (ionInput)="query.set($event.detail.value ?? '')"
-      />
-      <ion-buttons slot="end">
-        <ion-button (click)="closeSearch()">Cancel</ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search sessions" inputmode="search" [debounce]="0" [value]="query()"
+      (ionInput)="query.set($event.detail.value ?? '')" />
+    <ion-buttons slot="end">
+      <ion-button (click)="closeSearch()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 } @else {
-  <ion-header [translucent]="true">
-    <ion-toolbar>
-      <ion-title>Sessions</ion-title>
-      <ion-buttons slot="end">
-        <mh-notification-bell />
-        <ion-button
-          class="round"
-          shape="round"
-          aria-label="Search sessions"
-          (click)="openSearch()"
-        >
-          <ion-icon slot="icon-only" name="search-outline" />
-        </ion-button>
-        <!-- The one filled control in the header: creating is the page's
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Sessions</ion-title>
+    <ion-buttons slot="end">
+      <mh-notification-bell />
+      <ion-button class="round" shape="round" aria-label="Search sessions" (click)="openSearch()">
+        <ion-icon slot="icon-only" name="search-outline" />
+      </ion-button>
+      <!-- The one filled control in the header: creating is the page's
              primary action, and honey is what this product paints those. -->
-        <ion-button
-          class="round create"
-          shape="round"
-          fill="solid"
-          color="primary"
-          aria-label="New session"
-          (click)="openCreate()"
-        >
-          <ion-icon slot="icon-only" name="add-outline" />
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
+      <ion-button class="round create" shape="round" fill="solid" color="primary" aria-label="New session"
+        (click)="openCreate()">
+        <ion-icon slot="icon-only" name="add-outline" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 
-    @if (showChrome()) {
-      @if (view() === 'day') {
-        <!-- The day view swaps the whole orientation block: the strip and the
+  @if (showChrome()) {
+  @if (view() === 'day') {
+  <!-- The day view swaps the whole orientation block: the strip and the
              filters belong to the list, and the rail already answers "when". -->
-        <ion-toolbar>
-          <ion-buttons slot="start">
-            <ion-button aria-label="Back to agenda" (click)="showAgenda()">
-              <ion-icon slot="icon-only" name="chevron-back" />
-            </ion-button>
-          </ion-buttons>
-          <ion-title size="small">{{ selectedDayLabel() }}</ion-title>
-          <ion-buttons slot="end">
-            <ion-segment
-              class="view"
-              [value]="view()"
-              (ionChange)="setView($event.detail.value)"
-            >
-              <ion-segment-button value="agenda"><ion-label>Agenda</ion-label></ion-segment-button>
-              <ion-segment-button value="day"><ion-label>Day</ion-label></ion-segment-button>
-            </ion-segment>
-          </ion-buttons>
-        </ion-toolbar>
+  <ion-toolbar>
 
-        <ion-toolbar>
-          <div class="summary day">
-            @if (dayConflictLabel(); as warning) {
-              <span class="conflict">{{ warning }}</span>
-            } @else {
-              <span></span>
-            }
-            <span>{{ dayTotalLabel() }}</span>
-          </div>
-        </ion-toolbar>
+    <!-- <div class="controls">
+      <ion-button aria-label="Back to agenda" (click)="showAgenda()">
+        <ion-icon slot="icon-only" name="chevron-back" />
+      </ion-button>
+      <ion-title size="small">{{ selectedDayLabel() }}</ion-title>
+      <ion-segment class="view" [value]="view()" (ionChange)="setView($event.detail.value)">
+        <ion-segment-button value="agenda"><ion-label>Agenda</ion-label></ion-segment-button>
+        <ion-segment-button value="day"><ion-label>Day</ion-label></ion-segment-button>
+      </ion-segment>
+    </div> -->
+
+    <ion-buttons slot="start">
+      <ion-button aria-label="Back to agenda" (click)="showAgenda()">
+        <ion-icon slot="icon-only" name="chevron-back" />
+      </ion-button>
+    </ion-buttons>
+    <ion-title size="small">{{ selectedDayLabel() }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-segment class="view pr-5" [value]="view()" (ionChange)="setView($event.detail.value)">
+        <ion-segment-button value="agenda"><ion-label>Agenda</ion-label></ion-segment-button>
+        <ion-segment-button value="day"><ion-label>Day</ion-label></ion-segment-button>
+      </ion-segment>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <div class="summary day">
+      @if (dayConflictLabel(); as warning) {
+      <span class="conflict">{{ warning }}</span>
       } @else {
-        <ion-toolbar>
-          <!-- Summary first, then the strip: the numbers answer "how busy am
-               I", the strip answers "when". Both describe the same week. -->
-          <div class="summary">
-            <span><b>{{ weekCount() }}</b> this week</span>
-            <span class="sep">·</span>
-            <span><b>{{ signupCount() }}</b> signups</span>
-            @if (conflictCount() > 0) {
-              <span class="sep">·</span>
-              <span class="conflict">
-                {{ conflictCount() }}
-                {{ conflictCount() === 1 ? 'conflict' : 'conflicts' }}
-              </span>
-            }
-          </div>
-
-          <div class="controls">
-            <button type="button" class="month" (click)="openMonth()">
-              {{ monthLabel() }}
-              <ion-icon name="chevron-down" aria-hidden="true" />
-            </button>
-            <button type="button" class="today" (click)="goToday()">Today</button>
-            <ion-segment
-              class="view"
-              [value]="view()"
-              (ionChange)="setView($event.detail.value)"
-            >
-              <ion-segment-button value="agenda"><ion-label>Agenda</ion-label></ion-segment-button>
-              <ion-segment-button value="day"><ion-label>Day</ion-label></ion-segment-button>
-            </ion-segment>
-          </div>
-
-          <div class="week">
-            @for (day of weekDays(); track day.key) {
-              <button
-                type="button"
-                class="day"
-                [class.today]="day.isToday"
-                [class.selected]="day.key === selectedDayKey()"
-                [attr.aria-pressed]="day.key === selectedDayKey()"
-                (click)="pickDay(day.date)"
-              >
-                <span class="initial">{{ day.initial }}</span>
-                <span class="date">{{ day.dayOfMonth }}</span>
-                <span class="dots">
-                  @for (tone of day.dots; track $index) {
-                    <i [attr.data-tone]="tone"></i>
-                  }
-                </span>
-              </button>
-            }
-          </div>
-
-          <!-- Scrolls sideways rather than wrapping: a second chip row would
-               push the first session below the fold. -->
-          <div class="chip-row">
-            <ion-chip
-              class="filters"
-              [class.active]="filterCount() > 0"
-              [outline]="true"
-              (click)="openFilters()"
-            >
-              <ion-icon name="funnel-outline" aria-hidden="true" />
-              Filters@if (filterCount() > 0) { · {{ filterCount() }} }
-            </ion-chip>
-
-            @for (option of locationFilters; track option.label) {
-              <ion-chip
-                [outline]="filters().locationKind !== option.value"
-                [color]="filters().locationKind === option.value ? 'secondary' : 'medium'"
-                [attr.aria-pressed]="filters().locationKind === option.value"
-                (click)="setLocation(option.value)"
-              >
-                {{ option.label }}
-              </ion-chip>
-            }
-          </div>
-        </ion-toolbar>
+      <span></span>
       }
-    }
-  </ion-header>
+      <span>{{ dayTotalLabel() }}</span>
+    </div>
+  </ion-toolbar>
+  } @else {
+  <ion-toolbar>
+    <!-- Summary first, then the strip: the numbers answer "how busy am
+               I", the strip answers "when". Both describe the same week. -->
+    <div class="summary">
+      <span><b>{{ weekCount() }}</b> this week</span>
+      <span class="sep">·</span>
+      <span><b>{{ signupCount() }}</b> signups</span>
+      @if (conflictCount() > 0) {
+      <span class="sep">·</span>
+      <span class="conflict">
+        {{ conflictCount() }}
+        {{ conflictCount() === 1 ? 'conflict' : 'conflicts' }}
+      </span>
+      }
+    </div>
+
+    <div class="controls">
+      <button type="button" class="month" (click)="openMonth()">
+        {{ monthLabel() }}
+        <ion-icon name="chevron-down" aria-hidden="true" />
+      </button>
+      <button type="button" class="today" (click)="goToday()">Today</button>
+      <ion-segment class="view" [value]="view()" (ionChange)="setView($event.detail.value)">
+        <ion-segment-button value="agenda"><ion-label>Agenda</ion-label></ion-segment-button>
+        <ion-segment-button value="day"><ion-label>Day</ion-label></ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <div class="week">
+      @for (day of weekDays(); track day.key) {
+      <button type="button" class="day" [class.today]="day.isToday" [class.selected]="day.key === selectedDayKey()"
+        [attr.aria-pressed]="day.key === selectedDayKey()" (click)="pickDay(day.date)">
+        <span class="initial">{{ day.initial }}</span>
+        <span class="date">{{ day.dayOfMonth }}</span>
+        <span class="dots">
+          @for (tone of day.dots; track $index) {
+          <i [attr.data-tone]="tone"></i>
+          }
+        </span>
+      </button>
+      }
+    </div>
+
+    <!-- Scrolls sideways rather than wrapping: a second chip row would
+               push the first session below the fold. -->
+    <div class="chip-row">
+      <ion-chip class="filters" [class.active]="filterCount() > 0" [outline]="true" (click)="openFilters()">
+        <ion-icon name="funnel-outline" aria-hidden="true" />
+        Filters@if (filterCount() > 0) { · {{ filterCount() }} }
+      </ion-chip>
+
+      @for (option of locationFilters; track option.label) {
+      <ion-chip [outline]="filters().locationKind !== option.value"
+        [color]="filters().locationKind === option.value ? 'secondary' : 'medium'"
+        [attr.aria-pressed]="filters().locationKind === option.value" (click)="setLocation(option.value)">
+        {{ option.label }}
+      </ion-chip>
+      }
+    </div>
+  </ion-toolbar>
+  }
+  }
+</ion-header>
 }
 
 <ion-content [fullscreen]="true">
@@ -167,124 +141,89 @@
   </ion-refresher>
 
   @if (showLoadError()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      heading="Couldn't load your sessions"
-      message="Check your connection and try again."
-      actionLabel="Try again"
-      (action)="retry()"
-    />
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load your sessions"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
   } @else if (showSkeleton()) {
-    <!-- Mirrors the agenda row shape so nothing shifts when data lands. -->
-    <div class="agenda">
-      <div class="day-header">
-        <span class="mh-kicker">
-          <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.7rem" />
-        </span>
+  <!-- Mirrors the agenda row shape so nothing shifts when data lands. -->
+  <div class="agenda">
+    <div class="day-header">
+      <span class="mh-kicker">
+        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.7rem" />
+      </span>
+    </div>
+    @for (_ of skeletonRows; track $index) {
+    <ion-item lines="none" class="skeleton">
+      <div slot="start" class="when">
+        <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.9rem" />
       </div>
-      @for (_ of skeletonRows; track $index) {
-        <ion-item lines="none" class="skeleton">
-          <div slot="start" class="when">
-            <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.9rem" />
-          </div>
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
-          </ion-label>
-        </ion-item>
-      }
-    </div>
+      <ion-label>
+        <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
+        <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
+      </ion-label>
+    </ion-item>
+    }
+  </div>
   } @else if (isEmpty()) {
-    <mh-sessions-empty (create)="openCreate()" />
+  <mh-sessions-empty (create)="openCreate()" />
   } @else if (isFilteredEmpty()) {
-    <mh-empty-state
-      icon="calendar-outline"
-      heading="Nothing matches"
-      message="No sessions in this range match what you're looking for."
-      actionLabel="Clear filters"
-      actionFill="outline"
-      (action)="clearFilters()"
-    />
+  <mh-empty-state icon="calendar-outline" heading="Nothing matches"
+    message="No sessions in this range match what you're looking for." actionLabel="Clear filters" actionFill="outline"
+    (action)="clearFilters()" />
   } @else if (view() === 'day') {
-    <mh-day-rail
-      [instances]="dayInstances()"
-      (select)="open($event)"
-      (pickHour)="createAt($event)"
-    />
+  <mh-day-rail [instances]="dayInstances()" (select)="open($event)" (pickHour)="createAt($event)" />
   } @else {
-    <div class="agenda">
-      @for (day of days(); track day.key) {
-        <div class="day-header" [class.today]="day.isToday">
-          <span class="mh-kicker">{{ day.label }}</span>
-          <ion-note>
-            {{ day.instances.length }}
-            {{ day.instances.length === 1 ? 'session' : 'sessions' }}
-            @if (day.nextNote; as note) {
-              · {{ note }}
-            }
-            @if (day.conflicts > 0) {
-              <span class="conflict">· {{ day.conflicts }} conflict</span>
-            }
-          </ion-note>
-        </div>
-
-        @for (instance of day.instances; track instance.id) {
-          <mh-session-row
-            [instance]="instance"
-            (select)="open(instance)"
-            (longPress)="openQuickActions(instance)"
-          />
+  <div class="agenda">
+    @for (day of days(); track day.key) {
+    <div class="day-header" [class.today]="day.isToday">
+      <span class="mh-kicker">{{ day.label }}</span>
+      <ion-note>
+        {{ day.instances.length }}
+        {{ day.instances.length === 1 ? 'session' : 'sessions' }}
+        @if (day.nextNote; as note) {
+        · {{ note }}
         }
-      }
-
-      @if (truncated()) {
-        <!-- The range endpoint returns at most 100 and does not page. Saying so
-             beats a list that quietly stops. -->
-        <ion-note class="mh-note-block">
-          Showing the first 100 sessions in this range. Narrow the dates to see
-          further ahead.
-        </ion-note>
-      }
+        @if (day.conflicts > 0) {
+        <span class="conflict">· {{ day.conflicts }} conflict</span>
+        }
+      </ion-note>
     </div>
+
+    @for (instance of day.instances; track instance.id) {
+    <mh-session-row [instance]="instance" (select)="open(instance)" (longPress)="openQuickActions(instance)" />
+    }
+    }
+
+    @if (truncated()) {
+    <!-- The range endpoint returns at most 100 and does not page. Saying so
+             beats a list that quietly stops. -->
+    <ion-note class="mh-note-block">
+      Showing the first 100 sessions in this range. Narrow the dates to see
+      further ahead.
+    </ion-note>
+    }
+  </div>
   }
 
   <!-- The header button is the discoverable route in; the FAB is the one your
        thumb can reach after scrolling. -->
   @if (showChrome()) {
-    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-      <ion-fab-button aria-label="New session" (click)="openCreate()">
-        <ion-icon name="add-outline" />
-      </ion-fab-button>
-    </ion-fab>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button aria-label="New session" (click)="openCreate()">
+      <ion-icon name="add-outline" />
+    </ion-fab-button>
+  </ion-fab>
   }
 </ion-content>
 
-<mh-session-form-sheet
-  [(open)]="createOpen"
-  [initialStart]="createStart()"
-  [prefill]="createPrefill()"
-  (created)="onCreated()"
-/>
+<mh-session-form-sheet [(open)]="createOpen" [initialStart]="createStart()" [prefill]="createPrefill()"
+  (created)="onCreated()" />
 
 <mh-message-signups-sheet [(open)]="messageOpen" [instanceId]="messageInstanceId()" />
 
-<mh-session-actions-sheet
-  [(open)]="actionsOpen"
-  [instance]="actionsInstance()"
-  [canShare]="canShare()"
-  (action)="onAction($event)"
-/>
+<mh-session-actions-sheet [(open)]="actionsOpen" [instance]="actionsInstance()" [canShare]="canShare()"
+  (action)="onAction($event)" />
 
-<mh-session-filter-sheet
-  [(open)]="filterOpen"
-  [filters]="filters()"
-  (applied)="onFiltersApplied($event)"
-/>
+<mh-session-filter-sheet [(open)]="filterOpen" [filters]="filters()" (applied)="onFiltersApplied($event)" />
 
-<mh-month-sheet
-  [(open)]="monthOpen"
-  [instances]="store.rangeInstances()"
-  [anchor]="selectedDay()"
-  (daySelected)="pickDay($event)"
-  (monthChanged)="onMonthChanged($event)"
-/>
+<mh-month-sheet [(open)]="monthOpen" [instances]="store.rangeInstances()" [anchor]="selectedDay()"
+  (daySelected)="pickDay($event)" (monthChanged)="onMonthChanged($event)" />

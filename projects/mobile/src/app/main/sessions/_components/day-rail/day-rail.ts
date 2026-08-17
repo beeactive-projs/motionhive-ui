@@ -12,7 +12,7 @@ import { instanceBaseTone, instanceMeta } from '../../sessions.config';
  */
 const HOUR_HEIGHT = 44;
 
-/** Hours drawn when nothing is scheduled — a plausible working day. */
+/** The rail always draws at least this much of the day — a plausible working day. */
 const DEFAULT_FIRST_HOUR = 7;
 const DEFAULT_LAST_HOUR = 20;
 
@@ -55,15 +55,18 @@ export class DayRail {
   readonly hourHeight = HOUR_HEIGHT;
 
   private readonly _bounds = computed(() => {
-    const instances = this.instances();
-    if (instances.length === 0) {
-      return { first: DEFAULT_FIRST_HOUR, last: DEFAULT_LAST_HOUR };
-    }
-    let first = 23;
-    let last = 0;
-    for (const instance of instances) {
+    // The working day is the floor, not the fallback. Cropping the rail to the
+    // hours in use is right for a packed day and wrong for a quiet one: a single
+    // 09:00 session left three gridlines above a page of blank content, which
+    // reads as a half-drawn calendar rather than an empty afternoon.
+    let first = DEFAULT_FIRST_HOUR;
+    let last = DEFAULT_LAST_HOUR;
+
+    for (const instance of this.instances()) {
       const start = new Date(instance.startAt);
-      first = Math.min(first, start.getHours());
+      // Padded by an hour either side so an early or late session is never
+      // flush against the end of the rail.
+      first = Math.min(first, start.getHours() - 1);
 
       // Measured from the start of the day rather than read off the end time:
       // a session running to midnight has `getHours() === 0`, which would sort
@@ -72,12 +75,10 @@ export class DayRail {
       dayStart.setHours(0, 0, 0, 0);
       const endHours = (new Date(instance.endAt).getTime() - dayStart.getTime()) / 3_600_000;
       // An end exactly on the hour belongs to the hour before it.
-      last = Math.max(last, Math.ceil(endHours) - 1);
+      last = Math.max(last, Math.ceil(endHours));
     }
-    return {
-      first: Math.max(0, first - 1),
-      last: Math.min(23, Math.max(first, last) + 1),
-    };
+
+    return { first: Math.max(0, first), last: Math.min(23, last) };
   });
 
   readonly hours = computed(() => {

@@ -63,6 +63,24 @@ export class SheetShell {
   readonly saving = input(false);
   /** Off for the sheets that are a list of actions rather than a form. */
   readonly showFooter = input(true);
+  /**
+   * Off for sheets whose body already names what they are about — a title bar
+   * repeating it costs a row of height and pushes the content down.
+   *
+   * `title` stays required either way: with the bar hidden it becomes the
+   * modal's `aria-label`, so the dialog keeps an accessible name. Dismissal
+   * falls back to the grabber and the backdrop, both of which Ionic provides.
+   */
+  readonly showHeader = input(true);
+  /**
+   * Paint the body on the sheet's own surface instead of the page slate.
+   *
+   * `ion-content` defaults to `--ion-background-color`, which is why a form
+   * sheet's fields read as cards floating on a page. A sheet that is nothing
+   * but rows has no cards to float, so the slate turns into a gutter framing
+   * white rows — one continuous surface is what those want instead.
+   */
+  readonly flushBody = input(false);
   readonly breakpoints = input<readonly number[]>([0, 0.6, 0.95]);
   readonly initialBreakpoint = input(0.6);
 

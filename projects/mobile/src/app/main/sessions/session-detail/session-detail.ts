@@ -16,7 +16,6 @@ import {
   IonNote,
   IonProgressBar,
   IonSkeletonText,
-  IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
@@ -55,8 +54,10 @@ import {
   SessionActionId,
   SessionActionIds,
   SessionPrefill,
-  formatWeekdayList,
+  SessionSurfaces,
+  formatRecurrenceSummary,
   prefillFromInstance,
+  sessionTypeLabel,
 } from '../sessions.config';
 
 /** Provider names as people write them, for the Join button. */
@@ -65,6 +66,18 @@ const MEETING_PROVIDER_NAMES: Record<string, string> = {
   GOOGLE_MEET: 'Google Meet',
   TEAMS: 'Teams',
 };
+
+/**
+ * When the meeting link goes live, in minutes before the start.
+ *
+ * Mirrors `JOIN_BEFORE_START_MS` in the API's session-client service, which is
+ * what decides `joinActiveFrom`. Hardcoded rather than read from `joinInfo`:
+ * that endpoint 403s for the coach on their own session.
+ */
+const JOIN_OPENS_MINUTES = 5;
+
+/** How many attendees show before the list collapses behind "Show all". */
+const ATTENDEE_PREVIEW = 5;
 
 /**
  * When the API schedules reminders — `startAt` minus each offset. Mirrored from
@@ -114,7 +127,6 @@ interface ReminderRow {
     IonNote,
     IonProgressBar,
     IonSkeletonText,
-    IonTitle,
     IonToolbar,
   ],
   templateUrl: './session-detail.html',
@@ -137,6 +149,11 @@ export class SessionDetail implements ViewWillEnter {
   readonly noteParticipant = signal<SessionParticipant | null>(null);
   readonly capacityOpen = signal(false);
   readonly skeletonRows = [1, 2, 3];
+  readonly joinOpensMinutes = JOIN_OPENS_MINUTES;
+  readonly Surfaces = SessionSurfaces;
+
+  /** Set once the coach taps "Show all" — long rosters open one row deep. */
+  readonly attendeesExpanded = signal(false);
 
   /** No handle, no public link — so the Share verb stays hidden. */
   readonly canShare = computed(() => !!this._authStore.user()?.handle);
@@ -183,18 +200,70 @@ export class SessionDetail implements ViewWillEnter {
     });
   });
 
+  /** "Every Tue & Thu · 24 occurrences", or nothing for a one-off. */
   readonly recurrenceLabel = computed(() => {
     const template = this.template();
     if (!template?.isRecurring) return null;
-    const days = formatWeekdayList(template.recurrenceRule?.daysOfWeek ?? []);
-    return days ? `Repeats ${days}` : 'Repeats';
+    return formatRecurrenceSummary(template.recurrenceRule) || 'Repeats';
   });
 
+  /** "Friday 22 May · 07:30" — the line the card leads with. */
+  readonly startLine = computed(() => {
+    const instance = this.instance();
+    if (!instance) return '';
+    return `${this.dayLabel()} · ${formatSessionTime(instance.startAt)}`;
+  });
+
+  /** How long it runs and how often it comes round, under the date. */
+  readonly scheduleDetail = computed(() =>
+    [this.durationLabel(), this.recurrenceLabel()].filter(Boolean).join(' · '),
+  );
+
+  /** "Group" / "1-on-1" / "Open" — the band's type chip. */
+  readonly typeLabel = computed(() => sessionTypeLabel(this.template()?.type));
+
+  /**
+   * What the band says about the moment this session is in. Upcoming gets
+   * nothing: the date right below it already says that.
+   */
+  readonly statusChip = computed<{ label: string; tone: string } | null>(() => {
+    if (this.isCancelled()) return { label: 'Cancelled', tone: 'cancelled' };
+    if (this.lifecycle() === 'ongoing') return { label: 'Live now', tone: 'live' };
+    if (this.lifecycle() === 'past') return { label: 'Completed', tone: 'done' };
+    return null;
+  });
+
+  /** "Google Meet", not GOOGLE_MEET — falls back to the link when unset. */
+  readonly providerLabel = computed(() => {
+    const provider =
+      this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl());
+    return (provider && MEETING_PROVIDER_NAMES[provider]) || 'Online';
+  });
+
+  readonly venue = computed(
+    () => this.instance()?.venueOverride ?? this.template()?.venue ?? null,
+  );
+
+  readonly venueCity = computed(() => this.venue()?.city ?? null);
+
   readonly locationLabel = computed(() => {
-    if (this.isOnline()) return this.template()?.meetingProvider ?? 'Online';
-    return (
-      this.instance()?.venueOverride?.name ?? this.template()?.venue?.name ?? 'No venue set'
-    );
+    if (this.isOnline()) return this.providerLabel();
+    return this.venue()?.name ?? 'No venue set';
+  });
+
+  /**
+   * "Mon 13 May · 09:00 – 10:00 · Herăstrău" — a finished session in one line.
+   *
+   * Replaces the schedule card once the session is over: nothing on it is
+   * actionable any more, and the attendance below is what the screen is for.
+   */
+  readonly metaLine = computed(() => {
+    const instance = this.instance();
+    if (!instance) return '';
+    const place = this.locationLabel();
+    return [formatSessionDayShort(instance.startAt), this.timeRange(), place]
+      .filter(Boolean)
+      .join(' · ');
   });
 
   readonly meetingUrl = computed(
@@ -227,6 +296,14 @@ export class SessionDetail implements ViewWillEnter {
     return capacity ? `${this.confirmed()} / ${capacity}` : `${this.confirmed()} booked`;
   });
 
+  /** The same number as a sentence, for the banner above the fold. */
+  readonly bookedLabel = computed(() => {
+    const capacity = this.capacity();
+    return capacity
+      ? `${this.confirmed()} of ${capacity} booked`
+      : `${this.confirmed()} booked`;
+  });
+
   /**
    * Full, and still ahead of us — so there is something to do about it.
    *
@@ -253,8 +330,8 @@ export class SessionDetail implements ViewWillEnter {
   readonly showCta = computed(() => !this.isCancelled());
 
   /**
-   * "Starts in 4 min" / "Live now" — the one thing worth saying at the top of
-   * an imminent session.
+   * "live in 4 min" / "live now" — the clock half of the banner, lower-cased
+   * because it is always read as the tail of a longer line.
    *
    * Deliberately says nothing about who has joined. The design shows a lobby
    * count, but `joinInfo` requires the caller to be a CONFIRMED participant and
@@ -265,12 +342,33 @@ export class SessionDetail implements ViewWillEnter {
   readonly liveNote = computed(() => {
     const instance = this.instance();
     if (!instance || this.isCancelled()) return null;
-    if (this.lifecycle() === 'ongoing') return 'Live now';
+    if (this.lifecycle() === 'ongoing') return 'live now';
     if (this.lifecycle() === 'past') return null;
-    return formatTimeUntil(instance.startAt, this._clockService.now());
+
+    const until = formatTimeUntil(instance.startAt, this._clockService.now());
+    if (!until) return null;
+    // "in 4 min" reads as a countdown only with the verb in front of it;
+    // "starting now" already is a sentence.
+    return until.startsWith('in ') ? `live ${until}` : until;
   });
 
-  /** Named after the provider, so the button says where it is taking you. */
+  /**
+   * "11 of 20 booked · live in 4 min" — the one line worth reading when the
+   * session is about to start, or is on.
+   */
+  readonly liveBanner = computed(() => {
+    const note = this.liveNote();
+    return note ? `${this.bookedLabel()} · ${note}` : null;
+  });
+
+  /** Under the count in the footer: the countdown, or what a spot costs. */
+  readonly ctaMeta = computed(() => this.liveNote() ?? this.price());
+
+  /**
+   * Named after the provider, so the button says where it is taking you.
+   * "Join meeting" rather than "Join Online" when the link names nothing we
+   * recognise — `providerLabel`'s fallback is a place, not a destination.
+   */
   readonly joinLabel = computed(() => {
     const provider =
       this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl());
@@ -294,14 +392,14 @@ export class SessionDetail implements ViewWillEnter {
 
     return REMINDER_OFFSETS.map(({ label, offsetMs }) => ({
       label,
-      detail: new Date(start - offsetMs).toLocaleString('en-GB', {
+      detail: `Push · ${new Date(start - offsetMs).toLocaleString('en-GB', {
         weekday: 'short',
         day: 'numeric',
         month: 'short',
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
-      }),
+      })}`,
     }));
   });
 
@@ -319,9 +417,37 @@ export class SessionDetail implements ViewWillEnter {
     return `${attended} of ${total} attended`;
   });
 
-  /** Everyone but the waitlist — those get their own section below. */
+  /** How many are still unmarked — the register's own to-do line. */
+  readonly attendanceDetail = computed(() => {
+    const unmarked = this.attendees().length - this.markedCount();
+    if (unmarked <= 0) return null;
+    return `${unmarked} not marked yet`;
+  });
+
+  /**
+   * Everyone but the waitlist — those get their own section below.
+   *
+   * Requests waiting on a decision come first: the roster collapses behind
+   * "Show all" once it is long, and an approval hidden below the fold is one
+   * that does not get made.
+   */
   readonly attendees = computed(() =>
-    this.store.participants().filter((p) => p.status !== 'WAITLISTED'),
+    this.store
+      .participants()
+      .filter((p) => p.status !== 'WAITLISTED')
+      .sort((a, b) => Number(this.isPending(b)) - Number(this.isPending(a))),
+  );
+
+  /** The first few, until the coach asks for the rest or starts marking. */
+  readonly visibleAttendees = computed(() => {
+    const all = this.attendees();
+    if (this.attendeesExpanded() || this.editingAttendance()) return all;
+    // One row hidden is not worth a whole row to reveal it.
+    return all.length > ATTENDEE_PREVIEW + 1 ? all.slice(0, ATTENDEE_PREVIEW) : all;
+  });
+
+  readonly hiddenAttendees = computed(
+    () => this.attendees().length - this.visibleAttendees().length,
   );
 
   /**
@@ -338,6 +464,38 @@ export class SessionDetail implements ViewWillEnter {
 
   /** Marking who turned up only makes sense once the session has started. */
   readonly canMarkAttendance = computed(() => this.lifecycle() !== 'upcoming');
+
+  readonly markedCount = computed(() => {
+    const { attended, noShow } = this.counts();
+    return attended + noShow;
+  });
+
+  /**
+   * `null` = follow the session, `true`/`false` = the coach said so.
+   *
+   * A register that is already filled in is something to read, so it shows as
+   * badges and "Edit attendance" opens it; an untouched one is something to
+   * fill in, so it opens straight into the two marks.
+   */
+  private readonly _attendanceEdit = signal<boolean | null>(null);
+
+  readonly editingAttendance = computed(
+    () => this._attendanceEdit() ?? (this.canMarkAttendance() && this.markedCount() === 0),
+  );
+
+  /** The private note is a line under the name, not a prompt on every row. */
+  showsNote(participant: SessionParticipant): boolean {
+    return this.editingAttendance() || !!this.noteFor(participant);
+  }
+
+  toggleAttendanceEdit(): void {
+    this._attendanceEdit.set(!this.editingAttendance());
+  }
+
+  /** What signups read before booking — the description, if there is one. */
+  readonly description = computed(
+    () => this.instance()?.descriptionOverride ?? this.template()?.description ?? null,
+  );
 
   /** Who the message sheet is addressed to this time. */
   readonly messageAudience = signal<'all' | 'userIds'>('all');
@@ -386,11 +544,17 @@ export class SessionDetail implements ViewWillEnter {
     return avatarToneFor(participant.userId);
   }
 
-  /** Confirmed / pending / attended / no-show, as a badge colour. */
-  statusColor(participant: SessionParticipant): string {
-    if (participant.attended === true) return 'success';
-    if (participant.attended === false) return 'danger';
-    return participant.status === 'CONFIRMED' ? 'success' : 'medium';
+  /**
+   * Confirmed / pending / attended / no-show, as a chip tone.
+   *
+   * The same wash vocabulary as the band's chips rather than Ionic's solid
+   * colours: a column of saturated pills down the roster reads louder than the
+   * names beside them, which are the thing being looked up.
+   */
+  statusTone(participant: SessionParticipant): string {
+    if (participant.attended === true) return 'attended';
+    if (participant.attended === false) return 'noshow';
+    return participant.status === 'CONFIRMED' ? 'confirmed' : 'pending';
   }
 
   statusLabel(participant: SessionParticipant): string {
@@ -423,6 +587,9 @@ export class SessionDetail implements ViewWillEnter {
    * active choice clears it back to unmarked.
    */
   setAttendance(participant: SessionParticipant, attended: boolean): void {
+    // The first mark is what turns "nothing marked yet" false, and without
+    // this the register would close under the coach's thumb mid-list.
+    this._attendanceEdit.set(true);
     this.store.setAttendance(
       participant.id,
       participant.attended === attended ? null : attended,
@@ -522,10 +689,11 @@ export class SessionDetail implements ViewWillEnter {
    * The same verb sheet the agenda rows use, so one session offers one set of
    * actions wherever you reach it from.
    *
-   * Open and check-in are no-ops here — this *is* the session, and attendance
-   * is the list further down the page — so both just close the sheet. Cancel
-   * opens in place rather than navigating, which is the one thing that differs
-   * from the agenda's handling.
+   * Open and check-in never arrive here — passing `Surfaces.Detail` drops them
+   * from the sheet, because this *is* the session and attendance is a section
+   * further down the same page. The `default` below is the compiler's, not a
+   * silent swallow. Cancel opens in place rather than navigating, which is the
+   * one thing that differs from the agenda's handling.
    */
   async onAction(id: SessionActionId): Promise<void> {
     const instance = this.instance();

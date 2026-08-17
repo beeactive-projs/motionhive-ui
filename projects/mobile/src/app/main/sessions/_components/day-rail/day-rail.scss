@@ -1,9 +1,12 @@
 /* An hour rail is absolute positioning by nature — a block's offset and height
    encode its start and duration. Ionic has no primitive for this. */
 
+/* The top margin is the agenda's first-row inset plus the 0.35rem the first
+   hour label is nudged out of this box by — without that second term the label
+   starts flush with the content edge and tucks under the translucent header. */
 .rail {
   position: relative;
-  margin: 0.5rem 1.25rem 6rem;
+  margin: calc(0.75rem + 0.35rem) 1.25rem 6rem;
 }
 
 /* The row is the tap target for creating at that hour, so it is a button —

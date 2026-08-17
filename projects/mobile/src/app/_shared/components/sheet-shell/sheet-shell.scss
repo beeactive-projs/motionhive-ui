@@ -5,6 +5,13 @@ ion-modal {
   --background: var(--ion-card-background);
 }
 
+// `ion-content` paints `--ion-background-color` — the page slate — so a sheet
+// made only of rows shows it as a gutter around them. `flushBody` hands those
+// sheets the same surface the modal itself uses.
+ion-content.flush {
+  --background: var(--ion-card-background);
+}
+
 // The design centres the sheet title. `ion-title` centres itself on iOS but is
 // start-aligned on md, and exposes no alignment input.
 ion-title {

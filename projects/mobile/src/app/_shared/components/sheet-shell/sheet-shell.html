@@ -1,60 +1,45 @@
-<ion-modal
-  [isOpen]="open()"
-  [breakpoints]="breakpoints()"
-  [initialBreakpoint]="initialBreakpoint()"
-  [handle]="true"
-  [expandToScroll]="false"
-  (didDismiss)="open.set(false)"
->
+<ion-modal [isOpen]="open()" [breakpoints]="breakpoints()" [initialBreakpoint]="initialBreakpoint()" [handle]="true"
+  [expandToScroll]="false" [attr.aria-label]="title()" (didDismiss)="open.set(false)">
   <!-- Everything the modal shows must live inside this template: Ionic moves
        the modal when it presents, and anything outside is left behind. -->
   <ng-template>
+    @if (showHeader()) {
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-title>{{ title() }}</ion-title>
-        <ion-buttons slot="end">
+        <!-- <ion-buttons slot="end">
           <ion-button aria-label="Close" (click)="dismiss()">
             <ion-icon slot="icon-only" name="close" />
           </ion-button>
-        </ion-buttons>
+        </ion-buttons> -->
       </ion-toolbar>
     </ion-header>
+    }
 
-    <ion-content class="ion-padding">
+    <ion-content class="ion-padding" [class.flush]="flushBody()">
       <ng-container [ngTemplateOutlet]="body()" />
     </ion-content>
 
     @if (showFooter()) {
-      <ion-footer class="ion-no-border">
-        <ion-toolbar>
-          <!-- Not `ion-buttons`: that slot packs its children to one edge at
+    <ion-footer class="ion-no-border">
+      <ion-toolbar>
+        <!-- Not `ion-buttons`: that slot packs its children to one edge at
                toolbar-button size. The sheet's commit is a full-width bar. -->
-          <div class="actions">
-            <ion-button
-              fill="outline"
-              color="medium"
-              class="dismiss"
-              [disabled]="saving()"
-              (click)="dismiss()"
-            >
-              Cancel
-            </ion-button>
-            <ion-button
-              fill="solid"
-              class="confirm"
-              [color]="saveColor()"
-              [disabled]="!canSave() || saving()"
-              (click)="save.emit()"
-            >
-              @if (saving()) {
-                <ion-spinner name="crescent" />
-              } @else {
-                {{ saveLabel() }}
-              }
-            </ion-button>
-          </div>
-        </ion-toolbar>
-      </ion-footer>
+        <div class="actions">
+          <ion-button fill="outline" color="medium" class="dismiss" [disabled]="saving()" (click)="dismiss()">
+            Cancel
+          </ion-button>
+          <ion-button fill="solid" class="confirm" [color]="saveColor()" [disabled]="!canSave() || saving()"
+            (click)="save.emit()">
+            @if (saving()) {
+            <ion-spinner name="crescent" />
+            } @else {
+            {{ saveLabel() }}
+            }
+          </ion-button>
+        </div>
+      </ion-toolbar>
+    </ion-footer>
     }
   </ng-template>
 </ion-modal>
