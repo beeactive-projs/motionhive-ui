@@ -13,7 +13,12 @@
             <ion-col size="4">
               <ion-item button [detail]="false" lines="none" (click)="openTile(tile)">
                 <ion-label class="ion-text-center ion-text-wrap">
-                  <ion-icon [name]="tile.icon" size="large" aria-hidden="true" />
+                  <span class="glyph">
+                    <ion-icon [name]="tile.icon" size="large" aria-hidden="true" />
+                    @if (tile.dot?.()) {
+                      <span class="dot" aria-hidden="true"></span>
+                    }
+                  </span>
                   <p>{{ tile.label }}</p>
                 </ion-label>
               </ion-item>

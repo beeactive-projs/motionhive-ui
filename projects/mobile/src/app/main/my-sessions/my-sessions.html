@@ -1,0 +1,103 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      @if (tab() === 'cancelled') {
+        <ion-button class="back-to-list" (click)="backToUpcoming()">
+          <ion-icon slot="icon-only" name="chevron-back" />
+        </ion-button>
+      } @else {
+        <ion-back-button defaultHref="/tabs/home" />
+      }
+    </ion-buttons>
+    <ion-title>{{ tab() === 'cancelled' ? 'Cancelled' : 'My sessions' }}</ion-title>
+    @if (tab() !== 'cancelled') {
+      <!-- A tab root, so it carries the bell like the others. -->
+      <ion-buttons slot="end">
+        <mh-notification-bell />
+      </ion-buttons>
+    }
+  </ion-toolbar>
+
+  <!-- Two segments, so the labels breathe. Cancelled lives under the list. -->
+  @if (tab() !== 'cancelled') {
+    <ion-toolbar>
+      <ion-segment [value]="tab()" (ionChange)="onTabChange($event)">
+        @for (option of tabs; track option.key) {
+          <ion-segment-button [value]="option.key">
+            <ion-label>
+              {{ option.label }}
+              @if (countFor(option.key); as count) {
+                <span class="count">{{ count }}</span>
+              }
+            </ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+    </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load your sessions"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
+    <ion-list>
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none">
+          <ion-skeleton-text slot="start" [animated]="true" style="width: 3.25rem; height: 2.5rem" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 75%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="calendar-outline"
+      [heading]="emptyCopy().heading"
+      [message]="emptyCopy().message"
+      [actionLabel]="emptyCopy().action"
+      actionFill="outline"
+      (action)="discover()"
+    />
+  } @else {
+    <div class="rows">
+      @for (day of days(); track day.key) {
+        <div class="mh-section-label">{{ day.label }}</div>
+        @for (booking of day.items; track booking.id) {
+          <mh-booking-row
+            [booking]="booking"
+            (select)="open(booking)"
+            (join)="join(booking)"
+          />
+        }
+      }
+    </div>
+
+    <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
+
+  <!-- A ghost row, not a tab: rarely wanted, never scanned. -->
+  @if (showCancelledRow()) {
+    <ion-list class="ghost">
+      <ion-item button detail="true" lines="none" (click)="showCancelled()">
+        <ion-label>
+          <p>{{ cancelledCount() }} cancelled {{ cancelledCount() === 1 ? 'booking' : 'bookings' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  }
+</ion-content>

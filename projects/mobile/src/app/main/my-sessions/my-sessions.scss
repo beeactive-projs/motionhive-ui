@@ -1,0 +1,50 @@
+ion-segment {
+  --background: transparent;
+}
+
+ion-segment-button {
+  font-size: 0.8rem;
+}
+
+/* Count under the label, so the three columns stay the same width whatever
+   the numbers are. */
+.count {
+  display: block;
+  margin-top: 0.05rem;
+  color: var(--ion-color-medium);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.rows {
+  padding: 0.75rem;
+}
+
+/* Day pills sit inside the padded rows container, so they need no margin of
+   their own — unlike the notification centre, where the list is edge to edge. */
+.rows .mh-section-label {
+  padding-inline: 0.125rem;
+}
+
+.rows .mh-section-label:not(:first-child) {
+  padding-top: 0.75rem;
+}
+
+/* Present but quiet. Cancelled bookings are a record, not a destination. */
+.ghost {
+  background: transparent;
+  margin: 0.25rem 0.75rem 1.5rem;
+}
+
+.ghost ion-item {
+  --background: transparent;
+  --padding-start: 0.5rem;
+  --min-height: 2.75rem;
+  border: 1px dashed var(--mh-color-divider);
+  border-radius: var(--mh-radius-control);
+}
+
+.ghost p {
+  color: var(--ion-color-medium);
+  font-size: 0.8rem;
+}

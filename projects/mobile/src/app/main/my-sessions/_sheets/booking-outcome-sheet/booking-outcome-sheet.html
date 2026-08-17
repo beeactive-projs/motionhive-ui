@@ -1,0 +1,37 @@
+<ng-template #body>
+  <div class="result" [attr.data-tone]="copy().tone">
+    <span class="mark" aria-hidden="true">
+      <ion-icon [name]="copy().icon" />
+    </span>
+    <h2>{{ copy().title }}</h2>
+    <p>{{ copy().body }}</p>
+  </div>
+
+  @if (sessionTitle()) {
+    <div class="summary">
+      <span class="title">{{ sessionTitle() }}</span>
+      @if (whenLabel()) {
+        <span class="when">{{ whenLabel() }}</span>
+      }
+      @if (coachName()) {
+        <span class="coach">with {{ coachName() }}</span>
+      }
+    </div>
+  }
+
+  @if (showCalendar()) {
+    <ion-button fill="outline" expand="block" (click)="addToCalendar.emit()">
+      <ion-icon slot="start" name="calendar-outline" />
+      Add to calendar
+    </ion-button>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Booking"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+/>

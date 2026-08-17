@@ -1,0 +1,74 @@
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem 0.75rem 1.25rem;
+}
+
+/* Hexagon, as everywhere else a status gets a tile. */
+.mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.65rem;
+  margin-bottom: 0.875rem;
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+}
+
+.mark ion-icon {
+  font-size: 1.5rem;
+}
+
+.result[data-tone='success'] {
+  --tone-bg: var(--ion-color-success-wash);
+  --tone-fg: var(--ion-color-success-wash-contrast);
+}
+.result[data-tone='warning'] {
+  --tone-bg: var(--ion-color-warning-wash);
+  --tone-fg: var(--ion-color-warning-wash-contrast);
+}
+.result[data-tone='info'] {
+  --tone-bg: var(--ion-color-info-wash);
+  --tone-fg: var(--ion-color-info-wash-contrast);
+}
+
+.result h2 {
+  margin: 0 0 0.375rem;
+  font-family: var(--mh-font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.result p {
+  margin: 0;
+  max-width: 20rem;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.875rem;
+  margin: 0 0.25rem 1rem;
+  border: 1px solid var(--mh-color-divider);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-background-color);
+}
+
+.summary .title {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.summary .when,
+.summary .coach {
+  color: var(--ion-color-medium);
+  font-size: 0.8rem;
+}

@@ -1,0 +1,80 @@
+/* Card with a spine, matching the session and booking rows. The spine here
+   carries invoice status rather than session type. */
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+ion-item {
+  --background: var(--ion-card-background);
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.75rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-left: 3px solid var(--spine);
+  border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
+}
+
+:host([data-tone='honey']) ion-item {
+  --spine: var(--ion-color-primary);
+}
+:host([data-tone='emerald']) ion-item {
+  --spine: var(--ion-color-success);
+}
+:host([data-tone='slate']) ion-item {
+  --spine: var(--ion-color-medium);
+}
+:host([data-tone='coral']) ion-item {
+  --spine: var(--ion-color-danger);
+}
+
+ion-label h2 {
+  font-family: var(--ion-font-family);
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.2rem;
+  min-width: 0;
+}
+
+.tags ion-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.tags ion-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.68rem;
+}
+
+/* Money is mono and tabular so columns of amounts line up and cannot be
+   misread at a glance. */
+.amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-inline-start: 0.5rem;
+}
+
+.value {
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.due {
+  margin-top: 0.1rem;
+  color: var(--ion-color-medium);
+  font-size: 0.64rem;
+  white-space: nowrap;
+}

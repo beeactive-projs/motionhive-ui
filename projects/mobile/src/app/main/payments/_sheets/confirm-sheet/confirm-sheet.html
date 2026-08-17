@@ -1,0 +1,40 @@
+<ng-template #sheetBody>
+  <p class="lead">{{ body() }}</p>
+
+  @if (facts().length > 0) {
+    <dl class="facts">
+      @for (fact of facts(); track fact.label) {
+        <div>
+          <dt>{{ fact.label }}</dt>
+          <dd>{{ fact.value }}</dd>
+        </div>
+      }
+    </dl>
+  }
+
+  @if (irreversible(); as note) {
+    <!-- Named, not hidden: the point is that they know before, not after. -->
+    <div class="irreversible">
+      <ion-icon name="alert-circle-outline" aria-hidden="true" />
+      <span>{{ note }}</span>
+    </div>
+  }
+
+  @if (blockedReason(); as reason) {
+    <ion-note class="blocked">{{ reason }}</ion-note>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="sheetBody"
+  [saveLabel]="confirmLabel()"
+  [cancelLabel]="cancelLabel()"
+  [saveColor]="tone()"
+  [canSave]="!blockedReason()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+  (save)="confirm.emit()"
+/>

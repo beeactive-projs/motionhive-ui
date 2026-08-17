@@ -29,7 +29,7 @@
         <ion-toolbar>
           <ion-buttons slot="end">
             <ion-button fill="clear" color="medium" [disabled]="saving()" (click)="dismiss()">
-              Cancel
+              {{ cancelLabel() }}
             </ion-button>
             <ion-button
               fill="solid"

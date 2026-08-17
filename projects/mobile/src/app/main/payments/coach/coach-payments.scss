@@ -1,0 +1,122 @@
+/* Two figures, not a dashboard. The coach settles in one currency, so these
+   are the only totals in the feature that are safe to add up. */
+.earnings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+  padding: 0.75rem 0.75rem 0.25rem;
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--mh-color-divider);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.figure .value {
+  margin-top: 0.2rem;
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.figure .meta {
+  margin-top: 0.15rem;
+  color: var(--ion-color-medium);
+  font-size: 0.68rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filters ion-chip {
+  flex: none;
+  margin: 0;
+  height: 1.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.filters ion-chip.on {
+  --background: var(--ion-color-primary);
+  --color: #fff;
+}
+
+.rows {
+  padding: 0.5rem 0.75rem 5rem;
+}
+
+.rows .mh-section-label {
+  padding-inline: 0.125rem;
+}
+
+.rows .mh-section-label:not(:first-child) {
+  padding-top: 0.75rem;
+}
+
+.overdue {
+  color: var(--ion-color-danger);
+}
+
+/* 4f — the gate. Centred, one action, and honest that it leaves the app. */
+.gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1.5rem 2rem;
+}
+
+.gate .tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.65rem;
+  margin-bottom: 1rem;
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  background: var(--ion-color-medium-wash);
+  color: var(--ion-color-medium-wash-contrast);
+}
+
+.gate.amber .tile {
+  background: var(--ion-color-warning-wash);
+  color: var(--ion-color-warning-wash-contrast);
+}
+
+.gate .tile ion-icon {
+  font-size: 1.5rem;
+}
+
+.gate h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--mh-font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.gate p {
+  margin: 0 0 1.5rem;
+  max-width: 20rem;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.gate ion-button[expand='block'] {
+  width: 100%;
+  max-width: 20rem;
+}

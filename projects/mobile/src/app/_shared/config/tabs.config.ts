@@ -2,6 +2,7 @@ import { NavMode, NavModes } from 'core';
 import {
   barbellOutline,
   calendarOutline,
+  cardOutline,
   chatbubblesOutline,
   compassOutline,
   ellipsisHorizontal,
@@ -20,6 +21,7 @@ import { MoreTile, TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
 export const TAB_ICONS = {
   barbellOutline,
   calendarOutline,
+  cardOutline,
   chatbubblesOutline,
   compassOutline,
   ellipsisHorizontal,
@@ -63,6 +65,7 @@ export const COACH_TAB_SET: TabSet = {
       requiresInstructor: true,
     },
     { label: 'Discover', icon: 'compass-outline', route: '/tabs/discover' },
+    { label: 'Payments', icon: 'card-outline', route: '/tabs/home/payments' },
     ACCOUNT_TILE,
   ],
 };
@@ -72,13 +75,21 @@ export const TRAIN_TAB_SET: TabSet = {
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
-    { id: TabIds.Workouts, label: 'Workouts', icon: 'barbell-outline' },
+    { id: TabIds.Sessions, label: 'Sessions', icon: 'calendar-outline' },
     { id: TabIds.Discover, label: 'Discover', icon: 'compass-outline' },
     MESSAGES,
   ],
-  // My plans, My sessions and Profile join in M2 with their pages. Until then
-  // the sheet earns its place through the mode switch and the profile row.
-  more: [ACCOUNT_TILE],
+  /*
+   * Sessions holds the slot Workouts used to, and Workouts drops to the sheet
+   * until it is a real screen. Bookings are the only object a trainee actually
+   * owns today, and the live-join moment needs somewhere persistent to appear;
+   * a placeholder tab was buying neither.
+   */
+  more: [
+    { label: 'Workouts', icon: 'barbell-outline', route: '/tabs/workouts' },
+    { label: 'Billing', icon: 'card-outline', route: '/tabs/home/billing' },
+    ACCOUNT_TILE,
+  ],
 };
 
 export const TAB_SETS: Record<NavMode, TabSet> = {

@@ -45,6 +45,18 @@ export const routes: Routes = [
         loadComponent: () => import('./main/home/home').then((m) => m.Home),
       },
       {
+        // The coach's workbench and the client's bill drawer. Separate areas,
+        // so separate addresses rather than one shell switching on mode.
+        path: 'home/payments',
+        loadChildren: () =>
+          import('./main/payments/payments.routes').then((m) => m.paymentsRoutes),
+      },
+      {
+        path: 'home/billing',
+        loadChildren: () =>
+          import('./main/payments/payments.routes').then((m) => m.billingRoutes),
+      },
+      {
         path: 'home/account',
         loadChildren: () =>
           import('./main/account/account.routes').then((m) => m.accountRoutes),
@@ -73,8 +85,10 @@ export const routes: Routes = [
         loadComponent: () => import('./main/requests/requests').then((m) => m.Requests),
       },
       {
+        // One address for both roles; the screens behind it switch on mode.
+        // See `SessionsShell` — a route guard cannot do this, because Ionic
+        // restores a tab's page stack without re-resolving the route.
         path: 'sessions',
-        canActivate: [coachGuard],
         loadChildren: () =>
           import('./main/sessions/sessions.routes').then((m) => m.sessionsRoutes),
       },

@@ -21,6 +21,10 @@
     <ion-tab-button aria-label="More" (click)="openMore()">
       <ion-icon name="ellipsis-horizontal" aria-hidden="true" />
       <ion-label>More</ion-label>
+      <!-- A dot, not a count: it only has to say "something is in here". -->
+      @if (hasBillDue()) {
+        <ion-badge color="danger" class="dot" aria-label="You have a bill due"></ion-badge>
+      }
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

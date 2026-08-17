@@ -1,0 +1,35 @@
+.lead {
+  margin: 0 0.25rem 1rem;
+  color: var(--ion-color-dark);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.terms,
+.late {
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mh-radius-control);
+  margin: 0 0.25rem 0.625rem;
+}
+
+.terms {
+  border: 1px solid var(--mh-color-divider);
+  background: var(--ion-background-color);
+}
+
+/* Amber, not red: the red is on the button. This is a caution, not the act. */
+.late {
+  background: var(--ion-color-warning-wash);
+  color: var(--ion-color-warning-wash-contrast);
+}
+
+.terms p,
+.late p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.late .mh-kicker {
+  color: inherit;
+}

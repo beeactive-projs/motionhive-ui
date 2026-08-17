@@ -1,0 +1,36 @@
+<ng-template #body>
+  @if (isWaitlist()) {
+    <p class="lead">You will lose your place in the queue for this session.</p>
+  } @else {
+    <p class="lead">Your coach will be told, and your spot opens up for someone else.</p>
+
+    @if (cancelBy(); as by) {
+      <div class="terms">
+        <span class="mh-kicker">What you agreed</span>
+        <p>Free cancellation up to {{ by }}.</p>
+      </div>
+    }
+
+    @if (isLate()) {
+      <!-- Only when the free window has already passed — otherwise this reads
+           as a penalty on a cancellation that costs nothing. -->
+      <div class="late">
+        <span class="mh-kicker">You are past that</span>
+        <p>Cancelling now may still be charged. Your coach decides.</p>
+      </div>
+    }
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="isWaitlist() ? 'Leave the waitlist?' : 'Cancel your booking?'"
+  [body]="body"
+  [saveLabel]="isWaitlist() ? 'Leave waitlist' : 'Cancel booking'"
+  [cancelLabel]="isWaitlist() ? 'Stay on it' : 'Keep it'"
+  saveColor="danger"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.55]"
+  [initialBreakpoint]="0.55"
+  (save)="confirm.emit()"
+/>

@@ -1,0 +1,56 @@
+.amount-block {
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+
+.total {
+  margin-top: 0.2rem;
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 1.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.badges ion-badge {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.badges ion-note {
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+}
+
+.partial {
+  margin: 0.625rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.line-amount {
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two equal secondary actions — neither is the obvious next move. */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+ion-footer ion-toolbar {
+  --background: var(--ion-background-color);
+  --border-width: 0;
+  padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom));
+}

@@ -19,6 +19,19 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => string[]> = {
     d.entityId ? ['/tabs/sessions', d.entityId] : ['/tabs/sessions'],
   'coaching/clients': () => ['/tabs/clients'],
   'coaching/pending-requests': () => ['/tabs/clients/requests'],
+  // Payments, both sides. The coach's screens are guarded; the client's are
+  // not, which matches who each alert goes to.
+  'coaching/invoices': (d) =>
+    d.entityId ? ['/tabs/home/payments', d.entityId] : ['/tabs/home/payments'],
+  'coaching/payments': () => ['/tabs/home/payments'],
+  'profile/invoices': (d) =>
+    d.entityId ? ['/tabs/home/billing', d.entityId] : ['/tabs/home/billing'],
+  // The trainee's own bookings — the counterpart to `coaching/sessions`, and
+  // deliberately a different route: `/tabs/sessions` is the coach's agenda,
+  // behind an instructor guard.
+  sessions: (d) =>
+    d.entityId ? ['/tabs/sessions', d.entityId] : ['/tabs/sessions'],
+  'user/sessions': () => ['/tabs/sessions'],
 };
 
 /**
@@ -29,20 +42,13 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => string[]> = {
  * known-but-unbuilt one. `deep-link.spec.ts` checks this covers every screen
  * the API emits.
  *
- * Note `sessions` (not `coaching/sessions`): that one goes to the person who
- * booked, and a trainee has no session screen here. Routing it to the coach's
- * would bounce them off the instructor guard, which is worse than opening the
- * detail sheet.
  */
 const NOT_ON_MOBILE: Record<string, string> = {
   groups: 'Groups',
-  sessions: 'My sessions',
-  'user/sessions': 'My sessions',
   'user/plans': 'My plans',
   'coaching/exercises': 'Exercises',
-  'profile/invoices': 'Payments',
-  'coaching/invoices': 'Payments',
-  'coaching/payments': 'Payments',
+  // Subscriptions a coach *sells* stay on the web; the client's own
+  // memberships are a segment on their billing screen.
   'coaching/subscriptions': 'Memberships',
 };
 
@@ -52,14 +58,25 @@ const NOT_ON_MOBILE: Record<string, string> = {
  * three.
  */
 const PROFILE_TABS: Record<string, string> = {
-  memberships: 'Memberships',
-  invoices: 'Invoices',
   coaches: 'Coaches',
+};
+
+/**
+ * `screen: 'profile'` with a billing tab is really a billing link — the web
+ * keeps invoices and memberships behind profile tabs, mobile gives them their
+ * own screen with a segment.
+ */
+const PROFILE_TAB_ROUTES: Record<string, string[]> = {
+  memberships: ['/tabs/home/billing'],
+  invoices: ['/tabs/home/billing'],
 };
 
 /** Router commands for this notification, or null when it has nowhere to go. */
 export function routeFor(data: NotificationData | null): string[] | null {
   if (!data?.screen) return null;
+  if (data.screen === 'profile') {
+    return PROFILE_TAB_ROUTES[data.queryParams?.['tab'] ?? ''] ?? null;
+  }
   return SCREEN_ROUTES[data.screen]?.(data) ?? null;
 }
 
@@ -83,6 +100,6 @@ export function webOnlyLabel(data: NotificationData | null): string | null {
 
 /** Exported for the spec that checks both maps against the server's screens. */
 export const KNOWN_SCREENS = {
-  routed: Object.keys(SCREEN_ROUTES),
-  named: [...Object.keys(NOT_ON_MOBILE), 'profile'],
+  routed: [...Object.keys(SCREEN_ROUTES), 'profile'],
+  named: Object.keys(NOT_ON_MOBILE),
 };

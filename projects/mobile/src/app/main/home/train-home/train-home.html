@@ -22,6 +22,20 @@
   </ion-card>
 }
 
+<!-- 4a: present only while a bill is open. When nothing is due, payments
+     vanish from Home rather than sitting here saying zero. -->
+@if (store.hasBillDue()) {
+  <ion-list>
+    <ion-item button [detail]="true" class="bill-due" (click)="openBilling()">
+      <ion-icon slot="start" name="card-outline" color="primary" aria-hidden="true" />
+      <ion-label class="ion-text-wrap">
+        <h2>{{ store.openInvoices() === 1 ? 'You have an invoice to pay' : store.openInvoices() + ' invoices to pay' }}</h2>
+        <p>Tap to see what's owed and settle it.</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+}
+
 <ion-list>
   <ion-item button [detail]="true" (click)="openSessions()">
     <ion-icon slot="start" name="calendar-outline" color="primary" aria-hidden="true" />

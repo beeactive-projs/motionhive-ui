@@ -57,6 +57,11 @@ export class SheetShell {
   /** The sheet's fields, declared by the consumer as `<ng-template #body>`. */
   readonly body = input.required<TemplateRef<unknown>>();
   readonly saveLabel = input('Save');
+  /**
+   * The way out. "Cancel" is wrong whenever the sheet's own action is also a
+   * cancellation — two buttons reading Cancel that mean opposite things.
+   */
+  readonly cancelLabel = input('Cancel');
   /** Ionic palette name for the confirm button — `danger` for destructive sheets. */
   readonly saveColor = input('primary');
   readonly canSave = input(true);

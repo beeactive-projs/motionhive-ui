@@ -1,0 +1,92 @@
+.line ion-input:not(.amount-input) {
+  --padding-start: 0;
+}
+
+.line-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: 0.5rem;
+}
+
+.amount-input {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  width: 5rem;
+  border: 1px solid var(--mh-color-divider);
+  border-radius: var(--mh-radius-control);
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  border: 1px solid var(--mh-color-divider);
+  border-radius: var(--mh-radius-control);
+  overflow: hidden;
+}
+
+.stepper button {
+  width: 1.75rem;
+  height: 1.9rem;
+  border: 0;
+  background: none;
+  color: var(--ion-color-dark);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.stepper span {
+  min-width: 1rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.remove {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ion-color-medium);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0.75rem 1.5rem 2rem;
+  font-size: 0.9rem;
+}
+
+.total-row strong {
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.note {
+  margin: 0.5rem 0.25rem 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+ion-footer ion-toolbar {
+  --background: var(--ion-background-color);
+  --border-width: 0;
+  padding: 0.5rem 0.75rem calc(0.25rem + env(safe-area-inset-bottom));
+}

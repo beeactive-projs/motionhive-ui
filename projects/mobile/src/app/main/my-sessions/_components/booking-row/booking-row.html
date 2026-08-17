@@ -1,0 +1,45 @@
+<ion-item button detail="false" lines="none" (click)="select.emit()">
+  <div class="when" slot="start">
+    <span class="day">{{ day() }}</span>
+    <span class="time">{{ time() }}</span>
+    @if (duration()) {
+      <span class="duration">{{ duration() }}</span>
+    }
+  </div>
+
+  <ion-label>
+    <h2>{{ title() }}</h2>
+    <div class="tags">
+      @if (sessionCancelled()) {
+        <ion-badge color="danger">Session cancelled</ion-badge>
+      } @else if (showStatusChip()) {
+        <ion-badge [color]="statusColor()">{{ statusLabel() }}</ion-badge>
+      }
+      @if (attendance(); as mark) {
+        <ion-badge [color]="mark.color">{{ mark.label }}</ion-badge>
+      }
+      <ion-note>
+        {{ coachName() }}
+        @if (place()) {
+          · {{ place() }}
+        }
+      </ion-note>
+    </div>
+  </ion-label>
+
+  <!-- Live online session: the link is the only thing worth doing right now,
+       so it sits in the row instead of one screen further in. -->
+  @if (canJoin()) {
+    <ion-button
+      slot="end"
+      size="small"
+      shape="round"
+      (click)="join.emit(); $event.stopPropagation()"
+    >
+      <ion-icon slot="start" name="link-outline" />
+      Join
+    </ion-button>
+  } @else {
+    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+  }
+</ion-item>

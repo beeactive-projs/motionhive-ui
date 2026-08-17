@@ -1,0 +1,107 @@
+.amount-block {
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+
+.total {
+  margin-top: 0.2rem;
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 1.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.badges ion-badge {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.badges ion-note {
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+}
+
+.line-amount {
+  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The return states sit above the invoice rather than replacing it, so the
+   thing they were paying stays in view the whole time. */
+.band {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0.75rem 1rem 0;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mh-radius-card);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.band strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.band span {
+  display: block;
+  margin-top: 0.125rem;
+  opacity: 0.85;
+}
+
+.band ion-icon {
+  flex: none;
+  margin-top: 0.1rem;
+  font-size: 1.1rem;
+}
+
+.checking {
+  align-items: center;
+  background: var(--ion-color-medium-wash);
+  color: var(--ion-color-medium-wash-contrast);
+}
+
+.checking ion-spinner {
+  width: 1rem;
+  height: 1rem;
+}
+
+.paid {
+  background: var(--ion-color-success-wash);
+  color: var(--ion-color-success-wash-contrast);
+}
+
+/* Slate, not red: not completing a payment is not an error. */
+.unfinished {
+  background: var(--ion-color-medium-wash);
+  color: var(--ion-color-medium-wash-contrast);
+}
+
+.unfinished ion-button {
+  flex: none;
+  margin: -0.25rem -0.5rem 0 0;
+}
+
+ion-footer ion-toolbar {
+  --background: var(--ion-background-color);
+  --border-width: 0;
+  padding: 0.5rem 0.75rem calc(0.25rem + env(safe-area-inset-bottom));
+}
+
+.handoff {
+  margin: 0.5rem 0.25rem 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-align: center;
+}

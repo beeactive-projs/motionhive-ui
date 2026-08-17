@@ -1,0 +1,144 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/payments" />
+    </ion-buttons>
+    <ion-title>New invoice</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-section-label">Who</div>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item button detail="true" lines="none" (click)="pickerOpen.set(true)">
+      @if (selectedClient(); as client) {
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          [name]="selectedName()"
+          [imageUrl]="client.client?.avatarUrl ?? null"
+          [color]="toneFor(client)"
+        />
+        <ion-label>
+          <p>Billing</p>
+          <h3>{{ selectedName() }}</h3>
+        </ion-label>
+      } @else {
+        <ion-icon slot="start" name="person-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <h3>Choose a client</h3>
+        </ion-label>
+      }
+    </ion-item>
+  </ion-list>
+
+  <div class="mh-section-label">What for</div>
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (item of items(); track $index) {
+      <ion-item lines="full" class="line">
+        <ion-label position="stacked">Description</ion-label>
+        <ion-input
+          placeholder="Personal training session"
+          [value]="item.description"
+          (ionInput)="setDescription($index, $any($event.target).value)"
+        />
+        <div class="line-controls" slot="end">
+          <ion-input
+            class="amount-input"
+            type="number"
+            inputmode="decimal"
+            placeholder="0.00"
+            [value]="item.amount"
+            (ionInput)="setAmount($index, $any($event.target).value)"
+          />
+          <!-- A stepper, not a number field: quantities here are 1–5, and a
+               keyboard for that is a keyboard too many. -->
+          <div class="stepper">
+            <button type="button" aria-label="Fewer" (click)="step($index, -1)">−</button>
+            <span>{{ item.quantity }}</span>
+            <button type="button" aria-label="More" (click)="step($index, 1)">+</button>
+          </div>
+          @if (items().length > 1) {
+            <button type="button" class="remove" aria-label="Remove" (click)="removeItem($index)">
+              ×
+            </button>
+          }
+        </div>
+      </ion-item>
+    }
+    <ion-item button detail="false" lines="none" (click)="addItem()">
+      <ion-icon slot="start" name="add-outline" color="primary" aria-hidden="true" />
+      <ion-label color="primary"><h3>Add another line</h3></ion-label>
+    </ion-item>
+  </ion-list>
+
+  <div class="mh-section-label">When it's due</div>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="none">
+      <ion-label position="stacked">Due date (optional)</ion-label>
+      <ion-input
+        type="date"
+        [value]="dueDate()"
+        (ionInput)="dueDate.set($any($event.target).value)"
+      />
+    </ion-item>
+  </ion-list>
+
+  <div class="total-row">
+    <span>Total</span>
+    <!-- Currency is the coach's settlement currency: shown, not chosen. -->
+    <strong>{{ totalCents() | currencyRon: currency() : 'code' }}</strong>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar>
+    <!-- One decision, both visible. Burying "send" behind a toggle makes the
+         irreversible choice the accidental one. -->
+    <div class="pair">
+      <ion-button fill="outline" expand="block" [disabled]="!canSave() || saving()" (click)="save(false)">
+        Save draft
+      </ion-button>
+      <ion-button expand="block" [disabled]="!canSave() || saving()" (click)="save(true)">
+        Create &amp; send
+      </ion-button>
+    </div>
+    <p class="note">Sending finalises the invoice and Stripe emails it to your client.</p>
+  </ion-toolbar>
+</ion-footer>
+
+<ng-template #picker>
+  <ion-list [lines]="'none'">
+    @for (client of clients(); track client.clientId) {
+      <ion-item button detail="false" (click)="pick(client)">
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          [name]="nameOf(client)"
+          [imageUrl]="client.client?.avatarUrl ?? null"
+          [color]="toneFor(client)"
+        />
+        <ion-label>
+          <h3>{{ nameOf(client) }}</h3>
+          @if (client.client?.email; as email) {
+            <p>{{ email }}</p>
+          }
+        </ion-label>
+      </ion-item>
+    }
+    @if (clients().length === 0) {
+      <ion-note class="mh-note-block">
+        You have no active clients yet. Invoices go to people you already coach.
+      </ion-note>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="pickerOpen"
+  title="Choose a client"
+  [body]="picker"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.75]"
+  [initialBreakpoint]="0.75"
+/>

@@ -1,0 +1,30 @@
+<ion-item button detail="false" lines="none" (click)="select.emit()">
+  <mh-hex-avatar
+    slot="start"
+    size="sm"
+    [name]="personName()"
+    [imageUrl]="avatarUrl()"
+    [color]="personTone()"
+  />
+
+  <ion-label>
+    <h2>{{ personName() }}</h2>
+    <div class="tags">
+      @if (overdue()) {
+        <ion-badge color="danger">Overdue</ion-badge>
+      } @else if (style().chip; as chip) {
+        <ion-badge color="medium">{{ chip }}</ion-badge>
+      }
+      <ion-note>{{ reference() }}</ion-note>
+    </div>
+  </ion-label>
+
+  <div class="amount" slot="end">
+    <span class="value">{{ invoice().amountDueCents | currencyRon: invoice().currency : 'code' }}</span>
+    @if (dueLabel(); as due) {
+      <span class="due">{{ due }}</span>
+    }
+  </div>
+
+  <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+</ion-item>

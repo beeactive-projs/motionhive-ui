@@ -17,7 +17,12 @@ import {
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, checkmarkCircle, sparklesOutline } from 'ionicons/icons';
+import {
+  calendarOutline,
+  cardOutline,
+  checkmarkCircle,
+  sparklesOutline,
+} from 'ionicons/icons';
 
 import { AuthStore, BlogPost, MARKETING_BLOG_URL } from 'core';
 
@@ -59,7 +64,7 @@ export class TrainHome implements OnInit, ViewWillEnter {
   readonly firstName = this._authStore.user;
 
   constructor() {
-    addIcons({ calendarOutline, checkmarkCircle, sparklesOutline });
+    addIcons({ calendarOutline, cardOutline, checkmarkCircle, sparklesOutline });
   }
 
   ngOnInit(): void {
@@ -100,14 +105,19 @@ export class TrainHome implements OnInit, ViewWillEnter {
     void this._router.navigateByUrl(step.route);
   }
 
-  /**
-   * Both the sessions row and the coaches list land on Discover: booking and
-   * coach detail are Discover surfaces, and neither has its own page yet.
-   */
-  openSessions(): void {
-    void this._router.navigateByUrl('/tabs/discover');
+  openBilling(): void {
+    void this._router.navigateByUrl('/tabs/home/billing');
   }
 
+  /** Their own bookings, whether or not they have any yet. */
+  openSessions(): void {
+    void this._router.navigateByUrl('/tabs/sessions');
+  }
+
+  /**
+   * The coaches list still lands on Discover: finding a coach and their detail
+   * page are both Discover surfaces, and neither has its own page yet.
+   */
   openCoaches(): void {
     void this._router.navigateByUrl('/tabs/discover');
   }
