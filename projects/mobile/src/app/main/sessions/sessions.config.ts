@@ -1,16 +1,24 @@
-import { SessionInstance, SessionTone, sessionTone } from 'core';
+import {
+  SessionInstance,
+  SessionLocationKind,
+  SessionTone,
+  sessionTone,
+} from 'core';
 
 import {
   addOutline,
   alertCircleOutline,
   calendarOutline,
   chevronBack,
+  chevronDown,
   chevronForward,
   ellipsisHorizontal,
+  funnelOutline,
   globeOutline,
   locationOutline,
   peopleOutline,
   personOutline,
+  searchOutline,
   timeOutline,
   videocamOutline,
 } from 'ionicons/icons';
@@ -25,12 +33,15 @@ export const SESSION_ICONS = {
   alertCircleOutline,
   calendarOutline,
   chevronBack,
+  chevronDown,
   chevronForward,
   ellipsisHorizontal,
+  funnelOutline,
   globeOutline,
   locationOutline,
   peopleOutline,
   personOutline,
+  searchOutline,
   timeOutline,
   videocamOutline,
 };
@@ -56,6 +67,24 @@ export const LOCATION_KIND_OPTIONS = [
   { value: 'IN_PERSON', label: 'In-person', icon: 'location-outline' },
   { value: 'ONLINE', label: 'Online', icon: 'videocam-outline' },
 ] as const;
+
+/**
+ * The chip row under the week strip — the one narrowing worth reaching without
+ * opening the filter sheet, since "am I at a venue or on a call?" changes what
+ * the next hour looks like.
+ *
+ * `null` leads because the row doubles as its own reset: with three chips there
+ * is nowhere to put a separate clear, and a filter you cannot see how to undo
+ * is worse than one you cannot set.
+ */
+export const LOCATION_QUICK_FILTERS: readonly {
+  value: SessionLocationKind | null;
+  label: string;
+}[] = [
+  { value: null, label: 'All types' },
+  { value: 'ONLINE', label: 'Online' },
+  { value: 'IN_PERSON', label: 'In-person' },
+];
 
 /**
  * Weekday circles on the recurrence editor. `value` is ISO 8601 — 1=Mon..7=Sun,

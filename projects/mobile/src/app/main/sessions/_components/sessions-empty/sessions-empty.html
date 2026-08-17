@@ -1,0 +1,41 @@
+<div class="empty">
+  <mh-hex-avatar
+    name="No sessions yet"
+    icon="calendar-outline"
+    size="xl"
+    color="primary"
+    tone="wash"
+  />
+
+  <h2>No sessions yet</h2>
+  <p>
+    Sessions let you schedule and showcase your training. Your public sessions are
+    visible even to people not on MotionHive yet.
+  </p>
+
+  <div class="actions">
+    <ion-button expand="block" (click)="create.emit()">Create your first session</ion-button>
+    @if (hasTemplates()) {
+      <ion-button expand="block" fill="outline" (click)="fromTemplate.emit()">
+        Start from a template
+      </ion-button>
+    }
+  </div>
+
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="full">
+      <ion-icon slot="start" name="people-outline" color="medium" aria-hidden="true" />
+      <ion-label>
+        <h3>Group classes</h3>
+        <p>Set capacity, invite clients</p>
+      </ion-label>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-icon slot="start" name="globe-outline" color="medium" aria-hidden="true" />
+      <ion-label>
+        <h3>Open &amp; free</h3>
+        <p>Showcase community runs</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</div>

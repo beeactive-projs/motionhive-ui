@@ -1,3 +1,21 @@
+/* Round header buttons. Ionic gives `shape="round"` the radius but sizes the
+   button from its content, so an icon-only one comes out an oval; these two are
+   circles the same 2.25rem as the bell beside them. */
+ion-buttons ion-button.round {
+  --padding-start: 0;
+  --padding-end: 0;
+  --box-shadow: none;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+ion-buttons ion-button.round.create {
+  /* Ionic repaints an uncoloured solid button inside a toolbar as an inverted
+     chip. `color="primary"` in the template opts out; this only kills md's
+     resting elevation, which reads as a floating chip next to flat icons. */
+  --box-shadow: none;
+}
+
 /* Summary line above the week strip. */
 .summary {
   display: flex;
@@ -17,9 +35,70 @@
   color: var(--ion-color-medium-tint);
 }
 
+/* The day view splits its two facts to the edges: a warning you must read on
+   the left, the workload total on the right. */
+.summary.day {
+  justify-content: space-between;
+  padding-top: 0.25rem;
+}
+
 .conflict {
   color: var(--ion-color-danger);
   font-weight: 600;
+}
+
+/* Month label, Today, and the agenda/day toggle — one row. The month label
+   takes the slack so the two controls stay hard right. */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.25rem 0.625rem;
+}
+
+.controls .month {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-inline-end: auto;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: start;
+  white-space: nowrap;
+}
+
+.controls .month ion-icon {
+  font-size: 0.7rem;
+}
+
+.controls .today {
+  flex: none;
+  padding: 0.35rem 0.7rem;
+  border: none;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-dark);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Ionic sizes a segment to fill its container and floors each button at 90px,
+   which alone overflows a 402px row shared with two other controls. */
+.view {
+  flex: none;
+  width: auto;
+  --background: var(--mh-color-divider);
+}
+
+.view ion-segment-button {
+  min-width: 4rem;
+  min-height: 1.85rem;
+  font-size: 0.72rem;
 }
 
 /* Week strip. A seven-column grid is the shape; Ionic's grid is for page
@@ -28,7 +107,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.125rem;
-  padding: 0 1.25rem 0.625rem;
+  padding: 0 1.25rem 0.5rem;
 }
 
 .week .day {
@@ -37,12 +116,20 @@
   align-items: center;
   gap: 0.15rem;
   padding: 0.4rem 0;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--mh-radius-control);
   background: transparent;
 }
 
+/* Selected and today are different questions — "what am I looking at" and
+   "what day is it" — so they cannot both be a honey fill. The fill follows the
+   selection, which is what honey is for; today keeps a ring. */
 .week .day.today {
+  border-color: var(--ion-color-primary);
+}
+
+.week .day.selected {
+  border-color: transparent;
   background: var(--ion-color-primary);
 }
 
@@ -60,12 +147,13 @@
   line-height: 1;
 }
 
-.week .day.today .initial,
-.week .day.today .date {
+.week .day.selected .initial,
+.week .day.selected .date {
   color: var(--ion-color-primary-contrast);
 }
 
-/* Density dots — how busy a day is, without a number. */
+/* Density dots, keyed to what is scheduled rather than how much — honey is the
+   action colour and must not be spent saying "busy". */
 .week .dots {
   display: flex;
   gap: 0.1rem;
@@ -79,8 +167,62 @@
   background: var(--ion-color-primary);
 }
 
-.week .day.today .dots i {
+.week .dots i[data-tone='teal'] {
+  background: var(--ion-color-teal-shade);
+}
+
+.week .dots i[data-tone='navy'] {
+  background: var(--ion-color-info);
+}
+
+.week .dots i[data-tone='coral'] {
+  background: var(--ion-color-danger);
+}
+
+.week .dots i[data-tone='muted'] {
+  background: var(--ion-color-medium);
+}
+
+/* On the honey fill every tone loses its contrast, so the dots stop carrying
+   colour and just carry count. */
+.week .day.selected .dots i {
   background: var(--ion-color-primary-contrast);
+}
+
+/* Quick filters. Scrolls rather than wraps — a second row would push the first
+   session below the fold. */
+.chip-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.375rem;
+  overflow-x: auto;
+  padding: 0 1.25rem 0.625rem;
+  scrollbar-width: none;
+}
+
+.chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-row ion-chip {
+  flex: none;
+  margin: 0;
+  height: 1.9rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* The sheet trigger reads as a control rather than an option: tinted rather
+   than outlined, and it carries the count of what is already set. */
+.chip-row ion-chip.filters {
+  --background: var(--mh-chip-warning-background);
+  --color: var(--mh-color-honey-deep);
+  border-color: var(--mh-color-honey-deep);
+}
+
+.chip-row ion-chip.filters ion-icon {
+  margin-inline-end: 0.25rem;
+  font-size: 0.8rem;
 }
 
 .agenda {
@@ -119,79 +261,7 @@
   border-radius: var(--mh-radius-card);
 }
 
-/* Month label, Today, and the agenda/day toggle. */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0 1.25rem 0.5rem;
-}
-
-.controls .month {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--mh-color-honey-deep);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: start;
-  white-space: nowrap;
-}
-
-.controls .month ion-icon {
-  font-size: 0.75rem;
-  /* Points down: this opens a sheet below, not a forward navigation. */
-  transform: rotate(90deg);
-}
-
-.controls .today {
-  padding: 0.3rem 0.7rem;
-  border: none;
-  border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-divider);
-  color: var(--ion-color-dark);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-/* The toggle gets its own row and spans it — a full-width segment is the
-   Ionic idiom, and it stops the month label being squeezed out. */
-.view-row {
-  padding: 0 1.25rem 0.625rem;
-}
-
-.view-row .view {
-  --background: var(--mh-color-divider);
-}
-
-.view-row .view ion-segment-button {
-  min-height: 1.85rem;
-  font-size: 0.72rem;
-}
-
-
-/* A tapped day that is not today still needs to read as chosen. */
-.week .day.selected:not(.today) {
-  background: var(--mh-chip-warning-background);
-}
-
-.day-heading {
-  display: flex;
-  align-items: baseline;
-  gap: 0.375rem;
-  padding: 0.75rem 1.5rem 0.5rem;
-}
-
-.day-heading .mh-kicker {
-  color: var(--mh-color-honey-deep);
-  text-transform: uppercase;
-}
-
-.day-heading ion-note {
-  font-size: 0.68rem;
+.skeleton .when {
+  width: 3rem;
+  margin-inline-end: 0.75rem;
 }

@@ -12,10 +12,10 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
-  IonList,
   IonNote,
   IonRefresher,
   IonRefresherContent,
+  IonSearchbar,
   IonSegment,
   IonSegmentButton,
   IonSkeletonText,
@@ -28,18 +28,25 @@ import { addIcons } from 'ionicons';
 
 import {
   SessionInstance,
+  SessionLocationKind,
   SessionsInstructorStore,
   endOfDay,
+  formatSessionTime,
+  formatTimeUntil,
+  formatTotalDuration,
   localDayKey,
   sessionDayLabel,
+  sessionMinutes,
   startOfDay,
   weekStart,
 } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { ClockService } from '../../_shared/services/clock.service';
 import { DayRail } from './_components/day-rail/day-rail';
 import { SessionRow } from './_components/session-row/session-row';
+import { SessionsEmpty } from './_components/sessions-empty/sessions-empty';
 import { MessageSignupsSheet } from './_sheets/message-signups-sheet/message-signups-sheet';
 import { MonthSheet } from './_sheets/month-sheet/month-sheet';
 import { SessionFormSheet } from './_sheets/session-form-sheet/session-form-sheet';
@@ -49,7 +56,13 @@ import {
   SessionFilterSheet,
   activeFilterCount,
 } from './_sheets/session-filter-sheet/session-filter-sheet';
-import { AGENDA_DAYS_AHEAD, SESSION_ICONS, WEEKDAY_LETTERS } from './sessions.config';
+import {
+  AGENDA_DAYS_AHEAD,
+  LOCATION_QUICK_FILTERS,
+  SESSION_ICONS,
+  WEEKDAY_LETTERS,
+  instanceTone,
+} from './sessions.config';
 
 type LoadOptions = { force?: boolean; done?: () => void };
 
@@ -59,6 +72,8 @@ interface AgendaDay {
   isToday: boolean;
   instances: SessionInstance[];
   conflicts: number;
+  /** "next in 18 min" — only ever set on the day holding the soonest session. */
+  nextNote: string | null;
 }
 
 /**
@@ -83,10 +98,10 @@ interface AgendaDay {
     IonIcon,
     IonItem,
     IonLabel,
-    IonList,
     IonNote,
     IonRefresher,
     IonRefresherContent,
+    IonSearchbar,
     IonSegment,
     IonSegmentButton,
     IonSkeletonText,
@@ -99,6 +114,7 @@ interface AgendaDay {
     SessionFilterSheet,
     SessionFormSheet,
     SessionRow,
+    SessionsEmpty,
   ],
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
@@ -107,8 +123,11 @@ export class Sessions implements ViewWillEnter {
   readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
   private readonly _actionSheetController = inject(ActionSheetController);
+  private readonly _clockService = inject(ClockService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
+  readonly locationFilters = LOCATION_QUICK_FILTERS;
+
   readonly createOpen = signal(false);
   /** Seeds the create sheet when it opens from a slot on the day rail. */
   readonly createStart = signal<Date | null>(null);
@@ -116,6 +135,19 @@ export class Sessions implements ViewWillEnter {
   readonly monthOpen = signal(false);
   readonly messageOpen = signal(false);
   readonly messageInstanceId = signal<string | null>(null);
+
+  /**
+   * Search owns the whole toolbar while it is open — a title, three actions, a
+   * field and two filter rows do not fit above the fold on a phone. Same
+   * treatment as the inbox.
+   */
+  readonly searchOpen = signal(false);
+  /**
+   * Kept beside the sheet's filters rather than inside them: the "Filters · 2"
+   * badge counts what the sheet set, and a query typed in the header should not
+   * inflate it.
+   */
+  readonly query = signal('');
 
   /** 'agenda' is the day-grouped list; 'day' is the hour rail. */
   readonly view = signal<'agenda' | 'day'>('agenda');
@@ -135,10 +167,10 @@ export class Sessions implements ViewWillEnter {
   /** The Monday of the week the strip is showing. */
   readonly weekStartDate = computed(() => weekStart(this.selectedDay()));
 
-  /** The loaded window, narrowed by the filter sheet. */
+  /** The loaded window, narrowed by the filter sheet and the header search. */
   readonly visibleInstances = computed(() => {
-    const { q, type, locationKind, conflictsOnly } = this.filters();
-    const needle = q.trim().toLowerCase();
+    const { type, locationKind, conflictsOnly } = this.filters();
+    const needle = this.query().trim().toLowerCase();
 
     return this.store.rangeInstances().filter((instance) => {
       const template = instance.template;
@@ -151,6 +183,23 @@ export class Sessions implements ViewWillEnter {
       }
       return true;
     });
+  });
+
+  /**
+   * The soonest session still ahead of us, and how long until it starts.
+   *
+   * Read off a pulled clock rather than a timer — see `ClockService`. Null once
+   * the next one is more than eight hours out, which is when a countdown stops
+   * telling you anything the date on the row does not.
+   */
+  private readonly _nextUp = computed(() => {
+    const now = this._clockService.now();
+    const next = this.visibleInstances().find(
+      (instance) => new Date(instance.startAt).getTime() > now,
+    );
+    if (!next) return null;
+    const note = formatTimeUntil(next.startAt, now);
+    return note ? { key: localDayKey(new Date(next.startAt)), note } : null;
   });
 
   /** What the hour rail shows — the selected day only. */
@@ -177,6 +226,7 @@ export class Sessions implements ViewWillEnter {
     }
 
     const todayKey = localDayKey(new Date());
+    const nextUp = this._nextUp();
 
     return [...byDay.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
@@ -189,17 +239,29 @@ export class Sessions implements ViewWillEnter {
         ),
         conflicts: instances.filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0)
           .length,
+        nextNote: nextUp?.key === key ? nextUp.note : null,
       }));
   });
 
-  /** The seven days of the strip, with a density dot per session. */
+  /**
+   * The seven days of the strip, each with up to three dots keyed to what is
+   * scheduled — teal for online, navy for a 1-on-1, coral for a clash.
+   *
+   * Tone, not a single colour: honey is the brand's action colour, so painting
+   * every dot with it would use the accent to say "busy", which is a status.
+   */
   readonly weekDays = computed(() => {
     const start = this.weekStartDate();
     const todayKey = localDayKey(new Date());
-    const counts = new Map<string, number>();
+
+    const tones = new Map<string, string[]>();
     for (const instance of this.visibleInstances()) {
       const key = localDayKey(new Date(instance.startAt));
-      counts.set(key, (counts.get(key) ?? 0) + 1);
+      const existing = tones.get(key) ?? [];
+      // Three is enough to read as "busy" without the row growing.
+      if (existing.length >= 3) continue;
+      existing.push(instanceTone(instance));
+      tones.set(key, existing);
     }
 
     return Array.from({ length: 7 }, (_, offset) => {
@@ -212,22 +274,37 @@ export class Sessions implements ViewWillEnter {
         dayOfMonth: date.getDate(),
         date,
         isToday: key === todayKey,
-        // Three is enough to read as "busy" without the row growing.
-        dots: Array.from({ length: Math.min(counts.get(key) ?? 0, 3) }),
+        dots: tones.get(key) ?? [],
       };
     });
   });
 
-  readonly totalThisWindow = computed(() => this.visibleInstances().length);
+  /**
+   * The week the strip is showing — which is what the summary line counts.
+   *
+   * Scoped to the week rather than the whole loaded window because the line
+   * says "this week" and sits directly above the strip; counting 30 days there
+   * would label a number that nothing on screen accounts for.
+   */
+  private readonly _weekInstances = computed(() => {
+    const start = this.weekStartDate().getTime();
+    const end = start + 7 * 86_400_000;
+    return this.visibleInstances().filter((instance) => {
+      const at = new Date(instance.startAt).getTime();
+      return at >= start && at < end;
+    });
+  });
+
+  readonly weekCount = computed(() => this._weekInstances().length);
 
   readonly conflictCount = computed(
     () =>
-      this.visibleInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0)
+      this._weekInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0)
         .length,
   );
 
   readonly signupCount = computed(() =>
-    this.visibleInstances().reduce(
+    this._weekInstances().reduce(
       (sum, i) => sum + i.confirmedCount + i.pendingApprovalCount,
       0,
     ),
@@ -247,7 +324,25 @@ export class Sessions implements ViewWillEnter {
     this.selectedDay().toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
   );
 
-  /** Filters hid everything, but the window itself is not empty. */
+  /** "5 sessions · 6h scheduled" — the day view's right-hand summary. */
+  readonly dayTotalLabel = computed(() => {
+    const instances = this.dayInstances();
+    const count = `${instances.length} ${instances.length === 1 ? 'session' : 'sessions'}`;
+    const minutes = instances.reduce((sum, i) => sum + sessionMinutes(i), 0);
+    return minutes > 0 ? `${count} · ${formatTotalDuration(minutes)} scheduled` : count;
+  });
+
+  /** "1 conflict at 17:00" — the day view's left-hand warning, or null. */
+  readonly dayConflictLabel = computed(() => {
+    const clashing = this.dayInstances().filter(
+      (i) => (i.conflictingInstanceIds?.length ?? 0) > 0,
+    );
+    if (clashing.length === 0) return null;
+    const noun = clashing.length === 1 ? 'conflict' : 'conflicts';
+    return `${clashing.length} ${noun} at ${formatSessionTime(clashing[0].startAt)}`;
+  });
+
+  /** Filters or a search hid everything, but the window itself is not empty. */
   readonly isFilteredEmpty = computed(
     () =>
       this.store.rangeInstances().length > 0 && this.visibleInstances().length === 0,
@@ -279,6 +374,8 @@ export class Sessions implements ViewWillEnter {
   // Not ngOnInit: Ionic keeps the page alive in the tab stack, so that would
   // run once per app session. The store caches the window.
   ionViewWillEnter(): void {
+    // Before the load, so a cached window still renders a fresh countdown.
+    this._clockService.bump();
     this._load();
   }
 
@@ -304,6 +401,15 @@ export class Sessions implements ViewWillEnter {
     this.createOpen.set(true);
   }
 
+  openSearch(): void {
+    this.searchOpen.set(true);
+  }
+
+  closeSearch(): void {
+    this.searchOpen.set(false);
+    this.query.set('');
+  }
+
   openFilters(): void {
     this.filterOpen.set(true);
   }
@@ -318,10 +424,20 @@ export class Sessions implements ViewWillEnter {
 
   clearFilters(): void {
     this.filters.set({ ...NO_FILTERS });
+    this.query.set('');
+  }
+
+  /** The quick chips under the strip write straight through to the sheet's state. */
+  setLocation(kind: SessionLocationKind | null): void {
+    this.filters.update((filters) => ({ ...filters, locationKind: kind }));
   }
 
   setView(value: string | number | undefined): void {
     if (value === 'agenda' || value === 'day') this.view.set(value);
+  }
+
+  showAgenda(): void {
+    this.view.set('agenda');
   }
 
   pickDay(date: Date): void {
@@ -391,6 +507,7 @@ export class Sessions implements ViewWillEnter {
   }
 
   onRefresh(event: RefresherCustomEvent): void {
+    this._clockService.bump();
     this._load({ force: true, done: () => void event.target.complete() });
   }
 
@@ -408,4 +525,3 @@ export class Sessions implements ViewWillEnter {
     this.store.loadRange({ start, end }, opts);
   }
 }
-

@@ -1,0 +1,43 @@
+/* Centring a hero column is the one thing Ionic's utilities cannot express:
+   `ion-text-center` aligns text but leaves the hexagon and the buttons at their
+   natural width, and there is no centred-stack primitive. */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.empty h2 {
+  margin: 1.25rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.empty p {
+  margin: 0.5rem 0 0;
+  max-width: 20rem;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+/* The CTAs are the width of the content column, not of the page — `expand`
+   stretches them to their container, so the container is what sets the bound. */
+.actions {
+  align-self: stretch;
+  margin-top: 1.75rem;
+}
+
+.actions ion-button {
+  margin-bottom: 0.625rem;
+}
+
+/* `mh-card-list` is laid out for a full-bleed page; here it sits inside a
+   padded hero column and only needs the vertical rhythm. */
+.empty ion-list.mh-card-list {
+  align-self: stretch;
+  margin: 1rem 0 0;
+  text-align: start;
+}
