@@ -6,7 +6,6 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
-  IonCheckbox,
   IonContent,
   IonFooter,
   IonHeader,
@@ -19,6 +18,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
@@ -27,22 +27,26 @@ import {
   SessionInstance,
   SessionParticipant,
   SessionsDetailStore,
+  detectMeetingProvider,
   displayName,
   formatRelativeShort,
   formatSessionDayShort,
   formatSessionDuration,
   formatSessionTime,
+  formatTimeUntil,
   publicProfileUrl,
   sessionLifecycle,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { ClockService } from '../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
-import { ShareOutcomes, shareOrCopy } from '../../../_shared/utils/share';
+import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../_shared/utils/share';
 import { CancelSessionSheet } from '../_sheets/cancel-session-sheet/cancel-session-sheet';
 import { MessageSignupsSheet } from '../_sheets/message-signups-sheet/message-signups-sheet';
+import { ParticipantNoteSheet } from '../_sheets/participant-note-sheet/participant-note-sheet';
 import { SessionActionsSheet } from '../_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from '../_sheets/session-form-sheet/session-form-sheet';
 import {
@@ -53,6 +57,28 @@ import {
   formatWeekdayList,
   prefillFromInstance,
 } from '../sessions.config';
+
+/** Provider names as people write them, for the Join button. */
+const MEETING_PROVIDER_NAMES: Record<string, string> = {
+  ZOOM: 'Zoom',
+  GOOGLE_MEET: 'Google Meet',
+  TEAMS: 'Teams',
+};
+
+/**
+ * When the API schedules reminders — `startAt` minus each offset. Mirrored from
+ * the BE's booking flow, which writes exactly these two and only when they are
+ * still in the future at the time of booking.
+ */
+const REMINDER_OFFSETS = [
+  { label: '24 hours before', offsetMs: 24 * 3_600_000 },
+  { label: '1 hour before', offsetMs: 3_600_000 },
+];
+
+interface ReminderRow {
+  label: string;
+  detail: string;
+}
 
 /**
  * One occurrence: when, where, who is coming, and the one action that makes
@@ -69,13 +95,13 @@ import {
     EmptyState,
     MessageSignupsSheet,
     HexAvatar,
+    ParticipantNoteSheet,
     SessionActionsSheet,
     SessionFormSheet,
     IonBackButton,
     IonBadge,
     IonButton,
     IonButtons,
-    IonCheckbox,
     IonContent,
     IonFooter,
     IonHeader,
@@ -92,18 +118,21 @@ import {
   templateUrl: './session-detail.html',
   styleUrl: './session-detail.scss',
 })
-export class SessionDetail {
+export class SessionDetail implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _clockService = inject(ClockService);
   readonly store = inject(SessionsDetailStore);
 
   readonly cancelOpen = signal(false);
   readonly actionsOpen = signal(false);
   readonly duplicateOpen = signal(false);
   readonly duplicatePrefill = signal<SessionPrefill | null>(null);
+  readonly noteOpen = signal(false);
+  readonly noteParticipant = signal<SessionParticipant | null>(null);
   readonly skeletonRows = [1, 2, 3];
 
   /** No handle, no public link — so the Share verb stays hidden. */
@@ -204,6 +233,73 @@ export class SessionDetail {
   /** Nothing to do on a cancelled session. */
   readonly showCta = computed(() => !this.isCancelled());
 
+  /**
+   * "Starts in 4 min" / "Live now" — the one thing worth saying at the top of
+   * an imminent session.
+   *
+   * Deliberately says nothing about who has joined. The design shows a lobby
+   * count, but `joinInfo` requires the caller to be a CONFIRMED participant and
+   * 403s for the coach on their own session, and `instructorJoined` is a
+   * hardcoded false on the API. There is no join telemetry to report, and
+   * inferring it from `confirmedCount` would be inventing it.
+   */
+  readonly liveNote = computed(() => {
+    const instance = this.instance();
+    if (!instance || this.isCancelled()) return null;
+    if (this.lifecycle() === 'ongoing') return 'Live now';
+    if (this.lifecycle() === 'past') return null;
+    return formatTimeUntil(instance.startAt, this._clockService.now());
+  });
+
+  /** Named after the provider, so the button says where it is taking you. */
+  readonly joinLabel = computed(() => {
+    const provider =
+      this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl());
+    return provider ? `Join ${MEETING_PROVIDER_NAMES[provider]}` : 'Join meeting';
+  });
+
+  /**
+   * When the automatic reminders are due.
+   *
+   * Derived, not fetched — no endpoint exposes the reminder schedule — so these
+   * are worded as the schedule they are, never as deliveries. The API only
+   * writes a reminder that is still in the future when the booking is made, so
+   * claiming "sent" would be wrong for anyone who booked late.
+   */
+  readonly reminders = computed<ReminderRow[]>(() => {
+    const instance = this.instance();
+    if (!instance || this.isCancelled() || this.lifecycle() !== 'upcoming') return [];
+
+    const start = new Date(instance.startAt).getTime();
+    if (Number.isNaN(start)) return [];
+
+    return REMINDER_OFFSETS.map(({ label, offsetMs }) => ({
+      label,
+      detail: new Date(start - offsetMs).toLocaleString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+    }));
+  });
+
+  /**
+   * "9 of 12 attended" — from the roster, not `instance.attendedCount`.
+   *
+   * The denormalised counter is not refetched when a mark changes, so it would
+   * disagree with the list directly beneath it the instant anyone is ticked.
+   */
+  readonly attendanceSummary = computed(() => {
+    if (this.lifecycle() === 'upcoming') return null;
+    const { attended } = this.counts();
+    const total = this.attendees().length;
+    if (total === 0) return null;
+    return `${attended} of ${total} attended`;
+  });
+
   /** Everyone but the waitlist — those get their own section below. */
   readonly attendees = computed(() =>
     this.store.participants().filter((p) => p.status !== 'WAITLISTED'),
@@ -249,6 +345,15 @@ export class SessionDetail {
     });
   }
 
+  /**
+   * Ionic keeps this page alive in the stack, so coming back to it from a tab
+   * would otherwise render "starts in 40 min" from whenever it was first
+   * opened. The clock is pulled, not ticked — see `ClockService`.
+   */
+  ionViewWillEnter(): void {
+    this._clockService.bump();
+  }
+
   /** "2h" / "yesterday" — how long they have been in the queue. */
   waitingSince(participant: SessionParticipant): string {
     return formatRelativeShort(participant.bookedAt);
@@ -290,9 +395,52 @@ export class SessionDetail {
     this.store.decline(participant.id);
   }
 
-  /** Attendance is its own control, so tapping a row always means the same thing. */
+  /**
+   * Attendance has three states, not two.
+   *
+   * A checkbox can only say true or false, which conflates "did not turn up"
+   * with "not marked yet" — and those are very different things to a coach
+   * looking back at a class they have not finished registering. Tapping the
+   * active choice clears it back to unmarked.
+   */
   setAttendance(participant: SessionParticipant, attended: boolean): void {
-    this.store.setAttendance(participant.id, attended);
+    this.store.setAttendance(
+      participant.id,
+      participant.attended === attended ? null : attended,
+    );
+  }
+
+  /** Copy the meeting link — the row's whole purpose on an online session. */
+  async copyMeetingUrl(): Promise<void> {
+    const url = this.meetingUrl();
+    if (!url) return;
+    if (await copyToClipboard(url)) {
+      await this._feedbackService.success('Link copied');
+    } else {
+      await this._feedbackService.error(null, 'Could not copy the link.');
+    }
+  }
+
+  openNote(participant: SessionParticipant): void {
+    this.noteParticipant.set(participant);
+    this.noteOpen.set(true);
+  }
+
+  /** The coach's private note on one attendee — never shown to them. */
+  noteFor(participant: SessionParticipant): string | null {
+    return participant.privateNote ?? null;
+  }
+
+  onNoteSaved(note: string | null): void {
+    const participant = this.noteParticipant();
+    if (participant) this.store.setPrivateNote(participant.id, note);
+  }
+
+  duplicateThis(): void {
+    const instance = this.instance();
+    if (!instance) return;
+    this.duplicatePrefill.set(prefillFromInstance(instance));
+    this.duplicateOpen.set(true);
   }
 
   openProfile(participant: SessionParticipant): void {

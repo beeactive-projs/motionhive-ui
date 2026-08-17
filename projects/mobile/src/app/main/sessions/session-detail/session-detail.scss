@@ -70,6 +70,72 @@
   font-size: 0.68rem;
 }
 
+/* How long until it starts, or that it is on now. Teal while it is still
+   ahead, green once it is live — not honey either way, because "in 4 minutes"
+   is a state, not something to press. */
+.live-note {
+  margin: 0.75rem 1.25rem 0;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-teal-wash);
+  color: var(--ion-color-teal-wash-contrast);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.live-note.now {
+  background: var(--ion-color-success-wash);
+  color: var(--ion-color-success-wash-contrast);
+}
+
+/* The one number worth reading on a finished session. */
+.attendance-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 1.25rem 0;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-success-wash);
+  color: var(--ion-color-success-wash-contrast);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.attendance-summary ion-icon {
+  font-size: 1.1rem;
+}
+
+/* The private note, as a line under the name. A button because it opens the
+   editor, but dressed as text — a second filled control per row would compete
+   with the attendance marks on the right. */
+.note {
+  margin-top: 0.15rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ion-color-medium);
+  font-size: 0.72rem;
+  font-style: italic;
+  text-align: start;
+}
+
+.note.empty {
+  color: var(--mh-color-honey-deep);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Two icon buttons in the end slot. Ionic sizes toolbar buttons for a toolbar;
+   inside a list row they need to come down to something a thumb can hit
+   without the pair overflowing a 402px line. */
+.marks ion-button {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  height: 2rem;
+  margin: 0 0 0 0.25rem;
+}
+
 .cta {
   display: flex;
   align-items: center;

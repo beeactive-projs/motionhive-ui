@@ -95,13 +95,41 @@
               <p class="url">{{ meetingUrl() }}</p>
             }
           </ion-label>
-          @if (isOnline() && meetingUrl(); as url) {
-            <ion-button slot="end" fill="outline" size="small" [href]="url" target="_blank">
-              Join
+          @if (isOnline() && meetingUrl()) {
+            <!-- Copy, not Join: the CTA at the bottom joins, and what you need
+                 up here is the link itself, to paste somewhere else. -->
+            <ion-button slot="end" fill="outline" size="small" (click)="copyMeetingUrl()">
+              Copy
             </ion-button>
           }
         </ion-item>
       </ion-list>
+
+      @if (liveNote(); as note) {
+        <!-- Says only what the clock knows. The design also shows a lobby
+             count, but `joinInfo` 403s for the coach on their own session and
+             no join telemetry exists to put there. -->
+        <div class="live-note" [class.now]="lifecycle() === 'ongoing'">{{ note }}</div>
+      }
+
+      @if (reminders().length > 0) {
+        <div class="mh-section-label">Reminders</div>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (reminder of reminders(); track reminder.label; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'">
+              <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+              <ion-label>
+                <h3>{{ reminder.label }}</h3>
+                <p>{{ reminder.detail }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+        <p class="mh-helper">
+          Sent automatically to everyone booked in. Anyone who books after one of
+          these times does not get that reminder.
+        </p>
+      }
 
       <div class="mh-section-label">Spots</div>
       <div class="spots">
@@ -109,15 +137,24 @@
         <span class="count">{{ spotsLabel() }}</span>
       </div>
 
+      @if (attendanceSummary(); as summary) {
+        <div class="attendance-summary">
+          <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
+          {{ summary }}
+        </div>
+      }
+
       <div class="mh-section-label">
         Attendees
         @if (counts().pending > 0) {
-          <ion-badge color="warning">{{ counts().pending }} pending</ion-badge>
+          <ion-badge color="secondary">{{ counts().pending }} pending</ion-badge>
         }
       </div>
 
-      @if (lifecycle() !== 'upcoming' && attendees().length > 0) {
-        <ion-note class="mh-note-block">Tick who turned up. Tap a name for their profile.</ion-note>
+      @if (canMarkAttendance() && attendees().length > 0) {
+        <ion-note class="mh-note-block">
+          Mark who turned up. Tapping the same choice again clears it.
+        </ion-note>
       }
 
       @if (attendees().length === 0) {
@@ -141,6 +178,19 @@
               />
               <ion-label>
                 <h3>{{ nameOf(participant) }}</h3>
+                @if (canMarkAttendance()) {
+                  <!-- The design's note card is session-level, which does not
+                       exist; `privateNote` is per-participant, owner-only, and
+                       already backed — so the note lands here instead. -->
+                  <button
+                    type="button"
+                    class="note"
+                    [class.empty]="!noteFor(participant)"
+                    (click)="openNote(participant); $event.stopPropagation()"
+                  >
+                    {{ noteFor(participant) ?? 'Add a private note' }}
+                  </button>
+                }
               </ion-label>
 
               @if (isPending(participant)) {
@@ -165,14 +215,30 @@
                   </ion-button>
                 </ion-buttons>
               } @else if (canMarkAttendance()) {
-                <ion-checkbox
-                  slot="end"
-                  aria-label="Attended"
-                  [checked]="participant.attended === true"
-                  [disabled]="store.isParticipantBusy(participant.id)"
-                  (ionChange)="setAttendance(participant, $event.detail.checked)"
-                  (click)="$event.stopPropagation()"
-                />
+                <!-- Two buttons, not a checkbox: a checkbox has no way to say
+                     "not marked yet", which is different from "did not come". -->
+                <ion-buttons slot="end" class="marks">
+                  <ion-button
+                    size="small"
+                    aria-label="Attended"
+                    [fill]="participant.attended === true ? 'solid' : 'outline'"
+                    [color]="participant.attended === true ? 'success' : 'medium'"
+                    [disabled]="store.isParticipantBusy(participant.id)"
+                    (click)="setAttendance(participant, true); $event.stopPropagation()"
+                  >
+                    <ion-icon slot="icon-only" name="checkmark-circle-outline" />
+                  </ion-button>
+                  <ion-button
+                    size="small"
+                    aria-label="No-show"
+                    [fill]="participant.attended === false ? 'solid' : 'outline'"
+                    [color]="participant.attended === false ? 'danger' : 'medium'"
+                    [disabled]="store.isParticipantBusy(participant.id)"
+                    (click)="setAttendance(participant, false); $event.stopPropagation()"
+                  >
+                    <ion-icon slot="icon-only" name="close-circle-outline" />
+                  </ion-button>
+                </ion-buttons>
               } @else {
                 <ion-badge slot="end" [color]="statusColor(participant)">
                   {{ statusLabel(participant) }}
@@ -219,16 +285,36 @@
 @if (instance() && showCta()) {
   <ion-footer [translucent]="true">
     <ion-toolbar>
+      <!-- The CTA verb follows the session's moment: join it while it is on,
+           message the people coming while it is ahead, copy it once it is done. -->
       <div class="cta">
-        @if (price(); as amount) {
-          <div class="price">
-            <strong>{{ amount }}</strong>
-            <span>per spot</span>
-          </div>
+        @if (lifecycle() === 'past') {
+          <ion-button expand="block" fill="outline" class="action" (click)="duplicateThis()">
+            Duplicate session
+          </ion-button>
+        } @else {
+          @if (price(); as amount) {
+            <div class="price">
+              <strong>{{ amount }}</strong>
+              <span>per spot</span>
+            </div>
+          }
+          @if (isOnline() && meetingUrl(); as url) {
+            <ion-button
+              expand="block"
+              class="action"
+              [href]="url"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ joinLabel() }}
+            </ion-button>
+          } @else {
+            <ion-button expand="block" class="action" (click)="messageSignups()">
+              Message signups
+            </ion-button>
+          }
         }
-        <ion-button expand="block" class="action" (click)="messageSignups()">
-          Message signups
-        </ion-button>
       </div>
     </ion-toolbar>
   </ion-footer>
@@ -257,3 +343,9 @@
 />
 
 <mh-session-form-sheet [(open)]="duplicateOpen" [prefill]="duplicatePrefill()" />
+
+<mh-participant-note-sheet
+  [(open)]="noteOpen"
+  [participant]="noteParticipant()"
+  (save)="onNoteSaved($event)"
+/>

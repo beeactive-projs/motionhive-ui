@@ -1,0 +1,27 @@
+<ng-template #body>
+  <ion-textarea
+    fill="outline"
+    [autoGrow]="true"
+    [rows]="4"
+    [maxlength]="1000"
+    [counter]="true"
+    placeholder="Kept favouring the left knee — check next week."
+    [value]="draft()"
+    (ionInput)="draft.set($event.detail.value ?? '')"
+  />
+
+  <p class="mh-helper">
+    Only you can see this. It stays with this person on this session.
+  </p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  saveLabel="Save note"
+  [body]="body"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+  (save)="commit()"
+/>
