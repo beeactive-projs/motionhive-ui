@@ -15,7 +15,47 @@ ion-title {
   text-align: center;
 }
 
+// The action bar. A hairline holds it apart from the body scrolling under it,
+// and the row gets its own padding because the buttons are the bar now rather
+// than toolbar-sized text.
 ion-footer ion-toolbar {
   --background: var(--ion-card-background);
-  --border-width: 0;
+  --border-width: 1px 0 0;
+  --border-color: var(--ion-border-color);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.625rem;
+  --padding-bottom: 0.625rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.625rem;
+}
+
+// Ionic sizes buttons for a toolbar here — small, tight, and shadowed on md.
+// A sheet's commit is a 44px tap target, so the pair is sized deliberately.
+.actions ion-button {
+  --padding-start: 1.125rem;
+  --padding-end: 1.125rem;
+  --box-shadow: none;
+  height: 2.75rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+// Ink label on the card hairline rather than the medium palette's own grey:
+// the outline stays quiet next to the filled confirm, and the label still reads.
+.actions .dismiss {
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --color: var(--ion-text-color);
+}
+
+// The confirm takes the rest of the row — one obvious target per sheet.
+.actions .confirm {
+  flex: 1;
+  font-weight: 700;
 }

@@ -1,5 +1,16 @@
-import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
+import {
+  IonButton,
   IonDatetime,
   IonChip,
   IonDatetimeButton,
@@ -9,6 +20,9 @@ import {
   IonLabel,
   IonModal,
   IonNote,
+  IonPicker,
+  IonPickerColumn,
+  IonPickerColumnOption,
   IonSelect,
   IonSelectOption,
   IonToggle,
@@ -36,14 +50,14 @@ import {
 } from '../../sessions.config';
 
 /**
- * Every duration the BE accepts (5–480 min), at a granularity a coach would
- * actually use: 5-minute steps through the first two hours, then quarter-hours.
- * Presets would have ruled out a 35- or 50-minute session.
+ * Duration is two wheels rather than one long list of presets: hours 0–8 and
+ * minutes in 5-minute steps reach every value the BE accepts (5–480 min) and
+ * still allow a 35- or 50-minute session, which presets would have ruled out.
  */
-const DURATION_CHOICES = [
-  ...Array.from({ length: 24 }, (_, i) => (i + 1) * 5),
-  ...Array.from({ length: 24 }, (_, i) => 120 + (i + 1) * 15),
-];
+const MIN_DURATION_MINUTES = 5;
+const MAX_DURATION_MINUTES = 480;
+const DURATION_HOUR_CHOICES = Array.from({ length: 9 }, (_, i) => i);
+const DURATION_MINUTE_CHOICES = Array.from({ length: 12 }, (_, i) => i * 5);
 
 const OCCURRENCE_CHOICES = [4, 8, 12, 24, 52];
 
@@ -72,6 +86,7 @@ function defaultStart(): string {
 @Component({
   selector: 'mh-session-form-sheet',
   imports: [
+    IonButton,
     IonDatetime,
     IonChip,
     IonDatetimeButton,
@@ -81,6 +96,9 @@ function defaultStart(): string {
     IonLabel,
     IonModal,
     IonNote,
+    IonPicker,
+    IonPickerColumn,
+    IonPickerColumnOption,
     IonSelect,
     IonSelectOption,
     IonToggle,
@@ -102,7 +120,8 @@ export class SessionFormSheet {
   readonly typeOptions = SESSION_TYPE_OPTIONS;
   readonly locationOptions = LOCATION_KIND_OPTIONS;
   readonly weekdays = WEEKDAYS;
-  readonly durations = DURATION_CHOICES;
+  readonly hourChoices = DURATION_HOUR_CHOICES;
+  readonly minuteChoices = DURATION_MINUTE_CHOICES;
   readonly occurrenceChoices = OCCURRENCE_CHOICES;
 
   readonly title = signal('');
@@ -115,17 +134,25 @@ export class SessionFormSheet {
   readonly meetingUrl = signal('');
   readonly venueId = signal<string | null>(null);
 
+  /** The duration wheels live in their own popup, like the start date's. */
+  readonly durationOpen = signal(false);
+
   readonly isRecurring = signal(false);
   readonly daysOfWeek = signal<number[]>([]);
   readonly endAfterOccurrences = signal(12);
 
   readonly saving = signal(false);
   readonly venues = signal<Venue[]>([]);
+  private _venuesLoaded = false;
 
   /** A 1-on-1 has exactly one seat; asking for a capacity would be noise. */
   readonly showCapacity = computed(() => this.type() !== 'PRIVATE');
 
   readonly isOnline = computed(() => this.locationKind() === 'ONLINE');
+
+  /** The two wheels are views onto `durationMinutes`, which stays the truth. */
+  readonly durationHours = computed(() => Math.floor(this.durationMinutes() / 60));
+  readonly durationMinutesPart = computed(() => this.durationMinutes() % 60);
 
   readonly canSave = computed(() => {
     if (this.title().trim().length === 0) return false;
@@ -146,10 +173,17 @@ export class SessionFormSheet {
     addIcons(SESSION_ICONS);
 
     // Re-seed each time it opens, so a cancelled edit never leaks into the next.
+    // `untracked` so the effect depends on `open()` and nothing else: `_reset`
+    // reads `initialStart` and `_loadVenues` reads `venues`, and tracking those
+    // re-seeds the form mid-edit the moment the venue request lands. That also
+    // rewrites `startAt` under an open date picker, and Ionic reacts to a new
+    // `value` by scroll-animating the calendar away from the day just tapped.
     effect(() => {
       if (!this.open()) return;
-      this._reset();
-      this._loadVenues();
+      untracked(() => {
+        this._reset();
+        this._loadVenues();
+      });
     });
   }
 
@@ -163,6 +197,26 @@ export class SessionFormSheet {
     const hours = Math.floor(minutes / 60);
     const rest = minutes % 60;
     return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+  }
+
+  /**
+   * Greys out the minute options that would carry the pair outside the accepted
+   * range — every minute but `:00` at 8 h, and `:00` itself at 0 h. The wheel
+   * skips disabled options, so neither edge can be scrolled onto.
+   */
+  minuteAllowed(minutes: number): boolean {
+    const total = this.durationHours() * 60 + minutes;
+    return total >= MIN_DURATION_MINUTES && total <= MAX_DURATION_MINUTES;
+  }
+
+  setDurationHours(hours: string | number | undefined): void {
+    if (typeof hours !== 'number') return;
+    this._setDuration(hours, this.durationMinutesPart());
+  }
+
+  setDurationMinutes(minutes: string | number | undefined): void {
+    if (typeof minutes !== 'number') return;
+    this._setDuration(this.durationHours(), minutes);
   }
 
   /** `ion-input type="number"` emits a string; empty means "unset", not zero. */
@@ -242,6 +296,16 @@ export class SessionFormSheet {
       });
   }
 
+  /**
+   * Clamped rather than left to the wheels: switching to 8 h while the minute
+   * wheel sits on `:30` would otherwise ask for 510 minutes. Both bounds land
+   * back on a valid pair of options, so the wheels follow the correction.
+   */
+  private _setDuration(hours: number, minutes: number): void {
+    const total = hours * 60 + minutes;
+    this.durationMinutes.set(Math.min(Math.max(total, MIN_DURATION_MINUTES), MAX_DURATION_MINUTES));
+  }
+
   private _reset(): void {
     this.title.set('');
     this.type.set('GROUP');
@@ -258,8 +322,14 @@ export class SessionFormSheet {
     this.endAfterOccurrences.set(12);
   }
 
+  /**
+   * Fetched once. The flag rather than `venues().length` because an empty list
+   * is a valid answer — a coach with no venues would otherwise refetch on every
+   * open. A failure does not latch, so reopening retries.
+   */
   private _loadVenues(): void {
-    if (this.venues().length > 0) return;
+    if (this._venuesLoaded) return;
+    this._venuesLoaded = true;
     this._venueService
       .list()
       .pipe(take(1))
@@ -267,7 +337,10 @@ export class SessionFormSheet {
         next: (venues) => this.venues.set(venues),
         // A missing venue list is not worth an error: the picker just stays
         // empty and the session can still be created without one.
-        error: () => this.venues.set([]),
+        error: () => {
+          this._venuesLoaded = false;
+          this.venues.set([]);
+        },
       });
   }
 }

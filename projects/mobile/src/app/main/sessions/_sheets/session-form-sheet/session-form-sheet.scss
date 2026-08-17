@@ -68,6 +68,24 @@
   font-size: 0.72rem;
 }
 
+/* Value pill on the Duration row. Ionic ships `ion-datetime-button` as the
+   trigger for a datetime but has no equivalent for a picker, so a plain button
+   is dressed to match the one on the Starts row directly above it — same
+   surface, same padding, and none of the MD button's shout. */
+.picker-trigger {
+  --background: var(--ion-color-step-300, var(--ion-background-color-step-300));
+  --color: var(--ion-text-color);
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+  --box-shadow: none;
+  height: 2rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 /* Rows that behave as fields rather than list items. */
 .field {
   --background: var(--ion-card-background);

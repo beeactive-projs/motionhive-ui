@@ -117,12 +117,12 @@ h1 {
   line-height: 1.55;
 }
 
-/* Date pickers.
-   An `ion-datetime` in a bare `ion-modal` inherits the sheet's full-bleed size
-   and lands top-left on a white slab. Ionic sizes this one through modal
-   variables, and the modal is relocated on present so the rule has to be
-   global rather than scoped to whichever screen opened it. */
-ion-modal.mh-date-modal {
+/* Picker popups — dates and wheels alike.
+   A picker in a bare `ion-modal` inherits the sheet's full-bleed size and lands
+   top-left on a white slab. Ionic sizes these through modal variables, and the
+   modal is relocated on present so the rule has to be global rather than scoped
+   to whichever screen opened it. */
+ion-modal.mh-picker-modal {
   --width: 20rem;
   --height: auto;
   --max-width: calc(100% - 2rem);
@@ -133,7 +133,7 @@ ion-modal.mh-date-modal {
   justify-content: center;
 }
 
-ion-modal.mh-date-modal ion-datetime {
+ion-modal.mh-picker-modal ion-datetime {
   /* Without this the picker stretches to the modal and clips its own footer. */
   height: auto;
 }
@@ -145,26 +145,28 @@ ion-modal.mh-date-modal ion-datetime {
    `!important` because Ionic ships these components with scoped CSS, so its
    own `.input-fill-outline.sc-ion-input-md-h` rule outranks any selector we
    can write against the element. Same reason the `.ion-color-*` blocks in
-   variables.css use it. */
-ion-input,
-ion-textarea,
+   variables.css use it.
+
+   `shape="round"` has to be excluded rather than outranked: Ionic sets the
+   capsule through a plain `:host(.button-round)` declaration, and an
+   `!important` here beats that no matter how the selectors compare — so
+   without the `:not()` a round button silently comes out a 12px rectangle. */
+ion-input:not([shape='round']),
+ion-textarea:not([shape='round']),
 ion-select,
 ion-searchbar,
-ion-button {
+ion-button:not([shape='round']) {
   --border-radius: var(--mh-radius-control) !important;
+}
+
+/* `ion-datetime-button` renders its pill into shadow DOM, out of reach of the
+   rule above; `::part` is the documented way in. Without this it keeps Ionic's
+   8px while the trigger beside it takes the control radius. */
+ion-datetime-button::part(native) {
+  border-radius: var(--mh-radius-control);
 }
 
 /* Chips and anything explicitly round keep their pill. */
 ion-chip {
   --border-radius: var(--mh-radius-pill);
-}
-
-/* Select popovers. The default is a bare list pinned to the trigger; a long
-   one (durations run to eight hours) needs a height cap so it scrolls instead
-   of running off the screen. Global because Ionic relocates the popover. */
-ion-popover.mh-select-popover {
-  --width: 14rem;
-  --max-height: 60vh;
-  --border-radius: var(--mh-radius-card);
-  --box-shadow: 0 0.5rem 2rem rgb(var(--ion-text-color-rgb) / 0.2);
 }

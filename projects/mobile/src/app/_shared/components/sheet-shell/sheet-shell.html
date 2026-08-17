@@ -27,12 +27,21 @@
     @if (showFooter()) {
       <ion-footer class="ion-no-border">
         <ion-toolbar>
-          <ion-buttons slot="end">
-            <ion-button fill="clear" color="medium" [disabled]="saving()" (click)="dismiss()">
+          <!-- Not `ion-buttons`: that slot packs its children to one edge at
+               toolbar-button size. The sheet's commit is a full-width bar. -->
+          <div class="actions">
+            <ion-button
+              fill="outline"
+              color="medium"
+              class="dismiss"
+              [disabled]="saving()"
+              (click)="dismiss()"
+            >
               Cancel
             </ion-button>
             <ion-button
               fill="solid"
+              class="confirm"
               [color]="saveColor()"
               [disabled]="!canSave() || saving()"
               (click)="save.emit()"
@@ -43,7 +52,7 @@
                 {{ saveLabel() }}
               }
             </ion-button>
-          </ion-buttons>
+          </div>
         </ion-toolbar>
       </ion-footer>
     }

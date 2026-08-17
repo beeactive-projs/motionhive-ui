@@ -31,7 +31,7 @@
 
   <!-- Detached from the item on purpose: Ionic relocates a modal when it
        presents, so it cannot live inside the row it belongs to. -->
-  <ion-modal class="mh-date-modal" [keepContentsMounted]="true">
+  <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
     <ng-template>
       <ion-datetime
         id="session-start"
@@ -44,18 +44,54 @@
   </ion-modal>
 
   <ion-item lines="none" class="field">
-    <ion-select
-      label="Duration"
-      interface="popover"
-      [interfaceOptions]="{ cssClass: 'mh-select-popover' }"
-      [value]="durationMinutes()"
-      (ionChange)="durationMinutes.set($event.detail.value)"
-    >
-      @for (minutes of durations; track minutes) {
-        <ion-select-option [value]="minutes">{{ durationLabel(minutes) }}</ion-select-option>
-      }
-    </ion-select>
+    <ion-label>Duration</ion-label>
+    <ion-button slot="end" class="picker-trigger" (click)="durationOpen.set(true)">
+      {{ durationLabel(durationMinutes()) }}
+    </ion-button>
   </ion-item>
+
+  <!-- Detached for the same reason as the date modal above. -->
+  <ion-modal
+    class="mh-picker-modal"
+    [isOpen]="durationOpen()"
+    (didDismiss)="durationOpen.set(false)"
+  >
+    <ng-template>
+      <ion-picker>
+        <ion-picker-column
+          [value]="durationHours()"
+          (ionChange)="setDurationHours($event.detail.value)"
+        >
+          @for (hour of hourChoices; track hour) {
+            <ion-picker-column-option [value]="hour">{{ hour }}</ion-picker-column-option>
+          }
+          <div slot="suffix">h</div>
+        </ion-picker-column>
+
+        <ion-picker-column
+          [value]="durationMinutesPart()"
+          (ionChange)="setDurationMinutes($event.detail.value)"
+        >
+          @for (minute of minuteChoices; track minute) {
+            <ion-picker-column-option [value]="minute" [disabled]="!minuteAllowed(minute)">
+              {{ minute }}
+            </ion-picker-column-option>
+          }
+          <div slot="suffix">min</div>
+        </ion-picker-column>
+      </ion-picker>
+
+      <!-- The wheels apply as they land, so this only closes the popup. -->
+      <ion-button
+        expand="block"
+        fill="clear"
+        class="ion-margin-horizontal ion-margin-bottom"
+        (click)="durationOpen.set(false)"
+      >
+        Done
+      </ion-button>
+    </ng-template>
+  </ion-modal>
 
   <ion-item lines="none" class="field">
     <ion-toggle
