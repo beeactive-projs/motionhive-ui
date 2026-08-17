@@ -181,5 +181,45 @@
 }
 
 .waitlist-action {
+  display: flex;
+  gap: 0.625rem;
   padding: 0.5rem 1.5rem 0;
+}
+
+.waitlist-action ion-button {
+  flex: 1;
+  margin: 0;
+}
+
+/* Full is a status, so it takes the semantic danger wash rather than honey —
+   honey in this product means "press this". */
+.full-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 1rem 1.25rem 0;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-danger-wash);
+  color: var(--ion-color-danger-wash-contrast);
+}
+
+.full-banner ion-icon {
+  flex: none;
+  font-size: 1.15rem;
+}
+
+.full-banner div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.full-banner strong {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.full-banner span {
+  font-size: 0.72rem;
 }

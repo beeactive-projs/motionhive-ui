@@ -44,6 +44,7 @@ import { ClockService } from '../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../_shared/utils/share';
+import { CapacitySheet } from '../_sheets/capacity-sheet/capacity-sheet';
 import { CancelSessionSheet } from '../_sheets/cancel-session-sheet/cancel-session-sheet';
 import { MessageSignupsSheet } from '../_sheets/message-signups-sheet/message-signups-sheet';
 import { ParticipantNoteSheet } from '../_sheets/participant-note-sheet/participant-note-sheet';
@@ -92,6 +93,7 @@ interface ReminderRow {
   providers: [SessionsDetailStore],
   imports: [
     CancelSessionSheet,
+    CapacitySheet,
     EmptyState,
     MessageSignupsSheet,
     HexAvatar,
@@ -133,6 +135,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly duplicatePrefill = signal<SessionPrefill | null>(null);
   readonly noteOpen = signal(false);
   readonly noteParticipant = signal<SessionParticipant | null>(null);
+  readonly capacityOpen = signal(false);
   readonly skeletonRows = [1, 2, 3];
 
   /** No handle, no public link — so the Share verb stays hidden. */
@@ -222,6 +225,22 @@ export class SessionDetail implements ViewWillEnter {
   readonly spotsLabel = computed(() => {
     const capacity = this.capacity();
     return capacity ? `${this.confirmed()} / ${capacity}` : `${this.confirmed()} booked`;
+  });
+
+  /**
+   * Full, and still ahead of us — so there is something to do about it.
+   *
+   * Danger-tinted, not honey: "full" is a state of the session, and honey in
+   * this product means "press this".
+   */
+  readonly isFull = computed(() => {
+    const capacity = this.capacity();
+    return (
+      !!capacity &&
+      this.confirmed() >= capacity &&
+      this.lifecycle() === 'upcoming' &&
+      !this.isCancelled()
+    );
   });
 
   readonly price = computed(() => {
@@ -323,18 +342,18 @@ export class SessionDetail implements ViewWillEnter {
   /** Who the message sheet is addressed to this time. */
   readonly messageAudience = signal<'all' | 'userIds'>('all');
   readonly messageOpen = signal(false);
+  /** Explicit rather than derived: the whole queue, or one person from it. */
+  readonly messageWaitlistIds = signal<string[]>([]);
 
   readonly messageRecipients = computed(() =>
-    this.messageAudience() === 'userIds'
-      ? this.waitlist().map((p) => p.userId)
-      : [],
+    this.messageAudience() === 'userIds' ? this.messageWaitlistIds() : [],
   );
 
-  readonly messageLabel = computed(() =>
-    this.messageAudience() === 'userIds'
-      ? `the ${this.waitlist().length} people waiting`
-      : 'everyone booked in',
-  );
+  readonly messageLabel = computed(() => {
+    if (this.messageAudience() !== 'userIds') return 'everyone booked in';
+    const count = this.messageWaitlistIds().length;
+    return count === 1 ? 'one person on the waitlist' : `the ${count} people waiting`;
+  });
 
   constructor() {
     addIcons(SESSION_ICONS);
@@ -461,7 +480,30 @@ export class SessionDetail implements ViewWillEnter {
   messageWaitlist(): void {
     if (this.waitlist().length === 0) return;
     this.messageAudience.set('userIds');
+    this.messageWaitlistIds.set(this.waitlist().map((p) => p.userId));
     this.messageOpen.set(true);
+  }
+
+  /**
+   * Message one person in the queue.
+   *
+   * This is what a waitlist row can honestly offer. The design shows "Promote",
+   * but no route reaches the promotion service — it only runs inside the cancel
+   * transaction — and `approveParticipant` requires PENDING_APPROVAL, so it
+   * cannot be repurposed for a WAITLISTED row.
+   */
+  messageOne(participant: SessionParticipant): void {
+    this.messageAudience.set('userIds');
+    this.messageWaitlistIds.set([participant.userId]);
+    this.messageOpen.set(true);
+  }
+
+  openCapacity(): void {
+    this.capacityOpen.set(true);
+  }
+
+  onCapacityChanged(): void {
+    this.store.reload();
   }
 
   openCancel(): void {

@@ -1,0 +1,16 @@
+.mh-helper.error {
+  color: var(--ion-color-danger);
+  font-weight: 600;
+}
+
+/* A shortcut, not a second commit — plain text so it cannot be mistaken for
+   the save button in the footer. */
+.suggestion {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: start;
+}

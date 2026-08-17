@@ -1,0 +1,42 @@
+<ng-template #body>
+  <div class="mh-section-label">Spots</div>
+  <ion-input
+    fill="outline"
+    type="number"
+    inputmode="numeric"
+    [min]="floor()"
+    [max]="max"
+    [value]="value()"
+    (ionInput)="setValue($event.detail.value)"
+  />
+
+  @if (error(); as message) {
+    <p class="mh-helper error">{{ message }}</p>
+  }
+
+  @if (suggestion(); as target) {
+    <ion-note class="mh-note-block">
+      <button type="button" class="suggestion" (click)="applySuggestion()">
+        Set {{ target }} to fit everyone waiting
+      </button>
+    </ion-note>
+  }
+
+  <p class="mh-helper">
+    This changes only this session, not the rest of the series. People on the
+    waitlist are not moved in automatically when you raise capacity — message
+    them to let them know there is room.
+  </p>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Raise capacity"
+  saveLabel="Save capacity"
+  [body]="body"
+  [canSave]="canSave()"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+  (save)="save()"
+/>

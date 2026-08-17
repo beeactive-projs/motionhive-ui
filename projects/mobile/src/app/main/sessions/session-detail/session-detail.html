@@ -131,6 +131,18 @@
         </p>
       }
 
+      @if (isFull()) {
+        <div class="full-banner">
+          <ion-icon name="time-outline" aria-hidden="true" />
+          <div>
+            <strong>Session is full · {{ spotsLabel() }}</strong>
+            @if (waitlist().length > 0) {
+              <span>{{ waitlist().length }} waiting for a place</span>
+            }
+          </div>
+        </div>
+      }
+
       <div class="mh-section-label">Spots</div>
       <div class="spots">
         <ion-progress-bar [value]="fillPercent() / 100" />
@@ -256,24 +268,38 @@
         </div>
 
         <ion-list [inset]="true" class="mh-card-list">
-          @for (participant of waitlist(); track participant.id; let i = $index) {
-            <ion-item lines="full">
+          @for (participant of waitlist(); track participant.id; let i = $index; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'">
               <span slot="start" class="queue">{{ i + 1 }}</span>
               <ion-label>
                 <h3>{{ nameOf(participant) }}</h3>
                 <p>Waiting since {{ waitingSince(participant) }}</p>
               </ion-label>
+              <!-- Not "Promote": no endpoint reaches the promotion service, and
+                   approveParticipant only accepts PENDING_APPROVAL rows. -->
+              <ion-button
+                slot="end"
+                fill="outline"
+                size="small"
+                (click)="messageOne(participant)"
+              >
+                Message
+              </ion-button>
             </ion-item>
           }
         </ion-list>
 
         <ion-note class="mh-note-block">
-          The next in line is moved in automatically when someone cancels, up to
-          two hours before the start.
+          The next in line moves in automatically when someone cancels, up to two
+          hours before the start. Raising capacity does not move anyone in — tell
+          them yourself if you open more spots.
         </ion-note>
 
         <div class="waitlist-action">
-          <ion-button expand="block" fill="outline" (click)="messageWaitlist()">
+          <ion-button expand="block" fill="outline" (click)="openCapacity()">
+            Raise capacity
+          </ion-button>
+          <ion-button expand="block" (click)="messageWaitlist()">
             Message waitlist
           </ion-button>
         </div>
@@ -348,4 +374,12 @@
   [(open)]="noteOpen"
   [participant]="noteParticipant()"
   (save)="onNoteSaved($event)"
+/>
+
+<mh-capacity-sheet
+  [(open)]="capacityOpen"
+  [instance]="instance()"
+  [confirmed]="confirmed()"
+  [waitlisted]="waitlist().length"
+  (saved)="onCapacityChanged()"
 />
