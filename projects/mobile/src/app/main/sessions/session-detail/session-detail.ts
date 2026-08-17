@@ -2,7 +2,6 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  ActionSheetController,
   IonBackButton,
   IonBadge,
   IonButton,
@@ -24,21 +23,36 @@ import {
 import { addIcons } from 'ionicons';
 
 import {
+  AuthStore,
+  SessionInstance,
   SessionParticipant,
   SessionsDetailStore,
   displayName,
   formatRelativeShort,
+  formatSessionDayShort,
   formatSessionDuration,
   formatSessionTime,
+  publicProfileUrl,
   sessionLifecycle,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
+import { ShareOutcomes, shareOrCopy } from '../../../_shared/utils/share';
 import { CancelSessionSheet } from '../_sheets/cancel-session-sheet/cancel-session-sheet';
 import { MessageSignupsSheet } from '../_sheets/message-signups-sheet/message-signups-sheet';
-import { SESSION_ICONS, formatWeekdayList } from '../sessions.config';
+import { SessionActionsSheet } from '../_sheets/session-actions-sheet/session-actions-sheet';
+import { SessionFormSheet } from '../_sheets/session-form-sheet/session-form-sheet';
+import {
+  SESSION_ICONS,
+  SessionActionId,
+  SessionActionIds,
+  SessionPrefill,
+  formatWeekdayList,
+  prefillFromInstance,
+} from '../sessions.config';
 
 /**
  * One occurrence: when, where, who is coming, and the one action that makes
@@ -55,6 +69,8 @@ import { SESSION_ICONS, formatWeekdayList } from '../sessions.config';
     EmptyState,
     MessageSignupsSheet,
     HexAvatar,
+    SessionActionsSheet,
+    SessionFormSheet,
     IonBackButton,
     IonBadge,
     IonButton,
@@ -80,11 +96,18 @@ export class SessionDetail {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _actionSheetController = inject(ActionSheetController);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _feedbackService = inject(FeedbackService);
   readonly store = inject(SessionsDetailStore);
 
   readonly cancelOpen = signal(false);
+  readonly actionsOpen = signal(false);
+  readonly duplicateOpen = signal(false);
+  readonly duplicatePrefill = signal<SessionPrefill | null>(null);
   readonly skeletonRows = [1, 2, 3];
+
+  /** No handle, no public link — so the Share verb stays hidden. */
+  readonly canShare = computed(() => !!this._authStore.user()?.handle);
 
   readonly instance = this.store.instance;
   readonly template = this.store.template;
@@ -301,18 +324,62 @@ export class SessionDetail {
     void this._router.navigate(['/tabs/sessions']);
   }
 
-  async openActions(): Promise<void> {
-    const sheet = await this._actionSheetController.create({
-      header: this.title(),
-      buttons: [
-        ...(this.isCancelled()
-          ? []
-          : [{ text: 'Cancel session…', role: 'destructive', data: 'cancel' }]),
-        { text: 'Close', role: 'cancel' },
-      ],
+  openActions(): void {
+    this.actionsOpen.set(true);
+  }
+
+  /**
+   * The same verb sheet the agenda rows use, so one session offers one set of
+   * actions wherever you reach it from.
+   *
+   * Open and check-in are no-ops here — this *is* the session, and attendance
+   * is the list further down the page — so both just close the sheet. Cancel
+   * opens in place rather than navigating, which is the one thing that differs
+   * from the agenda's handling.
+   */
+  async onAction(id: SessionActionId): Promise<void> {
+    const instance = this.instance();
+    if (!instance) return;
+
+    switch (id) {
+      case SessionActionIds.Cancel:
+        this.openCancel();
+        return;
+      case SessionActionIds.Message:
+        this.messageSignups();
+        return;
+      case SessionActionIds.Duplicate:
+        // Opened here rather than bounced back to the agenda: this screen
+        // already holds the instance and its template, so there is nothing to
+        // pass and nothing to reload.
+        this.duplicatePrefill.set(prefillFromInstance(instance));
+        this.duplicateOpen.set(true);
+        return;
+      case SessionActionIds.Share:
+        await this._share(instance);
+        return;
+      default:
+        return;
+    }
+  }
+
+  private async _share(instance: SessionInstance): Promise<void> {
+    const handle = this._authStore.user()?.handle;
+    if (!handle) return;
+
+    const title = this.title() || 'Session';
+    const when = `${formatSessionDayShort(instance.startAt)}, ${formatSessionTime(instance.startAt)}`;
+
+    const outcome = await shareOrCopy({
+      title,
+      text: `${title} · ${when}`,
+      url: publicProfileUrl(handle),
     });
-    await sheet.present();
-    const { data } = await sheet.onDidDismiss<string>();
-    if (data === 'cancel') this.openCancel();
+
+    if (outcome === ShareOutcomes.Copied) {
+      await this._feedbackService.success('Link copied');
+    } else if (outcome === ShareOutcomes.Failed) {
+      await this._feedbackService.error(null, 'Could not share the link.');
+    }
   }
 }

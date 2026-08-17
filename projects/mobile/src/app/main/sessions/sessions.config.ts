@@ -13,10 +13,14 @@ import {
   addOutline,
   alertCircle,
   alertCircleOutline,
+  arrowForwardCircleOutline,
   calendarOutline,
+  checkmarkCircleOutline,
   chevronBack,
   chevronDown,
   chevronForward,
+  closeCircleOutline,
+  copyOutline,
   ellipsisHorizontal,
   funnelOutline,
   globeOutline,
@@ -24,6 +28,8 @@ import {
   peopleOutline,
   personOutline,
   searchOutline,
+  sendOutline,
+  shareOutline,
   timeOutline,
   videocamOutline,
 } from 'ionicons/icons';
@@ -37,10 +43,14 @@ export const SESSION_ICONS = {
   addOutline,
   alertCircle,
   alertCircleOutline,
+  arrowForwardCircleOutline,
   calendarOutline,
+  checkmarkCircleOutline,
   chevronBack,
   chevronDown,
   chevronForward,
+  closeCircleOutline,
+  copyOutline,
   ellipsisHorizontal,
   funnelOutline,
   globeOutline,
@@ -48,6 +58,8 @@ export const SESSION_ICONS = {
   peopleOutline,
   personOutline,
   searchOutline,
+  sendOutline,
+  shareOutline,
   timeOutline,
   videocamOutline,
 };
@@ -128,6 +140,49 @@ export function formatWeekdayList(days: readonly number[]): string {
   if (names.length === 1) return names[0];
   return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
 }
+
+/**
+ * The verbs on a session row, in priority order, destructive last.
+ *
+ * Only what an endpoint can actually deliver. Two are synthesized rather than
+ * called: Duplicate opens the create sheet pre-filled (there is no duplicate
+ * endpoint), and Share hands out a link the client builds itself.
+ *
+ * "Share booking link", not the design's "Share public link": every session URL
+ * in the web app sits behind the auth guard, so the only genuinely public
+ * destination is the coach's profile. The label should not promise a door that
+ * is locked.
+ */
+export const SessionActionIds = {
+  Open: 'open',
+  CheckIn: 'checkIn',
+  Message: 'message',
+  Duplicate: 'duplicate',
+  Share: 'share',
+  Cancel: 'cancel',
+} as const;
+
+export type SessionActionId =
+  (typeof SessionActionIds)[keyof typeof SessionActionIds];
+
+export const SESSION_ACTIONS: readonly {
+  id: SessionActionId;
+  label: string;
+  icon: string;
+  destructive?: boolean;
+}[] = [
+  { id: SessionActionIds.Open, label: 'Open session', icon: 'arrow-forward-circle-outline' },
+  { id: SessionActionIds.CheckIn, label: 'Check in attendees', icon: 'checkmark-circle-outline' },
+  { id: SessionActionIds.Message, label: 'Message all signups', icon: 'send-outline' },
+  { id: SessionActionIds.Duplicate, label: 'Duplicate', icon: 'copy-outline' },
+  { id: SessionActionIds.Share, label: 'Share booking link', icon: 'share-outline' },
+  {
+    id: SessionActionIds.Cancel,
+    label: 'Cancel session…',
+    icon: 'close-circle-outline',
+    destructive: true,
+  },
+];
 
 /**
  * When a series stops. `never` still generates a first batch of occurrences —

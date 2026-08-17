@@ -248,3 +248,12 @@
   [template]="template()"
   (cancelled)="onCancelled()"
 />
+
+<mh-session-actions-sheet
+  [(open)]="actionsOpen"
+  [instance]="instance()"
+  [canShare]="canShare()"
+  (action)="onAction($event)"
+/>
+
+<mh-session-form-sheet [(open)]="duplicateOpen" [prefill]="duplicatePrefill()" />

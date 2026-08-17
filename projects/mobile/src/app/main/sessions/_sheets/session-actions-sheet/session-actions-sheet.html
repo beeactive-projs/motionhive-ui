@@ -1,0 +1,38 @@
+<ng-template #body>
+  <div class="head">
+    <span class="time">{{ time() }}</span>
+    <div class="what">
+      <h3>{{ title() }}</h3>
+      <span class="mh-kicker">{{ meta() }}</span>
+    </div>
+  </div>
+
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (item of visibleActions(); track item.id; let last = $last) {
+      <ion-item
+        button
+        [detail]="false"
+        [lines]="last ? 'none' : 'full'"
+        [class.destructive]="item.destructive"
+        (click)="choose(item.id)"
+      >
+        <ion-icon
+          slot="start"
+          [name]="item.icon"
+          [color]="item.destructive ? 'danger' : 'primary'"
+          aria-hidden="true"
+        />
+        <ion-label>{{ item.label }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Session actions"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+/>

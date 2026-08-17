@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   LOCATION_KIND_OPTIONS,
+  SESSION_ACTIONS,
   SESSION_ICONS,
   SESSION_TYPE_OPTIONS,
 } from './sessions.config';
@@ -41,7 +42,11 @@ function iconNamesUsed(): string[] {
     }
   }
 
-  for (const option of [...SESSION_TYPE_OPTIONS, ...LOCATION_KIND_OPTIONS]) {
+  for (const option of [
+    ...SESSION_TYPE_OPTIONS,
+    ...LOCATION_KIND_OPTIONS,
+    ...SESSION_ACTIONS,
+  ]) {
     names.add(option.icon);
   }
 

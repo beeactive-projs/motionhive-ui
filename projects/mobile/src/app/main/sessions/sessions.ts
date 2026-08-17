@@ -1,7 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  ActionSheetController,
   IonButton,
   IonButtons,
   IonChip,
@@ -27,14 +26,17 @@ import {
 import { addIcons } from 'ionicons';
 
 import {
+  AuthStore,
   SessionInstance,
   SessionLocationKind,
   SessionsInstructorStore,
   endOfDay,
+  formatSessionDayShort,
   formatSessionTime,
   formatTimeUntil,
   formatTotalDuration,
   localDayKey,
+  publicProfileUrl,
   sessionDayLabel,
   sessionMinutes,
   startOfDay,
@@ -44,11 +46,14 @@ import {
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { ClockService } from '../../_shared/services/clock.service';
+import { FeedbackService } from '../../_shared/services/feedback.service';
+import { ShareOutcomes, shareOrCopy } from '../../_shared/utils/share';
 import { DayRail } from './_components/day-rail/day-rail';
 import { SessionRow } from './_components/session-row/session-row';
 import { SessionsEmpty } from './_components/sessions-empty/sessions-empty';
 import { MessageSignupsSheet } from './_sheets/message-signups-sheet/message-signups-sheet';
 import { MonthSheet } from './_sheets/month-sheet/month-sheet';
+import { SessionActionsSheet } from './_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from './_sheets/session-form-sheet/session-form-sheet';
 import { SessionFilterSheet } from './_sheets/session-filter-sheet/session-filter-sheet';
 import {
@@ -58,6 +63,8 @@ import {
   LOCATION_QUICK_FILTERS,
   NO_FILTERS,
   SESSION_ICONS,
+  SessionActionId,
+  SessionActionIds,
   SessionPrefill,
   WEEKDAY_LETTERS,
   activeFilterCount,
@@ -115,6 +122,7 @@ interface AgendaDay {
     MessageSignupsSheet,
     MonthSheet,
     NotificationBell,
+    SessionActionsSheet,
     SessionFilterSheet,
     SessionFormSheet,
     SessionRow,
@@ -126,8 +134,9 @@ interface AgendaDay {
 export class Sessions implements ViewWillEnter {
   readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
-  private readonly _actionSheetController = inject(ActionSheetController);
   private readonly _clockService = inject(ClockService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _feedbackService = inject(FeedbackService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly locationFilters = LOCATION_QUICK_FILTERS;
@@ -141,6 +150,11 @@ export class Sessions implements ViewWillEnter {
   readonly monthOpen = signal(false);
   readonly messageOpen = signal(false);
   readonly messageInstanceId = signal<string | null>(null);
+  readonly actionsOpen = signal(false);
+  readonly actionsInstance = signal<SessionInstance | null>(null);
+
+  /** No handle, no public link — so the Share verb stays hidden. */
+  readonly canShare = computed(() => !!this._authStore.user()?.handle);
 
   /**
    * Search owns the whole toolbar while it is open — a title, three actions, a
@@ -529,41 +543,67 @@ export class Sessions implements ViewWillEnter {
     this.selectedDay.set(today);
   }
 
-  /**
-   * Long-press a row for the verbs that would otherwise need the detail screen.
-   *
-   * Only actions with an endpoint behind them: the design also lists check-in,
-   * which nothing implements, and duplicate, which would need the create sheet
-   * pre-filled rather than a one-tap copy.
-   */
-  async openQuickActions(instance: SessionInstance): Promise<void> {
-    const title = instance.titleOverride ?? instance.template?.title ?? 'Session';
-    const signups = instance.confirmedCount + instance.pendingApprovalCount;
+  /** Long-press a row for the verbs that would otherwise need the detail screen. */
+  openQuickActions(instance: SessionInstance): void {
+    this.actionsInstance.set(instance);
+    this.actionsOpen.set(true);
+  }
 
-    const sheet = await this._actionSheetController.create({
-      header: title,
-      buttons: [
-        { text: 'Open session', data: 'open' },
-        ...(signups > 0
-          ? [{ text: `Message ${signups} ${signups === 1 ? 'signup' : 'signups'}`, data: 'message' }]
-          : []),
-        { text: 'Cancel session…', role: 'destructive', data: 'cancel' },
-        { text: 'Close', role: 'cancel' },
-      ],
+  /**
+   * The sheet reports the verb; the page decides what it means here.
+   *
+   * Check-in and cancel both hand off to the detail screen — one needs the
+   * attendee roster, the other the series context the cancel sheet reads, and
+   * neither is worth loading behind a list row.
+   */
+  async onAction(id: SessionActionId): Promise<void> {
+    const instance = this.actionsInstance();
+    if (!instance) return;
+
+    switch (id) {
+      case SessionActionIds.Open:
+      case SessionActionIds.CheckIn:
+      case SessionActionIds.Cancel:
+        this.open(instance);
+        return;
+      case SessionActionIds.Message:
+        this.messageInstanceId.set(instance.id);
+        this.messageOpen.set(true);
+        return;
+      case SessionActionIds.Duplicate:
+        this.duplicate(instance);
+        return;
+      case SessionActionIds.Share:
+        await this._share(instance);
+        return;
+    }
+  }
+
+  /**
+   * Share what a stranger can actually open.
+   *
+   * Every session URL in the web app is behind the auth guard, so a session
+   * link would drop the recipient on a login wall — worse than no link. The
+   * profile is the one public destination, and the session's name and time ride
+   * along in the share text so the message still says what it is about.
+   */
+  private async _share(instance: SessionInstance): Promise<void> {
+    const handle = this._authStore.user()?.handle;
+    if (!handle) return;
+
+    const title = instance.titleOverride ?? instance.template?.title ?? 'Session';
+    const when = `${formatSessionDayShort(instance.startAt)}, ${formatSessionTime(instance.startAt)}`;
+
+    const outcome = await shareOrCopy({
+      title,
+      text: `${title} · ${when}`,
+      url: publicProfileUrl(handle),
     });
 
-    await sheet.present();
-    const { data } = await sheet.onDidDismiss<string>();
-
-    if (data === 'open' || data === 'cancel') {
-      // Cancelling lives on the detail screen, which owns the series context
-      // the cancel sheet needs.
-      this.open(instance);
-      return;
-    }
-    if (data === 'message') {
-      this.messageInstanceId.set(instance.id);
-      this.messageOpen.set(true);
+    if (outcome === ShareOutcomes.Copied) {
+      await this._feedbackService.success('Link copied');
+    } else if (outcome === ShareOutcomes.Failed) {
+      await this._feedbackService.error(null, 'Could not share the link.');
     }
   }
 
