@@ -236,6 +236,15 @@
           />
         }
       }
+
+      @if (truncated()) {
+        <!-- The range endpoint returns at most 100 and does not page. Saying so
+             beats a list that quietly stops. -->
+        <ion-note class="mh-note-block">
+          Showing the first 100 sessions in this range. Narrow the dates to see
+          further ahead.
+        </ion-note>
+      }
     </div>
   }
 

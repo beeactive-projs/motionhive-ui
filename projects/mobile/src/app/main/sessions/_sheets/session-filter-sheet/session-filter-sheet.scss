@@ -1,6 +1,65 @@
+/* Chip groups. Wrapping rather than scrolling here — a sheet has the height to
+   spare, and a hidden chip in a filter list is a filter nobody finds. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
 
-.clear {
-  color: var(--mh-color-honey-deep);
+.chips ion-chip {
+  margin: 0;
+  font-size: 0.78rem;
   font-weight: 600;
-  text-align: center;
+}
+
+/* A text action on its own line. `ion-button fill="clear"` carries toolbar
+   sizing and a ripple that reads as a third control next to the chips. */
+.reset-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.reset-row .reset {
+  padding: 0.25rem 0;
+  border: none;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.reset-row .reset:disabled {
+  color: var(--ion-color-medium);
+  opacity: 0.6;
+}
+
+/* From and To side by side — a date range reads as one control, not two. */
+.pair {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.5rem;
+}
+
+/* The rows the pickers and the select sit in. `ion-item` defaults to a
+   full-bleed list row; inside a sheet these are fields, so they take the card
+   surface and a border like every other input here. */
+.field {
+  --background: var(--ion-card-background);
+  --border-radius: var(--mh-radius-control);
+  --padding-start: 0.75rem;
+  --inner-padding-end: 0.5rem;
+  --min-height: 3rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+}
+
+.field ion-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mh-helper.error {
+  color: var(--ion-color-danger);
+  font-weight: 600;
 }

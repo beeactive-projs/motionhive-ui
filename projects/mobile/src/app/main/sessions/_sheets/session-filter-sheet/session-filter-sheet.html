@@ -1,18 +1,18 @@
 <ng-template #body>
-  <ion-searchbar
-    placeholder="Search sessions"
-    inputmode="search"
-    [debounce]="0"
-    [value]="draft().q"
-    (ionInput)="setQuery($event.detail.value ?? '')"
-  />
+  <!-- Reset sits at the top of the body rather than beside the title: the sheet
+       chrome is shared with nine other sheets and owns that row. -->
+  <div class="reset-row">
+    <button type="button" class="reset" [disabled]="count() === 0" (click)="reset()">
+      Reset
+    </button>
+  </div>
 
   <div class="mh-section-label">Type</div>
   <div class="chips">
     @for (option of typeOptions; track option.value) {
       <ion-chip
         [outline]="draft().type !== option.value"
-        [color]="draft().type === option.value ? 'primary' : 'medium'"
+        [color]="draft().type === option.value ? 'secondary' : 'medium'"
         [attr.aria-pressed]="draft().type === option.value"
         (click)="toggleType(option.value)"
       >
@@ -21,12 +21,12 @@
     }
   </div>
 
-  <div class="mh-section-label">Where</div>
+  <div class="mh-section-label">Location</div>
   <div class="chips">
     @for (option of locationOptions; track option.value) {
       <ion-chip
         [outline]="draft().locationKind !== option.value"
-        [color]="draft().locationKind === option.value ? 'primary' : 'medium'"
+        [color]="draft().locationKind === option.value ? 'secondary' : 'medium'"
         [attr.aria-pressed]="draft().locationKind === option.value"
         (click)="toggleLocation(option.value)"
       >
@@ -35,33 +35,100 @@
     }
   </div>
 
-  <div class="mh-section-label">Only show</div>
-  <ion-list [inset]="true" class="mh-card-list">
-    <ion-item lines="none">
-      <ion-toggle
-        justify="space-between"
-        [checked]="draft().conflictsOnly"
-        (ionChange)="setConflictsOnly($event.detail.checked)"
+  <div class="mh-section-label">Status</div>
+  <div class="chips">
+    @for (option of statusOptions; track option.value) {
+      <ion-chip
+        [outline]="draft().status !== option.value"
+        [color]="draft().status === option.value ? 'secondary' : 'medium'"
+        [attr.aria-pressed]="draft().status === option.value"
+        (click)="toggleStatus(option.value)"
       >
-        <ion-label>
-          <h3>Overlapping sessions</h3>
-          <p>Sessions that clash with another booking.</p>
-        </ion-label>
-      </ion-toggle>
-    </ion-item>
-  </ion-list>
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
 
-  @if (count() > 0) {
-    <ion-note class="mh-note-block clear" (click)="clear()">Clear all filters</ion-note>
+  <div class="mh-section-label">Date</div>
+  <div class="pair">
+    <ion-item lines="none" class="field">
+      <ion-label>From</ion-label>
+      <ion-datetime-button slot="end" datetime="filter-date-from" />
+    </ion-item>
+    <ion-item lines="none" class="field">
+      <ion-label>To</ion-label>
+      <ion-datetime-button slot="end" datetime="filter-date-to" />
+    </ion-item>
+  </div>
+
+  <!-- Detached from the rows on purpose: Ionic relocates a modal when it
+       presents, so it cannot live inside the item it belongs to. -->
+  <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="filter-date-from"
+        presentation="date"
+        [showDefaultButtons]="true"
+        [value]="draft().dateFrom"
+        (ionChange)="setDateFrom($event.detail.value)"
+      />
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="filter-date-to"
+        presentation="date"
+        [showDefaultButtons]="true"
+        [value]="draft().dateTo"
+        (ionChange)="setDateTo($event.detail.value)"
+      />
+    </ng-template>
+  </ion-modal>
+
+  @if (rangeBackwards()) {
+    <p class="mh-helper error">The end date is before the start date.</p>
+  } @else if (rangeTooWide()) {
+    <p class="mh-helper error">Pick a range of six months or less.</p>
+  } @else if (draft().dateFrom || draft().dateTo) {
+    <div class="reset-row">
+      <button type="button" class="reset" (click)="clearDates()">Clear dates</button>
+    </div>
   }
+
+  @if (groups().length > 0) {
+    <div class="mh-section-label">Group</div>
+    <ion-item lines="none" class="field">
+      <ion-select
+        label="Group"
+        labelPlacement="stacked"
+        interface="action-sheet"
+        placeholder="Any group"
+        [value]="draft().groupId"
+        (ionChange)="setGroup($event.detail.value)"
+      >
+        <ion-select-option [value]="null">Any group</ion-select-option>
+        @for (group of groups(); track group.id) {
+          <ion-select-option [value]="group.id">{{ group.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+  }
+
+  <ion-note class="mh-note-block">
+    Filters apply to the sessions already loaded. Picking dates outside that
+    range loads them.
+  </ion-note>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
   title="Filters"
-  [saveLabel]="count() > 0 ? 'Apply · ' + count() : 'Apply'"
+  [saveLabel]="applyLabel()"
+  [canSave]="canApply()"
   [body]="body"
-  [breakpoints]="[0, 0.8]"
-  [initialBreakpoint]="0.8"
+  [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9"
   (save)="apply()"
 />

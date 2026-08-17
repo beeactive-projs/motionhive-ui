@@ -1,8 +1,12 @@
 import {
   SessionInstance,
+  SessionKind,
   SessionLocationKind,
   SessionTone,
+  endOfDay,
+  localDayKey,
   sessionTone,
+  startOfDay,
 } from 'core';
 
 import {
@@ -139,4 +143,213 @@ export const CANCEL_SCOPE_OPTIONS = [
  */
 export function instanceTone(instance: SessionInstance): SessionTone {
   return instance.template ? sessionTone(instance.template, instance) : 'honey';
+}
+
+// ─── Filters ──────────────────────────────────────────────────────────────
+
+/**
+ * What needs your attention, rather than what state the row is in.
+ *
+ * All three are sub-filters of SCHEDULED — the only status `loadRange` ever
+ * asks the API for — so none of them touch the store. `Scheduled` therefore
+ * means "nothing wrong with it": no clash, nobody waiting on approval.
+ */
+export const AgendaStatuses = {
+  Scheduled: 'scheduled',
+  ApprovalNeeded: 'approvalNeeded',
+  Conflict: 'conflict',
+} as const;
+
+export type AgendaStatus = (typeof AgendaStatuses)[keyof typeof AgendaStatuses];
+
+export const STATUS_OPTIONS: readonly { value: AgendaStatus; label: string }[] = [
+  { value: AgendaStatuses.Scheduled, label: 'Scheduled' },
+  { value: AgendaStatuses.ApprovalNeeded, label: 'Approval needed' },
+  { value: AgendaStatuses.Conflict, label: 'Conflict' },
+];
+
+/**
+ * What the agenda is narrowed to. Everything unset means "show it all".
+ *
+ * The free-text query is deliberately NOT in here: it lives in the header, and
+ * the sheet's trigger shows how many filters are set — a letter typed into
+ * search should not make that badge climb.
+ *
+ * Dates are `localDayKey` strings rather than `Date`s. They round-trip through
+ * an object compared for changes, they are what `ion-datetime` wants, and
+ * `yyyy-mm-dd` compares correctly as a plain string, so range checks need no
+ * parsing at all.
+ */
+export interface AgendaFilters {
+  type: SessionKind | null;
+  locationKind: SessionLocationKind | null;
+  status: AgendaStatus | null;
+  dateFrom: string | null;
+  dateTo: string | null;
+  groupId: string | null;
+}
+
+export const NO_FILTERS: AgendaFilters = {
+  type: null,
+  locationKind: null,
+  status: null,
+  dateFrom: null,
+  dateTo: null,
+  groupId: null,
+};
+
+/**
+ * How many of these are actually narrowing anything — drives the chip count.
+ *
+ * A from/to pair counts once: a range is one idea, and "Filters · 3" for what
+ * the user set as a single date range reads as a miscount.
+ */
+export function activeFilterCount(filters: AgendaFilters): number {
+  let count = 0;
+  if (filters.type) count++;
+  if (filters.locationKind) count++;
+  if (filters.status) count++;
+  if (filters.dateFrom || filters.dateTo) count++;
+  if (filters.groupId) count++;
+  return count;
+}
+
+/** Does this occurrence survive `status`? Shared so page and sheet agree. */
+export function matchesStatus(
+  instance: SessionInstance,
+  status: AgendaStatus,
+): boolean {
+  const clashes = (instance.conflictingInstanceIds?.length ?? 0) > 0;
+  const pending = instance.pendingApprovalCount > 0;
+
+  switch (status) {
+    case AgendaStatuses.Conflict:
+      return clashes;
+    case AgendaStatuses.ApprovalNeeded:
+      return pending;
+    default:
+      return !clashes && !pending;
+  }
+}
+
+/**
+ * The single predicate the agenda narrows by — one place, so the list, the
+ * week-strip dots and the counts can never disagree about what is showing.
+ */
+export function matchesFilters(
+  instance: SessionInstance,
+  filters: AgendaFilters,
+  query: string,
+): boolean {
+  const template = instance.template;
+
+  if (filters.type && template?.type !== filters.type) return false;
+  if (filters.locationKind && template?.locationKind !== filters.locationKind) {
+    return false;
+  }
+  if (filters.status && !matchesStatus(instance, filters.status)) return false;
+  if (filters.groupId && template?.groupId !== filters.groupId) return false;
+
+  if (filters.dateFrom || filters.dateTo) {
+    const day = localDayKey(new Date(instance.startAt));
+    if (filters.dateFrom && day < filters.dateFrom) return false;
+    if (filters.dateTo && day > filters.dateTo) return false;
+  }
+
+  const needle = query.trim().toLowerCase();
+  if (needle) {
+    const title = (instance.titleOverride ?? template?.title ?? '').toLowerCase();
+    if (!title.includes(needle)) return false;
+  }
+
+  return true;
+}
+
+// ─── The loaded window ────────────────────────────────────────────────────
+
+/**
+ * The BE rejects a range wider than this outright — `MAX_WINDOW_DAYS` in
+ * `session-instance.service.ts`, which throws "Date range too wide". Mirrored
+ * rather than discovered: a 400 here empties the agenda into an error screen.
+ */
+export const MAX_RANGE_DAYS = 180;
+
+export interface DayWindow {
+  start: Date;
+  end: Date;
+}
+
+/** The inverse of `localDayKey` — 'yyyy-mm-dd' back to a local midnight. */
+export function dayFromKey(key: string): Date {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/**
+ * Whole calendar days spanned, measured midnight-to-midnight.
+ *
+ * Deliberately not the raw millisecond difference: our end bound is the last
+ * instant of its day, so a "180 day" window is really 180.9999 days and the
+ * BE's `> 180` check would reject the very window we sized to fit.
+ */
+export function windowDays(window: DayWindow): number {
+  return (
+    (startOfDay(window.end).getTime() - startOfDay(window.start).getTime()) /
+    86_400_000
+  );
+}
+
+/**
+ * Grow a window to whole calendar months.
+ *
+ * The store's range cache is keyed on both bounds and holds three entries, so
+ * un-quantised windows evict each other constantly — nudging a date bound by a
+ * day is a brand new key. Rounded to months, every edit inside one month is the
+ * same request, and the three slots hold three months instead of three
+ * near-identical days.
+ */
+export function quantiseToMonths(window: DayWindow): DayWindow {
+  const start = new Date(window.start.getFullYear(), window.start.getMonth(), 1);
+  const end = new Date(window.end.getFullYear(), window.end.getMonth() + 1, 0);
+  return { start: startOfDay(start), end: endOfDay(end) };
+}
+
+function union(a: DayWindow, b: DayWindow): DayWindow {
+  return {
+    start: a.start < b.start ? a.start : b.start,
+    end: a.end > b.end ? a.end : b.end,
+  };
+}
+
+/**
+ * Widen `anchor` with whatever else we would like loaded, but only while the
+ * result still fits the API's cap.
+ *
+ * Widening-only was the previous rule and it was wrong: paging the month sheet
+ * forward kept growing one window until it crossed 180 days and every further
+ * request 400'd. What the user is looking at has to win, so anything that will
+ * not fit is dropped rather than the request being broken.
+ */
+export function fitWindow(anchor: DayWindow, extras: readonly DayWindow[]): DayWindow {
+  let result = quantiseToMonths(anchor);
+
+  // Rounding out to whole months can itself overshoot — a 175-day range
+  // touching seven months quantises to well over 180 — so the anchor gets the
+  // same treatment as everything else, giving up the rounding first and the
+  // far end only if it still will not fit.
+  if (windowDays(result) > MAX_RANGE_DAYS) {
+    result = { start: startOfDay(anchor.start), end: endOfDay(anchor.end) };
+  }
+  if (windowDays(result) > MAX_RANGE_DAYS) {
+    const end = new Date(result.start);
+    end.setDate(end.getDate() + MAX_RANGE_DAYS);
+    result = { start: result.start, end: endOfDay(end) };
+  }
+
+  for (const extra of extras) {
+    const candidate = union(result, quantiseToMonths(extra));
+    if (windowDays(candidate) <= MAX_RANGE_DAYS) result = candidate;
+  }
+
+  return result;
 }

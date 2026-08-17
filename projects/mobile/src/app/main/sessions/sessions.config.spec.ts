@@ -117,3 +117,102 @@ describe('option constants', () => {
     ]);
   });
 });
+
+describe('activeFilterCount', () => {
+  it('counts a date range once, not once per bound', async () => {
+    const { NO_FILTERS, activeFilterCount } = await import('./sessions.config');
+    expect(activeFilterCount({ ...NO_FILTERS, dateFrom: '2026-05-01' })).toBe(1);
+    expect(
+      activeFilterCount({ ...NO_FILTERS, dateFrom: '2026-05-01', dateTo: '2026-05-31' }),
+    ).toBe(1);
+  });
+
+  it('counts each other dimension separately', async () => {
+    const { NO_FILTERS, activeFilterCount } = await import('./sessions.config');
+    expect(activeFilterCount(NO_FILTERS)).toBe(0);
+    expect(
+      activeFilterCount({
+        ...NO_FILTERS,
+        type: 'GROUP',
+        locationKind: 'ONLINE',
+        status: 'conflict',
+        groupId: 'g-1',
+        dateTo: '2026-05-31',
+      }),
+    ).toBe(5);
+  });
+});
+
+describe('window fitting', () => {
+  const day = (iso: string) => new Date(`${iso}T12:00:00`);
+
+  it('rounds out to whole months so cache keys collapse', async () => {
+    const { quantiseToMonths } = await import('./sessions.config');
+    const out = quantiseToMonths({ start: day('2026-05-14'), end: day('2026-05-22') });
+    expect(out.start.getDate()).toBe(1);
+    expect(out.start.getMonth()).toBe(4);
+    // May has 31 days; the end must land on the last of the month, not the 1st
+    // of the next, or the window silently gains a day.
+    expect(out.end.getDate()).toBe(31);
+    expect(out.end.getMonth()).toBe(4);
+  });
+
+  // Midnight-to-midnight, because the end bound is 23:59:59.999 and the BE
+  // compares the raw difference against 180.
+  it('measures whole days, ignoring the end-of-day time', async () => {
+    const { windowDays } = await import('./sessions.config');
+    expect(
+      windowDays({ start: day('2026-05-01'), end: new Date('2026-05-31T23:59:59.999') }),
+    ).toBe(30);
+  });
+
+  it('keeps the anchor and drops extras that will not fit', async () => {
+    const { fitWindow, windowDays, MAX_RANGE_DAYS } = await import('./sessions.config');
+    const anchor = { start: day('2026-05-01'), end: day('2026-05-31') };
+    const far = { start: day('2027-01-01'), end: day('2027-01-31') };
+
+    const out = fitWindow(anchor, [far]);
+    expect(windowDays(out)).toBeLessThanOrEqual(MAX_RANGE_DAYS);
+    // The anchor is what the user is looking at, so it survives intact.
+    expect(out.start.getMonth()).toBe(4);
+    expect(out.end.getMonth()).toBe(4);
+  });
+
+  it('absorbs an extra that does fit', async () => {
+    const { fitWindow } = await import('./sessions.config');
+    const out = fitWindow(
+      { start: day('2026-05-01'), end: day('2026-05-31') },
+      [{ start: day('2026-06-10'), end: day('2026-06-20') }],
+    );
+    expect(out.start.getMonth()).toBe(4);
+    expect(out.end.getMonth()).toBe(5);
+  });
+
+  // The regression this whole helper exists for: paging the month sheet forward
+  // used to widen one window past the BE's cap, and every request after that
+  // 400'd into the error screen.
+  it('never exceeds the cap however far the cursor is paged', async () => {
+    const { fitWindow, windowDays, MAX_RANGE_DAYS } = await import('./sessions.config');
+    const base = { start: day('2026-05-01'), end: day('2026-05-31') };
+
+    let cursor = { start: day('2026-05-01'), end: day('2026-05-31') };
+    for (let step = 0; step < 18; step++) {
+      cursor = {
+        start: new Date(cursor.start.getFullYear(), cursor.start.getMonth() + 1, 1, 12),
+        end: new Date(cursor.start.getFullYear(), cursor.start.getMonth() + 2, 0, 12),
+      };
+      const out = fitWindow(cursor, [base]);
+      expect(windowDays(out)).toBeLessThanOrEqual(MAX_RANGE_DAYS);
+    }
+  });
+
+  // Quantising can overshoot on its own: a sub-180-day range touching seven
+  // months rounds out past the cap.
+  it('gives up the month rounding before it gives up the request', async () => {
+    const { fitWindow, windowDays, MAX_RANGE_DAYS } = await import('./sessions.config');
+    const out = fitWindow({ start: day('2026-01-20'), end: day('2026-07-10') }, []);
+    expect(windowDays(out)).toBeLessThanOrEqual(MAX_RANGE_DAYS);
+    // Still covers what was asked for, just without the rounding.
+    expect(out.start.getTime()).toBeLessThanOrEqual(day('2026-01-20').getTime());
+  });
+});

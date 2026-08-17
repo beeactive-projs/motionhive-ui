@@ -50,18 +50,20 @@ import { SessionsEmpty } from './_components/sessions-empty/sessions-empty';
 import { MessageSignupsSheet } from './_sheets/message-signups-sheet/message-signups-sheet';
 import { MonthSheet } from './_sheets/month-sheet/month-sheet';
 import { SessionFormSheet } from './_sheets/session-form-sheet/session-form-sheet';
-import {
-  AgendaFilters,
-  NO_FILTERS,
-  SessionFilterSheet,
-  activeFilterCount,
-} from './_sheets/session-filter-sheet/session-filter-sheet';
+import { SessionFilterSheet } from './_sheets/session-filter-sheet/session-filter-sheet';
 import {
   AGENDA_DAYS_AHEAD,
+  AgendaFilters,
+  DayWindow,
   LOCATION_QUICK_FILTERS,
+  NO_FILTERS,
   SESSION_ICONS,
   WEEKDAY_LETTERS,
+  activeFilterCount,
+  dayFromKey,
+  fitWindow,
   instanceTone,
+  matchesFilters,
 } from './sessions.config';
 
 type LoadOptions = { force?: boolean; done?: () => void };
@@ -158,32 +160,80 @@ export class Sessions implements ViewWillEnter {
   readonly filters = signal<AgendaFilters>({ ...NO_FILTERS });
   readonly filterCount = computed(() => activeFilterCount(this.filters()));
 
-  /** The window currently loaded. The month sheet can widen it. */
-  private readonly _windowStart = signal(startOfDay(new Date()));
-  private readonly _windowEnd = signal(
-    endOfDay(new Date(Date.now() + AGENDA_DAYS_AHEAD * 24 * 60 * 60 * 1000)),
-  );
+  /**
+   * The day the default window is anchored on. A signal rather than a fresh
+   * `new Date()` per read, so the required window is stable between visits
+   * instead of shifting by a millisecond on every recompute.
+   */
+  private readonly _today = signal(startOfDay(new Date()));
+
+  /** Which month the month sheet is parked on, once it has moved off today's. */
+  private readonly _monthCursor = signal<Date | null>(null);
+
+  /** Set while a load is in flight and the requirement moved underneath it. */
+  private _resyncQueued = false;
+
+  /** The bounds of the last request, so an unchanged requirement does not refetch. */
+  private readonly _loadedKey = signal<string | null>(null);
+
+  /**
+   * What we would like loaded: the default span ahead, plus wherever the month
+   * sheet and the date filter are pointing.
+   *
+   * The most specific request wins the anchor and the rest are merely nice to
+   * have, because the API rejects anything wider than 180 days — see
+   * `fitWindow`. Widening-only was the old rule and it eventually 400'd.
+   */
+  private readonly _requiredWindow = computed<DayWindow>(() => {
+    const today = this._today();
+    const base: DayWindow = {
+      start: today,
+      end: endOfDay(new Date(today.getTime() + AGENDA_DAYS_AHEAD * 86_400_000)),
+    };
+
+    const { dateFrom, dateTo } = this.filters();
+    const dateRange: DayWindow | null =
+      dateFrom || dateTo
+        ? {
+            start: dateFrom ? dayFromKey(dateFrom) : base.start,
+            end: dateTo ? endOfDay(dayFromKey(dateTo)) : base.end,
+          }
+        : null;
+
+    const cursor = this._monthCursor();
+    const monthRange: DayWindow | null = cursor
+      ? {
+          start: startOfDay(new Date(cursor.getFullYear(), cursor.getMonth(), 1)),
+          end: endOfDay(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0)),
+        }
+      : null;
+
+    const anchor = dateRange ?? monthRange ?? base;
+    const extras = [dateRange, monthRange, base].filter(
+      (window): window is DayWindow => window !== null && window !== anchor,
+    );
+
+    return fitWindow(anchor, extras);
+  });
 
   /** The Monday of the week the strip is showing. */
   readonly weekStartDate = computed(() => weekStart(this.selectedDay()));
 
   /** The loaded window, narrowed by the filter sheet and the header search. */
   readonly visibleInstances = computed(() => {
-    const { type, locationKind, conflictsOnly } = this.filters();
-    const needle = this.query().trim().toLowerCase();
-
-    return this.store.rangeInstances().filter((instance) => {
-      const template = instance.template;
-      if (type && template?.type !== type) return false;
-      if (locationKind && template?.locationKind !== locationKind) return false;
-      if (conflictsOnly && (instance.conflictingInstanceIds?.length ?? 0) === 0) return false;
-      if (needle) {
-        const title = (instance.titleOverride ?? template?.title ?? '').toLowerCase();
-        if (!title.includes(needle)) return false;
-      }
-      return true;
-    });
+    const filters = this.filters();
+    const query = this.query();
+    return this.store
+      .rangeInstances()
+      .filter((instance) => matchesFilters(instance, filters, query));
   });
+
+  /**
+   * `loadRange` asks for 100 rows and does not page, so a wide window on a busy
+   * coach silently stops short. Fixing that means paging in the store, which
+   * web shares — until then the list says so rather than quietly lying.
+   */
+  readonly truncated = computed(() => this.store.rangeInstances().length >= 100);
 
   /**
    * The soonest session still ahead of us, and how long until it starts.
@@ -376,7 +426,11 @@ export class Sessions implements ViewWillEnter {
   ionViewWillEnter(): void {
     // Before the load, so a cached window still renders a fresh countdown.
     this._clockService.bump();
-    this._load();
+    // Re-anchored here rather than at construction: the page lives in the tab
+    // stack, so a session left open overnight would otherwise keep asking for
+    // a window starting yesterday.
+    this._today.set(startOfDay(new Date()));
+    this._syncWindow();
   }
 
   open(instance: SessionInstance): void {
@@ -418,13 +472,16 @@ export class Sessions implements ViewWillEnter {
     this.monthOpen.set(true);
   }
 
+  /** A date filter can point outside the loaded window, so the window follows. */
   onFiltersApplied(filters: AgendaFilters): void {
     this.filters.set(filters);
+    this._syncWindow();
   }
 
   clearFilters(): void {
     this.filters.set({ ...NO_FILTERS });
     this.query.set('');
+    this._syncWindow();
   }
 
   /** The quick chips under the strip write straight through to the sheet's state. */
@@ -445,17 +502,10 @@ export class Sessions implements ViewWillEnter {
     this.view.set('day');
   }
 
-  /** Jumping outside the loaded window has to widen it before dots appear. */
+  /** Jumping outside the loaded window has to load it before dots appear. */
   onMonthChanged(month: Date): void {
-    const monthStart = startOfDay(month);
-    const monthEnd = endOfDay(new Date(month.getFullYear(), month.getMonth() + 1, 0));
-    const start = monthStart < this._windowStart() ? monthStart : this._windowStart();
-    const end = monthEnd > this._windowEnd() ? monthEnd : this._windowEnd();
-    if (start.getTime() === this._windowStart().getTime() &&
-        end.getTime() === this._windowEnd().getTime()) {
-      return;
-    }
-    this._loadWindow(start, end);
+    this._monthCursor.set(startOfDay(month));
+    this._syncWindow();
   }
 
   goToday(): void {
@@ -503,25 +553,53 @@ export class Sessions implements ViewWillEnter {
 
   /** A new session may land outside the cached window, so refetch rather than patch. */
   onCreated(): void {
-    this._load({ force: true });
+    this._syncWindow({ force: true });
   }
 
   onRefresh(event: RefresherCustomEvent): void {
     this._clockService.bump();
-    this._load({ force: true, done: () => void event.target.complete() });
+    this._syncWindow({ force: true, done: () => void event.target.complete() });
   }
 
   retry(): void {
-    this._load({ force: true });
+    this._syncWindow({ force: true });
   }
 
-  private _load(opts: LoadOptions = {}): void {
-    this._loadWindow(this._windowStart(), this._windowEnd(), opts);
-  }
+  /**
+   * Load whatever `_requiredWindow` now says, if that is not what is already
+   * loaded.
+   *
+   * `loadRange` drops any call arriving while one is in flight — it fires
+   * `done` and returns — so a filter applied mid-load would otherwise be lost
+   * with nothing to show for it. Queue it and re-run from the completion
+   * callback instead. Re-running recomputes the requirement rather than
+   * replaying a stale one, so several changes during one load collapse into a
+   * single follow-up request.
+   */
+  private _syncWindow(opts: LoadOptions = {}): void {
+    const target = this._requiredWindow();
+    const key = `${target.start.getTime()}-${target.end.getTime()}`;
 
-  private _loadWindow(start: Date, end: Date, opts: LoadOptions = {}): void {
-    this._windowStart.set(start);
-    this._windowEnd.set(end);
-    this.store.loadRange({ start, end }, opts);
+    if (!opts.force && key === this._loadedKey()) {
+      opts.done?.();
+      return;
+    }
+
+    if (this.store.rangeLoading()) {
+      this._resyncQueued = true;
+      opts.done?.();
+      return;
+    }
+
+    this._loadedKey.set(key);
+    this.store.loadRange(target, {
+      force: opts.force,
+      done: () => {
+        opts.done?.();
+        if (!this._resyncQueued) return;
+        this._resyncQueued = false;
+        this._syncWindow();
+      },
+    });
   }
 }
