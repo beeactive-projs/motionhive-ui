@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -9,6 +10,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonButton,
   IonDatetime,
@@ -28,24 +30,34 @@ import {
   IonToggle,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { take } from 'rxjs';
+import { Subject, catchError, debounceTime, of, switchMap, take } from 'rxjs';
 
 import {
   CreateTemplateRequest,
+  PreviewRecurrenceRequest,
+  RecurrenceRule,
   SessionKind,
   SessionLocationKind,
   SessionService,
+  SessionsInstructorStore,
   Venue,
   VenueService,
+  formatSessionDayShort,
 } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import {
+  DEFAULT_GENERATED_OCCURRENCES,
   LOCATION_KIND_OPTIONS,
+  RECURRENCE_END_OPTIONS,
+  RecurrenceEndMode,
+  RecurrenceEndModes,
   SESSION_ICONS,
   SESSION_TYPE_OPTIONS,
+  SessionPrefill,
   WEEKDAYS,
+  findOverlap,
   formatWeekdayList,
 } from '../../sessions.config';
 
@@ -111,10 +123,17 @@ export class SessionFormSheet {
   private readonly _sessionService = inject(SessionService);
   private readonly _venueService = inject(VenueService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _sessionsInstructorStore = inject(SessionsInstructorStore);
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly open = model(false);
   /** Pre-fills the start when opened from a slot on the day rail. */
   readonly initialStart = input<Date | null>(null);
+  /**
+   * Opens the sheet as a copy of an existing session — what Duplicate means,
+   * since the API has no duplicate endpoint. Wins over `initialStart`.
+   */
+  readonly prefill = input<SessionPrefill | null>(null);
   readonly created = output<void>();
 
   readonly typeOptions = SESSION_TYPE_OPTIONS;
@@ -123,6 +142,8 @@ export class SessionFormSheet {
   readonly hourChoices = DURATION_HOUR_CHOICES;
   readonly minuteChoices = DURATION_MINUTE_CHOICES;
   readonly occurrenceChoices = OCCURRENCE_CHOICES;
+  readonly endOptions = RECURRENCE_END_OPTIONS;
+  readonly EndModes = RecurrenceEndModes;
 
   readonly title = signal('');
   readonly type = signal<SessionKind>('GROUP');
@@ -139,11 +160,19 @@ export class SessionFormSheet {
 
   readonly isRecurring = signal(false);
   readonly daysOfWeek = signal<number[]>([]);
-  readonly endAfterOccurrences = signal(12);
+  readonly endAfterOccurrences = signal(DEFAULT_GENERATED_OCCURRENCES);
+  readonly endMode = signal<RecurrenceEndMode>(RecurrenceEndModes.After);
+  /** `yyyy-mm-dd`, only meaningful when `endMode` is `onDate`. */
+  readonly endDate = signal<string | null>(null);
 
   readonly saving = signal(false);
   readonly venues = signal<Venue[]>([]);
   private _venuesLoaded = false;
+
+  /** The first few dates the rule expands to, straight from the server. */
+  readonly preview = signal<string[]>([]);
+  readonly previewTruncated = signal(false);
+  private readonly _preview$ = new Subject<PreviewRecurrenceRequest>();
 
   /** A 1-on-1 has exactly one seat; asking for a capacity would be noise. */
   readonly showCapacity = computed(() => this.type() !== 'PRIVATE');
@@ -159,14 +188,98 @@ export class SessionFormSheet {
     if (this.isOnline() && this.meetingUrl().trim().length === 0) return false;
     // A weekly series with no day selected would expand to nothing.
     if (this.isRecurring() && this.daysOfWeek().length === 0) return false;
+    // "Ends on date" without the date is a rule the BE cannot expand.
+    if (
+      this.isRecurring() &&
+      this.endMode() === RecurrenceEndModes.OnDate &&
+      !this.endDate()
+    ) {
+      return false;
+    }
     return true;
+  });
+
+  /** A copy announces itself, so nobody thinks they are editing the original. */
+  readonly sheetTitle = computed(() =>
+    this.prefill() ? 'Duplicate session' : 'New session',
+  );
+
+  readonly saveLabel = computed(() =>
+    this.isRecurring() ? 'Create & publish' : 'Create session',
+  );
+
+  /**
+   * The rule as the API wants it, or null when it would not expand to anything.
+   *
+   * One definition feeding both the preview and the save, so what you are shown
+   * and what you get cannot be two different series.
+   */
+  private readonly _rule = computed<RecurrenceRule | null>(() => {
+    if (!this.isRecurring()) return null;
+    const days = this.daysOfWeek();
+    if (days.length === 0) return null;
+
+    const rule: RecurrenceRule = {
+      frequency: 'WEEKLY',
+      interval: 1,
+      daysOfWeek: [...days].sort((a, b) => a - b),
+    };
+
+    if (this.endMode() === RecurrenceEndModes.After) {
+      rule.endAfterOccurrences = this.endAfterOccurrences();
+    } else if (this.endMode() === RecurrenceEndModes.OnDate && this.endDate()) {
+      rule.endDate = this.endDate() ?? undefined;
+    }
+    return rule;
   });
 
   /** Plain-English summary, so the rule is legible before it is committed. */
   readonly recurrenceSummary = computed(() => {
     const list = formatWeekdayList(this.daysOfWeek());
     if (!list) return 'Pick at least one day';
-    return `Every ${list} · ${this.endAfterOccurrences()} sessions`;
+
+    switch (this.endMode()) {
+      case RecurrenceEndModes.Never:
+        return `Every ${list}, with no end date`;
+      case RecurrenceEndModes.OnDate: {
+        const until = this.endDate();
+        return until
+          ? `Every ${list} until ${formatSessionDayShort(until)}`
+          : `Every ${list} — pick an end date`;
+      }
+      default:
+        return `Every ${list} · ${this.endAfterOccurrences()} sessions`;
+    }
+  });
+
+  /** The first handful of dates, plus how many more there are. */
+  readonly previewDates = computed(() =>
+    this.preview().slice(0, 4).map((iso) => formatSessionDayShort(iso)),
+  );
+
+  readonly previewMore = computed(() => Math.max(0, this.preview().length - 4));
+
+  /**
+   * Whether this slot already collides with something in the loaded window.
+   *
+   * Advisory and non-blocking — an overlap is the coach's call, which is
+   * exactly how the BE treats it too (it warns after creating rather than
+   * refusing). Only the first occurrence is checked: a whole series against a
+   * whole window is a lot of work to say something the server will say anyway.
+   */
+  readonly conflictWarning = computed(() => {
+    const start = new Date(this.startAt());
+    if (Number.isNaN(start.getTime())) return null;
+
+    const clash = findOverlap(
+      this._sessionsInstructorStore.rangeInstances(),
+      start,
+      this.durationMinutes(),
+    );
+    if (!clash) return null;
+
+    const title = clash.titleOverride ?? clash.template?.title ?? 'another session';
+    return `Overlaps "${title}". You can still save.`;
   });
 
   constructor() {
@@ -174,15 +287,51 @@ export class SessionFormSheet {
 
     // Re-seed each time it opens, so a cancelled edit never leaks into the next.
     // `untracked` so the effect depends on `open()` and nothing else: `_reset`
-    // reads `initialStart` and `_loadVenues` reads `venues`, and tracking those
-    // re-seeds the form mid-edit the moment the venue request lands. That also
-    // rewrites `startAt` under an open date picker, and Ionic reacts to a new
-    // `value` by scroll-animating the calendar away from the day just tapped.
+    // reads `initialStart` and `prefill`, and `_loadVenues` reads `venues`, and
+    // tracking those re-seeds the form mid-edit the moment the venue request
+    // lands. That also rewrites `startAt` under an open date picker, and Ionic
+    // reacts to a new `value` by scroll-animating the calendar away from the
+    // day just tapped. Keep every seed read INSIDE `_reset`.
     effect(() => {
       if (!this.open()) return;
       untracked(() => {
         this._reset();
         this._loadVenues();
+      });
+    });
+
+    // Ask the server what the rule expands to. Debounced because the endpoint
+    // is throttled at 60/min and toggling weekday circles fires far faster than
+    // that; `switchMap` so a slow earlier answer cannot overwrite a newer one.
+    this._preview$
+      .pipe(
+        debounceTime(300),
+        switchMap((request) =>
+          this._sessionService.previewRecurrence(request).pipe(
+            // A failed preview is not worth an error: the summary line already
+            // says what the rule is, and the save path does not depend on this.
+            catchError(() => of({ occurrences: [], truncated: false })),
+          ),
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((response) => {
+        this.preview.set(response.occurrences);
+        this.previewTruncated.set(response.truncated);
+      });
+
+    effect(() => {
+      const rule = this._rule();
+      const startAt = this.startAt();
+      if (!rule) {
+        this.preview.set([]);
+        this.previewTruncated.set(false);
+        return;
+      }
+      this._preview$.next({
+        rule,
+        firstStartAt: new Date(startAt).toISOString(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     });
   }
@@ -232,6 +381,16 @@ export class SessionFormSheet {
     );
   }
 
+  setEndMode(mode: RecurrenceEndMode): void {
+    this.endMode.set(mode);
+  }
+
+  /** `ion-datetime` with a date presentation hands back `yyyy-mm-dd`. */
+  setEndDate(value: string | string[] | null | undefined): void {
+    const raw = Array.isArray(value) ? value[0] : value;
+    this.endDate.set(raw ? raw.slice(0, 10) : null);
+  }
+
   save(): void {
     if (!this.canSave() || this.saving()) return;
     this.saving.set(true);
@@ -264,14 +423,15 @@ export class SessionFormSheet {
       payload.priceAmountCents = Math.round((this.priceAmount() ?? 0) * 100);
     }
 
-    if (this.isRecurring()) {
-      payload.recurrenceRule = {
-        frequency: 'WEEKLY',
-        interval: 1,
-        daysOfWeek: [...this.daysOfWeek()].sort((a, b) => a - b),
-        endAfterOccurrences: this.endAfterOccurrences(),
-      };
-      payload.initialInstancesCount = this.endAfterOccurrences();
+    const rule = this._rule();
+    if (rule) {
+      payload.recurrenceRule = rule;
+      // How many rows to materialise now. A counted series generates itself
+      // exactly; the open-ended modes get a first batch that `regenerate` tops
+      // up later, because the BE stores occurrences rather than expanding the
+      // rule on read — "never" cannot mean infinite rows.
+      payload.initialInstancesCount =
+        rule.endAfterOccurrences ?? DEFAULT_GENERATED_OCCURRENCES;
     }
 
     this._sessionService
@@ -306,7 +466,34 @@ export class SessionFormSheet {
     this.durationMinutes.set(Math.min(Math.max(total, MIN_DURATION_MINUTES), MAX_DURATION_MINUTES));
   }
 
+  /**
+   * Seed the form. Called only from inside the open-effect's `untracked`, so
+   * every input read here stays untracked — see the effect's comment before
+   * moving any of these reads out.
+   */
   private _reset(): void {
+    this.preview.set([]);
+    this.previewTruncated.set(false);
+
+    const prefill = this.prefill();
+    if (prefill) {
+      this.title.set(prefill.title);
+      this.type.set(prefill.type);
+      this.locationKind.set(prefill.locationKind);
+      this.startAt.set(prefill.startAt);
+      this.durationMinutes.set(prefill.durationMinutes);
+      this.capacity.set(prefill.capacity);
+      this.priceAmount.set(prefill.priceAmount);
+      this.meetingUrl.set(prefill.meetingUrl);
+      this.venueId.set(prefill.venueId);
+      this.isRecurring.set(prefill.isRecurring);
+      this.daysOfWeek.set([...prefill.daysOfWeek]);
+      this.endAfterOccurrences.set(prefill.endAfterOccurrences);
+      this.endMode.set(RecurrenceEndModes.After);
+      this.endDate.set(null);
+      return;
+    }
+
     this.title.set('');
     this.type.set('GROUP');
     this.locationKind.set('IN_PERSON');
@@ -319,7 +506,9 @@ export class SessionFormSheet {
     this.venueId.set(null);
     this.isRecurring.set(false);
     this.daysOfWeek.set([]);
-    this.endAfterOccurrences.set(12);
+    this.endAfterOccurrences.set(DEFAULT_GENERATED_OCCURRENCES);
+    this.endMode.set(RecurrenceEndModes.After);
+    this.endDate.set(null);
   }
 
   /**

@@ -130,6 +130,126 @@ export function formatWeekdayList(days: readonly number[]): string {
 }
 
 /**
+ * When a series stops. `never` still generates a first batch of occurrences —
+ * the BE materialises rows rather than expanding a rule on read, so "forever"
+ * means "top it up later" (`regenerate`), not "infinite".
+ */
+export const RecurrenceEndModes = {
+  Never: 'never',
+  OnDate: 'onDate',
+  After: 'after',
+} as const;
+
+export type RecurrenceEndMode =
+  (typeof RecurrenceEndModes)[keyof typeof RecurrenceEndModes];
+
+export const RECURRENCE_END_OPTIONS: readonly {
+  value: RecurrenceEndMode;
+  label: string;
+}[] = [
+  { value: RecurrenceEndModes.Never, label: 'Never' },
+  { value: RecurrenceEndModes.OnDate, label: 'On date' },
+  { value: RecurrenceEndModes.After, label: 'After N' },
+];
+
+/** How many occurrences to materialise when the rule has no count of its own. */
+export const DEFAULT_GENERATED_OCCURRENCES = 12;
+
+/**
+ * Everything the create sheet needs to open as a copy of an existing session.
+ *
+ * A plain data shape with no Ionic in sight, so the mapping is unit-testable
+ * and the sheet only has to seed signals from it.
+ */
+export interface SessionPrefill {
+  title: string;
+  type: SessionKind;
+  locationKind: SessionLocationKind;
+  /** Local wall-clock, the format `ion-datetime` binds to. */
+  startAt: string;
+  durationMinutes: number;
+  capacity: number | null;
+  priceAmount: number | null;
+  meetingUrl: string;
+  venueId: string | null;
+  isRecurring: boolean;
+  daysOfWeek: number[];
+  endAfterOccurrences: number;
+}
+
+/** Local wall-clock string for `ion-datetime`, which does not take an instant. */
+function toLocalIso(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+    date.getHours(),
+  )}:${pad(date.getMinutes())}`;
+}
+
+/**
+ * Seed a new session from an existing occurrence — what "Duplicate" means,
+ * given the API has no duplicate endpoint.
+ *
+ * The start rolls forward in whole weeks when the source is already past. A
+ * copy of last Monday's class has to land in the future or the API refuses it,
+ * and the same weekday at the same time is the slot the coach is actually
+ * copying — moving it to "now" would lose the thing worth duplicating.
+ */
+export function prefillFromInstance(
+  instance: SessionInstance,
+  now: number = Date.now(),
+): SessionPrefill {
+  const template = instance.template;
+
+  const start = new Date(instance.startAt);
+  while (start.getTime() <= now) {
+    start.setDate(start.getDate() + 7);
+  }
+
+  const priceCents = template?.priceAmountCents ?? 0;
+  const rule = template?.recurrenceRule ?? null;
+
+  return {
+    title: instance.titleOverride ?? template?.title ?? '',
+    type: template?.type ?? 'GROUP',
+    locationKind: template?.locationKind ?? 'IN_PERSON',
+    startAt: toLocalIso(start),
+    durationMinutes: template?.durationMinutes ?? 60,
+    capacity: instance.capacityOverride ?? template?.capacity ?? null,
+    priceAmount: priceCents > 0 ? priceCents / 100 : null,
+    meetingUrl: instance.meetingUrlOverride ?? template?.meetingUrl ?? '',
+    venueId: instance.venueIdOverride ?? template?.venueId ?? null,
+    isRecurring: !!rule,
+    daysOfWeek: rule?.daysOfWeek ? [...rule.daysOfWeek] : [],
+    endAfterOccurrences: rule?.endAfterOccurrences ?? DEFAULT_GENERATED_OCCURRENCES,
+  };
+}
+
+/**
+ * Does a proposed slot overlap something already loaded?
+ *
+ * Advisory only — it can only see the window in memory, which is exactly why
+ * the server's own post-create warning stays. Worth having anyway: catching the
+ * clash before the session exists is cheaper than cancelling it afterwards.
+ */
+export function findOverlap(
+  instances: readonly SessionInstance[],
+  startAt: Date,
+  durationMinutes: number,
+): SessionInstance | null {
+  const start = startAt.getTime();
+  const end = start + durationMinutes * 60_000;
+  if (!Number.isFinite(start)) return null;
+
+  return (
+    instances.find((instance) => {
+      const otherStart = new Date(instance.startAt).getTime();
+      const otherEnd = new Date(instance.endAt).getTime();
+      return start < otherEnd && otherStart < end;
+    }) ?? null
+  );
+}
+
+/**
  * What a cancel applies to. Values match core's `CancelScope`; the copy is
  * filled in per-session, since the counts differ every time.
  */

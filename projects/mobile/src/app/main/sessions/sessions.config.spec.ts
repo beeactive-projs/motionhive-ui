@@ -118,6 +118,131 @@ describe('option constants', () => {
   });
 });
 
+describe('prefillFromInstance', () => {
+  const NOW = new Date('2026-05-21T09:00:00').getTime();
+
+  /** Only the fields the mapper reads. */
+  function instance(overrides: Record<string, unknown> = {}) {
+    return {
+      startAt: '2026-05-25T18:00:00',
+      endAt: '2026-05-25T19:00:00',
+      titleOverride: null,
+      capacityOverride: null,
+      meetingUrlOverride: null,
+      venueIdOverride: null,
+      confirmedCount: 0,
+      pendingApprovalCount: 0,
+      template: {
+        title: 'Strength club',
+        type: 'GROUP',
+        locationKind: 'IN_PERSON',
+        durationMinutes: 60,
+        capacity: 14,
+        priceAmountCents: 5000,
+        meetingUrl: null,
+        venueId: 'v-1',
+        recurrenceRule: null,
+      },
+      ...overrides,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+  }
+
+  it('copies the template, converting price back out of cents', async () => {
+    const { prefillFromInstance } = await import('./sessions.config');
+    const out = prefillFromInstance(instance(), NOW);
+    expect(out.title).toBe('Strength club');
+    expect(out.capacity).toBe(14);
+    expect(out.priceAmount).toBe(50);
+    expect(out.venueId).toBe('v-1');
+  });
+
+  it('prefers the per-occurrence overrides over the template', async () => {
+    const { prefillFromInstance } = await import('./sessions.config');
+    const out = prefillFromInstance(
+      instance({ titleOverride: 'Strength club · extra', capacityOverride: 20 }),
+      NOW,
+    );
+    expect(out.title).toBe('Strength club · extra');
+    expect(out.capacity).toBe(20);
+  });
+
+  it('keeps a future start exactly where it is', async () => {
+    const { prefillFromInstance } = await import('./sessions.config');
+    const out = prefillFromInstance(instance(), NOW);
+    expect(out.startAt).toBe('2026-05-25T18:00');
+  });
+
+  // Duplicating a past session must not propose a start in the past — the API
+  // refuses it. Same weekday, same time, next time round.
+  it('rolls a past start forward in whole weeks', async () => {
+    const { prefillFromInstance } = await import('./sessions.config');
+    const out = prefillFromInstance(
+      instance({ startAt: '2026-05-04T18:00:00', endAt: '2026-05-04T19:00:00' }),
+      NOW,
+    );
+    // 4 May was a Monday; the next Monday after 21 May is 25 May.
+    expect(out.startAt).toBe('2026-05-25T18:00');
+    expect(new Date(out.startAt).getDay()).toBe(new Date('2026-05-04T18:00:00').getDay());
+  });
+
+  it('carries a recurrence rule across, and survives a missing template', async () => {
+    const { prefillFromInstance, DEFAULT_GENERATED_OCCURRENCES } = await import(
+      './sessions.config'
+    );
+
+    const recurring = prefillFromInstance(
+      instance({
+        template: {
+          title: 'Yoga',
+          type: 'GROUP',
+          locationKind: 'IN_PERSON',
+          durationMinutes: 45,
+          capacity: null,
+          priceAmountCents: 0,
+          recurrenceRule: { frequency: 'WEEKLY', interval: 1, daysOfWeek: [1, 3] },
+        },
+      }),
+      NOW,
+    );
+    expect(recurring.isRecurring).toBe(true);
+    expect(recurring.daysOfWeek).toEqual([1, 3]);
+    expect(recurring.endAfterOccurrences).toBe(DEFAULT_GENERATED_OCCURRENCES);
+    expect(recurring.priceAmount).toBeNull();
+
+    // A list response can omit the template entirely.
+    const bare = prefillFromInstance(instance({ template: undefined }), NOW);
+    expect(bare.type).toBe('GROUP');
+    expect(bare.durationMinutes).toBe(60);
+    expect(bare.isRecurring).toBe(false);
+  });
+});
+
+describe('findOverlap', () => {
+  const loaded = [
+    { id: 'a', startAt: '2026-05-21T10:00:00', endAt: '2026-05-21T11:00:00' },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ] as any[];
+
+  it('finds a genuine overlap', async () => {
+    const { findOverlap } = await import('./sessions.config');
+    expect(findOverlap(loaded, new Date('2026-05-21T10:30:00'), 60)?.id).toBe('a');
+  });
+
+  // Back-to-back is the common case and must not warn, or the warning becomes
+  // noise a coach learns to ignore.
+  it('treats touching edges as clear', async () => {
+    const { findOverlap } = await import('./sessions.config');
+    expect(findOverlap(loaded, new Date('2026-05-21T11:00:00'), 60)).toBeNull();
+    expect(findOverlap(loaded, new Date('2026-05-21T09:00:00'), 60)).toBeNull();
+  });
+
+  it('returns null for an unusable start', async () => {
+    const { findOverlap } = await import('./sessions.config');
+    expect(findOverlap(loaded, new Date('nonsense'), 60)).toBeNull();
+  });
+});
+
 describe('activeFilterCount', () => {
   it('counts a date range once, not once per bound', async () => {
     const { NO_FILTERS, activeFilterCount } = await import('./sessions.config');

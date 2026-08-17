@@ -108,5 +108,27 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 0.5rem;
+}
+
+/* The tail of the preview row. Not a chip — it is a count, not a date you can
+   act on, and dressing it as one invites a tap that does nothing. */
+.chips .more {
+  color: var(--ion-color-medium);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Advisory, so it is tinted rather than red-on-white: this does not block the
+   save and must not read like a validation failure. */
+.conflict-warning {
+  margin: 0.75rem 0 0;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-danger-wash);
+  color: var(--ion-color-danger-wash-contrast);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.45;
 }

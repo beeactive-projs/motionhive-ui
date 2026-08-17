@@ -121,21 +121,68 @@
       }
     </div>
 
-    <div class="mh-section-label">Ends after</div>
+    <div class="mh-section-label">Ends</div>
     <div class="chips">
-      @for (count of occurrenceChoices; track count) {
+      @for (option of endOptions; track option.value) {
         <ion-chip
-          [outline]="endAfterOccurrences() !== count"
-          [color]="endAfterOccurrences() === count ? 'primary' : 'medium'"
-          [attr.aria-pressed]="endAfterOccurrences() === count"
-          (click)="endAfterOccurrences.set(count)"
+          [outline]="endMode() !== option.value"
+          [color]="endMode() === option.value ? 'secondary' : 'medium'"
+          [attr.aria-pressed]="endMode() === option.value"
+          (click)="setEndMode(option.value)"
         >
-          {{ count }}
+          {{ option.label }}
         </ion-chip>
       }
     </div>
 
+    @if (endMode() === EndModes.After) {
+      <div class="chips">
+        @for (count of occurrenceChoices; track count) {
+          <ion-chip
+            [outline]="endAfterOccurrences() !== count"
+            [color]="endAfterOccurrences() === count ? 'primary' : 'medium'"
+            [attr.aria-pressed]="endAfterOccurrences() === count"
+            (click)="endAfterOccurrences.set(count)"
+          >
+            {{ count }}
+          </ion-chip>
+        }
+      </div>
+    } @else if (endMode() === EndModes.OnDate) {
+      <ion-item lines="none" class="field">
+        <ion-label>Last session</ion-label>
+        <ion-datetime-button slot="end" datetime="session-end-date" />
+      </ion-item>
+
+      <!-- Detached for the same reason as the start picker above. -->
+      <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            id="session-end-date"
+            presentation="date"
+            [showDefaultButtons]="true"
+            [value]="endDate()"
+            (ionChange)="setEndDate($event.detail.value)"
+          />
+        </ng-template>
+      </ion-modal>
+    }
+
     <ion-note class="summary">{{ recurrenceSummary() }}</ion-note>
+
+    @if (previewDates().length > 0) {
+      <!-- Straight from `preview-recurrence`, not expanded here: the server owns
+           what a rule means, and a second implementation would drift. -->
+      <div class="mh-section-label">Preview</div>
+      <div class="chips">
+        @for (date of previewDates(); track $index) {
+          <ion-chip [outline]="true" color="medium">{{ date }}</ion-chip>
+        }
+        @if (previewMore() > 0) {
+          <span class="more">+ {{ previewMore() }} more</span>
+        }
+      </div>
+    }
   }
 
   <div class="mh-section-label">Where</div>
@@ -207,12 +254,18 @@
   <p class="mh-helper">
     Price is shown to signups. Taking payment isn't wired up yet, so nothing is charged.
   </p>
+
+  @if (conflictWarning(); as warning) {
+    <!-- Advisory, never blocking: an overlap is the coach's call, which is how
+         the API treats it too — it warns after creating rather than refusing. -->
+    <p class="conflict-warning">{{ warning }}</p>
+  }
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="New session"
-  saveLabel="Create session"
+  [title]="sheetTitle()"
+  [saveLabel]="saveLabel()"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

@@ -58,12 +58,14 @@ import {
   LOCATION_QUICK_FILTERS,
   NO_FILTERS,
   SESSION_ICONS,
+  SessionPrefill,
   WEEKDAY_LETTERS,
   activeFilterCount,
   dayFromKey,
   fitWindow,
   instanceTone,
   matchesFilters,
+  prefillFromInstance,
 } from './sessions.config';
 
 type LoadOptions = { force?: boolean; done?: () => void };
@@ -133,6 +135,8 @@ export class Sessions implements ViewWillEnter {
   readonly createOpen = signal(false);
   /** Seeds the create sheet when it opens from a slot on the day rail. */
   readonly createStart = signal<Date | null>(null);
+  /** Seeds the create sheet as a copy, when it opens from Duplicate. */
+  readonly createPrefill = signal<SessionPrefill | null>(null);
   readonly filterOpen = signal(false);
   readonly monthOpen = signal(false);
   readonly messageOpen = signal(false);
@@ -439,6 +443,18 @@ export class Sessions implements ViewWillEnter {
 
   openCreate(): void {
     this.createStart.set(null);
+    this.createPrefill.set(null);
+    this.createOpen.set(true);
+  }
+
+  /**
+   * Duplicate is the create sheet opened as a copy — there is no duplicate
+   * endpoint, and a one-tap clone would be worse anyway: the thing you almost
+   * always want to change is the date.
+   */
+  duplicate(instance: SessionInstance): void {
+    this.createStart.set(null);
+    this.createPrefill.set(prefillFromInstance(instance));
     this.createOpen.set(true);
   }
 
