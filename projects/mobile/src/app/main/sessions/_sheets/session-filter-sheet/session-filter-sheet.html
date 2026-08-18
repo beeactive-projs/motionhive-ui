@@ -1,51 +1,31 @@
 <ng-template #body>
-  <!-- Reset sits at the top of the body rather than beside the title: the sheet
-       chrome is shared with nine other sheets and owns that row. -->
-  <div class="reset-row">
-    <button type="button" class="reset" [disabled]="count() === 0" (click)="reset()">
-      Reset
-    </button>
-  </div>
-
   <div class="mh-section-label">Type</div>
   <div class="chips">
     @for (option of typeOptions; track option.value) {
-      <ion-chip
-        [outline]="draft().type !== option.value"
-        [color]="draft().type === option.value ? 'secondary' : 'medium'"
-        [attr.aria-pressed]="draft().type === option.value"
-        (click)="toggleType(option.value)"
-      >
-        {{ option.label }}
-      </ion-chip>
+    <ion-chip [class.selected]="draft().type === option.value"
+      [attr.aria-pressed]="draft().type === option.value" (click)="toggleType(option.value)">
+      {{ option.label }}
+    </ion-chip>
     }
   </div>
 
   <div class="mh-section-label">Location</div>
   <div class="chips">
     @for (option of locationOptions; track option.value) {
-      <ion-chip
-        [outline]="draft().locationKind !== option.value"
-        [color]="draft().locationKind === option.value ? 'secondary' : 'medium'"
-        [attr.aria-pressed]="draft().locationKind === option.value"
-        (click)="toggleLocation(option.value)"
-      >
-        {{ option.label }}
-      </ion-chip>
+    <ion-chip [class.selected]="draft().locationKind === option.value"
+      [attr.aria-pressed]="draft().locationKind === option.value" (click)="toggleLocation(option.value)">
+      {{ option.label }}
+    </ion-chip>
     }
   </div>
 
   <div class="mh-section-label">Status</div>
   <div class="chips">
     @for (option of statusOptions; track option.value) {
-      <ion-chip
-        [outline]="draft().status !== option.value"
-        [color]="draft().status === option.value ? 'secondary' : 'medium'"
-        [attr.aria-pressed]="draft().status === option.value"
-        (click)="toggleStatus(option.value)"
-      >
-        {{ option.label }}
-      </ion-chip>
+    <ion-chip [class.selected]="draft().status === option.value"
+      [attr.aria-pressed]="draft().status === option.value" (click)="toggleStatus(option.value)">
+      {{ option.label }}
+    </ion-chip>
     }
   </div>
 
@@ -65,55 +45,39 @@
        presents, so it cannot live inside the item it belongs to. -->
   <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
     <ng-template>
-      <ion-datetime
-        id="filter-date-from"
-        presentation="date"
-        [showDefaultButtons]="true"
-        [value]="draft().dateFrom"
-        (ionChange)="setDateFrom($event.detail.value)"
-      />
+      <ion-datetime id="filter-date-from" presentation="date" [showDefaultButtons]="true" [value]="draft().dateFrom"
+        (ionChange)="setDateFrom($event.detail.value)" />
     </ng-template>
   </ion-modal>
 
   <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
     <ng-template>
-      <ion-datetime
-        id="filter-date-to"
-        presentation="date"
-        [showDefaultButtons]="true"
-        [value]="draft().dateTo"
-        (ionChange)="setDateTo($event.detail.value)"
-      />
+      <ion-datetime id="filter-date-to" presentation="date" [showDefaultButtons]="true" [value]="draft().dateTo"
+        (ionChange)="setDateTo($event.detail.value)" />
     </ng-template>
   </ion-modal>
 
   @if (rangeBackwards()) {
-    <p class="mh-helper error">The end date is before the start date.</p>
+  <p class="mh-helper error">The end date is before the start date.</p>
   } @else if (rangeTooWide()) {
-    <p class="mh-helper error">Pick a range of six months or less.</p>
+  <p class="mh-helper error">Pick a range of six months or less.</p>
   } @else if (draft().dateFrom || draft().dateTo) {
-    <div class="reset-row">
-      <button type="button" class="reset" (click)="clearDates()">Clear dates</button>
-    </div>
+  <div class="reset-row">
+    <button type="button" class="reset" (click)="clearDates()">Clear dates</button>
+  </div>
   }
 
   @if (groups().length > 0) {
-    <div class="mh-section-label">Group</div>
-    <ion-item lines="none" class="field">
-      <ion-select
-        label="Group"
-        labelPlacement="stacked"
-        interface="action-sheet"
-        placeholder="Any group"
-        [value]="draft().groupId"
-        (ionChange)="setGroup($event.detail.value)"
-      >
-        <ion-select-option [value]="null">Any group</ion-select-option>
-        @for (group of groups(); track group.id) {
-          <ion-select-option [value]="group.id">{{ group.name }}</ion-select-option>
-        }
-      </ion-select>
-    </ion-item>
+  <div class="mh-section-label">Group</div>
+  <ion-item lines="none" class="field">
+    <ion-select labelPlacement="stacked" interface="action-sheet" placeholder="Any group" [value]="draft().groupId"
+      (ionChange)="setGroup($event.detail.value)">
+      <ion-select-option [value]="null">Any group</ion-select-option>
+      @for (group of groups(); track group.id) {
+      <ion-select-option [value]="group.id">{{ group.name }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
   }
 
   <ion-note class="mh-note-block">
@@ -122,13 +86,6 @@
   </ion-note>
 </ng-template>
 
-<mh-sheet-shell
-  [(open)]="open"
-  title="Filters"
-  [saveLabel]="applyLabel()"
-  [canSave]="canApply()"
-  [body]="body"
-  [breakpoints]="[0, 0.9]"
-  [initialBreakpoint]="0.9"
-  (save)="apply()"
-/>
+<mh-sheet-shell [(open)]="open" title="Filters" actionLabel="Reset" [actionDisabled]="count() === 0"
+  [saveLabel]="applyLabel()" [canSave]="canApply()" [body]="body" [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9"
+  (action)="reset()" (save)="apply()" />

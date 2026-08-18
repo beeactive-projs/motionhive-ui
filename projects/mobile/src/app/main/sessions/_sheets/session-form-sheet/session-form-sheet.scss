@@ -2,7 +2,7 @@
    text, and these carry an icon over a label in a grid. */
 .tiles {
   display: grid;
-  gap: 0.4375rem;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
@@ -18,13 +18,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.625rem 0.25rem;
+  gap: 0.3rem;
+  padding: 0.8125rem 0.25rem;
   border: 1.5px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
+  border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 500;
 }
 
@@ -36,24 +36,67 @@
 }
 
 .tile ion-icon {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
+}
+
+/* The Where and access tiles are pills — icon beside label, per the design. */
+.tile.row {
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--mh-radius-pill);
+}
+
+/* The two When pills. Not `.pair`: the date deserves more room than "60 min". */
+.when {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 0.4375rem;
+  margin-bottom: 0.5rem;
+}
+
+/* A button dressed as the field it opens: same surface, border and radius as
+   the outline inputs around it, with the value as its face. Ionic has no
+   trigger element for a picker (`ion-datetime-button` exists but renders the
+   date and time as two separate pills, where the design wants one). */
+.field-button {
+  --background: var(--ion-card-background);
+  --color: var(--ion-text-color);
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --box-shadow: none;
+  --padding-start: 0.8125rem;
+  --padding-end: 0.8125rem;
+  height: 3.0625rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+.field-button::part(native) {
+  justify-content: flex-start;
 }
 
 /* Weekday circles. */
 .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.25rem;
+  gap: 0.375rem;
   margin: 0.25rem 0 0.5rem;
 }
 
 .day {
+  width: 100%;
+  max-width: 2.75rem;
   aspect-ratio: 1;
+  justify-self: center;
   border: none;
   border-radius: var(--mh-radius-pill);
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
@@ -62,28 +105,75 @@
   color: var(--ion-color-primary-contrast);
 }
 
-.summary {
-  display: block;
-  padding: 0 0.25rem 0.5rem;
-  font-size: 0.72rem;
+/* The Ends control — iOS mode is the design's grey track with a raised white
+   segment; md mode is a text row with an underline, which is not this. */
+.ends {
+  --background: var(--mh-color-divider);
+  margin-bottom: 0.625rem;
 }
 
-/* Value pill on the Duration row. Ionic ships `ion-datetime-button` as the
-   trigger for a datetime but has no equivalent for a picker, so a plain button
-   is dressed to match the one on the Starts row directly above it — same
-   surface, same padding, and none of the MD button's shout. */
-.picker-trigger {
-  --background: var(--ion-color-step-300, var(--ion-background-color-step-300));
-  --color: var(--ion-text-color);
-  --padding-start: 0.75rem;
-  --padding-end: 0.75rem;
-  --box-shadow: none;
-  height: 2rem;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
+.ends ion-segment-button {
+  --color: var(--ion-color-medium);
+  --color-checked: var(--ion-text-color);
+  --indicator-color: var(--ion-card-background);
+  min-height: 2.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
   letter-spacing: normal;
-  text-transform: none;
+}
+
+/* A small number with its unit as prose: "16 occurrences", "24 hours…". */
+.inline-number {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.inline-number .count {
+  max-width: 5.75rem;
+}
+
+.inline-number span {
+  color: var(--ion-color-medium);
+  font-size: 0.875rem;
+}
+
+/* The rule read back as a sentence, on the selection wash — it is the one
+   thing on the sheet worth reading twice before committing to a series. */
+.rule-summary {
+  margin: 0.25rem 0 0.625rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--mh-radius-card);
+  background: var(--mh-chip-warning-background);
+  color: var(--mh-color-honey-deep);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Dates on the card surface with a hairline, not Ionic's grey chip fill — they
+   are read-only facts, and the grey fill is what the tappable chips wear. */
+.preview-chip {
+  --background: var(--ion-card-background);
+  --color: var(--ion-text-color);
+  border: 1px solid var(--ion-border-color);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* The tail of the preview row. Not a chip — it is a count, not a date you can
+   act on, and dressing it as one invites a tap that does nothing. */
+.chips .more {
+  color: var(--ion-color-medium);
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 /* Rows that behave as fields rather than list items. */
@@ -96,6 +186,29 @@
   border-radius: var(--mh-radius-control);
 }
 
+/* The repeat card: glyph, state as its title, and the whole row turns onto the
+   selection wash when the toggle is on — the design's one loud moment. */
+.repeat ion-icon[slot='start'] {
+  margin-inline: 0 0.875rem;
+  color: var(--ion-color-medium);
+  font-size: 1.25rem;
+}
+
+.repeat.on {
+  --background: var(--mh-chip-warning-background);
+  border-color: transparent;
+}
+
+.repeat.on ion-icon[slot='start'],
+.repeat.on ion-label h3 {
+  color: var(--mh-color-honey-deep);
+}
+
+.repeat.on ion-label p {
+  color: var(--mh-color-honey-deep);
+  opacity: 0.75;
+}
+
 /* Auto-flow, not `1fr 1fr`: a 1-on-1 hides the Spots field and a fixed
    two-column grid would leave the gap behind. */
 .pair {
@@ -105,30 +218,39 @@
   gap: 0.4375rem;
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 0.5rem;
+/* Unit riding inside a field: "12 spots", "50 RON". */
+.unit {
+  padding-inline-start: 0.5rem;
+  color: var(--ion-color-medium);
+  font-size: 0.875rem;
 }
 
-/* The tail of the preview row. Not a chip — it is a count, not a date you can
-   act on, and dressing it as one invites a tap that does nothing. */
-.chips .more {
-  color: var(--ion-color-medium);
-  font-size: 0.72rem;
+/* The currency select sits in the price input's end slot as a bare "RON ⌄" —
+   the field supplies the chrome, so the select sheds its own. */
+.currency {
+  --padding-start: 0.5rem;
+  --padding-end: 0;
+  min-height: 0;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
-/* Advisory, so it is tinted rather than red-on-white: this does not block the
+/* Advisory, so it is washed rather than red-on-white: this does not block the
    save and must not read like a validation failure. */
 .conflict-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
   margin: 0.75rem 0 0;
-  padding: 0.625rem 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-left: 3px solid var(--ion-color-danger);
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-danger-wash);
   color: var(--ion-color-danger-wash-contrast);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.75rem;
   line-height: 1.45;
+}
+
+.conflict-warning strong {
+  font-size: 0.8125rem;
 }

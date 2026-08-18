@@ -6,10 +6,21 @@
   gap: 0.375rem;
 }
 
+/* Soft fill when idle, solid navy when picked. Ionic's own chip states —
+   outline, or an 8% tint via `color` — both read as a third weight the design
+   doesn't have, so the fills come from the theme tokens directly. */
 .chips ion-chip {
   margin: 0;
   font-size: 0.78rem;
   font-weight: 600;
+  --background: var(--ion-color-medium-wash);
+  --color: var(--ion-color-medium-wash-contrast);
+  border: 1px solid var(--ion-color-medium-wash-contrast);
+}
+
+.chips ion-chip.selected {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-secondary-contrast);
 }
 
 /* A text action on its own line. `ion-button fill="clear"` carries toolbar
@@ -33,11 +44,10 @@
   opacity: 0.6;
 }
 
-/* From and To side by side — a date range reads as one control, not two. */
+/* From and To stacked — each date gets a full-width row so the picker button
+   never crowds the label. */
 .pair {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
   gap: 0.5rem;
 }
 

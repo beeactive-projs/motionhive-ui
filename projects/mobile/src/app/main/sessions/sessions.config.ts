@@ -1,5 +1,6 @@
 import {
   RecurrenceRule,
+  SessionAccess,
   SessionInstance,
   SessionKind,
   SessionLocationKind,
@@ -22,16 +23,22 @@ import {
   chevronForward,
   closeCircleOutline,
   copyOutline,
+  createOutline,
   ellipsisVertical,
   funnelOutline,
   globeOutline,
+  heartOutline,
+  hourglassOutline,
   locationOutline,
   notificationsOutline,
   peopleOutline,
   personOutline,
+  pricetagOutline,
+  repeatOutline,
   searchOutline,
   sendOutline,
   shareOutline,
+  timeOutline,
   videocamOutline,
 } from 'ionicons/icons';
 
@@ -52,16 +59,22 @@ export const SESSION_ICONS = {
   chevronForward,
   closeCircleOutline,
   copyOutline,
+  createOutline,
   ellipsisVertical,
   funnelOutline,
   globeOutline,
+  heartOutline,
+  hourglassOutline,
   locationOutline,
   notificationsOutline,
   peopleOutline,
   personOutline,
+  pricetagOutline,
+  repeatOutline,
   searchOutline,
   sendOutline,
   shareOutline,
+  timeOutline,
   videocamOutline,
 };
 
@@ -86,6 +99,32 @@ export const LOCATION_KIND_OPTIONS = [
   { value: 'IN_PERSON', label: 'In-person', icon: 'location-outline' },
   { value: 'ONLINE', label: 'Online', icon: 'videocam-outline' },
 ] as const;
+
+/**
+ * Who can book — the same four access levels the web dialog offers, with its
+ * sub-copy carried along so the sheet can explain the selected one.
+ */
+export const SESSION_ACCESS_OPTIONS: readonly {
+  value: SessionAccess;
+  label: string;
+  sub: string;
+  icon: string;
+}[] = [
+  { value: 'OPEN', label: 'Open', sub: 'Anyone with the link can book.', icon: 'globe-outline' },
+  { value: 'FREE', label: 'Free', sub: 'Listed publicly with no price tag.', icon: 'heart-outline' },
+  {
+    value: 'CLIENTS_ONLY',
+    label: 'Clients only',
+    sub: 'Only your active clients can book.',
+    icon: 'person-outline',
+  },
+  {
+    value: 'GROUP_ONLY',
+    label: 'Group members',
+    sub: 'Only members of a specific group.',
+    icon: 'people-outline',
+  },
+];
 
 /**
  * The chip row under the week strip — the one narrowing worth reaching without
@@ -203,6 +242,7 @@ export const SessionActionIds = {
   Open: 'open',
   CheckIn: 'checkIn',
   Message: 'message',
+  Edit: 'edit',
   Duplicate: 'duplicate',
   Share: 'share',
   Cancel: 'cancel',
@@ -247,6 +287,7 @@ export const SESSION_ACTIONS: readonly {
     icon: 'send-outline',
     color: 'info',
   },
+  { id: SessionActionIds.Edit, label: 'Edit session', icon: 'create-outline', color: 'medium' },
   { id: SessionActionIds.Duplicate, label: 'Duplicate', icon: 'copy-outline', color: 'medium' },
   { id: SessionActionIds.Share, label: 'Share booking link', icon: 'share-outline', color: 'medium' },
   {
@@ -307,13 +348,20 @@ export const DEFAULT_GENERATED_OCCURRENCES = 12;
  */
 export interface SessionPrefill {
   title: string;
+  description: string;
   type: SessionKind;
+  access: SessionAccess;
+  approvalRequired: boolean;
+  groupId: string | null;
   locationKind: SessionLocationKind;
   /** Local wall-clock, the format `ion-datetime` binds to. */
   startAt: string;
   durationMinutes: number;
   capacity: number | null;
+  waitlistEnabled: boolean;
+  cancellationCutoffHours: number;
   priceAmount: number | null;
+  priceCurrency: string;
   meetingUrl: string;
   venueId: string | null;
   isRecurring: boolean;
@@ -354,12 +402,19 @@ export function prefillFromInstance(
 
   return {
     title: instance.titleOverride ?? template?.title ?? '',
+    description: template?.description ?? '',
     type: template?.type ?? 'GROUP',
+    access: template?.access ?? 'OPEN',
+    approvalRequired: template?.approvalRequired ?? false,
+    groupId: template?.groupId ?? null,
     locationKind: template?.locationKind ?? 'IN_PERSON',
     startAt: toLocalIso(start),
     durationMinutes: template?.durationMinutes ?? 60,
     capacity: instance.capacityOverride ?? template?.capacity ?? null,
+    waitlistEnabled: template?.waitlistEnabled ?? true,
+    cancellationCutoffHours: template?.cancellationCutoffHours ?? 24,
     priceAmount: priceCents > 0 ? priceCents / 100 : null,
+    priceCurrency: template?.priceCurrency ?? 'RON',
     meetingUrl: instance.meetingUrlOverride ?? template?.meetingUrl ?? '',
     venueId: instance.venueIdOverride ?? template?.venueId ?? null,
     isRecurring: !!rule,

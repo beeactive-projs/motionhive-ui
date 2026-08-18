@@ -110,6 +110,10 @@ export class SessionActionsSheet {
           return started && !cancelled && !onDetail;
         case SessionActionIds.Message:
           return signups > 0;
+        case SessionActionIds.Edit:
+          // Detail only: editing needs the full template, which the agenda's
+          // rows don't carry — their eager `template` is an allowlisted subset.
+          return onDetail && !cancelled;
         case SessionActionIds.Share:
           return this.canShare() && !cancelled;
         case SessionActionIds.Cancel:

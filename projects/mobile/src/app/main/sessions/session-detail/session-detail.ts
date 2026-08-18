@@ -16,6 +16,7 @@ import {
   IonNote,
   IonProgressBar,
   IonSkeletonText,
+  IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
@@ -23,6 +24,7 @@ import { addIcons } from 'ionicons';
 
 import {
   AuthStore,
+  SessionAccess,
   SessionInstance,
   SessionParticipant,
   SessionsDetailStore,
@@ -38,7 +40,11 @@ import {
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import {
+  HexAvatar,
+  HexAvatarTone,
+  HexAvatarTones,
+} from '../../../_shared/components/hex-avatar/hex-avatar';
 import { ClockService } from '../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
@@ -50,6 +56,7 @@ import { ParticipantNoteSheet } from '../_sheets/participant-note-sheet/particip
 import { SessionActionsSheet } from '../_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from '../_sheets/session-form-sheet/session-form-sheet';
 import {
+  SESSION_ACCESS_OPTIONS,
   SESSION_ICONS,
   SessionActionId,
   SessionActionIds,
@@ -94,6 +101,24 @@ interface ReminderRow {
   detail: string;
 }
 
+/** One line of the Details card: a hex tile, the fact, and what it is. */
+interface DetailRow {
+  icon: string;
+  /** Ionic palette name for the tile. */
+  color: string;
+  tone: HexAvatarTone;
+  title: string;
+  detail: string | null;
+}
+
+/** Badge tone per access level — the same hues the web access chip uses. */
+const ACCESS_TONES: Record<SessionAccess, string> = {
+  [SessionAccess.Open]: 'open',
+  [SessionAccess.Free]: 'free',
+  [SessionAccess.ClientsOnly]: 'clients',
+  [SessionAccess.GroupOnly]: 'group',
+};
+
 /**
  * One occurrence: when, where, who is coming, and the one action that makes
  * sense right now.
@@ -127,6 +152,7 @@ interface ReminderRow {
     IonNote,
     IonProgressBar,
     IonSkeletonText,
+    IonTitle,
     IonToolbar,
   ],
   templateUrl: './session-detail.html',
@@ -143,6 +169,7 @@ export class SessionDetail implements ViewWillEnter {
 
   readonly cancelOpen = signal(false);
   readonly actionsOpen = signal(false);
+  readonly editOpen = signal(false);
   readonly duplicateOpen = signal(false);
   readonly duplicatePrefill = signal<SessionPrefill | null>(null);
   readonly noteOpen = signal(false);
@@ -497,6 +524,115 @@ export class SessionDetail implements ViewWillEnter {
     () => this.instance()?.descriptionOverride ?? this.template()?.description ?? null,
   );
 
+  /** "Open" / "Free" / "Clients only" — the access level as a hero badge. */
+  readonly accessLabel = computed(() => {
+    const access = this.template()?.access;
+    return SESSION_ACCESS_OPTIONS.find((option) => option.value === access)?.label ?? null;
+  });
+
+  readonly accessTone = computed(() => {
+    const access = this.template()?.access;
+    return access ? ACCESS_TONES[access] : null;
+  });
+
+  /** The cancel banner's second line — when it happened, who heard about it. */
+  readonly cancelDetail = computed(() => {
+    const cancelledAt = this.instance()?.cancelledAt;
+    if (!cancelledAt) return 'Everyone booked in was notified.';
+    return `Cancelled ${formatSessionDayShort(cancelledAt)} · everyone booked in was notified.`;
+  });
+
+  /**
+   * The rest of what the API knows about this session, as one card — price,
+   * access, group, cancellation policy, waitlist, series, timezone. The web
+   * detail spreads these across chips and dialogs; here they read as
+   * account-style rows.
+   */
+  readonly detailRows = computed<DetailRow[]>(() => {
+    const template = this.template();
+    const instance = this.instance();
+    if (!template) return [];
+
+    const rows: DetailRow[] = [
+      {
+        icon: 'pricetag-outline',
+        color: 'success',
+        tone: HexAvatarTones.Shade,
+        title: this.price() ?? 'Free',
+        detail: 'Price per spot',
+      },
+    ];
+
+    const access = SESSION_ACCESS_OPTIONS.find(
+      (option) => option.value === template.access,
+    );
+    if (access) {
+      rows.push({
+        icon: access.icon,
+        color: 'violet',
+        tone: HexAvatarTones.Base,
+        title: access.label,
+        detail: template.approvalRequired
+          ? 'Approval needed for every booking'
+          : access.sub,
+      });
+    }
+
+    if (template.group) {
+      rows.push({
+        icon: 'people-outline',
+        color: 'info',
+        tone: HexAvatarTones.Shade,
+        title: template.group.name,
+        detail: 'Group',
+      });
+    }
+
+    rows.push({
+      icon: 'time-outline',
+      color: 'coral',
+      tone: HexAvatarTones.Base,
+      title:
+        template.cancellationCutoffHours > 0
+          ? `Cancel up to ${template.cancellationCutoffHours}h before`
+          : 'Cancel any time',
+      detail: 'Cancellation policy',
+    });
+
+    rows.push({
+      icon: 'hourglass-outline',
+      color: 'medium',
+      tone: HexAvatarTones.Base,
+      title: template.waitlistEnabled ? 'Waitlist on' : 'Waitlist off',
+      detail: template.waitlistEnabled
+        ? 'A full session queues new signups'
+        : 'Booking closes once it is full',
+    });
+
+    if (template.isRecurring) {
+      const position = instance
+        ? `Session ${instance.occurrenceIndex + 1} of the series`
+        : null;
+      rows.push({
+        icon: 'repeat-outline',
+        color: 'secondary',
+        tone: HexAvatarTones.Base,
+        title: this.recurrenceLabel() ?? 'Repeats',
+        detail: instance?.isOverride ? `${position} · edited` : position,
+      });
+    }
+
+    rows.push({
+      icon: 'globe-outline',
+      color: 'dark',
+      tone: HexAvatarTones.Base,
+      title: template.timezone,
+      detail: 'Timezone',
+    });
+
+    return rows;
+  });
+
   /** Who the message sheet is addressed to this time. */
   readonly messageAudience = signal<'all' | 'userIds'>('all');
   readonly messageOpen = signal(false);
@@ -669,6 +805,11 @@ export class SessionDetail implements ViewWillEnter {
     this.capacityOpen.set(true);
   }
 
+  /** An edit changes what this whole screen shows — refetch, don't patch. */
+  onEdited(): void {
+    this.store.reload();
+  }
+
   onCapacityChanged(): void {
     this.store.reload();
   }
@@ -705,6 +846,11 @@ export class SessionDetail implements ViewWillEnter {
         return;
       case SessionActionIds.Message:
         this.messageSignups();
+        return;
+      case SessionActionIds.Edit:
+        // The store fetched the full template on load, so the form seeds with
+        // the fields the instance's eager subset omits (recurrence, anchor).
+        this.editOpen.set(true);
         return;
       case SessionActionIds.Duplicate:
         // Opened here rather than bounced back to the agenda: this screen

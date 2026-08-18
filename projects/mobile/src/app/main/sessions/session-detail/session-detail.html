@@ -1,10 +1,9 @@
 <ion-header [translucent]="true">
-  <!-- No title up here: the band and the heading under it name the session,
-       and a toolbar title over a coloured band reads as a second header. -->
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/sessions" />
     </ion-buttons>
+    <ion-title>Session</ion-title>
     @if (instance()) {
       <ion-buttons slot="end">
         <ion-button aria-label="Session actions" (click)="openActions()">
@@ -25,9 +24,11 @@
       (action)="store.reload()"
     />
   } @else if (store.loading() && !instance()) {
-    <div class="band skeleton-band"></div>
     <div class="body">
-      <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.4rem" />
+      <div class="hero">
+        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.25rem" />
+        <ion-skeleton-text [animated]="true" style="width: 35%" />
+      </div>
       <ion-list [inset]="true" class="mh-card-list">
         @for (_ of skeletonRows; track $index) {
           <ion-item lines="full">
@@ -40,37 +41,50 @@
       </ion-list>
     </div>
   } @else if (instance()) {
-    <!-- The band is the screen's one piece of colour, keyed to where the
-         session happens and whether it still stands. The chips on it say what
-         this is, in the order you need it: state, type, then place. -->
-    <div
-      class="band"
-      [class.online]="isOnline()"
-      [class.past]="lifecycle() === 'past'"
-      [class.cancelled]="isCancelled()"
-    >
-      <div class="chips">
-        @if (statusChip(); as status) {
-          <ion-badge [attr.data-tone]="status.tone">{{ status.label }}</ion-badge>
-        }
-        <ion-badge data-tone="type">{{ typeLabel() }}</ion-badge>
-        @if (isOnline()) {
-          <ion-badge data-tone="place">{{ providerLabel() }}</ion-badge>
+    <div class="body">
+      <!-- The hero carries what the band used to: the badges say what this
+           is, in the order you need it — state, type, then place — with the
+           name under them. Same card the account page opens with. -->
+      <div class="hero">
+        <div class="hero-badges">
+          @if (statusChip(); as status) {
+            <ion-badge [attr.data-tone]="status.tone">{{ status.label }}</ion-badge>
+          }
+          <ion-badge data-tone="type">{{ typeLabel() }}</ion-badge>
+          @if (accessLabel(); as access) {
+            <ion-badge [attr.data-tone]="accessTone()">{{ access }}</ion-badge>
+          }
+          @if (isOnline()) {
+            <ion-badge data-tone="place">{{ providerLabel() }}</ion-badge>
+          }
+        </div>
+        <h2 class="hero-name">{{ title() }}</h2>
+        @if (lifecycle() === 'past') {
+          <!-- Once it is over, when and where fit on one line — nothing in
+               them is actionable any more, and the register below is the point. -->
+          <p class="meta">{{ metaLine() }}</p>
         }
       </div>
-    </div>
 
-    <div class="body">
-      <h1>{{ title() }}</h1>
+      @if (isCancelled()) {
+        <!-- The same reason the web banner shows — the one fact a cancelled
+             session still owes its coach. -->
+        <div class="full-banner">
+          <ion-icon name="close-circle-outline" aria-hidden="true" />
+          <div>
+            <strong>Session cancelled</strong>
+            @if (instance()?.cancelReason; as reason) {
+              <span class="reason">“{{ reason }}”</span>
+            }
+            <span>{{ cancelDetail() }}</span>
+          </div>
+        </div>
+      }
 
-      @if (lifecycle() === 'past') {
-        <!-- Once it is over, when and where fit on one line — nothing in them
-             is actionable any more, and the register below is the point. -->
-        <p class="meta">{{ metaLine() }}</p>
-      } @else {
+      @if (lifecycle() !== 'past') {
         <ion-list [inset]="true" class="mh-card-list">
           <ion-item lines="full">
-            <ion-icon slot="start" name="calendar-outline" color="medium" aria-hidden="true" />
+            <mh-hex-avatar slot="start" size="sm" icon="calendar-outline" color="info" tone="shade" aria-hidden="true" />
             <ion-label>
               <h3>{{ startLine() }}</h3>
               @if (scheduleDetail(); as detail) {
@@ -81,7 +95,7 @@
 
           @if (isOnline()) {
             <ion-item lines="none">
-              <ion-icon slot="start" name="videocam-outline" color="primary" aria-hidden="true" />
+              <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="primary" aria-hidden="true" />
               <ion-label>
                 @if (meetingUrl(); as url) {
                   <!-- The link itself is the row: the CTA below joins, and what
@@ -101,7 +115,7 @@
             </ion-item>
           } @else {
             <ion-item lines="none">
-              <ion-icon slot="start" name="location-outline" color="primary" aria-hidden="true" />
+              <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" aria-hidden="true" />
               <ion-label>
                 <h3>{{ locationLabel() }}</h3>
                 @if (venueCity(); as city) {
@@ -123,15 +137,42 @@
         </div>
       }
 
+      <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
+        Details
+      </ion-note>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (row of detailRows(); track $index; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <mh-hex-avatar
+              slot="start"
+              size="sm"
+              [icon]="row.icon"
+              [color]="row.color"
+              [tone]="row.tone"
+              aria-hidden="true"
+            />
+            <ion-label>
+              <h3>{{ row.title }}</h3>
+              @if (row.detail) {
+                <p>{{ row.detail }}</p>
+              }
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+
       @if (reminders().length > 0) {
-        <div class="mh-section-label">Reminders</div>
+        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
+          Reminders
+        </ion-note>
         <ion-list [inset]="true" class="mh-card-list">
           @for (reminder of reminders(); track reminder.label; let last = $last) {
             <ion-item [lines]="last ? 'none' : 'full'">
-              <ion-icon
+              <mh-hex-avatar
                 slot="start"
-                name="notifications-outline"
-                color="medium"
+                size="sm"
+                icon="notifications-outline"
+                color="primary"
                 aria-hidden="true"
               />
               <ion-label>
@@ -160,7 +201,9 @@
       }
 
       @if (lifecycle() !== 'past') {
-        <div class="mh-section-label">Spots</div>
+        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
+          Spots
+        </ion-note>
         <div class="spots">
           <ion-progress-bar [value]="fillPercent() / 100" />
           <span class="count">{{ spotsLabel() }}</span>
@@ -179,12 +222,12 @@
         </div>
       }
 
-      <div class="mh-section-label">
+      <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
         {{ canMarkAttendance() ? 'Attendance' : 'Attendees' }}
         @if (counts().pending > 0) {
           <ion-badge color="secondary">{{ counts().pending }} pending</ion-badge>
         }
-      </div>
+      </ion-note>
 
       @if (editingAttendance() && attendees().length > 0) {
         <ion-note class="mh-note-block">
@@ -213,6 +256,10 @@
               />
               <ion-label>
                 <h3>{{ nameOf(participant) }}</h3>
+                @if (participant.bookingNote; as note) {
+                  <!-- What they wrote when booking — their words, so quoted. -->
+                  <p class="booking-note">“{{ note }}”</p>
+                }
                 @if (canMarkAttendance() && showsNote(participant)) {
                   <!-- The design's note card is session-level, which does not
                        exist; `privateNote` is per-participant, owner-only, and
@@ -291,10 +338,10 @@
       }
 
       @if (waitlist().length > 0) {
-        <div class="mh-section-label">
+        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
           Waitlist
           <ion-badge color="medium">{{ waitlist().length }}</ion-badge>
-        </div>
+        </ion-note>
 
         <ion-list [inset]="true" class="mh-card-list">
           @for (participant of waitlist(); track participant.id; let i = $index; let last = $last) {
@@ -303,6 +350,9 @@
               <ion-label>
                 <h3>{{ nameOf(participant) }}</h3>
                 <p>Waiting since {{ waitingSince(participant) }}</p>
+                @if (participant.bookingNote; as note) {
+                  <p class="booking-note">“{{ note }}”</p>
+                }
               </ion-label>
               <!-- Not "Promote": no endpoint reaches the promotion service, and
                    approveParticipant only accepts PENDING_APPROVAL rows. -->
@@ -338,7 +388,9 @@
         <!-- What signups read before booking. The design's card here is a note
              to attendees, which no field backs — this is the one piece of the
              coach's own writing the session actually carries. -->
-        <div class="mh-section-label">Description</div>
+        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
+          Description
+        </ion-note>
         <ion-list [inset]="true" class="mh-card-list">
           <ion-item lines="none">
             <ion-label class="description">{{ text }}</ion-label>
@@ -416,6 +468,8 @@
 />
 
 <mh-session-form-sheet [(open)]="duplicateOpen" [prefill]="duplicatePrefill()" />
+
+<mh-session-form-sheet [(open)]="editOpen" [template]="template()" (saved)="onEdited()" />
 
 <mh-participant-note-sheet
   [(open)]="noteOpen"

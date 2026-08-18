@@ -15,13 +15,13 @@
   <ion-toolbar>
     <ion-title>Sessions</ion-title>
     <ion-buttons slot="end">
-      <mh-notification-bell />
-      <ion-button class="round" shape="round" aria-label="Search sessions" (click)="openSearch()">
+      <mh-notification-bell class="round" />
+      <ion-button shape="round" aria-label="Search sessions" (click)="openSearch()">
         <ion-icon slot="icon-only" name="search-outline" />
       </ion-button>
       <!-- The one filled control in the header: creating is the page's
              primary action, and honey is what this product paints those. -->
-      <ion-button class="round create" shape="round" fill="solid" color="primary" aria-label="New session"
+      <ion-button class="round" shape="round" fill="solid" color="primary" aria-label="New session"
         (click)="openCreate()">
         <ion-icon slot="icon-only" name="add-outline" />
       </ion-button>
@@ -116,14 +116,14 @@
     <!-- Scrolls sideways rather than wrapping: a second chip row would
                push the first session below the fold. -->
     <div class="chip-row">
-      <ion-chip class="filters" [class.active]="filterCount() > 0" [outline]="true" (click)="openFilters()">
-        <ion-icon name="funnel-outline" aria-hidden="true" />
+      <ion-button class="filters" fill="clear" shape="round" size="small" [class.active]="filterCount() > 0"
+        (click)="openFilters()">
+        <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
         Filters@if (filterCount() > 0) { · {{ filterCount() }} }
-      </ion-chip>
+      </ion-button>
 
       @for (option of locationFilters; track option.label) {
-      <ion-chip [outline]="filters().locationKind !== option.value"
-        [color]="filters().locationKind === option.value ? 'secondary' : 'medium'"
+      <ion-chip [class.selected]="filters().locationKind === option.value"
         [attr.aria-pressed]="filters().locationKind === option.value" (click)="setLocation(option.value)">
         {{ option.label }}
       </ion-chip>
@@ -216,7 +216,7 @@
 </ion-content>
 
 <mh-session-form-sheet [(open)]="createOpen" [initialStart]="createStart()" [prefill]="createPrefill()"
-  (created)="onCreated()" />
+  (saved)="onCreated()" />
 
 <mh-message-signups-sheet [(open)]="messageOpen" [instanceId]="messageInstanceId()" />
 

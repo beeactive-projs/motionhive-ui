@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   LOCATION_KIND_OPTIONS,
+  SESSION_ACCESS_OPTIONS,
   SESSION_ACTIONS,
   SESSION_ICONS,
   SESSION_TYPE_OPTIONS,
@@ -16,6 +17,16 @@ const templates = import.meta.glob('./**/*.html', {
   eager: true,
 }) as Record<string, string>;
 
+/**
+ * The component sources too — the detail screen assembles its rows in
+ * TypeScript (`detailRows`), so their icon names never appear in a template.
+ */
+const sources = import.meta.glob(['./**/*.ts', '!./**/*.spec.ts'], {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
 /** `person-outline` → `personOutline`, the key `addIcons()` registers under. */
 function toCamelCase(name: string): string {
   return name.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
@@ -24,10 +35,11 @@ function toCamelCase(name: string): string {
 /**
  * Icon names this feature can render.
  *
- * Three sources, because a name reaches `ion-icon` three ways here: a static
- * attribute, a kebab literal inside a conditional binding, and the `icon` field
- * on the option constants the create sheet iterates — that last one lives in
- * TypeScript, so no amount of template scanning would find it.
+ * Four sources, because a name reaches `ion-icon` four ways here: a static
+ * attribute, a kebab literal inside a conditional binding, the `icon` field
+ * on the option constants the create sheet iterates, and `icon:` literals on
+ * rows components build in TypeScript — those last two live outside the
+ * templates, so no amount of template scanning would find them.
  */
 function iconNamesUsed(): string[] {
   const names = new Set<string>();
@@ -43,9 +55,16 @@ function iconNamesUsed(): string[] {
     }
   }
 
+  for (const ts of Object.values(sources)) {
+    for (const match of ts.matchAll(/\bicon: '([a-z][a-z0-9-]*)'/g)) {
+      names.add(match[1]);
+    }
+  }
+
   for (const option of [
     ...SESSION_TYPE_OPTIONS,
     ...LOCATION_KIND_OPTIONS,
+    ...SESSION_ACCESS_OPTIONS,
     ...SESSION_ACTIONS,
   ]) {
     names.add(option.icon);

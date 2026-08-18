@@ -98,13 +98,13 @@ h1 {
    Every list screen has a few; ion-list-header is a row with its own type
    scale, not a standalone label. */
 .mh-section-label {
-  padding: 1rem 1.5rem 0.375rem;
+  padding: 1rem 0.375rem 0.375rem;
   color: var(--ion-color-medium);
   font-family: var(--mh-font-mono);
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  /* letter-spacing: 0.08em;
+  text-transform: uppercase; */
 }
 
 /* A standalone line of explanatory text between blocks. `ion-note` is inline

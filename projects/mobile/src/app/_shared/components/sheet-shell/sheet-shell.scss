@@ -22,6 +22,56 @@ ion-title {
   text-align: center;
 }
 
+// The form-sheet header: title over its summary line, start-aligned, with the
+// close circle keeping the right edge. Only rendered when `subtitle` is set.
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1rem;
+}
+
+.heading-title {
+  font-family: var(--mh-font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.heading-subtitle {
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// The header's text action — honey ink so it reads as a link, not a button.
+// Ionic's disabled state supplies the faded look on its own.
+.header-action {
+  --color: var(--mh-color-honey-deep);
+  margin-inline-end: 0.375rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+// A quiet grey circle, per the design — not a bare toolbar glyph. `shape=round`
+// also keeps it clear of the global control-radius pin in styles.css.
+.close {
+  --color: var(--ion-color-medium);
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-inline-end: 0.375rem;
+}
+
+.close ion-icon {
+  font-size: 1.125rem;
+}
+
 // The action bar. A hairline holds it apart from the body scrolling under it,
 // and the row gets its own padding because the buttons are the bar now rather
 // than toolbar-sized text.

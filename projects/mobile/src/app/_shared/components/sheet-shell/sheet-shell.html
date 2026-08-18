@@ -6,12 +6,28 @@
     @if (showHeader()) {
     <ion-header class="ion-no-border">
       <ion-toolbar>
-        <ion-title>{{ title() }}</ion-title>
-        <!-- <ion-buttons slot="end">
-          <ion-button aria-label="Close" (click)="dismiss()">
+        @if (subtitle() || actionLabel()) {
+        <div class="heading">
+          <span class="heading-title">{{ title() }}</span>
+          @if (subtitle()) {
+          <span class="heading-subtitle">{{ subtitle() }}</span>
+          }
+        </div>
+        <ion-buttons slot="end">
+          @if (actionLabel()) {
+          <ion-button fill="clear" class="header-action" [disabled]="actionDisabled()" (click)="action.emit()">
+            {{ actionLabel() }}
+          </ion-button>
+          }
+          @if (subtitle()) {
+          <ion-button class="close" shape="round" aria-label="Close" (click)="dismiss()">
             <ion-icon slot="icon-only" name="close" />
           </ion-button>
-        </ion-buttons> -->
+          }
+        </ion-buttons>
+        } @else {
+        <ion-title>{{ title() }}</ion-title>
+        }
       </ion-toolbar>
     </ion-header>
     }

@@ -35,6 +35,8 @@ ion-note {
   font-size: 0.75rem;
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding: 0;
+  margin: 10px 0px;
 }
 
 // Whatever the value does, the label keeps its own line and its own space.

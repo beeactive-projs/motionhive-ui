@@ -54,6 +54,12 @@ import { close } from 'ionicons/icons';
 export class SheetShell {
   readonly open = model(false);
   readonly title = input.required<string>();
+  /**
+   * One-line summary under the title — "One-off · Thu 21 May". Setting it also
+   * switches the header to the design's left-aligned form-sheet layout; empty
+   * keeps the centred single-line title the simpler sheets use.
+   */
+  readonly subtitle = input('');
   /** The sheet's fields, declared by the consumer as `<ng-template #body>`. */
   readonly body = input.required<TemplateRef<unknown>>();
   readonly saveLabel = input('Save');
@@ -83,8 +89,16 @@ export class SheetShell {
   readonly flushBody = input(false);
   readonly breakpoints = input<readonly number[]>([0, 0.6, 0.95]);
   readonly initialBreakpoint = input(0.6);
+  /**
+   * Text action at the header's right edge — the filter sheet's "Reset".
+   * Setting it also moves the title to the start edge, same as `subtitle`,
+   * since a centred title would sit under the action.
+   */
+  readonly actionLabel = input('');
+  readonly actionDisabled = input(false);
 
   readonly save = output<void>();
+  readonly action = output<void>();
 
   private readonly _modal = viewChild(IonModal);
 

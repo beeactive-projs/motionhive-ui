@@ -19,22 +19,59 @@
     fill="outline"
     placeholder="Morning yoga flow"
     autocapitalize="sentences"
+    aria-label="Title"
     [value]="title()"
     (ionInput)="title.set($event.detail.value ?? '')"
   />
 
-  <div class="mh-section-label">When</div>
-  <ion-item lines="none" class="field">
-    <ion-label>Starts</ion-label>
-    <ion-datetime-button slot="end" datetime="session-start" />
-  </ion-item>
+  <div class="mh-section-label">Description</div>
+  <ion-textarea
+    fill="outline"
+    placeholder="What signups should know — optional"
+    autocapitalize="sentences"
+    aria-label="Description"
+    [autoGrow]="true"
+    [rows]="2"
+    [value]="description()"
+    (ionInput)="description.set($event.detail.value ?? '')"
+  />
 
-  <!-- Detached from the item on purpose: Ionic relocates a modal when it
+  <div class="mh-section-label">When</div>
+  <div class="when">
+    <ion-button
+      fill="outline"
+      class="field-button"
+      aria-label="Starts"
+      [disabled]="isEdit()"
+      (click)="startOpen.set(true)"
+    >
+      {{ startLabel() }}
+    </ion-button>
+    <ion-button
+      fill="outline"
+      class="field-button"
+      aria-label="Duration"
+      (click)="durationOpen.set(true)"
+    >
+      {{ durationLabel(durationMinutes()) }}
+    </ion-button>
+  </div>
+
+  @if (isEdit()) {
+    <!-- The update endpoint has no way to move `firstStartAt` — same as web,
+         where edits keep the anchor and only recreate can move it. -->
+    <p class="mh-helper">Start time can't be changed — duplicate the session to move it.</p>
+  }
+
+  <!-- Detached from the trigger on purpose: Ionic relocates a modal when it
        presents, so it cannot live inside the row it belongs to. -->
-  <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
+  <ion-modal
+    class="mh-picker-modal"
+    [isOpen]="startOpen()"
+    (didDismiss)="startOpen.set(false)"
+  >
     <ng-template>
       <ion-datetime
-        id="session-start"
         presentation="date-time"
         [showDefaultButtons]="true"
         [value]="startAt()"
@@ -43,14 +80,7 @@
     </ng-template>
   </ion-modal>
 
-  <ion-item lines="none" class="field">
-    <ion-label>Duration</ion-label>
-    <ion-button slot="end" class="picker-trigger" (click)="durationOpen.set(true)">
-      {{ durationLabel(durationMinutes()) }}
-    </ion-button>
-  </ion-item>
-
-  <!-- Detached for the same reason as the date modal above. -->
+  <!-- Detached for the same reason as the start picker above. -->
   <ion-modal
     class="mh-picker-modal"
     [isOpen]="durationOpen()"
@@ -94,19 +124,36 @@
   </ion-modal>
 
   <ion-item lines="none" class="field">
+    <ion-select
+      label="Timezone"
+      interface="modal"
+      aria-label="Timezone"
+      [value]="timezone()"
+      (ionChange)="timezone.set($event.detail.value)"
+    >
+      @for (option of timezones; track option.value) {
+        <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item lines="none" class="field repeat" [class.on]="isRecurring()">
+    <ion-icon slot="start" name="repeat-outline" aria-hidden="true" />
     <ion-toggle
       justify="space-between"
       [checked]="isRecurring()"
+      [disabled]="isEdit()"
       (ionChange)="isRecurring.set($event.detail.checked)"
     >
       <ion-label>
         <h3>{{ isRecurring() ? 'Repeats weekly' : "Doesn't repeat" }}</h3>
-        <p>Toggle to set up a series</p>
+        <p>{{ repeatSub() }}</p>
       </ion-label>
     </ion-toggle>
   </ion-item>
 
   @if (isRecurring()) {
+    <div class="mh-section-label">On days</div>
     <div class="days">
       @for (day of weekdays; track day.value) {
         <button
@@ -122,31 +169,31 @@
     </div>
 
     <div class="mh-section-label">Ends</div>
-    <div class="chips">
+    <ion-segment
+      mode="ios"
+      class="ends"
+      [value]="endMode()"
+      (ionChange)="onEndModeChange($event.detail.value)"
+    >
       @for (option of endOptions; track option.value) {
-        <ion-chip
-          [outline]="endMode() !== option.value"
-          [color]="endMode() === option.value ? 'secondary' : 'medium'"
-          [attr.aria-pressed]="endMode() === option.value"
-          (click)="setEndMode(option.value)"
-        >
-          {{ option.label }}
-        </ion-chip>
+        <ion-segment-button [value]="option.value">
+          <ion-label>{{ option.label }}</ion-label>
+        </ion-segment-button>
       }
-    </div>
+    </ion-segment>
 
     @if (endMode() === EndModes.After) {
-      <div class="chips">
-        @for (count of occurrenceChoices; track count) {
-          <ion-chip
-            [outline]="endAfterOccurrences() !== count"
-            [color]="endAfterOccurrences() === count ? 'primary' : 'medium'"
-            [attr.aria-pressed]="endAfterOccurrences() === count"
-            (click)="endAfterOccurrences.set(count)"
-          >
-            {{ count }}
-          </ion-chip>
-        }
+      <div class="inline-number">
+        <ion-input
+          class="count"
+          fill="outline"
+          type="number"
+          inputmode="numeric"
+          aria-label="Occurrences"
+          [value]="endAfterOccurrences()"
+          (ionInput)="setOccurrences($event.detail.value)"
+        />
+        <span>occurrences</span>
       </div>
     } @else if (endMode() === EndModes.OnDate) {
       <ion-item lines="none" class="field">
@@ -168,7 +215,7 @@
       </ion-modal>
     }
 
-    <ion-note class="summary">{{ recurrenceSummary() }}</ion-note>
+    <p class="rule-summary">“{{ recurrenceSummary() }}”</p>
 
     @if (previewDates().length > 0) {
       <!-- Straight from `preview-recurrence`, not expanded here: the server owns
@@ -176,7 +223,7 @@
       <div class="mh-section-label">Preview</div>
       <div class="chips">
         @for (date of previewDates(); track $index) {
-          <ion-chip [outline]="true" color="medium">{{ date }}</ion-chip>
+          <ion-chip class="preview-chip">{{ date }}</ion-chip>
         }
         @if (previewMore() > 0) {
           <span class="more">+ {{ previewMore() }} more</span>
@@ -190,7 +237,7 @@
     @for (option of locationOptions; track option.value) {
       <button
         type="button"
-        class="tile"
+        class="tile row"
         [class.selected]="locationKind() === option.value"
         (click)="locationKind.set(option.value)"
       >
@@ -206,6 +253,7 @@
       type="url"
       inputmode="url"
       placeholder="https://meet.google.com/…"
+      aria-label="Meeting link"
       [value]="meetingUrl()"
       (ionInput)="meetingUrl.set($event.detail.value ?? '')"
     />
@@ -227,44 +275,145 @@
     </ion-item>
   }
 
-  <div class="mh-section-label">Capacity &amp; price</div>
+  <div class="mh-section-label">Who can book</div>
+  <div class="tiles two">
+    @for (option of accessOptions; track option.value) {
+      <button
+        type="button"
+        class="tile row"
+        [class.selected]="access() === option.value"
+        (click)="access.set(option.value)"
+      >
+        <ion-icon [name]="option.icon" aria-hidden="true" />
+        <span>{{ option.label }}</span>
+      </button>
+    }
+  </div>
+  <p class="mh-helper">{{ accessSub() }}</p>
+
+  @if (needsGroup()) {
+    @if (groups().length > 0) {
+      <ion-item lines="none" class="field">
+        <ion-select
+          label="Group"
+          interface="action-sheet"
+          placeholder="Pick a group"
+          [value]="groupId()"
+          (ionChange)="groupId.set($event.detail.value)"
+        >
+          @for (group of groups(); track group.id) {
+            <ion-select-option [value]="group.id">{{ group.name }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+    } @else if (access() === Accesses.GroupOnly) {
+      <p class="mh-helper">You don't have a group yet — group members access needs one.</p>
+    }
+  }
+
+  <ion-item lines="none" class="field">
+    <ion-toggle
+      justify="space-between"
+      [checked]="approvalRequired()"
+      (ionChange)="approvalRequired.set($event.detail.checked)"
+    >
+      <ion-label>
+        <h3>Approval required</h3>
+        <p>You confirm each signup before it books.</p>
+      </ion-label>
+    </ion-toggle>
+  </ion-item>
+
   <div class="pair">
     @if (showCapacity()) {
+      <div>
+        <div class="mh-section-label">Capacity</div>
+        <ion-input
+          fill="outline"
+          type="number"
+          inputmode="numeric"
+          placeholder="12"
+          aria-label="Spots"
+          [value]="capacity()"
+          (ionInput)="capacity.set(toNumber($event.detail.value))"
+        >
+          <span slot="end" class="unit">spots</span>
+        </ion-input>
+      </div>
+    }
+    <div>
+      <div class="mh-section-label">Price</div>
       <ion-input
         fill="outline"
         type="number"
-        inputmode="numeric"
-        label="Spots"
-        labelPlacement="stacked"
-        [value]="capacity()"
-        (ionInput)="capacity.set(toNumber($event.detail.value))"
-      />
-    }
-    <ion-input
-      fill="outline"
-      type="number"
-      inputmode="decimal"
-      label="Price"
-      labelPlacement="stacked"
-      placeholder="0"
-      [value]="priceAmount()"
-      (ionInput)="priceAmount.set(toNumber($event.detail.value))"
-    />
+        inputmode="decimal"
+        placeholder="0"
+        aria-label="Price"
+        [value]="priceAmount()"
+        (ionInput)="priceAmount.set(toNumber($event.detail.value))"
+      >
+        <ion-select
+          slot="end"
+          class="currency"
+          interface="action-sheet"
+          aria-label="Currency"
+          [value]="priceCurrency()"
+          (ionChange)="priceCurrency.set($event.detail.value)"
+        >
+          @for (currency of currencies; track currency) {
+            <ion-select-option [value]="currency">{{ currency }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-input>
+    </div>
   </div>
   <p class="mh-helper">
     Price is shown to signups. Taking payment isn't wired up yet, so nothing is charged.
   </p>
 
-  @if (conflictWarning(); as warning) {
+  @if (showCapacity()) {
+    <ion-item lines="none" class="field">
+      <ion-toggle
+        justify="space-between"
+        [checked]="waitlistEnabled()"
+        (ionChange)="waitlistEnabled.set($event.detail.checked)"
+      >
+        <ion-label>
+          <h3>Waitlist</h3>
+          <p>Queue signups once it's full.</p>
+        </ion-label>
+      </ion-toggle>
+    </ion-item>
+  }
+
+  <div class="mh-section-label">Cancellation</div>
+  <div class="inline-number">
+    <ion-input
+      class="count"
+      fill="outline"
+      type="number"
+      inputmode="numeric"
+      aria-label="Cancellation cutoff"
+      [value]="cancellationCutoffHours()"
+      (ionInput)="setCutoffHours($event.detail.value)"
+    />
+    <span>hours before start — signups can cancel until then</span>
+  </div>
+
+  @if (conflict(); as warning) {
     <!-- Advisory, never blocking: an overlap is the coach's call, which is how
          the API treats it too — it warns after creating rather than refusing. -->
-    <p class="conflict-warning">{{ warning }}</p>
+    <div class="conflict-warning">
+      <strong>{{ warning.title }}</strong>
+      <span>{{ warning.detail }}</span>
+    </div>
   }
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
   [title]="sheetTitle()"
+  [subtitle]="sheetSubtitle()"
   [saveLabel]="saveLabel()"
   [body]="body"
   [canSave]="canSave()"
