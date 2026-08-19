@@ -1,0 +1,6 @@
+/* `ion-datetime-button` renders its pill into shadow DOM, out of reach of the
+   control-radius rules; `::part` is the documented way in. Without this it
+   keeps Ionic's 8px while the trigger beside it takes the control radius. */
+ion-datetime-button::part(native) {
+  border-radius: var(--mh-radius-control);
+}

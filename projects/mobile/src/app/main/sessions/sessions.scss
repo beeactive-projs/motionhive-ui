@@ -15,7 +15,7 @@ ion-buttons ion-button.round {
   gap: 0.375rem;
   padding: 0 1.25rem 0.5rem;
   color: var(--ion-color-medium);
-  font-size: 0.75rem;
+  font-size: var(--mh-text-sm);
 }
 
 .summary b {
@@ -51,21 +51,21 @@ ion-buttons ion-button.round {
 .controls .month {
   display: inline-flex;
   align-items: center;
-  gap: 0.15rem;
+  gap: 0.125rem;
   margin-inline-end: auto;
   min-width: 0;
   padding: 0;
   border: none;
   background: none;
   color: var(--mh-color-honey-deep);
-  font-size: 0.9rem;
+  font-size: var(--mh-text-base);
   font-weight: 700;
   text-align: start;
   white-space: nowrap;
 }
 
 .controls .month ion-icon {
-  font-size: 0.7rem;
+  font-size: var(--mh-text-sm);
 }
 
 /* Paired with the segment beside it: same track colour, same 30px, so the two
@@ -80,7 +80,7 @@ ion-buttons ion-button.round {
   border-radius: var(--mh-radius-pill);
   background: var(--mh-color-divider);
   color: var(--ion-color-dark);
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
 }
 
@@ -115,7 +115,7 @@ ion-buttons ion-button.round {
   flex: none;
   width: auto;
   grid-auto-columns: max-content;
-  padding: 0.1875rem;
+  padding: 0.25rem;
   border-radius: var(--mh-radius-control);
 
   &.pr-5 {
@@ -126,15 +126,15 @@ ion-buttons ion-button.round {
 .view ion-segment-button {
   --indicator-height: 0;
   /* Concentric with the track: the outer radius less the padding it sits in. */
-  --border-radius: calc(var(--mh-radius-control) - 0.1875rem);
+  --border-radius: calc(var(--mh-radius-control) - 0.25rem);
   --padding-start: 0.75rem;
   --padding-end: 0.75rem;
   min-width: 0;
   min-height: 0;
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
   letter-spacing: normal;
-  line-height: 1;
+  line-height: var(--mh-leading-none);
   & ion-label {
     margin: 0;
   }
@@ -172,7 +172,7 @@ ion-buttons ion-button.round {
    anywhere. Today takes the wash, the selection takes the solid honey, and a
    day that is both — the common case — resolves to the solid one below. */
 .week .day.today {
-  background: var(--mh-chip-warning-background);
+  background: var(--mh-color-selected-background);
 }
 
 .week .day.today .initial,
@@ -187,16 +187,16 @@ ion-buttons ion-button.round {
 .week .initial {
   color: var(--ion-color-medium);
   font-family: var(--mh-font-mono);
-  font-size: 0.6rem;
+  font-size: var(--mh-text-xs);
   font-weight: 600;
 }
 
 /* The strip's anchor: at a glance you read the numbers, not the letters. */
 .week .date {
   font-family: var(--mh-font-heading);
-  font-size: 1.15rem;
+  font-size: var(--mh-text-lg);
   font-weight: 700;
-  line-height: 1;
+  line-height: var(--mh-leading-none);
 }
 
 .week .day.selected .initial,
@@ -208,7 +208,7 @@ ion-buttons ion-button.round {
    action colour and must not be spent saying "busy". */
 .week .dots {
   display: flex;
-  gap: 0.1rem;
+  gap: 0.125rem;
   height: 0.25rem;
 }
 
@@ -262,8 +262,7 @@ ion-buttons ion-button.round {
 .chip-row ion-chip {
   flex: none;
   margin: 0;
-  // height: 1.9rem;
-  font-size: 0.75rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
   --background: var(--ion-color-medium-wash);
   --color: var(--ion-color-medium-wash-contrast);
@@ -291,7 +290,7 @@ ion-buttons ion-button.round {
   height: 2rem;
   min-height: 0;
   margin: 0;
-  font-size: 0.75rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
@@ -303,7 +302,7 @@ ion-buttons ion-button.round {
 }
 
 .chip-row .filters ion-icon {
-  font-size: 0.9rem;
+  font-size: var(--mh-text-base);
 }
 
 .agenda {
@@ -324,7 +323,6 @@ ion-buttons ion-button.round {
 
 .day-header .mh-kicker {
   color: var(--ion-color-medium);
-  text-transform: uppercase;
 }
 
 .day-header.today .mh-kicker {
@@ -332,7 +330,7 @@ ion-buttons ion-button.round {
 }
 
 .day-header ion-note {
-  font-size: 0.68rem;
+  font-size: var(--mh-text-sm);
 }
 
 .skeleton {

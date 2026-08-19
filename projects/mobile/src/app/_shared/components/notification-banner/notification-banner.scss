@@ -41,7 +41,7 @@
   display: block;
   overflow: hidden;
   color: var(--ion-text-color);
-  font-size: 0.85rem;
+  font-size: var(--mh-text-base);
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -52,8 +52,8 @@
   margin-top: 0.125rem;
   overflow: hidden;
   color: var(--ion-color-medium);
-  font-size: 0.78rem;
-  line-height: 1.4;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
   /* Two lines, then clipped — a long body must not push the banner down the
      screen. */
   -webkit-box-orient: vertical;
@@ -66,8 +66,8 @@
   border: 0;
   background: none;
   color: var(--ion-color-medium);
-  font-size: 1.05rem;
-  line-height: 1;
+  font-size: var(--mh-text-md);
+  line-height: var(--mh-leading-none);
 }
 
 @keyframes mh-banner-in {

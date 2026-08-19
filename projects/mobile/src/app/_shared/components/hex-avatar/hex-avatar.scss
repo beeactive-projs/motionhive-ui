@@ -17,17 +17,17 @@
 
 :host([data-size='sm']) {
   width: 1.875rem;
-  font-size: 0.7rem;
+  font-size: var(--mh-text-sm);
 }
 
 :host([data-size='lg']) {
   width: 3.25rem;
-  font-size: 1rem;
+  font-size: var(--mh-text-md);
 }
 
 :host([data-size='xl']) {
   width: 5rem;
-  font-size: 1.5rem;
+  font-size: var(--mh-text-2xl);
 }
 
 :host([data-size='2xl']) {
@@ -52,16 +52,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
+  line-height: var(--mh-leading-none);
 }
 
 ion-icon {
-  font-size: 1.25rem;
+  font-size: var(--mh-text-xl);
 }
 
 // The glyph tracks the hexagon rather than sitting lost inside a large tile.
 :host([data-size='sm']) ion-icon {
-  font-size: 0.9375rem;
+  font-size: var(--mh-text-md);
 }
 
 :host([data-size='xl']) ion-icon {

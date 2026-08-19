@@ -1,0 +1,56 @@
+/* Layout primitives — the page owns placement, components stay margin-free.
+   Component skins (theme/components/) never carry margins; a screen opts
+   into these wrappers and gets the app's one gutter and one rhythm.
+
+   .mh-page    the scrolling column: page gutter + vertical rhythm between
+               blocks (hero, sections, cards, footer notes). Direct child of
+               ion-content, around everything except slot="fixed" elements
+               (refresher) and modals/sheets.
+   .mh-section a label glued to its block (kicker/section-label + card-list).
+               Sits inside .mh-page; the page gap separates sections, the
+               section gap binds the label to its list. */
+
+.mh-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.mh-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Inside a section the label's own block padding would double the spacing the
+   section gap already provides — the inline padding stays, aligning the text
+   optically with the list border beside row content. */
+.mh-section > .mh-section-label,
+.mh-section > .mh-kicker {
+  padding-block: 0;
+}
+
+/* Kickers used as section labels get the same inline alignment. */
+.mh-section > .mh-kicker {
+  padding-inline: 0.875rem;
+}
+
+/* The page gutter already indents the note; keep only a whisper of inset so
+   explanatory text doesn't span edge-to-edge. */
+.mh-page > .mh-note-block,
+.mh-section > .mh-note-block {
+  padding: 0 0.5rem;
+}
+
+.mh-page > .mh-footnote,
+.mh-section > .mh-footnote {
+  padding-inline: 0.5rem;
+}
+
+/* `ion-list-header` (inside mh-section-header) brings Ionic's own 1rem start
+   padding, sized for a full-bleed page; inside the gutter it only needs the
+   label inset the other section labels get. */
+.mh-page mh-section-header ion-list-header {
+  padding-inline-start: 0.375rem;
+}

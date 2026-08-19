@@ -1,217 +1,409 @@
 /*
  * MotionHive brand theme for Ionic.
  *
- * Hex values are copied from the workspace palette source of truth:
- * projects/core/src/styles/theme-colors.ts (honey primary, navy, success,
- * warning, danger). A change there means updating this file too.
+ * ── The variable standard (four tiers, use the highest that fits) ──────────
  *
- * Shade/tint variants follow Ionic's color generator formula:
- * shade = mix(color, black, 12%), tint = mix(color, white, 10%).
- * Contrast colors are chosen for WCAG AA on the base color.
+ * 1. Ionic tokens. If Ionic names it, use Ionic's name: global tokens
+ *    (`--ion-background-color`, `--ion-text-color`, `--ion-border-color`),
+ *    per-component variables (`--background`, `--border-radius`, …) and the
+ *    semantic colour attribute (`color="primary"`). Never invent a parallel
+ *    variable for something Ionic already exposes.
+ *
+ * 2. Ionic colour slots — extended, not bypassed. Every hue goes through
+ *    `--ion-color-<name>` (+ `-rgb`, `-contrast`, `-shade`, `-tint` and the
+ *    `.ion-color-<name>` class block). Custom hues (info, violet, teal,
+ *    coral) join the same system. Soft fills for chips, badges and tiles use
+ *    the wash extension: `--ion-color-<name>-wash` + `-wash-contrast` —
+ *    the mobile equivalent of web's `bg-sky-100 text-sky-700` tag idiom.
+ *
+ * 3. Ramps — `--mh-<scale>-<step>`, mirrored byte-for-byte from the
+ *    workspace palette source of truth (projects/core/src/styles/
+ *    theme-colors.ts; a change there means updating here too). Ramps are
+ *    ABSOLUTE — they do not flip in dark mode — and exist so every token
+ *    below is derived by `var()` reference instead of a pasted hex.
+ *    Component SCSS must not read a ramp step directly: a raw step has no
+ *    dark-mode story. Needing one is the signal to mint a role token here.
+ *
+ * 4. Role tokens — `--mh-*`, only for what Ionic has no slot for: fonts,
+ *    radius (Ionic has no global radius token), the divider hairline, the
+ *    deep honey accent ink, the selection fill. Each is defined once here,
+ *    references ramp steps, and carries its dark override in
+ *    `.ion-palette-dark`.
+ *
+ * Derivation rules (the "adjacent ramp steps" convention):
+ *   shade / tint    = ramp steps 600 / 400 of the base 500
+ *   wash (light)    = step 100 fill + step 700 ink   (honey: 800 — 700 is
+ *                     the honey-deep accent and too light for tile ink)
+ *   wash (dark)     = step 900 fill + step 200 ink   (honey: 950 + 300 —
+ *                     amber's 900 reads as milk chocolate next to navy)
+ * Contrast colours are chosen for WCAG AA on the base colour. `-rgb`
+ * triplets are raw values by necessity — keep them in sync with their hex.
  */
 
 :root {
   /*
-   * Type — the same three families as web: Inter for UI, Poppins for headings,
-   * JetBrains Mono for the uppercase kickers. Loaded in index.html.
+   * ── Tier 3: ramps ───────────────────────────────────────────────────────
+   * primary…navy mirror theme-colors.ts. Slate (neutrals/surfaces) and teal
+   * are Tailwind's ramps; coral is a brand-custom hue with only the steps
+   * the design uses. Primary and warning share 500–950 and differ below:
+   * primary's pale end leans orange (selection fills), warning's leans amber
+   * (status washes).
+   */
+  --mh-primary-50: #fff7ed;
+  --mh-primary-100: #ffedd5;
+  --mh-primary-200: #fed7aa;
+  --mh-primary-300: #fdba74;
+  --mh-primary-400: #fb923c;
+  --mh-primary-500: #f59e0b;
+  --mh-primary-600: #d97706;
+  --mh-primary-700: #b45309;
+  --mh-primary-800: #92400e;
+  --mh-primary-900: #78350f;
+  --mh-primary-950: #451a03;
+
+  --mh-warning-50: #fffbeb;
+  --mh-warning-100: #fef3c7;
+  --mh-warning-200: #fde68a;
+  --mh-warning-300: #fcd34d;
+  --mh-warning-400: #fbbf24;
+  --mh-warning-500: #f59e0b;
+  --mh-warning-600: #d97706;
+  --mh-warning-700: #b45309;
+  --mh-warning-800: #92400e;
+  --mh-warning-900: #78350f;
+  --mh-warning-950: #451a03;
+
+  --mh-success-50: #ecfdf5;
+  --mh-success-100: #d1fae5;
+  --mh-success-200: #a7f3d0;
+  --mh-success-300: #6ee7b7;
+  --mh-success-400: #34d399;
+  --mh-success-500: #10b981;
+  --mh-success-600: #059669;
+  --mh-success-700: #047857;
+  --mh-success-800: #065f46;
+  --mh-success-900: #064e3b;
+  --mh-success-950: #022c22;
+
+  --mh-info-50: #f0f9ff;
+  --mh-info-100: #e0f2fe;
+  --mh-info-200: #bae6fd;
+  --mh-info-300: #7dd3fc;
+  --mh-info-400: #38bdf8;
+  --mh-info-500: #0ea5e9;
+  --mh-info-600: #0284c7;
+  --mh-info-700: #0369a1;
+  --mh-info-800: #075985;
+  --mh-info-900: #0c4a6e;
+  --mh-info-950: #082f49;
+
+  --mh-danger-50: #fef2f2;
+  --mh-danger-100: #fee2e2;
+  --mh-danger-200: #fecaca;
+  --mh-danger-300: #fca5a5;
+  --mh-danger-400: #f87171;
+  --mh-danger-500: #ef4444;
+  --mh-danger-600: #dc2626;
+  --mh-danger-700: #b91c1c;
+  --mh-danger-800: #991b1b;
+  --mh-danger-900: #7f1d1d;
+  --mh-danger-950: #450a0a;
+
+  --mh-violet-50: #f5f3ff;
+  --mh-violet-100: #ede9fe;
+  --mh-violet-200: #ddd6fe;
+  --mh-violet-300: #c4b5fd;
+  --mh-violet-400: #a78bfa;
+  --mh-violet-500: #8b5cf6;
+  --mh-violet-600: #7c3aed;
+  --mh-violet-700: #6d28d9;
+  --mh-violet-800: #5b21b6;
+  --mh-violet-900: #4c1d95;
+  --mh-violet-950: #2e1065;
+
+  --mh-navy-50: #f0f4f8;
+  --mh-navy-100: #d9e2ec;
+  --mh-navy-200: #bcccdc;
+  --mh-navy-300: #9fb3c8;
+  --mh-navy-400: #829ab1;
+  --mh-navy-500: #1e3a5f;
+  --mh-navy-600: #1a3354;
+  --mh-navy-700: #162b48;
+  --mh-navy-800: #12233d;
+  --mh-navy-900: #0e1b31;
+  --mh-navy-950: #0a1323;
+
+  --mh-slate-50: #f8fafc;
+  --mh-slate-100: #f1f5f9;
+  --mh-slate-200: #e2e8f0;
+  --mh-slate-300: #cbd5e1;
+  --mh-slate-400: #94a3b8;
+  --mh-slate-500: #64748b;
+  --mh-slate-600: #475569;
+  --mh-slate-700: #334155;
+  --mh-slate-800: #1e293b;
+  --mh-slate-900: #0f172a;
+  --mh-slate-950: #020617;
+
+  --mh-teal-50: #f0fdfa;
+  --mh-teal-100: #ccfbf1;
+  --mh-teal-200: #99f6e4;
+  --mh-teal-300: #5eead4;
+  --mh-teal-400: #2dd4bf;
+  --mh-teal-500: #14b8a6;
+  --mh-teal-600: #0d9488;
+  --mh-teal-700: #0f766e;
+  --mh-teal-800: #115e59;
+  --mh-teal-900: #134e4a;
+  --mh-teal-950: #042f2e;
+
+  /* Coral has no Tailwind ancestor — partial ramp, brand hue, base = 400. */
+  --mh-coral-100: #ffe4dc;
+  --mh-coral-200: #fdba9b;
+  --mh-coral-300: #fc9880;
+  --mh-coral-400: #fb8062;
+  --mh-coral-500: #ea6a4b;
+  --mh-coral-700: #c2410c;
+  --mh-coral-900: #4a1d0c;
+
+  /*
+   * ── Tier 4: role tokens ─────────────────────────────────────────────────
+   * Type — the same three families as web: Inter for UI, Poppins for
+   * headings, JetBrains Mono for the uppercase kickers. Loaded in index.html.
    */
   --ion-font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mh-font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
   --mh-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
 
   /*
-   * Light surfaces — slate page, white cards. Ionic's default light background
-   * is pure white, which makes a white card invisible; the design's card-based
-   * screens need the page one step darker than the things sitting on it.
-   * (Values: slate page bg + white card, per the design tokens.)
-   */
-  --ion-background-color: #f8fafc;
-  --ion-background-color-rgb: 248, 250, 252;
-  --ion-card-background: #ffffff;
-  --ion-item-background: #ffffff;
-  --ion-toolbar-background: #ffffff;
-  --ion-tab-bar-background: #ffffff;
-  --ion-border-color: #e2e8f0;
-
-  /*
-   * Ink is Midnight Navy, not black. Ionic leaves `--ion-text-color` undefined
-   * in light mode (components inline `var(--ion-text-color, #000)`), so any
-   * `var(--ion-text-color)` of ours would otherwise resolve to nothing.
-   */
-  --ion-text-color: #0e1b31;
-  --ion-text-color-rgb: 14, 27, 49;
-
-  /*
-   * Honey is too light to be read as text on its own tint. This is the deep
-   * amber the design uses for links and labels sitting on honey surfaces.
-   */
-  --mh-color-honey-deep: #b45309;
-
-  /*
-   * The hairline between rows inside a card — one step lighter than
-   * `--ion-border-color`, which outlines the card itself. Slate 100.
-   */
-  --mh-color-divider: #f1f5f9;
-
-  /*
-   * Soft status chips. A saturated fill with white text cannot reach the 4.5:1
-   * that badge-sized text needs (white on Sky 500 is 2.8:1), so the small
-   * status pills use the tint-plus-deep-ink pairing instead — the same idiom
-   * the design already uses for specialization chips. Scale steps 100 + 700.
-   */
-  --mh-chip-info-background: #e0f2fe;
-  --mh-chip-info-color: #0369a1;
-  --mh-chip-success-background: #d1fae5;
-  --mh-chip-success-color: #047857;
-
-  /* The fill behind a selected chip, tile or day. Pairs with honey-deep ink. */
-  --mh-chip-warning-background: #fff7ed;
-
-  /*
-   * Corner radius, three steps and a pill.
-   *
-   * Ionic's form controls default to 4px, which reads as a different design
+   * Corner radius, three steps and a pill. Ionic has no global radius token —
+   * its form controls default to 4px, which reads as a different design
    * language next to a 12px tile — so every control is pinned to `control`
    * in styles.css and components use these rather than their own numbers.
    */
   --mh-radius-control: 0.75rem;
   --mh-radius-card: 1rem;
   --mh-radius-pill: 999px;
+  --mh-radius-sheet: 1.25rem;
 
-  /* Primary — Honey Amber (primary[500]) */
-  --ion-color-primary: #f59e0b;
+  /*
+   * Type scale — strict 0.125rem grid (1rem = 16px), mirroring web's dominant
+   * Tailwind ladder (text-xs/sm/base/…). Component SCSS never writes a
+   * font-size literal; it picks the nearest role here.
+   */
+  --mh-text-xs: 0.625rem;   /* 10px — kickers, badges, timestamps, footnotes */
+  --mh-text-sm: 0.75rem;    /* 12px — meta, helper, secondary text */
+  --mh-text-base: 0.875rem; /* 14px — body, controls */
+  --mh-text-md: 1rem;       /* 16px — emphasized body, inputs, card titles */
+  --mh-text-lg: 1.125rem;   /* 18px — section titles */
+  --mh-text-xl: 1.25rem;    /* 20px — page titles (h1) */
+  --mh-text-2xl: 1.5rem;    /* 24px — hero numbers */
+
+  /* Leading & tracking — three leadings, one kicker tracking. */
+  --mh-leading-none: 1;
+  --mh-leading-tight: 1.4;
+  --mh-leading-body: 1.55;
+  --mh-tracking-kicker: 0.08em;
+
+  /* The WCAG minimum touch target (44px). */
+  --mh-tap-target: 2.75rem;
+
+  /*
+   * Border widths — the only sanctioned px values besides 1px hairlines.
+   * Everything else is a rem multiple of 0.125.
+   */
+  --mh-ring-width: 2px;  /* focus/danger ring, avatar cutout ring */
+  --mh-spine-width: 3px; /* left accent spine (session rows, day rail) */
+
+  /*
+   * Honey is too light to be read as text on its own tint. This is the deep
+   * amber the design uses for links and labels sitting on honey surfaces.
+   */
+  --mh-color-honey-deep: var(--mh-primary-700);
+
+  /*
+   * The hairline between rows inside a card — one step lighter than
+   * `--ion-border-color`, which outlines the card itself.
+   */
+  --mh-color-divider: var(--mh-slate-100);
+
+  /*
+   * The fill behind a selected chip, tile or day — honey's palest step,
+   * paired with honey-deep ink. Selection, not status: this is the one soft
+   * honey surface the brand rules allow, and it is deliberately one step
+   * paler than the honey wash so "selected" and "warning" never look alike.
+   */
+  --mh-color-selected-background: var(--mh-primary-50);
+
+  /*
+   * ── Tier 1: Ionic global tokens ─────────────────────────────────────────
+   * Light surfaces — slate page, white cards. Ionic's default light
+   * background is pure white, which makes a white card invisible; the
+   * design's card-based screens need the page one step darker than the
+   * things sitting on it.
+   */
+  --ion-background-color: var(--mh-slate-50);
+  --ion-background-color-rgb: 248, 250, 252;
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+  --ion-tab-bar-background: #ffffff;
+  --ion-border-color: var(--mh-slate-200);
+
+  /*
+   * Ink is Midnight Navy, not black. Ionic leaves `--ion-text-color`
+   * undefined in light mode (components inline `var(--ion-text-color,
+   * #000)`), so any `var(--ion-text-color)` of ours would otherwise resolve
+   * to nothing.
+   */
+  --ion-text-color: var(--mh-navy-900);
+  --ion-text-color-rgb: 14, 27, 49;
+
+  /*
+   * ── Tier 2: Ionic colour slots ──────────────────────────────────────────
+   */
+
+  /* Primary — Honey Amber */
+  --ion-color-primary: var(--mh-primary-500);
   --ion-color-primary-rgb: 245, 158, 11;
   --ion-color-primary-contrast: #000000;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
-  --ion-color-primary-shade: #d88b0a;
-  --ion-color-primary-tint: #f6a823;
+  --ion-color-primary-shade: var(--mh-primary-600);
+  --ion-color-primary-tint: var(--mh-primary-400);
 
-  /* Secondary — Midnight Navy (navy[500]; shade = navy[600]) */
-  --ion-color-secondary: #1e3a5f;
+  /*
+   * Secondary — Midnight Navy. The tint is the one formula-based exception
+   * (mix with 10% white): the navy ramp is bimodal — 50–400 are steel text
+   * tones for dark mode, so the "adjacent step" 400 would be a hover state
+   * four shades lighter than its base.
+   */
+  --ion-color-secondary: var(--mh-navy-500);
   --ion-color-secondary-rgb: 30, 58, 95;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #1a3354;
+  --ion-color-secondary-shade: var(--mh-navy-600);
   --ion-color-secondary-tint: #354e6f;
 
-  /* Success — Emerald (success[500]) */
-  --ion-color-success: #10b981;
+  /* Success — Emerald */
+  --ion-color-success: var(--mh-success-500);
   --ion-color-success-rgb: 16, 185, 129;
   --ion-color-success-contrast: #000000;
   --ion-color-success-contrast-rgb: 0, 0, 0;
-  --ion-color-success-shade: #0ea372;
-  --ion-color-success-tint: #28c08e;
+  --ion-color-success-shade: var(--mh-success-600);
+  --ion-color-success-tint: var(--mh-success-400);
 
-  /* Warning — Honey Gold (warning[500], mirrors primary by design) */
-  --ion-color-warning: #f59e0b;
+  /* Warning — Honey Gold (mirrors primary by design) */
+  --ion-color-warning: var(--mh-warning-500);
   --ion-color-warning-rgb: 245, 158, 11;
   --ion-color-warning-contrast: #000000;
   --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #d88b0a;
-  --ion-color-warning-tint: #f6a823;
+  --ion-color-warning-shade: var(--mh-warning-600);
+  --ion-color-warning-tint: var(--mh-warning-400);
 
-  /* Danger — Red (danger[500]) */
-  --ion-color-danger: #ef4444;
+  /* Danger — Red */
+  --ion-color-danger: var(--mh-danger-500);
   --ion-color-danger-rgb: 239, 68, 68;
   --ion-color-danger-contrast: #ffffff;
   --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #d23c3c;
-  --ion-color-danger-tint: #f15757;
+  --ion-color-danger-shade: var(--mh-danger-600);
+  --ion-color-danger-tint: var(--mh-danger-400);
 
   /*
-   * Info — Sky (info[500]). Ionic has no `info` slot; the workspace palette
-   * does, so it keeps that name here rather than inventing a second one.
-   * Shade/tint are the neighbouring ramp steps (600 / 400), not Ionic's
-   * mix() output — the ramp is the source of truth.
+   * Info — Sky. Ionic has no `info` slot; the workspace palette does, so it
+   * keeps that name here rather than inventing a second one.
    */
-  --ion-color-info: #0ea5e9;
+  --ion-color-info: var(--mh-info-500);
   --ion-color-info-rgb: 14, 165, 233;
   --ion-color-info-contrast: #ffffff;
   --ion-color-info-contrast-rgb: 255, 255, 255;
-  --ion-color-info-shade: #0284c7;
-  --ion-color-info-tint: #38bdf8;
+  --ion-color-info-shade: var(--mh-info-600);
+  --ion-color-info-tint: var(--mh-info-400);
 
-  /* Violet (violet[500]) — the one hue no other scale covers. */
-  --ion-color-violet: #8b5cf6;
+  /* Violet — the one hue no other scale covers. */
+  --ion-color-violet: var(--mh-violet-500);
   --ion-color-violet-rgb: 139, 92, 246;
   --ion-color-violet-contrast: #ffffff;
   --ion-color-violet-contrast-rgb: 255, 255, 255;
-  --ion-color-violet-shade: #7c3aed;
-  --ion-color-violet-tint: #a78bfa;
+  --ion-color-violet-shade: var(--mh-violet-600);
+  --ion-color-violet-tint: var(--mh-violet-400);
 
   /*
-   * Teal and Coral exist for one job: the avatar palette. A conversation list
-   * is a wall of hexagons, and with only the semantic colours to draw from
-   * every other row would be honey or navy. The design settled on a four-tone
-   * set (honey, teal, navy, coral) and these are the two it adds — same
-   * `violet` precedent above, same generic-slot block below.
-   *
-   * Both take navy ink, not white: white on Teal 400 is 1.9:1 and on Coral
-   * 2.4:1, nowhere near the 3:1 a glyph needs. Navy clears 7:1 on both.
+   * Teal and Coral exist for one job: the avatar palette. A conversation
+   * list is a wall of hexagons, and with only the semantic colours to draw
+   * from every other row would be honey or navy. The design settled on a
+   * four-tone set (honey, teal, navy, coral) and these are the two it adds.
+   * Both sit at ramp step 400 — their 500 is the shade — and both take navy
+   * ink, not white: white on Teal 400 is 1.9:1 and on Coral 2.4:1, nowhere
+   * near the 3:1 a glyph needs. Navy clears 7:1 on both.
    */
-  --ion-color-teal: #2dd4bf;
+  --ion-color-teal: var(--mh-teal-400);
   --ion-color-teal-rgb: 45, 212, 191;
-  --ion-color-teal-contrast: #0e1b31;
+  --ion-color-teal-contrast: var(--mh-navy-900);
   --ion-color-teal-contrast-rgb: 14, 27, 49;
-  --ion-color-teal-shade: #14b8a6;
-  --ion-color-teal-tint: #5eead4;
+  --ion-color-teal-shade: var(--mh-teal-500);
+  --ion-color-teal-tint: var(--mh-teal-300);
 
-  --ion-color-coral: #fb8062;
+  --ion-color-coral: var(--mh-coral-400);
   --ion-color-coral-rgb: 251, 128, 98;
-  --ion-color-coral-contrast: #0e1b31;
+  --ion-color-coral-contrast: var(--mh-navy-900);
   --ion-color-coral-contrast-rgb: 14, 27, 49;
-  --ion-color-coral-shade: #ea6a4b;
-  --ion-color-coral-tint: #fc9880;
+  --ion-color-coral-shade: var(--mh-coral-500);
+  --ion-color-coral-tint: var(--mh-coral-300);
 
   /*
    * Neutrals — Slate, not Ionic's default grays. The surfaces above already
-   * come from the Slate ramp (#f8fafc, #e2e8f0), so Ionic's #92949c / #222428
-   * read as a second, colder gray sitting on top of them. Steps 500 and 700,
-   * with their neighbours as shade/tint.
+   * come from the Slate ramp, so Ionic's #92949c / #222428 read as a second,
+   * colder gray sitting on top of them. Steps 500 and 700, with their
+   * neighbours as shade/tint.
    */
-  --ion-color-medium: #64748b;
+  --ion-color-medium: var(--mh-slate-500);
   --ion-color-medium-rgb: 100, 116, 139;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #475569;
-  --ion-color-medium-tint: #94a3b8;
+  --ion-color-medium-shade: var(--mh-slate-600);
+  --ion-color-medium-tint: var(--mh-slate-400);
 
-  --ion-color-dark: #334155;
+  --ion-color-dark: var(--mh-slate-700);
   --ion-color-dark-rgb: 51, 65, 85;
   --ion-color-dark-contrast: #ffffff;
   --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #1e293b;
-  --ion-color-dark-tint: #475569;
+  --ion-color-dark-shade: var(--mh-slate-800);
+  --ion-color-dark-tint: var(--mh-slate-600);
 
   /*
-   * Wash — the pale end of each ramp (step 100) paired with a dark ink from
-   * step 700/800. Ionic's `-tint` is one step lighter than the base and stays
-   * saturated, which is a different job: `wash` is for tiles that sit inside
-   * a list and must not shout, where the glyph carries the colour and the
-   * fill only hints at it. Every pair clears 4.5:1.
+   * Wash — the soft-fill extension of each colour slot: pale fill, deep ink.
+   * Ionic's `-tint` is one step lighter than the base and stays saturated,
+   * which is a different job: `wash` is for chips, badges and tiles that sit
+   * inside a list and must not shout, where the glyph carries the colour and
+   * the fill only hints at it. A saturated fill with white text cannot reach
+   * the 4.5:1 that badge-sized text needs (white on Sky 500 is 2.8:1), so
+   * small status pills always take the wash pairing. Every pair clears
+   * 4.5:1. The neutral washes (medium/dark/secondary) sit on slate + navy
+   * ink rather than their own ramps — a gray-on-gray wash has no pale step
+   * that still reads as a fill.
    */
-  --ion-color-primary-wash: #fef3c7;
-  --ion-color-primary-wash-contrast: #92400e;
-  --ion-color-warning-wash: #fef3c7;
-  --ion-color-warning-wash-contrast: #92400e;
-  --ion-color-success-wash: #dcfce7;
-  --ion-color-success-wash-contrast: #15803d;
-  --ion-color-danger-wash: #fee2e2;
-  --ion-color-danger-wash-contrast: #b91c1c;
-  --ion-color-info-wash: #e0f2fe;
-  --ion-color-info-wash-contrast: #0369a1;
-  --ion-color-violet-wash: #ede9fe;
-  --ion-color-violet-wash-contrast: #6d28d9;
-  --ion-color-teal-wash: #ccfbf1;
-  --ion-color-teal-wash-contrast: #0f766e;
-  --ion-color-coral-wash: #ffe4dc;
-  --ion-color-coral-wash-contrast: #c2410c;
-  --ion-color-medium-wash: #f1f5f9;
-  --ion-color-medium-wash-contrast: #475569;
-  --ion-color-dark-wash: #e2e8f0;
-  --ion-color-dark-wash-contrast: #0e1b31;
-  --ion-color-secondary-wash: #e2e8f0;
-  --ion-color-secondary-wash-contrast: #0e1b31;
+  --ion-color-primary-wash: var(--mh-warning-100);
+  --ion-color-primary-wash-contrast: var(--mh-warning-800);
+  --ion-color-warning-wash: var(--mh-warning-100);
+  --ion-color-warning-wash-contrast: var(--mh-warning-800);
+  --ion-color-success-wash: var(--mh-success-100);
+  --ion-color-success-wash-contrast: var(--mh-success-700);
+  --ion-color-danger-wash: var(--mh-danger-100);
+  --ion-color-danger-wash-contrast: var(--mh-danger-700);
+  --ion-color-info-wash: var(--mh-info-100);
+  --ion-color-info-wash-contrast: var(--mh-info-700);
+  --ion-color-violet-wash: var(--mh-violet-100);
+  --ion-color-violet-wash-contrast: var(--mh-violet-700);
+  --ion-color-teal-wash: var(--mh-teal-100);
+  --ion-color-teal-wash-contrast: var(--mh-teal-700);
+  --ion-color-coral-wash: var(--mh-coral-100);
+  --ion-color-coral-wash-contrast: var(--mh-coral-700);
+  --ion-color-medium-wash: var(--mh-slate-100);
+  --ion-color-medium-wash-contrast: var(--mh-slate-600);
+  --ion-color-dark-wash: var(--mh-slate-200);
+  --ion-color-dark-wash-contrast: var(--mh-navy-900);
+  --ion-color-secondary-wash: var(--mh-slate-200);
+  --ion-color-secondary-wash-contrast: var(--mh-navy-900);
 }
 
 /*
@@ -258,80 +450,77 @@
 
 /*
  * Dark palette — navy surfaces so dark mode stays on-brand (brand surface
- * rule: honey on dark). Mapping from theme-colors.ts navy ramp:
- * page bg = navy[900], card/toolbar bg = navy[800], border = navy[700],
- * text = navy[50]. Stepped colors are linear mixes between background and
+ * rule: honey on dark). Page bg = navy 900, card/toolbar bg = navy 800,
+ * border = navy 700, text = navy 50. Only tokens flip here — the ramps
+ * stay absolute. Stepped colors are linear mixes between background and
  * text, per Ionic's theming guide (they replace the gray defaults from
  * palettes/dark.class.css).
  */
 .ion-palette-dark {
   /* On navy, the deep amber goes unread — the design's dark-surface accent is
      the light honey tint instead. */
-  --mh-color-honey-deep: #fcd34d;
+  --mh-color-honey-deep: var(--mh-warning-300);
 
   /* Slate 100 would glare on a navy card; the divider tracks the border here. */
-  --mh-color-divider: #162b48;
+  --mh-color-divider: var(--mh-navy-700);
 
-  /* Wash inverts the same way chips do: deep fill, light ink. */
-  --ion-color-primary-wash: #422006;
-  --ion-color-primary-wash-contrast: #fcd34d;
-  --ion-color-warning-wash: #422006;
-  --ion-color-warning-wash-contrast: #fcd34d;
-  --ion-color-success-wash: #064e3b;
-  --ion-color-success-wash-contrast: #a7f3d0;
-  --ion-color-danger-wash: #4c0519;
-  --ion-color-danger-wash-contrast: #fecaca;
-  --ion-color-info-wash: #0c4a6e;
-  --ion-color-info-wash-contrast: #bae6fd;
-  --ion-color-violet-wash: #2e1065;
-  --ion-color-violet-wash-contrast: #ddd6fe;
-  --ion-color-teal-wash: #134e4a;
-  --ion-color-teal-wash-contrast: #99f6e4;
-  --ion-color-coral-wash: #4a1d0c;
-  --ion-color-coral-wash-contrast: #fdba9b;
-  --ion-color-medium-wash: #1e293b;
-  --ion-color-medium-wash-contrast: #cbd5e1;
-  --ion-color-dark-wash: #1e293b;
-  --ion-color-dark-wash-contrast: #e2e8f0;
-  --ion-color-secondary-wash: #1e293b;
-  --ion-color-secondary-wash-contrast: #e2e8f0;
+  /* Selection inverts like the washes: deep honey fill, light ink. */
+  --mh-color-selected-background: var(--mh-warning-950);
 
-  /* Chips invert: deep fill, light ink (scale steps 900 + 200). */
-  --mh-chip-warning-background: #422006;
-  --mh-chip-info-background: #0c4a6e;
-  --mh-chip-info-color: #bae6fd;
-  --mh-chip-success-background: #064e3b;
-  --mh-chip-success-color: #a7f3d0;
+  /* Wash inverts: deep fill (step 900; honey 950), light ink (step 200;
+     honey 300). */
+  --ion-color-primary-wash: var(--mh-warning-950);
+  --ion-color-primary-wash-contrast: var(--mh-warning-300);
+  --ion-color-warning-wash: var(--mh-warning-950);
+  --ion-color-warning-wash-contrast: var(--mh-warning-300);
+  --ion-color-success-wash: var(--mh-success-900);
+  --ion-color-success-wash-contrast: var(--mh-success-200);
+  --ion-color-danger-wash: var(--mh-danger-900);
+  --ion-color-danger-wash-contrast: var(--mh-danger-200);
+  --ion-color-info-wash: var(--mh-info-900);
+  --ion-color-info-wash-contrast: var(--mh-info-200);
+  --ion-color-violet-wash: var(--mh-violet-900);
+  --ion-color-violet-wash-contrast: var(--mh-violet-200);
+  --ion-color-teal-wash: var(--mh-teal-900);
+  --ion-color-teal-wash-contrast: var(--mh-teal-200);
+  --ion-color-coral-wash: var(--mh-coral-900);
+  --ion-color-coral-wash-contrast: var(--mh-coral-200);
+  --ion-color-medium-wash: var(--mh-slate-800);
+  --ion-color-medium-wash-contrast: var(--mh-slate-300);
+  --ion-color-dark-wash: var(--mh-slate-800);
+  --ion-color-dark-wash-contrast: var(--mh-slate-200);
+  --ion-color-secondary-wash: var(--mh-slate-800);
+  --ion-color-secondary-wash-contrast: var(--mh-slate-200);
 
   /*
-   * The saturated hues hold up on navy, so only the neutrals shift: Slate 500
-   * and 700 are too close to the card background to read as tiles, so both
-   * step up two rungs.
+   * The saturated hues hold up on navy, so only the neutrals shift: Slate
+   * 500 and 700 are too close to the card background to read as tiles, so
+   * both step up two rungs.
    */
-  --ion-color-medium: #94a3b8;
+  --ion-color-medium: var(--mh-slate-400);
   --ion-color-medium-rgb: 148, 163, 184;
-  --ion-color-medium-contrast: #0e1b31;
+  --ion-color-medium-contrast: var(--mh-navy-900);
   --ion-color-medium-contrast-rgb: 14, 27, 49;
-  --ion-color-medium-shade: #64748b;
-  --ion-color-medium-tint: #cbd5e1;
+  --ion-color-medium-shade: var(--mh-slate-500);
+  --ion-color-medium-tint: var(--mh-slate-300);
 
-  --ion-color-dark: #64748b;
+  --ion-color-dark: var(--mh-slate-500);
   --ion-color-dark-rgb: 100, 116, 139;
   --ion-color-dark-contrast: #ffffff;
   --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #475569;
-  --ion-color-dark-tint: #94a3b8;
+  --ion-color-dark-shade: var(--mh-slate-600);
+  --ion-color-dark-tint: var(--mh-slate-400);
 
-  --ion-background-color: #0e1b31;
+  --ion-background-color: var(--mh-navy-900);
   --ion-background-color-rgb: 14, 27, 49;
-  --ion-text-color: #f0f4f8;
+  --ion-text-color: var(--mh-navy-50);
   --ion-text-color-rgb: 240, 244, 248;
 
-  --ion-card-background: #12233d;
-  --ion-item-background: #12233d;
-  --ion-toolbar-background: #12233d;
-  --ion-tab-bar-background: #12233d;
-  --ion-border-color: #162b48;
+  --ion-card-background: var(--mh-navy-800);
+  --ion-item-background: var(--mh-navy-800);
+  --ion-toolbar-background: var(--mh-navy-800);
+  --ion-tab-bar-background: var(--mh-navy-800);
+  --ion-border-color: var(--mh-navy-700);
 
   --ion-background-color-step-50: #19263b;
   --ion-background-color-step-100: #253145;

@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 2rem 1.5rem 0.5rem;
+  padding: 1.25rem 0 0.25rem;
 }
 
 .hero h1 {
@@ -12,7 +12,7 @@
 
 .handle {
   font-family: var(--mh-font-mono);
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
 }
 
@@ -29,10 +29,10 @@
 
 .about {
   display: block;
-  padding: 0 1.5rem;
+  padding: 0 0.375rem;
   color: var(--ion-color-dark);
-  font-size: 0.82rem;
-  line-height: 1.6;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
   /* Bios are free text, so honour the author's own line breaks. */
   white-space: pre-wrap;
 }
@@ -40,7 +40,6 @@
 .tags {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 1.25rem;
 }
 
 .empty {

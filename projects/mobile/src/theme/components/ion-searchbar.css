@@ -1,0 +1,4 @@
+/* Control radius — same rule and same `!important` reason as ion-input.css. */
+ion-searchbar {
+  --border-radius: var(--mh-radius-control) !important;
+}

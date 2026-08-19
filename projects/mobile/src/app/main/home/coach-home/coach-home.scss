@@ -4,9 +4,9 @@
 .agenda-row {
   --background: var(--ion-background-color);
   --border-radius: var(--mh-radius-control);
-  --min-height: 48px;
+  --min-height: 3rem;
 
-  margin: 0 12px 12px;
+  margin: 0 0.75rem 0.75rem;
 }
 
 // Honey-tinted banner, through the documented card/item background variables.
@@ -28,9 +28,15 @@
   }
 }
 
-// The grid supplies the 16px page gutter and the 10px gutter between tiles, so
-// the cards inside it drop their own margins (see stat-tile.scss).
-ion-grid {
-  --ion-grid-padding: 11px;
-  --ion-grid-column-padding: 5px;
+// Two stat tiles on one row; `.mh-page` supplies the gutter, this row only the
+// gap between them.
+.tiles {
+  display: flex;
+  gap: 0.625rem;
+
+  mh-stat-tile {
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }

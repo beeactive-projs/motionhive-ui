@@ -16,157 +16,24 @@
 /* Dark palette — class-driven: ThemeService toggles `ion-palette-dark` on <html> */
 @import '@ionic/angular/css/palettes/dark.class.css';
 
-/* MotionHive brand theme */
+/* MotionHive brand theme — tokens, text roles, layout primitives */
 @import './theme/variables.css';
+@import './theme/typography.css';
+@import './theme/layout.css';
 
 /*
- * The few brand rules Ionic's variables cannot express. Everything else about a
- * component's look must go through its documented inputs and CSS variables —
- * this block exists because `ion-card` exposes no radius/border/elevation
- * variable, and because headings need the brand family.
+ * Per-component skins — the few brand rules Ionic's variables cannot express,
+ * one file per component. Skins carry no margins: components are
+ * layout-neutral, and pages place them (see theme/layout.css).
  */
-
-/* Cards are flat and outlined in this product, not Material-elevated. Radius,
-   border and the page gutter all come from the design's card spec. */
-ion-card {
-  margin: 0 1rem 0.75rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
-  box-shadow: none;
-}
-
-/* The grouped settings card: a card that happens to be a list. `ion-list`
-   publishes no CSS variables for border, radius or margin, so these are literal
-   rules — the one thing Ionic's API cannot express here. `[inset]` earns its
-   place anyway: it is what supplies `overflow: hidden`, which clips the first
-   and last rows' backgrounds to the corner radius.
-
-   Specificity: `[inset]` reflects to a `.list-inset` class, and Ionic ships
-   `.list-md.list-inset` (0,2,0) with its own 2px radius and 16px margins. This
-   selector is (0,2,1) so it wins; `.list-md`'s 8px vertical band is zeroed
-   here too, since the rows already carry their own padding. */
-ion-list.list-inset.mh-card-list {
-  margin: 0 1.25rem 0.875rem;
-  padding: 0;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
-  background: var(--ion-card-background);
-}
-
-/* Ionic's Material buttons SHOUT their labels. Every visible string in this
-   product is sentence case, so the uppercase transform has to go — it is a copy
-   rule, not a per-button style choice. Segment buttons do it too — they set it
-   on the host and the label inherits, so one rule covers both. */
-ion-button,
-ion-segment-button {
-  text-transform: none;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--mh-font-heading);
-}
-
-/* Page title — tight to the kicker above it. Ionic's default h1 is a 1.5rem
-   heading with 1rem of margin on both sides of it. */
-h1 {
-  margin: 0.125rem 0 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-/* Explanatory line under a field. Global because every edit sheet ends with
-   one, and eight copies of three declarations is worse than one rule. */
-.mh-helper {
-  margin: 0.75rem;
-  color: var(--ion-color-medium);
-  font-size: 0.65rem;
-  line-height: 1.55;
-}
-
-/* The uppercase micro-label above a heading or inside a card header. */
-.mh-kicker {
-  display: block;
-  font-family: var(--mh-font-mono);
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-}
-
-/* The mono label that titles a group of rows ("PEOPLE", "CONVERSATION").
-   Every list screen has a few; ion-list-header is a row with its own type
-   scale, not a standalone label. */
-.mh-section-label {
-  padding: 1rem 0.375rem 0.375rem;
-  color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  /* letter-spacing: 0.08em;
-  text-transform: uppercase; */
-}
-
-/* A standalone line of explanatory text between blocks. `ion-note` is inline
-   by default, so it needs to be told it owns a block. */
-.mh-note-block {
-  display: block;
-  padding: 0.75rem 1.5rem 0;
-  color: var(--ion-color-medium);
-  font-size: 0.72rem;
-  line-height: 1.55;
-}
-
-/* Picker popups — dates and wheels alike.
-   A picker in a bare `ion-modal` inherits the sheet's full-bleed size and lands
-   top-left on a white slab. Ionic sizes these through modal variables, and the
-   modal is relocated on present so the rule has to be global rather than scoped
-   to whichever screen opened it. */
-ion-modal.mh-picker-modal {
-  --width: 20rem;
-  --height: auto;
-  --max-width: calc(100% - 2rem);
-  --border-radius: var(--mh-radius-card);
-  --background: var(--ion-card-background);
-  --box-shadow: 0 0.5rem 2.5rem rgb(var(--ion-text-color-rgb) / 0.25);
-  align-items: center;
-  justify-content: center;
-}
-
-ion-modal.mh-picker-modal ion-datetime {
-  /* Without this the picker stretches to the modal and clips its own footer. */
-  height: auto;
-}
-
-/* One radius for everything you can tap or type into. Ionic ships 4px on form
-   controls and buttons, which clashes with the 12px cards and tiles around
-   them; this is the single place that decides it.
-
-   `!important` because Ionic ships these components with scoped CSS, so its
-   own `.input-fill-outline.sc-ion-input-md-h` rule outranks any selector we
-   can write against the element. Same reason the `.ion-color-*` blocks in
-   variables.css use it.
-
-   `shape="round"` has to be excluded rather than outranked: Ionic sets the
-   capsule through a plain `:host(.button-round)` declaration, and an
-   `!important` here beats that no matter how the selectors compare — so
-   without the `:not()` a round button silently comes out a 12px rectangle. */
-ion-input:not([shape='round']),
-ion-textarea:not([shape='round']),
-ion-select,
-ion-searchbar,
-ion-button:not([shape='round']) {
-  --border-radius: var(--mh-radius-control) !important;
-}
-
-/* `ion-datetime-button` renders its pill into shadow DOM, out of reach of the
-   rule above; `::part` is the documented way in. Without this it keeps Ionic's
-   8px while the trigger beside it takes the control radius. */
-ion-datetime-button::part(native) {
-  border-radius: var(--mh-radius-control);
-}
-
-/* Chips and anything explicitly round keep their pill. */
-ion-chip {
-  --border-radius: var(--mh-radius-pill);
-}
+@import './theme/components/ion-button.css';
+@import './theme/components/ion-card.css';
+@import './theme/components/ion-chip.css';
+@import './theme/components/ion-datetime.css';
+@import './theme/components/ion-input.css';
+@import './theme/components/ion-list.css';
+@import './theme/components/ion-modal.css';
+@import './theme/components/ion-searchbar.css';
+@import './theme/components/ion-segment.css';
+@import './theme/components/ion-select.css';
+@import './theme/components/ion-textarea.css';

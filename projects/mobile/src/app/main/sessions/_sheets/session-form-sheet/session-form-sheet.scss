@@ -18,25 +18,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.8125rem 0.25rem;
-  border: 1.5px solid var(--ion-border-color);
+  gap: 0.25rem;
+  padding: 0.875rem 0.25rem;
+  border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
   background: var(--ion-card-background);
   color: var(--ion-color-medium);
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
   font-weight: 500;
 }
 
 .tile.selected {
   border-color: var(--ion-color-primary);
-  background: var(--mh-chip-warning-background);
+  background: var(--mh-color-selected-background);
   color: var(--mh-color-honey-deep);
   font-weight: 600;
 }
 
 .tile ion-icon {
-  font-size: 1.15rem;
+  font-size: var(--mh-text-lg);
 }
 
 /* The Where and access tiles are pills — icon beside label, per the design. */
@@ -52,7 +52,7 @@
 .when {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 0.4375rem;
+  gap: 0.375rem;
   margin-bottom: 0.5rem;
 }
 
@@ -66,11 +66,11 @@
   --border-width: 1px;
   --border-color: var(--ion-border-color);
   --box-shadow: none;
-  --padding-start: 0.8125rem;
-  --padding-end: 0.8125rem;
-  height: 3.0625rem;
+  --padding-start: 0.875rem;
+  --padding-end: 0.875rem;
+  height: 3rem;
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--mh-text-md);
   font-weight: 500;
   letter-spacing: normal;
 }
@@ -89,14 +89,14 @@
 
 .day {
   width: 100%;
-  max-width: 2.75rem;
+  max-width: var(--mh-tap-target);
   aspect-ratio: 1;
   justify-self: center;
   border: none;
   border-radius: var(--mh-radius-pill);
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
-  font-size: 0.8rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
@@ -117,7 +117,7 @@
   --color-checked: var(--ion-text-color);
   --indicator-color: var(--ion-card-background);
   min-height: 2.375rem;
-  font-size: 0.8125rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
   letter-spacing: normal;
 }
@@ -136,7 +136,7 @@
 
 .inline-number span {
   color: var(--ion-color-medium);
-  font-size: 0.875rem;
+  font-size: var(--mh-text-base);
 }
 
 /* The rule read back as a sentence, on the selection wash — it is the one
@@ -145,9 +145,9 @@
   margin: 0.25rem 0 0.625rem;
   padding: 0.875rem 1rem;
   border-radius: var(--mh-radius-card);
-  background: var(--mh-chip-warning-background);
+  background: var(--mh-color-selected-background);
   color: var(--mh-color-honey-deep);
-  font-size: 0.9rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
@@ -164,7 +164,7 @@
   --background: var(--ion-card-background);
   --color: var(--ion-text-color);
   border: 1px solid var(--ion-border-color);
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
 }
 
@@ -172,15 +172,15 @@
    act on, and dressing it as one invites a tap that does nothing. */
 .chips .more {
   color: var(--ion-color-medium);
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
 }
 
 /* Rows that behave as fields rather than list items. */
 .field {
   --background: var(--ion-card-background);
-  --padding-start: 0.8125rem;
-  --inner-padding-end: 0.8125rem;
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.875rem;
   margin-bottom: 0.5rem;
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-control);
@@ -191,11 +191,11 @@
 .repeat ion-icon[slot='start'] {
   margin-inline: 0 0.875rem;
   color: var(--ion-color-medium);
-  font-size: 1.25rem;
+  font-size: var(--mh-text-xl);
 }
 
 .repeat.on {
-  --background: var(--mh-chip-warning-background);
+  --background: var(--mh-color-selected-background);
   border-color: transparent;
 }
 
@@ -215,14 +215,14 @@
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: 0.4375rem;
+  gap: 0.375rem;
 }
 
 /* Unit riding inside a field: "12 spots", "50 RON". */
 .unit {
   padding-inline-start: 0.5rem;
   color: var(--ion-color-medium);
-  font-size: 0.875rem;
+  font-size: var(--mh-text-base);
 }
 
 /* The currency select sits in the price input's end slot as a bare "RON ⌄" —
@@ -231,7 +231,7 @@
   --padding-start: 0.5rem;
   --padding-end: 0;
   min-height: 0;
-  font-size: 0.875rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
@@ -243,14 +243,14 @@
   gap: 0.125rem;
   margin: 0.75rem 0 0;
   padding: 0.75rem 0.875rem;
-  border-left: 3px solid var(--ion-color-danger);
+  border-left: var(--mh-spine-width) solid var(--ion-color-danger);
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-danger-wash);
   color: var(--ion-color-danger-wash-contrast);
-  font-size: 0.75rem;
-  line-height: 1.45;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
 }
 
 .conflict-warning strong {
-  font-size: 0.8125rem;
+  font-size: var(--mh-text-base);
 }

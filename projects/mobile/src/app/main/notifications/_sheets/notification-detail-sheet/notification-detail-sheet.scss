@@ -6,22 +6,18 @@
   padding: 0 0.25rem;
 }
 
-.eyebrow {
-  text-transform: uppercase;
-}
-
 .head h2 {
   margin: 0;
   font-family: var(--mh-font-heading);
-  font-size: 1.15rem;
+  font-size: var(--mh-text-lg);
   font-weight: 700;
 }
 
 .head .body {
   margin: 0;
   color: var(--ion-color-dark);
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
 }
 
 .actions {
@@ -38,6 +34,6 @@
   border: 1px solid var(--mh-color-divider);
   border-radius: var(--mh-radius-control);
   background: var(--ion-background-color);
-  font-size: 0.75rem;
-  line-height: 1.5;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
 }

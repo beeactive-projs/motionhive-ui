@@ -1,13 +1,13 @@
 <ng-template #body>
-  <div class="head">
-    <span class="time">{{ time() }}</span>
-    <div class="what">
-      <h3>{{ title() }}</h3>
-      <span class="mh-kicker">{{ meta() }}</span>
-    </div>
-  </div>
-
   <ion-list lines="none">
+    <ion-item class="head" lines="full">
+      <span slot="start" class="time">{{ time() }}</span>
+      <ion-label class="ion-text-wrap">
+        <h3>{{ title() }}</h3>
+        <span class="mh-kicker">{{ meta() }}</span>
+      </ion-label>
+    </ion-item>
+
     @for (item of visibleActions(); track item.id) {
       <ion-item
         button

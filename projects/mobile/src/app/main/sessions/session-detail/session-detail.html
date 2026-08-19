@@ -24,7 +24,7 @@
       (action)="store.reload()"
     />
   } @else if (store.loading() && !instance()) {
-    <div class="body">
+    <div class="mh-page body">
       <div class="hero">
         <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.25rem" />
         <ion-skeleton-text [animated]="true" style="width: 35%" />
@@ -41,7 +41,7 @@
       </ion-list>
     </div>
   } @else if (instance()) {
-    <div class="body">
+    <div class="mh-page body">
       <!-- The hero carries what the band used to: the badges say what this
            is, in the order you need it — state, type, then place — with the
            name under them. Same card the account page opens with. -->
@@ -137,55 +137,59 @@
         </div>
       }
 
-      <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
-        Details
-      </ion-note>
-      <ion-list [inset]="true" class="mh-card-list">
-        @for (row of detailRows(); track $index; let last = $last) {
-          <ion-item [lines]="last ? 'none' : 'full'">
-            <mh-hex-avatar
-              slot="start"
-              size="sm"
-              [icon]="row.icon"
-              [color]="row.color"
-              [tone]="row.tone"
-              aria-hidden="true"
-            />
-            <ion-label>
-              <h3>{{ row.title }}</h3>
-              @if (row.detail) {
-                <p>{{ row.detail }}</p>
-              }
-            </ion-label>
-          </ion-item>
-        }
-      </ion-list>
-
-      @if (reminders().length > 0) {
-        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
-          Reminders
+      <section class="mh-section">
+        <ion-note class="mh-kicker section-label" color="medium">
+          Details
         </ion-note>
         <ion-list [inset]="true" class="mh-card-list">
-          @for (reminder of reminders(); track reminder.label; let last = $last) {
+          @for (row of detailRows(); track $index; let last = $last) {
             <ion-item [lines]="last ? 'none' : 'full'">
               <mh-hex-avatar
                 slot="start"
                 size="sm"
-                icon="notifications-outline"
-                color="primary"
+                [icon]="row.icon"
+                [color]="row.color"
+                [tone]="row.tone"
                 aria-hidden="true"
               />
               <ion-label>
-                <h3>{{ reminder.label }}</h3>
-                <p>{{ reminder.detail }}</p>
+                <h3>{{ row.title }}</h3>
+                @if (row.detail) {
+                  <p>{{ row.detail }}</p>
+                }
               </ion-label>
             </ion-item>
           }
         </ion-list>
-        <p class="mh-helper">
-          Sent automatically to everyone booked in. Anyone who books after one of
-          these times does not get that reminder.
-        </p>
+      </section>
+
+      @if (reminders().length > 0) {
+        <section class="mh-section">
+          <ion-note class="mh-kicker section-label" color="medium">
+            Reminders
+          </ion-note>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (reminder of reminders(); track reminder.label; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'">
+                <mh-hex-avatar
+                  slot="start"
+                  size="sm"
+                  icon="notifications-outline"
+                  color="primary"
+                  aria-hidden="true"
+                />
+                <ion-label>
+                  <h3>{{ reminder.label }}</h3>
+                  <p>{{ reminder.detail }}</p>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+          <p class="mh-helper">
+            Sent automatically to everyone booked in. Anyone who books after one of
+            these times does not get that reminder.
+          </p>
+        </section>
       }
 
       @if (isFull()) {
@@ -201,13 +205,15 @@
       }
 
       @if (lifecycle() !== 'past') {
-        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
-          Spots
-        </ion-note>
-        <div class="spots">
-          <ion-progress-bar [value]="fillPercent() / 100" />
-          <span class="count">{{ spotsLabel() }}</span>
-        </div>
+        <section class="mh-section">
+          <ion-note class="mh-kicker section-label" color="medium">
+            Spots
+          </ion-note>
+          <div class="spots">
+            <ion-progress-bar [value]="fillPercent() / 100" />
+            <span class="count">{{ spotsLabel() }}</span>
+          </div>
+        </section>
       }
 
       @if (attendanceSummary(); as summary) {
@@ -222,180 +228,186 @@
         </div>
       }
 
-      <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
-        {{ canMarkAttendance() ? 'Attendance' : 'Attendees' }}
-        @if (counts().pending > 0) {
-          <ion-badge color="secondary">{{ counts().pending }} pending</ion-badge>
-        }
-      </ion-note>
-
-      @if (editingAttendance() && attendees().length > 0) {
-        <ion-note class="mh-note-block">
-          Mark who turned up. Tapping the same choice again clears it.
+      <section class="mh-section">
+        <ion-note class="mh-kicker section-label" color="medium">
+          {{ canMarkAttendance() ? 'Attendance' : 'Attendees' }}
+          @if (counts().pending > 0) {
+            <ion-badge color="secondary">{{ counts().pending }} pending</ion-badge>
+          }
         </ion-note>
-      }
 
-      @if (attendees().length === 0) {
-        <ion-note class="mh-note-block">Nobody has signed up yet.</ion-note>
-      } @else {
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (participant of visibleAttendees(); track participant.id; let last = $last) {
-            <ion-item
-              [lines]="last && hiddenAttendees() === 0 ? 'none' : 'full'"
-              [button]="hasProfile(participant)"
-              [detail]="hasProfile(participant) && !editingAttendance()"
-              (click)="openProfile(participant)"
-            >
-              <mh-hex-avatar
-                slot="start"
-                size="md"
-                aria-hidden="true"
-                [name]="nameOf(participant)"
-                [imageUrl]="participant.user?.avatarUrl ?? null"
-                [color]="toneFor(participant)"
-              />
-              <ion-label>
-                <h3>{{ nameOf(participant) }}</h3>
-                @if (participant.bookingNote; as note) {
-                  <!-- What they wrote when booking — their words, so quoted. -->
-                  <p class="booking-note">“{{ note }}”</p>
+        @if (editingAttendance() && attendees().length > 0) {
+          <ion-note class="mh-note-block">
+            Mark who turned up. Tapping the same choice again clears it.
+          </ion-note>
+        }
+
+        @if (attendees().length === 0) {
+          <ion-note class="mh-note-block">Nobody has signed up yet.</ion-note>
+        } @else {
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (participant of visibleAttendees(); track participant.id; let last = $last) {
+              <ion-item
+                [lines]="last && hiddenAttendees() === 0 ? 'none' : 'full'"
+                [button]="hasProfile(participant)"
+                [detail]="hasProfile(participant) && !editingAttendance()"
+                (click)="openProfile(participant)"
+              >
+                <mh-hex-avatar
+                  slot="start"
+                  size="md"
+                  aria-hidden="true"
+                  [name]="nameOf(participant)"
+                  [imageUrl]="participant.user?.avatarUrl ?? null"
+                  [color]="toneFor(participant)"
+                />
+                <ion-label>
+                  <h3>{{ nameOf(participant) }}</h3>
+                  @if (participant.bookingNote; as note) {
+                    <!-- What they wrote when booking — their words, so quoted. -->
+                    <p class="booking-note">“{{ note }}”</p>
+                  }
+                  @if (canMarkAttendance() && showsNote(participant)) {
+                    <!-- The design's note card is session-level, which does not
+                         exist; `privateNote` is per-participant, owner-only, and
+                         already backed — so the note lands here instead. -->
+                    <button
+                      type="button"
+                      class="note"
+                      [class.empty]="!noteFor(participant)"
+                      (click)="openNote(participant); $event.stopPropagation()"
+                    >
+                      {{ noteFor(participant) ?? 'Add a private note' }}
+                    </button>
+                  }
+                </ion-label>
+
+                @if (isPending(participant)) {
+                  <ion-buttons slot="end">
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="medium"
+                      [disabled]="store.isParticipantBusy(participant.id)"
+                      (click)="decline(participant); $event.stopPropagation()"
+                    >
+                      Decline
+                    </ion-button>
+                    <ion-button
+                      fill="solid"
+                      size="small"
+                      color="primary"
+                      [disabled]="store.isParticipantBusy(participant.id)"
+                      (click)="approve(participant); $event.stopPropagation()"
+                    >
+                      Approve
+                    </ion-button>
+                  </ion-buttons>
+                } @else if (editingAttendance()) {
+                  <!-- Two buttons, not a checkbox: a checkbox has no way to say
+                       "not marked yet", which is different from "did not come". -->
+                  <ion-buttons slot="end" class="marks">
+                    <ion-button
+                      size="small"
+                      aria-label="Attended"
+                      [fill]="participant.attended === true ? 'solid' : 'outline'"
+                      [color]="participant.attended === true ? 'success' : 'medium'"
+                      [disabled]="store.isParticipantBusy(participant.id)"
+                      (click)="setAttendance(participant, true); $event.stopPropagation()"
+                    >
+                      <ion-icon slot="icon-only" name="checkmark-circle-outline" />
+                    </ion-button>
+                    <ion-button
+                      size="small"
+                      aria-label="No-show"
+                      [fill]="participant.attended === false ? 'solid' : 'outline'"
+                      [color]="participant.attended === false ? 'danger' : 'medium'"
+                      [disabled]="store.isParticipantBusy(participant.id)"
+                      (click)="setAttendance(participant, false); $event.stopPropagation()"
+                    >
+                      <ion-icon slot="icon-only" name="close-circle-outline" />
+                    </ion-button>
+                  </ion-buttons>
+                } @else {
+                  <ion-badge slot="end" [attr.data-tone]="statusTone(participant)">
+                    {{ statusLabel(participant) }}
+                  </ion-badge>
                 }
-                @if (canMarkAttendance() && showsNote(participant)) {
-                  <!-- The design's note card is session-level, which does not
-                       exist; `privateNote` is per-participant, owner-only, and
-                       already backed — so the note lands here instead. -->
-                  <button
-                    type="button"
-                    class="note"
-                    [class.empty]="!noteFor(participant)"
-                    (click)="openNote(participant); $event.stopPropagation()"
-                  >
-                    {{ noteFor(participant) ?? 'Add a private note' }}
-                  </button>
-                }
-              </ion-label>
+              </ion-item>
+            }
 
-              @if (isPending(participant)) {
-                <ion-buttons slot="end">
-                  <ion-button
-                    fill="clear"
-                    size="small"
-                    color="medium"
-                    [disabled]="store.isParticipantBusy(participant.id)"
-                    (click)="decline(participant); $event.stopPropagation()"
-                  >
-                    Decline
-                  </ion-button>
-                  <ion-button
-                    fill="solid"
-                    size="small"
-                    color="primary"
-                    [disabled]="store.isParticipantBusy(participant.id)"
-                    (click)="approve(participant); $event.stopPropagation()"
-                  >
-                    Approve
-                  </ion-button>
-                </ion-buttons>
-              } @else if (editingAttendance()) {
-                <!-- Two buttons, not a checkbox: a checkbox has no way to say
-                     "not marked yet", which is different from "did not come". -->
-                <ion-buttons slot="end" class="marks">
-                  <ion-button
-                    size="small"
-                    aria-label="Attended"
-                    [fill]="participant.attended === true ? 'solid' : 'outline'"
-                    [color]="participant.attended === true ? 'success' : 'medium'"
-                    [disabled]="store.isParticipantBusy(participant.id)"
-                    (click)="setAttendance(participant, true); $event.stopPropagation()"
-                  >
-                    <ion-icon slot="icon-only" name="checkmark-circle-outline" />
-                  </ion-button>
-                  <ion-button
-                    size="small"
-                    aria-label="No-show"
-                    [fill]="participant.attended === false ? 'solid' : 'outline'"
-                    [color]="participant.attended === false ? 'danger' : 'medium'"
-                    [disabled]="store.isParticipantBusy(participant.id)"
-                    (click)="setAttendance(participant, false); $event.stopPropagation()"
-                  >
-                    <ion-icon slot="icon-only" name="close-circle-outline" />
-                  </ion-button>
-                </ion-buttons>
-              } @else {
-                <ion-badge slot="end" [attr.data-tone]="statusTone(participant)">
-                  {{ statusLabel(participant) }}
-                </ion-badge>
-              }
-            </ion-item>
-          }
-
-          @if (hiddenAttendees() > 0) {
-            <ion-item button detail="false" lines="none" (click)="attendeesExpanded.set(true)">
-              <ion-label class="show-all">Show all {{ attendees().length }}</ion-label>
-            </ion-item>
-          }
-        </ion-list>
-      }
+            @if (hiddenAttendees() > 0) {
+              <ion-item button detail="false" lines="none" (click)="attendeesExpanded.set(true)">
+                <ion-label class="show-all">Show all {{ attendees().length }}</ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        }
+      </section>
 
       @if (waitlist().length > 0) {
-        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
-          Waitlist
-          <ion-badge color="medium">{{ waitlist().length }}</ion-badge>
-        </ion-note>
+        <section class="mh-section">
+          <ion-note class="mh-kicker section-label" color="medium">
+            Waitlist
+            <ion-badge color="medium">{{ waitlist().length }}</ion-badge>
+          </ion-note>
 
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (participant of waitlist(); track participant.id; let i = $index; let last = $last) {
-            <ion-item [lines]="last ? 'none' : 'full'">
-              <span slot="start" class="queue">{{ i + 1 }}</span>
-              <ion-label>
-                <h3>{{ nameOf(participant) }}</h3>
-                <p>Waiting since {{ waitingSince(participant) }}</p>
-                @if (participant.bookingNote; as note) {
-                  <p class="booking-note">“{{ note }}”</p>
-                }
-              </ion-label>
-              <!-- Not "Promote": no endpoint reaches the promotion service, and
-                   approveParticipant only accepts PENDING_APPROVAL rows. -->
-              <ion-button
-                slot="end"
-                fill="outline"
-                size="small"
-                (click)="messageOne(participant)"
-              >
-                Message
-              </ion-button>
-            </ion-item>
-          }
-        </ion-list>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (participant of waitlist(); track participant.id; let i = $index; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'">
+                <span slot="start" class="queue">{{ i + 1 }}</span>
+                <ion-label>
+                  <h3>{{ nameOf(participant) }}</h3>
+                  <p>Waiting since {{ waitingSince(participant) }}</p>
+                  @if (participant.bookingNote; as note) {
+                    <p class="booking-note">“{{ note }}”</p>
+                  }
+                </ion-label>
+                <!-- Not "Promote": no endpoint reaches the promotion service, and
+                     approveParticipant only accepts PENDING_APPROVAL rows. -->
+                <ion-button
+                  slot="end"
+                  fill="outline"
+                  size="small"
+                  (click)="messageOne(participant)"
+                >
+                  Message
+                </ion-button>
+              </ion-item>
+            }
+          </ion-list>
 
-        <ion-note class="mh-note-block">
-          The next in line moves in automatically when someone cancels, up to two
-          hours before the start. Raising capacity does not move anyone in — tell
-          them yourself if you open more spots.
-        </ion-note>
+          <ion-note class="mh-note-block">
+            The next in line moves in automatically when someone cancels, up to two
+            hours before the start. Raising capacity does not move anyone in — tell
+            them yourself if you open more spots.
+          </ion-note>
 
-        <div class="waitlist-action">
-          <ion-button expand="block" fill="outline" (click)="openCapacity()">
-            Raise capacity
-          </ion-button>
-          <ion-button expand="block" (click)="messageWaitlist()">
-            Message waitlist
-          </ion-button>
-        </div>
+          <div class="waitlist-action">
+            <ion-button expand="block" fill="outline" (click)="openCapacity()">
+              Raise capacity
+            </ion-button>
+            <ion-button expand="block" (click)="messageWaitlist()">
+              Message waitlist
+            </ion-button>
+          </div>
+        </section>
       }
 
       @if (description(); as text) {
         <!-- What signups read before booking. The design's card here is a note
              to attendees, which no field backs — this is the one piece of the
              coach's own writing the session actually carries. -->
-        <ion-note class="mh-kicker ion-text-uppercase section-label" color="medium">
-          Description
-        </ion-note>
-        <ion-list [inset]="true" class="mh-card-list">
-          <ion-item lines="none">
-            <ion-label class="description">{{ text }}</ion-label>
-          </ion-item>
-        </ion-list>
+        <section class="mh-section">
+          <ion-note class="mh-kicker section-label" color="medium">
+            Description
+          </ion-note>
+          <ion-list [inset]="true" class="mh-card-list">
+            <ion-item lines="none">
+              <ion-label class="description">{{ text }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </section>
       }
     </div>
   }

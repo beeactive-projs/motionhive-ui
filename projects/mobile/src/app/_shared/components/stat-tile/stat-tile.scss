@@ -1,23 +1,21 @@
-// A tile is laid out by its caller's grid, so it drops the global card gutter
-// and stretches to the tallest tile in the row instead.
+// A tile is laid out by its caller's row and stretches to the tallest tile.
 ion-card {
-  margin: 0;
   height: 100%;
 }
 
-// The design's figure: 17px heading face, not Ionic's 20px card title.
+// The design's figure: 16px heading face, not Ionic's 20px card title.
 ion-card-title {
-  font-size: 1.05rem;
+  font-size: var(--mh-text-md);
   font-weight: 700;
 }
 
 ion-card-subtitle {
   font-family: var(--mh-font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
+  font-size: var(--mh-text-xs);
+  letter-spacing: var(--mh-tracking-kicker);
 }
 
 p {
-  margin: 2px 0 0;
-  font-size: 0.66rem;
+  margin: 0.125rem 0 0;
+  font-size: var(--mh-text-xs);
 }

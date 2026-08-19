@@ -1,0 +1,42 @@
+/* The grouped settings card: a card that happens to be a list. `ion-list`
+   publishes no CSS variables for border, radius or background, so these are
+   literal rules — the one thing Ionic's API cannot express here. `[inset]`
+   earns its place anyway: it is what supplies `overflow: hidden`, which clips
+   the first and last rows' backgrounds to the corner radius.
+
+   Skin only — `margin: 0` makes the list layout-neutral; the page's layout
+   container places it. Specificity: `[inset]` reflects to a `.list-inset`
+   class, and Ionic ships `.list-md.list-inset` (0,2,0) with its own 2px
+   radius and 16px margins. This selector is (0,2,1) so it wins; `.list-md`'s
+   8px vertical band is zeroed here too, since the rows already carry their
+   own padding. */
+ion-list.list-inset.mh-card-list {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+/* One spacing standard for every list row. Ionic's own numbers differ mode to
+   mode (md pads 1rem with no vertical air at all) and the row components had
+   each started restating their own — these four variables are the single
+   source now. `.mh-list-row` opts in the standalone card rows that render
+   outside any `ion-list` (the sessions agenda row and its skeleton twin). A
+   row with a real reason to differ (the chat transcript's zeroed bubbles, a
+   sheet's field rows) sets its own values in its component scope, which
+   outranks these plain selectors. */
+ion-list ion-item,
+ion-item.mh-list-row {
+  --padding-start: 0.875rem;
+  --inner-padding-end: 0.875rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+}
+
+/* md opens 32px between a slot="start" icon and the label — wide enough to
+   read as two columns at phone width. Same 1rem gap the avatar rows use. */
+ion-list ion-item ion-icon[slot='start'],
+ion-item.mh-list-row ion-icon[slot='start'] {
+  margin-inline-end: 0.875rem;
+}

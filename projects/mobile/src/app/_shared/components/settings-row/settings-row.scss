@@ -12,16 +12,12 @@
 ion-item {
   --background: var(--ion-card-background);
   --min-height: 0;
-  --padding-start: 0.875rem;
-  --inner-padding-end: 0.875rem;
-  --inner-padding-top: 0.75rem;
-  --inner-padding-bottom: 0.75rem;
   // Ionic dims the chevron to 25% by default, which drops it below the
   // design's weight and below the 3:1 a control needs.
   --detail-icon-color: var(--ion-color-medium);
   --detail-icon-opacity: 1;
 
-  font-size: 0.85rem;
+  font-size: var(--mh-text-base);
 }
 
 // The trailing value is secondary to the label but must stay legible.
@@ -32,11 +28,11 @@ ion-item {
 ion-note {
   max-width: 55%;
   overflow: hidden;
-  font-size: 0.75rem;
+  font-size: var(--mh-text-sm);
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: 0;
-  margin: 10px 0px;
+  margin: 0.625rem 0;
 }
 
 // Whatever the value does, the label keeps its own line and its own space.
@@ -47,11 +43,11 @@ ion-label {
 // Soft status chip, not a saturated fill: white on Emerald 500 is 2.2:1, well
 // under the 4.5:1 badge-sized text needs. Same pairing as the hero chips.
 ion-badge {
-  --background: var(--mh-chip-success-background);
-  --color: var(--mh-chip-success-color);
+  --background: var(--ion-color-success-wash);
+  --color: var(--ion-color-success-wash-contrast);
 
   border-radius: var(--mh-radius-pill);
-  font-size: 0.625rem;
+  font-size: var(--mh-text-xs);
 }
 
 .value-mono {

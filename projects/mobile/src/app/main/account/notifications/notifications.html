@@ -8,75 +8,77 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-note class="intro" color="medium">
-    You always see these in the app. Choose which categories also reach you by email.
-  </ion-note>
+  <div class="mh-page">
+    <ion-note class="mh-note-block" color="medium">
+      You always see these in the app. Choose which categories also reach you by email.
+    </ion-note>
 
-  @if (loading()) {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
-        <ion-item lines="full">
-          <ion-skeleton-text slot="start" [animated]="true" style="width: 1.875rem; height: 1.6rem" />
-          <ion-label>
-            <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
-            <p><ion-skeleton-text [animated]="true" style="width: 80%" /></p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
-  } @else if (loadFailed()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      heading="Couldn't load your preferences"
-      message="Check your connection and try again."
-      actionLabel="Try again"
-      (action)="load()"
-    />
-  } @else if (categories().length === 0) {
-    <mh-empty-state
-      icon="notifications-outline"
-      heading="Nothing to configure"
-      message="There are no notification categories on your account yet."
-    />
-  } @else {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (row of categories(); track row.category) {
-        <ion-item lines="full">
-          <mh-hex-avatar
-            slot="start"
-            size="sm"
-            [name]="row.label"
-            [icon]="styleFor(row.category).icon"
-            [color]="styleFor(row.category).color"
-            tone="wash"
-          />
-          <ion-label class="ion-text-wrap">
-            <h3>{{ row.label }}</h3>
-            <p>{{ row.description }}</p>
-            <p class="channels">
-              <span class="on">{{ inAppLabel(row.category) }}</span>
-              <span [class.on]="row.channels.email">Email</span>
-            </p>
-          </ion-label>
-          <ion-toggle
-            slot="end"
-            [checked]="row.channels.email"
-            [disabled]="isPending(row.category)"
-            [attr.aria-label]="'Email me about ' + row.label"
-            (ionChange)="onToggle(row.category, $event)"
-          />
-        </ion-item>
-      }
-    </ion-list>
+    @if (loading()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+          <ion-item lines="full">
+            <ion-skeleton-text slot="start" [animated]="true" style="width: 1.875rem; height: 1.625rem" />
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 80%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (loadFailed()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        heading="Couldn't load your preferences"
+        message="Check your connection and try again."
+        actionLabel="Try again"
+        (action)="load()"
+      />
+    } @else if (categories().length === 0) {
+      <mh-empty-state
+        icon="notifications-outline"
+        heading="Nothing to configure"
+        message="There are no notification categories on your account yet."
+      />
+    } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (row of categories(); track row.category) {
+          <ion-item lines="full">
+            <mh-hex-avatar
+              slot="start"
+              size="sm"
+              [name]="row.label"
+              [icon]="styleFor(row.category).icon"
+              [color]="styleFor(row.category).color"
+              tone="wash"
+            />
+            <ion-label class="ion-text-wrap">
+              <h3>{{ row.label }}</h3>
+              <p>{{ row.description }}</p>
+              <p class="channels">
+                <span class="on">{{ inAppLabel(row.category) }}</span>
+                <span [class.on]="row.channels.email">Email</span>
+              </p>
+            </ion-label>
+            <ion-toggle
+              slot="end"
+              [checked]="row.channels.email"
+              [disabled]="isPending(row.category)"
+              [attr.aria-label]="'Email me about ' + row.label"
+              (ionChange)="onToggle(row.category, $event)"
+            />
+          </ion-item>
+        }
+      </ion-list>
 
-    <ion-button
-      class="reset"
-      fill="clear"
-      size="small"
-      [disabled]="resetting()"
-      (click)="resetAll()"
-    >
-      Reset all to default
-    </ion-button>
-  }
+      <ion-button
+        class="reset"
+        fill="clear"
+        size="small"
+        [disabled]="resetting()"
+        (click)="resetAll()"
+      >
+        Reset all to default
+      </ion-button>
+    }
+  </div>
 </ion-content>

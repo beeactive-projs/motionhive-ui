@@ -1,0 +1,20 @@
+/* Ionic's Material buttons SHOUT their labels. Every visible string in this
+   product is sentence case, so the uppercase transform has to go — it is a
+   copy rule, not a per-button style choice. */
+ion-button {
+  text-transform: none;
+}
+
+/* One radius for everything you can tap — Ionic ships 4px, which reads as a
+   different design language next to the 12px tiles around it.
+
+   `!important` because Ionic ships scoped CSS that outranks any selector we
+   can write against the element (see ion-input.css for the full note).
+
+   `shape="round"` has to be excluded rather than outranked: Ionic sets the
+   capsule through a plain `:host(.button-round)` declaration, and an
+   `!important` here beats that no matter how the selectors compare — so
+   without the `:not()` a round button silently comes out a 12px rectangle. */
+ion-button:not([shape='round']) {
+  --border-radius: var(--mh-radius-control) !important;
+}

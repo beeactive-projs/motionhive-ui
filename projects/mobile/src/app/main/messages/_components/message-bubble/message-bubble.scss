@@ -31,12 +31,12 @@
 }
 
 .bubble {
-  padding: 0.6rem 0.875rem;
+  padding: 0.625rem 0.875rem;
   background: var(--ion-card-background);
   border: 1px solid var(--ion-border-color);
   color: var(--ion-text-color);
-  font-size: 0.875rem;
-  line-height: 1.45;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-tight);
   /* Preserve the sender's own line breaks; wrap anything unbroken (a pasted
      URL) rather than letting it push the bubble past its max-width. */
   white-space: pre-wrap;
@@ -64,11 +64,11 @@
   gap: 0.25rem;
   margin: 0.25rem 0.25rem 0;
   color: var(--ion-color-medium);
-  font-size: 0.66rem;
+  font-size: var(--mh-text-xs);
 }
 
 .meta ion-icon {
-  font-size: 0.85rem;
+  font-size: var(--mh-text-base);
 }
 
 /* Delivered is grey, read is amber — the whole receipt is that one colour. */

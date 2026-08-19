@@ -1,0 +1,4 @@
+/* Control radius — same rule and same `!important` reason as ion-input.css. */
+ion-textarea:not([shape='round']) {
+  --border-radius: var(--mh-radius-control) !important;
+}

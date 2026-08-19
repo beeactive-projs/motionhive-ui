@@ -49,37 +49,35 @@
     trainee home at a coach on every cold start.
   -->
   @if (!roleKnown()) {
-    <div class="ion-padding-horizontal ion-padding-top">
-      <ion-skeleton-text [animated]="true" style="width: 110px; height: 8px" />
-      <ion-skeleton-text [animated]="true" style="width: 200px; height: 16px" />
-    </div>
+    <div class="mh-page">
+      <div>
+        <ion-skeleton-text [animated]="true" style="width: 6.875rem; height: 0.5rem" />
+        <ion-skeleton-text [animated]="true" style="width: 12.5rem; height: 1rem" />
+      </div>
 
-    <ion-card>
-      <ion-item lines="none">
-        <ion-label>
-          <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
-          <p><ion-skeleton-text [animated]="true" style="width: 35%" /></p>
-        </ion-label>
-      </ion-item>
-    </ion-card>
+      <ion-card>
+        <ion-item lines="none">
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 35%" /></p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
 
-    <ion-grid>
-      <ion-row>
+      <div class="tiles">
         @for (_ of [1, 2]; track $index) {
-          <ion-col size="6">
-            <ion-card>
-              <ion-item lines="none">
-                <ion-label>
-                  <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
-                  <h2><ion-skeleton-text [animated]="true" style="width: 90%" /></h2>
-                  <p><ion-skeleton-text [animated]="true" style="width: 100%" /></p>
-                </ion-label>
-              </ion-item>
-            </ion-card>
-          </ion-col>
+          <ion-card>
+            <ion-item lines="none">
+              <ion-label>
+                <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
+                <h2><ion-skeleton-text [animated]="true" style="width: 90%" /></h2>
+                <p><ion-skeleton-text [animated]="true" style="width: 100%" /></p>
+              </ion-label>
+            </ion-item>
+          </ion-card>
         }
-      </ion-row>
-    </ion-grid>
+      </div>
+    </div>
   } @else if (mode() === NavModes.Coach) {
     <mh-coach-home />
   } @else {

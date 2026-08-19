@@ -1,0 +1,13 @@
+/* Cards are flat and outlined in this product, not Material-elevated. Radius
+   and border come from the design's card spec.
+
+   Skin only — `margin: 0` makes the card layout-neutral (Ionic ships its own
+   default margins). Where a card sits on a page is the page's decision:
+   spacing comes from the layout container (`.mh-page` gap or a local
+   wrapper), never from the component. */
+ion-card {
+  margin: 0;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  box-shadow: none;
+}

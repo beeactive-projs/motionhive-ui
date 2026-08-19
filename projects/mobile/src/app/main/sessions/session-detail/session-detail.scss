@@ -5,7 +5,6 @@
   flex-direction: column;
   align-items: center;
   gap: 0.625rem;
-  margin: 0.875rem 1.25rem;
   padding: 1.375rem 1.25rem 1.125rem;
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
@@ -22,16 +21,16 @@
 
 .hero-name {
   margin: 0;
-  font-size: 1.1875rem;
+  font-size: var(--mh-text-xl);
   font-weight: 700;
 }
 
-/* Account's section kicker, with room for the count badge some sections carry. */
+/* Account's section kicker, with room for the count badge some sections carry.
+   Placement comes from `.mh-section`; this only lays the badge beside the text. */
 .section-label {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  margin: 1rem 1.5rem 0.4375rem;
 }
 
 /* Chips read as a wash, not a fill — in the hero, which is already busy, and
@@ -43,7 +42,7 @@ ion-badge[data-tone] {
   --padding-end: 0.5rem;
   --background: var(--ion-color-medium-wash);
   --color: var(--ion-color-medium-wash-contrast);
-  font-size: 0.65rem;
+  font-size: var(--mh-text-xs);
   font-weight: 600;
   text-transform: none;
 }
@@ -93,21 +92,16 @@ ion-badge[data-tone='group'] {
   --color: var(--ion-color-info-wash-contrast);
 }
 
-ion-item ion-icon {
-  margin-inline-end: 1rem;
-}
-
 .body {
-  /* Horizontal placement belongs to the card lists and the blocks themselves,
-     like on the account page; the bottom clears the sticky CTA. */
-  padding: 0 0 7rem;
+  /* `.mh-page` owns the gutter and rhythm; the bottom clears the sticky CTA. */
+  padding-bottom: 7rem;
 }
 
 /* A finished session's when-and-where, one line under the hero name. */
 .meta {
   margin: 0;
   color: var(--ion-color-medium);
-  font-size: 0.8rem;
+  font-size: var(--mh-text-base);
 }
 
 /* The bar and its count sit on one line, which ion-progress-bar has no slot for. */
@@ -115,7 +109,6 @@ ion-item ion-icon {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  margin: 0 1.25rem;
 }
 
 .spots ion-progress-bar {
@@ -127,7 +120,7 @@ ion-item ion-icon {
 }
 
 .spots .count {
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
 }
 
@@ -136,7 +129,7 @@ ion-item ion-icon {
 .url {
   overflow-wrap: anywhere;
   font-family: var(--mh-font-mono);
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
 }
 
 /* How long until it starts, or that it is on now. Teal while it is still
@@ -146,20 +139,19 @@ ion-item ion-icon {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.75rem 1.25rem 0;
   padding: 0.625rem 0.875rem;
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-teal-wash);
   color: var(--ion-color-teal-wash-contrast);
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
 }
 
 /* The one thing on this screen that says "right now" without words. */
 .live-note .dot {
   flex: none;
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: var(--mh-radius-pill);
   background: currentColor;
 }
@@ -174,7 +166,6 @@ ion-item ion-icon {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 1rem 1.25rem 0;
   padding: 0.75rem 0.875rem;
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-success-wash);
@@ -183,36 +174,36 @@ ion-item ion-icon {
 
 .attendance-summary ion-icon {
   flex: none;
-  font-size: 1.25rem;
+  font-size: var(--mh-text-xl);
 }
 
 .attendance-summary div {
   display: flex;
   flex-direction: column;
-  line-height: 1.35;
+  line-height: var(--mh-leading-tight);
 }
 
 .attendance-summary strong {
-  font-size: 0.85rem;
+  font-size: var(--mh-text-base);
   font-weight: 700;
 }
 
 .attendance-summary span {
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
 }
 
 /* The rest of a long roster, one tap away. Deep amber rather than the honey
    primary: honey text on a white card comes nowhere near AA. */
 .show-all {
   color: var(--mh-color-honey-deep);
-  font-size: 0.8rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
 /* Free-running text, so it keeps its line breaks and its own leading. */
 .description {
-  font-size: 0.82rem;
-  line-height: 1.55;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
   white-space: pre-line;
 }
 
@@ -220,12 +211,12 @@ ion-item ion-icon {
    editor, but dressed as text — a second filled control per row would compete
    with the attendance marks on the right. */
 .note {
-  margin-top: 0.15rem;
+  margin-top: 0.125rem;
   padding: 0;
   border: none;
   background: none;
   color: var(--ion-color-medium);
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
   font-style: italic;
   text-align: start;
 }
@@ -239,7 +230,7 @@ ion-item ion-icon {
 /* What the trainee wrote when booking — quoted and italic, their words. */
 .booking-note {
   color: var(--ion-color-medium);
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
   font-style: italic;
 }
 
@@ -266,17 +257,17 @@ ion-item ion-icon {
   display: flex;
   flex-direction: column;
   flex: none;
-  line-height: 1.15;
+  line-height: var(--mh-leading-none);
 }
 
 .cta .stat strong {
   font-family: var(--mh-font-heading);
-  font-size: 0.95rem;
+  font-size: var(--mh-text-md);
 }
 
 .cta .stat span {
   color: var(--ion-color-medium);
-  font-size: 0.62rem;
+  font-size: var(--mh-text-xs);
   white-space: nowrap;
 }
 
@@ -297,14 +288,13 @@ ion-item ion-icon {
   border-radius: var(--mh-radius-pill);
   background: var(--mh-color-divider);
   color: var(--ion-color-medium);
-  font-size: 0.7rem;
+  font-size: var(--mh-text-sm);
   font-weight: 700;
 }
 
 .waitlist-action {
   display: flex;
   gap: 0.625rem;
-  padding: 0 1.25rem;
 }
 
 .waitlist-action ion-button {
@@ -323,7 +313,6 @@ ion-item ion-icon {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  margin: 1rem 1.25rem 0;
   padding: 0.75rem 0.875rem;
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-danger-wash);
@@ -332,20 +321,20 @@ ion-item ion-icon {
 
 .full-banner ion-icon {
   flex: none;
-  font-size: 1.15rem;
+  font-size: var(--mh-text-lg);
 }
 
 .full-banner div {
   display: flex;
   flex-direction: column;
-  line-height: 1.35;
+  line-height: var(--mh-leading-tight);
 }
 
 .full-banner strong {
-  font-size: 0.85rem;
+  font-size: var(--mh-text-base);
   font-weight: 700;
 }
 
 .full-banner span {
-  font-size: 0.72rem;
+  font-size: var(--mh-text-sm);
 }

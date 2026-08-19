@@ -8,105 +8,115 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (notFound()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      heading="Profile unavailable"
-      message="This person may have changed their handle or closed their account."
-    />
-  } @else if (loading() && !profile()) {
-    <div class="hero">
-      <ion-skeleton-text [animated]="true" style="width: 6rem; height: 6.75rem" />
-      <ion-skeleton-text [animated]="true" style="width: 45%; height: 1.2rem" />
-      <ion-skeleton-text [animated]="true" style="width: 30%" />
-    </div>
-  } @else if (profile(); as person) {
-    <div class="hero">
-      <mh-hex-avatar
-        size="2xl"
-        aria-hidden="true"
-        [name]="name()"
-        [imageUrl]="person.avatarUrl"
-        [color]="tone()"
+  <div class="mh-page">
+    @if (notFound()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        heading="Profile unavailable"
+        message="This person may have changed their handle or closed their account."
       />
-      <h1>{{ name() }}</h1>
-      <ion-note class="handle">&#64;{{ person.handle }}</ion-note>
+    } @else if (loading() && !profile()) {
+      <div class="hero">
+        <ion-skeleton-text [animated]="true" style="width: 6rem; height: 6.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 45%; height: 1.25rem" />
+        <ion-skeleton-text [animated]="true" style="width: 30%" />
+      </div>
+    } @else if (profile(); as person) {
+      <div class="hero">
+        <mh-hex-avatar
+          size="2xl"
+          aria-hidden="true"
+          [name]="name()"
+          [imageUrl]="person.avatarUrl"
+          [color]="tone()"
+        />
+        <h1>{{ name() }}</h1>
+        <ion-note class="handle">&#64;{{ person.handle }}</ion-note>
 
-      @if (roles().length > 0) {
-        <div class="roles">
-          @for (role of roles(); track role) {
-            <ion-chip [outline]="true" color="medium">{{ role }}</ion-chip>
-          }
-        </div>
-      }
-    </div>
-
-    @if (hasNothingToShow()) {
-      <ion-note class="mh-note-block empty">
-        {{ firstName() }} hasn't added any profile details yet.
-      </ion-note>
-    }
-
-    @if (bio(); as about) {
-      <div class="mh-section-label">About</div>
-      <ion-note class="about">{{ about }}</ion-note>
-    }
-
-    @if (specializations().length > 0) {
-      <div class="mh-section-label">Specialises in</div>
-      <div class="tags">
-        @for (item of specializations(); track item) {
-          <ion-chip [outline]="true" color="medium">{{ item }}</ion-chip>
+        @if (roles().length > 0) {
+          <div class="roles">
+            @for (role of roles(); track role) {
+              <ion-chip [outline]="true" color="medium">{{ role }}</ion-chip>
+            }
+          </div>
         }
       </div>
-    }
 
-    @if (experience() || rating()) {
-      <div class="mh-section-label">Coaching</div>
-      <ion-list [inset]="true" class="mh-card-list">
-        @if (experience(); as years) {
-          <ion-item [lines]="rating() ? 'full' : 'none'">
-            <ion-icon slot="start" name="ribbon-outline" color="medium" aria-hidden="true" />
-            <ion-label><h3>{{ years }}</h3></ion-label>
-          </ion-item>
-        }
-        @if (rating(); as score) {
-          <ion-item lines="none">
-            <ion-icon slot="start" name="star-outline" color="primary" aria-hidden="true" />
-            <ion-label><h3>{{ score }}</h3></ion-label>
-          </ion-item>
-        }
-      </ion-list>
-    }
+      @if (hasNothingToShow()) {
+        <ion-note class="mh-note-block empty">
+          {{ firstName() }} hasn't added any profile details yet.
+        </ion-note>
+      }
 
-    @if (hasContactDetails()) {
-      <div class="mh-section-label">Details</div>
-      <ion-list [inset]="true" class="mh-card-list">
-        @if (location(); as place) {
-          <ion-item lines="full">
-            <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
-            <ion-label><h3>{{ place }}</h3></ion-label>
-          </ion-item>
-        }
-        @if (person.email; as email) {
-          <ion-item lines="full" [href]="'mailto:' + email">
-            <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
-            <ion-label><h3>{{ email }}</h3></ion-label>
-          </ion-item>
-        }
-        @if (person.phone; as phone) {
-          <ion-item lines="none" [href]="'tel:' + phone">
-            <ion-icon slot="start" name="call-outline" color="medium" aria-hidden="true" />
-            <ion-label><h3>{{ phone }}</h3></ion-label>
-          </ion-item>
-        }
-      </ion-list>
-    }
+      @if (bio(); as about) {
+        <section class="mh-section">
+          <div class="mh-section-label">About</div>
+          <ion-note class="about">{{ about }}</ion-note>
+        </section>
+      }
 
-    @if (memberSince(); as since) {
-      <ion-note class="mh-note-block">On MotionHive since {{ since }}.</ion-note>
+      @if (specializations().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-label">Specialises in</div>
+          <div class="tags">
+            @for (item of specializations(); track item) {
+              <ion-chip [outline]="true" color="medium">{{ item }}</ion-chip>
+            }
+          </div>
+        </section>
+      }
+
+      @if (experience() || rating()) {
+        <section class="mh-section">
+          <div class="mh-section-label">Coaching</div>
+          <ion-list [inset]="true" class="mh-card-list">
+            @if (experience(); as years) {
+              <ion-item [lines]="rating() ? 'full' : 'none'">
+                <ion-icon slot="start" name="ribbon-outline" color="medium" aria-hidden="true" />
+                <ion-label><h3>{{ years }}</h3></ion-label>
+              </ion-item>
+            }
+            @if (rating(); as score) {
+              <ion-item lines="none">
+                <ion-icon slot="start" name="star-outline" color="primary" aria-hidden="true" />
+                <ion-label><h3>{{ score }}</h3></ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+
+      @if (hasContactDetails()) {
+        <section class="mh-section">
+          <div class="mh-section-label">Details</div>
+          <ion-list [inset]="true" class="mh-card-list">
+            @if (location(); as place) {
+              <ion-item lines="full">
+                <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
+                <ion-label><h3>{{ place }}</h3></ion-label>
+              </ion-item>
+            }
+            @if (person.email; as email) {
+              <ion-item lines="full" [href]="'mailto:' + email">
+                <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
+                <ion-label><h3>{{ email }}</h3></ion-label>
+              </ion-item>
+            }
+            @if (person.phone; as phone) {
+              <ion-item lines="none" [href]="'tel:' + phone">
+                <ion-icon slot="start" name="call-outline" color="medium" aria-hidden="true" />
+                <ion-label><h3>{{ phone }}</h3></ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+
+      @if (memberSince(); as since) {
+        <ion-note class="mh-note-block">On MotionHive since {{ since }}.</ion-note>
+      }
     }
-  }
+  </div>
 </ion-content>
 
 @if (profile() && !isSelf()) {

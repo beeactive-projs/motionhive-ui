@@ -9,10 +9,10 @@ ion-badge {
   top: 0.125rem;
   inset-inline-end: 0;
   min-width: 1rem;
-  padding: 0.1rem 0.25rem;
-  border: 2px solid var(--ion-toolbar-background, var(--ion-background-color));
-  border-radius: 999px;
-  font-size: 0.625rem;
-  line-height: 1;
+  padding: 0.125rem 0.25rem;
+  border: var(--mh-ring-width) solid var(--ion-toolbar-background, var(--ion-background-color));
+  border-radius: var(--mh-radius-pill);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-none);
   pointer-events: none;
 }

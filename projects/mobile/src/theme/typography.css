@@ -1,0 +1,70 @@
+/* Text roles â€” the brand type rules and the handful of named text utilities
+   every screen shares. Skin and type rhythm only; where a block of text sits
+   on a page is the page layout's job. */
+
+h1,
+h2,
+h3 {
+  font-family: var(--mh-font-heading);
+}
+
+/* Page title â€” tight to the kicker above it. Ionic's default h1 is a 1.5rem
+   heading with 1rem of margin on both sides of it. */
+h1 {
+  margin: 0.125rem 0 0;
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}
+
+/* Explanatory line under a field. Global because every edit sheet ends with
+   one, and eight copies of three declarations is worse than one rule. */
+.mh-helper {
+  margin: 0.75rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-body);
+}
+
+/* The mono micro-label above a heading or inside a card header. Sentence case
+   like every other visible string — never pair it with `ion-text-uppercase`
+   or a `text-transform`. */
+.mh-kicker {
+  display: block;
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+}
+
+/* The mono label that titles a group of rows ("PEOPLE", "CONVERSATION").
+   Every list screen has a few; ion-list-header is a row with its own type
+   scale, not a standalone label. Inside `.mh-section` the block padding is
+   neutralized â€” the section owns the spacing there (see layout.css). */
+.mh-section-label {
+  padding: 1rem 0.375rem 0.375rem;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+/* The fine print that closes a screen â€” "Member since", deletion warnings,
+   visibility captions. Smaller than `.mh-note-block`, margin-free: the page
+   layout places it. */
+.mh-footnote {
+  display: block;
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-body);
+}
+
+/* A standalone line of explanatory text between blocks. `ion-note` is inline
+   by default, so it needs to be told it owns a block. */
+.mh-note-block {
+  display: block;
+  padding: 0.75rem 1.5rem 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}

@@ -1,0 +1,4 @@
+/* Chips keep their pill — the one control that is deliberately round. */
+ion-chip {
+  --border-radius: var(--mh-radius-pill);
+}

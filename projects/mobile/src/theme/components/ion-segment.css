@@ -1,0 +1,5 @@
+/* Sentence case, same rule as ion-button: segment buttons set the uppercase
+   transform on the host and the label inherits, so one host rule covers it. */
+ion-segment-button {
+  text-transform: none;
+}

@@ -1,0 +1,6 @@
+// This screen is a full-bleed list page (plain ion-lists with their own row
+// padding); the two cards it shows are placed by the page, inset to the list
+// rows' gutter.
+ion-card {
+  margin: 0.25rem 1rem 0.75rem;
+}

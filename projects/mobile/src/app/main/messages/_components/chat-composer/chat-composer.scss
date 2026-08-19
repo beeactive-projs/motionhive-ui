@@ -25,13 +25,13 @@
   --padding-end: 0.875rem;
   /* Symmetric, unlike the 18/8 Ionic uses to clear a floating label: half of
      the 44px height less the line box, so one line sits centred in the pill. */
-  --padding-top: 0.8125rem;
-  --padding-bottom: 0.8125rem;
+  --padding-top: 0.875rem;
+  --padding-bottom: 0.875rem;
   --background: var(--mh-color-divider);
   --highlight-height: 0;
-  font-size: 0.9375rem;
+  font-size: var(--mh-text-md);
   /* Past this the keyboard and the bar leave no thread visible. */
-  max-height: 40vh;
+  max-height: 40dvh;
   overflow-y: auto;
 }
 
@@ -45,8 +45,8 @@
   --padding-start: 0;
   --padding-end: 0;
   --box-shadow: none;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
   margin: 0;
   font-weight: 600;
 }
@@ -60,6 +60,6 @@
 
 .error ion-note {
   flex: 1;
-  font-size: 0.72rem;
-  line-height: 1.4;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
 }

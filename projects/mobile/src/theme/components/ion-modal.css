@@ -1,0 +1,20 @@
+/* Picker popups — dates and wheels alike.
+   A picker in a bare `ion-modal` inherits the sheet's full-bleed size and
+   lands top-left on a white slab. Ionic sizes these through modal variables,
+   and the modal is relocated on present so the rule has to be global rather
+   than scoped to whichever screen opened it. */
+ion-modal.mh-picker-modal {
+  --width: 20rem;
+  --height: auto;
+  --max-width: calc(100% - 2rem);
+  --border-radius: var(--mh-radius-card);
+  --background: var(--ion-card-background);
+  --box-shadow: 0 0.5rem 2.5rem rgb(var(--ion-text-color-rgb) / 0.25);
+  align-items: center;
+  justify-content: center;
+}
+
+ion-modal.mh-picker-modal ion-datetime {
+  /* Without this the picker stretches to the modal and clips its own footer. */
+  height: auto;
+}

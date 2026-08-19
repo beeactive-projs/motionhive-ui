@@ -4,13 +4,9 @@
   padding: 1rem;
 }
 
-ion-list.mh-card-list {
-  margin-inline: 0;
-}
-
 .selected {
   margin: 0.75rem 0 0;
-  font-size: 0.8rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 

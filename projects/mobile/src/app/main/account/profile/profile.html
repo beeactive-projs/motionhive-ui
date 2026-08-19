@@ -8,64 +8,66 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="portrait">
-    <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
-    <ion-button fill="clear" size="small" (click)="photoSheetOpen.set(true)">Edit photo</ion-button>
-  </div>
+  <div class="mh-page">
+    <div class="portrait">
+      <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
+      <ion-button fill="clear" size="small" (click)="photoSheetOpen.set(true)">Edit photo</ion-button>
+    </div>
 
-  <ion-list [inset]="true" class="mh-card-list">
-    <mh-settings-row
-      label="Name"
-      [value]="store.fullName() || null"
-      valuePlaceholder="Not provided"
-      (select)="nameSheetOpen.set(true)"
-    />
-
-    @if (isInstructor()) {
+    <ion-list [inset]="true" class="mh-card-list">
       <mh-settings-row
-        label="About"
-        [value]="aboutValue()"
+        label="Name"
+        [value]="store.fullName() || null"
         valuePlaceholder="Not provided"
-        (select)="aboutSheetOpen.set(true)"
+        (select)="nameSheetOpen.set(true)"
       />
-    }
 
-    <mh-settings-row
-      label="Handle"
-      [value]="handleValue()"
-      valuePlaceholder="Not set"
-      [valueMono]="true"
-      (select)="handleSheetOpen.set(true)"
-    />
+      @if (isInstructor()) {
+        <mh-settings-row
+          label="About"
+          [value]="aboutValue()"
+          valuePlaceholder="Not provided"
+          (select)="aboutSheetOpen.set(true)"
+        />
+      }
 
-    <mh-settings-row
-      label="Phone"
-      [value]="account()?.phone ?? null"
-      valuePlaceholder="Not provided"
-      (select)="phoneSheetOpen.set(true)"
-    />
-
-    <mh-settings-row
-      label="Location"
-      [value]="locationValue()"
-      valuePlaceholder="Not provided"
-      (select)="locationSheetOpen.set(true)"
-    />
-
-    @if (isInstructor()) {
       <mh-settings-row
-        label="Links"
-        [value]="linksValue()"
-        valuePlaceholder="None added"
-        (select)="linksSheetOpen.set(true)"
+        label="Handle"
+        [value]="handleValue()"
+        valuePlaceholder="Not set"
+        [valueMono]="true"
+        (select)="handleSheetOpen.set(true)"
       />
-    }
-  </ion-list>
 
-  <ion-note class="caption" color="medium">
-    Your name, handle{{ isInstructor() ? ', about and links are' : ' and photo are' }} visible on
-    your public profile. Phone and email stay private.
-  </ion-note>
+      <mh-settings-row
+        label="Phone"
+        [value]="account()?.phone ?? null"
+        valuePlaceholder="Not provided"
+        (select)="phoneSheetOpen.set(true)"
+      />
+
+      <mh-settings-row
+        label="Location"
+        [value]="locationValue()"
+        valuePlaceholder="Not provided"
+        (select)="locationSheetOpen.set(true)"
+      />
+
+      @if (isInstructor()) {
+        <mh-settings-row
+          label="Links"
+          [value]="linksValue()"
+          valuePlaceholder="None added"
+          (select)="linksSheetOpen.set(true)"
+        />
+      }
+    </ion-list>
+
+    <ion-note class="mh-footnote" color="medium">
+      Your name, handle{{ isInstructor() ? ', about and links are' : ' and photo are' }} visible on
+      your public profile. Phone and email stay private.
+    </ion-note>
+  </div>
 
   <mh-photo-sheet [(open)]="photoSheetOpen" />
   <mh-name-sheet [(open)]="nameSheetOpen" />

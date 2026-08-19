@@ -148,13 +148,13 @@
   <div class="agenda">
     <div class="day-header">
       <span class="mh-kicker">
-        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.7rem" />
+        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
       </span>
     </div>
     @for (_ of skeletonRows; track $index) {
-    <ion-item lines="none" class="skeleton">
+    <ion-item lines="none" class="skeleton mh-list-row">
       <div slot="start" class="when">
-        <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.9rem" />
+        <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.875rem" />
       </div>
       <ion-label>
         <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>

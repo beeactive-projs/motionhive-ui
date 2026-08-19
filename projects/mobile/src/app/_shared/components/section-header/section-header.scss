@@ -2,7 +2,7 @@
 // the title. Nothing else here — ion-list-header owns the row layout.
 ion-note {
   display: block;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
+  font-size: var(--mh-text-sm);
+  letter-spacing: var(--mh-tracking-kicker);
   text-transform: uppercase;
 }

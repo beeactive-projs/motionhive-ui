@@ -1,4 +1,2 @@
-// The action rows sit flush inside the sheet, which already has its own padding.
-ion-list.mh-card-list {
-  margin-inline: 0;
-}
+/* The action rows sit flush inside the sheet, which already has its own
+   padding — the margin-free card-list skin needs no correction here. */

@@ -11,7 +11,7 @@
 
 .empty h2 {
   margin: 1.25rem 0 0;
-  font-size: 1.25rem;
+  font-size: var(--mh-text-xl);
   font-weight: 700;
 }
 
@@ -19,8 +19,8 @@
   margin: 0.5rem 0 0;
   max-width: 20rem;
   color: var(--ion-color-medium);
-  font-size: 0.85rem;
-  line-height: 1.55;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
 }
 
 /* The CTAs are the width of the content column, not of the page — `expand`
@@ -34,10 +34,10 @@
   margin-bottom: 0.625rem;
 }
 
-/* `mh-card-list` is laid out for a full-bleed page; here it sits inside a
-   padded hero column and only needs the vertical rhythm. */
+/* The card-list skin is margin-free; inside this padded hero column it needs
+   the column's own vertical rhythm and its natural text alignment back. */
 .empty ion-list.mh-card-list {
   align-self: stretch;
-  margin: 1rem 0 0;
+  margin-top: 1rem;
   text-align: start;
 }

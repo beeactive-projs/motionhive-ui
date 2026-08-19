@@ -11,7 +11,7 @@
    doesn't have, so the fills come from the theme tokens directly. */
 .chips ion-chip {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
   font-weight: 600;
   --background: var(--ion-color-medium-wash);
   --color: var(--ion-color-medium-wash-contrast);
@@ -35,7 +35,7 @@
   border: none;
   background: none;
   color: var(--mh-color-honey-deep);
-  font-size: 0.8rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .field ion-label {
-  font-size: 0.8rem;
+  font-size: var(--mh-text-base);
   font-weight: 600;
 }
 

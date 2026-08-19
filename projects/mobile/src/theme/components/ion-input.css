@@ -1,0 +1,12 @@
+/* One radius for everything you can type into. Ionic ships 4px on form
+   controls, which clashes with the 12px cards and tiles around them; the
+   `--mh-radius-control` token is the single place that decides it.
+
+   `!important` because Ionic ships these components with scoped CSS, so its
+   own `.input-fill-outline.sc-ion-input-md-h` rule outranks any selector we
+   can write against the element. Same reason the `.ion-color-*` blocks in
+   variables.css use it. `shape="round"` is excluded rather than outranked —
+   see ion-button.css for why. */
+ion-input:not([shape='round']) {
+  --border-radius: var(--mh-radius-control) !important;
+}

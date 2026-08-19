@@ -8,61 +8,63 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-note class="intro" color="medium">
-    People you block can't message you, see your conversation history, or appear in your message
-    list.
-  </ion-note>
+  <div class="mh-page">
+    <ion-note class="mh-note-block" color="medium">
+      People you block can't message you, see your conversation history, or appear in your message
+      list.
+    </ion-note>
 
-  @if (loading()) {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (_ of [1, 2, 3]; track $index) {
-        <ion-item lines="full">
-          <ion-skeleton-text slot="start" [animated]="true" style="width: 2.5rem; height: 2.2rem" />
-          <ion-label>
-            <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
-            <p><ion-skeleton-text [animated]="true" style="width: 35%" /></p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
-  } @else if (loadFailed()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      heading="Couldn't load your blocked list"
-      message="Check your connection and try again."
-      actionLabel="Try again"
-      (action)="load()"
-    />
-  } @else if (blocks().length === 0) {
-    <mh-empty-state
-      icon="shield-checkmark-outline"
-      heading="No blocked users"
-      message="When you block someone from a conversation, they'll appear here so you can unblock them later."
-    />
-  } @else {
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (block of blocks(); track block.id) {
-        <ion-item lines="full">
-          <mh-hex-avatar
-            slot="start"
-            [name]="nameOf(block)"
-            [imageUrl]="block.blocked?.avatarUrl ?? null"
-          />
-          <ion-label class="ion-text-wrap">
-            <h3>{{ nameOf(block) }}</h3>
-            <p>Blocked {{ block.createdAt | date: 'd MMM yyyy' }}</p>
-          </ion-label>
-          <ion-button
-            slot="end"
-            fill="clear"
-            size="small"
-            [disabled]="isUnblocking(block.blockedId)"
-            (click)="unblock(block)"
-          >
-            Unblock
-          </ion-button>
-        </ion-item>
-      }
-    </ion-list>
-  }
+    @if (loading()) {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of [1, 2, 3]; track $index) {
+          <ion-item lines="full">
+            <ion-skeleton-text slot="start" [animated]="true" style="width: 2.5rem; height: 2.25rem" />
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 35%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (loadFailed()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        heading="Couldn't load your blocked list"
+        message="Check your connection and try again."
+        actionLabel="Try again"
+        (action)="load()"
+      />
+    } @else if (blocks().length === 0) {
+      <mh-empty-state
+        icon="shield-checkmark-outline"
+        heading="No blocked users"
+        message="When you block someone from a conversation, they'll appear here so you can unblock them later."
+      />
+    } @else {
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (block of blocks(); track block.id) {
+          <ion-item lines="full">
+            <mh-hex-avatar
+              slot="start"
+              [name]="nameOf(block)"
+              [imageUrl]="block.blocked?.avatarUrl ?? null"
+            />
+            <ion-label class="ion-text-wrap">
+              <h3>{{ nameOf(block) }}</h3>
+              <p>Blocked {{ block.createdAt | date: 'd MMM yyyy' }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="clear"
+              size="small"
+              [disabled]="isUnblocking(block.blockedId)"
+              (click)="unblock(block)"
+            >
+              Unblock
+            </ion-button>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  </div>
 </ion-content>

@@ -1,12 +1,6 @@
-.intro {
-  display: block;
-  margin: 0.75rem 1.5rem 0.875rem;
-  font-size: 0.72rem;
-  line-height: 1.5;
-}
-
+/* `.mh-page` stretches flex children — the quiet action stays hugged left. */
 .reset {
-  margin: 0.5rem 1rem 2.5rem;
+  align-self: flex-start;
 }
 
 /* Which channels this category actually uses. In-app is permanently lit — the
@@ -14,10 +8,10 @@
 .channels {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.3125rem;
-  font-size: 0.62rem;
+  margin-top: 0.375rem;
+  font-size: var(--mh-text-xs);
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--mh-tracking-kicker);
   text-transform: uppercase;
 }
 
