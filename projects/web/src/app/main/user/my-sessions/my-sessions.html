@@ -102,9 +102,9 @@
           type="button"
           size="small"
           rounded
-          [severity]="typeFilter() === SessionKind.Group ? 'primary' : 'secondary'"
-          [text]="typeFilter() !== SessionKind.Group"
-          (click)="toggleType(SessionKind.Group)"
+          [severity]="typeFilter() === SessionType.Group ? 'primary' : 'secondary'"
+          [text]="typeFilter() !== SessionType.Group"
+          (click)="toggleType(SessionType.Group)"
           class="py-0.5 min-w-10"
         >
           Group
@@ -113,9 +113,9 @@
           type="button"
           size="small"
           rounded
-          [severity]="typeFilter() === SessionKind.Private ? 'primary' : 'secondary'"
-          [text]="typeFilter() !== SessionKind.Private"
-          (click)="toggleType(SessionKind.Private)"
+          [severity]="typeFilter() === SessionType.Private ? 'primary' : 'secondary'"
+          [text]="typeFilter() !== SessionType.Private"
+          (click)="toggleType(SessionType.Private)"
           class="py-0.5 min-w-10"
         >
           1-on-1
@@ -124,9 +124,9 @@
           type="button"
           size="small"
           rounded
-          [severity]="typeFilter() === SessionKind.Open ? 'primary' : 'secondary'"
-          [text]="typeFilter() !== SessionKind.Open"
-          (click)="toggleType(SessionKind.Open)"
+          [severity]="typeFilter() === SessionType.Open ? 'primary' : 'secondary'"
+          [text]="typeFilter() !== SessionType.Open"
+          (click)="toggleType(SessionType.Open)"
           class="py-0.5 min-w-10"
         >
           Open
@@ -251,9 +251,9 @@
           type="button"
           size="small"
           rounded
-          [severity]="typeFilter() === SessionKind.Group ? 'primary' : 'secondary'"
-          [outlined]="typeFilter() !== SessionKind.Group"
-          (click)="toggleType(SessionKind.Group)"
+          [severity]="typeFilter() === SessionType.Group ? 'primary' : 'secondary'"
+          [outlined]="typeFilter() !== SessionType.Group"
+          (click)="toggleType(SessionType.Group)"
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-users"></i>
@@ -263,9 +263,9 @@
           type="button"
           size="small"
           rounded
-          [severity]="typeFilter() === SessionKind.Private ? 'primary' : 'secondary'"
-          [outlined]="typeFilter() !== SessionKind.Private"
-          (click)="toggleType(SessionKind.Private)"
+          [severity]="typeFilter() === SessionType.Private ? 'primary' : 'secondary'"
+          [outlined]="typeFilter() !== SessionType.Private"
+          (click)="toggleType(SessionType.Private)"
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-user"></i>
@@ -275,9 +275,9 @@
           type="button"
           size="small"
           rounded
-          [severity]="typeFilter() === SessionKind.Open ? 'primary' : 'secondary'"
-          [outlined]="typeFilter() !== SessionKind.Open"
-          (click)="toggleType(SessionKind.Open)"
+          [severity]="typeFilter() === SessionType.Open ? 'primary' : 'secondary'"
+          [outlined]="typeFilter() !== SessionType.Open"
+          (click)="toggleType(SessionType.Open)"
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-globe"></i>

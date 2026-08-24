@@ -8,7 +8,12 @@ import {
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { SessionParticipant, SessionParticipantStatus } from 'core';
+import {
+  SESSION_PARTICIPANT_STATUSES,
+  SessionParticipant,
+  SessionParticipantStatus,
+} from 'core';
+import type { SessionStatusTone } from 'core';
 
 /**
  * `mh-participants-table` — table primitive for a session's roster.
@@ -59,26 +64,11 @@ export class ParticipantsTable {
   }
 
   protected statusLabel(s: string): string {
-    switch (s) {
-      case this.Status.Confirmed: return 'Confirmed';
-      case this.Status.PendingApproval: return 'Pending';
-      case this.Status.Waitlisted: return 'Waitlisted';
-      case this.Status.Cancelled: return 'Cancelled';
-      case this.Status.Declined: return 'Declined';
-      default: return s;
-    }
+    return SESSION_PARTICIPANT_STATUSES[s as SessionParticipantStatus]?.label ?? s;
   }
 
-  protected statusSeverity(
-    s: string,
-  ): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-    switch (s) {
-      case this.Status.Confirmed: return 'success';
-      case this.Status.PendingApproval: return 'warn';
-      case this.Status.Waitlisted: return 'info';
-      case this.Status.Cancelled:
-      case this.Status.Declined: return 'danger';
-      default: return 'secondary';
-    }
+  /** Core's status tones are named after PrimeNG severities — pass straight through. */
+  protected statusSeverity(s: string): SessionStatusTone {
+    return SESSION_PARTICIPANT_STATUSES[s as SessionParticipantStatus]?.tone ?? 'secondary';
   }
 }

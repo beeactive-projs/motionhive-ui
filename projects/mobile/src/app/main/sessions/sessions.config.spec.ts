@@ -175,16 +175,16 @@ describe('formatRecurrenceSummary', () => {
 
 describe('sessionTypeLabel', () => {
   // The chip on the detail band and the tile on the create sheet name the same
-  // thing, so they read from the same list.
+  // thing — core's SESSION_TYPES is the single list both read now.
   it('names a type the way the create sheet does', async () => {
-    const { sessionTypeLabel } = await import('./sessions.config');
+    const { sessionTypeLabel } = await import('core');
     expect(sessionTypeLabel('GROUP')).toBe('Group');
     expect(sessionTypeLabel('PRIVATE')).toBe('1-on-1');
     expect(sessionTypeLabel('OPEN')).toBe('Open');
   });
 
   it('falls back rather than rendering an enum at a user', async () => {
-    const { sessionTypeLabel } = await import('./sessions.config');
+    const { sessionTypeLabel } = await import('core');
     expect(sessionTypeLabel(null)).toBe('Session');
   });
 });

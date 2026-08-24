@@ -26,8 +26,10 @@ import {
   CreateTemplateRequest,
   CreateTemplateResponse,
   RecurrenceRule,
+  SESSION_ACCESS_LEVELS,
+  SESSION_LOCATION_KINDS,
   SessionAccess,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionService,
   SessionTemplate,
@@ -37,6 +39,7 @@ import {
   GroupService,
   Group,
   injectIsMobile,
+  sessionTypeLabel,
   showApiError,
 } from 'core';
 import { RecurrenceBuilder } from '../../../../../_shared/components/recurrence-builder/recurrence-builder';
@@ -69,7 +72,7 @@ export interface SessionForm {
   // Basics
   title: string;
   description: string;
-  type: SessionKind;
+  type: SessionType;
   access: SessionAccess;
   approvalRequired: boolean;
   groupId: string | null;
@@ -107,7 +110,7 @@ function blankForm(): SessionForm {
   return {
     title: '',
     description: '',
-    type: 'OPEN' as SessionKind,
+    type: 'OPEN' as SessionType,
     access: 'OPEN' as SessionAccess,
     approvalRequired: false,
     groupId: null,
@@ -179,46 +182,21 @@ export class SessionFormDialog {
   readonly venues = signal<Venue[]>([]);
   readonly groups = signal<Group[]>([]);
 
-  readonly typeOptions = [
-    { value: 'OPEN', label: 'Open (anyone)' },
-    { value: 'GROUP', label: 'Group' },
-    { value: 'PRIVATE', label: 'Private (1:1)' },
-  ];
+  readonly typeOptions = (['OPEN', 'GROUP', 'PRIVATE'] as SessionType[]).map((value) => ({
+    value,
+    label: sessionTypeLabel(value),
+  }));
   /**
    * Access requirement options rendered as 4 radio-cards (icon + label
-   * + sub-copy). The orthogonal `approvalRequired` toggle sits below as
-   * a separate checkbox — both compose without enums multiplying.
+   * + sub-copy), everything from core's `SESSION_ACCESS_LEVELS`. The
+   * orthogonal `approvalRequired` toggle sits below as a separate checkbox.
    */
-  readonly accessOptions: { value: SessionAccess; label: string; sub: string; icon: string }[] = [
-    {
-      value: 'OPEN',
-      label: 'Open',
-      sub: 'Anyone with the link can book.',
-      icon: 'pi-globe',
-    },
-    {
-      value: 'FREE',
-      label: 'Free',
-      sub: 'Listed publicly with no price tag.',
-      icon: 'pi-heart',
-    },
-    {
-      value: 'CLIENTS_ONLY',
-      label: 'Clients only',
-      sub: 'Only your active clients can book.',
-      icon: 'pi-user',
-    },
-    {
-      value: 'GROUP_ONLY',
-      label: 'Group members',
-      sub: 'Only members of a specific group.',
-      icon: 'pi-sitemap',
-    },
-  ];
-  readonly locationOptions = [
-    { value: 'ONLINE', label: 'Online' },
-    { value: 'IN_PERSON', label: 'In person (venue)' },
-  ];
+  readonly accessOptions = (
+    ['OPEN', 'FREE', 'CLIENTS_ONLY', 'GROUP_ONLY'] as SessionAccess[]
+  ).map((value) => ({ value, ...SESSION_ACCESS_LEVELS[value] }));
+  readonly locationOptions = (['ONLINE', 'IN_PERSON'] as SessionLocationKind[]).map(
+    (value) => ({ value, label: SESSION_LOCATION_KINDS[value].label }),
+  );
   readonly timezones = TIMEZONE_OPTIONS;
   readonly currencies = [
     { value: 'RON', label: 'RON' },
@@ -442,7 +420,7 @@ export class SessionFormDialog {
     this.form.set({
       title: t.title,
       description: t.description ?? '',
-      type: t.type as SessionKind,
+      type: t.type as SessionType,
       access: t.access as SessionAccess,
       approvalRequired: t.approvalRequired,
       groupId: t.groupId,

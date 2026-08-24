@@ -100,11 +100,6 @@ export * from './lib/models/notification';
 export * from './lib/models/messaging';
 
 // Models - Session
-// NOTE: profile.enums.ts already exports a `SessionType` referring to the
-// instructor-profile "session kinds" concept (ONLINE/IN_PERSON/HYBRID).
-// To avoid a collision with the new session module's `SessionType`
-// (GROUP/PRIVATE/OPEN), the session module enums are re-exported via
-// a namespaced barrel until we can clean up the profile model.
 export {
   CancelScope,
   FollowUpAudience,
@@ -116,7 +111,7 @@ export {
   SessionParticipantStatus,
   SessionReminderKind,
   SessionTemplateStatus,
-  SessionType as SessionKind,
+  SessionType,
   TemplateTab,
 } from './lib/models/session/session.enums';
 export type {
@@ -175,6 +170,8 @@ export * from './lib/constants/handle.const';
 export * from './lib/constants/social-platforms.const';
 export * from './lib/constants/avatar-upload.const';
 export * from './lib/constants/messaging-routes.const';
+export * from './lib/constants/session-types.const';
+export * from './lib/constants/session-meta.const';
 
 // Utils
 export * from './lib/utils/url.utils';

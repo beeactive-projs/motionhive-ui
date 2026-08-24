@@ -65,6 +65,12 @@ export class SheetShell {
   readonly saveLabel = input('Save');
   /** Ionic palette name for the confirm button — `danger` for destructive sheets. */
   readonly saveColor = input('primary');
+  /**
+   * Label on the footer's dismiss button. Override it where "Cancel" would sit
+   * next to a destructive confirm that also says cancel — the cancel-session
+   * sheet reads "Keep / Cancel session" instead of "Cancel / Cancel session".
+   */
+  readonly dismissLabel = input('Cancel');
   readonly canSave = input(true);
   readonly saving = input(false);
   /** Off for the sheets that are a list of actions rather than a form. */

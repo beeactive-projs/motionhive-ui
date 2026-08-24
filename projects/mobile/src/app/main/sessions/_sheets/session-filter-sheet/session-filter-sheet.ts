@@ -13,7 +13,7 @@ import {
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
-import { Group, GroupService, SessionKind, SessionLocationKind } from 'core';
+import { Group, GroupService, SessionType, SessionLocationKind } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import {
@@ -122,7 +122,7 @@ export class SessionFilterSheet {
   });
 
   /** Tapping the selected option clears it — the chips are toggles, not a radio. */
-  toggleType(type: SessionKind): void {
+  toggleType(type: SessionType): void {
     this.draft.update((draft) => ({ ...draft, type: draft.type === type ? null : type }));
   }
 

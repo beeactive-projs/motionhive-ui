@@ -29,7 +29,7 @@ import {
   ActionList,
   BottomSheet,
   SessionInstanceStatus,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionsInstructorStore,
   dayTone,
@@ -39,6 +39,7 @@ import {
   injectIsTabletDown,
   sessionDayLabel,
   sessionTone,
+  TEMPLATE_TABS,
   TemplateTab,
   type SessionInstance,
   type SessionTemplate,
@@ -117,15 +118,16 @@ export class Sessions implements OnDestroy {
   // Enum consts exposed for template comparisons — never compare against
   // raw string literals (see CLAUDE.md).
   protected readonly TemplateTab = TemplateTab;
-  protected readonly SessionKind = SessionKind;
+  protected readonly SessionType = SessionType;
   protected readonly SessionLocationKind = SessionLocationKind;
 
+  /** Words and icons from core's `TEMPLATE_TABS`. */
   protected readonly tabs: MenuItem[] = [
-    { id: TemplateTab.Active, label: 'Upcoming', icon: 'pi pi-calendar' },
-    { id: TemplateTab.Recurring, label: 'Recurring templates', icon: 'pi pi-replay' },
-    { id: TemplateTab.Ended, label: 'Past', icon: 'pi pi-history' },
-    { id: TemplateTab.Cancelled, label: 'Cancelled', icon: 'pi pi-times-circle' },
-  ];
+    TemplateTab.Active,
+    TemplateTab.Recurring,
+    TemplateTab.Ended,
+    TemplateTab.Cancelled,
+  ].map((id) => ({ id, label: TEMPLATE_TABS[id].label, icon: TEMPLATE_TABS[id].piIcon }));
 
   protected readonly searchInput = signal<string>('');
   protected searchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -344,7 +346,7 @@ export class Sessions implements OnDestroy {
   }
 
   /** Toggle a type pill — click the active one again to clear. */
-  protected toggleType(type: SessionKind): void {
+  protected toggleType(type: SessionType): void {
     const current = this.store.filters().type;
     this.store.setFilters({ type: current === type ? undefined : type });
   }

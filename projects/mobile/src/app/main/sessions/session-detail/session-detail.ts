@@ -24,8 +24,11 @@ import { addIcons } from 'ionicons';
 
 import {
   AuthStore,
-  SessionAccess,
+  SESSION_ACCESS_LEVELS,
+  SESSION_PARTICIPANT_STATUSES,
+  SESSION_REMINDER_KINDS,
   SessionInstance,
+  SessionInstanceStatus,
   SessionParticipant,
   SessionsDetailStore,
   detectMeetingProvider,
@@ -35,8 +38,11 @@ import {
   formatSessionDuration,
   formatSessionTime,
   formatTimeUntil,
+  meetingProviderLabel,
   publicProfileUrl,
   sessionLifecycle,
+  sessionTypeLabel,
+  sessionTypeTone,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
@@ -56,7 +62,6 @@ import { ParticipantNoteSheet } from '../_sheets/participant-note-sheet/particip
 import { SessionActionsSheet } from '../_sheets/session-actions-sheet/session-actions-sheet';
 import { SessionFormSheet } from '../_sheets/session-form-sheet/session-form-sheet';
 import {
-  SESSION_ACCESS_OPTIONS,
   SESSION_ICONS,
   SessionActionId,
   SessionActionIds,
@@ -64,15 +69,7 @@ import {
   SessionSurfaces,
   formatRecurrenceSummary,
   prefillFromInstance,
-  sessionTypeLabel,
 } from '../sessions.config';
-
-/** Provider names as people write them, for the Join button. */
-const MEETING_PROVIDER_NAMES: Record<string, string> = {
-  ZOOM: 'Zoom',
-  GOOGLE_MEET: 'Google Meet',
-  TEAMS: 'Teams',
-};
 
 /**
  * When the meeting link goes live, in minutes before the start.
@@ -85,16 +82,6 @@ const JOIN_OPENS_MINUTES = 5;
 
 /** How many attendees show before the list collapses behind "Show all". */
 const ATTENDEE_PREVIEW = 5;
-
-/**
- * When the API schedules reminders — `startAt` minus each offset. Mirrored from
- * the BE's booking flow, which writes exactly these two and only when they are
- * still in the future at the time of booking.
- */
-const REMINDER_OFFSETS = [
-  { label: '24 hours before', offsetMs: 24 * 3_600_000 },
-  { label: '1 hour before', offsetMs: 3_600_000 },
-];
 
 interface ReminderRow {
   label: string;
@@ -110,14 +97,6 @@ interface DetailRow {
   title: string;
   detail: string | null;
 }
-
-/** Badge tone per access level — the same hues the web access chip uses. */
-const ACCESS_TONES: Record<SessionAccess, string> = {
-  [SessionAccess.Open]: 'open',
-  [SessionAccess.Free]: 'free',
-  [SessionAccess.ClientsOnly]: 'clients',
-  [SessionAccess.GroupOnly]: 'group',
-};
 
 /**
  * One occurrence: when, where, who is coming, and the one action that makes
@@ -204,7 +183,9 @@ export class SessionDetail implements ViewWillEnter {
     return sessionLifecycle(instance.startAt, instance.endAt);
   });
 
-  readonly isCancelled = computed(() => this.instance()?.status === 'CANCELLED');
+  readonly isCancelled = computed(
+    () => this.instance()?.status === SessionInstanceStatus.Cancelled,
+  );
 
   readonly timeRange = computed(() => {
     const instance = this.instance();
@@ -250,22 +231,31 @@ export class SessionDetail implements ViewWillEnter {
   readonly typeLabel = computed(() => sessionTypeLabel(this.template()?.type));
 
   /**
+   * The session's type tone from core's `SESSION_TYPES` — honey Group, navy
+   * 1-on-1, teal Open — as the hero's surface. Statuses (coral conflict,
+   * muted cancelled) deliberately do not tint it: the surface says what this
+   * session *is*; the status chip and banners say what state it is in.
+   */
+  readonly heroTone = computed(() => sessionTypeTone(this.template()?.type));
+
+  /**
    * What the band says about the moment this session is in. Upcoming gets
-   * nothing: the date right below it already says that.
+   * nothing: the date right below it already says that. Tones are core's
+   * `SessionStatusTone` vocabulary, which the SCSS maps to washes.
    */
   readonly statusChip = computed<{ label: string; tone: string } | null>(() => {
-    if (this.isCancelled()) return { label: 'Cancelled', tone: 'cancelled' };
-    if (this.lifecycle() === 'ongoing') return { label: 'Live now', tone: 'live' };
-    if (this.lifecycle() === 'past') return { label: 'Completed', tone: 'done' };
+    if (this.isCancelled()) return { label: 'Cancelled', tone: 'danger' };
+    if (this.lifecycle() === 'ongoing') return { label: 'Live now', tone: 'success' };
+    if (this.lifecycle() === 'past') return { label: 'Completed', tone: 'secondary' };
     return null;
   });
 
   /** "Google Meet", not GOOGLE_MEET — falls back to the link when unset. */
-  readonly providerLabel = computed(() => {
-    const provider =
-      this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl());
-    return (provider && MEETING_PROVIDER_NAMES[provider]) || 'Online';
-  });
+  readonly providerLabel = computed(() =>
+    meetingProviderLabel(
+      this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl()),
+    ),
+  );
 
   readonly venue = computed(
     () => this.instance()?.venueOverride ?? this.template()?.venue ?? null,
@@ -399,7 +389,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly joinLabel = computed(() => {
     const provider =
       this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl());
-    return provider ? `Join ${MEETING_PROVIDER_NAMES[provider]}` : 'Join meeting';
+    return provider ? `Join ${meetingProviderLabel(provider)}` : 'Join meeting';
   });
 
   /**
@@ -417,7 +407,7 @@ export class SessionDetail implements ViewWillEnter {
     const start = new Date(instance.startAt).getTime();
     if (Number.isNaN(start)) return [];
 
-    return REMINDER_OFFSETS.map(({ label, offsetMs }) => ({
+    return Object.values(SESSION_REMINDER_KINDS).map(({ label, offsetMs }) => ({
       label,
       detail: `Push · ${new Date(start - offsetMs).toLocaleString('en-GB', {
         weekday: 'short',
@@ -524,15 +514,19 @@ export class SessionDetail implements ViewWillEnter {
     () => this.instance()?.descriptionOverride ?? this.template()?.description ?? null,
   );
 
-  /** "Open" / "Free" / "Clients only" — the access level as a hero badge. */
+  /**
+   * "Paid" / "Free" / "Clients only" — the access level as a hero
+   * badge, worded by core's `SESSION_ACCESS_LEVELS` (whose labels never
+   * collide with the type chip's).
+   */
   readonly accessLabel = computed(() => {
     const access = this.template()?.access;
-    return SESSION_ACCESS_OPTIONS.find((option) => option.value === access)?.label ?? null;
+    return access ? SESSION_ACCESS_LEVELS[access].label : null;
   });
 
   readonly accessTone = computed(() => {
     const access = this.template()?.access;
-    return access ? ACCESS_TONES[access] : null;
+    return access ? SESSION_ACCESS_LEVELS[access].tone : null;
   });
 
   /** The cancel banner's second line — when it happened, who heard about it. */
@@ -563,12 +557,10 @@ export class SessionDetail implements ViewWillEnter {
       },
     ];
 
-    const access = SESSION_ACCESS_OPTIONS.find(
-      (option) => option.value === template.access,
-    );
+    const access = template.access ? SESSION_ACCESS_LEVELS[template.access] : null;
     if (access) {
       rows.push({
-        icon: access.icon,
+        icon: access.ionIcon,
         color: 'violet',
         tone: HexAvatarTones.Base,
         title: access.label,
@@ -681,24 +673,22 @@ export class SessionDetail implements ViewWillEnter {
   }
 
   /**
-   * Confirmed / pending / attended / no-show, as a chip tone.
-   *
-   * The same wash vocabulary as the band's chips rather than Ionic's solid
-   * colours: a column of saturated pills down the roster reads louder than the
-   * names beside them, which are the thing being looked up.
+   * An attendance mark outranks the booking status; past that, the words and
+   * tones are core's `SESSION_PARTICIPANT_STATUSES` — the same vocabulary the
+   * web roster speaks. Washes rather than Ionic's solid colours: a column of
+   * saturated pills down the roster reads louder than the names beside them,
+   * which are the thing being looked up.
    */
   statusTone(participant: SessionParticipant): string {
-    if (participant.attended === true) return 'attended';
-    if (participant.attended === false) return 'noshow';
-    return participant.status === 'CONFIRMED' ? 'confirmed' : 'pending';
+    if (participant.attended === true) return 'success';
+    if (participant.attended === false) return 'danger';
+    return SESSION_PARTICIPANT_STATUSES[participant.status]?.tone ?? 'secondary';
   }
 
   statusLabel(participant: SessionParticipant): string {
     if (participant.attended === true) return 'Attended';
     if (participant.attended === false) return 'No-show';
-    if (participant.status === 'PENDING_APPROVAL') return 'Pending';
-    if (participant.status === 'WAITLISTED') return 'Waitlist';
-    return 'Confirmed';
+    return SESSION_PARTICIPANT_STATUSES[participant.status]?.label ?? participant.status;
   }
 
   /** Approve/decline only make sense while a request is still pending. */

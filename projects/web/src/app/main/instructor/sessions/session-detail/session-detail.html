@@ -67,8 +67,7 @@
         </button>
         }
       } @else {
-      <p-tag [value]="statusLabel(inst.status)"
-        [severity]="inst.status === SessionStatus.Cancelled ? 'danger' : 'secondary'" />
+      <p-tag [value]="statusLabel(inst.status)" [severity]="statusSeverity(inst.status)" />
       }
       }
     </div>

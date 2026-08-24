@@ -18,6 +18,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { InputText } from 'primeng/inputtext';
 import {
   BottomSheet,
+  CANCEL_SCOPES,
   CancelInstanceResponse,
   CancelScope,
   SessionInstance,
@@ -90,24 +91,25 @@ export class CancelSessionDialog {
     return i.confirmedCount + i.pendingApprovalCount + i.waitlistedCount;
   });
 
+  /** Labels from core's `CANCEL_SCOPES`; the help copy is this dialog's own. */
   readonly scopeOptions = computed(() => {
     const recurring = this.isRecurring();
     const opts: { value: CancelScope; label: string; help: string }[] = [
       {
         value: CancelScope.This,
-        label: 'Only this session',
+        label: CANCEL_SCOPES[CancelScope.This].label,
         help: 'Cancel the one occurrence below. The series continues.',
       },
     ];
     if (recurring) {
       opts.push({
         value: CancelScope.ThisAndFuture,
-        label: 'This and all future',
+        label: CANCEL_SCOPES[CancelScope.ThisAndFuture].label,
         help: 'Cancel this session and every later occurrence.',
       });
       opts.push({
         value: CancelScope.Series,
-        label: 'The whole series',
+        label: CANCEL_SCOPES[CancelScope.Series].label,
         help: 'Cancel every session in this series. The template is ended.',
       });
     }

@@ -7,10 +7,12 @@ import {
   Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import type { SessionKind } from 'core';
+import { sessionTypeLabel } from 'core';
+import type { SessionType } from 'core';
+import { sessionTypeCssColor } from './mappers';
 
 export interface CalendarFilters {
-  types: Record<SessionKind, boolean>;
+  types: Record<SessionType, boolean>;
   online: boolean;
   inPerson: boolean;
   conflictsOnly: boolean;
@@ -155,17 +157,18 @@ export class WeekFiltersPanel {
   @Input({ required: true }) filters!: CalendarFilters;
   @Output() filtersChange = new EventEmitter<CalendarFilters>();
 
+  /** Words and dots from core's `SESSION_TYPES`, via the calendar's tone map. */
   protected readonly typeOptions: {
-    value: SessionKind;
+    value: SessionType;
     label: string;
     color: string;
-  }[] = [
-    { value: 'GROUP', label: 'Group', color: 'var(--p-primary-500)' },
-    { value: 'PRIVATE', label: '1-on-1', color: '#1D4ED8' },
-    { value: 'OPEN', label: 'Open', color: 'var(--p-cyan-500, #14B8A6)' },
-  ];
+  }[] = (['GROUP', 'PRIVATE', 'OPEN'] as SessionType[]).map((value) => ({
+    value,
+    label: sessionTypeLabel(value),
+    color: sessionTypeCssColor(value),
+  }));
 
-  protected toggleType(t: SessionKind, on: boolean): void {
+  protected toggleType(t: SessionType, on: boolean): void {
     this.filtersChange.emit({
       ...this.filters,
       types: { ...this.filters.types, [t]: on },

@@ -97,7 +97,7 @@
                 [attr.aria-checked]="form().access === opt.value"
                 (click)="updateField('access', opt.value)"
               >
-                <i [class]="'pi ' + opt.icon" aria-hidden="true"></i>
+                <i [class]="opt.piIcon" aria-hidden="true"></i>
                 <span class="mh-sf__access-text">
                   <strong>{{ opt.label }}</strong>
                   <small>{{ opt.sub }}</small>

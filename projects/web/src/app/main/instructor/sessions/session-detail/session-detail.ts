@@ -17,6 +17,7 @@ import {
   ActionItem,
   ActionList,
   BottomSheet,
+  SESSION_INSTANCE_STATUSES,
   SessionInstance,
   SessionInstanceStatus,
   SessionLocationKind,
@@ -26,6 +27,7 @@ import {
   injectIsMobile,
   injectIsTablet,
 } from 'core';
+import type { SessionStatusTone } from 'core';
 import { AccessChip } from '../../../../_shared/components/access-chip/access-chip';
 import { TypeChip } from '../../../../_shared/components/type-chip/type-chip';
 import { CapacityBar } from '../../../../_shared/components/capacity-bar/capacity-bar';
@@ -101,14 +103,11 @@ export class InstructorSessionDetail implements OnInit {
   });
 
   protected statusLabel(status: SessionInstanceStatus): string {
-    switch (status) {
-      case SessionInstanceStatus.Cancelled:
-        return 'Cancelled';
-      case SessionInstanceStatus.Completed:
-        return 'Completed';
-      default:
-        return status;
-    }
+    return SESSION_INSTANCE_STATUSES[status]?.label ?? status;
+  }
+
+  protected statusSeverity(status: SessionInstanceStatus): SessionStatusTone {
+    return SESSION_INSTANCE_STATUSES[status]?.tone ?? 'secondary';
   }
 
   protected goBack(): void {

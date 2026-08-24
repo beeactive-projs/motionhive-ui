@@ -22,7 +22,7 @@ import {
   BookResponse,
   MyBookingsIndexStore,
   PublicSessionInstance,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionParticipantStatus,
   SessionsDiscoverStore,
@@ -87,7 +87,7 @@ export class SessionsDiscover implements OnInit, OnDestroy {
 
   // Enum consts exposed for template comparisons — never compare against
   // raw string literals (see CLAUDE.md).
-  protected readonly SessionKind = SessionKind;
+  protected readonly SessionType = SessionType;
   protected readonly SessionLocationKind = SessionLocationKind;
 
   /** How many quick filters are applied (type + location) — drives the badge. */
@@ -148,7 +148,7 @@ export class SessionsDiscover implements OnInit, OnDestroy {
   }
 
   /** Toggle a type quick-filter — click the active one again to clear. */
-  protected toggleType(type: SessionKind): void {
+  protected toggleType(type: SessionType): void {
     const current = this.store.filters().type;
     this.store.setFilters({ type: current === type ? undefined : type });
   }

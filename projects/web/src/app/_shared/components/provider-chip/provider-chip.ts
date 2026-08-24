@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Tag } from 'primeng/tag';
-import { SessionMeetingProvider } from 'core';
+import {
+  SESSION_MEETING_PROVIDERS,
+  SessionMeetingProvider,
+  meetingProviderLabel,
+} from 'core';
 
 /**
  * `mh-provider-chip` — meeting provider pill (Zoom / Google Meet / Teams).
@@ -19,30 +23,11 @@ export class ProviderChip {
 
   protected readonly Provider = SessionMeetingProvider;
 
-  protected readonly label = computed<string>(() => {
-    switch (this.provider()) {
-      case SessionMeetingProvider.Zoom:
-        return 'Zoom';
-      case SessionMeetingProvider.GoogleMeet:
-        return 'Google Meet';
-      case SessionMeetingProvider.Teams:
-        return 'Teams';
-      default:
-        return 'Online';
-    }
-  });
+  protected readonly label = computed<string>(() => meetingProviderLabel(this.provider()));
 
   protected readonly icon = computed<string>(() => {
-    switch (this.provider()) {
-      case SessionMeetingProvider.Zoom:
-        return 'pi pi-video';
-      case SessionMeetingProvider.GoogleMeet:
-        return 'pi pi-google';
-      case SessionMeetingProvider.Teams:
-        return 'pi pi-microsoft';
-      default:
-        return 'pi pi-video';
-    }
+    const provider = this.provider();
+    return (provider && SESSION_MEETING_PROVIDERS[provider]?.piIcon) || 'pi pi-video';
   });
 
   /** Per-provider bg + text color classes. */

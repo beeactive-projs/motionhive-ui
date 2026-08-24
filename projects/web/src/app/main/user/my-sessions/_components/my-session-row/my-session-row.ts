@@ -5,8 +5,9 @@ import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
 import {
   CurrencyRonPipe,
+  SESSION_PARTICIPANT_STATUSES,
   SessionInstructorRef,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionMeetingProvider,
   SessionParticipant,
@@ -17,6 +18,7 @@ import {
   formatSessionTime,
   sessionLifecycle,
 } from 'core';
+import type { SessionStatusTone } from 'core';
 import { Avatar } from '../../../../../_shared/components/avatar/avatar';
 import { TypeChip } from '../../../../../_shared/components/type-chip/type-chip';
 import { ProviderChip } from '../../../../../_shared/components/provider-chip/provider-chip';
@@ -52,6 +54,15 @@ const SessionRowTone = {
   Inactive: 'inactive',
 } as const;
 type SessionRowTone = (typeof SessionRowTone)[keyof typeof SessionRowTone];
+
+/** Core's status tone as the soft chip wash this row uses. */
+const STATUS_CLASSES: Record<SessionStatusTone, string> = {
+  success: 'bg-green-50 text-green-800',
+  warn: 'bg-orange-50 text-orange-800',
+  info: 'bg-sky-50 text-sky-800',
+  danger: 'bg-red-50 text-red-800',
+  secondary: 'bg-slate-50 text-slate-800',
+};
 
 /**
  * `mh-my-session-row` — a single booking row on the client "My sessions"
@@ -136,7 +147,7 @@ export class MySessionRow {
     return mins ? formatSessionDuration(mins) : '';
   });
 
-  protected readonly type = computed<SessionKind | null>(
+  protected readonly type = computed<SessionType | null>(
     () => this.instance()?.template?.type ?? null,
   );
 
@@ -171,7 +182,7 @@ export class MySessionRow {
   /** True for group/open sessions that have a known capacity to show. */
   protected readonly showCapacity = computed(() => {
     const t = this.type();
-    return this.capacity() != null && (t === SessionKind.Group || t === SessionKind.Open);
+    return this.capacity() != null && (t === SessionType.Group || t === SessionType.Open);
   });
 
   /** Left-edge tone — muted for finished/cancelled, teal online, honey in-person. */
@@ -187,52 +198,18 @@ export class MySessionRow {
   });
 
   protected readonly statusClass = computed<string>(() => {
-    switch (this.participant().status) {
-      case SessionParticipantStatus.Confirmed:
-        return 'bg-green-50 text-green-800';
-      case SessionParticipantStatus.PendingApproval:
-        return 'bg-orange-50 text-orange-800';
-      case SessionParticipantStatus.Waitlisted:
-        return 'bg-yellow-50 text-yellow-800';
-      case SessionParticipantStatus.Cancelled:
-      case SessionParticipantStatus.Declined:
-        return 'bg-red-50 text-red-800';
-      default:
-        return 'bg-green-50 text-green-800';
-    }
+    const tone = SESSION_PARTICIPANT_STATUSES[this.participant().status]?.tone ?? 'success';
+    return STATUS_CLASSES[tone];
   });
-  protected readonly statusIcon = computed<string>(() => {
-    switch (this.participant().status) {
-      case SessionParticipantStatus.Confirmed:
-        return 'pi pi-verified';
-      case SessionParticipantStatus.PendingApproval:
-        return 'pi pi-hourglass';
-      case SessionParticipantStatus.Waitlisted:
-        return 'pi pi-clock';
-      case SessionParticipantStatus.Cancelled:
-      case SessionParticipantStatus.Declined:
-        return 'pi pi-times-circle';
-      default:
-        return 'pi pi-tag';
-    }
-  });
+  protected readonly statusIcon = computed<string>(
+    () => SESSION_PARTICIPANT_STATUSES[this.participant().status]?.piIcon ?? 'pi pi-tag',
+  );
 
-  protected readonly statusLabel = computed(() => {
-    switch (this.participant().status) {
-      case SessionParticipantStatus.Confirmed:
-        return 'Confirmed';
-      case SessionParticipantStatus.PendingApproval:
-        return 'Pending approval';
-      case SessionParticipantStatus.Waitlisted:
-        return 'Waitlisted';
-      case SessionParticipantStatus.Cancelled:
-        return 'Cancelled';
-      case SessionParticipantStatus.Declined:
-        return 'Declined';
-      default:
-        return this.participant().status;
-    }
-  });
+  protected readonly statusLabel = computed(
+    () =>
+      SESSION_PARTICIPANT_STATUSES[this.participant().status]?.label ??
+      this.participant().status,
+  );
 
   /** Status label with the queue position appended for waitlisted rows. */
   protected readonly statusLabelText = computed(() => {

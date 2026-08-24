@@ -1,4 +1,5 @@
-import type { SessionInstance } from 'core';
+import { meetingProviderLabel, sessionTypeTone } from 'core';
+import type { SessionInstance, SessionType, SessionTypeTone } from 'core';
 import type { CalendarEvent } from '../../../../_shared/components/calendar/calendar-event.model';
 
 /**
@@ -25,9 +26,7 @@ export function instanceToCalendarEvent(
   const isOnline = template?.locationKind === 'ONLINE';
   const venueName =
     instance.venueOverride?.name ?? template?.venue?.name ?? 'In-person';
-  const subtitle = isOnline
-    ? labelForProvider(template?.meetingProvider ?? null)
-    : venueName;
+  const subtitle = isOnline ? meetingProviderLabel(template?.meetingProvider) : venueName;
 
   const badges: CalendarEvent['badges'] = [];
   if (isOnline) badges.push('online');
@@ -40,37 +39,25 @@ export function instanceToCalendarEvent(
     end: new Date(instance.endAt),
     title: instance.titleOverride ?? template?.title ?? '(untitled)',
     subtitle,
-    color: colorForType(template?.type),
+    color: template?.type ? sessionTypeCssColor(template.type) : 'var(--p-surface-500)',
     ring: (instance.conflictingInstanceIds?.length ?? 0) > 0 ? 'conflict' : 'none',
     badges: badges.length > 0 ? badges : undefined,
     payload: instance, // smart wrapper uses this on (eventClick) to navigate
   };
 }
 
-function colorForType(type: string | undefined): string {
-  switch (type) {
-    case 'GROUP':
-      return 'var(--p-primary-500)';
-    case 'PRIVATE':
-      // Navy is Tailwind-only (per theme.css); fall back to a stable hex.
-      return '#1D4ED8';
-    case 'OPEN':
-      // Teal — design canvas uses #14B8A6.
-      return 'var(--p-cyan-500, #14B8A6)';
-    default:
-      return 'var(--p-surface-500)';
-  }
-}
+/**
+ * Core's abstract type tone as web paint. Honey rides the PrimeNG primary
+ * token; navy is Tailwind-only (per theme.css) so it falls back to a stable
+ * hex; teal is the design canvas's #14B8A6.
+ */
+const TONE_CSS: Record<SessionTypeTone, string> = {
+  honey: 'var(--p-primary-500)',
+  navy: '#1D4ED8',
+  teal: 'var(--p-cyan-500, #14B8A6)',
+};
 
-function labelForProvider(provider: string | null): string {
-  switch (provider) {
-    case 'ZOOM':
-      return 'Zoom';
-    case 'GOOGLE_MEET':
-      return 'Google Meet';
-    case 'TEAMS':
-      return 'Teams';
-    default:
-      return 'Online';
-  }
+/** CSS colour for a session type — shared by event blocks and the filter dots. */
+export function sessionTypeCssColor(type: SessionType): string {
+  return TONE_CSS[sessionTypeTone(type)];
 }

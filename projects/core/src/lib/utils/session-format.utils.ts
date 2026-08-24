@@ -1,3 +1,5 @@
+import { sessionTypeTone } from '../constants/session-types.const';
+import type { SessionTypeTone } from '../constants/session-types.const';
 import type { SessionInstance, SessionTemplate } from '../models/session/session.model';
 
 /**
@@ -130,24 +132,23 @@ export function formatSessionDayShort(iso: string): string {
 }
 
 /**
- * Tone for a `<mh-time-row>` given a template + (optional) instance.
- * Picks the design's coral / muted / teal / navy / honey accent.
+ * Tone for a session surface (time-row spine, calendar block, detail hero)
+ * given a template + (optional) instance.
  *
- * Priority order matters: conflict > cancelled > online > 1-on-1 >
- * default. A 1-on-1 online session keeps the teal (location wins)
- * because that's the user's primary signal — "do I need a meeting
- * link?" — over "is this a 1-on-1?".
+ * Status overlays come first — a clash or a cancellation outranks identity —
+ * then the type's own hue from `SESSION_TYPES`: honey Group, navy 1-on-1,
+ * teal Open. Location deliberately does not colour any more: the design
+ * canvas colours by type, and "online" is said with a badge or a provider
+ * line, never a hue.
  */
-export type SessionTone = 'honey' | 'teal' | 'navy' | 'coral' | 'muted';
+export type SessionTone = SessionTypeTone | 'coral' | 'muted';
 export function sessionTone(
   t: SessionTemplate,
   inst: SessionInstance | null,
 ): SessionTone {
   if (inst?.conflictingInstanceIds?.length) return 'coral';
   if (inst?.status === 'CANCELLED') return 'muted';
-  if (t.locationKind === 'ONLINE') return 'teal';
-  if (t.type === 'PRIVATE') return 'navy';
-  return 'honey';
+  return sessionTypeTone(t.type);
 }
 
 /** Day-separator accent — 'today' for the current day, else 'default'. */

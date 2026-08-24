@@ -63,7 +63,7 @@ h1 {
    by default, so it needs to be told it owns a block. */
 .mh-note-block {
   display: block;
-  padding: 0.75rem 1.5rem 0;
+  padding: 1rem 0.375rem 0.375rem;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);

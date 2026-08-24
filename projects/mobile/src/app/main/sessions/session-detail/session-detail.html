@@ -45,7 +45,7 @@
       <!-- The hero carries what the band used to: the badges say what this
            is, in the order you need it — state, type, then place — with the
            name under them. Same card the account page opens with. -->
-      <div class="hero">
+      <div class="hero" [attr.data-tone]="heroTone()">
         <div class="hero-badges">
           @if (statusChip(); as status) {
             <ion-badge [attr.data-tone]="status.tone">{{ status.label }}</ion-badge>

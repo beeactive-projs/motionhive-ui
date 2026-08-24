@@ -12,6 +12,36 @@
   text-align: center;
 }
 
+/* The session's type tone from core's SESSION_TYPES — honey group, navy
+   1-on-1, teal open — as a wash surface, so the screen says what this is
+   before a word is read. The border takes the same hue at hairline strength;
+   the badges step back onto the card surface, because a wash chip sitting on
+   a wash of the same hue would melt into it. */
+.hero[data-tone='honey'] {
+  --hero-rgb: var(--ion-color-primary-rgb);
+  background: var(--ion-color-primary-wash);
+}
+
+.hero[data-tone='teal'] {
+  --hero-rgb: var(--ion-color-teal-rgb);
+  background: var(--ion-color-teal-wash);
+}
+
+.hero[data-tone='navy'] {
+  --hero-rgb: var(--ion-color-info-rgb);
+  background: var(--ion-color-info-wash);
+}
+
+.hero[data-tone] {
+  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
+     slash syntax cannot take. */
+  border-color: rgba(var(--hero-rgb), 0.25);
+}
+
+.hero[data-tone] ion-badge[data-tone] {
+  --background: var(--ion-card-background);
+}
+
 .hero-badges {
   display: flex;
   flex-wrap: wrap;
@@ -35,8 +65,10 @@
 
 /* Chips read as a wash, not a fill — in the hero, which is already busy, and
    down the roster's status column, where a stack of saturated pills would
-   out-shout the names beside them. Each is one ramp step deeper than the
-   surface it sits on, with that ramp's own ink. Unnamed tones stay neutral. */
+   out-shout the names beside them. Tone names are core's vocabulary
+   (`SessionAccessTone` + `SessionStatusTone`) plus the two context tones this
+   screen mints itself ('type', 'place'); 'secondary' and anything unnamed
+   stay on the neutral default. */
 ion-badge[data-tone] {
   --padding-start: 0.5rem;
   --padding-end: 0.5rem;
@@ -47,49 +79,37 @@ ion-badge[data-tone] {
   text-transform: none;
 }
 
-ion-badge[data-tone='type'] {
+ion-badge[data-tone='type'],
+ion-badge[data-tone='honey'] {
   --background: var(--ion-color-primary-wash);
   --color: var(--ion-color-primary-wash-contrast);
 }
 
-ion-badge[data-tone='place'] {
+ion-badge[data-tone='place'],
+ion-badge[data-tone='teal'] {
   --background: var(--ion-color-teal-wash);
   --color: var(--ion-color-teal-wash-contrast);
 }
 
-ion-badge[data-tone='live'],
-ion-badge[data-tone='attended'],
-ion-badge[data-tone='confirmed'] {
+ion-badge[data-tone='success'] {
   --background: var(--ion-color-success-wash);
   --color: var(--ion-color-success-wash-contrast);
 }
 
-ion-badge[data-tone='cancelled'],
-ion-badge[data-tone='noshow'] {
-  --background: var(--ion-color-danger-wash);
-  --color: var(--ion-color-danger-wash-contrast);
+ion-badge[data-tone='warn'] {
+  --background: var(--ion-color-warning-wash);
+  --color: var(--ion-color-warning-wash-contrast);
 }
 
-/* Access, in the web chip's hues: teal open, green free, honey clients-only,
-   sky group-only — at the same wash weight as every badge here. */
-ion-badge[data-tone='open'] {
-  --background: var(--ion-color-teal-wash);
-  --color: var(--ion-color-teal-wash-contrast);
-}
-
-ion-badge[data-tone='free'] {
-  --background: var(--ion-color-success-wash);
-  --color: var(--ion-color-success-wash-contrast);
-}
-
-ion-badge[data-tone='clients'] {
-  --background: var(--ion-color-primary-wash);
-  --color: var(--ion-color-primary-wash-contrast);
-}
-
-ion-badge[data-tone='group'] {
+ion-badge[data-tone='info'],
+ion-badge[data-tone='sky'] {
   --background: var(--ion-color-info-wash);
   --color: var(--ion-color-info-wash-contrast);
+}
+
+ion-badge[data-tone='danger'] {
+  --background: var(--ion-color-danger-wash);
+  --color: var(--ion-color-danger-wash-contrast);
 }
 
 .body {

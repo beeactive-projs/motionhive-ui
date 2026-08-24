@@ -7,9 +7,22 @@
   margin-bottom: 0.5rem;
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-card);
+
+  & ion-radio ion-label p {
+    white-space: normal;
+    font-size: var(--mh-text-sm);
+  }
 }
 
 .option.selected {
   border-color: var(--ion-color-danger);
-  --background: rgb(var(--ion-color-danger-rgb) / 0.05);
+  --background: rgba(var(--ion-color-danger-rgb), 0.1);
+
+  & ion-radio {
+    --color-checked: var(--ion-color-danger);
+  }
+}
+
+.mh-note-block {
+  padding-top: 0;
 }

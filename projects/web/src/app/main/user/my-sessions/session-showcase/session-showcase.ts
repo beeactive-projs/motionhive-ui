@@ -23,7 +23,7 @@ import {
   MyBookingsIndexStore,
   PublicSessionInstance,
   SessionInstanceStatus,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionParticipantStatus,
   SessionService,
@@ -132,7 +132,7 @@ export class SessionShowcase implements OnInit {
   /** Show the booked/capacity line only for group/open sessions with a cap. */
   protected readonly showCapacity = computed(() => {
     const t = this.tpl();
-    return this.cap() != null && (t?.type === SessionKind.Group || t?.type === SessionKind.Open);
+    return this.cap() != null && (t?.type === SessionType.Group || t?.type === SessionType.Open);
   });
 
   /** Did the current user already book this instance? */

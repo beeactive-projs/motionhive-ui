@@ -7,7 +7,7 @@ import {
   PublicSessionInstance,
   SessionInstructorRef,
   SessionInstanceStatus,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionMeetingProvider,
   formatSessionDayShort,
@@ -100,7 +100,7 @@ export class DiscoverSessionRow {
     return mins ? formatSessionDuration(mins) : '';
   });
 
-  protected readonly type = computed<SessionKind | null>(
+  protected readonly type = computed<SessionType | null>(
     () => this.instance().template?.type ?? null,
   );
 
@@ -135,7 +135,7 @@ export class DiscoverSessionRow {
   /** True for group/open sessions that have a known capacity to show. */
   protected readonly showCapacity = computed(() => {
     const t = this.type();
-    return this.capacity() != null && (t === SessionKind.Group || t === SessionKind.Open);
+    return this.capacity() != null && (t === SessionType.Group || t === SessionType.Open);
   });
 
   /** Left-edge tone — teal online, honey in-person. */

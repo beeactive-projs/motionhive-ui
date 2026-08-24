@@ -19,9 +19,10 @@ import { ToastModule } from 'primeng/toast';
 import { Popover } from 'primeng/popover';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import {
+  MY_TABS,
   MyBookingsIndexStore,
   MyTab,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionParticipant,
   SessionsMyStore,
@@ -95,24 +96,25 @@ export class MySessions implements OnInit {
   // Enum consts exposed for template comparisons — never compare against
   // raw string literals (see CLAUDE.md).
   protected readonly SessionLocationKind = SessionLocationKind;
-  protected readonly SessionKind = SessionKind;
+  protected readonly SessionType = SessionType;
 
   // Cancel-booking dialog state.
   protected readonly cancelOpen = signal(false);
   protected readonly cancelTarget = signal<SessionParticipant | null>(null);
 
+  /** Words and icons from core's `MY_TABS`; `countKey` doubles the tab key. */
   protected readonly tabs: TabSpec[] = [
-    { key: MyTab.Upcoming, label: 'Upcoming', icon: 'pi pi-calendar', countKey: 'upcoming' },
-    {
-      key: MyTab.PendingApproval,
-      label: 'Pending',
-      icon: 'pi pi-hourglass',
-      countKey: 'pendingApproval',
-    },
-    { key: MyTab.Waitlisted, label: 'Waitlisted', icon: 'pi pi-clock', countKey: 'waitlisted' },
-    { key: MyTab.Past, label: 'Past', icon: 'pi pi-history', countKey: 'past' },
-    { key: MyTab.Cancelled, label: 'Cancelled', icon: 'pi pi-times-circle', countKey: 'cancelled' },
-  ];
+    MyTab.Upcoming,
+    MyTab.PendingApproval,
+    MyTab.Waitlisted,
+    MyTab.Past,
+    MyTab.Cancelled,
+  ].map((key) => ({
+    key,
+    label: MY_TABS[key].label,
+    icon: MY_TABS[key].piIcon,
+    countKey: key,
+  }));
 
   // ─── Filters (client-side, no extra requests) ─────────────────────
   //
@@ -121,7 +123,7 @@ export class MySessions implements OnInit {
   // participants locally: search by title + a location quick-filter row.
   protected readonly searchInput = signal<string>('');
   protected readonly locationKindFilter = signal<SessionLocationKind | null>(null);
-  protected readonly typeFilter = signal<SessionKind | null>(null);
+  protected readonly typeFilter = signal<SessionType | null>(null);
 
   protected readonly filteredItems = computed(() => {
     const all = this.store.items();
@@ -176,7 +178,7 @@ export class MySessions implements OnInit {
     this.locationKindFilter.set(this.locationKindFilter() === kind ? null : kind);
   }
 
-  protected toggleType(type: SessionKind): void {
+  protected toggleType(type: SessionType): void {
     this.typeFilter.set(this.typeFilter() === type ? null : type);
   }
 

@@ -18,6 +18,7 @@ import {
   JoinInfo,
   PublicSessionInstance,
   SessionService,
+  meetingProviderLabel,
   showApiError,
 } from 'core';
 
@@ -278,12 +279,8 @@ export class SessionDayOfOnline implements OnInit {
 
   protected readonly providerLabel = computed(() => {
     const provider = this.instance()?.template?.meetingProvider;
-    switch (provider) {
-      case 'ZOOM': return 'Zoom';
-      case 'GOOGLE_MEET': return 'Google Meet';
-      case 'TEAMS': return 'Microsoft Teams';
-      default: return 'the meeting';
-    }
+    // "Join the meeting" when unknown — a destination, not a place.
+    return provider ? meetingProviderLabel(provider) : 'the meeting';
   });
 
   ngOnInit(): void {

@@ -47,13 +47,18 @@ export const GoalStatuses = {
 
 export type GoalStatus = (typeof GoalStatuses)[keyof typeof GoalStatuses];
 
-export const SessionTypes = {
+/**
+ * How a coach delivers their training — a profile-level preference, not the
+ * session domain's `SessionType` (GROUP/PRIVATE/OPEN). Named "format" so the
+ * two can never collide; the API field is still `sessionTypes`.
+ */
+export const SessionFormats = {
   Online: 'ONLINE',
   InPerson: 'IN_PERSON',
   Hybrid: 'HYBRID',
 } as const;
 
-export type SessionType = (typeof SessionTypes)[keyof typeof SessionTypes];
+export type SessionFormat = (typeof SessionFormats)[keyof typeof SessionFormats];
 
 export const AvailableDays = {
   Monday: 'MON',

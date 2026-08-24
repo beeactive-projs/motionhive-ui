@@ -43,7 +43,7 @@
                toolbar-button size. The sheet's commit is a full-width bar. -->
         <div class="actions">
           <ion-button fill="outline" color="medium" class="dismiss" [disabled]="saving()" (click)="dismiss()">
-            Cancel
+            {{ dismissLabel() }}
           </ion-button>
           <ion-button fill="solid" class="confirm" [color]="saveColor()" [disabled]="!canSave() || saving()"
             (click)="save.emit()">

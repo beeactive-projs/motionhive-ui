@@ -1,14 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { Tag } from 'primeng/tag';
-import { SessionKind } from 'core';
+import { SESSION_TYPES, SessionType, sessionTypeLabel, sessionTypeTone } from 'core';
+import type { SessionTypeTone } from 'core';
 
 /**
  * `mh-type-chip` — session type pill (GROUP / PRIVATE / OPEN).
  *
- * Smaller and less colorful than `mh-access-chip` — it appears
- * alongside the access chip in nearly every surface; visual weight
- * goes to access (the actionable concept).
+ * Words and hues come from core's `SESSION_TYPES` — the same honey / navy /
+ * teal the calendar blocks and the mobile surfaces carry — rendered at the
+ * light wash weight so it does not out-shout the access chip beside it.
  */
+
+/** Core's tone as the light Tailwind wash the chip idiom uses. */
+const TONE_CLASSES: Record<SessionTypeTone, string> = {
+  honey: 'bg-amber-100 text-amber-700',
+  navy: 'bg-blue-100 text-blue-700',
+  teal: 'bg-teal-100 text-teal-700',
+};
 @Component({
   selector: 'mh-type-chip',
   imports: [Tag],
@@ -16,45 +24,15 @@ import { SessionKind } from 'core';
   templateUrl: './type-chip.html',
 })
 export class TypeChip {
-  readonly type = input.required<SessionKind>();
+  readonly type = input.required<SessionType>();
 
-  protected readonly label = computed<string>(() => {
-    switch (this.type()) {
-      case SessionKind.Group:
-        return 'Group';
-      case SessionKind.Private:
-        return '1-on-1';
-      case SessionKind.Open:
-        return 'Open';
-      default:
-        return this.type();
-    }
-  });
+  protected readonly label = computed<string>(() => sessionTypeLabel(this.type()));
 
-  protected readonly icon = computed<string>(() => {
-    switch (this.type()) {
-      case SessionKind.Group:
-        return 'pi pi-users';
-      case SessionKind.Private:
-        return 'pi pi-user';
-      case SessionKind.Open:
-        return 'pi pi-globe';
-      default:
-        return 'pi pi-tag';
-    }
-  });
+  protected readonly icon = computed<string>(
+    () => SESSION_TYPES[this.type()]?.piIcon ?? 'pi pi-tag',
+  );
 
-  /** Lighter-than-severity bg + text color classes, per type. */
-  protected readonly colorClass = computed<string>(() => {
-    switch (this.type()) {
-      case SessionKind.Group:
-        return 'bg-blue-100 text-blue-700';
-      case SessionKind.Open:
-        return 'bg-green-100 text-green-700';
-      case SessionKind.Private:
-        return 'bg-violet-100 text-violet-700';
-      default:
-        return 'bg-slate-100 text-slate-700';
-    }
-  });
+  protected readonly colorClass = computed<string>(
+    () => TONE_CLASSES[sessionTypeTone(this.type())],
+  );
 }

@@ -16,6 +16,7 @@ import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import {
+  FOLLOW_UP_AUDIENCES,
   FollowUpAudience,
   FollowUpResponse,
   SessionService,
@@ -167,15 +168,13 @@ export class FollowUpDialog {
   );
 
   // `userIds` audience isn't surfaced — the picker UX isn't worth the rare use case.
-  readonly audiences = computed(() =>
-    this.context() === 'pre'
-      ? [{ value: FollowUpAudience.All, label: 'Everyone' }]
-      : [
-          { value: FollowUpAudience.All, label: 'Everyone' },
-          { value: FollowUpAudience.Attended, label: 'Attended only' },
-          { value: FollowUpAudience.NoShow, label: 'No-shows only' },
-        ],
-  );
+  readonly audiences = computed(() => {
+    const values =
+      this.context() === 'pre'
+        ? [FollowUpAudience.All]
+        : [FollowUpAudience.All, FollowUpAudience.Attended, FollowUpAudience.NoShow];
+    return values.map((value) => ({ value, label: FOLLOW_UP_AUDIENCES[value].label }));
+  });
 
   /**
    * One-tap message templates that pre-fill the textarea. Context-aware:

@@ -1,4 +1,4 @@
-import type { SessionType, AvailableDay } from './profile.enums';
+﻿import type { SessionFormat, AvailableDay } from './profile.enums';
 
 export interface InstructorCertification {
   name: string;
@@ -15,7 +15,7 @@ export interface InstructorProfile {
   specializations: string[] | null;
   certifications: InstructorCertification[] | null;
   yearsOfExperience: number | null;
-  sessionTypes: SessionType[];
+  sessionTypes: SessionFormat[];
   availableDays: AvailableDay[];
   languages: string[];
   websiteUrl: string | null;
@@ -38,7 +38,7 @@ export interface UpdateInstructorProfilePayload {
   specializations?: string[];
   certifications?: InstructorCertification[];
   yearsOfExperience?: number;
-  sessionTypes?: SessionType[];
+  sessionTypes?: SessionFormat[];
   availableDays?: AvailableDay[];
   languages?: string[];
   websiteUrl?: string;
@@ -58,7 +58,7 @@ export interface CreateInstructorProfilePayload {
   specializations?: string[];
   certifications?: InstructorCertification[];
   yearsOfExperience?: number;
-  sessionTypes?: SessionType[];
+  sessionTypes?: SessionFormat[];
   availableDays?: AvailableDay[];
   languages?: string[];
   websiteUrl?: string;

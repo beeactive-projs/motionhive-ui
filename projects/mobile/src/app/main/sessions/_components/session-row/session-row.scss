@@ -27,7 +27,9 @@ ion-item {
 }
 :host([data-tone='coral']) ion-item {
   --spine: var(--ion-color-danger);
-  box-shadow: 0 0 0 var(--mh-ring-width) rgb(var(--ion-color-danger-rgb) / 0.28);
+  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
+     slash syntax cannot take — with it the ring is invalid and never paints. */
+  box-shadow: 0 0 0 var(--mh-ring-width) rgba(var(--ion-color-danger-rgb), 0.28);
 }
 
 :host([data-tone='muted']) ion-item {

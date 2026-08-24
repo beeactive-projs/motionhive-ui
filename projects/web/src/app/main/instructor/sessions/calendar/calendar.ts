@@ -18,7 +18,7 @@ import {
   BottomSheet,
   CreateTemplateRequest,
   SessionInstance,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionTemplate,
   SessionsInstructorStore,
@@ -103,7 +103,7 @@ export class SessionsCalendar implements OnInit {
 
   // Enum consts exposed for template comparisons — never compare against
   // raw string literals (see CLAUDE.md).
-  protected readonly SessionKind = SessionKind;
+  protected readonly SessionType = SessionType;
   protected readonly SessionLocationKind = SessionLocationKind;
 
   protected readonly view = signal<CalendarView>('week');

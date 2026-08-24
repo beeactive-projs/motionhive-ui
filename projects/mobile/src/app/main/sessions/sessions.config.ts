@@ -1,13 +1,20 @@
 import {
+  CANCEL_SCOPES,
+  CancelScope,
   RecurrenceRule,
+  SESSION_ACCESS_LEVELS,
+  SESSION_LOCATION_KINDS,
+  SESSION_TYPES,
   SessionAccess,
   SessionInstance,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionTone,
   endOfDay,
   localDayKey,
+  meetingProviderLabel,
   sessionTone,
+  sessionTypeLabel,
   startOfDay,
 } from 'core';
 
@@ -17,6 +24,7 @@ import {
   alertCircleOutline,
   arrowForwardCircleOutline,
   calendarOutline,
+  cashOutline,
   checkmarkCircleOutline,
   chevronBack,
   chevronDown,
@@ -53,6 +61,7 @@ export const SESSION_ICONS = {
   alertCircleOutline,
   arrowForwardCircleOutline,
   calendarOutline,
+  cashOutline,
   checkmarkCircleOutline,
   chevronBack,
   chevronDown,
@@ -87,22 +96,32 @@ export const SESSION_ICONS = {
  */
 export const AGENDA_DAYS_AHEAD = 30;
 
-/** Type tiles on the create sheet, in the design's order. */
-export const SESSION_TYPE_OPTIONS = [
-  { value: 'GROUP', label: 'Group', icon: 'people-outline' },
-  { value: 'PRIVATE', label: '1-on-1', icon: 'person-outline' },
-  { value: 'OPEN', label: 'Open', icon: 'globe-outline' },
-] as const;
+/** Type tiles on the create sheet, in the design's order — words and icons
+    from core's `SESSION_TYPES`, in its ionicons dialect. */
+export const SESSION_TYPE_OPTIONS: readonly {
+  value: SessionType;
+  label: string;
+  icon: string;
+}[] = [SessionType.Group, SessionType.Private, SessionType.Open].map((value) => ({
+  value,
+  label: sessionTypeLabel(value),
+  icon: SESSION_TYPES[value].ionIcon,
+}));
 
-/** Where the session happens. Drives which fields the form shows. */
-export const LOCATION_KIND_OPTIONS = [
-  { value: 'IN_PERSON', label: 'In-person', icon: 'location-outline' },
-  { value: 'ONLINE', label: 'Online', icon: 'videocam-outline' },
-] as const;
+/** Where the session happens — words and icons from core; drives the form. */
+export const LOCATION_KIND_OPTIONS: readonly {
+  value: SessionLocationKind;
+  label: string;
+  icon: string;
+}[] = [SessionLocationKind.InPerson, SessionLocationKind.Online].map((value) => ({
+  value,
+  label: SESSION_LOCATION_KINDS[value].label,
+  icon: SESSION_LOCATION_KINDS[value].ionIcon,
+}));
 
 /**
- * Who can book — the same four access levels the web dialog offers, with its
- * sub-copy carried along so the sheet can explain the selected one.
+ * Who can book — core's `SESSION_ACCESS_LEVELS` in its ionicons dialect, with
+ * the sub-copy carried along so the sheet can explain the selected one.
  */
 export const SESSION_ACCESS_OPTIONS: readonly {
   value: SessionAccess;
@@ -110,21 +129,16 @@ export const SESSION_ACCESS_OPTIONS: readonly {
   sub: string;
   icon: string;
 }[] = [
-  { value: 'OPEN', label: 'Open', sub: 'Anyone with the link can book.', icon: 'globe-outline' },
-  { value: 'FREE', label: 'Free', sub: 'Listed publicly with no price tag.', icon: 'heart-outline' },
-  {
-    value: 'CLIENTS_ONLY',
-    label: 'Clients only',
-    sub: 'Only your active clients can book.',
-    icon: 'person-outline',
-  },
-  {
-    value: 'GROUP_ONLY',
-    label: 'Group members',
-    sub: 'Only members of a specific group.',
-    icon: 'people-outline',
-  },
-];
+  SessionAccess.Open,
+  SessionAccess.Free,
+  SessionAccess.ClientsOnly,
+  SessionAccess.GroupOnly,
+].map((value) => ({
+  value,
+  label: SESSION_ACCESS_LEVELS[value].label,
+  sub: SESSION_ACCESS_LEVELS[value].sub,
+  icon: SESSION_ACCESS_LEVELS[value].ionIcon,
+}));
 
 /**
  * The chip row under the week strip — the one narrowing worth reaching without
@@ -140,8 +154,10 @@ export const LOCATION_QUICK_FILTERS: readonly {
   label: string;
 }[] = [
   { value: null, label: 'All types' },
-  { value: 'ONLINE', label: 'Online' },
-  { value: 'IN_PERSON', label: 'In-person' },
+  ...[SessionLocationKind.Online, SessionLocationKind.InPerson].map((value) => ({
+    value,
+    label: SESSION_LOCATION_KINDS[value].label,
+  })),
 ];
 
 /**
@@ -179,11 +195,6 @@ export function formatWeekdayList(days: readonly number[]): string {
   if (names.length === 0) return '';
   if (names.length === 1) return names[0];
   return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
-}
-
-/** "Group" / "1-on-1" / "Open" — the type as the create sheet named it. */
-export function sessionTypeLabel(type: SessionKind | null | undefined): string {
-  return SESSION_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? 'Session';
 }
 
 /** How often it comes round: "Every Tue & Thu", "Every 2 weeks", "Every day". */
@@ -349,7 +360,7 @@ export const DEFAULT_GENERATED_OCCURRENCES = 12;
 export interface SessionPrefill {
   title: string;
   description: string;
-  type: SessionKind;
+  type: SessionType;
   access: SessionAccess;
   approvalRequired: boolean;
   groupId: string | null;
@@ -449,14 +460,14 @@ export function findOverlap(
 }
 
 /**
- * What a cancel applies to. Values match core's `CancelScope`; the copy is
- * filled in per-session, since the counts differ every time.
+ * What a cancel applies to. Values are core's `CancelScope` members; the copy
+ * is filled in per-session, since the details differ every time.
  */
-export const CANCEL_SCOPE_OPTIONS = [
-  { value: 'this', label: 'This occurrence only' },
-  { value: 'thisAndFuture', label: 'This and all future' },
-  { value: 'series', label: 'The entire series' },
-] as const;
+export const CANCEL_SCOPE_OPTIONS: readonly { value: CancelScope; label: string }[] = [
+  CancelScope.This,
+  CancelScope.ThisAndFuture,
+  CancelScope.Series,
+].map((value) => ({ value, label: CANCEL_SCOPES[value].label }));
 
 /**
  * Spine colour for an occurrence. Wraps core's `sessionTone`, which needs a
@@ -491,8 +502,8 @@ export function instanceCapacityLabel(instance: SessionInstance): string {
 
 /** Where it happens — the meeting provider online, else the venue name. */
 export function instancePlaceLabel(instance: SessionInstance): string {
-  if (instance.template?.locationKind === 'ONLINE') {
-    return instance.template.meetingProvider ?? 'Online';
+  if (instance.template?.locationKind === SessionLocationKind.Online) {
+    return meetingProviderLabel(instance.template.meetingProvider);
   }
   return instance.venueOverride?.name ?? instance.template?.venue?.name ?? '';
 }
@@ -511,19 +522,15 @@ export function instanceMeta(instance: SessionInstance): string {
 }
 
 /**
- * What the dots on the month grid mean.
- *
- * Deliberately not the design's Group / 1-on-1 / Open / Conflict. The tones
- * come from core's `sessionTone`, which tests location *before* type and has no
- * tone of its own for Open — an Open session is honey, exactly like a Group
- * one, so a legend promising to tell them apart would be lying. This describes
- * the colours that actually appear. Changing `sessionTone` to match the design
- * instead is a web-wide decision, not a mobile one.
+ * What the dots on the month grid mean — the design's legend, which
+ * `sessionTone` now honours: since it colours by type from core's
+ * `SESSION_TYPES` (location no longer plays), every promise here is one the
+ * dots actually keep.
  */
 export const MONTH_LEGEND: readonly { tone: SessionTone; label: string }[] = [
   { tone: 'honey', label: 'Group' },
   { tone: 'navy', label: '1-on-1' },
-  { tone: 'teal', label: 'Online' },
+  { tone: 'teal', label: 'Open' },
   { tone: 'coral', label: 'Conflict' },
 ];
 
@@ -563,7 +570,7 @@ export const STATUS_OPTIONS: readonly { value: AgendaStatus; label: string }[] =
  * parsing at all.
  */
 export interface AgendaFilters {
-  type: SessionKind | null;
+  type: SessionType | null;
   locationKind: SessionLocationKind | null;
   status: AgendaStatus | null;
   dateFrom: string | null;

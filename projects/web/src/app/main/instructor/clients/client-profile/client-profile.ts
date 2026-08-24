@@ -20,7 +20,10 @@ import {
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
+  SESSION_PARTICIPANT_STATUSES,
   SessionInstance,
+  SessionInstanceStatus,
+  SessionParticipantStatus,
   SessionService,
   TagSeverity,
   WorkoutLog,
@@ -347,30 +350,25 @@ export class ClientProfile {
     );
   }
 
+  /** Core's status words/tones; a cancelled *session* outranks the booking. */
   participantLabel(s: SessionInstance): string {
-    if (s.status === 'CANCELLED') return 'Session cancelled';
-    switch (this._participantStatus(s)) {
-      case 'CONFIRMED':
-        return 'Booked';
-      case 'PENDING_APPROVAL':
-        return 'Awaiting approval';
-      case 'WAITLISTED':
-        return 'Waitlisted';
-      default:
-        return 'Booked';
-    }
+    if (s.status === SessionInstanceStatus.Cancelled) return 'Session cancelled';
+    const status = this._participantStatus(s);
+    return (
+      (status &&
+        SESSION_PARTICIPANT_STATUSES[status as SessionParticipantStatus]?.label) ||
+      'Booked'
+    );
   }
 
   participantSeverity(s: SessionInstance): TagSeverity {
-    if (s.status === 'CANCELLED') return TagSeverity.Danger;
-    switch (this._participantStatus(s)) {
-      case 'PENDING_APPROVAL':
-        return TagSeverity.Warn;
-      case 'WAITLISTED':
-        return TagSeverity.Secondary;
-      default:
-        return TagSeverity.Success;
-    }
+    if (s.status === SessionInstanceStatus.Cancelled) return TagSeverity.Danger;
+    const status = this._participantStatus(s);
+    return (
+      (status &&
+        SESSION_PARTICIPANT_STATUSES[status as SessionParticipantStatus]?.tone) ||
+      TagSeverity.Success
+    );
   }
 
   openSession(s: SessionInstance): void {

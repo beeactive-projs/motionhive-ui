@@ -41,7 +41,7 @@ import {
   PreviewRecurrenceRequest,
   RecurrenceRule,
   SessionAccess,
-  SessionKind,
+  SessionType,
   SessionLocationKind,
   SessionService,
   SessionTemplate,
@@ -183,7 +183,7 @@ export class SessionFormSheet {
 
   readonly title = signal('');
   readonly description = signal('');
-  readonly type = signal<SessionKind>(SessionKind.Group);
+  readonly type = signal<SessionType>(SessionType.Group);
   readonly access = signal<SessionAccess>(SessionAccess.Open);
   readonly approvalRequired = signal(false);
   readonly groupId = signal<string | null>(null);
@@ -224,7 +224,7 @@ export class SessionFormSheet {
   readonly isEdit = computed(() => this.template() !== null);
 
   /** A 1-on-1 has exactly one seat; asking for a capacity would be noise. */
-  readonly showCapacity = computed(() => this.type() !== SessionKind.Private);
+  readonly showCapacity = computed(() => this.type() !== SessionType.Private);
 
   readonly isOnline = computed(() => this.locationKind() === SessionLocationKind.Online);
 
@@ -233,7 +233,7 @@ export class SessionFormSheet {
    * group-members session must name its group, and a GROUP-type one may.
    */
   readonly needsGroup = computed(
-    () => this.access() === SessionAccess.GroupOnly || this.type() === SessionKind.Group,
+    () => this.access() === SessionAccess.GroupOnly || this.type() === SessionType.Group,
   );
 
   /** Sub-copy for the selected access level — one line, not four cards. */
@@ -749,7 +749,7 @@ export class SessionFormSheet {
 
     this.title.set('');
     this.description.set('');
-    this.type.set(SessionKind.Group);
+    this.type.set(SessionType.Group);
     this.access.set(SessionAccess.Open);
     this.approvalRequired.set(false);
     this.groupId.set(null);

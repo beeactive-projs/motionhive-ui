@@ -7,11 +7,20 @@ import {
   Output,
 } from '@angular/core';
 import {
+  SESSION_LOCATION_KINDS,
+  SessionAccess,
+  SessionLocationKind,
   type BlockedSessionInstance,
   type PublicSessionInstance,
-  type SessionAccess,
   type SessionInstance,
+  type SessionLocationTone,
 } from 'core';
+
+/** Core's location tone as the stripe paint (teal online, honey in-person). */
+const STRIPE_COLORS: Record<SessionLocationTone, string> = {
+  teal: 'var(--p-teal-500)',
+  honey: 'var(--p-primary-500)',
+};
 import { AccessChip } from '../access-chip/access-chip';
 import { TypeChip } from '../type-chip/type-chip';
 import { CapacityBar } from '../capacity-bar/capacity-bar';
@@ -148,9 +157,10 @@ export class SessionCard {
       .approvalRequired;
   }
 
-  /** Color used for the left border stripe (teal = online, primary = in-person). */
+  /** Color used for the left border stripe, from core's location tone. */
   protected stripeColor(): string {
-    return this.isOnline() ? 'var(--p-cyan-500)' : 'var(--p-primary-500)';
+    const kind = this.isOnline() ? SessionLocationKind.Online : SessionLocationKind.InPerson;
+    return STRIPE_COLORS[SESSION_LOCATION_KINDS[kind].tone];
   }
 
   // ─── CTA selection ─────────────────────────────────────────────────
@@ -163,7 +173,7 @@ export class SessionCard {
     if (this.ctaLabel) return this.ctaLabel;
     if (this.isBlocked()) return 'Members only';
     if (this.eligibility === 'not-eligible') {
-      return this.access() === 'CLIENTS_ONLY' ? 'Become a client' : 'Members only';
+      return this.access() === SessionAccess.ClientsOnly ? 'Become a client' : 'Members only';
     }
     if (this.approvalRequired()) return 'Request to book';
     return 'Book';

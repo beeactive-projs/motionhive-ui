@@ -13,8 +13,8 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { VenueService } from 'core';
-import type { CreateTemplateRequest, SessionKind, Venue } from 'core';
+import { SESSION_TYPES, VenueService, sessionTypeLabel } from 'core';
+import type { CreateTemplateRequest, SessionType, Venue } from 'core';
 
 /**
  * Drag-to-create popover.
@@ -277,12 +277,15 @@ export class QuickCreatePopover implements OnInit {
   @Output() openFullForm = new EventEmitter<CreateTemplateRequest>();
   @Output() dismiss = new EventEmitter<void>();
 
-  protected readonly selectedType = signal<SessionKind>('GROUP');
-  protected readonly typeOptions: { value: SessionKind; label: string; icon: string }[] = [
-    { value: 'GROUP', label: 'Group', icon: 'pi pi-users' },
-    { value: 'PRIVATE', label: '1-on-1', icon: 'pi pi-user' },
-    { value: 'OPEN', label: 'Open', icon: 'pi pi-globe' },
-  ];
+  protected readonly selectedType = signal<SessionType>('GROUP');
+  /** Words and icons from core's `SESSION_TYPES`, in its PrimeIcons dialect. */
+  protected readonly typeOptions: { value: SessionType; label: string; icon: string }[] = (
+    ['GROUP', 'PRIVATE', 'OPEN'] as SessionType[]
+  ).map((value) => ({
+    value,
+    label: sessionTypeLabel(value),
+    icon: SESSION_TYPES[value].piIcon,
+  }));
 
   /** Location toggle — ONLINE skips the venue picker; IN_PERSON shows it. */
   protected readonly locationKind = signal<'ONLINE' | 'IN_PERSON'>('ONLINE');
@@ -316,7 +319,7 @@ export class QuickCreatePopover implements OnInit {
     );
   }
 
-  protected selectType(t: SessionKind): void {
+  protected selectType(t: SessionType): void {
     this.selectedType.set(t);
   }
 

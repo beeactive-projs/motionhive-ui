@@ -7,7 +7,6 @@ import {
   IonRadioGroup,
   IonTextarea,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
 import {
@@ -15,11 +14,12 @@ import {
   SessionInstance,
   SessionService,
   SessionTemplate,
+  formatSessionDayShort,
 } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
-import { CANCEL_SCOPE_OPTIONS, SESSION_ICONS } from '../../sessions.config';
+import { CANCEL_SCOPE_OPTIONS } from '../../sessions.config';
 
 /**
  * Cancel an occurrence, the rest of the series, or all of it.
@@ -48,7 +48,7 @@ export class CancelSessionSheet {
 
   readonly cancelled = output<void>();
 
-  readonly scope = signal<CancelScope>('this');
+  readonly scope = signal<CancelScope>(CancelScope.This);
   readonly message = signal('');
   readonly saving = signal(false);
 
@@ -60,19 +60,34 @@ export class CancelSessionSheet {
     return instance.confirmedCount + instance.pendingApprovalCount;
   });
 
-  readonly scopeOptions = computed(() =>
-    CANCEL_SCOPE_OPTIONS.map((option) => ({
+  /** "Powerlifting prep · Wed 3 Jun" — which session is on the block. */
+  readonly subtitle = computed(() => {
+    const instance = this.instance();
+    if (!instance) return '';
+    const title = instance.titleOverride ?? this.template()?.title ?? '';
+    const day = formatSessionDayShort(instance.startAt);
+    return title ? `${title} · ${day}` : day;
+  });
+
+  readonly scopeOptions = computed(() => {
+    const instance = this.instance();
+    const day = instance ? formatSessionDayShort(instance.startAt) : '';
+    return CANCEL_SCOPE_OPTIONS.map((option) => ({
       ...option,
-      detail: this._detailFor(option.value),
-    })),
-  );
+      detail: this._detailFor(option.value, day),
+    }));
+  });
+
+  readonly messageLabel = computed(() => {
+    const count = this.signupCount();
+    if (count === 0) return 'Message · optional';
+    return `Message to ${count} ${count === 1 ? 'signup' : 'signups'} · optional`;
+  });
 
   constructor() {
-    addIcons(SESSION_ICONS);
-
     effect(() => {
       if (!this.open()) return;
-      this.scope.set('this');
+      this.scope.set(CancelScope.This);
       this.message.set('');
     });
   }
@@ -88,7 +103,7 @@ export class CancelSessionSheet {
       .cancelInstance(instance.id, {
         // A one-off has no series to scope against; sending anything else
         // would cancel a template that has only this occurrence anyway.
-        scope: this.isRecurring() ? this.scope() : 'this',
+        scope: this.isRecurring() ? this.scope() : CancelScope.This,
         ...(message ? { message } : {}),
       })
       .pipe(take(1))
@@ -98,7 +113,7 @@ export class CancelSessionSheet {
           this.open.set(false);
           const count = result.cancelledInstanceIds.length;
           void this._feedbackService.success(
-            count > 1 ? `${count} sessions cancelled` : 'Session cancelled',
+            count > 1 ? `${count} sessions cancelled` : 'Session cancelled'
           );
           this.cancelled.emit();
         },
@@ -112,16 +127,17 @@ export class CancelSessionSheet {
   /**
    * What each option takes down. Exact counts would need the whole series
    * loaded, which this sheet does not have — so the copy says what happens
-   * without inventing a number.
+   * without inventing a number. The occurrence's own date is real data,
+   * though, so the single-occurrence option is grounded in it.
    */
-  private _detailFor(scope: CancelScope): string {
+  private _detailFor(scope: CancelScope, day: string): string {
     switch (scope) {
-      case 'this':
-        return 'The series carries on.';
-      case 'thisAndFuture':
+      case CancelScope.This:
+        return day ? `${day} — the series continues.` : 'The series continues.';
+      case CancelScope.ThisAndFuture:
         return 'This and every later occurrence.';
       default:
-        return 'Every upcoming occurrence. Past ones are kept.';
+        return 'Every session in this series. The template is ended.';
     }
   }
 }
