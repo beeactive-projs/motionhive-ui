@@ -47,16 +47,24 @@ describe('deep links', () => {
 
   it('routes a coach session alert to that session', () => {
     expect(routeFor({ screen: 'coaching/sessions', entityId: 'abc' })).toEqual([
-      '/tabs/sessions',
+      '/tabs/coach/sessions',
       'abc',
     ]);
   });
 
-  // A trainee's booking alert must not land on the coach's session page: the
-  // instructor guard would bounce them and the tap would do nothing visible.
-  it('does not route a trainee session alert into the coaching area', () => {
-    expect(routeFor({ screen: 'sessions', entityId: 'abc' })).toBeNull();
-    expect(webOnlyLabel({ screen: 'sessions', entityId: 'abc' })).toBe('My sessions');
+  // A trainee's booking alert lands on the trainee surface, never the coach's
+  // — the instructor guard would bounce a non-coach and the tap would do
+  // nothing visible. Both of the backend's spellings mean the same screen.
+  it('routes a trainee session alert to the trainee area', () => {
+    expect(routeFor({ screen: 'sessions', entityId: 'abc' })).toEqual([
+      '/tabs/user/sessions',
+      'abc',
+    ]);
+    expect(routeFor({ screen: 'user/sessions', entityId: 'abc' })).toEqual([
+      '/tabs/user/sessions',
+      'abc',
+    ]);
+    expect(routeFor({ screen: 'sessions' })).toEqual(['/tabs/user/sessions']);
   });
 
   // A program assignment is the alert most likely to be tapped by a trainee,

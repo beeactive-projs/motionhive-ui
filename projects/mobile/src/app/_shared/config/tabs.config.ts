@@ -49,7 +49,9 @@ export const COACH_TAB_SET: TabSet = {
   tabs: [
     HOME,
     { id: TabIds.Clients, label: 'Clients', icon: 'people-outline' },
-    { id: TabIds.Sessions, label: 'Sessions', icon: 'calendar-outline' },
+    // Role segment as the id: the coach sessions area lives under
+    // `/tabs/coach/sessions` (see tab.model.ts).
+    { id: TabIds.Coach, label: 'Sessions', icon: 'calendar-outline' },
     MESSAGES,
   ],
   // Programs, Exercises and Payments belong here per the design, but they have
@@ -72,13 +74,18 @@ export const TRAIN_TAB_SET: TabSet = {
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
-    { id: TabIds.Workouts, label: 'Workouts', icon: 'barbell-outline' },
+    // The trainee's bookings — `/tabs/user/sessions`. Sessions earned the tab
+    // slot; Workouts moved to the More sheet until it ships real content.
+    { id: TabIds.User, label: 'Sessions', icon: 'calendar-outline' },
     { id: TabIds.Discover, label: 'Discover', icon: 'compass-outline' },
     MESSAGES,
   ],
-  // My plans, My sessions and Profile join in M2 with their pages. Until then
-  // the sheet earns its place through the mode switch and the profile row.
-  more: [ACCOUNT_TILE],
+  // My plans and Profile join in M2 with their pages. Until then the sheet
+  // earns its place through Workouts, the mode switch and the profile row.
+  more: [
+    { label: 'Workouts', icon: 'barbell-outline', route: '/tabs/workouts' },
+    ACCOUNT_TILE,
+  ],
 };
 
 export const TAB_SETS: Record<NavMode, TabSet> = {

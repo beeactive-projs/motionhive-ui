@@ -1,0 +1,109 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Sessions</ion-title>
+    <ion-buttons slot="end">
+      <mh-notification-bell />
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
+      <ion-segment-button value="upcoming">
+        <ion-label>{{ upcomingLabel() }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past">
+        <ion-label>Past</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load your sessions"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
+    <!-- Mirrors the booking row shape so nothing shifts when data lands. -->
+    <div class="agenda">
+      <div class="day-header">
+        <span class="mh-kicker">
+          <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
+        </span>
+      </div>
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none" class="skeleton mh-list-row">
+          <div slot="start" class="when">
+            <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.875rem" />
+          </div>
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </div>
+  } @else if (isEmpty()) {
+    @if (isUpcoming()) {
+      <mh-my-sessions-empty
+        [noCoach]="store.hasCoach() === false"
+        (browse)="openDiscover()"
+      />
+    } @else {
+      <mh-empty-state
+        icon="calendar-outline"
+        heading="No past sessions yet"
+        message="Sessions you've been to show up here."
+      />
+    }
+    @if (store.cancelledCount() > 0) {
+      <ion-button class="ghost" fill="clear" color="medium" expand="block" (click)="openCancelled()">
+        Cancelled &amp; declined · {{ store.cancelledCount() }}
+        <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
+      </ion-button>
+    }
+  } @else {
+    <div class="agenda">
+      @for (day of days(); track day.key) {
+        <div class="day-header" [class.today]="day.isToday">
+          <span class="mh-kicker">{{ day.label }}</span>
+        </div>
+
+        @for (booking of day.bookings; track booking.id) {
+          <mh-my-session-row
+            [booking]="booking"
+            (select)="open(booking)"
+            (join)="join(booking)"
+          />
+        }
+      }
+
+      @if (isUpcoming() && store.upcomingTruncated()) {
+        <ion-note class="mh-note-block">
+          Showing your next 100 bookings — the rest appear as these pass.
+        </ion-note>
+      }
+
+      @if (!isUpcoming()) {
+        <ion-infinite-scroll [disabled]="!store.hasMorePast()" (ionInfinite)="onMorePast($event)">
+          <ion-infinite-scroll-content />
+        </ion-infinite-scroll>
+      }
+
+      @if (store.cancelledCount() > 0) {
+        <ion-button class="ghost" fill="clear" color="medium" expand="block" (click)="openCancelled()">
+          Cancelled &amp; declined · {{ store.cancelledCount() }}
+          <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
+        </ion-button>
+      }
+    </div>
+  }
+</ion-content>

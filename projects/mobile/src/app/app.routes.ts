@@ -12,8 +12,8 @@ import { TabIds } from './_shared/models/tab.model';
  * would drop the user out of the tab they opened it from. One route per tab
  * keeps the origin tab lit, at the cost of this loop.
  *
- * These must come first: `sessions` and `messages` load child routes with a
- * `:id` parameter that would otherwise swallow `notifications`.
+ * These must come first: the sessions areas and `messages` load child routes
+ * with a `:id` parameter that would otherwise swallow `notifications`.
  */
 const notificationRoutes: Routes = Object.values(TabIds).map((tab) => ({
   path: `${tab}/notifications`,
@@ -72,12 +72,28 @@ export const routes: Routes = [
         canActivate: [coachGuard],
         loadComponent: () => import('./main/requests/requests').then((m) => m.Requests),
       },
+      // Role-prefixed sessions areas: each role keeps its own stack and its
+      // own deep-link address, and the tab buttons navigate to the bare role
+      // segment — hence the redirects. The trainee side needs no guard beyond
+      // the parent authGuard: any authenticated user can hold bookings.
+      { path: 'coach', redirectTo: 'coach/sessions', pathMatch: 'full' },
       {
-        path: 'sessions',
+        path: 'coach/sessions',
         canActivate: [coachGuard],
         loadChildren: () =>
-          import('./main/sessions/sessions.routes').then((m) => m.sessionsRoutes),
+          import('./main/coach/sessions/sessions.routes').then((m) => m.sessionsRoutes),
       },
+      { path: 'user', redirectTo: 'user/sessions', pathMatch: 'full' },
+      {
+        path: 'user/sessions',
+        loadChildren: () =>
+          import('./main/user/sessions/sessions.routes').then(
+            (m) => m.userSessionsRoutes,
+          ),
+      },
+      // The pre-split address, kept so restored URLs and stale notification
+      // taps still land somewhere sensible.
+      { path: 'sessions', redirectTo: 'coach/sessions' },
       {
         path: 'workouts',
         loadComponent: () => import('./main/workouts/workouts').then((m) => m.Workouts),

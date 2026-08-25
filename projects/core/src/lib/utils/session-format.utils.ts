@@ -34,8 +34,15 @@ export function formatSessionDuration(minutes: number): string {
  * can return instances without their template (the same reason `sessionTone`
  * takes a nullable one), and `endAt` is always present. The template is only
  * the fallback for a malformed pair.
+ *
+ * Structurally typed on the three fields it reads, so the public/redacted
+ * instance shapes (`PublicSessionInstance`) qualify too.
  */
-export function sessionMinutes(instance: SessionInstance): number {
+export function sessionMinutes(
+  instance: Pick<SessionInstance, 'startAt' | 'endAt'> & {
+    template?: { durationMinutes: number } | null;
+  },
+): number {
   const span =
     (new Date(instance.endAt).getTime() - new Date(instance.startAt).getTime()) /
     60_000;
@@ -298,4 +305,85 @@ export function groupSessionsByBucket<T>(
     g.items.sort((a, b) => (desc ? ms(b) - ms(a) : ms(a) - ms(b)));
   }
   return arr;
+}
+
+// ─── Booking-side derivations (trainee) ────────────────────────────────────
+//
+// Restatements of backend contracts, kept here so every surface that renders
+// a trainee's booking derives the same instants the server enforces. The
+// join window mirrors the API's JOIN_BEFORE_START_MS / JOIN_AFTER_START_MS;
+// the cancel cutoff reads the booking-time snapshot, never the live template.
+
+/** The join window opens this many minutes before `startAt` (server contract). */
+export const JOIN_OPENS_BEFORE_MIN = 5;
+/** The join window closes this many minutes after `startAt` (server contract). */
+export const JOIN_CLOSES_AFTER_MIN = 15;
+
+export interface JoinWindow {
+  from: Date;
+  until: Date;
+}
+
+/**
+ * The join window for an online occurrence, derived from its start instant.
+ *
+ * `JoinInfo` from `GET /sessions/instances/:id/join-info` is the authority
+ * (`joinActiveFrom` / `joinActiveUntil`) — use this derivation only as the
+ * fallback when that call is unavailable (e.g. it 403s for a booking loaded
+ * from a stale cache). Both produce the same instants today by construction.
+ */
+export function joinWindowFor(startIso: string): JoinWindow {
+  const start = new Date(startIso).getTime();
+  return {
+    from: new Date(start - JOIN_OPENS_BEFORE_MIN * 60_000),
+    until: new Date(start + JOIN_CLOSES_AFTER_MIN * 60_000),
+  };
+}
+
+/**
+ * Where *now* sits relative to a join window:
+ *
+ *   before — the link is still withheld ("Join · opens 17:55")
+ *   open   — joinable right now ("Join session")
+ *   closed — the window has passed; the occurrence is a past record
+ *
+ * Accepts ISO strings (straight off `JoinInfo`) or Dates (from
+ * `joinWindowFor`). `now` is injectable for testing.
+ */
+export type JoinPhase = 'before' | 'open' | 'closed';
+export function joinPhase(
+  from: string | Date,
+  until: string | Date,
+  now: number = Date.now(),
+): JoinPhase {
+  if (now < new Date(from).getTime()) return 'before';
+  if (now >= new Date(until).getTime()) return 'closed';
+  return 'open';
+}
+
+/**
+ * The last instant a booking can be cancelled free of charge — `startAt`
+ * minus the *as-booked* cutoff (`SessionParticipant.snapshotCancelCutoffH`,
+ * never the template's live value). `null` when the cutoff is zero or
+ * negative: those terms allow cancelling any time, so there is no deadline
+ * to render.
+ */
+export function bookingCancelBy(startIso: string, cutoffHours: number): Date | null {
+  if (cutoffHours <= 0) return null;
+  return new Date(new Date(startIso).getTime() - cutoffHours * 3_600_000);
+}
+
+/**
+ * Whether cancelling *now* falls outside the as-booked window — the flag that
+ * shows the amber "this is a late cancel" card. Exactly at the deadline is
+ * still on time (the server's `WITHIN_WINDOW` check is the authority; this
+ * only decides whether to warn). Terms with no cutoff are never late.
+ */
+export function isLateCancel(
+  startIso: string,
+  cutoffHours: number,
+  now: number = Date.now(),
+): boolean {
+  const cancelBy = bookingCancelBy(startIso, cutoffHours);
+  return cancelBy !== null && now > cancelBy.getTime();
 }

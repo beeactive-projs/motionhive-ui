@@ -6,11 +6,17 @@ import type { NavMode } from 'core';
  * key Ionic uses for that tab's navigation stack (`computeStackId`) and the
  * value bound to `ion-tab-button[tab]`. The three must stay identical, so
  * they are one value rather than three fields.
+ *
+ * `Coach` and `User` are role segments, not feature names: each role's
+ * sessions area lives under its own prefix (`/tabs/coach/sessions`,
+ * `/tabs/user/sessions`) so the two surfaces keep separate stacks and
+ * separate deep-link addresses. Both tab buttons still read "Sessions".
  */
 export const TabIds = {
   Home: 'home',
   Clients: 'clients',
-  Sessions: 'sessions',
+  Coach: 'coach',
+  User: 'user',
   Workouts: 'workouts',
   Discover: 'discover',
   Messages: 'messages',

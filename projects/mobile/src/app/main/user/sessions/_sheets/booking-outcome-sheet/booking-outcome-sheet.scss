@@ -1,0 +1,102 @@
+/* Centred landing: tile, verdict, one sentence of what happens next. */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.25rem 0;
+  text-align: center;
+}
+
+.head h2 {
+  margin: 0.375rem 0 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+  font-weight: 700;
+}
+
+.head .copy {
+  margin: 0;
+  max-width: 20rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+}
+
+.head .footnote {
+  font-size: var(--mh-text-sm);
+}
+
+/* The session, captured — so the moment ends with the facts, not just an OK. */
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.date-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  width: 2.75rem;
+  padding: 0.375rem 0;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.25);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-color-primary-wash);
+}
+
+.date-tile .mh-kicker {
+  color: var(--ion-color-primary-wash-contrast);
+}
+
+.date-tile strong {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 700;
+}
+
+.summary .what {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary h3 {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.summary p {
+  margin: 0.125rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.summary ion-badge {
+  flex: none;
+  --background: var(--ion-color-warning-wash);
+  --color: var(--ion-color-warning-wash-contrast);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  text-transform: none;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-top: 1.25rem;
+}
+
+.actions ion-button {
+  margin: 0;
+}

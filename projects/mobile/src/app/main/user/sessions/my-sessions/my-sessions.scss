@@ -1,0 +1,51 @@
+/* Day-grouped list — same chrome as the coach agenda (sessions.scss), minus
+   the week strip and filters this list does not need. */
+
+.agenda {
+  padding: 0 1.25rem 3rem;
+}
+
+/* Sticky so the day you are reading stays labelled while you scroll it. */
+.day-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.75rem 0 0.5rem;
+  background: var(--ion-background-color);
+}
+
+.day-header .mh-kicker {
+  color: var(--ion-color-medium);
+}
+
+.day-header.today .mh-kicker {
+  color: var(--mh-color-honey-deep);
+}
+
+.skeleton {
+  --background: var(--ion-card-background);
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}
+
+.skeleton .when {
+  width: 3rem;
+  margin-inline-end: 0.75rem;
+}
+
+/* The demoted cancelled list: one quiet text row, deliberately not a card —
+   it must read as "there is more", not as another booking. */
+.ghost {
+  margin: 0.25rem 0 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 500;
+  text-transform: none;
+}
+
+.ghost ion-icon {
+  font-size: var(--mh-text-sm);
+}

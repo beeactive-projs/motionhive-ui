@@ -14,11 +14,18 @@ import { NotificationData } from 'core';
 const SCREEN_ROUTES: Record<string, (data: NotificationData) => string[]> = {
   messages: (d) => (d.entityId ? ['/tabs/messages', d.entityId] : ['/tabs/messages']),
   // The coaching screens only ever go to instructors, which is what the
-  // `/tabs/sessions` and `/tabs/clients` guards require.
+  // `/tabs/coach/sessions` and `/tabs/clients` guards require.
   'coaching/sessions': (d) =>
-    d.entityId ? ['/tabs/sessions', d.entityId] : ['/tabs/sessions'],
+    d.entityId ? ['/tabs/coach/sessions', d.entityId] : ['/tabs/coach/sessions'],
   'coaching/clients': () => ['/tabs/clients'],
   'coaching/pending-requests': () => ['/tabs/clients/requests'],
+  // `sessions` / `user/sessions` go to the person who booked — the trainee
+  // surface. The backend's two spellings are historical; both mean the same
+  // screen.
+  sessions: (d) =>
+    d.entityId ? ['/tabs/user/sessions', d.entityId] : ['/tabs/user/sessions'],
+  'user/sessions': (d) =>
+    d.entityId ? ['/tabs/user/sessions', d.entityId] : ['/tabs/user/sessions'],
 };
 
 /**
@@ -28,16 +35,9 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => string[]> = {
  * destination — and so an unrecognised screen stays visibly different from a
  * known-but-unbuilt one. `deep-link.spec.ts` checks this covers every screen
  * the API emits.
- *
- * Note `sessions` (not `coaching/sessions`): that one goes to the person who
- * booked, and a trainee has no session screen here. Routing it to the coach's
- * would bounce them off the instructor guard, which is worse than opening the
- * detail sheet.
  */
 const NOT_ON_MOBILE: Record<string, string> = {
   groups: 'Groups',
-  sessions: 'My sessions',
-  'user/sessions': 'My sessions',
   'user/plans': 'My plans',
   'coaching/exercises': 'Exercises',
   'profile/invoices': 'Payments',

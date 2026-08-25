@@ -84,6 +84,6 @@ export class CoachHome implements OnInit, ViewWillEnter {
   }
 
   openSessions(): void {
-    void this._router.navigateByUrl('/tabs/sessions');
+    void this._router.navigateByUrl('/tabs/coach/sessions');
   }
 }

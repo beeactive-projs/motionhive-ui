@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/user/sessions" />
+    </ion-buttons>
+    <ion-title>Cancelled &amp; declined</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (error() && bookings().length === 0) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load these bookings"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (loading() && bookings().length === 0) {
+    <div class="list">
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none" class="skeleton mh-list-row">
+          <div slot="start" class="when">
+            <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.875rem" />
+          </div>
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </div>
+  } @else if (bookings().length === 0) {
+    <mh-empty-state
+      icon="calendar-outline"
+      heading="Nothing here"
+      message="Cancelled and declined bookings show up here."
+    />
+  } @else {
+    <div class="list">
+      @for (booking of bookings(); track booking.id) {
+        <mh-my-session-row [booking]="booking" (select)="open(booking)" />
+      }
+
+      <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="onMore($event)">
+        <ion-infinite-scroll-content />
+      </ion-infinite-scroll>
+    </div>
+  }
+</ion-content>

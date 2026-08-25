@@ -66,6 +66,22 @@ describe('tab set configuration', () => {
     }
   });
 
+  it('gives each mode its own role-segmented sessions tab', () => {
+    // The two sessions surfaces live under /tabs/coach/sessions and
+    // /tabs/user/sessions — separate stacks, separate deep-link addresses —
+    // so each set carries its role segment as the tab id, never the other's.
+    expect(COACH_TAB_SET.tabs.some((tab) => tab.id === TabIds.Coach)).toBe(true);
+    expect(COACH_TAB_SET.tabs.some((tab) => tab.id === TabIds.User)).toBe(false);
+    expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.User)).toBe(true);
+    expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.Coach)).toBe(false);
+  });
+
+  it('keeps workouts reachable from More after losing its tab slot', () => {
+    expect(TRAIN_TAB_SET.more.some((tile) => tile.route === '/tabs/workouts')).toBe(
+      true,
+    );
+  });
+
   it('registers every icon name it renders', () => {
     // addIcons() is fed TAB_ICONS; an unregistered name renders as a blank box.
     const registered = new Set(

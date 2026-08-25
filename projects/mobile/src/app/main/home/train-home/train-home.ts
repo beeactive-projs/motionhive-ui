@@ -100,14 +100,11 @@ export class TrainHome implements OnInit, ViewWillEnter {
     void this._router.navigateByUrl(step.route);
   }
 
-  /**
-   * Both the sessions row and the coaches list land on Discover: booking and
-   * coach detail are Discover surfaces, and neither has its own page yet.
-   */
   openSessions(): void {
-    void this._router.navigateByUrl('/tabs/discover');
+    void this._router.navigateByUrl('/tabs/user/sessions');
   }
 
+  /** Coach browsing and detail are Discover surfaces; it has no page of its own yet. */
   openCoaches(): void {
     void this._router.navigateByUrl('/tabs/discover');
   }

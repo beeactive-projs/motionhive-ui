@@ -3,8 +3,12 @@ import { describe, expect, it } from 'vitest';
 
 import type { SessionInstance } from '../models/session/session.model';
 import {
+  bookingCancelBy,
   formatTimeUntil,
   formatTotalDuration,
+  isLateCancel,
+  joinPhase,
+  joinWindowFor,
   sessionMinutes,
 } from './session-format.utils';
 
@@ -105,5 +109,53 @@ describe('formatTotalDuration', () => {
 
   it('never renders a negative total', () => {
     expect(formatTotalDuration(-30)).toBe('0m');
+  });
+});
+
+describe('joinWindowFor / joinPhase', () => {
+  // The window is the server's contract: start − 5 min → start + 15 min.
+  it('derives the −5/+15 minute window from the start instant', () => {
+    const { from, until } = joinWindowFor(at(0));
+    expect(from.getTime()).toBe(NOW - 5 * MINUTE);
+    expect(until.getTime()).toBe(NOW + 15 * MINUTE);
+  });
+
+  it('is before the window until the −5 min boundary, open exactly at it', () => {
+    const { from, until } = joinWindowFor(at(5 * MINUTE));
+    expect(joinPhase(from, until, NOW - 1)).toBe('before');
+    expect(joinPhase(from, until, NOW)).toBe('open');
+  });
+
+  it('closes exactly at start + 15 min, not a moment sooner', () => {
+    const { from, until } = joinWindowFor(at(0));
+    expect(joinPhase(from, until, NOW + 15 * MINUTE - 1)).toBe('open');
+    expect(joinPhase(from, until, NOW + 15 * MINUTE)).toBe('closed');
+  });
+
+  it('reads ISO strings straight off JoinInfo', () => {
+    expect(joinPhase(at(-5 * MINUTE), at(15 * MINUTE), NOW)).toBe('open');
+  });
+});
+
+describe('bookingCancelBy / isLateCancel', () => {
+  // Always the as-booked snapshot cutoff — the maths must not care where the
+  // hours came from, only that start − N h is the deadline.
+  it('puts the deadline the cutoff ahead of start', () => {
+    expect(bookingCancelBy(at(48 * HOUR), 24)?.getTime()).toBe(NOW + 24 * HOUR);
+  });
+
+  it('returns null for terms with no cutoff — cancel any time, no deadline', () => {
+    expect(bookingCancelBy(at(48 * HOUR), 0)).toBeNull();
+    expect(bookingCancelBy(at(48 * HOUR), -1)).toBeNull();
+  });
+
+  it('flags late only past the deadline — exactly at it is still on time', () => {
+    const start = at(24 * HOUR);
+    expect(isLateCancel(start, 24, NOW)).toBe(false); // exactly at the cutoff
+    expect(isLateCancel(start, 24, NOW + 1)).toBe(true);
+  });
+
+  it('is never late when the terms have no cutoff', () => {
+    expect(isLateCancel(at(-HOUR), 0, NOW)).toBe(false);
   });
 });

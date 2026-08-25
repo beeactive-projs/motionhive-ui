@@ -1,0 +1,261 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/user/sessions" />
+    </ion-buttons>
+    <ion-title>Session</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (store.error(); as error) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load this session"
+      [message]="error"
+      actionLabel="Try again"
+      (action)="store.reload()"
+    />
+  } @else if (store.loading() && !store.instance()) {
+    <div class="mh-page body">
+      <div class="hero">
+        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.25rem" />
+        <ion-skeleton-text [animated]="true" style="width: 35%" />
+      </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item lines="full">
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  } @else if (store.instance()) {
+    <div class="mh-page body">
+      <div class="hero" [attr.data-tone]="heroTone()">
+        <div class="hero-badges">
+          @for (badge of heroBadges(); track badge.label) {
+            <ion-badge [attr.data-tone]="badge.tone">{{ badge.label }}</ion-badge>
+          }
+        </div>
+        <h2 class="hero-name">{{ title() }}</h2>
+        <p class="meta">{{ dateLine() }}</p>
+      </div>
+
+      @if (view() === Views.CancelledInstance) {
+        <div class="banner">
+          <ion-icon name="close-circle-outline" aria-hidden="true" />
+          <div>
+            <strong>Session cancelled</strong>
+            <span>{{ cancelledDetail() }}</span>
+          </div>
+        </div>
+      }
+
+      @if (band(); as band) {
+        <div class="band" [attr.data-tone]="band.tone">
+          @if (band.icon) {
+            <ion-icon [name]="band.icon" aria-hidden="true" />
+          } @else {
+            <span class="dot" aria-hidden="true"></span>
+          }
+          <div>
+            <strong>{{ band.title }}</strong>
+            <span>{{ band.detail }}</span>
+          </div>
+        </div>
+      }
+
+      <ion-list [inset]="true" class="mh-card-list">
+        @if (coach(); as coach) {
+          <ion-item lines="full" [button]="!!coach.handle" detail="false" (click)="openCoach()">
+            <mh-hex-avatar
+              slot="start"
+              size="sm"
+              [name]="coachName()"
+              [imageUrl]="coach.avatarUrl"
+              [color]="blockedInstance() ? 'secondary' : 'primary'"
+            />
+            <ion-label>
+              <p class="row-label">Coach</p>
+              <h3>{{ coachName() }}</h3>
+            </ion-label>
+            @if (!blockedInstance()) {
+              <ion-button slot="end" fill="clear" size="small" class="row-action" (click)="messageCoach(); $event.stopPropagation()">
+                Message
+              </ion-button>
+            }
+          </ion-item>
+        }
+
+        @if (blockedInstance()) {
+          <ion-item lines="none">
+            <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="violet" tone="wash" aria-hidden="true" />
+            <ion-label>
+              <h3>Location is for club members</h3>
+              <p>Join the club to see where and book.</p>
+            </ion-label>
+          </ion-item>
+        } @else {
+          @if (view() === Views.OnlineLive) {
+            <ion-item lines="full">
+              <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="teal" tone="wash" aria-hidden="true" />
+              <ion-label>
+                <h3>{{ providerLabel() }}</h3>
+                @if (meetingUrl(); as url) {
+                  <p class="url">{{ url }}</p>
+                }
+              </ion-label>
+              @if (meetingUrl()) {
+                <ion-button slot="end" fill="outline" size="small" aria-label="Copy meeting link" (click)="copyMeetingUrl()">
+                  <ion-icon slot="icon-only" name="copy-outline" />
+                </ion-button>
+              }
+            </ion-item>
+          } @else if (view() === Views.OnlinePre) {
+            <!-- The withheld link is a designed state, not an error. -->
+            <ion-item lines="full">
+              <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="medium" tone="wash" aria-hidden="true" />
+              <ion-label>
+                <h3>Meeting link unlocks 5 min before start</h3>
+                <p>Available from {{ unlockTime() }}</p>
+              </ion-label>
+            </ion-item>
+          } @else if (isOnlineSession()) {
+            <ion-item lines="full">
+              <mh-hex-avatar slot="start" size="sm" icon="videocam-outline" color="medium" tone="wash" aria-hidden="true" />
+              <ion-label>
+                <h3>{{ providerLabel() }}</h3>
+                @if (view() === Views.Showcase) {
+                  <p>The meeting link appears here once you're booked.</p>
+                }
+              </ion-label>
+            </ion-item>
+          } @else {
+            <ion-item lines="full">
+              <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" aria-hidden="true" />
+              <ion-label>
+                <p class="row-label">Where</p>
+                <h3>{{ whereLabel() }}</h3>
+                @if (whereCity(); as city) {
+                  <p>{{ city }}</p>
+                }
+              </ion-label>
+            </ion-item>
+          }
+
+          <ion-item lines="none">
+            <mh-hex-avatar slot="start" size="sm" icon="calendar-outline" color="info" tone="shade" aria-hidden="true" />
+            <ion-label>
+              <p class="row-label">When</p>
+              <h3>{{ whenLabel() }}</h3>
+            </ion-label>
+            @if (canAddToCalendar()) {
+              <ion-button slot="end" fill="clear" size="small" class="row-action" (click)="addToCalendar()">
+                Add to calendar
+              </ion-button>
+            }
+          </ion-item>
+        }
+      </ion-list>
+
+      @if (!blockedInstance()) {
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item [lines]="capacity() !== null ? 'full' : 'none'">
+            <mh-hex-avatar slot="start" size="sm" icon="pricetag-outline" color="success" tone="shade" aria-hidden="true" />
+            <ion-label>
+              <p class="row-label">Price</p>
+              <h3>{{ priceLabel() }}</h3>
+              @if (!isFree()) {
+                <p>Settled by invoice — nothing to pay now.</p>
+              }
+            </ion-label>
+          </ion-item>
+
+          @if (capacity() !== null) {
+            <ion-item lines="none">
+              <mh-hex-avatar slot="start" size="sm" icon="people-outline" color="medium" tone="wash" aria-hidden="true" />
+              <ion-label>
+                <p class="row-label">Spots</p>
+                <h3>{{ spotsLabel() }}</h3>
+                <ion-progress-bar [value]="spotsProgress()" />
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    </div>
+  }
+</ion-content>
+
+@if (showFooter()) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <div class="cta">
+        @switch (view()) {
+          @case (Views.Showcase) {
+            @switch (bookAction()) {
+              @case ('book') {
+                <ion-button expand="block" class="action" [disabled]="bookingInFlight()" (click)="book()">
+                  Book
+                </ion-button>
+              }
+              @case ('waitlist') {
+                <ion-button expand="block" class="action" [disabled]="bookingInFlight()" (click)="book()">
+                  Join waitlist
+                </ion-button>
+              }
+              @case ('full') {
+                <div class="inert">Session full</div>
+              }
+            }
+          }
+          @case (Views.BookedInPerson) {
+            <!-- Deliberately quiet: cancelling is available, never advertised. -->
+            <ion-button expand="block" fill="outline" color="medium" class="action" (click)="openCancel()">
+              Cancel booking
+            </ion-button>
+          }
+          @case (Views.OnlinePre) {
+            <ion-button fill="clear" color="medium" class="quiet" (click)="openCancel()">
+              Cancel booking
+            </ion-button>
+            <div class="inert action">Join · opens {{ unlockTime() }}</div>
+          }
+          @case (Views.OnlineLive) {
+            <ion-button expand="block" class="action" (click)="joinSession()">
+              <ion-icon slot="start" name="videocam-outline" />
+              Join session
+            </ion-button>
+          }
+          @case (Views.Pending) {
+            <ion-button expand="block" fill="outline" color="medium" class="action" (click)="openCancel()">
+              Withdraw request
+            </ion-button>
+          }
+          @case (Views.Waitlist) {
+            <ion-button expand="block" fill="outline" color="medium" class="action" (click)="openCancel()">
+              Leave the waitlist
+            </ion-button>
+          }
+        }
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}
+
+<mh-booking-outcome-sheet
+  [(open)]="outcomeOpen"
+  [status]="outcomeStatus()"
+  [instance]="publicInstance()"
+  (done)="onOutcomeDone()"
+/>
+
+<mh-cancel-booking-sheet
+  [(open)]="cancelOpen"
+  [participant]="store.booking()"
+  (cancelled)="onCancelled()"
+/>

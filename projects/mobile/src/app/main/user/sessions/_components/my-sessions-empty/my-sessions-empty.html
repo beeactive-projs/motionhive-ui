@@ -1,0 +1,16 @@
+<div class="empty">
+  <mh-hex-avatar
+    name="Nothing booked yet"
+    icon="calendar-outline"
+    size="xl"
+    color="primary"
+    tone="wash"
+  />
+
+  <h2>Nothing booked yet</h2>
+  <p>{{ message() }}</p>
+
+  <div class="actions">
+    <ion-button expand="block" (click)="browse.emit()">Browse Discover</ion-button>
+  </div>
+</div>

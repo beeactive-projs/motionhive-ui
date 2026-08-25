@@ -1,0 +1,36 @@
+<ion-item class="mh-list-row" button detail="false" lines="none" (click)="select.emit()">
+  <div class="when" slot="start">
+    <span class="time">{{ time() }}</span>
+    @if (duration()) {
+      <span class="duration">{{ duration() }}</span>
+    }
+  </div>
+
+  <ion-label>
+    <h2>{{ title() }}</h2>
+    <div class="tags">
+      @if (isOnline()) {
+        <ion-icon class="online" name="videocam-outline" aria-hidden="true" />
+      }
+      <ion-note>{{ meta() }}</ion-note>
+      @if (chip(); as chip) {
+        <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+      }
+    </div>
+  </ion-label>
+
+  @if (showJoin()) {
+    <ion-button
+      slot="end"
+      class="join"
+      size="small"
+      shape="round"
+      color="primary"
+      (click)="onJoin($event)"
+    >
+      Join
+    </ion-button>
+  } @else {
+    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+  }
+</ion-item>

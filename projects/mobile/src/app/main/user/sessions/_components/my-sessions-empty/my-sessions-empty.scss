@@ -1,0 +1,28 @@
+/* Same centred hero column as the coach's sessions-empty — Ionic has no
+   centred-stack primitive, so the flex column is written out. */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.empty h2 {
+  margin: 1.25rem 0 0;
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}
+
+.empty p {
+  margin: 0.5rem 0 0;
+  max-width: 20rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+}
+
+.actions {
+  align-self: stretch;
+  margin-top: 1.75rem;
+}

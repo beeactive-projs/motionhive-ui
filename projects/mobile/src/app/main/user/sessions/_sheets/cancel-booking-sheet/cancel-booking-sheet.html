@@ -1,0 +1,42 @@
+<ng-template #body>
+  @if (variant().showTerms) {
+    <div class="card">
+      <ion-icon name="document-text-outline" aria-hidden="true" />
+      <div>
+        <strong>{{ termsTitle() }}</strong>
+        @if (agreedLine()) {
+          <span>{{ agreedLine() }}</span>
+        }
+      </div>
+    </div>
+
+    @if (isLate()) {
+      <!-- Informs, never blocks: the confirm below still works. -->
+      <div class="card late">
+        <ion-icon name="time-outline" aria-hidden="true" />
+        <div>
+          <strong>{{ lateTitle() }}</strong>
+          <span>{{ lateDetail() }}</span>
+        </div>
+      </div>
+    }
+  } @else {
+    <p class="mh-helper">
+      Nothing is charged for this — your spot simply goes back to the coach.
+    </p>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="variant().title"
+  [subtitle]="subtitle()"
+  [saveLabel]="variant().saveLabel"
+  saveColor="danger"
+  [dismissLabel]="variant().dismissLabel"
+  [body]="body"
+  [saving]="saving()"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+  (save)="confirm()"
+/>

@@ -1,0 +1,56 @@
+<ng-template #body>
+  <div class="head">
+    <mh-hex-avatar
+      size="lg"
+      tone="wash"
+      aria-hidden="true"
+      [icon]="tile().icon"
+      [color]="tile().color"
+    />
+    <h2>{{ heading() }}</h2>
+    <p class="copy">{{ copy() }}</p>
+    @if (isWaitlisted()) {
+      <ion-note class="footnote">Spots go in the order people joined the list.</ion-note>
+    }
+  </div>
+
+  @if (instance()) {
+    <div class="summary">
+      @if (dateTile(); as tile) {
+        <div class="date-tile">
+          <span class="mh-kicker">{{ tile.weekday }}</span>
+          <strong>{{ tile.day }}</strong>
+        </div>
+      }
+      <div class="what">
+        <h3>{{ title() }}</h3>
+        <p>{{ summaryLine() }}</p>
+      </div>
+      @if (isPending()) {
+        <ion-badge>Pending</ion-badge>
+      }
+    </div>
+  }
+
+  <div class="actions">
+    @if (isConfirmed()) {
+      <ion-button expand="block" (click)="dismiss()">Done</ion-button>
+      <ion-button expand="block" fill="outline" color="medium" (click)="addToCalendar()">
+        <ion-icon slot="start" name="calendar-outline" />
+        Add to calendar
+      </ion-button>
+    } @else {
+      <ion-button expand="block" (click)="dismiss()">Got it</ion-button>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="heading()"
+  [body]="body"
+  [showHeader]="false"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.75]"
+  [initialBreakpoint]="0.75"
+/>

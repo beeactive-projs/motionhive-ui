@@ -79,13 +79,17 @@ export class Person {
   private readonly _router = inject(Router);
 
   /**
-   * Where back goes on a cold load. The screen is mounted under two tabs, so
-   * the fallback follows whichever one the URL is in — without it a deep link
-   * renders a header with no way out.
+   * Where back goes on a cold load. The screen is mounted under three tabs
+   * (messages, and each role's sessions area), so the fallback follows
+   * whichever one the URL is in — without it a deep link renders a header
+   * with no way out.
    */
-  readonly backHref = computed(() =>
-    this._router.url.startsWith('/tabs/messages') ? '/tabs/messages' : '/tabs/sessions',
-  );
+  readonly backHref = computed(() => {
+    const url = this._router.url;
+    if (url.startsWith('/tabs/messages')) return '/tabs/messages';
+    if (url.startsWith('/tabs/user')) return '/tabs/user/sessions';
+    return '/tabs/coach/sessions';
+  });
 
   readonly profile = signal<PublicUserProfile | null>(null);
   /**
