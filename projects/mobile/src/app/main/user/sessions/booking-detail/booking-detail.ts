@@ -121,6 +121,18 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
 
   readonly Views = DetailViews;
 
+  /**
+   * The stack this page was pushed onto. It is mounted under two tabs —
+   * the trainee sessions area and Discover (`discover/:id`) — and the
+   * settled rule is that back returns to origin, so the back fallback and
+   * both in-page navigations follow whichever stack the URL is in.
+   */
+  readonly stackBase = computed(() =>
+    this._router.url.startsWith('/tabs/discover')
+      ? '/tabs/discover'
+      : '/tabs/user/sessions',
+  );
+
   readonly skeletonRows = [1, 2, 3];
 
   readonly cancelOpen = signal(false);
@@ -464,7 +476,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     this.store.clearStateParticipant();
     this._myBookingsIndexStore.invalidate();
     this._myBookingsIndexStore.ensureLoaded(true);
-    void this._router.navigate(['/tabs/user/sessions']);
+    void this._router.navigate([this.stackBase()]);
   }
 
   joinSession(): void {
@@ -513,7 +525,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
 
   openCoach(): void {
     const handle = this.coach()?.handle;
-    if (handle) void this._router.navigate(['/tabs/user/sessions/person', handle]);
+    if (handle) void this._router.navigate([this.stackBase(), 'person', handle]);
   }
 
   onOutcomeDone(): void {

@@ -33,7 +33,6 @@ const TYPE_LABELS: Record<string, string> = {
   templateUrl: './session-row.html',
   styleUrl: './session-row.scss',
   host: {
-    '[attr.data-tone]': 'tone()',
     // Long-press is the quick-actions gesture. Bound on the host so the timer
     // is cancelled by a scroll or a lift anywhere on the row.
     '(pointerdown)': 'onPressStart()',

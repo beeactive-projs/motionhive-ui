@@ -1,0 +1,42 @@
+/* Geometry, spine tones and the tags line come from the shared
+   `.mh-session-row` skin (theme/components/mh-session-row.css). Only what
+   is specific to a discover row lives here. */
+
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* "n of m spots" — the quiet third line; the full chip replaces it. */
+.spots {
+  margin: 0.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+}
+
+/* The two-line mono price block where other rows keep their chevron:
+   amount over the currency code, "Free" in emerald. */
+.price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--mh-font-mono);
+}
+
+.price .amount {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.price .amount.free {
+  color: var(--ion-color-success);
+}
+
+.price .currency {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+}

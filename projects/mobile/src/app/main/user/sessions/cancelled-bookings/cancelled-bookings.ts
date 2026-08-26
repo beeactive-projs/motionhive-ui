@@ -8,11 +8,8 @@ import {
   IonHeader,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonRefresher,
   IonRefresherContent,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
@@ -24,6 +21,7 @@ import { take } from 'rxjs';
 import { MyTab, SessionParticipant, SessionService } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
+import { SessionRowSkeleton } from '../../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { MySessionRow } from '../_components/my-session-row/my-session-row';
 import { MY_SESSION_ICONS } from '../my-sessions.config';
 
@@ -48,14 +46,12 @@ const PAGE_SIZE = 50;
     IonHeader,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
-    IonLabel,
     IonRefresher,
     IonRefresherContent,
-    IonSkeletonText,
     IonTitle,
     IonToolbar,
     MySessionRow,
+    SessionRowSkeleton,
   ],
   templateUrl: './cancelled-bookings.html',
   styleUrl: './cancelled-bookings.scss',

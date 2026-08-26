@@ -1,116 +1,15 @@
-/* Card-with-spine geometry mirrors the coach row —
-   ../../../../coach/sessions/_components/session-row/session-row.scss —
-   change the two together. Only the tone map differs: the trainee spine is
-   keyed to booking status, not session type. */
+/* Geometry, spine tones and the tags line come from the shared
+   `.mh-session-row` skin (theme/components/mh-session-row.css). Only what
+   is specific to a booking row lives here. */
 
 :host {
   display: block;
   margin-bottom: 0.5rem;
 }
 
-ion-item {
-  --background: var(--ion-card-background);
-  --border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
-  border: 1px solid var(--ion-border-color);
-  border-left: var(--mh-spine-width) solid var(--spine);
-  border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
-}
-
-/* Spine colour — the booking status vocabulary from my-sessions.config. */
-:host([data-tone='booked']) ion-item {
-  --spine: var(--ion-color-success);
-}
-:host([data-tone='pending']) ion-item {
-  --spine: var(--ion-color-primary);
-}
-:host([data-tone='waitlist']) ion-item {
-  --spine: var(--ion-color-info);
-}
-:host([data-tone='muted']) ion-item {
-  --spine: var(--ion-color-medium);
-}
-
 /* A record reads quieter across the board, not just in the spine. */
-:host([data-tone='muted']) .time {
+ion-item[data-tone='muted'] .time {
   color: var(--ion-color-medium);
-}
-
-.when {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 3rem;
-  margin-inline-end: 0.75rem;
-}
-
-.time {
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  /* Times sit in a column; proportional digits make it wobble. */
-  font-variant-numeric: tabular-nums;
-}
-
-.duration {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  font-weight: 500;
-}
-
-.tags {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.25rem;
-  min-width: 0;
-}
-
-/* The small "this one is online" mark next to the meta — teal, per the
-   design: place is said with a glyph, never a hue on the spine. */
-.tags .online {
-  flex: none;
-  color: var(--ion-color-teal);
-  font-size: var(--mh-text-sm);
-}
-
-.tags ion-note {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: var(--mh-text-sm);
-}
-
-/* Status chips as washes — a saturated pill per row would out-shout the
-   titles. Tone names come from `bookingChip`. */
-.tags ion-badge {
-  flex: none;
-  --padding-start: 0.5rem;
-  --padding-end: 0.5rem;
-  --background: var(--ion-color-medium-wash);
-  --color: var(--ion-color-medium-wash-contrast);
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  text-transform: none;
-}
-
-.tags ion-badge[data-tone='warn'] {
-  --background: var(--ion-color-warning-wash);
-  --color: var(--ion-color-warning-wash-contrast);
-}
-
-.tags ion-badge[data-tone='info'] {
-  --background: var(--ion-color-info-wash);
-  --color: var(--ion-color-info-wash-contrast);
-}
-
-.tags ion-badge[data-tone='success'] {
-  --background: var(--ion-color-success-wash);
-  --color: var(--ion-color-success-wash-contrast);
-}
-
-ion-label h2 {
-  font-family: var(--ion-font-family);
-  font-weight: 600;
 }
 
 /* The live Join pill grows in place of the chevron; the row is otherwise

@@ -1,0 +1,199 @@
+/* Layout only — row cards, chips and day headers come from the shared
+   skins (.mh-session-row, .mh-chip-row, .mh-day-header). */
+
+/* ── Brand hero ─────────────────────────────────────────────────────── */
+
+.lead {
+  padding: 0.75rem 1.25rem 0;
+}
+
+.lead .eyebrow {
+  color: var(--mh-color-honey-deep);
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.hero h1 {
+  max-width: 15rem;
+  line-height: var(--mh-leading-tight);
+}
+
+/* The decorative hex cluster — offsets stagger the three marks the way the
+   logo's honeycomb does. Purely ornamental, hidden from the tree. */
+.hero-hexes {
+  display: flex;
+  flex: none;
+  gap: 0.25rem;
+  padding-top: 0.25rem;
+}
+
+.hero-hexes mh-hex-avatar:first-child {
+  margin-top: 1.125rem;
+}
+
+.hero-hexes mh-hex-avatar:last-child {
+  margin-top: 0.625rem;
+}
+
+/* The field-look search entry. A real field would imply typing happens
+   here; the tap hands over to the search header instead. */
+.search-entry {
+  height: var(--mh-tap-target);
+  margin: 0.75rem 0 0;
+  font-size: var(--mh-text-base);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  --background: var(--ion-color-medium-wash);
+  --background-hover: var(--ion-color-medium-wash);
+  --background-activated: var(--ion-color-medium-wash);
+  --color: var(--ion-color-medium);
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+  --box-shadow: none;
+}
+
+.search-entry::part(native) {
+  justify-content: flex-start;
+}
+
+.search-entry ion-icon {
+  margin-inline-end: 0.5rem;
+  font-size: var(--mh-text-md);
+}
+
+/* ── "Taking new clients" rail ──────────────────────────────────────── */
+
+.rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.25rem;
+}
+
+.rail-head .mh-kicker {
+  color: var(--ion-color-medium);
+}
+
+.rail-head .rail-link {
+  height: auto;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0;
+}
+
+.rail {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.25rem 1.25rem;
+  scrollbar-width: none;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* A stacked avatar tile. A plain button on purpose: `ion-button` owns its
+   inner layout and fights a column of avatar + two labels. */
+.rail-item {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 4.75rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ion-text-color);
+  font-family: var(--ion-font-family);
+}
+
+.rail-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.rail-name.muted {
+  color: var(--ion-color-medium);
+}
+
+.rail-city {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mh-text-xs);
+}
+
+/* ── Feed ───────────────────────────────────────────────────────────── */
+
+.feed-head {
+  padding: 1rem 1.25rem 0;
+}
+
+.feed-head .mh-kicker {
+  color: var(--ion-color-medium);
+}
+
+.agenda {
+  padding: 0 1.25rem 3rem;
+}
+
+/* ── Compact scrolled bar (5k) ──────────────────────────────────────── */
+
+.eyebrow .mh-kicker {
+  color: var(--mh-color-honey-deep);
+}
+
+/* ── Search takeover ────────────────────────────────────────────────── */
+
+.search-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 3rem 2.5rem;
+  text-align: center;
+}
+
+.search-hint ion-icon {
+  color: var(--ion-color-medium);
+  font-size: 1.875rem;
+}
+
+.search-hint p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.search-results {
+  padding: 0.25rem 1.25rem 3rem;
+}
+
+/* The coach result's loading twin — card look, no tone. */
+.coach-skeleton {
+  margin-bottom: 0.5rem;
+  --background: var(--ion-card-background);
+  --border-radius: var(--mh-radius-card);
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}

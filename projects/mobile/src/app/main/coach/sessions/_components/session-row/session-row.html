@@ -1,4 +1,11 @@
-<ion-item class="mh-list-row" button detail="false" lines="none" (click)="select.emit()">
+<ion-item
+  class="mh-session-row mh-list-row"
+  button
+  detail="false"
+  lines="none"
+  [attr.data-tone]="tone()"
+  (click)="select.emit()"
+>
   <div class="when" slot="start">
     <span class="time">{{ time() }}</span>
     @if (duration()) {

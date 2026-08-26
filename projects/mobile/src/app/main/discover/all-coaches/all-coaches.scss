@@ -1,0 +1,12 @@
+.list {
+  padding: 0.25rem 1.25rem 3rem;
+}
+
+/* The coach row's loading twin — card look, no tone. */
+.coach-skeleton {
+  margin-bottom: 0.5rem;
+  --background: var(--ion-card-background);
+  --border-radius: var(--mh-radius-card);
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}

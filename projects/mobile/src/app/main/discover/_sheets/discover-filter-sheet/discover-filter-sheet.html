@@ -1,0 +1,67 @@
+<ng-template #body>
+  <div class="mh-section-label">Type</div>
+  <div class="chips">
+    <ion-chip
+      [class.selected]="draft().type === null"
+      [attr.aria-pressed]="draft().type === null"
+      (click)="setType(null)"
+    >
+      Any
+    </ion-chip>
+    @for (option of typeOptions; track option.value) {
+      <ion-chip
+        [class.selected]="draft().type === option.value"
+        [attr.aria-pressed]="draft().type === option.value"
+        (click)="setType(option.value)"
+      >
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Location</div>
+  <div class="chips">
+    <ion-chip
+      [class.selected]="draft().locationKind === null"
+      [attr.aria-pressed]="draft().locationKind === null"
+      (click)="setLocation(null)"
+    >
+      Anywhere
+    </ion-chip>
+    @for (option of locationOptions; track option.value) {
+      <ion-chip
+        [class.selected]="draft().locationKind === option.value"
+        [attr.aria-pressed]="draft().locationKind === option.value"
+        (click)="setLocation(option.value)"
+      >
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Dates</div>
+  <div class="chips">
+    @for (option of presetOptions; track option.value) {
+      <ion-chip
+        [class.selected]="draft().datePreset === option.value"
+        [attr.aria-pressed]="draft().datePreset === option.value"
+        (click)="setPreset(option.value)"
+      >
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Filter sessions"
+  actionLabel="Reset"
+  [actionDisabled]="count() === 0"
+  [saveLabel]="applyLabel()"
+  [body]="body"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+  (action)="reset()"
+  (save)="apply()"
+/>

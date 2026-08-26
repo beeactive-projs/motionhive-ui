@@ -241,106 +241,15 @@ ion-buttons ion-button.round {
   background: var(--ion-color-primary-contrast);
 }
 
-/* Quick filters. Scrolls rather than wraps — a second row would push the first
-   session below the fold. Symmetric padding because the strip's hairline now
-   closes directly above it and chips flush against a rule read as clipped. */
-.chip-row {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.375rem;
-  overflow-x: auto;
-  padding: 0.625rem 1.25rem;
-  scrollbar-width: none;
-}
-
-.chip-row::-webkit-scrollbar {
-  display: none;
-}
-
-/* Same idle/selected treatment as the filter sheet's chips: soft wash fill
-   with a slate ring when idle, solid navy when picked. */
-.chip-row ion-chip {
-  flex: none;
-  margin: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  --background: var(--ion-color-medium-wash);
-  --color: var(--ion-color-medium-wash-contrast);
-}
-
-.chip-row ion-chip.selected {
-  --background: var(--ion-color-secondary);
-  --color: var(--ion-color-secondary-contrast);
-}
-
-/* The sheet trigger, same recipe as home's role pill: honey-tinted capsule,
-   plain sentence-case label. It must stay `fill="clear"` — a solid button in a
-   toolbar is styled as an inverted chip and would ignore `--color`. */
-.chip-row .filters {
-  --background: rgba(var(--ion-color-primary-rgb), 0.12);
-  --background-hover: rgba(var(--ion-color-primary-rgb), 0.2);
-  --background-activated: rgba(var(--ion-color-primary-rgb), 0.24);
-  // Text colour, not amber: amber on an amber tint fails AA, and it flips with
-  // the palette so the pill still reads in dark mode.
-  --color: var(--mh-color-honey-deep);
-  --padding-start: 1rem;
-  --padding-end: 1rem;
-  flex: none;
-  // Matches the chips beside it — Ionic's small button floor is taller.
-  height: 2rem;
-  min-height: 0;
-  margin: 0;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
-
-  &.active {
-    border: 1px solid var(--mh-color-honey-deep);
-    border-radius: var(--mh-radius-pill);
-  }
-}
-
-.chip-row .filters ion-icon {
-  font-size: var(--mh-text-base);
-}
+/* The quick-filter strip and the sticky day headers come from the shared
+   `.mh-chip-row` (layout.css + component skins) and `.mh-day-header`
+   (typography.css) roles; skeleton rows from `mh-session-row-skeleton`. */
 
 .agenda {
   padding: 0 1.25rem 6rem;
 }
 
-/* Sticky so the day you are reading stays labelled while you scroll it. */
-.day-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  align-items: baseline;
-  gap: 0.375rem;
-  padding: 0.75rem 0 0.5rem;
-  background: var(--ion-background-color);
-}
-
-.day-header .mh-kicker {
-  color: var(--ion-color-medium);
-}
-
-.day-header.today .mh-kicker {
-  color: var(--mh-color-honey-deep);
-}
-
-.day-header ion-note {
+/* The session count beside the day label — only this agenda carries one. */
+.mh-day-header ion-note {
   font-size: var(--mh-text-sm);
-}
-
-.skeleton {
-  --background: var(--ion-card-background);
-  margin-bottom: 0.5rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
-}
-
-.skeleton .when {
-  width: 3rem;
-  margin-inline-end: 0.75rem;
 }

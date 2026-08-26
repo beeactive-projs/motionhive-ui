@@ -23,15 +23,7 @@
   } @else if (loading() && bookings().length === 0) {
     <div class="list">
       @for (_ of skeletonRows; track $index) {
-        <ion-item lines="none" class="skeleton mh-list-row">
-          <div slot="start" class="when">
-            <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.875rem" />
-          </div>
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
-          </ion-label>
-        </ion-item>
+        <mh-session-row-skeleton />
       }
     </div>
   } @else if (bookings().length === 0) {

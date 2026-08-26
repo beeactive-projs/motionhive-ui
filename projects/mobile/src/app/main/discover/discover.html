@@ -1,16 +1,279 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Discover</ion-title>
-    <ion-buttons slot="end">
-      <mh-notification-bell />
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+@if (searchOpen()) {
+  <!-- Search owns the toolbar: the brand header yields entirely, exactly the
+       Messages pattern. -->
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Search coaches and sessions"
+        inputmode="search"
+        [debounce]="0"
+        [value]="search.query()"
+        (ionInput)="onQueryChange($event.detail.value ?? '')"
+      />
+      <ion-buttons slot="end">
+        <ion-button (click)="closeSearch()">Cancel</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+} @else if (scrolled()) {
+  <!-- 5k: the hero scrolled away, so the compact bar picks up the search
+       icon — search is never duplicated and never further than one tap. -->
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <mh-logo class="ion-margin-end" />
+      </ion-buttons>
+      <ion-title class="eyebrow"><span class="mh-kicker">Discover</span></ion-title>
+      <ion-buttons slot="end">
+        <ion-button aria-label="Search coaches and sessions" (click)="openSearch()">
+          <ion-icon slot="icon-only" name="search-outline" />
+        </ion-button>
+        <mh-notification-bell />
+        <ion-button aria-label="Your profile" (click)="openProfile()">
+          <mh-hex-avatar size="sm" [name]="userName()" [imageUrl]="avatarUrl()" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+} @else {
+  <!-- Root chrome. At rest the hero owns search, so no icon up top. -->
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <mh-logo class="ion-margin-end" />
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <mh-notification-bell />
+        <ion-button aria-label="Your profile" (click)="openProfile()">
+          <mh-hex-avatar size="sm" [name]="userName()" [imageUrl]="avatarUrl()" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+}
 
-<ion-content [fullscreen]="true">
-  <mh-empty-state
-    icon="compass-outline"
-    heading="Discover is coming"
-    message="Find coaches, sessions and groups from here."
-  />
+<ion-content [fullscreen]="true" [scrollEvents]="!searchOpen()" (ionScroll)="onScroll($event)">
+  @if (!searchOpen()) {
+    <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher-content />
+    </ion-refresher>
+
+    <!-- Brand hero — scrolls away with the content. -->
+    <div class="lead">
+      <span class="mh-kicker eyebrow">Discover</span>
+      <div class="hero">
+        <h1>Find your people in the hive</h1>
+        <div class="hero-hexes" aria-hidden="true">
+          <mh-hex-avatar size="xs" color="coral" />
+          <mh-hex-avatar size="sm" color="primary" />
+          <mh-hex-avatar size="xs" color="teal" />
+        </div>
+      </div>
+      <ion-button class="search-entry" expand="block" (click)="openSearch()">
+        <ion-icon slot="start" name="search-outline" aria-hidden="true" />
+        Search coaches and sessions
+      </ion-button>
+    </div>
+
+    <!-- "Taking new clients" rail. Hidden entirely on error or when nobody
+         has the door open — an empty rail is a claim about the catalogue. -->
+    @if (coachesStore.loading() && !coachesStore.loaded()) {
+      <div class="rail-head">
+        <span class="mh-kicker">Taking new clients</span>
+      </div>
+      <div class="rail">
+        @for (_ of railSkeleton; track $index) {
+          <div class="rail-item">
+            <mh-hex-avatar size="lg" color="medium" tone="wash" />
+            <ion-skeleton-text
+              [animated]="true"
+              style="width: 3rem; height: 0.625rem"
+            />
+          </div>
+        }
+      </div>
+    } @else if (coachesStore.acceptingCoaches().length > 0) {
+      <div class="rail-head">
+        <span class="mh-kicker">Taking new clients</span>
+        <ion-button class="rail-link" fill="clear" size="small" (click)="openAllCoaches()">
+          All coaches
+        </ion-button>
+      </div>
+      <div class="rail">
+        @for (coach of coachesStore.acceptingCoaches(); track coach.id) {
+          <button
+            type="button"
+            class="rail-item"
+            [disabled]="!coach.handle"
+            (click)="openCoach(coach)"
+          >
+            <mh-hex-avatar
+              size="lg"
+              [name]="railName(coach)"
+              [imageUrl]="coach.avatarUrl"
+              [color]="railTone(coach)"
+            />
+            <span class="rail-name">{{ railName(coach) }}</span>
+            @if (coach.city) {
+              <span class="rail-city">{{ coach.city }}</span>
+            }
+          </button>
+        }
+        <button type="button" class="rail-item" (click)="openAllCoaches()">
+          <mh-hex-avatar size="lg" icon="arrow-forward" color="medium" tone="wash" />
+          <span class="rail-name muted">All coaches</span>
+        </button>
+      </div>
+    }
+
+    <!-- The feed: quick filters, then chronological buckets. -->
+    <div class="feed-head">
+      <span class="mh-kicker">Coming up</span>
+    </div>
+    <div class="mh-chip-row">
+      @for (chip of quickFilters; track chip.id) {
+        <ion-chip
+          [class.selected]="isQuickSelected(chip.id)"
+          [attr.aria-pressed]="isQuickSelected(chip.id)"
+          (click)="onQuickFilter(chip.id)"
+        >
+          {{ chip.label }}
+        </ion-chip>
+      }
+      <ion-button
+        class="filters"
+        fill="clear"
+        shape="round"
+        size="small"
+        [class.active]="datesActive()"
+        (click)="openFilters()"
+      >
+        <ion-icon slot="start" name="calendar-outline" aria-hidden="true" />
+        Dates
+      </ion-button>
+    </div>
+
+    @if (showLoadError()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        heading="Couldn't load sessions"
+        message="Check your connection and try again."
+        actionLabel="Try again"
+        (action)="retry()"
+      />
+    } @else if (showSkeleton()) {
+      <!-- Mirrors the discover row shape so nothing shifts when data lands. -->
+      <div class="agenda">
+        <div class="mh-day-header">
+          <span class="mh-kicker">
+            <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
+          </span>
+        </div>
+        @for (_ of skeletonRows; track $index) {
+          <mh-session-row-skeleton />
+        }
+      </div>
+    } @else if (isEmpty()) {
+      @if (hasActiveFilters()) {
+        <mh-empty-state
+          icon="calendar-outline"
+          heading="Nothing matches"
+          message="No upcoming sessions match these filters."
+          actionLabel="Clear filters"
+          actionFill="outline"
+          (action)="clearFilters()"
+        />
+      } @else {
+        <mh-empty-state
+          icon="compass-outline"
+          heading="Nothing coming up yet"
+          message="When coaches publish sessions, they show up here."
+        />
+      }
+    } @else {
+      <div class="agenda">
+        @for (day of days(); track day.bucket.key) {
+          <div class="mh-day-header" [class.today]="isToday(day)">
+            <span class="mh-kicker">{{ day.bucket.label }}</span>
+          </div>
+          @for (instance of day.items; track instance.id) {
+            <mh-discover-session-row
+              [instance]="instance"
+              [booked]="isBooked(instance)"
+              (select)="openSession(instance)"
+            />
+          }
+        }
+
+        <ion-infinite-scroll [disabled]="!sessionsStore.hasMore()" (ionInfinite)="onLoadMore($event)">
+          <ion-infinite-scroll-content />
+        </ion-infinite-scroll>
+      </div>
+    }
+  } @else {
+    <!-- Search takeover states: too short → searching → error → empty → results. -->
+    @if (!search.isActive()) {
+      <div class="search-hint">
+        <ion-icon name="search-outline" aria-hidden="true" />
+        <p>Keep typing — search starts at two letters and looks across coaches and sessions.</p>
+      </div>
+    } @else if (search.isSearching()) {
+      <!-- Skeletons mirror the real row geometry — the frame of the answer
+           arrives before the answer. -->
+      <div class="search-results">
+        <div class="mh-section-label">Coaches</div>
+        <ion-item lines="none" class="coach-skeleton mh-list-row">
+          <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+          </ion-label>
+        </ion-item>
+        <div class="mh-section-label">Sessions</div>
+        @for (_ of [1, 2]; track $index) {
+          <mh-session-row-skeleton />
+        }
+      </div>
+    } @else if (search.hasError()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        heading="Couldn't search"
+        message="Check your connection and try typing again."
+      />
+    } @else if (search.isEmpty()) {
+      <mh-empty-state
+        icon="search-outline"
+        heading="No results"
+        message="No coaches or sessions match that — try fewer words."
+        actionLabel="Clear search"
+        actionFill="outline"
+        (action)="clearSearch()"
+      />
+    } @else {
+      <div class="search-results">
+        @if (search.coaches().length > 0) {
+          <div class="mh-section-label">Coaches</div>
+          @for (coach of search.coaches(); track coach.id) {
+            <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
+          }
+        }
+        @if (search.sessions().length > 0) {
+          <div class="mh-section-label">Sessions</div>
+          @for (instance of search.sessions(); track instance.id) {
+            <mh-discover-session-row
+              [instance]="instance"
+              [booked]="isBooked(instance)"
+              (select)="openSession(instance)"
+            />
+          }
+        }
+      </div>
+    }
+  }
 </ion-content>
+
+<mh-discover-filter-sheet
+  [(open)]="filterSheetOpen"
+  [filters]="sheetFilters()"
+  (applied)="onFiltersApplied($event)"
+/>

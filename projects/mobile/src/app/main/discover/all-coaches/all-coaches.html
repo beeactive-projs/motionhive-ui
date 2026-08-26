@@ -1,0 +1,81 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/discover" />
+    </ion-buttons>
+    <ion-title>Coaches</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load coaches"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
+    <!-- Mirrors the coach row shape so nothing shifts when data lands. -->
+    <div class="list">
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none" class="coach-skeleton mh-list-row">
+          <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </div>
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      heading="No coaches to show"
+      message="When coaches publish a public profile, they show up here."
+    />
+  } @else {
+    @if (chips().length > 0) {
+      <div class="mh-chip-row">
+        <ion-chip
+          [class.selected]="specialization() === null"
+          [attr.aria-pressed]="specialization() === null"
+          (click)="clearFilter()"
+        >
+          All
+        </ion-chip>
+        @for (chip of chips(); track chip) {
+          <ion-chip
+            [class.selected]="specialization() === chip"
+            [attr.aria-pressed]="specialization() === chip"
+            (click)="toggleSpecialization(chip)"
+          >
+            {{ chip }}
+          </ion-chip>
+        }
+      </div>
+    }
+
+    @if (isFilteredEmpty()) {
+      <mh-empty-state
+        icon="people-outline"
+        heading="Nothing matches"
+        message="No coaches list that specialization."
+        actionLabel="Clear filter"
+        actionFill="outline"
+        (action)="clearFilter()"
+      />
+    } @else {
+      <div class="list">
+        @for (coach of filtered(); track coach.id) {
+          <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
+        }
+      </div>
+    }
+  }
+</ion-content>

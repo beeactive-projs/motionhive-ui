@@ -1,0 +1,137 @@
+/* The session row — a card with a coloured spine, shared by the coach
+   agenda, the trainee bookings list, and Discover. `ion-item` has variables
+   for its padding and background but none for a per-row leading border or a
+   stacked start slot, so those are written out here once.
+
+   The spine vocabulary is the union of the consumers' tone maps: the
+   type/lifecycle tones (honey/teal/violet/navy/coral/muted) from the coach
+   agenda and Discover, and the booking-status tones (booked/pending/
+   waitlist/muted) from the trainee list. Rows set `data-tone` on the
+   ion-item itself. Skin only — the host margin between rows stays in each
+   row component. */
+
+ion-item.mh-session-row {
+  --background: var(--ion-card-background);
+  --border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
+  border: 1px solid var(--ion-border-color);
+  border-left: var(--mh-spine-width) solid var(--spine);
+  border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
+}
+
+/* Spine colour. */
+ion-item.mh-session-row[data-tone='honey'],
+ion-item.mh-session-row[data-tone='pending'] {
+  --spine: var(--ion-color-primary);
+}
+
+ion-item.mh-session-row[data-tone='teal'] {
+  --spine: var(--ion-color-teal);
+}
+
+ion-item.mh-session-row[data-tone='violet'] {
+  --spine: var(--ion-color-violet);
+}
+
+ion-item.mh-session-row[data-tone='navy'],
+ion-item.mh-session-row[data-tone='waitlist'] {
+  --spine: var(--ion-color-info);
+}
+
+ion-item.mh-session-row[data-tone='booked'] {
+  --spine: var(--ion-color-success);
+}
+
+ion-item.mh-session-row[data-tone='coral'] {
+  --spine: var(--ion-color-danger);
+  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
+     slash syntax cannot take — with it the ring is invalid and never paints. */
+  box-shadow: 0 0 0 var(--mh-ring-width) rgba(var(--ion-color-danger-rgb), 0.28);
+}
+
+ion-item.mh-session-row[data-tone='muted'] {
+  --spine: var(--ion-color-medium);
+}
+
+/* The stacked time rail in slot="start". */
+ion-item.mh-session-row .when {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 3rem;
+  margin-inline-end: 0.75rem;
+}
+
+ion-item.mh-session-row .time {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  /* Times sit in a column; proportional digits make it wobble. */
+  font-variant-numeric: tabular-nums;
+}
+
+ion-item.mh-session-row .duration {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+}
+
+/* The meta line under the title. */
+ion-item.mh-session-row .tags {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  min-width: 0;
+}
+
+/* The small "this one is online" mark next to the meta — teal, per the
+   design: place is said with a glyph, never a hue on the spine. */
+ion-item.mh-session-row .tags .online {
+  flex: none;
+  color: var(--ion-color-teal);
+  font-size: var(--mh-text-sm);
+}
+
+ion-item.mh-session-row .tags ion-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mh-text-sm);
+}
+
+ion-item.mh-session-row .tags ion-badge {
+  flex: none;
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Tone-attributed badges render as washes — a saturated pill per row would
+   out-shout the titles. Guarded to `[data-tone]` so badges using Ionic's
+   `color=` attribute (the coach agenda's Live/pending) keep their colours. */
+ion-item.mh-session-row .tags ion-badge[data-tone] {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  --background: var(--ion-color-medium-wash);
+  --color: var(--ion-color-medium-wash-contrast);
+}
+
+ion-item.mh-session-row .tags ion-badge[data-tone='warn'] {
+  --background: var(--ion-color-warning-wash);
+  --color: var(--ion-color-warning-wash-contrast);
+}
+
+ion-item.mh-session-row .tags ion-badge[data-tone='info'] {
+  --background: var(--ion-color-info-wash);
+  --color: var(--ion-color-info-wash-contrast);
+}
+
+ion-item.mh-session-row .tags ion-badge[data-tone='success'] {
+  --background: var(--ion-color-success-wash);
+  --color: var(--ion-color-success-wash-contrast);
+}
+
+ion-item.mh-session-row ion-label h2 {
+  font-family: var(--ion-font-family);
+  font-weight: 600;
+}

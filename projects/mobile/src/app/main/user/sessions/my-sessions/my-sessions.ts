@@ -9,7 +9,6 @@ import {
   IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
   IonLabel,
   IonNote,
   IonRefresher,
@@ -29,6 +28,7 @@ import { SessionParticipant, SessionService, localDayKey, sessionDayLabel } from
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../../../_shared/components/notification-bell/notification-bell';
+import { SessionRowSkeleton } from '../../../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ClockService } from '../../../../_shared/services/clock.service';
 import { MySessionRow } from '../_components/my-session-row/my-session-row';
 import { MySessionsEmpty } from '../_components/my-sessions-empty/my-sessions-empty';
@@ -62,7 +62,6 @@ interface BookingDay {
     IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonItem,
     IonLabel,
     IonNote,
     IonRefresher,
@@ -75,6 +74,7 @@ interface BookingDay {
     MySessionRow,
     MySessionsEmpty,
     NotificationBell,
+    SessionRowSkeleton,
   ],
   templateUrl: './my-sessions.html',
   styleUrl: './my-sessions.scss',

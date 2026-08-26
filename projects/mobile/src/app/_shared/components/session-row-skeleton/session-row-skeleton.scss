@@ -1,0 +1,19 @@
+/* Same self-spacing as the real rows it stands in for — the agenda lists
+   rely on the row owning the gap below itself. */
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* The card look without the spine: a shimmering placeholder should not
+   claim a tone it does not know yet. */
+ion-item {
+  --background: var(--ion-card-background);
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}
+
+.when {
+  width: 3rem;
+  margin-inline-end: 0.75rem;
+}

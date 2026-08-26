@@ -20,24 +20,25 @@
         <ion-icon class="online" name="videocam-outline" aria-hidden="true" />
       }
       <ion-note>{{ meta() }}</ion-note>
-      @if (chip(); as chip) {
-        <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+      @if (booked()) {
+        <ion-badge data-tone="success">Booked</ion-badge>
       }
     </div>
+    @if (chip(); as chip) {
+      <div class="tags">
+        <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+      </div>
+    } @else if (spots(); as spots) {
+      <p class="spots">{{ spots }}</p>
+    }
   </ion-label>
 
-  @if (showJoin()) {
-    <ion-button
-      slot="end"
-      class="join"
-      size="small"
-      shape="round"
-      color="primary"
-      (click)="onJoin($event)"
-    >
-      Join
-    </ion-button>
-  } @else {
-    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
-  }
+  <div class="price" slot="end">
+    @if (isFree()) {
+      <span class="amount free">Free</span>
+    } @else {
+      <span class="amount">{{ priceAmount() }}</span>
+      <span class="currency">{{ priceCurrency() }}</span>
+    }
+  </div>
 </ion-item>

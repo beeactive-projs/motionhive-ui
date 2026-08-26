@@ -100,7 +100,8 @@ export const routes: Routes = [
       },
       {
         path: 'discover',
-        loadComponent: () => import('./main/discover/discover').then((m) => m.Discover),
+        loadChildren: () =>
+          import('./main/discover/discover.routes').then((m) => m.discoverRoutes),
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],

@@ -2,3 +2,20 @@
 ion-chip {
   --border-radius: var(--mh-radius-pill);
 }
+
+/* Quick-filter chips inside a `.mh-chip-row` strip (layout.css): the same
+   idle/selected treatment as the filter sheets' chips — soft wash fill when
+   idle, solid navy when picked. */
+.mh-chip-row ion-chip {
+  flex: none;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  --background: var(--ion-color-medium-wash);
+  --color: var(--ion-color-medium-wash-contrast);
+}
+
+.mh-chip-row ion-chip.selected {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-secondary-contrast);
+}

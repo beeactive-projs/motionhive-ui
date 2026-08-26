@@ -34,21 +34,13 @@
   } @else if (showSkeleton()) {
     <!-- Mirrors the booking row shape so nothing shifts when data lands. -->
     <div class="agenda">
-      <div class="day-header">
+      <div class="mh-day-header">
         <span class="mh-kicker">
           <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
         </span>
       </div>
       @for (_ of skeletonRows; track $index) {
-        <ion-item lines="none" class="skeleton mh-list-row">
-          <div slot="start" class="when">
-            <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.875rem" />
-          </div>
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 70%" /></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 45%" /></p>
-          </ion-label>
-        </ion-item>
+        <mh-session-row-skeleton />
       }
     </div>
   } @else if (isEmpty()) {
@@ -73,7 +65,7 @@
   } @else {
     <div class="agenda">
       @for (day of days(); track day.key) {
-        <div class="day-header" [class.today]="day.isToday">
+        <div class="mh-day-header" [class.today]="day.isToday">
           <span class="mh-kicker">{{ day.label }}</span>
         </div>
 

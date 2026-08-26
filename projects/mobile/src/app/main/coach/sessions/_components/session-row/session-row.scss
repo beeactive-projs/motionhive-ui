@@ -1,85 +1,8 @@
-/* The row is a card with a coloured spine. `ion-item` has variables for its
-   padding and background but none for a per-row leading border or a stacked
-   start slot, so those two are written out. */
+/* Geometry, spine tones and the tags line come from the shared
+   `.mh-session-row` skin (theme/components/mh-session-row.css); only the
+   row's self-spacing lives here. */
 
 :host {
   display: block;
   margin-bottom: 0.5rem;
-}
-
-ion-item {
-  --background: var(--ion-card-background);
-  --border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
-  border: 1px solid var(--ion-border-color);
-  border-left: var(--mh-spine-width) solid var(--spine);
-  border-radius: 0.375rem var(--mh-radius-card) var(--mh-radius-card) 0.375rem;
-}
-
-/* Spine colour, from core's shared tone vocabulary. */
-:host([data-tone='honey']) ion-item {
-  --spine: var(--ion-color-primary);
-}
-:host([data-tone='teal']) ion-item {
-  --spine: var(--ion-color-teal);
-}
-:host([data-tone='navy']) ion-item {
-  --spine: var(--ion-color-info);
-}
-:host([data-tone='coral']) ion-item {
-  --spine: var(--ion-color-danger);
-  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
-     slash syntax cannot take — with it the ring is invalid and never paints. */
-  box-shadow: 0 0 0 var(--mh-ring-width) rgba(var(--ion-color-danger-rgb), 0.28);
-}
-
-:host([data-tone='muted']) ion-item {
-  --spine: var(--ion-color-medium);
-}
-
-.when {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 3rem;
-  margin-inline-end: 0.75rem;
-}
-
-.time {
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  /* Times sit in a column; proportional digits make it wobble. */
-  font-variant-numeric: tabular-nums;
-}
-
-.duration {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  font-weight: 500;
-}
-
-.tags {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.25rem;
-  min-width: 0;
-}
-
-.tags ion-badge {
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  text-transform: none;
-}
-
-.tags ion-note {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: var(--mh-text-sm);
-}
-
-ion-label h2 {
-  font-family: var(--ion-font-family);
-  font-weight: 600;
 }

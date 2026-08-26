@@ -28,9 +28,6 @@ import {
   imports: [IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote],
   templateUrl: './my-session-row.html',
   styleUrl: './my-session-row.scss',
-  host: {
-    '[attr.data-tone]': 'tone()',
-  },
 })
 export class MySessionRow {
   private readonly _clockService = inject(ClockService);

@@ -1,6 +1,6 @@
-import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, of, tap } from 'rxjs';
+import { Subject, catchError, of, switchMap, tap } from 'rxjs';
 import { SessionService } from '../services/session/session.service';
 import { apiErrorMessage } from '../utils/api-error.utils';
 import type {
@@ -31,12 +31,15 @@ export interface DiscoverFilters {
   locationKind?: SessionLocationKind;
   instructorId?: string;
   groupId?: string;
+  /** ISO 8601 lower bound (inclusive). BE caps the window at 90 days. */
+  dateFrom?: string;
+  /** ISO 8601 upper bound (exclusive). */
+  dateTo?: string;
 }
 
 @Injectable()
 export class SessionsDiscoverStore {
   private readonly _svc = inject(SessionService);
-  private readonly _destroyRef = inject(DestroyRef);
 
   // ─── State ─────────────────────────────────────────────────────────
   private readonly _items = signal<PublicSessionInstance[]>([]);
@@ -46,6 +49,11 @@ export class SessionsDiscoverStore {
   private readonly _filters = signal<DiscoverFilters>({});
   private readonly _page = signal(1);
   private readonly _pageSize = signal(20);
+
+  /** Refresher-style callbacks queued by `load()` — every exit flushes
+   *  them, including a superseded request (its caller's spinner must not
+   *  hang on a response that was cancelled). */
+  private _pendingDones: (() => void)[] = [];
 
   // ─── Public readonly ──────────────────────────────────────────────
   readonly items = this._items.asReadonly();
@@ -59,6 +67,46 @@ export class SessionsDiscoverStore {
   readonly hasMore = computed(
     () => this._items().length < this._total(),
   );
+
+  // ─── Load pipeline ────────────────────────────────────────────────
+
+  private readonly _load$ = new Subject<void>();
+
+  constructor() {
+    // One long-lived pipeline; `switchMap` cancels a superseded in-flight
+    // request, so `setFilters()` during a slow response refetches instead
+    // of stranding the just-cleared list (the old `if (loading) return`
+    // guard dropped that reload entirely).
+    this._load$
+      .pipe(
+        switchMap(() => {
+          const query: DiscoverQuery = {
+            ...this._filters(),
+            page: this._page(),
+            limit: this._pageSize(),
+          };
+          return this._svc.discover(query).pipe(
+            tap((res) => {
+              // Append on subsequent pages, replace on page 1.
+              if (this._page() === 1) this._items.set(res.items);
+              else this._items.set([...this._items(), ...res.items]);
+              this._total.set(res.total);
+            }),
+            catchError((err: unknown) => {
+              this._error.set(apiErrorMessage(err, 'Could not load sessions'));
+              return of(null);
+            }),
+          );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this._loading.set(false);
+        const dones = this._pendingDones;
+        this._pendingDones = [];
+        for (const done of dones) done();
+      });
+  }
 
   // ─── Mutators ─────────────────────────────────────────────────────
 
@@ -74,40 +122,28 @@ export class SessionsDiscoverStore {
     this.load();
   }
 
-  // ─── Load ─────────────────────────────────────────────────────────
-
-  load(): void {
-    if (this._loading()) return;
+  load(done?: () => void): void {
+    if (done) this._pendingDones.push(done);
     this._loading.set(true);
     this._error.set(null);
-
-    const query: DiscoverQuery = {
-      ...this._filters(),
-      page: this._page(),
-      limit: this._pageSize(),
-    };
-
-    this._svc
-      .discover(query)
-      .pipe(
-        tap((res) => {
-          // Append on subsequent pages, replace on page 1.
-          if (this._page() === 1) this._items.set(res.items);
-          else this._items.set([...this._items(), ...res.items]);
-          this._total.set(res.total);
-        }),
-        catchError((err: unknown) => {
-          this._error.set(apiErrorMessage(err, 'Could not load sessions'));
-          return of(null);
-        }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe({ complete: () => this._loading.set(false) });
+    this._load$.next();
   }
 
-  loadMore(): void {
-    if (!this.hasMore() || this._loading()) return;
-    this.setPage(this._page() + 1);
+  /** Page-1 refetch that keeps the current items on screen until the
+   *  response replaces them — for view re-entry and pull-to-refresh,
+   *  where a blank flash would lie about the data going away. */
+  reload(done?: () => void): void {
+    this._page.set(1);
+    this.load(done);
+  }
+
+  loadMore(done?: () => void): void {
+    if (!this.hasMore() || this._loading()) {
+      done?.();
+      return;
+    }
+    this._page.set(this._page() + 1);
+    this.load(done);
   }
 
 }

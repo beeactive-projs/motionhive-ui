@@ -18,3 +18,36 @@ ion-button {
 ion-button:not([shape='round']) {
   --border-radius: var(--mh-radius-control) !important;
 }
+
+/* The filter-sheet trigger leading a `.mh-chip-row` strip (layout.css) —
+   same recipe as home's role pill: honey-tinted capsule, plain sentence-case
+   label. It must stay `fill="clear"` — a solid button in a toolbar is styled
+   as an inverted chip and would ignore `--color`. */
+.mh-chip-row .filters {
+  --background: rgba(var(--ion-color-primary-rgb), 0.12);
+  --background-hover: rgba(var(--ion-color-primary-rgb), 0.2);
+  --background-activated: rgba(var(--ion-color-primary-rgb), 0.24);
+  /* Text colour, not amber: amber on an amber tint fails AA, and it flips
+     with the palette so the pill still reads in dark mode. */
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  flex: none;
+  /* Matches the chips beside it — Ionic's small button floor is taller. */
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.mh-chip-row .filters.active {
+  border: 1px solid var(--mh-color-honey-deep);
+  border-radius: var(--mh-radius-pill);
+}
+
+.mh-chip-row .filters ion-icon {
+  font-size: var(--mh-text-base);
+}

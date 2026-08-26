@@ -48,6 +48,29 @@ h1 {
   font-weight: 600;
 }
 
+/* The sticky day divider over a session list — a kicker that stays pinned
+   while you scroll the day it labels. Shared by the coach agenda, the
+   trainee bookings list, and Discover; `.today` warms the label to the
+   honey accent ink. */
+.mh-day-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.75rem 0 0.5rem;
+  background: var(--ion-background-color);
+}
+
+.mh-day-header .mh-kicker {
+  color: var(--ion-color-medium);
+}
+
+.mh-day-header.today .mh-kicker {
+  color: var(--mh-color-honey-deep);
+}
+
 /* The fine print that closes a screen â€” "Member since", deletion warnings,
    visibility captions. Smaller than `.mh-note-block`, margin-free: the page
    layout places it. */

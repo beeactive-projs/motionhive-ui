@@ -1,0 +1,30 @@
+<ion-item
+  class="mh-list-row"
+  lines="none"
+  [button]="hasProfile()"
+  [detail]="hasProfile()"
+  (click)="onSelect()"
+>
+  <mh-hex-avatar
+    slot="start"
+    size="md"
+    [name]="name()"
+    [imageUrl]="coach().avatarUrl"
+    [color]="tone()"
+  />
+
+  <ion-label>
+    <div class="name-line">
+      <h2>{{ name() }}</h2>
+      @if (coach().isAcceptingClients) {
+        <ion-badge class="accepting">Taking clients</ion-badge>
+      }
+    </div>
+    @if (specializations()) {
+      <ion-note class="specs">{{ specializations() }}</ion-note>
+    }
+    @if (meta()) {
+      <p class="meta">{{ meta() }}</p>
+    }
+  </ion-label>
+</ion-item>
