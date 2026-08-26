@@ -4,3 +4,20 @@ ion-col ion-label ion-icon {
   display: block;
   margin: 0 auto;
 }
+
+/* Marks the tile whose screen has something waiting. Same dot as the tab bar,
+   pinned to the glyph rather than the label. */
+.glyph {
+  position: relative;
+  display: inline-block;
+}
+
+.glyph .dot {
+  position: absolute;
+  top: 0.1rem;
+  inset-inline-end: -0.1rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--ion-color-danger);
+}

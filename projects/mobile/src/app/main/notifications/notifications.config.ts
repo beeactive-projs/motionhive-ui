@@ -1,6 +1,8 @@
 import {
   alertCircleOutline,
   checkmarkDoneOutline,
+  checkmarkOutline,
+  chevronDown,
   chevronForward,
   close,
   trashOutline,
@@ -18,6 +20,8 @@ export const NOTIFICATION_ICONS = {
   ...CATEGORY_ICONS,
   alertCircleOutline,
   checkmarkDoneOutline,
+  checkmarkOutline,
+  chevronDown,
   chevronForward,
   close,
   trashOutline,

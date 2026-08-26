@@ -1,0 +1,148 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/billing" />
+    </ion-buttons>
+    <ion-title>Invoice</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loadFailed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load this invoice"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (loading()) {
+    <div class="amount-block">
+      <ion-skeleton-text [animated]="true" style="width: 35%; height: 0.7rem" />
+      <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.8rem" />
+    </div>
+  } @else if (invoice(); as inv) {
+    <!-- 4i: a band, not a takeover. The invoice stays readable while we ask. -->
+    @if (checking()) {
+      <div class="band checking">
+        <ion-spinner name="crescent" />
+        <span>Checking with Stripe…</span>
+      </div>
+    }
+
+    <!-- 4j: only once the API says PAID, so the words can be absolute. -->
+    @if (outcome() === 'paid') {
+      <div class="band paid">
+        <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
+        <div>
+          <strong>Your payment went through</strong>
+          <span>{{ coachName() }} has been notified. Nothing else to do.</span>
+        </div>
+      </div>
+    }
+
+    <!-- 4k: two truths, neither an accusation. -->
+    @if (outcome() === 'unfinished') {
+      <div class="band unfinished">
+        <ion-icon name="time-outline" aria-hidden="true" />
+        <div>
+          <strong>Nothing was charged, as far as we can see</strong>
+          <span>
+            If you did pay, the status catches up on its own within a few minutes.
+            You can safely try again.
+          </span>
+        </div>
+        <ion-button fill="clear" size="small" (click)="dismissOutcome()">Dismiss</ion-button>
+      </div>
+    }
+
+    <div class="amount-block">
+      <div class="mh-kicker">{{ isPaid() ? 'Paid' : 'Amount due' }}</div>
+      <div class="total">{{ inv.amountDueCents | currencyRon: inv.currency : 'code' }}</div>
+
+      <div class="badges">
+        @if (isPaid()) {
+          <ion-badge color="success">Paid</ion-badge>
+        } @else if (overdue()) {
+          <ion-badge color="danger">Overdue</ion-badge>
+        }
+        @if (inv.number) {
+          <ion-note>{{ inv.number }}</ion-note>
+        }
+      </div>
+    </div>
+
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item lines="full">
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          [name]="coachName()"
+          [imageUrl]="inv.instructor?.avatarUrl ?? null"
+          [color]="coachTone()"
+        />
+        <ion-label>
+          <p>From</p>
+          <h3>{{ coachName() }}</h3>
+        </ion-label>
+      </ion-item>
+
+      @if (dueLabel(); as when) {
+        <ion-item [lines]="inv.invoicePdf ? 'full' : 'none'">
+          <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+          <ion-label>
+            <p>{{ isPaid() ? 'Paid on' : 'Due' }}</p>
+            <h3>{{ when }}</h3>
+          </ion-label>
+        </ion-item>
+      }
+
+      @if (inv.invoicePdf) {
+        <ion-item button detail="false" lines="none" (click)="openPdf()">
+          <ion-icon slot="start" name="document-text-outline" color="medium" aria-hidden="true" />
+          <ion-label>
+            <p>Document</p>
+            <h3>{{ isPaid() ? 'Receipt (PDF)' : 'Invoice (PDF)' }}</h3>
+          </ion-label>
+          <ion-icon slot="end" name="open-outline" color="medium" aria-hidden="true" />
+        </ion-item>
+      }
+    </ion-list>
+
+    @if (items().length > 0) {
+      <div class="mh-section-label">Items</div>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (item of items(); track item.id) {
+          <ion-item lines="full">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ item.description || 'Item' }}</h3>
+              @if (item.quantity > 1) {
+                <p>{{ item.quantity }} × {{ item.unitAmountCents | currencyRon: item.currency : 'code' }}</p>
+              }
+            </ion-label>
+            <ion-note slot="end" class="line-amount">
+              {{ item.amountCents | currencyRon: item.currency : 'code' }}
+            </ion-note>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  }
+</ion-content>
+
+@if (canPay() || paying()) {
+  <ion-footer class="ion-no-border">
+    <ion-toolbar>
+      <!-- 4h: the button names the destination, and the line under it sets
+           the return expectation *before* they leave. -->
+      <ion-button expand="block" [disabled]="paying()" (click)="pay()">
+        {{ payLabel() }}
+        <ion-icon slot="end" name="open-outline" />
+      </ion-button>
+      <p class="handoff">
+        Payment happens on Stripe's secure page. Come back here when you're
+        done and we'll confirm it.
+      </p>
+    </ion-toolbar>
+  </ion-footer>
+}

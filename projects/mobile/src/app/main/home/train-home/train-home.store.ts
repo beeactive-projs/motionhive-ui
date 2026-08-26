@@ -5,6 +5,7 @@ import { catchError, of, take } from 'rxjs';
 import {
   BlogPost,
   BlogService,
+  ClientPaymentService,
   ClientService,
   InstructorSearchResult,
   MyInstructor,
@@ -39,6 +40,7 @@ const COACHES_LIMIT = 3;
 export class TrainHomeStore {
   private readonly _profileService = inject(ProfileService);
   private readonly _clientService = inject(ClientService);
+  private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _blogService = inject(BlogService);
   private readonly _sessionService = inject(SessionService);
   private readonly _workoutLogService = inject(WorkoutLogService);
@@ -53,10 +55,14 @@ export class TrainHomeStore {
   private readonly _profileLoaded = signal(false);
 
   private readonly _upcomingSessions = signal(0);
+  /** 4a — the due card exists only while something is actually owed. */
+  private readonly _openInvoices = signal(0);
 
   readonly resume = this._resume.asReadonly();
   readonly posts = this._posts.asReadonly();
   readonly upcomingSessions = this._upcomingSessions.asReadonly();
+  readonly openInvoices = this._openInvoices.asReadonly();
+  readonly hasBillDue = computed(() => this._openInvoices() > 0);
   readonly postsLoading = signal(true);
   readonly coachesLoading = signal(true);
   readonly sessionsLoading = signal(true);
@@ -110,11 +116,27 @@ export class TrainHomeStore {
     this._loadSessions();
     this._loadCoaches();
     this._loadPosts();
+    this._loadBilling();
   }
 
   refresh(done?: () => void): void {
     this.load();
     done?.();
+  }
+
+  /**
+   * Counts only. The card is a nudge, not a list — and when nothing is open
+   * it disappears from Home entirely rather than sitting there saying zero.
+   */
+  private _loadBilling(): void {
+    this._clientPaymentService
+      .getMyCounts()
+      .pipe(
+        take(1),
+        catchError(() => of(null)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((counts) => this._openInvoices.set(counts?.invoices.open ?? 0));
   }
 
   private _loadProfile(): void {

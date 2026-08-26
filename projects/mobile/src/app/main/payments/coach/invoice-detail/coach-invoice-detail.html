@@ -1,0 +1,205 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home/payments" />
+    </ion-buttons>
+    <ion-title>Invoice</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loadFailed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load this invoice"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (loading()) {
+    <div class="amount-block">
+      <ion-skeleton-text [animated]="true" style="width: 35%; height: 0.7rem" />
+      <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.8rem" />
+    </div>
+    <ion-list [inset]="true">
+      @for (_ of [1, 2, 3]; track $index) {
+        <ion-item lines="full">
+          <ion-label>
+            <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+            <h3><ion-skeleton-text [animated]="true" style="width: 55%" /></h3>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (invoice(); as inv) {
+    <!-- The amount leads: it is the question the screen answers. -->
+    <div class="amount-block">
+      <div class="mh-kicker">{{ isPaid() ? 'Paid' : 'Amount due' }}</div>
+      <div class="total">{{ inv.amountDueCents | currencyRon: inv.currency : 'code' }}</div>
+
+      <div class="badges">
+        @if (overdue()) {
+          <ion-badge color="danger">Overdue</ion-badge>
+        } @else if (style()?.chip; as chip) {
+          <ion-badge color="medium">{{ chip }}</ion-badge>
+        } @else if (isPaid()) {
+          <ion-badge color="success">Paid</ion-badge>
+        }
+        @if (inv.number) {
+          <ion-note>{{ inv.number }}</ion-note>
+        }
+      </div>
+
+      @if (isOpen() && remainingCents() !== inv.amountDueCents) {
+        <p class="partial">
+          {{ inv.amountPaidCents | currencyRon: inv.currency : 'code' }} paid ·
+          {{ remainingCents() | currencyRon: inv.currency : 'code' }} remaining
+        </p>
+      }
+    </div>
+
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item lines="full">
+        <mh-hex-avatar
+          slot="start"
+          size="sm"
+          [name]="clientName()"
+          [imageUrl]="inv.client?.avatarUrl ?? null"
+          [color]="clientTone()"
+        />
+        <ion-label>
+          <p>Billed to</p>
+          <h3>{{ clientName() }}</h3>
+        </ion-label>
+      </ion-item>
+
+      @if (dueLabel(); as due) {
+        <ion-item lines="full">
+          <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+          <ion-label>
+            <p>{{ isPaid() ? 'Was due' : 'Due' }}</p>
+            <h3>{{ due }}</h3>
+          </ion-label>
+        </ion-item>
+      }
+
+      @if (inv.invoicePdf) {
+        <ion-item button detail="false" lines="none" (click)="openPdf()">
+          <ion-icon slot="start" name="document-text-outline" color="medium" aria-hidden="true" />
+          <ion-label>
+            <p>Document</p>
+            <h3>Open the PDF</h3>
+          </ion-label>
+          <ion-icon slot="end" name="open-outline" color="medium" aria-hidden="true" />
+        </ion-item>
+      }
+    </ion-list>
+
+    <!-- Line items come from Stripe after the screen opens. If that call
+         fails the section is simply absent — the amount block is the invoice. -->
+    @if (items().length > 0) {
+      <div class="mh-section-label">Items</div>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (item of items(); track item.id) {
+          <ion-item lines="full">
+            <ion-label class="ion-text-wrap">
+              <h3>{{ item.description || 'Item' }}</h3>
+              @if (item.quantity > 1) {
+                <p>{{ item.quantity }} × {{ item.unitAmountCents | currencyRon: item.currency : 'code' }}</p>
+              }
+            </ion-label>
+            <ion-note slot="end" class="line-amount">
+              {{ item.amountCents | currencyRon: item.currency : 'code' }}
+            </ion-note>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  }
+</ion-content>
+
+@if (invoice(); as inv) {
+  <ion-footer class="ion-no-border">
+    <ion-toolbar>
+      @if (isDraft()) {
+        <!-- The only state with a primary action: nobody has seen it yet. -->
+        <ion-button expand="block" [disabled]="acting()" (click)="sendOpen.set(true)">
+          Send to client
+        </ion-button>
+        <ion-button expand="block" fill="clear" color="medium" (click)="voidOpen.set(true)">
+          Delete draft
+        </ion-button>
+      } @else if (isOpen()) {
+        <!-- Waiting on the client, so neither action is honey. -->
+        <div class="pair">
+          <ion-button fill="outline" expand="block" (click)="markPaidOpen.set(true)">
+            Mark paid
+          </ion-button>
+          <ion-button fill="outline" expand="block" color="medium" (click)="voidOpen.set(true)">
+            Void
+          </ion-button>
+        </div>
+      } @else if (isPaid()) {
+        <ion-button
+          fill="outline"
+          expand="block"
+          color="medium"
+          (click)="refundOpen.set(true)"
+        >
+          Refund
+        </ion-button>
+      }
+    </ion-toolbar>
+  </ion-footer>
+}
+
+<mh-confirm-sheet
+  [(open)]="sendOpen"
+  title="Send this invoice?"
+  body="This finalises the invoice and generates its payment page and PDF. Stripe emails it to the client."
+  confirmLabel="Send it"
+  irreversible="A sent invoice can no longer be edited — only voided."
+  [saving]="acting()"
+  [facts]="sendFacts()"
+  (confirm)="send()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="markPaidOpen"
+  title="Mark as paid?"
+  body="Use this when the client paid you directly — cash or a bank transfer. Stripe records it as paid outside the platform."
+  confirmLabel="Mark paid"
+  [saving]="acting()"
+  [facts]="markPaidFacts()"
+  (confirm)="markPaid()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="voidOpen"
+  [title]="isDraft() ? 'Delete this draft?' : 'Void this invoice?'"
+  [body]="
+    isDraft()
+      ? 'The draft is removed. Nothing was ever sent to the client.'
+      : 'The client can no longer pay it, and it stops counting towards what you are owed.'
+  "
+  [confirmLabel]="isDraft() ? 'Delete draft' : 'Void invoice'"
+  tone="danger"
+  cancelLabel="Keep it"
+  [saving]="acting()"
+  (confirm)="voidInvoice()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="refundOpen"
+  title="Refund this payment?"
+  body="The full amount goes back to the client's card. Stripe's refund window is 14 days from payment."
+  confirmLabel="Refund"
+  tone="danger"
+  cancelLabel="Keep it"
+  [saving]="acting()"
+  [blockedReason]="
+    canRefund() ? null : 'The 14-day refund window for this payment has closed. Refunds after that are handled in the Stripe dashboard.'
+  "
+  [facts]="refundFacts()"
+  (confirm)="refund()"
+/>

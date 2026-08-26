@@ -12,48 +12,54 @@
   </ion-toolbar>
 
   <!--
-    All · Unread · one chip per category, on a single scrolling rail. A
-    dropdown would hide seven of the eight categories behind a tap; this way
-    the whole filter set is one swipe away, and the active chip carries its
-    own tint so the list never looks unfiltered when it is not.
+    All · Unread · Category. Eight category chips on a rail meant the last few
+    were always off-screen, so the set is behind one trigger that names the
+    active choice and carries its tint — the list never looks unfiltered when
+    it is not.
   -->
   @if (!isEmpty() || hasFilter()) {
-  <ion-toolbar>
-    <div class="filters">
-      <ion-chip [outline]="hasFilter()" [class.on]="!hasFilter()" (click)="showAll()">
-        All
-      </ion-chip>
+    <ion-toolbar>
+      <div class="filters">
+        <ion-chip [outline]="hasFilter()" [class.on]="!hasFilter()" (click)="showAll()">
+          All
+        </ion-chip>
 
-      <ion-chip
-        [outline]="!store.unreadOnly()"
-        [class.on]="store.unreadOnly()"
-        (click)="showUnread()"
-      >
-        Unread @if (store.unreadCount(); as count) {
-        <span class="count">{{ count }}</span>
+        <ion-chip
+          [outline]="!store.unreadOnly()"
+          [class.on]="store.unreadOnly()"
+          (click)="showUnread()"
+        >
+          Unread
+          @if (store.unreadCount(); as count) {
+            <span class="count">{{ count }}</span>
+          }
+        </ion-chip>
+
+        @if (activeCategoryStyle(); as active) {
+          <ion-chip
+            class="category on"
+            [style.--mh-chip-on-background]="'var(--ion-color-' + active.color + '-wash)'"
+            [style.--mh-chip-on-color]="'var(--ion-color-' + active.color + '-wash-contrast)'"
+          >
+            <ion-icon [name]="active.icon" aria-hidden="true" (click)="openCategoryPicker($event)" />
+            <span (click)="openCategoryPicker($event)">{{ active.label }}</span>
+            <!-- The clear is its own target: tapping the label reopens the
+                 picker to switch, tapping the x drops the filter. -->
+            <ion-icon
+              name="close"
+              role="button"
+              aria-label="Clear category filter"
+              (click)="clearCategory()"
+            />
+          </ion-chip>
+        } @else {
+          <ion-chip [outline]="true" (click)="openCategoryPicker($event)">
+            Category
+            <ion-icon name="chevron-down" aria-hidden="true" />
+          </ion-chip>
         }
-      </ion-chip>
-
-      <span class="divider" aria-hidden="true"></span>
-
-      @for (category of categories; track category.value) {
-      <ion-chip
-        class="category"
-        [style.--mh-chip-on-background]="'var(--ion-color-' + category.color + '-wash)'"
-        [style.--mh-chip-on-color]="'var(--ion-color-' + category.color + '-wash-contrast)'"
-        [outline]="store.category() !== category.value"
-        [class.on]="store.category() === category.value"
-        (click)="toggleCategory(category.value)"
-      >
-        <ion-icon [name]="category.icon" aria-hidden="true" />
-        {{ category.label }}
-        @if (store.category() === category.value) {
-        <ion-icon name="close" aria-hidden="true" />
-        }
-      </ion-chip>
-      }
-    </div>
-  </ion-toolbar>
+      </div>
+    </ion-toolbar>
   }
 </ion-header>
 
@@ -136,6 +142,42 @@
   </ion-infinite-scroll>
   }
 </ion-content>
+
+<!-- Anchored to the chip that opened it, so it reads as that chip's menu. -->
+<ion-popover
+  [isOpen]="categoryPickerOpen()"
+  [event]="categoryPickerEvent()"
+  cssClass="mh-select-popover"
+  [dismissOnSelect]="true"
+  (didDismiss)="categoryPickerOpen.set(false)"
+>
+  <ng-template>
+    <ion-list [lines]="'none'">
+      <ion-item button detail="false" (click)="pickCategory(null)">
+        <ion-label>All categories</ion-label>
+        @if (!store.category()) {
+          <ion-icon slot="end" name="checkmark-outline" color="primary" />
+        }
+      </ion-item>
+      @for (category of categories; track category.value) {
+        <ion-item button detail="false" (click)="pickCategory(category.value)">
+          <mh-hex-avatar
+            slot="start"
+            size="sm"
+            tone="wash"
+            aria-hidden="true"
+            [icon]="category.icon"
+            [color]="category.color"
+          />
+          <ion-label>{{ category.label }}</ion-label>
+          @if (store.category() === category.value) {
+            <ion-icon slot="end" name="checkmark-outline" color="primary" />
+          }
+        </ion-item>
+      }
+    </ion-list>
+  </ng-template>
+</ion-popover>
 
 <mh-notification-detail-sheet
   [(open)]="detailOpen"

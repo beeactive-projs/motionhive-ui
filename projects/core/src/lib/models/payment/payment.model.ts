@@ -41,6 +41,8 @@ export interface Refund {
 export interface PaymentListParams {
   status?: PaymentStatus;
   clientId?: string;
+  /** Narrow to the payments that settled one invoice — see RefundService. */
+  invoiceId?: string;
   fromDate?: string;
   toDate?: string;
   page?: number;

@@ -57,6 +57,19 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./main/home/switch-role/switch-role').then((m) => m.SwitchRole),
       },
+      // Money, both sides, under `home` so the Home tab stays lit. Neither
+      // gets a tab: a coach chases payment deliberately, and a client's bill
+      // is rare enough that a permanent slot would sit empty.
+      {
+        path: 'home/payments',
+        loadChildren: () =>
+          import('./main/payments/payments.routes').then((m) => m.paymentsRoutes),
+      },
+      {
+        path: 'home/billing',
+        loadChildren: () =>
+          import('./main/payments/payments.routes').then((m) => m.billingRoutes),
+      },
       {
         path: 'messages',
         loadChildren: () =>

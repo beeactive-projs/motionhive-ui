@@ -24,6 +24,19 @@ export interface InvoiceClientSummary {
   avatarUrl: string | null;
 }
 
+/**
+ * Who issued the invoice. Present on every invoice, but only the client's
+ * surfaces use it — their list leads with who is asking them for money, where
+ * the coach's leads with who owes.
+ */
+export interface InvoiceInstructorSummary {
+  id: string | null;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  avatarUrl: string | null;
+}
+
 export interface Invoice {
   id: string;
   instructorId: string;
@@ -48,6 +61,7 @@ export interface Invoice {
   createdAt: string;
   updatedAt: string;
   client?: InvoiceClientSummary | null;
+  instructor?: InvoiceInstructorSummary | null;
   lineItems?: InvoiceLineItem[];
 }
 

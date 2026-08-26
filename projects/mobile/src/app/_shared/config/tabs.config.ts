@@ -2,6 +2,7 @@ import { NavMode, NavModes } from 'core';
 import {
   barbellOutline,
   calendarOutline,
+  cardOutline,
   chatbubblesOutline,
   compassOutline,
   ellipsisHorizontal,
@@ -20,6 +21,7 @@ import { MoreTile, TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
 export const TAB_ICONS = {
   barbellOutline,
   calendarOutline,
+  cardOutline,
   chatbubblesOutline,
   compassOutline,
   ellipsisHorizontal,
@@ -54,9 +56,9 @@ export const COACH_TAB_SET: TabSet = {
     { id: TabIds.Coach, label: 'Sessions', icon: 'calendar-outline' },
     MESSAGES,
   ],
-  // Programs, Exercises and Payments belong here per the design, but they have
-  // no route yet — a tile that lands on the wrong page is worse than no tile.
-  // They join in M2 alongside their pages.
+  // Programs and Exercises belong here per the design, but they have no route
+  // yet — a tile that lands on the wrong page is worse than no tile. They join
+  // in M2 alongside their pages.
   more: [
     {
       label: 'Requests',
@@ -65,6 +67,7 @@ export const COACH_TAB_SET: TabSet = {
       requiresInstructor: true,
     },
     { label: 'Discover', icon: 'compass-outline', route: '/tabs/discover' },
+    { label: 'Payments', icon: 'card-outline', route: '/tabs/home/payments' },
     ACCOUNT_TILE,
   ],
 };
@@ -81,9 +84,11 @@ export const TRAIN_TAB_SET: TabSet = {
     MESSAGES,
   ],
   // My plans and Profile join in M2 with their pages. Until then the sheet
-  // earns its place through Workouts, the mode switch and the profile row.
+  // earns its place through Workouts, Billing, the mode switch and the profile
+  // row.
   more: [
     { label: 'Workouts', icon: 'barbell-outline', route: '/tabs/workouts' },
+    { label: 'Billing', icon: 'card-outline', route: '/tabs/home/billing' },
     ACCOUNT_TILE,
   ],
 };

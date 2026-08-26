@@ -2,3 +2,13 @@
 ion-select {
   --border-radius: var(--mh-radius-control) !important;
 }
+
+/* Select popovers. The default is a bare list pinned to the trigger; a long
+   one needs a height cap so it scrolls instead of running off the screen.
+   Global because Ionic relocates the popover on present. */
+ion-popover.mh-select-popover {
+  --width: 14rem;
+  --max-height: 60vh;
+  --border-radius: var(--mh-radius-card);
+  --box-shadow: 0 0.5rem 2rem rgb(var(--ion-text-color-rgb) / 0.2);
+}

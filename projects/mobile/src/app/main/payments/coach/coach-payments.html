@@ -1,0 +1,161 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>Payments</ion-title>
+  </ion-toolbar>
+
+  @if (!blocked()) {
+    <ion-toolbar>
+      <ion-segment [value]="segment()" (ionChange)="onSegmentChange($event)">
+        @for (option of segments; track option.value) {
+          <ion-segment-button [value]="option.value">
+            <ion-label>{{ option.label }}</ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+    </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (blocked()) {
+    <!-- 4f: the gate replaces the hub. An empty list with a locked button
+         would imply the feature is here and merely idle. -->
+    <div class="gate" [class.amber]="needsMore()">
+      <span class="tile" aria-hidden="true">
+        <ion-icon [name]="needsMore() ? 'alert-circle-outline' : 'lock-closed-outline'" />
+      </span>
+      <h2>{{ needsMore() ? 'Stripe needs more from you' : 'Connect Stripe to get paid' }}</h2>
+      <p>
+        @if (needsMore()) {
+          Your account is set up but Stripe is still waiting on some details before
+          you can take payments.
+        } @else {
+          Invoices and payouts run through Stripe. Setting up takes a few minutes
+          and opens outside the app.
+        }
+      </p>
+      <ion-button expand="block" [disabled]="connecting()" (click)="connect()">
+        <ion-icon slot="start" name="open-outline" />
+        {{ needsMore() ? 'Continue verification' : 'Connect Stripe' }}
+      </ion-button>
+      <!-- Localhost and dropped webhooks both leave the mirror stale. -->
+      <ion-button fill="clear" size="small" (click)="refreshStatus()">
+        <ion-icon slot="start" name="refresh-outline" />
+        I've already done this
+      </ion-button>
+    </div>
+  } @else if (segment() === 'memberships') {
+    <mh-empty-state
+      icon="card-outline"
+      heading="Memberships live on the web"
+      message="Recurring plans you sell are managed there for now."
+    />
+  } @else {
+    @if (earnings(); as summary) {
+      <!-- One currency by definition: a coach settles in exactly one. -->
+      <div class="earnings">
+        <div class="figure">
+          <span class="mh-kicker">Outstanding</span>
+          <span class="value">
+            {{ summary.outstandingInvoicesCents | currencyRon: summary.currency : 'code' }}
+          </span>
+          <span class="meta">
+            {{ summary.openInvoiceCount }} open
+            @if (summary.overdueInvoiceCount > 0) {
+              · {{ summary.overdueInvoiceCount }} overdue
+            }
+          </span>
+        </div>
+        <div class="figure">
+          <span class="mh-kicker">This month</span>
+          <span class="value">
+            {{ summary.monthToDateRevenueCents | currencyRon: summary.currency : 'code' }}
+          </span>
+          <span class="meta">
+            {{ summary.availableBalanceCents | currencyRon: summary.currency : 'code' }} available
+          </span>
+        </div>
+      </div>
+    }
+
+    <div class="filters">
+      @for (option of filters; track option.label) {
+        <ion-chip
+          [outline]="status() !== option.value"
+          [class.on]="status() === option.value"
+          (click)="setStatus(option.value)"
+        >
+          {{ option.label }}
+        </ion-chip>
+      }
+    </div>
+
+    @if (showLoadError()) {
+      <mh-empty-state
+        icon="alert-circle-outline"
+        heading="Couldn't load your invoices"
+        message="Check your connection and try again."
+        actionLabel="Try again"
+        (action)="retry()"
+      />
+    } @else if (showSkeleton()) {
+      <div class="rows">
+        @for (_ of skeletonRows; track $index) {
+          <ion-item lines="none">
+            <ion-skeleton-text slot="start" [animated]="true" style="width: 2.125rem; height: 2.375rem" />
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 65%" /></p>
+            </ion-label>
+            <ion-skeleton-text slot="end" [animated]="true" style="width: 4rem" />
+          </ion-item>
+        }
+      </div>
+    } @else if (isEmpty()) {
+      <mh-empty-state
+        icon="receipt-outline"
+        heading="No invoices yet"
+        message="Bill a client for a session or a block of coaching."
+        actionLabel="Create invoice"
+        (action)="create()"
+      />
+    } @else {
+      <div class="rows">
+        @if (overdue().length > 0) {
+          <div class="mh-section-label overdue">Overdue</div>
+          @for (invoice of overdue(); track invoice.id) {
+            <mh-invoice-row [invoice]="invoice" party="client" (select)="open(invoice)" />
+          }
+        }
+
+        @if (rest().length > 0) {
+          @if (overdue().length > 0) {
+            <div class="mh-section-label">Everything else</div>
+          }
+          @for (invoice of rest(); track invoice.id) {
+            <mh-invoice-row [invoice]="invoice" party="client" (select)="open(invoice)" />
+          }
+        }
+      </div>
+
+      <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="onLoadMore($event)">
+        <ion-infinite-scroll-content />
+      </ion-infinite-scroll>
+    }
+  }
+</ion-content>
+
+@if (!blocked() && segment() === 'invoices') {
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button aria-label="Create invoice" (click)="create()">
+      <ion-icon name="add-outline" />
+    </ion-fab-button>
+  </ion-fab>
+}

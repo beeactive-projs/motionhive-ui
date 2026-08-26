@@ -44,6 +44,12 @@ export interface MoreTile {
   readonly route: string;
   /** Hidden from users without the INSTRUCTOR role. */
   readonly requiresInstructor?: boolean;
+  /**
+   * Marks the tile and the More button with a dot when true. A count would
+   * overstate it — the point is only that something is waiting. Spliced in by
+   * the shell, since a static tile cannot read a store.
+   */
+  readonly dot?: Signal<boolean>;
 }
 
 export interface TabSet {

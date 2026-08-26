@@ -1,0 +1,142 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" />
+    </ion-buttons>
+    <ion-title>Billing</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="segment()" (ionChange)="onSegmentChange($event)">
+      @for (option of segments; track option.value) {
+        <ion-segment-button [value]="option.value">
+          <ion-label>{{ option.label }}</ion-label>
+        </ion-segment-button>
+      }
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (segment() === 'memberships') {
+    @if (subscriptions().length === 0) {
+      <mh-empty-state
+        icon="card-outline"
+        heading="No memberships"
+        message="Recurring plans you join will show up here."
+      />
+    } @else {
+      <div class="rows">
+        @for (sub of subscriptions(); track sub.id) {
+          <!-- 4m: one card per subscription; a status chip only when it is
+               not simply active. -->
+          <div class="membership">
+            <div class="head">
+              <span class="name">{{ sub.product?.name ?? 'Membership' }}</span>
+              @if (sub.status !== 'active') {
+                <ion-note class="status" [class.warn]="sub.status === 'past_due'">
+                  {{ sub.status === 'past_due' ? 'Payment overdue' : sub.status }}
+                </ion-note>
+              }
+            </div>
+            <div class="price">
+              {{ sub.amountCents | currencyRon: sub.currency : 'code' }}
+              <span class="interval">/ {{ sub.product?.interval ?? 'month' }}</span>
+            </div>
+            @if (sub.currentPeriodEnd) {
+              <div class="renews">
+                {{ sub.cancelAtPeriodEnd ? 'Ends' : 'Renews' }}
+                {{ sub.currentPeriodEnd | date: 'd MMM yyyy' }}
+              </div>
+            }
+            @if (!sub.cancelAtPeriodEnd) {
+              <ion-button fill="clear" size="small" color="medium" (click)="askCancel(sub)">
+                Cancel membership
+              </ion-button>
+            }
+          </div>
+        }
+      </div>
+    }
+  } @else if (showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load your invoices"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (showSkeleton()) {
+    <div class="rows">
+      @for (_ of skeletonRows; track $index) {
+        <ion-item lines="none">
+          <ion-skeleton-text slot="start" [animated]="true" style="width: 2.125rem; height: 2.375rem" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 65%" /></p>
+          </ion-label>
+          <ion-skeleton-text slot="end" [animated]="true" style="width: 4rem" />
+        </ion-item>
+      }
+    </div>
+  } @else if (isEmpty()) {
+    <!-- 4l: no action. Nothing a client can do makes invoices exist. -->
+    <mh-empty-state
+      icon="receipt-outline"
+      heading="No invoices"
+      message="When a coach bills you, it shows up here."
+    />
+  } @else {
+    <div class="rows">
+      @if (due().length > 0) {
+        <div class="due-strip">
+          <span class="mh-kicker">Due now</span>
+          <div class="chips">
+            <!-- One chip per currency — never a merged total. -->
+            @for (total of dueTotals(); track total.currency) {
+              <span class="chip">{{ total.cents | currencyRon: total.currency : 'code' }}</span>
+            }
+          </div>
+        </div>
+        @for (invoice of due(); track invoice.id) {
+          <mh-invoice-row [invoice]="invoice" party="instructor" (select)="open(invoice)" />
+        }
+      }
+
+      @if (paid().length > 0) {
+        <div class="mh-section-label">Paid</div>
+        @for (invoice of paid(); track invoice.id) {
+          <mh-invoice-row [invoice]="invoice" party="instructor" (select)="open(invoice)" />
+        }
+      }
+    </div>
+
+    <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="onLoadMore($event)">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
+
+  <!-- Saved cards are Stripe's, so this leaves the app. Reachable from both
+       segments because it belongs to neither. -->
+  <ion-button class="portal" fill="clear" size="small" (click)="openPortal()">
+    <ion-icon slot="start" name="card-outline" />
+    Payment methods
+    <ion-icon slot="end" name="open-outline" />
+  </ion-button>
+</ion-content>
+
+<mh-confirm-sheet
+  [(open)]="cancelOpen"
+  title="Cancel this membership?"
+  body="You keep access until the end of the period you have already paid for. Nothing is charged after that."
+  confirmLabel="Cancel membership"
+  cancelLabel="Keep it"
+  tone="danger"
+  [facts]="cancelFacts()"
+  [saving]="acting()"
+  (confirm)="confirmCancel()"
+/>

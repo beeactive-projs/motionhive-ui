@@ -23,6 +23,8 @@ export class EarningsService {
     let httpParams = new HttpParams();
     if (params.status) httpParams = httpParams.set('status', params.status);
     if (params.clientId) httpParams = httpParams.set('clientId', params.clientId);
+    // The only route from an invoice to something refundable.
+    if (params.invoiceId) httpParams = httpParams.set('invoiceId', params.invoiceId);
     if (params.fromDate) httpParams = httpParams.set('fromDate', params.fromDate);
     if (params.toDate) httpParams = httpParams.set('toDate', params.toDate);
     if (params.page) httpParams = httpParams.set('page', params.page.toString());

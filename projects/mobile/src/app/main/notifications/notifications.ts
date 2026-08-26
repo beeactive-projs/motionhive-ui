@@ -13,6 +13,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonPopover,
   IonRefresher,
   IonRefresherContent,
   IonSkeletonText,
@@ -33,6 +34,7 @@ import {
 } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import {
   FILTERABLE_CATEGORIES,
   categoryStyle,
@@ -66,6 +68,7 @@ interface NotificationDay {
   selector: 'mh-notifications',
   imports: [
     EmptyState,
+    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,
@@ -78,6 +81,7 @@ interface NotificationDay {
     IonItem,
     IonLabel,
     IonList,
+    IonPopover,
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
@@ -104,6 +108,10 @@ export class Notifications implements ViewWillEnter {
   /** The row the detail sheet is showing, and therefore whether it is open. */
   readonly detail = signal<BellNotification | null>(null);
   readonly detailOpen = signal(false);
+
+  readonly categoryPickerOpen = signal(false);
+  /** Ionic anchors a popover to the event that opened it, not to an element. */
+  readonly categoryPickerEvent = signal<Event | undefined>(undefined);
 
   readonly hasFilter = computed(() => this.store.unreadOnly() || !!this.store.category());
 
@@ -171,10 +179,20 @@ export class Notifications implements ViewWillEnter {
     this.store.loadList({ unreadOnly: true, category: null, markViewedAfter: true });
   }
 
-  /** Tapping the active category again clears it, so the chip is its own undo. */
-  toggleCategory(category: NotificationCategory): void {
-    const next = this.store.category() === category ? null : category;
-    this.store.loadList({ category: next, markViewedAfter: true });
+  openCategoryPicker(event: Event): void {
+    this.categoryPickerEvent.set(event);
+    this.categoryPickerOpen.set(true);
+  }
+
+  /** Null is "all categories" — the same call, so there is one code path. */
+  pickCategory(category: NotificationCategory | null): void {
+    this.categoryPickerOpen.set(false);
+    if (this.store.category() === category) return;
+    this.store.loadList({ category, markViewedAfter: true });
+  }
+
+  clearCategory(): void {
+    this.pickCategory(null);
   }
 
   // ─── Rows ─────────────────────────────────────────────────────

@@ -53,9 +53,9 @@ describe('deep links', () => {
   });
 
   // A trainee's booking alert lands on the trainee surface, never the coach's
-  // — the instructor guard would bounce a non-coach and the tap would do
-  // nothing visible. Both of the backend's spellings mean the same screen.
-  it('routes a trainee session alert to the trainee area', () => {
+  // — that route is behind an instructor guard, so the tap would bounce
+  // silently. Both of the backend's spellings mean the same screen.
+  it('routes a trainee session alert to their own sessions, not the coach agenda', () => {
     expect(routeFor({ screen: 'sessions', entityId: 'abc' })).toEqual([
       '/tabs/user/sessions',
       'abc',
@@ -67,6 +67,20 @@ describe('deep links', () => {
     expect(routeFor({ screen: 'sessions' })).toEqual(['/tabs/user/sessions']);
   });
 
+  // The two roles read the same invoice from opposite sides, so the alert has
+  // to pick the screen that matches who it was sent to.
+  it('splits invoice alerts by side of the bill', () => {
+    expect(routeFor({ screen: 'coaching/invoices', entityId: 'inv-1' })).toEqual([
+      '/tabs/home/payments',
+      'inv-1',
+    ]);
+    expect(routeFor({ screen: 'profile/invoices', entityId: 'inv-1' })).toEqual([
+      '/tabs/home/billing',
+      'inv-1',
+    ]);
+    expect(routeFor({ screen: 'coaching/payments' })).toEqual(['/tabs/home/payments']);
+  });
+
   // A program assignment is the alert most likely to be tapped by a trainee,
   // and it was the one falling through the map.
   it('names the plan screen a program assignment points at', () => {
@@ -74,13 +88,31 @@ describe('deep links', () => {
     expect(webOnlyLabel({ screen: 'user/plans', entityId: 'a-1' })).toBe('My plans');
   });
 
-  it('names the profile tab rather than the profile', () => {
-    expect(webOnlyLabel({ screen: 'profile', queryParams: { tab: 'memberships' } })).toBe(
-      'Memberships',
-    );
+  // The web keeps invoices and memberships behind profile tabs; mobile gives
+  // them a screen, so those two route and the rest still only get a name.
+  it('routes the billing profile tabs and names the ones with no screen', () => {
+    expect(routeFor({ screen: 'profile', queryParams: { tab: 'invoices' } })).toEqual([
+      '/tabs/home/billing',
+    ]);
+    expect(routeFor({ screen: 'profile', queryParams: { tab: 'memberships' } })).toEqual([
+      '/tabs/home/billing',
+    ]);
+    expect(routeFor({ screen: 'profile', queryParams: { tab: 'coaches' } })).toBeNull();
     expect(webOnlyLabel({ screen: 'profile', queryParams: { tab: 'coaches' } })).toBe('Coaches');
     // No tab means we cannot say what it is about, so we say nothing.
     expect(webOnlyLabel({ screen: 'profile' })).toBeNull();
+  });
+
+  // Both sides of an invoice alert land on the right person's screen.
+  it('sends invoice alerts to the side that received them', () => {
+    expect(routeFor({ screen: 'coaching/invoices', entityId: 'inv-1' })).toEqual([
+      '/tabs/home/payments',
+      'inv-1',
+    ]);
+    expect(routeFor({ screen: 'profile/invoices', entityId: 'inv-1' })).toEqual([
+      '/tabs/home/billing',
+      'inv-1',
+    ]);
   });
 
   it('says nothing about a screen it has never heard of', () => {

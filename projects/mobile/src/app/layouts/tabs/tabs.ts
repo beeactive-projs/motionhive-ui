@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import {
   IonBadge,
@@ -12,7 +12,14 @@ import {
 import { addIcons } from 'ionicons';
 import { filter, map } from 'rxjs';
 
-import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
+import {
+  AppModeStore,
+  AuthStore,
+  ClientPaymentService,
+  MessagingStore,
+  NavMode,
+  NavModes,
+} from 'core';
 
 import {
   activeTabIdFromUrl,
@@ -60,7 +67,15 @@ export class Tabs {
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _messagingStore = inject(MessagingStore);
+  private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _router = inject(Router);
+
+  /**
+   * Whether the trainee has a bill waiting. Only they get the dot: a client
+   * has to be interrupted by a bill, where a coach chases money deliberately
+   * and does not need their own app nagging them about it.
+   */
+  private readonly _openInvoices = signal(0);
 
   readonly moreOpen = signal(false);
 
@@ -107,11 +122,28 @@ export class Tabs {
   );
 
   readonly moreTiles = computed(() =>
-    this._tabSet().more.filter((tile) => !tile.requiresInstructor || this.canSwitchMode()),
+    this._tabSet()
+      .more.filter((tile) => !tile.requiresInstructor || this.canSwitchMode())
+      .map((tile) =>
+        tile.route === '/tabs/home/billing' ? { ...tile, dot: this.hasBillDue } : tile,
+      ),
+  );
+
+  readonly hasBillDue = computed(
+    () => this.mode() === NavModes.Train && this._openInvoices() > 0,
   );
 
   constructor() {
     addIcons(TAB_ICONS);
+
+    // Counts only, and only for the side that needs interrupting.
+    this._clientPaymentService
+      .getMyCounts()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (counts) => this._openInvoices.set(counts.invoices.open),
+        error: () => this._openInvoices.set(0),
+      });
   }
 
   openMore(): void {

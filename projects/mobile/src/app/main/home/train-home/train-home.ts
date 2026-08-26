@@ -17,7 +17,12 @@ import {
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, checkmarkCircle, sparklesOutline } from 'ionicons/icons';
+import {
+  calendarOutline,
+  cardOutline,
+  checkmarkCircle,
+  sparklesOutline,
+} from 'ionicons/icons';
 
 import { AuthStore, BlogPost, MARKETING_BLOG_URL } from 'core';
 
@@ -59,7 +64,7 @@ export class TrainHome implements OnInit, ViewWillEnter {
   readonly firstName = this._authStore.user;
 
   constructor() {
-    addIcons({ calendarOutline, checkmarkCircle, sparklesOutline });
+    addIcons({ calendarOutline, cardOutline, checkmarkCircle, sparklesOutline });
   }
 
   ngOnInit(): void {
@@ -98,6 +103,10 @@ export class TrainHome implements OnInit, ViewWillEnter {
   openStep(step: StartStep): void {
     if (step.done) return;
     void this._router.navigateByUrl(step.route);
+  }
+
+  openBilling(): void {
+    void this._router.navigateByUrl('/tabs/home/billing');
   }
 
   openSessions(): void {

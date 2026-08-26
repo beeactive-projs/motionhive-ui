@@ -72,3 +72,13 @@
 .mh-chip-row::-webkit-scrollbar {
   display: none;
 }
+
+/* A bare dot on a tab: something is waiting inside, no number implied. Ionic
+   sizes badges for text, so an empty one needs its own dimensions. */
+ion-tab-button ion-badge.dot {
+  min-width: 0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border-radius: 999px;
+}
