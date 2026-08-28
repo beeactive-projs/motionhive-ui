@@ -13,7 +13,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonPopover,
   IonRefresher,
   IonRefresherContent,
   IonSkeletonText,
@@ -25,25 +24,23 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import {
-  BellNotification,
-  NotificationCategory,
-  NotificationStore,
-  dayDividerLabel,
-  localDayKey,
-} from 'core';
+import { BellNotification, NotificationStore, dayDividerLabel, localDayKey } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
-import {
-  FILTERABLE_CATEGORIES,
-  categoryStyle,
-} from '../../_shared/config/notification-categories.config';
+import { queryParamsFor, routeFor } from '../../_shared/config/notification-deep-link';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { NotificationRow } from './_components/notification-row/notification-row';
+import { NotificationsEmpty } from './_components/notifications-empty/notifications-empty';
 import { NotificationDetailSheet } from './_sheets/notification-detail-sheet/notification-detail-sheet';
-import { queryParamsFor, routeFor } from './deep-link';
-import { NOTIFICATION_ICONS } from './notifications.config';
+import { NotificationFilterSheet } from './_sheets/notification-filter-sheet/notification-filter-sheet';
+import {
+  NO_FILTERS,
+  NOTIFICATION_ICONS,
+  NotificationFilters,
+  activeFilterCount,
+  categoryListLabel,
+  sameFilters,
+} from './notifications.config';
 
 /** One day's worth of rows, as the template consumes them. */
 interface NotificationDay {
@@ -55,10 +52,10 @@ interface NotificationDay {
 /**
  * The notification centre.
  *
- * Flat and chronological, newest first, with day dividers. Grouping by
- * category was considered and dropped: the category chip already answers
- * "show me only payments" without reordering time, and a feed that reorders
- * itself is a feed you cannot scan.
+ * Flat and chronological, newest first, one card per day under a date pill.
+ * Grouping by category was considered and dropped: the category filter already
+ * answers "show me only payments" without reordering time, and a feed that
+ * reorders itself is a feed you cannot scan.
  *
  * Opening the list marks its rows *viewed* (an analytics signal) but never
  * *read*. Unread clears three ways only, all of them deliberate: tapping a
@@ -68,7 +65,6 @@ interface NotificationDay {
   selector: 'mh-notifications',
   imports: [
     EmptyState,
-    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,
@@ -81,14 +77,15 @@ interface NotificationDay {
     IonItem,
     IonLabel,
     IonList,
-    IonPopover,
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
     NotificationDetailSheet,
+    NotificationFilterSheet,
     NotificationRow,
+    NotificationsEmpty,
   ],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss',
@@ -99,26 +96,25 @@ export class Notifications implements ViewWillEnter {
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
 
-  readonly categories = FILTERABLE_CATEGORIES.map((value) => ({
-    value,
-    ...categoryStyle(value),
-  }));
   readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7];
 
   /** The row the detail sheet is showing, and therefore whether it is open. */
   readonly detail = signal<BellNotification | null>(null);
   readonly detailOpen = signal(false);
 
-  readonly categoryPickerOpen = signal(false);
-  /** Ionic anchors a popover to the event that opened it, not to an element. */
-  readonly categoryPickerEvent = signal<Event | undefined>(undefined);
+  /** The filter sheet, opened from the Filters button. */
+  readonly filterOpen = signal(false);
 
-  readonly hasFilter = computed(() => this.store.unreadOnly() || !!this.store.category());
+  /** What the list is narrowed to, as the sheet edits it. The store owns it. */
+  readonly filters = computed<NotificationFilters>(() => ({
+    unreadOnly: this.store.unreadOnly(),
+    categories: this.store.categories(),
+  }));
+  readonly filterCount = computed(() => activeFilterCount(this.filters()));
+  readonly hasFilter = computed(() => this.filterCount() > 0);
 
-  readonly activeCategoryStyle = computed(() => {
-    const category = this.store.category();
-    return category ? categoryStyle(category) : null;
-  });
+  /** "Sessions and Payments" — null with no category on. */
+  readonly categoryLabel = computed(() => categoryListLabel(this.store.categories()));
 
   /**
    * Rows bucketed by local calendar day. Dropped while a category filter is
@@ -126,7 +122,7 @@ export class Notifications implements ViewWillEnter {
    * rows, and each row already carries its own date in that mode.
    */
   readonly days = computed<NotificationDay[]>(() => {
-    if (this.store.category()) return [];
+    if (this.store.categories().length > 0) return [];
 
     const buckets = new Map<string, BellNotification[]>();
     for (const item of this.store.notifications()) {
@@ -142,6 +138,13 @@ export class Notifications implements ViewWillEnter {
       label: dayDividerLabel(key),
       items,
     }));
+  });
+
+  /** "3 of 3 in Payments" — the filtered list says how much of it you see. */
+  readonly filterSummary = computed(() => {
+    const label = this.categoryLabel();
+    if (!label || !this.store.hasLoadedList()) return null;
+    return `${this.store.notifications().length} of ${this.store.total()} in ${label}`;
   });
 
   /** First load only. A refresh happens under the rows already on screen. */
@@ -171,28 +174,27 @@ export class Notifications implements ViewWillEnter {
 
   // ─── Filters ──────────────────────────────────────────────────
 
-  showAll(): void {
-    this.store.loadList({ unreadOnly: false, category: null, markViewedAfter: true });
+  openFilters(): void {
+    this.filterOpen.set(true);
   }
 
-  showUnread(): void {
-    this.store.loadList({ unreadOnly: true, category: null, markViewedAfter: true });
+  onFiltersApplied(filters: NotificationFilters): void {
+    if (sameFilters(filters, this.filters())) return;
+    this.store.loadList({ ...filters, markViewedAfter: true });
   }
 
-  openCategoryPicker(event: Event): void {
-    this.categoryPickerEvent.set(event);
-    this.categoryPickerOpen.set(true);
+  /** The quick chips in the strip write straight through to the sheet's Status. */
+  setUnreadOnly(unreadOnly: boolean): void {
+    this.onFiltersApplied({ ...this.filters(), unreadOnly });
   }
 
-  /** Null is "all categories" — the same call, so there is one code path. */
-  pickCategory(category: NotificationCategory | null): void {
-    this.categoryPickerOpen.set(false);
-    if (this.store.category() === category) return;
-    this.store.loadList({ category, markViewedAfter: true });
+  clearFilters(): void {
+    this.onFiltersApplied({ ...NO_FILTERS });
   }
 
-  clearCategory(): void {
-    this.pickCategory(null);
+  /** The line under a filtered list drops the categories and keeps Status. */
+  clearCategories(): void {
+    this.onFiltersApplied({ ...this.filters(), categories: [] });
   }
 
   // ─── Rows ─────────────────────────────────────────────────────
@@ -210,7 +212,7 @@ export class Notifications implements ViewWillEnter {
     if (!commands) {
       // The row the template handed over is the pre-click copy, so the sheet
       // would offer "Mark read" on something the tap just read.
-      this.detail.set(this.store.notifications().find((n) => n.id === item.id) ?? item);
+      this.detail.set(this._current(item.id) ?? item);
       this.detailOpen.set(true);
       return;
     }
@@ -248,7 +250,7 @@ export class Notifications implements ViewWillEnter {
     if (!item) return;
     this.toggleRead(item);
     // The sheet reads from the list, so re-point it at the updated row.
-    this.detail.set(this.store.notifications().find((n) => n.id === item.id) ?? null);
+    this.detail.set(this._current(item.id));
   }
 
   removeFromDetail(): void {
@@ -271,11 +273,22 @@ export class Notifications implements ViewWillEnter {
       replaceUrl: true,
     });
 
-    const item = this.store.notifications().find((n) => n.id === receiptId);
+    const item = this._current(receiptId);
     if (item) this.open(item);
   }
 
+  /** The store's copy of a row — the one that carries the latest read state. */
+  private _current(receiptId: string): BellNotification | null {
+    return this.store.notifications().find((n) => n.id === receiptId) ?? null;
+  }
+
   // ─── Page chrome ──────────────────────────────────────────────
+
+  /** The empty state's one button: clear the filter that emptied it, or settings. */
+  onEmptyAction(): void {
+    if (this.hasFilter()) this.clearFilters();
+    else this.openSettings();
+  }
 
   openSettings(): void {
     void this._router.navigate(['/tabs/home/account/notifications']);

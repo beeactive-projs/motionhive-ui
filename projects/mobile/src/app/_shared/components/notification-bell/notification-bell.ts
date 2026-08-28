@@ -11,14 +11,15 @@ import { NotificationStore } from 'core';
 import { activeTabIdFromUrl } from '../../config/tabs.config';
 
 /**
- * The bell for a tab's root header, with its unread badge.
+ * The bell for a tab's root header, with its unread dot.
  *
  * It links into its *own* tab's copy of the centre — Ionic keys a navigation
  * stack on the first segment after `/tabs`, so a fixed address would yank the
  * user out of the tab they were working in.
  *
  * The count comes from the shared store, which polls once a minute for the
- * whole app; every bell on screen reads the same signal.
+ * whole app; every bell on screen reads the same signal. Visually it is only
+ * a dot — the number lives in the accessible name and in the centre itself.
  */
 @Component({
   selector: 'mh-notification-bell',
@@ -44,9 +45,6 @@ export class NotificationBell {
   readonly target = computed(
     () => `/tabs/${activeTabIdFromUrl(this._url()) ?? 'home'}/notifications`,
   );
-
-  /** Two digits is the most that fits before the badge starts pushing the icon. */
-  readonly badge = computed(() => (this.unread() > 99 ? '99+' : `${this.unread()}`));
 
   constructor() {
     // Registered here, not by each host page — the bell is the only thing that

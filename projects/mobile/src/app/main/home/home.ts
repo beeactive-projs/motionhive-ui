@@ -19,6 +19,7 @@ import { addIcons } from 'ionicons';
 
 import { AppModeStore, AuthStore, NavMode, NavModes } from 'core';
 
+import { AvatarButton } from '../../_shared/components/avatar-button/avatar-button';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { Logo } from '../../_shared/components/logo/logo';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
@@ -34,6 +35,7 @@ import { TrainHome } from './train-home/train-home';
 @Component({
   selector: 'mh-home',
   imports: [
+    AvatarButton,
     CoachHome,
     HexAvatar,
     IonButton,
@@ -81,19 +83,12 @@ export class Home {
 
   readonly role = computed(() => ROLES[this.mode()]);
 
-  readonly userName = this._authStore.userName;
-  readonly avatarUrl = computed(() => this._authStore.user()?.avatarUrl ?? null);
-
   constructor() {
     addIcons(ROLE_ICONS);
   }
 
   openRoleSwitch(): void {
     void this._router.navigateByUrl('/tabs/home/switch-role');
-  }
-
-  openProfile(): void {
-    void this._router.navigateByUrl('/tabs/home/account');
   }
 
   /** Only one child is ever mounted, so this reaches whichever it is. */

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { KNOWN_SCREENS, routeFor, webOnlyLabel } from './deep-link';
+import {
+  KNOWN_SCREENS,
+  isOnTarget,
+  queryParamsFor,
+  routeFor,
+  webOnlyLabel,
+} from './notification-deep-link';
 
 /**
  * Every `data.screen` the API emits, taken from the builder files themselves —
@@ -67,6 +73,38 @@ describe('deep links', () => {
     expect(routeFor({ screen: 'sessions' })).toEqual(['/tabs/user/sessions']);
   });
 
+  // A cancelled or declined booking has its own list, and the tab param that
+  // names it is consumed rather than handed to a page that would ignore it.
+  it('routes a cancelled booking alert to the cancelled list', () => {
+    const data = { screen: 'user/sessions', queryParams: { tab: 'cancelled' } };
+    expect(routeFor(data)).toEqual(['/tabs/user/sessions/cancelled']);
+    expect(queryParamsFor(data)).toBeNull();
+    expect(routeFor({ screen: 'sessions', queryParams: { tab: 'cancelled' } })).toEqual([
+      '/tabs/user/sessions/cancelled',
+    ]);
+  });
+
+  // The backend names the conversation in the query, the way the web inbox
+  // reads it; on mobile it is the route segment.
+  it('opens a message alert in its conversation', () => {
+    const data = { screen: 'messages', queryParams: { conversationId: 'c-1' } };
+    expect(routeFor(data)).toEqual(['/tabs/messages', 'c-1']);
+    expect(queryParamsFor(data)).toBeNull();
+    expect(routeFor({ screen: 'messages', entityId: 'c-2' })).toEqual(['/tabs/messages', 'c-2']);
+    expect(routeFor({ screen: 'messages' })).toEqual(['/tabs/messages']);
+    expect(
+      queryParamsFor({ screen: 'messages', queryParams: { conversationId: 'c-1', foo: 'bar' } }),
+    ).toEqual({ foo: 'bar' });
+  });
+
+  it('forwards the params it does not consume', () => {
+    expect(queryParamsFor({ screen: 'profile', queryParams: { tab: 'invoices' } })).toEqual({
+      tab: 'invoices',
+    });
+    expect(queryParamsFor({ screen: 'coaching/payments' })).toBeNull();
+    expect(queryParamsFor({ screen: 'groups', queryParams: { x: '1' } })).toBeNull();
+  });
+
   // The two roles read the same invoice from opposite sides, so the alert has
   // to pick the screen that matches who it was sent to.
   it('splits invoice alerts by side of the bill', () => {
@@ -103,21 +141,37 @@ describe('deep links', () => {
     expect(webOnlyLabel({ screen: 'profile' })).toBeNull();
   });
 
-  // Both sides of an invoice alert land on the right person's screen.
-  it('sends invoice alerts to the side that received them', () => {
-    expect(routeFor({ screen: 'coaching/invoices', entityId: 'inv-1' })).toEqual([
-      '/tabs/home/payments',
-      'inv-1',
-    ]);
-    expect(routeFor({ screen: 'profile/invoices', entityId: 'inv-1' })).toEqual([
-      '/tabs/home/billing',
-      'inv-1',
-    ]);
-  });
-
   it('says nothing about a screen it has never heard of', () => {
     expect(routeFor({ screen: 'something/new' })).toBeNull();
     expect(webOnlyLabel({ screen: 'something/new' })).toBeNull();
     expect(routeFor(null)).toBeNull();
+  });
+});
+
+describe('isOnTarget', () => {
+  const clients = { screen: 'coaching/clients' };
+
+  it('is true on the exact screen and anywhere under it', () => {
+    expect(isOnTarget('/tabs/clients', clients)).toBe(true);
+    expect(isOnTarget('/tabs/clients/requests', clients)).toBe(true);
+    expect(isOnTarget('/tabs/clients?open=1', clients)).toBe(true);
+  });
+
+  it('is false on a sibling that merely shares the prefix', () => {
+    expect(isOnTarget('/tabs/clients-archive', clients)).toBe(false);
+    expect(isOnTarget('/tabs/home', clients)).toBe(false);
+  });
+
+  // The list is not the booking: an alert about one session still has
+  // something to announce while you are looking at all of them.
+  it('is false above the target', () => {
+    const booking = { screen: 'sessions', entityId: 'abc' };
+    expect(isOnTarget('/tabs/user/sessions', booking)).toBe(false);
+    expect(isOnTarget('/tabs/user/sessions/abc', booking)).toBe(true);
+  });
+
+  it('is false when the notification has nowhere to go', () => {
+    expect(isOnTarget('/tabs/home', { screen: 'groups' })).toBe(false);
+    expect(isOnTarget('/tabs/home', null)).toBe(false);
   });
 });

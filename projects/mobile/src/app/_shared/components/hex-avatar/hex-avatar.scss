@@ -11,8 +11,13 @@
   line-height: 0;
 }
 
-:host([data-size='xs']) {
+:host([data-size='dot']) {
   width: 0.875rem;
+}
+
+:host([data-size='xs']) {
+  width: 1.5rem;
+  font-size: var(--mh-text-xs);
 }
 
 :host([data-size='sm']) {
@@ -60,6 +65,10 @@ ion-icon {
 }
 
 // The glyph tracks the hexagon rather than sitting lost inside a large tile.
+:host([data-size='xs']) ion-icon {
+  font-size: var(--mh-text-sm);
+}
+
 :host([data-size='sm']) ion-icon {
   font-size: var(--mh-text-md);
 }

@@ -2,7 +2,9 @@ import { Component, computed, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 
 export const HexAvatarSizes = {
-  /** Bare brand dot — too small for initials, used inside chips and pills. */
+  /** Bare brand dot — too small for initials or a glyph, used as an ornament. */
+  Dot: 'dot',
+  /** The leading tile of a chip or pill — holds an icon, initials at a push. */
   ExtraSmall: 'xs',
   Small: 'sm',
   Medium: 'md',

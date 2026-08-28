@@ -26,6 +26,7 @@
  * one file per component. Skins carry no margins: components are
  * layout-neutral, and pages place them (see theme/layout.css).
  */
+@import './theme/components/ion-badge.css';
 @import './theme/components/ion-button.css';
 @import './theme/components/ion-card.css';
 @import './theme/components/ion-chip.css';

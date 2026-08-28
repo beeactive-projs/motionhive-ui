@@ -53,20 +53,12 @@ ion-footer ion-toolbar {
 }
 
 .day {
-  display: flex;
-  justify-content: center;
   margin: 0.375rem 0 0.875rem;
 }
 
-/* The date pill. */
-.day span {
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--mh-radius-pill);
-  background: var(--mh-color-divider);
-  color: var(--ion-color-medium);
-  font-family: var(--mh-font-mono);
-  font-size: var(--mh-text-xs);
-  font-weight: 600;
-  letter-spacing: var(--mh-tracking-kicker);
+/* The pill skin is the shared `.mh-day-pill` role (typography.css). The
+   uppercase is this transcript's own exception, kept until it is decided —
+   the role itself is sentence case, like every other visible string. */
+.day > span {
   text-transform: uppercase;
 }

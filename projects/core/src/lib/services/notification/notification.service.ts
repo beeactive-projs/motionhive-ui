@@ -39,7 +39,10 @@ export class NotificationService {
     if (params.page !== undefined) httpParams = httpParams.set('page', String(params.page));
     if (params.limit !== undefined) httpParams = httpParams.set('limit', String(params.limit));
     if (params.unreadOnly) httpParams = httpParams.set('unreadOnly', 'true');
-    if (params.category) httpParams = httpParams.set('category', params.category);
+    // One `category` param per value — the API reads them as a list.
+    for (const category of params.categories ?? []) {
+      httpParams = httpParams.append('category', category);
+    }
 
     // Bell list refresh — silent, the popover has its own skeleton.
     return this._http.get<PaginatedResponse<BellNotification>>(

@@ -1,5 +1,6 @@
-// The role pill, per the design: honey-tinted capsule, amber hexagon dot, plain
-// sentence-case label. Every value comes from the palette, not a literal.
+// The role pill, per the design: honey-tinted capsule with a hairline, the
+// role's hexagon tile, plain sentence-case label, a small chevron. Every value
+// comes from the palette, not a literal.
 //
 // It must stay `fill="clear"`. A *solid* button inside a toolbar is styled by
 // Ionic as an inverted chip — `color: var(--ion-toolbar-background, var(--color))`
@@ -13,8 +14,20 @@
   // Text colour, not amber: amber on an amber tint fails AA, and it flips with
   // the palette so the pill still reads in dark mode.
   --color: var(--ion-text-color);
-  --padding-start: 0.625rem;
+  // Reads as tappable: a hairline in the accent ink, through the button's own
+  // border variables — the same treatment as the active filter chip.
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: var(--mh-color-honey-deep);
+  // The tile hugs the start cap like a chip's avatar; the text keeps its inset.
+  --padding-start: 0.25rem;
   --padding-end: 0.625rem;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  // Same optical line as the avatar hex at the other end of the bar. Ionic's
+  // toolbar floor is 32px; `min-height` has to go for the height to hold.
+  height: 1.875rem;
+  min-height: 0;
 
   // Android buttons are uppercase and widely tracked by default; the design's
   // pill is a label, not a shout. `.button-native` inherits all four.
@@ -23,14 +36,16 @@
   letter-spacing: normal;
   text-transform: none;
 
+  // One rhythm between tile, label and chevron.
   mh-hex-avatar {
     margin-inline-end: 0.375rem;
   }
 
-  // Ionic sizes slotted icons at 1.35em — far too heavy for the design's
-  // 10x6 chevron.
+  // Chevron at label size so the pill reads as one label, not three parts —
+  // Ionic sizes a slotted end icon at 1.4em with its own 0.4em gap.
   ion-icon {
-    font-size: var(--mh-text-base);
+    margin-inline-start: 0.375rem;
+    font-size: var(--mh-text-sm);
   }
 }
 

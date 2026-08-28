@@ -19,6 +19,25 @@ ion-button:not([shape='round']) {
   --border-radius: var(--mh-radius-control) !important;
 }
 
+/* Header actions whose glyph is not an ion-icon — the logo mark, the avatar
+   hex. Ionic hands its 3rem hit circle only to icon-only buttons (it sizes
+   them by the `icon-only` slot), so the same geometry is set here and every
+   action on the bar presses as one set.
+
+   Two elements in the selector on purpose: Ionic's own `.sc-ion-buttons-md-s
+   ion-button` rule (32px, 2px side margins) would tie a bare class on
+   specificity and resolve on stylesheet load order. */
+ion-buttons ion-button.glyph {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  width: 3rem;
+  height: 3rem;
+  min-height: 0;
+  margin: 0;
+}
+
 /* The filter-sheet trigger leading a `.mh-chip-row` strip (layout.css) —
    same recipe as home's role pill: honey-tinted capsule, plain sentence-case
    label. It must stay `fill="clear"` — a solid button in a toolbar is styled

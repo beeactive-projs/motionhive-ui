@@ -1,62 +1,66 @@
-/* Three chips, so they fit without scrolling. */
-.filters {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.125rem 0.75rem 0.5rem;
+/* The strip's chips line up with the card edge below them: the page gutter is
+   1rem, and the toolbar's own inset would add to it. */
+.filter-bar {
+  --padding-start: 0;
+  --padding-end: 0;
 }
 
-.filters ion-chip {
-  flex: none;
-  margin: 0;
-  height: 1.875rem;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
+.filter-bar .mh-chip-row {
+  padding-inline: 1rem;
 }
 
-.filters ion-chip ion-icon {
-  font-size: var(--mh-text-base);
-}
-
+/* Red is reserved for unread — the count is the one red thing in the strip. */
 .count {
   margin-inline-start: 0.25rem;
   padding: 0.125rem 0.375rem;
   border-radius: var(--mh-radius-pill);
   background: var(--ion-color-danger);
-  color: #fff;
-  font-size: var(--mh-text-sm);
+  color: var(--ion-color-danger-contrast);
+  font-size: var(--mh-text-xs);
   font-weight: 700;
+  line-height: var(--mh-leading-none);
 }
 
-/* The clear x needs its own hit area inside the chip. */
-.filters ion-chip.category ion-icon[role='button'] {
-  margin-inline-start: 0.125rem;
-  padding: 0.125rem;
+/* On the solid selected chip the count fades into the chip's own ink. */
+.mh-chip-row ion-chip.selected .count {
+  background: rgba(var(--ion-color-secondary-contrast-rgb), 0.28);
 }
 
-/* An active chip wears its category's own tint, so a filtered list is never
-   mistaken for the full one. */
-.filters ion-chip.on {
-  --background: var(--ion-color-primary);
-  --color: #fff;
+/* Skeleton rows mirror the real row's tile placement and head line. */
+.skeleton ion-item {
+  --border-color: var(--mh-color-divider);
 }
 
-/* The active category chip wears its own colour, set per chip in the template
-   so the eight cases don't need eight rules here. */
-.filters ion-chip.category.on {
-  --background: var(--mh-chip-on-background);
-  --color: var(--mh-chip-on-color);
+.skeleton ion-skeleton-text[slot='start'] {
+  flex: none;
+  margin-inline-end: 0.75rem;
+  margin-top: 0.125rem;
+  align-self: flex-start;
 }
 
-.filters ion-chip.on .count {
-  background: rgb(255 255 255 / 0.28);
+.skeleton .head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem;
 }
 
-.mh-section-label {
-  padding-top: 1rem;
+/* "3 of 3 in Payments · Clear filter" under a filtered list. */
+.filter-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
 }
 
-ion-list {
-  background: transparent;
-  padding: 0;
+.filter-summary ion-button {
+  --padding-start: 0.25rem;
+  --padding-end: 0.25rem;
+  height: auto;
+  min-height: var(--mh-tap-target);
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
 }

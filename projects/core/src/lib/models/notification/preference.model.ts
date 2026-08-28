@@ -2,7 +2,7 @@
  * Top-level groupings the user sees on the settings page. Mirrors
  * the BE NotificationCategory enum exactly. Industry convention
  * (Linear, HubSpot redesign) is to group by category rather than
- * per-event-type — six choices instead of thirty.
+ * per-event-type — eight choices instead of forty-nine.
  */
 export enum NotificationCategory {
   Messaging = 'MESSAGING',
@@ -30,7 +30,7 @@ export interface ConfigurableChannelPreferences {
 }
 
 /**
- * One row on the settings page. The BE returns six of these on
+ * One row on the settings page. The BE returns eight of these on
  * GET /users/me/notification-settings, in display order, with the
  * effective channel state already merged.
  *

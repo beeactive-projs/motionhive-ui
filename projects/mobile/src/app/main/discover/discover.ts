@@ -25,7 +25,6 @@ import {
 import { addIcons } from 'ionicons';
 
 import {
-  AuthStore,
   InstructorSearchResult,
   MyBookingsIndexStore,
   PublicSessionInstance,
@@ -34,6 +33,7 @@ import {
   groupSessionsByBucket,
 } from 'core';
 
+import { AvatarButton } from '../../_shared/components/avatar-button/avatar-button';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { Logo } from '../../_shared/components/logo/logo';
@@ -78,6 +78,7 @@ const SCROLL_COLLAPSE_PX = 120;
 @Component({
   selector: 'mh-discover',
   imports: [
+    AvatarButton,
     CoachRow,
     DiscoverFilterSheet,
     DiscoverSessionRow,
@@ -112,7 +113,6 @@ export class Discover implements ViewWillEnter {
   readonly coachesStore = inject(DiscoverCoachesStore);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
   private readonly _clockService = inject(ClockService);
-  private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
 
   readonly search = injectDiscoverSearch();
@@ -126,9 +126,6 @@ export class Discover implements ViewWillEnter {
   readonly filterSheetOpen = signal(false);
   /** What the sheet last applied — kept so reopening it shows reality. */
   readonly sheetFilters = signal<DiscoverSheetFilters>(NO_SHEET_FILTERS);
-
-  readonly userName = this._authStore.userName;
-  readonly avatarUrl = computed(() => this._authStore.user()?.avatarUrl ?? null);
 
   constructor() {
     addIcons(DISCOVER_ICONS);
@@ -284,9 +281,5 @@ export class Discover implements ViewWillEnter {
 
   openAllCoaches(): void {
     void this._router.navigate(['/tabs/discover/coaches']);
-  }
-
-  openProfile(): void {
-    void this._router.navigateByUrl('/tabs/home/account');
   }
 }

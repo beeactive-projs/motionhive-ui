@@ -1,6 +1,12 @@
 <ion-item-sliding #sliding>
-  <ion-item-options side="start">
-    <ion-item-option color="primary" (click)="emitAndClose(sliding, toggleRead)">
+  <!-- A full swipe commits: read is reversible, so it may. -->
+  <ion-item-options side="start" (ionSwipe)="emitAndClose(sliding, toggleRead)">
+    <ion-item-option
+      color="primary"
+      [expandable]="true"
+      [attr.aria-label]="isUnread() ? 'Mark read' : 'Mark unread'"
+      (click)="emitAndClose(sliding, toggleRead)"
+    >
       <ion-icon slot="icon-only" name="checkmark-done-outline" />
     </ion-item-option>
   </ion-item-options>
@@ -31,13 +37,16 @@
     }
   </ion-item>
 
-  <ion-item-options side="end">
-    <ion-item-option color="medium" (click)="emitAndClose(sliding, dismiss)">
-      Dismiss
-    </ion-item-option>
-    <!-- Not `expandable`: a full swipe must not reach an action you cannot undo. -->
-    <ion-item-option color="danger" (click)="emitAndClose(sliding, remove)">
+  <!-- Dismiss sits at the screen edge and is the one a full swipe commits.
+       Ionic moves the `expandable` option outermost mid-swipe (`order: 1`), so
+       it lives there in the DOM too and never jumps. Delete is never
+       expandable: a full swipe must not reach an action you cannot undo. -->
+  <ion-item-options side="end" (ionSwipe)="emitAndClose(sliding, dismiss)">
+    <ion-item-option color="danger" aria-label="Delete" (click)="emitAndClose(sliding, remove)">
       <ion-icon slot="icon-only" name="trash-outline" />
+    </ion-item-option>
+    <ion-item-option color="medium" [expandable]="true" (click)="emitAndClose(sliding, dismiss)">
+      Dismiss
     </ion-item-option>
   </ion-item-options>
 </ion-item-sliding>

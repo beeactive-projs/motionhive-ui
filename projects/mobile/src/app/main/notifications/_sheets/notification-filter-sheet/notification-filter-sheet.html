@@ -1,0 +1,48 @@
+<ng-template #body>
+  <div class="mh-section-label">Status</div>
+  <div class="chips">
+    <ion-chip
+      [class.selected]="!draft().unreadOnly"
+      [attr.aria-pressed]="!draft().unreadOnly"
+      (click)="setUnreadOnly(false)"
+    >
+      All
+    </ion-chip>
+    <ion-chip
+      [class.selected]="draft().unreadOnly"
+      [attr.aria-pressed]="draft().unreadOnly"
+      (click)="setUnreadOnly(true)"
+    >
+      Unread
+    </ion-chip>
+  </div>
+
+  <div class="mh-section-label">Category</div>
+  <div class="chips">
+    @for (option of categoryOptions; track option.value) {
+      <ion-chip
+        [class.selected]="isPicked(option.value)"
+        [attr.aria-pressed]="isPicked(option.value)"
+        (click)="toggleCategory(option.value)"
+      >
+        {{ option.label }}
+      </ion-chip>
+    }
+  </div>
+
+  <ion-note class="mh-note-block">
+    Pick as many categories as you like. New messages never land here — the
+    Messages tab is that inbox.
+  </ion-note>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Filters"
+  actionLabel="Reset"
+  [actionDisabled]="count() === 0"
+  [saveLabel]="applyLabel()"
+  [body]="body"
+  (action)="reset()"
+  (save)="apply()"
+/>

@@ -1,0 +1,53 @@
+<ng-template #body>
+  @if (preference(); as pref) {
+    <div class="head">
+      <mh-hex-avatar
+        size="lg"
+        tone="wash"
+        aria-hidden="true"
+        [icon]="style()?.icon ?? 'notifications-outline'"
+        [color]="style()?.color ?? 'medium'"
+      />
+      <p class="description">{{ pref.description }}</p>
+    </div>
+
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (row of rows(); track row.key) {
+        <ion-item lines="full">
+          <ion-label class="ion-text-wrap">
+            {{ row.label }}
+            @if (row.note; as note) {
+              <p>{{ note }}</p>
+            }
+          </ion-label>
+          <ion-toggle
+            slot="end"
+            [checked]="row.checked"
+            [disabled]="row.locked || saving()"
+            [attr.aria-label]="row.label + ' for ' + pref.label"
+            (ionChange)="onToggle(row, $event)"
+          />
+        </ion-item>
+      }
+    </ion-list>
+
+    <ion-button
+      class="reset"
+      fill="clear"
+      size="small"
+      [disabled]="resetting() || saving()"
+      (click)="reset.emit()"
+    >
+      Reset this category to default
+    </ion-button>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [showFooter]="false"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+/>

@@ -1,0 +1,10 @@
+<div class="empty">
+  <mh-hex-avatar [name]="heading()" [icon]="icon()" size="xl" color="primary" tone="wash" />
+
+  <h2>{{ heading() }}</h2>
+  <p>{{ message() }}</p>
+
+  <div class="actions">
+    <ion-button expand="block" fill="outline" (click)="action.emit()">{{ actionLabel() }}</ion-button>
+  </div>
+</div>

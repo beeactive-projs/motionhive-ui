@@ -21,7 +21,7 @@
   <ion-header [translucent]="true">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <mh-logo class="ion-margin-end" />
+        <mh-logo />
       </ion-buttons>
       <ion-title class="eyebrow"><span class="mh-kicker">Discover</span></ion-title>
       <ion-buttons slot="end">
@@ -29,9 +29,7 @@
           <ion-icon slot="icon-only" name="search-outline" />
         </ion-button>
         <mh-notification-bell />
-        <ion-button aria-label="Your profile" (click)="openProfile()">
-          <mh-hex-avatar size="sm" [name]="userName()" [imageUrl]="avatarUrl()" />
-        </ion-button>
+        <mh-avatar-button />
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -40,13 +38,11 @@
   <ion-header [translucent]="true">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <mh-logo class="ion-margin-end" />
+        <mh-logo />
       </ion-buttons>
       <ion-buttons slot="end">
         <mh-notification-bell />
-        <ion-button aria-label="Your profile" (click)="openProfile()">
-          <mh-hex-avatar size="sm" [name]="userName()" [imageUrl]="avatarUrl()" />
-        </ion-button>
+        <mh-avatar-button />
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -64,9 +60,9 @@
       <div class="hero">
         <h1>Find your people in the hive</h1>
         <div class="hero-hexes" aria-hidden="true">
-          <mh-hex-avatar size="xs" color="coral" />
+          <mh-hex-avatar size="dot" color="coral" />
           <mh-hex-avatar size="sm" color="primary" />
-          <mh-hex-avatar size="xs" color="teal" />
+          <mh-hex-avatar size="dot" color="teal" />
         </div>
       </div>
       <ion-button class="search-entry" expand="block" (click)="openSearch()">

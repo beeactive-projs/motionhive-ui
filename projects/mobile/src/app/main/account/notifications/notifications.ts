@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton,
   IonButton,
@@ -11,26 +11,36 @@ import {
   IonNote,
   IonSkeletonText,
   IonTitle,
-  IonToggle,
   IonToolbar,
-  ToggleCustomEvent,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
-import { CategoryPreferenceView, NotificationCategory, NotificationService } from 'core';
+import {
+  CategoryPreferenceView,
+  ConfigurableChannelPreferences,
+  NotificationCategory,
+  NotificationService,
+} from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
+import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import {
   CategoryStyle,
   categoryStyle,
 } from '../../../_shared/config/notification-categories.config';
 import { ACCOUNT_ICONS } from '../account.config';
+import {
+  CategoryPreferenceSheet,
+  ChannelChange,
+} from './_sheets/category-preference-sheet/category-preference-sheet';
+import { channelSummary } from './notification-preferences.config';
 
 /**
- * Which categories also send email. In-app is always on — the bell is the inbox.
+ * Which channels each category reaches you on. In-app is always on — the bell
+ * is the inbox — so the page is a list of categories, and a sheet per category
+ * holds the channels the API lets you set (email today, push when it ships).
  *
  * The rows, their labels and their descriptions all come from the server, so a
  * category added there appears here with no code change. Each toggle commits on
@@ -40,8 +50,8 @@ import { ACCOUNT_ICONS } from '../account.config';
 @Component({
   selector: 'mh-account-notifications',
   imports: [
+    CategoryPreferenceSheet,
     EmptyState,
-    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,
@@ -53,8 +63,8 @@ import { ACCOUNT_ICONS } from '../account.config';
     IonNote,
     IonSkeletonText,
     IonTitle,
-    IonToggle,
     IonToolbar,
+    SettingsRow,
   ],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss',
@@ -63,12 +73,29 @@ export class AccountNotifications implements OnInit {
   private readonly _notificationService = inject(NotificationService);
   private readonly _feedbackService = inject(FeedbackService);
 
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
+
   readonly categories = signal<CategoryPreferenceView[]>([]);
   readonly loading = signal(false);
   readonly loadFailed = signal(false);
   readonly resetting = signal(false);
-  /** Categories with a PATCH in flight, so their row can't be double-flipped. */
+  /** Categories with a write in flight, so their toggles can't be double-flipped. */
   readonly pending = signal<ReadonlySet<NotificationCategory>>(new Set());
+
+  /** The category whose sheet is open, if any. */
+  readonly selected = signal<NotificationCategory | null>(null);
+  readonly sheetOpen = signal(false);
+
+  /** Read off the list, so an optimistic flip — or its rollback — reaches the sheet. */
+  readonly selectedPreference = computed(() => {
+    const category = this.selected();
+    return this.categories().find((row) => row.category === category) ?? null;
+  });
+
+  readonly selectedPending = computed(() => {
+    const category = this.selected();
+    return !!category && this.pending().has(category);
+  });
 
   constructor() {
     addIcons(ACCOUNT_ICONS);
@@ -78,9 +105,17 @@ export class AccountNotifications implements OnInit {
     this.load();
   }
 
+  /**
+   * First load shows the skeleton; a reload behind rows already on screen
+   * keeps them, so a per-category reset does not blank the page under the
+   * open sheet.
+   */
   load(): void {
-    this.loading.set(true);
-    this.loadFailed.set(false);
+    const quiet = this.categories().length > 0;
+    if (!quiet) {
+      this.loading.set(true);
+      this.loadFailed.set(false);
+    }
     this._notificationService
       .getSettings()
       .pipe(take(1))
@@ -89,9 +124,13 @@ export class AccountNotifications implements OnInit {
           this.categories.set(categories);
           this.loading.set(false);
         },
-        error: () => {
+        error: (error: unknown) => {
           this.loading.set(false);
-          this.loadFailed.set(true);
+          if (quiet) {
+            void this._feedbackService.error(error, 'Could not refresh your preferences.');
+          } else {
+            this.loadFailed.set(true);
+          }
         },
       });
   }
@@ -100,34 +139,55 @@ export class AccountNotifications implements OnInit {
     return categoryStyle(category);
   }
 
-  /**
-   * Where the always-on copy of this category lands. Everything goes to the
-   * bell except direct messages, which are suppressed there on purpose — the
-   * Messages tab and its badge are that inbox, so claiming "in-app" for them
-   * would point at a screen they never reach.
-   */
-  inAppLabel(category: NotificationCategory): string {
-    return category === NotificationCategory.Messaging ? 'Messages' : 'In-app';
+  summaryFor(row: CategoryPreferenceView): string {
+    return channelSummary(row);
   }
 
-  isPending(category: NotificationCategory): boolean {
-    return this.pending().has(category);
+  openCategory(category: NotificationCategory): void {
+    this.selected.set(category);
+    this.sheetOpen.set(true);
   }
 
-  onToggle(category: NotificationCategory, event: ToggleCustomEvent): void {
-    const email = event.detail.checked;
-    this._setEmail(category, email);
+  onChannelChanged(change: ChannelChange): void {
+    const category = this.selected();
+    const row = this.selectedPreference();
+    if (!category || !row) return;
+
+    const previous = row.channels;
+    const channels = { ...previous, [change.channel]: change.enabled };
+    this._setChannels(category, channels);
     this._markPending(category, true);
 
     this._notificationService
-      .updateSettings({ items: [{ category, channels: { email } }] })
+      .updateSettings({ items: [{ category, channels }] })
       .pipe(take(1))
       .subscribe({
         next: () => this._markPending(category, false),
         error: (error: unknown) => {
           this._markPending(category, false);
-          this._setEmail(category, !email);
+          this._setChannels(category, previous);
           void this._feedbackService.error(error, 'Could not save that preference.');
+        },
+      });
+  }
+
+  resetCategory(): void {
+    const category = this.selected();
+    if (!category || this.resetting()) return;
+    this.resetting.set(true);
+    this._notificationService
+      .resetCategoryToDefault(category)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.resetting.set(false);
+          void this._feedbackService.success('Reset to default');
+          // The response only counts rows; the effective state needs a reload.
+          this.load();
+        },
+        error: (error: unknown) => {
+          this.resetting.set(false);
+          void this._feedbackService.error(error, 'Could not reset this category.');
         },
       });
   }
@@ -151,11 +211,12 @@ export class AccountNotifications implements OnInit {
       });
   }
 
-  private _setEmail(category: NotificationCategory, email: boolean): void {
+  private _setChannels(
+    category: NotificationCategory,
+    channels: ConfigurableChannelPreferences,
+  ): void {
     this.categories.update((categories) =>
-      categories.map((row) =>
-        row.category === category ? { ...row, channels: { ...row.channels, email } } : row,
-      ),
+      categories.map((row) => (row.category === category ? { ...row, channels } : row)),
     );
   }
 

@@ -1,5 +1,16 @@
+/* The divider Ionic will not draw for us: its inset-list stylesheet zeroes the
+   border on `ion-item-sliding:last-of-type ion-item`, and the sliding inside
+   this host is always the last of its type — so `lines="full"` on the item
+   would vanish on every row. Same trick as mh-settings-row, same consequence:
+   keep the list homogeneous (rows only) so `:last-of-type` lands on the last
+   row. */
 :host {
   display: block;
+  border-block-end: 1px solid var(--mh-color-divider);
+}
+
+:host(:last-of-type) {
+  border-block-end: 0;
 }
 
 ion-item {

@@ -1,22 +1,22 @@
 @if (current(); as item) {
-  <div class="banner" role="status">
-    <button type="button" class="body" (click)="open()">
+  <div #banner class="banner" role="status" [class.settling]="settling()">
+    <ion-button class="body" fill="clear" (click)="open()">
       <mh-hex-avatar
+        slot="start"
         size="sm"
         tone="wash"
         aria-hidden="true"
         [icon]="style()?.icon ?? 'notifications-outline'"
         [color]="style()?.color ?? 'medium'"
       />
-
       <span class="text">
         <span class="title">{{ item.title }}</span>
         <span class="detail">{{ item.body }}</span>
       </span>
-    </button>
+    </ion-button>
 
-    <button type="button" class="close" aria-label="Dismiss" (click)="dismiss()">
-      <ion-icon name="close-outline" />
-    </button>
+    <ion-button class="close" fill="clear" shape="round" aria-label="Dismiss" (click)="dismiss()">
+      <ion-icon slot="icon-only" name="close-outline" />
+    </ion-button>
   </div>
 }

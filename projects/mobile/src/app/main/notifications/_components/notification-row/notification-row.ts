@@ -13,7 +13,7 @@ import { BellNotification, formatCalendarShort } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { categoryStyle } from '../../../../_shared/config/notification-categories.config';
-import { routeFor } from '../../deep-link';
+import { routeFor } from '../../../../_shared/config/notification-deep-link';
 
 /**
  * One row of the notification centre.
@@ -22,9 +22,9 @@ import { routeFor } from '../../deep-link';
  * appears only when the notification has somewhere to go on mobile — a row
  * without one still opens, into the detail sheet.
  *
- * Swiping right toggles read (reversible, safe). Swiping left reveals dismiss
- * and delete; only dismiss is reachable by a full swipe, since delete is not
- * undoable.
+ * Swiping right toggles read (reversible, safe), and a full swipe commits it.
+ * Swiping left reveals delete and dismiss; only dismiss is reachable by a full
+ * swipe, since delete is not undoable.
  */
 @Component({
   selector: 'mh-notification-row',

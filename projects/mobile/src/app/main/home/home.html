@@ -6,18 +6,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <mh-logo class="ion-margin-end" />
+      <mh-logo />
 
       @if (canSwitchMode()) {
         <ion-button
           class="role-pill"
           fill="clear"
           shape="round"
-          size="small"
           [attr.aria-label]="'Switch role, currently ' + role().label"
           (click)="openRoleSwitch()"
         >
-          <mh-hex-avatar slot="start" size="xs" color="primary" />
+          <!-- Decorative: the button's label already names the role. -->
+          <mh-hex-avatar slot="start" size="xs" [icon]="role().icon" [color]="role().color" />
           {{ role().label }}
           <ion-icon slot="end" name="chevron-down" aria-hidden="true" />
         </ion-button>
@@ -26,9 +26,7 @@
 
     <ion-buttons slot="end">
       <mh-notification-bell />
-      <ion-button aria-label="Your profile" (click)="openProfile()">
-        <mh-hex-avatar size="sm" [name]="userName()" [imageUrl]="avatarUrl()" />
-      </ion-button>
+      <mh-avatar-button />
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

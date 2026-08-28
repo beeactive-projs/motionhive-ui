@@ -61,7 +61,7 @@
 
   @for (bubble of bubbles(); track bubble.message.id) {
     @if (bubble.startsNewDay) {
-      <div class="day">
+      <div class="day mh-day-pill">
         <span>{{ dayLabel(bubble.dayKey) }}</span>
       </div>
     }

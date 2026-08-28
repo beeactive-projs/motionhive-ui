@@ -61,6 +61,6 @@ export interface ListNotificationsParams {
   page?: number;
   limit?: number;
   unreadOnly?: boolean;
-  /** Narrow to a single category. Omit for everything. */
-  category?: NotificationCategory;
+  /** Narrow to one or more categories. Omit for everything. */
+  categories?: NotificationCategory[];
 }

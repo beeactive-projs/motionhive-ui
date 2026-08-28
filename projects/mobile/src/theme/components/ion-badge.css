@@ -1,0 +1,13 @@
+/* A bare dot: something is waiting inside, no number implied. Ionic sizes
+   badges for text, so an empty one needs its own dimensions — and its own
+   `display`: Ionic hides an empty badge outright (`:host(:empty)`), and only
+   its tab button undoes that. Placement is the host's job — Ionic's own rules
+   inside a tab button, notification-bell.scss on the header bell. */
+ion-badge.dot {
+  display: block;
+  min-width: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border-radius: var(--mh-radius-pill);
+}

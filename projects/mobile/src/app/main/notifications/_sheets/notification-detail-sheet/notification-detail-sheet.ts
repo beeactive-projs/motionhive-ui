@@ -6,7 +6,7 @@ import { BellNotification } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { categoryStyle } from '../../../../_shared/config/notification-categories.config';
-import { webOnlyLabel } from '../../deep-link';
+import { webOnlyLabel } from '../../../../_shared/config/notification-deep-link';
 
 /**
  * What a notification opens into when it has nowhere to go.

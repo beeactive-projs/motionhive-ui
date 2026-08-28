@@ -1,0 +1,25 @@
+/* Chip groups. Wrapping rather than scrolling here — a sheet has the height to
+   spare, and a hidden chip in a filter list is a filter nobody finds. Same
+   treatment as the agenda's filter sheet. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+/* Soft fill when idle, solid navy when picked. Ionic's own chip states —
+   outline, or an 8% tint via `color` — both read as a third weight the design
+   doesn't have, so the fills come from the theme tokens directly. */
+.chips ion-chip {
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  --background: var(--ion-color-medium-wash);
+  --color: var(--ion-color-medium-wash-contrast);
+  border: 1px solid var(--ion-color-medium-wash-contrast);
+}
+
+.chips ion-chip.selected {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-secondary-contrast);
+}

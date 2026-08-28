@@ -13,19 +13,27 @@ export enum NotificationType {
   SessionCancelled = 'SESSION_CANCELLED',
   SessionRescheduled = 'SESSION_RESCHEDULED',
   SessionStatusChanged = 'SESSION_STATUS_CHANGED',
+  SessionFollowUp = 'SESSION_FOLLOW_UP',
   ParticipantJoined = 'PARTICIPANT_JOINED',
   ParticipantLeft = 'PARTICIPANT_LEFT',
   // Coaching
   ClientRequestReceived = 'CLIENT_REQUEST_RECEIVED',
   ClientRequestAccepted = 'CLIENT_REQUEST_ACCEPTED',
+  ClientRequestDeclined = 'CLIENT_REQUEST_DECLINED',
   ClientInvitationReceived = 'CLIENT_INVITATION_RECEIVED',
+  ClientRelationshipEnded = 'CLIENT_RELATIONSHIP_ENDED',
   // Groups
   GroupInvitationReceived = 'GROUP_INVITATION_RECEIVED',
   GroupInvitationAccepted = 'GROUP_INVITATION_ACCEPTED',
+  GroupInvitationDeclined = 'GROUP_INVITATION_DECLINED',
   GroupMemberJoined = 'GROUP_MEMBER_JOINED',
   GroupMemberLeft = 'GROUP_MEMBER_LEFT',
   GroupMemberRemoved = 'GROUP_MEMBER_REMOVED',
+  GroupMemberRoleChanged = 'GROUP_MEMBER_ROLE_CHANGED',
   GroupOwnershipTransferred = 'GROUP_OWNERSHIP_TRANSFERRED',
+  GroupJoinRequestReceived = 'GROUP_JOIN_REQUEST_RECEIVED',
+  GroupJoinRequestApproved = 'GROUP_JOIN_REQUEST_APPROVED',
+  GroupJoinRequestRejected = 'GROUP_JOIN_REQUEST_REJECTED',
   // Payments
   InvoiceCreated = 'INVOICE_CREATED',
   InvoiceDueSoon = 'INVOICE_DUE_SOON',
@@ -38,12 +46,23 @@ export enum NotificationType {
   StripeAccountReady = 'STRIPE_ACCOUNT_READY',
   StripeAccountRestricted = 'STRIPE_ACCOUNT_RESTRICTED',
   DisputeOpened = 'DISPUTE_OPENED',
+  DisputeEvidenceDue = 'DISPUTE_EVIDENCE_DUE',
   RefundIssued = 'REFUND_ISSUED',
+  RefundWindowClosing = 'REFUND_WINDOW_CLOSING',
+  CardExpiringSoon = 'CARD_EXPIRING_SOON',
+  EarningsSummary = 'EARNINGS_SUMMARY',
   // Posts
   PostNewComment = 'POST_NEW_COMMENT',
   PostPendingApproval = 'POST_PENDING_APPROVAL',
   PostApproved = 'POST_APPROVED',
   PostRejected = 'POST_REJECTED',
+  // Messaging
+  MessageReceived = 'MESSAGE_RECEIVED',
+  // Workouts (exercises + programs)
+  ExerciseForked = 'EXERCISE_FORKED',
+  ProgramAssigned = 'PROGRAM_ASSIGNED',
+  ClientCompletedWorkout = 'CLIENT_COMPLETED_WORKOUT',
+  ClientCompletedPlan = 'CLIENT_COMPLETED_PLAN',
 }
 
 /**

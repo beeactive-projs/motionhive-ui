@@ -6,58 +6,52 @@
     <ion-title>Notifications</ion-title>
     <ion-buttons slot="end">
       @if (store.hasUnread()) {
-      <ion-button (click)="markAllRead()">Mark all read</ion-button>
+        <ion-button (click)="markAllRead()">Mark all read</ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
 
   <!--
-    All · Unread · Category. Eight category chips on a rail meant the last few
-    were always off-screen, so the set is behind one trigger that names the
-    active choice and carries its tint — the list never looks unfiltered when
-    it is not.
+    Filters · All · Unread. The button opens the filter sheet — the same
+    shell as the agenda's — and the two chips beside it are the sheet's
+    Status section within reach. A category never shows in the strip: the
+    count on the button says how much is on, and the line under a filtered
+    list says what.
   -->
   @if (!isEmpty() || hasFilter()) {
-    <ion-toolbar>
-      <div class="filters">
-        <ion-chip [outline]="hasFilter()" [class.on]="!hasFilter()" (click)="showAll()">
+    <ion-toolbar class="filter-bar">
+      <div class="mh-chip-row" role="group" aria-label="Filter notifications">
+        <ion-button
+          class="filters"
+          fill="clear"
+          shape="round"
+          size="small"
+          aria-haspopup="dialog"
+          [class.active]="filterCount() > 0"
+          (click)="openFilters()"
+        >
+          <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
+          Filters@if (filterCount() > 0) { · {{ filterCount() }} }
+        </ion-button>
+
+        <ion-chip
+          [class.selected]="!store.unreadOnly()"
+          [attr.aria-pressed]="!store.unreadOnly()"
+          (click)="setUnreadOnly(false)"
+        >
           All
         </ion-chip>
 
         <ion-chip
-          [outline]="!store.unreadOnly()"
-          [class.on]="store.unreadOnly()"
-          (click)="showUnread()"
+          [class.selected]="store.unreadOnly()"
+          [attr.aria-pressed]="store.unreadOnly()"
+          (click)="setUnreadOnly(true)"
         >
           Unread
           @if (store.unreadCount(); as count) {
             <span class="count">{{ count }}</span>
           }
         </ion-chip>
-
-        @if (activeCategoryStyle(); as active) {
-          <ion-chip
-            class="category on"
-            [style.--mh-chip-on-background]="'var(--ion-color-' + active.color + '-wash)'"
-            [style.--mh-chip-on-color]="'var(--ion-color-' + active.color + '-wash-contrast)'"
-          >
-            <ion-icon [name]="active.icon" aria-hidden="true" (click)="openCategoryPicker($event)" />
-            <span (click)="openCategoryPicker($event)">{{ active.label }}</span>
-            <!-- The clear is its own target: tapping the label reopens the
-                 picker to switch, tapping the x drops the filter. -->
-            <ion-icon
-              name="close"
-              role="button"
-              aria-label="Clear category filter"
-              (click)="clearCategory()"
-            />
-          </ion-chip>
-        } @else {
-          <ion-chip [outline]="true" (click)="openCategoryPicker($event)">
-            Category
-            <ion-icon name="chevron-down" aria-hidden="true" />
-          </ion-chip>
-        }
       </div>
     </ion-toolbar>
   }
@@ -69,115 +63,93 @@
   </ion-refresher>
 
   @if (showLoadError()) {
-  <mh-empty-state
-    icon="alert-circle-outline"
-    heading="Couldn't load notifications"
-    message="Check your connection and try again."
-    actionLabel="Try again"
-    (action)="retry()"
-  />
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load notifications"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
   } @else if (showSkeleton()) {
-  <!-- Same geometry as a real row — tile, title, body, time — so content
-         swaps in without shifting anything. -->
-  <ion-list>
-    @for (_ of skeletonRows; track $index) {
-    <ion-item lines="none">
-      <ion-skeleton-text slot="start" [animated]="true" style="width: 2.125rem; height: 2.375rem" />
-      <ion-label>
-        <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
-        <p><ion-skeleton-text [animated]="true" style="width: 80%" /></p>
-      </ion-label>
-    </ion-item>
-    }
-  </ion-list>
-  } @else if (isEmpty()) { @if (hasFilter()) {
-  <mh-empty-state
-    icon="checkmark-done-outline"
-    [heading]="
-      activeCategoryStyle() ? 'Nothing in ' + activeCategoryStyle()!.label : 'All caught up'
-    "
-    message="Nothing to show with this filter on."
-    actionLabel="Clear filter"
-    actionFill="outline"
-    (action)="showAll()"
-  />
+    <!-- One day card's worth of rows in the real geometry — pill, tile, title,
+         time stub, body — so content lands without shifting anything. -->
+    <div class="mh-page skeleton">
+      <section class="mh-section">
+        <div class="mh-day-pill">
+          <span><ion-skeleton-text [animated]="true" style="width: 3.5rem; height: 0.625rem" /></span>
+        </div>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (_ of skeletonRows; track $index) {
+            <ion-item lines="full">
+              <ion-skeleton-text slot="start" [animated]="true" style="width: 1.875rem; height: 1.625rem" />
+              <ion-label>
+                <div class="head">
+                  <ion-skeleton-text [animated]="true" style="width: 55%; height: 0.875rem" />
+                  <ion-skeleton-text [animated]="true" style="width: 2.5rem; height: 0.75rem" />
+                </div>
+                <p><ion-skeleton-text [animated]="true" style="width: 85%" /></p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      </section>
+    </div>
+  } @else if (isEmpty()) {
+    <mh-notifications-empty
+      [filtered]="hasFilter()"
+      [filterLabel]="categoryLabel()"
+      (action)="onEmptyAction()"
+    />
   } @else {
-  <mh-empty-state
-    icon="notifications-outline"
-    heading="Nothing here yet"
-    message="Session reminders, new signups, messages and payments will show up here as they happen."
-    actionLabel="Notification settings"
-    actionFill="outline"
-    (action)="openSettings()"
-  />
-  } } @else { @if (days().length > 0) { @for (day of days(); track day.key) {
-  <div class="mh-section-label">{{ day.label }}</div>
-  <ion-list>
-    @for (item of day.items; track item.id) {
-    <mh-notification-row
-      [notification]="item"
-      (select)="open(item)"
-      (toggleRead)="toggleRead(item)"
-      (dismiss)="dismiss(item)"
-      (remove)="remove(item)"
-    />
-    }
-  </ion-list>
-  } } @else {
-  <ion-list>
-    @for (item of store.notifications(); track item.id) {
-    <mh-notification-row
-      [notification]="item"
-      (select)="open(item)"
-      (toggleRead)="toggleRead(item)"
-      (dismiss)="dismiss(item)"
-      (remove)="remove(item)"
-    />
-    }
-  </ion-list>
-  }
+    <div class="mh-page">
+      @if (days().length > 0) {
+        @for (day of days(); track day.key) {
+          <section class="mh-section">
+            <div class="mh-day-pill"><span>{{ day.label }}</span></div>
+            <ion-list [inset]="true" class="mh-card-list">
+              @for (item of day.items; track item.id) {
+                <mh-notification-row
+                  [notification]="item"
+                  (select)="open(item)"
+                  (toggleRead)="toggleRead(item)"
+                  (dismiss)="dismiss(item)"
+                  (remove)="remove(item)"
+                />
+              }
+            </ion-list>
+          </section>
+        }
+      } @else {
+        <!-- A category filter drops the day dividers (see `days`), so the
+             whole list is one card and the line under it says how much of
+             the categories this is. -->
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (item of store.notifications(); track item.id) {
+            <mh-notification-row
+              [notification]="item"
+              (select)="open(item)"
+              (toggleRead)="toggleRead(item)"
+              (dismiss)="dismiss(item)"
+              (remove)="remove(item)"
+            />
+          }
+        </ion-list>
 
-  <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
-    <ion-infinite-scroll-content />
-  </ion-infinite-scroll>
+        @if (filterSummary(); as summary) {
+          <div class="filter-summary">
+            <span>{{ summary }}</span>
+            <span aria-hidden="true">·</span>
+            <ion-button fill="clear" size="small" (click)="clearCategories()">Clear filter</ion-button>
+          </div>
+        }
+      }
+
+      <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+        <ion-infinite-scroll-content />
+      </ion-infinite-scroll>
+    </div>
   }
 </ion-content>
-
-<!-- Anchored to the chip that opened it, so it reads as that chip's menu. -->
-<ion-popover
-  [isOpen]="categoryPickerOpen()"
-  [event]="categoryPickerEvent()"
-  cssClass="mh-select-popover"
-  [dismissOnSelect]="true"
-  (didDismiss)="categoryPickerOpen.set(false)"
->
-  <ng-template>
-    <ion-list [lines]="'none'">
-      <ion-item button detail="false" (click)="pickCategory(null)">
-        <ion-label>All categories</ion-label>
-        @if (!store.category()) {
-          <ion-icon slot="end" name="checkmark-outline" color="primary" />
-        }
-      </ion-item>
-      @for (category of categories; track category.value) {
-        <ion-item button detail="false" (click)="pickCategory(category.value)">
-          <mh-hex-avatar
-            slot="start"
-            size="sm"
-            tone="wash"
-            aria-hidden="true"
-            [icon]="category.icon"
-            [color]="category.color"
-          />
-          <ion-label>{{ category.label }}</ion-label>
-          @if (store.category() === category.value) {
-            <ion-icon slot="end" name="checkmark-outline" color="primary" />
-          }
-        </ion-item>
-      }
-    </ion-list>
-  </ng-template>
-</ion-popover>
 
 <mh-notification-detail-sheet
   [(open)]="detailOpen"
@@ -185,3 +157,5 @@
   (toggleRead)="toggleReadFromDetail()"
   (remove)="removeFromDetail()"
 />
+
+<mh-notification-filter-sheet [(open)]="filterOpen" [filters]="filters()" (applied)="onFiltersApplied($event)" />

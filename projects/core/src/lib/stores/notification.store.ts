@@ -49,7 +49,7 @@ export class NotificationStore {
   readonly pageSize = 20;
 
   private readonly unreadOnlySignal = signal(false);
-  private readonly categorySignal = signal<NotificationCategory | null>(null);
+  private readonly categoriesSignal = signal<NotificationCategory[]>([]);
 
   // ─── Public readonly surface ──────────────────────────────────
   readonly unreadCount = this.unreadCountSignal.asReadonly();
@@ -69,13 +69,13 @@ export class NotificationStore {
   readonly hasMore = computed(() => this.notifications().length < this.total());
 
   readonly unreadOnly = this.unreadOnlySignal.asReadonly();
-  readonly category = this.categorySignal.asReadonly();
+  readonly categories = this.categoriesSignal.asReadonly();
 
   /** The filter both `loadList` and `loadMore` send. */
   private activeFilter() {
     return {
       ...(this.unreadOnlySignal() ? { unreadOnly: true } : {}),
-      ...(this.categorySignal() ? { category: this.categorySignal()! } : {}),
+      ...(this.categoriesSignal().length > 0 ? { categories: this.categoriesSignal() } : {}),
     };
   }
 
@@ -171,7 +171,8 @@ export class NotificationStore {
     opts: {
       markViewedAfter?: boolean;
       unreadOnly?: boolean;
-      category?: NotificationCategory | null;
+      /** Any of these; an empty list is every category. */
+      categories?: NotificationCategory[];
       /** Fires on success or failure — for pull-to-refresh spinners. */
       done?: () => void;
     } = {},
@@ -179,7 +180,7 @@ export class NotificationStore {
     // Held on the store, not passed per call, so `loadMore` pages within the
     // same filter instead of appending unfiltered rows underneath.
     if (opts.unreadOnly !== undefined) this.unreadOnlySignal.set(opts.unreadOnly);
-    if (opts.category !== undefined) this.categorySignal.set(opts.category);
+    if (opts.categories !== undefined) this.categoriesSignal.set(opts.categories);
 
     this.loadingSignal.set(true);
     this.loadFailedSignal.set(false);

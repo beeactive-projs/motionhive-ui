@@ -91,3 +91,23 @@ h1 {
   font-size: var(--mh-text-sm);
   line-height: var(--mh-leading-body);
 }
+
+/* The centred date pill over a day's group of rows — the chat transcript's
+   divider promoted to a role so the notification feed reads the same.
+   Margin-free: the page (or an `.mh-section` gap) places it. Sentence case:
+   `dayDividerLabel` output renders as-is — never pair it with a transform. */
+.mh-day-pill {
+  display: flex;
+  justify-content: center;
+}
+
+.mh-day-pill > span {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-divider);
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+}
