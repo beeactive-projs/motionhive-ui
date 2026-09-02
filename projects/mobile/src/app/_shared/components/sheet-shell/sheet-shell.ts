@@ -9,7 +9,6 @@ import {
   IonIcon,
   IonModal,
   IonSpinner,
-  IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -44,7 +43,6 @@ import { close } from 'ionicons/icons';
     IonIcon,
     IonModal,
     IonSpinner,
-    IonTitle,
     IonToolbar,
     NgTemplateOutlet,
   ],

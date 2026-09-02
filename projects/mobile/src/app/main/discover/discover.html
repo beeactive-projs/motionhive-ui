@@ -1,5 +1,5 @@
 @if (searchOpen()) {
-  <!-- Search owns the toolbar: the brand header yields entirely, exactly the
+  <!-- Search owns the toolbar: the page header yields entirely, exactly the
        Messages pattern. -->
   <ion-header [translucent]="true">
     <ion-toolbar>
@@ -15,15 +15,10 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-} @else if (scrolled()) {
-  <!-- 5k: the hero scrolled away, so the compact bar picks up the search
-       icon — search is never duplicated and never further than one tap. -->
+} @else {
   <ion-header [translucent]="true">
     <ion-toolbar>
-      <ion-buttons slot="start">
-        <mh-logo />
-      </ion-buttons>
-      <ion-title class="eyebrow"><span class="mh-kicker">Discover</span></ion-title>
+      <ion-title>Discover</ion-title>
       <ion-buttons slot="end">
         <ion-button aria-label="Search coaches and sessions" (click)="openSearch()">
           <ion-icon slot="icon-only" name="search-outline" />
@@ -33,30 +28,17 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-} @else {
-  <!-- Root chrome. At rest the hero owns search, so no icon up top. -->
-  <ion-header [translucent]="true">
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <mh-logo />
-      </ion-buttons>
-      <ion-buttons slot="end">
-        <mh-notification-bell />
-        <mh-avatar-button />
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
 }
 
-<ion-content [fullscreen]="true" [scrollEvents]="!searchOpen()" (ionScroll)="onScroll($event)">
+<ion-content [fullscreen]="true">
   @if (!searchOpen()) {
     <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
       <ion-refresher-content />
     </ion-refresher>
 
-    <!-- Brand hero — scrolls away with the content. -->
+    <!-- Brand hero — scrolls away with the content; the page name stays
+         in the toolbar like every other tab root. -->
     <div class="lead">
-      <span class="mh-kicker eyebrow">Discover</span>
       <div class="hero">
         <h1>Find your people in the hive</h1>
         <div class="hero-hexes" aria-hidden="true">

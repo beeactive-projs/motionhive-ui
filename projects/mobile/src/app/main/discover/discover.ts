@@ -19,7 +19,6 @@ import {
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
-  ScrollCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -36,7 +35,6 @@ import {
 import { AvatarButton } from '../../_shared/components/avatar-button/avatar-button';
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
-import { Logo } from '../../_shared/components/logo/logo';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ClockService } from '../../_shared/services/clock.service';
@@ -57,13 +55,6 @@ import {
   quickFilterSelected,
 } from './discover.config';
 import { DiscoverCoachesStore } from './discover.store';
-
-/**
- * Where the hero and its search field finish scrolling out — past this the
- * toolbar swaps to the compact bar that carries the search icon, so search
- * is never duplicated and never further than one tap.
- */
-const SCROLL_COLLAPSE_PX = 120;
 
 /**
  * Discover — the trainee's front door to the catalogue: brand hero, one
@@ -100,7 +91,6 @@ const SCROLL_COLLAPSE_PX = 120;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
-    Logo,
     NotificationBell,
     SessionRowSkeleton,
   ],
@@ -122,7 +112,6 @@ export class Discover implements ViewWillEnter {
   readonly railSkeleton = [1, 2, 3, 4];
 
   readonly searchOpen = signal(false);
-  readonly scrolled = signal(false);
   readonly filterSheetOpen = signal(false);
   /** What the sheet last applied — kept so reopening it shows reality. */
   readonly sheetFilters = signal<DiscoverSheetFilters>(NO_SHEET_FILTERS);
@@ -249,12 +238,6 @@ export class Discover implements ViewWillEnter {
 
   clearSearch(): void {
     this.search.clear();
-  }
-
-  // ─── Chrome ───────────────────────────────────────────────────────────────
-
-  onScroll(event: ScrollCustomEvent): void {
-    this.scrolled.set(event.detail.scrollTop > SCROLL_COLLAPSE_PX);
   }
 
   // ─── Loading / navigation ─────────────────────────────────────────────────
