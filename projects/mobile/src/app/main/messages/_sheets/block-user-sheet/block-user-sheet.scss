@@ -1,0 +1,11 @@
+/* Same full-bleed rows as the other action sheets — the list is the sheet's
+   own surface, and the shell's `flushBody` is the other half of this. */
+ion-list {
+  margin-inline: calc(var(--ion-padding, 16px) * -1);
+}
+
+/* Every row here commits a block, so all of them carry the destructive red. */
+ion-item ion-label {
+  color: var(--ion-color-danger);
+  font-weight: 600;
+}

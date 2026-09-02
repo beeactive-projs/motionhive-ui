@@ -2,7 +2,6 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  ActionSheetController,
   IonBackButton,
   IonButtons,
   IonContent,
@@ -17,8 +16,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { BLOCK_REASONS, MessagingStore, UserBlockReason, displayName } from 'core';
+import { MessagingStore, UserBlockReason, displayName } from 'core';
 
+import { BlockUserSheet } from '../_sheets/block-user-sheet/block-user-sheet';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
@@ -33,6 +33,7 @@ import { MESSAGING_ICONS } from '../messages.config';
 @Component({
   selector: 'mh-chat-details',
   imports: [
+    BlockUserSheet,
     HexAvatar,
     IonBackButton,
     IonButtons,
@@ -54,12 +55,12 @@ export class ChatDetails {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _actionSheetController = inject(ActionSheetController);
   private readonly _feedbackService = inject(FeedbackService);
   readonly store = inject(MessagingStore);
 
   readonly conversationId = signal<string | null>(null);
   readonly muting = signal(false);
+  readonly blockOpen = signal(false);
 
   readonly conversation = computed(() => {
     const id = this.conversationId();
@@ -117,31 +118,14 @@ export class ChatDetails {
 
   /** The reason is optional moderation metadata on the BE; the sheet collects it
    *  and the confirmation in one step. */
-  async confirmBlock(): Promise<void> {
+  async block(reason: UserBlockReason): Promise<void> {
     const conversation = this.conversation();
     const blockedId = this.otherUser()?.id;
     if (!conversation || !blockedId) return;
 
-    const sheet = await this._actionSheetController.create({
-      header: `Block ${this.name()}?`,
-      subHeader: 'They will not be able to message you, and you will not see this conversation.',
-      buttons: [
-        ...BLOCK_REASONS.map((reason) => ({
-          text: reason.label,
-          role: 'destructive',
-          data: reason.value,
-        })),
-        { text: 'Cancel', role: 'cancel' },
-      ],
-    });
-
-    await sheet.present();
-    const { data, role } = await sheet.onDidDismiss<UserBlockReason>();
-    if (role === 'cancel' || !data) return;
-
     const ok = await this.store.blockUser({
       blockedId,
-      reason: data,
+      reason,
       conversationId: conversation.id,
     });
 

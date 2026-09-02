@@ -1,5 +1,10 @@
 <ion-tabs>
-  <ion-tab-bar slot="bottom" [selectedTab]="activeTabId()" [class.ion-hide]="hideTabBar()">
+  <ion-tab-bar
+    slot="bottom"
+    [selectedTab]="activeTabId()"
+    [class.ion-hide]="hideTabBar()"
+    (ionTabButtonClick)="onTabButtonClick($event)"
+  >
     @for (tab of tabs(); track tab.id) {
       <ion-tab-button [tab]="tab.id">
         <ion-icon [name]="tab.icon" aria-hidden="true" />
@@ -15,8 +20,8 @@
     <!-- A real tab, Messenger-style: the menu is a page with its own stack,
          and the button lights up while you are in it. -->
     <ion-tab-button tab="more">
-      <ion-icon name="ellipsis-horizontal" aria-hidden="true" />
-      <ion-label>More</ion-label>
+      <ion-icon name="menu-outline" aria-hidden="true" />
+      <ion-label>Menu</ion-label>
       <!-- A dot, not a count: it only has to say "something is in here". -->
       @if (hasBillDue() || hasPendingRequests()) {
         <ion-badge color="danger" class="dot" [attr.aria-label]="moreDotLabel()"></ion-badge>

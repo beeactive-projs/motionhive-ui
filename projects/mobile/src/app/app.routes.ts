@@ -107,6 +107,24 @@ export const routes: Routes = [
         path: 'workouts',
         loadComponent: () => import('./main/workouts/workouts').then((m) => m.Workouts),
       },
+      // More-menu destinations mirroring web's nav: Groups is shared, while
+      // Programs and Exercises are coaching workspace pages. Top-level like
+      // `workouts` — nesting them under `coach` would keep the Sessions tab
+      // lit on screens that are not sessions.
+      {
+        path: 'groups',
+        loadComponent: () => import('./main/groups/groups').then((m) => m.Groups),
+      },
+      {
+        path: 'programs',
+        canActivate: [coachGuard],
+        loadComponent: () => import('./main/programs/programs').then((m) => m.Programs),
+      },
+      {
+        path: 'exercises',
+        canActivate: [coachGuard],
+        loadComponent: () => import('./main/exercises/exercises').then((m) => m.Exercises),
+      },
       {
         path: 'discover',
         loadChildren: () =>

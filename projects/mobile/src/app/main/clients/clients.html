@@ -1,81 +1,67 @@
 @if (searchOpen()) {
-  <!-- Search owns the toolbar: a title, three actions, a segment and a chip
+<!-- Search owns the toolbar: a title, three actions, a segment and a chip
        row do not fit above the fold on a phone. Same as the inbox. -->
-  <ion-header [translucent]="true">
-    <ion-toolbar>
-      <ion-searchbar
-        placeholder="Search clients"
-        inputmode="search"
-        [debounce]="0"
-        [value]="store.query()"
-        (ionInput)="onQuery($event.detail.value ?? '')"
-      />
-      <ion-buttons slot="end">
-        <ion-button (click)="closeSearch()">Cancel</ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search clients" inputmode="search" [debounce]="0" [value]="store.query()"
+      (ionInput)="onQuery($event.detail.value ?? '')" />
+    <ion-buttons slot="end">
+      <ion-button (click)="closeSearch()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 } @else {
-  <ion-header [translucent]="true">
-    <ion-toolbar>
-      <ion-title>Clients</ion-title>
-      <ion-buttons slot="end">
-        <mh-notification-bell class="round" />
-        @if (!isAttention()) {
-          <ion-button shape="round" aria-label="Search clients" (click)="openSearch()">
-            <ion-icon slot="icon-only" name="search-outline" />
-          </ion-button>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Clients</ion-title>
+    <ion-buttons slot="end">
+      <mh-notification-bell class="round" />
+      <ion-button shape="round" aria-label="Search clients" (click)="openSearch()">
+        <ion-icon slot="icon-only" name="search-outline" />
+      </ion-button>
+      <!-- A dot, not a count: it only has to say "something is waiting". -->
+      <ion-button shape="round" routerLink="/tabs/clients/requests" [attr.aria-label]="requestsLabel()">
+        <ion-icon slot="icon-only" name="hourglass-outline" />
+        @if (store.hasPendingRequests()) {
+        <ion-badge color="danger" class="dot" aria-hidden="true"></ion-badge>
         }
-        <!-- A dot, not a count: it only has to say "something is waiting". -->
-        <ion-button
-          shape="round"
-          routerLink="/tabs/clients/requests"
-          [attr.aria-label]="requestsLabel()"
-        >
-          <ion-icon slot="icon-only" name="hourglass-outline" />
-          @if (store.hasPendingRequests()) {
-            <ion-badge color="danger" class="dot" aria-hidden="true"></ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  @if (store.showChrome()) {
+  <ion-toolbar>
+    <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
+      <ion-segment-button [value]="Segments.Attention">
+        <ion-label>
+          Needs attention
+          @if (store.attentionCount() > 0) {
+          <ion-badge color="danger" class="count">{{ store.attentionCount() }}</ion-badge>
           }
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Segments.All">
+        <ion-label>{{ store.allCountLabel() }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 
-    @if (store.showChrome()) {
-      <ion-toolbar>
-        <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
-          <ion-segment-button [value]="Segments.Attention">
-            <ion-label>
-              Needs attention
-              @if (store.attentionCount() > 0) {
-                <ion-badge color="danger" class="count">{{ store.attentionCount() }}</ion-badge>
-              }
-            </ion-label>
-          </ion-segment-button>
-          <ion-segment-button [value]="Segments.All">
-            <ion-label>{{ store.allCountLabel() }}</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </ion-toolbar>
-
-      @if (!isAttention()) {
-        <ion-toolbar>
-          <!-- Scrolls sideways rather than wrapping: a second chip row would
+  @if (!isAttention()) {
+  <ion-toolbar>
+    <!-- Scrolls sideways rather than wrapping: a second chip row would
                push the first client below the fold. -->
-          <div class="mh-chip-row">
-            @for (option of filters; track option.id) {
-              <ion-chip
-                [class.selected]="store.filter() === option.id"
-                [attr.aria-pressed]="store.filter() === option.id"
-                (click)="setFilter(option.id)"
-              >
-                {{ option.label }}
-              </ion-chip>
-            }
-          </div>
-        </ion-toolbar>
+    <div class="mh-chip-row">
+      @for (option of filters; track option.id) {
+      <ion-chip [class.selected]="store.filter() === option.id" [attr.aria-pressed]="store.filter() === option.id"
+        (click)="setFilter(option.id)">
+        {{ option.label }}
+      </ion-chip>
       }
-    }
-  </ion-header>
+    </div>
+  </ion-toolbar>
+  }
+  }
+</ion-header>
 }
 
 <ion-content [fullscreen]="true">
@@ -84,140 +70,113 @@
   </ion-refresher>
 
   @if (store.showLoadError()) {
-    <mh-empty-state
-      icon="alert-circle-outline"
-      heading="Couldn't load your clients"
-      message="Check your connection and try again."
-      actionLabel="Try again"
-      (action)="retry()"
-    />
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load your clients"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
   } @else if (store.showSkeleton()) {
-    <!-- Mirrors the row shape so nothing shifts when data lands. -->
-    <div class="mh-page">
-      @if (isAttention()) {
-        <div class="mh-section-head">
-          <span class="mh-kicker">
-            <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
-          </span>
-        </div>
-        @for (_ of skeletonRows; track $index) {
-          <ion-item lines="none" class="row-skeleton mh-list-row">
-            <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-            <ion-label>
-              <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-              <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-            </ion-label>
-          </ion-item>
-        }
-      } @else {
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (_ of skeletonRows; track $index; let last = $last) {
-            <ion-item [lines]="last ? 'none' : 'full'">
-              <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
-              <ion-label>
-                <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
-                <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
-              </ion-label>
-            </ion-item>
-          }
-        </ion-list>
-      }
+  <!-- Mirrors the row shape so nothing shifts when data lands. -->
+  <div class="mh-page">
+    @if (isAttention()) {
+    <div class="mh-section-head">
+      <span class="mh-kicker">
+        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
+      </span>
     </div>
-  } @else if (store.isEmpty()) {
-    <mh-clients-empty (invite)="openInvite()" />
-  } @else if (isAttention()) {
-    <div class="mh-page">
-      @if (store.triageEmpty()) {
-        <mh-empty-state
-          icon="people-outline"
-          heading="No active clients yet"
-          message="Once someone accepts your invitation, their week shows up here."
-          actionLabel="See all clients"
-          actionFill="outline"
-          (action)="showAll()"
-        />
-      } @else {
-        @if (store.allClear()) {
-          <!-- A status, so the success wash — never honey. The on-track
-               list stays below so the screen never feels dead. -->
-          <div class="all-clear">
-            <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
-            <div>
-              <strong>Everyone is on track</strong>
-              <span>No one needs a nudge this week.</span>
-            </div>
-          </div>
-        } @else {
-          <section class="mh-section">
-            <div class="mh-section-head warm">
-              <span class="mh-kicker">This week</span>
-              <ion-note>{{ triageNote() }}</ion-note>
-            </div>
-            <div>
-              @for (client of store.attentionClients(); track client.clientId) {
-                <mh-attention-row [client]="client" (select)="openRoster(client)" />
-              }
-            </div>
-          </section>
-        }
-
-        @if (store.onTrackClients().length > 0) {
-          <section class="mh-section">
-            <div class="mh-section-head">
-              <span class="mh-kicker">On track</span>
-              <ion-note>{{ onTrackNote() }}</ion-note>
-            </div>
-            <ion-list [inset]="true" class="mh-card-list">
-              @for (client of store.onTrackClients(); track client.clientId) {
-                <mh-on-track-row [client]="client" (select)="openRoster(client)" />
-              }
-            </ion-list>
-          </section>
-        }
-      }
-    </div>
-  } @else {
-    @if (store.isFilteredEmpty()) {
-      @if (store.query()) {
-        <mh-empty-state
-          icon="people-outline"
-          heading="Nothing matches"
-          message="Only clients loaded so far are searched. Scroll to load more, or try another name."
-          actionLabel="Clear"
-          actionFill="outline"
-          (action)="clearFilters()"
-        />
-      } @else {
-        <mh-empty-state
-          icon="people-outline"
-          heading="Nothing here"
-          message="No clients with this status. Try another filter."
-          actionLabel="Show all"
-          actionFill="outline"
-          (action)="clearFilters()"
-        />
-      }
-    } @else {
-      <div class="mh-page">
-        <ion-list [inset]="true" class="mh-card-list">
-          @for (client of store.visibleClients(); track client.id) {
-            <mh-client-row
-              [client]="client"
-              (select)="open(client)"
-              (message)="message(client)"
-              (notes)="openNotes(client)"
-              (archive)="confirmArchive(client)"
-              (unarchive)="unarchive(client)"
-              (withdraw)="confirmWithdraw(client)"
-            />
-          }
-        </ion-list>
-      </div>
-
-      <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
-        <ion-infinite-scroll-content />
-      </ion-infinite-scroll>
+    @for (_ of skeletonRows; track $index) {
+    <ion-item lines="none" class="row-skeleton mh-list-row">
+      <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+      <ion-label>
+        <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+        <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+      </ion-label>
+    </ion-item>
     }
+    } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    }
+  </div>
+  } @else if (store.isEmpty()) {
+  <mh-clients-empty (invite)="openInvite()" />
+  } @else if (isAttention()) {
+  <div class="mh-page">
+    @if (store.triageEmpty()) {
+    <mh-empty-state icon="people-outline" heading="No active clients yet"
+      message="Once someone accepts your invitation, their week shows up here." actionLabel="See all clients"
+      actionFill="outline" (action)="showAll()" />
+    } @else {
+    @if (store.allClear()) {
+    <!-- A status, so the success wash — never honey. The on-track
+               list stays below so the screen never feels dead. -->
+    <div class="all-clear">
+      <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
+      <div>
+        <strong>Everyone is on track</strong>
+        <span>No one needs a nudge this week.</span>
+      </div>
+    </div>
+    } @else {
+    <section class="mh-section">
+      <div class="mh-section-head warm">
+        <span class="mh-kicker">This week</span>
+        <ion-note>{{ triageNote() }}</ion-note>
+      </div>
+      <div>
+        @for (client of store.attentionClients(); track client.clientId) {
+        <mh-attention-row [client]="client" (select)="openRoster(client)" />
+        }
+      </div>
+    </section>
+    }
+
+    @if (store.onTrackClients().length > 0) {
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <span class="mh-kicker">On track</span>
+        <ion-note>{{ onTrackNote() }}</ion-note>
+      </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (client of store.onTrackClients(); track client.clientId) {
+        <mh-on-track-row [client]="client" (select)="openRoster(client)" />
+        }
+      </ion-list>
+    </section>
+    }
+    }
+  </div>
+  } @else {
+  @if (store.isFilteredEmpty()) {
+  @if (store.query()) {
+  <mh-empty-state icon="people-outline" heading="Nothing matches"
+    message="Only clients loaded so far are searched. Scroll to load more, or try another name." actionLabel="Clear"
+    actionFill="outline" (action)="clearFilters()" />
+  } @else {
+  <mh-empty-state icon="people-outline" heading="Nothing here"
+    message="No clients with this status. Try another filter." actionLabel="Show all" actionFill="outline"
+    (action)="clearFilters()" />
+  }
+  } @else {
+  <div class="mh-page">
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (client of store.visibleClients(); track client.id) {
+      <mh-client-row [client]="client" (select)="open(client)" (message)="message(client)" (notes)="openNotes(client)"
+        (archive)="confirmArchive(client)" (unarchive)="unarchive(client)" (withdraw)="confirmWithdraw(client)" />
+      }
+    </ion-list>
+  </div>
+
+  <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
+  }
   }
 
   <!-- Always on the root, whatever the segment: inviting is the one action
@@ -231,31 +190,12 @@
 
 <mh-invite-client-sheet [(open)]="inviteOpen" (sent)="store.onInviteSent()" />
 
-<mh-client-notes-sheet
-  [(open)]="notesOpen"
-  [client]="notesClient()"
-  [saving]="notesSaving()"
-  (save)="saveNotes($event)"
-/>
+<mh-client-notes-sheet [(open)]="notesOpen" [client]="notesClient()" [saving]="notesSaving()"
+  (save)="saveNotes($event)" />
 
-<mh-confirm-sheet
-  [(open)]="archiveOpen"
-  [title]="archiveTitle()"
+<mh-confirm-sheet [(open)]="archiveOpen" [title]="archiveTitle()"
   body="They keep their account and history, and you can unarchive them later. They will not be told."
-  confirmLabel="Archive client"
-  cancelLabel="Keep"
-  tone="danger"
-  [saving]="archiveSaving()"
-  (confirm)="archive()"
-/>
+  confirmLabel="Archive client" cancelLabel="Keep" tone="danger" [saving]="archiveSaving()" (confirm)="archive()" />
 
-<mh-confirm-sheet
-  [(open)]="withdrawOpen"
-  title="Withdraw this invitation?"
-  [body]="withdrawBody()"
-  confirmLabel="Withdraw"
-  cancelLabel="Keep it"
-  tone="danger"
-  [saving]="withdrawSaving()"
-  (confirm)="withdraw()"
-/>
+<mh-confirm-sheet [(open)]="withdrawOpen" title="Withdraw this invitation?" [body]="withdrawBody()"
+  confirmLabel="Withdraw" cancelLabel="Keep it" tone="danger" [saving]="withdrawSaving()" (confirm)="withdraw()" />

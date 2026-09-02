@@ -1,3 +1,9 @@
+/* Ionic pads the searchbar for a toolbar; inside a padded sheet body the
+   field should span like the outline inputs do. */
+ion-searchbar {
+  padding-inline: 0;
+}
+
 /* Handle under a person's name. */
 .handle {
   font-family: var(--mh-font-mono);

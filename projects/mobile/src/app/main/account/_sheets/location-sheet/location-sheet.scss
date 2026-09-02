@@ -1,3 +1,9 @@
+// Ionic pads the searchbar for a toolbar; inside a padded sheet body the
+// field should span like the outline inputs do.
+ion-searchbar {
+  padding-inline: 0;
+}
+
 .searching {
   display: flex;
   justify-content: center;

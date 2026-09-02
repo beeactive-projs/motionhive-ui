@@ -8,6 +8,7 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
+  NavController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { filter, map } from 'rxjs';
@@ -37,10 +38,10 @@ import { MoreBadgesService } from '../../_shared/services/more-badges.service';
  *    light up. Binding `[selectedTab]` to a URL-derived signal re-fires the
  *    watcher whenever the active tab changes, which covers newly-created
  *    buttons after a mode swap.
- * 2. Navigation stacks live in the router outlet, keyed by URL segment, and are
- *    never pruned. Adding or removing buttons therefore cannot disturb them —
- *    which is why swapping the tab set is safe, and why returning to a mode
- *    restores exactly where you left it.
+ * 2. Navigation stacks live in the router outlet, keyed by URL segment, so
+ *    adding or removing buttons cannot disturb them — which is why swapping
+ *    the tab set is safe. Tab taps deliberately bypass Ionic's stack restore,
+ *    though: see `onTabButtonClick`.
  */
 @Component({
   selector: 'mh-tabs',
@@ -60,6 +61,7 @@ export class Tabs {
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _messagingStore = inject(MessagingStore);
   private readonly _moreBadgesService = inject(MoreBadgesService);
+  private readonly _navController = inject(NavController);
   private readonly _router = inject(Router);
 
   /** The stack the last navigation ended in, to notice leaving Clients. */
@@ -72,7 +74,7 @@ export class Tabs {
     resolveMode(this.canSwitchMode(), this._appModeStore.mode()),
   );
 
-  /** The dot on the More tab, shared with the menu page's rows. */
+  /** The dot on the Menu tab, shared with the menu page's rows. */
   readonly hasBillDue = this._moreBadgesService.hasBillDue;
   readonly hasPendingRequests = this._moreBadgesService.hasPendingRequests;
   readonly moreDotLabel = this._moreBadgesService.moreDotLabel;
@@ -131,6 +133,25 @@ export class Tabs {
         this._lastTabId = tabId;
         if (left) this._moreBadgesService.refreshPendingRequests();
       });
+  }
+
+  /**
+   * A tab tap always lands on the tab's root page. Left alone, `IonTabs`
+   * restores the tab's last-visited page — Sessions → search → Messages →
+   * Sessions would reopen the search, and a restored chat page would even hide
+   * the bar that was just tapped. Stopping the event here keeps it from
+   * reaching `IonTabs`' host listener, and the root-direction navigation
+   * clears the tab's stale stack. Only bar taps come through this — deep
+   * links and in-page navigation are untouched.
+   */
+  onTabButtonClick(event: Event): void {
+    event.stopPropagation();
+    const tab = (event as CustomEvent<{ tab?: string }>).detail?.tab;
+    if (!tab) return;
+    void this._navController.navigateRoot(`/tabs/${tab}`, {
+      animated: true,
+      animationDirection: 'back',
+    });
   }
 
   /**

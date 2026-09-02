@@ -16,91 +16,93 @@
     }
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <ion-list [inset]="true">
-        <ion-item>
-          <ion-input
-            label="First name"
-            labelPlacement="stacked"
-            type="text"
-            formControlName="firstName"
-            placeholder="John"
-            autocomplete="given-name"
-            enterkeyhint="next"
-            [errorText]="getFieldError('firstName')"
-            [class.ion-invalid]="isFieldInvalid('firstName')"
-            [class.ion-touched]="isFieldInvalid('firstName')"
-          />
-        </ion-item>
-        <ion-item>
-          <ion-input
-            label="Last name"
-            labelPlacement="stacked"
-            type="text"
-            formControlName="lastName"
-            placeholder="Doe"
-            autocomplete="family-name"
-            enterkeyhint="next"
-            [errorText]="getFieldError('lastName')"
-            [class.ion-invalid]="isFieldInvalid('lastName')"
-            [class.ion-touched]="isFieldInvalid('lastName')"
-          />
-        </ion-item>
-        <ion-item>
-          <ion-input
-            label="Email address"
-            labelPlacement="stacked"
-            type="email"
-            inputmode="email"
-            formControlName="email"
-            placeholder="you@example.com"
-            autocomplete="email"
-            enterkeyhint="next"
-            [errorText]="getFieldError('email')"
-            [class.ion-invalid]="isFieldInvalid('email')"
-            [class.ion-touched]="isFieldInvalid('email')"
-          />
-        </ion-item>
-        <ion-item>
-          <ion-input
-            label="Password"
-            labelPlacement="stacked"
-            type="password"
-            formControlName="password"
-            placeholder="Min. 8 characters"
-            autocomplete="new-password"
-            enterkeyhint="next"
-            [errorText]="getFieldError('password')"
-            [class.ion-invalid]="isFieldInvalid('password')"
-            [class.ion-touched]="isFieldInvalid('password')"
-          >
-            <ion-input-password-toggle slot="end" />
-          </ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-input
-            label="Confirm password"
-            labelPlacement="stacked"
-            type="password"
-            formControlName="confirmPassword"
-            placeholder="Re-enter your password"
-            autocomplete="new-password"
-            enterkeyhint="done"
-            [errorText]="getConfirmPasswordError()"
-            [class.ion-invalid]="isConfirmPasswordInvalid()"
-            [class.ion-touched]="isConfirmPasswordInvalid()"
-          >
-            <ion-input-password-toggle slot="end" />
-          </ion-input>
-        </ion-item>
-        <ion-item lines="none">
-          <ion-checkbox formControlName="isInstructor" labelPlacement="end" justify="start">
-            <ion-label class="ion-text-wrap">
-              Register as coach
-              <p>Coaches can create and manage sessions and clients</p>
-            </ion-label>
-          </ion-checkbox>
-        </ion-item>
-      </ion-list>
+      <div class="ion-margin-horizontal">
+        <ion-input
+          fill="outline"
+          label="First name"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="firstName"
+          placeholder="John"
+          autocomplete="given-name"
+          enterkeyhint="next"
+          [errorText]="getFieldError('firstName')"
+          [class.ion-invalid]="isFieldInvalid('firstName')"
+          [class.ion-touched]="isFieldInvalid('firstName')"
+        />
+        <ion-input
+          class="ion-margin-top"
+          fill="outline"
+          label="Last name"
+          labelPlacement="stacked"
+          type="text"
+          formControlName="lastName"
+          placeholder="Doe"
+          autocomplete="family-name"
+          enterkeyhint="next"
+          [errorText]="getFieldError('lastName')"
+          [class.ion-invalid]="isFieldInvalid('lastName')"
+          [class.ion-touched]="isFieldInvalid('lastName')"
+        />
+        <ion-input
+          class="ion-margin-top"
+          fill="outline"
+          label="Email address"
+          labelPlacement="stacked"
+          type="email"
+          inputmode="email"
+          formControlName="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          enterkeyhint="next"
+          [errorText]="getFieldError('email')"
+          [class.ion-invalid]="isFieldInvalid('email')"
+          [class.ion-touched]="isFieldInvalid('email')"
+        />
+        <ion-input
+          class="ion-margin-top"
+          fill="outline"
+          label="Password"
+          labelPlacement="stacked"
+          type="password"
+          formControlName="password"
+          placeholder="Min. 8 characters"
+          autocomplete="new-password"
+          enterkeyhint="next"
+          [errorText]="getFieldError('password')"
+          [class.ion-invalid]="isFieldInvalid('password')"
+          [class.ion-touched]="isFieldInvalid('password')"
+        >
+          <ion-input-password-toggle slot="end" />
+        </ion-input>
+        <ion-input
+          class="ion-margin-top"
+          fill="outline"
+          label="Confirm password"
+          labelPlacement="stacked"
+          type="password"
+          formControlName="confirmPassword"
+          placeholder="Re-enter your password"
+          autocomplete="new-password"
+          enterkeyhint="done"
+          [errorText]="getConfirmPasswordError()"
+          [class.ion-invalid]="isConfirmPasswordInvalid()"
+          [class.ion-touched]="isConfirmPasswordInvalid()"
+        >
+          <ion-input-password-toggle slot="end" />
+        </ion-input>
+        <ion-checkbox
+          class="ion-margin-top"
+          formControlName="isInstructor"
+          labelPlacement="end"
+          justify="start"
+        >
+          <ion-label class="ion-text-wrap">
+            Register as coach
+            <p>Coaches can create and manage sessions and clients</p>
+          </ion-label>
+        </ion-checkbox>
+      </div>
 
       <ion-button
         expand="block"

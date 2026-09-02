@@ -12,7 +12,7 @@ import {
 import { resolveMode } from '../config/tabs.config';
 
 /**
- * The attention state behind the More tab, shared between the tab bar's dot
+ * The attention state behind the Menu tab, shared between the tab bar's dot
  * and the menu page's per-row dots so the two can never disagree.
  *
  * Holds counts, exposes booleans: a dot only has to say "something is in
@@ -42,14 +42,14 @@ export class MoreBadgesService {
   );
 
   /**
-   * Whether the coach has client requests waiting — the one thing in More
+   * Whether the coach has client requests waiting — the one thing in the menu
    * that is someone else waiting on them.
    */
   readonly hasPendingRequests = computed(
     () => this._mode() === NavModes.Coach && this._pendingRequests() > 0,
   );
 
-  /** Something is in More — which thing decides what the dot announces. */
+  /** Something is in the menu — which thing decides what the dot announces. */
   readonly moreDotLabel = computed(() =>
     this.hasBillDue() ? 'You have a bill due' : 'You have client requests waiting',
   );

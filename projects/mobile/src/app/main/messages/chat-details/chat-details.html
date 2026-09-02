@@ -56,7 +56,7 @@
           icon="ban-outline"
           iconColor="danger"
           [disabled]="!conversation()"
-          (select)="confirmBlock()"
+          (select)="blockOpen.set(true)"
         />
       </ion-list>
     </section>
@@ -67,3 +67,5 @@
     </ion-note>
   </div>
 </ion-content>
+
+<mh-block-user-sheet [(open)]="blockOpen" [name]="name()" (confirm)="block($event)" />

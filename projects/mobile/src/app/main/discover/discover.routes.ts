@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 /**
  * The trainee's Discover area, mounted at `/tabs/discover`. A coach reaches
- * the same pages from the More sheet — the surface is role-agnostic.
+ * the same pages from the menu page — the surface is role-agnostic.
  *
  * Every path keeps `discover` as the first segment after `/tabs` so the tab
  * stays lit on the pushed screens; session detail reuses the trainee

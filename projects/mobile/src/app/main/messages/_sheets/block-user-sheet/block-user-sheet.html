@@ -1,0 +1,24 @@
+<ng-template #body>
+  <p class="mh-helper">
+    They will not be able to message you, and you will not see this
+    conversation.
+  </p>
+
+  <ion-list lines="none">
+    @for (reason of reasons; track reason.value) {
+      <ion-item button [detail]="false" (click)="choose(reason.value)">
+        <ion-label>{{ reason.label }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [showFooter]="false"
+  [flushBody]="true"
+  [breakpoints]="[0, 0.5]"
+  [initialBreakpoint]="0.5"
+/>

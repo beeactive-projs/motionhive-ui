@@ -1,32 +1,40 @@
 import { NavMode, NavModes } from 'core';
 import {
+  albumsOutline,
   barbellOutline,
   calendarOutline,
   cardOutline,
   chatbubblesOutline,
   compassOutline,
-  ellipsisHorizontal,
+  flashOutline,
   homeOutline,
+  menuOutline,
+  peopleCircleOutline,
   peopleOutline,
   personAddOutline,
+  swapHorizontalOutline,
 } from 'ionicons/icons';
 
-import { TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
+import { MoreTile, TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
 
 /**
  * Every icon the shell renders, in one place so `addIcons()` and the kebab
  * name strings below cannot drift apart.
  */
 export const TAB_ICONS = {
+  albumsOutline,
   barbellOutline,
   calendarOutline,
   cardOutline,
   chatbubblesOutline,
   compassOutline,
-  ellipsisHorizontal,
+  flashOutline,
   homeOutline,
+  menuOutline,
+  peopleCircleOutline,
   peopleOutline,
   personAddOutline,
+  swapHorizontalOutline,
 };
 
 // Tabs shared by both modes — same id, so Ionic keeps one stack across a swap.
@@ -35,6 +43,16 @@ const MESSAGES: TabItem = {
   id: TabIds.Messages,
   label: 'Messages',
   icon: 'chatbubbles-outline',
+};
+
+// Groups sits in web's shared nav block, so both modes carry the same row.
+// Slate wash on purpose: honey is reserved for actions/selection, and the
+// coloured hues are taken by this row's coach-mode neighbours.
+const GROUPS: MoreTile = {
+  label: 'Groups',
+  icon: 'people-circle-outline',
+  iconColor: 'medium',
+  route: '/tabs/groups',
 };
 
 export const COACH_TAB_SET: TabSet = {
@@ -48,20 +66,37 @@ export const COACH_TAB_SET: TabSet = {
     { id: TabIds.Coach, label: 'Sessions', icon: 'calendar-outline' },
     MESSAGES,
   ],
-  // Programs and Exercises belong here per the design, but they have no route
-  // yet — a row that lands on the wrong page is worse than no row. They join
-  // in M2 alongside their pages. Account has no row: the menu page's identity
-  // card is the way in.
+  // Grouped by intent, mirroring web's rail: the coaching workspace first,
+  // then the shared community destinations. Account has no row: the menu
+  // page's identity card is the way in.
   more: [
     {
-      label: 'Requests',
-      icon: 'person-add-outline',
-      iconColor: 'info',
-      route: '/tabs/clients/requests',
-      requiresInstructor: true,
+      label: 'Coaching',
+      items: [
+        {
+          label: 'Requests',
+          icon: 'person-add-outline',
+          iconColor: 'info',
+          route: '/tabs/clients/requests',
+          requiresInstructor: true,
+        },
+        { label: 'Programs', icon: 'albums-outline', iconColor: 'violet', route: '/tabs/programs' },
+        { label: 'Exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
+        {
+          label: 'Payments',
+          icon: 'card-outline',
+          iconColor: 'success',
+          route: '/tabs/home/payments',
+        },
+      ],
     },
-    { label: 'Discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
-    { label: 'Payments', icon: 'card-outline', iconColor: 'success', route: '/tabs/home/payments' },
+    {
+      label: 'Community',
+      items: [
+        { label: 'Discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
+        GROUPS,
+      ],
+    },
   ],
 };
 
@@ -71,16 +106,37 @@ export const TRAIN_TAB_SET: TabSet = {
   tabs: [
     HOME,
     // The trainee's bookings — `/tabs/user/sessions`. Sessions earned the tab
-    // slot; Workouts moved to the More sheet until it ships real content.
+    // slot; Workouts moved to the menu page until it ships real content.
     { id: TabIds.User, label: 'Sessions', icon: 'calendar-outline' },
     { id: TabIds.Discover, label: 'Discover', icon: 'compass-outline' },
     MESSAGES,
   ],
-  // My plans and Profile join in M2 with their pages. Until then the menu
-  // earns its place through Workouts, Billing and the identity card.
+  // "My training" mirrors web's mode group; the unlabeled card holds the
+  // shared/general rows, the way web's shared block carries no heading.
   more: [
-    { label: 'Workouts', icon: 'barbell-outline', iconColor: 'violet', route: '/tabs/workouts' },
-    { label: 'Billing', icon: 'card-outline', iconColor: 'success', route: '/tabs/home/billing' },
+    {
+      label: 'My training',
+      items: [
+        {
+          label: 'Workouts',
+          icon: 'barbell-outline',
+          iconColor: 'violet',
+          route: '/tabs/workouts',
+        },
+      ],
+    },
+    {
+      label: '',
+      items: [
+        GROUPS,
+        {
+          label: 'Billing',
+          icon: 'card-outline',
+          iconColor: 'success',
+          route: '/tabs/home/billing',
+        },
+      ],
+    },
   ],
 };
 

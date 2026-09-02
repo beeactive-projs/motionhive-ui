@@ -12,39 +12,38 @@
     }
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <ion-list [inset]="true">
-        <ion-item>
-          <ion-input
-            label="Email address"
-            labelPlacement="stacked"
-            type="email"
-            inputmode="email"
-            formControlName="email"
-            placeholder="you@example.com"
-            autocomplete="email"
-            enterkeyhint="next"
-            [errorText]="getFieldError('email')"
-            [class.ion-invalid]="isFieldInvalid('email')"
-            [class.ion-touched]="isFieldInvalid('email')"
-          />
-        </ion-item>
-        <ion-item>
-          <ion-input
-            label="Password"
-            labelPlacement="stacked"
-            type="password"
-            formControlName="password"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-            enterkeyhint="go"
-            [errorText]="getFieldError('password')"
-            [class.ion-invalid]="isFieldInvalid('password')"
-            [class.ion-touched]="isFieldInvalid('password')"
-          >
-            <ion-input-password-toggle slot="end" />
-          </ion-input>
-        </ion-item>
-      </ion-list>
+      <div class="ion-margin-horizontal">
+        <ion-input
+          fill="outline"
+          label="Email address"
+          labelPlacement="stacked"
+          type="email"
+          inputmode="email"
+          formControlName="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          enterkeyhint="next"
+          [errorText]="getFieldError('email')"
+          [class.ion-invalid]="isFieldInvalid('email')"
+          [class.ion-touched]="isFieldInvalid('email')"
+        />
+        <ion-input
+          class="ion-margin-top"
+          fill="outline"
+          label="Password"
+          labelPlacement="stacked"
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          enterkeyhint="go"
+          [errorText]="getFieldError('password')"
+          [class.ion-invalid]="isFieldInvalid('password')"
+          [class.ion-touched]="isFieldInvalid('password')"
+        >
+          <ion-input-password-toggle slot="end" />
+        </ion-input>
+      </div>
 
       <div class="ion-text-end">
         <ion-button fill="clear" size="small" routerLink="/auth/reset-password">

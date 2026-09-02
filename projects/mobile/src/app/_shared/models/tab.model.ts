@@ -20,6 +20,9 @@ export const TabIds = {
   Workouts: 'workouts',
   Discover: 'discover',
   Messages: 'messages',
+  Groups: 'groups',
+  Programs: 'programs',
+  Exercises: 'exercises',
   More: 'more',
 } as const;
 
@@ -37,7 +40,7 @@ export interface TabItem {
   readonly badge?: Signal<number>;
 }
 
-/** A row of the More menu page — reachable, but not worth a tab slot. */
+/** A row of the menu page behind the Menu tab — reachable, but not worth a tab slot. */
 export interface MoreTile {
   readonly label: string;
   readonly icon: string;
@@ -48,17 +51,27 @@ export interface MoreTile {
   /** Hidden from users without the INSTRUCTOR role. */
   readonly requiresInstructor?: boolean;
   /**
-   * Marks the row and the More tab button with a dot when true. A count would
+   * Marks the row and the Menu tab button with a dot when true. A count would
    * overstate it — the point is only that something is waiting. Spliced in at
    * render time, since a static entry cannot read a store.
    */
   readonly dot?: Signal<boolean>;
 }
 
+/**
+ * A labeled group of More rows — the mobile counterpart of web's `NavSection`,
+ * so the two menus keep the same grouped-by-intent architecture.
+ */
+export interface MoreSection {
+  /** Section kicker; '' renders the card without a label (web's shared block). */
+  readonly label: string;
+  readonly items: readonly MoreTile[];
+}
+
 export interface TabSet {
   readonly mode: NavMode;
   readonly tabs: readonly TabItem[];
-  readonly more: readonly MoreTile[];
+  readonly more: readonly MoreSection[];
   /** Where to land when this set becomes active and the current tab is gone. */
   readonly defaultTab: TabId;
 }

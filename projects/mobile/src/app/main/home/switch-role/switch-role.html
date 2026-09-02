@@ -16,54 +16,40 @@
     </div>
 
     @for (role of roles; track role.mode) {
-      <ion-card [button]="true" (click)="pick(role.mode)">
-        <ion-item lines="none">
-          <mh-hex-avatar
-            slot="start"
-            size="lg"
-            [name]="role.label"
-            [icon]="role.icon"
-            [color]="role.color"
-          />
-          <ion-label class="ion-text-wrap">
-            <h2>
-              {{ role.label }}
-              @if (mode() === role.mode) {
-                <ion-badge color="primary">Current</ion-badge>
-              }
-            </h2>
-            <p>{{ role.description }}</p>
-          </ion-label>
-          @if (mode() === role.mode) {
-            <ion-icon slot="end" name="checkmark-circle" color="primary" aria-hidden="true" />
-          } @else {
-            <ion-icon slot="end" name="ellipse-outline" color="medium" aria-hidden="true" />
-          }
-        </ion-item>
-      </ion-card>
+    <ion-card [button]="true" (click)="pick(role.mode)">
+      <ion-item lines="none">
+        <mh-hex-avatar slot="start" size="lg" [name]="role.label" [icon]="role.icon" [color]="role.color" />
+        <ion-label class="ion-text-wrap">
+          <h2>
+            {{ role.label }}
+
+          </h2>
+          <p>{{ role.description }}</p>
+        </ion-label>
+        @if (mode() === role.mode) {
+        <ion-icon slot="end" name="checkmark-circle" color="primary" aria-hidden="true" />
+        } @else {
+        <ion-icon slot="end" name="ellipse-outline" color="medium" aria-hidden="true" />
+        }
+      </ion-item>
+    </ion-card>
     }
 
     <!-- Roles the account cannot hold yet — visible so the list reads as one
          system that grows, never selectable. -->
     @for (role of upcoming; track role.label) {
-      <ion-card>
-        <ion-item lines="none" [disabled]="true">
-          <mh-hex-avatar
-            slot="start"
-            size="lg"
-            color="medium"
-            [name]="role.label"
-            [icon]="role.icon"
-          />
-          <ion-label class="ion-text-wrap">
-            <h2>
-              {{ role.label }}
-              <ion-badge color="medium">Coming soon</ion-badge>
-            </h2>
-            <p>{{ role.description }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-card>
+    <ion-card>
+      <ion-item lines="none" [disabled]="true">
+        <mh-hex-avatar slot="start" size="lg" color="medium" [name]="role.label" [icon]="role.icon" />
+        <ion-label class="ion-text-wrap">
+          <h2>
+            {{ role.label }}
+            <ion-badge color="medium">Coming soon</ion-badge>
+          </h2>
+          <p>{{ role.description }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
     }
 
     <div class="ion-text-center">

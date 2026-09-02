@@ -6,7 +6,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonNote,
   IonSearchbar,
   IonSegment,
   IonSegmentButton,
@@ -61,7 +60,6 @@ import {
     IonItem,
     IonLabel,
     IonList,
-    IonNote,
     IonSearchbar,
     IonSegment,
     IonSegmentButton,
@@ -92,8 +90,6 @@ export class InviteClientSheet {
   readonly selected = signal<UserSearchResult | null>(null);
   readonly email = signal('');
   readonly message = signal('');
-  /** The message field starts collapsed to a row; most invitations send without one. */
-  readonly messageOpen = signal(false);
   readonly saving = signal(false);
 
   /** Set once an email invite lands — the token its signup link carries. */
@@ -125,7 +121,6 @@ export class InviteClientSheet {
       this.selected.set(null);
       this.email.set('');
       this.message.set('');
-      this.messageOpen.set(false);
       this.sentToken.set(null);
       this.sentEmail.set('');
       this.people.clear();

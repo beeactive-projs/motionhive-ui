@@ -25,6 +25,7 @@ import {
   openOutline,
   personOutline,
   shareSocialOutline,
+  swapHorizontalOutline,
   timeOutline,
   trashOutline,
 } from 'ionicons/icons';
@@ -64,6 +65,7 @@ export const ACCOUNT_ICONS = {
   openOutline,
   personOutline,
   shareSocialOutline,
+  swapHorizontalOutline,
   timeOutline,
   trashOutline,
 };

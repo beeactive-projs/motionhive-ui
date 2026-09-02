@@ -2,3 +2,39 @@
 ion-searchbar {
   --border-radius: var(--mh-radius-control) !important;
 }
+
+/* Read as a field, not a floating box. md ships the searchbar as an elevated
+   card (solid fill + drop shadow); every other thing you can type into here is
+   `fill="outline"` — flat, transparent, 1px border. There is no `--border-*`
+   hook on the searchbar, so the border is an inset ring on the documented
+   `--box-shadow`, in the exact color chain md gives the outline inputs.
+   `--color` likewise: md types in its own near-black step instead of the
+   theme's ink, which the outline inputs inherit. */
+ion-searchbar {
+  --background: transparent !important;
+  --box-shadow: inset 0 0 0 1px
+    var(--ion-color-step-300, var(--ion-background-color-step-300, #b3b3b3)) !important;
+  --color: var(--ion-text-color) !important;
+}
+
+/* Focus mirrors the outline input's highlight: 2px of primary. Also
+   `!important` — otherwise the base ring above outranks it on importance. */
+ion-searchbar.searchbar-has-focus {
+  --box-shadow: inset 0 0 0 var(--mh-ring-width) var(--ion-color-primary) !important;
+}
+
+/* The outline input's 56px box; md content-sizes the searchbar to ~42px.
+   The floor must land on the container, not the host — the inner input's
+   `min-height: inherit` reads its parent, and the host's own padding sits
+   outside the field. */
+ion-searchbar .searchbar-input-container {
+  min-height: 3.5rem;
+}
+
+/* md pins the glyph 11px from the top of the bar it expects; in the taller
+   field it has to ride centre. `!important` for the same scoped-CSS reason
+   as the radius rule above. */
+ion-searchbar .searchbar-search-icon {
+  top: 50% !important;
+  transform: translateY(-50%);
+}

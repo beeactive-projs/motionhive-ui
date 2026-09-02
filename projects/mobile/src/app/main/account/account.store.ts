@@ -100,7 +100,7 @@ export class AccountStore {
 
   /**
    * Push the fields the shell renders back into `AuthStore`. The home header
-   * and the More sheet read the name and avatar from there, so without this a
+   * and the menu page read the name and avatar from there, so without this a
    * rename only shows up after a cold start.
    */
   syncAuthUser(): void {

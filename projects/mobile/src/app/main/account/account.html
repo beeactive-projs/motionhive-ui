@@ -77,6 +77,10 @@
     <section class="mh-section">
       <ion-note class="mh-kicker" color="medium">Preferences</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
+        @if (isInstructor()) {
+        <mh-settings-row label="Switch role" icon="swap-horizontal-outline" iconColor="medium" [value]="roleLabel()"
+          (select)="openSwitchRole()" />
+        }
         <mh-settings-row label="Notifications" icon="notifications-outline" iconColor="danger"
           (select)="go('notifications')" />
         <mh-settings-row label="Appearance" icon="color-palette-outline" iconColor="violet" [value]="themeLabel()"

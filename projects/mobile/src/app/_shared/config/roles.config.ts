@@ -50,10 +50,4 @@ export const ROLES: Record<NavMode, RoleOption> = {
 /** Insertion order — Coach first, matching the switch-role page. */
 export const ROLE_LIST: readonly RoleOption[] = Object.values(ROLES);
 
-export const UPCOMING_ROLES: readonly UpcomingRole[] = [
-  {
-    label: 'Studio',
-    icon: 'business-outline',
-    description: 'Manage venues, staff and group schedules.',
-  },
-];
+export const UPCOMING_ROLES: readonly UpcomingRole[] = [];

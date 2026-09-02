@@ -23,7 +23,8 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { ROLE_ICONS, ROLE_LIST, UPCOMING_ROLES } from '../../../_shared/config/roles.config';
 
 /**
- * The role picker behind the home top bar's pill.
+ * The role picker behind the home top bar's pill and the Switch role rows on
+ * the menu and account pages.
  *
  * A pushed page rather than a sheet: switching role re-renders home, the tab
  * bar and the notification scope, which is more than a toggle should do

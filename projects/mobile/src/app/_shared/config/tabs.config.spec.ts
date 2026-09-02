@@ -76,10 +76,16 @@ describe('tab set configuration', () => {
     expect(TRAIN_TAB_SET.tabs.some((tab) => tab.id === TabIds.Coach)).toBe(false);
   });
 
-  it('keeps workouts reachable from More after losing its tab slot', () => {
-    expect(TRAIN_TAB_SET.more.some((tile) => tile.route === '/tabs/workouts')).toBe(
-      true,
-    );
+  it('keeps workouts reachable from the menu after losing its tab slot', () => {
+    const tiles = TRAIN_TAB_SET.more.flatMap((section) => section.items);
+    expect(tiles.some((tile) => tile.route === '/tabs/workouts')).toBe(true);
+  });
+
+  it('offers groups in both modes, mirroring the web shared nav block', () => {
+    for (const set of Object.values(TAB_SETS)) {
+      const tiles = set.more.flatMap((section) => section.items);
+      expect(tiles.some((tile) => tile.route === '/tabs/groups')).toBe(true);
+    }
   });
 
   it('registers every icon name it renders', () => {
@@ -89,7 +95,7 @@ describe('tab set configuration', () => {
     );
     const used = Object.values(TAB_SETS).flatMap((set) => [
       ...set.tabs.map((tab) => tab.icon),
-      ...set.more.map((tile) => tile.icon),
+      ...set.more.flatMap((section) => section.items.map((tile) => tile.icon)),
     ]);
 
     for (const icon of used) {
@@ -98,7 +104,9 @@ describe('tab set configuration', () => {
   });
 
   it('marks every coach-only More tile as requiring the instructor role', () => {
-    const coachOnly = COACH_TAB_SET.more.filter((tile) => tile.route.startsWith('/tabs/clients'));
+    const coachOnly = COACH_TAB_SET.more
+      .flatMap((section) => section.items)
+      .filter((tile) => tile.route.startsWith('/tabs/clients'));
     expect(coachOnly.length).toBeGreaterThan(0);
     for (const tile of coachOnly) {
       expect(tile.requiresInstructor).toBe(true);

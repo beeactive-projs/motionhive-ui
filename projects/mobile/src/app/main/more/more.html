@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>More</ion-title>
+    <ion-title>Menu</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
     </ion-buttons>
@@ -26,16 +26,40 @@
       </ion-item>
     </ion-list>
 
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (entry of entries(); track entry.route) {
+    <!-- The same door as the home pill: who you're working as, switched on a
+         page that can explain what changes. Its own card — a settings-row
+         cannot share a list with the bare identity item (hairline rules). -->
+    @if (canSwitchRole()) {
+      <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row
-          [label]="entry.label"
-          [icon]="entry.icon"
-          [iconColor]="entry.iconColor"
-          [dot]="entry.dot?.() ?? false"
-          (select)="open(entry)"
+          label="Switch role"
+          icon="swap-horizontal-outline"
+          iconColor="medium"
+          [value]="roleLabel()"
+          (select)="openSwitchRole()"
         />
-      }
-    </ion-list>
+      </ion-list>
+    }
+
+    <!-- Grouped by intent, mirroring web's rail: the mode's workspace first,
+         then the shared destinations. -->
+    @for (section of sections(); track $index) {
+      <section class="mh-section">
+        @if (section.label) {
+          <ion-note class="mh-kicker" color="medium">{{ section.label }}</ion-note>
+        }
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (entry of section.items; track entry.route) {
+            <mh-settings-row
+              [label]="entry.label"
+              [icon]="entry.icon"
+              [iconColor]="entry.iconColor"
+              [dot]="entry.dot?.() ?? false"
+              (select)="open(entry)"
+            />
+          }
+        </ion-list>
+      </section>
+    }
   </div>
 </ion-content>

@@ -26,7 +26,14 @@
           }
         </ion-buttons>
         } @else {
-        <ion-title>{{ title() }}</ion-title>
+        <div class="heading">
+          <span class="heading-title">{{ title() }}</span>
+        </div>
+        <ion-buttons slot="end">
+          <ion-button class="close" shape="round" aria-label="Close" (click)="dismiss()">
+            <ion-icon slot="icon-only" name="close" />
+          </ion-button>
+        </ion-buttons>
         }
       </ion-toolbar>
     </ion-header>

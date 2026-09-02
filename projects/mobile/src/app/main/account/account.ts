@@ -22,10 +22,12 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { AuthService, WEB_APP_URL } from 'core';
+import { AppModeStore, AuthService, WEB_APP_URL } from 'core';
 
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
+import { ROLES } from '../../_shared/config/roles.config';
+import { resolveMode } from '../../_shared/config/tabs.config';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import {
   ThemePreference,
@@ -77,6 +79,7 @@ const THEME_LABELS: Record<ThemePreference, string> = {
 export class Account implements OnInit, ViewWillEnter {
   private readonly _router = inject(Router);
   private readonly _navController = inject(NavController);
+  private readonly _appModeStore = inject(AppModeStore);
   private readonly _authService = inject(AuthService);
   private readonly _themeService = inject(ThemeService);
   private readonly _feedbackService = inject(FeedbackService);
@@ -96,6 +99,10 @@ export class Account implements OnInit, ViewWillEnter {
   );
   readonly handle = computed(() => this.account()?.handle ?? null);
   readonly themeLabel = computed(() => THEME_LABELS[this._themeService.preference()]);
+  /** Named the way the pill names it — "Coach"/"Trainee", never the mode word. */
+  readonly roleLabel = computed(
+    () => ROLES[resolveMode(this.isInstructor(), this._appModeStore.mode())].label,
+  );
 
   readonly memberSince = computed(() => {
     const createdAt = this.account()?.createdAt;
@@ -133,6 +140,11 @@ export class Account implements OnInit, ViewWillEnter {
 
   go(path: string): void {
     void this._router.navigateByUrl(`/tabs/home/account/${path}`);
+  }
+
+  /** Same destination as the home pill — a page that explains what a switch changes. */
+  openSwitchRole(): void {
+    void this._router.navigateByUrl('/tabs/home/switch-role');
   }
 
   async copyHandle(): Promise<void> {
