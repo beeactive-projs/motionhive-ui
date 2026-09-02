@@ -1,0 +1,30 @@
+<div class="empty">
+  <mh-hex-avatar name="No clients yet" icon="people-outline" size="xl" color="primary" tone="wash" />
+
+  <h2>No clients yet</h2>
+  <p>
+    Invite the people you already train, or wait for requests — anyone on
+    MotionHive can find you on Discover and ask to connect.
+  </p>
+
+  <div class="actions">
+    <ion-button expand="block" (click)="invite.emit()">Invite your first client</ion-button>
+  </div>
+
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="full">
+      <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
+      <ion-label>
+        <h3>Invite by email</h3>
+        <p>Works before they join</p>
+      </ion-label>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-icon slot="start" name="search-outline" color="medium" aria-hidden="true" />
+      <ion-label>
+        <h3>Find on platform</h3>
+        <p>Already on MotionHive</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</div>

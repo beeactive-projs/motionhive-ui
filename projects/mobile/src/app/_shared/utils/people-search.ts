@@ -2,12 +2,21 @@ import { Signal, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 
-import { UserSearchResult, UserService } from 'core';
+import { UserRole, UserSearchResult, UserService } from 'core';
 
 /** Shorter than this matches most of the directory. */
 const MIN_LENGTH = 2;
 const DEBOUNCE_MS = 300;
 const LIMIT = 20;
+
+/**
+ * Narrowing the directory. The inbox searches everyone; the invite sheet wants
+ * trainees only, and only ones the coach is not already connected to.
+ */
+export interface PeopleSearchOptions {
+  role?: UserRole;
+  excludeConnected?: boolean;
+}
 
 export interface PeopleSearch {
   /** What the field currently holds, including below-minimum text. */
@@ -32,7 +41,7 @@ export interface PeopleSearch {
  *
  * Call from an injection context.
  */
-export function injectPeopleSearch(): PeopleSearch {
+export function injectPeopleSearch(options: PeopleSearchOptions = {}): PeopleSearch {
   const userService = inject(UserService);
 
   const query = signal('');
@@ -51,7 +60,7 @@ export function injectPeopleSearch(): PeopleSearch {
         }
         isSearching.set(true);
         return userService
-          .search({ q: term, limit: LIMIT })
+          .search({ q: term, limit: LIMIT, ...options })
           .pipe(tap(() => isSearching.set(false)));
       }),
     ),

@@ -1,0 +1,41 @@
+<ng-template #body>
+  <ion-list lines="none">
+    <ion-item class="head" lines="full">
+      <mh-hex-avatar
+        slot="start"
+        size="sm"
+        aria-hidden="true"
+        [name]="name()"
+        [imageUrl]="avatarUrl()"
+        [color]="avatarTone()"
+      />
+      <ion-label class="ion-text-wrap">
+        <h3>{{ name() }}</h3>
+        <span class="mh-kicker">{{ email() }}</span>
+      </ion-label>
+    </ion-item>
+
+    @for (item of visibleActions(); track item.id) {
+      <ion-item
+        button
+        [detail]="false"
+        [class.destructive]="item.destructive"
+        (click)="choose(item.id)"
+      >
+        <ion-icon slot="start" [name]="item.icon" [color]="item.color" aria-hidden="true" />
+        <ion-label>{{ item.label }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Client actions"
+  [body]="body"
+  [showHeader]="false"
+  [showFooter]="false"
+  [flushBody]="true"
+  [breakpoints]="[0, 0.5]"
+  [initialBreakpoint]="0.5"
+/>

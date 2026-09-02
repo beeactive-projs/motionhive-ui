@@ -1,0 +1,49 @@
+/* The divider Ionic will not draw for us: its inset-list stylesheet zeroes
+   the last row's border, and `lines="full"` on the item would vanish there.
+   Same trick as notification-row — keep the list homogeneous (rows only) so
+   `:last-of-type` lands on the last row. */
+:host {
+  display: block;
+  border-block-end: 1px solid var(--mh-color-divider);
+}
+
+:host(:last-of-type) {
+  border-block-end: 0;
+}
+
+ion-item {
+  --background: var(--ion-card-background);
+  --inner-border-width: 0;
+}
+
+mh-hex-avatar {
+  margin-inline-end: 0.875rem;
+}
+
+ion-label h2 {
+  font-family: var(--ion-font-family);
+  font-weight: 600;
+}
+
+/* Adherence on the right — green, but the wash ink so it clears AA on white. */
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-inline: 0.5rem;
+  line-height: var(--mh-leading-tight);
+}
+
+.stat .value {
+  color: var(--ion-color-success-wash-contrast);
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat .sub {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+}

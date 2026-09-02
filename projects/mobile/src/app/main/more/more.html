@@ -1,0 +1,41 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>More</ion-title>
+    <ion-buttons slot="end">
+      <mh-notification-bell />
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    <!-- Identity leads, the way Messenger opens its menu: who you are, then
+         the way into the account area. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item button [detail]="true" lines="none" (click)="openAccount()">
+        <mh-hex-avatar
+          slot="start"
+          size="md"
+          [name]="userName()"
+          [imageUrl]="user()?.avatarUrl ?? null"
+        />
+        <ion-label>
+          <h2>{{ userName() }}</h2>
+          <p>{{ user()?.email }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (entry of entries(); track entry.route) {
+        <mh-settings-row
+          [label]="entry.label"
+          [icon]="entry.icon"
+          [iconColor]="entry.iconColor"
+          [dot]="entry.dot?.() ?? false"
+          (select)="open(entry)"
+        />
+      }
+    </ion-list>
+  </div>
+</ion-content>

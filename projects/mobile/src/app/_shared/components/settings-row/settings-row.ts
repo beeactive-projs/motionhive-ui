@@ -42,6 +42,8 @@ export class SettingsRow {
   /** Renders the value in the mono family, for handles. */
   readonly valueMono = input(false);
   readonly badge = input<string | null>(null);
+  /** A waiting-dot at the row's end — the tab bar's "something is in here" idiom. */
+  readonly dot = input(false);
   readonly detail = input(true);
   readonly disabled = input(false);
   /** Secondary line under the label — used for the disabled rows' "Coming soon". */

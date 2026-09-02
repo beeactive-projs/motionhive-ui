@@ -72,3 +72,27 @@
 .mh-chip-row::-webkit-scrollbar {
   display: none;
 }
+
+/* A kicker and its note on one baseline over a block of rows — "This week ·
+   3 of 8 need a look", "Incoming · 1". The section's own gap binds it to the
+   list below; the inline inset lines the text up with the row content beside
+   the card border. `.warm` moves the kicker onto the honey ink, the way the
+   day header does for today: it names the moment, not a status. */
+.mh-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding-inline: 0.875rem;
+}
+
+.mh-section-head .mh-kicker {
+  color: var(--ion-color-medium);
+}
+
+.mh-section-head.warm .mh-kicker {
+  color: var(--mh-color-honey-deep);
+}
+
+.mh-section-head ion-note {
+  font-size: var(--mh-text-sm);
+}

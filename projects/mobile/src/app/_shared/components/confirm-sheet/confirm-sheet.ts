@@ -1,7 +1,7 @@
 import { Component, input, model, output } from '@angular/core';
 import { IonIcon, IonNote } from '@ionic/angular/standalone';
 
-import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SheetShell } from '../sheet-shell/sheet-shell';
 
 /** One line of "here is what you are actually agreeing to". */
 export interface ConfirmFact {

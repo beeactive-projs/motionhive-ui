@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  clientDisplayName,
   ClientService,
   GroupService,
   InstructorClient,
@@ -101,8 +102,7 @@ export class AddMembersDialog {
   }
 
   clientName(client: InstructorClient): string {
-    if (!client.client) return '—';
-    return `${client.client.firstName} ${client.client.lastName}`;
+    return clientDisplayName(client, '—');
   }
 
   saveMembers(): void {

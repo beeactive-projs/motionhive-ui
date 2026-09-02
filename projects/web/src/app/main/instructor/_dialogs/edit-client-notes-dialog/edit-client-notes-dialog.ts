@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ClientService, InstructorClient } from 'core';
+import { clientDisplayName, ClientService, InstructorClient } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -44,8 +44,7 @@ export class EditClientNotesDialog {
   }
 
   clientName(client: InstructorClient): string {
-    if (!client.client) return 'Unknown';
-    return `${client.client.firstName} ${client.client.lastName}`;
+    return clientDisplayName(client, 'Unknown');
   }
 
   saveNotes(): void {

@@ -1,0 +1,159 @@
+<ng-template #body>
+  @if (sentToken()) {
+    <!-- The email went; the link is here for the coach to hand over as well. -->
+    <div class="sent">
+      <mh-hex-avatar
+        name="Invitation sent"
+        icon="checkmark-circle-outline"
+        size="xl"
+        color="success"
+        tone="wash"
+      />
+      <h2>Invitation sent</h2>
+      <p>
+        We emailed {{ sentEmail() }} a link to join and connect with you. You can
+        also share it yourself.
+      </p>
+      <div class="actions">
+        <ion-button expand="block" fill="outline" (click)="shareLink()">
+          <ion-icon slot="start" name="share-outline" aria-hidden="true" />
+          Share invite link
+        </ion-button>
+        <ion-button expand="block" (click)="done()">Done</ion-button>
+      </div>
+    </div>
+  } @else {
+    <ion-segment [value]="mode()" (ionChange)="setMode($event.detail.value)">
+      <ion-segment-button [value]="Modes.Platform">
+        <ion-label>Find on platform</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Modes.Email">
+        <ion-label>Invite by email</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    @if (mode() === Modes.Platform) {
+      <ion-searchbar
+        placeholder="Search by name or email"
+        inputmode="search"
+        [debounce]="0"
+        [value]="people.query()"
+        (ionInput)="people.setQuery($event.detail.value ?? '')"
+      />
+      <p class="mh-helper">
+        Type at least 2 characters. Only platform users without an existing
+        relationship with you are shown.
+      </p>
+
+      @if (people.isActive()) {
+        @if (people.isSearching()) {
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (_ of skeletonRows; track $index; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'">
+                <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+                <ion-label>
+                  <h3><ion-skeleton-text [animated]="true" style="width: 45%" /></h3>
+                  <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        } @else if (people.isEmpty()) {
+          <mh-empty-state
+            icon="person-outline"
+            heading="Nobody found"
+            message="Check the spelling, or try their email."
+          />
+        } @else {
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (person of people.results(); track person.id; let last = $last) {
+              <ion-item
+                button
+                detail="false"
+                [lines]="last ? 'none' : 'full'"
+                [attr.aria-pressed]="isSelected(person)"
+                (click)="pick(person)"
+              >
+                <mh-hex-avatar
+                  slot="start"
+                  size="md"
+                  aria-hidden="true"
+                  [name]="nameOf(person)"
+                  [imageUrl]="person.avatarUrl"
+                  [color]="toneFor(person.id)"
+                />
+                <ion-label>
+                  <h3>{{ nameOf(person) }}</h3>
+                  @if (person.handle; as tag) {
+                    <p class="handle">&#64;{{ tag }}</p>
+                  }
+                </ion-label>
+                <ion-icon
+                  slot="end"
+                  class="pick"
+                  [name]="isSelected(person) ? 'checkmark-circle' : 'ellipse-outline'"
+                  [color]="isSelected(person) ? 'primary' : 'medium'"
+                  aria-hidden="true"
+                />
+              </ion-item>
+            }
+          </ion-list>
+        }
+      }
+    } @else {
+      <ion-input
+        type="email"
+        inputmode="email"
+        autocapitalize="off"
+        autocomplete="email"
+        fill="outline"
+        label="Email address"
+        labelPlacement="stacked"
+        placeholder="client@example.com"
+        [value]="email()"
+        (ionInput)="email.set($event.detail.value ?? '')"
+      />
+    }
+
+    @if (messageOpen()) {
+      <ion-textarea
+        fill="outline"
+        [autoGrow]="true"
+        [rows]="3"
+        [maxlength]="500"
+        [counter]="true"
+        label="Message · optional"
+        labelPlacement="stacked"
+        placeholder="Hi! I'd like to coach you on MotionHive."
+        [value]="message()"
+        (ionInput)="message.set($event.detail.value ?? '')"
+      />
+    } @else {
+      <ion-item button detail="false" lines="none" class="message-row" (click)="messageOpen.set(true)">
+        <ion-icon slot="start" name="create-outline" color="medium" aria-hidden="true" />
+        <ion-label>Add a personal message…</ion-label>
+        <ion-note slot="end">Optional</ion-note>
+      </ion-item>
+    }
+
+    @if (mode() === Modes.Email) {
+      <p class="mh-helper">
+        They'll get an email with a link to join and connect with you.
+        Invitations expire after {{ expiryDays }} days.
+      </p>
+    }
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Invite client"
+  [body]="body"
+  [saveLabel]="saveLabel()"
+  [canSave]="canSend()"
+  [saving]="saving()"
+  [showFooter]="!sentToken()"
+  [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9"
+  (save)="send()"
+/>

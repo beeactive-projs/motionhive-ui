@@ -1,0 +1,79 @@
+<ion-item-sliding #sliding>
+  @if (canMessage()) {
+    <ion-item-options side="start">
+      <ion-item-option color="primary" aria-label="Message" (click)="emitAndClose(sliding, message)">
+        <ion-icon slot="icon-only" name="chatbubble-outline" />
+      </ion-item-option>
+    </ion-item-options>
+  }
+
+  <ion-item
+    lines="none"
+    [button]="pressable()"
+    [detail]="openable()"
+    [class.archived]="isArchived()"
+    (click)="onSelect()"
+  >
+    @if (isEmailOnly()) {
+      <mh-hex-avatar
+        slot="start"
+        size="md"
+        icon="mail-outline"
+        color="medium"
+        tone="wash"
+        aria-hidden="true"
+      />
+    } @else {
+      <!-- Decorative: the name it would announce is the very next thing in the row. -->
+      <mh-hex-avatar
+        slot="start"
+        size="md"
+        aria-hidden="true"
+        [name]="name()"
+        [imageUrl]="client().client?.avatarUrl ?? null"
+        [color]="avatarTone()"
+      />
+    }
+
+    <ion-label>
+      <div class="name-line">
+        <h2>{{ name() }}</h2>
+        @if (statusTone(); as tone) {
+          <ion-badge [attr.data-tone]="tone">{{ statusLabel() }}</ion-badge>
+        }
+      </div>
+      <p>{{ subline() }}</p>
+    </ion-label>
+  </ion-item>
+
+  @if (hasTrailing()) {
+    <!-- Nothing here is `expandable`: a full swipe must never reach archive
+         or withdraw, and notes is not worth committing blind. -->
+    <ion-item-options side="end">
+      @if (isActive()) {
+        <ion-item-option color="medium" aria-label="Notes" (click)="emitAndClose(sliding, notes)">
+          <ion-icon slot="icon-only" name="create-outline" />
+        </ion-item-option>
+        <ion-item-option color="danger" aria-label="Archive" (click)="emitAndClose(sliding, archive)">
+          <ion-icon slot="icon-only" name="archive-outline" />
+        </ion-item-option>
+      } @else if (isArchived()) {
+        <ion-item-option
+          color="success"
+          aria-label="Unarchive"
+          (click)="emitAndClose(sliding, unarchive)"
+        >
+          <ion-icon slot="icon-only" name="arrow-undo-outline" />
+        </ion-item-option>
+      } @else {
+        <ion-item-option
+          color="danger"
+          aria-label="Withdraw invitation"
+          (click)="emitAndClose(sliding, withdraw)"
+        >
+          <ion-icon slot="icon-only" name="close-circle-outline" />
+        </ion-item-option>
+      }
+    </ion-item-options>
+  }
+</ion-item-sliding>

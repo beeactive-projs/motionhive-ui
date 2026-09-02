@@ -1,0 +1,8 @@
+// The identity row sits on the card like the settings rows beside it: same
+// fill, and a chevron at full strength — Ionic dims it to 25% by default,
+// below the 3:1 a control needs.
+ion-item {
+  --background: var(--ion-card-background);
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+}

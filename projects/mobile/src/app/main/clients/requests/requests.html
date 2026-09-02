@@ -1,0 +1,175 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/clients" />
+    </ion-buttons>
+    <ion-title>Requests</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.showLoadError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load your requests"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (store.showSkeleton()) {
+    <!-- Mirrors the row shape so nothing shifts when data lands. -->
+    <div class="mh-page">
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of skeletonRows; track $index; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  } @else if (store.isEmpty()) {
+    <mh-empty-state
+      icon="hourglass-outline"
+      heading="No pending requests"
+      message="Invitations you send and incoming client requests will show up here."
+      actionLabel="Invite client"
+      (action)="openInvite()"
+    />
+  } @else {
+    <div class="mh-page">
+      @if (store.incoming().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-head warm">
+            <span class="mh-kicker">Incoming</span>
+            <ion-note>· {{ store.incoming().length }}</ion-note>
+          </div>
+          <div class="stack">
+            @for (row of store.incoming(); track row.id) {
+              <ion-card class="request">
+                <ion-item lines="none">
+                  <!-- Decorative: the name it would announce is the very next thing. -->
+                  <mh-hex-avatar
+                    slot="start"
+                    size="md"
+                    aria-hidden="true"
+                    [name]="name(row)"
+                    [imageUrl]="row.client?.avatarUrl ?? null"
+                    [color]="toneFor(row)"
+                  />
+                  <ion-label>
+                    <h2>{{ name(row) }}</h2>
+                    <p>{{ email(row) }}</p>
+                  </ion-label>
+                  <ion-badge slot="end" data-tone="info">Incoming</ion-badge>
+                </ion-item>
+
+                @if (row.notes; as message) {
+                  <!-- Their words, so quoted. -->
+                  <p class="quote">“{{ message }}”</p>
+                }
+
+                <ion-note class="mh-footnote when">{{ received(row) }}</ion-note>
+
+                <div class="actions">
+                  <ion-button
+                    expand="block"
+                    fill="outline"
+                    [disabled]="store.isBusy(row.id)"
+                    (click)="decline(row)"
+                  >
+                    Decline
+                  </ion-button>
+                  <ion-button expand="block" [disabled]="store.isBusy(row.id)" (click)="accept(row)">
+                    Accept
+                  </ion-button>
+                </div>
+              </ion-card>
+            }
+          </div>
+        </section>
+      }
+
+      @if (store.sent().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <span class="mh-kicker">Invitations sent</span>
+            <ion-note>· {{ store.sent().length }}</ion-note>
+          </div>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (row of store.sent(); track row.id; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'" class="invite">
+                @if (row.client) {
+                  <mh-hex-avatar
+                    slot="start"
+                    size="md"
+                    aria-hidden="true"
+                    [name]="name(row)"
+                    [imageUrl]="row.client.avatarUrl ?? null"
+                    [color]="toneFor(row)"
+                  />
+                } @else {
+                  <mh-hex-avatar
+                    slot="start"
+                    size="md"
+                    icon="mail-outline"
+                    color="medium"
+                    tone="wash"
+                    aria-hidden="true"
+                  />
+                }
+                <ion-label>
+                  <div class="name-line">
+                    <h2>{{ name(row) }}</h2>
+                    <ion-badge data-tone="warn">{{ statusLabel(row) }}</ion-badge>
+                  </div>
+                  <div class="meta-line">
+                    <span class="meta">{{ sentMeta(row) }}</span>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="medium"
+                      [disabled]="store.isBusy(row.id)"
+                      (click)="resend(row)"
+                    >
+                      Resend
+                    </ion-button>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="danger"
+                      [disabled]="store.isBusy(row.id)"
+                      (click)="confirmWithdraw(row)"
+                    >
+                      Withdraw
+                    </ion-button>
+                  </div>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+    </div>
+  }
+</ion-content>
+
+<mh-invite-client-sheet [(open)]="inviteOpen" (sent)="onInviteSent()" />
+
+<mh-confirm-sheet
+  [(open)]="withdrawOpen"
+  title="Withdraw this invitation?"
+  [body]="withdrawBody()"
+  confirmLabel="Withdraw"
+  cancelLabel="Keep it"
+  tone="danger"
+  [saving]="withdrawSaving()"
+  (confirm)="withdraw()"
+/>

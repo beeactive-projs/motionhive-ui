@@ -1,0 +1,67 @@
+/* Round header buttons. Ionic gives `shape="round"` the radius but sizes the
+   button from its content, so an icon-only one comes out an oval; these are
+   circles the same size as the bell beside them — same rule as the agenda. */
+ion-buttons ion-button.round {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* The count riding inside the segment label — a badge, because it is a
+   number that wants attention, not a muted suffix like "· 8". */
+.count {
+  margin-inline-start: 0.375rem;
+  vertical-align: middle;
+}
+
+/* Section heads come from the shared `.mh-section-head` role (layout.css). */
+
+/* Everyone on track — a status, so the success wash rather than honey. */
+.all-clear {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0.875rem;
+  /* Legacy rgba(): the -rgb slots are comma-separated triplets, which the
+     slash syntax cannot take. */
+  border: 1px solid rgba(var(--ion-color-success-rgb), 0.25);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-success-wash);
+  color: var(--ion-color-success-wash-contrast);
+}
+
+.all-clear ion-icon {
+  flex: none;
+  font-size: var(--mh-text-2xl);
+}
+
+.all-clear div {
+  display: flex;
+  flex-direction: column;
+  line-height: var(--mh-leading-tight);
+}
+
+.all-clear strong {
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 700;
+}
+
+.all-clear span {
+  font-size: var(--mh-text-sm);
+}
+
+/* The loading twin of a triage row — card look, no tone. */
+.row-skeleton {
+  --background: var(--ion-card-background);
+  --border-radius: var(--mh-radius-card);
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}
+
+/* The FAB floats over the last rows; the page clears it. */
+.mh-page {
+  padding-bottom: 5rem;
+}

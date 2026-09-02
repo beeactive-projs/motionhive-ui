@@ -5,10 +5,11 @@
 
    The spine vocabulary is the union of the consumers' tone maps: the
    type/lifecycle tones (honey/teal/violet/navy/coral/muted) from the coach
-   agenda and Discover, and the booking-status tones (booked/pending/
-   waitlist/muted) from the trainee list. Rows set `data-tone` on the
-   ion-item itself. Skin only — the host margin between rows stays in each
-   row component. */
+   agenda and Discover, the booking-status tones (booked/pending/
+   waitlist/muted) from the trainee list, and the plain semantic tones
+   (danger/warning/info) the Clients triage keys its attention reasons to.
+   Rows set `data-tone` on the ion-item itself. Skin only — the host margin
+   between rows stays in each row component. */
 
 ion-item.mh-session-row {
   --background: var(--ion-card-background);
@@ -50,6 +51,20 @@ ion-item.mh-session-row[data-tone='coral'] {
 
 ion-item.mh-session-row[data-tone='muted'] {
   --spine: var(--ion-color-medium);
+}
+
+/* Semantic tones — a state, not a type. No ring: the ring is the conflict
+   mark and belongs to `coral` alone. */
+ion-item.mh-session-row[data-tone='danger'] {
+  --spine: var(--ion-color-danger);
+}
+
+ion-item.mh-session-row[data-tone='warning'] {
+  --spine: var(--ion-color-warning);
+}
+
+ion-item.mh-session-row[data-tone='info'] {
+  --spine: var(--ion-color-info);
 }
 
 /* The stacked time rail in slot="start". */

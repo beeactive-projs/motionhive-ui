@@ -1,0 +1,76 @@
+/* The mode switch sits above whichever field it reveals. */
+ion-segment {
+  margin-bottom: 0.75rem;
+}
+
+/* Ionic pads the searchbar for a toolbar; inside a padded sheet body the
+   field should meet the segment's edges. */
+ion-searchbar {
+  padding-inline: 0;
+}
+
+/* Handle under a person's name. */
+.handle {
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+/* The pick mark: an empty ring until chosen, a filled honey circle after. */
+.pick {
+  font-size: var(--mh-text-xl);
+}
+
+/* The collapsed message affordance — a quiet field-shaped row, not a card. */
+.message-row {
+  --background: var(--ion-background-color);
+  --border-radius: var(--mh-radius-control);
+  margin-top: 0.75rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  font-size: var(--mh-text-base);
+}
+
+.message-row ion-note {
+  font-size: var(--mh-text-sm);
+}
+
+ion-textarea {
+  margin-top: 0.75rem;
+}
+
+/* Sent state — the same centred hero column the empty screens use. */
+.sent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 0.5rem 0.5rem;
+  text-align: center;
+}
+
+.sent h2 {
+  margin: 1.25rem 0 0;
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}
+
+.sent p {
+  margin: 0.5rem 0 0;
+  max-width: 20rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+  overflow-wrap: anywhere;
+}
+
+.sent .actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  align-self: stretch;
+  margin-top: 1.75rem;
+}
+
+.sent .actions ion-button {
+  margin: 0;
+}

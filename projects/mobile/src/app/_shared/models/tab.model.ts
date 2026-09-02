@@ -20,6 +20,7 @@ export const TabIds = {
   Workouts: 'workouts',
   Discover: 'discover',
   Messages: 'messages',
+  More: 'more',
 } as const;
 
 export type TabId = (typeof TabIds)[keyof typeof TabIds];
@@ -36,18 +37,20 @@ export interface TabItem {
   readonly badge?: Signal<number>;
 }
 
-/** An entry in the "More" sheet — reachable, but not worth a tab slot. */
+/** A row of the More menu page — reachable, but not worth a tab slot. */
 export interface MoreTile {
   readonly label: string;
   readonly icon: string;
+  /** Ionic palette name for the row's icon tile. */
+  readonly iconColor: string;
   /** Absolute route; may point outside the tab set. */
   readonly route: string;
   /** Hidden from users without the INSTRUCTOR role. */
   readonly requiresInstructor?: boolean;
   /**
-   * Marks the tile and the More button with a dot when true. A count would
-   * overstate it — the point is only that something is waiting. Spliced in by
-   * the shell, since a static tile cannot read a store.
+   * Marks the row and the More tab button with a dot when true. A count would
+   * overstate it — the point is only that something is waiting. Spliced in at
+   * render time, since a static entry cannot read a store.
    */
   readonly dot?: Signal<boolean>;
 }

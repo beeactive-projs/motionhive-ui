@@ -39,7 +39,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { InvoiceRow } from '../_components/invoice-row/invoice-row';
-import { ConfirmSheet } from '../_sheets/confirm-sheet/confirm-sheet';
+import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { PAYMENT_ICONS } from '../payments.config';
 
 const PAGE_SIZE = 20;

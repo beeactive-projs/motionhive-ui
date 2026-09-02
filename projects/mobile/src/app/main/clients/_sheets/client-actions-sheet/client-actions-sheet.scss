@@ -1,0 +1,39 @@
+/* Who this is about. A native `ion-item`, not a hand-padded div: the item's
+   own padding is exactly what the action rows below use, so the head sits on
+   their margin by construction. `lines="full"` is the closing hairline. */
+.head {
+  --border-color: var(--mh-color-divider);
+}
+
+.head mh-hex-avatar {
+  margin-inline-end: 0.75rem;
+}
+
+.head h3 {
+  overflow: hidden;
+  margin: 0;
+  font-size: var(--mh-text-md);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The address, in the mono the product gives to addresses. */
+.head .mh-kicker {
+  margin-top: 0.125rem;
+  color: var(--ion-color-medium);
+  letter-spacing: normal;
+}
+
+/* The list is the sheet's own surface, not a card floating on it: head and
+   verbs bleed to the edges so the tap target is the full width. (The
+   shell's `flushBody` is the other half of this.) */
+ion-list {
+  margin-inline: calc(var(--ion-padding, 16px) * -1);
+}
+
+/* Destructive last and red — the only row that needs a second thought. */
+.destructive ion-label {
+  color: var(--ion-color-danger);
+  font-weight: 600;
+}

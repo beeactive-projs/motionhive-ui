@@ -78,12 +78,8 @@ export const routes: Routes = [
       {
         path: 'clients',
         canActivate: [coachGuard],
-        loadComponent: () => import('./main/clients/clients').then((m) => m.Clients),
-      },
-      {
-        path: 'clients/requests',
-        canActivate: [coachGuard],
-        loadComponent: () => import('./main/requests/requests').then((m) => m.Requests),
+        loadChildren: () =>
+          import('./main/clients/clients.routes').then((m) => m.clientsRoutes),
       },
       // Role-prefixed sessions areas: each role keeps its own stack and its
       // own deep-link address, and the tab buttons navigate to the bare role
@@ -115,6 +111,10 @@ export const routes: Routes = [
         path: 'discover',
         loadChildren: () =>
           import('./main/discover/discover.routes').then((m) => m.discoverRoutes),
+      },
+      {
+        path: 'more',
+        loadComponent: () => import('./main/more/more').then((m) => m.More),
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],

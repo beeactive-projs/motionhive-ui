@@ -30,4 +30,8 @@
       {{ text }}
     </ion-note>
   }
+
+  @if (dot()) {
+    <ion-badge slot="end" color="danger" class="dot" aria-hidden="true"></ion-badge>
+  }
 </ion-item>

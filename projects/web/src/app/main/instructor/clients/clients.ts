@@ -13,16 +13,17 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  ClientRequestTypes,
+  clientDisplayName,
+  clientEmail as clientEmailOf,
   ClientService,
-  ClientStatusLabels,
+  clientStatusLabel as clientStatusLabelOf,
   injectIsMobile,
   injectIsTablet,
   injectIsTabletDown,
   InstructorClient,
   InstructorClientStatus,
   InstructorClientStatuses,
-  PendingClientLabels,
+  isOpenableClient,
   showApiError,
   TagSeverity,
 } from 'core';
@@ -263,17 +264,9 @@ export class Clients implements OnInit {
     });
   }
 
-  /**
-   * Whether this row has a profile to open.
-   *
-   * The list merges two sources: real `instructor_client` relationships
-   * and pending `client_request` rows. Only the former has a profile.
-   * `requestType` is the discriminator, not `status` — a request row
-   * carries a `clientId` for an existing user and would otherwise look
-   * openable, then 404. A PENDING relationship row is fine to open.
-   */
+  /** Whether this row has a profile to open — see `isOpenableClient` in core. */
   isOpenable(client: InstructorClient): boolean {
-    return !!client.clientId && !client.requestType;
+    return isOpenableClient(client);
   }
 
   /** Open the full profile — plans, workouts, progress, sessions. */
@@ -369,27 +362,18 @@ export class Clients implements OnInit {
       });
   }
 
-  // --- Display helpers ---
+  // --- Display helpers (shared with mobile through core's client.utils) ---
 
   clientName(client: InstructorClient): string {
-    if (client.client) {
-      return `${client.client.firstName} ${client.client.lastName}`;
-    }
-    return client.invitedEmail ?? 'this client';
+    return clientDisplayName(client, 'this client');
   }
 
   clientEmail(client: InstructorClient): string {
-    return client.client?.email || client.invitedEmail || '—';
+    return clientEmailOf(client);
   }
 
   clientStatusLabel(client: InstructorClient): string {
-    if (client.status !== InstructorClientStatuses.Pending) {
-      return ClientStatusLabels[client.status];
-    }
-    if (client.requestType === ClientRequestTypes.InstructorToClient) {
-      return client.client ? PendingClientLabels.Invited : PendingClientLabels.EmailSent;
-    }
-    return PendingClientLabels.Request;
+    return clientStatusLabelOf(client);
   }
 
   statusSeverity(status: InstructorClientStatus): TagSeverity {

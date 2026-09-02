@@ -1,0 +1,203 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/clients" />
+    </ion-buttons>
+    <ion-title>Client</ion-title>
+    @if (store.client()) {
+      <ion-buttons slot="end">
+        <ion-button aria-label="Client actions" (click)="openActions()">
+          <ion-icon slot="icon-only" name="ellipsis-vertical" />
+        </ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (store.error(); as error) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't load this client"
+      [message]="error"
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (store.loading() && !store.client()) {
+    <div class="mh-page">
+      <div class="hero">
+        <mh-hex-avatar size="lg" color="medium" tone="wash" />
+        <ion-skeleton-text [animated]="true" style="width: 55%; height: 1.25rem" />
+        <ion-skeleton-text [animated]="true" style="width: 40%" />
+      </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of skeletonRows; track $index; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <ion-label>
+              <h3><ion-skeleton-text [animated]="true" style="width: 50%" /></h3>
+              <p><ion-skeleton-text [animated]="true" style="width: 30%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+  } @else if (store.client(); as client) {
+    <div class="mh-page">
+      <!-- Identity: the avatar, the name, the address in mono, and the two
+           chips that say where this relationship stands. -->
+      <div class="hero">
+        <mh-hex-avatar
+          size="lg"
+          aria-hidden="true"
+          [name]="name()"
+          [imageUrl]="client.client?.avatarUrl ?? null"
+          [color]="avatarTone()"
+        />
+        <h2 class="hero-name">{{ name() }}</h2>
+        <p class="hero-email">{{ email() }}</p>
+        <div class="hero-badges">
+          <ion-badge [attr.data-tone]="statusTone()">{{ statusLabel() }}</ion-badge>
+          @if (isPending() && client.expiresAt) {
+            <ion-badge data-tone="medium">Expires {{ client.expiresAt | date: 'd MMM' }}</ion-badge>
+          } @else if (client.startedAt) {
+            <ion-badge data-tone="medium">Since {{ client.startedAt | date: 'd MMM yyyy' }}</ion-badge>
+          }
+        </div>
+      </div>
+
+      @if (canMessage()) {
+        <ion-button expand="block" class="message" (click)="message()">
+          <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
+          Message
+        </ion-button>
+      }
+
+      @if (store.week(); as week) {
+        <section class="mh-section">
+          <span class="mh-kicker">This week</span>
+          <ion-card class="week" [class.flagged]="week.flagged">
+            <div class="week-head">
+              <span class="week-count">{{ week.completed }} of {{ week.due }}</span>
+              <span class="week-label">workouts done</span>
+              <span class="week-percent">{{ weekPercent() }}</span>
+            </div>
+            <!-- Done, skipped, still to come — in the proportion they happened. -->
+            <div class="bar" aria-hidden="true">
+              <span class="done" [style.flex-grow]="week.completed"></span>
+              <span class="skipped" [style.flex-grow]="week.skipped"></span>
+              <span class="remaining" [style.flex-grow]="week.remaining"></span>
+            </div>
+            <ion-note class="mh-footnote">
+              {{ weekFootnote() }}
+              @if (weekSub(); as sub) {
+                · {{ sub }}
+              }
+            </ion-note>
+          </ion-card>
+        </section>
+      }
+
+      @if (store.roster()) {
+        <section class="mh-section">
+          <span class="mh-kicker">Plan</span>
+          <ion-list [inset]="true" class="mh-card-list">
+            <ion-item lines="none">
+              <mh-hex-avatar
+                slot="start"
+                size="sm"
+                icon="barbell-outline"
+                color="violet"
+                tone="wash"
+                aria-hidden="true"
+              />
+              <ion-label>
+                <h3>{{ planLabel() }}</h3>
+                <p>Plans are managed on the web for now.</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </section>
+      }
+
+      @if (store.sessions().length > 0) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <span class="mh-kicker">Upcoming sessions</span>
+            <ion-note>Next 30 days</ion-note>
+          </div>
+          <div>
+            @for (instance of store.sessions(); track instance.id) {
+              <mh-session-row [instance]="instance" (select)="openSession(instance)" />
+            }
+          </div>
+        </section>
+      }
+
+      <section class="mh-section">
+        <div class="mh-section-head">
+          <span class="mh-kicker">Notes · private</span>
+          <ion-icon name="lock-closed-outline" class="lock" aria-hidden="true" />
+        </div>
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item button detail="false" lines="none" (click)="openNotes()">
+            <ion-label class="ion-text-wrap">
+              @if (client.notes) {
+                <p class="notes">{{ client.notes }}</p>
+              } @else {
+                <p class="notes empty">Add a private note</p>
+              }
+            </ion-label>
+            <ion-icon slot="end" name="create-outline" color="medium" aria-hidden="true" />
+          </ion-item>
+        </ion-list>
+      </section>
+
+      @if (isActive() || isArchived()) {
+        <!-- Last, and the one row in red: the only thing here worth a second thought. -->
+        <ion-list [inset]="true" class="mh-card-list">
+          @if (isActive()) {
+            <ion-item button detail="false" lines="none" (click)="confirmArchive()">
+              <ion-icon slot="start" name="archive-outline" color="danger" aria-hidden="true" />
+              <ion-label color="danger">Archive client…</ion-label>
+            </ion-item>
+          } @else {
+            <ion-item
+              button
+              detail="false"
+              lines="none"
+              [disabled]="store.saving()"
+              (click)="unarchive()"
+            >
+              <ion-icon slot="start" name="arrow-undo-outline" color="success" aria-hidden="true" />
+              <ion-label color="success">Unarchive client</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    </div>
+  }
+</ion-content>
+
+<mh-client-actions-sheet
+  [(open)]="actionsOpen"
+  [client]="store.client()"
+  (action)="onAction($event)"
+/>
+
+<mh-client-notes-sheet
+  [(open)]="notesOpen"
+  [client]="store.client()"
+  [saving]="notesSaving()"
+  (save)="saveNotes($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="archiveOpen"
+  [title]="archiveTitle()"
+  body="They keep their account and history, and you can unarchive them later. They will not be told."
+  confirmLabel="Archive client"
+  cancelLabel="Keep"
+  tone="danger"
+  [saving]="archiveSaving()"
+  (confirm)="archive()"
+/>

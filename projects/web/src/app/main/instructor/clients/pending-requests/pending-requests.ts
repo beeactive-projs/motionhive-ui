@@ -13,14 +13,16 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  clientDisplayName,
+  clientEmail as clientEmailOf,
   ClientRequestType,
   ClientRequestTypes,
   ClientService,
+  clientStatusLabel,
   injectIsMobile,
   injectIsTablet,
   injectIsTabletDown,
   InstructorClient,
-  PendingClientLabels,
   showApiError,
 } from 'core';
 import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
@@ -335,27 +337,22 @@ export class PendingRequests {
     });
   }
 
-  // --- Display helpers ---
+  // --- Display helpers (shared with mobile through core's client.utils) ---
 
   clientName(row: InstructorClient): string {
-    if (row.client) {
-      return `${row.client.firstName} ${row.client.lastName}`;
-    }
-    return row.invitedEmail ?? 'this client';
+    return clientDisplayName(row, 'this client');
   }
 
   clientEmail(row: InstructorClient): string {
-    return row.client?.email || row.invitedEmail || '—';
+    return clientEmailOf(row);
   }
 
   isIncoming(row: InstructorClient): boolean {
     return row.requestType !== this.RequestTypes.InstructorToClient;
   }
 
+  /** Every row here is PENDING, so the status label is the type label. */
   typeLabel(row: InstructorClient): string {
-    if (row.requestType === this.RequestTypes.InstructorToClient) {
-      return row.client ? PendingClientLabels.Invited : PendingClientLabels.EmailSent;
-    }
-    return PendingClientLabels.Request;
+    return clientStatusLabel(row);
   }
 }

@@ -1,8 +1,8 @@
 .lead {
   margin: 0 0.25rem 1rem;
   color: var(--ion-color-dark);
-  font-size: 0.9rem;
-  line-height: 1.55;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
 }
 
 .facts {
@@ -26,13 +26,13 @@
 
 .facts dt {
   color: var(--ion-color-medium);
-  font-size: 0.78rem;
+  font-size: var(--mh-text-sm);
 }
 
 .facts dd {
   margin: 0;
-  font-family: var(--mh-font-mono, ui-monospace, 'JetBrains Mono', monospace);
-  font-size: 0.82rem;
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   text-align: end;
@@ -48,19 +48,19 @@
   border-radius: var(--mh-radius-control);
   background: var(--ion-color-warning-wash);
   color: var(--ion-color-warning-wash-contrast);
-  font-size: 0.8rem;
-  line-height: 1.45;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
 }
 
 .irreversible ion-icon {
   flex: none;
-  margin-top: 0.1rem;
-  font-size: 0.95rem;
+  margin-top: 0.125rem;
+  font-size: var(--mh-text-md);
 }
 
 .blocked {
   display: block;
   margin: 0.75rem 0.25rem 0;
-  font-size: 0.78rem;
-  line-height: 1.5;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
 }

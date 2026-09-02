@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import {
@@ -12,14 +12,7 @@ import {
 import { addIcons } from 'ionicons';
 import { filter, map } from 'rxjs';
 
-import {
-  AppModeStore,
-  AuthStore,
-  ClientPaymentService,
-  MessagingStore,
-  NavMode,
-  NavModes,
-} from 'core';
+import { AppModeStore, AuthStore, MessagingStore, NavMode } from 'core';
 
 import {
   activeTabIdFromUrl,
@@ -29,7 +22,7 @@ import {
 } from '../../_shared/config/tabs.config';
 import { NotificationBanner } from '../../_shared/components/notification-banner/notification-banner';
 import { TabIds } from '../../_shared/models/tab.model';
-import { MoreSheet } from '../more-sheet/more-sheet';
+import { MoreBadgesService } from '../../_shared/services/more-badges.service';
 
 /**
  * The tab shell. Which tabs exist is data (`TAB_SETS`), not structure — so a
@@ -58,7 +51,6 @@ import { MoreSheet } from '../more-sheet/more-sheet';
     IonTabBar,
     IonTabButton,
     IonTabs,
-    MoreSheet,
     NotificationBanner,
   ],
   templateUrl: './tabs.html',
@@ -67,17 +59,11 @@ export class Tabs {
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
   private readonly _messagingStore = inject(MessagingStore);
-  private readonly _clientPaymentService = inject(ClientPaymentService);
+  private readonly _moreBadgesService = inject(MoreBadgesService);
   private readonly _router = inject(Router);
 
-  /**
-   * Whether the trainee has a bill waiting. Only they get the dot: a client
-   * has to be interrupted by a bill, where a coach chases money deliberately
-   * and does not need their own app nagging them about it.
-   */
-  private readonly _openInvoices = signal(0);
-
-  readonly moreOpen = signal(false);
+  /** The stack the last navigation ended in, to notice leaving Clients. */
+  private _lastTabId = activeTabIdFromUrl(this._router.url);
 
   /** Only an instructor has two modes; everyone else is permanently training. */
   readonly canSwitchMode = this._authStore.isInstructor;
@@ -85,6 +71,11 @@ export class Tabs {
   readonly mode = computed<NavMode>(() =>
     resolveMode(this.canSwitchMode(), this._appModeStore.mode()),
   );
+
+  /** The dot on the More tab, shared with the menu page's rows. */
+  readonly hasBillDue = this._moreBadgesService.hasBillDue;
+  readonly hasPendingRequests = this._moreBadgesService.hasPendingRequests;
+  readonly moreDotLabel = this._moreBadgesService.moreDotLabel;
 
   /**
    * The active stack id — the first URL segment after `/tabs`. Derived from
@@ -121,33 +112,25 @@ export class Tabs {
     ),
   );
 
-  readonly moreTiles = computed(() =>
-    this._tabSet()
-      .more.filter((tile) => !tile.requiresInstructor || this.canSwitchMode())
-      .map((tile) =>
-        tile.route === '/tabs/home/billing' ? { ...tile, dot: this.hasBillDue } : tile,
-      ),
-  );
-
-  readonly hasBillDue = computed(
-    () => this.mode() === NavModes.Train && this._openInvoices() > 0,
-  );
-
   constructor() {
     addIcons(TAB_ICONS);
 
     // Counts only, and only for the side that needs interrupting.
-    this._clientPaymentService
-      .getMyCounts()
-      .pipe(takeUntilDestroyed())
-      .subscribe({
-        next: (counts) => this._openInvoices.set(counts.invoices.open),
-        error: () => this._openInvoices.set(0),
-      });
-  }
+    this._moreBadgesService.refresh();
 
-  openMore(): void {
-    this.moreOpen.set(true);
+    // A request is answered inside the Clients stack, so leaving it is the
+    // moment the count can have changed — not every navigation.
+    this._router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        map(() => activeTabIdFromUrl(this._router.url)),
+        takeUntilDestroyed(),
+      )
+      .subscribe((tabId) => {
+        const left = this._lastTabId === TabIds.Clients && tabId !== TabIds.Clients;
+        this._lastTabId = tabId;
+        if (left) this._moreBadgesService.refreshPendingRequests();
+      });
   }
 
   /**

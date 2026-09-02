@@ -36,7 +36,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { ConfirmSheet } from '../../_sheets/confirm-sheet/confirm-sheet';
+import { ConfirmSheet } from '../../../../_shared/components/confirm-sheet/confirm-sheet';
 import {
   PAYMENT_ICONS,
   formatMoney,

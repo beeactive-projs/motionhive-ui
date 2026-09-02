@@ -9,16 +9,6 @@ ion-button ion-icon {
   font-size: var(--mh-text-2xl);
 }
 
-/* The dot sits on the bell's top-right shoulder. It is anchored from the
-   button's centre, not its corner: Ionic gives an icon-only toolbar button a
-   3rem hit circle, and a corner-pinned dot lands in the padding a finger's
-   width from the glyph. The ring in the toolbar colour lifts it clear of the
-   bell's outline. Size comes from the shared `ion-badge.dot` skin. */
-ion-badge.dot {
-  position: absolute;
-  top: calc(50% - 0.875rem);
-  inset-inline-end: calc(50% - 0.875rem);
-  box-sizing: content-box;
-  border: var(--mh-ring-width) solid var(--ion-toolbar-background, var(--ion-background-color));
-  pointer-events: none;
-}
+/* The dot on the bell's shoulder — size and placement both come from the
+   shared `ion-badge.dot` skin (theme/components/ion-badge.css), which the
+   Requests hourglass on the Clients tab wears too. */

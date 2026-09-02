@@ -9,10 +9,9 @@ import {
   homeOutline,
   peopleOutline,
   personAddOutline,
-  personCircleOutline,
 } from 'ionicons/icons';
 
-import { MoreTile, TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
+import { TabId, TabIds, TabItem, TabSet } from '../models/tab.model';
 
 /**
  * Every icon the shell renders, in one place so `addIcons()` and the kebab
@@ -28,7 +27,6 @@ export const TAB_ICONS = {
   homeOutline,
   peopleOutline,
   personAddOutline,
-  personCircleOutline,
 };
 
 // Tabs shared by both modes — same id, so Ionic keeps one stack across a swap.
@@ -37,12 +35,6 @@ const MESSAGES: TabItem = {
   id: TabIds.Messages,
   label: 'Messages',
   icon: 'chatbubbles-outline',
-};
-
-const ACCOUNT_TILE: MoreTile = {
-  label: 'Account',
-  icon: 'person-circle-outline',
-  route: '/tabs/home/account',
 };
 
 export const COACH_TAB_SET: TabSet = {
@@ -57,18 +49,19 @@ export const COACH_TAB_SET: TabSet = {
     MESSAGES,
   ],
   // Programs and Exercises belong here per the design, but they have no route
-  // yet — a tile that lands on the wrong page is worse than no tile. They join
-  // in M2 alongside their pages.
+  // yet — a row that lands on the wrong page is worse than no row. They join
+  // in M2 alongside their pages. Account has no row: the menu page's identity
+  // card is the way in.
   more: [
     {
       label: 'Requests',
       icon: 'person-add-outline',
+      iconColor: 'info',
       route: '/tabs/clients/requests',
       requiresInstructor: true,
     },
-    { label: 'Discover', icon: 'compass-outline', route: '/tabs/discover' },
-    { label: 'Payments', icon: 'card-outline', route: '/tabs/home/payments' },
-    ACCOUNT_TILE,
+    { label: 'Discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
+    { label: 'Payments', icon: 'card-outline', iconColor: 'success', route: '/tabs/home/payments' },
   ],
 };
 
@@ -83,13 +76,11 @@ export const TRAIN_TAB_SET: TabSet = {
     { id: TabIds.Discover, label: 'Discover', icon: 'compass-outline' },
     MESSAGES,
   ],
-  // My plans and Profile join in M2 with their pages. Until then the sheet
-  // earns its place through Workouts, Billing, the mode switch and the profile
-  // row.
+  // My plans and Profile join in M2 with their pages. Until then the menu
+  // earns its place through Workouts, Billing and the identity card.
   more: [
-    { label: 'Workouts', icon: 'barbell-outline', route: '/tabs/workouts' },
-    { label: 'Billing', icon: 'card-outline', route: '/tabs/home/billing' },
-    ACCOUNT_TILE,
+    { label: 'Workouts', icon: 'barbell-outline', iconColor: 'violet', route: '/tabs/workouts' },
+    { label: 'Billing', icon: 'card-outline', iconColor: 'success', route: '/tabs/home/billing' },
   ],
 };
 
