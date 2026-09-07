@@ -1,0 +1,27 @@
+<ng-template #body>
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (option of options; track option.value; let last = $last) {
+      <ion-item button detail="false" [lines]="last ? 'none' : 'full'" (click)="pick(option.value)">
+        <ion-label>
+          <h3>{{ option.label }}</h3>
+          <p>{{ option.hint }}</p>
+        </ion-label>
+        @if (sort() === option.value) {
+          <ion-icon slot="end" name="checkmark-circle" color="primary" aria-label="Selected" />
+        }
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<!-- No footer: the tap is the commit. A Save button on three radio rows adds
+     a step to a decision that is already made by the time you lift a finger. -->
+<mh-sheet-shell
+  [(open)]="open"
+  title="Sort by"
+  [body]="body"
+  [showFooter]="false"
+  [flushBody]="true"
+  [breakpoints]="[0, 0.45]"
+  [initialBreakpoint]="0.45"
+/>

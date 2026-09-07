@@ -1,4 +1,4 @@
-import { Component, input, model, output } from '@angular/core';
+import { Component, input, model, output, viewChild } from '@angular/core';
 import { IonIcon, IonNote } from '@ionic/angular/standalone';
 
 import { SheetShell } from '../sheet-shell/sheet-shell';
@@ -44,4 +44,18 @@ export class ConfirmSheet {
   readonly saving = input(false);
 
   readonly confirm = output<void>();
+
+  private readonly _shell = viewChild(SheetShell);
+
+  /**
+   * Close and await the dismissal, for callers that navigate once the action
+   * lands. Flipping `open` is enough on a page that stays put, but routing
+   * away detaches the view from change detection before `[isOpen]` is
+   * applied — and the sheet is then stranded on top of the new page. Same
+   * contract as `SheetShell.close()`, which this delegates to.
+   */
+  async close(): Promise<void> {
+    this.open.set(false);
+    await this._shell()?.close();
+  }
 }

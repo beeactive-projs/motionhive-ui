@@ -3,7 +3,7 @@
        row do not fit above the fold on a phone. Same as the inbox. -->
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-searchbar placeholder="Search clients" inputmode="search" [debounce]="0" [value]="store.query()"
+    <ion-searchbar mhAutofocus placeholder="Search clients" inputmode="search" [debounce]="0" [value]="store.query()"
       (ionInput)="onQuery($event.detail.value ?? '')" />
     <ion-buttons slot="end">
       <ion-button (click)="closeSearch()">Cancel</ion-button>

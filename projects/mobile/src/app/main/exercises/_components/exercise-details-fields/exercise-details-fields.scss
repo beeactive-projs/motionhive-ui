@@ -1,0 +1,11 @@
+/* Three sections stacked at the page rhythm — the host takes the gap the
+   `.mh-page` column would have given them as direct children. */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.invalid {
+  color: var(--ion-color-danger);
+}

@@ -1,5 +1,6 @@
 <ng-template #body>
   <ion-searchbar
+    mhAutofocus
     placeholder="Search for a place"
     [debounce]="0"
     (ionInput)="onSearch($event.detail.value ?? '')"

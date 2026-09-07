@@ -26,6 +26,7 @@ import {
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../../../_shared/utils/people-search';
@@ -65,6 +66,7 @@ import {
     IonSegmentButton,
     IonSkeletonText,
     IonTextarea,
+    SearchbarAutofocusDirective,
     SheetShell,
   ],
   templateUrl: './invite-client-sheet.html',

@@ -1,4 +1,9 @@
 <svg class="hex" [attr.viewBox]="viewBox" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  <!-- The filled shape is always drawn, and the image rides on top of it. A
+       photo that 404s or has not decoded yet would otherwise leave a hole
+       where the avatar should be — this way it degrades to the tinted
+       hexagon, which is what an avatar without a picture looks like anyway. -->
+  <path [attr.d]="path" />
   @if (showImage()) {
     <defs>
       <clipPath [attr.id]="clipId">
@@ -14,8 +19,6 @@
       preserveAspectRatio="xMidYMid slice"
       [attr.clip-path]="clipUrl"
     />
-  } @else {
-    <path [attr.d]="path" />
   }
 </svg>
 

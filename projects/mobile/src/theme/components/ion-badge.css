@@ -75,3 +75,16 @@ ion-badge[data-tone='violet'] {
   --background: var(--ion-color-violet-wash);
   --color: var(--ion-color-violet-wash-contrast);
 }
+
+/* The two palette washes the map above did not name. Coral is the brand
+   orange — the middle of the muscle-role ramp; navy is the neutral wash for
+   things you need rather than states you are in (equipment, unilateral). */
+ion-badge[data-tone='coral'] {
+  --background: var(--ion-color-coral-wash);
+  --color: var(--ion-color-coral-wash-contrast);
+}
+
+ion-badge[data-tone='navy'] {
+  --background: var(--ion-color-secondary-wash);
+  --color: var(--ion-color-secondary-wash-contrast);
+}

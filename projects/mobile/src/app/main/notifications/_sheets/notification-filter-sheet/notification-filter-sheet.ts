@@ -78,8 +78,10 @@ export class NotificationFilterSheet {
     return this.draft().categories.includes(category);
   }
 
+  /** Reset is a decision, not an edit: it lands and closes, like Apply. */
   reset(): void {
     this.draft.set({ ...NO_FILTERS });
+    this.apply();
   }
 
   apply(): void {

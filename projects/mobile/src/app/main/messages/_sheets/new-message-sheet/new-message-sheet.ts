@@ -15,6 +15,7 @@ import { MessagingStore, UserSearchResult, displayName } from 'core';
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
 import { AvatarTone, avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../../../_shared/utils/people-search';
 import { MESSAGING_ICONS } from '../../messages.config';
@@ -40,6 +41,7 @@ import { MESSAGING_ICONS } from '../../messages.config';
     IonNote,
     IonSearchbar,
     IonSkeletonText,
+    SearchbarAutofocusDirective,
     SheetShell,
   ],
   templateUrl: './new-message-sheet.html',

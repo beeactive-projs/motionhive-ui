@@ -1,0 +1,6 @@
+/* The searchbar carries Ionic's own page padding; inside an already padded
+   sheet it only needs to sit flush with the rows under it. */
+ion-searchbar {
+  --box-shadow: none;
+  padding-inline: 0;
+}

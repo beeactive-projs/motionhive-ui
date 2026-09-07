@@ -1,0 +1,48 @@
+<ng-template #body>
+  <ion-searchbar
+    mhAutofocus
+    [placeholder]="searchPlaceholder()"
+    inputmode="search"
+    [debounce]="0"
+    [value]="query()"
+    (ionInput)="onQuery($event.detail.value ?? '')"
+  />
+
+  @if (hint()) {
+    <ion-note class="mh-footnote hint">{{ hint() }}</ion-note>
+  }
+
+  @if (isEmpty()) {
+    <ion-note class="mh-note-block">Nothing matches that.</ion-note>
+  } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (option of visibleOptions(); track option.value; let last = $last) {
+        <ion-item
+          button
+          detail="false"
+          [lines]="last ? 'none' : 'full'"
+          [class.inert]="isDisabled(option.value)"
+          [attr.aria-disabled]="isDisabled(option.value)"
+          [attr.aria-pressed]="isOn(option.value)"
+          (click)="toggle(option.value)"
+        >
+          <ion-label>{{ option.label }}</ion-label>
+          @if (isOn(option.value)) {
+            <ion-icon slot="end" name="checkmark-circle" color="primary" aria-hidden="true" />
+          }
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [subtitle]="counter()"
+  [body]="body"
+  saveLabel="Done"
+  [breakpoints]="[0, 0.85]"
+  [initialBreakpoint]="0.85"
+  (save)="done()"
+/>

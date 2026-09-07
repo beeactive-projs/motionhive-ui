@@ -1,5 +1,6 @@
 <ion-modal [isOpen]="open()" [breakpoints]="breakpoints()" [initialBreakpoint]="initialBreakpoint()" [handle]="true"
-  [expandToScroll]="false" [attr.aria-label]="title()" (didDismiss)="open.set(false)">
+  [expandToScroll]="false" [attr.aria-label]="title()" [class]="presented() ? presentedClass : ''"
+  (didPresent)="presented.set(true)" (didDismiss)="open.set(false); presented.set(false)">
   <!-- Everything the modal shows must live inside this template: Ionic moves
        the modal when it presents, and anything outside is left behind. -->
   <ng-template>

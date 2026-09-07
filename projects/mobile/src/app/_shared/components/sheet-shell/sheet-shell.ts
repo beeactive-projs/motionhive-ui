@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, TemplateRef, input, model, output, viewChild } from '@angular/core';
+import { Component, TemplateRef, input, model, output, signal, viewChild } from '@angular/core';
 import {
   IonButton,
   IonButtons,
@@ -13,6 +13,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
+
+/**
+ * Put on the `ion-modal` once its enter animation has finished, and taken off
+ * again on dismiss. Ionic's own `presented` flag flips before the animation
+ * starts, so it cannot answer "is it safe to pop the keyboard yet" —
+ * `mhAutofocus` reads this class instead.
+ */
+export const SHEET_PRESENTED_CLASS = 'mh-presented';
 
 /**
  * The bottom sheet the account area edits in: grabber, centred title, close
@@ -103,6 +111,14 @@ export class SheetShell {
 
   readonly save = output<void>();
   readonly action = output<void>();
+
+  /**
+   * True from the end of the enter animation to dismissal. Mirrored onto the
+   * modal element as a class so `mhAutofocus` can tell an already-open sheet
+   * from one still sliding in.
+   */
+  readonly presented = signal(false);
+  readonly presentedClass = SHEET_PRESENTED_CLASS;
 
   private readonly _modal = viewChild(IonModal);
 

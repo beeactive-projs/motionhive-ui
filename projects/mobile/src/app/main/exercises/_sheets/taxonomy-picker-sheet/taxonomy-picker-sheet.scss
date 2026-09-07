@@ -1,0 +1,16 @@
+/* The searchbar carries Ionic's own page padding; inside a sheet that is
+   already padded it only needs to sit flush with the rows below it. */
+ion-searchbar {
+  --box-shadow: none;
+  padding-inline: 0;
+}
+
+.hint {
+  padding: 0 0.375rem 0.5rem;
+}
+
+/* At the cap the unpicked rows go quiet rather than throwing an error: the
+   limit is a fact about the model, not something the coach got wrong. */
+.inert {
+  opacity: 0.4;
+}

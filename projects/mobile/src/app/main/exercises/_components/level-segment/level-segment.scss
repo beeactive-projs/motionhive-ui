@@ -1,0 +1,10 @@
+/* Three labels in one row on a phone: Ionic's default segment padding leaves
+   "Intermediate" as "Intermedi…". Tighter buttons at the body size give the
+   longest label its room without letting any of the three wrap. */
+ion-segment-button {
+  min-width: 0;
+  --padding-start: 0.25rem;
+  --padding-end: 0.25rem;
+  font-size: var(--mh-text-sm);
+  letter-spacing: 0;
+}

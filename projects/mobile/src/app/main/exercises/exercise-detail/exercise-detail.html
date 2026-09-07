@@ -1,0 +1,185 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="backHref" />
+    </ion-buttons>
+    <ion-title>{{ name() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (error(); as message) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this exercise" [message]="message"
+    actionLabel="Try again" (action)="retry()" />
+  } @else if (loading() && !exercise()) {
+  <div class="hero skeleton">
+    <ion-skeleton-text [animated]="true" />
+  </div>
+  <div class="mh-page">
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <ion-label>
+          <h3><ion-skeleton-text [animated]="true" style="width: 30%" /></h3>
+          <p><ion-skeleton-text [animated]="true" style="width: 55%" /></p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    <ion-skeleton-text [animated]="true" style="width: 90%; height: 4rem" />
+  </div>
+  } @else if (exercise(); as exercise) {
+  <!-- The hero: a clip if there is one, the movement's two frames if there
+       are, and the kind tile when there is neither. Never an empty box. -->
+  @if (youtubeUrl(); as url) {
+  <div class="hero">
+    <mh-youtube-embed [url]="url" [title]="exercise.name" />
+  </div>
+  } @else if (hasHeroImage()) {
+  <div class="hero">
+    @if (currentFrame(); as frame) {
+    <img [src]="frame.url" [alt]="exercise.name" />
+    }
+    @if (frames().length > 1) {
+    <!-- Which of the two positions is showing. Decorative: the alternation
+         is the point, and announcing "frame 2 of 2" says nothing useful. -->
+    <div class="dots" aria-hidden="true">
+      @for (frame of frames(); track frame.id; let i = $index) {
+      <span [class.on]="i === frameIndex()"></span>
+      }
+    </div>
+    }
+  </div>
+  } @else if (heroStill(); as still) {
+  <div class="hero">
+    <img [src]="still" [alt]="exercise.name" />
+  </div>
+  } @else {
+  <div class="hero placeholder">
+    <mh-hex-avatar size="xl" tone="wash" [color]="kindTone()" [icon]="kindIcon()" [name]="kindLabel() + ' exercise'" />
+  </div>
+  }
+
+  <div class="mh-page">
+    <!-- What it is, a category per row: the tile carries the category's
+         colour, the label names it, and the chips under it are the facts.
+         Grouped the way the create form asks for them, in the card a
+         session reads its price and policy in. -->
+    <section class="mh-section">
+      <span class="mh-kicker">Details</span>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (row of detailRows(); track row.label; let last = $last) {
+        <ion-item [lines]="last && !description() ? 'none' : 'full'">
+          <mh-hex-avatar slot="start" size="sm" [icon]="row.icon" [color]="row.color" [tone]="row.tone"
+            aria-hidden="true" />
+          <ion-label class="ion-text-wrap">
+            <h3>{{ row.label }}</h3>
+            <div class="chips">
+              @for (chip of row.chips; track chip.label) {
+              <ion-badge [attr.data-tone]="chip.tone" [class.with-icon]="!!chip.icon">
+                @if (chip.icon; as icon) {
+                <ion-icon [name]="icon" aria-hidden="true" />
+                }
+                {{ chip.label }}
+              </ion-badge>
+              }
+            </div>
+            @if (row.hint) {
+            <p>{{ row.hint }}</p>
+            }
+          </ion-label>
+        </ion-item>
+        }
+
+        @if (description(); as text) {
+        <!-- The author's words, after the facts: chips scan, prose reads. -->
+        <ion-item lines="none">
+          <mh-hex-avatar slot="start" size="sm" icon="information-circle-outline" color="medium" aria-hidden="true" />
+          <ion-label class="ion-text-wrap">
+            <h3>About</h3>
+            <p class="prose">{{ text }}</p>
+          </ion-label>
+        </ion-item>
+        }
+      </ion-list>
+    </section>
+
+    @if (forkedFromName(); as source) {
+    <ion-note class="mh-footnote">Forked from {{ source }}</ion-note>
+    }
+
+    <section class="mh-section">
+      <span class="mh-kicker">Muscles &amp; equipment</span>
+      <ion-list [inset]="true" class="mh-card-list">
+        <!-- Red, orange, light blue: the muscle chart's convention, most work
+             first. The row names the role, so the colours need no legend. -->
+        @for (row of muscleEquipmentRows(); track row.label; let last = $last) {
+        <ion-item [lines]="last ? 'none' : 'full'">
+          <mh-hex-avatar slot="start" size="sm" [icon]="row.icon" [color]="row.color" [tone]="row.tone"
+            aria-hidden="true" />
+          <ion-label class="ion-text-wrap">
+            <h3>{{ row.label }}</h3>
+            @if (row.chips.length > 0) {
+            <div class="chips">
+              @for (chip of row.chips; track chip.label) {
+              <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+              }
+            </div>
+            }
+            <!-- @if (row.hint) {
+            <p>{{ row.hint }}</p>
+            } -->
+          </ion-label>
+        </ion-item>
+        }
+      </ion-list>
+    </section>
+
+    @if (steps().length > 0) {
+    <section class="mh-section">
+      <span class="mh-kicker">Instructions</span>
+      <ol class="steps">
+        @for (step of steps(); track $index) {
+        <li>
+          <span class="n">{{ $index + 1 }}</span>
+          <span class="text">{{ step }}</span>
+        </li>
+        }
+      </ol>
+    </section>
+    }
+
+    @if (canEdit() || canFork()) {
+    <ion-list [inset]="true" class="mh-card-list">
+      @if (canEdit()) {
+      <ion-item button detail lines="none" (click)="edit()">
+        <ion-icon slot="start" name="create-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <h3>Edit exercise</h3>
+          <p>Change anything, or remove it from your library</p>
+        </ion-label>
+      </ion-item>
+      }
+      @if (canFork()) {
+      <!-- Quiet, not honey: copying someone else's work is an option on this
+           page, not the thing the page is for. -->
+      <ion-item button detail lines="none" (click)="confirmFork()">
+        <ion-icon slot="start" name="git-network-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <h3>Fork to my exercises</h3>
+          <p>Copy it, then edit your version freely</p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    }
+
+    <span class="mh-kicker attribution">{{ attribution() }}</span>
+  </div>
+  }
+</ion-content>
+
+<mh-confirm-sheet [(open)]="forkOpen" [title]="forkTitle()"
+  body="A copy lands in your exercises. Edit anything — name, cues, media — without touching the original. Your version will say it was forked from this one."
+  irreversible="You can keep one live fork of each exercise. If you already have one, we'll take you to it instead."
+  confirmLabel="Fork exercise" cancelLabel="Cancel" [saving]="forking()" (confirm)="fork()" />

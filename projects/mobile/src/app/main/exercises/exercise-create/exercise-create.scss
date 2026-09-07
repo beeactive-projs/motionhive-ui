@@ -1,0 +1,109 @@
+/* "Step 2 of 3" in the toolbar's end slot — a label, not a button, so it
+   sheds the button metrics `ion-buttons` would otherwise impose. */
+.step-count {
+  padding-inline-end: 0.75rem;
+  color: var(--ion-color-medium);
+  white-space: nowrap;
+}
+
+/* Two columns: six kinds fit above the fold, and each card has room for the
+   tracking line that makes the choice meaningful. */
+.kind-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.kind {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.75rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+  color: var(--ion-color-dark);
+  font-family: var(--ion-font-family);
+  text-align: start;
+  cursor: pointer;
+}
+
+.kind ion-icon {
+  margin-block-end: 0.25rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-md);
+}
+
+.kind .label {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.kind .hint {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-tight);
+}
+
+/* Honey marks the selection — the one job the brand colour has here. */
+.kind.on {
+  border-color: var(--ion-color-primary);
+  background: var(--ion-color-primary-wash);
+}
+
+.kind.on ion-icon,
+.kind.on .hint {
+  color: var(--ion-color-primary-wash-contrast);
+}
+
+/* The action bar takes the page gutter, so Next sits flush with the cards
+   above it rather than a step wider, and keeps a breath of space off the tab
+   bar below. Ionic adds the safe-area inset itself when no tab bar is there
+   to carry it, so it is not repeated here. */
+ion-footer ion-toolbar {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.75rem;
+}
+
+/* Progress as three marks. The current step is a bar rather than a dot so
+   position reads at a glance without counting filled circles. */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.375rem;
+  padding-block-end: 0.75rem;
+}
+
+.dots span {
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: var(--mh-radius-pill);
+  background: var(--ion-border-color);
+  transition: width 0.2s ease;
+}
+
+.dots span.done {
+  background: var(--ion-color-primary);
+}
+
+.dots span.on {
+  width: 1.125rem;
+  background: var(--ion-color-primary);
+}
+
+/* Back yields to Next: going on is the common case, going back the escape. */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+}
+
+.actions.single {
+  grid-template-columns: 1fr;
+}
+
+.actions ion-button {
+  margin: 0;
+}

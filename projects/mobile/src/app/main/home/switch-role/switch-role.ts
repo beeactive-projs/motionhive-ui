@@ -15,7 +15,7 @@ import {
   NavController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
+import { checkmarkCircle } from 'ionicons/icons';
 
 import { AppModeStore, NavMode } from 'core';
 
@@ -60,7 +60,7 @@ export class SwitchRole {
   readonly mode = this._appModeStore.mode;
 
   constructor() {
-    addIcons({ ...ROLE_ICONS, checkmarkCircle, ellipseOutline });
+    addIcons({ ...ROLE_ICONS, checkmarkCircle });
   }
 
   /** Picking the current role is a no-op beyond going back, per the design. */

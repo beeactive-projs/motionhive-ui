@@ -1,0 +1,15 @@
+/* "887 exercises · sorted by name" — the line that tells you how big the
+   thing you are scrolling is. A kicker, so it reads as a label on the list
+   rather than a row of it. */
+.meta {
+  padding-inline: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+/* The second way out of an empty library, under the primary one. Quiet: it
+   is the shortcut, not the thing we are asking for. */
+.secondary-action {
+  display: flex;
+  justify-content: center;
+  margin-top: -0.5rem;
+}

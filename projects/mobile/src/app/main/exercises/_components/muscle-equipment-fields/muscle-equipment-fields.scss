@@ -1,0 +1,5 @@
+/* One section at the page rhythm — the host stands in for the `.mh-page`
+   child it replaces. Row skins come from `.mh-card-list` (ion-list.css). */
+:host {
+  display: block;
+}

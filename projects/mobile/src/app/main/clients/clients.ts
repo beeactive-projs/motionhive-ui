@@ -42,6 +42,7 @@ import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-she
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
 import { AttentionRow } from './_components/attention-row/attention-row';
@@ -104,6 +105,7 @@ import { ClientsStore } from './clients.store';
     NotificationBell,
     OnTrackRow,
     RouterLink,
+    SearchbarAutofocusDirective,
   ],
   templateUrl: './clients.html',
   styleUrl: './clients.scss',

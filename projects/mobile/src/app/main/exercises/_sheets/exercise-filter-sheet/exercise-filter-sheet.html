@@ -1,0 +1,87 @@
+<ng-template #body>
+  <div class="mh-section-label">Kind</div>
+  <div class="chips">
+    @for (chip of kindChips(); track chip.value) {
+      <ion-chip
+        [class.selected]="isKindOn(chip.value)"
+        [attr.aria-pressed]="isKindOn(chip.value)"
+        (click)="toggleKind(chip.value)"
+      >
+        {{ chip.label }}
+        @if (chip.count !== null) {
+          <span class="count">{{ chip.count }}</span>
+        }
+      </ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Level</div>
+  <div class="chips">
+    @for (chip of levelChips(); track chip.value) {
+      <ion-chip
+        [class.selected]="isLevelOn(chip.value)"
+        [attr.aria-pressed]="isLevelOn(chip.value)"
+        (click)="toggleLevel(chip.value)"
+      >
+        {{ chip.label }}
+        @if (chip.count !== null) {
+          <span class="count">{{ chip.count }}</span>
+        }
+      </ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Primary muscle</div>
+  <div class="chips">
+    @for (chip of muscleChips(); track chip.value) {
+      <ion-chip
+        [class.selected]="isMuscleOn(chip.value)"
+        [attr.aria-pressed]="isMuscleOn(chip.value)"
+        (click)="toggleMuscle(chip.value)"
+      >
+        {{ chip.label }}
+        @if (chip.count !== null) {
+          <span class="count">{{ chip.count }}</span>
+        }
+      </ion-chip>
+    }
+    <!-- Seventeen chips would bury Equipment below the fold; the eight that
+         cover most of the catalogue lead, and the rest are one tap away. -->
+    @if (hiddenMuscleCount() > 0) {
+      <ion-chip class="more" (click)="expandMuscles()">{{ showAllMusclesLabel() }}</ion-chip>
+    }
+  </div>
+
+  <div class="mh-section-label">Equipment</div>
+  <div class="chips">
+    @for (chip of equipmentChips(); track chip.value) {
+      <ion-chip
+        [class.selected]="isEquipmentOn(chip.value)"
+        [attr.aria-pressed]="isEquipmentOn(chip.value)"
+        (click)="toggleEquipment(chip.value)"
+      >
+        {{ chip.label }}
+        @if (chip.count !== null) {
+          <span class="count">{{ chip.count }}</span>
+        }
+      </ion-chip>
+    }
+  </div>
+
+  <ion-note class="mh-footnote">
+    Movement pattern, mechanic and force are on the web app.
+  </ion-note>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Filters"
+  actionLabel="Reset"
+  [actionDisabled]="count() === 0"
+  [saveLabel]="applyLabel()"
+  [body]="body"
+  [breakpoints]="[0, 0.75, 0.95]"
+  [initialBreakpoint]="0.75"
+  (action)="reset()"
+  (save)="apply()"
+/>

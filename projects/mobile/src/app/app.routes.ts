@@ -121,9 +121,12 @@ export const routes: Routes = [
         loadComponent: () => import('./main/programs/programs').then((m) => m.Programs),
       },
       {
+        // No guard on the area: the catalogue is reference material both
+        // roles read, and the API serves it to trainees too. The routes that
+        // write carry `coachGuard` themselves.
         path: 'exercises',
-        canActivate: [coachGuard],
-        loadComponent: () => import('./main/exercises/exercises').then((m) => m.Exercises),
+        loadChildren: () =>
+          import('./main/exercises/exercises.routes').then((m) => m.exercisesRoutes),
       },
       {
         path: 'discover',

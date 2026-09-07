@@ -1,0 +1,19 @@
+/* The destructive row wears its colour in the label, not the surface: a red
+   card at the end of a form reads as an error the page is reporting. */
+.danger ion-label h3 {
+  color: var(--ion-color-danger);
+}
+
+/* Same bar as the create wizard's: the page gutter so Save lines up with the
+   cards, and a breath of space off the tab bar. Ionic adds the safe-area
+   inset itself when no tab bar is there to carry it. */
+ion-footer ion-toolbar {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.75rem;
+}
+
+ion-footer ion-button {
+  margin: 0;
+}

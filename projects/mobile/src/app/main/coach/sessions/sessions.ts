@@ -45,6 +45,7 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../../_shared/components/notification-bell/notification-bell';
 import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { SearchbarAutofocusDirective } from '../../../_shared/directives/searchbar-autofocus.directive';
 import { ClockService } from '../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ShareOutcomes, shareOrCopy } from '../../../_shared/utils/share';
@@ -121,6 +122,7 @@ interface AgendaDay {
     MessageSignupsSheet,
     MonthSheet,
     NotificationBell,
+    SearchbarAutofocusDirective,
     SessionActionsSheet,
     SessionFilterSheet,
     SessionFormSheet,

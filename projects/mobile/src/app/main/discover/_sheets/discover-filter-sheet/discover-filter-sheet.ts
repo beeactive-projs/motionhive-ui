@@ -71,8 +71,10 @@ export class DiscoverFilterSheet {
     this.draft.update((draft) => ({ ...draft, datePreset }));
   }
 
+  /** Reset is a decision, not an edit: it lands and closes, like Apply. */
   reset(): void {
     this.draft.set({ ...NO_SHEET_FILTERS });
+    this.apply();
   }
 
   apply(): void {

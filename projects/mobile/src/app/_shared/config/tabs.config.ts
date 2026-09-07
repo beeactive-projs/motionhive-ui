@@ -123,6 +123,9 @@ export const TRAIN_TAB_SET: TabSet = {
           iconColor: 'violet',
           route: '/tabs/workouts',
         },
+        // The same library the coach side gets, read-only: a trainee looking
+        // up a movement their plan names should not have to ask for it.
+        { label: 'Exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
       ],
     },
     {

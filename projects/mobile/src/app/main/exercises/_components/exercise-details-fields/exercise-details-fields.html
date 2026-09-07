@@ -1,0 +1,91 @@
+<section class="mh-section">
+  <span class="mh-kicker">Classification</span>
+  <ion-note class="mh-note-block">All optional — leave them for later if you like.</ion-note>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="full">
+      <ion-select label="Pattern" labelPlacement="start" interface="action-sheet"
+        placeholder="Not set" [value]="form().draft().movementPattern"
+        (ionChange)="form().patch({ movementPattern: $event.detail.value })">
+        @for (option of patternOptions; track option.value) {
+        <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    <ion-item lines="full">
+      <ion-select label="Mechanic" labelPlacement="start" interface="action-sheet"
+        placeholder="Not set" [value]="form().draft().mechanic"
+        (ionChange)="form().patch({ mechanic: $event.detail.value })">
+        @for (option of mechanicOptions; track option.value) {
+        <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    <ion-item lines="full">
+      <ion-select label="Force" labelPlacement="start" interface="action-sheet"
+        placeholder="Not set" [value]="form().draft().force"
+        (ionChange)="form().patch({ force: $event.detail.value })">
+        @for (option of forceOptions; track option.value) {
+        <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label class="ion-text-wrap">
+        <h3>Unilateral movement</h3>
+        <p>Single-arm or single-leg — drives left vs right tracking later.</p>
+      </ion-label>
+      <ion-toggle slot="end" aria-label="Unilateral movement"
+        [checked]="form().draft().isUnilateral"
+        (ionChange)="form().patch({ isUnilateral: $event.detail.checked })" />
+    </ion-item>
+  </ion-list>
+</section>
+
+<section class="mh-section">
+  <span class="mh-kicker">Demo &amp; cues</span>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="full">
+      <ion-input label="YouTube demo" labelPlacement="stacked" inputmode="url"
+        placeholder="https://youtube.com/watch?v=…" [value]="form().draft().youtubeUrl"
+        (ionInput)="form().patch({ youtubeUrl: $event.detail.value ?? '' })" />
+    </ion-item>
+    <ion-item lines="full">
+      <ion-textarea label="Description" labelPlacement="stacked" [autoGrow]="true" [rows]="2"
+        placeholder="One to three sentences about the movement"
+        [value]="form().draft().description"
+        (ionInput)="form().patch({ description: $event.detail.value ?? '' })" />
+    </ion-item>
+    <ion-item lines="none">
+      <ion-textarea label="Instructions" labelPlacement="stacked" [autoGrow]="true" [rows]="3"
+        placeholder="Step-by-step form cues, one per line" [value]="form().draft().instructions"
+        (ionInput)="form().patch({ instructions: $event.detail.value ?? '' })" />
+    </ion-item>
+  </ion-list>
+  @if (!form().isYoutubeValid()) {
+  <ion-note class="mh-footnote invalid">
+    That does not look like a YouTube link. Paste a watch, youtu.be or shorts URL.
+  </ion-note>
+  } @else {
+  <ion-note class="mh-footnote">
+    Uploading your own video comes later. A YouTube link gives the exercise a thumbnail.
+  </ion-note>
+  }
+</section>
+
+<section class="mh-section">
+  <span class="mh-kicker">Visibility</span>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="none">
+      <ion-icon slot="start" name="lock-closed-outline" color="medium" aria-hidden="true" />
+      <ion-label class="ion-text-wrap">
+        <h3>Private</h3>
+        <p>Only you can see and use it. Turn off to publish it for other coaches.</p>
+      </ion-label>
+      <ion-toggle slot="end" aria-label="Private" [checked]="form().isPrivate()"
+        (ionChange)="form().setPrivate($event.detail.checked)" />
+    </ion-item>
+  </ion-list>
+  @if (visibilityNote(); as note) {
+  <ion-note class="mh-footnote">{{ note }}</ion-note>
+  }
+</section>

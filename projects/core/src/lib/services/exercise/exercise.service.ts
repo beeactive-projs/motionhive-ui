@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import type { Equipment } from '../../models/exercise/equipment.model';
 import type {
   CreateExercisePayload,
@@ -61,11 +62,20 @@ export class ExerciseService {
     );
   }
 
-  /** Returns 409 from the BE if this owner already has a live fork of the source. */
+  /**
+   * Copy a public exercise into the caller's own library.
+   *
+   * The BE answers 409 when a live fork of this source already exists. That
+   * is a designed outcome, not a failure: the caller is expected to take the
+   * user to the fork they already have. Marked `silentRequest()` so the
+   * global error dialog does not announce a "Conflict" over the top of that
+   * — the caller owns every outcome of this call.
+   */
   fork(id: string): Observable<Exercise> {
     return this._http.post<Exercise>(
       `${environment.apiUrl}${API_ENDPOINTS.EXERCISES.FORK(id)}`,
       {},
+      { context: silentRequest() },
     );
   }
 

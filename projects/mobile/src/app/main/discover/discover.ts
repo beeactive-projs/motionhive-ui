@@ -37,6 +37,7 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { ClockService } from '../../_shared/services/clock.service';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { CoachRow } from './_components/coach-row/coach-row';
@@ -92,6 +93,7 @@ import { DiscoverCoachesStore } from './discover.store';
     IonTitle,
     IonToolbar,
     NotificationBell,
+    SearchbarAutofocusDirective,
     SessionRowSkeleton,
   ],
   templateUrl: './discover.html',

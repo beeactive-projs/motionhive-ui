@@ -1,0 +1,102 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <!-- Close, not Back: step 1's back gesture leaves the form, and a
+           chevron would suggest it only steps backwards. -->
+      <ion-button aria-label="Cancel" (click)="cancel()">
+        <ion-icon slot="icon-only" name="close-circle-outline" />
+      </ion-button>
+    </ion-buttons>
+    <ion-title>New exercise</ion-title>
+    <ion-buttons slot="end">
+      <span class="mh-kicker step-count">Step {{ step() }} of 3</span>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="mh-page">
+    @switch (step()) {
+    @case (1) {
+    <section class="mh-section">
+      <div class="mh-section-head">
+        <span class="mh-kicker">Name</span>
+        <ion-note>{{ form.nameCount() }} / {{ maxNameLength }}</ion-note>
+      </div>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item lines="none">
+          <ion-input aria-label="Name" placeholder="e.g. Tempo goblet squat"
+            autocapitalize="sentences" [maxlength]="maxNameLength" [value]="form.draft().name"
+            (ionInput)="form.patch({ name: $event.detail.value ?? '' })" />
+        </ion-item>
+      </ion-list>
+    </section>
+
+    <section class="mh-section">
+      <span class="mh-kicker">Kind</span>
+      <ion-note class="mh-note-block">
+        Determines what gets tracked when a client logs this.
+      </ion-note>
+      <!-- A grid, not a select: the kind decides what the exercise can even
+           record, so the tracking promise has to be readable at choosing time. -->
+      <!-- One of six, so radio semantics: a toggle button that silently
+           un-presses its neighbour is the wrong story for a screen reader. -->
+      <div class="kind-grid" role="radiogroup" aria-label="Kind">
+        @for (card of kindCards; track card.value) {
+        <button type="button" role="radio" class="kind" [class.on]="form.draft().kind === card.value"
+          [attr.aria-checked]="form.draft().kind === card.value" (click)="selectKind(card.value)">
+          <ion-icon [name]="card.icon" aria-hidden="true" />
+          <span class="label">{{ card.label }}</span>
+          <span class="hint">{{ card.tracking }}</span>
+        </button>
+        }
+      </div>
+    </section>
+
+    <section class="mh-section">
+      <span class="mh-kicker">Level</span>
+      <mh-level-segment [level]="form.draft().level"
+        (levelChange)="form.patch({ level: $event })" />
+    </section>
+    }
+
+    @case (2) {
+    <mh-muscle-equipment-fields [selection]="form.selection()"
+      (selectionChange)="form.patch($event)" />
+    }
+
+    @case (3) {
+    <mh-exercise-details-fields [form]="form" />
+    }
+    }
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar>
+    <!-- Where you are, in the one place a phone has room for it. Decorative:
+         the header already says "Step 2 of 3" in words. -->
+    <div class="dots" aria-hidden="true">
+      @for (index of steps; track index) {
+      <span [class.on]="index === step()" [class.done]="index < step()"></span>
+      }
+    </div>
+    <div class="actions" [class.single]="step() === 1">
+      @if (step() > 1) {
+      <ion-button fill="outline" color="medium" [disabled]="saving()" (click)="back()">
+        Back
+      </ion-button>
+      }
+      <ion-button expand="block" [disabled]="!canAdvance() || saving()" (click)="next()">
+        @if (saving()) {
+        <ion-spinner name="crescent" />
+        } @else if (step() === 3) {
+        <ion-icon slot="start" name="checkmark-outline" aria-hidden="true" />
+        Create exercise
+        } @else {
+        {{ nextLabel() }}
+        }
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

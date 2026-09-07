@@ -1,0 +1,58 @@
+/* The divider Ionic will not draw for us: its inset-list stylesheet zeroes
+   the border on the last item, and every row here is a host wrapping one —
+   so `lines="full"` on the item would show on all of them, including the
+   last. Same trick as client-row: the host owns the rule. */
+:host {
+  display: block;
+  border-block-end: 1px solid var(--mh-color-divider);
+}
+
+:host(:last-of-type) {
+  border-block-end: 0;
+}
+
+ion-item {
+  --background: var(--ion-card-background);
+  --inner-border-width: 0;
+  /* Ionic dims the chevron to 25% by default, below the 3:1 a control needs. */
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+}
+
+mh-hex-avatar {
+  margin-inline-end: 0.875rem;
+}
+
+/* One line each, always. "Advanced Kettlebell Windmill" is a real row in the
+   seeded catalogue, and letting it wrap makes that row twice the height of
+   its neighbours — a list you scan by shape stops being scannable. */
+ion-label h2,
+ion-label p {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+ion-label h2 {
+  font-family: var(--ion-font-family);
+  font-weight: 600;
+}
+
+/* Level always shows; ownership only for the exceptions. Both stay on one
+   line and never yield — the name above them is what ellipsizes. */
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: none;
+  margin-inline-start: 0.5rem;
+}
+
+/* The ownership chip is the exception marker, so it reads as a label rather
+   than a status: mono and uppercase, the way the roster's chips do. */
+.ownership {
+  font-family: var(--mh-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: var(--mh-tracking-kicker);
+  text-transform: uppercase;
+}

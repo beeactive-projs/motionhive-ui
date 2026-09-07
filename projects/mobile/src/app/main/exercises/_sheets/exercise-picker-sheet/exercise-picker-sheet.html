@@ -1,0 +1,37 @@
+<ng-template #body>
+  <ion-searchbar mhAutofocus placeholder="Search exercises" inputmode="search" [debounce]="0"
+    [value]="query()" (ionInput)="onQuery($event.detail.value ?? '')" />
+
+  <div class="mh-section-label">{{ sectionLabel() }}</div>
+
+  @if (loading()) {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+        <ion-item [lines]="last ? 'none' : 'full'">
+          <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 50%" /></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 70%" /></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else if (isEmpty()) {
+    <ion-note class="mh-note-block">{{ emptyMessage() }}</ion-note>
+  } @else {
+    <!-- The library's own row, in its checkbox mode — so a picked exercise
+         looks the same here as it does everywhere else, photo included. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (exercise of rows(); track exercise.id) {
+        <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
+          (select)="toggle(exercise)" />
+      }
+    </ion-list>
+  }
+</ng-template>
+
+<!-- "Full library" rides the header action slot: the escape from this sheet
+     to the real page, without a second footer button competing with Add. -->
+<mh-sheet-shell [(open)]="open" title="Add exercises" [subtitle]="context()"
+  actionLabel="Full library" [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"
+  [breakpoints]="[0, 0.85]" [initialBreakpoint]="0.85" (action)="openLibrary()" (save)="add()" />

@@ -1,0 +1,24 @@
+<ion-item lines="none" button [detail]="!isPicker()" [attr.aria-pressed]="selected()"
+  (click)="select.emit()">
+  <!-- Decorative: the name it would announce is the very next thing in the row. -->
+  <mh-hex-avatar slot="start" size="md" tone="wash" aria-hidden="true" [color]="kindTone()"
+    [icon]="tileIcon()" [imageUrl]="thumbnailUrl()" />
+
+  <ion-label>
+    <h2>{{ name() }}</h2>
+    <p>{{ subline() }}</p>
+  </ion-label>
+
+  @if (isPicker()) {
+  @if (selected()) {
+  <ion-icon slot="end" name="checkmark-circle" color="primary" aria-hidden="true" />
+  }
+  } @else {
+  <div class="chips" slot="end">
+    @if (ownership(); as chip) {
+    <ion-badge class="ownership" [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+    }
+    <ion-badge [attr.data-tone]="levelTone()">{{ levelLabel() }}</ion-badge>
+  </div>
+  }
+</ion-item>

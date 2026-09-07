@@ -33,6 +33,7 @@ import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../_shared/services/feedback.service';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
 import { AvatarTone, avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../_shared/utils/people-search';
 import { ConversationRow } from './_components/conversation-row/conversation-row';
@@ -78,6 +79,7 @@ import { MESSAGING_ICONS } from './messages.config';
     IonToolbar,
     NewMessageSheet,
     NotificationBell,
+    SearchbarAutofocusDirective,
   ],
   templateUrl: './messages.html',
   styleUrl: './messages.scss',

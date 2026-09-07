@@ -1,0 +1,41 @@
+<section class="mh-section">
+  <span class="mh-kicker">Muscles &amp; equipment</span>
+  <ion-list [inset]="true" class="mh-card-list">
+    <!-- Required, capped at three — the picker enforces the cap, the row
+         only has to say which slot is the one that cannot stay empty. -->
+    <ion-item button detail lines="full" (click)="openPicker('primaryMuscleIds')">
+      <ion-label>
+        <h3>Primary muscles</h3>
+        <p>{{ primarySummary() }}</p>
+      </ion-label>
+      <ion-note slot="end">Required</ion-note>
+    </ion-item>
+
+    <ion-item button detail lines="full" (click)="openPicker('secondaryMuscleIds')">
+      <ion-label>
+        <h3>Secondary muscles</h3>
+        <p>{{ secondarySummary() }}</p>
+      </ion-label>
+      <ion-note slot="end">Optional</ion-note>
+    </ion-item>
+
+    <ion-item button detail lines="full" (click)="openPicker('stabilizerMuscleIds')">
+      <ion-label>
+        <h3>Stabilizers</h3>
+        <p>{{ stabilizerSummary() }}</p>
+      </ion-label>
+      <ion-note slot="end">Optional</ion-note>
+    </ion-item>
+
+    <ion-item button detail lines="none" (click)="openPicker('equipmentIds')">
+      <ion-label>
+        <h3>Equipment</h3>
+        <p>{{ equipmentSummary() }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</section>
+
+<mh-taxonomy-picker-sheet [(open)]="pickerOpen" [title]="picker().title" [options]="pickerOptions()"
+  [selectedIds]="pickerSelected()" [max]="picker().max" [hint]="picker().hint"
+  [searchPlaceholder]="picker().searchPlaceholder" (picked)="applyPicker($event)" />

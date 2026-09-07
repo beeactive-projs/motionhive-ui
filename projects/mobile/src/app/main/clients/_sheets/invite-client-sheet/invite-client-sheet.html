@@ -27,7 +27,8 @@
   </ion-segment>
 
   @if (mode() === Modes.Platform) {
-  <ion-searchbar placeholder="Search by name or email" inputmode="search" [debounce]="0" [value]="people.query()"
+  <ion-searchbar mhAutofocus placeholder="Search by name or email" inputmode="search" [debounce]="0"
+    [value]="people.query()"
     (ionInput)="people.setQuery($event.detail.value ?? '')" />
   <p class="mh-helper">
     Type at least 2 characters. Only platform users without an existing
@@ -62,8 +63,9 @@
         <p class="handle">&#64;{{ tag }}</p>
         }
       </ion-label>
-      <ion-icon slot="end" class="pick" [name]="isSelected(person) ? 'checkmark-circle' : 'ellipse-outline'"
-        [color]="isSelected(person) ? 'primary' : 'medium'" aria-hidden="true" />
+      @if (isSelected(person)) {
+      <ion-icon slot="end" class="pick" name="checkmark-circle" color="primary" aria-hidden="true" />
+      }
     </ion-item>
     }
   </ion-list>

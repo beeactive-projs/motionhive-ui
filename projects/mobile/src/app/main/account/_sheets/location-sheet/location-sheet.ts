@@ -15,6 +15,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, take, tap } fro
 import { PickedLocation, PlaceSearchService, ProfileService, StripeOnboardingStore } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AccountStore } from '../../account.store';
 
@@ -36,6 +37,7 @@ const SEARCH_DEBOUNCE_MS = 400;
     IonList,
     IonSearchbar,
     IonSpinner,
+    SearchbarAutofocusDirective,
     SheetShell,
   ],
   templateUrl: './location-sheet.html',
