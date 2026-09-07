@@ -17,6 +17,7 @@
     "cap:android": "npm run cap:sync:dev && cd android && .\\gradlew.bat installDebug && adb reverse tcp:3800 tcp:3800 && adb shell am start -n fit.motionhive.app/.MainActivity",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios",
+    "mobile:assets": "node scripts/mobile-assets.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "npm run check:reusability && ng test",
     "check:reusability": "node scripts/check-reusability.mjs",
@@ -96,5 +97,8 @@
     "last 2 Edge versions",
     "last 2 Safari versions",
     "last 2 iOS versions"
-  ]
+  ],
+  "allowScripts": {
+    "sharp@0.32.6": true
+  }
 }

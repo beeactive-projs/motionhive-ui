@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ system splash background. Matches the light Ionic background colour (slate-50). -->
+    <color name="mh_splash_background">#f8fafc</color>
+</resources>
