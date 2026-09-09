@@ -58,14 +58,9 @@
       <button type="button"
         class="flex items-center gap-3 border-b border-surface py-3 text-left last:border-0 hover:opacity-80"
         (click)="openClient(c)">
-        @if (c.avatarUrl) {
-        <img [src]="c.avatarUrl" [alt]="c.name" loading="lazy"
-          class="size-10 shrink-0 rounded-full border border-surface object-cover" />
-        } @else {
-        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-500/15">
-          <i class="pi pi-exclamation-circle"></i>
-        </span>
-        }
+        <mh-hex-avatar [size]="40" [userId]="c.clientId" [imageUrl]="c.avatarUrl"
+          [initials]="initialsFor(c)" />
+
         <span class="min-w-0 flex-1">
           <span class="block truncate text-sm font-semibold">{{ c.name }}</span>
           <span class="block truncate text-[12px] font-semibold text-amber-600">{{ attentionLabel(c) }}</span>
@@ -96,14 +91,9 @@
       <button type="button"
         class="flex items-center gap-3 border-b border-surface py-2.5 text-left last:border-0 hover:opacity-80"
         (click)="openClient(c)">
-        @if (c.avatarUrl) {
-        <img [src]="c.avatarUrl" [alt]="c.name" loading="lazy"
-          class="size-9 shrink-0 rounded-full border border-surface object-cover" />
-        } @else {
-        <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-100 text-muted-color dark:bg-surface-700">
-          <i class="pi pi-user text-sm"></i>
-        </span>
-        }
+        <mh-hex-avatar [size]="36" [userId]="c.clientId" [imageUrl]="c.avatarUrl"
+          [initials]="initialsFor(c)" />
+
         <span class="min-w-0 flex-1">
           <span class="block truncate text-[13px] font-semibold">{{ c.name }}</span>
           <span class="block truncate text-[11px] text-muted-color">{{ subtitleFor(c) }}</span>

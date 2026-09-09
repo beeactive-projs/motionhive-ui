@@ -22,6 +22,7 @@ import {
   showApiError,
 } from 'core';
 
+import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { KpiCard } from '../../../../_shared/components/kpi-card/kpi-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 
@@ -47,6 +48,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     FormsModule,
     ButtonDirective,
     Card,
+    HexAvatar,
     KpiCard,
     ListEmptyState,
     SelectButton,
@@ -174,5 +176,19 @@ export class CoachRoster implements OnInit {
         : 'Nothing scheduled in this window';
     }
     return `${c.completed} of ${c.due} sessions`;
+  }
+
+  /**
+   * Initials for the hex avatar. The roster returns `name` already joined
+   * (first + last, falling back to handle), so derive from the words rather
+   * than firstName/lastName — first and last word covers "Ana Maria Pop"
+   * the way a reader would abbreviate it.
+   */
+  initialsFor(c: RosterClient): string {
+    const words = c.name.trim().split(/\s+/).filter(Boolean);
+    if (words.length === 0) return '?';
+    const first = words[0]!.charAt(0);
+    const last = words.length > 1 ? words[words.length - 1]!.charAt(0) : '';
+    return (first + last).toUpperCase();
   }
 }
