@@ -14,7 +14,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
-import { AuthStore, showApiError } from 'core';
+import { AuthStore, WEB_APP_URL, showApiError } from 'core';
 import { AdminUsersService } from '../../_data/services/admin-users.service';
 import { AdminImpersonationService } from '../../_data/services/admin-impersonation.service';
 import {
@@ -23,7 +23,6 @@ import {
   AdminUserFilters,
   AdminUserListItem,
 } from '../../_data/models/admin.models';
-import { resolveWebAppUrl } from '../../_data/web-app-url.util';
 
 const ALL_ROLES = ['SUPER_ADMIN', 'ADMIN', 'SUPPORT', 'INSTRUCTOR', 'WRITER', 'USER'];
 
@@ -221,12 +220,11 @@ export class Users {
     }
     this._impersonation.impersonate(d.id, reason).subscribe({
       next: (res) => {
-        const base = resolveWebAppUrl();
-        const url = `${base}/impersonate?token=${encodeURIComponent(res.accessToken)}`;
+        const url = `${WEB_APP_URL}/impersonate?token=${encodeURIComponent(res.accessToken)}`;
         window.open(url, '_blank', 'noopener');
         this.toast(
           'Impersonating',
-          `Opening the app (${base}) as ${res.targetUser.email} in a new tab.`,
+          `Opening the app (${WEB_APP_URL}) as ${res.targetUser.email} in a new tab.`,
         );
         this.impersonateReason = '';
       },
