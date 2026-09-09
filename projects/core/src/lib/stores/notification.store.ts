@@ -189,6 +189,15 @@ export class NotificationStore {
       .list({ page: 1, limit: this.pageSize, ...this.activeFilter() })
       .pipe(
         tap((response) => {
+          // [TEMP-DEBUG] What the bell actually received. Delete with the
+          // rest: grep -rn "TEMP-DEBUG" projects/
+          // eslint-disable-next-line no-console
+          console.log('[TEMP-DEBUG] bell list', {
+            filter: this.activeFilter(),
+            received: response.items.length,
+            total: response.total,
+            types: response.items.map((i) => i.type),
+          });
           this.notificationsSignal.set(response.items);
           this.totalSignal.set(response.total);
           this.hasLoadedListSignal.set(true);
@@ -196,7 +205,11 @@ export class NotificationStore {
             this.markVisibleAsViewed();
           }
         }),
-        catchError(() => {
+        catchError((err: unknown) => {
+          // [TEMP-DEBUG] the error object was previously discarded, so a
+          // failed load looked the same as an empty bell.
+          // eslint-disable-next-line no-console
+          console.error('[TEMP-DEBUG] bell list FAILED', err);
           this.loadFailedSignal.set(true);
           return EMPTY;
         }),

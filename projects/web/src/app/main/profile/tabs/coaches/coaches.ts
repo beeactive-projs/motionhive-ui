@@ -103,15 +103,35 @@ export class ProfileCoaches implements OnInit {
     this.loadingRequests.set(true);
     this._clientService.getPendingRequests().subscribe({
       next: (requests) => {
-        this.incomingRequests.set(
-          requests.filter((r) => r.type === 'INSTRUCTOR_TO_CLIENT'),
+        const incoming = requests.filter(
+          (r) => r.type === 'INSTRUCTOR_TO_CLIENT',
         );
-        this.outgoingRequests.set(
-          requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR'),
+        const outgoing = requests.filter(
+          (r) => r.type === 'CLIENT_TO_INSTRUCTOR',
         );
+
+        // [TEMP-DEBUG] The API returned rows but the tab looks empty ⇒ the
+        // type filter dropped them. Log the raw payload and both filter
+        // results so the mismatch is visible. Delete with the rest:
+        // grep -rn "TEMP-DEBUG" projects/
+        // eslint-disable-next-line no-console
+        console.log('[TEMP-DEBUG] pendingRequests', {
+          received: requests.length,
+          rawTypes: requests.map((r) => r.type),
+          incomingAfterFilter: incoming.length,
+          outgoingAfterFilter: outgoing.length,
+          raw: requests,
+        });
+
+        this.incomingRequests.set(incoming);
+        this.outgoingRequests.set(outgoing);
         this.loadingRequests.set(false);
       },
-      error: () => {
+      error: (err: unknown) => {
+        // [TEMP-DEBUG] This error was previously discarded entirely, which
+        // made a failed request look identical to "no invitations".
+        // eslint-disable-next-line no-console
+        console.error('[TEMP-DEBUG] pendingRequests FAILED', err);
         this.loadingRequests.set(false);
       },
     });
