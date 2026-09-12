@@ -1,0 +1,101 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/programs" />
+    </ion-buttons>
+    <ion-title>Program settings</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [disabled]="!canSave()" (click)="save()">Save</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading()) {
+    <p class="state">Loading…</p>
+  } @else if (program(); as p) {
+    <div class="pad">
+      <ion-input
+        fill="outline"
+        label="Name"
+        labelPlacement="stacked"
+        placeholder="12-week strength block"
+        [value]="name()"
+        (ionInput)="name.set($any($event).detail.value ?? '')"
+      />
+
+      <ion-textarea
+        fill="outline"
+        label="Description"
+        labelPlacement="stacked"
+        [autoGrow]="true"
+        placeholder="Who it is for, and what it builds."
+        [value]="description()"
+        (ionInput)="description.set($any($event).detail.value ?? '')"
+      />
+
+      <!-- Authored in weeks because that is how a block is planned; stored as
+           days, so an open-ended or day-counted plan needs no migration. -->
+      <div class="duration">
+        <span class="mh-kicker">Length</span>
+        <div class="stepper" role="group" aria-label="Program length in weeks">
+          <button
+            type="button"
+            [disabled]="weeks() <= 1"
+            aria-label="One week fewer"
+            (click)="stepWeeks(-1)"
+          >
+            <ion-icon name="remove-outline" aria-hidden="true" />
+          </button>
+          <span class="value">{{ weeks() }} <em>{{ weeks() === 1 ? 'week' : 'weeks' }}</em></span>
+          <button type="button" aria-label="One week more" (click)="stepWeeks(1)">
+            <ion-icon name="add-outline" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- The status card counts what is actually built, so "not ready" is a
+         fact about the plan rather than a warning without a cause. -->
+    <section class="status" [class.ready]="isPublished()">
+      <span class="mh-kicker">{{ isPublished() ? 'Published' : 'Draft' }}</span>
+
+      @if (isPublished()) {
+        <p>Clients can be assigned to this program.</p>
+        <button class="link" type="button" (click)="openAssignments()">
+          View assignments
+        </button>
+      } @else {
+        <p>
+          {{ dayCount() }} {{ dayCount() === 1 ? 'day' : 'days' }} of work so far.
+          @if (blockers().length) {
+            Needs {{ blockers().join(' and ') }} before it can be assigned.
+          }
+        </p>
+        <ion-button
+          expand="block"
+          [disabled]="!canPublish() || saving()"
+          (click)="save(true)"
+        >
+          Publish
+        </ion-button>
+      }
+    </section>
+
+    <button class="delete" type="button" (click)="deleteOpen.set(true)">
+      <ion-icon name="trash-outline" aria-hidden="true" />
+      Delete program
+    </button>
+  }
+</ion-content>
+
+<mh-confirm-sheet
+  [(open)]="deleteOpen"
+  title="Delete program"
+  [body]="'Delete ' + (program()?.name ?? 'this program') + '? Clients already assigned keep their own copy.'"
+  confirmLabel="Delete"
+  cancelLabel="Keep it"
+  tone="danger"
+  [saving]="deleting()"
+  (confirm)="confirmDelete()"
+/>

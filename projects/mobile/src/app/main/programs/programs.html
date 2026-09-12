@@ -1,16 +1,71 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Programs</ion-title>
-    <ion-buttons slot="end">
-      <mh-notification-bell />
-    </ion-buttons>
+    <mh-notification-bell slot="end" />
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <mh-empty-state
-    icon="albums-outline"
-    heading="Programs are coming"
-    message="Build multi-week training programs for your clients."
-  />
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($any($event))">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.showSkeleton()) {
+    <div class="pills"><ion-skeleton-text [animated]="true" /></div>
+    @for (row of skeletonRows; track row) {
+      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (store.failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load your library"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="retry()"
+    />
+  } @else if (store.isEmpty()) {
+    <!-- A beginning, not a void: both creation verbs, said plainly. -->
+    <section class="cold">
+      <h2>Nothing here yet</h2>
+      <p>Build a multi-week program or a single routine — both live here.</p>
+      <ion-button expand="block" (click)="onCreate('program')">New program</ion-button>
+      <ion-button expand="block" fill="outline" (click)="onCreate('routine')">
+        New routine
+      </ion-button>
+      <button class="cold-link" type="button" (click)="onCreate('starters')">
+        Or browse our starters
+      </button>
+    </section>
+  } @else {
+    <div class="pills">
+      @for (pill of pills; track pill.id) {
+        <button
+          type="button"
+          class="pill"
+          [class.on]="store.size() === pill.id"
+          [attr.aria-pressed]="store.size() === pill.id"
+          (click)="store.size.set(pill.id)"
+        >
+          {{ pill.label }}
+          <span class="n">{{ countFor(pill.id) }}</span>
+        </button>
+      }
+    </div>
+
+    @for (program of store.visible(); track program.id) {
+      <mh-program-row [program]="program" (select)="open(program)" />
+    }
+
+    @if (!store.visible().length) {
+      <p class="none">Nothing of that kind yet.</p>
+    }
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button aria-label="Create" (click)="createOpen.set(true)">
+      <ion-icon name="add-outline" aria-hidden="true" />
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
+
+<mh-create-sheet [(open)]="createOpen" (choose)="onCreate($event)" />

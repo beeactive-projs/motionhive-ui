@@ -1,0 +1,73 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/programs" />
+    </ion-buttons>
+    <ion-title>Assignments</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading() && !rows().length) {
+    @for (row of skeletonRows; track row) {
+      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load assignments"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="load()"
+    />
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="people-outline"
+      heading="Nobody on this yet"
+      message="Assign it to a client and they will show up here."
+    />
+  } @else {
+    @for (row of rows(); track row.id) {
+      <ion-item
+        class="mh-session-row mh-list-row"
+        lines="none"
+        detail="false"
+        [attr.data-tone]="tone(row)"
+      >
+        <ion-label>
+          <h2>{{ clientName(row) }}</h2>
+          <div class="tags">
+            @if (chip(row); as c) {
+              <ion-badge [attr.data-tone]="c.tone">{{ c.label }}</ion-badge>
+            }
+          </div>
+          @if (subline(row)) {
+            <p class="sub">{{ subline(row) }}</p>
+          }
+        </ion-label>
+
+        @if (canPause(row)) {
+          <ion-button
+            slot="end"
+            fill="clear"
+            size="small"
+            [disabled]="busy() === row.id"
+            (click)="setStatus(row, 'PAUSED')"
+          >
+            Pause
+          </ion-button>
+        } @else if (canResume(row)) {
+          <ion-button
+            slot="end"
+            fill="clear"
+            size="small"
+            [disabled]="busy() === row.id"
+            (click)="setStatus(row, 'ACTIVE')"
+          >
+            Resume
+          </ion-button>
+        }
+      </ion-item>
+    }
+  }
+</ion-content>

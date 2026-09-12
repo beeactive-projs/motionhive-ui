@@ -1,0 +1,91 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/programs" />
+    </ion-buttons>
+    <ion-title>{{ name() || 'Day' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [disabled]="saving()" (click)="done()">Done</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading() && !workout()) {
+    <p class="state">Loading…</p>
+  } @else if (!workout()) {
+    <p class="state">Could not open this day.</p>
+  } @else {
+    <div class="pad">
+      <span class="mh-kicker eyebrow">{{ eyebrow() }}</span>
+
+      <ion-input
+        fill="outline"
+        label="Day name"
+        labelPlacement="stacked"
+        placeholder="Push day"
+        [value]="name()"
+        (ionInput)="name.set($any($event).detail.value ?? '')"
+      />
+
+      <ion-textarea
+        fill="outline"
+        label="Note for the client"
+        labelPlacement="stacked"
+        [autoGrow]="true"
+        placeholder="Anything they should know before starting."
+        [value]="note()"
+        (ionInput)="note.set($any($event).detail.value ?? '')"
+      />
+    </div>
+
+    <h3 class="mh-section-label">Exercises</h3>
+
+    @for (row of exercises(); track row.id) {
+      <article class="ex-row">
+        <button class="ex-name" type="button" (click)="openExercise(row)">
+          <span>{{ exerciseName(row) }}</span>
+          <ion-icon name="chevron-forward" aria-hidden="true" />
+        </button>
+        <div class="ex-foot">
+          <span class="sets">{{ setCount(row) }} {{ setCount(row) === 1 ? 'set' : 'sets' }}</span>
+          <button
+            class="ex-remove"
+            type="button"
+            [attr.aria-label]="'Remove ' + exerciseName(row)"
+            (click)="askRemove(row)"
+          >
+            <ion-icon name="trash-outline" aria-hidden="true" />
+          </button>
+        </div>
+      </article>
+    }
+
+    @if (!exercises().length) {
+      <p class="state">No exercises yet.</p>
+    }
+
+    <button class="add" type="button" (click)="pickerOpen.set(true)">
+      <ion-icon name="add-outline" aria-hidden="true" />
+      Add exercise
+    </button>
+  }
+</ion-content>
+
+<mh-exercise-picker-sheet
+  [(open)]="pickerOpen"
+  title="Add exercises"
+  [context]="name() || 'this day'"
+  [alreadyAdded]="addedIds()"
+  (picked)="onPicked($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="removeOpen"
+  title="Remove exercise"
+  [body]="removeBody()"
+  confirmLabel="Remove"
+  cancelLabel="Keep it"
+  tone="danger"
+  (confirm)="confirmRemove()"
+/>

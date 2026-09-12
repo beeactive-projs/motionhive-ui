@@ -119,7 +119,8 @@ export const routes: Routes = [
       {
         path: 'programs',
         canActivate: [coachGuard],
-        loadComponent: () => import('./main/programs/programs').then((m) => m.Programs),
+        loadChildren: () =>
+          import('./main/programs/programs.routes').then((m) => m.programRoutes),
       },
       {
         // No guard on the area: the catalogue is reference material both

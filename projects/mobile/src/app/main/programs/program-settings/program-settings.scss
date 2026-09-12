@@ -1,0 +1,129 @@
+:host {
+  --mh-gutter: 1.25rem;
+}
+
+.state {
+  padding: 2rem var(--mh-gutter);
+  color: var(--ion-color-medium);
+  text-align: center;
+}
+
+/* Padding, not margins: an ion-input lays out at 100% width, so a margin
+   pushes it past the screen edge. */
+.pad {
+  padding: 1rem var(--mh-gutter) 0;
+}
+
+.pad ion-textarea {
+  margin-top: 0.75rem;
+}
+
+.duration {
+  margin-top: 1rem;
+}
+
+.duration .mh-kicker {
+  display: block;
+  margin-bottom: 0.375rem;
+  color: var(--ion-color-medium);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-card-background);
+}
+
+.stepper button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  padding: 0;
+  border: 0;
+  background: var(--mh-color-selected-background);
+  color: var(--mh-color-honey-deep);
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  color: var(--ion-color-medium);
+  cursor: default;
+  opacity: 0.45;
+}
+
+.stepper .value {
+  flex: 1;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.stepper .value em {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ─── Status ──────────────────────────────────────────────────── */
+.status {
+  margin: 1.25rem var(--mh-gutter) 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-primary-wash);
+}
+
+.status.ready {
+  background: var(--ion-color-success-wash);
+}
+
+.status .mh-kicker {
+  color: var(--ion-color-primary-wash-contrast);
+}
+
+.status.ready .mh-kicker {
+  color: var(--ion-color-success-wash-contrast);
+}
+
+.status p {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  width: calc(100% - 2 * var(--mh-gutter));
+  margin: 1.5rem var(--mh-gutter);
+  padding: 0.75rem;
+  border: 0;
+  border-radius: var(--mh-radius-card);
+  background: none;
+  color: var(--ion-color-danger);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}

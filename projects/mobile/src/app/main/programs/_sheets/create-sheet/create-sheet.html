@@ -1,0 +1,24 @@
+<ng-template #body>
+  <ion-list lines="none">
+    @for (option of options; track option.id) {
+      <ion-item button [detail]="false" (click)="pick(option.id)">
+        <ion-icon slot="start" [name]="option.icon" aria-hidden="true" />
+        <ion-label>
+          <h3>{{ option.label }}</h3>
+          <p>{{ option.hint }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Create"
+  [body]="body"
+  [showHeader]="false"
+  [showFooter]="false"
+  [flushBody]="true"
+  [breakpoints]="[0, 0.4]"
+  [initialBreakpoint]="0.4"
+/>

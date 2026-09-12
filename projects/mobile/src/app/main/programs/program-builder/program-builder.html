@@ -1,0 +1,106 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/programs" />
+    </ion-buttons>
+    <ion-title>{{ title() }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [attr.aria-label]="'Program settings'" (click)="openSettings()">
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (store.loading() && !store.program()) {
+    <div class="rail"><ion-skeleton-text [animated]="true" /></div>
+    @for (w of skeletonWeeks; track w) {
+      <div class="s-week"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (store.failed()) {
+    <p class="state">Could not open this program.</p>
+  } @else if (store.program(); as program) {
+    <p class="sub mh-kicker">{{ subtitle() }}</p>
+
+    <!-- The rail jumps anywhere in a twelve-week plan; the dot says which
+         weeks actually hold work, so an empty stretch is visible at a glance. -->
+    <div class="rail" role="tablist" aria-label="Jump to week">
+      @for (week of store.weeks(); track week.index) {
+        <button
+          type="button"
+          class="week-pill"
+          [class.has-work]="week.filled > 0"
+          (click)="scrollToWeek(week.index)"
+        >
+          {{ week.index + 1 }}
+          @if (week.filled > 0) {
+            <span class="dot" aria-hidden="true"></span>
+          }
+        </button>
+      }
+    </div>
+
+    @for (week of store.weeks(); track week.index) {
+      <section class="week" [id]="'week-' + week.index">
+        <header>
+          <h2>Week {{ week.index + 1 }}</h2>
+          <span class="count">{{ week.filled }}/7</span>
+          @if (week.filled > 0) {
+            <button class="copy" type="button" (click)="openCopy(week.index)">
+              <ion-icon name="copy-outline" aria-hidden="true" />
+              Copy
+            </button>
+          }
+        </header>
+
+        @for (day of week.days; track $index) {
+          <button
+            class="day"
+            type="button"
+            [class.rest]="!day"
+            (click)="openDay(week, $index)"
+          >
+            <span class="dow mh-kicker">{{ dayLabels[$index] }}</span>
+
+            @if (day) {
+              <span class="name">{{ day.name }}</span>
+              <span
+                class="clear"
+                role="button"
+                tabindex="0"
+                [attr.aria-label]="'Clear ' + day.name"
+                (click)="askClear(day, $event)"
+                (keydown.enter)="askClear(day, $event)"
+              >
+                <ion-icon name="close-outline" aria-hidden="true" />
+              </span>
+            } @else {
+              <!-- A rest day is the absence of work, so it reads as a quiet
+                   invitation rather than an empty record. -->
+              <span class="name ghost">Rest — tap to add</span>
+              <ion-icon class="plus" name="add-outline" aria-hidden="true" />
+            }
+          </button>
+        }
+      </section>
+    }
+  }
+</ion-content>
+
+<mh-copy-week-sheet
+  [(open)]="copyOpen"
+  [fromWeek]="copyFrom()"
+  [weekCount]="store.weekCount()"
+  (copy)="onCopy($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="clearOpen"
+  title="Clear day"
+  [body]="clearBody()"
+  confirmLabel="Clear"
+  cancelLabel="Keep it"
+  tone="danger"
+  (confirm)="confirmClear()"
+/>
