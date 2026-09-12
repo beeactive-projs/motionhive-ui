@@ -3,6 +3,8 @@ import { IonIcon } from '@ionic/angular/standalone';
 
 import { LoggedSet, SetField, setFieldsFor } from 'core';
 
+import { secondsToClock } from '../../workouts.config';
+
 /** Which cell of a set row the user is editing. */
 export interface SetFieldTarget {
   setId: string;
@@ -36,7 +38,22 @@ export class SetRow {
   readonly toggle = output<void>();
   readonly edit = output<SetField>();
 
-  readonly fields = computed<SetField[]>(() => setFieldsFor(this.kind()));
+  /** Split squats and single-arm work are logged per side. */
+  readonly unilateral = input(false);
+  /**
+   * Bodyweight work the user has opted into loading — weighted pull-ups and
+   * dips still deserve a volume number.
+   */
+  readonly showAddedWeight = input(false);
+
+  readonly fields = computed<SetField[]>(() => {
+    const base = setFieldsFor(this.kind());
+    // Weight is prepended rather than appended so the column order matches
+    // a loaded exercise: weight then reps, everywhere.
+    return this.showAddedWeight() && !base.includes('weight')
+      ? (['weight', ...base] as SetField[])
+      : base;
+  });
 
   /** Only shown when it is not a plain working set. */
   readonly typeChip = computed(() => {
@@ -97,6 +114,17 @@ export class SetRow {
           : field === 'duration'
             ? s.durationSeconds
             : s.distanceMeters;
-    return raw == null ? '' : String(raw);
+    if (raw == null) return '';
+    // A hold reads as a clock, not as a count of seconds: 90 is "1:30".
+    if (field === 'duration') return secondsToClock(raw);
+    return String(raw);
+  }
+
+  /** Column headings, so "reps" can say "each" where that is what it means. */
+  fieldLabel(field: SetField): string {
+    if (field === 'reps') return this.unilateral() ? 'reps each' : 'reps';
+    if (field === 'duration') return 'time';
+    if (field === 'distance') return 'distance';
+    return 'kg';
   }
 }

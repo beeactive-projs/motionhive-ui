@@ -16,7 +16,14 @@ import { addIcons } from 'ionicons';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { Exercise, LoggedExercise, LoggedSet, SetField, WorkoutLogService } from 'core';
+import {
+  Exercise,
+  LoggedExercise,
+  LoggedSet,
+  SetField,
+  WorkoutLogService,
+  setFieldsFor,
+} from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
@@ -106,6 +113,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   readonly pickerOpen = signal(false);
   /**
+   * Bodyweight exercises the user has chosen to load. Per exercise and
+   * opt-in, so weighted pull-ups get a weight column without cluttering
+   * push-ups with one.
+   */
+  private readonly _loaded = signal<ReadonlySet<string>>(new Set());
+  /**
    * The exercise being swapped out, or null when the picker is adding. One
    * sheet serves both: swapping is adding with something taken away.
    */
@@ -132,7 +145,16 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly keypadLabel = computed(() => {
     const target = this.editing();
     if (!target) return '';
-    return target.field === 'weight' ? 'Weight (kg)' : target.field;
+    switch (target.field) {
+      case 'weight':
+        return 'Weight (kg)';
+      case 'duration':
+        return 'Time (mm:ss)';
+      case 'distance':
+        return 'Distance (m)';
+      default:
+        return 'Reps';
+    }
   });
 
   /** Keypad and rest timer share one slot; editing wins while it is open. */
@@ -255,6 +277,37 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
     this.store.logSet(target.exerciseId, target.setId, { [key]: value ?? undefined });
     this.editing.set(null);
+  }
+
+  /** Offer the weight column only where it is missing and would mean something. */
+  canAddWeight(exercise: LoggedExercise): boolean {
+    return exercise.exercise?.kind === 'BODYWEIGHT' && !this.hasAddedWeight(exercise);
+  }
+
+  hasAddedWeight(exercise: LoggedExercise): boolean {
+    return this._loaded().has(exercise.id);
+  }
+
+  addWeight(exercise: LoggedExercise): void {
+    this._loaded.update((set) => new Set(set).add(exercise.id));
+  }
+
+  isUnilateral(exercise: LoggedExercise): boolean {
+    return exercise.exercise?.isUnilateral ?? false;
+  }
+
+  /** Column headings for this exercise, which vary with its kind. */
+  columnsFor(exercise: LoggedExercise): string[] {
+    const fields = setFieldsFor(exercise.exercise?.kind);
+    const all = this.hasAddedWeight(exercise) && !fields.includes('weight')
+      ? (['weight', ...fields] as SetField[])
+      : fields;
+    return all.map((f) => {
+      if (f === 'reps') return this.isUnilateral(exercise) ? 'reps each' : 'reps';
+      if (f === 'duration') return 'time';
+      if (f === 'distance') return 'distance';
+      return 'kg';
+    });
   }
 
   editingFieldFor(setId: string): SetField | null {

@@ -109,3 +109,34 @@ export function elapsedLabel(startedAt: string, now: number): string {
   if (hrs > 0) return `${hrs}:${String(mins % 60).padStart(2, '0')}`;
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
+
+/**
+ * A duration as a clock. The API stores plain seconds, but nobody reads a
+ * ninety-second plank as "90" — they read it as 1:30.
+ */
+export function secondsToClock(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  const mins = Math.floor(total / 60);
+  return `${mins}:${String(total % 60).padStart(2, '0')}`;
+}
+
+/**
+ * Digits typed on a keypad, read right to left into seconds — the way every
+ * timer input works. "130" is 1:30, i.e. 90 seconds; "45" is 0:45.
+ */
+export function clockDigitsToSeconds(digits: string): number | null {
+  const clean = digits.replace(/\D/g, '');
+  if (!clean) return null;
+  const padded = clean.padStart(3, '0');
+  const secs = Number(padded.slice(-2));
+  const mins = Number(padded.slice(0, -2));
+  return mins * 60 + secs;
+}
+
+/** The same digits, shown back as the clock they are building. */
+export function clockDigitsToDisplay(digits: string): string {
+  const clean = digits.replace(/\D/g, '');
+  if (!clean) return '0:00';
+  const padded = clean.padStart(3, '0');
+  return `${Number(padded.slice(0, -2))}:${padded.slice(-2)}`;
+}

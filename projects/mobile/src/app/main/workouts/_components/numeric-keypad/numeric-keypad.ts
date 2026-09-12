@@ -1,4 +1,6 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
+
+import { clockDigitsToDisplay, clockDigitsToSeconds } from '../../workouts.config';
 import { IonIcon } from '@ionic/angular/standalone';
 
 /** What the keypad is editing — decides the step size and whether decimals make sense. */
@@ -51,6 +53,7 @@ export class NumericKeypad {
   /** What the row above is editing, so the pad says what it is changing. */
   readonly label = input('');
 
+  /** Emits the committed value: seconds for a clock, the typed number otherwise. */
   readonly commit = output<string>();
   readonly dismiss = output<void>();
 
@@ -59,9 +62,31 @@ export class NumericKeypad {
   /** What the user has typed so far. Seeded from `value` when the cell changes. */
   readonly draft = signal('');
 
+  /** What `commit` should carry — seconds once a clock is resolved. */
+  readonly committed = computed(() => {
+    if (!this.isClock()) return this.draft();
+    const seconds = clockDigitsToSeconds(this.draft());
+    return seconds === null ? '' : String(seconds);
+  });
+
   readonly allowsDecimal = computed(() => ALLOWS_DECIMAL[this.field()]);
 
-  readonly stepLabel = computed(() => `${STEP[this.field()]}`);
+  readonly stepLabel = computed(() => {
+    const step = STEP[this.field()];
+    return this.isClock() ? `${step}s` : `${step}`;
+  });
+
+  /**
+   * A duration is entered as a clock, filling right to left the way every
+   * timer input does: 1, 3, 0 builds 1:30. Typing "90" for a ninety-second
+   * hold is arithmetic the user should not have to do.
+   */
+  readonly isClock = computed(() => this.field() === 'duration');
+
+  /** What the pad shows back — the clock being built, or the raw number. */
+  readonly display = computed(() =>
+    this.isClock() ? clockDigitsToDisplay(this.draft()) : this.draft() || '0',
+  );
 
   constructor() {
     // Re-seed whenever the parent points the pad at a different cell.
@@ -69,6 +94,12 @@ export class NumericKeypad {
   }
 
   press(key: string): void {
+    if (this.isClock()) {
+      // Digits only, and capped at four so the clock cannot run past 99:59.
+      if (key === '.') return;
+      this.draft.update((current) => (current + key).replace(/^0+/, '').slice(0, 4));
+      return;
+    }
     // One decimal point, and never a leading run of zeros.
     if (key === '.' && this.draft().includes('.')) return;
     this.draft.update((current) => (current + key).replace(/^0+(?=\d)/, ''));
@@ -84,6 +115,17 @@ export class NumericKeypad {
 
   step(direction: 1 | -1): void {
     const step = STEP[this.field()];
+
+    if (this.isClock()) {
+      const seconds = clockDigitsToSeconds(this.draft()) ?? 0;
+      const next = Math.max(0, seconds + step * direction);
+      // Back to digits so further typing continues from what is on screen.
+      this.draft.set(
+        `${Math.floor(next / 60)}${String(next % 60).padStart(2, '0')}`.replace(/^0+(?=\d)/, ''),
+      );
+      return;
+    }
+
     const current = parseFloat(this.draft() || '0');
     const next = Math.max(0, (Number.isNaN(current) ? 0 : current) + step * direction);
     // Trim the float noise 2.5 increments produce (0.30000000000000004).

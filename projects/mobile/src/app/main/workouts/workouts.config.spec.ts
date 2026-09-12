@@ -3,9 +3,13 @@ import { describe, expect, it } from 'vitest';
 
 import {
   WORKOUT_ICONS,
+  clockDigitsToDisplay,
+  clockDigitsToSeconds,
   elapsedLabel,
   planPositionLabel,
   routineTone,
+  secondsToClock,
+  workoutDuration,
   workoutMetaLine,
 } from './workouts.config';
 
@@ -74,6 +78,39 @@ describe('workouts config', () => {
       'STRENGTH BLOCK · WEEK 3 · DAY 2',
     );
     expect(planPositionLabel(null, 0, 0)).toBe('WEEK 1 · DAY 1');
+  });
+
+  // A hold is read as a clock, never as a count of seconds.
+  it('shows a duration as a clock', () => {
+    expect(secondsToClock(90)).toBe('1:30');
+    expect(secondsToClock(45)).toBe('0:45');
+    expect(secondsToClock(600)).toBe('10:00');
+    expect(secondsToClock(0)).toBe('0:00');
+  });
+
+  // Keypad digits fill right to left, the way every timer input works —
+  // typing 1,3,0 means a minute and a half, not a hundred and thirty seconds.
+  it('reads keypad digits right to left into seconds', () => {
+    expect(clockDigitsToSeconds('130')).toBe(90);
+    expect(clockDigitsToSeconds('45')).toBe(45);
+    expect(clockDigitsToSeconds('5')).toBe(5);
+    expect(clockDigitsToSeconds('1000')).toBe(600);
+    expect(clockDigitsToSeconds('')).toBeNull();
+  });
+
+  it('shows those digits back as the clock they are building', () => {
+    expect(clockDigitsToDisplay('1')).toBe('0:01');
+    expect(clockDigitsToDisplay('13')).toBe('0:13');
+    expect(clockDigitsToDisplay('130')).toBe('1:30');
+    expect(clockDigitsToDisplay('')).toBe('0:00');
+  });
+
+  // One formatter for a workout's length, delegating to core's.
+  it('formats a workout length, and says nothing when there is none', () => {
+    expect(workoutDuration(1860)).toBe('31m');
+    expect(workoutDuration(3900)).toBe('1h 5m');
+    expect(workoutDuration(null)).toBe('');
+    expect(workoutDuration(0)).toBe('');
   });
 
   it('reads elapsed time off the start instant, never a tick count', () => {

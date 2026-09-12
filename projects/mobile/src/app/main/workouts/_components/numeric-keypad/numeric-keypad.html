@@ -3,7 +3,7 @@
     @if (label()) {
       <span class="mh-kicker">{{ label() }}</span>
     }
-    <output class="draft">{{ draft() || '0' }}</output>
+    <output class="draft">{{ display() }}</output>
 
     <div class="steppers">
       <button type="button" [attr.aria-label]="'Minus ' + stepLabel()" (click)="step(-1)">
@@ -23,7 +23,7 @@
       <button type="button" (click)="press(key)">{{ key }}</button>
     }
 
-    @if (allowsDecimal()) {
+    @if (allowsDecimal() && !isClock()) {
       <button type="button" (click)="press('.')">.</button>
     } @else {
       <button type="button" class="ghost" aria-label="Clear" (click)="clear()">C</button>
@@ -36,5 +36,5 @@
     </button>
   </div>
 
-  <button class="done" type="button" (click)="commit.emit(draft())">Done</button>
+  <button class="done" type="button" (click)="commit.emit(committed())">Done</button>
 </div>

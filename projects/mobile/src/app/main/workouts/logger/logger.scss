@@ -156,3 +156,35 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Column headings sit over the cells they name, so a hold says "time" and a
+   split squat says "reps each" rather than both saying "actual". */
+.grid-head .col {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.grid-head .tick-head {
+  flex: none;
+  width: var(--mh-tap-target);
+}
+
+.ex-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.add-weight {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+  padding: 0.375rem 0;
+  border: 0;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}

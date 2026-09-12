@@ -45,7 +45,10 @@
           <div class="grid-head">
             <span class="num">Set</span>
             <span class="prev">Prev</span>
-            <span class="spacer">Actual</span>
+            @for (column of columnsFor(exercise); track column) {
+              <span class="col">{{ column }}</span>
+            }
+            <span class="tick-head"></span>
           </div>
 
           @for (set of exercise.sets ?? []; track set.id; let i = $index) {
@@ -53,6 +56,8 @@
               [set]="set"
               [index]="i"
               [kind]="exercise.exercise?.kind ?? null"
+              [unilateral]="isUnilateral(exercise)"
+              [showAddedWeight]="hasAddedWeight(exercise)"
               [previous]="previousFor(exercise, i)"
               [editing]="editingFieldFor(set.id)"
               (toggle)="toggleSet(exercise, set)"
@@ -60,10 +65,21 @@
             />
           }
 
-          <button class="add-set" type="button" (click)="addSet(exercise)">
-            <ion-icon name="add-outline" aria-hidden="true" />
-            Add set
-          </button>
+          <div class="ex-actions">
+            <button class="add-set" type="button" (click)="addSet(exercise)">
+              <ion-icon name="add-outline" aria-hidden="true" />
+              Add set
+            </button>
+
+            <!-- Weighted pull-ups and dips still deserve a volume number, and
+                 push-ups still deserve not to be asked. -->
+            @if (canAddWeight(exercise)) {
+              <button class="add-weight" type="button" (click)="addWeight(exercise)">
+                <ion-icon name="add-outline" aria-hidden="true" />
+                Add weight
+              </button>
+            }
+          </div>
         }
       </section>
     }
