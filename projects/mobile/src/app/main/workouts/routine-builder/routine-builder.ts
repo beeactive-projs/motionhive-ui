@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
@@ -70,7 +70,6 @@ const DEFAULT_SETS = 3;
 export class RoutineBuilder implements ViewWillEnter {
   private readonly _routineService = inject(RoutineService);
   private readonly _logService = inject(WorkoutLogService);
-  private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedback = inject(FeedbackService);
 
@@ -110,16 +109,25 @@ export class RoutineBuilder implements ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
-    const id = this._route.snapshot.paramMap.get('id');
-    if (id === this._id()) return;
-    this._id.set(id);
+    // Read the live URL, not `route.snapshot`: Ionic keeps this page in the
+    // tab stack, so one instance serves every visit and the snapshot can
+    // still describe the route the page was created with.
+    const id = this._router.url.split('?')[0].split('/').pop() ?? null;
 
+    // `new` is not an identity. Two visits to it are two different routines,
+    // so it always starts clean — guarding on equality here is what left the
+    // previous routine's name and exercises sitting in the form.
     if (!id || id === 'new') {
+      this._id.set('new');
       this.routine.set(null);
       this.name.set('');
       this.exercises.set([]);
+      this.pickerOpen.set(false);
       return;
     }
+
+    if (id === this._id()) return;
+    this._id.set(id);
 
     this.loading.set(true);
     this._routineService

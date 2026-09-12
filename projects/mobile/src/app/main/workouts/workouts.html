@@ -114,6 +114,14 @@
         History
         <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
       </button>
+
+      <!-- Looking a movement up belongs next to training, not behind the
+           menu — you reach for it while building or mid-session. -->
+      <button class="history" type="button" (click)="openExercises()">
+        <ion-icon name="flash-outline" aria-hidden="true" />
+        Exercises
+        <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
+      </button>
     }
   }
 </ion-content>

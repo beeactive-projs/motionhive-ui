@@ -34,6 +34,13 @@ export const workoutRoutes: Routes = [
     title: 'Progress - MotionHive',
   },
   {
+    // The catalog list, in this stack too — reachable from the training
+    // surface without a detour through the menu or a tab switch.
+    path: 'exercises',
+    loadComponent: () => import('../exercises/exercises').then((m) => m.Exercises),
+    title: 'Exercises - MotionHive',
+  },
+  {
     // The catalog page, pushed onto THIS stack rather than the exercises tab:
     // checking what a movement is must not tear down the routine you are
     // building or the workout you are logging.
