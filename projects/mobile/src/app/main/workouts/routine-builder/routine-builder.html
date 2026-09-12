@@ -54,6 +54,31 @@
         @if (readOnly()) {
           <p class="ex-meta">{{ row.sets }} {{ row.sets === 1 ? 'set' : 'sets' }}</p>
         } @else {
+          <!-- What to aim for. Both optional: a routine that only names the
+               movements in order is still a useful routine. -->
+          <div class="targets">
+            <button
+              type="button"
+              class="target"
+              [class.active]="editing()?.index === i && editing()?.field === 'reps'"
+              [attr.aria-label]="'Target reps for ' + row.name"
+              (click)="editTarget(i, 'reps')"
+            >
+              <span class="mh-kicker">Reps</span>
+              <strong>{{ targetLabel(row, 'reps') }}</strong>
+            </button>
+            <button
+              type="button"
+              class="target"
+              [class.active]="editing()?.index === i && editing()?.field === 'weight'"
+              [attr.aria-label]="'Target weight for ' + row.name"
+              (click)="editTarget(i, 'weight')"
+            >
+              <span class="mh-kicker">Weight</span>
+              <strong>{{ targetLabel(row, 'weight') }}<em>kg</em></strong>
+            </button>
+          </div>
+
           <div class="ex-controls">
             <div class="stepper" role="group" [attr.aria-label]="'Sets for ' + row.name">
               <button
@@ -102,11 +127,28 @@
         <ion-icon name="add-outline" aria-hidden="true" />
         Add exercise
       </button>
+
+      @if (!isNew()) {
+        <button class="delete" type="button" (click)="deleteOpen.set(true)">
+          <ion-icon name="trash-outline" aria-hidden="true" />
+          Delete routine
+        </button>
+      }
     }
   }
 </ion-content>
 
-@if (!isNew()) {
+@if (editing() !== null) {
+  <ion-footer class="ion-no-border">
+    <mh-numeric-keypad
+      [field]="keypadField()"
+      [label]="keypadLabel()"
+      [value]="draft()"
+      (commit)="commitTarget($event)"
+      (dismiss)="editing.set(null)"
+    />
+  </ion-footer>
+} @else if (!isNew()) {
   <div class="cta">
     <ion-button expand="block" [disabled]="starting()" (click)="start()">
       Start workout
@@ -120,4 +162,15 @@
   [context]="name() || 'this routine'"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="deleteOpen"
+  title="Delete routine"
+  [body]="'Delete ' + (routine()?.name ?? 'this routine') + '? Workouts already logged from it are kept.'"
+  confirmLabel="Delete"
+  cancelLabel="Keep it"
+  tone="danger"
+  [saving]="deleting()"
+  (confirm)="confirmDelete()"
 />

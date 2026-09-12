@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonBackButton,
+  IonFooter,
   IonButton,
   IonButtons,
   IonContent,
@@ -22,9 +23,17 @@ import {
   WorkoutLogService,
 } from 'core';
 
+import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
+import { KeypadField, NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { WORKOUT_ICONS } from '../workouts.config';
+
+/** Which target cell the keypad is bound to. */
+interface TargetEdit {
+  index: number;
+  field: 'reps' | 'weight';
+}
 
 /** A row being authored, before it is a saved routine. */
 interface DraftExercise {
@@ -35,6 +44,7 @@ interface DraftExercise {
   sets: number;
   targetRepsMin: number | null;
   targetRepsMax: number | null;
+  targetWeightKg: number | null;
 }
 
 const DEFAULT_SETS = 3;
@@ -53,11 +63,14 @@ const DEFAULT_SETS = 3;
 @Component({
   selector: 'mh-routine-builder',
   imports: [
+    ConfirmSheet,
     ExercisePickerSheet,
+    NumericKeypad,
     IonBackButton,
     IonButton,
     IonButtons,
     IonContent,
+    IonFooter,
     IonHeader,
     IonIcon,
     IonInput,
@@ -81,6 +94,12 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly saving = signal(false);
   readonly starting = signal(false);
   readonly pickerOpen = signal(false);
+  readonly deleteOpen = signal(false);
+  readonly deleting = signal(false);
+
+  /** The target cell the keypad is editing, or null when it is closed. */
+  readonly editing = signal<TargetEdit | null>(null);
+  readonly draft = signal('');
 
   /**
    * A signal, not a field: `isNew` is a computed over it, and a computed
@@ -100,6 +119,16 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly canSave = computed(
     () => !!this.name().trim() && this.exercises().length > 0 && !this.readOnly(),
   );
+
+  readonly keypadField = computed<KeypadField>(() =>
+    this.editing()?.field === 'weight' ? 'weight' : 'reps',
+  );
+
+  readonly keypadLabel = computed(() => {
+    const edit = this.editing();
+    if (!edit) return '';
+    return edit.field === 'weight' ? 'Target weight (kg)' : 'Target reps';
+  });
 
   /** What the picker should already show as taken. */
   readonly addedIds = computed(() => this.exercises().map((row) => row.exerciseId));
@@ -145,6 +174,7 @@ export class RoutineBuilder implements ViewWillEnter {
               sets: e.defaultSets || DEFAULT_SETS,
               targetRepsMin: e.targetRepsMin,
               targetRepsMax: e.targetRepsMax,
+              targetWeightKg: e.targetWeightKg,
             })),
           );
           this.loading.set(false);
@@ -181,6 +211,7 @@ export class RoutineBuilder implements ViewWillEnter {
           sets: DEFAULT_SETS,
           targetRepsMin: null,
           targetRepsMax: null,
+          targetWeightKg: null,
         })),
       ]);
     }
@@ -211,6 +242,46 @@ export class RoutineBuilder implements ViewWillEnter {
     this.exercises.update((rows) => rows.filter((_, i) => i !== index));
   }
 
+  // ─── Targets ──────────────────────────────────────────────────
+
+  editTarget(index: number, field: 'reps' | 'weight'): void {
+    this.editing.set({ index, field });
+    const row = this.exercises()[index];
+    const current = field === 'weight' ? row?.targetWeightKg : row?.targetRepsMin;
+    this.draft.set(current == null ? '' : String(current));
+  }
+
+  commitTarget(typed: string): void {
+    const edit = this.editing();
+    this.editing.set(null);
+    if (!edit) return;
+
+    const raw = typed.trim();
+    const value = raw === '' ? null : Number(raw);
+    if (value !== null && Number.isNaN(value)) return;
+
+    this.exercises.update((rows) =>
+      rows.map((row, i) => {
+        if (i !== edit.index) return row;
+        // Reps are stored as a range; a single number is a range of one,
+        // which is what the flat summary on the exercise means.
+        return edit.field === 'weight'
+          ? { ...row, targetWeightKg: value }
+          : { ...row, targetRepsMin: value, targetRepsMax: value };
+      }),
+    );
+  }
+
+  targetLabel(row: DraftExercise, field: 'reps' | 'weight'): string {
+    if (field === 'weight') {
+      return row.targetWeightKg == null ? '–' : `${row.targetWeightKg}`;
+    }
+    const { targetRepsMin: min, targetRepsMax: max } = row;
+    if (min == null && max == null) return '–';
+    if (min != null && max != null && min !== max) return `${min}–${max}`;
+    return `${min ?? max}`;
+  }
+
   // ─── Saving ───────────────────────────────────────────────────
 
   save(): void {
@@ -224,6 +295,7 @@ export class RoutineBuilder implements ViewWillEnter {
         defaultSets: row.sets,
         ...(row.targetRepsMin != null ? { targetRepsMin: row.targetRepsMin } : {}),
         ...(row.targetRepsMax != null ? { targetRepsMax: row.targetRepsMax } : {}),
+        ...(row.targetWeightKg != null ? { targetWeightKg: row.targetWeightKg } : {}),
       })),
     };
 
@@ -242,6 +314,28 @@ export class RoutineBuilder implements ViewWillEnter {
         void this._feedback.error(err, 'Could not save the routine');
       },
     });
+  }
+
+  /** Nothing else can remove a routine, so this is the only way out. */
+  confirmDelete(): void {
+    const id = this._id();
+    if (!id || id === 'new' || this.deleting()) return;
+    this.deleting.set(true);
+    this._routineService
+      .remove(id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.deleting.set(false);
+          this.deleteOpen.set(false);
+          void this._feedback.success('Routine deleted');
+          void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
+        },
+        error: (err) => {
+          this.deleting.set(false);
+          void this._feedback.error(err, 'Could not delete the routine');
+        },
+      });
   }
 
   /** Starting a starter deep-copies it into your library, server-side. */
