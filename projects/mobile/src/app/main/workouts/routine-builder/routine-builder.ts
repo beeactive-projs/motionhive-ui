@@ -83,9 +83,17 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly starting = signal(false);
   readonly pickerOpen = signal(false);
 
-  private _id: string | null = null;
+  /**
+   * A signal, not a field: `isNew` is a computed over it, and a computed
+   * cannot see a plain property change. Held as one it stayed true for the
+   * life of the page, which hid the Start button on every saved routine.
+   */
+  private readonly _id = signal<string | null>(null);
 
-  readonly isNew = computed(() => this._id === 'new' || this._id === null);
+  readonly isNew = computed(() => {
+    const id = this._id();
+    return id === 'new' || id === null;
+  });
 
   /** A starter belongs to nobody: runnable and copyable, never editable. */
   readonly readOnly = computed(() => this.routine()?.source === 'SYSTEM');
@@ -103,8 +111,8 @@ export class RoutineBuilder implements ViewWillEnter {
 
   ionViewWillEnter(): void {
     const id = this._route.snapshot.paramMap.get('id');
-    if (id === this._id) return;
-    this._id = id;
+    if (id === this._id()) return;
+    this._id.set(id);
 
     if (!id || id === 'new') {
       this.routine.set(null);
@@ -213,7 +221,7 @@ export class RoutineBuilder implements ViewWillEnter {
 
     const request = this.isNew()
       ? this._routineService.create(payload)
-      : this._routineService.update(this._id!, payload);
+      : this._routineService.update(this._id()!, payload);
 
     request.pipe(take(1)).subscribe({
       next: () => {
@@ -230,7 +238,7 @@ export class RoutineBuilder implements ViewWillEnter {
 
   /** Starting a starter deep-copies it into your library, server-side. */
   start(): void {
-    const id = this._id;
+    const id = this._id();
     if (!id || id === 'new' || this.starting()) return;
 
     this.starting.set(true);

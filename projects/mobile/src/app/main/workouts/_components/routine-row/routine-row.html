@@ -19,14 +19,9 @@
     }
   </ion-label>
 
-  <!-- Stops the tap bubbling to the row: start and open are different verbs. -->
-  <button
-    class="play"
-    slot="end"
-    type="button"
-    [attr.aria-label]="'Start ' + routine().name"
-    (click)="start.emit(); $event.stopPropagation()"
-  >
-    <ion-icon name="play-outline" aria-hidden="true" />
-  </button>
+  <!-- A chevron, not a play button. One row, one outcome: it opens the
+       routine, where Start is the primary action alongside the exercise list
+       you probably wanted to check first. Two targets on one row left people
+       guessing which half they had hit. -->
+  <ion-icon class="chev" slot="end" name="chevron-forward" aria-hidden="true" />
 </ion-item>

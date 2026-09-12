@@ -5,8 +5,11 @@ import { Routine, dayDividerLabel, localDayKey } from 'core';
 
 /**
  * One saved routine: the shared session-row geometry with the spine keyed to
- * position rather than to a category, since a routine has none. The trailing
- * column is a play affordance — a routine's whole purpose is to be started.
+ * position rather than to a category, since a routine has none.
+ *
+ * The row opens the routine; it does not start it. Starting lives on the
+ * routine's own page, next to the exercise list — a second tap target on the
+ * row itself only made it unclear which half you had pressed.
  */
 @Component({
   selector: 'mh-routine-row',
@@ -22,7 +25,6 @@ export class RoutineRow {
   readonly starter = input(false);
 
   readonly select = output<void>();
-  readonly start = output<void>();
 
   readonly exerciseCount = computed(() => {
     const n = this.routine().exerciseCount;

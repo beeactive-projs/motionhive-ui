@@ -49,7 +49,6 @@
             [tone]="routineTone(i)"
             [starter]="true"
             (select)="openRoutine(routine)"
-            (start)="openRoutine(routine)"
           />
         }
         <button class="see-all" type="button" (click)="openStarters()">See all 10</button>
@@ -59,7 +58,6 @@
         <mh-today-hero
           [workout]="workout"
           [isToday]="!!store.today()"
-          (start)="startToday()"
         />
       }
 
@@ -97,7 +95,6 @@
             [routine]="routine"
             [tone]="routineTone(i)"
             (select)="openRoutine(routine)"
-            (start)="openRoutine(routine)"
           />
         }
       } @else {
