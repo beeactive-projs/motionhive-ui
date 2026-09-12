@@ -47,6 +47,6 @@
   }
 </ng-template>
 
-<mh-sheet-shell [(open)]="open" title="Add exercises" [subtitle]="context()"
+<mh-sheet-shell [(open)]="open" [title]="title()" [subtitle]="context()"
   [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"
   [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9" (save)="add()" />

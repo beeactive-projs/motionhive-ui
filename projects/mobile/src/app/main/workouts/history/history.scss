@@ -41,10 +41,22 @@
   font-size: var(--mh-text-xs);
 }
 
-.row ion-icon {
+/* Repeat rides the row rather than hiding behind it: two of the trackers we
+   looked at make this first-class, and it is the fastest route to a second
+   workout. Nested in the row's button, so it is a span with a button role —
+   a <button> inside a <button> is invalid and Safari drops the inner one. */
+.repeat {
+  display: flex;
   grid-column: 2;
   grid-row: 1 / span 3;
-  color: var(--ion-color-medium);
+  align-items: center;
+  justify-content: center;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-selected-background);
+  color: var(--mh-color-honey-deep);
+  cursor: pointer;
 }
 
 .s-row ion-skeleton-text {

@@ -11,6 +11,14 @@ import {
 } from 'core';
 
 /**
+ * How many empty sets a freshly added exercise starts with. The API creates
+ * the exercise row and no sets, which leaves a header with nothing under it
+ * and a tap needed before you can log anything. Three is the consensus
+ * default across the trackers this was researched against.
+ */
+const DEFAULT_SETS = 3;
+
+/**
  * One live workout.
  *
  * Every mutation is optimistic against the server's copy: the grid must feel
@@ -141,13 +149,39 @@ export class LoggerStore {
       .pipe(take(1))
       .subscribe((added) => {
         const kept = added.filter((e): e is LoggedExercise => !!e);
-        if (kept.length) {
-          this._updateLog((l) => ({
-            ...l,
-            exercises: [...(l.exercises ?? []), ...kept],
-          }));
+        if (!kept.length) {
+          done?.();
+          return;
         }
-        done?.();
+
+        this._updateLog((l) => ({
+          ...l,
+          exercises: [...(l.exercises ?? []), ...kept],
+        }));
+
+        // Seed the empty sets the API does not create, so the exercise is
+        // loggable the moment it appears rather than after three more taps.
+        forkJoin(
+          kept.flatMap((exercise) =>
+            Array.from({ length: DEFAULT_SETS }, () =>
+              this._logService
+                .addSet(log.id, exercise.id)
+                .pipe(catchError(() => of(null))),
+            ),
+          ),
+        )
+          .pipe(take(1))
+          .subscribe(() => {
+            // Re-read rather than splice: the sets came back in completion
+            // order, and their order in the exercise is the server's to say.
+            this._logService
+              .get(log.id)
+              .pipe(take(1), catchError(() => of(null)))
+              .subscribe((fresh) => {
+                if (fresh) this._log.set(fresh);
+                done?.();
+              });
+          });
       });
   }
 

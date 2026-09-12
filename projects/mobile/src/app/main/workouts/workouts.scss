@@ -69,6 +69,17 @@
   margin-top: 0.5rem;
 }
 
+.cold-link {
+  margin-top: 0.875rem;
+  padding: 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ─── Empty-workout on-ramp ───────────────────────────────────────
    Dashed, so it reads as "make something" rather than as a filled row that
    already exists. */

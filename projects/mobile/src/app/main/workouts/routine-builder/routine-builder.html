@@ -116,6 +116,7 @@
 
 <mh-exercise-picker-sheet
   [(open)]="pickerOpen"
+  title="Add exercises"
   [context]="name() || 'this routine'"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"

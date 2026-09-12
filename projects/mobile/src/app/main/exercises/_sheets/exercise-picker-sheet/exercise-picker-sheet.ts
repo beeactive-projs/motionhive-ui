@@ -64,6 +64,15 @@ export class ExercisePickerSheet {
   readonly open = model(false);
   /** "Day 2 · Lower body" — what the picked exercises are being added to. */
   readonly context = input('');
+  /**
+   * Swapping reuses this sheet, and a sheet headed "Add exercises" while it
+   * is about to replace something is exactly the ambiguity we are trying to
+   * remove. Callers say what the sheet is for.
+   */
+  readonly title = input('Add exercises');
+  readonly confirmVerb = input('Add');
+  /** One out, one in: swapping is a single choice, not a batch. */
+  readonly single = input(false);
   /** Already in the list behind the sheet; shown as picked and not re-addable. */
   readonly alreadyAdded = input<readonly string[]>([]);
 
@@ -118,8 +127,9 @@ export class ExercisePickerSheet {
 
   readonly addLabel = computed(() => {
     const count = this.selectedIds().length;
-    if (count === 0) return 'Add exercises';
-    return `Add ${count} ${count === 1 ? 'exercise' : 'exercises'}`;
+    if (this.single()) return count === 0 ? this.confirmVerb() : `${this.confirmVerb()} exercise`;
+    if (count === 0) return this.title();
+    return `${this.confirmVerb()} ${count} ${count === 1 ? 'exercise' : 'exercises'}`;
   });
 
   readonly canAdd = computed(() => this.selectedIds().length > 0);
@@ -188,6 +198,12 @@ export class ExercisePickerSheet {
   }
 
   toggle(exercise: Exercise): void {
+    // A swap replaces one movement with one movement, so the last tap wins
+    // rather than accumulating a batch that cannot be applied.
+    if (this.single()) {
+      this.selectedIds.set(this.isOn(exercise.id) ? [] : [exercise.id]);
+      return;
+    }
     this.selectedIds.update((ids) => toggleValue(ids, exercise.id));
   }
 

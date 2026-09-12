@@ -121,4 +121,19 @@ export class History implements ViewWillEnter {
   open(log: WorkoutLog): void {
     void this._router.navigate(['/tabs/workouts/finish', log.id]);
   }
+
+  /**
+   * Do that one again.
+   *
+   * Starts a fresh freestyle workout carrying the same movements, rather
+   * than re-opening the original or minting a routine on the way past: the
+   * plan day this came from was scheduled for a date already gone, and a
+   * routine per repeat would silently fill the library with near-duplicates.
+   */
+  repeat(log: WorkoutLog, event: Event): void {
+    event.stopPropagation();
+    void this._router.navigate(['/tabs/workouts/log', 'new'], {
+      queryParams: { from: log.id },
+    });
+  }
 }

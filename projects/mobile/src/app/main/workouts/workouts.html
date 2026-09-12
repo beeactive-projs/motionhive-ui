@@ -39,6 +39,12 @@
         <ion-button expand="block" fill="outline" (click)="openStarters()">
           Browse starter routines
         </ion-button>
+        <!-- Building your own has to be reachable from the state you are in
+             before you own anything; it used to appear only once you already
+             had a routine. -->
+        <button class="cold-link" type="button" (click)="newRoutine()">
+          Or build your own routine
+        </button>
       </section>
 
       @if (store.starterPreview().length) {

@@ -15,9 +15,14 @@ import {
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { LoggedExercise, LoggedSet, SetField, WorkoutLogService } from 'core';
+import { Exercise, LoggedExercise, LoggedSet, SetField, WorkoutLogService } from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
+import {
+  ExerciseActionId,
+  ExerciseActionsSheet,
+} from '../_sheets/exercise-actions-sheet/exercise-actions-sheet';
 import {
   KeypadField,
   NumericKeypad,
@@ -64,6 +69,8 @@ const KEYPAD_FIELD: Record<SetField, KeypadField> = {
 @Component({
   selector: 'mh-logger',
   imports: [
+    ExerciseActionsSheet,
+    ExercisePickerSheet,
     IonButton,
     IonButtons,
     IonContent,
@@ -94,6 +101,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /** Epoch ms when rest ends. Null parks the timer and frees the slot. */
   readonly restEndsAt = signal<number | null>(null);
 
+  readonly pickerOpen = signal(false);
+  /**
+   * The exercise being swapped out, or null when the picker is adding. One
+   * sheet serves both: swapping is adding with something taken away.
+   */
+  readonly swapTarget = signal<LoggedExercise | null>(null);
+
+  /** The exercise whose verb sheet is open. */
+  readonly actionsFor = signal<LoggedExercise | null>(null);
+  readonly actionsOpen = signal(false);
+
   /** Per-exercise "last time" sets, keyed by exercise id. */
   private readonly _previous = signal<Record<string, LoggedSet[]>>({});
 
@@ -109,6 +127,25 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   });
 
   /** Keypad and rest timer share one slot; editing wins while it is open. */
+  readonly pickerTitle = computed(() =>
+    this.swapTarget() ? 'Swap exercise' : 'Add exercises',
+  );
+
+  readonly pickerContext = computed(() => {
+    const target = this.swapTarget();
+    return target
+      ? `Replacing ${target.exerciseNameSnapshot}`
+      : (this.store.log()?.name ?? '');
+  });
+
+  /** Already in this workout, so the sheet does not offer them again. */
+  readonly addedIds = computed(() =>
+    this.store
+      .exercises()
+      .map((e) => e.exerciseId)
+      .filter((id): id is string => !!id),
+  );
+
   readonly showKeypad = computed(() => this.editing() !== null);
   readonly showRest = computed(() => !this.showKeypad() && this.restEndsAt() !== null);
 
@@ -232,6 +269,47 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.store.setSkipped(exercise.id, !exercise.isSkipped);
   }
 
+  openActions(exercise: LoggedExercise): void {
+    this.actionsFor.set(exercise);
+    this.actionsOpen.set(true);
+  }
+
+  onAction(id: ExerciseActionId): void {
+    const exercise = this.actionsFor();
+    this.actionsFor.set(null);
+    if (!exercise) return;
+
+    if (id === 'swap') {
+      this.swapTarget.set(exercise);
+      this.pickerOpen.set(true);
+    } else if (id === 'skip') {
+      this.store.setSkipped(exercise.id, !exercise.isSkipped);
+    } else {
+      this.store.removeExercise(exercise.id);
+      void this._feedback.success(`Removed ${exercise.exerciseNameSnapshot}`);
+    }
+  }
+
+  addExercise(): void {
+    this.swapTarget.set(null);
+    this.pickerOpen.set(true);
+  }
+
+  /** One handler for both jobs — whether it swaps depends on `swapTarget`. */
+  onPicked(picked: Exercise[]): void {
+    this.pickerOpen.set(false);
+    if (!picked.length) return;
+
+    const target = this.swapTarget();
+    this.swapTarget.set(null);
+
+    if (target) {
+      this.store.swapExercise(target.id, picked[0].id);
+      return;
+    }
+    this.store.addExercises(picked.map((e) => e.id));
+  }
+
   /** The catalog page for this movement, pushed onto the workouts stack. */
   openExercise(exercise: LoggedExercise): void {
     if (!exercise.exerciseId) return;
@@ -246,6 +324,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   private _startFreestyle(): void {
+    // `from` is a Repeat off the history list: same movements, new session.
+    const from = this._route.snapshot.queryParamMap.get('from');
     const name = `Workout — ${new Date().toLocaleDateString(undefined, {
       weekday: 'long',
       day: 'numeric',
@@ -262,8 +342,30 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
           void this._router.navigate(['/tabs/workouts/log', log.id], {
             replaceUrl: true,
           });
+          if (from) this._carryOver(from);
         },
         error: (err) => void this._feedback.error(err, 'Could not start the workout'),
+      });
+  }
+
+  /** Copy the movements out of a past workout into the one just started. */
+  private _carryOver(sourceLogId: string): void {
+    this._logService
+      .get(sourceLogId)
+      .pipe(take(1))
+      .subscribe({
+        next: (source) => {
+          const ids = (source.exercises ?? [])
+            .filter((e) => !e.isSkipped)
+            .map((e) => e.exerciseId)
+            .filter((id): id is string => !!id);
+          if (!ids.length) {
+            void this._feedback.info('That workout had no exercises to repeat');
+            return;
+          }
+          this.store.addExercises(ids);
+        },
+        error: () => void this._feedback.info('Could not load that workout to repeat'),
       });
   }
 }

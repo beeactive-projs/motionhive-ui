@@ -26,12 +26,12 @@
             <ion-icon name="chevron-forward" aria-hidden="true" />
           </button>
           <button
-            class="skip"
+            class="verbs"
             type="button"
-            [attr.aria-pressed]="exercise.isSkipped"
-            (click)="toggleSkip(exercise)"
+            [attr.aria-label]="'Actions for ' + exercise.exerciseNameSnapshot"
+            (click)="openActions(exercise)"
           >
-            {{ exercise.isSkipped ? 'Unskip' : 'Skip' }}
+            <ion-icon name="ellipsis-horizontal" aria-hidden="true" />
           </button>
         </header>
 
@@ -62,11 +62,42 @@
       </section>
     }
 
-    @if (!store.exercises().length) {
-      <p class="state">Nothing added yet. Add your first exercise to get going.</p>
+    @if (store.exercises().length) {
+      <button class="add-exercise" type="button" (click)="addExercise()">
+        <ion-icon name="add-outline" aria-hidden="true" />
+        Add exercise
+      </button>
+    } @else {
+      <!-- An empty workout is the freestyle on-ramp: the whole screen is one
+           instruction and one button, because there is nothing else to do
+           here yet. -->
+      <section class="blank">
+        <h2>Add your first exercise</h2>
+        <p>Pick the movements as you go — nothing has to be planned up front.</p>
+        <ion-button expand="block" (click)="addExercise()">
+          <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+          Add exercise
+        </ion-button>
+      </section>
     }
   }
 </ion-content>
+
+<mh-exercise-actions-sheet
+  [(open)]="actionsOpen"
+  [exercise]="actionsFor()"
+  (action)="onAction($event)"
+/>
+
+<mh-exercise-picker-sheet
+  [(open)]="pickerOpen"
+  [title]="pickerTitle()"
+  [context]="pickerContext()"
+  [confirmVerb]="swapTarget() ? 'Swap for' : 'Add'"
+  [single]="swapTarget() !== null"
+  [alreadyAdded]="addedIds()"
+  (picked)="onPicked($event)"
+/>
 
 <!-- One slot, three states: the keypad while a cell is open, the rest timer
      while resting, and nothing otherwise. Both dock so the grid above stays

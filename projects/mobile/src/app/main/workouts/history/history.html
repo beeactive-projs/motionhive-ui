@@ -41,7 +41,16 @@
             · {{ log.feelingRating }}/5
           }
         </span>
-        <ion-icon name="chevron-forward" aria-hidden="true" />
+        <span
+          class="repeat"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Repeat ' + log.name"
+          (click)="repeat(log, $event)"
+          (keydown.enter)="repeat(log, $event)"
+        >
+          <ion-icon name="refresh-outline" aria-hidden="true" />
+        </span>
       </button>
     }
 
