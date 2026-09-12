@@ -19,7 +19,12 @@
     @for (exercise of store.exercises(); track exercise.id) {
       <section class="exercise" [class.skipped]="exercise.isSkipped">
         <header>
-          <h2>{{ exercise.exerciseNameSnapshot }}</h2>
+          <!-- Mid-session you often need to check what the movement actually
+               is. Pushed onto this stack, so the workout stays live behind. -->
+          <button class="ex-open" type="button" (click)="openExercise(exercise)">
+            <h2>{{ exercise.exerciseNameSnapshot }}</h2>
+            <ion-icon name="chevron-forward" aria-hidden="true" />
+          </button>
           <button
             class="skip"
             type="button"

@@ -28,6 +28,8 @@ import { WORKOUT_ICONS } from '../workouts.config';
 
 /** A row being authored, before it is a saved routine. */
 interface DraftExercise {
+  /** Stable across re-renders; the exercise id is unique per routine. */
+  key: string;
   exerciseId: string;
   name: string;
   sets: number;
@@ -92,6 +94,9 @@ export class RoutineBuilder implements ViewWillEnter {
     () => !!this.name().trim() && this.exercises().length > 0 && !this.readOnly(),
   );
 
+  /** What the picker should already show as taken. */
+  readonly addedIds = computed(() => this.exercises().map((row) => row.exerciseId));
+
   constructor() {
     addIcons(WORKOUT_ICONS);
   }
@@ -118,6 +123,7 @@ export class RoutineBuilder implements ViewWillEnter {
           this.name.set(routine.name);
           this.exercises.set(
             (routine.exercises ?? []).map((e) => ({
+              key: e.id,
               exerciseId: e.exerciseId,
               name: e.exercise?.name ?? 'Exercise',
               sets: e.defaultSets || DEFAULT_SETS,
@@ -136,19 +142,45 @@ export class RoutineBuilder implements ViewWillEnter {
 
   // ─── Editing ──────────────────────────────────────────────────
 
+  /**
+   * Adds the picked movements, skipping any already in the routine. Adding
+   * the same exercise twice by accident is far more common than wanting it
+   * twice on purpose — and wanting more of it is what the sets stepper is for.
+   */
   onPicked(picked: { id: string; name: string }[]): void {
     this.pickerOpen.set(false);
     if (!picked.length) return;
-    this.exercises.update((rows) => [
-      ...rows,
-      ...picked.map((p) => ({
-        exerciseId: p.id,
-        name: p.name,
-        sets: DEFAULT_SETS,
-        targetRepsMin: null,
-        targetRepsMax: null,
-      })),
-    ]);
+
+    const have = new Set(this.exercises().map((row) => row.exerciseId));
+    const fresh = picked.filter((p) => !have.has(p.id));
+    const skipped = picked.length - fresh.length;
+
+    if (fresh.length) {
+      this.exercises.update((rows) => [
+        ...rows,
+        ...fresh.map((p) => ({
+          key: p.id,
+          exerciseId: p.id,
+          name: p.name,
+          sets: DEFAULT_SETS,
+          targetRepsMin: null,
+          targetRepsMax: null,
+        })),
+      ]);
+    }
+
+    if (skipped > 0) {
+      void this._feedback.info(
+        skipped === 1
+          ? 'That exercise is already in this routine'
+          : `${skipped} were already in this routine`,
+      );
+    }
+  }
+
+  /** The catalog page, pushed onto this stack so the draft survives. */
+  openExercise(row: DraftExercise): void {
+    void this._router.navigate(['/tabs/workouts/exercise', row.exerciseId]);
   }
 
   setCount(index: number, delta: number): void {

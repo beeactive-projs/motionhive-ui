@@ -10,6 +10,8 @@
 <ion-content [fullscreen]="true">
   @if (loading()) {
     <p class="state">Loading…</p>
+  } @else if (isEmptyPlan()) {
+    <p class="state">This plan has no workouts in it yet.</p>
   } @else if (failed() || !workout()) {
     <p class="state">Could not open this workout.</p>
   } @else {

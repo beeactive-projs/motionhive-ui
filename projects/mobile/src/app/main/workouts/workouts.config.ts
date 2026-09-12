@@ -13,7 +13,9 @@ import {
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
+  removeOutline,
   timeOutline,
+  trashOutline,
   trendingUpOutline,
 } from 'ionicons/icons';
 
@@ -36,7 +38,9 @@ export const WORKOUT_ICONS = {
   playOutline,
   playSkipForwardOutline,
   refreshOutline,
+  removeOutline,
   timeOutline,
+  trashOutline,
   trendingUpOutline,
 };
 

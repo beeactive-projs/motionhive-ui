@@ -57,6 +57,7 @@
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-pill);
   background: var(--ion-card-background);
+  color: var(--ion-text-color);
   font-size: var(--mh-text-sm);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -69,5 +70,5 @@
   gap: 0.25rem;
   border-color: transparent;
   background: var(--mh-color-selected-background);
-  color: var(--ion-color-primary);
+  color: var(--mh-color-honey-deep);
 }

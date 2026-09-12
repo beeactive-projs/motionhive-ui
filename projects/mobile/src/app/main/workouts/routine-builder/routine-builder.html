@@ -16,43 +16,81 @@
   @if (loading()) {
     <p class="state">Loading…</p>
   } @else {
-    @if (readOnly()) {
-      <!-- A starter is runnable by anyone and editable by no one; starting it
-           copies it into your own library. -->
-      <p class="starter-note">
-        A MotionHive starter. Start it and it becomes yours to edit.
-      </p>
-    } @else {
-      <ion-input
-        class="name"
-        fill="outline"
-        label="Routine name"
-        labelPlacement="stacked"
-        placeholder="Push day"
-        [value]="name()"
-        (ionInput)="name.set($any($event).detail.value ?? '')"
-      />
-    }
+    <!-- One padded wrapper rather than margins on each control: an ion-input
+         is 100% wide, so a margin pushed it past the screen edge. -->
+    <div class="pad">
+      @if (readOnly()) {
+        <p class="starter-note">
+          A MotionHive starter. Start it and it becomes yours to edit.
+        </p>
+      } @else {
+        <ion-input
+          fill="outline"
+          label="Routine name"
+          labelPlacement="stacked"
+          placeholder="Push day"
+          [value]="name()"
+          (ionInput)="name.set($any($event).detail.value ?? '')"
+        />
+      }
+    </div>
 
-    <h3 class="mh-section-label">Exercises</h3>
+    <h3 class="mh-section-label">
+      Exercises
+      @if (exercises().length) {
+        <span class="tally">{{ exercises().length }}</span>
+      }
+    </h3>
 
-    @for (row of exercises(); track row.exerciseId + $index; let i = $index) {
-      <div class="row">
-        <span class="name">{{ row.name }}</span>
+    @for (row of exercises(); track row.key; let i = $index) {
+      <article class="ex-row">
+        <!-- Tapping the name opens the movement itself — you should be able to
+             check what an exercise is while building with it. -->
+        <button class="ex-name" type="button" (click)="openExercise(row)">
+          <span>{{ row.name }}</span>
+          <ion-icon name="chevron-forward" aria-hidden="true" />
+        </button>
 
         @if (readOnly()) {
-          <span class="sets">{{ row.sets }} sets</span>
+          <p class="ex-meta">{{ row.sets }} {{ row.sets === 1 ? 'set' : 'sets' }}</p>
         } @else {
-          <div class="steppers">
-            <button type="button" aria-label="One set fewer" (click)="setCount(i, -1)">−</button>
-            <span class="count">{{ row.sets }}</span>
-            <button type="button" aria-label="One set more" (click)="setCount(i, 1)">+</button>
+          <div class="ex-controls">
+            <div class="stepper" role="group" [attr.aria-label]="'Sets for ' + row.name">
+              <button
+                type="button"
+                [disabled]="row.sets <= 1"
+                [attr.aria-label]="'One set fewer for ' + row.name"
+                (click)="setCount(i, -1)"
+              >
+                <ion-icon name="remove-outline" aria-hidden="true" />
+              </button>
+
+              <!-- The number says what it is. "3" alone between two circles
+                   told the user nothing. -->
+              <span class="value" aria-live="polite">
+                {{ row.sets }} <em>{{ row.sets === 1 ? 'set' : 'sets' }}</em>
+              </span>
+
+              <button
+                type="button"
+                [attr.aria-label]="'One set more for ' + row.name"
+                (click)="setCount(i, 1)"
+              >
+                <ion-icon name="add-outline" aria-hidden="true" />
+              </button>
+            </div>
+
+            <button
+              class="ex-remove"
+              type="button"
+              [attr.aria-label]="'Remove ' + row.name"
+              (click)="remove(i)"
+            >
+              <ion-icon name="trash-outline" aria-hidden="true" />
+            </button>
           </div>
-          <button class="remove" type="button" aria-label="Remove" (click)="remove(i)">
-            <ion-icon name="close" aria-hidden="true" />
-          </button>
         }
-      </div>
+      </article>
     }
 
     @if (!exercises().length) {
@@ -79,5 +117,6 @@
 <mh-exercise-picker-sheet
   [(open)]="pickerOpen"
   [context]="name() || 'this routine'"
+  [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
 />

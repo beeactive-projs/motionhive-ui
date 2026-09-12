@@ -12,7 +12,7 @@
 /* A completed set tints rather than greys: the row is still readable, and the
    user is often comparing it against the next one. */
 .row.done .cell {
-  background: var(--mh-success-50, #dcfce7);
+  background: var(--ion-color-success-wash, rgb(var(--ion-color-success-rgb) / 0.14));
   border-color: transparent;
 }
 
@@ -56,6 +56,7 @@
   border: 1px solid var(--ion-border-color);
   border-radius: var(--mh-radius-control);
   background: var(--ion-card-background);
+  color: var(--ion-text-color);
   font-size: var(--mh-text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -63,7 +64,7 @@
 }
 
 .cell.active {
-  border-color: var(--ion-color-primary);
+  border-color: var(--mh-color-honey-deep);
   box-shadow: 0 0 0 var(--mh-ring-width, 2px) var(--mh-color-selected-background);
 }
 

@@ -1,8 +1,6 @@
 <ng-template #body>
   <ion-searchbar mhAutofocus placeholder="Search exercises" inputmode="search" [debounce]="0"
-    [value]="query()" (ionInput)="onQuery($event.detail.value ?? '')" />
-
-  <div class="mh-section-label">{{ sectionLabel() }}</div>
+    [value]="query()" (ionInput)="onQuery($any($event).detail.value ?? '')" />
 
   @if (loading()) {
     <ion-list [inset]="true" class="mh-card-list">
@@ -19,19 +17,36 @@
   } @else if (isEmpty()) {
     <ion-note class="mh-note-block">{{ emptyMessage() }}</ion-note>
   } @else {
-    <!-- The library's own row, in its checkbox mode — so a picked exercise
-         looks the same here as it does everywhere else, photo included. -->
-    <ion-list [inset]="true" class="mh-card-list">
-      @for (exercise of rows(); track exercise.id) {
-        <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
-          (select)="toggle(exercise)" />
-      }
-    </ion-list>
+    <!-- Your own last picks first: the fastest path to the movement you meant. -->
+    @if (recents().length) {
+      <div class="mh-section-label">Recently used</div>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (exercise of recents(); track exercise.id) {
+          <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
+            (select)="toggle(exercise)" />
+        }
+      </ion-list>
+    }
+
+    @if (rows().length) {
+      <div class="mh-section-label">{{ sectionLabel() }}</div>
+      <!-- The library's own row, in its checkbox mode — so a picked exercise
+           looks the same here as it does everywhere else, photo included. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (exercise of rows(); track exercise.id) {
+          <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
+            (select)="toggle(exercise)" />
+        }
+      </ion-list>
+    }
+
+    <!-- The whole catalog is reachable by scrolling, rather than by leaving. -->
+    <ion-infinite-scroll [disabled]="!hasMore()" (ionInfinite)="loadMore($any($event))">
+      <ion-infinite-scroll-content loadingSpinner="crescent" />
+    </ion-infinite-scroll>
   }
 </ng-template>
 
-<!-- "Full library" rides the header action slot: the escape from this sheet
-     to the real page, without a second footer button competing with Add. -->
 <mh-sheet-shell [(open)]="open" title="Add exercises" [subtitle]="context()"
-  actionLabel="Full library" [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"
-  [breakpoints]="[0, 0.85]" [initialBreakpoint]="0.85" (action)="openLibrary()" (save)="add()" />
+  [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"
+  [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9" (save)="add()" />

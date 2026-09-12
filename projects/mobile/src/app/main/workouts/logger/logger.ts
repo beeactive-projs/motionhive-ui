@@ -232,6 +232,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.store.setSkipped(exercise.id, !exercise.isSkipped);
   }
 
+  /** The catalog page for this movement, pushed onto the workouts stack. */
+  openExercise(exercise: LoggedExercise): void {
+    if (!exercise.exerciseId) return;
+    void this._router.navigate(['/tabs/workouts/exercise', exercise.exerciseId]);
+  }
+
   // ─── Lifecycle ────────────────────────────────────────────────
 
   finish(): void {

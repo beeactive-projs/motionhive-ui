@@ -60,6 +60,11 @@ export class Preview implements ViewWillEnter {
   readonly starting = signal(false);
   readonly noteOpen = signal(false);
 
+  /** Loaded fine, but the plan holds no days at all — a different problem. */
+  readonly isEmptyPlan = computed(
+    () => !this.loading() && !this.failed() && !!this.assignment() && !this.workout(),
+  );
+
   readonly position = computed(() => {
     const w = this.workout();
     if (!w) return '';
@@ -94,10 +99,15 @@ export class Preview implements ViewWillEnter {
         next: (assignment) => {
           this.assignment.set(assignment);
           const days = assignment.workouts ?? [];
-          // Falls back to the first unfinished day so a stale link still
-          // lands somewhere useful rather than on an error.
+          // Three answers, in order: the day that was asked for, the next one
+          // still to do, or — on a plan whose days are all behind you — the
+          // last one. A finished plan used to fall through all of these and
+          // render "could not open this workout", which is not what happened.
           this.workout.set(
-            days.find((d) => d.id === workoutId) ?? days.find((d) => !d.status) ?? null,
+            days.find((d) => d.id === workoutId) ??
+              days.find((d) => !d.status) ??
+              days[days.length - 1] ??
+              null,
           );
           this.loading.set(false);
         },
