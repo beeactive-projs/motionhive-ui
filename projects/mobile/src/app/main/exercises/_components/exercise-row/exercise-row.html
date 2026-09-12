@@ -1,5 +1,5 @@
-<ion-item lines="none" button [detail]="!isPicker()" [attr.aria-pressed]="selected()"
-  (click)="select.emit()">
+<ion-item lines="none" button [detail]="!isPicker()" [class.picked]="selected()"
+  [attr.aria-pressed]="selected()" (click)="select.emit()">
   <!-- Decorative: the name it would announce is the very next thing in the row. -->
   <mh-hex-avatar slot="start" size="md" tone="wash" aria-hidden="true" [color]="kindTone()"
     [icon]="tileIcon()" [imageUrl]="thumbnailUrl()" />
@@ -11,7 +11,7 @@
 
   @if (isPicker()) {
   @if (selected()) {
-  <ion-icon slot="end" name="checkmark-circle" color="primary" aria-hidden="true" />
+  <ion-icon class="tick" slot="end" name="checkmark-circle" aria-hidden="true" />
   }
   } @else {
   <div class="chips" slot="end">

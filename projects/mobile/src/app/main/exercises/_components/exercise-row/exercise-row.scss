@@ -56,3 +56,16 @@ ion-label h2 {
   letter-spacing: var(--mh-tracking-kicker);
   text-transform: uppercase;
 }
+
+/* ─── Picked ──────────────────────────────────────────────────────
+   Selection has to be obvious at arm's length on a gym floor. The tick alone
+   was honey on white — 2.15:1, which reads as nothing happening — so the row
+   tints as well, and the tick uses the deep ink token rather than the fill. */
+ion-item.picked {
+  --background: var(--mh-color-selected-background);
+}
+
+.tick {
+  color: var(--mh-color-honey-deep);
+  font-size: 1.375rem;
+}

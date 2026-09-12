@@ -12,8 +12,10 @@
   padding: 1.25rem var(--mh-gutter) 0;
 }
 
+/* The ink form of success, not the fill: plain success green on a white card
+   is 2.42:1, which is a label you cannot read. */
 .hero .mh-kicker {
-  color: var(--ion-color-success);
+  color: var(--ion-color-success-wash-contrast);
 }
 
 .hero h1 {

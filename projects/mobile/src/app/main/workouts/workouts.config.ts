@@ -1,3 +1,4 @@
+import { formatTotalDuration } from 'core';
 import {
   addOutline,
   backspaceOutline,
@@ -83,6 +84,16 @@ export function planPositionLabel(
 ): string {
   const parts = [planName?.toUpperCase(), `WEEK ${weekIndex + 1}`, `DAY ${dayIndex + 1}`];
   return parts.filter(Boolean).join(' · ');
+}
+
+/**
+ * A finished workout's length. Delegates to core's formatter so a duration
+ * reads the same here as it does on a session — this was written out twice
+ * in this feature alone before it moved here.
+ */
+export function workoutDuration(seconds: number | null | undefined): string {
+  if (!seconds) return '';
+  return formatTotalDuration(seconds / 60);
 }
 
 /** How long the in-progress log has been open, as the resume banner says it. */

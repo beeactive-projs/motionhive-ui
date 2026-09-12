@@ -13,11 +13,13 @@ import {
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { take } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, take } from 'rxjs/operators';
 
 import { Exercise, LoggedExercise, LoggedSet, SetField, WorkoutLogService } from 'core';
 
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import {
   ExerciseActionId,
@@ -69,6 +71,7 @@ const KEYPAD_FIELD: Record<SetField, KeypadField> = {
 @Component({
   selector: 'mh-logger',
   imports: [
+    ConfirmSheet,
     ExerciseActionsSheet,
     ExercisePickerSheet,
     IonButton,
@@ -112,6 +115,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly actionsFor = signal<LoggedExercise | null>(null);
   readonly actionsOpen = signal(false);
 
+  /** Confirms that would otherwise lose logged work without asking. */
+  readonly removeConfirmOpen = signal(false);
+  readonly discardConfirmOpen = signal(false);
+  readonly finishConfirmOpen = signal(false);
+  readonly discarding = signal(false);
+
   /** Per-exercise "last time" sets, keyed by exercise id. */
   private readonly _previous = signal<Record<string, LoggedSet[]>>({});
 
@@ -146,6 +155,22 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       .filter((id): id is string => !!id),
   );
 
+  /** What removing this exercise would throw away. */
+  readonly removeBody = computed(() => {
+    const exercise = this.actionsFor();
+    if (!exercise) return '';
+    const done = (exercise.sets ?? []).filter((s) => s.isCompleted).length;
+    return done > 0
+      ? `${exercise.exerciseNameSnapshot} has ${done} completed ${done === 1 ? 'set' : 'sets'}. Removing it deletes them.`
+      : `Remove ${exercise.exerciseNameSnapshot} from this workout?`;
+  });
+
+  readonly finishBody = computed(() => {
+    const { done, total } = this.store.progress();
+    const left = total - done;
+    return `${left} ${left === 1 ? 'set is' : 'sets are'} still unticked. Finishing now records the workout as it stands.`;
+  });
+
   readonly showKeypad = computed(() => this.editing() !== null);
   readonly showRest = computed(() => !this.showKeypad() && this.restEndsAt() !== null);
 
@@ -158,7 +183,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!id) return;
 
     if (id === 'new') this._startFreestyle();
-    else this.store.load(id);
+    else this.store.load(id, () => this._loadLastTimes());
   }
 
   ionViewWillLeave(): void {
@@ -285,9 +310,41 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     } else if (id === 'skip') {
       this.store.setSkipped(exercise.id, !exercise.isSkipped);
     } else {
-      this.store.removeExercise(exercise.id);
-      void this._feedback.success(`Removed ${exercise.exerciseNameSnapshot}`);
+      // Asked, not assumed: an exercise can hold sets that are already logged.
+      this.actionsFor.set(exercise);
+      this.removeConfirmOpen.set(true);
     }
+  }
+
+  confirmRemove(): void {
+    const exercise = this.actionsFor();
+    this.removeConfirmOpen.set(false);
+    this.actionsFor.set(null);
+    if (!exercise) return;
+    this.store.removeExercise(exercise.id);
+    void this._feedback.success(`Removed ${exercise.exerciseNameSnapshot}`);
+  }
+
+  /** Abandon the whole session — the "changed my mind" path, not a skip. */
+  confirmDiscard(): void {
+    const log = this.store.log();
+    if (!log || this.discarding()) return;
+    this.discarding.set(true);
+    this._logService
+      .discard(log.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.discarding.set(false);
+          this.discardConfirmOpen.set(false);
+          void this._feedback.success('Workout discarded');
+          void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
+        },
+        error: (err) => {
+          this.discarding.set(false);
+          void this._feedback.error(err, 'Could not discard the workout');
+        },
+      });
   }
 
   addExercise(): void {
@@ -304,10 +361,13 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.swapTarget.set(null);
 
     if (target) {
-      this.store.swapExercise(target.id, picked[0].id);
+      this.store.swapExercise(target.id, picked[0].id, () => this._loadLastTimes());
       return;
     }
-    this.store.addExercises(picked.map((e) => e.id));
+    this.store.addExercises(
+      picked.map((e) => e.id),
+      () => this._loadLastTimes(),
+    );
   }
 
   /** The catalog page for this movement, pushed onto the workouts stack. */
@@ -318,7 +378,27 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   // ─── Lifecycle ────────────────────────────────────────────────
 
+  /**
+   * Finishing with sets still unticked is allowed — an explicit finish marks
+   * the workout complete even when partial — but it is worth one question,
+   * because the alternative reading is "I tapped the wrong thing".
+   */
   finish(): void {
+    if (!this.store.log()) return;
+    const { done, total } = this.store.progress();
+    if (total > 0 && done < total) {
+      this.finishConfirmOpen.set(true);
+      return;
+    }
+    this._goToFinish();
+  }
+
+  confirmFinish(): void {
+    this.finishConfirmOpen.set(false);
+    this._goToFinish();
+  }
+
+  private _goToFinish(): void {
     const log = this.store.log();
     if (log) void this._router.navigate(['/tabs/workouts/finish', log.id]);
   }
@@ -346,6 +426,34 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         },
         error: (err) => void this._feedback.error(err, 'Could not start the workout'),
       });
+  }
+
+  /**
+   * "Last time" for every movement in the workout, one call each.
+   *
+   * Fetched once on open rather than per row: the set grid renders before
+   * these land and simply shows an em dash until they do, which is also the
+   * honest answer for a movement never done before.
+   */
+  private _loadLastTimes(): void {
+    const ids = Array.from(
+      new Set(
+        this.store
+          .exercises()
+          .map((e) => e.exerciseId)
+          .filter((id): id is string => !!id),
+      ),
+    ).filter((id) => !(id in this._previous()));
+    if (!ids.length) return;
+
+    for (const id of ids) {
+      this._logService
+        .lastForExercise(id)
+        .pipe(take(1), catchError(() => of([] as LoggedSet[])))
+        .subscribe((sets) => {
+          this._previous.update((map) => ({ ...map, [id]: sets }));
+        });
+    }
   }
 
   /** Copy the movements out of a past workout into the one just started. */

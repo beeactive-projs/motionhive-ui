@@ -58,7 +58,7 @@ export class LoggerStore {
     return total > 0 && done === total;
   });
 
-  load(id: string): void {
+  load(id: string, done?: () => void): void {
     this._loading.set(true);
     this._failed.set(false);
     this._logService
@@ -68,6 +68,7 @@ export class LoggerStore {
         next: (log) => {
           this._log.set(log);
           this._loading.set(false);
+          done?.();
         },
         error: () => {
           this._failed.set(true);

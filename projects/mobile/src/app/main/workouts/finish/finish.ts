@@ -19,7 +19,7 @@ import { WorkoutLog, WorkoutLogService } from 'core';
 
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { WORKOUT_ICONS } from '../workouts.config';
+import { WORKOUT_ICONS, workoutDuration } from '../workouts.config';
 
 /** The emoji scale, as a rating affordance rather than decorative copy. */
 const FEELINGS = [
@@ -84,12 +84,9 @@ export class Finish implements ViewWillEnter {
     return !!log && !log.assignedWorkoutId && !log.sourceProgramId;
   });
 
-  readonly durationLabel = computed(() => {
-    const seconds = this.log()?.durationSeconds;
-    if (!seconds) return '—';
-    const mins = Math.round(seconds / 60);
-    return mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins} min`;
-  });
+  readonly durationLabel = computed(
+    () => workoutDuration(this.log()?.durationSeconds) || '—',
+  );
 
   /** Only the modalities the session actually contained get a tile. */
   readonly tiles = computed(() => {

@@ -6,6 +6,12 @@
     <ion-title>{{ store.log()?.name ?? 'Workout' }}</ion-title>
     <ion-buttons slot="end">
       <span class="progress">{{ store.progress().done }}/{{ store.progress().total }}</span>
+      <ion-button
+        [attr.aria-label]="'Discard workout'"
+        (click)="discardConfirmOpen.set(true)"
+      >
+        <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -120,3 +126,34 @@
     />
   }
 </ion-footer>
+
+<mh-confirm-sheet
+  [(open)]="removeConfirmOpen"
+  title="Remove exercise"
+  [body]="removeBody()"
+  confirmLabel="Remove"
+  cancelLabel="Keep it"
+  tone="danger"
+  (confirm)="confirmRemove()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="discardConfirmOpen"
+  title="Discard workout"
+  body="Everything logged in this session is deleted. Skipping a planned workout is a different thing — that keeps the record."
+  confirmLabel="Discard"
+  cancelLabel="Keep going"
+  tone="danger"
+  irreversible="This cannot be undone"
+  [saving]="discarding()"
+  (confirm)="confirmDiscard()"
+/>
+
+<mh-confirm-sheet
+  [(open)]="finishConfirmOpen"
+  title="Finish workout"
+  [body]="finishBody()"
+  confirmLabel="Finish"
+  cancelLabel="Keep going"
+  (confirm)="confirmFinish()"
+/>

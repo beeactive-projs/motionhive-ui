@@ -20,7 +20,7 @@ import { take } from 'rxjs/operators';
 import { WorkoutLog, WorkoutLogService, dayDividerLabel, localDayKey } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { WORKOUT_ICONS } from '../workouts.config';
+import { WORKOUT_ICONS, workoutDuration } from '../workouts.config';
 
 const PAGE_SIZE = 25;
 
@@ -112,10 +112,7 @@ export class History implements ViewWillEnter {
   }
 
   duration(log: WorkoutLog): string {
-    const seconds = log.durationSeconds;
-    if (!seconds) return '';
-    const mins = Math.round(seconds / 60);
-    return mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins} min`;
+    return workoutDuration(log.durationSeconds);
   }
 
   open(log: WorkoutLog): void {
