@@ -129,13 +129,8 @@ export class Workouts implements ViewWillEnter {
     void this._router.navigate(['/tabs/workouts/exercises']);
   }
 
-  /**
-   * A plan has no page of its own yet (that is the multi-week view, round 2),
-   * so it opens at the next thing you would actually do in it — the preview
-   * falls back to the first unfinished day when no specific one is named.
-   */
   openPlan(planId: string): void {
-    void this._router.navigate(['/tabs/workouts/preview', planId]);
+    void this._router.navigate(['/tabs/workouts/plan', planId]);
   }
 
   retry(): void {

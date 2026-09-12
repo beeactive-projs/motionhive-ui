@@ -56,6 +56,12 @@ export const workoutRoutes: Routes = [
     title: 'Routine - MotionHive',
   },
   {
+    // The trainee's view of a multi-week plan.
+    path: 'plan/:id',
+    loadComponent: () => import('./plan/plan').then((m) => m.Plan),
+    title: 'Plan - MotionHive',
+  },
+  {
     path: 'preview/:assignmentId',
     loadComponent: () => import('./preview/preview').then((m) => m.Preview),
     title: 'Workout - MotionHive',
