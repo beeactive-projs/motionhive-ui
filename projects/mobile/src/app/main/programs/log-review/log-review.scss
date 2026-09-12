@@ -1,0 +1,88 @@
+:host {
+  --mh-gutter: 1.25rem;
+}
+
+.state {
+  padding: 2rem var(--mh-gutter);
+  color: var(--ion-color-medium);
+  text-align: center;
+}
+
+.head {
+  padding: 1.25rem var(--mh-gutter) 0;
+}
+
+.head .mh-kicker {
+  color: var(--ion-color-success-wash-contrast);
+}
+
+.head h1 {
+  margin: 0.25rem 0 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}
+
+.duration {
+  margin: 0.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem var(--mh-gutter) 0;
+}
+
+.tiles mh-stat-tile {
+  flex: 1 1 8rem;
+}
+
+.feedback {
+  margin: 0 var(--mh-gutter);
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.rating {
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+/* Their words, quoted — this is a record, not a field. */
+.note {
+  margin: 0.375rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.ex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem var(--mh-gutter);
+  border-bottom: 1px solid var(--mh-color-divider);
+}
+
+.ex.skipped .name {
+  color: var(--ion-color-medium);
+  text-decoration: line-through;
+}
+
+.ex .name {
+  font-size: var(--mh-text-base);
+  font-weight: 500;
+}
+
+.ex .sets {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}

@@ -20,6 +20,13 @@ export const programRoutes: Routes = [
     title: 'Routine - MotionHive',
   },
   {
+    // Who needs attention — a coaching surface, not a program one, but it
+    // belongs with the work it reports on.
+    path: 'roster',
+    loadComponent: () => import('./roster/roster').then((m) => m.Roster),
+    title: 'Needs attention - MotionHive',
+  },
+  {
     path: 'program/:id',
     loadComponent: () =>
       import('./program-builder/program-builder').then((m) => m.ProgramBuilder),

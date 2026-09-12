@@ -23,6 +23,21 @@ export const clientsRoutes: Routes = [
     title: 'Requests - MotionHive',
   },
   {
+    // A client's training and one logged workout. Mounted here rather than
+    // under programs because they are reached from the person, and switching
+    // tabs mid-review would lose the client you were looking at.
+    path: 'client/:clientId/training',
+    loadComponent: () =>
+      import('../programs/client-training/client-training').then((m) => m.ClientTraining),
+    title: 'Training - MotionHive',
+  },
+  {
+    path: 'log/:id',
+    loadComponent: () =>
+      import('../programs/log-review/log-review').then((m) => m.LogReview),
+    title: 'Workout - MotionHive',
+  },
+  {
     // The client's user id, not the relationship id — it is what every
     // client endpoint keys on.
     path: ':clientId',

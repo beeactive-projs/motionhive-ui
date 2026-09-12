@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/clients" />
+    </ion-buttons>
+    <ion-title>Training</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading() && !loaded()) {
+    @for (row of skeletonRows; track row) {
+      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load their training"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="load()"
+    />
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="barbell-outline"
+      heading="Nothing yet"
+      message="Assign a program and their work will show up here."
+    />
+  } @else {
+    @if (activePlans().length) {
+      <h3 class="mh-section-label">Plan</h3>
+      @for (plan of activePlans(); track plan.id) {
+        <div class="plan">
+          <span class="name">{{ plan.programNameSnapshot }}</span>
+          <span class="sub">{{ planPosition(plan) }}</span>
+        </div>
+      }
+    }
+
+    <h3 class="mh-section-label">Recent workouts</h3>
+    @if (logs().length) {
+      @for (log of logs(); track log.id) {
+        <button class="log" type="button" (click)="openLog(log)">
+          <span class="day mh-kicker">{{ logDay(log) }}</span>
+          <span class="name">{{ log.name }}</span>
+          @if (logMeta(log)) {
+            <span class="meta">{{ logMeta(log) }}</span>
+          }
+          <ion-icon name="chevron-forward" aria-hidden="true" />
+        </button>
+      }
+    } @else {
+      <p class="none">Nothing logged in this window.</p>
+    }
+
+    <!-- Said plainly, because a short list otherwise reads as a lazy client
+         rather than as work they chose to keep to themselves. -->
+    <p class="privacy">
+      Workouts your client does outside their plan stay private unless they
+      share them, so this list may not be everything they did.
+    </p>
+  }
+</ion-content>

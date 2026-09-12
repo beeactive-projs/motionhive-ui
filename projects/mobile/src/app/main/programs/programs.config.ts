@@ -16,7 +16,9 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 
-import { Program, ProgramAssignmentStatus } from 'core';
+import { Program, ProgramAssignmentStatus, RosterAttention } from 'core';
+
+import { workoutDuration } from '../workouts/workouts.config';
 
 /**
  * Every icon these screens render. An unregistered name draws a blank box
@@ -134,3 +136,63 @@ export function scheduledDateFor(
   start.setDate(start.getDate() + weekIndex * DAYS_PER_WEEK + dayIndex);
   return start;
 }
+
+/**
+ * Why a client needs attention, and what to do about it.
+ *
+ * One reason per row, and every row ends in an action — a roster that only
+ * diagnoses leaves the coach to work out the next move for each person,
+ * which is the work it was supposed to save.
+ */
+const ATTENTION: Record<
+  string,
+  { label: string; tone: string; action: string }
+> = {
+  NEVER_STARTED: {
+    label: 'Never started',
+    tone: 'danger',
+    action: 'Nudge',
+  },
+  DROPPED: {
+    label: 'Falling off',
+    tone: 'coral',
+    action: 'Check in',
+  },
+  BEHIND: {
+    label: 'Behind',
+    tone: 'warning',
+    action: 'Check in',
+  },
+  SILENT: {
+    label: 'Gone quiet',
+    tone: 'info',
+    action: 'Message',
+  },
+};
+
+export function attentionLabel(reason: RosterAttention): string {
+  return reason ? (ATTENTION[reason]?.label ?? '') : '';
+}
+
+export function attentionTone(reason: RosterAttention): string {
+  return reason ? (ATTENTION[reason]?.tone ?? 'muted') : 'muted';
+}
+
+export function attentionAction(reason: RosterAttention): string {
+  return reason ? (ATTENTION[reason]?.action ?? 'Open') : 'Open';
+}
+
+/**
+ * Adherence as a row says it. Null means nothing was due in the window —
+ * which is an absence, not a zero, and printing "0%" would accuse someone of
+ * missing work that was never set.
+ */
+export function adherenceLabel(percent: number | null): string {
+  return percent === null ? 'Nothing due' : `${percent}% adherence`;
+}
+
+/**
+ * A logged workout's length, reusing the workouts feature's formatter so a
+ * duration reads the same wherever it appears.
+ */
+export const workoutDurationOf = workoutDuration;
