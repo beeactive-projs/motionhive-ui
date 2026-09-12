@@ -70,4 +70,16 @@
       </ion-item>
     }
   }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button aria-label="Assign to a client" (click)="openAssign()">
+      <ion-icon name="person-add-outline" aria-hidden="true" />
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
+
+<mh-assign-sheet
+  [(open)]="assignOpen"
+  [program]="program()"
+  (assign)="onAssign($event)"
+/>

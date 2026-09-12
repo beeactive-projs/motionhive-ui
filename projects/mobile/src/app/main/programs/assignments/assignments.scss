@@ -19,3 +19,10 @@ ion-item {
   margin: 0 var(--mh-gutter) 0.5rem;
   border-radius: var(--mh-radius-card);
 }
+
+/* A clear ion-button inherits the honey *fill* colour, which is 2.05:1 on a
+   white card. Text wants the deep ink token — same rule as every other
+   amber label in the app. */
+ion-item ion-button {
+  --color: var(--mh-color-honey-deep);
+}

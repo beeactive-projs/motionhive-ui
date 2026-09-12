@@ -5,8 +5,11 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
+  IonFab,
+  IonFabButton,
   IonContent,
   IonHeader,
+  IonIcon,
   IonItem,
   IonLabel,
   IonSkeletonText,
@@ -18,10 +21,17 @@ import { addIcons } from 'ionicons';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { ProgramAssignment, ProgramAssignmentService, displayName } from 'core';
+import {
+  Program,
+  ProgramAssignment,
+  ProgramAssignmentService,
+  ProgramService,
+  displayName,
+} from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { AssignRequest, AssignSheet } from '../_sheets/assign-sheet/assign-sheet';
 import { assignmentChip, assignmentTone, PROGRAM_ICONS } from '../programs.config';
 
 /**
@@ -33,13 +43,17 @@ import { assignmentChip, assignmentTone, PROGRAM_ICONS } from '../programs.confi
 @Component({
   selector: 'mh-assignments',
   imports: [
+    AssignSheet,
     EmptyState,
     IonBackButton,
     IonBadge,
     IonButton,
     IonButtons,
     IonContent,
+    IonFab,
+    IonFabButton,
     IonHeader,
+    IonIcon,
     IonItem,
     IonLabel,
     IonSkeletonText,
@@ -51,6 +65,7 @@ import { assignmentChip, assignmentTone, PROGRAM_ICONS } from '../programs.confi
 })
 export class Assignments implements ViewWillEnter {
   private readonly _assignmentService = inject(ProgramAssignmentService);
+  private readonly _programService = inject(ProgramService);
   private readonly _router = inject(Router);
   private readonly _feedback = inject(FeedbackService);
 
@@ -59,6 +74,8 @@ export class Assignments implements ViewWillEnter {
   readonly loaded = signal(false);
   readonly failed = signal(false);
   readonly busy = signal<string | null>(null);
+  readonly program = signal<Program | null>(null);
+  readonly assignOpen = signal(false);
 
   readonly skeletonRows = [1, 2, 3];
 
@@ -76,6 +93,12 @@ export class Assignments implements ViewWillEnter {
     if (!id) return;
     this._programId = id;
     this.load();
+
+    // The assign sheet previews the schedule, which needs the day grid.
+    this._programService
+      .get(id)
+      .pipe(take(1), catchError(() => of(null)))
+      .subscribe((program) => this.program.set(program));
   }
 
   load(): void {
@@ -99,6 +122,29 @@ export class Assignments implements ViewWillEnter {
           this.loaded.set(true);
           this.loading.set(false);
         },
+      });
+  }
+
+  openAssign(): void {
+    this.assignOpen.set(true);
+  }
+
+  onAssign(request: AssignRequest): void {
+    const programId = this._programId;
+    if (!programId) return;
+
+    this._assignmentService
+      .assign({ programId, ...request })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          // Re-read rather than prepend the response: the create payload
+          // carries no eager-loaded client, so an optimistic row would sit
+          // there calling them "Client" until the next visit.
+          this.load();
+          void this._feedback.success('Program assigned');
+        },
+        error: (err) => void this._feedback.error(err, 'Could not assign the program'),
       });
   }
 
@@ -144,7 +190,11 @@ export class Assignments implements ViewWillEnter {
           void this._feedback.info('Could not change that assignment');
           return;
         }
-        this.rows.update((rows) => rows.map((r) => (r.id === row.id ? updated : r)));
+        // The update payload carries no eager-loaded client, so keep the one
+        // already on screen — otherwise pausing renames the person "Client".
+        this.rows.update((rows) =>
+          rows.map((r) => (r.id === row.id ? { ...updated, client: r.client } : r)),
+        );
       });
   }
 }

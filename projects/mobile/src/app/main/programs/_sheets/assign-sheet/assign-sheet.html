@@ -1,0 +1,84 @@
+<ng-template #body>
+  @if (program(); as p) {
+    <div class="head">
+      <h3>{{ p.name }}</h3>
+    </div>
+  }
+
+  <div class="mh-section-label">Client</div>
+  @if (loading()) {
+    <p class="note">Loading your clients…</p>
+  } @else if (!clients().length) {
+    <p class="note">
+      No active clients yet. A client has to accept before they can be given work.
+    </p>
+  } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (row of clients(); track row.clientId) {
+        <ion-item button [detail]="false" (click)="clientId.set(row.clientId)">
+          <mh-hex-avatar
+            slot="start"
+            size="sm"
+            aria-hidden="true"
+            [name]="name(row)"
+            [imageUrl]="row.client?.avatarUrl ?? null"
+            [color]="tone(row)"
+          />
+          <ion-label>{{ name(row) }}</ion-label>
+          @if (clientId() === row.clientId) {
+            <ion-icon slot="end" name="checkmark-circle-outline" aria-hidden="true" />
+          }
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <div class="mh-section-label">Starts</div>
+  <div class="date">
+    <input
+      type="date"
+      [value]="startDate()"
+      (input)="startDate.set($any($event.target).value)"
+      [attr.aria-label]="'Start date'"
+    />
+  </div>
+
+  <!-- The real work of this sheet: which day lands on which date. A plan that
+       puts Day 1 on a Saturday is caught here, not in chat on Wednesday. -->
+  @if (preview().length) {
+    <div class="mh-section-label">Schedule</div>
+    <div class="preview">
+      @for (row of previewHead(); track row.name + row.date) {
+        <div class="p-row">
+          <span class="p-week mh-kicker">W{{ row.weekIndex + 1 }}</span>
+          <span class="p-name">{{ row.name }}</span>
+          <span class="p-date">{{ row.date }}</span>
+        </div>
+      }
+      @if (previewMore()) {
+        <p class="p-more">+ {{ previewMore() }} more</p>
+      }
+    </div>
+  }
+
+  <div class="mh-section-label">Note</div>
+  <ion-textarea
+    class="note-field"
+    fill="outline"
+    [autoGrow]="true"
+    placeholder="Anything they should know before starting."
+    [value]="notes()"
+    (ionInput)="notes.set($any($event).detail.value ?? '')"
+  />
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Assign program"
+  [body]="body"
+  saveLabel="Assign"
+  [canSave]="canAssign()"
+  [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9"
+  (save)="submit()"
+/>

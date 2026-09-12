@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { firstValueFrom, of } from 'rxjs';
+import { Observable, firstValueFrom, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import { Program, ProgramService, ProgramWorkout } from 'core';
@@ -140,9 +140,15 @@ export class ProgramBuilderStore {
   }
 
   /**
-   * Copy every day of one week into another, which is the single biggest
-   * time-saver in authoring — most blocks repeat a week with the loads moved.
-   * Days already in the target week are replaced, so repeating a copy is safe.
+   * Copy every day of one week into another, with the work inside it.
+   *
+   * The exercises and their prescribed sets are copied too — a copy that
+   * reproduced only the day names would leave a coach re-entering the whole
+   * week, which is the job this exists to avoid. There is no server-side
+   * copy-week, so the tree is walked here.
+   *
+   * Days already in the target week are removed first, so repeating a copy
+   * is safe rather than additive.
    */
   copyWeek(from: number, to: number, done?: () => void): void {
     const program = this._program();
@@ -159,29 +165,70 @@ export class ProgramBuilderStore {
     }
 
     this._saving.set(true);
-    const clears = existing.map((w) =>
-      this._programService.removeWorkout(program.id, w.id).pipe(catchError(() => of(null))),
-    );
+    void this._runCopy(program.id, source, existing, to, done);
+  }
 
-    // Sequential rather than parallel: the server assigns `sequenceNumber`,
-    // and racing the writes would scramble the order within the week.
-    const run = async () => {
-      for (const clear of clears) await firstValueFrom(clear.pipe(take(1)));
-      for (const day of source) {
-        await firstValueFrom(
-          this._programService
-            .addWorkout(program.id, {
-              name: day.name,
-              weekIndex: to,
-              dayIndex: day.dayIndex,
-              notes: day.notes ?? undefined,
-            })
-            .pipe(take(1), catchError(() => of(null))),
+  /**
+   * Sequential on purpose: the server assigns `sequenceNumber` and
+   * `orderIndex` from insertion order, so racing these would scramble the
+   * order of days within the week and of sets within an exercise.
+   */
+  private async _runCopy(
+    programId: string,
+    source: ProgramWorkout[],
+    existing: ProgramWorkout[],
+    to: number,
+    done?: () => void,
+  ): Promise<void> {
+    const settle = <T>(obs: Observable<T>) =>
+      firstValueFrom(obs.pipe(take(1), catchError(() => of(null))));
+
+    for (const old of existing) {
+      await settle(this._programService.removeWorkout(programId, old.id));
+    }
+
+    for (const day of source) {
+      const created = await settle(
+        this._programService.addWorkout(programId, {
+          name: day.name,
+          weekIndex: to,
+          dayIndex: day.dayIndex,
+          notes: day.notes ?? undefined,
+          phase: day.phase ?? undefined,
+          estimatedDurationMinutes: day.estimatedDurationMinutes ?? undefined,
+        }),
+      );
+      if (!created) continue;
+
+      for (const exercise of day.exercises ?? []) {
+        const copiedExercise = await settle(
+          this._programService.addExercise(programId, created.id, {
+            exerciseId: exercise.exerciseId,
+            notes: exercise.notes ?? undefined,
+            alternateExerciseId: exercise.alternateExerciseId ?? undefined,
+          }),
         );
+        if (!copiedExercise) continue;
+
+        for (const set of exercise.sets ?? []) {
+          await settle(
+            this._programService.addSet(programId, created.id, copiedExercise.id, {
+              setType: set.setType,
+              targetRepsMin: set.targetRepsMin ?? undefined,
+              targetRepsMax: set.targetRepsMax ?? undefined,
+              targetWeightKg: set.targetWeightKg ?? undefined,
+              targetDurationSeconds: set.targetDurationSeconds ?? undefined,
+              targetDistanceMeters: set.targetDistanceMeters ?? undefined,
+              targetRpe: set.targetRpe ?? undefined,
+              restAfterSeconds: set.restAfterSeconds ?? undefined,
+              tempo: set.tempo ?? undefined,
+            }),
+          );
+        }
       }
-      this._saving.set(false);
-      this.load(program.id, done);
-    };
-    void run();
+    }
+
+    this._saving.set(false);
+    this.load(programId, done);
   }
 }

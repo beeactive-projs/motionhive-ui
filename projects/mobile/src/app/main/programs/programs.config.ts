@@ -11,6 +11,7 @@ import {
   peopleOutline,
   personAddOutline,
   playOutline,
+  removeOutline,
   repeatOutline,
   trashOutline,
 } from 'ionicons/icons';
@@ -35,6 +36,7 @@ export const PROGRAM_ICONS = {
   peopleOutline,
   personAddOutline,
   playOutline,
+  removeOutline,
   repeatOutline,
   trashOutline,
 };
