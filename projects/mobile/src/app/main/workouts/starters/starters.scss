@@ -1,0 +1,12 @@
+.lede {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 1.25rem 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.s-row ion-skeleton-text {
+  height: 4.25rem;
+  margin: 0 1.25rem 0.5rem;
+  border-radius: var(--mh-radius-card);
+}

@@ -1,0 +1,55 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts" />
+    </ion-buttons>
+    <ion-title>History</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading() && !logs().length) {
+    @for (row of skeletonRows; track row) {
+      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load history"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="load()"
+    />
+  } @else if (!logs().length) {
+    <mh-empty-state
+      icon="time-outline"
+      heading="Nothing logged yet"
+      message="Finish a workout and it will show up here."
+    />
+  } @else {
+    <p class="count">{{ total() }} workouts logged</p>
+
+    @for (log of logs(); track log.id) {
+      <button class="row" type="button" (click)="open(log)">
+        <span class="date mh-kicker">{{ dayLabel(log) }}</span>
+        <span class="name">{{ log.name }}</span>
+        <span class="meta">
+          @if (duration(log)) {
+            {{ duration(log) }}
+          }
+          @if (log.feelingRating) {
+            · {{ log.feelingRating }}/5
+          }
+        </span>
+        <ion-icon name="chevron-forward" aria-hidden="true" />
+      </button>
+    }
+
+    <ion-infinite-scroll
+      [disabled]="logs().length >= total()"
+      (ionInfinite)="loadMore($any($event))"
+    >
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
+</ion-content>

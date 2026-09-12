@@ -1,0 +1,34 @@
+<div class="row" [class.done]="set().isCompleted">
+  <span class="num">
+    {{ index() + 1 }}
+    @if (typeChip()) {
+      <em class="type">{{ typeChip() }}</em>
+    }
+  </span>
+
+  <span class="prev" [attr.title]="'Last time: ' + previousLabel()">{{ previousLabel() }}</span>
+
+  @for (field of fields(); track field) {
+    <button
+      class="cell"
+      type="button"
+      [class.active]="editing() === field"
+      [attr.aria-label]="field + ' for set ' + (index() + 1)"
+      (click)="edit.emit(field)"
+    >
+      {{ cellValue(field) || '–' }}
+    </button>
+  }
+
+  <!-- The minimum bar: a tick alone is a valid log, so it is never gated on
+       a value being entered. -->
+  <button
+    class="tick"
+    type="button"
+    [attr.aria-pressed]="set().isCompleted"
+    [attr.aria-label]="'Set ' + (index() + 1) + ' complete'"
+    (click)="toggle.emit()"
+  >
+    <ion-icon name="checkmark-outline" aria-hidden="true" />
+  </button>
+</div>

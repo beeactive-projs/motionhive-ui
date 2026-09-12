@@ -1,0 +1,19 @@
+<div class="bar" [class.done]="done()" role="timer" aria-live="polite">
+  <div class="count">
+    <span class="mh-kicker">{{ done() ? 'Rest over' : 'Rest' }}</span>
+    <strong>{{ display() }}</strong>
+  </div>
+
+  @if (nextTarget()) {
+    <span class="next">Next: {{ nextTarget() }}</span>
+  }
+
+  <div class="actions">
+    <button type="button" aria-label="Minus 10 seconds" (click)="subtract()">−10</button>
+    <button type="button" aria-label="Plus 10 seconds" (click)="add()">+10</button>
+    <button class="skip" type="button" (click)="skip.emit()">
+      <ion-icon name="play-skip-forward-outline" aria-hidden="true" />
+      Skip
+    </button>
+  </div>
+</div>

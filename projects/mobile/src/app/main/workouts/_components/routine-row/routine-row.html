@@ -1,0 +1,32 @@
+<ion-item
+  class="mh-session-row mh-list-row"
+  button
+  detail="false"
+  lines="none"
+  [attr.data-tone]="tone()"
+  (click)="select.emit()"
+>
+  <ion-label>
+    <h2>{{ routine().name }}</h2>
+    <div class="tags">
+      <span class="count">{{ exerciseCount() }}</span>
+      @if (starter()) {
+        <ion-badge data-tone="type">Starter</ion-badge>
+      }
+    </div>
+    @if (lastDone()) {
+      <p class="last">{{ lastDone() }}</p>
+    }
+  </ion-label>
+
+  <!-- Stops the tap bubbling to the row: start and open are different verbs. -->
+  <button
+    class="play"
+    slot="end"
+    type="button"
+    [attr.aria-label]="'Start ' + routine().name"
+    (click)="start.emit(); $event.stopPropagation()"
+  >
+    <ion-icon name="play-outline" aria-hidden="true" />
+  </button>
+</ion-item>

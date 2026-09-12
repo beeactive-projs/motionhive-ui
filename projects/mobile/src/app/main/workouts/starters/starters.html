@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts" />
+    </ion-buttons>
+    <ion-title>Starter routines</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <p class="lede">Pick one to try — it becomes yours to edit.</p>
+
+  @if (loading() && !routines().length) {
+    @for (row of skeletonRows; track row) {
+      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load starters"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="load()"
+    />
+  } @else {
+    @for (routine of routines(); track routine.id; let i = $index) {
+      <mh-routine-row
+        [routine]="routine"
+        [tone]="routineTone(i)"
+        [starter]="true"
+        (select)="open(routine)"
+        (start)="open(routine)"
+      />
+    }
+  }
+</ion-content>

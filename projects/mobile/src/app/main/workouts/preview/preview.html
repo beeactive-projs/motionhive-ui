@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts" />
+    </ion-buttons>
+    <ion-title>Workout</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading()) {
+    <p class="state">Loading…</p>
+  } @else if (failed() || !workout()) {
+    <p class="state">Could not open this workout.</p>
+  } @else {
+    @if (workout(); as w) {
+      <div class="head">
+        @if (w.phase) {
+          <span class="mh-kicker phase">{{ w.phase }}</span>
+        }
+        <h1>{{ w.name }}</h1>
+        @if (position()) {
+          <span class="mh-kicker position">{{ position() }}</span>
+        }
+        @if (meta()) {
+          <p class="meta">{{ meta() }}</p>
+        }
+      </div>
+
+      <!-- Coach notes run long, so they open rather than push the exercise
+           list off the first screen. -->
+      @if (w.notes) {
+        <button class="note" type="button" (click)="noteOpen.set(!noteOpen())">
+          <span class="mh-kicker">Note from your coach</span>
+          <ion-icon [name]="noteOpen() ? 'chevron-down-outline' : 'chevron-forward'" aria-hidden="true" />
+        </button>
+        @if (noteOpen()) {
+          <p class="note-body">{{ w.notes }}</p>
+        }
+      }
+
+      <h3 class="mh-section-label">Exercises</h3>
+      @for (exercise of w.exercises ?? []; track exercise.id) {
+        <div class="ex">
+          <span class="name">{{ exercise.exercise?.name }}</span>
+          <span class="sets">{{ (exercise.sets ?? []).length }} sets</span>
+        </div>
+      }
+    }
+  }
+</ion-content>
+
+@if (workout()) {
+  <div class="cta">
+    <ion-button expand="block" [disabled]="starting()" (click)="start()">
+      Start workout
+    </ion-button>
+    <button class="quiet" type="button" (click)="skip()">Skip today</button>
+  </div>
+}

@@ -1,0 +1,83 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts" />
+    </ion-buttons>
+    <ion-title>{{ isNew() ? 'New routine' : (routine()?.name ?? 'Routine') }}</ion-title>
+    @if (!readOnly()) {
+      <ion-buttons slot="end">
+        <ion-button [disabled]="!canSave() || saving()" (click)="save()">Save</ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading()) {
+    <p class="state">Loading…</p>
+  } @else {
+    @if (readOnly()) {
+      <!-- A starter is runnable by anyone and editable by no one; starting it
+           copies it into your own library. -->
+      <p class="starter-note">
+        A MotionHive starter. Start it and it becomes yours to edit.
+      </p>
+    } @else {
+      <ion-input
+        class="name"
+        fill="outline"
+        label="Routine name"
+        labelPlacement="stacked"
+        placeholder="Push day"
+        [value]="name()"
+        (ionInput)="name.set($any($event).detail.value ?? '')"
+      />
+    }
+
+    <h3 class="mh-section-label">Exercises</h3>
+
+    @for (row of exercises(); track row.exerciseId + $index; let i = $index) {
+      <div class="row">
+        <span class="name">{{ row.name }}</span>
+
+        @if (readOnly()) {
+          <span class="sets">{{ row.sets }} sets</span>
+        } @else {
+          <div class="steppers">
+            <button type="button" aria-label="One set fewer" (click)="setCount(i, -1)">−</button>
+            <span class="count">{{ row.sets }}</span>
+            <button type="button" aria-label="One set more" (click)="setCount(i, 1)">+</button>
+          </div>
+          <button class="remove" type="button" aria-label="Remove" (click)="remove(i)">
+            <ion-icon name="close" aria-hidden="true" />
+          </button>
+        }
+      </div>
+    }
+
+    @if (!exercises().length) {
+      <p class="state">No exercises yet.</p>
+    }
+
+    @if (!readOnly()) {
+      <button class="add" type="button" (click)="pickerOpen.set(true)">
+        <ion-icon name="add-outline" aria-hidden="true" />
+        Add exercise
+      </button>
+    }
+  }
+</ion-content>
+
+@if (!isNew()) {
+  <div class="cta">
+    <ion-button expand="block" [disabled]="starting()" (click)="start()">
+      Start workout
+    </ion-button>
+  </div>
+}
+
+<mh-exercise-picker-sheet
+  [(open)]="pickerOpen"
+  [context]="name() || 'this routine'"
+  (picked)="onPicked($event)"
+/>

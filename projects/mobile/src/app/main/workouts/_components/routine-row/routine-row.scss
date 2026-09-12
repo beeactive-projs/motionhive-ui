@@ -1,0 +1,41 @@
+/* Geometry and spine tones come from the shared `.mh-session-row` skin
+   (theme/components/mh-session-row.css). Only the routine-specific parts
+   live here. */
+
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.count {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+}
+
+.last {
+  margin: 0.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+/* The start affordance. A circle rather than an ion-button so the tap target
+   stays 44px without the button's own padding fighting the row height. */
+.play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--mh-radius-pill);
+  background: var(--mh-color-selected-background);
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+.play ion-icon {
+  font-size: var(--mh-text-lg);
+}

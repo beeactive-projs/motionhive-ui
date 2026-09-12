@@ -1,0 +1,86 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="finish()">Finish</ion-button>
+    </ion-buttons>
+    <ion-title>{{ store.log()?.name ?? 'Workout' }}</ion-title>
+    <ion-buttons slot="end">
+      <span class="progress">{{ store.progress().done }}/{{ store.progress().total }}</span>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (store.loading()) {
+    <p class="state">Loading…</p>
+  } @else if (store.failed()) {
+    <p class="state">Could not open this workout.</p>
+  } @else {
+    @for (exercise of store.exercises(); track exercise.id) {
+      <section class="exercise" [class.skipped]="exercise.isSkipped">
+        <header>
+          <h2>{{ exercise.exerciseNameSnapshot }}</h2>
+          <button
+            class="skip"
+            type="button"
+            [attr.aria-pressed]="exercise.isSkipped"
+            (click)="toggleSkip(exercise)"
+          >
+            {{ exercise.isSkipped ? 'Unskip' : 'Skip' }}
+          </button>
+        </header>
+
+        @if (!exercise.isSkipped) {
+          <div class="grid-head">
+            <span class="num">Set</span>
+            <span class="prev">Prev</span>
+            <span class="spacer">Actual</span>
+          </div>
+
+          @for (set of exercise.sets ?? []; track set.id; let i = $index) {
+            <mh-set-row
+              [set]="set"
+              [index]="i"
+              [kind]="exercise.exercise?.kind ?? null"
+              [previous]="previousFor(exercise, i)"
+              [editing]="editingFieldFor(set.id)"
+              (toggle)="toggleSet(exercise, set)"
+              (edit)="editCell(exercise, set, $event)"
+            />
+          }
+
+          <button class="add-set" type="button" (click)="addSet(exercise)">
+            <ion-icon name="add-outline" aria-hidden="true" />
+            Add set
+          </button>
+        }
+      </section>
+    }
+
+    @if (!store.exercises().length) {
+      <p class="state">Nothing added yet. Add your first exercise to get going.</p>
+    }
+  }
+</ion-content>
+
+<!-- One slot, three states: the keypad while a cell is open, the rest timer
+     while resting, and nothing otherwise. Both dock so the grid above stays
+     readable — never an overlay. -->
+<ion-footer class="ion-no-border">
+  @if (showKeypad()) {
+    <mh-numeric-keypad
+      [field]="keypadField()"
+      [label]="keypadLabel()"
+      [value]="draft()"
+      (commit)="commitCell($event)"
+      (dismiss)="editing.set(null)"
+    />
+  } @else if (showRest()) {
+    <mh-rest-timer-bar
+      [endsAt]="restEndsAt()"
+      (nudge)="nudgeRest($event)"
+      (skip)="skipRest()"
+      (finished)="onRestFinished()"
+    />
+  }
+</ion-footer>

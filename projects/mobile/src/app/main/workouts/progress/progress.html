@@ -1,0 +1,50 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts" />
+    </ion-buttons>
+    <ion-title>Progress</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading() && !overview()) {
+    <div class="tiles">
+      @for (row of skeletonRows; track row) {
+        <div class="s-tile"><ion-skeleton-text [animated]="true" /></div>
+      }
+    </div>
+  } @else if (failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load progress"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="load()"
+    />
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="trending-up-outline"
+      heading="Nothing to show yet"
+      message="Log a few workouts and your numbers will build up here."
+    />
+  } @else {
+    <p class="range mh-kicker">Last 12 weeks</p>
+
+    <div class="tiles">
+      @for (tile of tiles(); track tile.label) {
+        <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+      }
+    </div>
+
+    @if (overview()?.records?.length) {
+      <h3 class="mh-section-label">Records</h3>
+      @for (record of overview()?.records ?? []; track record.exerciseId) {
+        <div class="record">
+          <span class="name">{{ record.exerciseName }}</span>
+          <span class="value">{{ record.weightKg }} kg</span>
+        </div>
+      }
+    }
+  }
+</ion-content>

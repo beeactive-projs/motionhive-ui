@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  padding: 0 var(--mh-gutter, 1.25rem);
+}
+
+.hero {
+  padding: 1rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.eyebrow {
+  color: var(--ion-color-primary);
+}
+
+.hero h2 {
+  margin: 0.375rem 0 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-lg);
+  font-weight: 700;
+}
+
+/* The plan's own position line, quieter than the eyebrow above it so the two
+   mono rows do not compete. */
+.position {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--ion-color-medium);
+}
+
+.meta {
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* A preview, not a checklist — the real list is one tap away, so these stay
+   plain lines with no bullets or counts. */
+.exercises {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exercises li {
+  padding: 0.25rem 0;
+  font-size: var(--mh-text-sm);
+}
+
+.exercises li + li {
+  border-top: 1px solid var(--mh-color-divider);
+}
+
+.more {
+  display: inline-block;
+  margin-top: 0.375rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+.cta {
+  margin-top: 0.875rem;
+}

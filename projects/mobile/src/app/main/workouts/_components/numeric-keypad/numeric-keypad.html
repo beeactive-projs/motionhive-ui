@@ -1,0 +1,40 @@
+<div class="pad" role="group" [attr.aria-label]="label() || 'Number pad'">
+  <div class="head">
+    @if (label()) {
+      <span class="mh-kicker">{{ label() }}</span>
+    }
+    <output class="draft">{{ draft() || '0' }}</output>
+
+    <div class="steppers">
+      <button type="button" [attr.aria-label]="'Minus ' + stepLabel()" (click)="step(-1)">
+        −{{ stepLabel() }}
+      </button>
+      <button type="button" [attr.aria-label]="'Plus ' + stepLabel()" (click)="step(1)">
+        +{{ stepLabel() }}
+      </button>
+    </div>
+    <button class="close" type="button" aria-label="Close number pad" (click)="dismiss.emit()">
+      <ion-icon name="chevron-down-outline" aria-hidden="true" />
+    </button>
+  </div>
+
+  <div class="keys">
+    @for (key of keys; track key) {
+      <button type="button" (click)="press(key)">{{ key }}</button>
+    }
+
+    @if (allowsDecimal()) {
+      <button type="button" (click)="press('.')">.</button>
+    } @else {
+      <button type="button" class="ghost" aria-label="Clear" (click)="clear()">C</button>
+    }
+
+    <button type="button" (click)="press('0')">0</button>
+
+    <button type="button" class="ghost" aria-label="Backspace" (click)="backspace()">
+      <ion-icon name="backspace-outline" aria-hidden="true" />
+    </button>
+  </div>
+
+  <button class="done" type="button" (click)="commit.emit(draft())">Done</button>
+</div>

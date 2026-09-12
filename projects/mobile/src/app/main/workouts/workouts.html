@@ -1,16 +1,116 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Workouts</ion-title>
-    <ion-buttons slot="end">
-      <mh-notification-bell />
-    </ion-buttons>
+    <mh-notification-bell slot="end" />
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <mh-empty-state
-    icon="barbell-outline"
-    heading="Workouts are coming"
-    message="Your plans, routines and logged sessions will live here."
-  />
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($any($event))">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.showSkeleton()) {
+    <!-- Chrome stays real while content shimmers in its final geometry, so
+         nothing jumps when the data lands. -->
+    <div class="skeleton">
+      <div class="s-hero"><ion-skeleton-text [animated]="true" /></div>
+      <div class="s-start"><ion-skeleton-text [animated]="true" /></div>
+      @for (row of skeletonRows; track row) {
+        <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+      }
+    </div>
+  } @else {
+    <!-- A session left open outranks everything else on the page. Navy, not
+         honey: resuming is not the same offer as starting. -->
+    @if (store.inProgress(); as log) {
+      <button class="resume" type="button" (click)="resume()">
+        <span class="mh-kicker">In progress · {{ elapsed() }}</span>
+        <strong>{{ log.name }}</strong>
+        <span class="action">Resume</span>
+      </button>
+    }
+
+    @if (store.isColdStart()) {
+      <section class="cold">
+        <h2>Nothing here yet</h2>
+        <p>Workouts you start, save or follow will live here.</p>
+        <ion-button expand="block" (click)="startEmpty()">Start an empty workout</ion-button>
+        <ion-button expand="block" fill="outline" (click)="openStarters()">
+          Browse starter routines
+        </ion-button>
+      </section>
+
+      @if (store.starterPreview().length) {
+        <h3 class="mh-section-label">Starter routines</h3>
+        @for (routine of store.starterPreview(); track routine.id; let i = $index) {
+          <mh-routine-row
+            [routine]="routine"
+            [tone]="routineTone(i)"
+            [starter]="true"
+            (select)="openRoutine(routine)"
+            (start)="openRoutine(routine)"
+          />
+        }
+        <button class="see-all" type="button" (click)="openStarters()">See all 10</button>
+      }
+    } @else {
+      @if (store.today() ?? store.upNext(); as workout) {
+        <mh-today-hero
+          [workout]="workout"
+          [isToday]="!!store.today()"
+          (start)="startToday()"
+        />
+      }
+
+      <!-- Always present, never gated behind a plan: this is the on-ramp for
+           anyone who just wants to train without setting something up. -->
+      <button class="empty-start" type="button" (click)="startEmpty()">
+        <ion-icon name="add-outline" aria-hidden="true" />
+        Start empty workout
+      </button>
+
+      @if (store.activePlans().length) {
+        <h3 class="mh-section-label">From your coach</h3>
+        @for (plan of store.activePlans(); track plan.id) {
+          <button class="plan" type="button" (click)="openPlan(plan.id)">
+            <span class="name">{{ plan.programNameSnapshot }}</span>
+            <span class="sub">
+              @if (plan.instructor; as coach) {
+                {{ coach.firstName }} {{ coach.lastName }} ·
+              }
+              {{ plan.completionPercent }}% done
+            </span>
+            <ion-icon name="chevron-forward" aria-hidden="true" />
+          </button>
+        }
+      }
+
+      <div class="rail-head">
+        <h3 class="mh-section-label">Your routines</h3>
+        <button class="link" type="button" (click)="newRoutine()">New routine</button>
+      </div>
+
+      @if (store.routines().length) {
+        @for (routine of store.routines(); track routine.id; let i = $index) {
+          <mh-routine-row
+            [routine]="routine"
+            [tone]="routineTone(i)"
+            (select)="openRoutine(routine)"
+            (start)="openRoutine(routine)"
+          />
+        }
+      } @else {
+        <p class="rail-empty">
+          Save a workout as a routine and it will show up here, ready to repeat.
+        </p>
+      }
+
+      <button class="history" type="button" (click)="openHistory()">
+        <ion-icon name="time-outline" aria-hidden="true" />
+        History
+        <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
+      </button>
+    }
+  }
 </ion-content>

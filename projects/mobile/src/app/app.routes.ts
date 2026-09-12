@@ -105,7 +105,8 @@ export const routes: Routes = [
       { path: 'sessions', redirectTo: 'coach/sessions' },
       {
         path: 'workouts',
-        loadComponent: () => import('./main/workouts/workouts').then((m) => m.Workouts),
+        loadChildren: () =>
+          import('./main/workouts/workouts.routes').then((m) => m.workoutRoutes),
       },
       // More-menu destinations mirroring web's nav: Groups is shared, while
       // Programs and Exercises are coaching workspace pages. Top-level like
