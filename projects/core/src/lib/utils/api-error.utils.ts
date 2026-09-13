@@ -23,25 +23,25 @@ const FRIENDLY_BY_STATUS: Record<number, string> = {
   0: 'You seem to be offline. Check your connection and try again.',
   429: 'Too many requests at once — give it a moment and try again.',
   500: 'Something went wrong on our side. Please try again.',
-  502: 'Something went wrong on our side. Please try again.',
-  503: 'Something went wrong on our side. Please try again.',
+  502: 'The service is temporarily unavailable. Please try again in a moment.',
+  503: 'The service is temporarily unavailable. Please try again in a moment.',
   504: 'The server took too long to respond. Please try again.',
 };
 
 /**
- * Best-effort extraction of a human-readable message from a backend
- * error. Prefers the BE's own `{ message }` payload (which is what
- * `HttpExceptionFilter` returns) for the statuses where that message is
- * meant for a user; substitutes plain copy for the ones where it is not;
- * then falls back to the caller's text.
+ * What a status means to a human, for the statuses whose server text is
+ * not for humans — "ThrottlerException: Too Many Requests", a 500's
+ * "Internal server error". Null for everything else: a 4xx message is
+ * written for the user and should reach them as is.
  */
+export function friendlyStatusMessage(status: number | undefined): string | null {
+  return status !== undefined ? (FRIENDLY_BY_STATUS[status] ?? null) : null;
+}
+
 export function apiErrorMessage(err: unknown, fallback: string): string {
   const e = err as MaybeApiError | null | undefined;
-  const status = e?.status;
-
-  if (status !== undefined && status in FRIENDLY_BY_STATUS) {
-    return FRIENDLY_BY_STATUS[status];
-  }
+  const friendly = friendlyStatusMessage(e?.status);
+  if (friendly) return friendly;
 
   // class-validator returns an array of messages; show the first, which is
   // the one about the field the user most likely just touched.

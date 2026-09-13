@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/programs" />
+      <ion-back-button [defaultHref]="builderUrl()" />
     </ion-buttons>
     <ion-title>{{ name() || 'Day' }}</ion-title>
     <ion-buttons slot="end">
@@ -26,6 +26,7 @@
         placeholder="Push day"
         [value]="name()"
         (ionInput)="name.set($any($event).detail.value ?? '')"
+        (ionBlur)="saveFields()"
       />
 
       <ion-textarea
@@ -36,6 +37,7 @@
         placeholder="Anything they should know before starting."
         [value]="note()"
         (ionInput)="note.set($any($event).detail.value ?? '')"
+        (ionBlur)="saveFields()"
       />
     </div>
 

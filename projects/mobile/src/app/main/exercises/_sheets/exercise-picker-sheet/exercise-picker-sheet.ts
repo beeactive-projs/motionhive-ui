@@ -94,20 +94,26 @@ export class ExercisePickerSheet {
 
   readonly isSearching = computed(() => this.query().trim().length > 0);
 
-  /** Your own last picks, hidden while searching and when already added. */
-  readonly recents = computed(() => {
-    if (this.isSearching()) return [];
-    const added = new Set(this.alreadyAdded());
-    return this._recents.exercises().filter((e) => !added.has(e.id));
-  });
+  /** Your own last picks, hidden while searching. */
+  readonly recents = computed(() =>
+    this.isSearching() ? [] : this._recents.exercises(),
+  );
 
   readonly rows = computed(() => {
-    const seen = new Set([...this.recents().map((e) => e.id), ...this.alreadyAdded()]);
-    // Two kinds of duplicate to drop: what the recents rail above already
-    // shows, and what is already in the list behind the sheet. Offering a
-    // movement you cannot add twice is just a tap that does nothing.
-    return this.results().filter((e) => !seen.has(e.id));
+    // The catalog repeats what the recents rail already shows; drop those so
+    // a movement never appears twice in one sheet.
+    const recentIds = new Set(this.recents().map((e) => e.id));
+    return this.results().filter((e) => !recentIds.has(e.id));
   });
+
+  /**
+   * Already in the list behind the sheet. Shown ticked and locked rather
+   * than hidden: a row that vanishes reads as "not in the catalog", and the
+   * user reopening the sheet could not tell what they had already picked.
+   */
+  isLocked(id: string): boolean {
+    return this.alreadyAdded().includes(id);
+  }
 
   readonly sectionLabel = computed(() =>
     this.isSearching() ? 'Results' : 'All exercises',
@@ -194,10 +200,12 @@ export class ExercisePickerSheet {
   }
 
   isOn(id: string): boolean {
-    return this.selectedIds().includes(id);
+    return this.selectedIds().includes(id) || this.isLocked(id);
   }
 
   toggle(exercise: Exercise): void {
+    // Removal is done from the list itself, not from here.
+    if (this.isLocked(exercise.id)) return;
     // A swap replaces one movement with one movement, so the last tap wins
     // rather than accumulating a batch that cannot be applied.
     if (this.single()) {

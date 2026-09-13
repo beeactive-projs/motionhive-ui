@@ -204,6 +204,8 @@ export interface CreatePrescribedExercisePayload {
   blockId?: string;
   notes?: string;
   orderIndex?: number;
+  /** Empty sets the server creates with the exercise, in the same transaction. */
+  defaultSets?: number;
 }
 
 export type UpdatePrescribedExercisePayload =

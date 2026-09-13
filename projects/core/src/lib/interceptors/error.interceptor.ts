@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 import { HttpErrorInfo, ErrorDialogService } from '../services/error-dialog/error-dialog.service';
+import { friendlyStatusMessage } from '../utils/api-error.utils';
 import { isSilentRequest } from './silent-request.context';
 
 // 401 is handled by the auth interceptor (token refresh / redirect to login).
@@ -15,50 +16,40 @@ const SKIP_STATUSES = new Set([400, 401, 422, 429]);
 
 function mapError(error: HttpErrorResponse): HttpErrorInfo {
   const serverMessage = error.error?.message as string | undefined;
+  const status = error.status;
 
-  switch (error.status) {
+  switch (status) {
     case 0:
-      return {
-        status: 0,
-        title: 'Connection Error',
-        message: 'Unable to reach the server. Please check your internet connection and try again.',
-      };
+      return { status, title: 'No connection', message: friendlyStatusMessage(0)! };
     case 403:
       return {
-        status: 403,
-        title: 'Access Denied',
-        message: serverMessage ?? 'You do not have permission to perform this action.',
+        status,
+        title: 'Access denied',
+        message: serverMessage ?? 'You do not have permission to do that.',
       };
     case 404:
       return {
-        status: 404,
-        title: 'Not Found',
-        message: serverMessage ?? 'The requested resource could not be found.',
+        status,
+        title: 'Not found',
+        message: serverMessage ?? 'What you asked for could not be found.',
       };
     case 409:
       return {
-        status: 409,
-        title: 'Conflict',
-        message: serverMessage ?? 'This action could not be completed due to a conflict.',
+        status,
+        title: 'Cannot do that right now',
+        message: serverMessage ?? 'This clashes with something that already exists.',
       };
     case 500:
-      return {
-        status: 500,
-        title: 'Server Error',
-        message: serverMessage ?? 'An unexpected error occurred on our end. Please try again later.',
-      };
     case 502:
     case 503:
     case 504:
-      return {
-        status: error.status,
-        title: 'Service Unavailable',
-        message: 'The service is temporarily unavailable. Please try again in a moment.',
-      };
+      // A 5xx body is written for logs, not for the person reading the
+      // dialog — "Internal server error" tells them nothing they can act on.
+      return { status, title: 'Something went wrong', message: friendlyStatusMessage(status)! };
     default:
       return {
-        status: error.status,
-        title: 'Something Went Wrong',
+        status,
+        title: 'Something went wrong',
         message: serverMessage ?? 'An unexpected error occurred. Please try again.',
       };
   }

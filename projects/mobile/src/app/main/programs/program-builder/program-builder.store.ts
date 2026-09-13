@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, firstValueFrom, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import { Program, ProgramService, ProgramWorkout } from 'core';
@@ -142,93 +142,37 @@ export class ProgramBuilderStore {
   /**
    * Copy every day of one week into another, with the work inside it.
    *
-   * The exercises and their prescribed sets are copied too — a copy that
-   * reproduced only the day names would leave a coach re-entering the whole
-   * week, which is the job this exists to avoid. There is no server-side
-   * copy-week, so the tree is walked here.
-   *
-   * Days already in the target week are removed first, so repeating a copy
-   * is safe rather than additive.
+   * One request. The server copies exercises and sets in a single
+   * transaction and replaces whatever the target week held, so repeating
+   * a copy is idempotent. The earlier client-side walk made one call per
+   * row — ~36 for a modest week — and tripped the global throttle the
+   * second time round.
    */
-  copyWeek(from: number, to: number, done?: () => void): void {
+  copyWeek(from: number, to: number, done?: (error?: unknown) => void): void {
     const program = this._program();
     if (!program || from === to) {
       done?.();
       return;
     }
-
-    const source = this.workouts().filter((w) => w.weekIndex === from);
-    const existing = this.workouts().filter((w) => w.weekIndex === to);
-    if (!source.length) {
+    if (!this.workouts().some((w) => w.weekIndex === from)) {
       done?.();
       return;
     }
 
     this._saving.set(true);
-    void this._runCopy(program.id, source, existing, to, done);
-  }
-
-  /**
-   * Sequential on purpose: the server assigns `sequenceNumber` and
-   * `orderIndex` from insertion order, so racing these would scramble the
-   * order of days within the week and of sets within an exercise.
-   */
-  private async _runCopy(
-    programId: string,
-    source: ProgramWorkout[],
-    existing: ProgramWorkout[],
-    to: number,
-    done?: () => void,
-  ): Promise<void> {
-    const settle = <T>(obs: Observable<T>) =>
-      firstValueFrom(obs.pipe(take(1), catchError(() => of(null))));
-
-    for (const old of existing) {
-      await settle(this._programService.removeWorkout(programId, old.id));
-    }
-
-    for (const day of source) {
-      const created = await settle(
-        this._programService.addWorkout(programId, {
-          name: day.name,
-          weekIndex: to,
-          dayIndex: day.dayIndex,
-          notes: day.notes ?? undefined,
-          phase: day.phase ?? undefined,
-          estimatedDurationMinutes: day.estimatedDurationMinutes ?? undefined,
-        }),
-      );
-      if (!created) continue;
-
-      for (const exercise of day.exercises ?? []) {
-        const copiedExercise = await settle(
-          this._programService.addExercise(programId, created.id, {
-            exerciseId: exercise.exerciseId,
-            notes: exercise.notes ?? undefined,
-            alternateExerciseId: exercise.alternateExerciseId ?? undefined,
-          }),
-        );
-        if (!copiedExercise) continue;
-
-        for (const set of exercise.sets ?? []) {
-          await settle(
-            this._programService.addSet(programId, created.id, copiedExercise.id, {
-              setType: set.setType,
-              targetRepsMin: set.targetRepsMin ?? undefined,
-              targetRepsMax: set.targetRepsMax ?? undefined,
-              targetWeightKg: set.targetWeightKg ?? undefined,
-              targetDurationSeconds: set.targetDurationSeconds ?? undefined,
-              targetDistanceMeters: set.targetDistanceMeters ?? undefined,
-              targetRpe: set.targetRpe ?? undefined,
-              restAfterSeconds: set.restAfterSeconds ?? undefined,
-              tempo: set.tempo ?? undefined,
-            }),
-          );
-        }
-      }
-    }
-
-    this._saving.set(false);
-    this.load(programId, done);
+    this._programService
+      .copyWeek(program.id, from, to)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._saving.set(false);
+          this.load(program.id, done);
+        },
+        error: (error: unknown) => {
+          // The program on screen is still fine; only this copy failed.
+          this._saving.set(false);
+          done?.(error);
+        },
+      });
   }
 }

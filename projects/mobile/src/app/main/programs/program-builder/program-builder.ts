@@ -167,7 +167,13 @@ export class ProgramBuilder implements ViewWillEnter {
         );
         return;
       }
-      this.store.copyWeek(from, targets[i], () => next(i + 1));
+      this.store.copyWeek(from, targets[i], (error) => {
+        if (error) {
+          void this._feedback.error(error, 'Could not copy the week');
+          return;
+        }
+        next(i + 1);
+      });
     };
     next(0);
   }

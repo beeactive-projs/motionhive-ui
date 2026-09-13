@@ -116,3 +116,12 @@ ion-footer ion-toolbar {
   flex: 1;
   font-weight: 700;
 }
+
+/* The pinned strip between header and body. Sits outside ion-content so it
+   never scrolls, and carries the page background so the rows sliding under
+   it do not show through. */
+.sticky {
+  flex: none;
+  padding: 0 1.25rem 0.5rem;
+  background: var(--ion-background-color);
+}

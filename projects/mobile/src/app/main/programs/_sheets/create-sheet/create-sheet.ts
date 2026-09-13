@@ -44,8 +44,20 @@ export class CreateSheet {
     },
   ];
 
+  /** The choice waits here until the sheet has actually gone. */
+  private _pending: CreateChoice | null = null;
+
   pick(id: CreateChoice): void {
+    // Not emitted yet: the parent navigates on it, and navigating while
+    // Ionic is still animating the dismissal tears the page down under the
+    // modal and leaves the sheet stranded on screen over the new page.
+    this._pending = id;
     this.open.set(false);
-    this.choose.emit(id);
+  }
+
+  onDismissed(): void {
+    const choice = this._pending;
+    this._pending = null;
+    if (choice) this.choose.emit(choice);
   }
 }
