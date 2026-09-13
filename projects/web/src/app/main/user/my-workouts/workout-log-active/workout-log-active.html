@@ -230,12 +230,12 @@
                   size="small"
                   [severity]="s.isCompleted ? 'success' : 'secondary'"
                   [outlined]="!s.isCompleted"
-                  [disabled]="isComplete()"
+                  [disabled]="isComplete() || isSetPending(s)"
                   (click)="toggleComplete(ex, s)"
                   [attr.aria-label]="s.isCompleted ? 'Mark set incomplete' : 'Mark set done'"
                   iconOnly
                 >
-                  <i [class]="s.isCompleted ? 'pi pi-check' : 'pi pi-circle'"></i>
+                  <i [class]="isSetPending(s) ? 'pi pi-spinner pi-spin' : (s.isCompleted ? 'pi pi-check' : 'pi pi-circle')"></i>
                 </button>
               </td>
             </tr>
@@ -303,10 +303,18 @@
     element, not padding: the content overflows this flex item, so
     padding-bottom lands at the box edge above the overflow and holds
     nothing back. It grows while the rest timer card is on screen.
+
+    Height is a `calc(rem + env(safe-area-inset-bottom))` — the fixed
+    chrome already renders the safe-area inset inside itself, and the
+    old fixed `h-40` / `h-72` didn't budge for notch devices, so on
+    an iPhone the Add-exercise button ended up sitting flush against
+    the top of the chrome.
   -->
   @if (l && !isComplete()) {
-  <div class="lg:hidden shrink-0" [class.h-40]="restSecondsLeft() == null"
-    [class.h-72]="restSecondsLeft() != null" aria-hidden="true"></div>
+  <div class="lg:hidden shrink-0" aria-hidden="true"
+    [style.height]="restSecondsLeft() == null
+      ? 'calc(13rem + env(safe-area-inset-bottom))'
+      : 'calc(20rem + env(safe-area-inset-bottom))'"></div>
   }
 </div>
 

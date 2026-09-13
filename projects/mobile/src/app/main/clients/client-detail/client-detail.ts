@@ -272,6 +272,14 @@ export class ClientDetail implements ViewWillEnter {
     void this._router.navigate(['/tabs/coach/sessions', instance.id]);
   }
 
+  /** Their plan and what they have logged — pushed onto the clients stack. */
+  openTraining(): void {
+    const clientId = this.store.client()?.clientId;
+    if (clientId) {
+      void this._router.navigate(['/tabs/clients/client', clientId, 'training']);
+    }
+  }
+
   retry(): void {
     this.store.reload();
   }

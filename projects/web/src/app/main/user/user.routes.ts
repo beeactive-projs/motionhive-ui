@@ -56,13 +56,14 @@ export const userRoutes: Routes = [
   },
   {
     path: 'plans',
-    // Plans is a lens of Training again, so the page form would be a
-    // second copy of the same list.
-    redirectTo: () =>
-      inject(Router).createUrlTree(['/user/training'], {
-        queryParams: { view: 'plans' },
-      }),
-    pathMatch: 'full',
+    // Plans has its own top-level route again. It used to redirect to
+    // Training?view=plans, but with no discoverable "Plans" nav entry
+    // the assignment was reachable only by clicking a notification.
+    // MyPlans is the exact list the Training-page lens renders inline,
+    // so this is one component in two mount points, not two copies.
+    loadComponent: () =>
+      import('./my-plans/my-plans').then((m) => m.MyPlans),
+    title: 'My plans - MotionHive',
   },
   {
     path: 'plans/:id',

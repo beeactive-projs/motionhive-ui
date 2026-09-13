@@ -110,6 +110,21 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   readonly restNextSet = signal<LoggedSet | null>(null);
   readonly restNextExerciseName = signal<string>('');
   private _restHandle: ReturnType<typeof setInterval> | null = null;
+  /**
+   * Which set started the currently running rest timer. Lets an
+   * un-check of a *different* set leave the timer alone — before,
+   * every un-check unconditionally killed the countdown, so fixing a
+   * typo on set 1 would murder the rest you were waiting through
+   * from set 4.
+   */
+  private _restForSetId: string | null = null;
+  /**
+   * Sets whose Done PATCH is currently in flight. Blocks re-taps so
+   * the second tap doesn't compute `!isCompleted` against the stale
+   * signal (which would send a duplicate PATCH, and if the response
+   * order flipped, silently un-check the set the user just checked).
+   */
+  private readonly _pendingSetIds = signal<Set<string>>(new Set());
   /** Wall-clock when the app last had focus (used for >30min auto-pause). */
   private _lastSeenAt: number = Date.now();
 
@@ -218,17 +233,77 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     });
   }
 
+  /** True while this set's Done PATCH is in flight — disables the button. */
+  isSetPending(set: LoggedSet): boolean {
+    return this._pendingSetIds().has(set.id);
+  }
+
+  /**
+   * Optimistic toggle: flip the check *before* the round-trip so the
+   * UI reacts to the tap immediately (previously the green tick only
+   * appeared after the PATCH returned — the "still loading" feel).
+   * Guarded by `_pendingSetIds` so a second tap while in flight can't
+   * compute against stale state and either duplicate the PATCH or
+   * silently un-check.
+   */
   toggleComplete(ex: LoggedExercise, set: LoggedSet): void {
     if (this.isComplete()) return;
-    const nextCompleted = !set.isCompleted;
+    if (this._pendingSetIds().has(set.id)) return;
+
+    const cur = this.log();
+    if (!cur) return;
+
+    const wasCompleted = set.isCompleted;
+    const nextCompleted = !wasCompleted;
+
+    // 1) Optimistic flip so the check paints instantly and so the
+    //    rest timer's "next set" scan below sees the updated state
+    //    (otherwise the just-checked set gets picked as "next").
+    this._mergeSet(ex.id, { ...set, isCompleted: nextCompleted } as LoggedSet);
+    this._pendingSetIds.update((s) => new Set(s).add(set.id));
+
+    // 2) Rest timer transitions — scoped to _restForSetId so an
+    //    un-check of an unrelated set never touches a live countdown.
+    if (nextCompleted) {
+      this._startRest(ex, set);
+    } else if (this._restForSetId === set.id) {
+      this._stopRest();
+    }
+
     const patch: LogSetPayload = { isCompleted: nextCompleted };
     if (nextCompleted) {
       if (set.reps != null) patch.reps = set.reps;
       if (set.weightKg != null) patch.weightKg = set.weightKg;
     }
-    this.patchSet(ex, set, patch);
-    if (nextCompleted) this._startRest(ex, set);
-    else this._stopRest();
+
+    this._service.logSet(cur.id, set.id, patch).subscribe({
+      next: (saved) => {
+        this._mergeSet(ex.id, saved);
+        this._clearPending(set.id);
+      },
+      error: (err) => {
+        // Revert the optimistic flip.
+        this._mergeSet(ex.id, {
+          ...set,
+          isCompleted: wasCompleted,
+        } as LoggedSet);
+        this._clearPending(set.id);
+        showApiError(
+          this._messageService,
+          "Couldn't save set",
+          'Please retry.',
+          err,
+        );
+      },
+    });
+  }
+
+  private _clearPending(setId: string): void {
+    this._pendingSetIds.update((s) => {
+      const n = new Set(s);
+      n.delete(setId);
+      return n;
+    });
   }
 
   onRepsBlur(ex: LoggedExercise, set: LoggedSet, raw: string): void {
@@ -820,21 +895,32 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   }
 
   private _startRest(ex: LoggedExercise, set: LoggedSet): void {
-    const seconds = set.assignedSet?.restAfterSeconds ?? 90;
-    this.restSecondsLeft.set(seconds);
-    // Find the next not-completed set anywhere.
+    // `?? 90` let the API's `0` through (terminal sets often prescribe
+    // 0). The timer then rendered `0:00` for one frame, ticked to -1,
+    // and killed itself — the "appears then disappears" flicker.
+    const raw = set.assignedSet?.restAfterSeconds;
+    const seconds = raw != null && raw > 0 ? raw : 90;
+
+    // Find the next not-completed set. Skips the just-toggled set
+    // (which the optimistic flip in toggleComplete has already marked
+    // completed, but belt-and-suspenders in case _startRest is ever
+    // called from elsewhere) and skips whole exercises marked skipped.
     const exs = this.exercises();
     let next: LoggedSet | null = null;
     let nextExName = '';
     outer: for (const e of exs) {
+      if (e.isSkipped) continue;
       for (const s of e.sets ?? []) {
-        if (!s.isCompleted) {
+        if (!s.isCompleted && s.id !== set.id) {
           next = s;
           nextExName = e.exerciseNameSnapshot;
           break outer;
         }
       }
     }
+
+    this._restForSetId = set.id;
+    this.restSecondsLeft.set(seconds);
     this.restNextSet.set(next);
     this.restNextExerciseName.set(nextExName);
 
@@ -856,6 +942,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
       clearInterval(this._restHandle);
       this._restHandle = null;
     }
+    this._restForSetId = null;
     this.restSecondsLeft.set(null);
     this.restNextSet.set(null);
     this.restNextExerciseName.set('');

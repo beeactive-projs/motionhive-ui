@@ -68,6 +68,12 @@ export class SheetShell {
   readonly subtitle = input('');
   /** The sheet's fields, declared by the consumer as `<ng-template #body>`. */
   readonly body = input.required<TemplateRef<unknown>>();
+  /**
+   * Optional strip pinned between the header and the scrolling body — a
+   * search bar or a filter row. Anything inside `body` scrolls away; a
+   * search that scrolls away is a search you have to scroll back up to use.
+   */
+  readonly sticky = input<TemplateRef<unknown> | null>(null);
   readonly saveLabel = input('Save');
   /** Ionic palette name for the confirm button — `danger` for destructive sheets. */
   readonly saveColor = input('primary');
@@ -110,6 +116,13 @@ export class SheetShell {
   readonly actionDisabled = input(false);
 
   readonly save = output<void>();
+  /**
+   * Fires once the modal is actually gone. Anything that navigates after a
+   * choice must wait for this rather than for `open` flipping false — Ionic
+   * is still animating the dismissal then, and tearing down the page under
+   * it leaves the sheet orphaned on screen.
+   */
+  readonly dismissed = output<void>();
   readonly action = output<void>();
 
   /**

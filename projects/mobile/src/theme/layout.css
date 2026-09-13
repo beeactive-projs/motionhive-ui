@@ -96,3 +96,106 @@
 .mh-section-head ion-note {
   font-size: var(--mh-text-sm);
 }
+
+/* ─── Screen states and recurring blocks ────────────────────────────
+   Shared by the workouts and programs screens, where each of these had been
+   written out per file — nine copies of the status line, eight of the
+   skeleton row. One definition, so a change to the gutter or the card radius
+   lands everywhere at once. */
+
+/* The one-line status a screen shows instead of content: "Loading…",
+   "Could not open this workout", "No exercises yet". */
+.mh-state {
+  margin: 0;
+  padding: 2rem var(--mh-gutter, 1.25rem);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-align: center;
+}
+
+/* A shimmering stand-in for one list row, in the row's final geometry so
+   nothing shifts when the data lands. */
+.mh-skeleton-row ion-skeleton-text {
+  height: 4.25rem;
+  margin: 0 var(--mh-gutter, 1.25rem) 0.5rem;
+  border-radius: var(--mh-radius-card);
+}
+
+/* The primary action pinned under the content, clear of the home indicator. */
+.mh-cta-bar {
+  padding: 0.75rem var(--mh-gutter, 1.25rem) calc(0.75rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--ion-border-color);
+  background: var(--ion-toolbar-background, var(--ion-card-background));
+}
+
+/* "Add …" as a dashed outline: reads as "make something", not as a filled
+   row that already exists. */
+.mh-add-dashed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  width: calc(100% - 2 * var(--mh-gutter, 1.25rem));
+  margin: 0.25rem var(--mh-gutter, 1.25rem) 1.5rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: transparent;
+  color: var(--mh-color-honey-deep);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* A grouped − value + control that names its own unit ("3 sets", "6 weeks").
+   Colours are explicit on every part: an unset `color` on a custom button
+   falls back to a UA value that ignores the palette. */
+.mh-stepper {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-control);
+  background: var(--ion-card-background);
+}
+
+.mh-stepper button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  padding: 0;
+  border: 0;
+  background: var(--mh-color-selected-background);
+  color: var(--mh-color-honey-deep);
+  cursor: pointer;
+}
+
+.mh-stepper button:disabled {
+  color: var(--ion-color-medium);
+  cursor: default;
+  opacity: 0.45;
+}
+
+.mh-stepper button ion-icon {
+  font-size: var(--mh-text-lg);
+}
+
+.mh-stepper .value {
+  flex: 1;
+  color: var(--ion-text-color);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.mh-stepper .value em {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-style: normal;
+  font-weight: 500;
+}

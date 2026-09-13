@@ -82,6 +82,8 @@ export class BuilderRail {
   readonly toggleWeek = output<number>();
   /** Week index to add into; null = "in another week" (week picked in the dialog). */
   readonly addWorkout = output<number | null>();
+  /** Emit source week index — parent opens the "Copy week…" picker. */
+  readonly copyWeek = output<number>();
   readonly workoutDropped = output<RailWorkoutDrop>();
   readonly weekDropped = output<RailWeekDrop>();
 

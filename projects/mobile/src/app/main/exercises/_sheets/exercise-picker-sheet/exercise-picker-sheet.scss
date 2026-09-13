@@ -4,3 +4,9 @@ ion-searchbar {
   --box-shadow: none;
   padding-inline: 0;
 }
+
+/* Already in the list behind the sheet: ticked, and quietly out of play. */
+mh-exercise-row.locked {
+  opacity: 0.55;
+  pointer-events: none;
+}

@@ -1,5 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { checkmarkCircle } from 'ionicons/icons';
 
 import { Exercise } from 'core';
 
@@ -63,6 +65,12 @@ export class ExerciseRow {
   readonly thumbnailUrl = computed(() => this.exercise().thumbnailUrl || null);
 
   readonly isPicker = computed(() => this.selected() !== null);
+
+  constructor() {
+    // The row is hosted by three features; none of them should have to know
+    // it draws a tick. Registered here, it renders wherever the row does.
+    addIcons({ checkmarkCircle });
+  }
 
   /**
    * The hexagon takes an icon or a picture, never both — the glyph would

@@ -1,0 +1,17 @@
+.head h3 {
+  margin: 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-base);
+  font-weight: 700;
+}
+
+ion-item ion-icon {
+  color: var(--ion-color-medium);
+}
+
+/* Removing an exercise loses what was logged against it, so it reads as the
+   destructive option it is. */
+ion-item.destructive ion-label,
+ion-item.destructive ion-icon {
+  color: var(--ion-color-danger);
+}

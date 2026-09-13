@@ -2,7 +2,7 @@ import { Service, inject } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 
-import { apiErrorMessage } from 'core';
+import { ErrorDialogService, apiErrorMessage } from 'core';
 
 const SUCCESS_DURATION_MS = 1500;
 const ERROR_DURATION_MS = 3000;
@@ -22,6 +22,7 @@ const ERROR_DURATION_MS = 3000;
 @Service()
 export class FeedbackService {
   private readonly _toastController = inject(ToastController);
+  private readonly _errorDialog = inject(ErrorDialogService);
 
   async success(message: string): Promise<void> {
     void this._vibrate(NotificationType.Success);
@@ -33,7 +34,20 @@ export class FeedbackService {
     await this._present(message, 'medium', SUCCESS_DURATION_MS);
   }
 
+  /**
+   * Report a failed write where it happened.
+   *
+   * Core's interceptor has already queued its generic dialog for this
+   * response by the time the caller gets here; a toast that names the
+   * action ("Could not copy the week") says it better, so the dialog is
+   * withdrawn before it renders. Screens that report nothing still get
+   * the dialog — this only replaces it, never silences it.
+   */
   async error(error: unknown, fallback: string): Promise<void> {
+    const status = (error as { status?: number } | null)?.status;
+    if (status !== undefined && this._errorDialog.error()?.status === status) {
+      this._errorDialog.close();
+    }
     void this._vibrate(NotificationType.Error);
     await this._present(apiErrorMessage(error, fallback), 'danger', ERROR_DURATION_MS);
   }

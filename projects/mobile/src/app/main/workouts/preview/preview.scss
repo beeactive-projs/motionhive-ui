@@ -1,0 +1,81 @@
+:host {
+  --mh-gutter: 1.25rem;
+}
+
+.head {
+  padding: 1rem var(--mh-gutter) 0;
+}
+
+.phase {
+  color: var(--mh-color-honey-deep);
+}
+
+.head h1 {
+  margin: 0.25rem 0 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}
+
+.position {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--ion-color-medium);
+}
+
+.meta {
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% - 2 * var(--mh-gutter));
+  margin: 1rem var(--mh-gutter) 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-primary-wash);
+  color: var(--ion-color-primary-wash-contrast);
+  cursor: pointer;
+}
+
+.note-body {
+  margin: 0.5rem var(--mh-gutter) 0;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+.ex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem var(--mh-gutter);
+  border-bottom: 1px solid var(--mh-color-divider);
+}
+
+.ex .name {
+  font-size: var(--mh-text-base);
+  font-weight: 500;
+}
+
+.ex .sets {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+.quiet {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}

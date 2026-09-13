@@ -1,0 +1,176 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/workouts" />
+    </ion-buttons>
+    <ion-title>{{ isNew() ? 'New routine' : (routine()?.name ?? 'Routine') }}</ion-title>
+    @if (!readOnly()) {
+      <ion-buttons slot="end">
+        <ion-button [disabled]="!canSave() || saving()" (click)="save()">Save</ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading()) {
+    <p class="mh-state">Loading…</p>
+  } @else {
+    <!-- One padded wrapper rather than margins on each control: an ion-input
+         is 100% wide, so a margin pushed it past the screen edge. -->
+    <div class="pad">
+      @if (readOnly()) {
+        <p class="starter-note">
+          A MotionHive starter. Start it and it becomes yours to edit.
+        </p>
+      } @else {
+        <ion-input
+          fill="outline"
+          label="Routine name"
+          labelPlacement="stacked"
+          placeholder="Push day"
+          [value]="name()"
+          (ionInput)="name.set($any($event).detail.value ?? '')"
+        />
+      }
+    </div>
+
+    <h3 class="mh-section-label">
+      Exercises
+      @if (exercises().length) {
+        <span class="tally">{{ exercises().length }}</span>
+      }
+    </h3>
+
+    @for (row of exercises(); track row.key; let i = $index) {
+      <article class="ex-row">
+        <!-- Tapping the name opens the movement itself — you should be able to
+             check what an exercise is while building with it. -->
+        <button class="ex-name" type="button" (click)="openExercise(row)">
+          <span>{{ row.name }}</span>
+          <ion-icon name="chevron-forward" aria-hidden="true" />
+        </button>
+
+        @if (readOnly()) {
+          <p class="ex-meta">{{ row.sets }} {{ row.sets === 1 ? 'set' : 'sets' }}</p>
+        } @else {
+          <!-- What to aim for. Both optional: a routine that only names the
+               movements in order is still a useful routine. -->
+          <div class="targets">
+            <button
+              type="button"
+              class="target"
+              [class.active]="editing()?.index === i && editing()?.field === 'reps'"
+              [attr.aria-label]="'Target reps for ' + row.name"
+              (click)="editTarget(i, 'reps')"
+            >
+              <span class="mh-kicker">Reps</span>
+              <strong>{{ targetLabel(row, 'reps') }}</strong>
+            </button>
+            <button
+              type="button"
+              class="target"
+              [class.active]="editing()?.index === i && editing()?.field === 'weight'"
+              [attr.aria-label]="'Target weight for ' + row.name"
+              (click)="editTarget(i, 'weight')"
+            >
+              <span class="mh-kicker">Weight</span>
+              <strong>{{ targetLabel(row, 'weight') }}<em>kg</em></strong>
+            </button>
+          </div>
+
+          <div class="ex-controls">
+            <div class="mh-stepper" role="group" [attr.aria-label]="'Sets for ' + row.name">
+              <button
+                type="button"
+                [disabled]="row.sets <= 1"
+                [attr.aria-label]="'One set fewer for ' + row.name"
+                (click)="setCount(i, -1)"
+              >
+                <ion-icon name="remove-outline" aria-hidden="true" />
+              </button>
+
+              <!-- The number says what it is. "3" alone between two circles
+                   told the user nothing. -->
+              <span class="value" aria-live="polite">
+                {{ row.sets }} <em>{{ row.sets === 1 ? 'set' : 'sets' }}</em>
+              </span>
+
+              <button
+                type="button"
+                [attr.aria-label]="'One set more for ' + row.name"
+                (click)="setCount(i, 1)"
+              >
+                <ion-icon name="add-outline" aria-hidden="true" />
+              </button>
+            </div>
+
+            <button
+              class="ex-remove"
+              type="button"
+              [attr.aria-label]="'Remove ' + row.name"
+              (click)="remove(i)"
+            >
+              <ion-icon name="trash-outline" aria-hidden="true" />
+            </button>
+          </div>
+        }
+      </article>
+    }
+
+    @if (!exercises().length) {
+      <p class="mh-state">No exercises yet.</p>
+    }
+
+    @if (!readOnly()) {
+      <button class="mh-add-dashed" type="button" (click)="pickerOpen.set(true)">
+        <ion-icon name="add-outline" aria-hidden="true" />
+        Add exercise
+      </button>
+
+      @if (!isNew()) {
+        <button class="delete" type="button" (click)="deleteOpen.set(true)">
+          <ion-icon name="trash-outline" aria-hidden="true" />
+          Delete routine
+        </button>
+      }
+    }
+  }
+</ion-content>
+
+@if (editing() !== null) {
+  <ion-footer class="ion-no-border">
+    <mh-numeric-keypad
+      [field]="keypadField()"
+      [label]="keypadLabel()"
+      [value]="draft()"
+      (commit)="commitTarget($event)"
+      (dismiss)="editing.set(null)"
+    />
+  </ion-footer>
+} @else if (!isNew()) {
+  <div class="mh-cta-bar">
+    <ion-button expand="block" [disabled]="starting()" (click)="start()">
+      Start workout
+    </ion-button>
+  </div>
+}
+
+<mh-exercise-picker-sheet
+  [(open)]="pickerOpen"
+  title="Add exercises"
+  [context]="name() || 'this routine'"
+  [alreadyAdded]="addedIds()"
+  (picked)="onPicked($event)"
+/>
+
+<mh-confirm-sheet
+  [(open)]="deleteOpen"
+  title="Delete routine"
+  [body]="'Delete ' + (routine()?.name ?? 'this routine') + '? Workouts already logged from it are kept.'"
+  confirmLabel="Delete"
+  cancelLabel="Keep it"
+  tone="danger"
+  [saving]="deleting()"
+  (confirm)="confirmDelete()"
+/>

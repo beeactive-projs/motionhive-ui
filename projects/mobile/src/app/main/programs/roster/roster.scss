@@ -1,0 +1,15 @@
+:host {
+  --mh-gutter: 1.25rem;
+}
+
+/* Geometry and spine tones come from the shared `.mh-session-row` skin. */
+ion-item {
+  margin-bottom: 0.5rem;
+}
+
+.sub {
+  margin: 0.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
