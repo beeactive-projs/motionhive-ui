@@ -12,7 +12,7 @@
 
   @if (loading() && !routines().length) {
     @for (row of skeletonRows; track row) {
-      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
     }
   } @else if (failed()) {
     <mh-empty-state

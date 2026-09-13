@@ -19,7 +19,7 @@
       <div class="s-week"><ion-skeleton-text [animated]="true" /></div>
     }
   } @else if (store.failed()) {
-    <p class="state">Could not open this program.</p>
+    <p class="mh-state">Could not open this program.</p>
   } @else if (store.program(); as program) {
     <p class="sub mh-kicker">{{ subtitle() }}</p>
 

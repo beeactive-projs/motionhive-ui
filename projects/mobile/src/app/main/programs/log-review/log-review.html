@@ -9,9 +9,9 @@
 
 <ion-content [fullscreen]="true">
   @if (loading()) {
-    <p class="state">Loading…</p>
+    <p class="mh-state">Loading…</p>
   } @else if (failed() || !log()) {
-    <p class="state">Could not open this workout.</p>
+    <p class="mh-state">Could not open this workout.</p>
   } @else if (log(); as l) {
     <div class="head">
       <span class="mh-kicker">Logged</span>

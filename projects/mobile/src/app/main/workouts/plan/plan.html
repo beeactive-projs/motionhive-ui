@@ -10,10 +10,10 @@
 <ion-content [fullscreen]="true">
   @if (loading() && !assignment()) {
     @for (row of skeletonRows; track row) {
-      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
     }
   } @else if (failed() || !assignment()) {
-    <p class="state">Could not open this plan.</p>
+    <p class="mh-state">Could not open this plan.</p>
   } @else if (assignment(); as plan) {
     <!-- Where am I. A twelve-week plan is intimidating as a count of
          workouts; as a position it is finite. -->

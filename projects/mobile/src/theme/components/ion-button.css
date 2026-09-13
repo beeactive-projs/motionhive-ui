@@ -70,3 +70,10 @@ ion-buttons ion-button.glyph {
 .mh-chip-row .filters ion-icon {
   font-size: var(--mh-text-base);
 }
+
+/* A clear button sitting on a card. Ionic gives it the honey *fill* colour,
+   which is 2.05:1 on white; text wants the deep ink token. Scoped to rows so
+   toolbar buttons keep Ionic's own treatment. */
+ion-item ion-button[fill='clear'] {
+  --color: var(--mh-color-honey-deep);
+}

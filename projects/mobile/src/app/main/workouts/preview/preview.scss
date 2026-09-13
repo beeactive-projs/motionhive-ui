@@ -2,12 +2,6 @@
   --mh-gutter: 1.25rem;
 }
 
-.state {
-  padding: 2rem var(--mh-gutter);
-  color: var(--ion-color-medium);
-  text-align: center;
-}
-
 .head {
   padding: 1rem var(--mh-gutter) 0;
 }
@@ -71,13 +65,6 @@
 .ex .sets {
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
-}
-
-/* Pinned: the whole point of this screen is the one action at the end of it. */
-.cta {
-  padding: 0.75rem var(--mh-gutter) calc(0.75rem + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--ion-border-color);
-  background: var(--ion-card-background);
 }
 
 .quiet {

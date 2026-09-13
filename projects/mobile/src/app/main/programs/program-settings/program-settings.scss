@@ -2,12 +2,6 @@
   --mh-gutter: 1.25rem;
 }
 
-.state {
-  padding: 2rem var(--mh-gutter);
-  color: var(--ion-color-medium);
-  text-align: center;
-}
-
 /* Padding, not margins: an ion-input lays out at 100% width, so a margin
    pushes it past the screen edge. */
 .pad {
@@ -26,51 +20,6 @@
   display: block;
   margin-bottom: 0.375rem;
   color: var(--ion-color-medium);
-}
-
-.stepper {
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-}
-
-.stepper button {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: var(--mh-tap-target);
-  height: var(--mh-tap-target);
-  padding: 0;
-  border: 0;
-  background: var(--mh-color-selected-background);
-  color: var(--mh-color-honey-deep);
-  cursor: pointer;
-}
-
-.stepper button:disabled {
-  color: var(--ion-color-medium);
-  cursor: default;
-  opacity: 0.45;
-}
-
-.stepper .value {
-  flex: 1;
-  color: var(--ion-text-color);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
-.stepper .value em {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-  font-style: normal;
-  font-weight: 500;
 }
 
 /* ─── Status ──────────────────────────────────────────────────── */

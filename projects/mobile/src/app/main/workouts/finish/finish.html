@@ -9,9 +9,9 @@
 
 <ion-content [fullscreen]="true">
   @if (loading()) {
-    <p class="state">Loading…</p>
+    <p class="mh-state">Loading…</p>
   } @else if (failed() || !log()) {
-    <p class="state">Could not open this workout.</p>
+    <p class="mh-state">Could not open this workout.</p>
   } @else {
     <div class="hero">
       <span class="mh-kicker">{{ isReview() ? 'Logged' : 'Done' }}</span>
@@ -91,7 +91,7 @@
 </ion-content>
 
 @if (!isReview() && log()) {
-  <div class="cta">
+  <div class="mh-cta-bar">
     <ion-button expand="block" [disabled]="saving()" (click)="save()">
       Save &amp; finish
     </ion-button>

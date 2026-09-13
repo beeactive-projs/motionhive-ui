@@ -2,12 +2,6 @@
   --mh-gutter: 1.25rem;
 }
 
-.state {
-  padding: 2rem var(--mh-gutter);
-  color: var(--ion-color-medium);
-  text-align: center;
-}
-
 .head {
   padding: 1rem var(--mh-gutter) 0;
 }
@@ -202,8 +196,3 @@
   font-variant-numeric: tabular-nums;
 }
 
-.s-row ion-skeleton-text {
-  height: 5rem;
-  margin: 0 var(--mh-gutter) 0.75rem;
-  border-radius: var(--mh-radius-card);
-}

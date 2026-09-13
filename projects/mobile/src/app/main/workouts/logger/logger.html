@@ -18,9 +18,9 @@
 
 <ion-content [fullscreen]="true">
   @if (store.loading()) {
-    <p class="state">Loading…</p>
+    <p class="mh-state">Loading…</p>
   } @else if (store.failed()) {
-    <p class="state">Could not open this workout.</p>
+    <p class="mh-state">Could not open this workout.</p>
   } @else {
     @for (exercise of store.exercises(); track exercise.id) {
       <section class="exercise" [class.skipped]="exercise.isSkipped">
@@ -85,7 +85,7 @@
     }
 
     @if (store.exercises().length) {
-      <button class="add-exercise" type="button" (click)="addExercise()">
+      <button class="mh-add-dashed" type="button" (click)="addExercise()">
         <ion-icon name="add-outline" aria-hidden="true" />
         Add exercise
       </button>

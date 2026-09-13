@@ -13,14 +13,3 @@ ion-item {
   font-size: var(--mh-text-xs);
 }
 
-/* A clear ion-button inherits the honey fill, which fails contrast on a
-   white card; text takes the deep ink token. */
-ion-item ion-button {
-  --color: var(--mh-color-honey-deep);
-}
-
-.s-row ion-skeleton-text {
-  height: 5rem;
-  margin: 0 var(--mh-gutter) 0.5rem;
-  border-radius: var(--mh-radius-card);
-}

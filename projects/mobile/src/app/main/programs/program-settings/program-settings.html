@@ -12,7 +12,7 @@
 
 <ion-content [fullscreen]="true">
   @if (loading()) {
-    <p class="state">Loading…</p>
+    <p class="mh-state">Loading…</p>
   } @else if (program(); as p) {
     <div class="pad">
       <ion-input
@@ -38,7 +38,7 @@
            days, so an open-ended or day-counted plan needs no migration. -->
       <div class="duration">
         <span class="mh-kicker">Length</span>
-        <div class="stepper" role="group" aria-label="Program length in weeks">
+        <div class="mh-stepper" role="group" aria-label="Program length in weeks">
           <button
             type="button"
             [disabled]="weeks() <= 1"

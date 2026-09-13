@@ -9,11 +9,11 @@
 
 <ion-content [fullscreen]="true">
   @if (loading()) {
-    <p class="state">Loading…</p>
+    <p class="mh-state">Loading…</p>
   } @else if (isEmptyPlan()) {
-    <p class="state">This plan has no workouts in it yet.</p>
+    <p class="mh-state">This plan has no workouts in it yet.</p>
   } @else if (failed() || !workout()) {
-    <p class="state">Could not open this workout.</p>
+    <p class="mh-state">Could not open this workout.</p>
   } @else {
     @if (workout(); as w) {
       <div class="head">
@@ -53,7 +53,7 @@
 </ion-content>
 
 @if (workout()) {
-  <div class="cta">
+  <div class="mh-cta-bar">
     <ion-button expand="block" [disabled]="starting()" (click)="start()">
       Start workout
     </ion-button>

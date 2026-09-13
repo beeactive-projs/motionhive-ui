@@ -2,12 +2,6 @@
   --mh-gutter: 1.25rem;
 }
 
-.state {
-  padding: 2rem var(--mh-gutter);
-  color: var(--ion-color-medium);
-  text-align: center;
-}
-
 .hero {
   padding: 1.25rem var(--mh-gutter) 0;
 }
@@ -110,8 +104,3 @@
   font-size: var(--mh-text-xs);
 }
 
-.cta {
-  padding: 0.75rem var(--mh-gutter) calc(0.75rem + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--ion-border-color);
-  background: var(--ion-card-background);
-}

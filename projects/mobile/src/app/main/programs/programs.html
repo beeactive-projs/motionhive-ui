@@ -13,7 +13,7 @@
   @if (store.showSkeleton()) {
     <div class="pills"><ion-skeleton-text [animated]="true" /></div>
     @for (row of skeletonRows; track row) {
-      <div class="s-row"><ion-skeleton-text [animated]="true" /></div>
+      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
     }
   } @else if (store.failed()) {
     <mh-empty-state

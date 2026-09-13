@@ -12,9 +12,9 @@
 
 <ion-content [fullscreen]="true">
   @if (loading() && !workout()) {
-    <p class="state">Loading…</p>
+    <p class="mh-state">Loading…</p>
   } @else if (!workout()) {
-    <p class="state">Could not open this day.</p>
+    <p class="mh-state">Could not open this day.</p>
   } @else {
     <div class="pad">
       <span class="mh-kicker eyebrow">{{ eyebrow() }}</span>
@@ -62,10 +62,10 @@
     }
 
     @if (!exercises().length) {
-      <p class="state">No exercises yet.</p>
+      <p class="mh-state">No exercises yet.</p>
     }
 
-    <button class="add" type="button" (click)="pickerOpen.set(true)">
+    <button class="mh-add-dashed" type="button" (click)="pickerOpen.set(true)">
       <ion-icon name="add-outline" aria-hidden="true" />
       Add exercise
     </button>
