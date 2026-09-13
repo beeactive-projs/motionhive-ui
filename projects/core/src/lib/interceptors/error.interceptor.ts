@@ -8,7 +8,10 @@ import { isSilentRequest } from './silent-request.context';
 
 // 401 is handled by the auth interceptor (token refresh / redirect to login).
 // 400 and 422 are validation/business-logic errors — components show field-level errors.
-const SKIP_STATUSES = new Set([400, 401, 422]);
+// 429 is rate-limiting: a modal for "you typed too fast" is far too heavy;
+//   callers that care surface a toast via `showApiError` (which knows 429
+//   should read as "give it a moment"), and everything else stays silent.
+const SKIP_STATUSES = new Set([400, 401, 422, 429]);
 
 function mapError(error: HttpErrorResponse): HttpErrorInfo {
   const serverMessage = error.error?.message as string | undefined;

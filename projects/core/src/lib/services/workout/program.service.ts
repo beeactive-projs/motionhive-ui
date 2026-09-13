@@ -91,6 +91,23 @@ export class ProgramService {
     );
   }
 
+  /**
+   * Copy one week onto another — exercises and sets included — in one
+   * request and one server transaction. Replaces a client-side walk that
+   * made one call per row, tripped the global throttle on the second copy,
+   * and was not atomic.
+   */
+  copyWeek(
+    programId: string,
+    fromWeekIndex: number,
+    toWeekIndex: number,
+  ): Observable<ProgramWorkout[]> {
+    return this._http.post<ProgramWorkout[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.COPY_WEEK(programId)}`,
+      { fromWeekIndex, toWeekIndex },
+    );
+  }
+
   removeWorkout(programId: string, workoutId: string): Observable<void> {
     return this._http.delete<void>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WORKOUT_BY_ID(programId, workoutId)}`,

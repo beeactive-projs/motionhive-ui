@@ -213,6 +213,8 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/programs/${id}`,
     WORKOUTS: (id: string) => `/programs/${id}/workouts`,
     WORKOUTS_REORDER: (id: string) => `/programs/${id}/workouts/reorder`,
+    /** One request to copy a whole week; the client used to walk the tree. */
+    COPY_WEEK: (programId: string) => `/programs/${programId}/workouts/copy-week`,
     WORKOUT_BY_ID: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}`,
     EXERCISES: (id: string, workoutId: string) =>

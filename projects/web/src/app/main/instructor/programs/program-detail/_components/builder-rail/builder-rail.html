@@ -102,6 +102,24 @@
           >
             <i class="pi pi-plus"></i>
           </button>
+          @if (!searchActive() && g.workouts.length > 0) {
+            <!-- Only enabled when this week actually has something to copy;
+                 an empty source week has nothing to duplicate. -->
+            <button pButton
+              type="button"
+              size="small"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              pTooltip="Copy this week"
+              tooltipPosition="right"
+              (click)="copyWeek.emit(g.week)"
+              [attr.aria-label]="'Copy week ' + (g.week + 1) + ' into another week'"
+              iconOnly
+            >
+              <i class="pi pi-copy"></i>
+            </button>
+          }
         </div>
 
         <!-- Always in the DOM so every week is a valid drop target. Open: the
