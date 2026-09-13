@@ -182,6 +182,31 @@ export class ClientProfile {
     return c.invitedEmail?.charAt(0).toUpperCase() ?? '?';
   });
 
+  /** Top 3 workouts for the Overview "Recent workouts" card. */
+  readonly recentWorkouts = computed(() => this.workouts().slice(0, 3));
+
+  /**
+   * Active assignments for the Overview "Programs" card. Reads from the
+   * same signal the Plans tab writes into; if the coach flipped that tab
+   * to History it'll temporarily hold no active rows, but the Overview
+   * still renders correctly — it just shows the empty state until the
+   * Plans tab is switched back or the Overview reload picks up.
+   */
+  readonly activeAssignments = computed(() =>
+    this.assignments().filter((a) =>
+      a.status === 'PENDING' || a.status === 'ACTIVE' || a.status === 'PAUSED',
+    ),
+  );
+
+  /** Number of workouts this client has logged in the last 7 days. */
+  readonly workoutsLast7Days = computed(() => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return this.workouts().filter((w) => {
+      const t = w.startedAt ? new Date(w.startedAt).getTime() : 0;
+      return t >= cutoff;
+    }).length;
+  });
+
   readonly statusLabel = computed(() => {
     const c = this.client();
     if (!c) return '';
@@ -204,12 +229,18 @@ export class ClientProfile {
   constructor() {
     this._loadClient();
 
-    // Lazy-load the client's workout history the first time the
-    // Workouts tab is opened. BE 404s if the link isn't ACTIVE, so
-    // archived/pending links surface as "No workouts" with a toast.
+    // Overview (tab 0) surfaces summary cards for recent workouts and
+    // active programs, so it needs the same data the Workouts (3) and
+    // Plans (4) tabs load. Piggybacking on the existing signals means
+    // switching to those tabs afterwards is instant, and the Overview
+    // stays live if the client completes something while it's open.
+    // Sessions tab (1) still has its own load — the Overview doesn't
+    // surface bookings, and pre-fetching them would be wasted round-
+    // trips for every coach who never opens that tab.
     effect(() => {
+      const tab = this.activeTab();
       if (
-        this.activeTab() === 3 &&
+        (tab === 3 || tab === 0) &&
         !this.workoutsLoaded() &&
         !this.workoutsLoading() &&
         this.client()
@@ -217,8 +248,6 @@ export class ClientProfile {
         this._loadWorkouts();
       }
     });
-    // Sessions this client is booked into — loaded the first time the
-    // tab is opened, like the others.
     effect(() => {
       if (
         this.activeTab() === 1 &&
@@ -229,11 +258,10 @@ export class ClientProfile {
         this._loadSessions();
       }
     });
-    // Lazy-load program assignments the first time the Plans tab is
-    // opened. The instructor list endpoint already filters by clientId.
     effect(() => {
+      const tab = this.activeTab();
       if (
-        this.activeTab() === 4 &&
+        (tab === 4 || tab === 0) &&
         !this.assignmentsLoaded() &&
         !this.assignmentsLoading() &&
         this.client()

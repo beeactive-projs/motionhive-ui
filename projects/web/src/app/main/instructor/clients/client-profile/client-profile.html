@@ -144,24 +144,128 @@
             }
           </p-card>
 
+          <!-- At a glance: the shape of the client's current training week. -->
+          <div class="grid grid-cols-3 gap-2">
+            <p-card class="shadow-md">
+              <div class="flex flex-col items-center gap-1 py-1 text-center">
+                <span class="text-2xl font-bold tabular-nums">{{ workoutsTotal() }}</span>
+                <span class="text-[11px] uppercase tracking-wide text-muted-color">Total workouts</span>
+              </div>
+            </p-card>
+            <p-card class="shadow-md">
+              <div class="flex flex-col items-center gap-1 py-1 text-center">
+                <span class="text-2xl font-bold tabular-nums">{{ workoutsLast7Days() }}</span>
+                <span class="text-[11px] uppercase tracking-wide text-muted-color">Last 7 days</span>
+              </div>
+            </p-card>
+            <p-card class="shadow-md">
+              <div class="flex flex-col items-center gap-1 py-1 text-center">
+                <span class="text-2xl font-bold tabular-nums">{{ activeAssignments().length }}</span>
+                <span class="text-[11px] uppercase tracking-wide text-muted-color">Active plans</span>
+              </div>
+            </p-card>
+          </div>
+
           <p-card class="shadow-md">
-            <div class="flex items-center gap-3 text-surface-400">
-              <i class="pi pi-calendar text-2xl"></i>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold">Recent workouts</h3>
+              @if (workoutsTotal() > 3) {
+              <button pButton type="button" [text]="true" size="small" severity="secondary"
+                (click)="activeTab.set(3)">
+                See all
+                <i class="pi pi-arrow-right text-[10px]"></i>
+              </button>
+              }
+            </div>
+            @if (workoutsLoading() && !workouts().length) {
+            <div class="flex items-center gap-2 py-4 text-sm text-surface-400">
+              <i class="pi pi-spin pi-spinner"></i>
+              Loading recent workouts…
+            </div>
+            } @else if (recentWorkouts().length === 0) {
+            <div class="flex items-center gap-3 text-surface-400 py-2">
+              <i class="pi pi-bolt text-2xl"></i>
               <div>
-                <p class="font-medium text-surface-500">Sessions</p>
-                <p class="text-sm">Session history will appear here.</p>
+                <p class="font-medium text-surface-500">No workouts yet</p>
+                <p class="text-sm">Workouts this client logs — assigned or freestyle — will appear here.</p>
               </div>
             </div>
+            } @else {
+            <ul class="flex flex-col gap-2 list-none m-0 p-0">
+              @for (w of recentWorkouts(); track w.id) {
+              <li
+                class="flex items-center gap-3 px-3 py-2 rounded-md border border-surface-200 hover:bg-surface-100 transition-colors cursor-pointer"
+                (click)="openWorkoutReplay(w)"
+              >
+                <div class="w-14 text-center">
+                  <div class="text-[10px] uppercase font-semibold text-surface-400">{{ w.startedAt | date: 'EEE' }}</div>
+                  <div class="text-lg font-bold leading-none">{{ w.startedAt | date: 'd' }}</div>
+                  <div class="text-[10px] text-surface-400">{{ w.startedAt | date: 'MMM y' }}</div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-medium text-sm truncate">{{ w.name }}</div>
+                  <div class="text-xs text-surface-400 truncate">
+                    @if (w.assignment?.programNameSnapshot) {
+                    {{ w.assignment?.programNameSnapshot }}
+                    } @else {
+                    Freestyle workout
+                    }
+                    @if ((w.prCount ?? 0) > 0) {
+                    · <i class="pi pi-trophy text-[10px]"></i> {{ w.prCount }} PR{{ w.prCount === 1 ? '' : 's' }}
+                    }
+                  </div>
+                </div>
+                <div class="text-xs text-surface-500 whitespace-nowrap">
+                  <span><i class="pi pi-check text-[10px] mr-1"></i>{{ workoutSetCount(w) }} {{ workoutSetCount(w) === 1 ? 'set' : 'sets' }}</span>
+                </div>
+              </li>
+              }
+            </ul>
+            }
           </p-card>
 
           <p-card class="shadow-md">
-            <div class="flex items-center gap-3 text-surface-400">
-              <i class="pi pi-chart-line text-2xl"></i>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold">Active programs</h3>
+              @if (activeAssignments().length > 3 || assignmentsTotal() > 0) {
+              <button pButton type="button" [text]="true" size="small" severity="secondary"
+                (click)="activeTab.set(4)">
+                See all
+                <i class="pi pi-arrow-right text-[10px]"></i>
+              </button>
+              }
+            </div>
+            @if (assignmentsLoading() && !assignments().length) {
+            <div class="flex items-center gap-2 py-4 text-sm text-surface-400">
+              <i class="pi pi-spin pi-spinner"></i>
+              Loading programs…
+            </div>
+            } @else if (activeAssignments().length === 0) {
+            <div class="flex items-center gap-3 text-surface-400 py-2">
+              <i class="pi pi-bookmark text-2xl"></i>
               <div>
-                <p class="font-medium text-surface-500">Progress</p>
-                <p class="text-sm">Progress tracking will appear here.</p>
+                <p class="font-medium text-surface-500">No active programs</p>
+                <p class="text-sm">Assign one from the Programs area to schedule structured workouts.</p>
               </div>
             </div>
+            } @else {
+            <ul class="flex flex-col gap-2 list-none m-0 p-0">
+              @for (a of activeAssignments().slice(0, 3); track a.id) {
+              <li class="flex items-center gap-3 px-3 py-2 rounded-md border border-surface-200">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-medium text-sm truncate">{{ a.programNameSnapshot }}</span>
+                    <p-tag [value]="a.status" [severity]="assignmentStatusSeverity(a)" rounded />
+                  </div>
+                  <div class="text-xs text-surface-400 mt-1">
+                    {{ hasStarted(a) ? 'Started' : 'Starts' }} {{ a.startDate | date: 'mediumDate' }}
+                    · {{ a.completionPercent }}% complete
+                  </div>
+                </div>
+              </li>
+              }
+            </ul>
+            }
           </p-card>
 
         </div>
@@ -236,10 +340,19 @@
 
         @case (2) {
         <p-card class="shadow-md">
-          <div class="flex flex-col items-center gap-3 py-16 text-center">
+          <div class="flex flex-col items-center gap-3 py-10 text-center">
             <i class="pi pi-chart-line text-4xl text-surface-300"></i>
-            <h3 class="text-lg font-semibold text-surface-500">Progress</h3>
-            <p class="text-sm text-surface-400">Open a logged workout to see what {{ clientName() }} actually did. A per-client progress summary is not built yet.</p>
+            <h3 class="text-lg font-semibold text-surface-500">Per-exercise progress isn't built yet</h3>
+            <p class="text-sm text-surface-400">
+              For a per-exercise history, open a logged workout from the Workouts tab
+              or the Overview.<br />
+              Overall progress at a glance lives on the Overview tab.
+            </p>
+            <button pButton type="button" severity="secondary" [outlined]="true" size="small"
+              (click)="activeTab.set(0)">
+              <i class="pi pi-arrow-left"></i>
+              Back to Overview
+            </button>
           </div>
         </p-card>
         }
