@@ -106,6 +106,16 @@ export interface Program {
   kind: ProgramKind;
   status: ProgramStatus;
   /**
+   * The size of the thing. `true` is a routine — one repeatable session,
+   * read through `RoutineService`'s flattened view; `false` is a multi-week
+   * program laid out over `weekIndex`/`dayIndex`.
+   *
+   * `GET /programs` returns both, so anything listing the library needs this
+   * to tell them apart. It has always been on the wire and simply was not
+   * declared here.
+   */
+  isSingleWorkout: boolean;
+  /**
    * Program length in days. Author UI defaults to "Weeks" with a
    * Weeks/Days toggle — multiply by 7 client-side when posting from a
    * weeks input. Null = open-ended (no end date).
@@ -137,6 +147,9 @@ export interface ListProgramsQuery {
   search?: string;
   status?: ProgramStatus;
 }
+
+/** Which half of the library a surface wants, or both. */
+export type ProgramSize = 'program' | 'routine' | 'all';
 
 export interface PaginatedPrograms {
   items: Program[];
@@ -184,6 +197,15 @@ export interface ReorderProgramWorkoutsPayload {
   }[];
 }
 
+/**
+ * New `orderIndex` per moved row — the exercises of a workout or the sets
+ * of an exercise. Rows left out keep their index. One request, one
+ * transaction; a drag used to be a PATCH per moved row.
+ */
+export interface ReorderPrescribedRowsPayload {
+  items: { id: string; orderIndex: number }[];
+}
+
 export interface CreatePrescribedExercisePayload {
   exerciseId: string;
   supersetGroupId?: number;
@@ -191,6 +213,8 @@ export interface CreatePrescribedExercisePayload {
   blockId?: string;
   notes?: string;
   orderIndex?: number;
+  /** Empty sets the server creates with the exercise, in the same transaction. */
+  defaultSets?: number;
 }
 
 export type UpdatePrescribedExercisePayload =

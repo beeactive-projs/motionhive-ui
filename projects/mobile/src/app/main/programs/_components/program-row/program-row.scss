@@ -1,0 +1,31 @@
+/* Geometry and spine tones come from the shared `.mh-session-row` skin
+   (theme/components/mh-session-row.css). Only the library-specific parts
+   live here. */
+
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.meta {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+}
+
+.trailing {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.who {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+  white-space: nowrap;
+}
+
+.trailing ion-icon {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+}

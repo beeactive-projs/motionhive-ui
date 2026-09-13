@@ -1,0 +1,47 @@
+:host {
+  --mh-gutter: 1.25rem;
+}
+
+.range {
+  margin: 0;
+  padding: 0.875rem var(--mh-gutter) 0;
+  color: var(--ion-color-medium);
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.625rem var(--mh-gutter) 0;
+}
+
+.tiles mh-stat-tile,
+.tiles .s-tile {
+  flex: 1 1 6rem;
+}
+
+.s-tile ion-skeleton-text {
+  height: 4.5rem;
+  margin: 0;
+  border-radius: var(--mh-radius-card);
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem var(--mh-gutter);
+  border-bottom: 1px solid var(--mh-color-divider);
+}
+
+.record .name {
+  font-size: var(--mh-text-base);
+  font-weight: 500;
+}
+
+.record .value {
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

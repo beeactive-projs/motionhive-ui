@@ -1,0 +1,30 @@
+<ion-item
+  class="mh-session-row mh-list-row"
+  button
+  detail="false"
+  lines="none"
+  [attr.data-tone]="tone()"
+  (click)="select.emit()"
+>
+  <ion-label>
+    <h2>{{ program().name }}</h2>
+    <div class="tags">
+      @if (meta()) {
+        <span class="meta">{{ meta() }}</span>
+      }
+      @if (isDraft()) {
+        <ion-badge data-tone="muted">Draft</ion-badge>
+      }
+      @if (isRoutine()) {
+        <ion-badge data-tone="type">Routine</ion-badge>
+      }
+    </div>
+  </ion-label>
+
+  <div class="trailing" slot="end">
+    @if (trailing()) {
+      <span class="who">{{ trailing() }}</span>
+    }
+    <ion-icon name="chevron-forward" aria-hidden="true" />
+  </div>
+</ion-item>

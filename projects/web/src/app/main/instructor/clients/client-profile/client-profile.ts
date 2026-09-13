@@ -8,9 +8,11 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import {
   ClientService,
   ClientStatusLabels,
@@ -151,6 +153,16 @@ export class ClientProfile {
   /** id of the assignment whose status is being mutated — drives per-row spinner. */
   readonly assignmentMutatingId = signal<string | null>(null);
 
+  /**
+   * Debounces the Programs-tab search. Every keystroke used to fan out
+   * as a fresh forkJoin over `['PENDING','ACTIVE','PAUSED']` — three
+   * parallel requests per character — and a typed-fast search would
+   * blow past the global rate limit and pop the "Something Went Wrong"
+   * modal. Now the input pushes into a Subject and only the last value
+   * in a 300ms window fires the load.
+   */
+  private readonly _searchInput = new Subject<string>();
+
   readonly clientName = computed(() => {
     const c = this.client();
     if (!c) return '';
@@ -229,6 +241,14 @@ export class ClientProfile {
         this._loadAssignments();
       }
     });
+
+    // Debounced Programs-tab search — see `_searchInput` for context.
+    this._searchInput
+      .pipe(debounceTime(300), takeUntilDestroyed())
+      .subscribe((term) => {
+        this.assignmentsSearch.set(term);
+        this._loadAssignments();
+      });
   }
 
   /**
@@ -442,10 +462,13 @@ export class ClientProfile {
     this._loadAssignments();
   }
 
-  /** Debounced by the template's 300ms input, so this just refetches. */
+  /**
+   * Debounced through `_searchInput`. Every keystroke fans out into a
+   * `forkJoin` of three status requests in "Current" scope, so hitting
+   * the endpoint per character trips the throttle quickly.
+   */
   onAssignmentSearch(term: string): void {
-    this.assignmentsSearch.set(term);
-    this._loadAssignments();
+    this._searchInput.next(term);
   }
 
   loadMoreAssignments(): void {

@@ -100,6 +100,7 @@
       <mh-builder-rail [weeks]="weeks()" [selectedWorkoutId]="activeWorkout()?.id ?? null"
         [collapsedWeeks]="collapsedWeeks()" [totalWorkouts]="totalWorkouts()" (selectWorkout)="selectWorkout($event)"
         (toggleWeek)="toggleWeekCollapsed($event)" (addWorkout)="openAddWorkout($event)"
+        (copyWeek)="openCopyWeek($event)"
         (workoutDropped)="onRailWorkoutDropped($event)" (weekDropped)="onRailWeekDropped($event)" />
     </aside>
 
@@ -155,6 +156,10 @@
 @if (moveTargetSourceWorkout(); as source) {
 <mh-move-target-dialog [program]="p" [mode]="moveTargetMode()" [sourceWorkout]="source"
   [exercise]="moveTargetExercise()" [(visible)]="moveTargetDialogOpen" (chosen)="onMoveTargetChosen($event)" />
+}
+@if (copyWeekSource() !== null) {
+<mh-copy-week-dialog [program]="p" [sourceWeekIndex]="copyWeekSource() ?? 0" [(visible)]="copyWeekDialogOpen"
+  (chosen)="onCopyWeekChosen($event)" />
 }
 }
 

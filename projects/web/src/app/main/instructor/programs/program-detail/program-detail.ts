@@ -17,7 +17,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, defer, forkJoin, from, of, throwError } from 'rxjs';
+import { Observable, defer, from, of, throwError } from 'rxjs';
 import { catchError, concatMap, finalize, map, toArray } from 'rxjs/operators';
 
 import {
@@ -42,6 +42,7 @@ import {
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { ExerciseDetailDialog } from '../../exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
+import { CopyWeekDialog } from '../copy-week-dialog/copy-week-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
 import { MoveTargetChoice, MoveTargetDialog } from '../move-target-dialog/move-target-dialog';
 import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
@@ -78,6 +79,7 @@ import { WorkoutEditor } from './_components/workout-editor/workout-editor';
     BottomSheet,
     ListEmptyState,
     AssignProgramDialog,
+    CopyWeekDialog,
     ExerciseDetailDialog,
     ExercisePickerDialog,
     MoveTargetDialog,
@@ -145,6 +147,12 @@ export class ProgramDetail implements OnInit {
   /** Workout being moved (workout mode) / source workout (exercise mode). */
   readonly moveTargetSourceWorkout = signal<ProgramWorkout | null>(null);
   readonly moveTargetExercise = signal<PrescribedExercise | null>(null);
+
+  // ── Copy-week dialog — source week + open flag ───────────────────
+
+  readonly copyWeekDialogOpen = signal(false);
+  /** 0-based source week for the copy — null when the dialog isn't armed. */
+  readonly copyWeekSource = signal<number | null>(null);
 
   // ── Rail collapse state — persisted per program in localStorage ──
 
@@ -638,8 +646,8 @@ export class ProgramDetail implements OnInit {
   /**
    * Persist a new exercise order. `ordered` is the target visual order;
    * each row still carries its stale `orderIndex`, which is how the
-   * changed set is detected. Optimistic local update, one PATCH per
-   * changed row, full resync on failure.
+   * changed set is detected. Optimistic local update, one PATCH for
+   * every changed row, full resync on failure.
    */
   private _applyExerciseOrder(workout: ProgramWorkout, ordered: PrescribedExercise[]): void {
     const p = this.program();
@@ -655,13 +663,9 @@ export class ProgramDetail implements OnInit {
     });
     if (changed.length === 0) return;
     this._track(
-      forkJoin(
-        changed.map((e) =>
-          this._programService.updateExercise(p.id, workout.id, e.id, {
-            orderIndex: e.orderIndex,
-          }),
-        ),
-      ),
+      this._programService.reorderExercises(p.id, workout.id, {
+        items: changed.map((e) => ({ id: e.id, orderIndex: e.orderIndex })),
+      }),
     ).subscribe({
       error: (err) => {
         showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
@@ -842,13 +846,9 @@ export class ProgramDetail implements OnInit {
     });
     if (changed.length === 0) return;
     this._track(
-      forkJoin(
-        changed.map((s) =>
-          this._programService.updateSet(p.id, workout.id, ex.id, s.id, {
-            orderIndex: s.orderIndex,
-          }),
-        ),
-      ),
+      this._programService.reorderSets(p.id, workout.id, ex.id, {
+        items: changed.map((s) => ({ id: s.id, orderIndex: s.orderIndex })),
+      }),
     ).subscribe({
       error: (err) => {
         showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
@@ -936,6 +936,48 @@ export class ProgramDetail implements OnInit {
       const ex = this.moveTargetExercise();
       if (ex) this._moveExerciseToWorkout(source, ex, choice.workoutId);
     }
+  }
+
+  // ── Copy week ────────────────────────────────────────────────────
+
+  /** Rail's ⋯/copy button — arm the source and open the picker. */
+  openCopyWeek(sourceWeek: number): void {
+    this.copyWeekSource.set(sourceWeek);
+    this.copyWeekDialogOpen.set(true);
+  }
+
+  /**
+   * User confirmed a target — do the copy in one BE call and refetch
+   * the tree. The endpoint replaces the target week's workouts and
+   * returns freshly created rows without nested exercises/sets, so
+   * merging in place would render half-empty cards; a refetch is the
+   * safe path.
+   */
+  onCopyWeekChosen(targetWeek: number): void {
+    const p = this.program();
+    const source = this.copyWeekSource();
+    if (!p || source === null) return;
+    this._track(this._programService.copyWeek(p.id, source, targetWeek)).subscribe({
+      next: (copied) => {
+        this._messageService.add({
+          severity: 'success',
+          summary: `Week ${source + 1} copied into week ${targetWeek + 1}`,
+          detail:
+            copied.length === 1
+              ? '1 workout copied.'
+              : `${copied.length} workouts copied.`,
+          life: 2500,
+        });
+        // Reveal the destination so the newly copied workouts are visible.
+        if (this.collapsedWeeks().has(targetWeek)) {
+          this.toggleWeekCollapsed(targetWeek);
+        }
+        this._refetch();
+      },
+      error: (err) => {
+        showApiError(this._messageService, "Couldn't copy the week", 'Please try again.', err);
+      },
+    });
   }
 
   /** Cross-week/day move — one PATCH; the BE 409s if the slot got taken. */

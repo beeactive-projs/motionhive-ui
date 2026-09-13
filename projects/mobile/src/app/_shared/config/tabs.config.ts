@@ -105,10 +105,11 @@ export const TRAIN_TAB_SET: TabSet = {
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
-    // The trainee's bookings — `/tabs/user/sessions`. Sessions earned the tab
-    // slot; Workouts moved to the menu page until it ships real content.
+    // The trainee's bookings — `/tabs/user/sessions`.
     { id: TabIds.User, label: 'Sessions', icon: 'calendar-outline' },
-    { id: TabIds.Discover, label: 'Discover', icon: 'compass-outline' },
+    // Training is the thing a trainee opens daily; finding a coach is
+    // something they do once. Discover gave up the slot for it.
+    { id: TabIds.Workouts, label: 'Workouts', icon: 'barbell-outline' },
     MESSAGES,
   ],
   // "My training" mirrors web's mode group; the unlabeled card holds the
@@ -117,12 +118,6 @@ export const TRAIN_TAB_SET: TabSet = {
     {
       label: 'My training',
       items: [
-        {
-          label: 'Workouts',
-          icon: 'barbell-outline',
-          iconColor: 'violet',
-          route: '/tabs/workouts',
-        },
         // The same library the coach side gets, read-only: a trainee looking
         // up a movement their plan names should not have to ask for it.
         { label: 'Exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
@@ -131,6 +126,7 @@ export const TRAIN_TAB_SET: TabSet = {
     {
       label: '',
       items: [
+        { label: 'Discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
         GROUPS,
         {
           label: 'Billing',

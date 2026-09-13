@@ -1,0 +1,28 @@
+<ng-template #body>
+  <p class="lede">
+    Every day of week {{ fromWeek() + 1 }} is copied across. Anything already in
+    the target week is replaced.
+  </p>
+
+  <ion-list lines="none">
+    @for (index of targets(); track index) {
+      <ion-item button [detail]="false" (click)="toggle(index)">
+        <ion-label>Week {{ index + 1 }}</ion-label>
+        @if (isOn(index)) {
+          <ion-icon slot="end" name="checkmark-circle-outline" aria-hidden="true" />
+        }
+      </ion-item>
+    }
+  </ion-list>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [saveLabel]="confirmLabel()"
+  [canSave]="selected().length > 0"
+  [breakpoints]="[0, 0.6]"
+  [initialBreakpoint]="0.6"
+  (save)="apply()"
+/>

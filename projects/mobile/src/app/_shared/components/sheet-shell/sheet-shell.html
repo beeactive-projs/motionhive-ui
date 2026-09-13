@@ -1,6 +1,6 @@
 <ion-modal [isOpen]="open()" [breakpoints]="breakpoints()" [initialBreakpoint]="initialBreakpoint()" [handle]="true"
   [expandToScroll]="false" [attr.aria-label]="title()" [class]="presented() ? presentedClass : ''"
-  (didPresent)="presented.set(true)" (didDismiss)="open.set(false); presented.set(false)">
+  (didPresent)="presented.set(true)" (didDismiss)="open.set(false); presented.set(false); dismissed.emit()">
   <!-- Everything the modal shows must live inside this template: Ionic moves
        the modal when it presents, and anything outside is left behind. -->
   <ng-template>
@@ -38,6 +38,12 @@
         }
       </ion-toolbar>
     </ion-header>
+    }
+
+    @if (sticky(); as pinned) {
+    <div class="sticky">
+      <ng-container [ngTemplateOutlet]="pinned" />
+    </div>
     }
 
     <ion-content class="ion-padding" [class.flush]="flushBody()">

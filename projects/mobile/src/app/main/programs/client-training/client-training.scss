@@ -1,0 +1,80 @@
+:host {
+  --mh-gutter: 1.25rem;
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0 var(--mh-gutter) 0.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.plan .name {
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.plan .sub,
+.log .meta {
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-xs);
+}
+
+.log {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.125rem 0.75rem;
+  width: 100%;
+  padding: 0.75rem var(--mh-gutter);
+  border: 0;
+  border-bottom: 1px solid var(--mh-color-divider);
+  background: none;
+  color: var(--ion-text-color);
+  text-align: start;
+  cursor: pointer;
+}
+
+.log .day {
+  grid-column: 1;
+  color: var(--ion-color-medium);
+}
+
+.log .name {
+  grid-column: 1;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+}
+
+.log .meta {
+  grid-column: 1;
+}
+
+.log ion-icon {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  color: var(--ion-color-medium);
+}
+
+.none {
+  margin: 0;
+  padding: 1rem var(--mh-gutter);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* The boundary, stated rather than implied. */
+.privacy {
+  margin: 1.25rem var(--mh-gutter) 2rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-primary-wash);
+  color: var(--ion-color-primary-wash-contrast);
+  font-size: var(--mh-text-xs);
+  line-height: var(--mh-leading-body);
+}
+

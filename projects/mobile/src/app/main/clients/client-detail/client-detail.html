@@ -133,6 +133,19 @@
         </section>
       }
 
+      <!-- 7h: training is a section of the client, not an island. It points
+           at the detail rather than duplicating it. -->
+      <section class="mh-section">
+        <div class="mh-section-head">
+          <span class="mh-kicker">Training</span>
+        </div>
+        <button class="training" type="button" (click)="openTraining()">
+          <ion-icon name="barbell-outline" aria-hidden="true" />
+          <span class="t-label">Plan &amp; logged workouts</span>
+          <ion-icon class="t-chev" name="chevron-forward" aria-hidden="true" />
+        </button>
+      </section>
+
       <section class="mh-section">
         <div class="mh-section-head">
           <span class="mh-kicker">Notes · private</span>

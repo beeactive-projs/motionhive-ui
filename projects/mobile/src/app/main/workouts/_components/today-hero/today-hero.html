@@ -1,0 +1,29 @@
+<article class="hero">
+  <span class="mh-kicker eyebrow">{{ eyebrow() }}</span>
+
+  <h2>{{ workout().name }}</h2>
+
+  @if (position()) {
+    <span class="mh-kicker position">{{ position() }}</span>
+  }
+
+  @if (meta()) {
+    <p class="meta">{{ meta() }}</p>
+  }
+
+  @if (inlineExercises().length) {
+    <ul class="exercises">
+      @for (name of inlineExercises(); track name) {
+        <li>{{ name }}</li>
+      }
+    </ul>
+    @if (moreCount()) {
+      <span class="more">+ {{ moreCount() }} more</span>
+    }
+  }
+
+  <ion-button expand="block" class="cta" (click)="start.emit()">
+    <ion-icon slot="start" name="play-outline" aria-hidden="true" />
+    Start workout
+  </ion-button>
+</article>

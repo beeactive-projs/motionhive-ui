@@ -1,0 +1,97 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/clients" />
+    </ion-buttons>
+    <ion-title>Needs attention</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (loading() && !summary()) {
+    @for (row of skeletonRows; track row) {
+      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
+    }
+  } @else if (failed()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Could not load the roster"
+      message="Check your connection and try again."
+      actionLabel="Retry"
+      (action)="load()"
+    />
+  } @else if (isEmpty()) {
+    <!-- Nobody on a plan is a different answer from nobody needing help. -->
+    <mh-empty-state
+      icon="people-outline"
+      heading="Nobody on a plan yet"
+      message="Assign a program to a client and their progress shows up here."
+    />
+  } @else if (allSteady()) {
+    <mh-empty-state
+      icon="checkmark-circle-outline"
+      heading="Everyone is on track"
+      message="Nobody has fallen behind in the last four weeks."
+    />
+  } @else {
+    @for (row of needsAttention(); track row.clientId) {
+      <ion-item
+        class="mh-session-row mh-list-row"
+        lines="none"
+        detail="false"
+        [attr.data-tone]="attentionTone(row.attention)"
+      >
+        <mh-hex-avatar
+          slot="start"
+          size="md"
+          aria-hidden="true"
+          [name]="row.name"
+          [imageUrl]="row.avatarUrl"
+          [color]="tone(row)"
+        />
+
+        <ion-label (click)="open(row)">
+          <h2>{{ row.name }}</h2>
+          <div class="tags">
+            <ion-badge [attr.data-tone]="attentionTone(row.attention)">
+              {{ attentionLabel(row.attention) }}
+            </ion-badge>
+          </div>
+          <p class="sub">{{ subline(row) }}</p>
+        </ion-label>
+
+        <!-- A diagnosis with no next move is just bad news. -->
+        <ion-button slot="end" fill="clear" size="small" (click)="act(row)">
+          {{ attentionAction(row.attention) }}
+        </ion-button>
+      </ion-item>
+    }
+
+    @if (steady().length) {
+      <h3 class="mh-section-label">On track</h3>
+      @for (row of steady(); track row.clientId) {
+        <ion-item
+          class="mh-session-row mh-list-row"
+          button
+          lines="none"
+          detail="false"
+          data-tone="muted"
+          (click)="open(row)"
+        >
+          <mh-hex-avatar
+            slot="start"
+            size="md"
+            aria-hidden="true"
+            [name]="row.name"
+            [imageUrl]="row.avatarUrl"
+            [color]="tone(row)"
+          />
+          <ion-label>
+            <h2>{{ row.name }}</h2>
+            <p class="sub">{{ adherenceLabel(row.adherencePercent) }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    }
+  }
+</ion-content>

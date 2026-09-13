@@ -15,6 +15,7 @@ import type {
   PrescribedSet,
   Program,
   ProgramWorkout,
+  ReorderPrescribedRowsPayload,
   ReorderProgramWorkoutsPayload,
   UpdatePrescribedExercisePayload,
   UpdatePrescribedSetPayload,
@@ -91,6 +92,23 @@ export class ProgramService {
     );
   }
 
+  /**
+   * Copy one week onto another — exercises and sets included — in one
+   * request and one server transaction. Replaces a client-side walk that
+   * made one call per row, tripped the global throttle on the second copy,
+   * and was not atomic.
+   */
+  copyWeek(
+    programId: string,
+    fromWeekIndex: number,
+    toWeekIndex: number,
+  ): Observable<ProgramWorkout[]> {
+    return this._http.post<ProgramWorkout[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.COPY_WEEK(programId)}`,
+      { fromWeekIndex, toWeekIndex },
+    );
+  }
+
   removeWorkout(programId: string, workoutId: string): Observable<void> {
     return this._http.delete<void>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WORKOUT_BY_ID(programId, workoutId)}`,
@@ -109,6 +127,29 @@ export class ProgramService {
   ): Observable<ProgramWorkout[]> {
     return this._http.patch<ProgramWorkout[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WORKOUTS_REORDER(programId)}`,
+      payload,
+    );
+  }
+
+  reorderExercises(
+    programId: string,
+    workoutId: string,
+    payload: ReorderPrescribedRowsPayload,
+  ): Observable<PrescribedExercise[]> {
+    return this._http.patch<PrescribedExercise[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.EXERCISES_REORDER(programId, workoutId)}`,
+      payload,
+    );
+  }
+
+  reorderSets(
+    programId: string,
+    workoutId: string,
+    exerciseId: string,
+    payload: ReorderPrescribedRowsPayload,
+  ): Observable<PrescribedSet[]> {
+    return this._http.patch<PrescribedSet[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.SETS_REORDER(programId, workoutId, exerciseId)}`,
       payload,
     );
   }

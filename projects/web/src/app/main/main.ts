@@ -109,6 +109,11 @@ export class Main {
           // into thirds — Progress was arithmetic over the very log
           // that Workouts listed, so they were the same data twice.
           { label: 'Workouts', route: '/user/training', icon: 'pi pi-bolt' },
+          // Plans is a first-class destination again — without a nav
+          // entry, a client's assigned programme was only reachable
+          // through the notification, and only until the notification
+          // was dismissed.
+          { label: 'Plans', route: '/user/plans', icon: 'pi pi-list-check' },
         ],
       },
     ];
