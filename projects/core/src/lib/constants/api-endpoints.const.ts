@@ -219,10 +219,14 @@ export const API_ENDPOINTS = {
       `/programs/${id}/workouts/${workoutId}`,
     EXERCISES: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises`,
+    EXERCISES_REORDER: (id: string, workoutId: string) =>
+      `/programs/${id}/workouts/${workoutId}/exercises/reorder`,
     EXERCISE_BY_ID: (id: string, workoutId: string, exerciseId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}`,
     SETS: (id: string, workoutId: string, exerciseId: string) =>
       `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}/sets`,
+    SETS_REORDER: (id: string, workoutId: string, exerciseId: string) =>
+      `/programs/${id}/workouts/${workoutId}/exercises/${exerciseId}/sets/reorder`,
     SET_BY_ID: (
       id: string,
       workoutId: string,

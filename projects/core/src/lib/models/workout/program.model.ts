@@ -197,6 +197,15 @@ export interface ReorderProgramWorkoutsPayload {
   }[];
 }
 
+/**
+ * New `orderIndex` per moved row — the exercises of a workout or the sets
+ * of an exercise. Rows left out keep their index. One request, one
+ * transaction; a drag used to be a PATCH per moved row.
+ */
+export interface ReorderPrescribedRowsPayload {
+  items: { id: string; orderIndex: number }[];
+}
+
 export interface CreatePrescribedExercisePayload {
   exerciseId: string;
   supersetGroupId?: number;

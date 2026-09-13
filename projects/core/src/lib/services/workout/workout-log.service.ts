@@ -142,13 +142,15 @@ export class WorkoutLogService {
 
   // ── Mid-session mutations (freestyle + S14 affordances) ──────────
 
+  /** `defaultSets` has the server create that many empty sets with the exercise. */
   addExercise(
     workoutLogId: string,
     exerciseId: string,
+    defaultSets?: number,
   ): Observable<LoggedExercise> {
     return this._http.post<LoggedExercise>(
       `${environment.apiUrl}${API_ENDPOINTS.WORKOUT_LOGS.ADD_EXERCISE(workoutLogId)}`,
-      { exerciseId },
+      { exerciseId, ...(defaultSets ? { defaultSets } : {}) },
     );
   }
 

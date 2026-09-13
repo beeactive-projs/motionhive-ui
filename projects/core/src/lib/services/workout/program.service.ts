@@ -15,6 +15,7 @@ import type {
   PrescribedSet,
   Program,
   ProgramWorkout,
+  ReorderPrescribedRowsPayload,
   ReorderProgramWorkoutsPayload,
   UpdatePrescribedExercisePayload,
   UpdatePrescribedSetPayload,
@@ -126,6 +127,29 @@ export class ProgramService {
   ): Observable<ProgramWorkout[]> {
     return this._http.patch<ProgramWorkout[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.WORKOUTS_REORDER(programId)}`,
+      payload,
+    );
+  }
+
+  reorderExercises(
+    programId: string,
+    workoutId: string,
+    payload: ReorderPrescribedRowsPayload,
+  ): Observable<PrescribedExercise[]> {
+    return this._http.patch<PrescribedExercise[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.EXERCISES_REORDER(programId, workoutId)}`,
+      payload,
+    );
+  }
+
+  reorderSets(
+    programId: string,
+    workoutId: string,
+    exerciseId: string,
+    payload: ReorderPrescribedRowsPayload,
+  ): Observable<PrescribedSet[]> {
+    return this._http.patch<PrescribedSet[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.SETS_REORDER(programId, workoutId, exerciseId)}`,
       payload,
     );
   }

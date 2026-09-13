@@ -135,8 +135,10 @@ export class LoggerStore {
   }
 
   /**
-   * The picker commits several at once; the endpoint takes one at a time, so
-   * they go in parallel and land in the order the user chose them.
+   * The picker commits several at once; the endpoint takes one at a time,
+   * so they go in parallel and land in the order the user chose them.
+   * `defaultSets` has the server seed the empty sets with each exercise,
+   * so it is loggable the moment it appears — one request per movement.
    */
   addExercises(exerciseIds: string[], done?: () => void): void {
     const log = this._log();
@@ -144,44 +146,25 @@ export class LoggerStore {
 
     forkJoin(
       exerciseIds.map((id) =>
-        this._logService.addExercise(log.id, id).pipe(catchError(() => of(null))),
+        this._logService
+          .addExercise(log.id, id, DEFAULT_SETS)
+          .pipe(catchError(() => of(null))),
       ),
     )
       .pipe(take(1))
       .subscribe((added) => {
-        const kept = added.filter((e): e is LoggedExercise => !!e);
-        if (!kept.length) {
+        if (!added.some(Boolean)) {
           done?.();
           return;
         }
-
-        this._updateLog((l) => ({
-          ...l,
-          exercises: [...(l.exercises ?? []), ...kept],
-        }));
-
-        // Seed the empty sets the API does not create, so the exercise is
-        // loggable the moment it appears rather than after three more taps.
-        forkJoin(
-          kept.flatMap((exercise) =>
-            Array.from({ length: DEFAULT_SETS }, () =>
-              this._logService
-                .addSet(log.id, exercise.id)
-                .pipe(catchError(() => of(null))),
-            ),
-          ),
-        )
-          .pipe(take(1))
-          .subscribe(() => {
-            // Re-read rather than splice: the sets came back in completion
-            // order, and their order in the exercise is the server's to say.
-            this._logService
-              .get(log.id)
-              .pipe(take(1), catchError(() => of(null)))
-              .subscribe((fresh) => {
-                if (fresh) this._log.set(fresh);
-                done?.();
-              });
+        // Re-read rather than splice: the rows came back in completion
+        // order, and their order in the log is the server's to say.
+        this._logService
+          .get(log.id)
+          .pipe(take(1), catchError(() => of(null)))
+          .subscribe((fresh) => {
+            if (fresh) this._log.set(fresh);
+            done?.();
           });
       });
   }

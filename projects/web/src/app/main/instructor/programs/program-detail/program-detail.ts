@@ -17,7 +17,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
-import { Observable, defer, forkJoin, from, of, throwError } from 'rxjs';
+import { Observable, defer, from, of, throwError } from 'rxjs';
 import { catchError, concatMap, finalize, map, toArray } from 'rxjs/operators';
 
 import {
@@ -646,8 +646,8 @@ export class ProgramDetail implements OnInit {
   /**
    * Persist a new exercise order. `ordered` is the target visual order;
    * each row still carries its stale `orderIndex`, which is how the
-   * changed set is detected. Optimistic local update, one PATCH per
-   * changed row, full resync on failure.
+   * changed set is detected. Optimistic local update, one PATCH for
+   * every changed row, full resync on failure.
    */
   private _applyExerciseOrder(workout: ProgramWorkout, ordered: PrescribedExercise[]): void {
     const p = this.program();
@@ -663,13 +663,9 @@ export class ProgramDetail implements OnInit {
     });
     if (changed.length === 0) return;
     this._track(
-      forkJoin(
-        changed.map((e) =>
-          this._programService.updateExercise(p.id, workout.id, e.id, {
-            orderIndex: e.orderIndex,
-          }),
-        ),
-      ),
+      this._programService.reorderExercises(p.id, workout.id, {
+        items: changed.map((e) => ({ id: e.id, orderIndex: e.orderIndex })),
+      }),
     ).subscribe({
       error: (err) => {
         showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
@@ -850,13 +846,9 @@ export class ProgramDetail implements OnInit {
     });
     if (changed.length === 0) return;
     this._track(
-      forkJoin(
-        changed.map((s) =>
-          this._programService.updateSet(p.id, workout.id, ex.id, s.id, {
-            orderIndex: s.orderIndex,
-          }),
-        ),
-      ),
+      this._programService.reorderSets(p.id, workout.id, ex.id, {
+        items: changed.map((s) => ({ id: s.id, orderIndex: s.orderIndex })),
+      }),
     ).subscribe({
       error: (err) => {
         showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
