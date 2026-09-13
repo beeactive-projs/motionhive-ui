@@ -141,3 +141,9 @@
   }
 </ng-template>
 
+<!-- Toast for load errors. Only surfaces when this component is the route
+     (its own `providers: [MessageService]`); when embedded in Training,
+     Training's own toast handles that page's errors and this one shows
+     any toasts that originated inside MyPlans itself. -->
+<p-toast position="top-right" />
+

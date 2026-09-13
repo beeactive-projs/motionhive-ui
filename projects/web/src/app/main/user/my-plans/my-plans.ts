@@ -17,6 +17,7 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
+import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 
@@ -75,6 +76,7 @@ interface PlanGroup {
     DaySeparator,
     MyPlanRow,
     Skeleton,
+    Toast,
     TooltipModule,
     Tabs,
     TabList,
@@ -82,6 +84,11 @@ interface PlanGroup {
     TabPanels,
     TabPanel,
   ],
+  // Provided here (not just in a parent) so this component can mount
+  // as a standalone route — the Plans nav entry loads it directly at
+  // `/user/plans`. Without this, `inject(MessageService)` blew up with
+  // NG0201 when opened outside the Training page.
+  providers: [MessageService],
   templateUrl: './my-plans.html',
   styleUrl: './my-plans.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
