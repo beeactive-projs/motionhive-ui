@@ -16,7 +16,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { MessagingStore } from 'core';
+import { MessagingStore, injectDelayedFlag } from 'core';
 
 import { MESSAGING_ICONS } from '../../messages.config';
 
@@ -64,6 +64,10 @@ export class ChatComposer implements OnDestroy {
   readonly isRateLimited = computed(() => this.limitedSeconds() > 0);
 
   readonly sending = computed(() => this.store.isSending(this.conversationId()));
+
+  // A send that lands quickly should look instant; a spinner that flashes
+  // for 80ms reads as a glitch, not as feedback.
+  readonly showSpinner = injectDelayedFlag(this.sending);
 
   readonly isTooLong = computed(() => this.value().length > MAX_BODY_LENGTH);
 

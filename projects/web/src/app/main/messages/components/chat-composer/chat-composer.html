@@ -37,7 +37,7 @@
       [attr.aria-label]="sending() ? 'Sending…' : 'Send message'"
       [title]="isRateLimited() ? 'Slow down — try again in ' + limitedSecs() + 's' : 'Send'"
     >
-      @if (sending()) {
+      @if (showSpinner()) {
         <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
       } @else {
         <i class="pi pi-send" aria-hidden="true"></i>

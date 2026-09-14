@@ -109,8 +109,13 @@ export class Chat implements ViewWillLeave {
     () => this.otherUser()?.id ?? this._draftRecipientId(),
   );
 
+  // A draft has no conversation behind it, so its messages live under a
+  // key derived from the recipient — that is what puts a just-sent first
+  // message on screen before the server has created the thread.
   private readonly _messagesState = computed(() =>
-    this.store.messagesFor(this.conversationId()),
+    this.conversationId()
+      ? this.store.messagesFor(this.conversationId())
+      : this.store.pendingMessagesFor(this.recipientId()),
   );
 
   readonly loading = computed(() => this._messagesState().loading);

@@ -33,7 +33,7 @@
     [attr.aria-label]="isRateLimited() ? 'Sending paused' : 'Send'"
     (click)="send()"
   >
-    @if (sending()) {
+    @if (showSpinner()) {
       <ion-spinner name="crescent" />
     } @else if (isRateLimited()) {
       {{ limitedSeconds() }}
