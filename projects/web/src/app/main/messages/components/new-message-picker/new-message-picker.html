@@ -82,6 +82,18 @@
     </div>
   }
 
+  @if (pendingBubbles().length) {
+    <div class="mh-picker__thread">
+      @for (bubble of pendingBubbles(); track bubble.message.id) {
+        <mh-message-bubble
+          [message]="bubble.message"
+          [position]="bubble.position"
+          [mine]="true"
+        />
+      }
+    </div>
+  }
+
   <div class="mh-picker__composer">
     <mh-chat-composer
       [conversationId]="null"
