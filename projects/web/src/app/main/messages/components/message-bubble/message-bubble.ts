@@ -1,5 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { BubblePosition, displayName, initialsOf, MessageView, ParticipantSnapshot } from 'core';
+import {
+  BubblePosition,
+  displayName,
+  initialsOf,
+  isOptimisticMessageId,
+  MessageView,
+  ParticipantSnapshot,
+} from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
 /**
@@ -54,12 +61,21 @@ export class MessageBubble {
   protected readonly isDeleted = computed(() => !!this.message().deletedAt);
 
   /**
+   * On screen but not yet acknowledged by the server. This is where the
+   * wait for a send is shown: the composer stays free, and the bubble
+   * itself carries the state until its receipt appears.
+   */
+  protected readonly isPending = computed(() =>
+    isOptimisticMessageId(this.message().id),
+  );
+
+  /**
    * Read-receipt state for my own messages: `'read'` once the other
    * participant's `lastReadAt` reaches this message, else `'sent'`.
    * `null` for "them" bubbles and deleted messages (no receipt shown).
    */
   protected readonly receipt = computed<'read' | 'sent' | null>(() => {
-    if (!this.mine() || this.isDeleted()) return null;
+    if (!this.mine() || this.isDeleted() || this.isPending()) return null;
     const readAt = this.otherReadAt();
     if (!readAt) return 'sent';
     const sentMs = new Date(this.message().createdAt).getTime();

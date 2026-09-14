@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 
 import {
   MessagingStore,
+  isOptimisticMessageId,
   isPendingThreadKey,
   pendingThreadKey,
 } from './messaging.store';
@@ -208,5 +209,97 @@ describe('MessagingStore — first-message (pending) thread', () => {
     const items = store.messagesFor(REAL_CONV).items;
     expect(items).toHaveLength(1);
     expect(items[0].id).toBe('msg-server');
+  });
+
+  // ─── the composer must not wait on the network ───────────────────
+
+  it('empties the draft on the keystroke, not on the response', () => {
+    api.sendMessage.mockReturnValue(new Subject());
+    store.saveDraft(REAL_CONV, 'hello');
+
+    void store.sendMessage({
+      conversationId: REAL_CONV,
+      recipientId: RECIPIENT,
+      body: 'hello',
+    });
+
+    // The composers mirror this draft into their input. Leaving it set
+    // until the server answered wrote the text straight back after they
+    // cleared it, so it sat there for the whole round trip.
+    expect(store.draftFor(REAL_CONV)).toBe('');
+  });
+
+  it('empties the picker draft too when there is no conversation yet', () => {
+    api.sendMessage.mockReturnValue(new Subject());
+    store.saveDraft(null, 'hello');
+
+    void store.sendMessage({
+      conversationId: null,
+      recipientId: RECIPIENT,
+      body: 'hello',
+    });
+
+    expect(store.draftFor(null)).toBe('');
+  });
+
+  it('gives the text back when the send fails', async () => {
+    api.sendMessage.mockReturnValue(
+      throwError(
+        () => new HttpErrorResponse({ status: 403, error: { message: 'Nope.' } }),
+      ),
+    );
+
+    await store.sendMessage({
+      conversationId: REAL_CONV,
+      recipientId: RECIPIENT,
+      body: 'hello',
+    });
+
+    expect(store.draftFor(REAL_CONV)).toBe('hello');
+  });
+
+  it('marks an unacknowledged message so the bubble can show the wait', () => {
+    api.sendMessage.mockReturnValue(new Subject());
+
+    void store.sendMessage({
+      conversationId: REAL_CONV,
+      recipientId: RECIPIENT,
+      body: 'hello',
+    });
+
+    expect(isOptimisticMessageId(store.messagesFor(REAL_CONV).items[0].id)).toBe(
+      true,
+    );
+    expect(isOptimisticMessageId('msg-server')).toBe(false);
+  });
+
+  it('keeps a second message typed while the first is still in flight', async () => {
+    // First send resolves on demand; the second is fired before it does.
+    const first = new Subject<ReturnType<typeof sendResult>>();
+    api.sendMessage.mockReturnValueOnce(first);
+
+    void store.sendMessage({
+      conversationId: null,
+      recipientId: RECIPIENT,
+      body: 'one',
+    });
+    api.sendMessage.mockReturnValue(new Subject());
+    void store.sendMessage({
+      conversationId: null,
+      recipientId: RECIPIENT,
+      body: 'two',
+    });
+
+    expect(store.pendingMessagesFor(RECIPIENT).items).toHaveLength(2);
+
+    first.next(sendResult());
+    first.complete();
+    await Promise.resolve();
+
+    // The pending thread is handed over, and the still-unsent second
+    // message travels with it rather than vanishing.
+    const thread = store.messagesFor(REAL_CONV).items;
+    expect(thread.map((m) => m.body)).toEqual(['hello', 'two']);
+    expect(store.pendingMessagesFor(RECIPIENT).items).toEqual([]);
   });
 });
