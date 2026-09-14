@@ -31,6 +31,7 @@
 }
 
 .bubble {
+  transition: opacity 0.18s ease;
   padding: 0.625rem 0.875rem;
   background: var(--ion-card-background);
   border: 1px solid var(--ion-border-color);
@@ -51,6 +52,13 @@
 }
 
 /* A tombstone is the BE's '[deleted]' string; it reads as absence, not speech. */
+/* Not acknowledged by the server yet. Deliberately a fade rather than a
+   spinner or a clock: it settles without a swap, so a send that lands in
+   100ms reads as instant instead of flashing an indicator. */
+.bubble.pending {
+  opacity: 0.55;
+}
+
 .bubble.deleted {
   background: var(--mh-color-divider);
   border-color: transparent;

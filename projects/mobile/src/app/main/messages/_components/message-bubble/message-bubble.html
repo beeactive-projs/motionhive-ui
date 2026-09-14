@@ -13,14 +13,19 @@
   }
 
   <div class="stack">
-    <div class="bubble" [class.deleted]="isDeleted()" [style.border-radius]="radius()">
+    <div
+      class="bubble"
+      [class.deleted]="isDeleted()"
+      [class.pending]="isPending()"
+      [style.border-radius]="radius()"
+    >
       {{ message().body }}
     </div>
 
     @if (showMeta()) {
       <div class="meta">
         <span>{{ timeLabel() }}</span>
-        @if (showReceipt() && !isDeleted()) {
+        @if (showReceipt() && !isDeleted() && !isPending()) {
           <ion-icon
             name="checkmark-done"
             [class.read]="isRead()"

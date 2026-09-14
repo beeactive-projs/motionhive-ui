@@ -1,7 +1,13 @@
 import { Component, computed, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 
-import { BubblePosition, MessageView, ParticipantSnapshot, displayName } from 'core';
+import {
+  BubblePosition,
+  MessageView,
+  ParticipantSnapshot,
+  displayName,
+  isOptimisticMessageId,
+} from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
@@ -44,6 +50,13 @@ export class MessageBubble {
   readonly showReceipt = input(false);
 
   readonly isDeleted = computed(() => !!this.message().deletedAt);
+
+  /**
+   * On screen but not yet acknowledged by the server. This is where the
+   * wait for a send is shown: the composer stays free, and the bubble
+   * itself carries the state until its receipt appears.
+   */
+  readonly isPending = computed(() => isOptimisticMessageId(this.message().id));
 
   readonly authorName = computed(() => displayName(this.author(), ''));
 
