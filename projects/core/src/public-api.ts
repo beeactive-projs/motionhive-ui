@@ -186,6 +186,7 @@ export * from './lib/utils/session-format.utils';
 export * from './lib/utils/exercise-tag.utils';
 export * from './lib/utils/form.utils';
 export * from './lib/utils/messaging.utils';
+export * from './lib/utils/delayed-flag.utils';
 export * from './lib/utils/client.utils';
 
 // Services

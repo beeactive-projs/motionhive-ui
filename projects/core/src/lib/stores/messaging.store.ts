@@ -44,6 +44,24 @@ const EMPTY_MESSAGES: ConversationMessages = {
   loading: false,
   hasLoaded: false,
 };
+
+/**
+ * A DIRECT thread that does not exist on the server yet is cached under
+ * a key derived from its recipient, so the first message can render the
+ * instant it is sent instead of after the round trip that creates the
+ * conversation. The key is replaced by the real conversation id as soon
+ * as the server answers, and never reaches the API — every call that
+ * would hit the network checks `isPendingThreadKey` first.
+ */
+const PENDING_THREAD_PREFIX = 'pending:';
+
+export function pendingThreadKey(recipientId: string): string {
+  return `${PENDING_THREAD_PREFIX}${recipientId}`;
+}
+
+export function isPendingThreadKey(id: string | null | undefined): boolean {
+  return !!id && id.startsWith(PENDING_THREAD_PREFIX);
+}
 import { MessagingService } from '../services/messaging/messaging.service';
 import { MessagingRealtimeService } from '../services/messaging/messaging-realtime.service';
 import { AuthStore } from './auth.store';
@@ -321,6 +339,16 @@ export class MessagingStore {
     return this._messagesByConv()[conversationId] ?? EMPTY_MESSAGES;
   }
 
+  /**
+   * Messages already sent to someone we have no conversation with yet.
+   * The new-message screens render these so a first message appears
+   * immediately, exactly like one sent into an existing thread.
+   */
+  pendingMessagesFor(recipientId: string | null): ConversationMessages {
+    if (!recipientId) return EMPTY_MESSAGES;
+    return this.messagesFor(pendingThreadKey(recipientId));
+  }
+
   // ── F4 public read surfaces ─────────────────────────────────
   readonly composeMode = this._composeMode.asReadonly();
   readonly sendRateLimitedUntil = this._sendRateLimitedUntil.asReadonly();
@@ -480,6 +508,8 @@ export class MessagingStore {
    * markRead is idempotent (it sets `last_read_at = NOW()`).
    */
   markReadOnEntry(id: string): void {
+    if (isPendingThreadKey(id)) return;
+
     // Optimistic unread clear on the inbox row. No-op when the row
     // hasn't loaded yet — that's fine, the next list refresh will
     // come back with the BE's authoritative `unreadCount: 0`.
@@ -639,6 +669,10 @@ export class MessagingStore {
    * isn't a forced refresh.
    */
   loadMessages(conversationId: string, opts: { force?: boolean } = {}): void {
+    // A pending thread exists only on this client — asking the server
+    // for its history would 400 on the id.
+    if (isPendingThreadKey(conversationId)) return;
+
     const state = this.messagesFor(conversationId);
     if (state.loading) return;
     if (!opts.force && state.hasLoaded) return;
@@ -675,10 +709,13 @@ export class MessagingStore {
    *     `conversationId` is `null` — the BE auto-creates the
    *     conversation on first send and returns it in the response.
    *
-   * Optimistic insert: a temp message is added to the active thread
-   * immediately with id `optim-<random>`. On 201, we replace it with
-   * the server's row. On error, we strip it back out and surface the
-   * BE's message via `sendError` (which the composer renders inline).
+   * Optimistic insert: a temp message with id `optim-<random>` is added
+   * immediately — to the open thread, or, for a first message, to the
+   * pending thread keyed on the recipient (see `pendingThreadKey`), so
+   * the bubble never waits on the network. On 201 we replace it with the
+   * server's row and hand the pending thread over to the real
+   * conversation. On error we strip it back out and surface the BE's
+   * message via `sendError` (which the composer renders inline).
    *
    * 429 sets `sendRateLimitedUntil` so the composer disables for the
    * BE-supplied window. 403 surfaces the reason as an inline error
@@ -706,23 +743,25 @@ export class MessagingStore {
     const now = new Date().toISOString();
     const optimisticId = `optim-${cryptoRandom()}`;
 
-    // Insert into the active thread when we have one. New-message
-    // sends don't have a thread to insert into until the BE responds.
-    if (conversationId) {
-      const optimistic: MessageView = {
-        id: optimisticId,
-        conversationId,
-        senderId,
-        kind: 'TEXT',
-        body: trimmed,
-        deletedAt: null,
-        createdAt: now,
-      };
-      this.patchMessages(conversationId, {
-        items: [...this.messagesFor(conversationId).items, optimistic],
-        hasLoaded: true,
-      });
-    }
+    // A first message has no conversation to insert into yet, so it goes
+    // under a key derived from the recipient — the draft screen and the
+    // picker read that key. Either way the bubble is on screen before the
+    // request leaves, and the key is dropped once the server answers.
+    const threadKey = conversationId ?? pendingThreadKey(recipientId);
+
+    const optimistic: MessageView = {
+      id: optimisticId,
+      conversationId: threadKey,
+      senderId,
+      kind: 'TEXT',
+      body: trimmed,
+      deletedAt: null,
+      createdAt: now,
+    };
+    this.patchMessages(threadKey, {
+      items: [...this.messagesFor(threadKey).items, optimistic],
+      hasLoaded: true,
+    });
 
     this._sending.update((s) => ({ ...s, [draftKey]: true }));
     this._sendError.set(null);
@@ -779,9 +818,10 @@ export class MessagingStore {
                   ),
                 });
               } else {
-                // From the picker. Close compose mode so the user is
-                // not trapped on a half-state screen; the inline error
-                // (next set call) tells them why no thread opened.
+                // From the picker/draft screen. No thread was created,
+                // so drop the pending bubble and close compose mode —
+                // the inline error (next set call) explains why.
+                this.dropThread(threadKey);
                 this._composeMode.set(false);
               }
               this._sendError.set(
@@ -814,6 +854,9 @@ export class MessagingStore {
                   : [...cached, res.message],
                 hasLoaded: cached.length > 0 ? this.messagesFor(realConvId).hasLoaded : true,
               });
+              // The real thread now holds the message, so the pending
+              // key has nothing left to show.
+              this.dropThread(threadKey);
             }
 
             // Upsert the conversation list item — promotes it to the
@@ -852,14 +895,13 @@ export class MessagingStore {
             resolve(realConvId);
           }),
           catchError((err: unknown) => {
-            // Roll back the optimistic insert.
-            if (conversationId) {
-              this.patchMessages(conversationId, {
-                items: this.messagesFor(conversationId).items.filter(
-                  (m) => m.id !== optimisticId,
-                ),
-              });
-            }
+            // Roll back the optimistic insert — in the real thread, or
+            // in the pending one when this was a first message.
+            this.patchMessages(threadKey, {
+              items: this.messagesFor(threadKey).items.filter(
+                (m) => m.id !== optimisticId,
+              ),
+            });
 
             if (err instanceof HttpErrorResponse) {
               if (err.status === 429) {
@@ -927,6 +969,8 @@ export class MessagingStore {
    * top) or a load is already in flight.
    */
   loadOlderMessages(conversationId: string): void {
+    if (isPendingThreadKey(conversationId)) return;
+
     const state = this.messagesFor(conversationId);
     if (state.loading) return;
     if (!state.nextBefore) return;
@@ -1371,6 +1415,13 @@ export class MessagingStore {
    * Also bumps the LRU ordering and evicts the least-recently-touched
    * conversation when the cache exceeds `MAX_CACHED_CONVERSATIONS`.
    */
+  /** Forget a thread's cached messages (and its place in the LRU). */
+  private dropThread(conversationId: string): void {
+    this._messagesByConv.update((all) => omitKey(all, conversationId));
+    const idx = this.cachedConversationOrder.indexOf(conversationId);
+    if (idx >= 0) this.cachedConversationOrder.splice(idx, 1);
+  }
+
   private patchMessages(
     conversationId: string,
     patch: Partial<ConversationMessages>,

@@ -192,8 +192,23 @@
   color: #94a3b8;
 }
 
+.mh-picker__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px 0;
+  margin-top: auto; // sits directly above the composer
+  overflow-y: auto;
+}
+
 .mh-picker__composer {
   margin-top: auto; // sticks to the bottom when results are short
+}
+
+// The thread already pushes the composer down; two `margin-top: auto` in
+// one column would split the free space between them.
+.mh-picker__thread + .mh-picker__composer {
+  margin-top: 0;
 }
 
 // ── Mobile: bottom sheet over the dimmed inbox ───────────────────

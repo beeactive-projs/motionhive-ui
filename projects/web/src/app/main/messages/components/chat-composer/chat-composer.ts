@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MessagingStore } from 'core';
+import { MessagingStore, injectDelayedFlag } from 'core';
 
 const MAX_BODY_LENGTH = 4000;
 
@@ -82,6 +82,10 @@ export class ChatComposer {
   protected readonly sending = computed(() =>
     this.store.isSending(this.conversationId()),
   );
+
+  // A send that lands quickly should look instant; a spinner that flashes
+  // for 80ms reads as a glitch, not as feedback.
+  protected readonly showSpinner = injectDelayedFlag(this.sending);
 
   protected readonly tooLong = computed(() => this.value().length > MAX_BODY_LENGTH);
 

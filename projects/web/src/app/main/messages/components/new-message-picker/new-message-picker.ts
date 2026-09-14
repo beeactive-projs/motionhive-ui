@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import {
   displayName,
+  groupMessages,
   initialsOf,
   injectIsMobile,
   MessagingStore,
@@ -20,6 +21,7 @@ import {
 } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { ChatComposer } from '../chat-composer/chat-composer';
+import { MessageBubble } from '../message-bubble/message-bubble';
 
 /**
  * New Message picker. Rents the right pane (or the full screen on
@@ -35,7 +37,7 @@ import { ChatComposer } from '../chat-composer/chat-composer';
 @Component({
   selector: 'mh-new-message-picker',
   standalone: true,
-  imports: [FormsModule, HexAvatar, ChatComposer],
+  imports: [FormsModule, HexAvatar, ChatComposer, MessageBubble],
   templateUrl: './new-message-picker.html',
   styleUrl: './new-message-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +62,17 @@ export class NewMessagePicker {
   );
 
   private readonly query$ = new Subject<string>();
+
+  /**
+   * Messages already sent to the picked person while their conversation
+   * is still being created. Rendering them here is what makes a first
+   * message behave like every other one: the bubble is on screen
+   * immediately, and the thread we navigate to already contains it.
+   * Everything shown here was sent by us, hence `mine` is always true.
+   */
+  protected readonly pendingBubbles = computed(() =>
+    groupMessages(this.store.pendingMessagesFor(this.selected()?.id ?? null).items),
+  );
 
   protected readonly recipientName = computed(() => {
     const u = this.selected();
@@ -107,6 +120,16 @@ export class NewMessagePicker {
   }
 
   protected onSelect(user: UserSearchResult): void {
+    // Already talking to them: open the thread rather than composing a
+    // "new" message into it. Saves the round trip that would resolve to
+    // the same conversation, and the history is right there.
+    const existing = this.store.findDirectWith(user.id);
+    if (existing) {
+      this.store.exitComposeMode();
+      this.store.openConversation(existing.id);
+      return;
+    }
+
     this.selected.set(user);
     this.results.set([]);
     this.query.set('');
