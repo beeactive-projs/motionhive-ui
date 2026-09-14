@@ -34,14 +34,10 @@
       class="mh-composer__send"
       [disabled]="!canSend()"
       (click)="send()"
-      [attr.aria-label]="sending() ? 'Sending…' : 'Send message'"
+      aria-label="Send message"
       [title]="isRateLimited() ? 'Slow down — try again in ' + limitedSecs() + 's' : 'Send'"
     >
-      @if (showSpinner()) {
-        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
-      } @else {
-        <i class="pi pi-send" aria-hidden="true"></i>
-      }
+      <i class="pi pi-send" aria-hidden="true"></i>
     </button>
   </div>
 

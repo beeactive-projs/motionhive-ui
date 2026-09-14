@@ -7,16 +7,10 @@ import {
   input,
   signal,
 } from '@angular/core';
-import {
-  IonButton,
-  IonIcon,
-  IonNote,
-  IonSpinner,
-  IonTextarea,
-} from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonNote, IonTextarea } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { MessagingStore, injectDelayedFlag } from 'core';
+import { MessagingStore } from 'core';
 
 import { MESSAGING_ICONS } from '../../messages.config';
 
@@ -35,7 +29,7 @@ const MAX_BODY_LENGTH = 4000;
  */
 @Component({
   selector: 'mh-chat-composer',
-  imports: [IonButton, IonIcon, IonNote, IonSpinner, IonTextarea],
+  imports: [IonButton, IonIcon, IonNote, IonTextarea],
   templateUrl: './chat-composer.html',
   styleUrl: './chat-composer.scss',
 })
@@ -63,17 +57,13 @@ export class ChatComposer implements OnDestroy {
 
   readonly isRateLimited = computed(() => this.limitedSeconds() > 0);
 
-  readonly sending = computed(() => this.store.isSending(this.conversationId()));
-
-  // A send that lands quickly should look instant; a spinner that flashes
-  // for 80ms reads as a glitch, not as feedback.
-  readonly showSpinner = injectDelayedFlag(this.sending);
-
   readonly isTooLong = computed(() => this.value().length > MAX_BODY_LENGTH);
 
+  // Deliberately not gated on an in-flight send. The message is already
+  // in the thread, so the composer has nothing left to wait for and a
+  // second message should not queue behind the first.
   readonly canSend = computed(
     () =>
-      !this.sending() &&
       !this.isRateLimited() &&
       !this.isTooLong() &&
       !!this.recipientId() &&
@@ -119,8 +109,9 @@ export class ChatComposer implements OnDestroy {
     if (!recipientId) return;
 
     const body = this.value().trim();
-    // Clear straight away so the field feels responsive; the store owns the
-    // optimistic bubble.
+    // Clear on the keystroke. The store clears its own draft at the same
+    // moment and restores it if the send fails, and the effect above
+    // mirrors that back into this field.
     this.value.set('');
 
     await this.store.sendMessage({
@@ -128,13 +119,6 @@ export class ChatComposer implements OnDestroy {
       recipientId,
       body,
     });
-
-    // A rejected send left the box empty — put the text back so it can be
-    // fixed rather than retyped.
-    if (this.store.sendError()) {
-      this.value.set(body);
-      this.store.saveDraft(this.conversationId(), body);
-    }
   }
 
   dismissError(): void {

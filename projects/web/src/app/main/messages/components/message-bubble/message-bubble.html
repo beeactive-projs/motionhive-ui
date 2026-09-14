@@ -26,6 +26,7 @@
     <div
       class="mh-bubble__body"
       [class.mh-bubble__body--deleted]="isDeleted()"
+      [class.mh-bubble__body--pending]="isPending()"
       [style.border-radius]="bubbleRadius()"
     >
       <!-- Body is plaintext — bound via {{ }} so HTML is never injected. -->

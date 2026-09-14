@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MessagingStore, injectDelayedFlag } from 'core';
+import { MessagingStore } from 'core';
 
 const MAX_BODY_LENGTH = 4000;
 
@@ -79,20 +79,14 @@ export class ChatComposer {
 
   protected readonly isRateLimited = computed(() => this.limitedSecs() > 0);
 
-  protected readonly sending = computed(() =>
-    this.store.isSending(this.conversationId()),
-  );
-
-  // A send that lands quickly should look instant; a spinner that flashes
-  // for 80ms reads as a glitch, not as feedback.
-  protected readonly showSpinner = injectDelayedFlag(this.sending);
-
   protected readonly tooLong = computed(() => this.value().length > MAX_BODY_LENGTH);
 
+  // Deliberately not gated on an in-flight send. The message is already
+  // in the thread, so the composer has nothing left to wait for and a
+  // second message should not queue behind the first.
   protected readonly canSend = computed(
     () =>
       !this.disabled() &&
-      !this.sending() &&
       !this.isRateLimited() &&
       !this.tooLong() &&
       this.value().trim().length > 0,
@@ -153,9 +147,9 @@ export class ChatComposer {
 
     const body = this.value().trim();
 
-    // Clear the local mirror immediately for a snappy "sent" feel.
-    // The store also clears its draft on success; on failure it
-    // restores via the rollback path (sendError is shown instead).
+    // Clear the field on the keystroke. The store clears its own draft
+    // at the same moment and restores it if the send fails, and the
+    // effect above mirrors that back into this input.
     this.value.set('');
 
     const resultConvId = await this.store.sendMessage({
@@ -163,13 +157,6 @@ export class ChatComposer {
       recipientId,
       body,
     });
-
-    // If a 429/403 fired, the store kept the draft empty but set
-    // sendError. Put the body back so the user can edit/retry.
-    if (this.store.sendError()) {
-      this.value.set(body);
-      this.store.saveDraft(this.conversationId(), body);
-    }
 
     if (resultConvId) {
       this.submitted.emit(resultConvId);

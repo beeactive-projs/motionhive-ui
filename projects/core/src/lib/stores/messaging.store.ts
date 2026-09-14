@@ -55,6 +55,18 @@ const EMPTY_MESSAGES: ConversationMessages = {
  */
 const PENDING_THREAD_PREFIX = 'pending:';
 
+/**
+ * Prefix of the temporary id an optimistic message carries until the
+ * server hands back the real row. Rendering surfaces read it to mark a
+ * bubble as still in flight, which is where the wait belongs: the
+ * composer is free the moment the message is on screen.
+ */
+const OPTIMISTIC_MESSAGE_PREFIX = 'optim-';
+
+export function isOptimisticMessageId(id: string | null | undefined): boolean {
+  return !!id && id.startsWith(OPTIMISTIC_MESSAGE_PREFIX);
+}
+
 export function pendingThreadKey(recipientId: string): string {
   return `${PENDING_THREAD_PREFIX}${recipientId}`;
 }
@@ -166,9 +178,12 @@ export class MessagingStore {
   private readonly _composerDraft = signal<Record<string, string>>({});
 
   /**
-   * In-flight send tracking. Maps conversationId → temp message id
-   * (the optimistic insert). One in flight at a time per conversation
-   * is enough for v1 (composer disables itself while sending).
+   * In-flight send tracking, keyed by conversation ('new' for the
+   * picker). The composers deliberately do NOT gate on this: the
+   * message is in the thread the moment it is typed, so the wait is
+   * shown on the bubble (see `isOptimisticMessageId`) and a second
+   * message never queues behind the first. Kept as a read surface for
+   * anything that genuinely needs to know a request is outstanding.
    */
   private readonly _sending = signal<Record<string, boolean>>({});
 
@@ -374,7 +389,10 @@ export class MessagingStore {
     return this._composerDraft()[key] ?? '';
   }
 
-  /** True while a send for the given conversation is in flight. */
+  /**
+   * True while a send for the given conversation is in flight. Not for
+   * disabling a composer — see the note on `_sending`.
+   */
   isSending(conversationId: string | null): boolean {
     const key = conversationId ?? 'new';
     return this._sending()[key] === true;
@@ -741,7 +759,7 @@ export class MessagingStore {
     const draftKey = conversationId ?? 'new';
     const senderId = this._auth.user()?.id ?? null;
     const now = new Date().toISOString();
-    const optimisticId = `optim-${cryptoRandom()}`;
+    const optimisticId = `${OPTIMISTIC_MESSAGE_PREFIX}${cryptoRandom()}`;
 
     // A first message has no conversation to insert into yet, so it goes
     // under a key derived from the recipient — the draft screen and the
@@ -763,6 +781,12 @@ export class MessagingStore {
       hasLoaded: true,
     });
 
+    // Clear the draft here rather than on the response. The composers
+    // mirror this draft into their input, so leaving it set meant the
+    // text they had just cleared locally was written straight back and
+    // sat there until the round trip finished. Restored on failure.
+    this._composerDraft.update((all) => omitKey(all, draftKey));
+
     this._sending.update((s) => ({ ...s, [draftKey]: true }));
     this._sendError.set(null);
 
@@ -783,13 +807,9 @@ export class MessagingStore {
               !this._conversations().some((c) => c.id === conversationId) &&
               !(conversationId in this._messagesByConv())
             ) {
-              this._composerDraft.update((all) => omitKey(all, draftKey));
               resolve(conversationId);
               return;
             }
-
-            // Clear the draft on success — composer is now empty.
-            this._composerDraft.update((all) => omitKey(all, draftKey));
 
             const realConvId = res.conversation.id;
 
@@ -848,14 +868,19 @@ export class MessagingStore {
               // would drop its history behind a `hasLoaded` that suppresses
               // the refetch.
               const cached = this.messagesFor(realConvId).items;
+              // Anything else typed while this was in flight is still
+              // sitting in the pending thread; move it across rather
+              // than dropping it with the key.
+              const carried = this.messagesFor(threadKey)
+                .items.filter((m) => m.id !== optimisticId)
+                .map((m) => ({ ...m, conversationId: realConvId }));
+              const merged = [...cached, res.message, ...carried].filter(
+                (m, i, all) => all.findIndex((x) => x.id === m.id) === i,
+              );
               this.patchMessages(realConvId, {
-                items: cached.some((m) => m.id === res.message.id)
-                  ? cached
-                  : [...cached, res.message],
+                items: merged,
                 hasLoaded: cached.length > 0 ? this.messagesFor(realConvId).hasLoaded : true,
               });
-              // The real thread now holds the message, so the pending
-              // key has nothing left to show.
               this.dropThread(threadKey);
             }
 
@@ -896,12 +921,18 @@ export class MessagingStore {
           }),
           catchError((err: unknown) => {
             // Roll back the optimistic insert — in the real thread, or
-            // in the pending one when this was a first message.
+            // in the pending one when this was a first message — and put
+            // the text back in the composer so it can be fixed and
+            // resent rather than retyped.
             this.patchMessages(threadKey, {
               items: this.messagesFor(threadKey).items.filter(
                 (m) => m.id !== optimisticId,
               ),
             });
+            this._composerDraft.update((all) => ({
+              ...all,
+              [draftKey]: trimmed,
+            }));
 
             if (err instanceof HttpErrorResponse) {
               if (err.status === 429) {
