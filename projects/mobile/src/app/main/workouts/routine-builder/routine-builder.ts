@@ -1,14 +1,21 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
-  IonFooter,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
@@ -18,21 +25,32 @@ import { take } from 'rxjs/operators';
 
 import {
   CreateRoutineExercisePayload,
+  Exercise,
   Routine,
   RoutineService,
-  WorkoutLogService,
+  RoutineSources,
 } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
-import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
-import { KeypadField, NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { WORKOUT_ICONS } from '../workouts.config';
+import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
+import { ExerciseCard } from '../_components/exercise-card/exercise-card';
+import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
+import { DEFAULT_SETS, KeypadField, KeypadFields, WORKOUT_ICONS } from '../workouts.config';
+
+/** The two targets a routine prescribes per exercise. */
+const TargetFields = {
+  Reps: 'reps',
+  Weight: 'weight',
+} as const;
+
+type TargetField = (typeof TargetFields)[keyof typeof TargetFields];
 
 /** Which target cell the keypad is bound to. */
 interface TargetEdit {
   index: number;
-  field: 'reps' | 'weight';
+  field: TargetField;
 }
 
 /** A row being authored, before it is a saved routine. */
@@ -47,7 +65,8 @@ interface DraftExercise {
   targetWeightKg: number | null;
 }
 
-const DEFAULT_SETS = 3;
+/** The URL segment that means "a routine that does not exist yet". */
+const NEW = 'new';
 
 /**
  * The routine builder — the logger without a stopwatch.
@@ -58,39 +77,53 @@ const DEFAULT_SETS = 3;
  * movements in order is still a useful routine.
  *
  * Handles `new` and an existing id on the same screen — the only difference
- * is whether the save is a create or an update.
+ * is whether the save is a create or an update. A starter opens here too,
+ * read-only: runnable and copyable, never editable.
  */
 @Component({
   selector: 'mh-routine-builder',
   imports: [
     ConfirmSheet,
+    EmptyState,
+    ExerciseCard,
     ExercisePickerSheet,
-    NumericKeypad,
     IonBackButton,
     IonButton,
     IonButtons,
+    IonCard,
+    IonCardContent,
     IonContent,
     IonFooter,
     IonHeader,
     IonIcon,
     IonInput,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
+    IonSkeletonText,
     IonTitle,
     IonToolbar,
+    NumericKeypad,
   ],
   templateUrl: './routine-builder.html',
   styleUrl: './routine-builder.scss',
 })
 export class RoutineBuilder implements ViewWillEnter {
   private readonly _routineService = inject(RoutineService);
-  private readonly _logService = inject(WorkoutLogService);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _feedback = inject(FeedbackService);
+  private readonly _feedbackService = inject(FeedbackService);
+
+  readonly Targets = TargetFields;
+  readonly skeletonCards = [1, 2];
 
   readonly routine = signal<Routine | null>(null);
   readonly name = signal('');
   readonly exercises = signal<DraftExercise[]>([]);
 
   readonly loading = signal(false);
+  readonly error = signal(false);
   readonly saving = signal(false);
   readonly starting = signal(false);
   readonly pickerOpen = signal(false);
@@ -103,51 +136,59 @@ export class RoutineBuilder implements ViewWillEnter {
 
   /**
    * A signal, not a field: `isNew` is a computed over it, and a computed
-   * cannot see a plain property change. Held as one it stayed true for the
-   * life of the page, which hid the Start button on every saved routine.
+   * cannot see a plain property change.
    */
   private readonly _id = signal<string | null>(null);
 
   readonly isNew = computed(() => {
     const id = this._id();
-    return id === 'new' || id === null;
+    return id === NEW || id === null;
   });
 
+  readonly showSkeleton = computed(() => this.loading() && !this.routine());
+  readonly showError = computed(() => this.error() && !this.routine());
+
   /** A starter belongs to nobody: runnable and copyable, never editable. */
-  readonly readOnly = computed(() => this.routine()?.source === 'SYSTEM');
+  readonly readOnly = computed(() => this.routine()?.source === RoutineSources.System);
+
+  readonly title = computed(() =>
+    this.isNew() ? 'New routine' : (this.routine()?.name ?? 'Routine'),
+  );
 
   readonly canSave = computed(
     () => !!this.name().trim() && this.exercises().length > 0 && !this.readOnly(),
   );
 
   readonly keypadField = computed<KeypadField>(() =>
-    this.editing()?.field === 'weight' ? 'weight' : 'reps',
+    this.editing()?.field === TargetFields.Weight ? KeypadFields.Weight : KeypadFields.Reps,
   );
 
   readonly keypadLabel = computed(() => {
     const edit = this.editing();
     if (!edit) return '';
-    return edit.field === 'weight' ? 'Target weight (kg)' : 'Target reps';
+    return edit.field === TargetFields.Weight ? 'Target weight (kg)' : 'Target reps';
   });
 
   /** What the picker should already show as taken. */
   readonly addedIds = computed(() => this.exercises().map((row) => row.exerciseId));
+
+  readonly deleteBody = computed(
+    () =>
+      `Delete ${this.routine()?.name ?? 'this routine'}? Workouts already logged from it are kept.`,
+  );
 
   constructor() {
     addIcons(WORKOUT_ICONS);
   }
 
   ionViewWillEnter(): void {
-    // Read the live URL, not `route.snapshot`: Ionic keeps this page in the
-    // tab stack, so one instance serves every visit and the snapshot can
-    // still describe the route the page was created with.
-    const id = this._router.url.split('?')[0].split('/').pop() ?? null;
+    const id = this._route.snapshot.paramMap.get('id');
 
     // `new` is not an identity. Two visits to it are two different routines,
     // so it always starts clean — guarding on equality here is what left the
     // previous routine's name and exercises sitting in the form.
-    if (!id || id === 'new') {
-      this._id.set('new');
+    if (!id || id === NEW) {
+      this._id.set(NEW);
       this.routine.set(null);
       this.name.set('');
       this.exercises.set([]);
@@ -157,8 +198,15 @@ export class RoutineBuilder implements ViewWillEnter {
 
     if (id === this._id()) return;
     this._id.set(id);
+    this.load();
+  }
+
+  load(): void {
+    const id = this._id();
+    if (!id || id === NEW) return;
 
     this.loading.set(true);
+    this.error.set(false);
     this._routineService
       .get(id)
       .pipe(take(1))
@@ -179,9 +227,9 @@ export class RoutineBuilder implements ViewWillEnter {
           );
           this.loading.set(false);
         },
-        error: (err) => {
+        error: () => {
+          this.error.set(true);
           this.loading.set(false);
-          void this._feedback.error(err, 'Could not open that routine');
         },
       });
   }
@@ -193,7 +241,7 @@ export class RoutineBuilder implements ViewWillEnter {
    * the same exercise twice by accident is far more common than wanting it
    * twice on purpose — and wanting more of it is what the sets stepper is for.
    */
-  onPicked(picked: { id: string; name: string }[]): void {
+  onPicked(picked: Exercise[]): void {
     this.pickerOpen.set(false);
     if (!picked.length) return;
 
@@ -217,7 +265,7 @@ export class RoutineBuilder implements ViewWillEnter {
     }
 
     if (skipped > 0) {
-      void this._feedback.info(
+      void this._feedbackService.info(
         skipped === 1
           ? 'That exercise is already in this routine'
           : `${skipped} were already in this routine`,
@@ -232,10 +280,12 @@ export class RoutineBuilder implements ViewWillEnter {
 
   setCount(index: number, delta: number): void {
     this.exercises.update((rows) =>
-      rows.map((row, i) =>
-        i === index ? { ...row, sets: Math.max(1, row.sets + delta) } : row,
-      ),
+      rows.map((row, i) => (i === index ? { ...row, sets: Math.max(1, row.sets + delta) } : row)),
     );
+  }
+
+  setsLabel(row: DraftExercise): string {
+    return `${row.sets} ${row.sets === 1 ? 'set' : 'sets'}`;
   }
 
   remove(index: number): void {
@@ -244,11 +294,16 @@ export class RoutineBuilder implements ViewWillEnter {
 
   // ─── Targets ──────────────────────────────────────────────────
 
-  editTarget(index: number, field: 'reps' | 'weight'): void {
+  editTarget(index: number, field: TargetField): void {
     this.editing.set({ index, field });
     const row = this.exercises()[index];
-    const current = field === 'weight' ? row?.targetWeightKg : row?.targetRepsMin;
+    const current = field === TargetFields.Weight ? row?.targetWeightKg : row?.targetRepsMin;
     this.draft.set(current == null ? '' : String(current));
+  }
+
+  isEditing(index: number, field: TargetField): boolean {
+    const edit = this.editing();
+    return edit?.index === index && edit.field === field;
   }
 
   commitTarget(typed: string): void {
@@ -265,15 +320,15 @@ export class RoutineBuilder implements ViewWillEnter {
         if (i !== edit.index) return row;
         // Reps are stored as a range; a single number is a range of one,
         // which is what the flat summary on the exercise means.
-        return edit.field === 'weight'
+        return edit.field === TargetFields.Weight
           ? { ...row, targetWeightKg: value }
           : { ...row, targetRepsMin: value, targetRepsMax: value };
       }),
     );
   }
 
-  targetLabel(row: DraftExercise, field: 'reps' | 'weight'): string {
-    if (field === 'weight') {
+  targetLabel(row: DraftExercise, field: TargetField): string {
+    if (field === TargetFields.Weight) {
       return row.targetWeightKg == null ? '–' : `${row.targetWeightKg}`;
     }
     const { targetRepsMin: min, targetRepsMax: max } = row;
@@ -306,12 +361,12 @@ export class RoutineBuilder implements ViewWillEnter {
     request.pipe(take(1)).subscribe({
       next: () => {
         this.saving.set(false);
-        void this._feedback.success('Routine saved');
+        void this._feedbackService.success('Routine saved');
         void this._router.navigate(['/tabs/workouts']);
       },
       error: (err) => {
         this.saving.set(false);
-        void this._feedback.error(err, 'Could not save the routine');
+        void this._feedbackService.error(err, 'Could not save the routine');
       },
     });
   }
@@ -319,7 +374,7 @@ export class RoutineBuilder implements ViewWillEnter {
   /** Nothing else can remove a routine, so this is the only way out. */
   confirmDelete(): void {
     const id = this._id();
-    if (!id || id === 'new' || this.deleting()) return;
+    if (!id || id === NEW || this.deleting()) return;
     this.deleting.set(true);
     this._routineService
       .remove(id)
@@ -328,12 +383,12 @@ export class RoutineBuilder implements ViewWillEnter {
         next: () => {
           this.deleting.set(false);
           this.deleteOpen.set(false);
-          void this._feedback.success('Routine deleted');
+          void this._feedbackService.success('Routine deleted');
           void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
         },
         error: (err) => {
           this.deleting.set(false);
-          void this._feedback.error(err, 'Could not delete the routine');
+          void this._feedbackService.error(err, 'Could not delete the routine');
         },
       });
   }
@@ -341,7 +396,7 @@ export class RoutineBuilder implements ViewWillEnter {
   /** Starting a starter deep-copies it into your library, server-side. */
   start(): void {
     const id = this._id();
-    if (!id || id === 'new' || this.starting()) return;
+    if (!id || id === NEW || this.starting()) return;
 
     this.starting.set(true);
     this._routineService
@@ -354,7 +409,7 @@ export class RoutineBuilder implements ViewWillEnter {
         },
         error: (err) => {
           this.starting.set(false);
-          void this._feedback.error(err, 'Could not start that routine');
+          void this._feedbackService.error(err, 'Could not start that routine');
         },
       });
   }

@@ -7,6 +7,10 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -18,15 +22,20 @@ import { take } from 'rxjs/operators';
 import { ProgramService, ProgramWorkout } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { CopyWeekSheet } from '../_sheets/copy-week-sheet/copy-week-sheet';
-import { PROGRAM_ICONS, weeksToDays } from '../programs.config';
+import {
+  DAY_LABELS,
+  DEFAULT_PROGRAM_WEEKS,
+  PROGRAM_ICONS,
+  weekLabel,
+  weeksToDays,
+} from '../programs.config';
 import { ProgramBuilderStore, WeekCard } from './program-builder.store';
 
-/** Monday-first labels for the seven day columns. */
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-const NEW_PROGRAM_WEEKS = 4;
+/** The URL segment that means "a program that does not exist yet". */
+const NEW = 'new';
 
 /**
  * The program builder — vertical weeks.
@@ -45,12 +54,17 @@ const NEW_PROGRAM_WEEKS = 4;
   imports: [
     ConfirmSheet,
     CopyWeekSheet,
+    EmptyState,
     IonBackButton,
     IonButton,
     IonButtons,
     IonContent,
     IonHeader,
     IonIcon,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
@@ -64,10 +78,12 @@ export class ProgramBuilder implements ViewWillEnter {
   private readonly _programService = inject(ProgramService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _feedback = inject(FeedbackService);
+  private readonly _feedbackService = inject(FeedbackService);
 
   readonly dayLabels = DAY_LABELS;
-  readonly skeletonWeeks = [1, 2, 3];
+  readonly weekLabel = weekLabel;
+  readonly skeletonWeeks = [1, 2];
+  readonly skeletonRows = [1, 2, 3];
 
   readonly copyOpen = signal(false);
   readonly copyFrom = signal(0);
@@ -96,11 +112,11 @@ export class ProgramBuilder implements ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
-    const id = this._router.url.split('?')[0].split('/').pop() ?? null;
+    const id = this._route.snapshot.paramMap.get('id');
 
-    if (id === 'new') {
-      if (this._id === 'new' && this.store.program()) return;
-      this._id = 'new';
+    if (id === NEW) {
+      if (this._id === NEW && this.store.program()) return;
+      this._id = NEW;
       this._createDraft();
       return;
     }
@@ -111,7 +127,15 @@ export class ProgramBuilder implements ViewWillEnter {
     this.store.load(id);
   }
 
+  retry(): void {
+    this.ionViewWillEnter();
+  }
+
   // ─── Grid ─────────────────────────────────────────────────────
+
+  daysLabel(week: WeekCard): string {
+    return `${week.filled} of ${week.days.length} days`;
+  }
 
   openDay(week: WeekCard, dayIndex: number): void {
     const program = this.store.program();
@@ -119,12 +143,7 @@ export class ProgramBuilder implements ViewWillEnter {
 
     const existing = week.days[dayIndex];
     if (existing) {
-      void this._router.navigate([
-        '/tabs/programs/program',
-        program.id,
-        'day',
-        existing.id,
-      ]);
+      void this._router.navigate(['/tabs/programs/program', program.id, 'day', existing.id]);
       return;
     }
 
@@ -135,6 +154,7 @@ export class ProgramBuilder implements ViewWillEnter {
   }
 
   askClear(day: ProgramWorkout, event: Event): void {
+    // Inside the row's own tap target; without this the tap also opens the day.
     event.stopPropagation();
     this.clearTarget.set(day);
     this.clearOpen.set(true);
@@ -160,7 +180,7 @@ export class ProgramBuilder implements ViewWillEnter {
     // One at a time so the later copies see the earlier ones committed.
     const next = (i: number): void => {
       if (i >= targets.length) {
-        void this._feedback.success(
+        void this._feedbackService.success(
           targets.length === 1
             ? `Week ${from + 1} copied to week ${targets[0] + 1}`
             : `Week ${from + 1} copied to ${targets.length} weeks`,
@@ -169,7 +189,7 @@ export class ProgramBuilder implements ViewWillEnter {
       }
       this.store.copyWeek(from, targets[i], (error) => {
         if (error) {
-          void this._feedback.error(error, 'Could not copy the week');
+          void this._feedbackService.error(error, 'Could not copy the week');
           return;
         }
         next(i + 1);
@@ -202,7 +222,7 @@ export class ProgramBuilder implements ViewWillEnter {
     this._programService
       .create({
         name: 'Untitled program',
-        durationDays: weeksToDays(NEW_PROGRAM_WEEKS),
+        durationDays: weeksToDays(DEFAULT_PROGRAM_WEEKS),
       })
       .pipe(take(1))
       .subscribe({
@@ -214,7 +234,7 @@ export class ProgramBuilder implements ViewWillEnter {
           });
         },
         error: (err) => {
-          void this._feedback.error(err, 'Could not start the program');
+          void this._feedbackService.error(err, 'Could not start the program');
           void this._router.navigate(['/tabs/programs']);
         },
       });

@@ -11,6 +11,7 @@ import {
   TrainingDayWorkout,
   WorkoutLog,
   WorkoutLogService,
+  localDayKey,
 } from 'core';
 
 /** Enough starters to fill the cold-start rail; the rest live behind "See all". */
@@ -28,9 +29,9 @@ const ROUTINE_LIMIT = 50;
  */
 @Injectable()
 export class WorkoutsStore {
-  private readonly _assignmentService = inject(ProgramAssignmentService);
+  private readonly _programAssignmentService = inject(ProgramAssignmentService);
   private readonly _routineService = inject(RoutineService);
-  private readonly _logService = inject(WorkoutLogService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
 
   private readonly _trainingDay = signal<TrainingDay | null>(null);
   private readonly _routines = signal<Routine[]>([]);
@@ -42,8 +43,6 @@ export class WorkoutsStore {
   private readonly _failed = signal(false);
 
   readonly loading = this._loading.asReadonly();
-  readonly hasLoaded = this._loaded.asReadonly();
-  readonly failed = this._failed.asReadonly();
 
   readonly inProgress = this._inProgress.asReadonly();
   readonly routines = this._routines.asReadonly();
@@ -65,11 +64,11 @@ export class WorkoutsStore {
   readonly upNext = computed<TrainingDayWorkout | null>(() => {
     if (this.today()) return null;
     const week = this._trainingDay()?.week ?? [];
-    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayKey = localDayKey(new Date());
     return week.find((w) => !!w.scheduledDate && w.scheduledDate > todayKey) ?? null;
   });
 
-  /** Nothing assigned, nothing saved, nothing logged — the 6b cold start. */
+  /** Nothing assigned, nothing saved, nothing logged — the cold start. */
   readonly isColdStart = computed(
     () =>
       this._loaded() &&
@@ -84,23 +83,26 @@ export class WorkoutsStore {
   /** First load only — a refresh happens under the content already on screen. */
   readonly showSkeleton = computed(() => this._loading() && !this._loaded());
 
+  /** The load-bearing read failed and there is nothing older to show instead. */
+  readonly showError = computed(() => this._failed() && !this._trainingDay());
+
   load(opts: { done?: () => void } = {}): void {
     this._loading.set(true);
 
     forkJoin({
-      day: this._assignmentService.trainingDay().pipe(catchError(() => of(null))),
+      day: this._programAssignmentService.trainingDay().pipe(catchError(() => of(null))),
       routines: this._routineService
         .list({ library: 'mine', limit: ROUTINE_LIMIT })
         .pipe(catchError(() => of(null))),
       starters: this._routineService
         .list({ library: 'system', limit: ROUTINE_LIMIT })
         .pipe(catchError(() => of(null))),
-      inProgress: this._logService.getInProgress().pipe(catchError(() => of(null))),
+      inProgress: this._workoutLogService.getInProgress().pipe(catchError(() => of(null))),
     })
       .pipe(take(1))
       .subscribe({
         next: ({ day, routines, starters, inProgress }) => {
-          this._trainingDay.set(day);
+          if (day) this._trainingDay.set(day);
           if (routines) this._routines.set(routines.items);
           if (starters) this._starters.set(starters.items);
           this._inProgress.set(inProgress);
@@ -118,10 +120,5 @@ export class WorkoutsStore {
           opts.done?.();
         },
       });
-  }
-
-  /** Drop a resumed or discarded log without refetching the whole page. */
-  clearInProgress(): void {
-    this._inProgress.set(null);
   }
 }

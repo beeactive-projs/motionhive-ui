@@ -67,3 +67,23 @@ export const OneRepMaxSource = {
 } as const;
 export type OneRepMaxSource =
   (typeof OneRepMaxSource)[keyof typeof OneRepMaxSource];
+
+/**
+ * Who wrote a routine. `SYSTEM` is a MotionHive starter: runnable by anyone,
+ * editable by no one, and copyable into your own library.
+ */
+export const RoutineSources = {
+  System: 'SYSTEM',
+  User: 'USER',
+  Instructor: 'INSTRUCTOR',
+} as const;
+export type RoutineSource = (typeof RoutineSources)[keyof typeof RoutineSources];
+
+/** The input columns a set row can show, in display order. */
+export const SetFields = {
+  Weight: 'weight',
+  Reps: 'reps',
+  Duration: 'duration',
+  Distance: 'distance',
+} as const;
+export type SetField = (typeof SetFields)[keyof typeof SetFields];

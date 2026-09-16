@@ -1,12 +1,16 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
   IonFooter,
   IonHeader,
   IonIcon,
+  IonNote,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
@@ -18,27 +22,32 @@ import { catchError, take } from 'rxjs/operators';
 
 import {
   Exercise,
+  ExerciseKind,
   LoggedExercise,
   LoggedSet,
   SetField,
+  SetFields,
   WorkoutLogService,
   setFieldsFor,
 } from 'core';
 
-import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
-import {
-  ExerciseActionId,
-  ExerciseActionsSheet,
-} from '../_sheets/exercise-actions-sheet/exercise-actions-sheet';
-import {
-  KeypadField,
-  NumericKeypad,
-} from '../_components/numeric-keypad/numeric-keypad';
+import { ExerciseCard } from '../_components/exercise-card/exercise-card';
+import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
 import { RestTimerBar } from '../_components/rest-timer-bar/rest-timer-bar';
 import { SetRow } from '../_components/set-row/set-row';
-import { WORKOUT_ICONS } from '../workouts.config';
+import { ExerciseActionsSheet } from '../_sheets/exercise-actions-sheet/exercise-actions-sheet';
+import {
+  ExerciseActionId,
+  ExerciseActionIds,
+  KeypadField,
+  KeypadFields,
+  WORKOUT_ICONS,
+  exerciseSetSummary,
+} from '../workouts.config';
 import { LoggerStore } from './logger.store';
 
 /** Which cell the keypad is bound to. */
@@ -58,10 +67,18 @@ const DEFAULT_REST_SECONDS = 90;
 
 /** The keypad's step size is keyed to the field, not the exercise kind. */
 const KEYPAD_FIELD: Record<SetField, KeypadField> = {
-  weight: 'weight',
-  reps: 'reps',
-  duration: 'duration',
-  distance: 'distance',
+  [SetFields.Weight]: KeypadFields.Weight,
+  [SetFields.Reps]: KeypadFields.Reps,
+  [SetFields.Duration]: KeypadFields.Duration,
+  [SetFields.Distance]: KeypadFields.Distance,
+};
+
+/** What the keypad's context line calls each field. */
+const FIELD_LABELS: Record<SetField, string> = {
+  [SetFields.Weight]: 'Weight (kg)',
+  [SetFields.Reps]: 'Reps',
+  [SetFields.Duration]: 'Time (mm:ss)',
+  [SetFields.Distance]: 'Distance (m)',
 };
 
 /**
@@ -79,14 +96,20 @@ const KEYPAD_FIELD: Record<SetField, KeypadField> = {
   selector: 'mh-logger',
   imports: [
     ConfirmSheet,
+    EmptyState,
     ExerciseActionsSheet,
+    ExerciseCard,
     ExercisePickerSheet,
     IonButton,
     IonButtons,
+    IonCard,
+    IonCardContent,
     IonContent,
     IonFooter,
     IonHeader,
     IonIcon,
+    IonNote,
+    IonSkeletonText,
     IonTitle,
     IonToolbar,
     NumericKeypad,
@@ -101,8 +124,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly store = inject(LoggerStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _logService = inject(WorkoutLogService);
-  private readonly _feedback = inject(FeedbackService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
+  private readonly _feedbackService = inject(FeedbackService);
+
+  readonly skeletonCards = [1, 2];
 
   /** The cell bound to the keypad, or null when nothing is being edited. */
   readonly editing = signal<EditTarget | null>(null);
@@ -134,30 +159,29 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   readonly finishConfirmOpen = signal(false);
   readonly discarding = signal(false);
 
+  /**
+   * Finish and discard both navigate once confirmed, so those two sheets are
+   * dismissed through their own `close()` rather than by flipping `open` —
+   * routing away in the same turn would otherwise leave the sheet presented
+   * over the page it just opened. Named refs: the logger owns three confirm
+   * sheets, so a bare `viewChild(ConfirmSheet)` would pick the wrong one.
+   */
+  private readonly _discardSheet = viewChild<ConfirmSheet>('discardSheet');
+  private readonly _finishSheet = viewChild<ConfirmSheet>('finishSheet');
+
   /** Per-exercise "last time" sets, keyed by exercise id. */
   private readonly _previous = signal<Record<string, LoggedSet[]>>({});
 
   readonly keypadField = computed<KeypadField>(() => {
     const target = this.editing();
-    return target ? KEYPAD_FIELD[target.field] : 'reps';
+    return target ? KEYPAD_FIELD[target.field] : KeypadFields.Reps;
   });
 
   readonly keypadLabel = computed(() => {
     const target = this.editing();
-    if (!target) return '';
-    switch (target.field) {
-      case 'weight':
-        return 'Weight (kg)';
-      case 'duration':
-        return 'Time (mm:ss)';
-      case 'distance':
-        return 'Distance (m)';
-      default:
-        return 'Reps';
-    }
+    return target ? FIELD_LABELS[target.field] : '';
   });
 
-  /** Keypad and rest timer share one slot; editing wins while it is open. */
   readonly pickerTitle = computed(() =>
     this.swapTarget() ? 'Swap exercise' : 'Add exercises',
   );
@@ -215,6 +239,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.editing.set(null);
   }
 
+  retry(): void {
+    this.ionViewWillEnter();
+  }
+
   // ─── Sets ─────────────────────────────────────────────────────
 
   toggleSet(exercise: LoggedExercise, set: LoggedSet): void {
@@ -244,14 +272,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   editCell(exercise: LoggedExercise, set: LoggedSet, field: SetField): void {
     this.editing.set({ exerciseId: exercise.id, setId: set.id, field });
-    const current =
-      field === 'weight'
-        ? set.weightKg
-        : field === 'reps'
-          ? set.reps
-          : field === 'duration'
-            ? set.durationSeconds
-            : set.distanceMeters;
+    const current = cellValue(set, field);
     this.draft.set(current == null ? '' : String(current));
   }
 
@@ -266,22 +287,15 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       return;
     }
 
-    const key =
-      target.field === 'weight'
-        ? 'weightKg'
-        : target.field === 'reps'
-          ? 'reps'
-          : target.field === 'duration'
-            ? 'durationSeconds'
-            : 'distanceMeters';
-
-    this.store.logSet(target.exerciseId, target.setId, { [key]: value ?? undefined });
+    this.store.logSet(target.exerciseId, target.setId, {
+      [PAYLOAD_KEY[target.field]]: value ?? undefined,
+    });
     this.editing.set(null);
   }
 
   /** Offer the weight column only where it is missing and would mean something. */
   canAddWeight(exercise: LoggedExercise): boolean {
-    return exercise.exercise?.kind === 'BODYWEIGHT' && !this.hasAddedWeight(exercise);
+    return exercise.exercise?.kind === ExerciseKind.Bodyweight && !this.hasAddedWeight(exercise);
   }
 
   hasAddedWeight(exercise: LoggedExercise): boolean {
@@ -299,15 +313,21 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   /** Column headings for this exercise, which vary with its kind. */
   columnsFor(exercise: LoggedExercise): string[] {
     const fields = setFieldsFor(exercise.exercise?.kind);
-    const all = this.hasAddedWeight(exercise) && !fields.includes('weight')
-      ? (['weight', ...fields] as SetField[])
-      : fields;
-    return all.map((f) => {
-      if (f === 'reps') return this.isUnilateral(exercise) ? 'reps each' : 'reps';
-      if (f === 'duration') return 'time';
-      if (f === 'distance') return 'distance';
+    const all =
+      this.hasAddedWeight(exercise) && !fields.includes(SetFields.Weight)
+        ? [SetFields.Weight, ...fields]
+        : fields;
+    return all.map((field) => {
+      if (field === SetFields.Reps) return this.isUnilateral(exercise) ? 'reps each' : 'reps';
+      if (field === SetFields.Duration) return 'time';
+      if (field === SetFields.Distance) return 'distance';
       return 'kg';
     });
+  }
+
+  /** "2 of 4 sets" under the name — the whole-workout state at a glance. */
+  setsLabel(exercise: LoggedExercise): string {
+    return exerciseSetSummary(exercise);
   }
 
   editingFieldFor(setId: string): SetField | null {
@@ -338,14 +358,10 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   onRestFinished(): void {
-    void this._feedback.success('Rest over');
+    void this._feedbackService.success('Rest over');
   }
 
   // ─── Exercises ────────────────────────────────────────────────
-
-  toggleSkip(exercise: LoggedExercise): void {
-    this.store.setSkipped(exercise.id, !exercise.isSkipped);
-  }
 
   openActions(exercise: LoggedExercise): void {
     this.actionsFor.set(exercise);
@@ -357,15 +373,19 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.actionsFor.set(null);
     if (!exercise) return;
 
-    if (id === 'swap') {
-      this.swapTarget.set(exercise);
-      this.pickerOpen.set(true);
-    } else if (id === 'skip') {
-      this.store.setSkipped(exercise.id, !exercise.isSkipped);
-    } else {
-      // Asked, not assumed: an exercise can hold sets that are already logged.
-      this.actionsFor.set(exercise);
-      this.removeConfirmOpen.set(true);
+    switch (id) {
+      case ExerciseActionIds.Swap:
+        this.swapTarget.set(exercise);
+        this.pickerOpen.set(true);
+        return;
+      case ExerciseActionIds.Skip:
+        this.store.setSkipped(exercise.id, !exercise.isSkipped);
+        return;
+      case ExerciseActionIds.Remove:
+        // Asked, not assumed: an exercise can hold sets that are already logged.
+        this.actionsFor.set(exercise);
+        this.removeConfirmOpen.set(true);
+        return;
     }
   }
 
@@ -375,7 +395,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.actionsFor.set(null);
     if (!exercise) return;
     this.store.removeExercise(exercise.id);
-    void this._feedback.success(`Removed ${exercise.exerciseNameSnapshot}`);
+    void this._feedbackService.success(`Removed ${exercise.exerciseNameSnapshot}`);
   }
 
   /** Abandon the whole session — the "changed my mind" path, not a skip. */
@@ -383,19 +403,19 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     const log = this.store.log();
     if (!log || this.discarding()) return;
     this.discarding.set(true);
-    this._logService
+    this._workoutLogService
       .discard(log.id)
       .pipe(take(1))
       .subscribe({
-        next: () => {
+        next: async () => {
           this.discarding.set(false);
-          this.discardConfirmOpen.set(false);
-          void this._feedback.success('Workout discarded');
+          await this._discardSheet()?.close();
+          void this._feedbackService.success('Workout discarded');
           void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
         },
         error: (err) => {
           this.discarding.set(false);
-          void this._feedback.error(err, 'Could not discard the workout');
+          void this._feedbackService.error(err, 'Could not discard the workout');
         },
       });
   }
@@ -446,8 +466,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this._goToFinish();
   }
 
-  confirmFinish(): void {
-    this.finishConfirmOpen.set(false);
+  async confirmFinish(): Promise<void> {
+    await this._finishSheet()?.close();
     this._goToFinish();
   }
 
@@ -465,7 +485,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       month: 'short',
     })}`;
 
-    this._logService
+    this._workoutLogService
       .start({ name })
       .pipe(take(1))
       .subscribe({
@@ -477,7 +497,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
           });
           if (from) this._carryOver(from);
         },
-        error: (err) => void this._feedback.error(err, 'Could not start the workout'),
+        error: (err) => void this._feedbackService.error(err, 'Could not start the workout'),
       });
   }
 
@@ -500,7 +520,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     if (!ids.length) return;
 
     for (const id of ids) {
-      this._logService
+      this._workoutLogService
         .lastForExercise(id)
         .pipe(take(1), catchError(() => of([] as LoggedSet[])))
         .subscribe((sets) => {
@@ -511,7 +531,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   /** Copy the movements out of a past workout into the one just started. */
   private _carryOver(sourceLogId: string): void {
-    this._logService
+    this._workoutLogService
       .get(sourceLogId)
       .pipe(take(1))
       .subscribe({
@@ -521,12 +541,24 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             .map((e) => e.exerciseId)
             .filter((id): id is string => !!id);
           if (!ids.length) {
-            void this._feedback.info('That workout had no exercises to repeat');
+            void this._feedbackService.info('That workout had no exercises to repeat');
             return;
           }
           this.store.addExercises(ids);
         },
-        error: () => void this._feedback.info('Could not load that workout to repeat'),
+        error: () => void this._feedbackService.info('Could not load that workout to repeat'),
       });
   }
+}
+
+/** Which log column each set field writes to. */
+const PAYLOAD_KEY: Record<SetField, 'weightKg' | 'reps' | 'durationSeconds' | 'distanceMeters'> = {
+  [SetFields.Weight]: 'weightKg',
+  [SetFields.Reps]: 'reps',
+  [SetFields.Duration]: 'durationSeconds',
+  [SetFields.Distance]: 'distanceMeters',
+};
+
+function cellValue(set: LoggedSet, field: SetField): number | null {
+  return set[PAYLOAD_KEY[field]];
 }

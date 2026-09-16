@@ -1,94 +1,18 @@
-.head {
-  padding: 0 1.25rem;
-}
-
-.head h3 {
-  margin: 0;
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-base);
-  font-weight: 700;
-}
-
-.note {
-  margin: 0;
-  padding: 0 1.25rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-  line-height: var(--mh-leading-body);
-}
-
+/* The chosen client's tick — the deep honey ink, the way the exercise picker
+   marks a picked row. */
 ion-item ion-icon {
   color: var(--mh-color-honey-deep);
   font-size: 1.375rem;
 }
 
-.date {
-  padding: 0 1.25rem;
+/* The week a preview row belongs to, in the kicker face at a fixed width so
+   the names line up under each other. */
+.week {
+  width: 3.5rem;
+  margin-inline-end: 0.5rem;
 }
 
-/* A native date input: the platform picker is better than anything we would
-   build, and a start date is a plain calendar day. */
-.date input {
+.more {
   width: 100%;
-  min-height: var(--mh-tap-target);
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-  color: var(--ion-text-color);
-  font-family: inherit;
-  font-size: var(--mh-text-base);
-}
-
-.preview {
-  margin: 0 1.25rem;
-  padding: 0.25rem 0.75rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
-  background: var(--ion-card-background);
-}
-
-.p-row {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.5rem 0;
-}
-
-.p-row + .p-row {
-  border-top: 1px solid var(--mh-color-divider);
-}
-
-.p-week {
-  flex: none;
-  width: 1.75rem;
-  color: var(--ion-color-medium);
-}
-
-.p-name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.p-date {
-  flex: none;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-}
-
-.p-more {
-  margin: 0;
-  padding: 0.5rem 0 0.25rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
   text-align: center;
-}
-
-.note-field {
-  margin: 0 1.25rem 1rem;
 }

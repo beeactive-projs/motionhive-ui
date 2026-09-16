@@ -4,9 +4,16 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
@@ -15,13 +22,18 @@ import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
 import {
+  AssignedExercise,
   AssignedWorkout,
+  ExerciseKind,
   ProgramAssignment,
   ProgramAssignmentService,
   WorkoutLogService,
 } from 'core';
 
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { kindIcon, kindTone } from '../../exercises/exercises.config';
 import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.config';
 
 /**
@@ -34,12 +46,21 @@ import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.c
 @Component({
   selector: 'mh-workout-preview',
   imports: [
+    EmptyState,
+    HexAvatar,
     IonBackButton,
     IonButton,
     IonButtons,
+    IonCard,
+    IonCardContent,
     IonContent,
+    IonFooter,
     IonHeader,
     IonIcon,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonSkeletonText,
     IonTitle,
     IonToolbar,
   ],
@@ -47,38 +68,43 @@ import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.c
   styleUrl: './preview.scss',
 })
 export class Preview implements ViewWillEnter {
-  private readonly _assignmentService = inject(ProgramAssignmentService);
-  private readonly _logService = inject(WorkoutLogService);
+  private readonly _programAssignmentService = inject(ProgramAssignmentService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _feedback = inject(FeedbackService);
+  private readonly _feedbackService = inject(FeedbackService);
 
   readonly assignment = signal<ProgramAssignment | null>(null);
   readonly workout = signal<AssignedWorkout | null>(null);
   readonly loading = signal(false);
-  readonly failed = signal(false);
+  readonly error = signal(false);
   readonly starting = signal(false);
   readonly noteOpen = signal(false);
 
+  readonly skeletonRows = [1, 2, 3, 4];
+
+  readonly showSkeleton = computed(() => this.loading() && !this.assignment());
+  readonly showError = computed(() => this.error() && !this.assignment());
+
   /** Loaded fine, but the plan holds no days at all — a different problem. */
   readonly isEmptyPlan = computed(
-    () => !this.loading() && !this.failed() && !!this.assignment() && !this.workout(),
+    () => !this.loading() && !this.error() && !!this.assignment() && !this.workout(),
   );
 
   readonly position = computed(() => {
-    const w = this.workout();
-    if (!w) return '';
+    const workout = this.workout();
+    if (!workout) return '';
     return planPositionLabel(
       this.assignment()?.programNameSnapshot ?? null,
-      w.weekIndex,
-      w.dayIndex,
+      workout.weekIndex,
+      workout.dayIndex,
     );
   });
 
   readonly meta = computed(() => {
-    const w = this.workout();
-    if (!w) return '';
-    return workoutMetaLine(w.exercises?.length ?? null, w.estimatedDurationMinutes);
+    const workout = this.workout();
+    if (!workout) return '';
+    return workoutMetaLine(workout.exercises?.length ?? null, workout.estimatedDurationMinutes);
   });
 
   constructor() {
@@ -86,13 +112,17 @@ export class Preview implements ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
+    this.load();
+  }
+
+  load(): void {
     const assignmentId = this._route.snapshot.paramMap.get('assignmentId');
     const workoutId = this._route.snapshot.queryParamMap.get('workout');
     if (!assignmentId) return;
 
     this.loading.set(true);
-    this.failed.set(false);
-    this._assignmentService
+    this.error.set(false);
+    this._programAssignmentService
       .get(assignmentId)
       .pipe(take(1))
       .subscribe({
@@ -112,10 +142,32 @@ export class Preview implements ViewWillEnter {
           this.loading.set(false);
         },
         error: () => {
-          this.failed.set(true);
+          this.error.set(true);
           this.loading.set(false);
         },
       });
+  }
+
+  exerciseName(exercise: AssignedExercise): string {
+    return exercise.exercise?.name ?? 'Exercise';
+  }
+
+  setsLabel(exercise: AssignedExercise): string {
+    const n = (exercise.sets ?? []).length;
+    return `${n} ${n === 1 ? 'set' : 'sets'}`;
+  }
+
+  /** The kind-tinted hex tile, same as the library row draws it. */
+  tileIcon(exercise: AssignedExercise): string {
+    return kindIcon(this._kindOf(exercise));
+  }
+
+  tileTone(exercise: AssignedExercise): string {
+    return kindTone(this._kindOf(exercise));
+  }
+
+  toggleNote(): void {
+    this.noteOpen.update((open) => !open);
   }
 
   start(): void {
@@ -123,7 +175,7 @@ export class Preview implements ViewWillEnter {
     if (!workout || this.starting()) return;
 
     this.starting.set(true);
-    this._logService
+    this._workoutLogService
       .start({ assignedWorkoutId: workout.id })
       .pipe(take(1))
       .subscribe({
@@ -133,7 +185,7 @@ export class Preview implements ViewWillEnter {
         },
         error: (err) => {
           this.starting.set(false);
-          void this._feedback.error(err, 'Could not start the workout');
+          void this._feedbackService.error(err, 'Could not start the workout');
         },
       });
   }
@@ -141,15 +193,20 @@ export class Preview implements ViewWillEnter {
   skip(): void {
     const workout = this.workout();
     if (!workout) return;
-    this._assignmentService
+    this._programAssignmentService
       .skipAssignedWorkout(workout.id)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          void this._feedback.success('Marked as skipped');
+          void this._feedbackService.success('Marked as skipped');
           void this._router.navigate(['/tabs/workouts']);
         },
-        error: (err) => void this._feedback.error(err, 'Could not skip that'),
+        error: (err) => void this._feedbackService.error(err, 'Could not skip that'),
       });
+  }
+
+  /** The catalogue row is typed loosely on the assignment tree; strength is the safe default. */
+  private _kindOf(exercise: AssignedExercise): ExerciseKind {
+    return (exercise.exercise?.kind as ExerciseKind | undefined) ?? ExerciseKind.Strength;
   }
 }

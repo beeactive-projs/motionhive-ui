@@ -7,14 +7,9 @@
     </ion-item>
 
     @for (item of actions(); track item.id) {
-      <ion-item
-        button
-        [detail]="false"
-        [class.destructive]="item.destructive"
-        (click)="choose(item.id)"
-      >
-        <ion-icon slot="start" [name]="item.icon" aria-hidden="true" />
-        <ion-label>{{ item.label }}</ion-label>
+      <ion-item button [detail]="false" (click)="choose(item.id)">
+        <ion-icon slot="start" [name]="item.icon" [color]="item.color" aria-hidden="true" />
+        <ion-label [color]="item.destructive ? 'danger' : undefined">{{ item.label }}</ion-label>
       </ion-item>
     }
   </ion-list>

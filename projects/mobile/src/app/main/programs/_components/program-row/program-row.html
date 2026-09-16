@@ -9,22 +9,20 @@
   <ion-label>
     <h2>{{ program().name }}</h2>
     <div class="tags">
-      @if (meta()) {
-        <span class="meta">{{ meta() }}</span>
-      }
       @if (isDraft()) {
-        <ion-badge data-tone="muted">Draft</ion-badge>
+        <ion-badge data-tone="medium">Draft</ion-badge>
       }
       @if (isRoutine()) {
-        <ion-badge data-tone="type">Routine</ion-badge>
+        <ion-badge data-tone="teal">Routine</ion-badge>
+      }
+      @if (meta()) {
+        <ion-note>{{ meta() }}</ion-note>
       }
     </div>
   </ion-label>
 
-  <div class="trailing" slot="end">
-    @if (trailing()) {
-      <span class="who">{{ trailing() }}</span>
-    }
-    <ion-icon name="chevron-forward" aria-hidden="true" />
-  </div>
+  @if (trailing()) {
+    <ion-note slot="end" class="trailing">{{ trailing() }}</ion-note>
+  }
+  <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
 </ion-item>

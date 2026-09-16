@@ -10,13 +10,7 @@ import {
   WorkoutLogService,
 } from 'core';
 
-/**
- * How many empty sets a freshly added exercise starts with. The API creates
- * the exercise row and no sets, which leaves a header with nothing under it
- * and a tap needed before you can log anything. Three is the consensus
- * default across the trackers this was researched against.
- */
-const DEFAULT_SETS = 3;
+import { DEFAULT_SETS } from '../workouts.config';
 
 /**
  * One live workout.
@@ -28,22 +22,22 @@ const DEFAULT_SETS = 3;
  */
 @Injectable()
 export class LoggerStore {
-  private readonly _logService = inject(WorkoutLogService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
 
   private readonly _log = signal<WorkoutLog | null>(null);
   private readonly _loading = signal(false);
-  private readonly _failed = signal(false);
+  private readonly _error = signal(false);
   private readonly _saving = signal(0);
 
   readonly log = this._log.asReadonly();
   readonly loading = this._loading.asReadonly();
-  readonly failed = this._failed.asReadonly();
   /** True while any set write is in flight — drives the quiet saving hint. */
   readonly saving = computed(() => this._saving() > 0);
 
-  readonly exercises = computed<LoggedExercise[]>(
-    () => this._log()?.exercises ?? [],
-  );
+  readonly showSkeleton = computed(() => this._loading() && !this._log());
+  readonly showError = computed(() => this._error() && !this._log());
+
+  readonly exercises = computed<LoggedExercise[]>(() => this._log()?.exercises ?? []);
 
   /** Skipped exercises leave the denominator; they were a decision, not work. */
   readonly progress = computed(() => {
@@ -60,8 +54,8 @@ export class LoggerStore {
 
   load(id: string, done?: () => void): void {
     this._loading.set(true);
-    this._failed.set(false);
-    this._logService
+    this._error.set(false);
+    this._workoutLogService
       .get(id)
       .pipe(take(1))
       .subscribe({
@@ -71,7 +65,7 @@ export class LoggerStore {
           done?.();
         },
         error: () => {
-          this._failed.set(true);
+          this._error.set(true);
           this._loading.set(false);
         },
       });
@@ -81,7 +75,7 @@ export class LoggerStore {
   adopt(log: WorkoutLog): void {
     this._log.set(log);
     this._loading.set(false);
-    this._failed.set(false);
+    this._error.set(false);
   }
 
   // ─── Sets ─────────────────────────────────────────────────────
@@ -93,7 +87,7 @@ export class LoggerStore {
     this._patchSet(exerciseId, setId, payload as Partial<LoggedSet>);
     this._saving.update((n) => n + 1);
 
-    this._logService
+    this._workoutLogService
       .logSet(log.id, setId, payload)
       .pipe(
         take(1),
@@ -108,7 +102,7 @@ export class LoggerStore {
   addSet(exerciseId: string): void {
     const log = this._log();
     if (!log) return;
-    this._logService
+    this._workoutLogService
       .addSet(log.id, exerciseId)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((set) => {
@@ -126,7 +120,7 @@ export class LoggerStore {
     const log = this._log();
     if (!log) return;
     this._updateExercise(exerciseId, (ex) => ({ ...ex, isSkipped: skipped }));
-    this._logService
+    this._workoutLogService
       .setExerciseSkipped(log.id, exerciseId, skipped)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((updated) => {
@@ -146,7 +140,7 @@ export class LoggerStore {
 
     forkJoin(
       exerciseIds.map((id) =>
-        this._logService
+        this._workoutLogService
           .addExercise(log.id, id, DEFAULT_SETS)
           .pipe(catchError(() => of(null))),
       ),
@@ -159,7 +153,7 @@ export class LoggerStore {
         }
         // Re-read rather than splice: the rows came back in completion
         // order, and their order in the log is the server's to say.
-        this._logService
+        this._workoutLogService
           .get(log.id)
           .pipe(take(1), catchError(() => of(null)))
           .subscribe((fresh) => {
@@ -172,7 +166,7 @@ export class LoggerStore {
   swapExercise(exerciseId: string, newExerciseId: string, done?: () => void): void {
     const log = this._log();
     if (!log) return;
-    this._logService
+    this._workoutLogService
       .swapExercise(log.id, exerciseId, newExerciseId)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe((swapped) => {
@@ -188,7 +182,7 @@ export class LoggerStore {
       ...l,
       exercises: (l.exercises ?? []).filter((e) => e.id !== exerciseId),
     }));
-    this._logService
+    this._workoutLogService
       .removeExercise(log.id, exerciseId)
       .pipe(take(1), catchError(() => of(null)))
       .subscribe();

@@ -12,14 +12,14 @@
 /* A completed set tints rather than greys: the row is still readable, and the
    user is often comparing it against the next one. */
 .row.done .cell {
-  background: var(--ion-color-success-wash, rgb(var(--ion-color-success-rgb) / 0.14));
   border-color: transparent;
+  background: var(--ion-color-success-wash);
 }
 
 .row.done .tick {
-  background: var(--ion-color-success);
   border-color: transparent;
-  color: #fff;
+  background: var(--ion-color-success);
+  color: var(--ion-color-success-contrast);
 }
 
 .num {
@@ -31,9 +31,10 @@
   font-weight: 600;
 }
 
+/* The warm-up mark under the number — amber ink, the way the design chips it. */
 .num .type {
   display: block;
-  color: var(--ion-color-warning);
+  color: var(--ion-color-warning-wash-contrast);
   font-style: normal;
 }
 
@@ -65,12 +66,12 @@
 
 .cell.active {
   border-color: var(--mh-color-honey-deep);
-  box-shadow: 0 0 0 var(--mh-ring-width, 2px) var(--mh-color-selected-background);
+  box-shadow: 0 0 0 var(--mh-ring-width) var(--mh-color-selected-background);
 }
 
 .tick {
-  flex: none;
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   width: var(--mh-tap-target);

@@ -1,13 +1,17 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
   IonHeader,
   IonIcon,
   IonInput,
+  IonNote,
+  IonSkeletonText,
   IonTextarea,
   IonTitle,
   IonToolbar,
@@ -21,12 +25,12 @@ import { catchError, take } from 'rxjs/operators';
 import { Exercise, PrescribedExercise, Program, ProgramService, ProgramWorkout } from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
-import { PROGRAM_ICONS } from '../programs.config';
-
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const DEFAULT_SETS = 3;
+import { ExerciseCard } from '../../workouts/_components/exercise-card/exercise-card';
+import { DEFAULT_SETS } from '../../workouts/workouts.config';
+import { PROGRAM_ICONS, dayLabel, weekLabel } from '../programs.config';
 
 /**
  * One day of a program — the same job the routine builder does, over the
@@ -37,20 +41,26 @@ const DEFAULT_SETS = 3;
  * while a day writes through `ProgramService` at
  * `programs/:id/workouts/:workoutId/exercises`. Same screen to a coach, two
  * different shapes underneath, and pretending otherwise is how the concepts
- * get mixed.
+ * get mixed. The exercise card they share is the one piece that is the same.
  */
 @Component({
   selector: 'mh-day-editor',
   imports: [
     ConfirmSheet,
+    EmptyState,
+    ExerciseCard,
     ExercisePickerSheet,
     IonBackButton,
     IonButton,
     IonButtons,
+    IonCard,
+    IonCardContent,
     IonContent,
     IonHeader,
     IonIcon,
     IonInput,
+    IonNote,
+    IonSkeletonText,
     IonTextarea,
     IonTitle,
     IonToolbar,
@@ -60,12 +70,16 @@ const DEFAULT_SETS = 3;
 })
 export class DayEditor implements ViewWillEnter, ViewWillLeave {
   private readonly _programService = inject(ProgramService);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _feedback = inject(FeedbackService);
+  private readonly _feedbackService = inject(FeedbackService);
+
+  readonly skeletonCards = [1, 2];
 
   readonly program = signal<Program | null>(null);
   readonly workout = signal<ProgramWorkout | null>(null);
   readonly loading = signal(false);
+  readonly error = signal(false);
   readonly saving = signal(false);
   readonly pickerOpen = signal(false);
   readonly removeTarget = signal<PrescribedExercise | null>(null);
@@ -78,7 +92,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   private _workoutId: string | null = null;
   /**
    * Whether name and note have been seeded from the server for this day.
-   * `_load` re-runs after every exercise change to refresh the list, and
+   * `load` re-runs after every exercise change to refresh the list, and
    * re-seeding the fields then threw away whatever the user had typed but
    * not yet saved — a renamed day snapped back to "Day 4" on adding an
    * exercise. The fields are filled once per day, then left alone.
@@ -88,6 +102,11 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   private _saved = { name: '', note: '' };
   private _pendingSave: Promise<boolean> | null = null;
 
+  readonly showSkeleton = computed(() => this.loading() && !this.workout());
+  readonly showError = computed(
+    () => !this.loading() && !this.workout() && (this.error() || !!this.program()),
+  );
+
   /** Where back lands when there is no stack to pop — a reload, a deep link. */
   readonly builderUrl = computed(() => {
     const id = this.program()?.id;
@@ -95,9 +114,9 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   });
 
   readonly eyebrow = computed(() => {
-    const w = this.workout();
-    if (!w) return '';
-    return `WEEK ${w.weekIndex + 1} · ${DAY_LABELS[w.dayIndex] ?? `DAY ${w.dayIndex + 1}`}`;
+    const workout = this.workout();
+    if (!workout) return '';
+    return `${weekLabel(workout.weekIndex)} · ${dayLabel(workout.dayIndex)}`;
   });
 
   readonly exercises = computed<PrescribedExercise[]>(
@@ -106,27 +125,25 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
 
   readonly addedIds = computed(() => this.exercises().map((e) => e.exerciseId));
 
-  readonly removeBody = computed(() =>
-    this.removeTarget()
-      ? `Remove ${this.exerciseName(this.removeTarget()!)} from this day?`
-      : '',
-  );
+  readonly removeBody = computed(() => {
+    const row = this.removeTarget();
+    return row ? `Remove ${this.exerciseName(row)} from this day?` : '';
+  });
 
   constructor() {
     addIcons(PROGRAM_ICONS);
   }
 
   ionViewWillEnter(): void {
-    const parts = this._router.url.split('?')[0].split('/');
-    const programId = parts[parts.indexOf('program') + 1] ?? null;
-    const workoutId = parts[parts.indexOf('day') + 1] ?? null;
+    const programId = this._route.snapshot.paramMap.get('id');
+    const workoutId = this._route.snapshot.paramMap.get('workoutId');
     if (!programId || !workoutId) return;
     if (programId === this._programId && workoutId === this._workoutId) return;
 
     this._programId = programId;
     this._workoutId = workoutId;
     this._fieldsSeeded = false;
-    this._load();
+    this.load();
   }
 
   /**
@@ -142,8 +159,9 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     return row.exercise?.name ?? 'Exercise';
   }
 
-  setCount(row: PrescribedExercise): number {
-    return (row.sets ?? []).length;
+  setsLabel(row: PrescribedExercise): string {
+    const n = (row.sets ?? []).length;
+    return `${n} ${n === 1 ? 'set' : 'sets'}`;
   }
 
   // ─── Editing ──────────────────────────────────────────────────
@@ -172,8 +190,8 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
       .subscribe((results) => {
         this.saving.set(false);
         const failure = results.find((r) => !(r as PrescribedExercise)?.id);
-        if (failure) void this._feedback.error(failure, 'Some exercises were not added');
-        this._load();
+        if (failure) void this._feedbackService.error(failure, 'Some exercises were not added');
+        this.load();
       });
   }
 
@@ -193,7 +211,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     this._programService
       .removeExercise(programId, workoutId, row.id)
       .pipe(take(1), catchError(() => of(null)))
-      .subscribe(() => this._load());
+      .subscribe(() => this.load());
   }
 
   openExercise(row: PrescribedExercise): void {
@@ -224,7 +242,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
       .then(() => true)
       .catch((err: unknown) => {
         this._saved = previous;
-        void this._feedback.error(err, 'Could not save the day');
+        void this._feedbackService.error(err, 'Could not save the day');
         return false;
       })
       .finally(() => {
@@ -245,10 +263,11 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     if (saved) void this._router.navigate(['/tabs/programs/program', programId]);
   }
 
-  private _load(): void {
+  load(): void {
     const programId = this._programId;
     if (!programId) return;
     this.loading.set(true);
+    this.error.set(false);
 
     this._programService
       .get(programId)
@@ -266,7 +285,10 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
           }
           this.loading.set(false);
         },
-        error: () => this.loading.set(false),
+        error: () => {
+          this.error.set(true);
+          this.loading.set(false);
+        },
       });
   }
 }

@@ -1,11 +1,22 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
-import { IonIcon, IonItem, IonLabel, IonList, IonTextarea } from '@ionic/angular/standalone';
+import {
+  IonDatetime,
+  IonDatetimeButton,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonNote,
+  IonTextarea,
+} from '@ionic/angular/standalone';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import {
   ClientService,
   InstructorClient,
+  InstructorClientStatuses,
   Program,
   ProgramWorkout,
   displayName,
@@ -14,13 +25,13 @@ import {
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { scheduledDateFor } from '../../programs.config';
+import { scheduledDateFor, todayIso, weekLabel } from '../../programs.config';
 
 /** One line of the schedule preview. */
 export interface PreviewRow {
   name: string;
   date: string;
-  weekIndex: number;
+  week: string;
 }
 
 export interface AssignRequest {
@@ -42,7 +53,19 @@ const PREVIEW_ROWS = 6;
  */
 @Component({
   selector: 'mh-assign-sheet',
-  imports: [HexAvatar, IonIcon, IonItem, IonLabel, IonList, IonTextarea, SheetShell],
+  imports: [
+    HexAvatar,
+    IonDatetime,
+    IonDatetimeButton,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonModal,
+    IonNote,
+    IonTextarea,
+    SheetShell,
+  ],
   templateUrl: './assign-sheet.html',
   styleUrl: './assign-sheet.scss',
 })
@@ -62,10 +85,6 @@ export class AssignSheet {
 
   readonly canAssign = computed(() => !!this.clientId() && !!this.startDate());
 
-  readonly chosen = computed(() =>
-    this.clients().find((c) => c.clientId === this.clientId()) ?? null,
-  );
-
   /**
    * Every day of the plan against a real date. Sorted by position, because a
    * coach reads this as "what happens first", not as a calendar.
@@ -77,10 +96,10 @@ export class AssignSheet {
 
     return [...(program.workouts ?? [])]
       .sort((a, b) => a.weekIndex - b.weekIndex || a.dayIndex - b.dayIndex)
-      .map((w: ProgramWorkout) => ({
-        name: w.name,
-        weekIndex: w.weekIndex,
-        date: scheduledDateFor(start, w.weekIndex, w.dayIndex).toLocaleDateString(
+      .map((workout: ProgramWorkout) => ({
+        name: workout.name,
+        week: weekLabel(workout.weekIndex),
+        date: scheduledDateFor(start, workout.weekIndex, workout.dayIndex).toLocaleDateString(
           undefined,
           { weekday: 'short', day: 'numeric', month: 'short' },
         ),
@@ -110,7 +129,9 @@ export class AssignSheet {
         this.loading.set(false);
         const rows = Array.isArray(page) ? page : (page?.items ?? []);
         // Only an active relationship can be given work.
-        this.clients.set(rows.filter((r: InstructorClient) => r.status === 'ACTIVE'));
+        this.clients.set(
+          rows.filter((row: InstructorClient) => row.status === InstructorClientStatuses.Active),
+        );
       });
   }
 
@@ -120,6 +141,12 @@ export class AssignSheet {
 
   tone(row: InstructorClient): string {
     return avatarToneFor(row.clientId);
+  }
+
+  /** The picker hands back an ISO instant; a start date is the calendar day of it. */
+  onStartChange(value: string | string[] | null | undefined): void {
+    const iso = Array.isArray(value) ? value[0] : value;
+    if (iso) this.startDate.set(iso.slice(0, 10));
   }
 
   submit(): void {
@@ -139,12 +166,4 @@ export class AssignSheet {
     this.startDate.set(todayIso());
     this.notes.set('');
   }
-}
-
-/** Local calendar day, not UTC — a start date is a day, not an instant. */
-function todayIso(): string {
-  const now = new Date();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return `${now.getFullYear()}-${m}-${d}`;
 }

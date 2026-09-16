@@ -1,93 +1,27 @@
-:host {
-  --mh-gutter: 1.25rem;
-}
-
+/* "9/22" beside the discard button — mono and tabular so it does not jitter
+   as sets get ticked. */
 .progress {
   padding-inline-end: 0.75rem;
-  color: var(--ion-color-medium);
   font-family: var(--mh-font-mono);
   font-size: var(--mh-text-sm);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-.exercise {
-  padding: 0.875rem var(--mh-gutter);
-  border-bottom: 1px solid var(--mh-color-divider);
-}
-
-/* A skipped exercise stays visible and legible — it is a decision the user
-   made, and hiding it would make the workout look shorter than it was. */
-.exercise.skipped h2 {
-  color: var(--ion-color-medium);
-  text-decoration: line-through;
-}
-
-.exercise header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* The name is the way into the movement itself, so it is a button — but it
-   must not look like one competing with Skip beside it. */
-.ex-open {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 0.375rem;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ion-text-color);
-  text-align: start;
-  cursor: pointer;
-}
-
-.ex-open ion-icon {
-  flex: none;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-base);
-}
-
-.exercise h2 {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-base);
-  font-weight: 700;
-}
-
-/* Swap, skip and remove behind one target rather than three competing with
-   the exercise name for the same row. */
-.verbs {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: var(--mh-tap-target);
-  height: var(--mh-tap-target);
-  padding: 0;
-  border: 0;
-  border-radius: var(--mh-radius-pill);
-  background: none;
-  color: var(--ion-color-medium);
-  cursor: pointer;
-}
-
-/* Column labels, once per exercise — the set rows themselves stay wordless. */
+/* Column labels over the set grid. The grid itself is the one custom control
+   on this screen (set-row): its cells and tick are sized for a thumb between
+   sets, which no list row is. These headings sit over those cells, so they
+   share the row's geometry — the set number, the "last time" column, the
+   input cells, and the tick's width — rather than an Ionic row's. */
 .grid-head {
   display: flex;
   gap: 0.375rem;
-  padding: 0.5rem 0 0.125rem;
+  padding: 0.25rem 0 0.125rem;
   color: var(--ion-color-medium);
   font-family: var(--mh-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--mh-text-xs);
   font-weight: 600;
   letter-spacing: var(--mh-tracking-kicker);
-  text-transform: uppercase;
 }
 
 .grid-head .num {
@@ -96,40 +30,6 @@
 
 .grid-head .prev {
   width: 3.5rem;
-}
-
-.add-set {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.375rem;
-  padding: 0.375rem 0;
-  border: 0;
-  background: none;
-  color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* The freestyle on-ramp. An empty workout has exactly one thing to do, so it
-   gets the whole screen rather than a line of grey text and no way forward. */
-.blank {
-  padding: 3rem var(--mh-gutter) 0;
-  text-align: center;
-}
-
-.blank h2 {
-  margin: 0;
-  font-family: var(--mh-font-heading);
-  font-size: var(--mh-text-lg);
-  font-weight: 700;
-}
-
-.blank p {
-  margin: 0.5rem 0 1.25rem;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
 }
 
 /* Column headings sit over the cells they name, so a hold says "time" and a
@@ -145,21 +45,21 @@
   width: var(--mh-tap-target);
 }
 
+/* Add set / Add weight under the grid — quiet text actions in the honey ink. */
 .ex-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
 }
 
-.add-weight {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.375rem;
-  padding: 0.375rem 0;
-  border: 0;
-  background: none;
-  color: var(--mh-color-honey-deep);
-  font-size: var(--mh-text-sm);
+.ex-actions ion-button {
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0.5rem;
+  margin: 0;
   font-weight: 600;
-  cursor: pointer;
+}
+
+ion-card ion-skeleton-text {
+  margin: 0.375rem 0;
 }

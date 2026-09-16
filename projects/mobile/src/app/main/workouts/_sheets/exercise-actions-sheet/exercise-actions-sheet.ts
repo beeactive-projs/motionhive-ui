@@ -4,15 +4,15 @@ import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { LoggedExercise } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-
-export type ExerciseActionId = 'swap' | 'skip' | 'remove';
+import { ExerciseActionId, exerciseActions } from '../../workouts.config';
 
 /**
  * The verbs for one exercise mid-workout.
  *
  * Uses the app's own sheet chrome rather than `ion-action-sheet`: the design
  * language specifies the grabber, the Poppins title and the row treatment,
- * and an Ionic default sheet matches none of them.
+ * and an Ionic default sheet matches none of them. The verbs themselves are
+ * declared in `workouts.config` beside the icons they draw.
  */
 @Component({
   selector: 'mh-exercise-actions-sheet',
@@ -28,24 +28,7 @@ export class ExerciseActionsSheet {
 
   readonly name = computed(() => this.exercise()?.exerciseNameSnapshot ?? '');
 
-  readonly actions = computed(() => {
-    const skipped = this.exercise()?.isSkipped ?? false;
-    return [
-      { id: 'swap' as const, label: 'Swap exercise', icon: 'repeat-outline', destructive: false },
-      {
-        id: 'skip' as const,
-        label: skipped ? 'Unskip exercise' : 'Skip exercise',
-        icon: 'play-skip-forward-outline',
-        destructive: false,
-      },
-      {
-        id: 'remove' as const,
-        label: 'Remove from workout',
-        icon: 'trash-outline',
-        destructive: true,
-      },
-    ];
-  });
+  readonly actions = computed(() => exerciseActions(this.exercise()?.isSkipped ?? false));
 
   choose(id: ExerciseActionId): void {
     this.open.set(false);

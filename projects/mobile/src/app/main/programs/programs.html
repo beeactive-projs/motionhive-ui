@@ -1,68 +1,90 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Programs</ion-title>
-    <mh-notification-bell slot="end" />
+    <ion-buttons slot="end">
+      <mh-notification-bell />
+    </ion-buttons>
   </ion-toolbar>
+
+  @if (!store.isEmpty() && !store.showError()) {
+    <ion-toolbar>
+      <!-- Scrolls sideways rather than wrapping, same strip as the exercise
+           library: the count in each pill is the thing you need to know
+           before you wonder why the list is short. -->
+      <div class="mh-chip-row">
+        @for (pill of pills; track pill.value) {
+          <ion-chip
+            [class.selected]="store.size() === pill.value"
+            [attr.aria-pressed]="store.size() === pill.value"
+            (click)="setSize(pill.value)"
+          >
+            {{ pill.label }} · {{ countFor(pill.value) }}
+          </ion-chip>
+        }
+      </div>
+    </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($any($event))">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
 
-  @if (store.showSkeleton()) {
-    <div class="pills"><ion-skeleton-text [animated]="true" /></div>
-    @for (row of skeletonRows; track row) {
-      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (store.failed()) {
+  @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Could not load your library"
+      heading="Couldn't load your library"
       message="Check your connection and try again."
-      actionLabel="Retry"
+      actionLabel="Try again"
       (action)="retry()"
     />
+  } @else if (store.showSkeleton()) {
+    <!-- Mirrors the row shape so nothing shifts when the rows land. -->
+    <div class="mh-page">
+      <div>
+        @for (_ of skeletonRows; track $index) {
+          <mh-session-row-skeleton [rail]="false" />
+        }
+      </div>
+    </div>
   } @else if (store.isEmpty()) {
     <!-- A beginning, not a void: both creation verbs, said plainly. -->
-    <section class="cold">
-      <h2>Nothing here yet</h2>
-      <p>Build a multi-week program or a single routine — both live here.</p>
-      <ion-button expand="block" (click)="onCreate('program')">New program</ion-button>
-      <ion-button expand="block" fill="outline" (click)="onCreate('routine')">
-        New routine
-      </ion-button>
-      <button class="cold-link" type="button" (click)="onCreate('starters')">
+    <mh-empty-state
+      icon="albums-outline"
+      heading="Nothing here yet"
+      message="Build a multi-week program or a single routine — both live here."
+      actionLabel="New program"
+      (action)="onCreate(Choices.Program)"
+    />
+    <div class="secondary-actions">
+      <ion-button fill="outline" (click)="onCreate(Choices.Routine)">New routine</ion-button>
+      <ion-button fill="clear" size="small" (click)="onCreate(Choices.Starters)">
         Or browse our starters
-      </button>
-    </section>
-  } @else {
-    <div class="pills">
-      @for (pill of pills; track pill.id) {
-        <button
-          type="button"
-          class="pill"
-          [class.on]="store.size() === pill.id"
-          [attr.aria-pressed]="store.size() === pill.id"
-          (click)="store.size.set(pill.id)"
-        >
-          {{ pill.label }}
-          <span class="n">{{ countFor(pill.id) }}</span>
-        </button>
-      }
+      </ion-button>
     </div>
-
-    @for (program of store.visible(); track program.id) {
-      <mh-program-row [program]="program" (select)="open(program)" />
-    }
-
-    @if (!store.visible().length) {
-      <p class="none">Nothing of that kind yet.</p>
-    }
+  } @else if (store.isFilteredEmpty()) {
+    <mh-empty-state
+      icon="albums-outline"
+      heading="Nothing of that kind yet"
+      message="Nothing in the library matches this pill."
+      actionLabel="Show all"
+      actionFill="outline"
+      (action)="setSize(Sizes.All)"
+    />
+  } @else {
+    <div class="mh-page">
+      <div>
+        @for (program of store.visible(); track program.id) {
+          <mh-program-row [program]="program" (select)="open(program)" />
+        }
+      </div>
+    </div>
   }
 
+  <!-- The one place anything gets created: the FAB opens the three verbs. -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button aria-label="Create" (click)="createOpen.set(true)">
+    <ion-fab-button aria-label="Create" (click)="openCreate()">
       <ion-icon name="add-outline" aria-hidden="true" />
     </ion-fab-button>
   </ion-fab>

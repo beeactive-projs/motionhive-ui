@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [attr.aria-label]="'Program settings'" (click)="openSettings()">
+      <ion-button aria-label="Program settings" (click)="openSettings()">
         <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
@@ -13,78 +13,115 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (store.loading() && !store.program()) {
-    <div class="rail"><ion-skeleton-text [animated]="true" /></div>
-    @for (w of skeletonWeeks; track w) {
-      <div class="s-week"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (store.failed()) {
-    <p class="mh-state">Could not open this program.</p>
-  } @else if (store.program(); as program) {
-    <p class="sub mh-kicker">{{ subtitle() }}</p>
-
-    <!-- The rail jumps anywhere in a twelve-week plan; the dot says which
-         weeks actually hold work, so an empty stretch is visible at a glance. -->
-    <div class="rail" role="tablist" aria-label="Jump to week">
-      @for (week of store.weeks(); track week.index) {
-        <button
-          type="button"
-          class="week-pill"
-          [class.has-work]="week.filled > 0"
-          (click)="scrollToWeek(week.index)"
-        >
-          {{ week.index + 1 }}
-          @if (week.filled > 0) {
-            <span class="dot" aria-hidden="true"></span>
-          }
-        </button>
+  @if (store.showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this program"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (store.showSkeleton()) {
+    <!-- Mirrors the week cards so nothing shifts when the grid lands. -->
+    <div class="mh-page">
+      <span class="mh-kicker meta">
+        <ion-skeleton-text [animated]="true" style="width: 11rem; height: 0.75rem" />
+      </span>
+      @for (_ of skeletonWeeks; track $index) {
+        <section class="mh-section">
+          <span class="mh-kicker">
+            <ion-skeleton-text [animated]="true" style="width: 4rem; height: 0.75rem" />
+          </span>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (_ of skeletonRows; track $index; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'">
+                <ion-label>
+                  <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
       }
     </div>
+  } @else if (store.program()) {
+    <div class="mh-page">
+      <span class="mh-kicker meta">{{ subtitle() }}</span>
 
-    @for (week of store.weeks(); track week.index) {
-      <section class="week" [id]="'week-' + week.index">
-        <header>
-          <h2>Week {{ week.index + 1 }}</h2>
-          <span class="count">{{ week.filled }}/7</span>
-          @if (week.filled > 0) {
-            <button class="copy" type="button" (click)="openCopy(week.index)">
-              <ion-icon name="copy-outline" aria-hidden="true" />
-              Copy
-            </button>
-          }
-        </header>
-
-        @for (day of week.days; track $index) {
+      <!-- The rail jumps anywhere in a twelve-week plan; the dot says which
+           weeks actually hold work, so an empty stretch is visible at a glance.
+           Plain buttons: a rail of same-sized pills is a grid control, like the
+           sessions week strip. -->
+      <div class="rail" role="tablist" aria-label="Jump to week">
+        @for (week of store.weeks(); track week.index) {
           <button
-            class="day"
             type="button"
-            [class.rest]="!day"
-            (click)="openDay(week, $index)"
+            class="week-pill"
+            [class.has-work]="week.filled > 0"
+            [attr.aria-label]="weekLabel(week.index)"
+            (click)="scrollToWeek(week.index)"
           >
-            <span class="dow mh-kicker">{{ dayLabels[$index] }}</span>
-
-            @if (day) {
-              <span class="name">{{ day.name }}</span>
-              <span
-                class="clear"
-                role="button"
-                tabindex="0"
-                [attr.aria-label]="'Clear ' + day.name"
-                (click)="askClear(day, $event)"
-                (keydown.enter)="askClear(day, $event)"
-              >
-                <ion-icon name="close-outline" aria-hidden="true" />
-              </span>
-            } @else {
-              <!-- A rest day is the absence of work, so it reads as a quiet
-                   invitation rather than an empty record. -->
-              <span class="name ghost">Rest — tap to add</span>
-              <ion-icon class="plus" name="add-outline" aria-hidden="true" />
+            {{ week.index + 1 }}
+            @if (week.filled > 0) {
+              <span class="dot" aria-hidden="true"></span>
             }
           </button>
         }
-      </section>
-    }
+      </div>
+
+      @for (week of store.weeks(); track week.index) {
+        <section class="mh-section week" [id]="'week-' + week.index">
+          <div class="mh-section-head">
+            <span class="mh-kicker">{{ weekLabel(week.index) }}</span>
+            <ion-note>{{ daysLabel(week) }}</ion-note>
+            @if (week.filled > 0) {
+              <ion-button fill="clear" size="small" (click)="openCopy(week.index)">
+                <ion-icon slot="start" name="copy-outline" aria-hidden="true" />
+                Copy
+              </ion-button>
+            }
+          </div>
+
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (day of week.days; track $index; let last = $last) {
+              <ion-item
+                button
+                detail="false"
+                [lines]="last ? 'none' : 'full'"
+                [class.rest]="!day"
+                (click)="openDay(week, $index)"
+              >
+                <ion-note slot="start" class="mh-kicker dow">{{ dayLabels[$index] }}</ion-note>
+                <ion-label>
+                  @if (day) {
+                    <h2>{{ day.name }}</h2>
+                  } @else {
+                    <!-- A rest day is the absence of work, so it reads as a quiet
+                         invitation rather than an empty record. -->
+                    <p>Rest — tap to add</p>
+                  }
+                </ion-label>
+
+                @if (day) {
+                  <ion-button
+                    slot="end"
+                    fill="clear"
+                    shape="round"
+                    color="medium"
+                    [attr.aria-label]="'Clear ' + day.name"
+                    (click)="askClear(day, $event)"
+                  >
+                    <ion-icon slot="icon-only" name="close-outline" aria-hidden="true" />
+                  </ion-button>
+                } @else {
+                  <ion-icon slot="end" name="add-outline" color="medium" aria-hidden="true" />
+                }
+              </ion-item>
+            }
+          </ion-list>
+        </section>
+      }
+    </div>
   }
 </ion-content>
 

@@ -13,9 +13,10 @@
         +{{ stepLabel() }}
       </button>
     </div>
-    <button class="close" type="button" aria-label="Close number pad" (click)="dismiss.emit()">
-      <ion-icon name="chevron-down-outline" aria-hidden="true" />
-    </button>
+
+    <ion-button fill="clear" shape="round" color="medium" aria-label="Close number pad" (click)="dismiss.emit()">
+      <ion-icon slot="icon-only" name="chevron-down-outline" aria-hidden="true" />
+    </ion-button>
   </div>
 
   <div class="keys">
@@ -36,5 +37,5 @@
     </button>
   </div>
 
-  <button class="done" type="button" (click)="commit.emit(committed())">Done</button>
+  <ion-button expand="block" class="done" (click)="commit.emit(committed())">Done</ion-button>
 </div>

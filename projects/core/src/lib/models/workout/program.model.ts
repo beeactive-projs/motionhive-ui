@@ -149,7 +149,12 @@ export interface ListProgramsQuery {
 }
 
 /** Which half of the library a surface wants, or both. */
-export type ProgramSize = 'program' | 'routine' | 'all';
+export const ProgramSizes = {
+  Program: 'program',
+  Routine: 'routine',
+  All: 'all',
+} as const;
+export type ProgramSize = (typeof ProgramSizes)[keyof typeof ProgramSizes];
 
 export interface PaginatedPrograms {
   items: Program[];

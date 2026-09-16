@@ -1,0 +1,36 @@
+<ion-item
+  class="mh-session-row mh-list-row"
+  button
+  detail="false"
+  lines="none"
+  [attr.data-tone]="tone()"
+  [class.today]="startable()"
+  (click)="select.emit()"
+>
+  <div class="when" slot="start">
+    <span class="time">{{ rail().day }}</span>
+    <span class="duration">{{ rail().weekday }}</span>
+  </div>
+
+  <ion-label>
+    <h2>{{ day().name }}</h2>
+    <div class="tags">
+      @if (isSkipped()) {
+        <ion-badge data-tone="medium">Skipped</ion-badge>
+      }
+      @if (meta()) {
+        <ion-note>{{ meta() }}</ion-note>
+      }
+    </div>
+  </ion-label>
+
+  @if (startable()) {
+    <ion-button slot="end" class="start" size="small" shape="round" color="primary" (click)="onStart($event)">
+      Start
+    </ion-button>
+  } @else if (isDone()) {
+    <ion-icon slot="end" class="tick" name="checkmark-circle-outline" color="success" aria-hidden="true" />
+  } @else {
+    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+  }
+</ion-item>

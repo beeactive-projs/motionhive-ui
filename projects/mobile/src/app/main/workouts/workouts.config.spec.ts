@@ -1,16 +1,25 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
+import { WorkoutLogStatus } from 'core';
+
+import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   WORKOUT_ICONS,
+  assignedDayTone,
   clockDigitsToDisplay,
   clockDigitsToSeconds,
+  dateRail,
   elapsedLabel,
+  exerciseSetSummary,
+  logChip,
+  logTone,
   planPositionLabel,
   routineTone,
   secondsToClock,
   workoutDuration,
   workoutMetaLine,
+  workoutTiles,
 } from './workouts.config';
 
 /** Every template in this feature, inlined at build time by Vite. */
@@ -28,15 +37,20 @@ const sources = import.meta.glob(['./**/*.ts', '!./**/*.spec.ts'], {
 }) as Record<string, string>;
 
 /**
- * Icon names this feature renders: static `name="…"` attributes, plus the
- * `icon: '…-outline'` literals that bound names (`[name]="item.icon"`) are
- * fed from. Scanning only the templates missed every icon an action sheet
- * declares, which is the same blank-box failure one layer further back.
+ * Icon names this feature renders: static `name="…"` attributes on
+ * `ion-icon`, static `icon="…"` attributes on the shared components that
+ * draw one (empty states, settings rows, hex tiles), plus the `icon: '…'`
+ * literals that bound names (`[name]="item.icon"`) are fed from. Scanning
+ * only the templates missed every icon an action sheet declares, which is
+ * the same blank-box failure one layer further back.
  */
 function iconNamesUsed(): Set<string> {
   const found = new Set<string>();
   for (const html of Object.values(templates)) {
     for (const match of html.matchAll(/<ion-icon[^>]*\bname="([a-z-]+)"/g)) {
+      found.add(match[1]);
+    }
+    for (const match of html.matchAll(/\sicon="([a-z-]+)"/g)) {
       found.add(match[1]);
     }
   }
@@ -49,6 +63,29 @@ function iconNamesUsed(): Set<string> {
 }
 
 const kebab = (key: string) => key.replace(/([A-Z])/g, '-$1').toLowerCase();
+
+/** Enough of a WorkoutLog to exercise the helpers. */
+const log = (over: Record<string, unknown> = {}) =>
+  ({
+    id: 'l1',
+    name: 'Push day',
+    status: WorkoutLogStatus.Completed,
+    startedAt: '2026-09-12T10:00:00Z',
+    durationSeconds: 1860,
+    feelingRating: null,
+    exercises: [],
+    ...over,
+  }) as never;
+
+const set = (over: Record<string, unknown> = {}) => ({
+  id: 's',
+  isCompleted: true,
+  weightKg: null,
+  reps: null,
+  durationSeconds: null,
+  distanceMeters: null,
+  ...over,
+});
 
 describe('workouts config', () => {
   // An unregistered icon renders as a blank box with no error — which is how
@@ -67,6 +104,26 @@ describe('workouts config', () => {
     expect(routineTone(0)).toBe(routineTone(5));
   });
 
+  // Every tone a row can wear must be one the `.mh-session-row` skin paints;
+  // an unknown name leaves the row with no spine at all.
+  it('keys a logged workout to a spine the row skin knows', () => {
+    const known = new Set(Object.values(SpineTones));
+    expect(logTone(log())).toBe(SpineTones.Booked);
+    expect(logTone(log({ status: WorkoutLogStatus.InProgress }))).toBe(SpineTones.Honey);
+    expect(logTone(log({ status: WorkoutLogStatus.Skipped }))).toBe(SpineTones.Muted);
+    for (const status of Object.values(WorkoutLogStatus)) {
+      expect(known).toContain(logTone(log({ status })));
+      expect(known).toContain(assignedDayTone({ status } as never));
+    }
+  });
+
+  // Completed is what almost every row is; a chip on every row says nothing.
+  it('chips only the log states that are exceptions', () => {
+    expect(logChip(log())).toBeNull();
+    expect(logChip(log({ status: WorkoutLogStatus.Skipped }))?.label).toBe('Skipped');
+    expect(logChip(log({ status: WorkoutLogStatus.InProgress }))?.label).toBe('In progress');
+  });
+
   it('names only the parts of the meta line it actually knows', () => {
     expect(workoutMetaLine(6, 55, 'Barbell')).toBe('6 exercises · ~55 min · Barbell');
     expect(workoutMetaLine(1, null)).toBe('1 exercise');
@@ -74,10 +131,16 @@ describe('workouts config', () => {
   });
 
   it('counts weeks and days from one, not zero', () => {
-    expect(planPositionLabel('Strength block', 2, 1)).toBe(
-      'STRENGTH BLOCK · WEEK 3 · DAY 2',
-    );
-    expect(planPositionLabel(null, 0, 0)).toBe('WEEK 1 · DAY 1');
+    expect(planPositionLabel('Strength block', 2, 1)).toBe('Strength block · Week 3 · Day 2');
+    expect(planPositionLabel(null, 0, 0)).toBe('Week 1 · Day 1');
+  });
+
+  // A calendar day is read as local midnight: `new Date('2026-09-12')` would
+  // read it as UTC and slip a day west of Greenwich.
+  it('reads a calendar day for the date rail without slipping a day', () => {
+    expect(dateRail('2026-09-12').day).toBe('12');
+    // 2026-09-12 is a Saturday.
+    expect(dateRail('2026-09-12').weekday).toMatch(/^Sat/);
   });
 
   // A hold is read as a clock, never as a count of seconds.
@@ -121,5 +184,39 @@ describe('workouts config', () => {
     expect(elapsedLabel(started.toISOString(), started.getTime() + 3_900_000)).toBe('1:05');
     // A clock that has not moved is 0:00, never negative.
     expect(elapsedLabel(started.toISOString(), started.getTime() - 5_000)).toBe('0:00');
+  });
+
+  // Only what the session actually contained — never one composite number.
+  // Shared by the trainee's summary and the coach's review, so this is the
+  // one place the tile maths lives.
+  it('tiles only the modalities a session contained', () => {
+    const loaded = log({
+      exercises: [
+        { isSkipped: false, sets: [set({ weightKg: 80, reps: 8 }), set({ weightKg: 80, reps: 7 })] },
+      ],
+    });
+    expect(workoutTiles(loaded).map((t) => t.label)).toEqual(['Sets', 'Volume']);
+    expect(workoutTiles(loaded).find((t) => t.label === 'Volume')?.value).toBe('1200 kg');
+
+    const bodyweight = log({
+      exercises: [{ isSkipped: false, sets: [set({ reps: 12 }), set({ reps: 10 })] }],
+    });
+    expect(workoutTiles(bodyweight).map((t) => t.label)).toEqual(['Sets', 'Reps']);
+
+    const hold = log({
+      exercises: [{ isSkipped: false, sets: [set({ durationSeconds: 60 }), set({ isCompleted: false, durationSeconds: 60 })] }],
+    });
+    // Unticked sets do not count, so one minute, not two.
+    expect(workoutTiles(hold)).toEqual([
+      { label: 'Sets', value: '1' },
+      { label: 'Time', value: '1 min' },
+    ]);
+  });
+
+  // A skip is a decision; "0 of 4" would read as a failure.
+  it('summarises an exercise as done-of-total, and a skip as a skip', () => {
+    expect(exerciseSetSummary({ isSkipped: false, sets: [set(), set({ isCompleted: false })] } as never)).toBe('1 of 2 sets');
+    expect(exerciseSetSummary({ isSkipped: false, sets: [set()] } as never)).toBe('1 of 1 set');
+    expect(exerciseSetSummary({ isSkipped: true, sets: [set()] } as never)).toBe('Skipped');
   });
 });

@@ -8,56 +8,47 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading() && !logs().length) {
-    @for (row of skeletonRows; track row) {
-      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (failed()) {
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Could not load history"
+      heading="Couldn't load your history"
       message="Check your connection and try again."
-      actionLabel="Retry"
-      (action)="load()"
+      actionLabel="Try again"
+      (action)="retry()"
     />
-  } @else if (!logs().length) {
+  } @else if (store.showSkeleton()) {
+    <!-- Mirrors the row shape so nothing shifts when the rows land. -->
+    <div class="mh-page">
+      <span class="mh-kicker meta">
+        <ion-skeleton-text [animated]="true" style="width: 9rem; height: 0.75rem" />
+      </span>
+      <div>
+        @for (_ of skeletonRows; track $index) {
+          <mh-session-row-skeleton />
+        }
+      </div>
+    </div>
+  } @else if (store.isEmpty()) {
     <mh-empty-state
       icon="time-outline"
       heading="Nothing logged yet"
       message="Finish a workout and it will show up here."
     />
   } @else {
-    <p class="count">{{ total() }} workouts logged</p>
+    <div class="mh-page">
+      <span class="mh-kicker meta">{{ store.countLabel() }}</span>
+      <div>
+        @for (log of store.items(); track log.id) {
+          <mh-log-row [log]="log" [repeatable]="true" (select)="open(log)" (repeat)="repeat(log)" />
+        }
+      </div>
+    </div>
 
-    @for (log of logs(); track log.id) {
-      <button class="row" type="button" (click)="open(log)">
-        <span class="date mh-kicker">{{ dayLabel(log) }}</span>
-        <span class="name">{{ log.name }}</span>
-        <span class="meta">
-          @if (duration(log)) {
-            {{ duration(log) }}
-          }
-          @if (log.feelingRating) {
-            · {{ log.feelingRating }}/5
-          }
-        </span>
-        <span
-          class="repeat"
-          role="button"
-          tabindex="0"
-          [attr.aria-label]="'Repeat ' + log.name"
-          (click)="repeat(log, $event)"
-          (keydown.enter)="repeat(log, $event)"
-        >
-          <ion-icon name="refresh-outline" aria-hidden="true" />
-        </span>
-      </button>
-    }
-
-    <ion-infinite-scroll
-      [disabled]="logs().length >= total()"
-      (ionInfinite)="loadMore($any($event))"
-    >
+    <ion-infinite-scroll [disabled]="!store.hasMore()" (ionInfinite)="onLoadMore($event)">
       <ion-infinite-scroll-content />
     </ion-infinite-scroll>
   }

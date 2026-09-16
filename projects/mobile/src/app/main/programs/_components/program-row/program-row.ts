@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
-import { IonBadge, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 
-import { Program, dayDividerLabel, localDayKey } from 'core';
+import { Program, ProgramStatus, dayDividerLabel, localDayKey } from 'core';
 
 import { programMeta, programTone } from '../../programs.config';
 
@@ -12,7 +12,7 @@ import { programMeta, programTone } from '../../programs.config';
  */
 @Component({
   selector: 'mh-program-row',
-  imports: [IonBadge, IonIcon, IonItem, IonLabel],
+  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote],
   templateUrl: './program-row.html',
   styleUrl: './program-row.scss',
 })
@@ -27,7 +27,7 @@ export class ProgramRow {
 
   readonly meta = computed(() => programMeta(this.program()));
 
-  readonly isDraft = computed(() => this.program().status === 'DRAFT');
+  readonly isDraft = computed(() => this.program().status === ProgramStatus.Draft);
 
   readonly isRoutine = computed(() => this.program().isSingleWorkout);
 

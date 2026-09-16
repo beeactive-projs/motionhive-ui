@@ -8,56 +8,96 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading() && !loaded()) {
-    @for (row of skeletonRows; track row) {
-      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (failed()) {
+  @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Could not load their training"
+      heading="Couldn't load their training"
       message="Check your connection and try again."
-      actionLabel="Retry"
+      actionLabel="Try again"
       (action)="load()"
     />
+  } @else if (showSkeleton()) {
+    <!-- Mirrors the row shape so nothing shifts when data lands. -->
+    <div class="mh-page">
+      <section class="mh-section">
+        <span class="mh-kicker">Plan</span>
+        <ion-list [inset]="true" class="mh-card-list">
+          <ion-item lines="none">
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 40%" /></p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </section>
+      <section class="mh-section">
+        <span class="mh-kicker">Recent workouts</span>
+        <div>
+          @for (_ of skeletonRows; track $index) {
+            <mh-session-row-skeleton />
+          }
+        </div>
+      </section>
+    </div>
   } @else if (isEmpty()) {
     <mh-empty-state
-      icon="barbell-outline"
+      icon="albums-outline"
       heading="Nothing yet"
       message="Assign a program and their work will show up here."
     />
   } @else {
-    @if (activePlans().length) {
-      <h3 class="mh-section-label">Plan</h3>
-      @for (plan of activePlans(); track plan.id) {
-        <div class="plan">
-          <span class="name">{{ plan.programNameSnapshot }}</span>
-          <span class="sub">{{ planPosition(plan) }}</span>
-        </div>
+    <div class="mh-page">
+      @if (activePlans().length) {
+        <section class="mh-section">
+          <span class="mh-kicker">Plan</span>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (plan of activePlans(); track plan.id; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'">
+                <ion-label>
+                  <h2>{{ plan.programNameSnapshot }}</h2>
+                  <p>{{ planSubline(plan) }}</p>
+                  <ion-progress-bar [value]="plan.completionPercent / 100" />
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
       }
-    }
 
-    <h3 class="mh-section-label">Recent workouts</h3>
-    @if (logs().length) {
-      @for (log of logs(); track log.id) {
-        <button class="log" type="button" (click)="openLog(log)">
-          <span class="day mh-kicker">{{ logDay(log) }}</span>
-          <span class="name">{{ log.name }}</span>
-          @if (logMeta(log)) {
-            <span class="meta">{{ logMeta(log) }}</span>
-          }
-          <ion-icon name="chevron-forward" aria-hidden="true" />
-        </button>
-      }
-    } @else {
-      <p class="none">Nothing logged in this window.</p>
-    }
+      <section class="mh-section">
+        <span class="mh-kicker">Recent workouts</span>
+        @if (logs().length) {
+          <div>
+            @for (log of logs(); track log.id) {
+              <mh-log-row [log]="log" (select)="openLog(log)" />
+            }
+          </div>
+        } @else {
+          <ion-note class="mh-note-block">Nothing logged in this window.</ion-note>
+        }
+      </section>
 
-    <!-- Said plainly, because a short list otherwise reads as a lazy client
-         rather than as work they chose to keep to themselves. -->
-    <p class="privacy">
-      Workouts your client does outside their plan stay private unless they
-      share them, so this list may not be everything they did.
-    </p>
+      <!-- The boundary, stated rather than implied — styled as a rule, never
+           a gap that looks like a bug. A short list otherwise reads as a lazy
+           client rather than as work they chose to keep to themselves. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item lines="none">
+          <mh-hex-avatar
+            slot="start"
+            size="sm"
+            icon="lock-closed-outline"
+            color="medium"
+            tone="wash"
+            aria-hidden="true"
+          />
+          <ion-label class="ion-text-wrap">
+            <p>
+              Workouts your client does outside their plan stay private unless they
+              share them, so this list may not be everything they did.
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
   }
 </ion-content>

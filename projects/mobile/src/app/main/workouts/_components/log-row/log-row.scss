@@ -1,0 +1,28 @@
+/* Geometry, spine tones and the tags line come from the shared
+   `.mh-session-row` skin (theme/components/mh-session-row.css); only the
+   row's self-spacing and its one control live here. */
+
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* A record reads quieter across the board, not just in the spine. */
+ion-item[data-tone='muted'] .time,
+ion-item[data-tone='muted'] h2 {
+  color: var(--ion-color-medium);
+}
+
+/* Repeat as a soft honey circle — an action, so it earns the accent. Ionic's
+   clear button inherits the honey fill colour for its glyph, which is 2.05:1
+   on white; the deep ink token is what an amber glyph wants. */
+ion-button {
+  --background: var(--mh-color-selected-background);
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  min-height: 0;
+  margin: 0;
+}

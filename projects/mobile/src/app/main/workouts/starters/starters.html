@@ -8,28 +8,46 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <p class="lede">Pick one to try — it becomes yours to edit.</p>
-
-  @if (loading() && !routines().length) {
-    @for (row of skeletonRows; track row) {
-      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (failed()) {
+  @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Could not load starters"
+      heading="Couldn't load the starters"
       message="Check your connection and try again."
-      actionLabel="Retry"
+      actionLabel="Try again"
+      (action)="load()"
+    />
+  } @else if (isEmpty()) {
+    <mh-empty-state
+      icon="flash-outline"
+      heading="No starters yet"
+      message="MotionHive's starter routines are not available right now. Try again in a moment."
+      actionLabel="Try again"
+      actionFill="outline"
       (action)="load()"
     />
   } @else {
-    @for (routine of routines(); track routine.id; let i = $index) {
-      <mh-routine-row
-        [routine]="routine"
-        [tone]="routineTone(i)"
-        [starter]="true"
-        (select)="open(routine)"
-      />
-    }
+    <div class="mh-page">
+      <ion-note class="mh-note-block">Pick one to try — it becomes yours to edit.</ion-note>
+
+      @if (showSkeleton()) {
+        <!-- Mirrors the row shape so nothing shifts when the rows land. -->
+        <div>
+          @for (_ of skeletonRows; track $index) {
+            <mh-session-row-skeleton [rail]="false" />
+          }
+        </div>
+      } @else {
+        <div>
+          @for (routine of routines(); track routine.id; let i = $index) {
+            <mh-routine-row
+              [routine]="routine"
+              [tone]="routineTone(i)"
+              [starter]="true"
+              (select)="open(routine)"
+            />
+          }
+        </div>
+      }
+    </div>
   }
 </ion-content>

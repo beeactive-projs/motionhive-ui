@@ -2,15 +2,16 @@ import { Component, model, output } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-
-export type CreateChoice = 'program' | 'routine' | 'starters';
+import { CREATE_OPTIONS, CreateChoice } from '../../programs.config';
 
 /**
  * The one place anything gets created in the library.
  *
  * Three verbs behind a single button rather than three competing controls in
- * the header: they are the same intent at different sizes, and a starter is
- * the honest third answer for someone who does not want to author at all.
+ * the header — see `CREATE_OPTIONS`. The choice is handed back only once the
+ * sheet has actually gone: the parent navigates on it, and navigating while
+ * Ionic is still animating the dismissal tears the page down under the modal
+ * and leaves the sheet stranded on screen over the new page.
  */
 @Component({
   selector: 'mh-create-sheet',
@@ -23,34 +24,12 @@ export class CreateSheet {
 
   readonly choose = output<CreateChoice>();
 
-  readonly options = [
-    {
-      id: 'program' as const,
-      label: 'New program',
-      hint: 'Multi-week, several days each',
-      icon: 'albums-outline',
-    },
-    {
-      id: 'routine' as const,
-      label: 'New routine',
-      hint: 'One session you repeat',
-      icon: 'repeat-outline',
-    },
-    {
-      id: 'starters' as const,
-      label: 'Browse starters',
-      hint: "Start from one of ours",
-      icon: 'flash-outline',
-    },
-  ];
+  readonly options = CREATE_OPTIONS;
 
   /** The choice waits here until the sheet has actually gone. */
   private _pending: CreateChoice | null = null;
 
   pick(id: CreateChoice): void {
-    // Not emitted yet: the parent navigates on it, and navigating while
-    // Ionic is still animating the dismissal tears the page down under the
-    // modal and leaves the sheet stranded on screen over the new page.
     this._pending = id;
     this.open.set(false);
   }

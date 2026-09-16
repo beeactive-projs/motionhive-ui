@@ -1,4 +1,6 @@
-export type RoutineSource = 'SYSTEM' | 'USER' | 'INSTRUCTOR';
+import type { RoutineSource } from './workout.enums';
+
+export type { RoutineSource } from './workout.enums';
 
 /**
  * A routine is a person's own saved workout: a name plus an ordered list

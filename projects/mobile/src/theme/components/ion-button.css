@@ -77,3 +77,26 @@ ion-buttons ion-button.glyph {
 ion-item ion-button[fill='clear'] {
   --color: var(--mh-color-honey-deep);
 }
+
+/* "Add …" as a dashed outline: reads as "make something", not as a filled
+   row that already exists. An outline ion-button with the border restyled —
+   Ionic exposes the style and width, so no wrapper is needed. */
+ion-button.mh-add-dashed {
+  --border-style: dashed;
+  --border-width: 1px;
+  --border-color: var(--ion-border-color);
+  --color: var(--mh-color-honey-deep);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* A danger-tinted outline square the size of a tap target — the remove
+   control beside a stepper. Icon-only, so the padding goes. */
+ion-button.mh-remove {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+  min-height: 0;
+  margin: 0;
+}

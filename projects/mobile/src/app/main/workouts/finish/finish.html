@@ -8,92 +8,128 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading()) {
-    <p class="mh-state">Loading…</p>
-  } @else if (failed() || !log()) {
-    <p class="mh-state">Could not open this workout.</p>
-  } @else {
-    <div class="hero">
-      <span class="mh-kicker">{{ isReview() ? 'Logged' : 'Done' }}</span>
-      <h1>{{ log()?.name }}</h1>
-      <p class="duration">{{ durationLabel() }}</p>
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this workout"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="load()"
+    />
+  } @else if (showSkeleton()) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          <ion-skeleton-text [animated]="true" style="width: 20%; height: 0.75rem" />
+          <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.25rem" />
+          <ion-skeleton-text [animated]="true" style="width: 30%" />
+        </ion-card-content>
+      </ion-card>
+      <div class="mh-tiles">
+        @for (_ of skeletonTiles; track $index) {
+          <mh-stat-tile label="" value="" [loading]="true" />
+        }
+      </div>
     </div>
+  } @else if (log(); as log) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          <span class="mh-kicker done">{{ isReview() ? 'Logged' : 'Done' }}</span>
+          <h2>{{ log.name }}</h2>
+          <p class="duration">{{ durationLabel() }}</p>
+        </ion-card-content>
+      </ion-card>
 
-    <!-- Only what the session actually contained. Never one composite. -->
-    <div class="tiles">
-      @for (tile of tiles(); track tile.label) {
-        <mh-stat-tile [label]="tile.label" [value]="tile.value" />
-      }
-    </div>
-
-    @if (!isReview()) {
-      <h3 class="mh-section-label">How did it feel?</h3>
-      <div class="feelings">
-        @for (f of feelings; track f.value) {
-          <button
-            type="button"
-            class="feeling"
-            [class.on]="feeling() === f.value"
-            [attr.aria-label]="'Rating ' + f.value + ' of 5'"
-            [attr.aria-pressed]="feeling() === f.value"
-            (click)="feeling.set(f.value)"
-          >
-            {{ f.glyph }}
-          </button>
+      <!-- Only what the session actually contained. Never one composite. -->
+      <div class="mh-tiles">
+        @for (tile of tiles(); track tile.label) {
+          <mh-stat-tile [label]="tile.label" [value]="tile.value" />
         }
       </div>
 
-      <h3 class="mh-section-label">Notes</h3>
-      <ion-textarea
-        class="note"
-        fill="outline"
-        [autoGrow]="true"
-        placeholder="Anything worth remembering next time?"
-        [value]="note()"
-        (ionInput)="note.set($any($event).detail.value ?? '')"
-      />
-    }
+      @if (!isReview()) {
+        <section class="mh-section">
+          <span class="mh-kicker">How did it feel?</span>
+          <!-- A rating affordance sized for a thumb: five same-sized tiles, one
+               of which is pressed. A grid, so the tiles stay plain buttons. -->
+          <div class="feelings">
+            @for (f of feelings; track f.value) {
+              <button
+                type="button"
+                class="feeling"
+                [class.on]="feeling() === f.value"
+                [attr.aria-label]="'Rating ' + f.value + ' of 5'"
+                [attr.aria-pressed]="feeling() === f.value"
+                (click)="feeling.set(f.value)"
+              >
+                {{ f.glyph }}
+              </button>
+            }
+          </div>
+        </section>
 
-    <!-- One prompt slot. A freestyle session can become a routine; a session
-         that came from a plan shows nothing here at all. -->
-    @if (canSaveAsRoutine()) {
-      <div class="prompt">
-        <span class="mh-kicker">Save as routine?</span>
-        <p>Keep this workout to repeat later.</p>
-        <ion-input
-          fill="outline"
-          label="Name"
-          labelPlacement="stacked"
-          [value]="routineName()"
-          (ionInput)="routineName.set($any($event).detail.value ?? '')"
-        />
-        <ion-button
-          expand="block"
-          fill="outline"
-          [disabled]="savingRoutine() || !routineName().trim()"
-          (click)="saveAsRoutine()"
-        >
-          Save routine
-        </ion-button>
-      </div>
-    }
+        <section class="mh-section">
+          <span class="mh-kicker">Notes</span>
+          <ion-textarea
+            fill="outline"
+            [autoGrow]="true"
+            placeholder="Anything worth remembering next time?"
+            [value]="note()"
+            (ionInput)="note.set($any($event).detail.value ?? '')"
+          />
+        </section>
+      }
 
-    <h3 class="mh-section-label">What you did</h3>
-    @for (exercise of log()?.exercises ?? []; track exercise.id) {
-      <div class="ex" [class.skipped]="exercise.isSkipped">
-        <span class="name">{{ exercise.exerciseNameSnapshot }}</span>
-        <span class="sets">
-          {{ exercise.isSkipped ? 'Skipped' : (exercise.sets ?? []).length + ' sets' }}
-        </span>
-      </div>
-    }
+      <!-- One prompt slot. A freestyle session can become a routine; a session
+           that came from a plan shows nothing here at all. -->
+      @if (canSaveAsRoutine()) {
+        <ion-card class="prompt">
+          <ion-card-content>
+            <span class="mh-kicker">Save as routine?</span>
+            <p>Keep this workout to repeat later.</p>
+            <ion-input
+              fill="outline"
+              label="Name"
+              labelPlacement="stacked"
+              [value]="routineName()"
+              (ionInput)="routineName.set($any($event).detail.value ?? '')"
+            />
+            <ion-button
+              expand="block"
+              fill="outline"
+              [disabled]="savingRoutine() || !routineName().trim()"
+              (click)="saveAsRoutine()"
+            >
+              Save routine
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      }
+
+      <section class="mh-section">
+        <span class="mh-kicker">What you did</span>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (exercise of exercises(); track exercise.id; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'" [class.skipped]="exercise.isSkipped">
+              <ion-label>
+                <h2>{{ exercise.exerciseNameSnapshot }}</h2>
+              </ion-label>
+              <ion-note slot="end">{{ setSummary(exercise) }}</ion-note>
+            </ion-item>
+          }
+        </ion-list>
+      </section>
+    </div>
   }
 </ion-content>
 
 @if (!isReview() && log()) {
-  <div class="mh-cta-bar">
-    <ion-button expand="block" [disabled]="saving()" (click)="save()">
-      Save &amp; finish
-    </ion-button>
-  </div>
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <div class="mh-cta-bar">
+        <ion-button expand="block" [disabled]="saving()" (click)="save()">Save &amp; finish</ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
 }

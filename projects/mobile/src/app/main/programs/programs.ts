@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonButton,
+  IonButtons,
+  IonChip,
   IonContent,
   IonFab,
   IonFabButton,
@@ -9,7 +11,6 @@ import {
   IonIcon,
   IonRefresher,
   IonRefresherContent,
-  IonSkeletonText,
   IonTitle,
   IonToolbar,
   RefresherCustomEvent,
@@ -17,13 +18,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { Program, ProgramSize } from 'core';
+import { Program, ProgramSize, ProgramSizes } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
+import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ProgramRow } from './_components/program-row/program-row';
-import { CreateChoice, CreateSheet } from './_sheets/create-sheet/create-sheet';
-import { PROGRAM_ICONS } from './programs.config';
+import { CreateSheet } from './_sheets/create-sheet/create-sheet';
+import { CreateChoice, CreateChoices, LIBRARY_PILLS, PROGRAM_ICONS } from './programs.config';
 import { ProgramsStore } from './programs.store';
 
 /**
@@ -41,6 +43,8 @@ import { ProgramsStore } from './programs.store';
     CreateSheet,
     EmptyState,
     IonButton,
+    IonButtons,
+    IonChip,
     IonContent,
     IonFab,
     IonFabButton,
@@ -48,11 +52,11 @@ import { ProgramsStore } from './programs.store';
     IonIcon,
     IonRefresher,
     IonRefresherContent,
-    IonSkeletonText,
     IonTitle,
     IonToolbar,
     NotificationBell,
     ProgramRow,
+    SessionRowSkeleton,
   ],
   providers: [ProgramsStore],
   templateUrl: './programs.html',
@@ -63,12 +67,9 @@ export class Programs implements ViewWillEnter {
   private readonly _router = inject(Router);
 
   readonly skeletonRows = [1, 2, 3, 4];
-
-  readonly pills: { id: ProgramSize; label: string }[] = [
-    { id: 'all', label: 'All' },
-    { id: 'program', label: 'Programs' },
-    { id: 'routine', label: 'Routines' },
-  ];
+  readonly pills = LIBRARY_PILLS;
+  readonly Choices = CreateChoices;
+  readonly Sizes = ProgramSizes;
 
   readonly createOpen = signal(false);
 
@@ -86,8 +87,16 @@ export class Programs implements ViewWillEnter {
     this.store.load({ done: () => void event.target.complete() });
   }
 
-  countFor(id: ProgramSize): number {
-    return this.store.counts()[id];
+  retry(): void {
+    this.store.load();
+  }
+
+  setSize(size: ProgramSize): void {
+    this.store.setSize(size);
+  }
+
+  countFor(size: ProgramSize): number {
+    return this.store.counts()[size];
   }
 
   open(program: Program): void {
@@ -96,15 +105,15 @@ export class Programs implements ViewWillEnter {
     void this._router.navigate(['/tabs/programs', path, program.id]);
   }
 
+  openCreate(): void {
+    this.createOpen.set(true);
+  }
+
   onCreate(choice: CreateChoice): void {
-    if (choice === 'starters') {
+    if (choice === CreateChoices.Starters) {
       void this._router.navigate(['/tabs/workouts/starters']);
       return;
     }
     void this._router.navigate(['/tabs/programs', choice, 'new']);
-  }
-
-  retry(): void {
-    this.store.load();
   }
 }

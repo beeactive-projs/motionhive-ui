@@ -1,8 +1,9 @@
 import { Component, computed, input, model, output, signal } from '@angular/core';
-import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonIcon, IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
+import { weekLabel } from '../../programs.config';
 
 /**
  * Copy one week onto others — the single biggest time-saver in authoring,
@@ -13,7 +14,7 @@ import { toggleValue } from '../../../../_shared/utils/list.utils';
  */
 @Component({
   selector: 'mh-copy-week-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, IonNote, SheetShell],
   templateUrl: './copy-week-sheet.html',
   styleUrl: './copy-week-sheet.scss',
 })
@@ -33,7 +34,7 @@ export class CopyWeekSheet {
     ),
   );
 
-  readonly title = computed(() => `Copy week ${this.fromWeek() + 1}`);
+  readonly title = computed(() => `Copy ${weekLabel(this.fromWeek()).toLowerCase()}`);
 
   readonly confirmLabel = computed(() => {
     const n = this.selected().length;
@@ -54,9 +55,5 @@ export class CopyWeekSheet {
     this.selected.set([]);
     this.open.set(false);
     this.copy.emit(chosen);
-  }
-
-  onOpenChange(open: boolean): void {
-    if (!open) this.selected.set([]);
   }
 }

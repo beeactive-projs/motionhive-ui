@@ -1,9 +1,14 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
+import { ProgramAssignmentStatus, ProgramStatus } from 'core';
+
+import { SpineTones } from '../../_shared/models/spine-tone.model';
 import {
   PROGRAM_ICONS,
   assignmentChip,
+  assignmentSubline,
+  assignmentTone,
   programMeta,
   programTone,
   scheduledDateFor,
@@ -23,10 +28,16 @@ const sources = import.meta.glob(['./**/*.ts', '!./**/*.spec.ts'], {
   eager: true,
 }) as Record<string, string>;
 
+/**
+ * Icon names this feature renders: static `name="…"` on `ion-icon`, static
+ * `icon="…"` on the shared components that draw one, and the `icon: '…'`
+ * literals bound names are fed from.
+ */
 function iconNamesUsed(): Set<string> {
   const found = new Set<string>();
   for (const html of Object.values(templates)) {
     for (const m of html.matchAll(/<ion-icon[^>]*\bname="([a-z-]+)"/g)) found.add(m[1]);
+    for (const m of html.matchAll(/\sicon="([a-z-]+)"/g)) found.add(m[1]);
   }
   for (const ts of Object.values(sources)) {
     for (const m of ts.matchAll(/\bicon:\s*'([a-z][a-z-]*)'/g)) found.add(m[1]);
@@ -41,10 +52,20 @@ const program = (over: Record<string, unknown> = {}) =>
   ({
     id: 'p1',
     name: 'Block',
-    status: 'PUBLISHED',
+    status: ProgramStatus.Published,
     isSingleWorkout: false,
     durationDays: 28,
     workouts: [],
+    ...over,
+  }) as never;
+
+/** Enough of a ProgramAssignment to exercise the row copy. */
+const assignment = (over: Record<string, unknown> = {}) =>
+  ({
+    id: 'a1',
+    status: ProgramAssignmentStatus.Active,
+    startDate: '2026-09-07',
+    completionPercent: 25,
     ...over,
   }) as never;
 
@@ -59,10 +80,12 @@ describe('programs config', () => {
   // The spine is the only thing telling a program from a routine at a glance,
   // and a draft has to read as unassignable before you tap into it.
   it('keys the spine to what a row is, and dims a draft', () => {
-    expect(programTone(program())).toBe('honey');
-    expect(programTone(program({ isSingleWorkout: true }))).toBe('teal');
-    expect(programTone(program({ status: 'DRAFT' }))).toBe('muted');
-    expect(programTone(program({ isSingleWorkout: true, status: 'DRAFT' }))).toBe('muted');
+    expect(programTone(program())).toBe(SpineTones.Honey);
+    expect(programTone(program({ isSingleWorkout: true }))).toBe(SpineTones.Teal);
+    expect(programTone(program({ status: ProgramStatus.Draft }))).toBe(SpineTones.Muted);
+    expect(programTone(program({ isSingleWorkout: true, status: ProgramStatus.Draft }))).toBe(
+      SpineTones.Muted,
+    );
   });
 
   it('says nothing about a routine whose exercise count it does not know', () => {
@@ -84,10 +107,30 @@ describe('programs config', () => {
   // ACTIVE is silent on purpose: it is what most rows are, and a chip on
   // every row is a chip that says nothing.
   it('chips only the assignment states that are exceptions', () => {
-    expect(assignmentChip('ACTIVE')).toBeNull();
-    expect(assignmentChip('PAUSED')?.label).toBe('Paused');
-    expect(assignmentChip('PENDING')?.label).toBe('Not started');
-    expect(assignmentChip('CANCELLED')?.label).toBe('Cancelled');
+    expect(assignmentChip(ProgramAssignmentStatus.Active)).toBeNull();
+    expect(assignmentChip(ProgramAssignmentStatus.Paused)?.label).toBe('Paused');
+    expect(assignmentChip(ProgramAssignmentStatus.Pending)?.label).toBe('Not started');
+    expect(assignmentChip(ProgramAssignmentStatus.Cancelled)?.label).toBe('Cancelled');
+  });
+
+  // Every state must map to a tone the `.mh-session-row` skin actually
+  // paints — ACTIVE once mapped to a name the stylesheet did not know and
+  // shipped with no spine at all.
+  it('gives every assignment state a spine the row skin knows', () => {
+    const known = new Set(Object.values(SpineTones));
+    for (const status of Object.values(ProgramAssignmentStatus)) {
+      expect(known, `${status} has no paintable spine`).toContain(assignmentTone(status));
+    }
+    expect(assignmentTone(ProgramAssignmentStatus.Active)).toBe(SpineTones.Booked);
+  });
+
+  // The paused promise is the whole point of pausing.
+  it('says what resuming a paused assignment does', () => {
+    expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Paused }))).toMatch(
+      /shifts the remaining schedule forward/,
+    );
+    expect(assignmentSubline(assignment())).toBe('25% done');
+    expect(assignmentSubline(assignment({ status: ProgramAssignmentStatus.Cancelled }))).toBe('');
   });
 
   // The assign preview is only as good as this maths: a start date on the

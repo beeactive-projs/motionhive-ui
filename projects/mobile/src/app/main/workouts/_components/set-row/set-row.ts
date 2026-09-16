@@ -1,15 +1,9 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 
-import { LoggedSet, SetField, setFieldsFor } from 'core';
+import { LoggedSet, SetField, SetFields, setFieldsFor } from 'core';
 
-import { secondsToClock } from '../../workouts.config';
-
-/** Which cell of a set row the user is editing. */
-export interface SetFieldTarget {
-  setId: string;
-  field: SetField;
-}
+import { secondsToClock, setTypeMark } from '../../workouts.config';
 
 /**
  * One set: what was planned, what happened, and the tick that says it did.
@@ -19,6 +13,11 @@ export interface SetFieldTarget {
  *
  * Which cells appear is driven by the exercise's kind via `setFieldsFor`, so
  * a plank shows a duration cell and no weight field at all.
+ *
+ * The cells and the tick are plain buttons on theme tokens rather than
+ * `ion-button`s on purpose: they are grid cells sized for a thumb between
+ * sets, and Ionic's button chrome (its padding, its ripple, its label
+ * sizing) fights a grid at every row.
  */
 @Component({
   selector: 'mh-set-row',
@@ -50,48 +49,13 @@ export class SetRow {
     const base = setFieldsFor(this.kind());
     // Weight is prepended rather than appended so the column order matches
     // a loaded exercise: weight then reps, everywhere.
-    return this.showAddedWeight() && !base.includes('weight')
-      ? (['weight', ...base] as SetField[])
+    return this.showAddedWeight() && !base.includes(SetFields.Weight)
+      ? [SetFields.Weight, ...base]
       : base;
   });
 
   /** Only shown when it is not a plain working set. */
-  readonly typeChip = computed(() => {
-    const type = this.set().setType;
-    if (!type || type === 'NORMAL') return '';
-    return type === 'WARMUP' ? 'W' : type.charAt(0) + type.slice(1).toLowerCase();
-  });
-
-  /**
-   * The prescription, when this set came from a plan.
-   *
-   * `resolvedWeightKg` wins over `targetWeightKg`: the backend stamps it at
-   * workout start with the %1RM already worked out against the user's latest
-   * one-rep max, and the locked decision is that a client sees "82.5 kg", not
-   * "80% of 1RM".
-   */
-  readonly target = computed(() => {
-    const assigned = this.set().assignedSet;
-    if (!assigned) return '';
-
-    const bits: string[] = [];
-
-    const { targetRepsMin: min, targetRepsMax: max } = assigned;
-    if (min != null && max != null && min !== max) bits.push(`${min}–${max}`);
-    else if (min ?? max) bits.push(`${min ?? max}`);
-
-    const weight = assigned.resolvedWeightKg ?? assigned.targetWeightKg;
-    if (weight != null) bits.push(`${weight}kg`);
-
-    if (assigned.targetDurationSeconds != null) {
-      bits.push(`${assigned.targetDurationSeconds}s`);
-    }
-    if (assigned.targetDistanceMeters != null) {
-      bits.push(`${assigned.targetDistanceMeters}m`);
-    }
-
-    return bits.join(' × ');
-  });
+  readonly typeMark = computed(() => setTypeMark(this.set().setType));
 
   /** "60 × 8" from the same set number last time — the memory aid. */
   readonly previousLabel = computed(() => {
@@ -100,31 +64,22 @@ export class SetRow {
     const bits: string[] = [];
     if (prev.weightKg != null) bits.push(`${prev.weightKg}`);
     if (prev.reps != null) bits.push(`${prev.reps}`);
-    if (prev.durationSeconds != null) bits.push(`${prev.durationSeconds}s`);
+    if (prev.durationSeconds != null) bits.push(secondsToClock(prev.durationSeconds));
     return bits.length ? bits.join(' × ') : '—';
   });
 
   cellValue(field: SetField): string {
-    const s = this.set();
-    const raw =
-      field === 'weight'
-        ? s.weightKg
-        : field === 'reps'
-          ? s.reps
-          : field === 'duration'
-            ? s.durationSeconds
-            : s.distanceMeters;
-    if (raw == null) return '';
-    // A hold reads as a clock, not as a count of seconds: 90 is "1:30".
-    if (field === 'duration') return secondsToClock(raw);
-    return String(raw);
-  }
-
-  /** Column headings, so "reps" can say "each" where that is what it means. */
-  fieldLabel(field: SetField): string {
-    if (field === 'reps') return this.unilateral() ? 'reps each' : 'reps';
-    if (field === 'duration') return 'time';
-    if (field === 'distance') return 'distance';
-    return 'kg';
+    const set = this.set();
+    switch (field) {
+      case SetFields.Weight:
+        return set.weightKg == null ? '' : String(set.weightKg);
+      case SetFields.Reps:
+        return set.reps == null ? '' : String(set.reps);
+      case SetFields.Duration:
+        // A hold reads as a clock, not as a count of seconds: 90 is "1:30".
+        return set.durationSeconds == null ? '' : secondsToClock(set.durationSeconds);
+      case SetFields.Distance:
+        return set.distanceMeters == null ? '' : String(set.distanceMeters);
+    }
   }
 }
