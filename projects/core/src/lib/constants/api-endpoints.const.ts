@@ -296,6 +296,7 @@ export const API_ENDPOINTS = {
     REPORTS: '/messaging/reports',
     UNREAD_COUNT: '/messaging/unread-count',
     STREAM: '/messaging/stream',
+    STREAM_TICKET: '/messaging/stream/ticket',
     STREAM_ACK: '/messaging/stream/ack',
   },
 } as const;

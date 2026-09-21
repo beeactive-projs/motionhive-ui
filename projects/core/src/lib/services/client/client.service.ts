@@ -28,6 +28,12 @@ export class ClientService {
     if (params.status) httpParams = httpParams.set('status', params.status);
     if (params.page) httpParams = httpParams.set('page', params.page.toString());
     if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
+    if (params.direction) httpParams = httpParams.set('direction', params.direction);
+
+    // Sent trimmed, and only when it can match: the API ignores anything
+    // under two characters, and an empty `search=` would be noise on the URL.
+    const search = params.search?.trim();
+    if (search) httpParams = httpParams.set('search', search);
 
     return this._http.get<ClientListResponse>(this.baseUrl, { params: httpParams });
   }

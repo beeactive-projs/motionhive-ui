@@ -33,9 +33,11 @@ import { injectPeopleSearch } from '../../../../_shared/utils/people-search';
 import { ShareOutcomes, shareOrCopy } from '../../../../_shared/utils/share';
 import {
   CLIENT_ICONS,
+  EMAIL_MAX_LENGTH,
   INVITE_EXPIRY_DAYS,
   InviteMode,
   InviteModes,
+  emailErrorMessage,
   inviteLink,
   isValidEmail,
 } from '../../clients.config';
@@ -94,6 +96,20 @@ export class InviteClientSheet {
   readonly message = signal('');
   readonly saving = signal(false);
 
+  readonly emailMaxLength = EMAIL_MAX_LENGTH;
+
+  /**
+   * Set on blur, not on the first keystroke. A half-typed address is not a
+   * mistake yet, and red text that appears at `r` and stays until `@` is
+   * reached teaches people to ignore it.
+   */
+  readonly emailTouched = signal(false);
+
+  /** Null until there is something to say, which is what `ion-invalid` reads. */
+  readonly emailError = computed(() =>
+    this.emailTouched() ? emailErrorMessage(this.email()) : null,
+  );
+
   /** Set once an email invite lands — the token its signup link carries. */
   readonly sentToken = signal<string | null>(null);
   readonly sentEmail = signal('');
@@ -122,6 +138,7 @@ export class InviteClientSheet {
       this.mode.set(InviteModes.Platform);
       this.selected.set(null);
       this.email.set('');
+      this.emailTouched.set(false);
       this.message.set('');
       this.sentToken.set(null);
       this.sentEmail.set('');
@@ -133,6 +150,7 @@ export class InviteClientSheet {
     if (value !== InviteModes.Platform && value !== InviteModes.Email) return;
     this.mode.set(value);
     this.selected.set(null);
+    this.emailTouched.set(false);
   }
 
   /** One pick at a time; tapping the picked person again clears it. */

@@ -74,6 +74,27 @@ export interface ClientListParams {
   status?: InstructorClientStatus;
   page?: number;
   limit?: number;
+  /**
+   * Narrow to pending rows pointing one way. Only a pending row has a
+   * direction, so setting this excludes settled relationships.
+   */
+  direction?: ClientDirection;
+  /**
+   * Server-side search over the client's name, email, and the address an
+   * email-only invitation went to. Whitespace splits it into tokens that
+   * must all match, so "anna popescu" spans first and last name. Terms
+   * under two characters are ignored by the API.
+   */
+  search?: string;
 }
+
+/** Which way a pending row points — mirrors the API's `ClientDirection`. */
+export const ClientDirections = {
+  Incoming: 'incoming',
+  Outgoing: 'outgoing',
+} as const;
+
+export type ClientDirection =
+  (typeof ClientDirections)[keyof typeof ClientDirections];
 
 export type ClientListResponse = PaginatedResponse<InstructorClient>;

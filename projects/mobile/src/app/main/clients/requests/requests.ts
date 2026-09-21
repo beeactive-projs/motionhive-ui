@@ -77,6 +77,14 @@ export class Requests implements ViewWillEnter {
 
   readonly skeletonRows = [1, 2, 3];
 
+  /**
+   * Invitations resent during this visit. Resend only disables while its
+   * request is in flight, so three quick taps sent three emails — the BE
+   * now refuses the third with a 429, but the button should never have
+   * asked. Cleared on entry, so coming back to the page allows another.
+   */
+  private readonly _resent = signal(new Set<string>());
+
   readonly inviteOpen = signal(false);
 
   readonly withdrawOpen = signal(false);
@@ -97,7 +105,13 @@ export class Requests implements ViewWillEnter {
   // from a notification should be gone when this screen comes back.
   ionViewWillEnter(): void {
     this._clockService.bump();
+    this._resent.set(new Set());
     this.store.load({ force: true });
+  }
+
+  /** One resend per visit is plenty; the row says so rather than going quiet. */
+  isResent(id: string): boolean {
+    return this._resent().has(id);
   }
 
   name(row: InstructorClient): string {
@@ -141,8 +155,12 @@ export class Requests implements ViewWillEnter {
   }
 
   resend(row: InstructorClient): void {
+    if (this.isResent(row.id)) return;
     this.store.resend(row).subscribe({
-      next: () => void this._feedbackService.success('Invitation resent'),
+      next: () => {
+        this._resent.update((ids) => new Set(ids).add(row.id));
+        void this._feedbackService.success('Invitation resent');
+      },
       error: (error: unknown) =>
         void this._feedbackService.error(error, 'Could not resend the invitation.'),
     });

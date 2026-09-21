@@ -98,6 +98,19 @@ export class ClientTraining implements ViewWillEnter {
     ),
   );
 
+  /**
+   * Whose training this is, for the header — "Training" alone made every
+   * client's plan look like the same screen. Read off an assignment's
+   * eager-loaded client rather than fetched: this page already has the rows,
+   * and a second request for a title is not worth a spinner. A client with
+   * nothing assigned yet has no row to read, and keeps the plain title.
+   */
+  readonly clientName = computed(() => {
+    const client = this.assignments().find((a) => a.client)?.client;
+    if (!client) return '';
+    return [client.firstName, client.lastName].filter(Boolean).join(' ').trim();
+  });
+
   readonly showSkeleton = computed(() => this.loading() && !this.loaded());
   readonly showError = computed(() => this.error() && !this.loaded());
 

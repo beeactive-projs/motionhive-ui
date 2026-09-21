@@ -25,6 +25,13 @@ h1 {
   line-height: var(--mh-leading-body);
 }
 
+/* The same line when it is reporting a problem with the field above it —
+   over a length limit, out of range. Global for the same reason. */
+.mh-helper.over {
+  color: var(--ion-color-danger);
+  font-weight: 600;
+}
+
 /* The mono micro-label above a heading or inside a card header. Sentence case
    like every other visible string — never pair it with `ion-text-uppercase`
    or a `text-transform`. */
@@ -80,6 +87,18 @@ h1 {
   color: var(--ion-color-medium);
   font-size: var(--mh-text-xs);
   line-height: var(--mh-leading-body);
+}
+
+/* Read by a screen reader, never laid out. For the text that carries
+   structure the visual design states some other way — a page heading the
+   toolbar already shows, a label an icon already stands for. */
+.mh-visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* A standalone line of explanatory text between blocks. `ion-note` is inline

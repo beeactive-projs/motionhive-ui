@@ -6,10 +6,12 @@ import {
   InstructorClient,
   InstructorClientStatus,
   InstructorClientStatuses,
+  RosterClient,
   RosterService,
   RosterSummary,
 } from 'core';
 
+import { MoreBadgesService } from '../../_shared/services/more-badges.service';
 import {
   ClientFilterId,
   ClientFilterIds,
@@ -18,11 +20,18 @@ import {
   ROSTER_WINDOW,
   filterStatus,
   matchesClientQuery,
+  matchesRosterQuery,
 } from './clients.config';
 
 const PAGE_SIZE = 20;
 
-type LoadOptions = { force?: boolean; done?: () => void };
+/**
+ * `done` carries what went wrong, or nothing when the load settled. A
+ * refresher has to stop spinning either way, but only the caller knows
+ * whether the failure is worth saying out loud — a background lens failing
+ * quietly is fine, a pull-to-refresh failing quietly is not.
+ */
+type LoadOptions = { force?: boolean; done?: (error?: unknown) => void };
 
 /**
  * Page-scoped state for the coach's Clients tab.
@@ -42,11 +51,22 @@ type LoadOptions = { force?: boolean; done?: () => void };
 export class ClientsStore {
   private readonly _clientService = inject(ClientService);
   private readonly _rosterService = inject(RosterService);
+  private readonly _moreBadgesService = inject(MoreBadgesService);
 
   readonly segment = signal<ClientsSegment>(ClientsSegments.Attention);
   readonly filter = signal<ClientFilterId>(ClientFilterIds.All);
-  /** The header search — narrows the loaded rows locally; `getClients` has no `q`. */
+
+  /**
+   * The header search. The directory sends it to the API, which searches
+   * the whole roster — filtering only the loaded page meant a coach with
+   * 100 clients got "Nothing matches" for client #85 until they had
+   * scrolled far enough to load them. The triage still narrows in memory:
+   * the roster is one unpaged response and is already all here.
+   */
   readonly query = signal('');
+
+  /** What the last list request actually searched for. */
+  private readonly _appliedQuery = signal('');
 
   private readonly _roster = signal<RosterSummary | null>(null);
   private readonly _rosterLoading = signal(false);
@@ -65,8 +85,6 @@ export class ClientsStore {
    */
   private readonly _allTotal = signal<number | null>(null);
 
-  private readonly _pendingCount = signal(0);
-
   /**
    * A filter change or a refresh starts a new page-1 request while an older
    * one may still be in flight. Responses carry the sequence they were asked
@@ -82,7 +100,14 @@ export class ClientsStore {
   readonly clients = this._clients.asReadonly();
   readonly listLoading = this._listLoading.asReadonly();
   readonly listError = this._listError.asReadonly();
-  readonly pendingCount = this._pendingCount.asReadonly();
+
+  /**
+   * Owned by `MoreBadgesService`, which the tab shell already keeps current.
+   * Reading it here rather than fetching again keeps the hourglass on this
+   * page and the dot on the Menu tab on one number from one request — two
+   * owners meant two calls on every load of this tab.
+   */
+  readonly pendingCount = this._moreBadgesService.pendingRequests;
 
   /** In the API's order: needs-attention first, then least adherent. */
   readonly attentionClients = computed(() =>
@@ -92,6 +117,16 @@ export class ClientsStore {
   readonly onTrackClients = computed(() =>
     (this._roster()?.clients ?? []).filter((client) => client.attention === null),
   );
+
+  /**
+   * What the triage actually renders. The unfiltered lists above stay the
+   * source for every count on the screen: narrowing the segment badge and
+   * the "2 of 8 need a look" note as you type would make the search look
+   * like it had archived people rather than hidden them.
+   */
+  readonly visibleAttentionClients = computed(() => this._narrowRoster(this.attentionClients()));
+
+  readonly visibleOnTrackClients = computed(() => this._narrowRoster(this.onTrackClients()));
 
   readonly attentionCount = computed(() => this.attentionClients().length);
 
@@ -107,10 +142,25 @@ export class ClientsStore {
     () => this._rosterLoaded() && (this._roster()?.clients.length ?? 0) === 0,
   );
 
+  /** A search is running and it hid the whole roster. */
+  readonly isRosterFilteredEmpty = computed(
+    () =>
+      !!this.query().trim() &&
+      this._rosterLoaded() &&
+      this.visibleAttentionClients().length === 0 &&
+      this.visibleOnTrackClients().length === 0,
+  );
+
+  /**
+   * The rows on screen. The API has already applied the search, so this
+   * only re-filters while a newly typed term is still in flight — without
+   * it the previous result set would sit there looking like a match.
+   */
   readonly visibleClients = computed(() => {
     const query = this.query();
     const clients = this._clients();
-    return query.trim() ? clients.filter((client) => matchesClientQuery(client, query)) : clients;
+    if (!query.trim() || query === this._appliedQuery()) return clients;
+    return clients.filter((client) => matchesClientQuery(client, query));
   });
 
   readonly hasMore = computed(() => this._clients().length < this._total());
@@ -120,9 +170,15 @@ export class ClientsStore {
     return total === null ? 'All clients' : `All clients · ${total}`;
   });
 
-  readonly hasPendingRequests = computed(() => this._pendingCount() > 0);
+  readonly hasPendingRequests = computed(() => this.pendingCount() > 0);
 
   private readonly _isAttention = computed(() => this.segment() === ClientsSegments.Attention);
+
+  private _narrowRoster(clients: readonly RosterClient[]): RosterClient[] {
+    const query = this.query();
+    if (!query.trim()) return [...clients];
+    return clients.filter((client) => matchesRosterQuery(client, query));
+  }
 
   readonly showSkeleton = computed(() =>
     this._isAttention()
@@ -153,6 +209,25 @@ export class ClientsStore {
       this.visibleClients().length === 0,
   );
 
+  /** The search has come back from the API, so the result is the whole roster. */
+  readonly searchSettled = computed(
+    () => this.query().trim() === this._appliedQuery().trim(),
+  );
+
+  /**
+   * The last load of the segment on screen failed, but there are rows from
+   * an earlier one still under it.
+   *
+   * Keeping stale rows is right; letting them pass for current is not. A
+   * toast only covers the refresh someone asked for by hand — entering the
+   * tab refreshes too, and that failure needs something that stays put.
+   */
+  readonly isStale = computed(() =>
+    this._isAttention()
+      ? this._rosterError() && !!this._roster()
+      : this._listError() && this._clients().length > 0,
+  );
+
   /** The segment and chips stay on an error screen — you need them to try the other lens. */
   readonly showChrome = computed(() => !this.isEmpty());
 
@@ -172,8 +247,12 @@ export class ClientsStore {
     this.loadPendingCount();
   }
 
-  /** Silent by construction: the skeleton only shows over an empty list. */
-  refresh(done?: () => void): void {
+  /**
+   * Silent by construction: the skeleton only shows over an empty list. The
+   * callback is handed the failure so a pull-to-refresh can say so — stale
+   * rows left on screen with no word look exactly like fresh ones.
+   */
+  refresh(done?: (error?: unknown) => void): void {
     this.load({ force: true, done });
   }
 
@@ -195,10 +274,10 @@ export class ClientsStore {
           this._rosterLoading.set(false);
           opts.done?.();
         },
-        error: () => {
+        error: (error: unknown) => {
           this._rosterError.set(true);
           this._rosterLoading.set(false);
-          opts.done?.();
+          opts.done?.(error);
         },
       });
   }
@@ -213,7 +292,7 @@ export class ClientsStore {
   }
 
   /** Infinite scroll — appends the next page. */
-  loadMore(done?: () => void): void {
+  loadMore(done?: (error?: unknown) => void): void {
     if (this._listLoading() || !this.hasMore()) {
       done?.();
       return;
@@ -231,33 +310,58 @@ export class ClientsStore {
   setFilter(id: ClientFilterId): void {
     if (id === this.filter()) return;
     this.filter.set(id);
+    this._resetList();
+    this.loadList({ force: true });
+  }
+
+  /**
+   * A new search term. Debounced by the page, because every call is a
+   * request now; the rows reset so page 2 of the old term cannot append
+   * onto page 1 of the new one.
+   */
+  setQuery(value: string): void {
+    if (value === this.query()) return;
+    this.query.set(value);
+    if (this.segment() !== ClientsSegments.All) return;
+    this._resetList();
+    this.loadList({ force: true });
+  }
+
+  private _resetList(): void {
     this._clients.set([]);
     this._total.set(0);
     this._page.set(1);
     this._listLoaded.set(false);
-    this.loadList({ force: true });
   }
 
   clearFilters(): void {
+    const hadQuery = !!this.query();
     this.query.set('');
-    this.setFilter(ClientFilterIds.All);
+    if (this.filter() !== ClientFilterIds.All) {
+      this.setFilter(ClientFilterIds.All);
+      return;
+    }
+    // `setFilter` early-returns when the chip is already All, so the
+    // cleared search would never reach the API without this.
+    if (hadQuery && this.segment() === ClientsSegments.All) {
+      this._resetList();
+      this.loadList({ force: true });
+    }
   }
 
-  /** Counts feed a dot, not layout — a failure just hides it. */
-  loadPendingCount(): void {
-    this._clientService
-      .getPendingRequestsCount()
-      .pipe(take(1))
-      .subscribe({
-        next: (response) => this._pendingCount.set(response.count),
-        error: () => this._pendingCount.set(0),
-      });
+  /**
+   * Counts feed a dot, not layout — the service swallows a failure. Unforced
+   * on entry, so it joins the tab shell's request instead of racing it;
+   * `force` is for the verbs below that just changed the number.
+   */
+  loadPendingCount(force = false): void {
+    this._moreBadgesService.refreshPendingRequests(force);
   }
 
   /** A new invitation is a new PENDING row and one more request in flight. */
   onInviteSent(): void {
     this.loadList({ force: true });
-    this.loadPendingCount();
+    this.loadPendingCount(true);
   }
 
   // ── Mutations ────────────────────────────────────────────────────────────
@@ -293,7 +397,7 @@ export class ClientsStore {
       tap(() => {
         this._clients.update((rows) => rows.filter((row) => row.id !== client.id));
         this._total.update((total) => Math.max(0, total - 1));
-        this.loadPendingCount();
+        this.loadPendingCount(true);
       }),
     );
   }
@@ -333,14 +437,15 @@ export class ClientsStore {
     );
   }
 
-  private _fetchPage(page: number, done?: () => void): void {
+  private _fetchPage(page: number, done?: (error?: unknown) => void): void {
     const seq = ++this._listSeq;
     const status = filterStatus(this.filter());
+    const search = this.query().trim();
     this._listLoading.set(true);
     this._listError.set(false);
 
     this._clientService
-      .getClients({ status, page, limit: PAGE_SIZE })
+      .getClients({ status, search, page, limit: PAGE_SIZE })
       .pipe(take(1))
       .subscribe({
         next: (response) => {
@@ -353,12 +458,15 @@ export class ClientsStore {
           );
           this._total.set(response.total);
           this._page.set(page);
-          if (status === undefined) this._allTotal.set(response.total);
+          this._appliedQuery.set(search);
+          // Only an unfiltered page can speak for the whole directory — a
+          // searched total would shrink "All clients · N" to the matches.
+          if (status === undefined && !search) this._allTotal.set(response.total);
           this._listLoaded.set(true);
           this._listLoading.set(false);
           done?.();
         },
-        error: () => {
+        error: (error: unknown) => {
           if (seq !== this._listSeq) {
             done?.();
             return;
@@ -366,7 +474,7 @@ export class ClientsStore {
           // A failed later page leaves what we have; the next scroll retries.
           if (page === 1) this._listError.set(true);
           this._listLoading.set(false);
-          done?.();
+          done?.(error);
         },
       });
   }

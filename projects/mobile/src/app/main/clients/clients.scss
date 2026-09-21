@@ -52,6 +52,41 @@ ion-buttons ion-button.round {
   font-size: var(--mh-text-sm);
 }
 
+/* "Couldn't refresh" — a state, so the danger wash and never honey. Sits
+   above the list it is about and stays until a load succeeds. */
+.stale {
+  /* The page gutter, without `.mh-page`'s bottom padding for the FAB. */
+  padding: 0.75rem 1rem 0;
+}
+
+.stale-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  /* Legacy rgba(): the -rgb slots are comma-separated triplets. */
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.25);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-danger-wash);
+  color: var(--ion-color-danger-wash-contrast);
+  font-size: var(--mh-text-sm);
+}
+
+.stale-bar ion-icon {
+  flex: none;
+  font-size: var(--mh-text-lg);
+}
+
+.stale-bar span {
+  flex: 1;
+  line-height: var(--mh-leading-tight);
+}
+
+.stale-bar ion-button {
+  flex: none;
+  margin: 0;
+}
+
 /* The loading twin of a triage row — card look, no tone. */
 .row-skeleton {
   --background: var(--ion-card-background);

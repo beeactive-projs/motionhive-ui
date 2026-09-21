@@ -2,7 +2,9 @@
   @if (sentToken()) {
   <!-- The email went; the link is here for the coach to hand over as well. -->
   <div class="sent">
-    <mh-hex-avatar name="Invitation sent" icon="checkmark-circle-outline" size="xl" color="success" tone="wash" />
+    <!-- Decorative: the heading right under it says the same words, and
+         `mh-hex-avatar` gives a named tile a hidden label of its own. -->
+    <mh-hex-avatar aria-hidden="true" icon="checkmark-circle-outline" size="xl" color="success" tone="wash" />
     <h2>Invitation sent</h2>
     <p>
       We emailed {{ sentEmail() }} a link to join and connect with you. You can
@@ -30,10 +32,18 @@
   <ion-searchbar mhAutofocus placeholder="Search by name or email" inputmode="search" [debounce]="0"
     [value]="people.query()"
     (ionInput)="people.setQuery($event.detail.value ?? '')" />
+  <!-- The minimum is only worth saying while it is unmet: once results are
+       on screen, a hint telling you to type more sits right above them. -->
+  @if (people.isActive()) {
+  <p class="mh-helper">
+    Only platform users without an existing relationship with you are shown.
+  </p>
+  } @else {
   <p class="mh-helper">
     Type at least 2 characters. Only platform users without an existing
     relationship with you are shown.
   </p>
+  }
 
   @if (people.isActive()) {
   @if (people.isSearching()) {
@@ -73,9 +83,16 @@
   }
   } @else {
   <div class="mh-section-label">Email address</div>
-  <ion-input type="email" inputmode="email" autocapitalize="off" autocomplete="email" fill="outline"
-    placeholder="client@example.com" aria-label="Email address" [value]="email()"
-    (ionInput)="email.set($event.detail.value ?? '')" />
+  <ion-input type="email" inputmode="email" autocapitalize="off" autocorrect="off" autocomplete="email"
+    spellcheck="false" fill="outline" placeholder="client@example.com" aria-label="Email address"
+    [maxlength]="emailMaxLength" [value]="email()"
+    (ionInput)="email.set($event.detail.value ?? '')" (ionBlur)="emailTouched.set(true)" />
+  <!-- Not `ion-invalid` + `errorText`: Ionic rewrites this host's class list
+       on its own re-render and drops classes Angular put there, so the
+       message came and went with the focus. Rendering it here always shows. -->
+  @if (emailError(); as error) {
+  <p class="mh-helper over" role="alert">{{ error }}</p>
+  }
   }
 
   <div class="mh-section-label">Message</div>

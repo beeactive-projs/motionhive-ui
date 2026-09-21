@@ -136,10 +136,10 @@
                       fill="clear"
                       size="small"
                       color="medium"
-                      [disabled]="store.isBusy(row.id)"
+                      [disabled]="store.isBusy(row.id) || isResent(row.id)"
                       (click)="resend(row)"
                     >
-                      Resend
+                      {{ isResent(row.id) ? 'Resent' : 'Resend' }}
                     </ion-button>
                     <ion-button
                       fill="clear"

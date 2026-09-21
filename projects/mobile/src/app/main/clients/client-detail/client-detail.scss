@@ -117,9 +117,16 @@
   font-size: var(--mh-text-sm);
 }
 
-/* The note, free-running so it keeps its line breaks; the empty state is the
-   invitation to write one, in the accent ink rather than a greyed prompt. */
+/* The note keeps its line breaks, but stops at six of them: a full-length one
+   ran past 1200px and pushed Archive client — the section below — off the
+   bottom of the screen entirely. The row is already tappable and opens the
+   note in its editor, so the clamp hides nothing that costs a second tap. */
 .notes {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
   margin: 0.25rem 0;
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);

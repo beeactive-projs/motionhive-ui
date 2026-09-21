@@ -36,6 +36,7 @@ import {
   clientDisplayName,
   isIncomingRequest,
   isOpenableClient,
+  isSentInvite,
 } from 'core';
 
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
@@ -124,7 +125,11 @@ export class Clients implements ViewWillEnter {
   /**
    * Search owns the whole toolbar while it is open — a title, three actions,
    * a segment and a chip row do not fit above the fold on a phone. Same
-   * treatment as the inbox and the agenda. Only the directory is searchable.
+   * treatment as the inbox and the agenda.
+   *
+   * It narrows both lenses. The box sits above the segment, so scoping it to
+   * the directory made it dead on the landing segment: it opened, took what
+   * you typed, and changed nothing.
    */
   readonly searchOpen = signal(false);
 
@@ -157,13 +162,21 @@ export class Clients implements ViewWillEnter {
 
   readonly isAttention = computed(() => this.store.segment() === ClientsSegments.Attention);
 
-  /** "3 of 8 clients need a look" — beside the This week kicker. */
+  /**
+   * "3 of 8 clients need a look" — beside the This week kicker, and only
+   * when the whole roster is on screen. It counts the roster, not the rows
+   * below it, so leaving it up during a search would describe a set the
+   * coach can no longer see.
+   */
   readonly triageNote = computed(() =>
-    triageNote(this.store.attentionCount(), this.store.rosterTotal()),
+    this.store.query()
+      ? ''
+      : triageNote(this.store.attentionCount(), this.store.rosterTotal()),
   );
 
+  /** Counts what is under it, so it still adds up while a search narrows. */
   readonly onTrackNote = computed(() => {
-    const count = this.store.onTrackClients().length;
+    const count = this.store.visibleOnTrackClients().length;
     return `${count} ${count === 1 ? 'client' : 'clients'}`;
   });
 
@@ -186,7 +199,6 @@ export class Clients implements ViewWillEnter {
 
   setSegment(value: string | number | undefined): void {
     if (value !== ClientsSegments.Attention && value !== ClientsSegments.All) return;
-    if (value === ClientsSegments.Attention) this.closeSearch();
     this.store.setSegment(value);
   }
 
@@ -200,15 +212,20 @@ export class Clients implements ViewWillEnter {
 
   closeSearch(): void {
     this.searchOpen.set(false);
-    this.store.query.set('');
+    this.store.setQuery('');
   }
 
   onQuery(value: string): void {
-    this.store.query.set(value);
+    this.store.setQuery(value);
   }
 
+  /**
+   * Drops the chip and the search together. Closes the box directly
+   * rather than via `closeSearch`, so clearing both does not fire one
+   * request for the emptied term and a second for the reset chip.
+   */
   clearFilters(): void {
-    this.closeSearch();
+    this.searchOpen.set(false);
     this.store.clearFilters();
   }
 
@@ -221,16 +238,18 @@ export class Clients implements ViewWillEnter {
   }
 
   /**
-   * A relationship row opens the profile. An incoming request has no profile
-   * yet — the decision it needs lives on the Requests page, so that is where
-   * the tap goes. Everything else (sent invites) is inert.
+   * A relationship row opens the profile. A pending one has no profile yet,
+   * in either direction — an incoming request needs a decision and a sent
+   * invitation can be resent or withdrawn, and both of those live on the
+   * Requests page, so that is where the tap goes. A row that did nothing at
+   * all on tap just read as broken.
    */
   open(client: InstructorClient): void {
     if (isOpenableClient(client)) {
       void this._router.navigate(['/tabs/clients', client.clientId]);
       return;
     }
-    if (isIncomingRequest(client)) {
+    if (isIncomingRequest(client) || isSentInvite(client)) {
       void this._router.navigateByUrl('/tabs/clients/requests');
     }
   }
@@ -326,8 +345,18 @@ export class Clients implements ViewWillEnter {
     });
   }
 
+  /**
+   * A refresh that fails leaves the rows that were already there, which is
+   * right — but silently, they read as fresh. The cold-load case says it
+   * inline in the middle of the page, so only the warm one needs the toast.
+   */
   onRefresh(event: RefresherCustomEvent): void {
-    this.store.refresh(() => void event.target.complete());
+    this.store.refresh((error) => {
+      void event.target.complete();
+      if (error && !this.store.showLoadError()) {
+        void this._feedbackService.error(error, 'Could not refresh your clients.');
+      }
+    });
   }
 
   onLoadMore(event: InfiniteScrollCustomEvent): void {

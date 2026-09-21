@@ -8,6 +8,7 @@ import {
   IonButton,
   IonButtons,
   IonCard,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -68,6 +69,7 @@ import { ClientDetailStore } from './client-detail.store';
     HexAvatar,
     IonBackButton,
     IonBadge,
+    IonChip,
     IonButton,
     IonButtons,
     IonCard,
@@ -276,7 +278,7 @@ export class ClientDetail implements ViewWillEnter {
   openTraining(): void {
     const clientId = this.store.client()?.clientId;
     if (clientId) {
-      void this._router.navigate(['/tabs/clients/client', clientId, 'training']);
+      void this._router.navigate(['/tabs/clients', clientId, 'training']);
     }
   }
 

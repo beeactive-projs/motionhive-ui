@@ -8,6 +8,7 @@ import {
   checkmarkCircleOutline,
   chevronForward,
   closeCircleOutline,
+  cloudOfflineOutline,
   createOutline,
   ellipsisVertical,
   hourglassOutline,
@@ -50,6 +51,7 @@ export const CLIENT_ICONS = {
   checkmarkCircleOutline,
   chevronForward,
   closeCircleOutline,
+  cloudOfflineOutline,
   createOutline,
   ellipsisVertical,
   hourglassOutline,
@@ -107,9 +109,9 @@ export const ROSTER_WINDOW: RosterWindow = '1w';
 /**
  * Spine colour for an attention reason. Semantic, never honey: a flagged
  * client is a state, not something to press.
- *   BEHIND / DROPPED — the plan is slipping: red.
- *   NEVER_STARTED    — assigned but untouched: amber.
- *   SILENT           — gone quiet: sky.
+ *   BEHIND / DROPPED        — the plan is slipping: red.
+ *   NO_PLAN / NEVER_STARTED — nothing is happening yet: amber.
+ *   SILENT                  — gone quiet: sky.
  */
 export type AttentionTone = 'danger' | 'warning' | 'info';
 
@@ -118,6 +120,7 @@ export function attentionTone(attention: RosterAttention): AttentionTone | null 
     case 'BEHIND':
     case 'DROPPED':
       return 'danger';
+    case 'NO_PLAN':
     case 'NEVER_STARTED':
       return 'warning';
     case 'SILENT':
@@ -130,6 +133,8 @@ export function attentionTone(attention: RosterAttention): AttentionTone | null 
 /** Plain language, because a coach should not decode an enum. */
 export function attentionLabel(client: RosterClient): string {
   switch (client.attention) {
+    case 'NO_PLAN':
+      return 'No plan assigned';
     case 'NEVER_STARTED':
       return 'Has not started';
     case 'SILENT':
@@ -146,6 +151,8 @@ export function attentionLabel(client: RosterClient): string {
 /** One line saying what actually happened, for the screens with room for it. */
 export function attentionDetail(client: RosterClient): string {
   switch (client.attention) {
+    case 'NO_PLAN':
+      return 'Nothing is assigned, so there is nothing for them to follow.';
     case 'NEVER_STARTED':
       return 'Assigned a plan but has never logged a workout.';
     case 'SILENT':
@@ -201,6 +208,11 @@ export interface ClientStat {
  * long they have been gone; everyone else's is their adherence.
  */
 export function attentionStat(client: RosterClient): ClientStat {
+  // Nothing assigned means no adherence to quote — "— adherence" would read
+  // as a measurement that failed rather than a plan that was never written.
+  if (client.attention === 'NO_PLAN') {
+    return { value: '—', sub: 'no plan' };
+  }
   if (client.attention === 'SILENT' && client.daysSinceLastWorkout !== null) {
     return { value: `${client.daysSinceLastWorkout}d`, sub: 'last active' };
   }
@@ -212,9 +224,16 @@ export function onTrackStat(client: RosterClient): ClientStat {
   return { value: adherenceLabel(client), sub: lastActiveShort(client) ?? 'adherence' };
 }
 
-/** "3 of 8 clients need a look" — the line beside the triage kicker. */
+/**
+ * "3 of 8 active clients need a look" — the line beside the triage kicker.
+ *
+ * "active" is load-bearing. The segment above reads "All clients · N", which
+ * counts every row including invitations still in flight; this denominator is
+ * the roster, which is active relationships only. Two different numbers on
+ * one screen with nothing to tell them apart read as a contradiction.
+ */
 export function triageNote(needs: number, total: number): string {
-  const noun = total === 1 ? 'client' : 'clients';
+  const noun = total === 1 ? 'active client' : 'active clients';
   const verb = needs === 1 ? 'needs' : 'need';
   return `${needs} of ${total} ${noun} ${verb} a look`;
 }
@@ -249,6 +268,21 @@ export function matchesClientQuery(client: InstructorClient, query: string): boo
   return (
     clientDisplayName(client).toLowerCase().includes(term) ||
     clientEmail(client).toLowerCase().includes(term)
+  );
+}
+
+/**
+ * The same search over a roster row. The roster is a different shape from a
+ * relationship — a name and a handle, no email — so it needs its own
+ * predicate, but the search box above the two segments is one box and has to
+ * narrow whichever list is under it.
+ */
+export function matchesRosterQuery(client: RosterClient, query: string): boolean {
+  const term = query.trim().toLowerCase();
+  if (!term) return true;
+  return (
+    client.name.toLowerCase().includes(term) ||
+    (client.handle?.toLowerCase().includes(term) ?? false)
   );
 }
 
@@ -320,6 +354,16 @@ export function visibleClientActions(client: InstructorClient): ClientAction[] {
   });
 }
 
+// ── Client notes ────────────────────────────────────────────────────────────
+
+/**
+ * Length ceiling on a private note, matching `UpdateClientDto`'s `@MaxLength`.
+ * The counter under the field counts down from this, so the two must agree —
+ * a server limit above it turns the counter into decoration, and one below it
+ * rejects a note the coach was told was fine.
+ */
+export const NOTES_MAX_LENGTH = 2000;
+
 // ── Invite sheet ────────────────────────────────────────────────────────────
 
 /** The two ways in: someone already on MotionHive, or an address. */
@@ -330,15 +374,69 @@ export const InviteModes = {
 
 export type InviteMode = (typeof InviteModes)[keyof typeof InviteModes];
 
-/** Stated in the sheet's copy; the BE owns the real TTL. */
-export const INVITE_EXPIRY_DAYS = 14;
+/**
+ * Stated in the sheet's copy; the BE owns the real TTL and sets it to 30 days
+ * (`expiresAt` on the created request, and again on every resend). This said
+ * 14, so the sheet promised one thing and the Requests row — which renders
+ * the server's own `expiresAt` — said another about the same invitation.
+ */
+export const INVITE_EXPIRY_DAYS = 30;
 
 /**
- * Enough to stop a typo, not a full RFC 5322 parse — the BE validates for
- * real, and an over-strict check here would refuse addresses the BE takes.
+ * RFC 5321's ceiling on an address, and on its local part. The first is also
+ * the input's `maxlength`, so the field cannot hold something the BE will
+ * always refuse.
+ */
+export const EMAIL_MAX_LENGTH = 254;
+const EMAIL_LOCAL_MAX_LENGTH = 64;
+
+/**
+ * Dot-separated atoms, never doubled and never at an edge. The punctuation is
+ * RFC 5322's atext set, which is wide — but it excludes the characters that
+ * let `<script>@x.com` through before.
+ */
+const EMAIL_LOCAL =
+  /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*$/;
+
+/**
+ * Labels that start and end alphanumeric, and a TLD of at least two letters.
+ * Rejects the empty label in `b..c` and the leading hyphen in `-b.com`.
+ */
+const EMAIL_DOMAIN = /^(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
+
+/**
+ * Enough to stop a typo, not a full RFC 5322 parse.
+ *
+ * Deliberately tracks class-validator's `@IsEmail()` on the BE's invitation
+ * DTO rather than sitting looser than it: a check that enables Send on an
+ * address the BE then rejects turns a typo into a round trip and a toast.
  */
 export function isValidEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+  const email = value.trim();
+  if (!email || email.length > EMAIL_MAX_LENGTH) return false;
+
+  const at = email.lastIndexOf('@');
+  if (at < 1) return false;
+
+  const local = email.slice(0, at);
+  const domain = email.slice(at + 1);
+  if (local.length > EMAIL_LOCAL_MAX_LENGTH) return false;
+
+  return EMAIL_LOCAL.test(local) && EMAIL_DOMAIN.test(domain);
+}
+
+/**
+ * What to say under the field, or null when there is nothing to say. Empty is
+ * not an error — a field nobody has filled in yet has not gone wrong, and
+ * Send is disabled anyway.
+ */
+export function emailErrorMessage(value: string): string | null {
+  const email = value.trim();
+  if (!email) return null;
+  if (email.length > EMAIL_MAX_LENGTH) {
+    return `An email address cannot be longer than ${EMAIL_MAX_LENGTH} characters.`;
+  }
+  return isValidEmail(email) ? null : 'Enter a valid email address, like client@example.com.';
 }
 
 /**

@@ -3,7 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/clients" />
     </ion-buttons>
-    <ion-title>Client</ion-title>
+    <!-- The name, not "Client": on a phone the header is the orientation cue,
+         and a generic one makes every client's page look like the same page. -->
+    <ion-title>{{ name() || 'Client' }}</ion-title>
     @if (store.client()) {
       <ion-buttons slot="end">
         <ion-button aria-label="Client actions" (click)="openActions()">
@@ -128,6 +130,23 @@
           <div>
             @for (instance of store.sessions(); track instance.id) {
               <mh-session-row [instance]="instance" (select)="openSession(instance)" />
+            }
+          </div>
+        </section>
+      }
+
+      @if (client.groupMemberships?.length) {
+        <!-- Only when there are any: "not in any groups" is not news about a
+             person, and a phone has no room for a section that says nothing. -->
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <span class="mh-kicker">Groups</span>
+          </div>
+          <div class="mh-chip-row">
+            @for (group of client.groupMemberships; track group.groupId) {
+              <!-- A label, not a control: no handler, and nothing that hints
+                   at one. Groups are managed on the web for now. -->
+              <ion-chip>{{ group.groupName }}</ion-chip>
             }
           </div>
         </section>

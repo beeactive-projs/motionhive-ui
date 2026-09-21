@@ -23,11 +23,13 @@ import {
   clientSubline,
   daysBetween,
   filterStatus,
+  emailErrorMessage,
   inviteLink,
   isValidEmail,
   lastActiveLabel,
   lastActiveShort,
   matchesClientQuery,
+  matchesRosterQuery,
   onTrackStat,
   receivedLabel,
   sentMetaLabel,
@@ -232,10 +234,24 @@ describe('roster numbers', () => {
     });
   });
 
+  // The search box sits above both segments, so it has to narrow the roster
+  // too. Scoped to the directory, it opened on the landing segment, took
+  // what you typed and changed nothing.
+  it('searches a roster row by name and handle', () => {
+    expect(matchesRosterQuery(roster(), '  IONES ')).toBe(true);
+    expect(matchesRosterQuery(roster(), 'maria')).toBe(true);
+    expect(matchesRosterQuery(roster(), 'radu')).toBe(false);
+    expect(matchesRosterQuery(roster(), '   ')).toBe(true);
+    expect(matchesRosterQuery(roster({ handle: 'mio' }), 'MIO')).toBe(true);
+    expect(matchesRosterQuery(roster({ handle: null }), 'mio')).toBe(false);
+  });
+
   it('agrees the triage note with its numbers', () => {
-    expect(triageNote(3, 8)).toBe('3 of 8 clients need a look');
-    expect(triageNote(1, 8)).toBe('1 of 8 clients needs a look');
-    expect(triageNote(1, 1)).toBe('1 of 1 client needs a look');
+    // "active" qualifies the denominator: the segment above counts pending
+    // invitations too, so the bare noun made the two numbers look wrong.
+    expect(triageNote(3, 8)).toBe('3 of 8 active clients need a look');
+    expect(triageNote(1, 8)).toBe('1 of 8 active clients needs a look');
+    expect(triageNote(1, 1)).toBe('1 of 1 active client needs a look');
   });
 });
 
@@ -273,11 +289,37 @@ describe('invite sheet', () => {
   it('accepts an address and refuses what cannot be one', () => {
     expect(isValidEmail('radu@example.com')).toBe(true);
     expect(isValidEmail('  radu@example.com ')).toBe(true);
+    expect(isValidEmail('radu+tag@sub.example.co.uk')).toBe(true);
     expect(isValidEmail('radu')).toBe(false);
     expect(isValidEmail('radu@')).toBe(false);
     expect(isValidEmail('radu@example')).toBe(false);
     expect(isValidEmail('ra du@example.com')).toBe(false);
     expect(isValidEmail('')).toBe(false);
+  });
+
+  // Each of these enabled Send, went to the BE and came back rejected.
+  it('refuses the malformed addresses the BE would reject anyway', () => {
+    expect(isValidEmail('a@b..c')).toBe(false);
+    expect(isValidEmail('a@-b.com')).toBe(false);
+    expect(isValidEmail('a@b-.com')).toBe(false);
+    expect(isValidEmail('<script>@x.com')).toBe(false);
+    expect(isValidEmail('.radu@example.com')).toBe(false);
+    expect(isValidEmail('radu.@example.com')).toBe(false);
+    expect(isValidEmail(`${'a'.repeat(300)}@example.com`)).toBe(false);
+    expect(isValidEmail(`${'a'.repeat(65)}@example.com`)).toBe(false);
+  });
+
+  // Empty is not a mistake — nothing has been filled in and Send is off.
+  it('explains a bad address and stays quiet about an empty one', () => {
+    expect(emailErrorMessage('')).toBeNull();
+    expect(emailErrorMessage('   ')).toBeNull();
+    expect(emailErrorMessage('radu@example.com')).toBeNull();
+    expect(emailErrorMessage('radu@')).toBe(
+      'Enter a valid email address, like client@example.com.',
+    );
+    expect(emailErrorMessage(`${'a'.repeat(250)}@example.com`)).toBe(
+      'An email address cannot be longer than 254 characters.',
+    );
   });
 
   // The link must be the web app's signup page — inside the WebView,

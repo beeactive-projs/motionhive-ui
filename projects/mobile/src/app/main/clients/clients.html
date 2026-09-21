@@ -3,8 +3,10 @@
        row do not fit above the fold on a phone. Same as the inbox. -->
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-searchbar mhAutofocus placeholder="Search clients" inputmode="search" [debounce]="0" [value]="store.query()"
-      (ionInput)="onQuery($event.detail.value ?? '')" />
+    <!-- Debounced, unlike the other searchbars: the directory half of this
+         box is a request per term now, not a filter over loaded rows. -->
+    <ion-searchbar mhAutofocus placeholder="Search clients" inputmode="search" [debounce]="300"
+      [value]="store.query()" (ionInput)="onQuery($event.detail.value ?? '')" />
     <ion-buttons slot="end">
       <ion-button (click)="closeSearch()">Cancel</ion-button>
     </ion-buttons>
@@ -65,9 +67,25 @@
 }
 
 <ion-content [fullscreen]="true">
+  <!-- The toolbar shows the page's name but `ion-title` is not a heading, so
+       a screen reader had nothing to land on and the outline began at h2. -->
+  <h1 class="mh-visually-hidden">Clients</h1>
+
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
+
+  @if (store.isStale()) {
+    <!-- A status, so neutral-semantic rather than honey. It sits above both
+         lenses because either one can be the stale one. -->
+    <div class="stale">
+      <div class="stale-bar">
+        <ion-icon name="cloud-offline-outline" aria-hidden="true" />
+        <span>Couldn't refresh. Showing the last update.</span>
+        <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+      </div>
+    </div>
+  }
 
   @if (store.showLoadError()) {
   <mh-empty-state icon="alert-circle-outline" heading="Couldn't load your clients"
@@ -112,8 +130,14 @@
     <mh-empty-state icon="people-outline" heading="No active clients yet"
       message="Once someone accepts your invitation, their week shows up here." actionLabel="See all clients"
       actionFill="outline" (action)="showAll()" />
+    } @else if (store.isRosterFilteredEmpty()) {
+    <!-- The roster is this week's active clients only, so a name that is on
+         the directory but not here is a match the coach should go find. -->
+    <mh-empty-state icon="people-outline" heading="Nothing matches"
+      message="Nobody on this week's roster matches that. Try All clients." actionLabel="Search all clients"
+      actionFill="outline" (action)="showAll()" />
     } @else {
-    @if (store.allClear()) {
+    @if (store.allClear() && !store.query()) {
     <!-- A status, so the success wash — never honey. The on-track
                list stays below so the screen never feels dead. -->
     <div class="all-clear">
@@ -123,28 +147,30 @@
         <span>No one needs a nudge this week.</span>
       </div>
     </div>
-    } @else {
+    } @else if (store.visibleAttentionClients().length > 0) {
     <section class="mh-section">
       <div class="mh-section-head warm">
         <span class="mh-kicker">This week</span>
-        <ion-note>{{ triageNote() }}</ion-note>
+        @if (triageNote(); as note) {
+        <ion-note>{{ note }}</ion-note>
+        }
       </div>
       <div>
-        @for (client of store.attentionClients(); track client.clientId) {
+        @for (client of store.visibleAttentionClients(); track client.clientId) {
         <mh-attention-row [client]="client" (select)="openRoster(client)" />
         }
       </div>
     </section>
     }
 
-    @if (store.onTrackClients().length > 0) {
+    @if (store.visibleOnTrackClients().length > 0) {
     <section class="mh-section">
       <div class="mh-section-head">
         <span class="mh-kicker">On track</span>
         <ion-note>{{ onTrackNote() }}</ion-note>
       </div>
       <ion-list [inset]="true" class="mh-card-list">
-        @for (client of store.onTrackClients(); track client.clientId) {
+        @for (client of store.visibleOnTrackClients(); track client.clientId) {
         <mh-on-track-row [client]="client" (select)="openRoster(client)" />
         }
       </ion-list>
@@ -155,9 +181,11 @@
   } @else {
   @if (store.isFilteredEmpty()) {
   @if (store.query()) {
+  <!-- The API searches the whole directory now, so there is nothing left
+       to scroll for and the copy no longer says there is. -->
   <mh-empty-state icon="people-outline" heading="Nothing matches"
-    message="Only clients loaded so far are searched. Scroll to load more, or try another name." actionLabel="Clear"
-    actionFill="outline" (action)="clearFilters()" />
+    message="No client matches that. Try another name or email." actionLabel="Clear" actionFill="outline"
+    (action)="clearFilters()" />
   } @else {
   <mh-empty-state icon="people-outline" heading="Nothing here"
     message="No clients with this status. Try another filter." actionLabel="Show all" actionFill="outline"
