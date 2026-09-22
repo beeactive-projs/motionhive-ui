@@ -4,12 +4,30 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <!-- Debounced, unlike the other searchbars: the directory half of this
-         box is a request per term now, not a filter over loaded rows. -->
-    <ion-searchbar mhAutofocus placeholder="Search clients" inputmode="search" [debounce]="300"
-      [value]="store.query()" (ionInput)="onQuery($event.detail.value ?? '')" />
+         box is a request per term now, not a filter over loaded rows.
+         Named, because a searchbar with only a placeholder announces itself
+         as Ionic's default "search text". -->
+    <ion-searchbar mhAutofocus placeholder="Search clients" aria-label="Search clients"
+      inputmode="search" [debounce]="300" [value]="store.query()"
+      (ionInput)="onQuery($event.detail.value ?? '')" />
     <ion-buttons slot="end">
-      <ion-button (click)="closeSearch()">Cancel</ion-button>
+      <ion-button class="cancel" (click)="closeSearch()">Cancel</ion-button>
     </ion-buttons>
+  </ion-toolbar>
+
+  <!-- What is actually being searched. The box took the segment and the chips
+       with it, and a search run with "Archived" on looks exactly like the
+       whole client list. -->
+  <ion-toolbar class="scope-bar">
+    <div class="scope">
+      <span class="where">{{ searchScope() }}</span>
+      @if (store.filter() !== Filters.All) {
+      <ion-button fill="clear" size="small" (click)="setFilter(Filters.All)">Clear filter</ion-button>
+      }
+    </div>
+    @if (showSearchHint()) {
+    <p class="hint">Type at least {{ minSearchLength }} characters to search every client.</p>
+    }
   </ion-toolbar>
 </ion-header>
 } @else {
@@ -37,8 +55,11 @@
       <ion-segment-button [value]="Segments.Attention">
         <ion-label>
           Needs attention
+          <!-- The wash pairing, not the solid fill: white on danger-500 is
+               3.76:1, and badge-sized text needs 4.5:1 (see the wash note in
+               variables.css). It still reads unmistakably as red. -->
           @if (store.attentionCount() > 0) {
-          <ion-badge color="danger" class="count">{{ store.attentionCount() }}</ion-badge>
+          <ion-badge data-tone="danger" class="count">{{ store.attentionCount() }}</ion-badge>
           }
         </ion-label>
       </ion-segment-button>
@@ -52,12 +73,16 @@
   <ion-toolbar>
     <!-- Scrolls sideways rather than wrapping: a second chip row would
                push the first client below the fold. -->
-    <div class="mh-chip-row">
+    <div class="mh-chip-row" role="group" aria-label="Filter clients by status">
       @for (option of filters; track option.id) {
-      <ion-chip [class.selected]="store.filter() === option.id" [attr.aria-pressed]="store.filter() === option.id"
-        (click)="setFilter(option.id)">
+      <!-- `ion-button`, not `ion-chip`: the chip renders a non-interactive
+                 element, so it never takes focus and its `aria-pressed` named a
+                 state nothing could reach. -->
+      <ion-button class="chip" fill="clear" shape="round" size="small"
+        [class.selected]="store.filter() === option.id"
+        [attr.aria-pressed]="store.filter() === option.id" (click)="setFilter(option.id)">
         {{ option.label }}
-      </ion-chip>
+      </ion-button>
       }
     </div>
   </ion-toolbar>
@@ -71,6 +96,10 @@
        a screen reader had nothing to land on and the outline began at h2. -->
   <h1 class="mh-visually-hidden">Clients</h1>
 
+  <!-- A search or a chip change is silent otherwise: the list simply becomes
+       shorter. Polite, and only once the result is the final one. -->
+  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
+
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
   </ion-refresher>
@@ -78,7 +107,7 @@
   @if (store.isStale()) {
     <!-- A status, so neutral-semantic rather than honey. It sits above both
          lenses because either one can be the stale one. -->
-    <div class="stale">
+    <div class="stale" role="status">
       <div class="stale-bar">
         <ion-icon name="cloud-offline-outline" aria-hidden="true" />
         <span>Couldn't refresh. Showing the last update.</span>
@@ -92,7 +121,7 @@
     message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
   } @else if (store.showSkeleton()) {
   <!-- Mirrors the row shape so nothing shifts when data lands. -->
-  <div class="mh-page">
+  <div class="mh-page" aria-busy="true">
     @if (isAttention()) {
     <div class="mh-section-head">
       <span class="mh-kicker">
@@ -103,7 +132,7 @@
     <ion-item lines="none" class="row-skeleton mh-list-row">
       <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
       <ion-label>
-        <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+        <h3><ion-skeleton-text [animated]="true" style="width: 40%" /></h3>
         <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
       </ion-label>
     </ion-item>
@@ -150,7 +179,10 @@
     } @else if (store.visibleAttentionClients().length > 0) {
     <section class="mh-section">
       <div class="mh-section-head warm">
-        <span class="mh-kicker">This week</span>
+        <!-- A heading, not a span: the outline ran straight from the page
+             title into the client names, with nothing between the two lists
+             to navigate by. The rows below drop to h3 to sit under it. -->
+        <h2 class="mh-kicker">This week</h2>
         @if (triageNote(); as note) {
         <ion-note>{{ note }}</ion-note>
         }
@@ -166,7 +198,7 @@
     @if (store.visibleOnTrackClients().length > 0) {
     <section class="mh-section">
       <div class="mh-section-head">
-        <span class="mh-kicker">On track</span>
+        <h2 class="mh-kicker">On track</h2>
         <ion-note>{{ onTrackNote() }}</ion-note>
       </div>
       <ion-list [inset]="true" class="mh-card-list">
@@ -207,13 +239,17 @@
   }
   }
 
-  <!-- Always on the root, whatever the segment: inviting is the one action
-       every state of this screen leads to. -->
+  <!-- On the root whatever the segment: inviting is the one action every
+       state of this screen leads to — except the onboarding one, which is a
+       full-width "Invite your first client" button and needs no second copy
+       of itself floating over it. -->
+  @if (!store.isEmpty()) {
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button aria-label="Invite client" (click)="openInvite()">
       <ion-icon name="person-add-outline" />
     </ion-fab-button>
   </ion-fab>
+  }
 </ion-content>
 
 <mh-invite-client-sheet [(open)]="inviteOpen" (sent)="store.onInviteSent()" />

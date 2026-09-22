@@ -5,7 +5,7 @@ import { RosterClient } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { onTrackStat, subtitleFor } from '../../clients.config';
+import { onTrackStat, subtitleFor } from '../../roster-labels';
 
 /**
  * One client who needs nothing this week: a plain card-list row, adherence

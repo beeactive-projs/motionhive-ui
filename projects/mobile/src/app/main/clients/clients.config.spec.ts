@@ -11,33 +11,35 @@ import {
 
 import {
   CLIENT_ACTIONS,
-  CLIENT_FILTERS,
-  CLIENT_ICONS,
   ClientActionIds,
+  NOTES_COUNTER_FROM,
+  NOTES_MAX_LENGTH,
+  clientStatusTone,
+  clientSubline,
+  visibleClientActions,
+} from './clients.config';
+import {
+  CLIENT_FILTERS,
   ClientFilterIds,
+  MIN_SEARCH_LENGTH,
+  filterStatus,
+  matchesClientQuery,
+  matchesRosterQuery,
+} from './clients.filters';
+import { CLIENT_ICONS } from './clients.icons';
+import { inviteLink } from './invite.utils';
+import { daysBetween, receivedLabel, sentMetaLabel, splitPendingRows } from './requests.utils';
+import {
   adherenceLabel,
   attentionLabel,
   attentionStat,
   attentionTone,
-  clientStatusTone,
-  clientSubline,
-  daysBetween,
-  filterStatus,
-  emailErrorMessage,
-  inviteLink,
-  isValidEmail,
   lastActiveLabel,
   lastActiveShort,
-  matchesClientQuery,
-  matchesRosterQuery,
   onTrackStat,
-  receivedLabel,
-  sentMetaLabel,
-  splitPendingRows,
   subtitleFor,
   triageNote,
-  visibleClientActions,
-} from './clients.config';
+} from './roster-labels';
 
 /** Every template in this feature, inlined at build time by Vite. */
 const templates = import.meta.glob('./**/*.html', {
@@ -285,48 +287,43 @@ describe('All clients rows', () => {
 });
 
 describe('invite sheet', () => {
-  // Enough to catch a typo before the request; the BE is the real validator.
-  it('accepts an address and refuses what cannot be one', () => {
-    expect(isValidEmail('radu@example.com')).toBe(true);
-    expect(isValidEmail('  radu@example.com ')).toBe(true);
-    expect(isValidEmail('radu+tag@sub.example.co.uk')).toBe(true);
-    expect(isValidEmail('radu')).toBe(false);
-    expect(isValidEmail('radu@')).toBe(false);
-    expect(isValidEmail('radu@example')).toBe(false);
-    expect(isValidEmail('ra du@example.com')).toBe(false);
-    expect(isValidEmail('')).toBe(false);
-  });
-
-  // Each of these enabled Send, went to the BE and came back rejected.
-  it('refuses the malformed addresses the BE would reject anyway', () => {
-    expect(isValidEmail('a@b..c')).toBe(false);
-    expect(isValidEmail('a@-b.com')).toBe(false);
-    expect(isValidEmail('a@b-.com')).toBe(false);
-    expect(isValidEmail('<script>@x.com')).toBe(false);
-    expect(isValidEmail('.radu@example.com')).toBe(false);
-    expect(isValidEmail('radu.@example.com')).toBe(false);
-    expect(isValidEmail(`${'a'.repeat(300)}@example.com`)).toBe(false);
-    expect(isValidEmail(`${'a'.repeat(65)}@example.com`)).toBe(false);
-  });
-
-  // Empty is not a mistake — nothing has been filled in and Send is off.
-  it('explains a bad address and stays quiet about an empty one', () => {
-    expect(emailErrorMessage('')).toBeNull();
-    expect(emailErrorMessage('   ')).toBeNull();
-    expect(emailErrorMessage('radu@example.com')).toBeNull();
-    expect(emailErrorMessage('radu@')).toBe(
-      'Enter a valid email address, like client@example.com.',
-    );
-    expect(emailErrorMessage(`${'a'.repeat(250)}@example.com`)).toBe(
-      'An email address cannot be longer than 254 characters.',
-    );
-  });
+  // Address validation moved to core (`email.utils`), next to `client.utils`:
+  // the web invite dialog has to agree with this sheet about what a valid
+  // address is. Its cases live in `email.utils.spec.ts`.
 
   // The link must be the web app's signup page — inside the WebView,
   // `window.location.origin` is `capacitor://localhost` and goes nowhere.
   it('builds the invite link on the web signup address', () => {
     expect(inviteLink('abc123')).toBe(`${SIGNUP_URL}?token=abc123`);
     expect(inviteLink('a b/c')).toBe(`${SIGNUP_URL}?token=a%20b%2Fc`);
+  });
+});
+
+describe('search floor', () => {
+  // The API ignores a shorter term and answers with the unfiltered page,
+  // which is indistinguishable from a page of matches — a single `a` came
+  // back as the whole directory under a search box reading `a`. The floor
+  // here is what tells the store to hold the term back and narrow in memory
+  // instead, and it has to match the API's.
+  it('matches the minimum the API and the invite sheet both use', () => {
+    expect(MIN_SEARCH_LENGTH).toBe(2);
+  });
+});
+
+describe('client notes', () => {
+  // The counter is information only as a warning; from the first character
+  // it is noise about a limit nobody is near.
+  it('starts the counter inside the last tenth of the budget', () => {
+    expect(NOTES_COUNTER_FROM).toBe(1800);
+    expect(NOTES_COUNTER_FROM).toBeLessThan(NOTES_MAX_LENGTH);
+    expect(NOTES_COUNTER_FROM / NOTES_MAX_LENGTH).toBeCloseTo(0.9);
+  });
+
+  // The field's `maxlength` is this, and so is `UpdateClientDto`'s
+  // `@MaxLength` — a server limit above it turns the counter into
+  // decoration, one below it rejects a note the coach was told was fine.
+  it('caps a note where the DTO does', () => {
+    expect(NOTES_MAX_LENGTH).toBe(2000);
   });
 });
 

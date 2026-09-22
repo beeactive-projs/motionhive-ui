@@ -188,9 +188,15 @@
         <!-- Last, and the one row in red: the only thing here worth a second thought. -->
         <ion-list [inset]="true" class="mh-card-list">
           @if (isActive()) {
+            <!-- The label takes the wash ink rather than Ionic's `color`
+                 slot: danger-500 as text on a white card is 3.76:1, and the
+                 one row here worth a second thought is the last one that
+                 should be hard to read. The glyph keeps the saturated hue —
+                 3:1 is enough for a graphic, and the pair is the same
+                 treatment the attention rows use. -->
             <ion-item button detail="false" lines="none" (click)="confirmArchive()">
               <ion-icon slot="start" name="archive-outline" color="danger" aria-hidden="true" />
-              <ion-label color="danger">Archive client…</ion-label>
+              <ion-label class="verb danger">Archive client…</ion-label>
             </ion-item>
           } @else {
             <ion-item
@@ -201,7 +207,7 @@
               (click)="unarchive()"
             >
               <ion-icon slot="start" name="arrow-undo-outline" color="success" aria-hidden="true" />
-              <ion-label color="success">Unarchive client</ion-label>
+              <ion-label class="verb success">Unarchive client</ion-label>
             </ion-item>
           }
         </ion-list>

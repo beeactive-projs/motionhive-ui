@@ -5,7 +5,11 @@ ion-chip {
 
 /* Quick-filter chips inside a `.mh-chip-row` strip (layout.css): the same
    idle/selected treatment as the filter sheets' chips — soft wash fill when
-   idle, solid navy when picked. */
+   idle, solid navy when picked.
+   A strip whose chips DO something uses `.mh-chip-row .chip` (ion-button.css)
+   instead: `ion-chip` renders a non-interactive element — no role, no tab
+   stop, and an `aria-pressed` that means nothing without one — so it can only
+   be a label. These rules stay for the labels. */
 .mh-chip-row ion-chip {
   flex: none;
   margin: 0;

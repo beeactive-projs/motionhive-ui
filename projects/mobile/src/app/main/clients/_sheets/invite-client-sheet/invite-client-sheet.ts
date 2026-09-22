@@ -18,9 +18,12 @@ import { take } from 'rxjs';
 import {
   ClientService,
   CreateClientInvitation,
+  EMAIL_MAX_LENGTH,
   UserRoles,
   UserSearchResult,
   displayName,
+  emailErrorMessage,
+  isValidEmail,
 } from 'core';
 
 import { EmptyState } from '../../../../_shared/components/empty-state/empty-state';
@@ -31,16 +34,8 @@ import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../../../_shared/utils/people-search';
 import { ShareOutcomes, shareOrCopy } from '../../../../_shared/utils/share';
-import {
-  CLIENT_ICONS,
-  EMAIL_MAX_LENGTH,
-  INVITE_EXPIRY_DAYS,
-  InviteMode,
-  InviteModes,
-  emailErrorMessage,
-  inviteLink,
-  isValidEmail,
-} from '../../clients.config';
+import { CLIENT_ICONS } from '../../clients.icons';
+import { INVITE_EXPIRY_DAYS, InviteMode, InviteModes, inviteLink } from '../../invite.utils';
 
 /**
  * Invite someone to be coached — by finding them on the platform, or by

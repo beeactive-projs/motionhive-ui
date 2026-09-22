@@ -30,7 +30,8 @@ import { ClockService } from '../../../_shared/services/clock.service';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../_shared/utils/avatar-tone.utils';
 import { InviteClientSheet } from '../_sheets/invite-client-sheet/invite-client-sheet';
-import { CLIENT_ICONS, receivedLabel, sentMetaLabel } from '../clients.config';
+import { CLIENT_ICONS } from '../clients.icons';
+import { receivedLabel, sentMetaLabel } from '../requests.utils';
 import { RequestsStore } from './requests.store';
 
 /**

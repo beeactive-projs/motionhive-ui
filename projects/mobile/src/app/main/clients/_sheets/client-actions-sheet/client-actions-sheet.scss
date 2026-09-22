@@ -32,8 +32,11 @@ ion-list {
   margin-inline: calc(var(--ion-padding, 16px) * -1);
 }
 
-/* Destructive last and red — the only row that needs a second thought. */
+/* Destructive last and red — the only row that needs a second thought. The
+   wash ink, not the saturated slot colour: danger-500 as text on the sheet's
+   surface is 3.76:1, under the 4.5:1 body text needs. The glyph beside it
+   keeps the full hue, where 3:1 is the bar. */
 .destructive ion-label {
-  color: var(--ion-color-danger);
+  color: var(--ion-color-danger-wash-contrast);
   font-weight: 600;
 }

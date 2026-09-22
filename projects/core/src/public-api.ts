@@ -187,6 +187,7 @@ export * from './lib/utils/exercise-tag.utils';
 export * from './lib/utils/form.utils';
 export * from './lib/utils/messaging.utils';
 export * from './lib/utils/client.utils';
+export * from './lib/utils/email.utils';
 
 // Services
 export * from './lib/services/auth/auth.service';

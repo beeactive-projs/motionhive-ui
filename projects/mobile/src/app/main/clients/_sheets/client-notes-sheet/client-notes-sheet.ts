@@ -4,7 +4,7 @@ import { IonTextarea } from '@ionic/angular/standalone';
 import { InstructorClient, clientDisplayName } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
-import { NOTES_MAX_LENGTH } from '../../clients.config';
+import { NOTES_COUNTER_FROM, NOTES_MAX_LENGTH } from '../../clients.config';
 
 /**
  * The coach's private notes on one client — goals, injuries, what keeps them
@@ -52,16 +52,17 @@ export class ClientNotesSheet {
   /** What would actually be sent — compared against what is already stored. */
   private readonly _trimmed = computed(() => this.draft().trim());
 
-  readonly tooLong = computed(() => this._trimmed().length > NOTES_MAX_LENGTH);
-
-  readonly overBy = computed(() =>
-    Math.max(0, this._trimmed().length - NOTES_MAX_LENGTH),
-  );
+  /**
+   * The field's `maxlength` is the same ceiling, so the note cannot be over
+   * it and there is no over-the-limit state to report. What is worth showing
+   * is the approach: the counter appears in the last tenth of the budget and
+   * stays hidden before it, where "19 / 2000" is noise about a limit nobody
+   * is near.
+   */
+  readonly showCounter = computed(() => this.draft().length >= NOTES_COUNTER_FROM);
 
   /** Clearing a note is a real edit; re-saving the same text is not. */
-  readonly dirty = computed(() => this._trimmed() !== (this.client()?.notes ?? '').trim());
-
-  readonly canSave = computed(() => this.dirty() && !this.tooLong());
+  readonly canSave = computed(() => this._trimmed() !== (this.client()?.notes ?? '').trim());
 
   commit(): void {
     if (!this.canSave()) return;

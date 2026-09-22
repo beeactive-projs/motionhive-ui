@@ -65,41 +65,49 @@
   min-width: 0;
 }
 
+/* For an email-only invitation the address IS the identity, so it wraps
+   rather than ellipsising. */
 .name-line h2 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .name-line ion-badge {
   flex: none;
 }
 
-.meta-line {
-  display: flex;
-  align-items: center;
-  gap: 0.125rem;
-  margin-top: 0.125rem;
-}
-
-.meta-line .meta {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
+/* When it went and how long it still stands — a full line of its own, since
+   the expiry is the reason to read it at all. */
+.meta {
+  margin: 0.125rem 0 0;
   color: var(--ion-color-medium);
   font-size: var(--mh-text-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* Text verbs, sized to the meta line rather than to a toolbar. */
-.meta-line ion-button {
+/* The two quiet verbs, on their own row and at the tap target. Pulled back
+   by their own inline padding so the labels line up with the meta above. */
+.verbs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline-start: -0.5rem;
+}
+
+.verbs ion-button {
   --padding-start: 0.5rem;
   --padding-end: 0.5rem;
   flex: none;
-  height: 1.75rem;
+  min-height: var(--mh-tap-target);
   margin: 0;
   font-size: var(--mh-text-sm);
   font-weight: 600;
   letter-spacing: normal;
+}
+
+/* Semantic hue as ink is the wash contrast, not the slot colour: danger-500
+   as 12px text on a white card is 3.76:1. Same rule as the client detail's
+   archive row and the attention rows' reason line. */
+.verbs ion-button[color='danger'] {
+  --color: var(--ion-color-danger-wash-contrast);
 }

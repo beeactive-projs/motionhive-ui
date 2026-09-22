@@ -124,6 +124,10 @@ ion-buttons ion-button.round {
 }
 
 .view ion-segment-button {
+  /* Stated here, not inherited: the global skin puts honey-deep ink on every
+     checked segment button, and this pill's checked label is the page's own
+     ink on a white fill instead. */
+  --color-checked: var(--ion-text-color);
   --indicator-height: 0;
   /* Concentric with the track: the outer radius less the padding it sits in. */
   --border-radius: calc(var(--mh-radius-control) - 0.25rem);

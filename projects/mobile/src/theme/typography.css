@@ -37,6 +37,11 @@ h1 {
    or a `text-transform`. */
 .mh-kicker {
   display: block;
+  /* Zeroed so the role can be worn by a heading element. A kicker that
+     labels a section of rows should BE that section's heading — a span
+     leaves the outline running straight from the page title into the row
+     names, with nothing between the lists to navigate by. */
+  margin: 0;
   font-family: var(--mh-font-mono);
   font-size: var(--mh-text-xs);
   font-weight: 600;

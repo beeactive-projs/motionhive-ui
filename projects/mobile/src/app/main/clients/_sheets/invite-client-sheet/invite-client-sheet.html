@@ -29,8 +29,10 @@
   </ion-segment>
 
   @if (mode() === Modes.Platform) {
-  <ion-searchbar mhAutofocus placeholder="Search by name or email" inputmode="search" [debounce]="0"
-    [value]="people.query()"
+  <!-- Named: a searchbar with only a placeholder announces itself as Ionic's
+       default "search text". -->
+  <ion-searchbar mhAutofocus placeholder="Search by name or email" aria-label="Search people"
+    inputmode="search" [debounce]="0" [value]="people.query()"
     (ionInput)="people.setQuery($event.detail.value ?? '')" />
   <!-- The minimum is only worth saying while it is unmet: once results are
        on screen, a hint telling you to type more sits right above them. -->

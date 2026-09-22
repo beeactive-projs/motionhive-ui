@@ -40,13 +40,9 @@ import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { SessionRow } from '../../coach/sessions/_components/session-row/session-row';
 import { ClientActionsSheet } from '../_sheets/client-actions-sheet/client-actions-sheet';
 import { ClientNotesSheet } from '../_sheets/client-notes-sheet/client-notes-sheet';
-import {
-  CLIENT_ICONS,
-  ClientActionId,
-  ClientActionIds,
-  adherenceLabel,
-  lastActiveLabel,
-} from '../clients.config';
+import { ClientActionId, ClientActionIds } from '../clients.config';
+import { CLIENT_ICONS } from '../clients.icons';
+import { adherenceLabel, lastActiveLabel } from '../roster-labels';
 import { ClientDetailStore } from './client-detail.store';
 
 /**

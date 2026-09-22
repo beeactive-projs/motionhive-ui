@@ -1,4 +1,5 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, take, tap } from 'rxjs';
 
 import {
@@ -17,13 +18,24 @@ import {
   ClientFilterIds,
   ClientsSegment,
   ClientsSegments,
-  ROSTER_WINDOW,
+  MIN_SEARCH_LENGTH,
   filterStatus,
   matchesClientQuery,
   matchesRosterQuery,
-} from './clients.config';
+} from './clients.filters';
+import { ROSTER_WINDOW } from './roster-labels';
 
 const PAGE_SIZE = 20;
+
+/**
+ * How long an unforced re-entry leaves what is on screen alone. Long enough
+ * to cover stepping into a client and straight back out — which re-fired the
+ * roster, the list and the request count within a second or two, for data
+ * that had no chance to change — and short enough that nothing here is
+ * visibly behind. Same shape as `MoreBadgesService`'s own window, which the
+ * request count this page reads already rides on.
+ */
+const FRESH_MS = 15_000;
 
 /**
  * `done` carries what went wrong, or nothing when the load settled. A
@@ -52,6 +64,13 @@ export class ClientsStore {
   private readonly _clientService = inject(ClientService);
   private readonly _rosterService = inject(RosterService);
   private readonly _moreBadgesService = inject(MoreBadgesService);
+  /**
+   * The page's, since the store is provided by it. Every stream below is
+   * cancelled with the page: `take(1)` caps how many values arrive but does
+   * not stop a slow response landing after the view is gone, writing to
+   * signals nobody reads and raising a toast on a screen the coach has left.
+   */
+  private readonly _destroyRef = inject(DestroyRef);
 
   readonly segment = signal<ClientsSegment>(ClientsSegments.Attention);
   readonly filter = signal<ClientFilterId>(ClientFilterIds.All);
@@ -65,8 +84,16 @@ export class ClientsStore {
    */
   readonly query = signal('');
 
-  /** What the last list request actually searched for. */
+  /** What the last list response actually searched for. */
   private readonly _appliedQuery = signal('');
+
+  /**
+   * What the last list request was issued with. Distinct from
+   * `_appliedQuery`, which only moves when a response lands: between the two
+   * a request is in flight, and a segment switch in that window must not
+   * fire a second request for the term already on its way.
+   */
+  private _requestedQuery = '';
 
   private readonly _roster = signal<RosterSummary | null>(null);
   private readonly _rosterLoading = signal(false);
@@ -92,6 +119,10 @@ export class ClientsStore {
    * land in an "Archived" list.
    */
   private _listSeq = 0;
+
+  /** When each lens last landed, for the freshness window `reenter()` reads. */
+  private _rosterFetchedAt = 0;
+  private _listFetchedAt = 0;
 
   readonly roster = this._roster.asReadonly();
   readonly rosterLoading = this._rosterLoading.asReadonly();
@@ -152,14 +183,36 @@ export class ClientsStore {
   );
 
   /**
-   * The rows on screen. The API has already applied the search, so this
-   * only re-filters while a newly typed term is still in flight — without
-   * it the previous result set would sit there looking like a match.
+   * The part of the search the API will act on — nothing, below its floor.
+   *
+   * The API ignores a term under `MIN_SEARCH_LENGTH` and answers with the
+   * unfiltered page, which is indistinguishable from a page of matches. A
+   * single `a` therefore came back as the whole directory, "Test User" and
+   * all, under a search box reading `a`. Holding the term back is the fix:
+   * an unsearched request is at least honestly unsearched, and the rows are
+   * narrowed in memory instead.
+   */
+  private readonly _serverQuery = computed(() => {
+    const term = this.query().trim();
+    return term.length >= MIN_SEARCH_LENGTH ? term : '';
+  });
+
+  /** Typed, but not yet enough for the API to search on. Said under the field. */
+  readonly queryTooShort = computed(() => {
+    const term = this.query().trim();
+    return term.length > 0 && term.length < MIN_SEARCH_LENGTH;
+  });
+
+  /**
+   * The rows on screen. The API has already applied whatever it could search
+   * on, so this re-filters while a newly typed term is still in flight —
+   * without it the previous result set would sit there looking like a match —
+   * and permanently for a term below the floor, which the API ignored.
    */
   readonly visibleClients = computed(() => {
-    const query = this.query();
+    const query = this.query().trim();
     const clients = this._clients();
-    if (!query.trim() || query === this._appliedQuery()) return clients;
+    if (!query || query === this._appliedQuery()) return clients;
     return clients.filter((client) => matchesClientQuery(client, query));
   });
 
@@ -209,18 +262,29 @@ export class ClientsStore {
       this.visibleClients().length === 0,
   );
 
-  /** The search has come back from the API, so the result is the whole roster. */
-  readonly searchSettled = computed(
-    () => this.query().trim() === this._appliedQuery().trim(),
+  /**
+   * The rows below are the answer to what is in the box — nothing is still
+   * on its way. Read by the page to decide when a result count is worth
+   * announcing: saying "3 clients" over a list about to be replaced is worse
+   * than saying nothing.
+   */
+  readonly searchSettled = computed(() => this._serverQuery() === this._appliedQuery());
+
+  /** How many rows a screen reader should be told about once it settles. */
+  readonly visibleCount = computed(() =>
+    this._isAttention()
+      ? this.visibleAttentionClients().length + this.visibleOnTrackClients().length
+      : this.visibleClients().length,
   );
 
   /**
    * The last load of the segment on screen failed, but there are rows from
    * an earlier one still under it.
    *
-   * Keeping stale rows is right; letting them pass for current is not. A
-   * toast only covers the refresh someone asked for by hand — entering the
-   * tab refreshes too, and that failure needs something that stays put.
+   * Keeping stale rows is right; letting them pass for current is not. This
+   * bar is the only thing that says so: entering the tab refreshes too, and a
+   * failure there needs something that stays put and offers the retry, not a
+   * toast that is gone before it is read.
    */
   readonly isStale = computed(() =>
     this._isAttention()
@@ -248,12 +312,26 @@ export class ClientsStore {
   }
 
   /**
-   * Silent by construction: the skeleton only shows over an empty list. The
-   * callback is handed the failure so a pull-to-refresh can say so — stale
-   * rows left on screen with no word look exactly like fresh ones.
+   * Quietly by construction: the skeleton only shows over an empty list, and
+   * a failure here raises the stale bar rather than anything transient. The
+   * callback only has to stop a refresher spinning.
    */
   refresh(done?: (error?: unknown) => void): void {
     this.load({ force: true, done });
+  }
+
+  /**
+   * Entering the tab. Ionic keeps this page alive in the stack, so an invite
+   * accepted or a client archived elsewhere still has to be picked up — but
+   * stepping into a client and straight back out re-fired both lenses and the
+   * count for data seconds old. Anything younger than `FRESH_MS` is left
+   * alone; pull-to-refresh and the verbs that just changed something go
+   * through `refresh()` and are never held back.
+   */
+  reenter(): void {
+    const oldest = Math.min(this._rosterFetchedAt, this._listFetchedAt);
+    if (oldest > 0 && Date.now() - oldest < FRESH_MS) return;
+    this.refresh();
   }
 
   loadRoster(opts: LoadOptions = {}): void {
@@ -264,14 +342,18 @@ export class ClientsStore {
     this._rosterLoading.set(true);
     this._rosterError.set(false);
 
+    // Silent: this page keeps its stale rows under an inline bar and says so
+    // itself. The global dialog on top of that is the same failure told
+    // twice, and on an entry nobody asked for, told at all.
     this._rosterService
-      .roster(ROSTER_WINDOW)
-      .pipe(take(1))
+      .roster(ROSTER_WINDOW, { silent: true })
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (summary) => {
           this._roster.set(summary);
           this._rosterLoaded.set(true);
           this._rosterLoading.set(false);
+          this._rosterFetchedAt = Date.now();
           opts.done?.();
         },
         error: (error: unknown) => {
@@ -302,9 +384,13 @@ export class ClientsStore {
 
   setSegment(segment: ClientsSegment): void {
     this.segment.set(segment);
-    // Both lenses load on entry; this only fills a gap an earlier error left.
+    // Both lenses load on entry; this only fills a gap an earlier error left,
+    // or a term typed while the other lens was on screen. `loadList` skips a
+    // request already in flight, so the force is aimed at the one case it
+    // cannot see: an in-flight request for a term the coach has since
+    // replaced, which would otherwise land and be the last word.
     if (segment === ClientsSegments.Attention) this.loadRoster();
-    else this.loadList();
+    else this.loadList({ force: this._serverQuery() !== this._requestedQuery });
   }
 
   setFilter(id: ClientFilterId): void {
@@ -321,10 +407,22 @@ export class ClientsStore {
    */
   setQuery(value: string): void {
     if (value === this.query()) return;
+    const previous = this._serverQuery();
     this.query.set(value);
-    if (this.segment() !== ClientsSegments.All) return;
+
+    // The API's answer would be the same one it already gave — a third
+    // character on a term it has, or a first one it still cannot use. The
+    // rows on screen re-narrow in memory; there is nothing to fetch.
+    if (this._serverQuery() === previous) return;
+
+    // Out of date whichever lens is on screen. Scoping this to the directory
+    // was the bug: a term typed on the triage left `_listLoaded` true, so
+    // switching to All clients — including through that lens's own "Search
+    // all clients" button — found a loaded list and never asked the API for
+    // the term. A coach with 100 clients kept getting "Nothing matches" for
+    // client #85, who was on page 5 and had never been fetched.
     this._resetList();
-    this.loadList({ force: true });
+    if (this.segment() === ClientsSegments.All) this.loadList({ force: true });
   }
 
   private _resetList(): void {
@@ -335,18 +433,21 @@ export class ClientsStore {
   }
 
   clearFilters(): void {
-    const hadQuery = !!this.query();
+    const hadServerQuery = !!this._serverQuery();
     this.query.set('');
+    // The chip first: `setFilter` resets the rows and reloads for the cleared
+    // term as well, so going through it is the one request that covers both.
     if (this.filter() !== ClientFilterIds.All) {
       this.setFilter(ClientFilterIds.All);
       return;
     }
-    // `setFilter` early-returns when the chip is already All, so the
-    // cleared search would never reach the API without this.
-    if (hadQuery && this.segment() === ClientsSegments.All) {
-      this._resetList();
-      this.loadList({ force: true });
-    }
+    // `setFilter` early-returns when the chip is already All, so the cleared
+    // search would never reach the API without this. A term the API never saw
+    // needs no round trip: those rows are the unfiltered page already, and
+    // only the in-memory narrowing has to drop away.
+    if (!hadServerQuery) return;
+    this._resetList();
+    if (this.segment() === ClientsSegments.All) this.loadList({ force: true });
   }
 
   /**
@@ -373,6 +474,7 @@ export class ClientsStore {
   archive(client: InstructorClient): Observable<InstructorClient> {
     return this._clientService.archiveClient(client.clientId).pipe(
       take(1),
+      takeUntilDestroyed(this._destroyRef),
       tap((updated) => {
         this._settle(client.id, updated, InstructorClientStatuses.Active);
         this.loadRoster({ force: true });
@@ -383,6 +485,7 @@ export class ClientsStore {
   unarchive(client: InstructorClient): Observable<InstructorClient> {
     return this._clientService.unarchiveClient(client.clientId).pipe(
       take(1),
+      takeUntilDestroyed(this._destroyRef),
       tap((updated) => {
         this._settle(client.id, updated, InstructorClientStatuses.Archived);
         this.loadRoster({ force: true });
@@ -394,9 +497,15 @@ export class ClientsStore {
   withdraw(client: InstructorClient): Observable<unknown> {
     return this._clientService.cancelRequest(client.id).pipe(
       take(1),
+      takeUntilDestroyed(this._destroyRef),
       tap(() => {
         this._clients.update((rows) => rows.filter((row) => row.id !== client.id));
         this._total.update((total) => Math.max(0, total - 1));
+        // The invitation is gone from the directory, not merely out of this
+        // chip's reach the way an archived row is — so the count behind
+        // "All clients · N" moves too. Without this the rows went 3 → 2
+        // under a segment still reading "All clients · 3".
+        this._allTotal.update((total) => (total === null ? null : Math.max(0, total - 1)));
         this.loadPendingCount(true);
       }),
     );
@@ -405,6 +514,7 @@ export class ClientsStore {
   updateNotes(client: InstructorClient, notes: string): Observable<InstructorClient> {
     return this._clientService.updateClient(client.clientId, { notes }).pipe(
       take(1),
+      takeUntilDestroyed(this._destroyRef),
       tap((updated) => this._patch(client.id, updated)),
     );
   }
@@ -440,13 +550,17 @@ export class ClientsStore {
   private _fetchPage(page: number, done?: (error?: unknown) => void): void {
     const seq = ++this._listSeq;
     const status = filterStatus(this.filter());
-    const search = this.query().trim();
+    const search = this._serverQuery();
     this._listLoading.set(true);
     this._listError.set(false);
+    if (page === 1) this._requestedQuery = search;
 
+    // Silent for the same reason as the roster: this page reports a failed
+    // load itself, inline and with a retry, and a modal over three of them at
+    // once is what a pull-to-refresh with no connection used to produce.
     this._clientService
-      .getClients({ status, search, page, limit: PAGE_SIZE })
-      .pipe(take(1))
+      .getClients({ status, search, page, limit: PAGE_SIZE }, { silent: true })
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (response) => {
           if (seq !== this._listSeq) {
@@ -459,6 +573,7 @@ export class ClientsStore {
           this._total.set(response.total);
           this._page.set(page);
           this._appliedQuery.set(search);
+          this._listFetchedAt = Date.now();
           // Only an unfiltered page can speak for the whole directory — a
           // searched total would shrink "All clients · N" to the matches.
           if (status === undefined && !search) this._allTotal.set(response.total);

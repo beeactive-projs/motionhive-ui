@@ -5,7 +5,7 @@ import { RosterClient } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { attentionLabel, attentionStat, attentionTone } from '../../clients.config';
+import { attentionLabel, attentionStat, attentionTone } from '../../roster-labels';
 
 /**
  * One flagged client on the triage lens: the settled spine card, with the

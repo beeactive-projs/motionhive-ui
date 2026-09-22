@@ -15,6 +15,63 @@ ion-buttons ion-button.round {
   vertical-align: middle;
 }
 
+/* Ionic sizes a toolbar text button to 32px. Cancel is the only way out of
+   the search once it owns the bar, so it gets the tap target. */
+ion-buttons ion-button.cancel {
+  min-height: var(--mh-tap-target);
+}
+
+/* ── The open search's scope line ────────────────────────────────────────
+   What is being searched, since the box took the segment and the chips with
+   it. Sits directly under the field, in the toolbar's own gutter. */
+.scope-bar {
+  --min-height: 0;
+  --padding-top: 0;
+  --padding-bottom: 0.5rem;
+}
+
+.scope {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding-inline: 1rem;
+}
+
+.scope .where {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The chip's only way off while the strip is hidden — sized to the line, the
+   way the section-head actions are. */
+.scope ion-button {
+  --color: var(--mh-color-honey-deep);
+  --padding-start: 0.25rem;
+  --padding-end: 0.25rem;
+  flex: none;
+  height: 1.5rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+/* Why a one-character term is not searching everyone — the invite sheet says
+   the same thing under its own people search. */
+.hint {
+  margin: 0.25rem 1rem 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
 /* Section heads come from the shared `.mh-section-head` role (layout.css). */
 
 /* Everyone on track — a status, so the success wash rather than honey. */
@@ -82,7 +139,11 @@ ion-buttons ion-button.round {
   line-height: var(--mh-leading-tight);
 }
 
+/* Ionic paints a clear button in the honey *fill* colour, which is 1.76:1 on
+   this wash. The retry takes the bar's own ink, the same deep hue the text
+   beside it already uses — and it flips with the palette. */
 .stale-bar ion-button {
+  --color: var(--ion-color-danger-wash-contrast);
   flex: none;
   margin: 0;
 }

@@ -3,3 +3,20 @@
 ion-segment-button {
   text-transform: none;
 }
+
+/* Honey as ink, not as fill. Ionic paints the selected label — and the 2px
+   indicator under it — in `--ion-color-primary`, which is 2.05:1 on white;
+   the same failure the clear-button-on-a-card rule fixes (ion-button.css).
+   `--mh-color-honey-deep` is the sanctioned ink form of the brand colour and
+   flips with the palette, so the label clears AA in both.
+
+   On the button, not the segment. Ionic declares `--color-checked` in the
+   button's own `:host`, and again in `:host(.in-toolbar)` off
+   `--ion-toolbar-segment-color-checked` — both shadow-tree rules, which a
+   declaration from out here outranks whatever their specificity, and both of
+   which would otherwise swallow a value inherited from the segment. A page
+   that wants something else says so on the button too (see the sessions
+   agenda's `.view ion-segment-button`). */
+ion-segment-button {
+  --color-checked: var(--mh-color-honey-deep);
+}

@@ -170,3 +170,19 @@
   color: var(--ion-color-medium);
   font-size: var(--mh-text-base);
 }
+
+/* The two relationship verbs at the foot of the page. Semantic hue as ink is
+   the wash contrast, not the saturated slot colour — success-500 on white is
+   2.5:1 and danger-500 is 3.76:1, both short of the 4.5:1 body text needs.
+   Same rule the attention rows' reason line follows. */
+.verb {
+  font-weight: 600;
+}
+
+.verb.danger {
+  color: var(--ion-color-danger-wash-contrast);
+}
+
+.verb.success {
+  color: var(--ion-color-success-wash-contrast);
+}

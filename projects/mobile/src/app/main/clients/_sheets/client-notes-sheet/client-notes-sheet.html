@@ -4,17 +4,13 @@
     [autoGrow]="true"
     [rows]="5"
     [maxlength]="maxLength"
-    [counter]="true"
+    [counter]="showCounter()"
     placeholder="Goals, injuries, what keeps them motivated…"
     [value]="draft()"
     (ionInput)="draft.set($event.detail.value ?? '')"
   />
 
-  @if (tooLong()) {
-    <p class="mh-helper over">{{ overBy() }} characters over the limit. Trim it to save.</p>
-  } @else {
-    <p class="mh-helper">Only you can see this. It stays with this client.</p>
-  }
+  <p class="mh-helper">Only you can see this. It stays with this client.</p>
 </ng-template>
 
 <mh-sheet-shell
