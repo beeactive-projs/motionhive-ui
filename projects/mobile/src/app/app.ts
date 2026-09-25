@@ -6,6 +6,7 @@ import { AuthService } from 'core';
 
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { ThemeService } from './_shared/services/theme.service';
+import { PushRegistrationService } from './_shared/services/push-registration.service';
 
 @Component({
   selector: 'mh-root',
@@ -27,6 +28,14 @@ export class App {
    * this service.
    */
   private readonly _authService = inject(AuthService);
+
+  /**
+   * Instantiated for its constructor: it watches the signed-in state and
+   * registers or revokes this device's push token accordingly. Nothing
+   * reads it, but without something constructing it no device is ever
+   * registered and every push resolves to "this user has no devices".
+   */
+  private readonly _pushRegistration = inject(PushRegistrationService);
 
   constructor() {
     // launchAutoHide is off in capacitor.config.ts — hide once the UI has rendered.
