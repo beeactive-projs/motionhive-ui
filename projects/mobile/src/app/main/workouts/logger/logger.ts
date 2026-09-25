@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
@@ -34,6 +34,7 @@ import {
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { RestAlertService } from '../../../_shared/services/rest-alert.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
@@ -126,6 +127,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _router = inject(Router);
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _restAlert = inject(RestAlertService);
 
   readonly skeletonCards = [1, 2];
 
@@ -222,6 +224,12 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   constructor() {
     addIcons(WORKOUT_ICONS);
+
+    // One place to mirror the countdown to the OS. Every path that starts,
+    // extends, skips or abandons rest already routes through `restEndsAt`,
+    // so the alert follows it without a call at each of those sites. The
+    // service only reaches the OS once the app is backgrounded.
+    effect(() => this._restAlert.track(this.restEndsAt()));
   }
 
   ionViewWillEnter(): void {
