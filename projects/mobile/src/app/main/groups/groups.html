@@ -152,6 +152,12 @@
         </div>
       </div>
       <p class="post-body">{{ post.content }}</p>
+
+      @if (post.mediaUrls; as photos) {
+      <mh-post-gallery [urls]="photos" [authorName]="authorNameOf(post)"
+        (openPhoto)="openPhoto(post.id, $event)" />
+      }
+
       <div class="post-meta">
         <span>
           <ion-icon [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'"

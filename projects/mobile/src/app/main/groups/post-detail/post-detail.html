@@ -76,6 +76,11 @@
            post is read. -->
       <p class="post-body">{{ post.content }}</p>
 
+      @if (post.mediaUrls; as photos) {
+      <mh-post-gallery [urls]="photos" [authorName]="authorName(post)"
+        (openPhoto)="openPhoto($event)" />
+      }
+
       <div class="post-meta">
         <ion-button fill="clear" size="small" class="meta-button"
           [class.reacted]="post.myReaction"

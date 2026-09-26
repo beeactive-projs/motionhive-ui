@@ -1,5 +1,6 @@
 import {
   Group,
+  WEB_APP_URL,
   GroupMemberPostPolicies,
   GroupMemberPostPolicy,
   GroupMemberRole,
@@ -278,6 +279,24 @@ export const COMMENT_MAX_LENGTH = 2000;
 export const POST_MAX_IMAGES = 4;
 /** Rejected by the upload route with 'File is larger than 5 MB.' */
 export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+
+// ── Invite links ─────────────────────────────────────────────────────────
+
+/**
+ * Where a group's join link lands.
+ *
+ * Built on the web app's address, never `window.location` — inside the
+ * WebView that is `capacitor://localhost`, which is meaningless to whoever
+ * receives the link. Same reasoning as the client invite's `SIGNUP_URL`.
+ *
+ * The path is `/join/<token>`, which is where web's `mainRoutes` actually
+ * mounts its accept screen. Web's own copy button builds
+ * `/groups/join/<token>` and 404s — worth fixing there, but this generates
+ * the address that works.
+ */
+export function joinLinkUrl(token: string): string {
+  return `${WEB_APP_URL}/join/${token}`;
+}
 
 // ── Errors ───────────────────────────────────────────────────────────────
 

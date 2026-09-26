@@ -54,6 +54,13 @@ export const groupsRoutes: Routes = [
     title: 'Manage group - MotionHive',
   },
   {
+    // A post's photos, full screen. Under `post/` so it pushes over the post
+    // it came from and the back gesture closes it.
+    path: 'post/:postId/photos',
+    loadComponent: () => import('./photo-view/photo-view').then((m) => m.PhotoView),
+    title: 'Photos - MotionHive',
+  },
+  {
     // A group seen from outside, with the way in. Its own route because the
     // group's own page is members-only: sending a non-member there is the
     // 403 this screen exists to prevent.

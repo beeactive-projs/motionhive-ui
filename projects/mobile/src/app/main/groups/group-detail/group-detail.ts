@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -41,10 +41,14 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { PostGallery } from '../_components/post-gallery/post-gallery';
+import { AddMembersSheet } from '../_sheets/add-members-sheet/add-members-sheet';
+import { JoinLinkSheet } from '../_sheets/join-link-sheet/join-link-sheet';
 import {
   canDeletePost,
   canLeave,
   canManageGroup,
+  canManageJoinLink,
   canPost,
   joinPolicyLabel,
   joinPolicyTone,
@@ -66,8 +70,10 @@ import { GroupDetailStore } from './group-detail.store';
 @Component({
   selector: 'mh-group-detail',
   imports: [
+    AddMembersSheet,
     ConfirmSheet,
     EmptyState,
+    JoinLinkSheet,
     HexAvatar,
     IonBackButton,
     IonButton,
@@ -89,6 +95,7 @@ import { GroupDetailStore } from './group-detail.store';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    PostGallery,
   ],
   templateUrl: './group-detail.html',
   styleUrl: './group-detail.scss',
@@ -106,6 +113,11 @@ export class GroupDetail implements ViewWillEnter {
   readonly Tabs = GroupTabs;
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
+  readonly addMembersOpen = signal(false);
+  readonly joinLinkOpen = signal(false);
+
+  /** Asked to open and load in one call; see `AddMembersSheet.show`. */
+  private readonly _addMembersSheet = viewChild(AddMembersSheet);
   readonly leaveOpen = signal(false);
   readonly leaving = signal(false);
 
@@ -123,6 +135,15 @@ export class GroupDetail implements ViewWillEnter {
   // alone; a moderator gets `canDeletePost` and nothing on this list.
   readonly canManage = computed(() => canManageGroup(this.store.viewerRole()));
   readonly canLeaveGroup = computed(() => canLeave(this.store.viewerRole()));
+
+  /**
+   * Minting a link needs the platform INSTRUCTOR role, not just ownership —
+   * both join-link routes carry `@Roles('INSTRUCTOR')`, checked before the
+   * service runs. An owner-by-transfer without it would get a 403.
+   */
+  readonly canShareJoinLink = computed(() =>
+    canManageJoinLink(this.store.viewerRole(), this._auth.isInstructor()),
+  );
 
   readonly canCompose = computed(() => {
     const group = this.store.group();
@@ -261,6 +282,25 @@ export class GroupDetail implements ViewWillEnter {
     });
   }
 
+  openJoinLink(): void {
+    this.joinLinkOpen.set(true);
+  }
+
+  /** The group's token changed, so the sheet's next open must see it. */
+  onJoinLinkChanged(): void {
+    this.store.reloadGroup();
+  }
+
+  openAddMembers(): void {
+    this._addMembersSheet()?.show();
+  }
+
+  /** Straight back to the member list, which is now out of date. */
+  onMembersAdded(): void {
+    this.store.reloadMembers();
+    this.store.setTab(GroupTabs.Members);
+  }
+
   confirmLeave(): void {
     this.leaveOpen.set(true);
   }
@@ -290,6 +330,13 @@ export class GroupDetail implements ViewWillEnter {
 
   openPost(postId: string): void {
     void this._router.navigate(['/tabs/groups/post', postId]);
+  }
+
+  /** Straight to the viewer, skipping the post — the tap was on a photo. */
+  openPhoto(post: Post, index: number): void {
+    void this._router.navigate(['/tabs/groups/post', post.id, 'photos'], {
+      queryParams: { index },
+    });
   }
 
   /**

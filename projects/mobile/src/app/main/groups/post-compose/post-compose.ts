@@ -158,11 +158,25 @@ export class PostCompose {
         void this._feedbackService.error(null, `${file.name} is larger than 5 MB.`);
         continue;
       }
+      // Picking the same photo twice is a mis-tap, not an instruction to
+      // post it twice — and it would upload twice on submit. Name and size
+      // together, because two different photos can share a name.
+      if (this._alreadyPicked(file)) continue;
+
       this.images.update((list) => [
         ...list,
         { file, previewUrl: URL.createObjectURL(file) },
       ]);
     }
+  }
+
+  private _alreadyPicked(file: File): boolean {
+    return this.images().some(
+      (image) =>
+        image.file.name === file.name &&
+        image.file.size === file.size &&
+        image.file.lastModified === file.lastModified,
+    );
   }
 
   removeImage(image: PendingImage): void {

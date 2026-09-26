@@ -278,6 +278,18 @@ export class GroupDetailStore {
     this.loadPosts({ force: true });
   }
 
+  /** Re-reads the group alone — its join token or settings changed. */
+  reloadGroup(): void {
+    this._loadGroup(true);
+  }
+
+  /** After adding people — the list and the header count are both stale. */
+  reloadMembers(): void {
+    this._membersLoaded.set(false);
+    this.loadMembers({ force: true });
+    this._loadGroup(true);
+  }
+
   removeMember(userId: string): Observable<unknown> {
     return this._groupService.removeMember(this._groupId, userId).pipe(
       take(1),

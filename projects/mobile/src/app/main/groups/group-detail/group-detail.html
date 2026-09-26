@@ -141,6 +141,13 @@
         <span class="post-body">{{ post.content }}</span>
       </button>
 
+      @if (post.mediaUrls; as photos) {
+      <!-- A photo opens the viewer, not the post: tapping a picture to read
+           the comments under it is not what the tap meant. -->
+      <mh-post-gallery [urls]="photos" [authorName]="authorName(post)"
+        (openPhoto)="openPhoto(post, $event)" />
+      }
+
       <div class="post-meta">
         <ion-button fill="clear" size="small" class="meta-button"
           [class.reacted]="post.myReaction"
@@ -176,6 +183,13 @@
       }
     </ion-list>
     } @else {
+    @if (canManage()) {
+    <ion-button expand="block" fill="outline" class="add-members" (click)="openAddMembers()">
+      <ion-icon slot="start" name="person-add-outline" />
+      Add members
+    </ion-button>
+    }
+
     <ion-searchbar placeholder="Search members" aria-label="Search members" inputmode="search"
       [value]="store.memberQuery()" (ionInput)="onMemberQuery($event.detail.value ?? '')" />
 
@@ -248,6 +262,21 @@
     </div>
     }
 
+    @if (canShareJoinLink()) {
+    <!-- The only way into an invite-only group for someone who is not your
+         client, so it sits with the group's own settings rather than under
+         the member list. -->
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item button [detail]="true" lines="none" (click)="openJoinLink()">
+        <ion-icon slot="start" name="link-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <h2>Invite link</h2>
+          <p>{{ group.joinToken ? 'A link is active' : 'No link yet' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    }
+
     @if (canLeaveGroup()) {
     <!-- The owner never sees this: the API answers "Group owner cannot
          leave. Transfer ownership first or delete the group." -->
@@ -276,3 +305,10 @@
   body="It will be removed for everyone, along with its comments." confirmLabel="Delete"
   tone="danger" irreversible="This cannot be undone." [saving]="deletingPost()"
   (confirm)="deletePost()" />
+
+@if (store.group(); as group) {
+<mh-add-members-sheet [(open)]="addMembersOpen" [groupId]="group.id"
+  (added)="onMembersAdded()" />
+<mh-join-link-sheet [(open)]="joinLinkOpen" [groupId]="group.id" [groupName]="group.name"
+  [token]="group.joinToken" (changed)="onJoinLinkChanged()" />
+}

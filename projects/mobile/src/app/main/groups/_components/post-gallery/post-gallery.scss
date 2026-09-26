@@ -1,0 +1,80 @@
+/* The count picks the shape. One photo fills the width; two split it; three
+   and four tile — the same arrangements web uses, so a post looks like
+   itself on either. */
+.gallery {
+  display: grid;
+  gap: 0.125rem;
+  margin-top: 0.625rem;
+  border-radius: var(--mh-radius-card);
+  overflow: hidden;
+}
+
+.gallery[data-count='1'] {
+  grid-template-columns: 1fr;
+}
+
+.gallery[data-count='2'] {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Three: one tall on the left, two stacked on the right. */
+.gallery[data-count='3'] {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.gallery[data-count='3'] .cell:first-child {
+  grid-row: span 2;
+}
+
+.gallery[data-count='4'] {
+  grid-template-columns: 1fr 1fr;
+}
+
+.cell {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: var(--ion-color-step-100, var(--ion-card-background));
+  cursor: pointer;
+  /* Square by default so the grid stays even whatever the photos are. */
+  aspect-ratio: 1;
+}
+
+/* A single photo keeps a gentler shape — a lone square crops a landscape
+   shot harder than it deserves. */
+.gallery[data-count='1'] .cell {
+  aspect-ratio: 4 / 3;
+}
+
+.gallery[data-count='3'] .cell:first-child {
+  aspect-ratio: auto;
+}
+
+.cell:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: calc(-1 * var(--mh-ring-width));
+}
+
+.cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* "+2" over the last tile when there are more than the grid shows. */
+.more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Legacy rgba(): a scrim over a photo, not a theme surface. */
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+}

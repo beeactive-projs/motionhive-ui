@@ -29,6 +29,7 @@ import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../_shared/components/sheet-shell/sheet-shell';
+import { PostGallery } from '../_components/post-gallery/post-gallery';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import {
   COMMENT_MAX_LENGTH,
@@ -69,6 +70,7 @@ import { PostDetailStore } from './post-detail.store';
     IonTextarea,
     IonTitle,
     IonToolbar,
+    PostGallery,
     SheetShell,
   ],
   templateUrl: './post-detail.html',
@@ -197,6 +199,15 @@ export class PostDetail implements ViewWillEnter {
    */
   hasProfile(row: Post | PostComment): boolean {
     return !!row.author?.handle;
+  }
+
+  /** Opens the full-screen viewer on the photo that was tapped. */
+  openPhoto(index: number): void {
+    const post = this.store.post();
+    if (!post) return;
+    void this._router.navigate(['/tabs/groups/post', post.id, 'photos'], {
+      queryParams: { index },
+    });
   }
 
   openProfile(row: Post | PostComment): void {

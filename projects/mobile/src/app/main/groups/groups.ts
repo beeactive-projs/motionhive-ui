@@ -27,12 +27,13 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { AuthStore, DiscoverGroup, formatRelativeShort } from 'core';
+import { AuthStore, DiscoverGroup, Post, formatRelativeShort } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { NotificationBell } from '../../_shared/components/notification-bell/notification-bell';
 import { SearchbarAutofocusDirective } from '../../_shared/directives/searchbar-autofocus.directive';
+import { PostGallery } from './_components/post-gallery/post-gallery';
 import { GROUP_ICONS } from './groups.icons';
 import { GroupsSegments, MIN_SEARCH_LENGTH } from './groups.filters';
 import { GroupsStore } from './groups.store';
@@ -74,6 +75,7 @@ import { GroupsStore } from './groups.store';
     IonTitle,
     IonToolbar,
     NotificationBell,
+    PostGallery,
     SearchbarAutofocusDirective,
   ],
   templateUrl: './groups.html',
@@ -206,6 +208,17 @@ export class Groups implements ViewWillEnter {
 
   openPost(postId: string): void {
     void this._router.navigate(['/tabs/groups/post', postId]);
+  }
+
+  /** Straight to the viewer, skipping the post — the tap was on a photo. */
+  openPhoto(postId: string, index: number): void {
+    void this._router.navigate(['/tabs/groups/post', postId, 'photos'], {
+      queryParams: { index },
+    });
+  }
+
+  authorNameOf(post: Post): string {
+    return post.author ? post.author.firstName + ' ' + post.author.lastName : 'Member';
   }
 
   createGroup(): void {

@@ -1,0 +1,66 @@
+/* Dark on every theme: a photo is shown against a neutral surround, and a
+   light page would tint what the reader is trying to look at. These are
+   fixed values, not theme tokens, for exactly that reason. */
+.bar {
+  --background: #000;
+  --color: #fff;
+  --border-color: transparent;
+}
+
+.stage {
+  --background: #000;
+}
+
+.centre {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* `dvh`, not `vh`: the WebView's chrome moves, and a photo that hides
+     behind it is a photo half-seen. */
+  min-height: 100%;
+  padding: 1rem;
+}
+
+.centre img {
+  max-width: 100%;
+  /* Leaves the toolbar its room rather than sliding under it. */
+  /* Leaves the toolbar and the tab bar their room rather than sliding
+     under either. */
+  max-height: 68dvh;
+  object-fit: contain;
+  display: block;
+}
+
+.nav {
+  position: absolute;
+  inset-inline: 0;
+  /* Centred against the photo rather than pinned low: the tab bar owns the
+     bottom of the screen, and arrows placed there sat underneath it. */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding-inline: 0.75rem;
+  /* The row spans the width so the arrows sit at the edges; only the
+     buttons themselves should take a tap. */
+  pointer-events: none;
+}
+
+.nav ion-button {
+  pointer-events: auto;
+}
+
+.arrow {
+  --color: #fff;
+  /* Legacy rgba(): a control floating over a photo needs its own backdrop,
+     which no theme surface can provide. */
+  --background: rgba(255, 255, 255, 0.14);
+  --background-hover: rgba(255, 255, 255, 0.22);
+  --border-radius: var(--mh-radius-pill);
+  width: var(--mh-tap-target);
+  height: var(--mh-tap-target);
+}
+
+.arrow.button-disabled {
+  opacity: 0.35;
+}
