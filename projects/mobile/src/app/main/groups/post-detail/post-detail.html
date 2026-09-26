@@ -1,0 +1,245 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Back" />
+    </ion-buttons>
+    <ion-title>Post</ion-title>
+    <ion-buttons slot="end">
+      @if (canEditThisPost()) {
+      <ion-button shape="round" aria-label="Edit this post" (click)="startEdit()">
+        <ion-icon slot="icon-only" name="create-outline" />
+      </ion-button>
+      }
+      @if (canDeleteThisPost()) {
+      <ion-button shape="round" aria-label="Delete this post" (click)="confirmDeletePost()">
+        <ion-icon slot="icon-only" name="trash-outline" />
+      </ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h1 class="mh-visually-hidden">Post</h1>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.isStale()) {
+  <div class="stale" role="status">
+    <div class="stale-bar">
+      <ion-icon name="cloud-offline-outline" aria-hidden="true" />
+      <span>Couldn't refresh. Showing the last update.</span>
+      <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+    </div>
+  </div>
+  }
+
+  @if (store.showPostError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this post"
+    message="It may have been deleted, or you may be offline." actionLabel="Try again"
+    (action)="retry()" />
+  } @else if (store.showPostSkeleton()) {
+  <div class="mh-page" aria-busy="true">
+    <article class="post">
+      <div class="post-head">
+        <mh-hex-avatar size="md" color="medium" tone="wash" />
+        <div class="lines">
+          <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.875rem" />
+          <ion-skeleton-text [animated]="true" style="width: 25%; height: 0.75rem" />
+        </div>
+      </div>
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 0.75rem" />
+      <ion-skeleton-text [animated]="true" style="width: 85%; height: 0.75rem" />
+      <ion-skeleton-text [animated]="true" style="width: 60%; height: 0.75rem" />
+    </article>
+  </div>
+  } @else if (store.post(); as post) {
+  <div class="mh-page">
+    <article class="post">
+      <div class="post-head">
+        <!-- The author opens their profile; the rest of the card does not,
+             so the body and its verbs keep their own targets. -->
+        <button type="button" class="author" [disabled]="!hasProfile(post)"
+          [attr.aria-label]="hasProfile(post) ? 'View ' + authorName(post) + '\u2019s profile' : null"
+          (click)="openProfile(post)">
+          <mh-hex-avatar size="md" [name]="authorName(post)" [imageUrl]="avatarUrl(post)" />
+          <div class="who">
+            <h2>{{ authorName(post) }}</h2>
+            <p>{{ postedAt(post.postedAt) }}</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Not clamped, unlike the feed card: this screen is where the whole
+           post is read. -->
+      <p class="post-body">{{ post.content }}</p>
+
+      <div class="post-meta">
+        <ion-button fill="clear" size="small" class="meta-button"
+          [class.reacted]="post.myReaction"
+          [attr.aria-label]="post.myReaction ? 'Unlike this post' : 'Like this post'"
+          [attr.aria-pressed]="!!post.myReaction" (click)="like()">
+          <ion-icon slot="start" [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'" />
+          {{ post.reactionCount }}
+        </ion-button>
+        <span class="comment-count">{{ commentCountLabel() }}</span>
+      </div>
+    </article>
+
+    <section class="comments">
+      <h2 class="mh-kicker">Comments</h2>
+
+      @if (store.showCommentsError()) {
+      <mh-empty-state icon="alert-circle-outline" heading="Couldn't load comments"
+        message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+      } @else if (store.showCommentsSkeleton()) {
+      <div aria-busy="true">
+        @for (_ of skeletonRows; track $index) {
+        <div class="comment-skeleton">
+          <mh-hex-avatar size="sm" color="medium" tone="wash" />
+          <div class="lines">
+            <ion-skeleton-text [animated]="true" style="width: 30%; height: 0.75rem" />
+            <ion-skeleton-text [animated]="true" style="width: 80%; height: 0.75rem" />
+          </div>
+        </div>
+        }
+      </div>
+      } @else if (store.isEmpty()) {
+      <mh-empty-state icon="chatbubble-outline" heading="No comments yet"
+        message="Be the first to say something." />
+      } @else {
+      @for (comment of store.comments(); track comment.id) {
+      <div class="thread">
+        <article class="comment">
+          <button type="button" class="comment-avatar" [disabled]="!hasProfile(comment)"
+            [attr.aria-label]="hasProfile(comment) ? 'View ' + authorName(comment) + '\u2019s profile' : null"
+            (click)="openProfile(comment)">
+            <mh-hex-avatar size="sm" [name]="authorName(comment)" [imageUrl]="avatarUrl(comment)" />
+          </button>
+          <div class="comment-body">
+            <div class="comment-head">
+              <button type="button" class="comment-name" [disabled]="!hasProfile(comment)"
+                [attr.aria-label]="hasProfile(comment) ? 'View ' + authorName(comment) + '\u2019s profile' : null"
+                (click)="openProfile(comment)">
+                <h3>{{ authorName(comment) }}</h3>
+              </button>
+              <span class="when">{{ postedAt(comment.createdAt) }}</span>
+            </div>
+            <p>{{ comment.content }}</p>
+            <div class="comment-actions">
+              <ion-button fill="clear" size="small" class="link-button"
+                [attr.aria-label]="'Reply to ' + authorName(comment)" (click)="replyTo(comment)">
+                Reply
+              </ion-button>
+              @if (mayDeleteComment(comment)) {
+              <ion-button fill="clear" size="small" class="link-button" color="danger"
+                [attr.aria-label]="'Delete comment by ' + authorName(comment)"
+                (click)="confirmDeleteComment(comment)">
+                Delete
+              </ion-button>
+              }
+            </div>
+          </div>
+        </article>
+
+        <!-- One level and no further: the API rejects a reply to a reply, so
+             replying from in here targets the thread root above. -->
+        @for (child of comment.replies ?? []; track child.id) {
+        <article class="comment reply">
+          <button type="button" class="comment-avatar" [disabled]="!hasProfile(child)"
+            [attr.aria-label]="hasProfile(child) ? 'View ' + authorName(child) + '\u2019s profile' : null"
+            (click)="openProfile(child)">
+            <mh-hex-avatar size="sm" [name]="authorName(child)" [imageUrl]="avatarUrl(child)" />
+          </button>
+          <div class="comment-body">
+            <div class="comment-head">
+              <button type="button" class="comment-name" [disabled]="!hasProfile(child)"
+                [attr.aria-label]="hasProfile(child) ? 'View ' + authorName(child) + '\u2019s profile' : null"
+                (click)="openProfile(child)">
+                <h3>{{ authorName(child) }}</h3>
+              </button>
+              <span class="when">{{ postedAt(child.createdAt) }}</span>
+            </div>
+            <p>{{ child.content }}</p>
+            <div class="comment-actions">
+              <ion-button fill="clear" size="small" class="link-button"
+                [attr.aria-label]="'Reply to ' + authorName(child)"
+                (click)="replyTo(comment, child)">
+                Reply
+              </ion-button>
+              @if (mayDeleteComment(child)) {
+              <ion-button fill="clear" size="small" class="link-button" color="danger"
+                [attr.aria-label]="'Delete comment by ' + authorName(child)"
+                (click)="confirmDeleteComment(child)">
+                Delete
+              </ion-button>
+              }
+            </div>
+          </div>
+        </article>
+        }
+      </div>
+      }
+      }
+    </section>
+  </div>
+  }
+
+  @if (store.commentsHasMore()) {
+  <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
+  }
+</ion-content>
+
+@if (store.post()) {
+<ion-footer [translucent]="true">
+  @if (replyingTo(); as target) {
+  <!-- Which thread this is going into. Without it, a reply started minutes
+       ago looks exactly like a new comment. -->
+  <ion-toolbar class="reply-bar">
+    <div class="reply-context">
+      <span>Replying to {{ target.name }}</span>
+      <ion-button fill="clear" size="small" (click)="cancelReply()">Cancel</ion-button>
+    </div>
+  </ion-toolbar>
+  }
+  <ion-toolbar class="composer-bar">
+    <div class="composer">
+      <ion-textarea class="composer-input" [autoGrow]="true" [rows]="1" [maxlength]="maxLength"
+        [placeholder]="composerPlaceholder()" [attr.aria-label]="composerPlaceholder()"
+        [value]="draft()" (ionInput)="onDraft($event.detail.value ?? '')" />
+      <ion-button shape="round" class="send" [disabled]="!canSend()" aria-label="Post comment"
+        (click)="send()">
+        <ion-icon slot="icon-only" name="send-outline" />
+      </ion-button>
+    </div>
+    @if (showRemaining()) {
+    <p class="remaining" [class.over]="remaining() < 0" role="status">
+      {{ remaining() }} characters left
+    </p>
+    }
+  </ion-toolbar>
+</ion-footer>
+}
+
+<!-- Content only: images are not editable here, the same as on web. -->
+<ng-template #editBody>
+  <ion-textarea class="edit-body" [autoGrow]="true" [rows]="6" [maxlength]="postMaxLength"
+    aria-label="Post content" [value]="editDraft()"
+    (ionInput)="onEditDraft($event.detail.value ?? '')" />
+</ng-template>
+
+<mh-sheet-shell [(open)]="editOpen" title="Edit post" [body]="editBody" saveLabel="Save"
+  [canSave]="canSaveEdit()" [saving]="savingEdit()" (save)="saveEdit()" />
+
+<mh-confirm-sheet [(open)]="deleteCommentOpen" title="Delete this comment?"
+  body="It will be removed for everyone. Replies to it go too." confirmLabel="Delete" tone="danger"
+  irreversible="This cannot be undone." [saving]="deletingComment()" (confirm)="deleteComment()" />
+
+<mh-confirm-sheet [(open)]="deletePostOpen" title="Delete this post?"
+  body="It will be removed for everyone, along with its comments." confirmLabel="Delete"
+  tone="danger" irreversible="This cannot be undone." [saving]="deletingPost()"
+  (confirm)="deletePost()" />

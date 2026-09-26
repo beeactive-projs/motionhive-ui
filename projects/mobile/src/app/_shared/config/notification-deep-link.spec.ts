@@ -102,7 +102,10 @@ describe('deep links', () => {
       tab: 'invoices',
     });
     expect(queryParamsFor({ screen: 'coaching/payments' })).toBeNull();
-    expect(queryParamsFor({ screen: 'groups', queryParams: { x: '1' } })).toBeNull();
+    // An unrouted screen has nowhere to forward them to. `groups` used to be
+    // the example here; it is routed now, so this uses one that still isn't.
+    expect(queryParamsFor({ screen: 'user/plans', queryParams: { x: '1' } })).toBeNull();
+    expect(queryParamsFor({ screen: 'groups', queryParams: { x: '1' } })).toEqual({ x: '1' });
   });
 
   // The two roles read the same invoice from opposite sides, so the alert has
@@ -171,7 +174,17 @@ describe('isOnTarget', () => {
   });
 
   it('is false when the notification has nowhere to go', () => {
-    expect(isOnTarget('/tabs/home', { screen: 'groups' })).toBe(false);
+    // An unrouted screen, and no notification at all.
+    expect(isOnTarget('/tabs/home', { screen: 'user/plans' })).toBe(false);
     expect(isOnTarget('/tabs/home', null)).toBe(false);
+  });
+
+  it('lands a group alert on its group, or on the hub when it names none', () => {
+    // A removal alert carries no entityId on purpose: the reader has just
+    // lost access to that group, so /tabs/groups/<id> would 403.
+    const alert = { screen: 'groups', entityId: 'g-1' };
+    expect(isOnTarget('/tabs/groups', alert)).toBe(false);
+    expect(isOnTarget('/tabs/groups/g-1', alert)).toBe(true);
+    expect(isOnTarget('/tabs/groups', { screen: 'groups' })).toBe(true);
   });
 });

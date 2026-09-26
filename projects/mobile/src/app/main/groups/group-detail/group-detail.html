@@ -1,0 +1,278 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Groups" />
+    </ion-buttons>
+    <ion-title>{{ store.group()?.name ?? 'Group' }}</ion-title>
+    <ion-buttons slot="end">
+      @if (canManage()) {
+      <!-- Two separate destinations rather than one kebab: the queues are
+           work that arrives, settings are a thing you go and change. -->
+      <ion-button shape="round" aria-label="Group settings" (click)="editGroup()">
+        <ion-icon slot="icon-only" name="settings-outline" />
+      </ion-button>
+      <ion-button shape="round" aria-label="Review requests and posts" (click)="manage()">
+        <ion-icon slot="icon-only" name="shield-checkmark-outline" />
+      </ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+
+  @if (store.group(); as group) {
+  <!-- Compact: the name is already in the toolbar above, so this carries
+       only what the toolbar cannot — how many people, and how you get in. -->
+  <ion-toolbar class="hero-bar">
+    <div class="hero">
+      <mh-hex-avatar size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
+      <div class="hero-meta">
+        <span class="count">{{ memberCountLabel() }}</span>
+        <ion-chip [color]="policyTone()" class="policy">{{ policyLabel() }}</ion-chip>
+      </div>
+    </div>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="store.tab()" (ionChange)="setTab($event.detail.value)">
+      <ion-segment-button [value]="Tabs.Posts">
+        <ion-label>Posts</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Tabs.Members">
+        <ion-label>Members</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Tabs.About">
+        <ion-label>About</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+  }
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- `ion-title` is not a heading, so a screen reader had nothing to land
+       on and the outline began at h2. -->
+  <h1 class="mh-visually-hidden">{{ store.group()?.name ?? 'Group' }}</h1>
+  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.isStale()) {
+  <div class="stale" role="status">
+    <div class="stale-bar">
+      <ion-icon name="cloud-offline-outline" aria-hidden="true" />
+      <span>Couldn't refresh. Showing the last update.</span>
+      <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+    </div>
+  </div>
+  }
+
+  @if (store.showGroupError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (store.showGroupSkeleton()) {
+  <div class="mh-page" aria-busy="true">
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+  } @else if (isPosts()) {
+  <div class="mh-page">
+    @if (canCompose()) {
+    <!-- A prompt, not a FAB: the composer is the main verb here and a
+         floating button would sit on top of the newest post. -->
+    <button type="button" class="compose" (click)="compose()">
+      <ion-icon name="add-outline" aria-hidden="true" />
+      <span>Share something with the group</span>
+    </button>
+    }
+
+    @if (store.showLoadError()) {
+    <mh-empty-state icon="alert-circle-outline" heading="Couldn't load posts"
+      message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+    } @else if (store.showSkeleton()) {
+    <div aria-busy="true">
+      @for (_ of skeletonRows; track $index) {
+      <article class="post-skeleton">
+        <div class="post-skeleton-head">
+          <mh-hex-avatar size="md" color="medium" tone="wash" />
+          <div class="lines">
+            <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.875rem" />
+            <ion-skeleton-text [animated]="true" style="width: 25%; height: 0.75rem" />
+          </div>
+        </div>
+        <ion-skeleton-text [animated]="true" style="width: 100%; height: 0.75rem" />
+        <ion-skeleton-text [animated]="true" style="width: 70%; height: 0.75rem" />
+      </article>
+      }
+    </div>
+    } @else if (store.isEmpty()) {
+    <mh-empty-state icon="chatbubble-outline" heading="No posts yet"
+      [message]="canCompose() ? 'Be the first to share something.' : 'Posts from this group will show up here.'" />
+    } @else {
+    @for (post of store.posts(); track post.id) {
+    <article class="post-card">
+      <div class="post-head">
+        <mh-hex-avatar size="md" [name]="authorName(post)" [imageUrl]="post.author?.avatarUrl ?? null" />
+        <div class="who">
+          <h2>{{ authorName(post) }}</h2>
+          <p>{{ postedAt(post.postedAt) }}</p>
+        </div>
+        @if (mayDelete(post)) {
+        <ion-button fill="clear" shape="round" class="post-action" [attr.aria-label]="'Delete post by ' + authorName(post)"
+          (click)="confirmDeletePost(post)">
+          <ion-icon slot="icon-only" name="trash-outline" />
+        </ion-button>
+        }
+      </div>
+
+      <!-- The body opens the post; the buttons below it do their own thing,
+           so the whole card is not one tap target. -->
+      <button type="button" class="post-body-button" [attr.aria-label]="'Open post by ' + authorName(post)"
+        (click)="openPost(post.id)">
+        <span class="post-body">{{ post.content }}</span>
+      </button>
+
+      <div class="post-meta">
+        <ion-button fill="clear" size="small" class="meta-button"
+          [class.reacted]="post.myReaction"
+          [attr.aria-label]="(post.myReaction ? 'Unlike' : 'Like') + ' post by ' + authorName(post)"
+          [attr.aria-pressed]="!!post.myReaction" (click)="like(post)">
+          <ion-icon slot="start" [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'" />
+          {{ post.reactionCount }}
+        </ion-button>
+        <ion-button fill="clear" size="small" class="meta-button"
+          [attr.aria-label]="'Comments on post by ' + authorName(post)" (click)="openPost(post.id)">
+          <ion-icon slot="start" name="chatbubble-outline" />
+          {{ post.commentCount }}
+        </ion-button>
+      </div>
+    </article>
+    }
+    }
+  </div>
+  } @else if (isMembers()) {
+  <div class="mh-page">
+    @if (store.showLoadError()) {
+    <mh-empty-state icon="alert-circle-outline" heading="Couldn't load members"
+      message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+    } @else if (store.showSkeleton()) {
+    <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    } @else {
+    <ion-searchbar placeholder="Search members" aria-label="Search members" inputmode="search"
+      [value]="store.memberQuery()" (ionInput)="onMemberQuery($event.detail.value ?? '')" />
+
+    @if (store.isFilteredEmpty()) {
+    <mh-empty-state icon="people-outline" heading="Nobody matches"
+      message="No member matches that. Try a different name." />
+    } @else if (store.isEmpty()) {
+    <mh-empty-state icon="people-outline" heading="No members yet"
+      message="People who join this group will show up here." />
+    } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (member of store.visibleMembers(); track member.id; let last = $last) {
+      <!-- Tappable only when the account has a handle: a profile is addressed
+           by handle, so without one there is nowhere to go. -->
+      <ion-item [lines]="last ? 'none' : 'full'" [button]="hasProfile(member)"
+        [detail]="false" (click)="openMember(member)">
+        <mh-hex-avatar slot="start" size="md" [name]="memberName(member)"
+          [imageUrl]="member.user?.avatarUrl ?? null" />
+        <ion-label>
+          <h2>{{ memberName(member) }}</h2>
+          <!-- No email here: this is a social list, not an admin one. The
+               owner's member-management screen is where contact details
+               belong. Search still matches on email, since an owner may
+               well type one. -->
+        </ion-label>
+        <ion-chip slot="end" [color]="roleTone(member)" class="role">{{ roleLabel(member) }}</ion-chip>
+      </ion-item>
+      }
+    </ion-list>
+    }
+    }
+  </div>
+  } @else if (store.group(); as group) {
+  <div class="mh-page about">
+    @if (group.description) {
+    <section class="mh-section">
+      <h2 class="mh-kicker">About</h2>
+      <p class="description">{{ group.description }}</p>
+    </section>
+    }
+
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item lines="full">
+        <ion-label>
+          <h2>Members</h2>
+          <p>{{ memberCountLabel() }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item [lines]="group.city ? 'full' : 'none'">
+        <ion-label>
+          <h2>Joining</h2>
+          <p>{{ policyLabel() }}</p>
+        </ion-label>
+      </ion-item>
+      @if (group.city) {
+      <ion-item lines="none">
+        <ion-label>
+          <h2>Where</h2>
+          <p>{{ group.city }}@if (group.country) {, {{ group.country }}}</p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+
+    @if (group.tags?.length) {
+    <div class="mh-chip-row" role="group" aria-label="Group tags">
+      @for (tag of group.tags; track tag) {
+      <ion-chip color="medium" class="tag">{{ tag }}</ion-chip>
+      }
+    </div>
+    }
+
+    @if (canLeaveGroup()) {
+    <!-- The owner never sees this: the API answers "Group owner cannot
+         leave. Transfer ownership first or delete the group." -->
+    <div class="leave-row">
+      <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeave()">
+        <ion-icon slot="start" name="exit-outline" />
+        Leave group
+      </ion-button>
+    </div>
+    }
+  </div>
+  }
+
+  @if ((isPosts() && store.postsHasMore()) || (isMembers() && store.membersHasMore())) {
+  <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
+  }
+</ion-content>
+
+<mh-confirm-sheet [(open)]="leaveOpen" title="Leave this group?"
+  body="You'll stop seeing its posts. You can ask to join again later." confirmLabel="Leave"
+  tone="danger" [saving]="leaving()" (confirm)="leave()" />
+
+<mh-confirm-sheet [(open)]="deletePostOpen" title="Delete this post?"
+  body="It will be removed for everyone, along with its comments." confirmLabel="Delete"
+  tone="danger" irreversible="This cannot be undone." [saving]="deletingPost()"
+  (confirm)="deletePost()" />

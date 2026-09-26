@@ -1,0 +1,204 @@
+/* Cancel sits beside the open searchbar and has to keep a full tap target. */
+ion-buttons ion-button.cancel {
+  min-height: var(--mh-tap-target);
+}
+
+/* ── The open search's scope line ────────────────────────────────────────
+   Which list is under the box, since the box took the segment with it. */
+.scope-bar {
+  --min-height: 0;
+  --padding-top: 0;
+  --padding-bottom: 0.5rem;
+}
+
+.scope {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding-inline: 1rem;
+}
+
+.scope .where {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Why a one-character term is not searching the directory. */
+.hint {
+  margin: 0.25rem 1rem 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+/* ── "Couldn't refresh" ──────────────────────────────────────────────────
+   A state, so the danger wash and never honey. Sits above whichever lens is
+   stale and stays until a load succeeds. */
+.stale {
+  /* The page gutter, without `.mh-page`'s bottom padding for the FAB. */
+  padding: 0.75rem 1rem 0;
+}
+
+.stale-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  /* Legacy rgba(): the -rgb slots are comma-separated triplets. */
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.25);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-danger-wash);
+  color: var(--ion-color-danger-wash-contrast);
+  font-size: var(--mh-text-sm);
+}
+
+.stale-bar ion-icon {
+  flex: none;
+  font-size: var(--mh-text-lg);
+}
+
+.stale-bar span {
+  flex: 1;
+  line-height: var(--mh-leading-tight);
+}
+
+/* Ionic paints a clear button in the honey fill colour, which is 1.76:1 on
+   this wash. The retry takes the bar's own ink instead. */
+.stale-bar ion-button {
+  --color: var(--ion-color-danger-wash-contrast);
+  flex: none;
+  margin: 0;
+}
+
+/* ── Feed posts ──────────────────────────────────────────────────────────
+   A card, not a list row: a post is a block of text with an author above it
+   and counts below, which a row cannot hold without truncating the part
+   people came to read. */
+.post-card {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+  text-align: start;
+  cursor: pointer;
+}
+
+/* The card is the tap target, so it needs a visible focus ring of its own —
+   Ionic gives one only to its own components. */
+.post-card:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
+}
+
+/* Which group this came from. Above the author because the feed mixes
+   groups, and the group is the first thing that orients the reader. */
+.in-group {
+  margin: 0 0 0.5rem;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.post-head .who {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: var(--mh-leading-tight);
+}
+
+.post-head h2 {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-md);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-head p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* Clamped: a long post is opened to be read, and an unbounded card pushes
+   the next post off the screen. `pre-wrap` keeps the author's own breaks. */
+.post-body {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  margin: 0.625rem 0 0;
+  overflow: hidden;
+  font-size: var(--mh-text-md);
+  line-height: var(--mh-leading-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.post-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.post-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.post-meta ion-icon {
+  font-size: var(--mh-text-lg);
+}
+
+/* Liked: the brand amber, matching web's `severity="primary"` reaction
+   button. Grey would read as "disabled" on the one control that is meant to
+   look acted-on. */
+.post-meta ion-icon.reacted {
+  color: var(--ion-color-primary);
+}
+
+/* The loading twin of a post card, so nothing shifts when data lands. */
+.post-skeleton {
+  display: block;
+  margin-bottom: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+}
+
+.post-skeleton-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-skeleton-head .lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}

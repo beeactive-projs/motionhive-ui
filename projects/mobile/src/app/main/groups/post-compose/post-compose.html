@@ -1,0 +1,82 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Cancel" />
+    </ion-buttons>
+    <ion-title>New post</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [disabled]="!canSubmit()" (click)="submit()">
+        @if (submitting()) {
+        <ion-spinner name="crescent" />
+        } @else {
+        Post
+        }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h1 class="mh-visually-hidden">New post</h1>
+
+  @if (loadError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else {
+  <div class="mh-page">
+    @if (groupName(); as name) {
+    <p class="destination">Posting in <strong>{{ name }}</strong></p>
+    }
+
+    @if (needsApproval()) {
+    <!-- Said before they write, not after: the API returns success either
+         way and only `approvalState` tells the two apart. -->
+    <div class="review-note" role="note">
+      <ion-icon name="hourglass-outline" aria-hidden="true" />
+      <span>Posts here are reviewed before they appear.</span>
+    </div>
+    }
+
+    <ion-textarea class="body" [autoGrow]="true" [rows]="6" [maxlength]="maxLength"
+      placeholder="Share something with the group" aria-label="Post content" [value]="content()"
+      (ionInput)="onContent($event.detail.value ?? '')" />
+
+    @if (images().length > 0) {
+    <div class="thumbs" role="group" aria-label="Photos on this post">
+      @for (image of images(); track image.previewUrl) {
+      <div class="thumb">
+        <img [src]="image.previewUrl" alt="" />
+        <button type="button" class="drop" [attr.aria-label]="'Remove ' + image.file.name"
+          (click)="removeImage(image)">
+          <ion-icon name="close-outline" aria-hidden="true" />
+        </button>
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+</ion-content>
+
+@if (!loadError()) {
+<ion-footer [translucent]="true">
+  <ion-toolbar class="tools">
+    <ion-button fill="clear" [disabled]="!canAddImage()" (click)="pickImage()">
+      <ion-icon slot="start" name="image-outline" />
+      Photo
+    </ion-button>
+    <ion-note slot="end" class="counts">
+      @if (showRemaining()) {
+      <span [class.over]="remaining() < 0">{{ remaining() }} left</span>
+      }
+      <span>{{ images().length }}/{{ maxImages }}</span>
+    </ion-note>
+  </ion-toolbar>
+</ion-footer>
+}
+
+<!-- A plain file input rather than a camera plugin: `capture` is enough to
+     reach the camera, and a native dependency for one button is not worth
+     it. Same call the avatar picker makes. -->
+<input #fileInput type="file" class="mh-visually-hidden" [accept]="accept" multiple
+  (change)="onFilesSelected($event)" />

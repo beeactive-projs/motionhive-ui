@@ -1,0 +1,141 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Cancel" />
+    </ion-buttons>
+    <ion-title>{{ heading() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h1 class="mh-visually-hidden">{{ heading() }}</h1>
+
+  @if (loadError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else {
+  <div class="mh-page">
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item lines="full">
+        <ion-input label="Name" labelPlacement="stacked" placeholder="Morning Crew"
+          [maxlength]="nameMaxLength" [value]="name()"
+          (ionInput)="name.set($event.detail.value ?? '')" />
+      </ion-item>
+      <ion-item lines="full">
+        <ion-textarea label="Description" labelPlacement="stacked" [autoGrow]="true" [rows]="3"
+          placeholder="What is this group for?" [maxlength]="descriptionMaxLength"
+          [value]="description()" (ionInput)="description.set($event.detail.value ?? '')" />
+      </ion-item>
+      <ion-item lines="none">
+        <ion-input label="City" labelPlacement="stacked" placeholder="Optional"
+          [value]="city()" (ionInput)="city.set($event.detail.value ?? '')" />
+      </ion-item>
+    </ion-list>
+
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item lines="none">
+        <ion-toggle [checked]="isPublic()" (ionChange)="isPublic.set($event.detail.checked)">
+          <ion-label>
+            <h2>Public group</h2>
+            <p>Anyone can find it in Discover.</p>
+          </ion-label>
+        </ion-toggle>
+      </ion-item>
+    </ion-list>
+
+    <section class="mh-section">
+      <h2 class="mh-kicker">Joining</h2>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-radio-group [value]="joinPolicy()" (ionChange)="setJoinPolicy($event.detail.value)">
+          @for (option of joinPolicyOptions; track option.value; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <ion-radio [value]="option.value" justify="start" labelPlacement="end">
+              <ion-label>
+                <h2>{{ option.label }}</h2>
+                <p>{{ option.hint }}</p>
+              </ion-label>
+            </ion-radio>
+          </ion-item>
+          }
+        </ion-radio-group>
+      </ion-list>
+      @if (joinPolicyNote(); as note) {
+      <!-- Said rather than silently corrected: the owner may be about to
+           make the group public in the next breath. -->
+      <ion-note class="policy-note">{{ note }}</ion-note>
+      }
+    </section>
+
+    <section class="mh-section">
+      <h2 class="mh-kicker">Posting</h2>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-radio-group [value]="postPolicy()" (ionChange)="setPostPolicy($event.detail.value)">
+          @for (option of postPolicyOptions; track option.value; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <ion-radio [value]="option.value" justify="start" labelPlacement="end">
+              <ion-label>
+                <h2>{{ option.label }}</h2>
+                <p>{{ option.hint }}</p>
+              </ion-label>
+            </ion-radio>
+          </ion-item>
+          }
+        </ion-radio-group>
+      </ion-list>
+    </section>
+
+    <section class="mh-section">
+      <h2 class="mh-kicker">Tags</h2>
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item lines="none">
+          <ion-input label="Add a tag" labelPlacement="stacked" placeholder="strength"
+            [maxlength]="tagMaxLength" [value]="tagDraft()"
+            (ionInput)="tagDraft.set($event.detail.value ?? '')"
+            (keydown.enter)="addTag()" />
+          <ion-button slot="end" fill="clear" [disabled]="!canAddTag()" aria-label="Add tag"
+            (click)="addTag()">
+            <ion-icon slot="icon-only" name="add-outline" />
+          </ion-button>
+        </ion-item>
+      </ion-list>
+      @if (tags().length > 0) {
+      <div class="mh-chip-row" role="group" aria-label="Group tags">
+        @for (tag of tags(); track tag) {
+        <ion-chip color="medium" [attr.aria-label]="'Remove tag ' + tag" (click)="removeTag(tag)">
+          {{ tag }}
+          <ion-icon name="close-outline" aria-hidden="true" />
+        </ion-chip>
+        }
+      </div>
+      }
+    </section>
+
+    @if (isEdit()) {
+    <!-- Last and red: the one action here that cannot be walked back. -->
+    <div class="danger-row">
+      <ion-button expand="block" fill="outline" color="danger" (click)="confirmDelete()">
+        <ion-icon slot="start" name="trash-outline" />
+        Delete group
+      </ion-button>
+    </div>
+    }
+  </div>
+  }
+</ion-content>
+
+@if (!loadError()) {
+<ion-footer [translucent]="true">
+  <ion-toolbar class="save-bar">
+    <ion-button expand="block" [disabled]="!canSave()" (click)="save()">
+      @if (saving()) {
+      <ion-spinner name="crescent" slot="start" />
+      }
+      {{ saveLabel() }}
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>
+}
+
+<mh-confirm-sheet [(open)]="deleteOpen" title="Delete this group?"
+  body="Its posts, members and comments go with it." confirmLabel="Delete" tone="danger"
+  irreversible="This cannot be undone." [saving]="deleting()" (confirm)="deleteGroup()" />

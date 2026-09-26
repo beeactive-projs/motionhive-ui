@@ -83,6 +83,18 @@ export interface UpdateMemberRolePayload {
   role: 'MEMBER' | 'MODERATOR';
 }
 
+/**
+ * `GET /groups/:id` — a group plus the caller's own role in it.
+ *
+ * The role comes from the server because the membership row is already
+ * loaded there to authorise the read. Deriving it on the client by searching
+ * the member list is wrong: that list is paginated, so a moderator past the
+ * first page reads as a non-member and silently loses their controls.
+ */
+export interface GroupWithMyRole extends Group {
+  myRole: GroupMemberRole;
+}
+
 export type GroupListResponse = PaginatedResponse<Group>;
 export type GroupMemberListResponse = PaginatedResponse<GroupMember>;
 

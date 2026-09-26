@@ -76,6 +76,13 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
     link(d.entityId ? ['/tabs/home/billing', d.entityId] : ['/tabs/home/billing'], params(d)),
   sessions: traineeSessions,
   'user/sessions': traineeSessions,
+  // Every group alert carries the group id, or nothing when the reader has
+  // just lost access to it (removed from the group) — so an absent entityId
+  // is deliberate and lands on the hub rather than a 403.
+  //
+  // Note the comment alert points at the group too, not the post: that is
+  // what the server sends, and guessing a post id here would break the tap.
+  groups: (d) => link(d.entityId ? ['/tabs/groups', d.entityId] : ['/tabs/groups'], params(d)),
 };
 
 /**
@@ -87,7 +94,6 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
  * every screen the API emits.
  */
 const NOT_ON_MOBILE: Record<string, string> = {
-  groups: 'Groups',
   'user/plans': 'My plans',
   'coaching/exercises': 'Exercises',
   // Subscriptions a coach *sells* stay on the web; the client's own

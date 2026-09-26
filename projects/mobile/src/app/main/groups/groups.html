@@ -1,16 +1,248 @@
+@if (searchOpen()) {
+<!-- Search owns the toolbar: a title, two actions and a three-way segment do
+     not fit above the fold on a phone. Same as the clients directory. -->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <!-- Debounced: this is a request per term, not a filter over loaded
+         rows. Named, because a searchbar with only a placeholder announces
+         itself as Ionic's default "search text". -->
+    <ion-searchbar mhAutofocus placeholder="Search groups" aria-label="Search groups" inputmode="search"
+      [debounce]="300" [value]="store.query()" (ionInput)="onQuery($event.detail.value ?? '')" />
+    <ion-buttons slot="end">
+      <ion-button class="cancel" (click)="closeSearch()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar class="scope-bar">
+    <!-- The box took the segment with it, so this says which list is under
+         it. Searching only ever means the directory. -->
+    <div class="scope"><span class="where">Discover</span></div>
+    @if (showSearchHint()) {
+    <p class="hint">Type at least {{ minSearchLength }} characters to search.</p>
+    }
+  </ion-toolbar>
+</ion-header>
+} @else {
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Groups</ion-title>
     <ion-buttons slot="end">
-      <mh-notification-bell />
+      <mh-notification-bell class="round" />
+      <ion-button shape="round" aria-label="Search groups" (click)="openSearch()">
+        <ion-icon slot="icon-only" name="search-outline" />
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
+      <ion-segment-button [value]="Segments.Feed">
+        <ion-label>Feed</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Segments.Discover">
+        <ion-label>Discover</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Segments.Mine">
+        <ion-label>Your groups</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
+}
 
 <ion-content [fullscreen]="true">
-  <mh-empty-state
-    icon="people-circle-outline"
-    heading="Groups are coming"
-    message="Your communities, feeds and group conversations will live here."
-  />
+  <!-- The toolbar shows the page's name but `ion-title` is not a heading, so
+       a screen reader had nothing to land on and the outline began at h2. -->
+  <h1 class="mh-visually-hidden">Groups</h1>
+
+  <!-- A search is silent otherwise: the list simply becomes shorter. -->
+  <p class="mh-visually-hidden" role="status">{{ resultAnnouncement() }}</p>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.isStale()) {
+  <!-- A status, so neutral-semantic rather than honey. It sits above every
+       lens because any of them can be the stale one. -->
+  <div class="stale" role="status">
+    <div class="stale-bar">
+      <ion-icon name="cloud-offline-outline" aria-hidden="true" />
+      <span>Couldn't refresh. Showing the last update.</span>
+      <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+    </div>
+  </div>
+  }
+
+  @if (store.showLoadError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load groups"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (store.showSkeleton()) {
+  <!-- Mirrors the shape below it so nothing shifts when data lands: cards on
+       the feed, rows on the two group lists. -->
+  <div class="mh-page" aria-busy="true">
+    @if (isFeed()) {
+    @for (_ of skeletonRows; track $index) {
+    <article class="post-skeleton">
+      <div class="post-skeleton-head">
+        <mh-hex-avatar size="md" color="medium" tone="wash" />
+        <div class="lines">
+          <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.875rem" />
+          <ion-skeleton-text [animated]="true" style="width: 25%; height: 0.75rem" />
+        </div>
+      </div>
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 0.75rem" />
+      <ion-skeleton-text [animated]="true" style="width: 70%; height: 0.75rem" />
+    </article>
+    }
+    } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    }
+  </div>
+  } @else if (isFeed()) {
+  <div class="mh-page">
+    @if (store.isEmpty()) {
+    @if (store.myGroupCount() === 0) {
+    <!-- Nothing in the feed because there is nothing to feed it. The way out
+         differs by role: a coach makes the first group, everyone else finds
+         one. -->
+    @if (canCreate()) {
+    <mh-empty-state icon="people-outline" heading="No groups yet"
+      message="Create a group to bring your clients together in one place." actionLabel="Create a group"
+      (action)="createGroup()" />
+    } @else {
+    <mh-empty-state icon="compass-outline" heading="No groups yet"
+      message="Join a group and posts from it show up here." actionLabel="Discover groups" actionFill="outline"
+      (action)="discoverGroups()" />
+    }
+    } @else {
+    <!-- In groups, but nobody has posted in any of them. -->
+    <mh-empty-state icon="chatbubble-outline" heading="Nothing posted yet"
+      message="Posts from your groups will show up here." actionLabel="See your groups" actionFill="outline"
+      (action)="setSegment(Segments.Mine)" />
+    }
+    } @else {
+    <!-- Cards rather than list rows: a post is a block of text with an author
+         above it and counts below, which a row cannot hold. -->
+    @for (post of store.feed(); track post.id) {
+    <article class="post-card" tabindex="0" role="button" [attr.aria-label]="'Open post by ' +
+        (post.author ? post.author.firstName + ' ' + post.author.lastName : 'a member')"
+      (click)="openPost(post.id)" (keydown.enter)="openPost(post.id)" (keydown.space)="openPost(post.id)">
+      @if (post.group) {
+      <!-- Only the cross-group feed populates this; on a group's own feed
+           the group is implicit in the URL. -->
+      <p class="in-group">{{ post.group.name }}</p>
+      }
+      <div class="post-head">
+        <mh-hex-avatar size="md" [name]="post.author ? post.author.firstName + ' ' + post.author.lastName : ''"
+          [imageUrl]="post.author?.avatarUrl ?? null" />
+        <div class="who">
+          <h2>{{ post.author ? post.author.firstName + ' ' + post.author.lastName : 'Member' }}</h2>
+          <p>{{ postedAt(post.postedAt) }}</p>
+        </div>
+      </div>
+      <p class="post-body">{{ post.content }}</p>
+      <div class="post-meta">
+        <span>
+          <ion-icon [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'"
+            [class.reacted]="post.myReaction" aria-hidden="true" />
+          {{ post.reactionCount }}
+        </span>
+        <span>
+          <ion-icon name="chatbubble-outline" aria-hidden="true" />
+          {{ post.commentCount }}
+        </span>
+      </div>
+    </article>
+    }
+    }
+  </div>
+  } @else if (isDiscover()) {
+  <div class="mh-page">
+    @if (store.isFilteredEmpty()) {
+    <mh-empty-state icon="search-outline" heading="Nothing matches"
+      message="No public group matches that. Try a different word." />
+    } @else if (store.isEmpty()) {
+    <mh-empty-state icon="compass-outline" heading="No public groups yet"
+      message="Public groups show up here as instructors create them." />
+    } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (group of store.discover(); track group.id; let last = $last) {
+      <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'"
+        (click)="openDiscovered(group.id)">
+        <mh-hex-avatar slot="start" size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
+        <ion-label>
+          <h2>{{ group.name }}</h2>
+          <p>
+            {{ group.memberCount }} {{ group.memberCount === 1 ? 'member' : 'members' }}
+            @if (group.city) { · {{ group.city }} }
+          </p>
+        </ion-label>
+        @if (hasPendingRequest(group)) {
+        <!-- Says where they already stand, so the row does not read as an
+             untouched group they have yet to act on. -->
+        <ion-icon slot="end" name="hourglass-outline" color="warning" aria-label="Request pending" />
+        } @else {
+        <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+        }
+      </ion-item>
+      }
+    </ion-list>
+    }
+  </div>
+  } @else {
+  <div class="mh-page">
+    @if (store.isEmpty()) {
+    @if (canCreate()) {
+    <mh-empty-state icon="people-outline" heading="No groups yet"
+      message="Create a group to bring your clients together in one place." actionLabel="Create a group"
+      (action)="createGroup()" />
+    } @else {
+    <mh-empty-state icon="compass-outline" heading="You're not in any groups"
+      message="Find a group to join and it shows up here." actionLabel="Discover groups" actionFill="outline"
+      (action)="discoverGroups()" />
+    }
+    } @else {
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (group of store.mine(); track group.id; let last = $last) {
+      <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="openGroup(group.id)">
+        <mh-hex-avatar slot="start" size="md" [name]="group.name" [imageUrl]="group.logoUrl" />
+        <ion-label>
+          <h2>{{ group.name }}</h2>
+          <p>
+            {{ group.memberCount }} {{ group.memberCount === 1 ? 'member' : 'members' }}
+            @if (!group.isPublic) { · Private }
+          </p>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+      </ion-item>
+      }
+    </ion-list>
+    }
+  </div>
+  }
+
+  @if (hasMore()) {
+  <ion-infinite-scroll (ionInfinite)="onLoadMore($event)">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
+  }
+
+  @if (canCreate() && !searchOpen()) {
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button aria-label="Create a group" (click)="createGroup()">
+      <ion-icon name="add-outline" />
+    </ion-fab-button>
+  </ion-fab>
+  }
 </ion-content>

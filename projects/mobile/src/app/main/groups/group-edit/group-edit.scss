@@ -1,0 +1,27 @@
+/* The note under the join-policy list — an explanation, not a warning, so
+   it takes the muted voice rather than a status wash. */
+.policy-note {
+  display: block;
+  padding: 0.5rem 1rem 0;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+/* Tag chips double as their own remove button, so the whole chip is the
+   target rather than a 12px × inside it. */
+.mh-chip-row ion-chip {
+  cursor: pointer;
+}
+
+.danger-row {
+  margin-top: 1.5rem;
+}
+
+/* The save bar sits on the footer, full width — this is the page's one
+   commitment and it should never need hunting for. */
+.save-bar {
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+}

@@ -1,0 +1,135 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Group" />
+    </ion-buttons>
+    <ion-title>Manage</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
+      <ion-segment-button [value]="Tabs.Requests">
+        <ion-label>
+          Requests
+          @if (store.requestCount() > 0) {
+          <ion-badge data-tone="danger" class="count">{{ store.requestCount() }}</ion-badge>
+          }
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="Tabs.Posts">
+        <ion-label>
+          Posts
+          @if (store.postCount() > 0) {
+          <ion-badge data-tone="danger" class="count">{{ store.postCount() }}</ion-badge>
+          }
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h1 class="mh-visually-hidden">Manage group</h1>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.showError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load these queues"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (store.showSkeleton()) {
+  <div class="mh-page" aria-busy="true">
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+        <ion-label>
+          <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+          <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+  } @else if (isRequests()) {
+  <div class="mh-page">
+    @if (store.requests().length === 0) {
+    <mh-empty-state icon="checkmark-circle-outline" heading="No requests waiting"
+      message="People asking to join will show up here." />
+    } @else {
+    @for (request of store.requests(); track request.id) {
+    <article class="queue-card">
+      <div class="who">
+        <mh-hex-avatar size="md" [name]="requesterName(request)"
+          [imageUrl]="request.user?.avatarUrl ?? null" />
+        <div class="lines">
+          <h2>{{ requesterName(request) }}</h2>
+          <p>Asked {{ askedAt(request.createdAt) }}</p>
+        </div>
+      </div>
+
+      @if (request.message) {
+      <p class="message">{{ request.message }}</p>
+      }
+
+      <div class="actions">
+        <ion-button fill="outline" size="small" color="medium"
+          [disabled]="store.isBusy(request.id)"
+          [attr.aria-label]="'Decline ' + requesterName(request)"
+          (click)="rejectRequest(request)">
+          Decline
+        </ion-button>
+        <ion-button size="small" [disabled]="store.isBusy(request.id)"
+          [attr.aria-label]="'Approve ' + requesterName(request)"
+          (click)="approveRequest(request)">
+          @if (store.isBusy(request.id)) {
+          <ion-spinner name="crescent" slot="start" />
+          }
+          Approve
+        </ion-button>
+      </div>
+    </article>
+    }
+    }
+  </div>
+  } @else {
+  <div class="mh-page">
+    @if (store.posts().length === 0) {
+    <mh-empty-state icon="checkmark-circle-outline" heading="Nothing to review"
+      message="Posts waiting for approval will show up here." />
+    } @else {
+    @for (post of store.posts(); track post.id) {
+    <article class="queue-card">
+      <div class="who">
+        <mh-hex-avatar size="md" [name]="authorName(post)"
+          [imageUrl]="post.author?.avatarUrl ?? null" />
+        <div class="lines">
+          <h2>{{ authorName(post) }}</h2>
+          <p>Written {{ askedAt(post.createdAt) }}</p>
+        </div>
+      </div>
+
+      <!-- The whole post, not a preview: you cannot approve what you can
+           only see half of. -->
+      <p class="message">{{ post.content }}</p>
+
+      <div class="actions">
+        <ion-button fill="outline" size="small" color="medium" [disabled]="store.isBusy(post.id)"
+          [attr.aria-label]="'Reject post by ' + authorName(post)" (click)="rejectPost(post)">
+          Reject
+        </ion-button>
+        <ion-button size="small" [disabled]="store.isBusy(post.id)"
+          [attr.aria-label]="'Publish post by ' + authorName(post)" (click)="publishPost(post)">
+          @if (store.isBusy(post.id)) {
+          <ion-spinner name="crescent" slot="start" />
+          }
+          Publish
+        </ion-button>
+      </div>
+    </article>
+    }
+    }
+  </div>
+  }
+</ion-content>

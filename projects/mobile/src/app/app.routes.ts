@@ -114,7 +114,16 @@ export const routes: Routes = [
       // lit on screens that are not sessions.
       {
         path: 'groups',
-        loadComponent: () => import('./main/groups/groups').then((m) => m.Groups),
+        loadChildren: () => import('./main/groups/groups.routes').then((m) => m.groupsRoutes),
+      },
+      {
+        // Someone else's profile, by handle — web's `/@<handle>`. Top-level
+        // rather than nested under groups: a name is tappable from members,
+        // posts and comments, and eventually from sessions and messages too.
+        path: 'u/:handle',
+        loadComponent: () =>
+          import('./main/profile-view/profile-view').then((m) => m.ProfileView),
+        title: 'Profile - MotionHive',
       },
       {
         path: 'programs',
