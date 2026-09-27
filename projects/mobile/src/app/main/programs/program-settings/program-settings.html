@@ -79,6 +79,20 @@
         </ion-card-content>
       </ion-card>
 
+      <!-- A copy to build the next block from, without touching this one.
+           Above the danger row so the two are never mistaken for each other. -->
+      <ion-list [inset]="true" class="mh-card-list">
+        <ion-item button detail="false" lines="none" [disabled]="duplicating()"
+          (click)="duplicate()">
+          @if (duplicating()) {
+            <ion-spinner slot="start" name="crescent" />
+          } @else {
+            <ion-icon slot="start" name="copy-outline" color="medium" aria-hidden="true" />
+          }
+          <ion-label>Duplicate program</ion-label>
+        </ion-item>
+      </ion-list>
+
       <!-- Last, and the one row in red: the only thing here worth a second thought. -->
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item button detail="false" lines="none" (click)="deleteOpen.set(true)">

@@ -1,0 +1,26 @@
+<ng-template #body>
+  <div class="mh-section-label">Type</div>
+  <div class="chips">
+    @for (chip of sizeChips; track chip.value) {
+      <ion-chip
+        [class.selected]="isOn(chip.value)"
+        [attr.aria-pressed]="isOn(chip.value)"
+        (click)="choose(chip.value)"
+      >
+        {{ chip.label }}
+        <span class="count">{{ countFor(chip.value) }}</span>
+      </ion-chip>
+    }
+  </div>
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  title="Filter programs"
+  [body]="body"
+  saveLabel="Show results"
+  dismissLabel="Clear"
+  [breakpoints]="[0, 0.5]"
+  [initialBreakpoint]="0.5"
+  (save)="commit()"
+/>

@@ -1,7 +1,13 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 
-import { Program, ProgramStatus, dayDividerLabel, localDayKey } from 'core';
+import {
+  Program,
+  ProgramSource,
+  ProgramStatus,
+  dayDividerLabel,
+  localDayKey,
+} from 'core';
 
 import { programMeta, programTone } from '../../programs.config';
 
@@ -30,6 +36,13 @@ export class ProgramRow {
   readonly isDraft = computed(() => this.program().status === ProgramStatus.Draft);
 
   readonly isRoutine = computed(() => this.program().isSingleWorkout);
+
+  /**
+   * MotionHive's own starter content, which appears in everyone's library.
+   * Badged because a coach opening their programs has no other way to tell
+   * a starter from something they wrote.
+   */
+  readonly isStarter = computed(() => this.program().source === ProgramSource.System);
 
   /**
    * The right-hand block: who is on it for a coach, or when it was last

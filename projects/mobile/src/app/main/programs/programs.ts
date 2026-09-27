@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonButton,
@@ -25,7 +25,15 @@ import { NotificationBell } from '../../_shared/components/notification-bell/not
 import { SessionRowSkeleton } from '../../_shared/components/session-row-skeleton/session-row-skeleton';
 import { ProgramRow } from './_components/program-row/program-row';
 import { CreateSheet } from './_sheets/create-sheet/create-sheet';
-import { CreateChoice, CreateChoices, LIBRARY_PILLS, PROGRAM_ICONS } from './programs.config';
+import { ProgramFilterSheet } from './_sheets/program-filter-sheet/program-filter-sheet';
+import {
+  CreateChoice,
+  CreateChoices,
+  LIBRARY_PILLS,
+  ORIGIN_PILLS,
+  PROGRAM_ICONS,
+  ProgramOrigin,
+} from './programs.config';
 import { ProgramsStore } from './programs.store';
 
 /**
@@ -41,6 +49,7 @@ import { ProgramsStore } from './programs.store';
   selector: 'mh-programs',
   imports: [
     CreateSheet,
+    ProgramFilterSheet,
     EmptyState,
     IonButton,
     IonButtons,
@@ -68,6 +77,20 @@ export class Programs implements ViewWillEnter {
 
   readonly skeletonRows = [1, 2, 3, 4];
   readonly pills = LIBRARY_PILLS;
+  readonly originPills = ORIGIN_PILLS;
+  readonly filtersOpen = signal(false);
+
+  /**
+   * Whether the sheet is holding anything back. One axis lives in there, so
+   * the count is 0 or 1 — but it reads the same as every other library.
+   */
+  readonly activeFilterCount = computed(() =>
+    this.store.size() === ProgramSizes.All ? 0 : 1,
+  );
+
+  openFilters(): void {
+    this.filtersOpen.set(true);
+  }
   readonly Choices = CreateChoices;
   readonly Sizes = ProgramSizes;
 
@@ -89,6 +112,10 @@ export class Programs implements ViewWillEnter {
 
   retry(): void {
     this.store.load();
+  }
+
+  setOrigin(origin: ProgramOrigin): void {
+    this.store.setOrigin(origin);
   }
 
   setSize(size: ProgramSize): void {

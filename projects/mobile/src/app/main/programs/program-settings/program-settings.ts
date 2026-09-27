@@ -13,6 +13,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonSpinner,
   IonSkeletonText,
   IonTextarea,
   IonTitle,
@@ -60,6 +61,7 @@ import {
     IonItem,
     IonLabel,
     IonList,
+    IonSpinner,
     IonSkeletonText,
     IonTextarea,
     IonTitle,
@@ -194,6 +196,37 @@ export class ProgramSettings implements ViewWillEnter {
 
   publish(): void {
     this.save(true);
+  }
+
+  readonly duplicating = signal(false);
+
+  /**
+   * A copy of this program, owned by the caller, as a fresh draft.
+   *
+   * Lands on the copy rather than staying here: the reason to duplicate is
+   * to change something, and the thing to change is the new one.
+   */
+  duplicate(): void {
+    const id = this._id;
+    if (!id || this.duplicating()) return;
+
+    this.duplicating.set(true);
+    this._programService
+      .duplicate(id)
+      .pipe(take(1))
+      .subscribe({
+        next: (copy) => {
+          this.duplicating.set(false);
+          void this._feedbackService.success('Program duplicated');
+          void this._router.navigate(['/tabs/programs/program', copy.id], {
+            replaceUrl: true,
+          });
+        },
+        error: (err) => {
+          this.duplicating.set(false);
+          void this._feedbackService.error(err, 'Could not duplicate the program');
+        },
+      });
   }
 
   confirmDelete(): void {

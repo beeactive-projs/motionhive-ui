@@ -6,6 +6,7 @@ import {
   checkmarkCircleOutline,
   chevronForward,
   closeOutline,
+  funnelOutline,
   copyOutline,
   ellipsisHorizontal,
   flashOutline,
@@ -43,6 +44,7 @@ export const PROGRAM_ICONS = {
   checkmarkCircleOutline,
   chevronForward,
   closeOutline,
+  funnelOutline,
   copyOutline,
   ellipsisHorizontal,
   flashOutline,
@@ -81,6 +83,29 @@ export function weekLabel(weekIndex: number): string {
  * `isSingleWorkout` — not a different query, so the pills narrow what is
  * already loaded.
  */
+/**
+ * Whose content a row is. A coach's library legitimately contains MotionHive
+ * starters alongside their own work, and before this there was no way to
+ * tell them apart — the question that kept coming up when opening Programs.
+ */
+export const ProgramOrigins = {
+  All: 'all',
+  Mine: 'mine',
+  Starters: 'starters',
+} as const;
+
+export type ProgramOrigin = (typeof ProgramOrigins)[keyof typeof ProgramOrigins];
+
+/**
+ * The origin row. Shown only when there is something to separate — a coach
+ * with no starters in view gets one axis of pills, not two.
+ */
+export const ORIGIN_PILLS: readonly { value: ProgramOrigin; label: string }[] = [
+  { value: ProgramOrigins.All, label: 'All' },
+  { value: ProgramOrigins.Mine, label: 'Mine' },
+  { value: ProgramOrigins.Starters, label: 'MotionHive' },
+];
+
 export const LIBRARY_PILLS: readonly { value: ProgramSize; label: string }[] = [
   { value: ProgramSizes.All, label: 'All' },
   { value: ProgramSizes.Program, label: 'Programs' },

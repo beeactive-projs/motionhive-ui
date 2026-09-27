@@ -1,7 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { take } from 'rxjs/operators';
 
-import { Program, ProgramService, ProgramSize, ProgramSizes } from 'core';
+import { Program, ProgramService, ProgramSize, ProgramSizes, ProgramSource } from 'core';
+
+import { ProgramOrigin, ProgramOrigins } from './programs.config';
 
 const PAGE_SIZE = 50;
 
@@ -25,27 +27,77 @@ export class ProgramsStore {
 
   readonly size = signal<ProgramSize>(ProgramSizes.All);
 
+  /**
+   * Whose content to show. Narrows what is already loaded rather than
+   * refetching: the list arrives in one page, and `source` travels on every
+   * row, so the answer is already here.
+   */
+  readonly origin = signal<ProgramOrigin>(ProgramOrigins.All);
+
   readonly loading = this._loading.asReadonly();
 
   readonly programs = computed(() => this._all().filter((p) => !p.isSingleWorkout));
   readonly routines = computed(() => this._all().filter((p) => p.isSingleWorkout));
 
-  readonly visible = computed(() => {
-    switch (this.size()) {
-      case ProgramSizes.Program:
-        return this.programs();
-      case ProgramSizes.Routine:
-        return this.routines();
+  /** The rows left after the origin pill, before the size pill narrows them. */
+  private readonly _byOrigin = computed(() => {
+    const rows = this._all();
+    switch (this.origin()) {
+      case ProgramOrigins.Mine:
+        return rows.filter((p) => p.source !== ProgramSource.System);
+      case ProgramOrigins.Starters:
+        return rows.filter((p) => p.source === ProgramSource.System);
       default:
-        return this._all();
+        return rows;
     }
   });
 
-  readonly counts = computed<Record<ProgramSize, number>>(() => ({
-    all: this._all().length,
-    program: this.programs().length,
-    routine: this.routines().length,
-  }));
+  readonly visible = computed(() => {
+    const rows = this._byOrigin();
+    switch (this.size()) {
+      case ProgramSizes.Program:
+        return rows.filter((p) => !p.isSingleWorkout);
+      case ProgramSizes.Routine:
+        return rows.filter((p) => p.isSingleWorkout);
+      default:
+        return rows;
+    }
+  });
+
+  /** Counts within the chosen origin — a pill must predict its own result. */
+  readonly counts = computed<Record<ProgramSize, number>>(() => {
+    const rows = this._byOrigin();
+    return {
+      all: rows.length,
+      program: rows.filter((p) => !p.isSingleWorkout).length,
+      routine: rows.filter((p) => p.isSingleWorkout).length,
+    };
+  });
+
+  /**
+   * Counts per origin, within the type filter that is already on — a pill
+   * must predict its own result. Showing 20 beside a list of 12 routines
+   * would be a number the tap cannot produce.
+   */
+  readonly originCounts = computed<Record<ProgramOrigin, number>>(() => {
+    const size = this.size();
+    const rows = this._all().filter((p) =>
+      size === ProgramSizes.Program
+        ? !p.isSingleWorkout
+        : size === ProgramSizes.Routine
+          ? p.isSingleWorkout
+          : true,
+    );
+    return {
+      all: rows.length,
+      mine: rows.filter((p) => p.source !== ProgramSource.System).length,
+      starters: rows.filter((p) => p.source === ProgramSource.System).length,
+    };
+  });
+
+  setOrigin(origin: ProgramOrigin): void {
+    this.origin.set(origin);
+  }
 
   /** First load only — a refresh happens under the rows already on screen. */
   readonly showSkeleton = computed(() => this._loading() && !this._loaded());

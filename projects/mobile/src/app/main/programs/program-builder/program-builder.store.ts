@@ -176,4 +176,48 @@ export class ProgramBuilderStore {
         },
       });
   }
+
+  /**
+   * Copy one day into the same slot of several weeks, in one request.
+   *
+   * Unlike `copyWeek`, the endpoint takes every target at once — so there is
+   * no chain of calls to walk, and no half-applied copy if a later week
+   * would have failed.
+   */
+  copyDay(
+    fromWeek: number,
+    dayIndex: number,
+    toWeeks: number[],
+    toDayIndex?: number,
+    done?: (error?: unknown) => void,
+  ): void {
+    const program = this._program();
+    // A different target day makes the source week a real target too.
+    const movingDay = toDayIndex !== undefined && toDayIndex !== dayIndex;
+    const targets = toWeeks.filter((w) => movingDay || w !== fromWeek);
+    if (!program || !targets.length) {
+      done?.();
+      return;
+    }
+    // Nothing in the source slot is nothing to copy.
+    if (!this.workouts().some((w) => w.weekIndex === fromWeek && w.dayIndex === dayIndex)) {
+      done?.();
+      return;
+    }
+
+    this._saving.set(true);
+    this._programService
+      .copyDay(program.id, fromWeek, dayIndex, targets, toDayIndex)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._saving.set(false);
+          this.load(program.id, done);
+        },
+        error: (error: unknown) => {
+          this._saving.set(false);
+          done?.(error);
+        },
+      });
+  }
 }

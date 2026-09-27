@@ -8,18 +8,40 @@
 
   @if (!store.isEmpty() && !store.showError()) {
     <ion-toolbar>
-      <!-- Scrolls sideways rather than wrapping, same strip as the exercise
-           library: the count in each pill is the thing you need to know
-           before you wonder why the list is short. -->
+      <!-- One row, like the exercises and sessions libraries: the Filters
+           trigger leads, then the axis worth seeing without a tap. Origin is
+           that axis here — "is this mine or MotionHive's?" is the question
+           this list kept raising. Type moved into the sheet; two stacked
+           rows cost a third of the screen above the fold. -->
       <div class="mh-chip-row">
-        @for (pill of pills; track pill.value) {
-          <ion-chip
-            [class.selected]="store.size() === pill.value"
-            [attr.aria-pressed]="store.size() === pill.value"
-            (click)="setSize(pill.value)"
-          >
-            {{ pill.label }} · {{ countFor(pill.value) }}
-          </ion-chip>
+        <ion-button class="filters" fill="clear" shape="round" size="small"
+          [class.active]="activeFilterCount() > 0" (click)="openFilters()">
+          <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
+          Filters@if (activeFilterCount() > 0) { · {{ activeFilterCount() }} }
+        </ion-button>
+
+        @if (store.originCounts().starters > 0 && store.originCounts().mine > 0) {
+          @for (pill of originPills; track pill.value) {
+            <ion-chip
+              [class.selected]="store.origin() === pill.value"
+              [attr.aria-pressed]="store.origin() === pill.value"
+              (click)="setOrigin(pill.value)"
+            >
+              {{ pill.label }} · {{ store.originCounts()[pill.value] }}
+            </ion-chip>
+          }
+        } @else {
+          <!-- Nothing to separate, so the row carries the type pills instead
+               of standing empty beside a lone trigger. -->
+          @for (pill of pills; track pill.value) {
+            <ion-chip
+              [class.selected]="store.size() === pill.value"
+              [attr.aria-pressed]="store.size() === pill.value"
+              (click)="setSize(pill.value)"
+            >
+              {{ pill.label }} · {{ countFor(pill.value) }}
+            </ion-chip>
+          }
         }
       </div>
     </ion-toolbar>
@@ -91,3 +113,10 @@
 </ion-content>
 
 <mh-create-sheet [(open)]="createOpen" (choose)="onCreate($event)" />
+
+<mh-program-filter-sheet
+  [(open)]="filtersOpen"
+  [size]="store.size()"
+  [counts]="store.counts()"
+  (apply)="setSize($event)"
+/>

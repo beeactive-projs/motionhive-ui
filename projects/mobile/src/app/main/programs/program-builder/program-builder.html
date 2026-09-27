@@ -103,6 +103,21 @@
                 </ion-label>
 
                 @if (day) {
+                  <!-- Two verbs, two buttons: a kebab would hide both behind a
+                       tap for no saving at this count. Copy sits first because
+                       it is the one used while building. -->
+                  @if (store.weekCount() > 1) {
+                    <ion-button
+                      slot="end"
+                      fill="clear"
+                      shape="round"
+                      color="medium"
+                      [attr.aria-label]="'Copy ' + day.name + ' to other weeks'"
+                      (click)="openCopyDay(week.index, $index, day, $event)"
+                    >
+                      <ion-icon slot="icon-only" name="copy-outline" aria-hidden="true" />
+                    </ion-button>
+                  }
                   <ion-button
                     slot="end"
                     fill="clear"
@@ -124,6 +139,17 @@
     </div>
   }
 </ion-content>
+
+<mh-copy-day-sheet
+  [(open)]="copyDayOpen"
+  [fromWeek]="copyDayWeek()"
+  [weekCount]="store.weekCount()"
+  [dayName]="copyDayName()"
+  [sourceDay]="copyDayIndex()"
+  [occupiedWeeks]="copyDayOccupied()"
+  [occupiedTargetDay]="copyDayTargetOccupied()"
+  (copy)="copyDayTo($event)"
+/>
 
 <mh-copy-week-sheet
   [(open)]="copyOpen"

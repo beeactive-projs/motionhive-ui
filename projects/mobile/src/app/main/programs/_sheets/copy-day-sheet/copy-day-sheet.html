@@ -1,0 +1,62 @@
+<ng-template #body>
+  <ion-note class="mh-note-block">
+    This day is copied into the weeks you pick. The rest of those weeks is
+    left alone.
+  </ion-note>
+
+  <ion-list lines="none">
+    @for (index of targets(); track index) {
+      <ion-item button [detail]="false" (click)="toggle(index)">
+        <ion-label>
+          Week {{ index + 1 }}
+          <!-- Marked on the row itself, so the cost is visible while
+               choosing rather than only in the summary below. -->
+          @if (isOccupied(index)) {
+            <p>Has training on this day</p>
+          }
+        </ion-label>
+        @if (isOn(index)) {
+          <ion-icon slot="end" name="checkmark-circle-outline" aria-hidden="true" />
+        }
+      </ion-item>
+    }
+  </ion-list>
+
+  <!-- Only with one week chosen: across a block "which day?" has no single
+       answer, so the question is not asked until it has one. -->
+  @if (canChooseDay()) {
+    <div class="target-day">
+      <p class="label">Land it on</p>
+      <div class="mh-chip-row" role="group" aria-label="Day to copy into">
+        @for (label of dayLabels; track $index) {
+          <ion-button
+            class="chip"
+            fill="clear"
+            shape="round"
+            size="small"
+            [class.selected]="effectiveDay() === $index"
+            [attr.aria-pressed]="effectiveDay() === $index"
+            (click)="setTargetDay($index)"
+          >
+            {{ label }}
+          </ion-button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (replaceWarning(); as warning) {
+    <ion-note class="replace-warning" role="status">{{ warning }}</ion-note>
+  }
+</ng-template>
+
+<mh-sheet-shell
+  [(open)]="open"
+  [title]="title()"
+  [body]="body"
+  [saveLabel]="confirmLabel()"
+  [canSave]="selected().length > 0"
+  [breakpoints]="[0, 0.75]"
+  [initialBreakpoint]="0.75"
+  (save)="apply()"
+/>

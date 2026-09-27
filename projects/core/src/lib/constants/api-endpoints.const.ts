@@ -215,6 +215,8 @@ export const API_ENDPOINTS = {
     WORKOUTS_REORDER: (id: string) => `/programs/${id}/workouts/reorder`,
     /** One request to copy a whole week; the client used to walk the tree. */
     COPY_WEEK: (programId: string) => `/programs/${programId}/workouts/copy-week`,
+    COPY_DAY: (programId: string) => `/programs/${programId}/workouts/copy-day`,
+    DUPLICATE: (programId: string) => `/programs/${programId}/duplicate`,
     WORKOUT_BY_ID: (id: string, workoutId: string) =>
       `/programs/${id}/workouts/${workoutId}`,
     EXERCISES: (id: string, workoutId: string) =>

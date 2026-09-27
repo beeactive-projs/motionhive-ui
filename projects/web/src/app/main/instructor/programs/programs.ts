@@ -29,6 +29,7 @@ import {
   PaginatedPrograms,
   Program,
   ProgramService,
+  ProgramSource,
   ProgramStatus,
   TagSeverity,
   UpdateProgramPayload,
@@ -56,6 +57,8 @@ import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
  * sessions there are no `p-tabs` — status is a filter over one list, not
  * a top-level surface switch, so it renders as quick-filter pills.
  */
+type ProgramOrigin = 'all' | 'mine' | 'starters';
+
 @Component({
   selector: 'mh-programs',
   imports: [
@@ -111,6 +114,12 @@ export class Programs {
   private _searchTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly statusFilter = signal<ProgramStatus | null>(null);
+
+  /**
+   * Whose content to show. Narrows what is already loaded rather than
+   * refetching — `source` travels on every row, so the answer is in hand.
+   */
+  readonly originFilter = signal<ProgramOrigin>('all');
   readonly formDialogOpen = signal(false);
   /** When set → the form dialog opens in edit mode; null → create mode. */
   readonly editTarget = signal<Program | null>(null);
@@ -127,7 +136,47 @@ export class Programs {
 
   // ── Derived ──────────────────────────────────────────────────────
 
-  readonly hasMore = computed(() => this.items().length < this.total());
+  readonly hasMore = computed(() => this.visibleItems().length < this.total());
+
+  /** MotionHive's own starter content, which appears in every library. */
+  isStarter(p: Program): boolean {
+    return p.source === ProgramSource.System;
+  }
+
+  /** The rows actually rendered, after the origin filter. */
+  readonly visibleItems = computed(() => {
+    const rows = this.items();
+    switch (this.originFilter()) {
+      case 'mine':
+        return rows.filter((p) => p.source !== ProgramSource.System);
+      case 'starters':
+        return rows.filter((p) => p.source === ProgramSource.System);
+      default:
+        return rows;
+    }
+  });
+
+  /**
+   * Only worth a filter when the library genuinely mixes the two — most
+   * coaches see one or the other and do not need the chrome.
+   */
+  readonly showOriginFilter = computed(() => {
+    const rows = this.items();
+    return (
+      rows.some((p) => p.source === ProgramSource.System) &&
+      rows.some((p) => p.source !== ProgramSource.System)
+    );
+  });
+
+  readonly originTabs: { value: ProgramOrigin; label: string }[] = [
+    { value: 'all', label: 'All' },
+    { value: 'mine', label: 'Mine' },
+    { value: 'starters', label: 'MotionHive' },
+  ];
+
+  setOrigin(value: ProgramOrigin): void {
+    this.originFilter.set(value);
+  }
 
   readonly statusTabs: { status: ProgramStatus | null; label: string }[] = [
     { status: null, label: 'All' },

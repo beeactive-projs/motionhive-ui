@@ -15,6 +15,7 @@ import {
   IonTitle,
   IonToolbar,
   ViewWillEnter,
+  ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
@@ -24,6 +25,7 @@ import { ProgramService, ProgramWorkout } from 'core';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
+import { CopyDaySheet } from '../_sheets/copy-day-sheet/copy-day-sheet';
 import { CopyWeekSheet } from '../_sheets/copy-week-sheet/copy-week-sheet';
 import {
   DAY_LABELS,
@@ -36,6 +38,13 @@ import { ProgramBuilderStore, WeekCard } from './program-builder.store';
 
 /** The URL segment that means "a program that does not exist yet". */
 const NEW = 'new';
+
+/**
+ * The name a fresh draft is born with. Matched on leave to tell an untouched
+ * draft from one the coach actually started — renaming it is the first thing
+ * anyone does, so it is a reliable signal.
+ */
+const UNTOUCHED_DRAFT_NAME = 'Untitled program';
 
 /**
  * The program builder — vertical weeks.
@@ -53,6 +62,7 @@ const NEW = 'new';
   selector: 'mh-program-builder',
   imports: [
     ConfirmSheet,
+    CopyDaySheet,
     CopyWeekSheet,
     EmptyState,
     IonBackButton,
@@ -73,7 +83,7 @@ const NEW = 'new';
   templateUrl: './program-builder.html',
   styleUrl: './program-builder.scss',
 })
-export class ProgramBuilder implements ViewWillEnter {
+export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   readonly store = inject(ProgramBuilderStore);
   private readonly _programService = inject(ProgramService);
   private readonly _route = inject(ActivatedRoute);
@@ -109,6 +119,28 @@ export class ProgramBuilder implements ViewWillEnter {
 
   constructor() {
     addIcons(PROGRAM_ICONS);
+  }
+
+  /**
+   * Throw away a draft nobody used.
+   *
+   * Tapping "new" has to create a real row immediately, because days need a
+   * program id to hang off. Backing out without naming it used to leave that
+   * row behind — the list filled with "Untitled program", some with no days
+   * at all. Only an untouched one is discarded: still the birth name, and
+   * nothing scheduled.
+   */
+  ionViewWillLeave(): void {
+    const program = this.store.program();
+    if (!program || !this._id || this._id === NEW) return;
+    if (program.name !== UNTOUCHED_DRAFT_NAME) return;
+    if (this.store.workouts().length > 0) return;
+
+    const id = this._id;
+    this._id = null;
+    // Silent on failure: the coach has already left, and a toast about a
+    // draft they abandoned is noise. The row simply stays.
+    this._programService.remove(id).pipe(take(1)).subscribe({ error: () => undefined });
   }
 
   ionViewWillEnter(): void {
@@ -172,6 +204,97 @@ export class ProgramBuilder implements ViewWillEnter {
     this.copyOpen.set(true);
   }
 
+  // ─── Copy a day across weeks ──────────────────────────────────
+
+  readonly copyDayOpen = signal(false);
+  readonly copyDayWeek = signal(0);
+  readonly copyDayIndex = signal(0);
+  readonly copyDayName = signal('');
+
+  /**
+   * Weeks that already hold training in the slot being copied — the sheet
+   * turns this into the "will be replaced" warning. Computed here because
+   * the page holds the program's shape; the sheet only renders it.
+   */
+  readonly copyDayOccupied = computed(() => {
+    const day = this.copyDayIndex();
+    return this.store
+      .weeks()
+      .filter((week) => week.index !== this.copyDayWeek() && !!week.days[day])
+      .map((week) => week.index);
+  });
+
+  openCopyDay(
+    weekIndex: number,
+    dayIndex: number,
+    day: ProgramWorkout,
+    event: Event,
+  ): void {
+    // The row itself opens the day editor; this button must not do both.
+    event.stopPropagation();
+    this.copyDayWeek.set(weekIndex);
+    this.copyDayIndex.set(dayIndex);
+    this.copyDayName.set(day.name);
+    this.copyDayOpen.set(true);
+  }
+
+  /**
+   * One request for every target, unlike `onCopy` — the day endpoint takes
+   * the whole list, so there is no chain to walk and no partial state if a
+   * later week fails.
+   */
+  copyDayTo(choice: { weeks: number[]; toDayIndex?: number }): void {
+    this.copyDayOpen.set(false);
+    const targets = choice.weeks;
+    if (!targets.length) return;
+
+    const name = this.copyDayName();
+    const movedDay =
+      choice.toDayIndex !== undefined && choice.toDayIndex !== this.copyDayIndex();
+
+    this.store.copyDay(
+      this.copyDayWeek(),
+      this.copyDayIndex(),
+      targets,
+      choice.toDayIndex,
+      (error) => {
+        if (error) {
+          void this._feedbackService.error(error, 'Could not copy the day');
+          return;
+        }
+        // Naming the day when it changed: "copied to week 2" would hide the
+        // part the coach deliberately chose.
+        if (movedDay) {
+          void this._feedbackService.success(
+            `${name} copied to ${this.dayLabels[choice.toDayIndex!]}, week ${targets[0] + 1}`,
+          );
+          return;
+        }
+        void this._feedbackService.success(
+          targets.length === 1
+            ? `${name} copied to week ${targets[0] + 1}`
+            : `${name} copied to ${targets.length} weeks`,
+        );
+      },
+    );
+  }
+
+  /**
+   * Occupancy for every day of the week, so the sheet can answer "is the day
+   * I just picked already taken?" without calling back into the page.
+   *
+   * Indexed by day: `copyDayTargetOccupied()[3]` is the weeks with something
+   * on Thursday.
+   */
+  readonly copyDayTargetOccupied = computed(() =>
+    this.dayLabels.map((_, dayIndex) =>
+      this.store
+        .weeks()
+        .filter((week) => !!week.days[dayIndex])
+        .map((week) => week.index),
+    ),
+  );
+
   onCopy(targets: number[]): void {
     const from = this.copyFrom();
     this.copyOpen.set(false);
@@ -221,7 +344,7 @@ export class ProgramBuilder implements ViewWillEnter {
   private _createDraft(): void {
     this._programService
       .create({
-        name: 'Untitled program',
+        name: UNTOUCHED_DRAFT_NAME,
         durationDays: weeksToDays(DEFAULT_PROGRAM_WEEKS),
       })
       .pipe(take(1))

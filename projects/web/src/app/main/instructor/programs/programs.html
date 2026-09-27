@@ -10,6 +10,26 @@
         follow.</p>
       }
     </div>
+
+    <!-- Only when the library actually mixes the two: a coach whose list is
+         entirely their own does not need a filter for it. -->
+    @if (showOriginFilter()) {
+    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Author filter">
+      @for (tab of originTabs; track tab.value) {
+      <button pButton
+        type="button"
+        size="small"
+        rounded
+        [severity]="originFilter() === tab.value ? 'primary' : 'secondary'"
+        [text]="originFilter() !== tab.value"
+        (click)="setOrigin(tab.value)"
+        class="py-0.5 min-w-10"
+      >
+        {{ tab.label }}
+      </button>
+      }
+    </div>
+    }
     @if (!isMobile()) {
     <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openCreate()">
       <i class="pi pi-plus"></i>
@@ -94,12 +114,17 @@
   } @else {
   <div class="flex flex-col gap-4">
     <div class="grid gap-3.5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-      @for (p of items(); track p.id) {
+      @for (p of visibleItems(); track p.id) {
       <a [routerLink]="['/coaching/programs', p.id]" class="no-underline text-inherit">
         <p-card class="h-full">
           <div class="flex flex-col gap-2">
             <div class="flex items-center gap-2">
               <h3 class="flex-1 m-0 font-heading text-sm font-semibold leading-snug line-clamp-2">{{ p.name }}</h3>
+              <!-- Whose it is. A coach's library legitimately mixes their own
+                   work with MotionHive starters, and nothing said which. -->
+              @if (isStarter(p)) {
+              <p-tag value="MotionHive" severity="info" />
+              }
               <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
               <button pButton
                 type="button"
