@@ -103,12 +103,17 @@ ion-buttons ion-button.glyph {
    host onto its shadow `<button>`, where no selector out here can reach them
    — so styling on the attribute left the selected chip with no fill at all.
    Both come off the same expression in the template, so the look and what is
-   announced cannot disagree. */
+   announced cannot disagree.
+
+   Honey, not navy: selection is the brand's job across this app — the
+   segment underline and the active tab already use it, so a navy chip in the
+   same toolbar read as a different system. Black on honey is 9.78:1, which
+   is why the fill can carry small text at all. */
 .mh-chip-row .chip.selected {
-  --background: var(--ion-color-secondary);
-  --background-hover: var(--ion-color-secondary);
-  --background-activated: var(--ion-color-secondary-shade);
-  --color: var(--ion-color-secondary-contrast);
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --color: var(--ion-color-primary-contrast);
 }
 
 /* A clear button sitting on a card. Ionic gives it the honey *fill* colour,

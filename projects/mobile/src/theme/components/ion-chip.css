@@ -19,7 +19,10 @@ ion-chip {
   --color: var(--ion-color-medium-wash-contrast);
 }
 
+/* Honey, matching `.mh-chip-row .chip.selected` in ion-button.css — the two
+   are one vocabulary, and selection is the brand colour everywhere else in
+   this app. Black on honey is 9.78:1. */
 .mh-chip-row ion-chip.selected {
-  --background: var(--ion-color-secondary);
-  --color: var(--ion-color-secondary-contrast);
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
 }

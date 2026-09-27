@@ -17,7 +17,8 @@
 // The Android 12+ *system* splash (shown before the Capacitor one) takes its colour from
 // android/app/src/main/res/values{,-night}/colors.xml, not from these images.
 //
-// Brand rule (CLAUDE.md): navy mark on light surfaces, honey mark on dark ones.
+// Brand rule: the honey mark on both surfaces, matching web and the marketing site.
+// The navy mark is kept for the icon's foreground, where it sits on a honey tile.
 // Backgrounds match --ion-background-color light/dark so splash → first paint is seamless.
 
 import { execSync } from 'node:child_process';
@@ -82,7 +83,12 @@ async function writeSources() {
 
   // Splash: mark at 20% of the canvas width (the tool's own default for its easy mode).
   const splashMarkHeight = Math.round((SPLASH * 0.2) / MARK_ASPECT);
-  await compose(SPLASH, SLATE_50, await renderMark(NAVY_MARK, splashMarkHeight), join(outDir, 'splash.png'));
+  // Honey on light too, not navy: web and the marketing site both carry the
+  // honey mark as their identity, so a navy launch screen was mobile
+  // introducing a second brand. A logo is a graphic, not text, so the 2.05:1
+  // of honey on slate-50 is not a contrast failure — text on honey still
+  // goes through `--mh-color-honey-deep`.
+  await compose(SPLASH, SLATE_50, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash.png'));
   await compose(SPLASH, NAVY_900, await renderMark(HONEY_MARK, splashMarkHeight), join(outDir, 'splash-dark.png'));
 }
 
