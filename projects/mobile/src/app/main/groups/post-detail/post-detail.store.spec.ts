@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Post, PostComment, PostService } from 'core';
+import { GroupMemberRoles, GroupService, Post, PostComment, PostService } from 'core';
 
 import { PostDetailStore } from './post-detail.store';
 
@@ -11,6 +11,7 @@ const POST_ID = 'p-1';
 function post(overrides: Partial<Post> = {}): Post {
   return {
     id: POST_ID,
+    groupId: 'g-1',
     content: 'hello',
     reactionCount: 1,
     commentCount: 0,
@@ -34,6 +35,7 @@ function page<T>(items: T[], total = items.length) {
 interface Fixtures {
   post?: Post;
   comments?: ReturnType<typeof page<PostComment>>;
+  viewerRole?: (typeof GroupMemberRoles)[keyof typeof GroupMemberRoles];
 }
 
 function setup(fixtures: Fixtures = {}) {
@@ -49,10 +51,14 @@ function setup(fixtures: Fixtures = {}) {
   );
   const deleteComment = vi.fn(() => of({ ok: true as const }));
   const deletePost = vi.fn(() => of({ deleted: true as const }));
+  const getById = vi.fn(() =>
+    of({ id: 'g-1', myRole: fixtures.viewerRole ?? GroupMemberRoles.Member } as never),
+  );
 
   TestBed.configureTestingModule({
     providers: [
       PostDetailStore,
+      { provide: GroupService, useValue: { getById } },
       {
         provide: PostService,
         useValue: {
@@ -70,6 +76,7 @@ function setup(fixtures: Fixtures = {}) {
   return {
     store: TestBed.inject(PostDetailStore),
     getPostById,
+    getById,
     getComments,
     toggleReaction,
     addComment,
@@ -156,6 +163,31 @@ describe('PostDetailStore — deleting', () => {
     store.deleteComment('c1').subscribe();
 
     expect(store.post()?.commentCount).toBe(0);
+  });
+});
+
+describe('PostDetailStore — the viewer role', () => {
+  // Without this a moderator opening a post could not delete it: the screen
+  // had no way to know they were staff, even though the API allowed it.
+  it('reads the role from the post\'s own group', () => {
+    const { store, getById } = setup({ viewerRole: GroupMemberRoles.Moderator });
+
+    store.init(POST_ID);
+
+    expect(getById).toHaveBeenCalledWith('g-1');
+    expect(store.viewerRole()).toBe(GroupMemberRoles.Moderator);
+  });
+
+  it('falls back to no role when the group cannot be read', () => {
+    // Authorship still works; only the staff powers wait. The API is the
+    // real gate either way.
+    const { store, getById } = setup();
+    getById.mockReturnValueOnce(throwError(() => new Error('offline')));
+
+    store.init(POST_ID);
+
+    expect(store.viewerRole()).toBeNull();
+    expect(store.post()).not.toBeNull();
   });
 });
 

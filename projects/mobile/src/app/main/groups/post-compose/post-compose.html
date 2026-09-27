@@ -22,6 +22,11 @@
   @if (loadError()) {
   <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
     message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (cannotPost()) {
+  <!-- Said before they write, not after the API rejects it. The group page
+       hides its prompt, but this route is reachable on its own. -->
+  <mh-empty-state icon="lock-closed-outline" heading="Posting is off here"
+    message="Only the group's owner and moderators can post in this group." />
   } @else {
   <div class="mh-page">
     @if (groupName(); as name) {
@@ -58,7 +63,7 @@
   }
 </ion-content>
 
-@if (!loadError()) {
+@if (!loadError() && !cannotPost()) {
 <ion-footer [translucent]="true">
   <ion-toolbar class="tools">
     <ion-button fill="clear" [disabled]="!canAddImage()" (click)="pickImage()">

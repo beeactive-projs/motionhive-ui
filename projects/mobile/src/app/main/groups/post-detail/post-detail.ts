@@ -23,7 +23,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { AuthStore, Post, PostComment, displayName, formatRelativeShort } from 'core';
+import {
+  AuthStore,
+  GroupsRefreshService,
+  Post,
+  PostComment,
+  displayName,
+  formatRelativeShort,
+} from 'core';
 
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
@@ -82,6 +89,7 @@ export class PostDetail implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _auth = inject(AuthStore);
+  private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -109,18 +117,9 @@ export class PostDetail implements ViewWillEnter {
 
   private readonly _viewerId = computed(() => this._auth.user()?.id ?? '');
 
-  /**
-   * The group's own role is not on a post, and this screen is reached from a
-   * notification as often as from the group — so there is nothing to ask.
-   * Authorship is what this page can answer, and the API is the real gate:
-   * staff moderating from here still get their delete, it just is not
-   * offered up front.
-   */
-  private readonly _authorOnlyRole = null;
-
   readonly canDeleteThisPost = computed(() => {
     const post = this.store.post();
-    return !!post && canDeletePost(this._authorOnlyRole, this._viewerId(), post.authorId);
+    return !!post && canDeletePost(this.store.viewerRole(), this._viewerId(), post.authorId);
   });
 
   /** Edit is the author's alone — staff may delete, never rewrite. */
@@ -217,7 +216,7 @@ export class PostDetail implements ViewWillEnter {
   }
 
   mayDeleteComment(comment: PostComment): boolean {
-    return canDeleteComment(this._authorOnlyRole, this._viewerId(), comment.authorId);
+    return canDeleteComment(this.store.viewerRole(), this._viewerId(), comment.authorId);
   }
 
   // ── Composing ──────────────────────────────────────────────────────────
@@ -309,6 +308,8 @@ export class PostDetail implements ViewWillEnter {
       next: () => {
         this.savingEdit.set(false);
         this.editOpen.set(false);
+        // The feeds behind this screen are still showing the old text.
+        this._groupsRefresh.notify();
         void this._feedbackService.success('Post updated');
       },
       error: (error: unknown) => {
@@ -330,6 +331,8 @@ export class PostDetail implements ViewWillEnter {
       next: () => {
         this.deletingPost.set(false);
         this.deletePostOpen.set(false);
+        // We are about to land on a feed that still lists this post.
+        this._groupsRefresh.notify();
         void this._feedbackService.success('Post deleted');
         // Back to the group: the screen it was deleted from no longer has
         // anything to show.

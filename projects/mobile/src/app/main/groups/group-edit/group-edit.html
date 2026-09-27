@@ -10,7 +10,12 @@
 <ion-content [fullscreen]="true">
   <h1 class="mh-visually-hidden">{{ heading() }}</h1>
 
-  @if (loadError()) {
+  @if (notAllowed()) {
+  <!-- The read succeeds for any member, so without this the form would
+       populate for someone whose save is going to be refused. -->
+  <mh-empty-state icon="lock-closed-outline" heading="Only the owner can change this"
+    message="Ask the group's owner if something needs updating." />
+  } @else if (loadError()) {
   <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
     message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
   } @else {
@@ -123,7 +128,7 @@
   }
 </ion-content>
 
-@if (!loadError()) {
+@if (!loadError() && !notAllowed()) {
 <ion-footer [translucent]="true">
   <ion-toolbar class="save-bar">
     <ion-button expand="block" [disabled]="!canSave()" (click)="save()">

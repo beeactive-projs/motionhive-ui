@@ -205,6 +205,11 @@ export class GroupDetail implements ViewWillEnter {
     this.store.setTab(value as GroupTab);
   }
 
+  /** From the search's "Load more" — the match may be on an unfetched page. */
+  loadMoreMembers(): void {
+    this.store.loadMoreMembers();
+  }
+
   onMemberQuery(value: string): void {
     this.store.setMemberQuery(value);
   }
@@ -299,6 +304,8 @@ export class GroupDetail implements ViewWillEnter {
   onMembersAdded(): void {
     this.store.reloadMembers();
     this.store.setTab(GroupTabs.Members);
+    // The member count shows on every list this group appears in.
+    this._groupsRefresh.notify();
   }
 
   confirmLeave(): void {

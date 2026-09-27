@@ -24,7 +24,13 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { GroupJoinRequest, Post, displayName, formatRelativeShort } from 'core';
+import {
+  GroupJoinRequest,
+  GroupsRefreshService,
+  Post,
+  displayName,
+  formatRelativeShort,
+} from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
@@ -78,6 +84,7 @@ export class GroupManage implements ViewWillEnter {
   readonly store = inject(GroupManageStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly Tabs = ManageTabs;
@@ -150,7 +157,11 @@ export class GroupManage implements ViewWillEnter {
   ): void {
     if (this.store.isBusy(request.id)) return;
     this.store.decideRequest(request, action).subscribe({
-      next: () => void this._feedbackService.success(success),
+      next: () => {
+        // An approval adds a member, which the group's own screens count.
+        this._groupsRefresh.notify();
+        void this._feedbackService.success(success);
+      },
       error: (error: unknown) =>
         void this._feedbackService.error(error, 'Could not save that decision.'),
     });
@@ -159,7 +170,12 @@ export class GroupManage implements ViewWillEnter {
   private _moderate(post: Post, decision: 'APPROVED' | 'REJECTED', success: string): void {
     if (this.store.isBusy(post.id)) return;
     this.store.moderatePost(post, decision).subscribe({
-      next: () => void this._feedbackService.success(success),
+      next: () => {
+        // Publishing makes the post visible — the feed behind this screen
+        // was rendered without it.
+        this._groupsRefresh.notify();
+        void this._feedbackService.success(success);
+      },
       error: (error: unknown) =>
         void this._feedbackService.error(error, 'Could not save that decision.'),
     });

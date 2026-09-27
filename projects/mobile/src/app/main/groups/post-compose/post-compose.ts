@@ -26,6 +26,7 @@ import {
   IMAGE_MAX_BYTES,
   POST_MAX_IMAGES,
   POST_MAX_LENGTH,
+  canPost,
   isPostingBlockedError,
   postNeedsApproval,
 } from '../groups.config';
@@ -101,7 +102,8 @@ export class PostCompose {
     () =>
       this.content().trim().length > 0 &&
       this.content().length <= this.maxLength &&
-      !this.submitting(),
+      !this.submitting() &&
+      !this.cannotPost(),
   );
 
   readonly remaining = computed(() => this.maxLength - this.content().length);
@@ -115,6 +117,18 @@ export class PostCompose {
   readonly needsApproval = computed(() => {
     const group = this._group();
     return !!group && postNeedsApproval(group.myRole, group);
+  });
+
+  /**
+   * Whether this person may post here at all.
+   *
+   * The group page hides the composer prompt when they cannot, but this
+   * route is reachable directly and from a notification — and without this
+   * the first they would hear of it is a 403 after writing the whole post.
+   */
+  readonly cannotPost = computed(() => {
+    const group = this._group();
+    return !!group && !canPost(group.myRole, group);
   });
 
   constructor() {

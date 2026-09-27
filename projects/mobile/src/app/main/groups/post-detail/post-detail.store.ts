@@ -2,7 +2,9 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, finalize, take, tap } from 'rxjs';
 
-import { Post, PostComment, PostService } from 'core';
+import { GroupService, Post, PostComment, PostService } from 'core';
+
+import { ViewerRole } from '../groups.config';
 
 const PAGE_SIZE = 20;
 
@@ -20,6 +22,7 @@ type LoadOptions = { force?: boolean; done?: (error?: unknown) => void };
 @Injectable()
 export class PostDetailStore {
   private readonly _postService = inject(PostService);
+  private readonly _groupService = inject(GroupService);
   /** The page's, since the page provides this store. */
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -29,6 +32,18 @@ export class PostDetailStore {
   private readonly _postLoading = signal(false);
   private readonly _postError = signal(false);
 
+  /**
+   * The viewer's role in the group this post belongs to.
+   *
+   * Fetched from the post's `groupId` rather than assumed: without it a
+   * moderator opening a post could not delete it, because the screen had no
+   * way to know they were staff — the API would have allowed it all along.
+   *
+   * Null while it loads, and null if it fails. Authorship still works
+   * either way; only the staff powers wait.
+   */
+  private readonly _viewerRole = signal<ViewerRole>(null);
+
   private readonly _comments = signal<PostComment[]>([]);
   private readonly _commentsTotal = signal(0);
   private readonly _commentsPage = signal(1);
@@ -37,6 +52,7 @@ export class PostDetailStore {
   private readonly _commentsLoaded = signal(false);
 
   readonly post = this._post.asReadonly();
+  readonly viewerRole = this._viewerRole.asReadonly();
   readonly comments = this._comments.asReadonly();
 
   readonly commentsHasMore = computed(
@@ -227,8 +243,26 @@ export class PostDetailStore {
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe({
-        next: (post) => this._post.set(post),
+        next: (post) => {
+          this._post.set(post);
+          this._loadViewerRole(post.groupId);
+        },
         error: () => this._postError.set(true),
+      });
+  }
+
+  /**
+   * Quiet and best-effort: it only decides whether a delete button appears,
+   * and the API refuses the action anyway if the answer was wrong.
+   */
+  private _loadViewerRole(groupId: string): void {
+    if (!groupId) return;
+    this._groupService
+      .getById(groupId)
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (group) => this._viewerRole.set(group.myRole),
+        error: () => this._viewerRole.set(null),
       });
   }
 
@@ -279,6 +313,7 @@ export class PostDetailStore {
   private _resetAll(): void {
     this._post.set(null);
     this._postError.set(false);
+    this._viewerRole.set(null);
     this._comments.set([]);
     this._commentsTotal.set(0);
     this._commentsPage.set(1);

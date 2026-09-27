@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -112,6 +112,16 @@ export class GroupPreview {
     this._route.paramMap.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params) => {
       const groupId = params.get('groupId');
       if (groupId) this.store.init(groupId);
+    });
+
+    // Someone who is already in should not be looking at a preview offering
+    // to let them in — the API answers that with "You are already a member".
+    // Reached by a stale link, or by going back after joining.
+    effect(() => {
+      if (!this.store.alreadyMember()) return;
+      void this._router.navigate(['/tabs/groups', this.store.groupId()], {
+        replaceUrl: true,
+      });
     });
   }
 

@@ -139,9 +139,26 @@ export class GroupDetailStore {
     return false;
   });
 
-  /** A member search hid everyone, but the group is not empty. */
+  /**
+   * True when a search hid every loaded row while more remain unfetched —
+   * "nobody matches" would be a lie, because the person may be on a page
+   * that has not been loaded. The page offers to keep looking instead.
+   */
+  readonly searchNeedsMore = computed(
+    () =>
+      this._isMembers() &&
+      !!this.memberQuery().trim() &&
+      this.visibleMembers().length === 0 &&
+      this.membersHasMore(),
+  );
+
+  /** A member search hid everyone, and there is nothing left to load. */
   readonly isFilteredEmpty = computed(
-    () => this._isMembers() && !!this.memberQuery().trim() && this.visibleMembers().length === 0,
+    () =>
+      this._isMembers() &&
+      !!this.memberQuery().trim() &&
+      this.visibleMembers().length === 0 &&
+      !this.membersHasMore(),
   );
 
   /** Called once by the page with the id from the route. */

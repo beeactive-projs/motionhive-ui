@@ -23,7 +23,9 @@ function profile(joinPolicy: JoinPolicy = JoinPolicies.Open): PublicGroupProfile
   } as unknown as PublicGroupProfile;
 }
 
-function setup(options: { joinPolicy?: JoinPolicy; pending?: boolean } = {}) {
+function setup(
+  options: { joinPolicy?: JoinPolicy; pending?: boolean; member?: boolean } = {},
+) {
   const getPublicProfile = vi.fn(() => of(profile(options.joinPolicy)));
   const getMyJoinRequest = vi.fn(() =>
     of({ request: options.pending ? ({ id: 'r-1' } as never) : null }),
@@ -36,13 +38,23 @@ function setup(options: { joinPolicy?: JoinPolicy; pending?: boolean } = {}) {
       of({ status: 'JOINED', message: 'ok', member: {} as never } as SelfJoinResult),
   );
   const cancelMyJoinRequest = vi.fn(() => of({ message: 'ok' }));
+  // The members-only read: a 200 means they are already in.
+  const getById = vi.fn(() =>
+    options.member ? of({ id: GROUP_ID } as never) : throwError(() => ({ status: 403 })),
+  );
 
   TestBed.configureTestingModule({
     providers: [
       GroupPreviewStore,
       {
         provide: GroupService,
-        useValue: { getPublicProfile, getMyJoinRequest, selfJoin, cancelMyJoinRequest },
+        useValue: {
+          getPublicProfile,
+          getMyJoinRequest,
+          selfJoin,
+          cancelMyJoinRequest,
+          getById,
+        },
       },
     ],
   });
@@ -121,6 +133,27 @@ describe('GroupPreviewStore — the way in', () => {
     store.cancelRequest().subscribe();
 
     expect(store.cta()?.action).toBe(JoinActions.Request);
+  });
+});
+
+describe('GroupPreviewStore — already inside', () => {
+  it('knows when the viewer is already a member', () => {
+    // Otherwise the preview offers a Join that the API answers with
+    // "You are already a member of this group".
+    const { store } = setup({ member: true });
+
+    store.init(GROUP_ID);
+
+    expect(store.alreadyMember()).toBe(true);
+  });
+
+  it('stays a preview for someone who is not in the group', () => {
+    const { store } = setup();
+
+    store.init(GROUP_ID);
+
+    expect(store.alreadyMember()).toBe(false);
+    expect(store.cta()?.action).toBe(JoinActions.Join);
   });
 });
 

@@ -35,7 +35,12 @@
     <ion-refresher-content />
   </ion-refresher>
 
-  @if (store.showError()) {
+  @if (store.forbidden()) {
+  <!-- Both queues are owner-only on the server, so this is not a failure to
+       retry — it is a screen that was never theirs. -->
+  <mh-empty-state icon="lock-closed-outline" heading="Only the owner can review these"
+    message="Join requests and pending posts are handled by the group's owner." />
+  } @else if (store.showError()) {
   <mh-empty-state icon="alert-circle-outline" heading="Couldn't load these queues"
     message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
   } @else if (store.showSkeleton()) {

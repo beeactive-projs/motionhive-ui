@@ -40,6 +40,16 @@ export class GroupManageStore {
   /** Rows with a decision in flight, so each can spin on its own. */
   private readonly _busyIds = signal<ReadonlySet<string>>(new Set());
 
+  /**
+   * Both queues answered 403 — this viewer does not own the group.
+   *
+   * Told apart from a failed load because they are different news: one is
+   * "try again", the other is "this was never yours to see".
+   */
+  private readonly _forbidden = signal(false);
+
+  readonly forbidden = this._forbidden.asReadonly();
+
   readonly requests = this._requests.asReadonly();
   readonly posts = this._posts.asReadonly();
 
@@ -55,6 +65,7 @@ export class GroupManageStore {
   /** Both queues failed and there is nothing to show instead. */
   readonly showError = computed(
     () =>
+      !this._forbidden() &&
       this._requestsError() &&
       this._postsError() &&
       this._requests().length === 0 &&
@@ -152,6 +163,7 @@ export class GroupManageStore {
         },
         error: (error: unknown) => {
           this._requestsError.set(true);
+          this._noteForbidden(error);
           done(error);
         },
       });
@@ -180,9 +192,16 @@ export class GroupManageStore {
         },
         error: (error: unknown) => {
           this._postsError.set(true);
+          this._noteForbidden(error);
           done(error);
         },
       });
+  }
+
+  private _noteForbidden(error: unknown): void {
+    if ((error as { status?: number } | null)?.status === 403) {
+      this._forbidden.set(true);
+    }
   }
 
   private _resetAll(): void {
@@ -193,5 +212,6 @@ export class GroupManageStore {
     this._postsLoaded.set(false);
     this._postsError.set(false);
     this._busyIds.set(new Set());
+    this._forbidden.set(false);
   }
 }

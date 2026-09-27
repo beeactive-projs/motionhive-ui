@@ -31,6 +31,15 @@ export class GroupPreviewStore {
   /** A group that is private or gone, as opposed to a failed request. */
   private readonly _notFound = signal(false);
 
+  /**
+   * True once we know this viewer is already in the group — the members-only
+   * read succeeded. The page sends them to the real group rather than
+   * offering a Join that the API answers with "already a member".
+   */
+  private readonly _alreadyMember = signal(false);
+
+  readonly alreadyMember = this._alreadyMember.asReadonly();
+
   readonly profile = this._profile.asReadonly();
   readonly notFound = this._notFound.asReadonly();
   readonly hasPendingRequest = this._hasPendingRequest.asReadonly();
@@ -45,9 +54,15 @@ export class GroupPreviewStore {
     return joinCta(profile.group.joinPolicy, this._hasPendingRequest());
   });
 
+  /** The id this preview is about, for the page's redirect. */
+  groupId(): string {
+    return this._groupId;
+  }
+
   init(groupId: string): void {
     if (groupId === this._groupId) return;
     this._groupId = groupId;
+    this._alreadyMember.set(false);
     this._profile.set(null);
     this._hasPendingRequest.set(false);
     this._error.set(false);
@@ -63,6 +78,16 @@ export class GroupPreviewStore {
 
     // Silent: this page reports a failed load itself, inline and with a
     // retry. The global dialog on top of that is the same failure twice.
+    // The members-only read comes along for the ride: a 200 from it means
+    // they are already in, which changes the whole screen.
+    this._groupService
+      .getById(this._groupId)
+      .pipe(take(1), takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: () => this._alreadyMember.set(true),
+        error: () => this._alreadyMember.set(false),
+      });
+
     forkJoin({
       profile: this._groupService.getPublicProfile(this._groupId),
       // A 404 here just means "no request", which is the common case — so it

@@ -41,6 +41,7 @@ import { EmptyState } from '../../../_shared/components/empty-state/empty-state'
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import {
   GROUP_DESCRIPTION_MAX_LENGTH,
+  canManageGroup,
   GROUP_MAX_TAGS,
   GROUP_NAME_MAX_LENGTH,
   GROUP_TAG_MAX_LENGTH,
@@ -113,6 +114,15 @@ export class GroupEdit implements ViewWillEnter {
   readonly loading = signal(false);
   readonly loadError = signal(false);
   readonly saving = signal(false);
+
+  /**
+   * Set when the group loaded but this viewer does not own it.
+   *
+   * `GET /groups/:id` answers any member with 200, so the form would
+   * populate for someone whose save is going to 403 — Delete button and
+   * all. Only `PATCH` and `DELETE` are owner-gated on the server.
+   */
+  readonly notAllowed = signal(false);
 
   readonly name = signal('');
   readonly description = signal('');
@@ -266,6 +276,11 @@ export class GroupEdit implements ViewWillEnter {
       .pipe(take(1), takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (group) => {
+          if (!canManageGroup(group.myRole)) {
+            this.notAllowed.set(true);
+            this.loading.set(false);
+            return;
+          }
           this.name.set(group.name);
           this.description.set(group.description ?? '');
           this.isPublic.set(group.isPublic);

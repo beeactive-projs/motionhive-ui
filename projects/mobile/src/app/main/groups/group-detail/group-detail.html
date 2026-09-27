@@ -193,7 +193,14 @@
     <ion-searchbar placeholder="Search members" aria-label="Search members" inputmode="search"
       [value]="store.memberQuery()" (ionInput)="onMemberQuery($event.detail.value ?? '')" />
 
-    @if (store.isFilteredEmpty()) {
+    @if (store.searchNeedsMore()) {
+    <!-- The search only sees rows already fetched, so in a big group the
+         person may simply not be loaded yet. Saying "nobody matches" here
+         would be wrong. -->
+    <mh-empty-state icon="people-outline" heading="Nobody matches yet"
+      message="Not everyone is loaded. Load more members and search again."
+      actionLabel="Load more" actionFill="outline" (action)="loadMoreMembers()" />
+    } @else if (store.isFilteredEmpty()) {
     <mh-empty-state icon="people-outline" heading="Nobody matches"
       message="No member matches that. Try a different name." />
     } @else if (store.isEmpty()) {
