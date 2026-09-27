@@ -149,6 +149,15 @@ export interface AssignProgramPayload {
   clientId: string;
   /** ISO date — day 0 of the program lands here. */
   startDate: string;
+  /**
+   * Which weekdays the program's training days land on, ISO 1=Mon..7=Sun.
+   *
+   * The program's distinct days pair with these in order, so a Mon/Wed
+   * program sent [2, 4] runs Tue/Thu. The count must match the number of
+   * days the program trains on. Omitted, days fall by counting forward
+   * from `startDate`.
+   */
+  daysOfWeek?: number[];
   notes?: string;
 }
 
