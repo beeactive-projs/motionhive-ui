@@ -125,21 +125,26 @@
                     aria-hidden="true"
                   />
                 }
-                <ion-label>
+                <!-- The verbs take their own row. Sharing the meta line with
+                     them left both the invitee's address and the expiry —
+                     "Sent yesterday · expires in 29 days", the whole point of
+                     the line — ellipsised at phone width, and squeezed the
+                     two buttons, one of them destructive, down to 28px. -->
+                <ion-label class="ion-text-wrap">
                   <div class="name-line">
                     <h2>{{ name(row) }}</h2>
                     <ion-badge data-tone="warn">{{ statusLabel(row) }}</ion-badge>
                   </div>
-                  <div class="meta-line">
-                    <span class="meta">{{ sentMeta(row) }}</span>
+                  <p class="meta">{{ sentMeta(row) }}</p>
+                  <div class="verbs">
                     <ion-button
                       fill="clear"
                       size="small"
                       color="medium"
-                      [disabled]="store.isBusy(row.id)"
+                      [disabled]="store.isBusy(row.id) || isResent(row.id)"
                       (click)="resend(row)"
                     >
-                      Resend
+                      {{ isResent(row.id) ? 'Resent' : 'Resend' }}
                     </ion-button>
                     <ion-button
                       fill="clear"

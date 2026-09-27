@@ -7,7 +7,8 @@ import { InstructorClient, clientDisplayName, clientEmail } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { CLIENT_ICONS, ClientActionId, visibleClientActions } from '../../clients.config';
+import { ClientActionId, visibleClientActions } from '../../clients.config';
+import { CLIENT_ICONS } from '../../clients.icons';
 
 /**
  * The verbs for one client — the ⋮ on the detail screen.

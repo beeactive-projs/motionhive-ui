@@ -3,7 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/clients" />
     </ion-buttons>
-    <ion-title>Client</ion-title>
+    <!-- The name, not "Client": on a phone the header is the orientation cue,
+         and a generic one makes every client's page look like the same page. -->
+    <ion-title>{{ name() || 'Client' }}</ion-title>
     @if (store.client()) {
       <ion-buttons slot="end">
         <ion-button aria-label="Client actions" (click)="openActions()">
@@ -133,6 +135,23 @@
         </section>
       }
 
+      @if (client.groupMemberships?.length) {
+        <!-- Only when there are any: "not in any groups" is not news about a
+             person, and a phone has no room for a section that says nothing. -->
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <span class="mh-kicker">Groups</span>
+          </div>
+          <div class="mh-chip-row">
+            @for (group of client.groupMemberships; track group.groupId) {
+              <!-- A label, not a control: no handler, and nothing that hints
+                   at one. Groups are managed on the web for now. -->
+              <ion-chip>{{ group.groupName }}</ion-chip>
+            }
+          </div>
+        </section>
+      }
+
       <!-- 7h: training is a section of the client, not an island. It points
            at the detail rather than duplicating it. -->
       <section class="mh-section">
@@ -169,9 +188,15 @@
         <!-- Last, and the one row in red: the only thing here worth a second thought. -->
         <ion-list [inset]="true" class="mh-card-list">
           @if (isActive()) {
+            <!-- The label takes the wash ink rather than Ionic's `color`
+                 slot: danger-500 as text on a white card is 3.76:1, and the
+                 one row here worth a second thought is the last one that
+                 should be hard to read. The glyph keeps the saturated hue —
+                 3:1 is enough for a graphic, and the pair is the same
+                 treatment the attention rows use. -->
             <ion-item button detail="false" lines="none" (click)="confirmArchive()">
               <ion-icon slot="start" name="archive-outline" color="danger" aria-hidden="true" />
-              <ion-label color="danger">Archive client…</ion-label>
+              <ion-label class="verb danger">Archive client…</ion-label>
             </ion-item>
           } @else {
             <ion-item
@@ -182,7 +207,7 @@
               (click)="unarchive()"
             >
               <ion-icon slot="start" name="arrow-undo-outline" color="success" aria-hidden="true" />
-              <ion-label color="success">Unarchive client</ion-label>
+              <ion-label class="verb success">Unarchive client</ion-label>
             </ion-item>
           }
         </ion-list>

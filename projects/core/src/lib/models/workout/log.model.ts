@@ -2,8 +2,11 @@ import type { AssignedSet } from './assignment.model';
 import type { ExerciseKind } from '../exercise/exercise.enums';
 import type {
   ExerciseSetType,
+  SetField,
   WorkoutLogStatus,
 } from './workout.enums';
+
+export type { SetField } from './workout.enums';
 
 /**
  * One client workout-log session. Either tied to an assigned workout
@@ -104,9 +107,6 @@ export interface LoggedExercise {
   } | null;
   sets?: LoggedSet[];
 }
-
-/** The input columns a set row shows, in display order. */
-export type SetField = 'weight' | 'reps' | 'duration' | 'distance';
 
 const FIELDS_BY_KIND: Record<ExerciseKind, SetField[]> = {
   STRENGTH: ['weight', 'reps'],

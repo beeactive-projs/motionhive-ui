@@ -1,0 +1,124 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Groups" />
+    </ion-buttons>
+    <ion-title>{{ group()?.name ?? 'Group' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h1 class="mh-visually-hidden">{{ group()?.name ?? 'Group' }}</h1>
+
+  @if (store.notFound()) {
+  <mh-empty-state icon="lock-closed-outline" heading="This group is private"
+    message="Ask the owner for an invite, or look for another group." />
+  } @else if (store.showError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (store.showSkeleton()) {
+  <div class="mh-page" aria-busy="true">
+    <div class="hero">
+      <mh-hex-avatar size="2xl" color="medium" tone="wash" />
+      <ion-skeleton-text [animated]="true" style="width: 50%; height: 1.125rem" />
+      <ion-skeleton-text [animated]="true" style="width: 30%; height: 0.75rem" />
+    </div>
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <ion-label>
+          <p><ion-skeleton-text [animated]="true" style="width: 25%" /></p>
+          <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+  } @else if (group(); as group) {
+  <div class="mh-page">
+    <section class="hero">
+      <mh-hex-avatar size="2xl" [name]="group.name" [imageUrl]="group.logoUrl" />
+      <h2 class="name">{{ group.name }}</h2>
+      <div class="meta">
+        <span class="count">{{ memberCountLabel() }}</span>
+        <ion-chip [color]="policyTone()" class="policy">{{ policyLabel() }}</ion-chip>
+      </div>
+    </section>
+
+    @if (group.description) {
+    <section class="mh-section">
+      <h2 class="mh-kicker">About</h2>
+      <p class="description">{{ group.description }}</p>
+    </section>
+    }
+
+    <ion-list [inset]="true" class="mh-card-list">
+      @if (instructorName(); as instructor) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="person-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Run by</p>
+          <h2>{{ instructor }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+      @if (location(); as where) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Where</p>
+          <h2>{{ where }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+      <ion-item lines="none">
+        <ion-icon slot="start" name="people-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Members</p>
+          <h2>{{ memberCountLabel() }}</h2>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    @if (group.tags?.length) {
+    <div class="mh-chip-row" role="group" aria-label="Group tags">
+      @for (tag of group.tags; track tag) {
+      <ion-chip color="medium" class="tag">{{ tag }}</ion-chip>
+      }
+    </div>
+    }
+
+    <!-- Members and posts stay hidden until you are in: the API serves
+         neither to a non-member, and showing empty sections would suggest
+         the group has nothing in it. -->
+    <p class="locked">
+      <ion-icon name="lock-closed-outline" aria-hidden="true" />
+      <span>Posts and members are visible once you join.</span>
+    </p>
+  </div>
+  }
+</ion-content>
+
+@if (store.cta(); as cta) {
+<ion-footer [translucent]="true">
+  <ion-toolbar class="join-bar">
+    @if (cta.action === Actions.Pending) {
+    <!-- A report, not a button — with the one thing they can still do
+         beside it. -->
+    <div class="pending">
+      <span>{{ cta.label }}</span>
+      <ion-button fill="clear" size="small" [disabled]="joining()" (click)="cancelRequest()">
+        Withdraw
+      </ion-button>
+    </div>
+    } @else {
+    <ion-button expand="block" [disabled]="!cta.enabled || joining()" (click)="join()">
+      @if (joining()) {
+      <ion-spinner name="crescent" slot="start" />
+      }
+      {{ cta.label }}
+    </ion-button>
+    }
+  </ion-toolbar>
+</ion-footer>
+}

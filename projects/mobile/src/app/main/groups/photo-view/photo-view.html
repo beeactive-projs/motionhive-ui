@@ -1,0 +1,44 @@
+<ion-header [translucent]="true" class="bar">
+  <ion-toolbar class="bar">
+    <ion-buttons slot="start">
+      <ion-button aria-label="Close photo" (click)="close()">
+        <ion-icon slot="icon-only" name="close-outline" />
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ counter() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="stage">
+  @if (error()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load these photos"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (loading()) {
+  <div class="centre" aria-busy="true">
+    <ion-spinner name="crescent" />
+  </div>
+  } @else if (current(); as url) {
+  <div class="centre">
+    <img [src]="url" [attr.alt]="'Photo ' + (index() + 1) + ' of ' + total()" />
+  </div>
+
+  @if (total() > 1) {
+  <!-- Arrows rather than a swipe: a swipe on a photo competes with Ionic's
+       own back gesture, and losing the photo on a mis-swipe is worse than a
+       pair of buttons. -->
+  <div class="nav">
+    <ion-button fill="clear" class="arrow" [disabled]="!hasPrevious()" aria-label="Previous photo"
+      (click)="previous()">
+      <ion-icon slot="icon-only" name="chevron-back" />
+    </ion-button>
+    <ion-button fill="clear" class="arrow" [disabled]="!hasNext()" aria-label="Next photo"
+      (click)="next()">
+      <ion-icon slot="icon-only" name="chevron-forward" />
+    </ion-button>
+  </div>
+  }
+  } @else {
+  <mh-empty-state icon="image-outline" heading="No photos on this post"
+    message="It may have been edited since you opened it." />
+  }
+</ion-content>

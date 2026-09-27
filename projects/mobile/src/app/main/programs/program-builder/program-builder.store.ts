@@ -2,9 +2,9 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
-import { Program, ProgramService, ProgramWorkout } from 'core';
+import { Program, ProgramService, ProgramStatus, ProgramWorkout } from 'core';
 
-import { weeksOf } from '../programs.config';
+import { DAY_LABELS, DEFAULT_PROGRAM_WEEKS, weeksOf } from '../programs.config';
 
 /** One week's worth of days, as the builder renders them. */
 export interface WeekCard {
@@ -13,8 +13,7 @@ export interface WeekCard {
   filled: number;
 }
 
-const DAYS_PER_WEEK = 7;
-const DEFAULT_WEEKS = 4;
+const DAYS_PER_WEEK = DAY_LABELS.length;
 
 /**
  * One program being authored.
@@ -30,13 +29,15 @@ export class ProgramBuilderStore {
 
   private readonly _program = signal<Program | null>(null);
   private readonly _loading = signal(false);
-  private readonly _failed = signal(false);
+  private readonly _error = signal(false);
   private readonly _saving = signal(false);
 
   readonly program = this._program.asReadonly();
   readonly loading = this._loading.asReadonly();
-  readonly failed = this._failed.asReadonly();
   readonly saving = this._saving.asReadonly();
+
+  readonly showSkeleton = computed(() => this._loading() && !this._program());
+  readonly showError = computed(() => this._error() && !this._program());
 
   readonly workouts = computed<ProgramWorkout[]>(() => this._program()?.workouts ?? []);
 
@@ -46,7 +47,7 @@ export class ProgramBuilderStore {
     if (!program) return 0;
     const declared = weeksOf(program);
     const used = this.workouts().reduce((max, w) => Math.max(max, w.weekIndex + 1), 0);
-    return Math.max(declared ?? DEFAULT_WEEKS, used, 1);
+    return Math.max(declared ?? DEFAULT_PROGRAM_WEEKS, used, 1);
   });
 
   readonly weeks = computed<WeekCard[]>(() => {
@@ -65,11 +66,11 @@ export class ProgramBuilderStore {
   /** Total days with work — what the status card counts. */
   readonly filledDays = computed(() => this.workouts().length);
 
-  readonly isPublished = computed(() => this._program()?.status === 'PUBLISHED');
+  readonly isPublished = computed(() => this._program()?.status === ProgramStatus.Published);
 
   load(id: string, done?: () => void): void {
     this._loading.set(true);
-    this._failed.set(false);
+    this._error.set(false);
     this._programService
       .get(id)
       .pipe(take(1))
@@ -80,7 +81,7 @@ export class ProgramBuilderStore {
           done?.();
         },
         error: () => {
-          this._failed.set(true);
+          this._error.set(true);
           this._loading.set(false);
           done?.();
         },
@@ -96,7 +97,7 @@ export class ProgramBuilderStore {
   adopt(program: Program): void {
     this._program.set(program);
     this._loading.set(false);
-    this._failed.set(false);
+    this._error.set(false);
   }
 
   // ─── Days ─────────────────────────────────────────────────────
@@ -170,6 +171,50 @@ export class ProgramBuilderStore {
         },
         error: (error: unknown) => {
           // The program on screen is still fine; only this copy failed.
+          this._saving.set(false);
+          done?.(error);
+        },
+      });
+  }
+
+  /**
+   * Copy one day into the same slot of several weeks, in one request.
+   *
+   * Unlike `copyWeek`, the endpoint takes every target at once — so there is
+   * no chain of calls to walk, and no half-applied copy if a later week
+   * would have failed.
+   */
+  copyDay(
+    fromWeek: number,
+    dayIndex: number,
+    toWeeks: number[],
+    toDayIndex?: number,
+    done?: (error?: unknown) => void,
+  ): void {
+    const program = this._program();
+    // A different target day makes the source week a real target too.
+    const movingDay = toDayIndex !== undefined && toDayIndex !== dayIndex;
+    const targets = toWeeks.filter((w) => movingDay || w !== fromWeek);
+    if (!program || !targets.length) {
+      done?.();
+      return;
+    }
+    // Nothing in the source slot is nothing to copy.
+    if (!this.workouts().some((w) => w.weekIndex === fromWeek && w.dayIndex === dayIndex)) {
+      done?.();
+      return;
+    }
+
+    this._saving.set(true);
+    this._programService
+      .copyDay(program.id, fromWeek, dayIndex, targets, toDayIndex)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this._saving.set(false);
+          this.load(program.id, done);
+        },
+        error: (error: unknown) => {
           this._saving.set(false);
           done?.(error);
         },

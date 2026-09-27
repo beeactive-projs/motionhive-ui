@@ -8,6 +8,7 @@ import {
   IonButton,
   IonButtons,
   IonCard,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -39,13 +40,9 @@ import { injectOpenDirectMessage } from '../../../_shared/utils/direct-message';
 import { SessionRow } from '../../coach/sessions/_components/session-row/session-row';
 import { ClientActionsSheet } from '../_sheets/client-actions-sheet/client-actions-sheet';
 import { ClientNotesSheet } from '../_sheets/client-notes-sheet/client-notes-sheet';
-import {
-  CLIENT_ICONS,
-  ClientActionId,
-  ClientActionIds,
-  adherenceLabel,
-  lastActiveLabel,
-} from '../clients.config';
+import { ClientActionId, ClientActionIds } from '../clients.config';
+import { CLIENT_ICONS } from '../clients.icons';
+import { adherenceLabel, lastActiveLabel } from '../roster-labels';
 import { ClientDetailStore } from './client-detail.store';
 
 /**
@@ -68,6 +65,7 @@ import { ClientDetailStore } from './client-detail.store';
     HexAvatar,
     IonBackButton,
     IonBadge,
+    IonChip,
     IonButton,
     IonButtons,
     IonCard,
@@ -276,7 +274,7 @@ export class ClientDetail implements ViewWillEnter {
   openTraining(): void {
     const clientId = this.store.client()?.clientId;
     if (clientId) {
-      void this._router.navigate(['/tabs/clients/client', clientId, 'training']);
+      void this._router.navigate(['/tabs/clients', clientId, 'training']);
     }
   }
 

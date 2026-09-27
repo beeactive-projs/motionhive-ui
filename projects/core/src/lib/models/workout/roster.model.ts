@@ -8,12 +8,14 @@ export type RosterWindow = '1w' | '4w';
 
 /**
  * Why a client needs looking at. Null when they don't.
+ *   NO_PLAN       — no active plan at all, so nothing is being asked of them
  *   NEVER_STARTED — assigned work, nothing ever logged
  *   SILENT        — no workout in 14+ days
  *   DROPPED       — adherence fell 20+ points against the prior window
  *   BEHIND        — under half the work due in the window
  */
 export type RosterAttention =
+  | 'NO_PLAN'
   | 'NEVER_STARTED'
   | 'SILENT'
   | 'DROPPED'

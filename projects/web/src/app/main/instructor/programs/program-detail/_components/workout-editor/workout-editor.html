@@ -84,6 +84,24 @@
       >
         <i class="pi pi-calendar"></i>
       </button>
+      <!-- Copy sits beside move, not inside it: one leaves this day where it
+           is, the other does not, and that is the whole distinction. -->
+      <button
+        pButton
+        type="button"
+        size="small"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="Copy this day into other weeks"
+        tooltipPosition="left"
+        (click)="copyDay.emit()"
+        class="mh-reorder-btn"
+        [attr.aria-label]="'Copy ' + workout().name + ' into other weeks'"
+        iconOnly
+      >
+        <i class="pi pi-copy"></i>
+      </button>
       <button pButton
         type="button"
         size="small"

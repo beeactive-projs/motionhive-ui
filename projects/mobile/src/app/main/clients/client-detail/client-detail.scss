@@ -117,9 +117,16 @@
   font-size: var(--mh-text-sm);
 }
 
-/* The note, free-running so it keeps its line breaks; the empty state is the
-   invitation to write one, in the accent ink rather than a greyed prompt. */
+/* The note keeps its line breaks, but stops at six of them: a full-length one
+   ran past 1200px and pushed Archive client — the section below — off the
+   bottom of the screen entirely. The row is already tappable and opens the
+   note in its editor, so the clamp hides nothing that costs a second tap. */
 .notes {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
   margin: 0.25rem 0;
   color: var(--ion-text-color);
   font-size: var(--mh-text-base);
@@ -162,4 +169,20 @@
 .training .t-chev {
   color: var(--ion-color-medium);
   font-size: var(--mh-text-base);
+}
+
+/* The two relationship verbs at the foot of the page. Semantic hue as ink is
+   the wash contrast, not the saturated slot colour — success-500 on white is
+   2.5:1 and danger-500 is 3.76:1, both short of the 4.5:1 body text needs.
+   Same rule the attention rows' reason line follows. */
+.verb {
+  font-weight: 600;
+}
+
+.verb.danger {
+  color: var(--ion-color-danger-wash-contrast);
+}
+
+.verb.success {
+  color: var(--ion-color-success-wash-contrast);
 }

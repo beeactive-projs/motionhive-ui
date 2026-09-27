@@ -1,77 +1,15 @@
-:host {
-  --mh-gutter: 1.25rem;
-}
-
-.pad {
-  padding: 1rem var(--mh-gutter) 0;
-}
-
+/* Where in the plan this day sits, in the honey ink: it names the position,
+   not a status. */
 .eyebrow {
-  display: block;
-  margin-bottom: 0.5rem;
   color: var(--mh-color-honey-deep);
 }
 
-.pad ion-textarea {
-  margin-top: 0.75rem;
-}
-
-.ex-row {
-  margin: 0 var(--mh-gutter) 0.5rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
-  background: var(--ion-card-background);
-}
-
-.ex-name {
+/* The one control under an exercise, at the card's far edge. */
+.controls {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ion-text-color);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  text-align: start;
-  cursor: pointer;
+  justify-content: flex-end;
 }
 
-.ex-name span {
-  flex: 1;
-  min-width: 0;
+ion-card ion-skeleton-text {
+  margin: 0.375rem 0;
 }
-
-.ex-name ion-icon {
-  flex: none;
-  color: var(--ion-color-medium);
-}
-
-.ex-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-.sets {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-}
-
-.ex-remove {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--mh-tap-target);
-  height: var(--mh-tap-target);
-  padding: 0;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-  color: var(--ion-color-danger);
-  cursor: pointer;
-}
-

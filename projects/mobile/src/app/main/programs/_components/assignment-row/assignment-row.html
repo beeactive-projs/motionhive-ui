@@ -1,0 +1,33 @@
+<ion-item class="mh-session-row mh-list-row" lines="none" detail="false" [attr.data-tone]="tone()">
+  <!-- Decorative: the name it would announce is the very next thing in the row. -->
+  <mh-hex-avatar
+    slot="start"
+    size="md"
+    aria-hidden="true"
+    [name]="name()"
+    [imageUrl]="assignment().client?.avatarUrl ?? null"
+    [color]="avatarTone()"
+  />
+
+  <ion-label>
+    <h2>{{ name() }}</h2>
+    <div class="tags">
+      @if (chip(); as chip) {
+        <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+      }
+      @if (subline()) {
+        <ion-note>{{ subline() }}</ion-note>
+      }
+    </div>
+  </ion-label>
+
+  @if (canPause()) {
+    <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="pause.emit()">
+      Pause
+    </ion-button>
+  } @else if (canResume()) {
+    <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="resume.emit()">
+      Resume
+    </ion-button>
+  }
+</ion-item>

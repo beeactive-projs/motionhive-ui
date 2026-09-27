@@ -8,67 +8,58 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading() && !rows().length) {
-    @for (row of skeletonRows; track row) {
-      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (failed()) {
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Could not load assignments"
+      heading="Couldn't load the assignments"
       message="Check your connection and try again."
-      actionLabel="Retry"
-      (action)="load()"
+      actionLabel="Try again"
+      (action)="retry()"
     />
-  } @else if (isEmpty()) {
+  } @else if (store.showSkeleton()) {
+    <!-- Mirrors the row shape so nothing shifts when data lands. -->
+    <div class="mh-page">
+      <span class="mh-kicker meta">
+        <ion-skeleton-text [animated]="true" style="width: 11rem; height: 0.75rem" />
+      </span>
+      <div>
+        @for (_ of skeletonRows; track $index) {
+          <ion-item lines="none" class="row-skeleton mh-list-row">
+            <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 40%" /></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </div>
+    </div>
+  } @else if (store.isEmpty()) {
     <mh-empty-state
       icon="people-outline"
       heading="Nobody on this yet"
       message="Assign it to a client and they will show up here."
+      actionLabel="Assign to a client"
+      (action)="openAssign()"
     />
   } @else {
-    @for (row of rows(); track row.id) {
-      <ion-item
-        class="mh-session-row mh-list-row"
-        lines="none"
-        detail="false"
-        [attr.data-tone]="tone(row)"
-      >
-        <ion-label>
-          <h2>{{ clientName(row) }}</h2>
-          <div class="tags">
-            @if (chip(row); as c) {
-              <ion-badge [attr.data-tone]="c.tone">{{ c.label }}</ion-badge>
-            }
-          </div>
-          @if (subline(row)) {
-            <p class="sub">{{ subline(row) }}</p>
-          }
-        </ion-label>
-
-        @if (canPause(row)) {
-          <ion-button
-            slot="end"
-            fill="clear"
-            size="small"
-            [disabled]="busy() === row.id"
-            (click)="setStatus(row, 'PAUSED')"
-          >
-            Pause
-          </ion-button>
-        } @else if (canResume(row)) {
-          <ion-button
-            slot="end"
-            fill="clear"
-            size="small"
-            [disabled]="busy() === row.id"
-            (click)="setStatus(row, 'ACTIVE')"
-          >
-            Resume
-          </ion-button>
+    <div class="mh-page">
+      <span class="mh-kicker meta">{{ store.subtitle() }}</span>
+      <div>
+        @for (row of store.rows(); track row.id) {
+          <mh-assignment-row
+            [assignment]="row"
+            [busy]="store.isBusy(row.id)"
+            (pause)="setStatus(row, Statuses.Paused)"
+            (resume)="setStatus(row, Statuses.Active)"
+          />
         }
-      </ion-item>
-    }
+      </div>
+    </div>
   }
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
@@ -78,8 +69,4 @@
   </ion-fab>
 </ion-content>
 
-<mh-assign-sheet
-  [(open)]="assignOpen"
-  [program]="program()"
-  (assign)="onAssign($event)"
-/>
+<mh-assign-sheet [(open)]="assignOpen" [program]="store.program()" (assign)="onAssign($event)" />

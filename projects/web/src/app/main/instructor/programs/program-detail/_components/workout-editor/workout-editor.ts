@@ -37,6 +37,8 @@ export class WorkoutEditor {
   readonly moveUp = output<void>();
   readonly moveDown = output<void>();
   readonly moveToWeek = output<void>();
+  /** Copy this whole day into other weeks, or onto another day. */
+  readonly copyDay = output<void>();
   readonly edit = output<void>();
   readonly remove = output<void>();
   readonly addExercise = output<void>();

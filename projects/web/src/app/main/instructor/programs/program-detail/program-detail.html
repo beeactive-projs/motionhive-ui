@@ -54,6 +54,18 @@
         <i class="pi pi-pencil"></i>
         Edit
       </button>
+      <!-- A copy to build the next block from, leaving this one untouched. -->
+      <button pButton
+        type="button"
+        outlined
+        severity="secondary"
+        [size]="isTablet() ? 'small' : undefined"
+        (click)="duplicateProgram()"
+        [disabled]="duplicating()"
+      >
+        <i class="pi" [class]="duplicating() ? 'pi-spinner pi-spin' : 'pi-copy'"></i>
+        Duplicate
+      </button>
       <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openAssign()">
         <i class="pi pi-user-plus"></i>
         Assign to client
@@ -110,7 +122,7 @@
         [indexInWeek]="activeWorkoutPosition().indexInWeek"
         [weekWorkoutCount]="activeWorkoutPosition().weekWorkoutCount" [canMoveExerciseAcross]="totalWorkouts() >= 2"
         [showBack]="isMobile()" (back)="closeEditor()" (moveUp)="moveActiveWorkout(-1)"
-        (moveDown)="moveActiveWorkout(1)" (moveToWeek)="openMoveWorkoutDialog(w)" (edit)="openEditWorkout(w)"
+        (moveDown)="moveActiveWorkout(1)" (moveToWeek)="openMoveWorkoutDialog(w)" (copyDay)="openCopyDay(w)" (edit)="openEditWorkout(w)"
         (remove)="confirmDeleteWorkout(w)" (addExercise)="openExercisePicker(w)"
         (reorderExercise)="moveExercise(w, $event.from, $event.to)" (moveExerciseTo)="openMoveExerciseDialog(w, $event)"
         (removeExercise)="confirmDeleteExercise(w, $event)" (viewExercise)="openExerciseInfo($event)"
@@ -157,6 +169,11 @@
 <mh-move-target-dialog [program]="p" [mode]="moveTargetMode()" [sourceWorkout]="source"
   [exercise]="moveTargetExercise()" [(visible)]="moveTargetDialogOpen" (chosen)="onMoveTargetChosen($event)" />
 }
+@if (copyDaySource(); as src) {
+<mh-copy-day-dialog [program]="p" [sourceWorkout]="src" [(visible)]="copyDayDialogOpen"
+  (chosen)="onCopyDayChosen($event)" />
+}
+
 @if (copyWeekSource() !== null) {
 <mh-copy-week-dialog [program]="p" [sourceWeekIndex]="copyWeekSource() ?? 0" [(visible)]="copyWeekDialogOpen"
   (chosen)="onCopyWeekChosen($event)" />

@@ -1,26 +1,28 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 
-import { clockDigitsToDisplay, clockDigitsToSeconds } from '../../workouts.config';
-import { IonIcon } from '@ionic/angular/standalone';
-
-/** What the keypad is editing — decides the step size and whether decimals make sense. */
-export type KeypadField = 'weight' | 'reps' | 'duration' | 'distance' | 'rpe';
+import {
+  KeypadField,
+  KeypadFields,
+  clockDigitsToDisplay,
+  clockDigitsToSeconds,
+} from '../../workouts.config';
 
 /** Per-field stepper increments. Weight steps by the smallest plate pair. */
 const STEP: Record<KeypadField, number> = {
-  weight: 2.5,
-  reps: 1,
-  duration: 15,
-  distance: 50,
-  rpe: 0.5,
+  [KeypadFields.Weight]: 2.5,
+  [KeypadFields.Reps]: 1,
+  [KeypadFields.Duration]: 15,
+  [KeypadFields.Distance]: 50,
+  [KeypadFields.Rpe]: 0.5,
 };
 
 const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
-  weight: true,
-  reps: false,
-  duration: false,
-  distance: false,
-  rpe: true,
+  [KeypadFields.Weight]: true,
+  [KeypadFields.Reps]: false,
+  [KeypadFields.Duration]: false,
+  [KeypadFields.Distance]: false,
+  [KeypadFields.Rpe]: true,
 };
 
 /**
@@ -31,6 +33,11 @@ const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
  * thumb while holding a bar. This keeps entry in the bottom third and adds
  * the steppers that are how weights actually get chosen — plates come in
  * pairs, so 2.5 is one tap, not four digits.
+ *
+ * The keys are plain buttons on theme tokens, not `ion-button`s: a keypad is
+ * a grid of same-sized targets, and Ionic's button chrome fights that at
+ * every key. Done and the close chevron are ordinary actions, so they are
+ * Ionic's.
  *
  * The buffer lives HERE rather than in the parent. Round-tripping every
  * keystroke through an input/output pair means each tap reads whatever the
@@ -43,7 +50,7 @@ const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
  */
 @Component({
   selector: 'mh-numeric-keypad',
-  imports: [IonIcon],
+  imports: [IonButton, IonIcon],
   templateUrl: './numeric-keypad.html',
   styleUrl: './numeric-keypad.scss',
 })
@@ -81,7 +88,7 @@ export class NumericKeypad {
    * timer input does: 1, 3, 0 builds 1:30. Typing "90" for a ninety-second
    * hold is arithmetic the user should not have to do.
    */
-  readonly isClock = computed(() => this.field() === 'duration');
+  readonly isClock = computed(() => this.field() === KeypadFields.Duration);
 
   /** What the pad shows back — the clock being built, or the raw number. */
   readonly display = computed(() =>

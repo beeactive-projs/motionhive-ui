@@ -1,0 +1,6 @@
+/* The searchbar sits in the sheet's sticky strip, so it keeps the sheet's
+   own gutter rather than the page's. */
+ion-searchbar {
+  --box-shadow: none;
+  padding-inline: 0.5rem;
+}

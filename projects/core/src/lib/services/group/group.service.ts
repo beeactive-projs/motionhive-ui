@@ -13,6 +13,7 @@ import {
   GroupJoinRequestListResponse,
   GroupMember,
   GroupMemberListResponse,
+  GroupWithMyRole,
   PublicGroupProfile,
   SelfJoinResult,
   UpdateGroupPayload,
@@ -34,8 +35,9 @@ export class GroupService {
     return this._http.get<Group[]>(this.baseUrl + '/instructor');
   }
 
-  getById(groupId: string): Observable<Group> {
-    return this._http.get<Group>(`${this.baseUrl}/${groupId}`);
+  /** One group, with the caller's own role in it (see `GroupWithMyRole`). */
+  getById(groupId: string): Observable<GroupWithMyRole> {
+    return this._http.get<GroupWithMyRole>(`${this.baseUrl}/${groupId}`);
   }
 
   /**

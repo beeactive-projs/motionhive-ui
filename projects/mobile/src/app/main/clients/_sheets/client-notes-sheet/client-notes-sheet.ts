@@ -4,6 +4,7 @@ import { IonTextarea } from '@ionic/angular/standalone';
 import { InstructorClient, clientDisplayName } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { NOTES_COUNTER_FROM, NOTES_MAX_LENGTH } from '../../clients.config';
 
 /**
  * The coach's private notes on one client — goals, injuries, what keeps them
@@ -12,6 +13,11 @@ import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-she
  * The sheet emits the trimmed text and stays open until the page's save
  * lands, so a failed save keeps the draft on screen rather than losing it.
  * An empty string clears the note — the API takes a string, not null.
+ *
+ * Save is gated on the draft having actually changed and still fitting. It
+ * used to be unconditional, which meant a stray tap on a sheet opened and
+ * left alone re-saved the same text, and a sheet whose field had been cleared
+ * blanked an existing note with no confirmation and no way back.
  */
 @Component({
   selector: 'mh-client-notes-sheet',
@@ -28,6 +34,8 @@ export class ClientNotesSheet {
 
   readonly draft = signal('');
 
+  readonly maxLength = NOTES_MAX_LENGTH;
+
   constructor() {
     // Seeded on open so a dismissed edit is discarded rather than carried over.
     effect(() => {
@@ -41,7 +49,23 @@ export class ClientNotesSheet {
     return client ? `Notes · ${clientDisplayName(client)}` : 'Notes';
   });
 
+  /** What would actually be sent — compared against what is already stored. */
+  private readonly _trimmed = computed(() => this.draft().trim());
+
+  /**
+   * The field's `maxlength` is the same ceiling, so the note cannot be over
+   * it and there is no over-the-limit state to report. What is worth showing
+   * is the approach: the counter appears in the last tenth of the budget and
+   * stays hidden before it, where "19 / 2000" is noise about a limit nobody
+   * is near.
+   */
+  readonly showCounter = computed(() => this.draft().length >= NOTES_COUNTER_FROM);
+
+  /** Clearing a note is a real edit; re-saving the same text is not. */
+  readonly canSave = computed(() => this._trimmed() !== (this.client()?.notes ?? '').trim());
+
   commit(): void {
-    this.save.emit(this.draft().trim());
+    if (!this.canSave()) return;
+    this.save.emit(this._trimmed());
   }
 }

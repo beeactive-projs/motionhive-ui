@@ -1,25 +1,18 @@
-:host {
-  --mh-gutter: 1.25rem;
-}
-
-.hero {
-  padding: 1.25rem var(--mh-gutter) 0;
-}
+/* The hero card: the outcome, the session's name, and how long it ran. */
 
 /* The ink form of success, not the fill: plain success green on a white card
    is 2.42:1, which is a label you cannot read. */
-.hero .mh-kicker {
+.hero .done {
   color: var(--ion-color-success-wash-contrast);
 }
 
-.hero h1 {
+.hero h2 {
   margin: 0.25rem 0 0;
-  font-family: var(--mh-font-heading);
   font-size: var(--mh-text-xl);
   font-weight: 700;
 }
 
-.duration {
+.hero .duration {
   margin: 0.25rem 0 0;
   color: var(--ion-color-medium);
   font-family: var(--mh-font-mono);
@@ -27,22 +20,17 @@
   font-weight: 600;
 }
 
-.tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 1rem var(--mh-gutter) 0;
+.hero ion-skeleton-text {
+  margin: 0.375rem 0;
 }
 
-.tiles mh-stat-tile {
-  flex: 1 1 8rem;
-}
-
-/* A rating affordance, sized for a thumb. */
+/* ─── Feelings ────────────────────────────────────────────────────
+   Five same-sized tiles sized for a thumb, one of which is pressed. Plain
+   buttons on theme tokens: a rating grid, like the set grid, is a row of
+   equal cells, and Ionic's button chrome fights that. */
 .feelings {
   display: flex;
   gap: 0.5rem;
-  padding: 0 var(--mh-gutter);
 }
 
 .feeling {
@@ -61,15 +49,8 @@
   background: var(--mh-color-selected-background);
 }
 
-.note {
-  margin: 0 var(--mh-gutter);
-}
-
+/* The one prompt slot, on the honey wash — a question, not a status. */
 .prompt {
-  margin: 1.25rem var(--mh-gutter) 0;
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
   background: var(--ion-color-primary-wash);
 }
 
@@ -83,24 +64,11 @@
 }
 
 .prompt ion-button {
-  margin-top: 0.625rem;
+  margin: 0.625rem 0 0;
 }
 
-.ex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem var(--mh-gutter);
-  border-bottom: 1px solid var(--mh-color-divider);
-}
-
-.ex.skipped .name {
+/* A skipped exercise stays in the record, quieter. */
+ion-item.skipped h2 {
   color: var(--ion-color-medium);
   text-decoration: line-through;
 }
-
-.ex .sets {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-}
-

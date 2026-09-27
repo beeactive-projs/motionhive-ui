@@ -1,0 +1,46 @@
+<ng-template #sticky>
+  <ion-searchbar placeholder="Search your clients" aria-label="Search your clients"
+    inputmode="search" [value]="query()" (ionInput)="onQuery($event.detail.value ?? '')" />
+</ng-template>
+
+<ng-template #body>
+  @if (loading()) {
+  <ion-list [inset]="true" class="mh-card-list" aria-busy="true">
+    @for (_ of [1, 2, 3, 4]; track $index; let last = $last) {
+    <ion-item [lines]="last ? 'none' : 'full'">
+      <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+      <ion-label>
+        <h2><ion-skeleton-text [animated]="true" style="width: 45%" /></h2>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+  } @else if (isEmpty()) {
+  <!-- Either they have no clients yet, or every one of them is already in. -->
+  <mh-empty-state icon="people-outline" heading="Nobody left to add"
+    message="Everyone you coach is already in this group." />
+  } @else if (isFilteredEmpty()) {
+  <mh-empty-state icon="search-outline" heading="Nobody matches"
+    message="No client matches that name." />
+  } @else {
+  <ion-list [inset]="true" class="mh-card-list">
+    @for (client of visible(); track client.clientId; let last = $last) {
+    <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="toggle(client)">
+      <mh-hex-avatar slot="start" size="md" [name]="name(client)"
+        [imageUrl]="client.client?.avatarUrl ?? null" />
+      <ion-label>
+        <h2>{{ name(client) }}</h2>
+      </ion-label>
+      <!-- The row is the target; the checkbox reports rather than receives,
+           so a near-miss on a 24px box does not do nothing. -->
+      <ion-checkbox slot="end" [checked]="isSelected(client)" [attr.aria-label]="name(client)"
+        (click)="$event.preventDefault()" />
+    </ion-item>
+    }
+  </ion-list>
+  }
+</ng-template>
+
+<mh-sheet-shell [(open)]="open" title="Add members" subtitle="From the people you coach"
+  [body]="body" [sticky]="sticky" [saveLabel]="saveLabel()" [canSave]="canSave()"
+  [saving]="saving()" (save)="save()" />

@@ -34,8 +34,10 @@ import { clientStatusTone, clientSubline } from '../../clients.config';
  * those live on the Requests page. The row only emits; the page owns the
  * store calls and the confirmations.
  *
- * An email-only invite has no account behind it — no avatar to show, no
- * profile to open, nobody to message — so it gets a mail tile and stays inert.
+ * An email-only invite has no account behind it — no avatar to show and
+ * nobody to message — so it gets a mail tile. It is still pressable: there is
+ * no profile to open, but the invitation itself can be managed on the
+ * Requests page, which is where the page sends the tap.
  */
 @Component({
   selector: 'mh-client-row',
@@ -75,8 +77,13 @@ export class ClientRow {
 
   readonly isIncoming = computed(() => isIncomingRequest(this.client()));
 
-  /** Openable, or an incoming request — which the page routes to Requests. */
-  readonly pressable = computed(() => this.openable() || this.isIncoming());
+  /**
+   * Openable, or pending in either direction — both of which the page routes
+   * to Requests, where an invitation can be resent or withdrawn.
+   */
+  readonly pressable = computed(
+    () => this.openable() || this.isIncoming() || this.isInvite(),
+  );
 
   readonly isActive = computed(
     () => this.client().status === InstructorClientStatuses.Active,

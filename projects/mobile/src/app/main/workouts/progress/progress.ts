@@ -4,7 +4,10 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonSkeletonText,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
@@ -12,11 +15,14 @@ import {
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { ProgressOverview, ProgressService } from 'core';
+import { ProgressOverview, ProgressRange, ProgressService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { WORKOUT_ICONS } from '../workouts.config';
+
+/** The window the page reads — twelve weeks is a training block. */
+const RANGE: ProgressRange = '12w';
 
 /**
  * Progress — the reward for logging, not the reason for it.
@@ -33,7 +39,10 @@ import { WORKOUT_ICONS } from '../workouts.config';
     IonButtons,
     IonContent,
     IonHeader,
-    IonSkeletonText,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
     IonTitle,
     IonToolbar,
     StatTile,
@@ -47,37 +56,44 @@ export class Progress implements ViewWillEnter {
   readonly overview = signal<ProgressOverview | null>(null);
   readonly loading = signal(false);
   readonly loaded = signal(false);
-  readonly failed = signal(false);
+  readonly error = signal(false);
 
-  readonly skeletonRows = [1, 2, 3];
+  readonly skeletonTiles = [1, 2, 3];
 
-  readonly isEmpty = computed(() => (this.overview()?.lifetimeWorkouts ?? 0) === 0);
+  readonly showSkeleton = computed(() => this.loading() && !this.overview());
+  readonly showError = computed(() => this.error() && !this.overview());
+
+  readonly isEmpty = computed(
+    () => this.loaded() && (this.overview()?.lifetimeWorkouts ?? 0) === 0,
+  );
 
   readonly tiles = computed(() => {
-    const o = this.overview();
-    if (!o) return [];
-    const hours = Math.round(o.totals.trainingSeconds / 360) / 10;
+    const overview = this.overview();
+    if (!overview) return [];
+    const hours = Math.round(overview.totals.trainingSeconds / 360) / 10;
     return [
-      { label: 'Workouts', value: String(o.totals.workouts) },
-      { label: 'Volume', value: `${Math.round(o.totals.volumeKg)} kg` },
+      { label: 'Workouts', value: String(overview.totals.workouts) },
+      { label: 'Volume', value: `${Math.round(overview.totals.volumeKg)} kg` },
       { label: 'Time', value: `${hours} h` },
     ];
   });
+
+  readonly records = computed(() => this.overview()?.records ?? []);
 
   constructor() {
     addIcons(WORKOUT_ICONS);
   }
 
+  // Always re-read: a workout finished since changes every number here.
   ionViewWillEnter(): void {
-    if (this.loaded()) return;
     this.load();
   }
 
   load(): void {
     this.loading.set(true);
-    this.failed.set(false);
+    this.error.set(false);
     this._progressService
-      .overview('12w')
+      .overview(RANGE)
       .pipe(take(1))
       .subscribe({
         next: (overview) => {
@@ -86,7 +102,7 @@ export class Progress implements ViewWillEnter {
           this.loading.set(false);
         },
         error: () => {
-          this.failed.set(true);
+          this.error.set(true);
           this.loaded.set(true);
           this.loading.set(false);
         },

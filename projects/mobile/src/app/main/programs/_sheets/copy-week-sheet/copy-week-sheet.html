@@ -1,8 +1,8 @@
 <ng-template #body>
-  <p class="lede">
+  <ion-note class="mh-note-block">
     Every day of week {{ fromWeek() + 1 }} is copied across. Anything already in
     the target week is replaced.
-  </p>
+  </ion-note>
 
   <ion-list lines="none">
     @for (index of targets(); track index) {

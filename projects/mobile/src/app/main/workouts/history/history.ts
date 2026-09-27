@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
@@ -6,30 +6,33 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonRefresher,
+  IonRefresherContent,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { take } from 'rxjs/operators';
 
-import { WorkoutLog, WorkoutLogService, dayDividerLabel, localDayKey } from 'core';
+import { WorkoutLog } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
-import { WORKOUT_ICONS, workoutDuration } from '../workouts.config';
-
-const PAGE_SIZE = 25;
+import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { LogRow } from '../_components/log-row/log-row';
+import { WORKOUT_ICONS } from '../workouts.config';
+import { HistoryStore } from './history.store';
 
 /**
  * Everything logged, newest first.
  *
  * Skipped days stay in the list rather than disappearing — a skip was a
  * decision, and a history that hides them reads as a cleaner training record
- * than the one that actually happened.
+ * than the one that actually happened. Repeat is first-class on every done
+ * row: it is the fastest route to a second workout.
  */
 @Component({
   selector: 'mh-workout-history',
@@ -39,80 +42,47 @@ const PAGE_SIZE = 25;
     IonButtons,
     IonContent,
     IonHeader,
-    IonIcon,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    IonRefresher,
+    IonRefresherContent,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    LogRow,
+    SessionRowSkeleton,
   ],
   templateUrl: './history.html',
   styleUrl: './history.scss',
+  providers: [HistoryStore],
 })
 export class History implements ViewWillEnter {
-  private readonly _logService = inject(WorkoutLogService);
+  readonly store = inject(HistoryStore);
   private readonly _router = inject(Router);
 
-  readonly logs = signal<WorkoutLog[]>([]);
-  readonly loading = signal(false);
-  readonly loaded = signal(false);
-  readonly failed = signal(false);
-  readonly total = signal(0);
-
-  private _page = 1;
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
   constructor() {
     addIcons(WORKOUT_ICONS);
   }
 
+  // Not ngOnInit: Ionic keeps the page alive in the stack, and a workout
+  // finished since belongs at the top. The store re-reads the loaded window
+  // in place, so the scroll holds.
   ionViewWillEnter(): void {
-    if (this.loaded()) return;
-    this.load();
+    this.store.refresh();
   }
 
-  load(): void {
-    this._page = 1;
-    this.loading.set(true);
-    this.failed.set(false);
-    this._logService
-      .list({ page: 1, limit: PAGE_SIZE })
-      .pipe(take(1))
-      .subscribe({
-        next: (page) => {
-          this.logs.set(page.items);
-          this.total.set(page.total);
-          this.loaded.set(true);
-          this.loading.set(false);
-        },
-        error: () => {
-          this.failed.set(true);
-          this.loaded.set(true);
-          this.loading.set(false);
-        },
-      });
+  onRefresh(event: RefresherCustomEvent): void {
+    this.store.refresh(() => void event.target.complete());
   }
 
-  loadMore(event: InfiniteScrollCustomEvent): void {
-    this._page += 1;
-    this._logService
-      .list({ page: this._page, limit: PAGE_SIZE })
-      .pipe(take(1))
-      .subscribe({
-        next: (page) => {
-          this.logs.update((rows) => [...rows, ...page.items]);
-          void event.target.complete();
-        },
-        error: () => void event.target.complete(),
-      });
+  onLoadMore(event: InfiniteScrollCustomEvent): void {
+    this.store.loadMore(() => void event.target.complete());
   }
 
-  dayLabel(log: WorkoutLog): string {
-    return dayDividerLabel(localDayKey(new Date(log.startedAt)));
-  }
-
-  duration(log: WorkoutLog): string {
-    return workoutDuration(log.durationSeconds);
+  retry(): void {
+    this.store.refresh();
   }
 
   open(log: WorkoutLog): void {
@@ -127,8 +97,7 @@ export class History implements ViewWillEnter {
    * plan day this came from was scheduled for a date already gone, and a
    * routine per repeat would silently fill the library with near-duplicates.
    */
-  repeat(log: WorkoutLog, event: Event): void {
-    event.stopPropagation();
+  repeat(log: WorkoutLog): void {
     void this._router.navigate(['/tabs/workouts/log', 'new'], {
       queryParams: { from: log.id },
     });

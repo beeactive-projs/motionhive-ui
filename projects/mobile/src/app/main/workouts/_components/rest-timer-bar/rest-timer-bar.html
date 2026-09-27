@@ -9,11 +9,15 @@
   }
 
   <div class="actions">
-    <button type="button" aria-label="Minus 10 seconds" (click)="subtract()">−10</button>
-    <button type="button" aria-label="Plus 10 seconds" (click)="add()">+10</button>
-    <button class="skip" type="button" (click)="skip.emit()">
-      <ion-icon name="play-skip-forward-outline" aria-hidden="true" />
+    <ion-button size="small" shape="round" fill="outline" color="medium" aria-label="Minus 10 seconds" (click)="subtract()">
+      −10
+    </ion-button>
+    <ion-button size="small" shape="round" fill="outline" color="medium" aria-label="Plus 10 seconds" (click)="add()">
+      +10
+    </ion-button>
+    <ion-button size="small" shape="round" class="skip" (click)="skip.emit()">
+      <ion-icon slot="start" name="play-skip-forward-outline" aria-hidden="true" />
       Skip
-    </button>
+    </ion-button>
   </div>
 </div>

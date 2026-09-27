@@ -26,6 +26,8 @@ export interface Post {
     firstName: string;
     lastName: string;
     avatarUrl: string | null;
+    /** How a profile is addressed (`/@<handle>`). Null when unset. */
+    handle?: string | null;
   } | null;
   /**
    * Populated by the cross-group feed (`GET /posts/feed`) so the FE can
@@ -48,6 +50,8 @@ export interface PostComment {
     firstName: string;
     lastName: string;
     avatarUrl: string | null;
+    /** How a profile is addressed (`/@<handle>`). Null when unset. */
+    handle?: string | null;
   } | null;
   /** Populated for top-level comments only (1-level nesting on the UI). */
   replies?: PostComment[];

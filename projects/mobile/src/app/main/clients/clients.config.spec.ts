@@ -11,31 +11,35 @@ import {
 
 import {
   CLIENT_ACTIONS,
-  CLIENT_FILTERS,
-  CLIENT_ICONS,
   ClientActionIds,
+  NOTES_COUNTER_FROM,
+  NOTES_MAX_LENGTH,
+  clientStatusTone,
+  clientSubline,
+  visibleClientActions,
+} from './clients.config';
+import {
+  CLIENT_FILTERS,
   ClientFilterIds,
+  MIN_SEARCH_LENGTH,
+  filterStatus,
+  matchesClientQuery,
+  matchesRosterQuery,
+} from './clients.filters';
+import { CLIENT_ICONS } from './clients.icons';
+import { inviteLink } from './invite.utils';
+import { daysBetween, receivedLabel, sentMetaLabel, splitPendingRows } from './requests.utils';
+import {
   adherenceLabel,
   attentionLabel,
   attentionStat,
   attentionTone,
-  clientStatusTone,
-  clientSubline,
-  daysBetween,
-  filterStatus,
-  inviteLink,
-  isValidEmail,
   lastActiveLabel,
   lastActiveShort,
-  matchesClientQuery,
   onTrackStat,
-  receivedLabel,
-  sentMetaLabel,
-  splitPendingRows,
   subtitleFor,
   triageNote,
-  visibleClientActions,
-} from './clients.config';
+} from './roster-labels';
 
 /** Every template in this feature, inlined at build time by Vite. */
 const templates = import.meta.glob('./**/*.html', {
@@ -232,10 +236,24 @@ describe('roster numbers', () => {
     });
   });
 
+  // The search box sits above both segments, so it has to narrow the roster
+  // too. Scoped to the directory, it opened on the landing segment, took
+  // what you typed and changed nothing.
+  it('searches a roster row by name and handle', () => {
+    expect(matchesRosterQuery(roster(), '  IONES ')).toBe(true);
+    expect(matchesRosterQuery(roster(), 'maria')).toBe(true);
+    expect(matchesRosterQuery(roster(), 'radu')).toBe(false);
+    expect(matchesRosterQuery(roster(), '   ')).toBe(true);
+    expect(matchesRosterQuery(roster({ handle: 'mio' }), 'MIO')).toBe(true);
+    expect(matchesRosterQuery(roster({ handle: null }), 'mio')).toBe(false);
+  });
+
   it('agrees the triage note with its numbers', () => {
-    expect(triageNote(3, 8)).toBe('3 of 8 clients need a look');
-    expect(triageNote(1, 8)).toBe('1 of 8 clients needs a look');
-    expect(triageNote(1, 1)).toBe('1 of 1 client needs a look');
+    // "active" qualifies the denominator: the segment above counts pending
+    // invitations too, so the bare noun made the two numbers look wrong.
+    expect(triageNote(3, 8)).toBe('3 of 8 active clients need a look');
+    expect(triageNote(1, 8)).toBe('1 of 8 active clients needs a look');
+    expect(triageNote(1, 1)).toBe('1 of 1 active client needs a look');
   });
 });
 
@@ -269,22 +287,43 @@ describe('All clients rows', () => {
 });
 
 describe('invite sheet', () => {
-  // Enough to catch a typo before the request; the BE is the real validator.
-  it('accepts an address and refuses what cannot be one', () => {
-    expect(isValidEmail('radu@example.com')).toBe(true);
-    expect(isValidEmail('  radu@example.com ')).toBe(true);
-    expect(isValidEmail('radu')).toBe(false);
-    expect(isValidEmail('radu@')).toBe(false);
-    expect(isValidEmail('radu@example')).toBe(false);
-    expect(isValidEmail('ra du@example.com')).toBe(false);
-    expect(isValidEmail('')).toBe(false);
-  });
+  // Address validation moved to core (`email.utils`), next to `client.utils`:
+  // the web invite dialog has to agree with this sheet about what a valid
+  // address is. Its cases live in `email.utils.spec.ts`.
 
   // The link must be the web app's signup page — inside the WebView,
   // `window.location.origin` is `capacitor://localhost` and goes nowhere.
   it('builds the invite link on the web signup address', () => {
     expect(inviteLink('abc123')).toBe(`${SIGNUP_URL}?token=abc123`);
     expect(inviteLink('a b/c')).toBe(`${SIGNUP_URL}?token=a%20b%2Fc`);
+  });
+});
+
+describe('search floor', () => {
+  // The API ignores a shorter term and answers with the unfiltered page,
+  // which is indistinguishable from a page of matches — a single `a` came
+  // back as the whole directory under a search box reading `a`. The floor
+  // here is what tells the store to hold the term back and narrow in memory
+  // instead, and it has to match the API's.
+  it('matches the minimum the API and the invite sheet both use', () => {
+    expect(MIN_SEARCH_LENGTH).toBe(2);
+  });
+});
+
+describe('client notes', () => {
+  // The counter is information only as a warning; from the first character
+  // it is noise about a limit nobody is near.
+  it('starts the counter inside the last tenth of the budget', () => {
+    expect(NOTES_COUNTER_FROM).toBe(1800);
+    expect(NOTES_COUNTER_FROM).toBeLessThan(NOTES_MAX_LENGTH);
+    expect(NOTES_COUNTER_FROM / NOTES_MAX_LENGTH).toBeCloseTo(0.9);
+  });
+
+  // The field's `maxlength` is this, and so is `UpdateClientDto`'s
+  // `@MaxLength` — a server limit above it turns the counter into
+  // decoration, one below it rejects a note the coach was told was fine.
+  it('caps a note where the DTO does', () => {
+    expect(NOTES_MAX_LENGTH).toBe(2000);
   });
 });
 

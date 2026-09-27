@@ -1,0 +1,12 @@
+<div class="gallery" [attr.data-count]="visible().length">
+  @for (url of visible(); track url; let i = $index, last = $last) {
+  <button type="button" class="cell" [attr.aria-label]="label(i)" (click)="open(i)">
+    <!-- `alt` is empty on purpose: the button already carries the label, and
+         a second announcement of the same thing is noise. -->
+    <img [src]="url" alt="" loading="lazy" />
+    @if (last && extra() > 0) {
+    <span class="more" aria-hidden="true">+{{ extra() }}</span>
+    }
+  </button>
+  }
+</div>

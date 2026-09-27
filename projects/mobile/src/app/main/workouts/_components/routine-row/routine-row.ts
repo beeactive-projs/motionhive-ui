@@ -1,7 +1,9 @@
 import { Component, computed, input, output } from '@angular/core';
-import { IonBadge, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 
 import { Routine, dayDividerLabel, localDayKey } from 'core';
+
+import { SpineTone, SpineTones } from '../../../../_shared/models/spine-tone.model';
 
 /**
  * One saved routine: the shared session-row geometry with the spine keyed to
@@ -13,14 +15,14 @@ import { Routine, dayDividerLabel, localDayKey } from 'core';
  */
 @Component({
   selector: 'mh-routine-row',
-  imports: [IonBadge, IonIcon, IonItem, IonLabel],
+  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote],
   templateUrl: './routine-row.html',
   styleUrl: './routine-row.scss',
 })
 export class RoutineRow {
   readonly routine = input.required<Routine>();
   /** Spine colour, rotated by list position — see `routineTone`. */
-  readonly tone = input('honey');
+  readonly tone = input<SpineTone>(SpineTones.Honey);
   /** Starters are runnable by anyone and owned by nobody. */
   readonly starter = input(false);
 

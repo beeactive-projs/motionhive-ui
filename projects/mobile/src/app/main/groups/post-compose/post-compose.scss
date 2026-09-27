@@ -1,0 +1,111 @@
+/* Where this is going. Quiet, but present — the composer is reachable from
+   two screens and "which group" is the one thing it must not leave ambiguous. */
+.destination {
+  margin: 0 0 0.75rem;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+.destination strong {
+  color: var(--ion-text-color);
+  font-weight: 600;
+}
+
+/* "Posts here are reviewed" — a note about what will happen, so the neutral
+   surface rather than a status wash. Nothing has gone wrong. */
+.review-note {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-card-background);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-tight);
+}
+
+.review-note ion-icon {
+  flex: none;
+  font-size: var(--mh-text-lg);
+}
+
+/* The writing surface carries no card chrome: the page is the composer, and
+   a bordered box inside a bordered page is one frame too many. */
+.body {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  font-size: var(--mh-text-md);
+  line-height: var(--mh-leading-body);
+}
+
+.thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.thumb {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--mh-radius-card);
+  overflow: hidden;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The remove target sits on the image, so it carries its own backdrop —
+   a bare glyph disappears against a light photo. */
+.drop {
+  position: absolute;
+  top: 0.25rem;
+  inset-inline-end: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--mh-radius-pill);
+  /* Legacy rgba(): a fixed scrim, not a theme colour — it sits on a photo,
+     not on the page surface. */
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+}
+
+.drop ion-icon {
+  font-size: var(--mh-text-base);
+}
+
+.drop:focus-visible {
+  outline: var(--mh-ring-width) solid var(--ion-color-primary);
+  outline-offset: var(--mh-ring-width);
+}
+
+.tools {
+  --padding-start: 0.5rem;
+  --padding-end: 1rem;
+}
+
+.counts {
+  display: flex;
+  gap: 0.75rem;
+  font-size: var(--mh-text-sm);
+}
+
+.counts .over {
+  color: var(--ion-color-danger);
+  font-weight: 600;
+}

@@ -8,55 +8,116 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading()) {
-    <p class="mh-state">Loading…</p>
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this workout"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="load()"
+    />
+  } @else if (showSkeleton()) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          <ion-skeleton-text [animated]="true" style="width: 45%; height: 0.75rem" />
+          <ion-skeleton-text [animated]="true" style="width: 65%; height: 1.25rem" />
+          <ion-skeleton-text [animated]="true" style="width: 40%" />
+        </ion-card-content>
+      </ion-card>
+      <ion-list [inset]="true" class="mh-card-list">
+        @for (_ of skeletonRows; track $index; let last = $last) {
+          <ion-item [lines]="last ? 'none' : 'full'">
+            <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 50%" /></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 25%" /></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
   } @else if (isEmptyPlan()) {
-    <p class="mh-state">This plan has no workouts in it yet.</p>
-  } @else if (failed() || !workout()) {
-    <p class="mh-state">Could not open this workout.</p>
-  } @else {
-    @if (workout(); as w) {
-      <div class="head">
-        @if (w.phase) {
-          <span class="mh-kicker phase">{{ w.phase }}</span>
-        }
-        <h1>{{ w.name }}</h1>
-        @if (position()) {
-          <span class="mh-kicker position">{{ position() }}</span>
-        }
-        @if (meta()) {
-          <p class="meta">{{ meta() }}</p>
-        }
-      </div>
+    <mh-empty-state
+      icon="barbell-outline"
+      heading="Nothing to do yet"
+      message="This plan has no workouts in it. Your coach may still be building it."
+    />
+  } @else if (workout(); as workout) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          @if (workout.phase) {
+            <span class="mh-kicker phase">{{ workout.phase }}</span>
+          }
+          <h2>{{ workout.name }}</h2>
+          @if (position()) {
+            <span class="mh-kicker position">{{ position() }}</span>
+          }
+          @if (meta()) {
+            <p class="meta">{{ meta() }}</p>
+          }
+        </ion-card-content>
+      </ion-card>
 
       <!-- Coach notes run long, so they open rather than push the exercise
            list off the first screen. -->
-      @if (w.notes) {
-        <button class="note" type="button" (click)="noteOpen.set(!noteOpen())">
-          <span class="mh-kicker">Note from your coach</span>
-          <ion-icon [name]="noteOpen() ? 'chevron-down-outline' : 'chevron-forward'" aria-hidden="true" />
-        </button>
-        @if (noteOpen()) {
-          <p class="note-body">{{ w.notes }}</p>
-        }
+      @if (workout.notes; as note) {
+        <ion-list [inset]="true" class="mh-card-list note">
+          <ion-item button detail="false" lines="none" (click)="toggleNote()">
+            <ion-label class="ion-text-wrap">
+              <span class="mh-kicker">Note from your coach</span>
+              @if (noteOpen()) {
+                <p>{{ note }}</p>
+              }
+            </ion-label>
+            <ion-icon
+              slot="end"
+              [name]="noteOpen() ? 'chevron-down-outline' : 'chevron-forward'"
+              color="medium"
+              aria-hidden="true"
+            />
+          </ion-item>
+        </ion-list>
       }
 
-      <h3 class="mh-section-label">Exercises</h3>
-      @for (exercise of w.exercises ?? []; track exercise.id) {
-        <div class="ex">
-          <span class="name">{{ exercise.exercise?.name }}</span>
-          <span class="sets">{{ (exercise.sets ?? []).length }} sets</span>
-        </div>
-      }
-    }
+      <section class="mh-section">
+        <span class="mh-kicker">Exercises</span>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (exercise of workout.exercises ?? []; track exercise.id; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'">
+              <!-- Decorative: the name it would announce is the very next thing in the row. -->
+              <mh-hex-avatar
+                slot="start"
+                size="md"
+                tone="wash"
+                aria-hidden="true"
+                [color]="tileTone(exercise)"
+                [icon]="tileIcon(exercise)"
+              />
+              <ion-label>
+                <h2>{{ exerciseName(exercise) }}</h2>
+                <p>{{ setsLabel(exercise) }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      </section>
+    </div>
   }
 </ion-content>
 
 @if (workout()) {
-  <div class="mh-cta-bar">
-    <ion-button expand="block" [disabled]="starting()" (click)="start()">
-      Start workout
-    </ion-button>
-    <button class="quiet" type="button" (click)="skip()">Skip today</button>
-  </div>
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <div class="mh-cta-bar">
+        <ion-button expand="block" [disabled]="starting()" (click)="start()">Start workout</ion-button>
+        <!-- Quiet: skipping keeps the day visible in history as skipped, and
+             it is a decision, not the thing we are asking for. -->
+        <ion-button expand="block" fill="clear" color="medium" size="small" (click)="skip()">
+          Skip today
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
 }

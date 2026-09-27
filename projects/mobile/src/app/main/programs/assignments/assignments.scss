@@ -1,22 +1,24 @@
-:host {
-  --mh-gutter: 1.25rem;
-}
-
-/* Geometry and spine tones come from the shared `.mh-session-row` skin. */
-ion-item {
-  margin-bottom: 0.5rem;
-}
-
-.sub {
-  margin: 0.25rem 0 0;
+/* "12-week strength block · 5 clients" — the line that says whose list this
+   is. A kicker, so it reads as a label on the list rather than a row of it. */
+.meta {
+  padding-inline: 0.875rem;
   color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  line-height: var(--mh-leading-body);
 }
 
-/* A clear ion-button inherits the honey *fill* colour, which is 2.05:1 on a
-   white card. Text wants the deep ink token — same rule as every other
-   amber label in the app. */
-ion-item ion-button {
-  --color: var(--mh-color-honey-deep);
+/* The loading twin of an assignment row: the card look without a spine, since
+   a placeholder should not claim a state it does not know yet. */
+.row-skeleton {
+  --background: var(--ion-card-background);
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: var(--mh-radius-card);
+}
+
+.row-skeleton mh-hex-avatar {
+  margin-inline-end: 0.875rem;
+}
+
+/* Room under the last row for the FAB. */
+.mh-page {
+  padding-bottom: 6rem;
 }

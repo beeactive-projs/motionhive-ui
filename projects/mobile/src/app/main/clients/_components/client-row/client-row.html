@@ -1,16 +1,23 @@
 <ion-item-sliding #sliding>
   @if (canMessage()) {
     <ion-item-options side="start">
-      <ion-item-option color="primary" aria-label="Message" (click)="emitAndClose(sliding, message)">
-        <ion-icon slot="icon-only" name="chatbubble-outline" />
+      <!-- Named, not just an icon: a coloured square is a guess, and one of
+           the trailing ones archives. -->
+      <ion-item-option color="primary" (click)="emitAndClose(sliding, message)">
+        <ion-icon slot="top" name="chatbubble-outline" aria-hidden="true" />
+        Message
       </ion-item-option>
     </ion-item-options>
   }
 
+  <!-- The chevron follows the tap, not the destination. Showing it only on
+       rows that open a profile left pending and invitation rows — which do go
+       somewhere, the Requests page — reading as inert. Where the tap lands is
+       said by the status badge beside the name. -->
   <ion-item
     lines="none"
     [button]="pressable()"
-    [detail]="openable()"
+    [detail]="pressable()"
     [class.archived]="isArchived()"
     (click)="onSelect()"
   >
@@ -35,14 +42,18 @@
       />
     }
 
-    <ion-label>
-      <div class="name-line">
-        <h2>{{ name() }}</h2>
+    <!-- The badge sits on the subline, not beside the name. Sharing the top
+         line with it cost an email-only invitation the end of its address —
+         `radu.testclient@motion…` — and for a row with no account behind it
+         the address IS the identity. -->
+    <ion-label [class.ion-text-wrap]="isEmailOnly()">
+      <h2>{{ name() }}</h2>
+      <div class="meta-line">
+        <p>{{ subline() }}</p>
         @if (statusTone(); as tone) {
           <ion-badge [attr.data-tone]="tone">{{ statusLabel() }}</ion-badge>
         }
       </div>
-      <p>{{ subline() }}</p>
     </ion-label>
   </ion-item>
 
@@ -51,27 +62,23 @@
          or withdraw, and notes is not worth committing blind. -->
     <ion-item-options side="end">
       @if (isActive()) {
-        <ion-item-option color="medium" aria-label="Notes" (click)="emitAndClose(sliding, notes)">
-          <ion-icon slot="icon-only" name="create-outline" />
+        <ion-item-option color="medium" (click)="emitAndClose(sliding, notes)">
+          <ion-icon slot="top" name="create-outline" aria-hidden="true" />
+          Notes
         </ion-item-option>
-        <ion-item-option color="danger" aria-label="Archive" (click)="emitAndClose(sliding, archive)">
-          <ion-icon slot="icon-only" name="archive-outline" />
+        <ion-item-option color="danger" (click)="emitAndClose(sliding, archive)">
+          <ion-icon slot="top" name="archive-outline" aria-hidden="true" />
+          Archive
         </ion-item-option>
       } @else if (isArchived()) {
-        <ion-item-option
-          color="success"
-          aria-label="Unarchive"
-          (click)="emitAndClose(sliding, unarchive)"
-        >
-          <ion-icon slot="icon-only" name="arrow-undo-outline" />
+        <ion-item-option color="success" (click)="emitAndClose(sliding, unarchive)">
+          <ion-icon slot="top" name="arrow-undo-outline" aria-hidden="true" />
+          Unarchive
         </ion-item-option>
       } @else {
-        <ion-item-option
-          color="danger"
-          aria-label="Withdraw invitation"
-          (click)="emitAndClose(sliding, withdraw)"
-        >
-          <ion-icon slot="icon-only" name="close-circle-outline" />
+        <ion-item-option color="danger" (click)="emitAndClose(sliding, withdraw)">
+          <ion-icon slot="top" name="close-circle-outline" aria-hidden="true" />
+          Withdraw
         </ion-item-option>
       }
     </ion-item-options>

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>{{ isNew() ? 'New routine' : (routine()?.name ?? 'Routine') }}</ion-title>
+    <ion-title>{{ title() }}</ion-title>
     @if (!readOnly()) {
       <ion-buttons slot="end">
         <ion-button [disabled]="!canSave() || saving()" (click)="save()">Save</ion-button>
@@ -13,16 +13,32 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading()) {
-    <p class="mh-state">Loading…</p>
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this routine"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="load()"
+    />
+  } @else if (showSkeleton()) {
+    <div class="mh-page">
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 3.5rem" />
+      @for (_ of skeletonCards; track $index) {
+        <ion-card>
+          <ion-card-content>
+            <ion-skeleton-text [animated]="true" style="width: 50%; height: 1rem" />
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 2.75rem" />
+          </ion-card-content>
+        </ion-card>
+      }
+    </div>
   } @else {
-    <!-- One padded wrapper rather than margins on each control: an ion-input
-         is 100% wide, so a margin pushed it past the screen edge. -->
-    <div class="pad">
+    <div class="mh-page">
       @if (readOnly()) {
-        <p class="starter-note">
+        <ion-note class="mh-note-block">
           A MotionHive starter. Start it and it becomes yours to edit.
-        </p>
+        </ion-note>
       } @else {
         <ion-input
           fill="outline"
@@ -33,108 +49,119 @@
           (ionInput)="name.set($any($event).detail.value ?? '')"
         />
       }
-    </div>
 
-    <h3 class="mh-section-label">
-      Exercises
-      @if (exercises().length) {
-        <span class="tally">{{ exercises().length }}</span>
-      }
-    </h3>
-
-    @for (row of exercises(); track row.key; let i = $index) {
-      <article class="ex-row">
-        <!-- Tapping the name opens the movement itself — you should be able to
-             check what an exercise is while building with it. -->
-        <button class="ex-name" type="button" (click)="openExercise(row)">
-          <span>{{ row.name }}</span>
-          <ion-icon name="chevron-forward" aria-hidden="true" />
-        </button>
+      <section class="mh-section">
+        <div class="mh-section-head">
+          <span class="mh-kicker">Exercises</span>
+          @if (exercises().length) {
+            <ion-note>{{ exercises().length }}</ion-note>
+          }
+        </div>
 
         @if (readOnly()) {
-          <p class="ex-meta">{{ row.sets }} {{ row.sets === 1 ? 'set' : 'sets' }}</p>
+          <!-- A starter is read, not edited: plain rows, each opening the movement. -->
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (row of exercises(); track row.key; let last = $last) {
+              <ion-item button [detail]="true" [lines]="last ? 'none' : 'full'" (click)="openExercise(row)">
+                <ion-label>
+                  <h2>{{ row.name }}</h2>
+                  <p>{{ setsLabel(row) }}</p>
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
         } @else {
-          <!-- What to aim for. Both optional: a routine that only names the
-               movements in order is still a useful routine. -->
-          <div class="targets">
-            <button
-              type="button"
-              class="target"
-              [class.active]="editing()?.index === i && editing()?.field === 'reps'"
-              [attr.aria-label]="'Target reps for ' + row.name"
-              (click)="editTarget(i, 'reps')"
-            >
-              <span class="mh-kicker">Reps</span>
-              <strong>{{ targetLabel(row, 'reps') }}</strong>
-            </button>
-            <button
-              type="button"
-              class="target"
-              [class.active]="editing()?.index === i && editing()?.field === 'weight'"
-              [attr.aria-label]="'Target weight for ' + row.name"
-              (click)="editTarget(i, 'weight')"
-            >
-              <span class="mh-kicker">Weight</span>
-              <strong>{{ targetLabel(row, 'weight') }}<em>kg</em></strong>
-            </button>
-          </div>
+          @for (row of exercises(); track row.key; let i = $index) {
+            <mh-exercise-card [name]="row.name" (open)="openExercise(row)">
+              <!-- What to aim for. Both optional: a routine that only names the
+                   movements in order is still a useful routine. The two cells
+                   share the logger's keypad, so entering a number is one
+                   learned gesture across the feature. -->
+              <div class="targets">
+                <button
+                  type="button"
+                  class="target"
+                  [class.active]="isEditing(i, Targets.Reps)"
+                  [attr.aria-label]="'Target reps for ' + row.name"
+                  (click)="editTarget(i, Targets.Reps)"
+                >
+                  <span class="mh-kicker">Reps</span>
+                  <strong>{{ targetLabel(row, Targets.Reps) }}</strong>
+                </button>
+                <button
+                  type="button"
+                  class="target"
+                  [class.active]="isEditing(i, Targets.Weight)"
+                  [attr.aria-label]="'Target weight for ' + row.name"
+                  (click)="editTarget(i, Targets.Weight)"
+                >
+                  <span class="mh-kicker">Weight</span>
+                  <strong>{{ targetLabel(row, Targets.Weight) }}<em>kg</em></strong>
+                </button>
+              </div>
 
-          <div class="ex-controls">
-            <div class="mh-stepper" role="group" [attr.aria-label]="'Sets for ' + row.name">
-              <button
-                type="button"
-                [disabled]="row.sets <= 1"
-                [attr.aria-label]="'One set fewer for ' + row.name"
-                (click)="setCount(i, -1)"
-              >
-                <ion-icon name="remove-outline" aria-hidden="true" />
-              </button>
+              <div class="controls">
+                <div class="mh-stepper" role="group" [attr.aria-label]="'Sets for ' + row.name">
+                  <ion-button
+                    fill="clear"
+                    [disabled]="row.sets <= 1"
+                    [attr.aria-label]="'One set fewer for ' + row.name"
+                    (click)="setCount(i, -1)"
+                  >
+                    <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
+                  </ion-button>
 
-              <!-- The number says what it is. "3" alone between two circles
-                   told the user nothing. -->
-              <span class="value" aria-live="polite">
-                {{ row.sets }} <em>{{ row.sets === 1 ? 'set' : 'sets' }}</em>
-              </span>
+                  <!-- The number says what it is. "3" alone between two circles
+                       told the user nothing. -->
+                  <span class="value" aria-live="polite">
+                    {{ row.sets }} <em>{{ row.sets === 1 ? 'set' : 'sets' }}</em>
+                  </span>
 
-              <button
-                type="button"
-                [attr.aria-label]="'One set more for ' + row.name"
-                (click)="setCount(i, 1)"
-              >
-                <ion-icon name="add-outline" aria-hidden="true" />
-              </button>
-            </div>
+                  <ion-button
+                    fill="clear"
+                    [attr.aria-label]="'One set more for ' + row.name"
+                    (click)="setCount(i, 1)"
+                  >
+                    <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
+                  </ion-button>
+                </div>
 
-            <button
-              class="ex-remove"
-              type="button"
-              [attr.aria-label]="'Remove ' + row.name"
-              (click)="remove(i)"
-            >
-              <ion-icon name="trash-outline" aria-hidden="true" />
-            </button>
-          </div>
+                <ion-button
+                  class="mh-remove"
+                  fill="outline"
+                  color="danger"
+                  [attr.aria-label]="'Remove ' + row.name"
+                  (click)="remove(i)"
+                >
+                  <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
+                </ion-button>
+              </div>
+            </mh-exercise-card>
+          }
+
+          @if (!exercises().length) {
+            <ion-note class="mh-note-block">No exercises yet — add the movements in the order you do them.</ion-note>
+          }
         }
-      </article>
-    }
+      </section>
 
-    @if (!exercises().length) {
-      <p class="mh-state">No exercises yet.</p>
-    }
+      @if (!readOnly()) {
+        <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="pickerOpen.set(true)">
+          <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+          Add exercises
+        </ion-button>
 
-    @if (!readOnly()) {
-      <button class="mh-add-dashed" type="button" (click)="pickerOpen.set(true)">
-        <ion-icon name="add-outline" aria-hidden="true" />
-        Add exercise
-      </button>
-
-      @if (!isNew()) {
-        <button class="delete" type="button" (click)="deleteOpen.set(true)">
-          <ion-icon name="trash-outline" aria-hidden="true" />
-          Delete routine
-        </button>
+        @if (!isNew()) {
+          <!-- Last, and the one row in red: the only thing here worth a second thought. -->
+          <ion-list [inset]="true" class="mh-card-list">
+            <ion-item button detail="false" lines="none" (click)="deleteOpen.set(true)">
+              <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
+              <ion-label color="danger">Delete routine…</ion-label>
+            </ion-item>
+          </ion-list>
+        }
       }
-    }
+    </div>
   }
 </ion-content>
 
@@ -148,12 +175,14 @@
       (dismiss)="editing.set(null)"
     />
   </ion-footer>
-} @else if (!isNew()) {
-  <div class="mh-cta-bar">
-    <ion-button expand="block" [disabled]="starting()" (click)="start()">
-      Start workout
-    </ion-button>
-  </div>
+} @else if (!isNew() && routine()) {
+  <ion-footer [translucent]="true">
+    <ion-toolbar>
+      <div class="mh-cta-bar">
+        <ion-button expand="block" [disabled]="starting()" (click)="start()">Start workout</ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
 }
 
 <mh-exercise-picker-sheet
@@ -167,7 +196,7 @@
 <mh-confirm-sheet
   [(open)]="deleteOpen"
   title="Delete routine"
-  [body]="'Delete ' + (routine()?.name ?? 'this routine') + '? Workouts already logged from it are kept.'"
+  [body]="deleteBody()"
   confirmLabel="Delete"
   cancelLabel="Keep it"
   tone="danger"

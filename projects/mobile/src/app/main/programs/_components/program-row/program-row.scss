@@ -1,31 +1,20 @@
-/* Geometry and spine tones come from the shared `.mh-session-row` skin
-   (theme/components/mh-session-row.css). Only the library-specific parts
-   live here. */
+/* Geometry, spine tones and the tags line come from the shared
+   `.mh-session-row` skin (theme/components/mh-session-row.css). Only the
+   library-specific parts live here. */
 
 :host {
   display: block;
   margin-bottom: 0.5rem;
 }
 
-.meta {
+/* A draft reads quieter across the board, not just in the spine. */
+ion-item[data-tone='muted'] h2 {
   color: var(--ion-color-medium);
-  font-size: var(--mh-text-xs);
-  font-weight: 500;
 }
 
+/* Who is on it, or when it was last touched — beside the chevron, on one line. */
 .trailing {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.who {
-  color: var(--ion-color-medium);
+  margin-inline-end: 0.375rem;
   font-size: var(--mh-text-xs);
   white-space: nowrap;
-}
-
-.trailing ion-icon {
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-base);
 }

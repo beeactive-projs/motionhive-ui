@@ -20,8 +20,15 @@ mh-hex-avatar {
   margin-inline-end: 0.875rem;
 }
 
-ion-label h2 {
+/* The name sits under the section's own heading, so it is an h3 — which
+   Ionic sizes at 0.875rem. The row's type is unchanged; only its level is.
+   Breaking anywhere is the lesser evil at the largest text sizes (see
+   attention-row). */
+ion-label h3 {
+  overflow-wrap: anywhere;
+  hyphens: auto;
   font-family: var(--ion-font-family);
+  font-size: var(--mh-text-md);
   font-weight: 600;
 }
 

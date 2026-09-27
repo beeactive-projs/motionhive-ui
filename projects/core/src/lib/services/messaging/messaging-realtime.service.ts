@@ -1,7 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy, inject, signal } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
+import { silentRequest } from '../../interceptors/silent-request.context';
 import { MessagingStreamEnvelope, MessagingStreamEvent } from '../../models/messaging';
 import { TokenService } from '../auth/token.service';
 
@@ -17,16 +19,23 @@ export type MessagingStreamStatus = 'idle' | 'connecting' | 'open' | 'closed';
 
 /**
  * MessagingRealtimeService — thin wrapper around the browser `EventSource`
- * pointed at `GET /messaging/stream?token=<jwt>`.
+ * pointed at `GET /messaging/stream?ticket=<jwt>`.
  *
  * Why not WebSockets: the BE deliberately ships SSE only (see
  * docs/plans/messaging-backend-plan.md §7). EventSource cannot set
- * headers, so the JWT goes in the query string — same token the REST
- * client uses, just delivered differently because of the browser API.
+ * headers, so something has to go in the query string.
+ *
+ * That something is NOT the access token. A URL is copied into access
+ * logs, proxy logs and browser history, and the access token is a
+ * two-hour key to the whole API — one logged line used to be enough to
+ * take an account over. So each connection first POSTs for a **stream
+ * ticket**: sixty seconds, and refused by every endpoint but this one.
+ * The POST carries the access token the proper way, in a header.
  *
  * Lifecycle:
- *   - `connect()` opens the stream. Idempotent; calling while already
- *     connected is a no-op.
+ *   - `connect()` fetches a ticket and opens the stream. Idempotent;
+ *     calling while connected — or while a ticket is in flight — is a
+ *     no-op, so a burst of calls cannot open two streams.
  *   - `disconnect()` closes it cleanly.
  *   - The browser auto-reconnects on transient drops and sends
  *     `Last-Event-ID` so the BE's in-process ring buffer can replay
@@ -42,8 +51,15 @@ const RECONNECT_BACKOFF_MS = 3_000;
 @Injectable({ providedIn: 'root' })
 export class MessagingRealtimeService implements OnDestroy {
   private readonly _tokens = inject(TokenService);
+  private readonly _http = inject(HttpClient);
 
   private source: EventSource | null = null;
+  /**
+   * A ticket request is in flight. `connect()` is called from several
+   * places (login, reconnect backoff, `online`), and without this a
+   * second call during that round trip would open a second stream.
+   */
+  private ticketPending = false;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   /**
    * Listener bound to `window.online` so we can wake the stream the
@@ -66,11 +82,13 @@ export class MessagingRealtimeService implements OnDestroy {
   }
 
   /**
-   * Open the SSE stream. The JWT is read at call time from TokenService
-   * — callers should call `connect()` AFTER auth has hydrated.
+   * Open the SSE stream. The access token is read at call time from
+   * TokenService — callers should call `connect()` AFTER auth has
+   * hydrated. Returns immediately; the stream opens once the ticket
+   * lands.
    */
   connect(): void {
-    if (this.source) return; // already connected
+    if (this.source || this.ticketPending) return; // already up, or on the way
 
     const token = this._tokens.getAccessToken();
     if (!token) {
@@ -90,12 +108,44 @@ export class MessagingRealtimeService implements OnDestroy {
       return;
     }
 
+    this._status.set('connecting');
+    this.ticketPending = true;
+
+    this._http
+      .post<{ ticket: string }>(
+        environment.apiUrl + API_ENDPOINTS.MESSAGING.STREAM_TICKET,
+        {},
+        // Nobody asked for this request — it is the stream reconnecting in
+        // the background. Left loud, a flaky connection would put a modal
+        // over whatever the user was doing, once every backoff.
+        { context: silentRequest() },
+      )
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.ticketPending = false;
+          // `disconnect()` may have run while the ticket was in flight.
+          if (this._status() === 'idle') return;
+          this.open(response.ticket);
+        },
+        error: () => {
+          this.ticketPending = false;
+          // Usually an expired access token. The auth interceptor
+          // refreshes it on the next REST call, so back off and retry
+          // rather than giving up on the stream for the session.
+          this._status.set('closed');
+          this.scheduleReconnect();
+        },
+      });
+  }
+
+  /** Ticket in hand — open the stream itself. */
+  private open(ticket: string): void {
     const url =
       environment.apiUrl +
       API_ENDPOINTS.MESSAGING.STREAM +
-      `?token=${encodeURIComponent(token)}`;
+      `?ticket=${encodeURIComponent(ticket)}`;
 
-    this._status.set('connecting');
     const es = new EventSource(url);
 
     es.addEventListener('open', () => {
@@ -119,12 +169,11 @@ export class MessagingRealtimeService implements OnDestroy {
 
     es.addEventListener('error', () => {
       // EventSource auto-retries transient errors. When the browser
-      // gives up (readyState=CLOSED) it's almost always because the
-      // baked-in JWT expired and the server keeps returning 401. We
+      // gives up (readyState=CLOSED) the connection is done for. We
       // throw the closed source away and reconnect after a small
-      // backoff, which re-reads the token from TokenService — by
-      // then the auth interceptor will have refreshed it via the
-      // next user-initiated REST call.
+      // backoff, which mints a fresh ticket — a ticket only has to
+      // outlive the handshake, so an old one being long expired by
+      // now is expected, not a failure.
       if (es.readyState === EventSource.CLOSED) {
         this._status.set('closed');
         this.scheduleReconnect();
@@ -137,10 +186,12 @@ export class MessagingRealtimeService implements OnDestroy {
   disconnect(): void {
     this.clearReconnectTimer();
     this.detachOnlineListener();
+    // Set first: an in-flight ticket request checks this on arrival and
+    // drops the ticket rather than opening a stream nobody asked for.
+    this._status.set('idle');
     if (!this.source) return;
     this.source.close();
     this.source = null;
-    this._status.set('idle');
   }
 
   /**

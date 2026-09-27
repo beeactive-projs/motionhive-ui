@@ -4,9 +4,17 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
+  IonFooter,
   IonHeader,
   IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonSkeletonText,
   IonTextarea,
   IonTitle,
   IonToolbar,
@@ -15,20 +23,18 @@ import {
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
-import { WorkoutLog, WorkoutLogService } from 'core';
+import { LoggedExercise, WorkoutLog, WorkoutLogService, WorkoutLogStatus } from 'core';
 
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
-import { WORKOUT_ICONS, workoutDuration } from '../workouts.config';
-
-/** The emoji scale, as a rating affordance rather than decorative copy. */
-const FEELINGS = [
-  { value: 1, glyph: '😣' },
-  { value: 2, glyph: '😕' },
-  { value: 3, glyph: '😐' },
-  { value: 4, glyph: '🙂' },
-  { value: 5, glyph: '💪' },
-];
+import {
+  FEELINGS,
+  WORKOUT_ICONS,
+  exerciseSetSummary,
+  workoutDuration,
+  workoutTiles,
+} from '../workouts.config';
 
 /**
  * Finish and summary.
@@ -43,12 +49,21 @@ const FEELINGS = [
 @Component({
   selector: 'mh-workout-finish',
   imports: [
+    EmptyState,
     IonBackButton,
     IonButton,
     IonButtons,
+    IonCard,
+    IonCardContent,
     IonContent,
+    IonFooter,
     IonHeader,
     IonInput,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
+    IonSkeletonText,
     IonTextarea,
     IonTitle,
     IonToolbar,
@@ -58,16 +73,17 @@ const FEELINGS = [
   styleUrl: './finish.scss',
 })
 export class Finish implements ViewWillEnter {
-  private readonly _logService = inject(WorkoutLogService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-  private readonly _feedback = inject(FeedbackService);
+  private readonly _feedbackService = inject(FeedbackService);
 
   readonly feelings = FEELINGS;
+  readonly skeletonTiles = [1, 2, 3];
 
   readonly log = signal<WorkoutLog | null>(null);
   readonly loading = signal(false);
-  readonly failed = signal(false);
+  readonly error = signal(false);
   readonly saving = signal(false);
 
   readonly feeling = signal<number | null>(null);
@@ -75,8 +91,11 @@ export class Finish implements ViewWillEnter {
   readonly routineName = signal('');
   readonly savingRoutine = signal(false);
 
+  readonly showSkeleton = computed(() => this.loading() && !this.log());
+  readonly showError = computed(() => this.error() && !this.log());
+
   /** Already finished — then this is a read-only look back, not a form. */
-  readonly isReview = computed(() => this.log()?.status === 'COMPLETED');
+  readonly isReview = computed(() => this.log()?.status === WorkoutLogStatus.Completed);
 
   /** A freestyle session is the one that can become a routine. */
   readonly canSaveAsRoutine = computed(() => {
@@ -90,39 +109,27 @@ export class Finish implements ViewWillEnter {
 
   /** Only the modalities the session actually contained get a tile. */
   readonly tiles = computed(() => {
-    const exercises = this.log()?.exercises ?? [];
-    const sets = exercises.flatMap((e) => e.sets ?? []).filter((s) => s.isCompleted);
-
-    const volume = sets.reduce(
-      (sum, s) => sum + (s.weightKg != null && s.reps != null ? s.weightKg * s.reps : 0),
-      0,
-    );
-    const bodyweightReps = sets
-      .filter((s) => s.weightKg == null && s.reps != null)
-      .reduce((sum, s) => sum + (s.reps ?? 0), 0);
-    const holdSeconds = sets.reduce((sum, s) => sum + (s.durationSeconds ?? 0), 0);
-    const distance = sets.reduce((sum, s) => sum + (s.distanceMeters ?? 0), 0);
-
-    const tiles: { label: string; value: string }[] = [
-      { label: 'Sets', value: String(sets.length) },
-    ];
-    if (volume > 0) tiles.push({ label: 'Volume', value: `${Math.round(volume)} kg` });
-    if (bodyweightReps > 0) tiles.push({ label: 'Reps', value: String(bodyweightReps) });
-    if (holdSeconds > 0) tiles.push({ label: 'Time', value: `${Math.round(holdSeconds / 60)} min` });
-    if (distance > 0) tiles.push({ label: 'Distance', value: `${distance} m` });
-    return tiles;
+    const log = this.log();
+    return log ? workoutTiles(log) : [];
   });
+
+  readonly exercises = computed<LoggedExercise[]>(() => this.log()?.exercises ?? []);
 
   constructor() {
     addIcons(WORKOUT_ICONS);
   }
 
   ionViewWillEnter(): void {
+    this.load();
+  }
+
+  load(): void {
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) return;
 
     this.loading.set(true);
-    this._logService
+    this.error.set(false);
+    this._workoutLogService
       .get(id)
       .pipe(take(1))
       .subscribe({
@@ -134,10 +141,14 @@ export class Finish implements ViewWillEnter {
           this.loading.set(false);
         },
         error: () => {
-          this.failed.set(true);
+          this.error.set(true);
           this.loading.set(false);
         },
       });
+  }
+
+  setSummary(exercise: LoggedExercise): string {
+    return exerciseSetSummary(exercise);
   }
 
   save(): void {
@@ -145,7 +156,7 @@ export class Finish implements ViewWillEnter {
     if (!log || this.saving()) return;
 
     this.saving.set(true);
-    this._logService
+    this._workoutLogService
       .complete(log.id, {
         feelingRating: this.feeling() ?? undefined,
         notes: this.note().trim() || undefined,
@@ -154,12 +165,12 @@ export class Finish implements ViewWillEnter {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          void this._feedback.success('Workout saved');
+          void this._feedbackService.success('Workout saved');
           void this._router.navigate(['/tabs/workouts']);
         },
         error: (err) => {
           this.saving.set(false);
-          void this._feedback.error(err, 'Could not save the workout');
+          void this._feedbackService.error(err, 'Could not save the workout');
         },
       });
   }
@@ -170,17 +181,17 @@ export class Finish implements ViewWillEnter {
     if (!log || !name || this.savingRoutine()) return;
 
     this.savingRoutine.set(true);
-    this._logService
+    this._workoutLogService
       .saveAsRoutine(log.id, { name })
       .pipe(take(1))
       .subscribe({
         next: () => {
           this.savingRoutine.set(false);
-          void this._feedback.success(`Saved "${name}"`);
+          void this._feedbackService.success(`Saved "${name}"`);
         },
         error: (err) => {
           this.savingRoutine.set(false);
-          void this._feedback.error(err, 'Could not save that routine');
+          void this._feedbackService.error(err, 'Could not save that routine');
         },
       });
   }

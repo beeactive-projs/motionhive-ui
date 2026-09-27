@@ -5,7 +5,11 @@ ion-chip {
 
 /* Quick-filter chips inside a `.mh-chip-row` strip (layout.css): the same
    idle/selected treatment as the filter sheets' chips — soft wash fill when
-   idle, solid navy when picked. */
+   idle, solid navy when picked.
+   A strip whose chips DO something uses `.mh-chip-row .chip` (ion-button.css)
+   instead: `ion-chip` renders a non-interactive element — no role, no tab
+   stop, and an `aria-pressed` that means nothing without one — so it can only
+   be a label. These rules stay for the labels. */
 .mh-chip-row ion-chip {
   flex: none;
   margin: 0;
@@ -15,7 +19,10 @@ ion-chip {
   --color: var(--ion-color-medium-wash-contrast);
 }
 
+/* Honey, matching `.mh-chip-row .chip.selected` in ion-button.css — the two
+   are one vocabulary, and selection is the brand colour everywhere else in
+   this app. Black on honey is 9.78:1. */
 .mh-chip-row ion-chip.selected {
-  --background: var(--ion-color-secondary);
-  --color: var(--ion-color-secondary-contrast);
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
 }

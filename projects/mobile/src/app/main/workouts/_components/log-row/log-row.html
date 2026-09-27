@@ -1,0 +1,39 @@
+<ion-item
+  class="mh-session-row mh-list-row"
+  button
+  detail="false"
+  lines="none"
+  [attr.data-tone]="tone()"
+  (click)="select.emit()"
+>
+  <div class="when" slot="start">
+    <span class="time">{{ rail().day }}</span>
+    <span class="duration">{{ rail().weekday }}</span>
+  </div>
+
+  <ion-label>
+    <h2>{{ log().name }}</h2>
+    <div class="tags">
+      @if (chip(); as chip) {
+        <ion-badge [attr.data-tone]="chip.tone">{{ chip.label }}</ion-badge>
+      }
+      @if (meta()) {
+        <ion-note>{{ meta() }}</ion-note>
+      }
+    </div>
+  </ion-label>
+
+  @if (repeatable()) {
+    <ion-button
+      slot="end"
+      fill="clear"
+      shape="round"
+      [attr.aria-label]="'Repeat ' + log().name"
+      (click)="onRepeat($event)"
+    >
+      <ion-icon slot="icon-only" name="refresh-outline" aria-hidden="true" />
+    </ion-button>
+  } @else {
+    <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+  }
+</ion-item>

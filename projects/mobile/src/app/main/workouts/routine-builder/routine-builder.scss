@@ -1,102 +1,11 @@
-:host {
-  --mh-gutter: 1.25rem;
-}
-
-/* Padding, not margins. An ion-input lays out at 100% width, so a margin adds
-   to it and pushes the control past the screen edge. */
-.pad {
-  padding: 1rem var(--mh-gutter) 0;
-}
-
-.starter-note {
-  margin: 0;
-  padding: 0.75rem 0.875rem;
-  border-radius: var(--mh-radius-card);
-  background: var(--ion-color-primary-wash);
-  color: var(--ion-color-primary-wash-contrast);
-  font-size: var(--mh-text-sm);
-}
-
-.mh-section-label .tally {
-  margin-inline-start: 0.375rem;
-  color: var(--ion-color-medium);
-}
-
-/* ─── Exercise row ────────────────────────────────────────────────
-   Two lines: what the movement is, then what you are prescribing of it.
-   One line could not carry a long catalog name plus a labelled stepper
-   without truncating the name to nothing. */
-.ex-row {
-  margin: 0 var(--mh-gutter) 0.5rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-card);
-  background: var(--ion-card-background);
-}
-
-.ex-name {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ion-text-color);
-  font-size: var(--mh-text-base);
-  font-weight: 600;
-  line-height: var(--mh-leading-tight);
-  text-align: start;
-  cursor: pointer;
-}
-
-.ex-name span {
-  flex: 1;
-  min-width: 0;
-}
-
-.ex-name ion-icon {
-  flex: none;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-base);
-}
-
-.ex-meta {
-  margin: 0.375rem 0 0;
-  color: var(--ion-color-medium);
-  font-size: var(--mh-text-sm);
-}
-
-.ex-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.625rem;
-}
-
-.ex-remove {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: var(--mh-tap-target);
-  height: var(--mh-tap-target);
-  padding: 0;
-  border: 1px solid var(--ion-border-color);
-  border-radius: var(--mh-radius-control);
-  background: var(--ion-card-background);
-  color: var(--ion-color-danger);
-  cursor: pointer;
-}
-
 /* ─── Targets ─────────────────────────────────────────────────────
-   Optional, so they read as quiet fields rather than required inputs, and
-   they share the logger's keypad so entering a number is one learned
-   gesture across the feature. */
+   Two cells of the same grid the logger's set rows use — plain buttons on
+   theme tokens, sized for a thumb, so a target is entered with the same
+   gesture as an actual. Optional, so they read as quiet fields rather than
+   required inputs. */
 .targets {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.625rem;
 }
 
 .target {
@@ -116,7 +25,7 @@
 
 .target.active {
   border-color: var(--mh-color-honey-deep);
-  box-shadow: 0 0 0 var(--mh-ring-width, 2px) var(--mh-color-selected-background);
+  box-shadow: 0 0 0 var(--mh-ring-width) var(--mh-color-selected-background);
 }
 
 .target .mh-kicker {
@@ -137,19 +46,14 @@
   font-weight: 500;
 }
 
-.delete {
+/* The sets stepper and the remove control on one line under the targets. */
+.controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  width: calc(100% - 2 * var(--mh-gutter));
-  margin: 0 var(--mh-gutter) 1.5rem;
-  padding: 0.75rem;
-  border: 0;
-  border-radius: var(--mh-radius-card);
-  background: none;
-  color: var(--ion-color-danger);
-  font-size: var(--mh-text-sm);
-  font-weight: 600;
-  cursor: pointer;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+ion-card ion-skeleton-text {
+  margin: 0.375rem 0;
 }

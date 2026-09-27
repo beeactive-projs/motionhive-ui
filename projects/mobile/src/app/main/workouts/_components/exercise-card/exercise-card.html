@@ -1,0 +1,31 @@
+<ion-card>
+  <!-- The name is the way into the movement itself: mid-session, or while
+       building, you often need to check what an exercise actually is. -->
+  <ion-item button detail="false" lines="none" (click)="open.emit()">
+    <ion-label>
+      <h2>{{ name() }}</h2>
+      @if (meta(); as text) {
+        <p>{{ text }}</p>
+      }
+    </ion-label>
+
+    @if (showActions()) {
+      <ion-button
+        slot="end"
+        fill="clear"
+        shape="round"
+        color="medium"
+        [attr.aria-label]="'Actions for ' + name()"
+        (click)="onActions($event)"
+      >
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />
+      </ion-button>
+    } @else {
+      <ion-icon slot="end" name="chevron-forward" color="medium" aria-hidden="true" />
+    }
+  </ion-item>
+
+  <ion-card-content>
+    <ng-content />
+  </ion-card-content>
+</ion-card>

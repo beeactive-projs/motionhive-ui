@@ -1,0 +1,11 @@
+/* The bottom tab bar.
+
+   Honey as ink, not as fill — the same rule the segment and the clear button
+   on a card follow. Ionic paints the selected tab in `--ion-color-primary`,
+   which is 2.05:1 on white at 12px; `--mh-color-honey-deep` is the sanctioned
+   ink form and flips with the palette, so the active tab clears AA in both.
+   The icon takes it too: at tab-bar size the glyph is the label's twin, and a
+   honey icon over a deep-amber word reads as two different states. */
+ion-tab-bar {
+  --color-selected: var(--mh-color-honey-deep);
+}

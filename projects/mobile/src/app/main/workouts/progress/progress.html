@@ -8,20 +8,25 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading() && !overview()) {
-    <div class="tiles">
-      @for (row of skeletonRows; track row) {
-        <div class="s-tile"><ion-skeleton-text [animated]="true" /></div>
-      }
-    </div>
-  } @else if (failed()) {
+  @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Could not load progress"
+      heading="Couldn't load your progress"
       message="Check your connection and try again."
-      actionLabel="Retry"
+      actionLabel="Try again"
       (action)="load()"
     />
+  } @else if (showSkeleton()) {
+    <div class="mh-page">
+      <section class="mh-section">
+        <span class="mh-kicker">Last 12 weeks</span>
+        <div class="mh-tiles">
+          @for (_ of skeletonTiles; track $index) {
+            <mh-stat-tile label="" value="" [loading]="true" />
+          }
+        </div>
+      </section>
+    </div>
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="trending-up-outline"
@@ -29,22 +34,31 @@
       message="Log a few workouts and your numbers will build up here."
     />
   } @else {
-    <p class="range mh-kicker">Last 12 weeks</p>
+    <div class="mh-page">
+      <section class="mh-section">
+        <span class="mh-kicker">Last 12 weeks</span>
+        <div class="mh-tiles">
+          @for (tile of tiles(); track tile.label) {
+            <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+          }
+        </div>
+      </section>
 
-    <div class="tiles">
-      @for (tile of tiles(); track tile.label) {
-        <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+      @if (records().length) {
+        <section class="mh-section">
+          <span class="mh-kicker">Records</span>
+          <ion-list [inset]="true" class="mh-card-list">
+            @for (record of records(); track record.exerciseId; let last = $last) {
+              <ion-item [lines]="last ? 'none' : 'full'">
+                <ion-label>
+                  <h2>{{ record.exerciseName }}</h2>
+                </ion-label>
+                <ion-note slot="end" class="value">{{ record.weightKg }} kg</ion-note>
+              </ion-item>
+            }
+          </ion-list>
+        </section>
       }
     </div>
-
-    @if (overview()?.records?.length) {
-      <h3 class="mh-section-label">Records</h3>
-      @for (record of overview()?.records ?? []; track record.exerciseId) {
-        <div class="record">
-          <span class="name">{{ record.exerciseName }}</span>
-          <span class="value">{{ record.weightKg }} kg</span>
-        </div>
-      }
-    }
   }
 </ion-content>

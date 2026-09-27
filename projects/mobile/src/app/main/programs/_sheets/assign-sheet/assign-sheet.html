@@ -1,21 +1,26 @@
 <ng-template #body>
-  @if (program(); as p) {
-    <div class="head">
-      <h3>{{ p.name }}</h3>
-    </div>
+  @if (program(); as program) {
+    <div class="mh-section-label">Program</div>
+    <ion-list [inset]="true" class="mh-card-list">
+      <ion-item lines="none">
+        <ion-label>
+          <h2>{{ program.name }}</h2>
+        </ion-label>
+      </ion-item>
+    </ion-list>
   }
 
   <div class="mh-section-label">Client</div>
   @if (loading()) {
-    <p class="note">Loading your clients…</p>
+    <ion-note class="mh-note-block">Loading your clients…</ion-note>
   } @else if (!clients().length) {
-    <p class="note">
+    <ion-note class="mh-note-block">
       No active clients yet. A client has to accept before they can be given work.
-    </p>
+    </ion-note>
   } @else {
     <ion-list [inset]="true" class="mh-card-list">
-      @for (row of clients(); track row.clientId) {
-        <ion-item button [detail]="false" (click)="clientId.set(row.clientId)">
+      @for (row of clients(); track row.clientId; let last = $last) {
+        <ion-item button [detail]="false" [lines]="last ? 'none' : 'full'" (click)="clientId.set(row.clientId)">
           <mh-hex-avatar
             slot="start"
             size="sm"
@@ -34,36 +39,49 @@
   }
 
   <div class="mh-section-label">Starts</div>
-  <div class="date">
-    <input
-      type="date"
-      [value]="startDate()"
-      (input)="startDate.set($any($event.target).value)"
-      [attr.aria-label]="'Start date'"
-    />
-  </div>
+  <ion-list [inset]="true" class="mh-card-list">
+    <ion-item lines="none">
+      <ion-label>Start date</ion-label>
+      <ion-datetime-button slot="end" datetime="assign-start-date" />
+    </ion-item>
+  </ion-list>
+
+  <!-- Detached: `ion-modal` relocates itself when it presents, so it cannot
+       live inside the row it belongs to. Same as the session form's pickers. -->
+  <ion-modal class="mh-picker-modal" [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="assign-start-date"
+        presentation="date"
+        [showDefaultButtons]="true"
+        [value]="startDate()"
+        (ionChange)="onStartChange($event.detail.value)"
+      />
+    </ng-template>
+  </ion-modal>
 
   <!-- The real work of this sheet: which day lands on which date. A plan that
        puts Day 1 on a Saturday is caught here, not in chat on Wednesday. -->
   @if (preview().length) {
     <div class="mh-section-label">Schedule</div>
-    <div class="preview">
-      @for (row of previewHead(); track row.name + row.date) {
-        <div class="p-row">
-          <span class="p-week mh-kicker">W{{ row.weekIndex + 1 }}</span>
-          <span class="p-name">{{ row.name }}</span>
-          <span class="p-date">{{ row.date }}</span>
-        </div>
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (row of previewHead(); track row.name + row.date; let last = $last) {
+        <ion-item [lines]="last && !previewMore() ? 'none' : 'full'">
+          <ion-note slot="start" class="mh-kicker week">{{ row.week }}</ion-note>
+          <ion-label>{{ row.name }}</ion-label>
+          <ion-note slot="end">{{ row.date }}</ion-note>
+        </ion-item>
       }
       @if (previewMore()) {
-        <p class="p-more">+ {{ previewMore() }} more</p>
+        <ion-item lines="none">
+          <ion-note class="more">+ {{ previewMore() }} more</ion-note>
+        </ion-item>
       }
-    </div>
+    </ion-list>
   }
 
   <div class="mh-section-label">Note</div>
   <ion-textarea
-    class="note-field"
     fill="outline"
     [autoGrow]="true"
     placeholder="Anything they should know before starting."

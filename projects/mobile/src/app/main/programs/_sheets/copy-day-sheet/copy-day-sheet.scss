@@ -1,0 +1,35 @@
+/* The row's sub-line, naming what a copy would cost on that week. */
+ion-item ion-label p {
+  margin: 0.125rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+}
+
+/* What is about to be overwritten, once something is selected. A warning
+   about a consequence the coach is choosing, not an error — so the warning
+   wash rather than danger. */
+.replace-warning {
+  display: block;
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--mh-radius-card);
+  background: var(--ion-color-warning-wash);
+  color: var(--ion-color-warning-wash-contrast);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+/* The "land it on" picker, shown only for a single-week copy. */
+.target-day {
+  margin-top: 0.75rem;
+}
+
+.target-day .label {
+  margin: 0 0 0.375rem;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+  text-transform: uppercase;
+}

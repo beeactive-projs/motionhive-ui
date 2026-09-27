@@ -5,7 +5,6 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonFab,
   IonFabButton,
@@ -36,6 +35,7 @@ import {
   clientDisplayName,
   isIncomingRequest,
   isOpenableClient,
+  isSentInvite,
 } from 'core';
 
 import { ConfirmSheet } from '../../_shared/components/confirm-sheet/confirm-sheet';
@@ -53,12 +53,14 @@ import { ClientNotesSheet } from './_sheets/client-notes-sheet/client-notes-shee
 import { InviteClientSheet } from './_sheets/invite-client-sheet/invite-client-sheet';
 import {
   CLIENT_FILTERS,
-  CLIENT_ICONS,
   ClientFilterId,
+  ClientFilterIds,
   ClientsSegments,
-  triageNote,
-} from './clients.config';
+  MIN_SEARCH_LENGTH,
+} from './clients.filters';
+import { CLIENT_ICONS } from './clients.icons';
 import { ClientsStore } from './clients.store';
+import { triageNote } from './roster-labels';
 
 /**
  * The coach's Clients tab: triage first, everyone second.
@@ -81,7 +83,6 @@ import { ClientsStore } from './clients.store';
     IonBadge,
     IonButton,
     IonButtons,
-    IonChip,
     IonContent,
     IonFab,
     IonFabButton,
@@ -118,13 +119,19 @@ export class Clients implements ViewWillEnter {
   private readonly _openDirectMessage = injectOpenDirectMessage();
 
   readonly Segments = ClientsSegments;
+  readonly Filters = ClientFilterIds;
   readonly filters = CLIENT_FILTERS;
+  readonly minSearchLength = MIN_SEARCH_LENGTH;
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
   /**
    * Search owns the whole toolbar while it is open — a title, three actions,
    * a segment and a chip row do not fit above the fold on a phone. Same
-   * treatment as the inbox and the agenda. Only the directory is searchable.
+   * treatment as the inbox and the agenda.
+   *
+   * It narrows both lenses. The box sits above the segment, so scoping it to
+   * the directory made it dead on the landing segment: it opened, took what
+   * you typed, and changed nothing.
    */
   readonly searchOpen = signal(false);
 
@@ -157,13 +164,21 @@ export class Clients implements ViewWillEnter {
 
   readonly isAttention = computed(() => this.store.segment() === ClientsSegments.Attention);
 
-  /** "3 of 8 clients need a look" — beside the This week kicker. */
+  /**
+   * "3 of 8 clients need a look" — beside the This week kicker, and only
+   * when the whole roster is on screen. It counts the roster, not the rows
+   * below it, so leaving it up during a search would describe a set the
+   * coach can no longer see.
+   */
   readonly triageNote = computed(() =>
-    triageNote(this.store.attentionCount(), this.store.rosterTotal()),
+    this.store.query()
+      ? ''
+      : triageNote(this.store.attentionCount(), this.store.rosterTotal()),
   );
 
+  /** Counts what is under it, so it still adds up while a search narrows. */
   readonly onTrackNote = computed(() => {
-    const count = this.store.onTrackClients().length;
+    const count = this.store.visibleOnTrackClients().length;
     return `${count} ${count === 1 ? 'client' : 'clients'}`;
   });
 
@@ -173,20 +188,60 @@ export class Clients implements ViewWillEnter {
     return count > 0 ? `Requests, ${count} pending` : 'Requests';
   });
 
+  /**
+   * What the open search is actually searching.
+   *
+   * The box takes the whole toolbar while it is open, so the segment and the
+   * chip row go with it — and with them any way to see, or change, whether
+   * you are searching the triage or the directory and with which status on. A
+   * search run with "Archived" selected looks exactly like your whole client
+   * list. This line keeps the scope on screen, and the chip clearable.
+   */
+  readonly searchScope = computed(() => {
+    const lens = this.isAttention() ? 'Needs attention' : 'All clients';
+    const chip = this.filters.find((filter) => filter.id === this.store.filter());
+    return chip && chip.id !== ClientFilterIds.All ? `${lens} · ${chip.label}` : lens;
+  });
+
+  /**
+   * The floor is only worth saying where it bites. On the triage it does not:
+   * the roster is one unpaged response, so a single character narrows it
+   * completely and correctly. Same shape as the invite sheet's people search.
+   */
+  readonly showSearchHint = computed(() => this.store.queryTooShort() && !this.isAttention());
+
+  /**
+   * What a screen reader is told once a search or a filter settles. Nothing
+   * is on screen to say it otherwise: the list simply becomes shorter.
+   *
+   * Empty while a term is still on its way — announcing "3 clients" over a
+   * list about to be replaced is worse than saying nothing — and empty when
+   * nothing is narrowing, where the count is just the page's own length.
+   */
+  readonly resultAnnouncement = computed(() => {
+    const narrowing = !!this.store.query().trim() || this.store.filter() !== ClientFilterIds.All;
+    if (!narrowing || !this.store.searchSettled() || this.store.showSkeleton()) return '';
+
+    const count = this.store.visibleCount();
+    if (count === 0) return 'No clients match that.';
+    return `${count} ${count === 1 ? 'client' : 'clients'}.`;
+  });
+
   constructor() {
     addIcons(CLIENT_ICONS);
   }
 
   // Not ngOnInit: Ionic keeps the page alive in the tab stack. An invite, an
   // accepted request or an archive elsewhere changes this list, so entering
-  // always refetches — silently, since rows already on screen stay put.
+  // refetches — quietly, since rows already on screen stay put. `reenter`
+  // holds that back for a few seconds, so stepping into a client and straight
+  // back out does not re-fire both lenses and the count for data seconds old.
   ionViewWillEnter(): void {
-    this.store.refresh();
+    this.store.reenter();
   }
 
   setSegment(value: string | number | undefined): void {
     if (value !== ClientsSegments.Attention && value !== ClientsSegments.All) return;
-    if (value === ClientsSegments.Attention) this.closeSearch();
     this.store.setSegment(value);
   }
 
@@ -200,15 +255,20 @@ export class Clients implements ViewWillEnter {
 
   closeSearch(): void {
     this.searchOpen.set(false);
-    this.store.query.set('');
+    this.store.setQuery('');
   }
 
   onQuery(value: string): void {
-    this.store.query.set(value);
+    this.store.setQuery(value);
   }
 
+  /**
+   * Drops the chip and the search together. Closes the box directly
+   * rather than via `closeSearch`, so clearing both does not fire one
+   * request for the emptied term and a second for the reset chip.
+   */
   clearFilters(): void {
-    this.closeSearch();
+    this.searchOpen.set(false);
     this.store.clearFilters();
   }
 
@@ -221,16 +281,18 @@ export class Clients implements ViewWillEnter {
   }
 
   /**
-   * A relationship row opens the profile. An incoming request has no profile
-   * yet — the decision it needs lives on the Requests page, so that is where
-   * the tap goes. Everything else (sent invites) is inert.
+   * A relationship row opens the profile. A pending one has no profile yet,
+   * in either direction — an incoming request needs a decision and a sent
+   * invitation can be resent or withdrawn, and both of those live on the
+   * Requests page, so that is where the tap goes. A row that did nothing at
+   * all on tap just read as broken.
    */
   open(client: InstructorClient): void {
     if (isOpenableClient(client)) {
       void this._router.navigate(['/tabs/clients', client.clientId]);
       return;
     }
-    if (isIncomingRequest(client)) {
+    if (isIncomingRequest(client) || isSentInvite(client)) {
       void this._router.navigateByUrl('/tabs/clients/requests');
     }
   }
@@ -240,6 +302,9 @@ export class Clients implements ViewWillEnter {
   }
 
   // ── Row verbs ────────────────────────────────────────────────────────────
+  // Every store verb below is already cancelled with this page — the store is
+  // provided here and pipes `takeUntilDestroyed` on its own destroy ref — so
+  // none of these handlers can run against a view that is gone.
 
   /** Reopens the existing thread, or the draft chat if there is none yet. */
   message(client: InstructorClient): void {
@@ -326,6 +391,18 @@ export class Clients implements ViewWillEnter {
     });
   }
 
+  /**
+   * A refresh that fails leaves the rows that were already there, which is
+   * right — but silently, they read as fresh. The stale bar above the list
+   * says so and offers the retry, and it stays put until a load succeeds.
+   *
+   * No toast on top of it. A pull with no connection fails the roster, the
+   * list and the request count at once, which is how one gesture produced a
+   * blocking alert, a toast and the bar — the same news three times, two of
+   * them transient. The loads are `silentRequest()` now (the alert), and the
+   * bar is the one that survives long enough to be acted on (the toast).
+   * Toasts stay for the writes below, where there is nothing else to show.
+   */
   onRefresh(event: RefresherCustomEvent): void {
     this.store.refresh(() => void event.target.complete());
   }

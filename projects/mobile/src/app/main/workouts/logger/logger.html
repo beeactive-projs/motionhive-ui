@@ -5,11 +5,8 @@
     </ion-buttons>
     <ion-title>{{ store.log()?.name ?? 'Workout' }}</ion-title>
     <ion-buttons slot="end">
-      <span class="progress">{{ store.progress().done }}/{{ store.progress().total }}</span>
-      <ion-button
-        [attr.aria-label]="'Discard workout'"
-        (click)="discardConfirmOpen.set(true)"
-      >
+      <ion-note class="progress">{{ store.progress().done }}/{{ store.progress().total }}</ion-note>
+      <ion-button aria-label="Discard workout" (click)="discardConfirmOpen.set(true)">
         <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
@@ -17,109 +14,103 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (store.loading()) {
-    <p class="mh-state">Loading…</p>
-  } @else if (store.failed()) {
-    <p class="mh-state">Could not open this workout.</p>
+  @if (store.showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this workout"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (store.showSkeleton()) {
+    <!-- Mirrors the card shape so nothing shifts when the grid lands. -->
+    <div class="mh-page">
+      @for (_ of skeletonCards; track $index) {
+        <ion-card>
+          <ion-card-content>
+            <ion-skeleton-text [animated]="true" style="width: 50%; height: 1rem" />
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 2.75rem" />
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 2.75rem" />
+            <ion-skeleton-text [animated]="true" style="width: 100%; height: 2.75rem" />
+          </ion-card-content>
+        </ion-card>
+      }
+    </div>
   } @else {
-    @for (exercise of store.exercises(); track exercise.id) {
-      <section class="exercise" [class.skipped]="exercise.isSkipped">
-        <header>
-          <!-- Mid-session you often need to check what the movement actually
-               is. Pushed onto this stack, so the workout stays live behind. -->
-          <button class="ex-open" type="button" (click)="openExercise(exercise)">
-            <h2>{{ exercise.exerciseNameSnapshot }}</h2>
-            <ion-icon name="chevron-forward" aria-hidden="true" />
-          </button>
-          <button
-            class="verbs"
-            type="button"
-            [attr.aria-label]="'Actions for ' + exercise.exerciseNameSnapshot"
-            (click)="openActions(exercise)"
-          >
-            <ion-icon name="ellipsis-horizontal" aria-hidden="true" />
-          </button>
-        </header>
+    <div class="mh-page">
+      @for (exercise of store.exercises(); track exercise.id) {
+        <mh-exercise-card
+          [name]="exercise.exerciseNameSnapshot"
+          [meta]="setsLabel(exercise)"
+          [skipped]="exercise.isSkipped"
+          [showActions]="true"
+          (open)="openExercise(exercise)"
+          (actions)="openActions(exercise)"
+        >
+          @if (!exercise.isSkipped) {
+            <!-- Column labels, once per exercise — the set rows stay wordless. -->
+            <div class="grid-head">
+              <span class="num">Set</span>
+              <span class="prev">Prev</span>
+              @for (column of columnsFor(exercise); track column) {
+                <span class="col">{{ column }}</span>
+              }
+              <span class="tick-head"></span>
+            </div>
 
-        @if (!exercise.isSkipped) {
-          <div class="grid-head">
-            <span class="num">Set</span>
-            <span class="prev">Prev</span>
-            @for (column of columnsFor(exercise); track column) {
-              <span class="col">{{ column }}</span>
+            @for (set of exercise.sets ?? []; track set.id; let i = $index) {
+              <mh-set-row
+                [set]="set"
+                [index]="i"
+                [kind]="exercise.exercise?.kind ?? null"
+                [unilateral]="isUnilateral(exercise)"
+                [showAddedWeight]="hasAddedWeight(exercise)"
+                [previous]="previousFor(exercise, i)"
+                [editing]="editingFieldFor(set.id)"
+                (toggle)="toggleSet(exercise, set)"
+                (edit)="editCell(exercise, set, $event)"
+              />
             }
-            <span class="tick-head"></span>
-          </div>
 
-          @for (set of exercise.sets ?? []; track set.id; let i = $index) {
-            <mh-set-row
-              [set]="set"
-              [index]="i"
-              [kind]="exercise.exercise?.kind ?? null"
-              [unilateral]="isUnilateral(exercise)"
-              [showAddedWeight]="hasAddedWeight(exercise)"
-              [previous]="previousFor(exercise, i)"
-              [editing]="editingFieldFor(set.id)"
-              (toggle)="toggleSet(exercise, set)"
-              (edit)="editCell(exercise, set, $event)"
-            />
+            <div class="ex-actions">
+              <ion-button fill="clear" size="small" (click)="addSet(exercise)">
+                <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                Add set
+              </ion-button>
+
+              <!-- Weighted pull-ups and dips still deserve a volume number, and
+                   push-ups still deserve not to be asked. -->
+              @if (canAddWeight(exercise)) {
+                <ion-button fill="clear" size="small" (click)="addWeight(exercise)">
+                  <ion-icon slot="start" name="add-outline" aria-hidden="true" />
+                  Add weight
+                </ion-button>
+              }
+            </div>
           }
+        </mh-exercise-card>
+      }
 
-          <div class="ex-actions">
-            <button class="add-set" type="button" (click)="addSet(exercise)">
-              <ion-icon name="add-outline" aria-hidden="true" />
-              Add set
-            </button>
-
-            <!-- Weighted pull-ups and dips still deserve a volume number, and
-                 push-ups still deserve not to be asked. -->
-            @if (canAddWeight(exercise)) {
-              <button class="add-weight" type="button" (click)="addWeight(exercise)">
-                <ion-icon name="add-outline" aria-hidden="true" />
-                Add weight
-              </button>
-            }
-          </div>
-        }
-      </section>
-    }
-
-    @if (store.exercises().length) {
-      <button class="mh-add-dashed" type="button" (click)="addExercise()">
-        <ion-icon name="add-outline" aria-hidden="true" />
-        Add exercise
-      </button>
-    } @else {
-      <!-- An empty workout is the freestyle on-ramp: the whole screen is one
-           instruction and one button, because there is nothing else to do
-           here yet. -->
-      <section class="blank">
-        <h2>Add your first exercise</h2>
-        <p>Pick the movements as you go — nothing has to be planned up front.</p>
-        <ion-button expand="block" (click)="addExercise()">
+      @if (store.exercises().length) {
+        <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="addExercise()">
           <ion-icon slot="start" name="add-outline" aria-hidden="true" />
           Add exercise
         </ion-button>
-      </section>
-    }
+      } @else {
+        <!-- An empty workout is the freestyle on-ramp: the whole screen is one
+             instruction and one button, because there is nothing else to do
+             here yet. -->
+        <mh-empty-state
+          icon="barbell-outline"
+          heading="Add your first exercise"
+          message="Pick the movements as you go — nothing has to be planned up front."
+          actionLabel="Add exercise"
+          (action)="addExercise()"
+        />
+      }
+    </div>
   }
 </ion-content>
-
-<mh-exercise-actions-sheet
-  [(open)]="actionsOpen"
-  [exercise]="actionsFor()"
-  (action)="onAction($event)"
-/>
-
-<mh-exercise-picker-sheet
-  [(open)]="pickerOpen"
-  [title]="pickerTitle()"
-  [context]="pickerContext()"
-  [confirmVerb]="swapTarget() ? 'Swap for' : 'Add'"
-  [single]="swapTarget() !== null"
-  [alreadyAdded]="addedIds()"
-  (picked)="onPicked($event)"
-/>
 
 <!-- One slot, three states: the keypad while a cell is open, the rest timer
      while resting, and nothing otherwise. Both dock so the grid above stays
@@ -143,6 +134,22 @@
   }
 </ion-footer>
 
+<mh-exercise-actions-sheet
+  [(open)]="actionsOpen"
+  [exercise]="actionsFor()"
+  (action)="onAction($event)"
+/>
+
+<mh-exercise-picker-sheet
+  [(open)]="pickerOpen"
+  [title]="pickerTitle()"
+  [context]="pickerContext()"
+  [confirmVerb]="swapTarget() ? 'Swap for' : 'Add'"
+  [single]="swapTarget() !== null"
+  [alreadyAdded]="addedIds()"
+  (picked)="onPicked($event)"
+/>
+
 <mh-confirm-sheet
   [(open)]="removeConfirmOpen"
   title="Remove exercise"
@@ -154,6 +161,7 @@
 />
 
 <mh-confirm-sheet
+  #discardSheet
   [(open)]="discardConfirmOpen"
   title="Discard workout"
   body="Everything logged in this session is deleted. Skipping a planned workout is a different thing — that keeps the record."
@@ -166,6 +174,7 @@
 />
 
 <mh-confirm-sheet
+  #finishSheet
   [(open)]="finishConfirmOpen"
   title="Finish workout"
   [body]="finishBody()"

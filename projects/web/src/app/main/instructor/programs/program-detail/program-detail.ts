@@ -42,6 +42,7 @@ import {
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
 import { ExerciseDetailDialog } from '../../exercises/exercise-detail-dialog/exercise-detail-dialog';
 import { AssignProgramDialog } from '../assign-program-dialog/assign-program-dialog';
+import { CopyDayChoice, CopyDayDialog } from '../copy-day-dialog/copy-day-dialog';
 import { CopyWeekDialog } from '../copy-week-dialog/copy-week-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
 import { MoveTargetChoice, MoveTargetDialog } from '../move-target-dialog/move-target-dialog';
@@ -66,6 +67,20 @@ import { WorkoutEditor } from './_components/workout-editor/workout-editor';
  * so we don't gate roles here — the BE 404s cross-instructor probes.
  * All mutations update the tree optimistically and resync on failure.
  */
+/**
+ * Day names for the copy-day toast. The dialog has its own copy for its
+ * labels; this is only for saying which day a copy landed on.
+ */
+const DAY_LABELS = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
 @Component({
   selector: 'mh-program-detail',
   imports: [
@@ -79,6 +94,7 @@ import { WorkoutEditor } from './_components/workout-editor/workout-editor';
     BottomSheet,
     ListEmptyState,
     AssignProgramDialog,
+    CopyDayDialog,
     CopyWeekDialog,
     ExerciseDetailDialog,
     ExercisePickerDialog,
@@ -139,6 +155,7 @@ export class ProgramDetail implements OnInit {
     set: PrescribedSet | null;
   } | null>(null);
   readonly deleting = signal(false);
+  readonly duplicating = signal(false);
 
   // ── Cross-container move dialog ──────────────────────────────────
 
@@ -151,6 +168,8 @@ export class ProgramDetail implements OnInit {
   // ── Copy-week dialog — source week + open flag ───────────────────
 
   readonly copyWeekDialogOpen = signal(false);
+  readonly copyDayDialogOpen = signal(false);
+  readonly copyDaySource = signal<ProgramWorkout | null>(null);
   /** 0-based source week for the copy — null when the dialog isn't armed. */
   readonly copyWeekSource = signal<number | null>(null);
 
@@ -936,6 +955,97 @@ export class ProgramDetail implements OnInit {
       const ex = this.moveTargetExercise();
       if (ex) this._moveExerciseToWorkout(source, ex, choice.workoutId);
     }
+  }
+
+  /**
+   * A copy of this program, owned by the caller, as a fresh draft.
+   *
+   * Navigates to the copy rather than staying here: the reason to duplicate
+   * is to change something, and the thing to change is the new one.
+   */
+  duplicateProgram(): void {
+    const p = this.program();
+    if (!p || this.duplicating()) return;
+
+    this.duplicating.set(true);
+    this._track(this._programService.duplicate(p.id)).subscribe({
+      next: (copy) => {
+        this.duplicating.set(false);
+        this._messageService.add({
+          severity: 'success',
+          summary: 'Program duplicated',
+          detail: 'Opened the copy — the original is unchanged.',
+          life: 2500,
+        });
+        void this._router.navigate(['/coaching/programs', copy.id]);
+      },
+      error: (err) => {
+        this.duplicating.set(false);
+        showApiError(
+          this._messageService,
+          "Couldn't duplicate the program",
+          'Please try again.',
+          err,
+        );
+      },
+    });
+  }
+
+  // ── Copy day ─────────────────────────────────────────────────────
+
+  /** The day's own copy button — arm the source and open the picker. */
+  openCopyDay(workout: ProgramWorkout): void {
+    this.copyDaySource.set(workout);
+    this.copyDayDialogOpen.set(true);
+  }
+
+  /**
+   * One request for every target — the endpoint takes the whole list, so
+   * there is no chain to walk and no half-applied copy if a later week
+   * would have failed.
+   *
+   * Refetches rather than merging: the response carries freshly created
+   * rows without their nested exercises and sets, so splicing them in would
+   * render half-empty cards. Same reason `onCopyWeekChosen` refetches.
+   */
+  onCopyDayChosen(choice: CopyDayChoice): void {
+    const p = this.program();
+    const source = this.copyDaySource();
+    if (!p || !source || !choice.weeks.length) return;
+
+    this._track(
+      this._programService.copyDay(
+        p.id,
+        source.weekIndex,
+        source.dayIndex,
+        choice.weeks,
+        choice.toDayIndex,
+      ),
+    ).subscribe({
+      next: (copied) => {
+        const movedDay =
+          choice.toDayIndex !== undefined && choice.toDayIndex !== source.dayIndex;
+        this._messageService.add({
+          severity: 'success',
+          summary: movedDay
+            ? `${source.name} copied to ${DAY_LABELS[choice.toDayIndex!]}`
+            : `${source.name} copied`,
+          detail:
+            copied.length === 1
+              ? 'Copied into 1 week.'
+              : `Copied into ${copied.length} weeks.`,
+          life: 2500,
+        });
+        // Reveal each destination so the copies are visible.
+        for (const week of choice.weeks) {
+          if (this.collapsedWeeks().has(week)) this.toggleWeekCollapsed(week);
+        }
+        this._refetch();
+      },
+      error: (err) => {
+        showApiError(this._messageService, "Couldn't copy the day", 'Please try again.', err);
+      },
+    });
   }
 
   // ── Copy week ────────────────────────────────────────────────────

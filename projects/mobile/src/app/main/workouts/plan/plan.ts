@@ -1,35 +1,31 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, computed, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
   IonContent,
   IonHeader,
-  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonProgressBar,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { take } from 'rxjs/operators';
 
-import {
-  AssignedWorkout,
-  ProgramAssignment,
-  ProgramAssignmentService,
-  displayName,
-  localDayKey,
-} from 'core';
+import { AssignedWorkout } from 'core';
 
-import { WORKOUT_ICONS } from '../workouts.config';
-
-/** One week of the plan, as the list renders it. */
-interface PlanWeek {
-  index: number;
-  days: AssignedWorkout[];
-  done: number;
-}
+import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
+import { SessionRowSkeleton } from '../../../_shared/components/session-row-skeleton/session-row-skeleton';
+import { AssignedDayRow } from '../_components/assigned-day-row/assigned-day-row';
+import { WORKOUT_ICONS, shortDayLabel } from '../workouts.config';
+import { PlanStore } from './plan.store';
 
 /**
  * The trainee's side of a multi-week program.
@@ -43,141 +39,100 @@ interface PlanWeek {
 @Component({
   selector: 'mh-plan',
   imports: [
+    AssignedDayRow,
+    EmptyState,
     IonBackButton,
     IonButtons,
+    IonCard,
+    IonCardContent,
     IonContent,
     IonHeader,
-    IonIcon,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
+    IonProgressBar,
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    SessionRowSkeleton,
   ],
   templateUrl: './plan.html',
   styleUrl: './plan.scss',
+  providers: [PlanStore],
 })
 export class Plan implements ViewWillEnter {
-  private readonly _assignmentService = inject(ProgramAssignmentService);
+  readonly store = inject(PlanStore);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
-
-  readonly assignment = signal<ProgramAssignment | null>(null);
-  readonly loading = signal(false);
-  readonly failed = signal(false);
 
   readonly skeletonRows = [1, 2, 3];
 
-  private _id: string | null = null;
+  readonly title = computed(() => this.store.assignment()?.programNameSnapshot ?? 'Plan');
 
-  readonly coachName = computed(() => {
-    const instructor = this.assignment()?.instructor;
-    return instructor ? displayName(instructor, 'your coach') : null;
+  /** "From Alex Dima · Started Mon 1 Sep" — who set it and when it began. */
+  readonly fromLine = computed(() => {
+    const assignment = this.store.assignment();
+    if (!assignment) return '';
+    const parts: string[] = [];
+    const coach = this.store.coachName();
+    if (coach) parts.push(`From ${coach}`);
+    parts.push(`Started ${shortDayLabel(assignment.startDate)}`);
+    return parts.join(' · ');
   });
 
-  readonly workouts = computed<AssignedWorkout[]>(
-    () => this.assignment()?.workouts ?? [],
+  readonly positionLabel = computed(
+    () => `Week ${this.store.currentWeek() + 1} of ${this.store.weeks().length}`,
   );
 
-  /** Done counts what was actually finished, not what has merely passed. */
-  readonly doneCount = computed(
-    () => this.workouts().filter((w) => w.status === 'COMPLETED').length,
-  );
+  readonly doneLabel = computed(() => `${this.store.doneCount()} / ${this.store.totalCount()} done`);
 
-  readonly totalCount = computed(() => this.workouts().length);
-
-  readonly percent = computed(() => {
-    const total = this.totalCount();
-    return total ? Math.round((this.doneCount() / total) * 100) : 0;
+  /**
+   * Today normally sits inside the current week's rows, where it wears the
+   * Start pill. It gets its own section only when it does not — a trainee
+   * who is a week behind still has today's work to do today.
+   */
+  readonly todayApart = computed<AssignedWorkout | null>(() => {
+    const today = this.store.today();
+    if (!today) return null;
+    return this.store.thisWeek().some((day) => day.id === today.id) ? null : today;
   });
 
-  readonly weeks = computed<PlanWeek[]>(() => {
-    const byWeek = new Map<number, AssignedWorkout[]>();
-    for (const w of this.workouts()) {
-      const bucket = byWeek.get(w.weekIndex);
-      if (bucket) bucket.push(w);
-      else byWeek.set(w.weekIndex, [w]);
-    }
-    return [...byWeek.entries()]
-      .sort(([a], [b]) => a - b)
-      .map(([index, days]) => ({
-        index,
-        days: days.sort((a, b) => a.dayIndex - b.dayIndex),
-        done: days.filter((d) => d.status === 'COMPLETED').length,
-      }));
+  /** What is coming when today is a rest day and the next day is not in view. */
+  readonly upNextApart = computed<AssignedWorkout | null>(() => {
+    const next = this.store.upNext();
+    if (!next) return null;
+    return this.store.thisWeek().some((day) => day.id === next.id) ? null : next;
   });
-
-  /** Which week the trainee is actually in — the first with work left. */
-  readonly currentWeek = computed(() => {
-    const week = this.weeks().find((w) => w.done < w.days.length);
-    return week?.index ?? Math.max(0, this.weeks().length - 1);
-  });
-
-  readonly today = computed<AssignedWorkout | null>(() => {
-    const key = localDayKey(new Date());
-    return this.workouts().find((w) => w.scheduledDate === key && !w.status) ?? null;
-  });
-
-  /** What is coming when today is a rest day, so the page is never blank. */
-  readonly upNext = computed<AssignedWorkout | null>(() => {
-    if (this.today()) return null;
-    const key = localDayKey(new Date());
-    return (
-      this.workouts()
-        .filter((w) => !w.status && w.scheduledDate > key)
-        .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate))[0] ?? null
-    );
-  });
-
-  readonly thisWeek = computed(
-    () => this.weeks().find((w) => w.index === this.currentWeek())?.days ?? [],
-  );
 
   constructor() {
     addIcons(WORKOUT_ICONS);
   }
 
+  // Always re-read: finishing a workout changes every count on this page,
+  // and Ionic keeps the page alive in the stack between visits.
   ionViewWillEnter(): void {
-    const id = this._router.url.split('?')[0].split('/').pop() ?? null;
-    if (!id) return;
-    // Always re-read: finishing a workout changes every count on this page.
-    this._id = id;
-    this.loading.set(true);
-    this.failed.set(false);
-
-    this._assignmentService
-      .get(id)
-      .pipe(take(1))
-      .subscribe({
-        next: (assignment) => {
-          this.assignment.set(assignment);
-          this.loading.set(false);
-        },
-        error: () => {
-          this.failed.set(true);
-          this.loading.set(false);
-        },
-      });
+    const id = this._route.snapshot.paramMap.get('id');
+    if (id) this.store.load(id);
   }
 
-  dayLabel(day: AssignedWorkout): string {
-    const [y, m, d] = day.scheduledDate.split('-').map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString(undefined, {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-    });
+  retry(): void {
+    this.ionViewWillEnter();
   }
 
-  isDone(day: AssignedWorkout): boolean {
-    return day.status === 'COMPLETED';
+  isToday(day: AssignedWorkout): boolean {
+    return this.store.today()?.id === day.id;
   }
 
-  isSkipped(day: AssignedWorkout): boolean {
-    return day.status === 'SKIPPED';
+  isCurrentWeek(index: number): boolean {
+    return index === this.store.currentWeek();
   }
 
   /** From here on it is just a workout — the same preview the hero uses. */
   open(day: AssignedWorkout): void {
-    if (!this._id) return;
-    void this._router.navigate(['/tabs/workouts/preview', this._id], {
+    const assignment = this.store.assignment();
+    if (!assignment) return;
+    void this._router.navigate(['/tabs/workouts/preview', assignment.id], {
       queryParams: { workout: day.id },
     });
   }

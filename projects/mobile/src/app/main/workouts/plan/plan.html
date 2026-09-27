@@ -3,87 +3,99 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>{{ assignment()?.programNameSnapshot ?? 'Plan' }}</ion-title>
+    <ion-title>{{ title() }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading() && !assignment()) {
-    @for (row of skeletonRows; track row) {
-      <div class="mh-skeleton-row"><ion-skeleton-text [animated]="true" /></div>
-    }
-  } @else if (failed() || !assignment()) {
-    <p class="mh-state">Could not open this plan.</p>
-  } @else if (assignment(); as plan) {
-    <!-- Where am I. A twelve-week plan is intimidating as a count of
-         workouts; as a position it is finite. -->
-    <section class="head">
-      <h1>{{ plan.programNameSnapshot }}</h1>
-      <span class="mh-kicker from">
-        @if (coachName()) {
-          From {{ coachName() }} ·
+  @if (store.showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this plan"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  } @else if (store.showSkeleton()) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          <ion-skeleton-text [animated]="true" style="width: 55%; height: 0.75rem" />
+          <ion-skeleton-text [animated]="true" style="width: 70%; height: 1.25rem" />
+          <ion-skeleton-text [animated]="true" style="width: 100%; height: 0.5rem" />
+        </ion-card-content>
+      </ion-card>
+      <div>
+        @for (_ of skeletonRows; track $index) {
+          <mh-session-row-skeleton />
         }
-        Started {{ plan.startDate }}
-      </span>
-
-      <div class="progress">
-        <div class="bar" [style.--pct.%]="percent()" role="presentation"></div>
-        <div class="figures">
-          <span class="mh-kicker">Week {{ currentWeek() + 1 }} of {{ weeks().length }}</span>
-          <span class="mh-kicker done">{{ doneCount() }} / {{ totalCount() }} done</span>
-        </div>
       </div>
-    </section>
+    </div>
+  } @else if (store.assignment(); as plan) {
+    <div class="mh-page">
+      <!-- Where am I. A twelve-week plan is intimidating as a count of
+           workouts; as a position it is finite. -->
+      <ion-card class="hero">
+        <ion-card-content>
+          <span class="mh-kicker from">{{ fromLine() }}</span>
+          <h2>{{ plan.programNameSnapshot }}</h2>
+          <ion-progress-bar [value]="store.progress()" />
+          <div class="figures">
+            <span class="mh-kicker">{{ positionLabel() }}</span>
+            <span class="mh-kicker done">{{ doneLabel() }}</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
 
-    <!-- What's today. -->
-    @if (today(); as day) {
-      <button class="today" type="button" (click)="open(day)">
-        <span class="mh-kicker">Today</span>
-        <strong>{{ day.name }}</strong>
-        <span class="go">
-          <ion-icon name="play-outline" aria-hidden="true" />
-          Start
-        </span>
-      </button>
-    } @else if (upNext(); as day) {
-      <button class="today next" type="button" (click)="open(day)">
-        <span class="mh-kicker">Up next · {{ dayLabel(day) }}</span>
-        <strong>{{ day.name }}</strong>
-        <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
-      </button>
-    }
-
-    <!-- What's this week. -->
-    @if (thisWeek().length) {
-      <h3 class="mh-section-label">This week</h3>
-      @for (day of thisWeek(); track day.id) {
-        <button
-          class="day"
-          type="button"
-          [class.done]="isDone(day)"
-          [class.skipped]="isSkipped(day)"
-          (click)="open(day)"
-        >
-          <span class="when mh-kicker">{{ dayLabel(day) }}</span>
-          <span class="name">{{ day.name }}</span>
-          @if (isDone(day)) {
-            <ion-icon class="tick" name="checkmark-circle-outline" aria-hidden="true" />
-          } @else if (isSkipped(day)) {
-            <span class="tag">Skipped</span>
-          } @else {
-            <ion-icon class="chev" name="chevron-forward" aria-hidden="true" />
-          }
-        </button>
+      <!-- What's today, when it is not already in the week below. -->
+      @if (todayApart(); as day) {
+        <section class="mh-section">
+          <div class="mh-section-head warm">
+            <span class="mh-kicker">Today</span>
+          </div>
+          <mh-assigned-day-row [day]="day" [startable]="true" (select)="open(day)" (start)="open(day)" />
+        </section>
+      } @else if (upNextApart(); as day) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <span class="mh-kicker">Up next</span>
+          </div>
+          <mh-assigned-day-row [day]="day" (select)="open(day)" />
+        </section>
       }
-    }
 
-    <!-- How much is left. -->
-    <h3 class="mh-section-label">All weeks</h3>
-    @for (week of weeks(); track week.index) {
-      <div class="week" [class.current]="week.index === currentWeek()">
-        <span class="w-name">Week {{ week.index + 1 }}</span>
-        <span class="w-count">{{ week.done }} / {{ week.days.length }}</span>
-      </div>
-    }
+      <!-- What's this week. -->
+      @if (store.thisWeek().length) {
+        <section class="mh-section">
+          <div class="mh-section-head">
+            <span class="mh-kicker">This week</span>
+            <ion-note>{{ positionLabel() }}</ion-note>
+          </div>
+          <div>
+            @for (day of store.thisWeek(); track day.id) {
+              <mh-assigned-day-row
+                [day]="day"
+                [startable]="isToday(day)"
+                (select)="open(day)"
+                (start)="open(day)"
+              />
+            }
+          </div>
+        </section>
+      }
+
+      <!-- How much is left. -->
+      <section class="mh-section">
+        <span class="mh-kicker">All weeks</span>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (week of store.weeks(); track week.index; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'" [class.current]="isCurrentWeek(week.index)">
+              <ion-label>Week {{ week.index + 1 }}</ion-label>
+              <ion-note slot="end" class="count">{{ week.done }} / {{ week.days.length }}</ion-note>
+            </ion-item>
+          }
+        </ion-list>
+      </section>
+    </div>
   }
 </ion-content>

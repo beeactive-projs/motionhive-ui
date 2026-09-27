@@ -12,7 +12,7 @@ import {
   apiErrorMessage,
 } from 'core';
 
-import { ROSTER_WINDOW } from '../clients.config';
+import { ROSTER_WINDOW } from '../roster-labels';
 
 /** How far ahead the Upcoming sessions section looks. */
 const UPCOMING_DAYS = 30;

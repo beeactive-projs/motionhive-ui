@@ -3,7 +3,7 @@ import { Observable, finalize, take, tap } from 'rxjs';
 
 import { ClientService, InstructorClient, InstructorClientStatuses } from 'core';
 
-import { splitPendingRows } from '../clients.config';
+import { splitPendingRows } from '../requests.utils';
 
 /** The BE drops expired rows, and a coach with more than this pending has a different problem. */
 const PAGE_LIMIT = 100;

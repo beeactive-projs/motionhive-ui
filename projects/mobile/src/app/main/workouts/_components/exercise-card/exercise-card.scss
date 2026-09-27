@@ -1,0 +1,31 @@
+/* The card chrome comes from the ion-card skin (theme/components/ion-card.css);
+   only what is specific to an exercise card lives here. */
+
+:host {
+  display: block;
+}
+
+/* The header item sits on the card's own surface, and its chevron at full
+   strength — Ionic dims it to 25% by default, below the 3:1 a control needs. */
+ion-item {
+  --background: var(--ion-card-background);
+  --detail-icon-color: var(--ion-color-medium);
+  --detail-icon-opacity: 1;
+}
+
+ion-item h2 {
+  font-family: var(--mh-font-heading);
+  font-weight: 700;
+}
+
+/* The header already pads the top; the body only needs air below the rows. */
+ion-card-content {
+  padding-top: 0;
+}
+
+/* A skipped exercise stays readable — it is a decision the user made, and
+   hiding it would make the workout look shorter than it was. */
+:host(.skipped) ion-item h2 {
+  color: var(--ion-color-medium);
+  text-decoration: line-through;
+}

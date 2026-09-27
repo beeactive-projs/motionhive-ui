@@ -42,6 +42,7 @@ export class ProgramService {
     if (query.limit !== undefined) p = p.set('limit', String(query.limit));
     if (query.search) p = p.set('search', query.search);
     if (query.status) p = p.set('status', query.status);
+    if (query.library) p = p.set('library', query.library);
     return this._http.get<PaginatedPrograms>(this._baseUrl, { params: p });
   }
 
@@ -106,6 +107,46 @@ export class ProgramService {
     return this._http.post<ProgramWorkout[]>(
       `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.COPY_WEEK(programId)}`,
       { fromWeekIndex, toWeekIndex },
+    );
+  }
+
+  /**
+   * Copy one day's training into the same day slot of other weeks.
+   *
+   * Takes every target in one call, unlike `copyWeek` — a day is usually
+   * repeated across several weeks at once, and a request per week is the
+   * throttle problem `copyWeek` was built to avoid, one level down.
+   *
+   * Whatever occupies a target slot is replaced, matching `copyWeek`.
+   */
+  copyDay(
+    programId: string,
+    fromWeekIndex: number,
+    dayIndex: number,
+    toWeekIndexes: number[],
+    /**
+     * Land the copy on a different day. Only valid with one target week —
+     * the API rejects it across several, since "which day?" would have no
+     * single answer.
+     */
+    toDayIndex?: number,
+  ): Observable<ProgramWorkout[]> {
+    return this._http.post<ProgramWorkout[]>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.COPY_DAY(programId)}`,
+      {
+        fromWeekIndex,
+        dayIndex,
+        toWeekIndexes,
+        ...(toDayIndex !== undefined ? { toDayIndex } : {}),
+      },
+    );
+  }
+
+  /** A full copy of a program, owned by the caller, as a fresh draft. */
+  duplicate(programId: string): Observable<Program> {
+    return this._http.post<Program>(
+      `${environment.apiUrl}${API_ENDPOINTS.PROGRAMS.DUPLICATE(programId)}`,
+      {},
     );
   }
 

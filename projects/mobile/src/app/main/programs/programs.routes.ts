@@ -6,6 +6,11 @@ import { Routes } from '@angular/router';
  * Routines open the round-1 builder — the same screen the trainee authors in,
  * because a routine is a routine whoever wrote it. Programs get the week grid,
  * and a day inside one opens that same builder again with a week·day context.
+ *
+ * Who needs attention is not here: that is the Clients tab's triage lens, and
+ * a second roster under programs was the same list with a different colour
+ * map. A client's own training and a logged workout mount under clients for
+ * the same reason — they are reached from the person.
  */
 export const programRoutes: Routes = [
   {
@@ -18,13 +23,6 @@ export const programRoutes: Routes = [
     loadComponent: () =>
       import('../workouts/routine-builder/routine-builder').then((m) => m.RoutineBuilder),
     title: 'Routine - MotionHive',
-  },
-  {
-    // Who needs attention — a coaching surface, not a program one, but it
-    // belongs with the work it reports on.
-    path: 'roster',
-    loadComponent: () => import('./roster/roster').then((m) => m.Roster),
-    title: 'Needs attention - MotionHive',
   },
   {
     path: 'program/:id',

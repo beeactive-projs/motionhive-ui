@@ -1,0 +1,34 @@
+/* Geometry, spine tones and the tags line come from the shared
+   `.mh-session-row` skin (theme/components/mh-session-row.css). Only what is
+   specific to a planned day lives here. */
+
+:host {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* A finished or skipped day is the record of what you did — legible, quieter. */
+ion-item[data-tone='muted'] h2,
+ion-item[data-tone='booked'] h2 {
+  color: var(--ion-color-medium);
+}
+
+/* Today's row warms to the selection wash: it names the moment, not a status,
+   and the Start pill beside it is the one thing on the page asking for a tap. */
+ion-item.today {
+  --background: var(--mh-color-selected-background);
+}
+
+/* The Start pill grows in place of the chevron; the row is otherwise
+   unchanged. Ionic's small button floor is taller than the row wants. */
+.start {
+  height: 2rem;
+  min-height: 0;
+  margin: 0;
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.tick {
+  font-size: 1.375rem;
+}

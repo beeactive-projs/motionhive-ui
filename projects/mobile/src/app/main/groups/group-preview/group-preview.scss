@@ -1,0 +1,113 @@
+/* The identity block, same shape as a person's profile: this screen's
+   subject is the group itself, not a list of its fields. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0 1.25rem;
+  text-align: center;
+}
+
+.hero .name {
+  margin: 0.25rem 0 0;
+  font-family: var(--mh-font-heading);
+  font-size: var(--mh-text-xl);
+  font-weight: 700;
+  line-height: var(--mh-leading-tight);
+}
+
+.hero .meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero .count {
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-sm);
+  font-weight: 600;
+}
+
+.policy,
+.tag {
+  height: 1.5rem;
+  margin: 0;
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--mh-text-base);
+  line-height: var(--mh-leading-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Detail rows: label above value, matching the profile screen. */
+ion-item ion-label p {
+  margin: 0 0 0.125rem;
+  color: var(--ion-color-medium);
+  font-family: var(--mh-font-mono);
+  font-size: var(--mh-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--mh-tracking-kicker);
+  text-transform: uppercase;
+}
+
+ion-item ion-label h2 {
+  margin: 0;
+  font-size: var(--mh-text-base);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Why the rest of the group is not on screen. A statement of fact, so the
+   muted voice — nothing has gone wrong. */
+.locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-sm);
+  text-align: center;
+}
+
+.locked ion-icon {
+  flex: none;
+  font-size: var(--mh-text-base);
+}
+
+.join-bar {
+  --padding-top: 0.5rem;
+  --padding-bottom: 0.5rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+}
+
+/* A pending request is a state, not an action — so it reads as a line of
+   text with the withdraw beside it, rather than a disabled button. */
+.pending {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--mh-tap-target);
+  color: var(--ion-color-medium);
+  font-size: var(--mh-text-base);
+}
+
+.pending span {
+  flex: 1;
+  font-weight: 600;
+}
+
+.pending ion-button {
+  --color: var(--mh-color-honey-deep);
+  flex: none;
+  margin: 0;
+  font-weight: 600;
+}

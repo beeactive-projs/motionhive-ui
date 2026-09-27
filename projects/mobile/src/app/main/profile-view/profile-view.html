@@ -1,0 +1,134 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/groups" text="Back" />
+    </ion-buttons>
+    <ion-title>Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h1 class="mh-visually-hidden">{{ fullName() || 'Profile' }}</h1>
+
+  @if (store.notFound()) {
+  <mh-empty-state icon="person-outline" heading="Profile not found"
+    message="This person may have changed their handle or left MotionHive." />
+  } @else if (store.showError()) {
+  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this profile"
+    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  } @else if (store.showSkeleton()) {
+  <div class="mh-page" aria-busy="true">
+    <div class="hero">
+      <mh-hex-avatar size="2xl" color="medium" tone="wash" />
+      <ion-skeleton-text [animated]="true" style="width: 50%; height: 1.125rem" />
+      <ion-skeleton-text [animated]="true" style="width: 30%; height: 0.75rem" />
+    </div>
+    <ion-list [inset]="true" class="mh-card-list">
+      @for (_ of skeletonRows; track $index; let last = $last) {
+      <ion-item [lines]="last ? 'none' : 'full'">
+        <ion-label>
+          <p><ion-skeleton-text [animated]="true" style="width: 25%" /></p>
+          <h2><ion-skeleton-text [animated]="true" style="width: 55%" /></h2>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+  } @else if (store.profile(); as profile) {
+  <div class="mh-page">
+    <section class="hero">
+      <mh-hex-avatar size="2xl" [name]="fullName()" [imageUrl]="profile.avatarUrl" />
+      <h2 class="name">{{ fullName() }}</h2>
+      <p class="handle">&#64;{{ profile.handle }}</p>
+
+      @if (profile.displayRoles.length > 0) {
+      <div class="roles">
+        @for (role of profile.displayRoles; track role) {
+        <ion-chip color="primary" class="role">{{ role }}</ion-chip>
+        }
+      </div>
+      }
+
+      @if (canMessage()) {
+      <ion-button expand="block" fill="outline" class="message" (click)="message(profile)">
+        <ion-icon slot="start" name="chatbubble-outline" />
+        Message
+      </ion-button>
+      }
+    </section>
+
+    <!-- Each row renders only if the server let this viewer see it. An
+         absent value means "not shared with you", not "empty". -->
+    <ion-list [inset]="true" class="mh-card-list">
+      @if (location(); as where) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Location</p>
+          <h2>{{ where }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+
+      @if (profile.email) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="mail-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Email</p>
+          <h2>{{ profile.email }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+
+      @if (profile.phone) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="call-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Phone</p>
+          <h2>{{ profile.phone }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+
+      @if (profile.language) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="language-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Language</p>
+          <h2>{{ profile.language }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+
+      @if (profile.timezone) {
+      <ion-item lines="full">
+        <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Timezone</p>
+          <h2>{{ profile.timezone }}</h2>
+        </ion-label>
+      </ion-item>
+      }
+
+      <!-- Always present: `memberSince` is public for everyone, so this row
+           guarantees the card is never empty. -->
+      <ion-item lines="none">
+        <ion-icon slot="start" name="calendar-outline" color="medium" aria-hidden="true" />
+        <ion-label>
+          <p>Member since</p>
+          <h2>{{ memberSince() }}</h2>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    @if (showPrivateNote()) {
+    <!-- Otherwise a name over an almost-empty card reads as a page that
+         failed rather than a person who keeps to themselves. -->
+    <div class="private" role="note">
+      <ion-icon name="lock-closed-outline" aria-hidden="true" />
+      <span>{{ profile.firstName || 'This person' }} keeps the rest of their profile private.</span>
+    </div>
+    }
+  </div>
+  }
+</ion-content>

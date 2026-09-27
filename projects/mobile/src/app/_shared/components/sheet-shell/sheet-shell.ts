@@ -1,5 +1,15 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, TemplateRef, input, model, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  TemplateRef,
+  effect,
+  input,
+  model,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {
   IonButton,
   IonButtons,
@@ -134,9 +144,36 @@ export class SheetShell {
   readonly presentedClass = SHEET_PRESENTED_CLASS;
 
   private readonly _modal = viewChild(IonModal);
+  private readonly _modalElement = viewChild(IonModal, { read: ElementRef });
 
   constructor() {
     addIcons({ close });
+    // A title that resolves after the sheet is already in the DOM — every
+    // `computed()` one here does — has to be pushed onto the dialog by hand.
+    effect(() => {
+      this.title();
+      if (this.presented()) this.syncDialogLabel();
+    });
+  }
+
+  /**
+   * Re-apply the dialog's accessible name.
+   *
+   * Ionic copies the host `aria-label` onto the shadow `.modal-wrapper` — the
+   * element that actually carries `role="dialog"` — once, in
+   * `componentWillLoad`, into a plain instance field that never re-renders.
+   * Every title here is a `computed()` that fills in when a row is chosen, so
+   * the name froze at whatever it was when the page first rendered: a sheet
+   * reading "Archive Anna Popescu?" announced "Archive this client?", and on
+   * a destructive confirmation that is a hazard, not a blemish.
+   *
+   * `aria-labelledby` is not a way out — an IDREF cannot cross the shadow
+   * boundary to reach the heading, which is slotted light DOM — so the label
+   * is written onto the wrapper directly, before the sheet is announced.
+   */
+  syncDialogLabel(): void {
+    const host = this._modalElement()?.nativeElement as HTMLElement | undefined;
+    host?.shadowRoot?.querySelector('.modal-wrapper')?.setAttribute('aria-label', this.title());
   }
 
   dismiss(): void {

@@ -1,0 +1,47 @@
+<ng-template #body>
+  @if (url(); as link) {
+  <div class="link-block">
+    <p class="url">{{ link }}</p>
+    <div class="actions">
+      <ion-button expand="block" (click)="share()">
+        <ion-icon slot="start" name="share-outline" />
+        Share link
+      </ion-button>
+      <ion-button expand="block" fill="outline" color="danger" [disabled]="working()"
+        (click)="revoke()">
+        @if (working()) {
+        <ion-spinner name="crescent" slot="start" />
+        } @else {
+        <ion-icon slot="start" name="trash-outline" />
+        }
+        Revoke
+      </ion-button>
+    </div>
+    <!-- Said before they tap it: revoking breaks every copy already sent,
+         which is not obvious from the word. -->
+    <ion-note class="hint">
+      Anyone with this link can join. Revoking it stops every copy you have
+      already shared.
+    </ion-note>
+  </div>
+  } @else {
+  <div class="link-block empty">
+    <ion-icon name="link-outline" class="glyph" aria-hidden="true" />
+    <p class="lead">No invite link yet</p>
+    <ion-note class="hint">
+      Create one to let people join without an invitation, even if the group
+      is invite only.
+    </ion-note>
+    <ion-button expand="block" [disabled]="working()" (click)="generate()">
+      @if (working()) {
+      <ion-spinner name="crescent" slot="start" />
+      }
+      Create invite link
+    </ion-button>
+  </div>
+  }
+</ng-template>
+
+<!-- No footer: every action here is in the body, and a Save button would
+     imply something is waiting to be committed. -->
+<mh-sheet-shell [(open)]="open" title="Invite link" [body]="body" [showFooter]="false" />

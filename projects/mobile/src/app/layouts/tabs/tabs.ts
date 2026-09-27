@@ -131,7 +131,7 @@ export class Tabs {
       .subscribe((tabId) => {
         const left = this._lastTabId === TabIds.Clients && tabId !== TabIds.Clients;
         this._lastTabId = tabId;
-        if (left) this._moreBadgesService.refreshPendingRequests();
+        if (left) this._moreBadgesService.refreshPendingRequests(true);
       });
   }
 

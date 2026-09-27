@@ -18,9 +18,10 @@
   border: 1px solid var(--ion-color-medium-wash-contrast);
 }
 
+/* Honey, like every other selected chip in the app. */
 .chips ion-chip.selected {
-  --background: var(--ion-color-secondary);
-  --color: var(--ion-color-secondary-contrast);
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
 }
 
 /* A text action on its own line. `ion-button fill="clear"` carries toolbar

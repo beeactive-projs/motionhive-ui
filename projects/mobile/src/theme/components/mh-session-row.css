@@ -121,29 +121,16 @@ ion-item.mh-session-row .tags ion-badge {
   text-transform: none;
 }
 
-/* Tone-attributed badges render as washes — a saturated pill per row would
-   out-shout the titles. Guarded to `[data-tone]` so badges using Ionic's
-   `color=` attribute (the coach agenda's Live/pending) keep their colours. */
+/* Tone-attributed badges inside the tags line take the row's tighter
+   padding; their colours come from the one tone map every badge leans on
+   (theme/components/ion-badge.css). This rule must not restate colours: it
+   outranks that map on specificity, and when it once did, every tone the
+   map knew and this file did not — teal, danger, honey — rendered as the
+   neutral wash. Guarded to `[data-tone]` so badges using Ionic's `color=`
+   attribute (the coach agenda's Live/pending) keep their colours. */
 ion-item.mh-session-row .tags ion-badge[data-tone] {
   --padding-start: 0.5rem;
   --padding-end: 0.5rem;
-  --background: var(--ion-color-medium-wash);
-  --color: var(--ion-color-medium-wash-contrast);
-}
-
-ion-item.mh-session-row .tags ion-badge[data-tone='warn'] {
-  --background: var(--ion-color-warning-wash);
-  --color: var(--ion-color-warning-wash-contrast);
-}
-
-ion-item.mh-session-row .tags ion-badge[data-tone='info'] {
-  --background: var(--ion-color-info-wash);
-  --color: var(--ion-color-info-wash-contrast);
-}
-
-ion-item.mh-session-row .tags ion-badge[data-tone='success'] {
-  --background: var(--ion-color-success-wash);
-  --color: var(--ion-color-success-wash-contrast);
 }
 
 ion-item.mh-session-row ion-label h2 {

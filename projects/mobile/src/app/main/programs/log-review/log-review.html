@@ -8,43 +8,77 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  @if (loading()) {
-    <p class="mh-state">Loading…</p>
-  } @else if (failed() || !log()) {
-    <p class="mh-state">Could not open this workout.</p>
-  } @else if (log(); as l) {
-    <div class="head">
-      <span class="mh-kicker">Logged</span>
-      <h1>{{ l.name }}</h1>
-      <p class="duration">{{ durationLabel() }}</p>
+  @if (showError()) {
+    <mh-empty-state
+      icon="alert-circle-outline"
+      heading="Couldn't open this workout"
+      message="Check your connection and try again."
+      actionLabel="Try again"
+      (action)="load()"
+    />
+  } @else if (showSkeleton()) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          <ion-skeleton-text [animated]="true" style="width: 20%; height: 0.75rem" />
+          <ion-skeleton-text [animated]="true" style="width: 60%; height: 1.25rem" />
+          <ion-skeleton-text [animated]="true" style="width: 30%" />
+        </ion-card-content>
+      </ion-card>
+      <div class="mh-tiles">
+        @for (_ of skeletonTiles; track $index) {
+          <mh-stat-tile label="" value="" [loading]="true" />
+        }
+      </div>
     </div>
+  } @else if (log(); as log) {
+    <div class="mh-page">
+      <ion-card class="hero">
+        <ion-card-content>
+          <span class="mh-kicker logged">Logged</span>
+          <h2>{{ log.name }}</h2>
+          <p class="duration">{{ durationLabel() }}</p>
+        </ion-card-content>
+      </ion-card>
 
-    <div class="tiles">
-      @for (tile of tiles(); track tile.label) {
-        <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+      <div class="mh-tiles">
+        @for (tile of tiles(); track tile.label) {
+          <mh-stat-tile [label]="tile.label" [value]="tile.value" />
+        }
+      </div>
+
+      @if (hasFeedback()) {
+        <section class="mh-section">
+          <span class="mh-kicker">How it went</span>
+          <ion-list [inset]="true" class="mh-card-list">
+            <ion-item lines="none">
+              <ion-label class="ion-text-wrap">
+                @if (log.feelingRating) {
+                  <h2>Felt {{ log.feelingRating }} out of 5</h2>
+                }
+                @if (log.notes) {
+                  <!-- Their words, quoted — this is a record, not a field. -->
+                  <p class="note">“{{ log.notes }}”</p>
+                }
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </section>
       }
+
+      <section class="mh-section">
+        <span class="mh-kicker">What they did</span>
+        <ion-list [inset]="true" class="mh-card-list">
+          @for (exercise of exercises(); track exercise.id; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'full'" [class.skipped]="exercise.isSkipped">
+              <ion-label>
+                <h2>{{ exercise.exerciseNameSnapshot }}</h2>
+              </ion-label>
+              <ion-note slot="end">{{ setSummary(exercise) }}</ion-note>
+            </ion-item>
+          }
+        </ion-list>
+      </section>
     </div>
-
-    @if (l.feelingRating || l.notes) {
-      <h3 class="mh-section-label">How it went</h3>
-      <div class="feedback">
-        @if (l.feelingRating) {
-          <p class="rating">Felt {{ l.feelingRating }} out of 5</p>
-        }
-        @if (l.notes) {
-          <p class="note">“{{ l.notes }}”</p>
-        }
-      </div>
-    }
-
-    <h3 class="mh-section-label">What they did</h3>
-    @for (exercise of exercises(); track exercise.id) {
-      <div class="ex" [class.skipped]="exercise.isSkipped">
-        <span class="name">{{ exercise.exerciseNameSnapshot }}</span>
-        <span class="sets">
-          {{ exercise.isSkipped ? 'Skipped' : setSummary(exercise) }}
-        </span>
-      </div>
-    }
   }
 </ion-content>

@@ -1,10 +1,14 @@
-// Brand surface rule: navy mark on light surfaces, honey on dark. Nothing
-// else here — the SVG carries its own size.
+// The mark is honey on both surfaces.
+//
+// Web and the marketing site both carry the honey logo as their identity
+// (`logo-honey-192.png`); the navy variant exists only for the social share
+// card, where it sits on a navy fill. Mobile was the one place showing navy
+// on a light surface, which read as a different product.
+//
+// Honey on white is 2.05:1 — fine for a logo, which is a graphic rather than
+// text, and the mark's own weight carries it. Text on honey still goes
+// through `--mh-color-honey-deep`.
 svg {
   display: block;
-  fill: var(--ion-color-secondary);
-}
-
-:host-context(.ion-palette-dark) svg {
   fill: var(--ion-color-primary);
 }

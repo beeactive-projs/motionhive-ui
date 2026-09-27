@@ -26,7 +26,12 @@ export const clientsRoutes: Routes = [
     // A client's training and one logged workout. Mounted here rather than
     // under programs because they are reached from the person, and switching
     // tabs mid-review would lose the client you were looking at.
-    path: 'client/:clientId/training',
+    //
+    // `:clientId/training`, not `client/:clientId/training`: the detail route
+    // below is `:clientId`, and a stray literal segment in one of the two
+    // shapes is what deep links and guards get wrong. Declared before
+    // `:clientId` so the two-segment path is matched first.
+    path: ':clientId/training',
     loadComponent: () =>
       import('../programs/client-training/client-training').then((m) => m.ClientTraining),
     title: 'Training - MotionHive',

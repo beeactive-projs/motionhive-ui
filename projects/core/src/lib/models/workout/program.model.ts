@@ -2,6 +2,8 @@ import type {
   ExerciseBlockKind,
   ExerciseSetType,
   ProgramKind,
+  ProgramLibrary,
+  ProgramSource,
   ProgramStatus,
 } from './workout.enums';
 
@@ -116,6 +118,11 @@ export interface Program {
    */
   isSingleWorkout: boolean;
   /**
+   * Who authored it. `SYSTEM` rows are MotionHive starters that appear in
+   * everyone's library — the badge on a row reads this.
+   */
+  source: ProgramSource;
+  /**
    * Program length in days. Author UI defaults to "Weeks" with a
    * Weeks/Days toggle — multiply by 7 client-side when posting from a
    * weeks input. Null = open-ended (no end date).
@@ -146,10 +153,17 @@ export interface ListProgramsQuery {
   limit?: number;
   search?: string;
   status?: ProgramStatus;
+  /** Whose content to return. Omitted means both, yours first. */
+  library?: ProgramLibrary;
 }
 
 /** Which half of the library a surface wants, or both. */
-export type ProgramSize = 'program' | 'routine' | 'all';
+export const ProgramSizes = {
+  Program: 'program',
+  Routine: 'routine',
+  All: 'all',
+} as const;
+export type ProgramSize = (typeof ProgramSizes)[keyof typeof ProgramSizes];
 
 export interface PaginatedPrograms {
   items: Program[];
