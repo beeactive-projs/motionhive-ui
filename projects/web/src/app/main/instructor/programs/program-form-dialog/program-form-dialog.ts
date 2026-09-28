@@ -23,6 +23,7 @@ import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MessageService, SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
@@ -149,6 +150,36 @@ export class ProgramFormDialog {
   durationMax(): number {
     return this.form.controls.durationUnit.value === 'weeks' ? 104 : 728;
   }
+
+  /**
+   * The length currently typed, in whole weeks. Tracks the form rather than
+   * reading it on submit so the warning below appears while the coach is
+   * still deciding.
+   */
+  private readonly _formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.getRawValue(),
+  });
+
+  private readonly _typedWeeks = computed(() => {
+    const v = this._formValue();
+    if (v?.durationValue == null) return null;
+    const days = v.durationUnit === 'weeks' ? v.durationValue * 7 : v.durationValue;
+    return Math.ceil(days / 7);
+  });
+
+  /**
+   * Days that would be deleted by the length now typed.
+   *
+   * Shortening a program is a real edit: the weeks that no longer fit are
+   * dropped, because a declared length the workouts contradict is what gave
+   * clients an end date before their own last session.
+   */
+  readonly doomedDays = computed(() => {
+    const weeks = this._typedWeeks();
+    const workouts = this.program()?.workouts;
+    if (weeks == null || !workouts?.length) return 0;
+    return workouts.filter((w) => w.weekIndex >= weeks).length;
+  });
 
   // ── Derived ──────────────────────────────────────────────────────
 
