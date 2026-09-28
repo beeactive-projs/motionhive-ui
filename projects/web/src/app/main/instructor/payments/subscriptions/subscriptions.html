@@ -17,7 +17,7 @@
     }
   </div>
 
-  <button pButton type="button" size="small" (click)="showCreateDialog.set(true)"><i class="pi pi-plus"></i> New membership</button>
+  <button pButton type="button" size="small" (click)="showCreateDialog.set(true)"><i class="pi pi-plus"></i> {{ 'payments.subscriptions.new' | translate }}</button>
 </header>
 
 
@@ -28,12 +28,12 @@
     scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
-        <th>Client</th>
-        <th>Plan</th>
-        <th class="text-center" style="width: 1%;">Amount</th>
-        <th class="text-center" style="width: 10%;">Status</th>
-        <th class="text-center">Current period</th>
-        <th class="text-center" style="width: 1%;">Actions</th>
+        <th>{{ 'payments.common.client' | translate }}</th>
+        <th>{{ 'payments.common.plan' | translate }}</th>
+        <th class="text-center" style="width: 1%;">{{ 'form.label.amount' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'form.label.status' | translate }}</th>
+        <th class="text-center">{{ 'payments.common.currentPeriod' | translate }}</th>
+        <th class="text-center" style="width: 1%;">{{ 'common.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -51,9 +51,12 @@
         </td>
         <td class="text-end tabular-nums">{{ sub.amountCents | currencyRon:sub.currency }}</td>
         <td class="text-center">
-          <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" class="w-full" rounded />
+          <p-tag [value]="sub.status | statusLabel: 'subscriptionStatus'" [severity]="statusSeverity(sub.status)"
+            class="w-full" rounded />
           @if (sub.cancelAt) {
-          <p class="text-xs text-muted-color mt-0.5 mb-0">cancels {{ sub.cancelAt | date:'dd MMM' }}</p>
+          <p class="text-xs text-muted-color mt-0.5 mb-0">
+            {{ 'payments.subscriptions.cancelsLower' | translate: { date: (sub.cancelAt | date:'dd MMM') } }}
+          </p>
           }
         </td>
         <td class="text-center">
@@ -65,7 +68,9 @@
           <span class="text-sm text-surface-500">—</span>
           }
           @if (sub.trialEnd) {
-          <p class="text-xs text-muted-color mt-0.5 mb-0">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</p>
+          <p class="text-xs text-muted-color mt-0.5 mb-0">
+            {{ 'payments.subscriptions.trialUntil' | translate: { date: (sub.trialEnd | date:'dd MMM yyyy') } }}
+          </p>
           }
         </td>
         <td>
@@ -77,7 +82,8 @@
               size="small"
               severity="danger"
               [text]="true"
-              pTooltip="Cancel at period end"
+              [pTooltip]="'payments.subscriptions.cancelAtPeriodEnd' | translate"
+              [attr.aria-label]="'payments.subscriptions.cancelAtPeriodEnd' | translate"
               tooltipPosition="left"
               (click)="confirmCancel(sub)"
               iconOnly
@@ -90,7 +96,8 @@
               size="small"
               severity="danger"
               [text]="true"
-              pTooltip="Cancel immediately"
+              [pTooltip]="'payments.subscriptions.cancelImmediately' | translate"
+              [attr.aria-label]="'payments.subscriptions.cancelImmediately' | translate"
               tooltipPosition="left"
               (click)="confirmCancelImmediately(sub)"
               iconOnly
@@ -130,8 +137,9 @@
     <ng-template #emptymessage>
       <tr>
         <td colspan="6">
-          <mh-list-empty-state icon="pi pi-sync" title="No memberships found"
-            message="Subscribe clients to recurring plans to get started." actionLabel="New membership"
+          <mh-list-empty-state icon="pi pi-sync" [title]="'payments.subscriptions.empty.notFound' | translate"
+            [message]="'payments.subscriptions.empty.message' | translate"
+            [actionLabel]="'payments.subscriptions.new' | translate"
             actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
         </td>
       </tr>
@@ -139,9 +147,11 @@
 
     <ng-template #paginatorleft let-state>
       <p-tag [rounded]="true">
-        View {{ state.first + 1 }} -
-        {{ state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows }} of
-        {{ state.totalRecords }}
+        {{ 'common.paginator' | translate: {
+          first: state.first + 1,
+          last: state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows,
+          total: state.totalRecords
+        } }}
       </p-tag>
     </ng-template>
   </p-table>
@@ -173,24 +183,24 @@
     <ng-template #list let-items>
       <div class="flex flex-col gap-3 pt-1">
         @for (sub of items; track trackById($index, sub)) {
-        <mh-list-card [status]="sub.status" [statusSeverity]="statusSeverity(sub.status)"
+        <mh-list-card [status]="sub.status | enumLabel: 'subscriptionStatus'" [statusSeverity]="statusSeverity(sub.status)"
           [avatarImage]="sub.client?.avatarUrl" [avatarInitials]="clientInitials(sub)" [title]="clientDisplay(sub)" [subtitle]="planDisplay(sub)"
           [accent]="cardAccent(sub)" [clickable]="true" (click)="openActionMenu(sub, $event, actionMenu)">
           <div amount class="flex flex-col items-end">
             <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
               {{ sub.amountCents | currencyRon:sub.currency }}
             </span>
-            <span class="text-xs text-surface-500">per cycle</span>
+            <span class="text-xs text-surface-500">{{ 'payments.common.perCycle' | translate }}</span>
           </div>
           <div meta class="flex items-center gap-2 text-xs text-surface-500 flex-wrap">
             @if (sub.currentPeriodEnd) {
-            <span>Renews {{ sub.currentPeriodEnd | date:'dd MMM' }}</span>
+            <span>{{ 'payments.subscriptions.renews' | translate: { date: (sub.currentPeriodEnd | date:'dd MMM') } }}</span>
             }
             @if (sub.trialEnd) {
-            <span>· Trial ends {{ sub.trialEnd | date:'dd MMM' }}</span>
+            <span>· {{ 'payments.subscriptions.trialEnds' | translate: { date: (sub.trialEnd | date:'dd MMM') } }}</span>
             }
             @if (sub.cancelAt) {
-            <span class="text-red-500">· Cancels {{ sub.cancelAt | date:'dd MMM' }}</span>
+            <span class="text-red-500">· {{ 'payments.subscriptions.cancels' | translate: { date: (sub.cancelAt | date:'dd MMM') } }}</span>
             }
           </div>
         </mh-list-card>
@@ -213,8 +223,9 @@
       </div>
     </ng-template>
     <ng-template #empty>
-      <mh-list-empty-state icon="pi pi-sync" title="No memberships yet"
-        message="Subscribe clients to recurring plans to get started." actionLabel="New membership"
+      <mh-list-empty-state icon="pi pi-sync" [title]="'payments.subscriptions.empty.title' | translate"
+        [message]="'payments.subscriptions.empty.message' | translate"
+        [actionLabel]="'payments.subscriptions.new' | translate"
         actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
     </ng-template>
   </p-dataview>

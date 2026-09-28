@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -22,7 +22,9 @@ import { ProviderChip } from '../../../../_shared/components/provider-chip/provi
 import { AccessChip } from '../../../../_shared/components/access-chip/access-chip';
 import { TypeChip } from '../../../../_shared/components/type-chip/type-chip';
 import {
+  CancelScope,
   DateWindowsMs,
+  EnumLabelPipe,
   SessionInstance,
   SessionInstanceStatus,
   SessionService,
@@ -30,6 +32,7 @@ import {
   SessionTemplateStatus,
   SessionsInstructorStore,
   apiErrorMessage,
+  appLocale,
   injectIsMobile,
   injectIsTablet,
   showApiError,
@@ -53,7 +56,6 @@ import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-
  */
 @Component({
   selector: 'mh-instructor-template-detail',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -67,19 +69,21 @@ import { SessionFormDialog } from '../_dialogs/session-form-dialog/session-form-
     MessageModule,
     ToastModule,
     ConfirmDialogModule,
+    TranslatePipe,
+    EnumLabelPipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './template-detail.html',
   styleUrl: './template-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InstructorTemplateDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _location = inject(Location);
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
-  private readonly _confirm = inject(ConfirmationService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
   // Root-scoped: refresh the list after the series is cancelled so the
   // template card moves out of Upcoming / Recurring tabs.
   private readonly _listStore = inject(SessionsInstructorStore);
@@ -104,11 +108,11 @@ export class InstructorTemplateDetail implements OnInit {
   /** Last (latest) scheduled occurrence — label used in the regen panel. */
   protected readonly lastOccurrenceLabel = computed(() => {
     const all = this.instances();
-    if (!all.length) return 'first start';
+    if (!all.length) return this._translateService.instant('sessions.templateDetail.firstStart');
     const last = all
       .slice()
       .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime())[0];
-    return new Date(last.startAt).toLocaleDateString('en-GB', {
+    return new Date(last.startAt).toLocaleDateString(appLocale(), {
       weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
     });
   });
@@ -157,19 +161,29 @@ export class InstructorTemplateDetail implements OnInit {
     const t = this.template();
     if (!t) return;
     this.busyRegen.set(true);
-    this._svc.regenerate(t.id, { count: this.regenCount() }).subscribe({
+    this._sessionService.regenerate(t.id, { count: this.regenCount() }).subscribe({
       next: (res) => {
         this.busyRegen.set(false);
-        this._msg.add({
+        this._messageService.add({
           severity: 'success',
-          summary: 'Schedule extended',
-          detail: `${res.generatedInstances.length} new occurrence(s) added.${res.warnings.length ? ` (${res.warnings.length} had conflicts)` : ''}`,
+          summary: this._translateService.instant('sessions.templateDetail.toast.extended.summary'),
+          detail: this._translateService.instant(
+            res.warnings.length
+              ? 'sessions.templateDetail.toast.extended.detailWithConflicts'
+              : 'sessions.templateDetail.toast.extended.detail',
+            { count: res.generatedInstances.length, conflicts: res.warnings.length },
+          ),
         });
         this._load(t.id);
       },
       error: (err: unknown) => {
         this.busyRegen.set(false);
-        showApiError(this._msg, 'Could not extend schedule', 'Please try again.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('sessions.templateDetail.toast.extendFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
+          err,
+        );
       },
     });
   }
@@ -194,29 +208,31 @@ export class InstructorTemplateDetail implements OnInit {
     const anyInstance =
       this.upcoming()[0] ?? this.past()[0] ?? null;
     if (!anyInstance) {
-      this._msg.add({
+      this._messageService.add({
         severity: 'warn',
-        summary: 'Nothing to cancel',
-        detail: 'This series has no occurrences yet.',
+        summary: this._translateService.instant('sessions.templateDetail.toast.nothingToCancel.summary'),
+        detail: this._translateService.instant('sessions.templateDetail.toast.nothingToCancel.detail'),
       });
       return;
     }
-    this._confirm.confirm({
-      header: 'Cancel the entire series?',
-      message:
-        'All upcoming occurrences will be cancelled and the series will be ended. Attendees will be notified.',
-      acceptLabel: 'Yes, cancel series',
-      rejectLabel: 'Keep series',
+    this._confirmationService.confirm({
+      header: this._translateService.instant('sessions.templateDetail.confirm.cancelSeries.header'),
+      message: this._translateService.instant('sessions.templateDetail.confirm.cancelSeries.message'),
+      acceptLabel: this._translateService.instant('sessions.templateDetail.confirm.cancelSeries.accept'),
+      rejectLabel: this._translateService.instant('sessions.templateDetail.confirm.keepSeries'),
       acceptButtonProps: { severity: 'danger' },
       accept: () => {
-        this._svc
-          .cancelInstance(anyInstance.id, { scope: 'series' })
+        this._sessionService
+          .cancelInstance(anyInstance.id, { scope: CancelScope.Series })
           .subscribe({
             next: (res) => {
-              this._msg.add({
+              this._messageService.add({
                 severity: 'success',
-                summary: 'Series cancelled',
-                detail: `${res.cancelledInstanceIds.length} occurrence(s) cancelled · ${res.notifiedUserIds.length} attendee(s) notified.`,
+                summary: this._translateService.instant('sessions.templateDetail.toast.seriesCancelled'),
+                detail: this._translateService.instant('sessions.common.cancelledNotified', {
+                  cancelled: res.cancelledInstanceIds.length,
+                  notified: res.notifiedUserIds.length,
+                }),
               });
               // Refresh local detail + list store so the card disappears
               // from the Recurring tab on next visit.
@@ -228,9 +244,9 @@ export class InstructorTemplateDetail implements OnInit {
             },
             error: (err: unknown) => {
               showApiError(
-                this._msg,
-                'Could not cancel series',
-                'Please try again.',
+                this._messageService,
+                this._translateService.instant('sessions.templateDetail.toast.cancelSeriesFailed'),
+                this._translateService.instant('common.pleaseTryAgain'),
                 err,
               );
             },
@@ -248,40 +264,46 @@ export class InstructorTemplateDetail implements OnInit {
   protected endAfterThisWeek(): void {
     const upcoming = this.upcoming().filter((i) => i.status === SessionInstanceStatus.Scheduled);
     if (upcoming.length < 2) {
-      this._msg.add({
+      this._messageService.add({
         severity: 'info',
-        summary: 'Nothing to end',
-        detail: 'No occurrences are scheduled beyond this week.',
+        summary: this._translateService.instant('sessions.templateDetail.toast.nothingToEnd.summary'),
+        detail: this._translateService.instant('sessions.templateDetail.toast.nothingToEnd.detail'),
       });
       return;
     }
     const cutoff = upcoming[1]; // first one to cancel
-    this._confirm.confirm({
-      header: 'End series after this week?',
-      message: `Cancels ${upcoming.length - 1} occurrence(s) from ${new Date(cutoff.startAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} onward. Attendees will be notified.`,
-      acceptLabel: 'Yes, end after this week',
-      rejectLabel: 'Keep series',
+    this._confirmationService.confirm({
+      header: this._translateService.instant('sessions.templateDetail.confirm.endAfterWeek.header'),
+      message: this._translateService.instant('sessions.templateDetail.confirm.endAfterWeek.message', {
+        count: upcoming.length - 1,
+        date: new Date(cutoff.startAt).toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' }),
+      }),
+      acceptLabel: this._translateService.instant('sessions.templateDetail.confirm.endAfterWeek.accept'),
+      rejectLabel: this._translateService.instant('sessions.templateDetail.confirm.keepSeries'),
       acceptButtonProps: { severity: 'danger' },
       accept: () => {
         const t = this.template();
         if (!t) return;
-        this._svc
-          .cancelInstance(cutoff.id, { scope: 'thisAndFuture' })
+        this._sessionService
+          .cancelInstance(cutoff.id, { scope: CancelScope.ThisAndFuture })
           .subscribe({
             next: (res) => {
-              this._msg.add({
+              this._messageService.add({
                 severity: 'success',
-                summary: 'Series ended after this week',
-                detail: `${res.cancelledInstanceIds.length} occurrence(s) cancelled · ${res.notifiedUserIds.length} attendee(s) notified.`,
+                summary: this._translateService.instant('sessions.templateDetail.toast.seriesEnded'),
+                detail: this._translateService.instant('sessions.common.cancelledNotified', {
+                  cancelled: res.cancelledInstanceIds.length,
+                  notified: res.notifiedUserIds.length,
+                }),
               });
               this._load(t.id);
               this._listStore.reload();
             },
             error: (err: unknown) => {
               showApiError(
-                this._msg,
-                'Could not end the series',
-                'Please try again.',
+                this._messageService,
+                this._translateService.instant('sessions.templateDetail.toast.endFailed'),
+                this._translateService.instant('common.pleaseTryAgain'),
                 err,
               );
             },
@@ -294,16 +316,18 @@ export class InstructorTemplateDetail implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     forkJoin({
-      template: this._svc.getTemplate(id).pipe(
+      template: this._sessionService.getTemplate(id).pipe(
         catchError((err: unknown) => {
-          this.error.set(apiErrorMessage(err, 'Could not load template'));
+          this.error.set(
+            apiErrorMessage(err, this._translateService.instant('sessions.templateDetail.toast.loadFailed')),
+          );
           return of(null);
         }),
       ),
       // BE defaults to a 7-day window if dateFrom/dateTo omitted (too
       // narrow for series view) and caps the range at 180 days. Use the
       // full allowed window centered around now.
-      instances: this._svc
+      instances: this._sessionService
         .listInstances({
           templateId: id,
           dateFrom: new Date(Date.now() - DateWindowsMs.TemplateLookback).toISOString(),

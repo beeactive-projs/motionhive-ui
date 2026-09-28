@@ -1,6 +1,5 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   computed,
   inject,
   OnInit,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -16,11 +16,14 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import {
+  AppLanguages,
   ClientPaymentService,
   InvoiceStatuses,
   CurrencyRonPipe,
   StatusLabelPipe,
+  appLanguage,
   getInvoiceStatusSeverity,
+  showApiError,
   type Invoice,
   type InvoiceLineItemDetail,
 } from 'core';
@@ -48,6 +51,7 @@ interface ActivityEntry {
     DatePipe,
     RouterLink,
     FormsModule,
+    TranslatePipe,
     ButtonDirective,
     TagModule,
     SkeletonModule,
@@ -59,13 +63,13 @@ interface ActivityEntry {
   providers: [MessageService],
   templateUrl: './invoice-detail.html',
   styleUrl: './invoice-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserInvoiceDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly invoice = signal<Invoice | null>(null);
   readonly lineItems = signal<InvoiceLineItemDetail[]>([]);
@@ -77,8 +81,8 @@ export class UserInvoiceDetail implements OnInit {
 
   readonly Statuses = InvoiceStatuses;
 
-  /** Waiver text shown to the client — picks RO or EN based on the
-   *  browser's preferred language. The canonical bilingual text is saved
+  /** Waiver text shown to the client — picks RO or EN to match the app's
+   *  UI language. The canonical bilingual text is saved
    *  server-side regardless of which version we show here (legal audit
    *  must cover both jurisdictions). */
   readonly consentText = this.resolveWaiverText();
@@ -101,19 +105,19 @@ export class UserInvoiceDetail implements OnInit {
 
     const draft: TrackerStep = {
       key: 'draft',
-      label: 'Draft',
+      label: this._translateService.instant('billing.invoiceDetail.tracker.draft'),
       date: inv.createdAt,
       state: 'done',
     };
     const sent: TrackerStep = {
       key: 'sent',
-      label: 'Sent',
+      label: this._translateService.instant('billing.invoiceDetail.tracker.sent'),
       date: inv.finalizedAt,
       state: inv.finalizedAt ? 'done' : 'pending',
     };
     const paid: TrackerStep = {
       key: 'paid',
-      label: 'Paid',
+      label: this._translateService.instant('billing.invoiceDetail.tracker.paid'),
       date: inv.paidAt,
       state: inv.paidAt ? 'done' : 'pending',
     };
@@ -132,17 +136,19 @@ export class UserInvoiceDetail implements OnInit {
   readonly activity = computed<ActivityEntry[]>(() => {
     const inv = this.invoice();
     if (!inv) return [];
+    const label = (event: 'issued' | 'sent' | 'paid' | 'voided') =>
+      this._translateService.instant(`billing.invoiceDetail.activityLog.${event}`);
     const events: ActivityEntry[] = [
-      { label: 'Invoice issued', at: inv.createdAt, kind: 'neutral' },
+      { label: label('issued'), at: inv.createdAt, kind: 'neutral' },
     ];
     if (inv.finalizedAt) {
-      events.push({ label: 'Invoice sent', at: inv.finalizedAt, kind: 'neutral' });
+      events.push({ label: label('sent'), at: inv.finalizedAt, kind: 'neutral' });
     }
     if (inv.paidAt) {
-      events.push({ label: 'Invoice paid', at: inv.paidAt, kind: 'success' });
+      events.push({ label: label('paid'), at: inv.paidAt, kind: 'success' });
     }
     if (inv.voidedAt) {
-      events.push({ label: 'Invoice voided', at: inv.voidedAt, kind: 'danger' });
+      events.push({ label: label('voided'), at: inv.voidedAt, kind: 'danger' });
     }
     return events.sort(
       (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime(),
@@ -159,11 +165,9 @@ export class UserInvoiceDetail implements OnInit {
     this.loadLineItems(id);
   }
 
+  /** Legal copy, kept verbatim in code rather than in the translation files. */
   private resolveWaiverText(): string {
-    const lang = (
-      typeof navigator !== 'undefined' ? navigator.language : 'en'
-    ).toLowerCase();
-    if (lang.startsWith('ro')) {
+    if (appLanguage() === AppLanguages.Romanian) {
       return 'Sunt de acord cu accesul imediat la serviciu și renunț la dreptul meu de retragere de 14 zile (OUG 34/2014).';
     }
     return 'I agree to immediate access to the service and waive my 14-day right of withdrawal (Romanian OUG 34/2014).';
@@ -194,8 +198,8 @@ export class UserInvoiceDetail implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Invoice not found',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('billing.invoiceDetail.toast.notFound'),
         });
         this._router.navigate(['/user/invoices']);
       },
@@ -213,13 +217,14 @@ export class UserInvoiceDetail implements OnInit {
         next: (res) => {
           window.location.href = res.url;
         },
-        error: (err) => {
+        error: (err: unknown) => {
           this.payLoading.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to start payment',
-          });
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('billing.invoiceDetail.toast.payFailed'),
+            err,
+          );
         },
       });
   }

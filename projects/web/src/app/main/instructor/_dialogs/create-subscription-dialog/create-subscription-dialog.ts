@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
@@ -8,7 +7,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Select } from 'primeng/select';
@@ -24,35 +24,26 @@ import {
   type InstructorClient,
 } from 'core';
 
-interface ClientOption {
-  label: string;
-  value: string;
-}
-
-interface ProductOption {
-  label: string;
-  value: string;
-  product: Product;
-}
+type ProductOption = SelectItem<string> & { product: Product };
 
 @Component({
   selector: 'mh-create-subscription-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, Select, InputNumber, CurrencyRonPipe],
+  imports: [FormsModule, TranslatePipe, ButtonDirective, Dialog, Select, InputNumber, CurrencyRonPipe],
   templateUrl: './create-subscription-dialog.html',
   styleUrl: './create-subscription-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateSubscriptionDialog {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _productService = inject(ProductService);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly saved = output<void>();
 
   readonly saving = signal(false);
-  readonly clientOptions = signal<ClientOption[]>([]);
+  readonly clientOptions = signal<SelectItem<string>[]>([]);
   readonly productOptions = signal<ProductOption[]>([]);
 
   formClientUserId: string | undefined = undefined;
@@ -100,13 +91,18 @@ export class CreateSubscriptionDialog {
         next: (res) => {
           this.productOptions.set(
             res.items.map((p) => ({
-              label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} ${p.currency}/${p.interval}`,
+              label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} ${p.currency}/${this.intervalShort(p.interval)}`,
               value: p.id,
               product: p,
             })),
           );
         },
       });
+  }
+
+  /** Lower-case interval word for the plan option label ("month" / "lună"). */
+  private intervalShort(interval: Product['interval']): string {
+    return interval ? this._translateService.instant(`paymentDialogs.interval.short.${interval}`) : '';
   }
 
   onProductChange(productId: string): void {
@@ -138,16 +134,23 @@ export class CreateSubscriptionDialog {
           if (sub.pendingConfirmationUrl) {
             this._messageService.add({
               severity: 'info',
-              summary: 'Membership pending client confirmation',
-              detail:
-                "We emailed the client a link to confirm and start their membership. They'll see the plan, amount, and cycle, then pay with a saved or new card. Nothing is charged until they confirm.",
+              summary: this._translateService.instant(
+                'paymentDialogs.createSubscription.toast.pending.summary',
+              ),
+              detail: this._translateService.instant(
+                'paymentDialogs.createSubscription.toast.pending.detail',
+              ),
               life: 9000,
             });
           } else {
             this._messageService.add({
               severity: 'success',
-              summary: 'Subscription created',
-              detail: 'The subscription has been created successfully',
+              summary: this._translateService.instant(
+                'paymentDialogs.createSubscription.toast.created.summary',
+              ),
+              detail: this._translateService.instant(
+                'paymentDialogs.createSubscription.toast.created.detail',
+              ),
             });
           }
         },
@@ -155,8 +158,8 @@ export class CreateSubscriptionDialog {
           this.saving.set(false);
           showApiError(
             this._messageService,
-            'Could not create subscription',
-            'Please try again.',
+            this._translateService.instant('paymentDialogs.createSubscription.toast.createFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
             err,
           );
         },

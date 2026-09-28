@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -12,6 +13,7 @@ import {
   StripeAccountStatuses,
   TagSeverity,
   deriveStripeAccountStatus,
+  showApiError,
   type OnboardingStatusResponse,
 } from 'core';
 
@@ -25,15 +27,16 @@ import {
     SkeletonModule,
     MessageModule,
     ToastModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './stripe-onboarding-card.html',
   styleUrl: './stripe-onboarding-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StripeOnboardingCard implements OnInit {
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly status = signal<OnboardingStatusResponse | null>(null);
   readonly loading = signal(true);
@@ -74,11 +77,12 @@ export class StripeOnboardingCard implements OnInit {
       },
       error: (err) => {
         this.actionLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to start onboarding',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('payments.common.startOnboardingFailed'),
+          err,
+        );
       },
     });
   }
@@ -101,15 +105,14 @@ export class StripeOnboardingCard implements OnInit {
   statusLabel(): string {
     switch (this.accountStatus) {
       case StripeAccountStatuses.Active:
-        return 'Active';
       case StripeAccountStatuses.Pending:
-        return 'Pending review';
       case StripeAccountStatuses.Restricted:
-        return 'Action required';
       case StripeAccountStatuses.Disconnected:
-        return 'Disconnected';
+        return this._translateService.instant(`payments.onboardingCard.status.${this.accountStatus}`);
       default:
-        return 'Not connected';
+        return this._translateService.instant(
+          `payments.onboardingCard.status.${StripeAccountStatuses.NotStarted}`,
+        );
     }
   }
 }

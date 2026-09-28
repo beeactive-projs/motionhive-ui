@@ -12,14 +12,14 @@
 -->
 <div class="mh-inbox">
   <header class="mh-inbox__header" [class.mh-inbox__header--mobile-hidden]="hasActivePane()">
-    <h1 class="mh-inbox__title">Messages</h1>
+    <h1 class="mh-inbox__title">{{ 'nav.messages' | translate }}</h1>
     @if (store.unreadTotal() > 0) {
-      <span class="mh-inbox__unread-chip">{{ store.unreadTotal() }} unread</span>
+      <span class="mh-inbox__unread-chip">{{ 'messages.inbox.unread' | translate: { count: store.unreadTotal() } }}</span>
     }
     @if (store.streamStatus() === 'closed') {
       <span class="mh-inbox__status-chip" role="status" aria-live="polite">
         <i class="pi pi-wifi" aria-hidden="true"></i>
-        Reconnecting…
+        {{ 'messages.inbox.reconnecting' | translate }}
       </span>
     }
     <span class="mh-inbox__header-spacer"></span>
@@ -28,10 +28,10 @@
       class="mh-inbox__btn mh-inbox__btn--primary"
       (click)="onNewMessage()"
       [disabled]="store.composeMode()"
-      aria-label="New message"
+      [attr.aria-label]="'messages.newMessage' | translate"
     >
       <i class="pi pi-pencil" aria-hidden="true"></i>
-      <span class="mh-inbox__btn-label">New message</span>
+      <span class="mh-inbox__btn-label">{{ 'messages.newMessage' | translate }}</span>
     </button>
   </header>
 

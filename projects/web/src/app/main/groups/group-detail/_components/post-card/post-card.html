@@ -20,7 +20,7 @@
         <button type="button"
           class="self-start text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
           (click)="toggleContent()">
-          {{ contentExpanded() ? 'Show less' : 'Read more' }}
+          {{ (contentExpanded() ? 'button.showLess' : 'groups.post.readMore') | translate }}
         </button>
       }
     </div>
@@ -31,9 +31,9 @@
       @for (url of visibleImages(); track url; let i = $index, last = $last) {
       <button type="button"
         class="post-gallery__cell bg-surface-100 dark:bg-surface-800 cursor-pointer hover:opacity-95 transition-opacity"
-        [attr.aria-label]="'Open photo ' + (i + 1)"
+        [attr.aria-label]="'groups.post.openPhoto' | translate: { index: i + 1 }"
         (click)="openPhoto(i)">
-        <img [src]="url" [alt]="'Post image ' + (i + 1)" loading="lazy" />
+        <img [src]="url" [alt]="'groups.post.imageAlt' | translate: { index: i + 1 }" loading="lazy" />
         @if (last && extraImageCount() > 0) {
         <div class="post-gallery__overlay">+{{ extraImageCount() }}</div>
         }
@@ -47,7 +47,11 @@
       <mh-post-reaction-bar [post]="post()" />
       <button pButton type="button" text severity="secondary" size="small" rounded (click)="toggleComments()">
         <i class="pi pi-comment"></i>
-        {{ post().commentCount > 0 ? post().commentCount.toString() : 'Comment' }}
+        @if (post().commentCount > 0) {
+        {{ post().commentCount }}
+        } @else {
+        {{ 'groups.post.comment' | translate }}
+        }
       </button>
     </div>
 

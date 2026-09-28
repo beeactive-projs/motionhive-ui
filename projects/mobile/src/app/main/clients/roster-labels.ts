@@ -1,9 +1,11 @@
-import { RosterAttention, RosterClient, RosterWindow } from 'core';
+import { RosterAttention, RosterClient, RosterWindow, translate } from 'core';
 
 /**
  * Plain language over the coach's roster — what the API says in enums and
  * percentages, said the way a coach reads it. Pure, and shared by the triage
- * rows, the on-track rows and the client detail card.
+ * rows, the on-track rows and the client detail card. Every label goes
+ * through `translate()` when called, so these are safe to use anywhere after
+ * bootstrap.
  */
 
 /** The triage reads "this week" — the roster's shorter window. */
@@ -37,15 +39,17 @@ export function attentionTone(attention: RosterAttention): AttentionTone | null 
 export function attentionLabel(client: RosterClient): string {
   switch (client.attention) {
     case 'NO_PLAN':
-      return 'No plan assigned';
+      return translate('clients.roster.attention.noPlan');
     case 'NEVER_STARTED':
-      return 'Has not started';
+      return translate('clients.roster.attention.neverStarted');
     case 'SILENT':
-      return `Inactive for ${client.daysSinceLastWorkout} days`;
+      return translate('clients.roster.attention.inactive', {
+        count: client.daysSinceLastWorkout,
+      });
     case 'DROPPED':
-      return 'Dropping off';
+      return translate('clients.roster.attention.dropped');
     case 'BEHIND':
-      return 'Behind plan';
+      return translate('clients.roster.attention.behind');
     default:
       return '';
   }
@@ -55,17 +59,26 @@ export function attentionLabel(client: RosterClient): string {
 export function attentionDetail(client: RosterClient): string {
   switch (client.attention) {
     case 'NO_PLAN':
-      return 'Nothing is assigned, so there is nothing for them to follow.';
+      return translate('clients.roster.detail.noPlan');
     case 'NEVER_STARTED':
-      return 'Assigned a plan but has never logged a workout.';
+      return translate('clients.roster.detail.neverStarted');
     case 'SILENT':
       return client.due > 0
-        ? `${client.completed} of ${client.due} workouts done in this window.`
-        : 'No workouts logged recently.';
+        ? translate('clients.roster.detail.silent', {
+            completed: client.completed,
+            due: client.due,
+          })
+        : translate('clients.roster.detail.silentNone');
     case 'DROPPED':
-      return `Down from ${client.previousAdherencePercent}% to ${client.adherencePercent}% against the previous window.`;
+      return translate('clients.roster.detail.dropped', {
+        previous: client.previousAdherencePercent,
+        current: client.adherencePercent,
+      });
     case 'BEHIND':
-      return `${client.completed} of ${client.due} workouts done.`;
+      return translate('clients.roster.detail.behind', {
+        completed: client.completed,
+        due: client.due,
+      });
     default:
       return '';
   }
@@ -79,25 +92,29 @@ export function adherenceLabel(client: RosterClient): string {
 /** Nothing scheduled is a fact about the plan, not about the person. */
 export function subtitleFor(client: RosterClient): string {
   if (client.due === 0) {
-    return client.activePlans === 0 ? 'No active plan' : 'Nothing scheduled in this window';
+    return client.activePlans === 0
+      ? translate('clients.roster.noActivePlan')
+      : translate('clients.roster.nothingScheduled');
   }
-  return `${client.completed} of ${client.due} workouts`;
+  return translate('clients.roster.progress', { completed: client.completed, due: client.due });
 }
 
 /** "today" / "3d ago" — the stat sub-line on a list row. Null when unknown. */
 export function lastActiveShort(client: RosterClient): string | null {
   const days = client.daysSinceLastWorkout;
   if (days === null) return null;
-  return days === 0 ? 'today' : `${days}d ago`;
+  return days === 0
+    ? translate('clients.roster.lastActiveShort.today')
+    : translate('clients.roster.lastActiveShort.daysAgo', { count: days });
 }
 
 /** The sentence form for the detail card. Null when unknown. */
 export function lastActiveLabel(client: RosterClient): string | null {
   const days = client.daysSinceLastWorkout;
   if (days === null) return null;
-  if (days === 0) return 'Trained today';
-  if (days === 1) return 'Last active yesterday';
-  return `Last active ${days} days ago`;
+  if (days === 0) return translate('clients.roster.lastActive.today');
+  if (days === 1) return translate('clients.roster.lastActive.yesterday');
+  return translate('clients.roster.lastActive.daysAgo', { count: days });
 }
 
 /** The mono block at a row's right edge: one number and what it is. */
@@ -114,17 +131,23 @@ export function attentionStat(client: RosterClient): ClientStat {
   // Nothing assigned means no adherence to quote — "— adherence" would read
   // as a measurement that failed rather than a plan that was never written.
   if (client.attention === 'NO_PLAN') {
-    return { value: '—', sub: 'no plan' };
+    return { value: '—', sub: translate('clients.roster.stat.noPlan') };
   }
   if (client.attention === 'SILENT' && client.daysSinceLastWorkout !== null) {
-    return { value: `${client.daysSinceLastWorkout}d`, sub: 'last active' };
+    return {
+      value: translate('clients.roster.stat.days', { count: client.daysSinceLastWorkout }),
+      sub: translate('clients.roster.stat.lastActive'),
+    };
   }
-  return { value: adherenceLabel(client), sub: 'adherence' };
+  return { value: adherenceLabel(client), sub: translate('clients.roster.stat.adherence') };
 }
 
 /** An on-track row: adherence, with when they last trained under it. */
 export function onTrackStat(client: RosterClient): ClientStat {
-  return { value: adherenceLabel(client), sub: lastActiveShort(client) ?? 'adherence' };
+  return {
+    value: adherenceLabel(client),
+    sub: lastActiveShort(client) ?? translate('clients.roster.stat.adherence'),
+  };
 }
 
 /**
@@ -136,7 +159,5 @@ export function onTrackStat(client: RosterClient): ClientStat {
  * one screen with nothing to tell them apart read as a contradiction.
  */
 export function triageNote(needs: number, total: number): string {
-  const noun = total === 1 ? 'active client' : 'active clients';
-  const verb = needs === 1 ? 'needs' : 'need';
-  return `${needs} of ${total} ${noun} ${verb} a look`;
+  return translate('clients.triage.note', { needs, total });
 }

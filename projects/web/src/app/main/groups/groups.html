@@ -5,19 +5,19 @@
       routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
       class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap transition-colors hover:bg-surface-300 hover:text-surface-800">
       <i class="pi pi-bookmark text-base"></i>
-      <span>Feed</span>
+      <span>{{ 'groups.feed.title' | translate }}</span>
     </a>
     <a [routerLink]="['./discover']"
       routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
       class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap transition-colors hover:bg-surface-300 hover:text-surface-800">
       <i class="pi pi-compass text-base"></i>
-      <span>Discover</span>
+      <span>{{ 'nav.discover' | translate }}</span>
     </a>
     <a [routerLink]="['./your-groups']"
       routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
       class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap transition-colors hover:bg-surface-300 hover:text-surface-800">
       <i class="pi pi-users text-base"></i>
-      <span>Your groups</span>
+      <span>{{ 'groups.yourGroups.title' | translate }}</span>
     </a>
   </nav>
 
@@ -36,7 +36,7 @@
             routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i class="pi pi-bookmark text-base"></i>
-            <span>Feed</span>
+            <span>{{ 'groups.feed.title' | translate }}</span>
           </a>
         </li>
         <li>
@@ -44,7 +44,7 @@
             routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i class="pi pi-compass text-base"></i>
-            <span>Discover</span>
+            <span>{{ 'nav.discover' | translate }}</span>
           </a>
         </li>
         <li>
@@ -52,14 +52,14 @@
             routerLinkActive="bg-primary-500/30 text-primary-700 dark:text-primary-500 font-semibold"
             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i class="pi pi-users text-base"></i>
-            <span>Your groups</span>
+            <span>{{ 'groups.yourGroups.title' | translate }}</span>
           </a>
         </li>
       </ul>
     </nav>
 
     @if (isInstructor()) {
-    <button pButton type="button" fluid (click)="openCreate()"><i class="pi pi-plus"></i> Create new group</button>
+    <button pButton type="button" fluid (click)="openCreate()"><i class="pi pi-plus"></i> {{ 'groups.layout.createGroup' | translate }}</button>
     }
 
     <hr class="border-0 border-t border-surface my-1" />
@@ -67,7 +67,7 @@
     <!-- Joined groups shortcuts -->
     <nav class="px-1">
       <h3 class="px-3 mb-2 text-xs uppercase tracking-wider text-surface-700 dark:text-surface-400">
-        Groups you've joined
+        {{ 'groups.layout.joinedTitle' | translate }}
       </h3>
 
       @if (loadingJoined()) {
@@ -84,7 +84,7 @@
       </ul>
       } @else if (joinedGroups().length === 0) {
       <p class="text-xs text-surface-700 dark:text-surface-400 px-3">
-        You haven't joined any groups yet.
+        {{ 'groups.layout.joinedNone' | translate }}
       </p>
       } @else {
       <ul class="flex flex-col gap-1 mb-2 list-none m-0 p-0">
@@ -106,7 +106,7 @@
             <span class="min-w-0 flex-1">
               <span class="block truncate font-medium">{{ g.name }}</span>
               <span class="block text-xs text-muted-color">
-                {{ g.memberCount }} {{ g.memberCount === 1 ? 'member' : 'members' }}
+                {{ 'count.members' | translate: { count: g.memberCount } }}
               </span>
             </span>
           </a>

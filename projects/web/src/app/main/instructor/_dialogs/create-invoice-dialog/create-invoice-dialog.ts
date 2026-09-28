@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   computed,
@@ -14,8 +13,16 @@ import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { debounceTime, Subject, Subscription, startWith } from 'rxjs';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { DatePicker } from 'primeng/datepicker';
@@ -23,6 +30,7 @@ import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { Tooltip } from 'primeng/tooltip';
 import {
@@ -32,6 +40,7 @@ import {
   ProductService,
   ProductTypes,
   StripeOnboardingStore,
+  showApiError,
   type InstructorClient,
   type Product,
 } from 'core';
@@ -85,7 +94,9 @@ interface StoredDraft {
 @Component({
   selector: 'mh-create-invoice-dialog',
   imports: [
+    FormsModule,
     ReactiveFormsModule,
+    TranslatePipe,
     DatePipe,
     Avatar,
     ButtonDirective,
@@ -96,12 +107,12 @@ interface StoredDraft {
     InputText,
     InputNumber,
     Select,
+    SelectButton,
     TextareaModule,
     Tooltip,
   ],
   templateUrl: './create-invoice-dialog.html',
   styleUrl: './create-invoice-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateInvoiceDialog {
   private readonly _invoiceService = inject(PaymentInvoiceService);
@@ -109,11 +120,13 @@ export class CreateInvoiceDialog {
   private readonly _productService = inject(ProductService);
   private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
-  private readonly _fb = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
+  private readonly _formBuilder = inject(FormBuilder);
   // Needed to nudge OnPush change detection after the async `loadForEdit`
   // hydrates the form with `emitEvent: false`. Without this, the
   // template stays bound to the empty initial state.
   private readonly _cdr = inject(ChangeDetectorRef);
+  private readonly _currencyPipe = new CurrencyRonPipe();
 
   readonly visible = model(false);
   readonly saved = output<void>();
@@ -139,7 +152,7 @@ export class CreateInvoiceDialog {
    * exists on Stripe; this signal lets us render a small read-only
    * "Bill to: <name>" header instead of leaving the section empty.
    */
-  readonly _editRecipient = signal<{ name: string; email: string | null } | null>(
+  readonly editRecipient = signal<{ name: string; email: string | null } | null>(
     null,
   );
   readonly clientOptions = signal<ClientOption[]>([]);
@@ -154,12 +167,19 @@ export class CreateInvoiceDialog {
    *  BE picks the real currency from the account, this is cosmetic. */
   readonly displayCurrency = signal<string>('USD');
 
-  readonly dueChipOptions: { label: string; value: DuePreset }[] = [
-    { label: 'On receipt', value: 0 },
-    { label: '7 days', value: 7 },
-    { label: '14 days', value: 14 },
-    { label: '30 days', value: 30 },
-    { label: 'Custom', value: 'custom' },
+  /** Bill-to mode: an existing client, or a new recipient typed in by hand. */
+  readonly recipientModeOptions: SelectItem<boolean>[] = [
+    { label: this._translateService.instant('paymentDialogs.createInvoice.existingClient'), value: false },
+    { label: this._translateService.instant('paymentDialogs.createInvoice.newRecipient'), value: true },
+  ];
+
+  readonly dueChipOptions: SelectItem<DuePreset>[] = [
+    { label: this._translateService.instant('paymentDialogs.createInvoice.due.onReceipt'), value: 0 },
+    ...([7, 14, 30] as const).map((days) => ({
+      label: this._translateService.instant('count.days', { count: days }),
+      value: days,
+    })),
+    { label: this._translateService.instant('paymentDialogs.createInvoice.due.custom'), value: 'custom' },
   ];
 
   // NOTE: the following fields are ordered carefully.
@@ -182,7 +202,7 @@ export class CreateInvoiceDialog {
   private readonly _lineItemSubs = new WeakMap<FormGroup, Subscription>();
   private readonly _autoSave$ = new Subject<void>();
 
-  readonly form = this._fb.group({
+  readonly form = this._formBuilder.group({
     clientUserId: [''],
     guestEmail: ['', [Validators.email]],
     guestFirstName: [''],
@@ -190,7 +210,7 @@ export class CreateInvoiceDialog {
     notes: [''],
     customDueDate: [null as Date | null],
     sendImmediately: [true],
-    lineItems: this._fb.array([this.createLineItemGroup()]),
+    lineItems: this._formBuilder.array([this.createLineItemGroup()]),
   });
 
   get lineItems(): FormArray {
@@ -220,9 +240,10 @@ export class CreateInvoiceDialog {
   private formatRecipientName(
     client: { firstName: string | null; lastName: string | null; email: string } | null | undefined,
   ): string {
-    if (!client) return 'Recipient';
+    const fallback = this._translateService.instant('paymentDialogs.createInvoice.recipient');
+    if (!client) return fallback;
     const full = [client.firstName, client.lastName].filter((s): s is string => !!s).join(' ');
-    return full || client.email || 'Recipient';
+    return full || client.email || fallback;
   }
 
   constructor() {
@@ -270,7 +291,7 @@ export class CreateInvoiceDialog {
   // ---------------------------------------------------------------
 
   createLineItemGroup(initial?: Partial<StoredLineItem>): FormGroup {
-    const group = this._fb.group({
+    const group = this._formBuilder.group({
       productId: [initial?.productId ?? (null as string | null)],
       name: [initial?.name ?? ''],
       description: [initial?.description ?? ''],
@@ -477,7 +498,8 @@ export class CreateInvoiceDialog {
       next: (response) => {
         this.productOptions.set(
           response.items.map((p) => ({
-            label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} RON`,
+            // The product's own currency — not a hardcoded RON.
+            label: `${p.name} — ${this._currencyPipe.transform(p.amountCents, p.currency, 'code')}`,
             value: p.id,
             product: p,
           })),
@@ -585,7 +607,7 @@ export class CreateInvoiceDialog {
         this.draftSavedAt.set(null);
         // Stash the recipient name so the locked summary in edit mode
         // can render it without re-fetching the client list.
-        this._editRecipient.set({
+        this.editRecipient.set({
           name: this.formatRecipientName(invoice.client),
           email: invoice.client?.email ?? null,
         });
@@ -597,13 +619,14 @@ export class CreateInvoiceDialog {
         // opened. One markForCheck rebinds everything in one pass.
         this._cdr.markForCheck();
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.loadingForEdit.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Could not load invoice',
-          detail: err?.error?.message || 'Try again in a moment.',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('paymentDialogs.createInvoice.toast.loadFailed.summary'),
+          this._translateService.instant('paymentDialogs.createInvoice.toast.loadFailed.detail'),
+          err,
+        );
         this.visible.set(false);
       },
     });
@@ -738,27 +761,15 @@ export class CreateInvoiceDialog {
         const email = this.form.value.guestEmail?.trim();
         const firstName = this.form.value.guestFirstName?.trim();
         if (!email || this.form.get('guestEmail')?.invalid) {
-          this._messageService.add({
-            severity: 'warn',
-            summary: 'Email required',
-            detail: 'Please enter a valid email address for the recipient.',
-          });
+          this.warn('emailRequired');
           return;
         }
         if (!firstName) {
-          this._messageService.add({
-            severity: 'warn',
-            summary: 'Name required',
-            detail: 'Please enter at least a first name for the recipient.',
-          });
+          this.warn('nameRequired');
           return;
         }
       } else if (!this.form.value.clientUserId) {
-        this._messageService.add({
-          severity: 'warn',
-          summary: 'Client required',
-          detail: 'Please select a client or enter an email address.',
-        });
+        this.warn('clientRequired');
         return;
       }
     }
@@ -768,23 +779,26 @@ export class CreateInvoiceDialog {
       this.lineItems.controls.forEach((group, idx) => {
         const amt = group.get('amount');
         const qty = group.get('quantity');
-        if (amt?.invalid) details.push(`Line ${idx + 1}: amount must be ≥ 0.50 RON`);
-        if (qty?.invalid) details.push(`Line ${idx + 1}: quantity must be ≥ 1`);
+        const line = idx + 1;
+        if (amt?.invalid) {
+          details.push(this._translateService.instant('paymentDialogs.createInvoice.toast.lineAmountInvalid', { line }));
+        }
+        if (qty?.invalid) {
+          details.push(this._translateService.instant('paymentDialogs.createInvoice.toast.lineQuantityInvalid', { line }));
+        }
       });
       this._messageService.add({
         severity: 'warn',
-        summary: 'Line items invalid',
-        detail: details.join(' · ') || 'Check all line items',
+        summary: this._translateService.instant('paymentDialogs.createInvoice.toast.lineItemsInvalid.summary'),
+        detail:
+          details.join(' · ') ||
+          this._translateService.instant('paymentDialogs.createInvoice.toast.lineItemsInvalid.detail'),
       });
       return;
     }
 
     if (this.duePreset() === 'custom' && !this.form.value.customDueDate) {
-      this._messageService.add({
-        severity: 'warn',
-        summary: 'Due date required',
-        detail: 'Pick a date or choose one of the presets.',
-      });
+      this.warn('dueDateRequired');
       return;
     }
 
@@ -832,18 +846,19 @@ export class CreateInvoiceDialog {
           this.saved.emit();
           this._messageService.add({
             severity: 'success',
-            summary: 'Draft updated',
-            detail: 'Invoice changes saved.',
+            summary: this._translateService.instant('paymentDialogs.createInvoice.toast.updated.summary'),
+            detail: this._translateService.instant('paymentDialogs.createInvoice.toast.updated.detail'),
           });
         },
-        error: (err) => {
+        error: (err: unknown) => {
           this.saving.set(false);
           this._suspendAutoSave = false;
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to update invoice',
-          });
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('paymentDialogs.createInvoice.toast.updateFailed'),
+            err,
+          );
         },
       });
       return;
@@ -871,20 +886,24 @@ export class CreateInvoiceDialog {
         this._suspendAutoSave = false;
         this.visible.set(false);
         this.saved.emit();
+        const toast = raw.sendImmediately
+          ? 'paymentDialogs.createInvoice.toast.sent'
+          : 'paymentDialogs.createInvoice.toast.draftSaved';
         this._messageService.add({
           severity: 'success',
-          summary: raw.sendImmediately ? 'Invoice sent' : 'Draft saved',
-          detail: raw.sendImmediately ? 'Invoice created and sent' : 'Invoice saved as draft',
+          summary: this._translateService.instant(`${toast}.summary`),
+          detail: this._translateService.instant(`${toast}.detail`),
         });
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.saving.set(false);
         this._suspendAutoSave = false;
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to create invoice',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('paymentDialogs.createInvoice.toast.createFailed'),
+          err,
+        );
       },
     });
   }
@@ -893,6 +912,15 @@ export class CreateInvoiceDialog {
     // "Save as draft" = send to backend with sendImmediately=false.
     this.form.patchValue({ sendImmediately: false });
     this.submit();
+  }
+
+  /** Warning toast from `paymentDialogs.createInvoice.toast.<name>.{summary,detail}`. */
+  private warn(name: 'emailRequired' | 'nameRequired' | 'clientRequired' | 'dueDateRequired'): void {
+    this._messageService.add({
+      severity: 'warn',
+      summary: this._translateService.instant(`paymentDialogs.createInvoice.toast.${name}.summary`),
+      detail: this._translateService.instant(`paymentDialogs.createInvoice.toast.${name}.detail`),
+    });
   }
 
   isFieldInvalid(field: string): boolean {

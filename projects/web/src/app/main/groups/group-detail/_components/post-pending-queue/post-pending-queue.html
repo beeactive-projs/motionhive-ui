@@ -1,6 +1,6 @@
 @if (loading()) {
 <p-card class="shadow-md">
-  <div class="flex flex-col gap-3" role="status" aria-label="Loading pending posts">
+  <div class="flex flex-col gap-3" role="status" [attr.aria-label]="'groups.pendingPosts.loadingA11y' | translate">
     @for (i of skeletonRows; track i) {
     <div class="flex items-start gap-3">
       <p-skeleton shape="circle" size="2.5rem" />
@@ -17,7 +17,7 @@
   <header class="flex items-center gap-2 mb-3">
     <i class="pi pi-clock text-warn-500" aria-hidden="true"></i>
     <h3 class="font-medium text-surface-900 dark:text-surface-100 m-0">
-      Pending approval
+      {{ 'groups.pendingPosts.title' | translate }}
     </h3>
     <p-tag [value]="count().toString()" severity="warn" />
   </header>
@@ -44,14 +44,14 @@
         @if (post.mediaUrls?.length) {
         <p class="text-xs text-surface-500 mt-1 flex items-center gap-1">
           <i class="pi pi-image" aria-hidden="true"></i>
-          {{ post.mediaUrls?.length }} image(s)
+          {{ 'groups.pendingPosts.images' | translate: { count: post.mediaUrls?.length } }}
         </p>
         }
 
         <div class="mt-2 flex items-center gap-2">
           <button pButton type="button" size="small" severity="success" [disabled]="isAnyBusy() && !isBusy(post)" (click)="approve(post)">
             <i class="pi" [class]="isBusy(post) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-            Approve
+            {{ 'button.approve' | translate }}
           </button>
           <button pButton
             type="button"
@@ -62,7 +62,7 @@
             (click)="reject(post)"
           >
             <i class="pi" [class]="isBusy(post) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-            Reject
+            {{ 'button.reject' | translate }}
           </button>
         </div>
       </div>

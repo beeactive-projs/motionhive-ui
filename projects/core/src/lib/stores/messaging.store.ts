@@ -7,6 +7,7 @@ import {
   Injectable,
   signal,
 } from '@angular/core';
+import { translate } from '../i18n/translator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -844,9 +845,7 @@ export class MessagingStore {
                 this.dropThread(threadKey);
                 this._composeMode.set(false);
               }
-              this._sendError.set(
-                'Message couldn’t be delivered. They may have left or blocked messages from you.',
-              );
+              this._sendError.set(translate('error.messaging.notDelivered'));
               resolve(conversationId);
               return;
             }
@@ -944,8 +943,8 @@ export class MessagingStore {
                 this._sendRateLimitedUntil.set(Date.now() + windowMs);
                 this._sendError.set(
                   retryAfter
-                    ? `Slow down — try again in ${retryAfter}s.`
-                    : 'Slow down — too many messages.',
+                    ? translate('error.messaging.rateLimitedRetry', { seconds: retryAfter })
+                    : translate('error.messaging.rateLimited'),
                 );
                 resolve(conversationId);
                 return EMPTY;
@@ -954,19 +953,19 @@ export class MessagingStore {
                 // BE supplies user-facing copy in `message` already.
                 const reason =
                   (err.error as { message?: string })?.message ??
-                  'You can’t send this message.';
+                  translate('error.messaging.forbidden');
                 this._sendError.set(reason);
                 resolve(conversationId);
                 return EMPTY;
               }
               if (err.status === 400) {
-                this._sendError.set('Message couldn’t be sent.');
+                this._sendError.set(translate('error.messaging.notSent'));
                 resolve(conversationId);
                 return EMPTY;
               }
               if (err.status === 0) {
                 // No network. Inline-only — global handler also fires.
-                this._sendError.set('You’re offline. Check your connection.');
+                this._sendError.set(translate('error.messaging.offline'));
                 resolve(conversationId);
                 return throwError(() => err);
               }
@@ -975,7 +974,7 @@ export class MessagingStore {
             // 5xx + anything else: let the global handler show the
             // dialog AND surface an inline error so the composer
             // doesn't sit silent.
-            this._sendError.set('Couldn’t send. Try again.');
+            this._sendError.set(translate('error.messaging.sendFailed'));
             resolve(conversationId);
             return throwError(() => err);
           }),

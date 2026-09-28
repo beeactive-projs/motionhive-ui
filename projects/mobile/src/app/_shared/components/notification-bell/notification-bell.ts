@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { IonBadge, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { notificationsOutline } from 'ionicons/icons';
 import { filter, map, startWith } from 'rxjs';
@@ -23,7 +24,7 @@ import { activeTabIdFromUrl } from '../../config/tabs.config';
  */
 @Component({
   selector: 'mh-notification-bell',
-  imports: [IonBadge, IonButton, IonIcon, RouterLink],
+  imports: [IonBadge, IonButton, IonIcon, RouterLink, TranslatePipe],
   templateUrl: './notification-bell.html',
   styleUrl: './notification-bell.scss',
 })

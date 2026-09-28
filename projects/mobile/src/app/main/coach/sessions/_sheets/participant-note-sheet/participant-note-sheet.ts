@@ -1,5 +1,6 @@
-import { Component, computed, effect, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { IonTextarea } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { SessionParticipant, displayName } from 'core';
 
@@ -17,11 +18,13 @@ import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-
  */
 @Component({
   selector: 'mh-participant-note-sheet',
-  imports: [IonTextarea, SheetShell],
+  imports: [IonTextarea, SheetShell, TranslatePipe],
   templateUrl: './participant-note-sheet.html',
   styleUrl: './participant-note-sheet.scss',
 })
 export class ParticipantNoteSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly participant = input<SessionParticipant | null>(null);
   readonly saving = input(false);
@@ -41,7 +44,10 @@ export class ParticipantNoteSheet {
 
   readonly title = computed(() => {
     const participant = this.participant();
-    return participant ? `Note · ${displayName(participant.user, 'Someone')}` : 'Note';
+    if (!participant) return this._translateService.instant('sessions.noteSheet.title');
+    return this._translateService.instant('sessions.noteSheet.titleWithName', {
+      name: displayName(participant.user, this._translateService.instant('common.someone')),
+    });
   });
 
   commit(): void {

@@ -4,18 +4,18 @@
       type="button"
       class="mh-mm__nav"
       (click)="prev()"
-      aria-label="Previous month"
+      [attr.aria-label]="'a11y.previousMonth' | translate"
     >
       <i class="pi pi-chevron-left" aria-hidden="true"></i>
     </button>
     <span class="mh-mm__title">
-      {{ viewMonth() | date: 'MMMM yyyy' : '' : 'en-GB' }}
+      {{ viewMonth() | date: 'LLLL yyyy' }}
     </span>
     <button
       type="button"
       class="mh-mm__nav"
       (click)="next()"
-      aria-label="Next month"
+      [attr.aria-label]="'a11y.nextMonth' | translate"
     >
       <i class="pi pi-chevron-right" aria-hidden="true"></i>
     </button>

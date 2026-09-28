@@ -24,8 +24,9 @@ import {
   IonToolbar,
   NavController,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { AuthService, RegisterRequest, UserService } from 'core';
+import { AuthService, RegisterRequest, UserService, validationMessage } from 'core';
 
 @Component({
   selector: 'mh-sign-up',
@@ -44,6 +45,7 @@ import { AuthService, RegisterRequest, UserService } from 'core';
     IonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.scss',
@@ -54,6 +56,7 @@ export class SignUp {
   private readonly _userService = inject(UserService);
   private readonly _navController = inject(NavController);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -99,7 +102,9 @@ export class SignUp {
       },
       error: (error) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error?.message || 'Registration failed. Please try again.');
+        this.errorMessage.set(
+          error.error?.message || this._translateService.instant('auth.signUp.error'),
+        );
       },
     });
   }
@@ -115,29 +120,14 @@ export class SignUp {
     return field.hasError('required') || this.registerForm.hasError('passwordMismatch');
   }
 
+  /** The control's own error first (required), then the group-level mismatch. */
   getConfirmPasswordError(): string {
-    const field = this.registerForm.get('confirmPassword');
-    if (!field) return '';
-    if (field.hasError('required')) return 'Please confirm your password';
-    if (this.registerForm.hasError('passwordMismatch')) return 'Passwords do not match';
-    return '';
+    const errors = this.registerForm.get('confirmPassword')?.errors ?? this.registerForm.errors;
+    return validationMessage(errors, { required: 'auth.signUp.confirmPasswordRequired' });
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.registerForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return `${this.capitalize(fieldName)} is required`;
-    if (field.errors['email']) return 'Please enter a valid email address';
-    if (field.errors['minlength']) {
-      const minLength = field.errors['minlength'].requiredLength;
-      return `${this.capitalize(fieldName)} must be at least ${minLength} characters`;
-    }
-    if (field.errors['passwordStrength']) {
-      return 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
-    }
-
-    return '';
+    return validationMessage(this.registerForm.get(fieldName)?.errors);
   }
 
   private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
@@ -164,12 +154,5 @@ export class SignUp {
   private navigateToApp(): void {
     const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl');
     this._navController.navigateRoot(returnUrl || '/tabs/home');
-  }
-
-  private capitalize(str: string): string {
-    if (str === 'firstName') return 'First name';
-    if (str === 'lastName') return 'Last name';
-    if (str === 'confirmPassword') return 'Confirm password';
-    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

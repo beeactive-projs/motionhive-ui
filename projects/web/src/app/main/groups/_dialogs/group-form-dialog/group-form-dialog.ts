@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,8 +9,16 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CreateGroupPayload, Group, GroupService, JoinPolicy, UpdateGroupPayload } from 'core';
-import { MessageService } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  CreateGroupPayload,
+  Group,
+  GroupService,
+  JoinPolicies,
+  JoinPolicy,
+  UpdateGroupPayload,
+} from 'core';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Chip } from 'primeng/chip';
 import { Dialog } from 'primeng/dialog';
@@ -20,21 +27,26 @@ import { Select } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-interface JoinPolicyOption {
-  label: string;
-  value: JoinPolicy;
-}
-
 @Component({
   selector: 'mh-group-form-dialog',
-  imports: [FormsModule, ButtonDirective, Chip, Dialog, InputText, Select, TextareaModule, ToggleSwitch],
+  imports: [
+    FormsModule,
+    ButtonDirective,
+    Chip,
+    Dialog,
+    InputText,
+    Select,
+    TextareaModule,
+    ToggleSwitch,
+    TranslatePipe,
+  ],
   templateUrl: './group-form-dialog.html',
   styleUrl: './group-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupFormDialog {
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly group = input<Group | null>(null);
@@ -42,19 +54,21 @@ export class GroupFormDialog {
 
   formName = '';
   formDescription = '';
-  formJoinPolicy: JoinPolicy = 'OPEN';
+  formJoinPolicy: JoinPolicy = JoinPolicies.Open;
   formIsPublic = true;
   formTags: string[] = [];
   formTagInput = '';
   readonly saving = signal(false);
 
-  readonly dialogHeader = computed(() => (this.group() ? 'Edit group' : 'Create group'));
+  readonly dialogHeader = computed(() =>
+    this._translateService.instant(this.group() ? 'groups.common.editGroup' : 'groups.formDialog.create'),
+  );
 
-  readonly joinPolicyOptions: JoinPolicyOption[] = [
-    { label: 'Open', value: 'OPEN' },
-    { label: 'Approval required', value: 'APPROVAL' },
-    { label: 'Invite only', value: 'INVITE_ONLY' },
-  ];
+  readonly joinPolicyOptions: SelectItem<JoinPolicy>[] = [
+    JoinPolicies.Open,
+    JoinPolicies.Approval,
+    JoinPolicies.InviteOnly,
+  ].map((value) => ({ label: this._translateService.instant(`groups.joinPolicyLong.${value}`), value }));
 
   private readonly _syncFormEffect = effect(() => {
     const group = this.group();
@@ -93,8 +107,8 @@ export class GroupFormDialog {
           this.visible.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Group created',
-            detail: 'Your new group has been created successfully',
+            summary: this._translateService.instant('groups.toast.groupCreated.summary'),
+            detail: this._translateService.instant('groups.toast.groupCreated.detail'),
           });
           this.saved.emit();
         },
@@ -102,8 +116,8 @@ export class GroupFormDialog {
           this.saving.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to create group',
+            summary: this._translateService.instant('toast.summary.error'),
+            detail: err.error?.message || this._translateService.instant('groups.toast.groupCreateFailed'),
           });
         },
       });
@@ -122,8 +136,8 @@ export class GroupFormDialog {
           this.visible.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Group updated',
-            detail: 'Group has been updated successfully',
+            summary: this._translateService.instant('groups.toast.groupUpdated.summary'),
+            detail: this._translateService.instant('groups.toast.groupUpdated.detail'),
           });
           this.saved.emit();
         },
@@ -131,8 +145,8 @@ export class GroupFormDialog {
           this.saving.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to update group',
+            summary: this._translateService.instant('toast.summary.error'),
+            detail: err.error?.message || this._translateService.instant('groups.toast.groupUpdateFailed'),
           });
         },
       });
@@ -161,7 +175,7 @@ export class GroupFormDialog {
   private _resetForm(): void {
     this.formName = '';
     this.formDescription = '';
-    this.formJoinPolicy = 'OPEN';
+    this.formJoinPolicy = JoinPolicies.Open;
     this.formIsPublic = true;
     this.formTags = [];
     this.formTagInput = '';

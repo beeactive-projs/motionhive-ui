@@ -5,7 +5,7 @@
   <a [routerLink]="['/groups', g.id]"
     class="inline-flex items-center gap-2 text-xs text-surface-700 dark:text-surface-400 hover:text-primary-500 w-fit no-underline">
     <i class="pi pi-users text-[0.7rem]"></i>
-    <span>Posted in <span class="font-medium">{{ g.name }}</span></span>
+    <span>{{ 'groups.post.postedIn' | translate }} <span class="font-medium">{{ g.name }}</span></span>
   </a>
   }
 
@@ -20,7 +20,8 @@
         </div>
         <div class="flex items-center gap-1">
           @if (menuItems().length > 0) {
-          <button pButton type="button" rounded text severity="secondary" size="small" (click)="postMenu.toggle($event)" iconOnly>
+          <button pButton type="button" rounded text severity="secondary" size="small" (click)="postMenu.toggle($event)"
+            [attr.aria-label]="'a11y.moreActions' | translate" iconOnly>
             <i class="pi pi-ellipsis-h"></i>
           </button>
           <p-menu #postMenu [model]="menuItems()" [appendTo]="'body'" [popup]="true" />

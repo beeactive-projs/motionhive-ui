@@ -1,4 +1,4 @@
-import { Component, signal, inject, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,6 +7,7 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG imports
 import { ButtonDirective } from 'primeng/button';
@@ -14,7 +15,7 @@ import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 
 // Core imports
-import { AuthService, Logo } from 'core';
+import { AuthService, Logo, validationMessage } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
@@ -27,16 +28,17 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     MessageModule,
     ThemeToggleComponent,
     Logo,
+    TranslatePipe,
   ],
   templateUrl: './new-password.component.html',
   styleUrl: './new-password.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewPasswordComponent implements OnInit {
   private readonly _formBuilder = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -60,7 +62,7 @@ export class NewPasswordComponent implements OnInit {
       this.hasToken.set(!!this.token);
       if (!this.token) {
         this.errorMessage.set(
-          'Invalid or missing reset token. Please request a new password reset link.',
+          this._translateService.instant('auth.newPassword.error.missingToken'),
         );
       }
     });
@@ -96,9 +98,7 @@ export class NewPasswordComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.successMessage.set(
-            'Your password has been reset successfully. Redirecting to login...',
-          );
+          this.successMessage.set(this._translateService.instant('auth.newPassword.success'));
           setTimeout(() => {
             this._router.navigate(['/auth/login']);
           }, 2000);
@@ -106,7 +106,8 @@ export class NewPasswordComponent implements OnInit {
         error: (error) => {
           this.isLoading.set(false);
           this.errorMessage.set(
-            error.error?.message || 'Failed to reset password. The link may have expired.',
+            error.error?.message ||
+              this._translateService.instant('auth.newPassword.error.resetFailed'),
           );
         },
       });
@@ -125,20 +126,6 @@ export class NewPasswordComponent implements OnInit {
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.newPasswordForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return `${this.capitalize(fieldName)} is required`;
-    if (field.errors['minlength']) {
-      return `Password must be at least ${field.errors['minlength'].requiredLength} characters`;
-    }
-
-    return '';
-  }
-
-  private capitalize(str: string): string {
-    if (str === 'newPassword') return 'New password';
-    if (str === 'confirmPassword') return 'Confirm password';
-    return str.charAt(0).toUpperCase() + str.slice(1);
+    return validationMessage(this.newPasswordForm.get(fieldName)?.errors);
   }
 }

@@ -1,10 +1,12 @@
 import { Component, computed, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import {
   BubblePosition,
   MessageView,
   ParticipantSnapshot,
+  appLocale,
   displayName,
   isOptimisticMessageId,
 } from 'core';
@@ -27,7 +29,7 @@ const TIGHT_RADIUS = 6;
  */
 @Component({
   selector: 'mh-message-bubble',
-  imports: [HexAvatar, IonIcon],
+  imports: [HexAvatar, IonIcon, TranslatePipe],
   templateUrl: './message-bubble.html',
   styleUrl: './message-bubble.scss',
   host: {
@@ -85,7 +87,7 @@ export class MessageBubble {
   });
 
   readonly timeLabel = computed(() =>
-    new Date(this.message().createdAt).toLocaleTimeString(undefined, {
+    new Date(this.message().createdAt).toLocaleTimeString(appLocale(), {
       hour: 'numeric',
       minute: '2-digit',
     }),

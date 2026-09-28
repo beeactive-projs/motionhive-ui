@@ -1,8 +1,6 @@
 <ng-template #body>
   @if (isRecurring()) {
-  <ion-note class="mh-note-block">
-    This is part of a recurring series. Choose what to cancel.
-  </ion-note>
+  <ion-note class="mh-note-block">{{ 'sessions.cancelSheet.recurringNote' | translate }}</ion-note>
 
   <ion-radio-group [value]="scope()" (ionChange)="scope.set($event.detail.value)">
     @for (option of scopeOptions(); track option.value) {
@@ -21,14 +19,13 @@
   <div class="mh-section-label">{{ messageLabel() }}</div>
 
   <ion-textarea fill="outline" [autoGrow]="true" [rows]="3" [maxlength]="500"
-    placeholder="Sorry — have to cancel. Let's regroup next week." [value]="message()"
+    [placeholder]="'sessions.cancelSheet.placeholder' | translate" [value]="message()"
     (ionInput)="message.set($event.detail.value ?? '')" />
 
-  <p class="mh-helper">
-    Everyone who signed up is notified either way. This adds your reason.
-  </p>
+  <p class="mh-helper">{{ 'sessions.cancelSheet.helper' | translate }}</p>
 </ng-template>
 
-<mh-sheet-shell [(open)]="open" title="Cancel session" [subtitle]="subtitle()" saveLabel="Cancel session"
-  saveColor="danger" dismissLabel="Keep" [body]="body" [saving]="saving()" [breakpoints]="[0, 0.75]"
+<mh-sheet-shell [(open)]="open" [title]="'sessions.cancelSheet.title' | translate" [subtitle]="subtitle()"
+  [saveLabel]="'sessions.cancelSheet.confirm' | translate" saveColor="danger"
+  [dismissLabel]="'button.keep' | translate" [body]="body" [saving]="saving()" [breakpoints]="[0, 0.75]"
   [initialBreakpoint]="0.75" (save)="confirm()" />

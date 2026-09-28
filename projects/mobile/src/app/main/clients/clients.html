@@ -7,11 +7,12 @@
          box is a request per term now, not a filter over loaded rows.
          Named, because a searchbar with only a placeholder announces itself
          as Ionic's default "search text". -->
-    <ion-searchbar mhAutofocus placeholder="Search clients" aria-label="Search clients"
+    <ion-searchbar mhAutofocus [placeholder]="'clients.list.search' | translate"
+      [attr.aria-label]="'clients.list.search' | translate"
       inputmode="search" [debounce]="300" [value]="store.query()"
       (ionInput)="onQuery($event.detail.value ?? '')" />
     <ion-buttons slot="end">
-      <ion-button class="cancel" (click)="closeSearch()">Cancel</ion-button>
+      <ion-button class="cancel" (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 
@@ -22,21 +23,23 @@
     <div class="scope">
       <span class="where">{{ searchScope() }}</span>
       @if (store.filter() !== Filters.All) {
-      <ion-button fill="clear" size="small" (click)="setFilter(Filters.All)">Clear filter</ion-button>
+      <ion-button fill="clear" size="small" (click)="setFilter(Filters.All)">
+        {{ 'button.clearFilter' | translate }}
+      </ion-button>
       }
     </div>
     @if (showSearchHint()) {
-    <p class="hint">Type at least {{ minSearchLength }} characters to search every client.</p>
+    <p class="hint">{{ 'clients.list.searchHint' | translate: { count: minSearchLength } }}</p>
     }
   </ion-toolbar>
 </ion-header>
 } @else {
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Clients</ion-title>
+    <ion-title>{{ 'nav.clients' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell class="round" />
-      <ion-button shape="round" aria-label="Search clients" (click)="openSearch()">
+      <ion-button shape="round" [attr.aria-label]="'clients.list.search' | translate" (click)="openSearch()">
         <ion-icon slot="icon-only" name="search-outline" />
       </ion-button>
       <!-- A dot, not a count: it only has to say "something is waiting". -->
@@ -54,7 +57,7 @@
     <ion-segment [value]="store.segment()" (ionChange)="setSegment($event.detail.value)">
       <ion-segment-button [value]="Segments.Attention">
         <ion-label>
-          Needs attention
+          {{ 'clients.segments.attention' | translate }}
           <!-- The wash pairing, not the solid fill: white on danger-500 is
                3.76:1, and badge-sized text needs 4.5:1 (see the wash note in
                variables.css). It still reads unmistakably as red. -->
@@ -73,7 +76,7 @@
   <ion-toolbar>
     <!-- Scrolls sideways rather than wrapping: a second chip row would
                push the first client below the fold. -->
-    <div class="mh-chip-row" role="group" aria-label="Filter clients by status">
+    <div class="mh-chip-row" role="group" [attr.aria-label]="'clients.list.filterByStatus' | translate">
       @for (option of filters; track option.id) {
       <!-- `ion-button`, not `ion-chip`: the chip renders a non-interactive
                  element, so it never takes focus and its `aria-pressed` named a
@@ -81,7 +84,7 @@
       <ion-button class="chip" fill="clear" shape="round" size="small"
         [class.selected]="store.filter() === option.id"
         [attr.aria-pressed]="store.filter() === option.id" (click)="setFilter(option.id)">
-        {{ option.label }}
+        {{ option.label | translate }}
       </ion-button>
       }
     </div>
@@ -94,7 +97,7 @@
 <ion-content [fullscreen]="true">
   <!-- The toolbar shows the page's name but `ion-title` is not a heading, so
        a screen reader had nothing to land on and the outline began at h2. -->
-  <h1 class="mh-visually-hidden">Clients</h1>
+  <h1 class="mh-visually-hidden">{{ 'nav.clients' | translate }}</h1>
 
   <!-- A search or a chip change is silent otherwise: the list simply becomes
        shorter. Polite, and only once the result is the final one. -->
@@ -110,15 +113,16 @@
     <div class="stale" role="status">
       <div class="stale-bar">
         <ion-icon name="cloud-offline-outline" aria-hidden="true" />
-        <span>Couldn't refresh. Showing the last update.</span>
-        <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+        <span>{{ 'error.staleData' | translate }}</span>
+        <ion-button size="small" fill="clear" (click)="retry()">{{ 'button.tryAgain' | translate }}</ion-button>
       </div>
     </div>
   }
 
   @if (store.showLoadError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load your clients"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'clients.list.loadError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else if (store.showSkeleton()) {
   <!-- Mirrors the row shape so nothing shifts when data lands. -->
   <div class="mh-page" aria-busy="true">
@@ -156,14 +160,16 @@
   } @else if (isAttention()) {
   <div class="mh-page">
     @if (store.triageEmpty()) {
-    <mh-empty-state icon="people-outline" heading="No active clients yet"
-      message="Once someone accepts your invitation, their week shows up here." actionLabel="See all clients"
+    <mh-empty-state icon="people-outline" [heading]="'clients.triage.empty.title' | translate"
+      [message]="'clients.triage.empty.message' | translate"
+      [actionLabel]="'clients.triage.empty.action' | translate"
       actionFill="outline" (action)="showAll()" />
     } @else if (store.isRosterFilteredEmpty()) {
     <!-- The roster is this week's active clients only, so a name that is on
          the directory but not here is a match the coach should go find. -->
-    <mh-empty-state icon="people-outline" heading="Nothing matches"
-      message="Nobody on this week's roster matches that. Try All clients." actionLabel="Search all clients"
+    <mh-empty-state icon="people-outline" [heading]="'empty.nothingMatches' | translate"
+      [message]="'clients.triage.noMatch.message' | translate"
+      [actionLabel]="'clients.triage.noMatch.action' | translate"
       actionFill="outline" (action)="showAll()" />
     } @else {
     @if (store.allClear() && !store.query()) {
@@ -172,8 +178,8 @@
     <div class="all-clear">
       <ion-icon name="checkmark-circle-outline" aria-hidden="true" />
       <div>
-        <strong>Everyone is on track</strong>
-        <span>No one needs a nudge this week.</span>
+        <strong>{{ 'clients.triage.allClear.title' | translate }}</strong>
+        <span>{{ 'clients.triage.allClear.message' | translate }}</span>
       </div>
     </div>
     } @else if (store.visibleAttentionClients().length > 0) {
@@ -182,7 +188,7 @@
         <!-- A heading, not a span: the outline ran straight from the page
              title into the client names, with nothing between the two lists
              to navigate by. The rows below drop to h3 to sit under it. -->
-        <h2 class="mh-kicker">This week</h2>
+        <h2 class="mh-kicker">{{ 'clients.triage.thisWeek' | translate }}</h2>
         @if (triageNote(); as note) {
         <ion-note>{{ note }}</ion-note>
         }
@@ -198,7 +204,7 @@
     @if (store.visibleOnTrackClients().length > 0) {
     <section class="mh-section">
       <div class="mh-section-head">
-        <h2 class="mh-kicker">On track</h2>
+        <h2 class="mh-kicker">{{ 'clients.triage.onTrack' | translate }}</h2>
         <ion-note>{{ onTrackNote() }}</ion-note>
       </div>
       <ion-list [inset]="true" class="mh-card-list">
@@ -215,12 +221,14 @@
   @if (store.query()) {
   <!-- The API searches the whole directory now, so there is nothing left
        to scroll for and the copy no longer says there is. -->
-  <mh-empty-state icon="people-outline" heading="Nothing matches"
-    message="No client matches that. Try another name or email." actionLabel="Clear" actionFill="outline"
+  <mh-empty-state icon="people-outline" [heading]="'empty.nothingMatches' | translate"
+    [message]="'clients.directory.noMatch.message' | translate"
+    [actionLabel]="'button.clear' | translate" actionFill="outline"
     (action)="clearFilters()" />
   } @else {
-  <mh-empty-state icon="people-outline" heading="Nothing here"
-    message="No clients with this status. Try another filter." actionLabel="Show all" actionFill="outline"
+  <mh-empty-state icon="people-outline" [heading]="'clients.directory.noStatus.title' | translate"
+    [message]="'clients.directory.noStatus.message' | translate"
+    [actionLabel]="'clients.directory.noStatus.action' | translate" actionFill="outline"
     (action)="clearFilters()" />
   }
   } @else {
@@ -245,7 +253,7 @@
        of itself floating over it. -->
   @if (!store.isEmpty()) {
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button aria-label="Invite client" (click)="openInvite()">
+    <ion-fab-button [attr.aria-label]="'clients.inviteClient' | translate" (click)="openInvite()">
       <ion-icon name="person-add-outline" />
     </ion-fab-button>
   </ion-fab>
@@ -258,8 +266,11 @@
   (save)="saveNotes($event)" />
 
 <mh-confirm-sheet [(open)]="archiveOpen" [title]="archiveTitle()"
-  body="They keep their account and history, and you can unarchive them later. They will not be told."
-  confirmLabel="Archive client" cancelLabel="Keep" tone="danger" [saving]="archiveSaving()" (confirm)="archive()" />
+  [body]="'clients.confirm.archive.body' | translate"
+  [confirmLabel]="'clients.actions.archiveClient' | translate" [cancelLabel]="'button.keep' | translate"
+  tone="danger" [saving]="archiveSaving()" (confirm)="archive()" />
 
-<mh-confirm-sheet [(open)]="withdrawOpen" title="Withdraw this invitation?" [body]="withdrawBody()"
-  confirmLabel="Withdraw" cancelLabel="Keep it" tone="danger" [saving]="withdrawSaving()" (confirm)="withdraw()" />
+<mh-confirm-sheet [(open)]="withdrawOpen" [title]="'clients.confirm.withdraw.title' | translate"
+  [body]="withdrawBody()" [confirmLabel]="'clients.actions.withdraw' | translate"
+  [cancelLabel]="'clients.confirm.withdraw.cancel' | translate" tone="danger" [saving]="withdrawSaving()"
+  (confirm)="withdraw()" />

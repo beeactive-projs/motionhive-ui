@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonButtons,
   IonContent,
@@ -48,6 +49,7 @@ import { MoreBadgesService } from '../../_shared/services/more-badges.service';
     IonToolbar,
     NotificationBell,
     SettingsRow,
+    TranslatePipe,
   ],
   templateUrl: './more.html',
   styleUrl: './more.scss',

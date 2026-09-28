@@ -18,6 +18,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -25,6 +26,7 @@ import {
   ClientService,
   CurrencyRonPipe,
   InstructorClient,
+  InstructorClientStatuses,
   InvoiceLineItem,
   InvoiceService,
   StripeOnboardingService,
@@ -76,6 +78,7 @@ interface DraftItem {
     IonTitle,
     IonToolbar,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './create-invoice.html',
   styleUrl: './create-invoice.scss',
@@ -86,6 +89,7 @@ export class CreateInvoice implements ViewWillEnter {
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly clients = signal<InstructorClient[]>([]);
   readonly clientId = signal<string | null>(null);
@@ -130,7 +134,10 @@ export class CreateInvoice implements ViewWillEnter {
   }
 
   nameOf(client: InstructorClient): string {
-    return displayName(client.client ?? null, client.client?.email ?? 'Client');
+    return displayName(
+      client.client ?? null,
+      client.client?.email ?? this._translateService.instant('payments.fallback.client'),
+    );
   }
 
   toneFor(client: InstructorClient): string {
@@ -195,7 +202,9 @@ export class CreateInvoice implements ViewWillEnter {
         next: (invoice) => {
           this.saving.set(false);
           void this._feedbackService.success(
-            sendImmediately ? 'Invoice sent' : 'Draft saved',
+            this._translateService.instant(
+              sendImmediately ? 'payments.toast.invoiceSent' : 'payments.toast.draftSaved',
+            ),
           );
           void this._router.navigate(['/tabs/home/payments', invoice.id], {
             replaceUrl: true,
@@ -203,14 +212,17 @@ export class CreateInvoice implements ViewWillEnter {
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not create the invoice.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.createFailed'),
+          );
         },
       });
   }
 
   private _loadClients(): void {
     this._clientService
-      .getClients({ status: 'ACTIVE', page: 1, limit: 100 })
+      .getClients({ status: InstructorClientStatuses.Active, page: 1, limit: 100 })
       .pipe(take(1))
       .subscribe({ next: (response) => this.clients.set(response.items ?? []) });
   }

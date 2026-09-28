@@ -11,7 +11,7 @@
       severity="secondary"
       (click)="close()"
       class="photo-viewer__close"
-      aria-label="Close photo"
+      [attr.aria-label]="'a11y.closePhoto' | translate"
       iconOnly
     >
       <i class="pi pi-times"></i>
@@ -31,7 +31,7 @@
     <div class="flex flex-col items-center gap-3 text-surface-0">
       <i class="pi pi-image text-4xl opacity-60"></i>
       <p class="text-sm">{{ error() }}</p>
-      <button pButton type="button" size="small" (click)="close()">Go back</button>
+      <button pButton type="button" size="small" (click)="close()">{{ 'groups.photoViewer.goBack' | translate }}</button>
     </div>
     } @else if (post() && images().length > 0) {
     <p-galleria [value]="images()" [(activeIndex)]="currentIndex" [numVisible]="5" [circular]="true"
@@ -44,7 +44,7 @@
     } @else if (post()) {
     <div class="flex flex-col items-center gap-2 text-surface-0">
       <i class="pi pi-image text-4xl opacity-60"></i>
-      <p class="text-sm">This post has no photos.</p>
+      <p class="text-sm">{{ 'groups.photoViewer.noPhotos' | translate }}</p>
     </div>
     }
   </div>

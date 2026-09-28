@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   input,
@@ -10,7 +9,8 @@ import {
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
-import { MessagingStore, UserBlockReason } from 'core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { BLOCK_REASONS, EnumLabelPipe, MessagingStore, translate, UserBlockReason } from 'core';
 
 /**
  * Confirm-and-block dialog. Two slots:
@@ -24,32 +24,26 @@ import { MessagingStore, UserBlockReason } from 'core';
  */
 @Component({
   selector: 'mh-block-confirm-dialog',
-  standalone: true,
-  imports: [ButtonDirective, Dialog],
+  imports: [ButtonDirective, Dialog, EnumLabelPipe, TranslatePipe],
   templateUrl: './block-confirm-dialog.html',
   styleUrl: './block-confirm-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlockConfirmDialog {
   private readonly _store = inject(MessagingStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly blockedId = input<string | null>(null);
   readonly conversationId = input<string | null>(null);
-  readonly displayName = input<string>('this user');
+  readonly displayName = input<string>(translate('messages.thisUser'));
   readonly blocked = output<void>();
 
   protected readonly submitting = signal(false);
   protected readonly reason = signal<UserBlockReason | null>(null);
 
-  protected readonly reasons: { key: UserBlockReason; label: string }[] = [
-    { key: 'SPAM', label: 'Spam' },
-    { key: 'HARASSMENT', label: 'Harassment' },
-    { key: 'SCAM', label: 'Scam' },
-    { key: 'IMPERSONATION', label: 'Impersonation' },
-    { key: 'OTHER', label: 'Other' },
-  ];
+  /** Reason chips in display order; labels come from `enum.userBlockReason.<value>`. */
+  protected readonly reasons: readonly UserBlockReason[] = BLOCK_REASONS.map((r) => r.value);
 
   protected selectReason(r: UserBlockReason): void {
     // Toggle off when the same chip is tapped again.
@@ -72,16 +66,18 @@ export class BlockConfirmDialog {
     if (ok) {
       this._messageService.add({
         severity: 'success',
-        summary: 'User blocked',
-        detail: `${this.displayName()} can no longer message you.`,
+        summary: this._translateService.instant('messages.toast.blocked'),
+        detail: this._translateService.instant('messages.toast.blockedDetail', {
+          name: this.displayName(),
+        }),
       });
       this.visible.set(false);
       this.blocked.emit();
     } else {
       this._messageService.add({
         severity: 'error',
-        summary: 'Could not block',
-        detail: 'Please try again.',
+        summary: this._translateService.instant('messages.toast.blockFailed'),
+        detail: this._translateService.instant('common.pleaseTryAgain'),
       });
     }
   }

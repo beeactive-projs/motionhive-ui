@@ -1,17 +1,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" text="Back" />
+      <ion-back-button defaultHref="/tabs/groups" [text]="'button.back' | translate" />
     </ion-buttons>
-    <ion-title>Post</ion-title>
+    <ion-title>{{ 'groups.post.title' | translate }}</ion-title>
     <ion-buttons slot="end">
       @if (canEditThisPost()) {
-      <ion-button shape="round" aria-label="Edit this post" (click)="startEdit()">
+      <ion-button shape="round" [attr.aria-label]="'groups.post.a11y.editThis' | translate" (click)="startEdit()">
         <ion-icon slot="icon-only" name="create-outline" />
       </ion-button>
       }
       @if (canDeleteThisPost()) {
-      <ion-button shape="round" aria-label="Delete this post" (click)="confirmDeletePost()">
+      <ion-button shape="round" [attr.aria-label]="'groups.post.a11y.deleteThis' | translate"
+        (click)="confirmDeletePost()">
         <ion-icon slot="icon-only" name="trash-outline" />
       </ion-button>
       }
@@ -20,7 +21,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <h1 class="mh-visually-hidden">Post</h1>
+  <h1 class="mh-visually-hidden">{{ 'groups.post.title' | translate }}</h1>
 
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
@@ -30,15 +31,15 @@
   <div class="stale" role="status">
     <div class="stale-bar">
       <ion-icon name="cloud-offline-outline" aria-hidden="true" />
-      <span>Couldn't refresh. Showing the last update.</span>
-      <ion-button size="small" fill="clear" (click)="retry()">Try again</ion-button>
+      <span>{{ 'error.staleData' | translate }}</span>
+      <ion-button size="small" fill="clear" (click)="retry()">{{ 'button.tryAgain' | translate }}</ion-button>
     </div>
   </div>
   }
 
   @if (store.showPostError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this post"
-    message="It may have been deleted, or you may be offline." actionLabel="Try again"
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.post.loadError.title' | translate"
+    [message]="'groups.post.loadError.message' | translate" [actionLabel]="'button.tryAgain' | translate"
     (action)="retry()" />
   } @else if (store.showPostSkeleton()) {
   <div class="mh-page" aria-busy="true">
@@ -62,7 +63,7 @@
         <!-- The author opens their profile; the rest of the card does not,
              so the body and its verbs keep their own targets. -->
         <button type="button" class="author" [disabled]="!hasProfile(post)"
-          [attr.aria-label]="hasProfile(post) ? 'View ' + authorName(post) + '\u2019s profile' : null"
+          [attr.aria-label]="hasProfile(post) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(post) }) : null"
           (click)="openProfile(post)">
           <mh-hex-avatar size="md" [name]="authorName(post)" [imageUrl]="avatarUrl(post)" />
           <div class="who">
@@ -84,7 +85,7 @@
       <div class="post-meta">
         <ion-button fill="clear" size="small" class="meta-button"
           [class.reacted]="post.myReaction"
-          [attr.aria-label]="post.myReaction ? 'Unlike this post' : 'Like this post'"
+          [attr.aria-label]="(post.myReaction ? 'groups.post.a11y.unlikeThis' : 'groups.post.a11y.likeThis') | translate"
           [attr.aria-pressed]="!!post.myReaction" (click)="like()">
           <ion-icon slot="start" [name]="post.myReaction ? 'thumbs-up' : 'thumbs-up-outline'" />
           {{ post.reactionCount }}
@@ -94,11 +95,12 @@
     </article>
 
     <section class="comments">
-      <h2 class="mh-kicker">Comments</h2>
+      <h2 class="mh-kicker">{{ 'groups.post.comments' | translate }}</h2>
 
       @if (store.showCommentsError()) {
-      <mh-empty-state icon="alert-circle-outline" heading="Couldn't load comments"
-        message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+      <mh-empty-state icon="alert-circle-outline" [heading]="'groups.post.commentsLoadError' | translate"
+        [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+        (action)="retry()" />
       } @else if (store.showCommentsSkeleton()) {
       <div aria-busy="true">
         @for (_ of skeletonRows; track $index) {
@@ -112,21 +114,21 @@
         }
       </div>
       } @else if (store.isEmpty()) {
-      <mh-empty-state icon="chatbubble-outline" heading="No comments yet"
-        message="Be the first to say something." />
+      <mh-empty-state icon="chatbubble-outline" [heading]="'groups.post.empty.title' | translate"
+        [message]="'groups.post.empty.message' | translate" />
       } @else {
       @for (comment of store.comments(); track comment.id) {
       <div class="thread">
         <article class="comment">
           <button type="button" class="comment-avatar" [disabled]="!hasProfile(comment)"
-            [attr.aria-label]="hasProfile(comment) ? 'View ' + authorName(comment) + '\u2019s profile' : null"
+            [attr.aria-label]="hasProfile(comment) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(comment) }) : null"
             (click)="openProfile(comment)">
             <mh-hex-avatar size="sm" [name]="authorName(comment)" [imageUrl]="avatarUrl(comment)" />
           </button>
           <div class="comment-body">
             <div class="comment-head">
               <button type="button" class="comment-name" [disabled]="!hasProfile(comment)"
-                [attr.aria-label]="hasProfile(comment) ? 'View ' + authorName(comment) + '\u2019s profile' : null"
+                [attr.aria-label]="hasProfile(comment) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(comment) }) : null"
                 (click)="openProfile(comment)">
                 <h3>{{ authorName(comment) }}</h3>
               </button>
@@ -135,14 +137,14 @@
             <p>{{ comment.content }}</p>
             <div class="comment-actions">
               <ion-button fill="clear" size="small" class="link-button"
-                [attr.aria-label]="'Reply to ' + authorName(comment)" (click)="replyTo(comment)">
-                Reply
+                [attr.aria-label]="'groups.post.replyTo' | translate: { name: authorName(comment) }" (click)="replyTo(comment)">
+                {{ 'groups.post.reply' | translate }}
               </ion-button>
               @if (mayDeleteComment(comment)) {
               <ion-button fill="clear" size="small" class="link-button" color="danger"
-                [attr.aria-label]="'Delete comment by ' + authorName(comment)"
+                [attr.aria-label]="'groups.post.a11y.deleteComment' | translate: { name: authorName(comment) }"
                 (click)="confirmDeleteComment(comment)">
-                Delete
+                {{ 'button.delete' | translate }}
               </ion-button>
               }
             </div>
@@ -154,14 +156,14 @@
         @for (child of comment.replies ?? []; track child.id) {
         <article class="comment reply">
           <button type="button" class="comment-avatar" [disabled]="!hasProfile(child)"
-            [attr.aria-label]="hasProfile(child) ? 'View ' + authorName(child) + '\u2019s profile' : null"
+            [attr.aria-label]="hasProfile(child) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(child) }) : null"
             (click)="openProfile(child)">
             <mh-hex-avatar size="sm" [name]="authorName(child)" [imageUrl]="avatarUrl(child)" />
           </button>
           <div class="comment-body">
             <div class="comment-head">
               <button type="button" class="comment-name" [disabled]="!hasProfile(child)"
-                [attr.aria-label]="hasProfile(child) ? 'View ' + authorName(child) + '\u2019s profile' : null"
+                [attr.aria-label]="hasProfile(child) ? ('groups.post.a11y.viewProfile' | translate: { name: authorName(child) }) : null"
                 (click)="openProfile(child)">
                 <h3>{{ authorName(child) }}</h3>
               </button>
@@ -170,15 +172,15 @@
             <p>{{ child.content }}</p>
             <div class="comment-actions">
               <ion-button fill="clear" size="small" class="link-button"
-                [attr.aria-label]="'Reply to ' + authorName(child)"
+                [attr.aria-label]="'groups.post.replyTo' | translate: { name: authorName(child) }"
                 (click)="replyTo(comment, child)">
-                Reply
+                {{ 'groups.post.reply' | translate }}
               </ion-button>
               @if (mayDeleteComment(child)) {
               <ion-button fill="clear" size="small" class="link-button" color="danger"
-                [attr.aria-label]="'Delete comment by ' + authorName(child)"
+                [attr.aria-label]="'groups.post.a11y.deleteComment' | translate: { name: authorName(child) }"
                 (click)="confirmDeleteComment(child)">
-                Delete
+                {{ 'button.delete' | translate }}
               </ion-button>
               }
             </div>
@@ -206,8 +208,8 @@
        ago looks exactly like a new comment. -->
   <ion-toolbar class="reply-bar">
     <div class="reply-context">
-      <span>Replying to {{ target.name }}</span>
-      <ion-button fill="clear" size="small" (click)="cancelReply()">Cancel</ion-button>
+      <span>{{ 'groups.post.replyingTo' | translate: { name: target.name } }}</span>
+      <ion-button fill="clear" size="small" (click)="cancelReply()">{{ 'button.cancel' | translate }}</ion-button>
     </div>
   </ion-toolbar>
   }
@@ -216,14 +218,15 @@
       <ion-textarea class="composer-input" [autoGrow]="true" [rows]="1" [maxlength]="maxLength"
         [placeholder]="composerPlaceholder()" [attr.aria-label]="composerPlaceholder()"
         [value]="draft()" (ionInput)="onDraft($event.detail.value ?? '')" />
-      <ion-button shape="round" class="send" [disabled]="!canSend()" aria-label="Post comment"
+      <ion-button shape="round" class="send" [disabled]="!canSend()"
+        [attr.aria-label]="'groups.post.a11y.postComment' | translate"
         (click)="send()">
         <ion-icon slot="icon-only" name="send-outline" />
       </ion-button>
     </div>
     @if (showRemaining()) {
     <p class="remaining" [class.over]="remaining() < 0" role="status">
-      {{ remaining() }} characters left
+      {{ 'groups.post.remaining' | translate: { count: remaining() } }}
     </p>
     }
   </ion-toolbar>
@@ -233,18 +236,20 @@
 <!-- Content only: images are not editable here, the same as on web. -->
 <ng-template #editBody>
   <ion-textarea class="edit-body" [autoGrow]="true" [rows]="6" [maxlength]="postMaxLength"
-    aria-label="Post content" [value]="editDraft()"
+    [attr.aria-label]="'groups.common.postContent' | translate" [value]="editDraft()"
     (ionInput)="onEditDraft($event.detail.value ?? '')" />
 </ng-template>
 
-<mh-sheet-shell [(open)]="editOpen" title="Edit post" [body]="editBody" saveLabel="Save"
+<mh-sheet-shell [(open)]="editOpen" [title]="'groups.post.editTitle' | translate" [body]="editBody"
+  [saveLabel]="'button.save' | translate"
   [canSave]="canSaveEdit()" [saving]="savingEdit()" (save)="saveEdit()" />
 
-<mh-confirm-sheet [(open)]="deleteCommentOpen" title="Delete this comment?"
-  body="It will be removed for everyone. Replies to it go too." confirmLabel="Delete" tone="danger"
-  irreversible="This cannot be undone." [saving]="deletingComment()" (confirm)="deleteComment()" />
+<mh-confirm-sheet [(open)]="deleteCommentOpen" [title]="'groups.post.deleteComment.title' | translate"
+  [body]="'groups.post.deleteComment.body' | translate" [confirmLabel]="'button.delete' | translate"
+  tone="danger" [irreversible]="'groups.common.cannotBeUndone' | translate"
+  [saving]="deletingComment()" (confirm)="deleteComment()" />
 
-<mh-confirm-sheet [(open)]="deletePostOpen" title="Delete this post?"
-  body="It will be removed for everyone, along with its comments." confirmLabel="Delete"
-  tone="danger" irreversible="This cannot be undone." [saving]="deletingPost()"
+<mh-confirm-sheet [(open)]="deletePostOpen" [title]="'groups.post.deletePost.title' | translate"
+  [body]="'groups.post.deletePost.body' | translate" [confirmLabel]="'button.delete' | translate"
+  tone="danger" [irreversible]="'groups.common.cannotBeUndone' | translate" [saving]="deletingPost()"
   (confirm)="deletePost()" />

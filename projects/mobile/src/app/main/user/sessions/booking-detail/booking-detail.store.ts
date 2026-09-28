@@ -1,4 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, of, take } from 'rxjs';
 
 import {
@@ -32,6 +33,7 @@ import {
 export class BookingDetailStore {
   private readonly _sessionService = inject(SessionService);
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _id = signal<string | null>(null);
   private readonly _stateParticipant = signal<SessionParticipant | null>(null);
@@ -126,7 +128,12 @@ export class BookingDetailStore {
         },
         error: (error: unknown) => {
           if (!silent || !this._instance()) {
-            this._error.set(apiErrorMessage(error, "Couldn't load this session."));
+            this._error.set(
+              apiErrorMessage(
+                error,
+                this._translateService.instant('mySessions.detail.loadError.message'),
+              ),
+            );
           }
           this._loading.set(false);
         },

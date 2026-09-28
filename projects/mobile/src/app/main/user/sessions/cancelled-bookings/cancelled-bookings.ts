@@ -15,6 +15,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -52,6 +53,7 @@ const PAGE_SIZE = 50;
     IonToolbar,
     MySessionRow,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './cancelled-bookings.html',
   styleUrl: './cancelled-bookings.scss',

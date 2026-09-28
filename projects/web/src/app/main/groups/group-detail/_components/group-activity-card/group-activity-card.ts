@@ -1,14 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Group, GroupMember, Post } from 'core';
 import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'mh-group-activity-card',
-  imports: [DatePipe, CardModule],
+  imports: [DatePipe, CardModule, TranslatePipe],
   templateUrl: './group-activity-card.html',
   styleUrl: './group-activity-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupActivityCard {
   readonly group = input.required<Group>();

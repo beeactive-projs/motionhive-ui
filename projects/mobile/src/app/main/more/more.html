@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Menu</ion-title>
+    <ion-title>{{ 'nav.menu' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
     </ion-buttons>
@@ -32,7 +32,7 @@
     @if (canSwitchRole()) {
       <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row
-          label="Switch role"
+          [label]="'role.switch' | translate"
           icon="swap-horizontal-outline"
           iconColor="medium"
           [value]="roleLabel()"
@@ -46,12 +46,12 @@
     @for (section of sections(); track $index) {
       <section class="mh-section">
         @if (section.label) {
-          <ion-note class="mh-kicker" color="medium">{{ section.label }}</ion-note>
+          <ion-note class="mh-kicker" color="medium">{{ section.label | translate }}</ion-note>
         }
         <ion-list [inset]="true" class="mh-card-list">
           @for (entry of section.items; track entry.route) {
             <mh-settings-row
-              [label]="entry.label"
+              [label]="entry.label | translate"
               [icon]="entry.icon"
               [iconColor]="entry.iconColor"
               [dot]="entry.dot?.() ?? false"

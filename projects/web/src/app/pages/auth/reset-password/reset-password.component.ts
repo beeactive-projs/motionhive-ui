@@ -1,6 +1,7 @@
-import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG imports
 import { ButtonDirective } from 'primeng/button';
@@ -8,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 
 // Core imports
-import { AuthService, Logo } from 'core';
+import { AuthService, Logo, validationMessage } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
@@ -21,14 +22,15 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     MessageModule,
     ThemeToggleComponent,
     Logo,
+    TranslatePipe,
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent {
   private readonly _formBuilder = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
+  private readonly _translateService = inject(TranslateService);
 
   // Signals for component state
   isLoading = signal(false);
@@ -55,15 +57,14 @@ export class ResetPasswordComponent {
     this._authService.forgotPassword({ email }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set(
-          'If an account exists with this email, you will receive password reset instructions shortly.',
-        );
+        this.successMessage.set(this._translateService.instant('auth.resetPassword.sent'));
         this.forgotPasswordForm.reset();
       },
       error: (error) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          error.error?.message || 'Failed to send reset instructions. Please try again.',
+          error.error?.message ||
+            this._translateService.instant('auth.resetPassword.error.sendFailed'),
         );
       },
     });
@@ -76,12 +77,6 @@ export class ResetPasswordComponent {
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.forgotPasswordForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return 'Email is required';
-    if (field.errors['email']) return 'Please enter a valid email address';
-
-    return '';
+    return validationMessage(this.forgotPasswordForm.get(fieldName)?.errors);
   }
 }

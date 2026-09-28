@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -12,6 +11,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   clientDisplayName,
   clientEmail as clientEmailOf,
@@ -23,10 +23,11 @@ import {
   injectIsTablet,
   injectIsTabletDown,
   InstructorClient,
+  escapeHtml,
   showApiError,
 } from 'core';
 import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonDirective } from 'primeng/button';
 import { UserInfo } from '../../../../_shared/components/user-info/user-info';
@@ -58,11 +59,11 @@ import { InviteClientDialog } from '../../_dialogs/invite-client-dialog/invite-c
     InviteClientDialog,
     ListEmptyState,
     MobileFab,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './pending-requests.html',
   styleUrl: './pending-requests.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PendingRequests {
   private readonly _router = inject(Router);
@@ -71,6 +72,7 @@ export class PendingRequests {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   // Email links (e.g. "New client request") include ?requestId=<id> so we
   // can scroll-highlight the row the instructor came here to act on.
@@ -90,8 +92,8 @@ export class PendingRequests {
   readonly RequestTypes = ClientRequestTypes;
 
   readonly breadcrumbItems: MenuItem[] = [
-    { label: 'Clients', routerLink: '/coaching/clients' },
-    { label: 'Pending requests' },
+    { label: this._translateService.instant('nav.clients'), routerLink: '/coaching/clients' },
+    { label: this._translateService.instant('clients.pendingRequests.title') },
   ];
 
   protected readonly isMobile = injectIsMobile();
@@ -118,10 +120,11 @@ export class PendingRequests {
   readonly rows = 10;
 
   typeFilter = signal<ClientRequestType | undefined>(undefined);
-  readonly typeOptions: { label: string; value: ClientRequestType | undefined }[] = [
-    { label: 'All', value: undefined },
-    { label: 'Incoming', value: ClientRequestTypes.ClientToInstructor },
-    { label: 'Outgoing', value: ClientRequestTypes.InstructorToClient },
+  /** Labels are translation keys — the template translates them. */
+  readonly typeOptions: SelectItem<ClientRequestType | undefined>[] = [
+    { label: 'common.all', value: undefined },
+    { label: 'clients.pendingRequests.type.incoming', value: ClientRequestTypes.ClientToInstructor },
+    { label: 'clients.pendingRequests.type.outgoing', value: ClientRequestTypes.InstructorToClient },
   ];
 
   constructor() {
@@ -195,7 +198,7 @@ export class PendingRequests {
         error: (err) => {
           this.loading.set(false);
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Error', 'Failed to load pending requests', err);
+          this._showError('clients.toast.loadRequestsFailed', err);
         },
       });
   }
@@ -220,7 +223,7 @@ export class PendingRequests {
         },
         error: (err) => {
           this.loading.set(false);
-          showApiError(this._messageService, 'Error', 'Failed to load pending requests', err);
+          this._showError('clients.toast.loadRequestsFailed', err);
         },
       });
   }
@@ -255,13 +258,12 @@ export class PendingRequests {
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: 'Request accepted',
-            detail: 'Client request accepted successfully',
+            summary: this._translateService.instant('clients.toast.accepted.summary'),
+            detail: this._translateService.instant('clients.toast.accepted.detail'),
           });
           this.loadRequests();
         },
-        error: (err) =>
-          showApiError(this._messageService, 'Error', 'Failed to accept request', err),
+        error: (err) => this._showError('clients.toast.acceptFailed', err),
       });
   }
 
@@ -273,22 +275,27 @@ export class PendingRequests {
         next: () => {
           this._messageService.add({
             severity: 'info',
-            summary: 'Request declined',
-            detail: 'Client request has been declined',
+            summary: this._translateService.instant('clients.toast.declined.summary'),
+            detail: this._translateService.instant('clients.toast.declined.detail'),
           });
           this.loadRequests();
         },
-        error: (err) =>
-          showApiError(this._messageService, 'Error', 'Failed to decline request', err),
+        error: (err) => this._showError('clients.toast.declineFailed', err),
       });
   }
 
   cancelRequest(row: InstructorClient): void {
     this._confirmationService.confirm({
-      header: 'Cancel invitation',
-      message: `Are you sure you want to cancel the invitation to <strong>${this.clientName(row)}</strong>?`,
+      header: this._translateService.instant('clients.confirm.cancelInvitation.header'),
+      message: this._translateService.instant('clients.confirm.cancelInvitation.message', {
+        name: `<strong>${escapeHtml(this.clientName(row))}</strong>`,
+      }),
       acceptIcon: 'pi pi-times',
-      acceptButtonProps: { label: 'Cancel invitation', severity: 'danger', iconPos: 'left' },
+      acceptButtonProps: {
+        label: this._translateService.instant('clients.confirm.cancelInvitation.accept'),
+        severity: 'danger',
+        iconPos: 'left',
+      },
       rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => {
         this._clientService
@@ -298,13 +305,12 @@ export class PendingRequests {
             next: () => {
               this._messageService.add({
                 severity: 'success',
-                summary: 'Invitation cancelled',
-                detail: 'The invitation has been cancelled',
+                summary: this._translateService.instant('clients.toast.invitationCancelled.summary'),
+                detail: this._translateService.instant('clients.toast.invitationCancelled.detail'),
               });
               this.loadRequests();
             },
-            error: (err) =>
-              showApiError(this._messageService, 'Error', 'Failed to cancel invitation', err),
+            error: (err) => this._showError('clients.toast.cancelInvitationFailed', err),
           });
       },
     });
@@ -312,10 +318,15 @@ export class PendingRequests {
 
   resendInvitation(row: InstructorClient): void {
     this._confirmationService.confirm({
-      header: 'Resend invitation',
-      message: `Resend the invitation to <strong>${this.clientName(row)}</strong>?`,
+      header: this._translateService.instant('clients.confirm.resendInvitation.header'),
+      message: this._translateService.instant('clients.confirm.resendInvitation.message', {
+        name: `<strong>${escapeHtml(this.clientName(row))}</strong>`,
+      }),
       acceptIcon: 'pi pi-send',
-      acceptButtonProps: { label: 'Resend invitation', iconPos: 'left' },
+      acceptButtonProps: {
+        label: this._translateService.instant('clients.confirm.resendInvitation.accept'),
+        iconPos: 'left',
+      },
       rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => {
         this._clientService
@@ -325,22 +336,31 @@ export class PendingRequests {
             next: () => {
               this._messageService.add({
                 severity: 'success',
-                summary: 'Invitation resent',
-                detail: 'The invitation has been resent successfully',
+                summary: this._translateService.instant('clients.toast.invitationResent.summary'),
+                detail: this._translateService.instant('clients.toast.invitationResent.detail'),
               });
               this.loadRequests();
             },
-            error: (err) =>
-              showApiError(this._messageService, 'Error', 'Failed to resend invitation', err),
+            error: (err) => this._showError('clients.toast.resendInvitationFailed', err),
           });
       },
     });
   }
 
+  /** Error toast with the generic "Error" summary and a feature fallback detail. */
+  private _showError(fallbackKey: string, err: unknown): void {
+    showApiError(
+      this._messageService,
+      this._translateService.instant('toast.summary.error'),
+      this._translateService.instant(fallbackKey),
+      err,
+    );
+  }
+
   // --- Display helpers (shared with mobile through core's client.utils) ---
 
   clientName(row: InstructorClient): string {
-    return clientDisplayName(row, 'this client');
+    return clientDisplayName(row, this._translateService.instant('clients.common.thisClient'));
   }
 
   clientEmail(row: InstructorClient): string {

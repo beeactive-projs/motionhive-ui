@@ -3,7 +3,7 @@
     type="button"
     class="mh-chat-header__back"
     (click)="back.emit()"
-    aria-label="Back to inbox"
+    [attr.aria-label]="'messages.header.back' | translate"
   >
     <i class="pi pi-chevron-left" aria-hidden="true"></i>
   </button>
@@ -23,8 +23,8 @@
     type="button"
     class="mh-chat-header__icon-btn"
     (click)="toggleInfo.emit()"
-    aria-label="Toggle conversation info"
-    title="Conversation info"
+    [attr.aria-label]="'messages.header.toggleInfo' | translate"
+    [title]="'messages.header.info' | translate"
   >
     <i class="pi pi-info-circle" aria-hidden="true"></i>
   </button>

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnDestroy,
   OnInit,
@@ -10,6 +9,7 @@ import {
 import { Location, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -68,11 +68,11 @@ import { BookingConfirmedDialog } from '../_dialogs/booking-confirmed-dialog/boo
     Toast,
     BookDialog,
     BookingConfirmedDialog,
+    TranslatePipe,
   ],
   providers: [SessionsDiscoverStore, MessageService],
   templateUrl: './sessions-discover.html',
   styleUrl: './sessions-discover.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionsDiscover implements OnInit, OnDestroy {
   protected readonly store = inject(SessionsDiscoverStore);
@@ -128,7 +128,9 @@ export class SessionsDiscover implements OnInit, OnDestroy {
   protected readonly bookOpen = signal(false);
   /** Success modal opens after a successful book. */
   protected readonly confirmedOpen = signal(false);
-  protected readonly bookedStatus = signal<SessionParticipantStatus>('CONFIRMED');
+  protected readonly bookedStatus = signal<SessionParticipantStatus>(
+    SessionParticipantStatus.Confirmed,
+  );
 
   ngOnInit(): void {
     this.store.load();

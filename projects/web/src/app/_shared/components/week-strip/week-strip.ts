@@ -1,10 +1,11 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { appLocale, weekdayNames } from 'core';
 
 /**
  * `mh-week-strip` — 7-column horizontal day picker used in the mobile
@@ -37,8 +38,7 @@ export interface WeekStripDot {
 
 @Component({
   selector: 'mh-week-strip',
-  imports: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
   templateUrl: './week-strip.html',
   styleUrl: './week-strip.scss',
 })
@@ -51,6 +51,9 @@ export class WeekStrip {
 
   /** Emits the tapped day. Parent updates its anchor + reloads. */
   readonly selectedDateChange = output<Date>();
+
+  /** Single-letter weekday labels in the UI locale, Monday first. */
+  private readonly _weekdayLabels = weekdayNames('narrow');
 
   /** Derived 7-cell array — labels, day numbers, dots, flags. */
   protected readonly cells = computed(() => {
@@ -71,13 +74,14 @@ export class WeekStrip {
       return {
         date: d,
         iso,
-        label: d.toLocaleDateString('en-GB', { weekday: 'short' }).charAt(0),
+        // JS getDay() is Sun=0; the label list is Mon-first.
+        label: this._weekdayLabels[(d.getDay() + 6) % 7],
         day: d.getDate(),
         isToday: d.getTime() === today.getTime(),
         isSelected: selKey === iso,
         hasConflict,
         dots: dayDots,
-        aria: d.toLocaleDateString('en-GB', {
+        aria: d.toLocaleDateString(appLocale(), {
           weekday: 'long',
           day: 'numeric',
           month: 'long',

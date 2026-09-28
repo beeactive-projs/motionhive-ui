@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
@@ -70,13 +70,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     BookingConfirmedDialog,
     CancelBookingDialog,
     Avatar,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './session-showcase.html',
   styleUrl: './session-showcase.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionShowcase implements OnInit {
+  private readonly _translateService = inject(TranslateService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _location = inject(Location);
@@ -200,7 +201,7 @@ export class SessionShowcase implements OnInit {
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
     if (!id) {
-      this.error.set('Missing session id.');
+      this.error.set(this._translateService.instant('mySessions.error.missingId'));
       return;
     }
     // Defensive: a malformed deep-link (e.g. /sessions/my from an old
@@ -208,7 +209,7 @@ export class SessionShowcase implements OnInit {
     // error instead of firing /sessions/instances/my/public at the BE,
     // which 400s with "Validation failed (uuid is expected)".
     if (!UUID_RE.test(id)) {
-      this.error.set('That session link looks invalid.');
+      this.error.set(this._translateService.instant('mySessions.error.invalidLink'));
       return;
     }
     this._load(id);
@@ -285,8 +286,13 @@ export class SessionShowcase implements OnInit {
       .pipe(
         catchError((err: unknown) => {
           if (!silent) {
-            showApiError(this._messageService, 'Could not load session', 'Please try again.', err);
-            this.error.set('Could not load this session.');
+            showApiError(
+              this._messageService,
+              this._translateService.instant('mySessions.toast.loadFailed'),
+              this._translateService.instant('common.pleaseTryAgain'),
+              err,
+            );
+            this.error.set(this._translateService.instant('mySessions.error.loadFailed'));
           }
           return of(null);
         }),

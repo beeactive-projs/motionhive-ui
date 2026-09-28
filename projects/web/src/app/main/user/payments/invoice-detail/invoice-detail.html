@@ -5,7 +5,7 @@
   <nav class="flex items-center gap-2 text-sm text-surface-500">
     <a routerLink="/profile" [queryParams]="{ tab: 'invoices' }"
       class="hover:text-surface-700 dark:hover:text-surface-300 transition-colors">
-      Invoices
+      {{ 'billing.invoiceDetail.breadcrumb' | translate }}
     </a>
     <span>/</span>
     <span class="text-surface-700 dark:text-surface-300 tabular-nums">
@@ -27,15 +27,15 @@
       <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div class="flex flex-col gap-2 min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
-            <p-tag [value]="inv.status | statusLabel" [severity]="statusSeverity(inv.status)" />
+            <p-tag [value]="inv.status | statusLabel: 'invoiceStatus'" [severity]="statusSeverity(inv.status)" />
             @if (inv.paidOutOfBand) {
-              <p-tag value="PAID OUT OF BAND" severity="secondary" />
+              <p-tag [value]="'billing.invoiceDetail.paidOutOfBand' | translate" severity="secondary" />
             }
             <span class="text-sm text-surface-500 tabular-nums">
               {{ displayNumber() }}
-              · Issued {{ inv.createdAt | date: 'dd MMM yyyy' }}
+              · {{ 'billing.invoiceDetail.issuedOn' | translate: { date: (inv.createdAt | date: 'dd MMM yyyy') } }}
               @if (inv.dueDate) {
-                · Due {{ inv.dueDate | date: 'dd MMM yyyy' }}
+                · {{ 'billing.invoiceDetail.dueOn' | translate: { date: (inv.dueDate | date: 'dd MMM yyyy') } }}
               }
             </span>
           </div>
@@ -43,10 +43,9 @@
           <div class="flex flex-col gap-1">
             <span class="text-xs uppercase tracking-wide text-surface-500">
               @switch (inv.status) {
-                @case (Statuses.Paid) { Paid in full }
-                @case (Statuses.Void) { Voided }
-                @case (Statuses.Open) { Amount due }
-                @default { Amount due }
+                @case (Statuses.Paid) { {{ 'billing.invoiceDetail.amountLabel.paid' | translate }} }
+                @case (Statuses.Void) { {{ 'billing.invoiceDetail.amountLabel.voided' | translate }} }
+                @default { {{ 'billing.invoiceDetail.amountLabel.due' | translate }} }
               }
             </span>
             <span class="font-heading text-3xl md:text-4xl font-semibold text-primary-500 tabular-nums">
@@ -61,7 +60,7 @@
             <a [href]="inv.invoicePdf" target="_blank" rel="noopener">
               <button pButton type="button" severity="secondary" [outlined]="true" size="small">
                 <i class="pi pi-download"></i>
-                Download invoice PDF
+                {{ 'billing.invoiceDetail.downloadPdf' | translate }}
               </button>
             </a>
           }
@@ -108,7 +107,7 @@
                   @if (step.date) {
                     {{ step.date | date: 'dd MMM' }}
                   } @else {
-                    pending
+                    {{ 'billing.invoiceDetail.tracker.pending' | translate }}
                   }
                 </span>
               </div>
@@ -126,9 +125,9 @@
 
         <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 overflow-hidden">
           <header class="px-4 py-3 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
-            <span class="text-sm font-medium">Line items</span>
+            <span class="text-sm font-medium">{{ 'billing.invoiceDetail.lineItems' | translate }}</span>
             <span class="text-xs text-surface-500">
-              {{ lineItems().length }} {{ lineItems().length === 1 ? 'item' : 'items' }}
+              {{ 'billing.invoiceDetail.itemsCount' | translate: { count: lineItems().length } }}
             </span>
           </header>
 
@@ -141,10 +140,10 @@
             <table class="w-full text-sm">
               <thead class="text-xs uppercase tracking-wide text-surface-500">
                 <tr>
-                  <th class="text-left px-4 py-2 font-medium">Description</th>
-                  <th class="text-right px-4 py-2 font-medium w-16">Qty</th>
-                  <th class="text-right px-4 py-2 font-medium w-28">Unit</th>
-                  <th class="text-right px-4 py-2 font-medium w-28">Amount</th>
+                  <th class="text-left px-4 py-2 font-medium">{{ 'form.label.description' | translate }}</th>
+                  <th class="text-right px-4 py-2 font-medium w-16">{{ 'billing.invoiceDetail.qty' | translate }}</th>
+                  <th class="text-right px-4 py-2 font-medium w-28">{{ 'billing.invoiceDetail.unit' | translate }}</th>
+                  <th class="text-right px-4 py-2 font-medium w-28">{{ 'form.label.amount' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -159,18 +158,18 @@
               </tbody>
               <tfoot>
                 <tr class="border-t border-surface-200 dark:border-surface-700">
-                  <td colspan="3" class="px-4 py-3 text-right text-xs uppercase tracking-wide text-surface-500">Subtotal</td>
+                  <td colspan="3" class="px-4 py-3 text-right text-xs uppercase tracking-wide text-surface-500">{{ 'billing.invoiceDetail.subtotal' | translate }}</td>
                   <td class="px-4 py-3 text-right tabular-nums">{{ inv.amountDueCents | currencyRon : inv.currency }}</td>
                 </tr>
                 <tr class="border-t border-surface-200 dark:border-surface-700/50">
-                  <td colspan="3" class="px-4 py-3 text-right text-xs uppercase tracking-wide text-surface-500">Total</td>
+                  <td colspan="3" class="px-4 py-3 text-right text-xs uppercase tracking-wide text-surface-500">{{ 'billing.invoiceDetail.total' | translate }}</td>
                   <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ inv.amountDueCents | currencyRon : inv.currency }}</td>
                 </tr>
               </tfoot>
             </table>
           } @else {
             <div class="py-6 text-center text-sm text-surface-500">
-              No line items available.
+              {{ 'billing.invoiceDetail.noLineItems' | translate }}
             </div>
           }
         </section>
@@ -178,7 +177,7 @@
         <!-- Notes from the instructor (read-only on the client side) -->
         @if (inv.description) {
           <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-4 flex flex-col gap-2">
-            <span class="text-xs uppercase tracking-wide text-surface-500">Notes</span>
+            <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.notes' | translate }}</span>
             <p class="m-0 text-sm whitespace-pre-wrap">{{ inv.description }}</p>
           </section>
         }
@@ -191,7 +190,7 @@
         @if (inv.status === Statuses.Open) {
           <section class="rounded-lg border border-primary-300/40 bg-primary-50/50 dark:bg-primary-900/10 p-4 flex flex-col gap-3">
             <span class="text-xs uppercase tracking-wide text-primary-700 dark:text-primary-400 font-semibold">
-              Pay this invoice
+              {{ 'billing.invoiceDetail.payTitle' | translate }}
             </span>
 
             <!-- EU cooling-off waiver (OUG 34/2014) -->
@@ -208,7 +207,7 @@
 
             <button pButton type="button" size="small" [disabled]="(!consentChecked) || payLoading()" fluid (click)="payInvoice()">
               <i class="pi" [class]="payLoading() ? 'pi-spinner pi-spin' : 'pi-credit-card'"></i>
-              Pay now
+              {{ 'billing.invoiceDetail.payNow' | translate }}
             </button>
           </section>
         }
@@ -216,20 +215,20 @@
         <!-- Payment details shown once the invoice has been paid -->
         @if (inv.status === Statuses.Paid) {
           <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-4 flex flex-col gap-2">
-            <span class="text-xs uppercase tracking-wide text-surface-500">Payment</span>
+            <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'billing.invoiceDetail.payment' | translate }}</span>
             @if (inv.paidAt) {
               <div class="flex items-center justify-between text-sm">
-                <span class="text-surface-500">Paid</span>
+                <span class="text-surface-500">{{ 'billing.invoiceDetail.paid' | translate }}</span>
                 <span class="tabular-nums">{{ inv.paidAt | date: 'dd MMM, HH:mm' }}</span>
               </div>
             }
             <div class="flex items-center justify-between text-sm">
-              <span class="text-surface-500">Amount</span>
+              <span class="text-surface-500">{{ 'form.label.amount' | translate }}</span>
               <span class="font-medium tabular-nums">{{ inv.amountPaidCents | currencyRon : inv.currency }}</span>
             </div>
             @if (inv.paidOutOfBand) {
               <span class="text-xs text-surface-500">
-                Settled directly with your coach (cash or bank transfer).
+                {{ 'billing.invoiceDetail.settledDirectly' | translate }}
               </span>
             }
           </section>
@@ -237,7 +236,7 @@
 
         <!-- Activity log -->
         <section class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900/60 p-4 flex flex-col gap-3">
-          <span class="text-xs uppercase tracking-wide text-surface-500">Activity</span>
+          <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'billing.invoiceDetail.activity' | translate }}</span>
           @if (activity().length) {
             <ol class="flex flex-col gap-2.5 m-0 p-0 list-none">
               @for (e of activity(); track e.at + e.label) {

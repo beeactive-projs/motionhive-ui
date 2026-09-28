@@ -23,8 +23,9 @@ import {
   IonToolbar,
   NavController,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { AuthService } from 'core';
+import { AuthService, validationMessage } from 'core';
 
 /**
  * Sets a new password from the emailed reset link. Reachable only with a
@@ -49,6 +50,7 @@ import { AuthService } from 'core';
     IonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './new-password.html',
   styleUrl: './new-password.scss',
@@ -58,6 +60,7 @@ export class NewPassword {
   private readonly _authService = inject(AuthService);
   private readonly _navController = inject(NavController);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _token = this._route.snapshot.queryParamMap.get('token') ?? '';
 
@@ -93,9 +96,7 @@ export class NewPassword {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.successMessage.set(
-            'Your password has been reset successfully. Redirecting to sign in…',
-          );
+          this.successMessage.set(this._translateService.instant('auth.newPassword.success'));
           setTimeout(() => {
             this._navController.navigateRoot('/auth/login');
           }, 2000);
@@ -103,7 +104,7 @@ export class NewPassword {
         error: (error) => {
           this.isLoading.set(false);
           this.errorMessage.set(
-            error.error?.message || 'Failed to reset password. The link may have expired.',
+            error.error?.message || this._translateService.instant('auth.newPassword.error'),
           );
         },
       });
@@ -120,24 +121,15 @@ export class NewPassword {
     return field.hasError('required') || this.newPasswordForm.hasError('passwordMismatch');
   }
 
+  /** The control's own error first (required), then the group-level mismatch. */
   getConfirmPasswordError(): string {
-    const field = this.newPasswordForm.get('confirmPassword');
-    if (!field) return '';
-    if (field.hasError('required')) return 'Confirm password is required';
-    if (this.newPasswordForm.hasError('passwordMismatch')) return 'Passwords do not match';
-    return '';
+    return validationMessage(
+      this.newPasswordForm.get('confirmPassword')?.errors ?? this.newPasswordForm.errors,
+    );
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.newPasswordForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return 'New password is required';
-    if (field.errors['minlength']) {
-      return `Password must be at least ${field.errors['minlength'].requiredLength} characters`;
-    }
-
-    return '';
+    return validationMessage(this.newPasswordForm.get(fieldName)?.errors);
   }
 
   private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {

@@ -21,7 +21,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "npm run check:reusability && ng test",
     "check:reusability": "node scripts/check-reusability.mjs",
-    "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && node scripts/xliffmerge.cjs --profile xliffmerge.json"
+    "extract-i18n": "ng extract-i18n website --output-path projects/website/src/locale && node scripts/xliffmerge.cjs --profile xliffmerge.json",
+    "i18n:check": "node scripts/i18n-check.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -59,11 +60,15 @@
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
     "@ionic/angular": "^8.8.16",
+    "@messageformat/core": "^3.4.0",
+    "@ngx-translate/core": "^18.0.0",
+    "@ngx-translate/http-loader": "^18.0.0",
     "@primeuix/themes": "^3.0.0",
     "@tailwindcss/postcss": "^4.3.3",
     "chart.js": "^4.5.1",
     "flag-icons": "^7.5.0",
     "libphonenumber-js": "^1.13.10",
+    "ngx-translate-messageformat-compiler": "^7.3.0",
     "postcss": "^8.5.25",
     "primeicons": "^7.0.0",
     "primeng": "^22.1.0-rc.2",

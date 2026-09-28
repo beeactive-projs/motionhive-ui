@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonBadge,
   IonIcon,
@@ -50,6 +51,7 @@ import { clientStatusTone, clientSubline } from '../../clients.config';
     IonItemOptions,
     IonItemSliding,
     IonLabel,
+    TranslatePipe,
   ],
   templateUrl: './client-row.html',
   styleUrl: './client-row.scss',

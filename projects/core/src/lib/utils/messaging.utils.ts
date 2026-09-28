@@ -1,4 +1,6 @@
 import { MessageView } from '../models/messaging';
+import { appLocale } from '../i18n/app-language';
+import { translate } from '../i18n/translator';
 
 /**
  * Presentation helpers shared by every messaging surface — pure functions over
@@ -23,7 +25,7 @@ interface NamedLike {
  */
 export function displayName(
   snapshot: NamedLike | null | undefined,
-  fallback = 'Unknown',
+  fallback = translate('common.unknown'),
 ): string {
   if (!snapshot) return fallback;
   const full = [snapshot.firstName, snapshot.lastName]
@@ -131,17 +133,17 @@ function gapMs(a: MessageView, b: MessageView): number {
  */
 export function dayDividerLabel(dayKey: string): string {
   const today = isoDay(new Date().toISOString());
-  if (dayKey === today) return 'Today';
+  if (dayKey === today) return translate('time.today');
 
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  if (dayKey === isoDay(yesterday.toISOString())) return 'Yesterday';
+  if (dayKey === isoDay(yesterday.toISOString())) return translate('time.yesterday');
 
   // Parsed as local midnight; `new Date('2026-08-10')` would be UTC midnight
   // and print the day before west of Greenwich.
   const [year, month, day] = dayKey.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(appLocale(), {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -162,11 +164,11 @@ export function formatRelativeShort(iso: string): string {
   if (Number.isNaN(then)) return '';
   const ms = Date.now() - then;
   const seconds = Math.floor(ms / 1000);
-  if (seconds < 60) return 'now';
+  if (seconds < 60) return translate('time.now');
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return translate('time.agoMinutes', { minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
+  if (hours < 24) return translate('time.agoHours', { hours });
 
   // Local-day comparison: "yesterday" is whatever the user calls yesterday,
   // not whatever the server's UTC midnight thinks.
@@ -175,14 +177,14 @@ export function formatRelativeShort(iso: string): string {
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const startOfYesterday = startOfToday - 24 * 3600_000;
   if (that.getTime() >= startOfYesterday && that.getTime() < startOfToday) {
-    return 'yesterday';
+    return translate('time.yesterdayShort');
   }
 
   const days = Math.floor(hours / 24);
   if (days < 7) {
-    return that.toLocaleDateString(undefined, { weekday: 'short' });
+    return that.toLocaleDateString(appLocale(), { weekday: 'short' });
   }
-  return that.toLocaleDateString(undefined, {
+  return that.toLocaleDateString(appLocale(), {
     month: 'short',
     day: 'numeric',
   });

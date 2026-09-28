@@ -4,17 +4,16 @@
   [closable]="!sending()"
   [closeOnEscape]="!sending()"
   [dismissableMask]="!sending()"
-  header="Send invoice"
+  [header]="'paymentDialogs.sendInvoiceEmail.title' | translate"
   styleClass="w-full max-w-md"
 >
   <div class="flex flex-col gap-4 p-1">
     <p class="text-sm text-surface-700 dark:text-surface-300 m-0">
-      We'll email the invoice to this address. Leave the on-file email to send through Stripe,
-      or type a different one to send a copy elsewhere (e.g. an accountant, a parent, a second contact).
+      {{ 'paymentDialogs.sendInvoiceEmail.intro' | translate }}
     </p>
 
     <label class="flex flex-col gap-2">
-      <span class="text-xs uppercase tracking-wide text-surface-500">Send to</span>
+      <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.sendInvoiceEmail.sendTo' | translate }}</span>
       <input
         pInputText
         type="email"
@@ -22,12 +21,12 @@
         [ngModel]="email()"
         (ngModelChange)="onEmailChange($event)"
         [disabled]="sending()"
-        placeholder="name@example.com"
+        [placeholder]="'paymentDialogs.sendInvoiceEmail.emailPlaceholder' | translate"
         class="w-full"
       />
       @if (onFileEmail(); as onFile) {
         <span class="text-xs text-surface-500">
-          On file: <span class="font-medium">{{ onFile }}</span>
+          {{ 'paymentDialogs.sendInvoiceEmail.onFile' | translate }} <span class="font-medium">{{ onFile }}</span>
         </span>
       }
     </label>
@@ -35,7 +34,7 @@
     @if (isOverride()) {
       <p-message severity="info" [closable]="false" styleClass="w-full">
         <span class="text-xs">
-          This copy will be sent from MotionHive to the address above. The customer's on-file email won't be notified.
+          {{ 'paymentDialogs.sendInvoiceEmail.overrideInfo' | translate }}
         </span>
       </p-message>
     }
@@ -44,11 +43,11 @@
   <ng-template #footer>
     <div class="flex justify-end gap-2">
       <button pButton type="button" severity="secondary" [text]="true" size="small" [disabled]="sending()" (click)="visible.set(false)">
-        Cancel
+        {{ 'button.cancel' | translate }}
       </button>
       <button pButton type="button" size="small" [disabled]="!emailLooksValid() || sending()" (click)="send()">
         <i class="pi" [class]="sending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-        Send
+        {{ 'button.send' | translate }}
       </button>
     </div>
   </ng-template>

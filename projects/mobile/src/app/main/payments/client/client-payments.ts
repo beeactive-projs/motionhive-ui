@@ -25,22 +25,26 @@ import {
   SegmentCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
 import {
   ClientPaymentService,
   CurrencyRonPipe,
+  EnumLabelPipe,
   Invoice,
   InvoiceStatuses,
   Subscription,
+  SubscriptionStatuses,
+  appLocale,
 } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { InvoiceRow } from '../_components/invoice-row/invoice-row';
 import { ConfirmSheet } from '../../../_shared/components/confirm-sheet/confirm-sheet';
-import { PAYMENT_ICONS } from '../payments.config';
+import { PAYMENT_ICONS, PAYMENT_SEGMENTS, PaymentSegment } from '../payments.config';
 
 const PAGE_SIZE = 20;
 
@@ -63,6 +67,7 @@ const PAGE_SIZE = 20;
     CurrencyRonPipe,
     DatePipe,
     EmptyState,
+    EnumLabelPipe,
     InvoiceRow,
     IonBackButton,
     IonButton,
@@ -82,6 +87,7 @@ const PAGE_SIZE = 20;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './client-payments.html',
   styleUrl: './client-payments.scss',
@@ -90,15 +96,14 @@ export class ClientPayments implements ViewWillEnter {
   private readonly _service = inject(ClientPaymentService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4];
 
-  readonly segments = [
-    { value: 'invoices', label: 'Invoices' },
-    { value: 'memberships', label: 'Memberships' },
-  ] as const;
+  readonly segments = PAYMENT_SEGMENTS;
+  readonly SubscriptionStatuses = SubscriptionStatuses;
 
-  readonly segment = signal<'invoices' | 'memberships'>('invoices');
+  readonly segment = signal<PaymentSegment>('invoices');
   readonly invoices = signal<Invoice[]>([]);
   readonly subscriptions = signal<Subscription[]>([]);
   readonly loading = signal(false);
@@ -149,16 +154,19 @@ export class ClientPayments implements ViewWillEnter {
     const sub = this.cancelTarget();
     if (!sub) return [];
     return [
-      { label: 'Plan', value: sub.product?.name ?? 'Membership' },
       {
-        label: 'Access until',
+        label: this._translateService.instant('payments.facts.plan'),
+        value: sub.product?.name ?? this._translateService.instant('payments.fallback.membership'),
+      },
+      {
+        label: this._translateService.instant('payments.facts.accessUntil'),
         value: sub.currentPeriodEnd
-          ? new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
+          ? new Date(sub.currentPeriodEnd).toLocaleDateString(appLocale(), {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
             })
-          : 'the end of this period',
+          : this._translateService.instant('payments.facts.endOfPeriod'),
       },
     ];
   });
@@ -174,7 +182,7 @@ export class ClientPayments implements ViewWillEnter {
 
   onSegmentChange(event: SegmentCustomEvent): void {
     const value = event.detail.value;
-    if (typeof value === 'string') this.segment.set(value as 'invoices' | 'memberships');
+    if (typeof value === 'string') this.segment.set(value as PaymentSegment);
   }
 
   open(invoice: Invoice): void {
@@ -189,7 +197,10 @@ export class ClientPayments implements ViewWillEnter {
       .subscribe({
         next: ({ url }) => window.open(url, '_blank', 'noopener'),
         error: (error: unknown) =>
-          void this._feedbackService.error(error, 'Could not open your payment settings.'),
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.portalFailed'),
+          ),
       });
   }
 
@@ -210,12 +221,17 @@ export class ClientPayments implements ViewWillEnter {
         next: () => {
           this.acting.set(false);
           this.cancelOpen.set(false);
-          void this._feedbackService.success('Membership will end at the period end');
+          void this._feedbackService.success(
+            this._translateService.instant('payments.toast.membershipCanceled'),
+          );
           this._loadSubscriptions();
         },
         error: (error: unknown) => {
           this.acting.set(false);
-          void this._feedbackService.error(error, 'Could not cancel that membership.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.cancelMembershipFailed'),
+          );
         },
       });
   }

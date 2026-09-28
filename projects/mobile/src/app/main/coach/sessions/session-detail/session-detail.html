@@ -3,10 +3,10 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/coach/sessions" />
     </ion-buttons>
-    <ion-title>Session</ion-title>
+    <ion-title>{{ 'common.session' | translate }}</ion-title>
     @if (instance()) {
       <ion-buttons slot="end">
-        <ion-button aria-label="Session actions" (click)="openActions()">
+        <ion-button [attr.aria-label]="'sessions.actionsSheet.title' | translate" (click)="openActions()">
           <ion-icon slot="icon-only" name="ellipsis-vertical" />
         </ion-button>
       </ion-buttons>
@@ -18,9 +18,9 @@
   @if (store.error(); as error) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load this session"
+      [heading]="'sessions.detail.loadError' | translate"
       [message]="error"
-      actionLabel="Try again"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="store.reload()"
     />
   } @else if (store.loading() && !instance()) {
@@ -72,9 +72,9 @@
         <div class="full-banner">
           <ion-icon name="close-circle-outline" aria-hidden="true" />
           <div>
-            <strong>Session cancelled</strong>
+            <strong>{{ 'sessions.detail.cancelled.title' | translate }}</strong>
             @if (instance()?.cancelReason; as reason) {
-              <span class="reason">“{{ reason }}”</span>
+              <span class="reason">{{ 'sessions.quote' | translate: { text: reason } }}</span>
             }
             <span>{{ cancelDetail() }}</span>
           </div>
@@ -101,15 +101,15 @@
                   <!-- The link itself is the row: the CTA below joins, and what
                        you need here is the address, to paste somewhere else. -->
                   <h3 class="url">{{ url }}</h3>
-                  <p>Join opens {{ joinOpensMinutes }} min before</p>
+                  <p>{{ 'sessions.detail.joinOpens' | translate: { minutes: joinOpensMinutes } }}</p>
                 } @else {
                   <h3>{{ providerLabel() }}</h3>
-                  <p>No meeting link on this session yet</p>
+                  <p>{{ 'sessions.detail.noMeetingLink' | translate }}</p>
                 }
               </ion-label>
               @if (meetingUrl()) {
                 <ion-button slot="end" fill="outline" size="small" (click)="copyMeetingUrl()">
-                  Copy
+                  {{ 'sessions.detail.copy' | translate }}
                 </ion-button>
               }
             </ion-item>
@@ -139,7 +139,7 @@
 
       <section class="mh-section">
         <ion-note class="mh-kicker section-label" color="medium">
-          Details
+          {{ 'sessions.detail.details' | translate }}
         </ion-note>
         <ion-list [inset]="true" class="mh-card-list">
           @for (row of detailRows(); track $index; let last = $last) {
@@ -166,7 +166,7 @@
       @if (reminders().length > 0) {
         <section class="mh-section">
           <ion-note class="mh-kicker section-label" color="medium">
-            Reminders
+            {{ 'sessions.detail.reminders' | translate }}
           </ion-note>
           <ion-list [inset]="true" class="mh-card-list">
             @for (reminder of reminders(); track reminder.label; let last = $last) {
@@ -185,10 +185,7 @@
               </ion-item>
             }
           </ion-list>
-          <p class="mh-helper">
-            Sent automatically to everyone booked in. Anyone who books after one of
-            these times does not get that reminder.
-          </p>
+          <p class="mh-helper">{{ 'sessions.detail.remindersHint' | translate }}</p>
         </section>
       }
 
@@ -196,9 +193,9 @@
         <div class="full-banner">
           <ion-icon name="people-outline" aria-hidden="true" />
           <div>
-            <strong>Session is full · {{ spotsLabel() }}</strong>
+            <strong>{{ 'sessions.detail.full' | translate: { spots: spotsLabel() } }}</strong>
             @if (waitlist().length > 0) {
-              <span>{{ waitlist().length }} waiting for a place</span>
+              <span>{{ 'sessions.detail.waiting' | translate: { count: waitlist().length } }}</span>
             }
           </div>
         </div>
@@ -207,7 +204,7 @@
       @if (lifecycle() !== 'past') {
         <section class="mh-section">
           <ion-note class="mh-kicker section-label" color="medium">
-            Spots
+            {{ 'sessions.detail.spots' | translate }}
           </ion-note>
           <div class="spots">
             <ion-progress-bar [value]="fillPercent() / 100" />
@@ -230,20 +227,20 @@
 
       <section class="mh-section">
         <ion-note class="mh-kicker section-label" color="medium">
-          {{ canMarkAttendance() ? 'Attendance' : 'Attendees' }}
+          {{ (canMarkAttendance() ? 'sessions.detail.attendance' : 'sessions.detail.attendees') | translate }}
           @if (counts().pending > 0) {
-            <ion-badge color="secondary">{{ counts().pending }} pending</ion-badge>
+            <ion-badge color="secondary">
+              {{ 'sessions.badge.pending' | translate: { count: counts().pending } }}
+            </ion-badge>
           }
         </ion-note>
 
         @if (editingAttendance() && attendees().length > 0) {
-          <ion-note class="mh-note-block">
-            Mark who turned up. Tapping the same choice again clears it.
-          </ion-note>
+          <ion-note class="mh-note-block">{{ 'sessions.detail.attendanceHint' | translate }}</ion-note>
         }
 
         @if (attendees().length === 0) {
-          <ion-note class="mh-note-block">Nobody has signed up yet.</ion-note>
+          <ion-note class="mh-note-block">{{ 'sessions.detail.noSignups' | translate }}</ion-note>
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
             @for (participant of visibleAttendees(); track participant.id; let last = $last) {
@@ -265,7 +262,7 @@
                   <h3>{{ nameOf(participant) }}</h3>
                   @if (participant.bookingNote; as note) {
                     <!-- What they wrote when booking — their words, so quoted. -->
-                    <p class="booking-note">“{{ note }}”</p>
+                    <p class="booking-note">{{ 'sessions.quote' | translate: { text: note } }}</p>
                   }
                   @if (canMarkAttendance() && showsNote(participant)) {
                     <!-- The design's note card is session-level, which does not
@@ -277,7 +274,7 @@
                       [class.empty]="!noteFor(participant)"
                       (click)="openNote(participant); $event.stopPropagation()"
                     >
-                      {{ noteFor(participant) ?? 'Add a private note' }}
+                      {{ noteFor(participant) ?? ('sessions.detail.privateNote' | translate) }}
                     </button>
                   }
                 </ion-label>
@@ -291,7 +288,7 @@
                       [disabled]="store.isParticipantBusy(participant.id)"
                       (click)="decline(participant); $event.stopPropagation()"
                     >
-                      Decline
+                      {{ 'button.decline' | translate }}
                     </ion-button>
                     <ion-button
                       fill="solid"
@@ -300,7 +297,7 @@
                       [disabled]="store.isParticipantBusy(participant.id)"
                       (click)="approve(participant); $event.stopPropagation()"
                     >
-                      Approve
+                      {{ 'button.approve' | translate }}
                     </ion-button>
                   </ion-buttons>
                 } @else if (editingAttendance()) {
@@ -309,7 +306,7 @@
                   <ion-buttons slot="end" class="marks">
                     <ion-button
                       size="small"
-                      aria-label="Attended"
+                      [attr.aria-label]="'sessions.detail.attended' | translate"
                       [fill]="participant.attended === true ? 'solid' : 'outline'"
                       [color]="participant.attended === true ? 'success' : 'medium'"
                       [disabled]="store.isParticipantBusy(participant.id)"
@@ -319,7 +316,7 @@
                     </ion-button>
                     <ion-button
                       size="small"
-                      aria-label="No-show"
+                      [attr.aria-label]="'sessions.detail.noShow' | translate"
                       [fill]="participant.attended === false ? 'solid' : 'outline'"
                       [color]="participant.attended === false ? 'danger' : 'medium'"
                       [disabled]="store.isParticipantBusy(participant.id)"
@@ -338,7 +335,9 @@
 
             @if (hiddenAttendees() > 0) {
               <ion-item button detail="false" lines="none" (click)="attendeesExpanded.set(true)">
-                <ion-label class="show-all">Show all {{ attendees().length }}</ion-label>
+                <ion-label class="show-all">
+                  {{ 'sessions.detail.showAll' | translate: { count: attendees().length } }}
+                </ion-label>
               </ion-item>
             }
           </ion-list>
@@ -348,7 +347,7 @@
       @if (waitlist().length > 0) {
         <section class="mh-section">
           <ion-note class="mh-kicker section-label" color="medium">
-            Waitlist
+            {{ 'sessions.detail.waitlist' | translate }}
             <ion-badge color="medium">{{ waitlist().length }}</ion-badge>
           </ion-note>
 
@@ -358,9 +357,9 @@
                 <span slot="start" class="queue">{{ i + 1 }}</span>
                 <ion-label>
                   <h3>{{ nameOf(participant) }}</h3>
-                  <p>Waiting since {{ waitingSince(participant) }}</p>
+                  <p>{{ 'sessions.detail.waitingSince' | translate: { since: waitingSince(participant) } }}</p>
                   @if (participant.bookingNote; as note) {
-                    <p class="booking-note">“{{ note }}”</p>
+                    <p class="booking-note">{{ 'sessions.quote' | translate: { text: note } }}</p>
                   }
                 </ion-label>
                 <!-- Not "Promote": no endpoint reaches the promotion service, and
@@ -371,24 +370,20 @@
                   size="small"
                   (click)="messageOne(participant)"
                 >
-                  Message
+                  {{ 'sessions.detail.message' | translate }}
                 </ion-button>
               </ion-item>
             }
           </ion-list>
 
-          <ion-note class="mh-note-block">
-            The next in line moves in automatically when someone cancels, up to two
-            hours before the start. Raising capacity does not move anyone in — tell
-            them yourself if you open more spots.
-          </ion-note>
+          <ion-note class="mh-note-block">{{ 'sessions.detail.waitlistHint' | translate }}</ion-note>
 
           <div class="waitlist-action">
             <ion-button expand="block" fill="outline" (click)="openCapacity()">
-              Raise capacity
+              {{ 'sessions.detail.raiseCapacity' | translate }}
             </ion-button>
             <ion-button expand="block" (click)="messageWaitlist()">
-              Message waitlist
+              {{ 'sessions.detail.messageWaitlist' | translate }}
             </ion-button>
           </div>
         </section>
@@ -400,7 +395,7 @@
              coach's own writing the session actually carries. -->
         <section class="mh-section">
           <ion-note class="mh-kicker section-label" color="medium">
-            Description
+            {{ 'form.label.description' | translate }}
           </ion-note>
           <ion-list [inset]="true" class="mh-card-list">
             <ion-item lines="none">
@@ -422,11 +417,11 @@
         @if (lifecycle() === 'past') {
           @if (attendees().length > 0) {
             <ion-button expand="block" fill="outline" class="action" (click)="toggleAttendanceEdit()">
-              {{ editingAttendance() ? 'Done marking' : 'Edit attendance' }}
+              {{ (editingAttendance() ? 'sessions.detail.doneMarking' : 'sessions.detail.editAttendance') | translate }}
             </ion-button>
           }
           <ion-button expand="block" class="action" (click)="duplicateThis()">
-            Duplicate session
+            {{ 'sessions.detail.duplicate' | translate }}
           </ion-button>
         } @else {
           <div class="stat">
@@ -447,7 +442,7 @@
             </ion-button>
           } @else {
             <ion-button expand="block" class="action" (click)="messageSignups()">
-              Message signups
+              {{ 'sessions.detail.messageSignups' | translate }}
             </ion-button>
           }
         }
@@ -461,7 +456,7 @@
   [instanceId]="instance()?.id ?? null"
   [audience]="messageAudience()"
   [userIds]="messageRecipients()"
-  [recipientLabel]="messageLabel()"
+  [recipientNote]="messageNote()"
 />
 
 <mh-cancel-session-sheet

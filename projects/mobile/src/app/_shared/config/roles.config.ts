@@ -1,4 +1,4 @@
-import { NavMode, NavModes } from 'core';
+import { NavMode, NavModes, translate } from 'core';
 import { barbellOutline, businessOutline, chevronDown, peopleOutline } from 'ionicons/icons';
 
 /** One switchable role, as the pill and the switch-role page render it. */
@@ -33,16 +33,25 @@ export const ROLE_ICONS = { barbellOutline, businessOutline, chevronDown, people
 export const ROLES: Record<NavMode, RoleOption> = {
   [NavModes.Coach]: {
     mode: NavModes.Coach,
-    label: 'Coach',
+    // Getters: translated when read, after the language file has loaded.
+    get label() {
+      return translate('role.coach.label');
+    },
     icon: 'people-outline',
-    description: 'Your clients, sessions and earnings.',
+    get description() {
+      return translate('role.coach.description');
+    },
     color: 'primary',
   },
   [NavModes.Train]: {
     mode: NavModes.Train,
-    label: 'Trainee',
+    get label() {
+      return translate('role.train.label');
+    },
     icon: 'barbell-outline',
-    description: 'Your workouts, coaches and plans.',
+    get description() {
+      return translate('role.train.description');
+    },
     color: 'secondary',
   },
 };

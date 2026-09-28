@@ -1,4 +1,4 @@
-<div class="mh-ws" role="group" aria-label="Week navigator">
+<div class="mh-ws" role="group" [attr.aria-label]="'components.weekStrip.navigator' | translate">
   @for (cell of cells(); track cell.iso) {
     <button
       type="button"

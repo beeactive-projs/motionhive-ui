@@ -1,13 +1,7 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  OnInit,
-  inject,
-  signal,
-  DestroyRef,
-} from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonDirective } from 'primeng/button';
@@ -52,21 +46,22 @@ type VerifyState = 'verifying' | 'success' | 'invalid' | 'missing';
     ProgressSpinnerModule,
     ThemeToggleComponent,
     Logo,
+    TranslatePipe,
   ],
   templateUrl: './verify-email.component.html',
   styleUrl: './verify-email.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailComponent implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _authService = inject(AuthService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   readonly state = signal<VerifyState>('verifying');
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string>(
-    'Your email has been verified. Redirecting you to sign in…',
+    this._translateService.instant('auth.verifyEmail.verified'),
   );
 
   ngOnInit(): void {
@@ -104,7 +99,7 @@ export class VerifyEmailComponent implements OnInit {
           this.state.set('invalid');
           this.errorMessage.set(
             (err?.error?.message as string) ||
-              'This verification link is no longer valid. Request a new one from your profile.',
+              this._translateService.instant('auth.verifyEmail.invalidDefault'),
           );
         },
       });

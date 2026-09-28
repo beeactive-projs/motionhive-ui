@@ -2,27 +2,26 @@
   <!-- Header · shared across desktop + mobile -->
   <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Sessions</h1>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">{{ 'sessions.list.title' | translate }}</h1>
       @if (isTabletDown()) {
-      <p class="text-xs text-surface-700 dark:text-surface-400">Schedule training and manage signups.</p>
+      <p class="text-xs text-surface-700 dark:text-surface-400">{{ 'sessions.list.subtitleCompact' | translate }}</p>
       } @else {
-      <p class="text-sm text-surface-700 dark:text-surface-400">Schedule training, manage signups, and showcase your
-        availability.</p>
+      <p class="text-sm text-surface-700 dark:text-surface-400">{{ 'sessions.list.subtitle' | translate }}</p>
       }
     </div>
     <div class="flex gap-3">
       @if (isMobile()) {
-      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToCalendar()" iconOnly>
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToCalendar()" [attr.aria-label]="'sessions.common.calendar' | translate" iconOnly>
         <i class="pi pi-calendar"></i>
       </button>
       } @else {
       <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="goToCalendar()">
         <i class="pi pi-calendar"></i>
-        Calendar
+        {{ 'sessions.common.calendar' | translate }}
       </button>
       <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="onCreateNew()">
         <i class="pi pi-plus"></i>
-        New session
+        {{ 'sessions.common.newSession' | translate }}
       </button>
       }
     </div>
@@ -30,15 +29,18 @@
 
   <!-- KPI strip · shared — mobile 2-col, tablet/desktop 4-col -->
   @let kpiLoading = store.loading() && store.templates().length === 0;
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3" aria-label="Overview">
-    <mh-kpi-card icon="pi pi-calendar" label="This week" [value]="store.kpis().thisWeek" sub="Scheduled sessions"
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3" [attr.aria-label]="'sessions.list.kpi.overview' | translate">
+    <mh-kpi-card icon="pi pi-calendar" [label]="'sessions.list.kpi.thisWeek.label' | translate"
+      [value]="store.kpis().thisWeek" [sub]="'sessions.list.kpi.thisWeek.sub' | translate" [loading]="kpiLoading" />
+    <mh-kpi-card icon="pi pi-users" [label]="'sessions.list.kpi.totalSignups.label' | translate"
+      [value]="store.kpis().totalSignups" [sub]="'sessions.list.kpi.totalSignups.sub' | translate"
       [loading]="kpiLoading" />
-    <mh-kpi-card icon="pi pi-users" label="Total signups" [value]="store.kpis().totalSignups" sub="Across upcoming"
-      [loading]="kpiLoading" />
-    <mh-kpi-card icon="pi pi-replay" label="Recurring" [value]="store.kpis().recurring + ' active'"
-      sub="Series in motion" [loading]="kpiLoading" />
-    <mh-kpi-card icon="pi pi-exclamation-triangle" label="Needs attention" [value]="store.kpis().needsAttention"
-      [sub]="store.kpis().needsAttention === 0 ? 'All clear' : 'Conflicts and pending'"
+    <mh-kpi-card icon="pi pi-replay" [label]="'sessions.list.kpi.recurring.label' | translate"
+      [value]="'sessions.list.kpi.recurring.value' | translate: { count: store.kpis().recurring }"
+      [sub]="'sessions.list.kpi.recurring.sub' | translate" [loading]="kpiLoading" />
+    <mh-kpi-card icon="pi pi-exclamation-triangle" [label]="'sessions.list.kpi.needsAttention.label' | translate"
+      [value]="store.kpis().needsAttention"
+      [sub]="(store.kpis().needsAttention === 0 ? 'sessions.list.kpi.needsAttention.clear' : 'sessions.list.kpi.needsAttention.pending') | translate"
       [severity]="store.kpis().needsAttention > 0 ? 'danger' : undefined" [loading]="kpiLoading" />
   </section>
 
@@ -131,7 +133,7 @@
 
 @if (isMobile()) {
 <!-- Mobile FAB (single primary action). -->
-<mh-mobile-fab icon="pi pi-plus" label="New session" (tap)="onCreateNew()" />
+<mh-mobile-fab icon="pi pi-plus" [label]="'sessions.common.newSession' | translate" (tap)="onCreateNew()" />
 }
 
 @if (isMobile()) {
@@ -161,10 +163,12 @@
       (click)="filtersPopover.toggle($event)"
     >
       <i class="pi pi-filter"></i>
-      {{ appliedFilterCount() > 0 ? 'Filters · ' + appliedFilterCount() : 'Filters' }}
+      {{ appliedFilterCount() > 0
+        ? ('common.filtersCount' | translate: { count: appliedFilterCount() })
+        : ('common.filters' | translate) }}
     </button>
     } @else {
-    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+    <div class="flex flex-wrap items-center gap-1.5" role="group" [attr.aria-label]="'sessions.list.filters.quick' | translate">
       <button pButton
         type="button"
         size="small"
@@ -174,7 +178,7 @@
         (click)="clearQuickFilters()"
         class="py-0.5 min-w-10"
       >
-        All
+        {{ 'common.all' | translate }}
       </button>
 
     <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
@@ -189,7 +193,7 @@
         class="py-0.5 min-w-10"
       >
         <i class="pi pi-video"></i>
-        Online
+        {{ SessionLocationKind.Online | enumLabel: 'sessionLocationKind' }}
       </button>
       <button pButton
         type="button"
@@ -201,7 +205,7 @@
         class="py-0.5 min-w-10"
       >
         <i class="pi pi-map-marker"></i>
-        In-person
+        {{ SessionLocationKind.InPerson | enumLabel: 'sessionLocationKind' }}
       </button>
 
     <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
@@ -215,7 +219,7 @@
         (click)="toggleType(SessionType.Group)"
         class="py-0.5 min-w-10"
       >
-        Group
+        {{ SessionType.Group | enumLabel: 'sessionType' }}
       </button>
       <button pButton
         type="button"
@@ -226,7 +230,7 @@
         (click)="toggleType(SessionType.Private)"
         class="py-0.5 min-w-10"
       >
-        1-on-1
+        {{ SessionType.Private | enumLabel: 'sessionType' }}
       </button>
       <button pButton
         type="button"
@@ -237,13 +241,14 @@
         (click)="toggleType(SessionType.Open)"
         class="py-0.5 min-w-10"
       >
-        Open
+        {{ SessionType.Open | enumLabel: 'sessionType' }}
       </button>
     </div>
     }
     <p-iconfield class="flex-1 md:flex-[0_1_320px]">
       <p-inputicon class="pi pi-search" />
-      <input pInputText type="text" fluid placeholder="Search sessions, venues, clients…" aria-label="Search sessions"
+      <input pInputText type="text" fluid [placeholder]="'sessions.list.search.placeholder' | translate"
+        [attr.aria-label]="'sessions.list.search.ariaLabel' | translate"
         [ngModel]="searchInput()" (ngModelChange)="onSearchInput($event)" />
       @if (searchInput() !== '') {
       <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchInput('')" />
@@ -275,8 +280,7 @@
     @if (store.upcomingInstances().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ store.upcomingInstances().length }} session{{ store.upcomingInstances().length === 1 ? '' :
-      's' }} total.
+      {{ 'sessions.list.endOfList.sessions' | translate: { count: store.upcomingInstances().length } }}
     </div>
     }
   </div>
@@ -286,28 +290,28 @@
     <mh-day-separator [label]="sectionLabel(group.date)" [count]="group.items.length" [tone]="dayTone(group.date)" />
     @for (inst of group.items; track inst.id) {
     <mh-time-row [time]="formatTime(inst.startAt)" [duration]="formatDuration(inst.template?.durationMinutes ?? 0)"
-      [title]="inst.titleOverride ?? inst.template?.title ?? 'Session'"
+      [title]="inst.titleOverride ?? inst.template?.title ?? ('common.session' | translate)"
       [tone]="inst.template ? toneFor(inst.template, inst) : 'honey'" [conflict]="!!inst.conflictingInstanceIds?.length"
       (click)="onInstanceOpen(inst)"
       (contextmenu)="$event.preventDefault(); inst.template && openActions(inst.template)">
       <span meta>
         @if (inst.conflictingInstanceIds?.length) {
         <span class="mh-mob__chip mh-mob__chip--coral">
-          <i class="pi pi-exclamation-triangle"></i> Conflict
+          <i class="pi pi-exclamation-triangle"></i> {{ 'sessions.common.conflict' | translate }}
         </span>
         } @else if (inst.template?.type === SessionType.Private) {
-        <span class="mh-mob__chip mh-mob__chip--blue">1-on-1</span>
+        <span class="mh-mob__chip mh-mob__chip--blue">{{ SessionType.Private | enumLabel: 'sessionType' }}</span>
         } @else if (inst.template?.locationKind === SessionLocationKind.Online) {
-        <span class="mh-mob__chip mh-mob__chip--teal">Online</span>
+        <span class="mh-mob__chip mh-mob__chip--teal">{{ SessionLocationKind.Online | enumLabel: 'sessionLocationKind' }}</span>
         } @else {
-        <span class="mh-mob__chip mh-mob__chip--honey">{{ inst.template?.type | titlecase }}</span>
+        <span class="mh-mob__chip mh-mob__chip--honey">{{ inst.template?.type | enumLabel: 'sessionType' }}</span>
         }
         @if ((inst.template?.capacity ?? 0) > 0) {
         <span class="text-[10px] text-muted-color">
           {{ inst.confirmedCount }}/{{ inst.template?.capacity }}
         </span>
         } @else if (inst.confirmedCount > 0) {
-        <span class="text-[10px] text-muted-color">{{ inst.confirmedCount }} confirmed</span>
+        <span class="text-[10px] text-muted-color">{{ 'sessions.common.confirmedCount' | translate: { count: inst.confirmedCount } }}</span>
         }
       </span>
     </mh-time-row>
@@ -317,7 +321,7 @@
     @if (store.upcomingInstances().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ store.upcomingInstances().length }} total.
+      {{ 'sessions.list.endOfList.total' | translate: { count: store.upcomingInstances().length } }}
     </div>
     }
   </div>
@@ -343,13 +347,13 @@
     @if (store.loading()) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color" role="status">
       <i class="pi pi-spinner pi-spin"></i>
-      Loading more sessions…
+      {{ 'sessions.list.loadingMoreSessions' | translate }}
     </div>
     }
     } @else if (store.templates().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ store.total() }} session{{ store.total() === 1 ? '' : 's' }} total.
+      {{ 'sessions.list.endOfList.sessions' | translate: { count: store.total() } }}
     </div>
     }
   </div>
@@ -365,21 +369,21 @@
       <span meta>
         @if (inst.conflictingInstanceIds?.length) {
         <span class="mh-mob__chip mh-mob__chip--coral">
-          <i class="pi pi-exclamation-triangle"></i> Conflict
+          <i class="pi pi-exclamation-triangle"></i> {{ 'sessions.common.conflict' | translate }}
         </span>
         } @else if (t.type === SessionType.Private) {
-        <span class="mh-mob__chip mh-mob__chip--blue">1-on-1</span>
+        <span class="mh-mob__chip mh-mob__chip--blue">{{ SessionType.Private | enumLabel: 'sessionType' }}</span>
         } @else if (t.locationKind === SessionLocationKind.Online) {
-        <span class="mh-mob__chip mh-mob__chip--teal">Online</span>
+        <span class="mh-mob__chip mh-mob__chip--teal">{{ SessionLocationKind.Online | enumLabel: 'sessionLocationKind' }}</span>
         } @else {
-        <span class="mh-mob__chip mh-mob__chip--honey">{{ t.type | titlecase }}</span>
+        <span class="mh-mob__chip mh-mob__chip--honey">{{ t.type | enumLabel: 'sessionType' }}</span>
         }
         @if ((t.capacity ?? 0) > 0) {
         <span class="text-[10px] text-muted-color">
           {{ inst.confirmedCount }}/{{ t.capacity }}
         </span>
         } @else if (inst.confirmedCount > 0) {
-        <span class="text-[10px] text-muted-color">{{ inst.confirmedCount }} confirmed</span>
+        <span class="text-[10px] text-muted-color">{{ 'sessions.common.confirmedCount' | translate: { count: inst.confirmedCount } }}</span>
         }
       </span>
     </mh-time-row>
@@ -390,13 +394,13 @@
     <div #scrollSentinel class="h-px w-full" aria-hidden="true"></div>
     @if (store.loading()) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color" role="status">
-      <i class="pi pi-spinner pi-spin"></i> Loading more…
+      <i class="pi pi-spinner pi-spin"></i> {{ 'sessions.list.loadingMore' | translate }}
     </div>
     }
     } @else if (store.templates().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ store.total() }} total.
+      {{ 'sessions.list.endOfList.total' | translate: { count: store.total() } }}
     </div>
     }
   </div>
@@ -415,7 +419,7 @@
     @if (store.cancelledInstances().length > 0 && store.cancelledInstances().length < 100) { <div
       class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ store.cancelledTotal() }} cancelled total.
+      {{ 'sessions.list.endOfList.cancelled' | translate: { count: store.cancelledTotal() } }}
   </div>
   }
   </div>
@@ -424,15 +428,16 @@
     <mh-day-separator [label]="cancelledLabel()" [count]="store.cancelledTotal()" [sticky]="false" />
     @for (inst of store.cancelledInstances(); track inst.id) {
     <mh-time-row [time]="formatTime(inst.startAt)" [duration]="formatDuration(inst.template?.durationMinutes ?? 0)"
-      [title]="inst.template?.title ?? 'Cancelled session'" tone="muted" (click)="openCancelledInstance(inst.id)">
-      <span meta>Cancelled</span>
+      [title]="inst.template?.title ?? ('sessions.list.cancelledSession' | translate)" tone="muted"
+      (click)="openCancelledInstance(inst.id)">
+      <span meta>{{ SessionInstanceStatus.Cancelled | enumLabel: 'sessionInstanceStatus' }}</span>
     </mh-time-row>
     }
 
     @if (store.cancelledInstances().length > 0 && store.cancelledInstances().length < 100) { <div
       class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ store.cancelledTotal() }} cancelled total.
+      {{ 'sessions.list.endOfList.cancelled' | translate: { count: store.cancelledTotal() } }}
   </div>
   }
   </div>
@@ -450,9 +455,9 @@
   @if (store.error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">
-      Couldn't load sessions: {{ store.error() }}
+      {{ 'sessions.list.loadError' | translate: { error: store.error() } }}
     </span>
-    <button pButton type="button" size="small" [outlined]="true" (click)="retry()">Retry</button>
+    <button pButton type="button" size="small" [outlined]="true" (click)="retry()">{{ 'button.retry' | translate }}</button>
   </p-message>
   }
 </ng-template>
@@ -479,26 +484,28 @@
        action so the instructor can add a session straight from here. -->
   @switch (store.tab()) {
   @case (TemplateTab.Ended) {
-  <mh-list-empty-state icon="pi pi-history" title="No past sessions yet"
-    message="Sessions you've run will show up here once they end." actionLabel="Create a session"
-    actionIcon="pi pi-plus" (action)="onCreateNew()" />
+  <mh-list-empty-state icon="pi pi-history" [title]="'sessions.list.empty.past.title' | translate"
+    [message]="'sessions.list.empty.past.message' | translate"
+    [actionLabel]="'sessions.list.empty.past.action' | translate" actionIcon="pi pi-plus" (action)="onCreateNew()" />
   }
   @case (TemplateTab.Recurring) {
-  <mh-list-empty-state icon="pi pi-replay" title="No recurring templates"
-    message="Create a session and toggle 'Repeat on a schedule' to build a series."
-    actionLabel="Create a recurring session" actionIcon="pi pi-plus" (action)="onCreateNew()" />
+  <mh-list-empty-state icon="pi pi-replay" [title]="'sessions.list.empty.recurring.title' | translate"
+    [message]="'sessions.list.empty.recurring.message' | translate"
+    [actionLabel]="'sessions.list.empty.recurring.action' | translate" actionIcon="pi pi-plus"
+    (action)="onCreateNew()" />
   }
   @default {
-  <mh-list-empty-state icon="pi pi-calendar-plus" title="No sessions yet"
-    message="Sessions let you schedule training and showcase your availability. People can see your public sessions on your profile — even if they're not signed up to MotionHive yet."
-    actionLabel="Create your first session" actionIcon="pi pi-plus" (action)="onCreateNew()" />
+  <mh-list-empty-state icon="pi pi-calendar-plus" [title]="'sessions.list.empty.default.title' | translate"
+    [message]="'sessions.list.empty.default.message' | translate"
+    [actionLabel]="'sessions.list.empty.default.action' | translate" actionIcon="pi pi-plus"
+    (action)="onCreateNew()" />
   }
   }
 </ng-template>
 
 <ng-template #cancelledEmptyState>
-  <mh-list-empty-state icon="pi pi-times-circle" title="No cancelled sessions"
-    message="Sessions you cancel show up here for the last 90 days." />
+  <mh-list-empty-state icon="pi pi-times-circle" [title]="'sessions.list.empty.cancelled.title' | translate"
+    [message]="'sessions.list.empty.cancelled.message' | translate" />
 </ng-template>
 
 <!-- Create / edit dialog (used by every tab) -->
@@ -524,12 +531,12 @@
         (click)="clearQuickFilters()"
         class="py-0.5 min-w-10"
       >
-        All
+        {{ 'common.all' | translate }}
       </button>
     </div>
 
     <div class="flex flex-col gap-2">
-      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Type</p>
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">{{ 'form.label.type' | translate }}</p>
       <div class="flex flex-wrap gap-1.5">
         <button pButton
           type="button"
@@ -541,7 +548,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-users"></i>
-          Group
+          {{ SessionType.Group | enumLabel: 'sessionType' }}
         </button>
         <button pButton
           type="button"
@@ -553,7 +560,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-user"></i>
-          1-on-1
+          {{ SessionType.Private | enumLabel: 'sessionType' }}
         </button>
         <button pButton
           type="button"
@@ -565,13 +572,13 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-globe"></i>
-          Open
+          {{ SessionType.Open | enumLabel: 'sessionType' }}
         </button>
       </div>
     </div>
 
     <div class="flex flex-col gap-2">
-      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Location</p>
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">{{ 'form.label.location' | translate }}</p>
       <div class="flex flex-wrap gap-1.5">
         <button pButton
           type="button"
@@ -583,7 +590,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-video"></i>
-          Online
+          {{ SessionLocationKind.Online | enumLabel: 'sessionLocationKind' }}
         </button>
         <button pButton
           type="button"
@@ -595,7 +602,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-map-marker"></i>
-          In-person
+          {{ SessionLocationKind.InPerson | enumLabel: 'sessionLocationKind' }}
         </button>
       </div>
     </div>

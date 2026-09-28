@@ -17,15 +17,15 @@
       class="mh-card__check"
       [checked]="selected"
       (click)="onSelectToggle($event)"
-      [attr.aria-label]="'Select ' + title()"
+      [attr.aria-label]="'components.sessionCard.select' | translate: { title: title() }"
     />
   }
 
   <!-- Time block (date + time) -->
   <div class="mh-card__time">
-    <span class="mh-card__date">{{ startAt() | date: 'EEE d MMM' : '' : 'en-GB' }}</span>
-    <span class="mh-card__hour">{{ startAt() | date: 'HH:mm' : '' : 'en-GB' }}</span>
-    <span class="mh-card__dur">{{ durationMinutes() }} min</span>
+    <span class="mh-card__date">{{ startAt() | date: 'EEE d MMM' }}</span>
+    <span class="mh-card__hour">{{ startAt() | date: 'HH:mm' }}</span>
+    <span class="mh-card__dur">{{ 'time.minutesShort' | translate: { minutes: durationMinutes() } }}</span>
   </div>
 
   <!-- Main info -->
@@ -44,9 +44,9 @@
         ></mh-provider-chip>
       }
       @if (isRecurring()) {
-        <span class="mh-card__chip-recurring" title="Recurring series">
+        <span class="mh-card__chip-recurring" [title]="'components.sessionCard.recurringSeries' | translate">
           <i class="pi pi-refresh" aria-hidden="true"></i>
-          Recurring
+          {{ 'components.sessionCard.recurring' | translate }}
         </span>
       }
     </div>
@@ -54,16 +54,16 @@
     @if (isBlocked()) {
       <p class="mh-card__locked">
         <i class="pi pi-lock" aria-hidden="true"></i>
-        Description and signup hidden — members only
+        {{ 'components.sessionCard.blockedHint' | translate }}
       </p>
     } @else {
       <p class="mh-card__meta">
         @if (isOnline()) {
           <i class="pi pi-video" aria-hidden="true"></i>
-          Online
+          {{ 'enum.sessionLocationKind.ONLINE' | translate }}
         } @else {
           <i class="pi pi-map-marker" aria-hidden="true"></i>
-          {{ $any(instance).venueOverride?.name ?? $any(instance).template?.venue?.name ?? 'In-person' }}
+          {{ $any(instance).venueOverride?.name ?? $any(instance).template?.venue?.name ?? ('enum.sessionLocationKind.IN_PERSON' | translate) }}
         }
       </p>
     }

@@ -1,4 +1,4 @@
-import { InstructorClient, isIncomingRequest, isSentInvite, startOfDay } from 'core';
+import { InstructorClient, isIncomingRequest, isSentInvite, startOfDay, translate } from 'core';
 
 /** The Requests page's own helpers: who is waiting on whom, and since when. */
 
@@ -27,9 +27,9 @@ export function daysBetween(iso: string, now: number): number {
 /** "Received today" / "Received yesterday" / "Received 3 days ago". */
 export function receivedLabel(iso: string, now: number): string {
   const days = daysBetween(iso, now);
-  if (days <= 0) return 'Received today';
-  if (days === 1) return 'Received yesterday';
-  return `Received ${days} days ago`;
+  if (days <= 0) return translate('clients.requests.received.today');
+  if (days === 1) return translate('clients.requests.received.yesterday');
+  return translate('clients.requests.received.daysAgo', { count: days });
 }
 
 /**
@@ -40,11 +40,19 @@ export function receivedLabel(iso: string, now: number): string {
 export function sentMetaLabel(row: InstructorClient, now: number): string {
   const sentDays = daysBetween(row.createdAt, now);
   const sent =
-    sentDays <= 0 ? 'Sent today' : sentDays === 1 ? 'Sent yesterday' : `Sent ${sentDays} days ago`;
+    sentDays <= 0
+      ? translate('clients.requests.sent.today')
+      : sentDays === 1
+        ? translate('clients.requests.sent.yesterday')
+        : translate('clients.requests.sent.daysAgo', { count: sentDays });
   if (!row.expiresAt) return sent;
 
   const left = -daysBetween(row.expiresAt, now);
   const expires =
-    left <= 0 ? 'expires today' : left === 1 ? 'expires tomorrow' : `expires in ${left} days`;
-  return `${sent} · ${expires}`;
+    left <= 0
+      ? translate('clients.requests.expires.today')
+      : left === 1
+        ? translate('clients.requests.expires.tomorrow')
+        : translate('clients.requests.expires.inDays', { count: left });
+  return translate('clients.requests.sentMeta', { sent, expires });
 }

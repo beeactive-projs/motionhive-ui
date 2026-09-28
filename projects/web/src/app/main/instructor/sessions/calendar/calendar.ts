@@ -1,6 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -9,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -17,11 +17,13 @@ import { ToastModule } from 'primeng/toast';
 import {
   BottomSheet,
   CreateTemplateRequest,
+  EnumLabelPipe,
   SessionInstance,
   SessionType,
   SessionLocationKind,
   SessionTemplate,
   SessionsInstructorStore,
+  appLocale,
   dayTone,
   formatSessionDuration,
   formatSessionTime,
@@ -72,7 +74,6 @@ import {
  */
 @Component({
   selector: 'mh-sessions-calendar',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -90,9 +91,10 @@ import {
     MobileFab,
     TimeRow,
     WeekStrip,
+    TranslatePipe,
+    EnumLabelPipe,
   ],
   providers: [MessageService],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './calendar.html',
   styleUrl: './calendar.scss',
 })
@@ -100,6 +102,7 @@ export class SessionsCalendar implements OnInit {
   protected readonly store = inject(SessionsInstructorStore);
   private readonly _router = inject(Router);
   private readonly _location = inject(Location);
+  private readonly _translateService = inject(TranslateService);
 
   // Enum consts exposed for template comparisons — never compare against
   // raw string literals (see CLAUDE.md).
@@ -166,7 +169,7 @@ export class SessionsCalendar implements OnInit {
     const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
     switch (this.view()) {
       case 'day':
-        return r.start.toLocaleDateString('en-GB', {
+        return r.start.toLocaleDateString(appLocale(), {
           weekday: 'long',
           day: 'numeric',
           month: 'long',
@@ -175,10 +178,10 @@ export class SessionsCalendar implements OnInit {
       case 'week': {
         const endDisplay = new Date(r.end);
         endDisplay.setDate(r.end.getDate() - 1);
-        return `${r.start.toLocaleDateString('en-GB', opts)} – ${endDisplay.toLocaleDateString('en-GB', { ...opts, year: 'numeric' })}`;
+        return `${r.start.toLocaleDateString(appLocale(), opts)} – ${endDisplay.toLocaleDateString(appLocale(), { ...opts, year: 'numeric' })}`;
       }
       case 'month':
-        return r.start.toLocaleDateString('en-GB', {
+        return r.start.toLocaleDateString(appLocale(), {
           month: 'long',
           year: 'numeric',
         });
@@ -278,7 +281,7 @@ export class SessionsCalendar implements OnInit {
 
   /** "May 2026" label for the mobile month-picker trigger. */
   protected readonly monthLabel = computed(() =>
-    this.anchor().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+    this.anchor().toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' }),
   );
 
   /** Template alias — local-zone YYYY-MM-DD for `data-agenda-day`. */
@@ -555,7 +558,11 @@ export class SessionsCalendar implements OnInit {
 
   /** Title to render for an instance row (override wins if set). */
   protected instanceTitle(inst: SessionInstance): string {
-    return inst.titleOverride ?? inst.template?.title ?? '(Session)';
+    return (
+      inst.titleOverride ??
+      inst.template?.title ??
+      this._translateService.instant('sessions.calendar.untitledSession')
+    );
   }
 
   /** Conflict flag for the row's conflict ring. */

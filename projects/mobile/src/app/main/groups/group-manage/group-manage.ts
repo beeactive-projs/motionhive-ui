@@ -22,12 +22,14 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
   GroupJoinRequest,
   GroupsRefreshService,
   Post,
+  PostApprovalStates,
   displayName,
   formatRelativeShort,
 } from 'core';
@@ -75,6 +77,7 @@ type ManageTab = (typeof ManageTabs)[keyof typeof ManageTabs];
     IonSpinner,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './group-manage.html',
   styleUrl: './group-manage.scss',
@@ -84,6 +87,7 @@ export class GroupManage implements ViewWillEnter {
   readonly store = inject(GroupManageStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -115,11 +119,11 @@ export class GroupManage implements ViewWillEnter {
   }
 
   requesterName(request: GroupJoinRequest): string {
-    return displayName(request.user, 'Someone');
+    return displayName(request.user, this._translateService.instant('common.someone'));
   }
 
   authorName(post: Post): string {
-    return post.author ? displayName(post.author, 'Member') : 'Member';
+    return displayName(post.author, this._translateService.instant('groups.common.member'));
   }
 
   askedAt(iso: string): string {
@@ -127,19 +131,33 @@ export class GroupManage implements ViewWillEnter {
   }
 
   approveRequest(request: GroupJoinRequest): void {
-    this._decide(request, 'APPROVE', `${this.requesterName(request)} joined`);
+    this._decide(
+      request,
+      'APPROVE',
+      this._translateService.instant('groups.manage.toast.approved', {
+        name: this.requesterName(request),
+      }),
+    );
   }
 
   rejectRequest(request: GroupJoinRequest): void {
-    this._decide(request, 'REJECT', 'Request declined');
+    this._decide(request, 'REJECT', this._translateService.instant('groups.manage.toast.declined'));
   }
 
   publishPost(post: Post): void {
-    this._moderate(post, 'APPROVED', 'Post published');
+    this._moderate(
+      post,
+      PostApprovalStates.Approved,
+      this._translateService.instant('groups.manage.toast.published'),
+    );
   }
 
   rejectPost(post: Post): void {
-    this._moderate(post, 'REJECTED', 'Post rejected');
+    this._moderate(
+      post,
+      PostApprovalStates.Rejected,
+      this._translateService.instant('groups.manage.toast.rejected'),
+    );
   }
 
   onRefresh(event: RefresherCustomEvent): void {
@@ -163,7 +181,10 @@ export class GroupManage implements ViewWillEnter {
         void this._feedbackService.success(success);
       },
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not save that decision.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.manage.toast.failed'),
+        ),
     });
   }
 
@@ -177,7 +198,10 @@ export class GroupManage implements ViewWillEnter {
         void this._feedbackService.success(success);
       },
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not save that decision.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.manage.toast.failed'),
+        ),
     });
   }
 }

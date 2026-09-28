@@ -2,7 +2,6 @@ import {
   Component,
   signal,
   inject,
-  ChangeDetectionStrategy,
   afterNextRender,
   viewChild,
   ElementRef,
@@ -10,6 +9,7 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG imports
 import { ButtonDirective } from 'primeng/button';
@@ -31,6 +31,7 @@ import {
   PRIVACY_POLICY_URL,
   TERMS_OF_SERVICE_URL,
   ThemeService,
+  validationMessage,
 } from 'core';
 import { Divider } from 'primeng/divider';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
@@ -51,10 +52,10 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     Divider,
     ThemeToggleComponent,
     Logo,
+    TranslatePipe,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private readonly _formBuilder = inject(FormBuilder);
@@ -64,6 +65,7 @@ export class LoginComponent {
   private readonly _facebookAuthService = inject(FacebookAuthService);
   private readonly _router = inject(Router);
   private readonly _themeService = inject(ThemeService);
+  private readonly _translateService = inject(TranslateService);
   protected readonly _route = inject(ActivatedRoute);
 
   // Legal pages live on the marketing site — link out absolutely (the app
@@ -106,7 +108,8 @@ export class LoginComponent {
       error: (error) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          error.error?.message || 'Invalid email or password. Please try again.',
+          error.error?.message ||
+            this._translateService.instant('auth.login.error.invalidCredentials'),
         );
       },
     });
@@ -138,7 +141,9 @@ export class LoginComponent {
       },
       error: (error: { error?: { message?: string } }) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error?.message || 'Google sign-in failed. Please try again.');
+        this.errorMessage.set(
+          error.error?.message || this._translateService.instant('auth.common.googleFailed'),
+        );
       },
     });
   }
@@ -158,7 +163,8 @@ export class LoginComponent {
           error: (error: { error?: { message?: string } }) => {
             this.isLoading.set(false);
             this.errorMessage.set(
-              error.error?.message || 'Facebook sign-in failed. Please try again.',
+              error.error?.message ||
+                this._translateService.instant('auth.login.error.facebookFailed'),
             );
           },
         });
@@ -175,16 +181,7 @@ export class LoginComponent {
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.loginForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return `${this.capitalize(fieldName)} is required`;
-    if (field.errors['email']) return 'Please enter a valid email address';
-    if (field.errors['minlength']) {
-      return `${this.capitalize(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
-    }
-
-    return '';
+    return validationMessage(this.loginForm.get(fieldName)?.errors);
   }
 
   private navigateToDashboard(): void {
@@ -195,9 +192,5 @@ export class LoginComponent {
     }
 
     this._router.navigate(['/home']);
-  }
-
-  private capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

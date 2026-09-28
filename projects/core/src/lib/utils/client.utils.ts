@@ -5,6 +5,7 @@ import {
   PendingClientLabels,
 } from '../models/client/client.enums';
 import { InstructorClient } from '../models/client/client.model';
+import { translate } from '../i18n/translator';
 import { displayName } from './messaging.utils';
 
 /**
@@ -19,7 +20,10 @@ import { displayName } from './messaging.utils';
  */
 
 /** "First Last", or the invited address for someone not on the platform yet. */
-export function clientDisplayName(client: InstructorClient, fallback = 'This client'): string {
+export function clientDisplayName(
+  client: InstructorClient,
+  fallback = translate('common.thisClient'),
+): string {
   if (client.client) return displayName(client.client, fallback);
   return client.invitedEmail ?? fallback;
 }

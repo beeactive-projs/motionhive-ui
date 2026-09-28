@@ -28,7 +28,8 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/core/tsconfig.spec.json"
+            "tsConfig": "projects/core/tsconfig.spec.json",
+            "setupFiles": ["projects/core/src/test-setup.ts"]
           }
         }
       }
@@ -49,12 +50,18 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "projects/web/src/main.ts",
+            "allowedCommonJsDependencies": ["@messageformat/core"],
             "tsConfig": "projects/web/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "projects/web/public"
+              },
+              {
+                "glob": "*.json",
+                "input": "projects/core/src/i18n",
+                "output": "/i18n/shared/"
               },
               {
                 "glob": "flag-icons.min.css",
@@ -116,7 +123,11 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/web/tsconfig.spec.json",
+            "setupFiles": ["projects/web/src/test-setup.ts"]
+          }
         }
       }
     },
@@ -330,6 +341,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "projects/mobile/src/main.ts",
+            "allowedCommonJsDependencies": ["@messageformat/core"],
             "outputPath": "dist/mobile",
             "tsConfig": "projects/mobile/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -337,6 +349,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/mobile/public"
+              },
+              {
+                "glob": "*.json",
+                "input": "projects/core/src/i18n",
+                "output": "/i18n/shared/"
               }
             ],
             "styles": ["projects/mobile/src/styles.css"]

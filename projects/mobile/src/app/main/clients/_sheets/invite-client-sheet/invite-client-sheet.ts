@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, model, output, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonButton,
   IonIcon,
@@ -34,6 +35,7 @@ import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { AvatarTone, avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
 import { injectPeopleSearch } from '../../../../_shared/utils/people-search';
 import { ShareOutcomes, shareOrCopy } from '../../../../_shared/utils/share';
+import { MIN_SEARCH_LENGTH } from '../../clients.filters';
 import { CLIENT_ICONS } from '../../clients.icons';
 import { INVITE_EXPIRY_DAYS, InviteMode, InviteModes, inviteLink } from '../../invite.utils';
 
@@ -65,6 +67,7 @@ import { INVITE_EXPIRY_DAYS, InviteMode, InviteModes, inviteLink } from '../../i
     IonTextarea,
     SearchbarAutofocusDirective,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './invite-client-sheet.html',
   styleUrl: './invite-client-sheet.scss',
@@ -72,6 +75,7 @@ import { INVITE_EXPIRY_DAYS, InviteMode, InviteModes, inviteLink } from '../../i
 export class InviteClientSheet {
   private readonly _clientService = inject(ClientService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
 
@@ -80,6 +84,8 @@ export class InviteClientSheet {
 
   readonly Modes = InviteModes;
   readonly expiryDays = INVITE_EXPIRY_DAYS;
+  /** Same floor as the people search's own — stated in the hint under the box. */
+  readonly minSearchLength = MIN_SEARCH_LENGTH;
   readonly skeletonRows = [1, 2, 3];
 
   /** Trainees only, and only ones the coach is not already connected to. */
@@ -119,9 +125,11 @@ export class InviteClientSheet {
   /** "Send invitation · Cristi" once someone is picked. */
   readonly saveLabel = computed(() => {
     const person = this.selected();
-    if (this.mode() !== InviteModes.Platform || !person) return 'Send invitation';
+    if (this.mode() !== InviteModes.Platform || !person) {
+      return this._translateService.instant('clients.inviteSheet.send');
+    }
     const first = person.firstName?.trim() || displayName(person);
-    return `Send invitation · ${first}`;
+    return this._translateService.instant('clients.inviteSheet.sendTo', { name: first });
   });
 
   constructor() {
@@ -184,7 +192,9 @@ export class InviteClientSheet {
         next: (response) => {
           this.saving.set(false);
           this.sent.emit();
-          void this._feedbackService.success('Invitation sent');
+          void this._feedbackService.success(
+            this._translateService.instant('clients.toast.invitationSent'),
+          );
 
           // Only an email invite comes back with a link worth handing over.
           const token = response.request.token;
@@ -197,7 +207,10 @@ export class InviteClientSheet {
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not send the invitation.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('clients.toast.sendFailed'),
+          );
         },
       });
   }
@@ -207,15 +220,20 @@ export class InviteClientSheet {
     if (!token) return;
 
     const outcome = await shareOrCopy({
-      title: 'Join me on MotionHive',
-      text: 'Join me on MotionHive so we can plan your training in one place.',
+      title: this._translateService.instant('clients.inviteSheet.share.title'),
+      text: this._translateService.instant('clients.inviteSheet.share.text'),
       url: inviteLink(token),
     });
 
     if (outcome === ShareOutcomes.Copied) {
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(
+        this._translateService.instant('toast.detail.linkCopied'),
+      );
     } else if (outcome === ShareOutcomes.Failed) {
-      await this._feedbackService.error(null, 'Could not share the link.');
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('clients.toast.shareFailed'),
+      );
     }
   }
 

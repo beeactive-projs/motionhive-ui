@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/messages" />
     </ion-buttons>
-    <ion-title>Details</ion-title>
+    <ion-title>{{ 'messages.details.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -25,12 +25,16 @@
 
     @if (handle()) {
       <ion-list [inset]="true" class="mh-card-list">
-        <mh-settings-row label="View profile" icon="person-outline" (select)="openProfile()" />
+        <mh-settings-row
+          icon="person-outline"
+          [label]="'messages.details.viewProfile' | translate"
+          (select)="openProfile()"
+        />
       </ion-list>
     }
 
     <section class="mh-section">
-      <div class="mh-section-label">Conversation</div>
+      <div class="mh-section-label">{{ 'messages.details.sectionConversation' | translate }}</div>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item lines="none">
           <ion-toggle
@@ -40,8 +44,8 @@
             (ionChange)="toggleMute()"
           >
             <ion-label>
-              <h3>Mute notifications</h3>
-              <p>You'll still see the unread badge.</p>
+              <h3>{{ 'messages.details.mute' | translate }}</h3>
+              <p>{{ 'messages.details.muteHint' | translate }}</p>
             </ion-label>
           </ion-toggle>
         </ion-item>
@@ -49,11 +53,11 @@
     </section>
 
     <section class="mh-section">
-      <div class="mh-section-label">Privacy</div>
+      <div class="mh-section-label">{{ 'messages.details.sectionPrivacy' | translate }}</div>
       <ion-list [inset]="true" class="mh-card-list">
         <mh-settings-row
-          label="Block {{ name() }}"
           icon="ban-outline"
+          [label]="'messages.details.block' | translate: { name: name() }"
           iconColor="danger"
           [disabled]="!conversation()"
           (select)="blockOpen.set(true)"
@@ -62,8 +66,8 @@
     </section>
 
     <ion-note class="mh-note-block ion-text-center">
-      Blocking stops messages both ways.<br />
-      Manage blocked people in Account → Blocked users.
+      {{ 'messages.details.blockNote' | translate }}<br />
+      {{ 'messages.details.blockManageNote' | translate }}
     </ion-note>
   </div>
 </ion-content>

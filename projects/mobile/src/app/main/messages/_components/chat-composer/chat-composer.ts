@@ -8,9 +8,10 @@ import {
   signal,
 } from '@angular/core';
 import { IonButton, IonIcon, IonNote, IonTextarea } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { MessagingStore } from 'core';
+import { MessagingStore, translate } from 'core';
 
 import { MESSAGING_ICONS } from '../../messages.config';
 
@@ -29,7 +30,7 @@ const MAX_BODY_LENGTH = 4000;
  */
 @Component({
   selector: 'mh-chat-composer',
-  imports: [IonButton, IonIcon, IonNote, IonTextarea],
+  imports: [IonButton, IonIcon, IonNote, IonTextarea, TranslatePipe],
   templateUrl: './chat-composer.html',
   styleUrl: './chat-composer.scss',
 })
@@ -40,7 +41,8 @@ export class ChatComposer implements OnDestroy {
   readonly conversationId = input<string | null>(null);
   /** Who receives it. Send is a no-op without one. */
   readonly recipientId = input<string | null>(null);
-  readonly placeholder = input('Message…');
+  // Evaluated per instance, after bootstrap has loaded the language file.
+  readonly placeholder = input(translate('messages.chat.placeholderGeneric'));
 
   /** Local mirror of the store draft, so typing does not round-trip. */
   readonly value = signal('');

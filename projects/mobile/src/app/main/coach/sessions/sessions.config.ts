@@ -10,12 +10,15 @@ import {
   SessionType,
   SessionLocationKind,
   SessionTone,
+  appLocale,
   endOfDay,
   localDayKey,
   meetingProviderLabel,
   sessionTone,
   sessionTypeLabel,
   startOfDay,
+  translate,
+  weekdayNames,
 } from 'core';
 
 import {
@@ -96,26 +99,34 @@ export const SESSION_ICONS = {
  */
 export const AGENDA_DAYS_AHEAD = 30;
 
+// Labels below are getters, not values: these constants are evaluated when the
+// module loads, which can be before the language file has — reading on access
+// keeps them translated wherever they are rendered.
+
 /** Type tiles on the create sheet, in the design's order — words and icons
     from core's `SESSION_TYPES`, in its ionicons dialect. */
 export const SESSION_TYPE_OPTIONS: readonly {
-  value: SessionType;
-  label: string;
-  icon: string;
+  readonly value: SessionType;
+  readonly label: string;
+  readonly icon: string;
 }[] = [SessionType.Group, SessionType.Private, SessionType.Open].map((value) => ({
   value,
-  label: sessionTypeLabel(value),
+  get label() {
+    return sessionTypeLabel(value);
+  },
   icon: SESSION_TYPES[value].ionIcon,
 }));
 
 /** Where the session happens — words and icons from core; drives the form. */
 export const LOCATION_KIND_OPTIONS: readonly {
-  value: SessionLocationKind;
-  label: string;
-  icon: string;
+  readonly value: SessionLocationKind;
+  readonly label: string;
+  readonly icon: string;
 }[] = [SessionLocationKind.InPerson, SessionLocationKind.Online].map((value) => ({
   value,
-  label: SESSION_LOCATION_KINDS[value].label,
+  get label() {
+    return SESSION_LOCATION_KINDS[value].label;
+  },
   icon: SESSION_LOCATION_KINDS[value].ionIcon,
 }));
 
@@ -124,10 +135,10 @@ export const LOCATION_KIND_OPTIONS: readonly {
  * the sub-copy carried along so the sheet can explain the selected one.
  */
 export const SESSION_ACCESS_OPTIONS: readonly {
-  value: SessionAccess;
-  label: string;
-  sub: string;
-  icon: string;
+  readonly value: SessionAccess;
+  readonly label: string;
+  readonly sub: string;
+  readonly icon: string;
 }[] = [
   SessionAccess.Open,
   SessionAccess.Free,
@@ -135,8 +146,12 @@ export const SESSION_ACCESS_OPTIONS: readonly {
   SessionAccess.GroupOnly,
 ].map((value) => ({
   value,
-  label: SESSION_ACCESS_LEVELS[value].label,
-  sub: SESSION_ACCESS_LEVELS[value].sub,
+  get label() {
+    return SESSION_ACCESS_LEVELS[value].label;
+  },
+  get sub() {
+    return SESSION_ACCESS_LEVELS[value].sub;
+  },
   icon: SESSION_ACCESS_LEVELS[value].ionIcon,
 }));
 
@@ -150,13 +165,20 @@ export const SESSION_ACCESS_OPTIONS: readonly {
  * is worse than one you cannot set.
  */
 export const LOCATION_QUICK_FILTERS: readonly {
-  value: SessionLocationKind | null;
-  label: string;
+  readonly value: SessionLocationKind | null;
+  readonly label: string;
 }[] = [
-  { value: null, label: 'All types' },
+  {
+    value: null,
+    get label() {
+      return translate('sessions.filters.allTypes');
+    },
+  },
   ...[SessionLocationKind.Online, SessionLocationKind.InPerson].map((value) => ({
     value,
-    label: SESSION_LOCATION_KINDS[value].label,
+    get label() {
+      return SESSION_LOCATION_KINDS[value].label;
+    },
   })),
 ];
 
@@ -164,19 +186,30 @@ export const LOCATION_QUICK_FILTERS: readonly {
  * Weekday circles on the recurrence editor. `value` is ISO 8601 — 1=Mon..7=Sun,
  * which is what `RecurrenceRuleDto.daysOfWeek` expects. Getting this wrong
  * shifts a whole series by a day.
+ *
+ * The names come from the UI locale (`weekdayNames` is Monday-first, so index
+ * `value - 1`), read on access rather than frozen when the module loads.
  */
-export const WEEKDAYS = [
-  { value: 1, label: 'M', short: 'Mon' },
-  { value: 2, label: 'T', short: 'Tue' },
-  { value: 3, label: 'W', short: 'Wed' },
-  { value: 4, label: 'T', short: 'Thu' },
-  { value: 5, label: 'F', short: 'Fri' },
-  { value: 6, label: 'S', short: 'Sat' },
-  { value: 7, label: 'S', short: 'Sun' },
-] as const;
+export const WEEKDAYS: readonly {
+  readonly value: number;
+  /** Single letter — "M", "T". */
+  readonly label: string;
+  /** Short name — "Mon", "Tue". */
+  readonly short: string;
+}[] = [1, 2, 3, 4, 5, 6, 7].map((value) => ({
+  value,
+  get label() {
+    return weekdayNames('narrow')[value - 1];
+  },
+  get short() {
+    return weekdayNames('short')[value - 1];
+  },
+}));
 
-/** The single-letter column headers, for anything laying out a week. */
-export const WEEKDAY_LETTERS = WEEKDAYS.map((day) => day.label);
+/** The single-letter column headers, Monday first, for anything laying out a week. */
+export function weekdayLetters(): string[] {
+  return weekdayNames('narrow');
+}
 
 /**
  * "Mon", "Mon & Wed", "Mon, Wed & Fri" — ISO weekday numbers as prose.
@@ -187,28 +220,32 @@ export const WEEKDAY_LETTERS = WEEKDAYS.map((day) => day.label);
  * different sentences for one thing.
  */
 export function formatWeekdayList(days: readonly number[]): string {
+  const short = weekdayNames('short');
   const names = [...days]
     .sort((a, b) => a - b)
-    .map((value) => WEEKDAYS.find((day) => day.value === value)?.short)
-    .filter((name) => name !== undefined);
+    .filter((value) => value >= 1 && value <= 7)
+    .map((value) => short[value - 1]);
 
   if (names.length === 0) return '';
   if (names.length === 1) return names[0];
-  return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
+  return translate('sessions.recurrence.dayList', {
+    list: names.slice(0, -1).join(', '),
+    last: names[names.length - 1],
+  });
 }
 
 /** How often it comes round: "Every Tue & Thu", "Every 2 weeks", "Every day". */
 function frequencyPhrase(rule: RecurrenceRule): string {
-  const every = rule.interval > 1 ? `Every ${rule.interval}` : 'Every';
+  const count = Math.max(1, rule.interval);
 
-  if (rule.frequency === 'DAILY') return rule.interval > 1 ? `${every} days` : 'Every day';
+  if (rule.frequency === 'DAILY') return translate('sessions.recurrence.everyDays', { count });
   if (rule.frequency === 'MONTHLY') {
-    return rule.interval > 1 ? `${every} months` : 'Every month';
+    return translate('sessions.recurrence.everyMonths', { count });
   }
 
   const days = formatWeekdayList(rule.daysOfWeek ?? []);
-  if (!days) return rule.interval > 1 ? `${every} weeks` : 'Every week';
-  return rule.interval > 1 ? `${every} weeks on ${days}` : `Every ${days}`;
+  if (!days) return translate('sessions.recurrence.everyWeeks', { count });
+  return translate('sessions.recurrence.everyWeeksOn', { count, days });
 }
 
 /**
@@ -221,20 +258,21 @@ function frequencyPhrase(rule: RecurrenceRule): string {
 export function formatRecurrenceSummary(rule: RecurrenceRule | null | undefined): string {
   if (!rule) return '';
 
-  const parts = [frequencyPhrase(rule)];
+  const frequency = frequencyPhrase(rule);
+  let end: string | null = null;
 
   if (rule.endAfterOccurrences) {
-    parts.push(`${rule.endAfterOccurrences} occurrences`);
+    end = translate('sessions.recurrence.occurrences', { count: rule.endAfterOccurrences });
   } else if (rule.endDate) {
-    const end = new Date(rule.endDate);
-    if (!Number.isNaN(end.getTime())) {
-      parts.push(
-        `until ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`,
-      );
+    const endDate = new Date(rule.endDate);
+    if (!Number.isNaN(endDate.getTime())) {
+      end = translate('sessions.recurrence.until', {
+        date: endDate.toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' }),
+      });
     }
   }
 
-  return parts.join(' · ');
+  return end ? translate('sessions.recurrence.summary', { frequency, end }) : frequency;
 }
 
 /**
@@ -274,6 +312,7 @@ export type SessionActionId =
  */
 export const SESSION_ACTIONS: readonly {
   id: SessionActionId;
+  /** Translation key — the sheet's template translates it. */
   label: string;
   icon: string;
   /** Ionic palette name for the leading glyph. */
@@ -282,28 +321,43 @@ export const SESSION_ACTIONS: readonly {
 }[] = [
   {
     id: SessionActionIds.Open,
-    label: 'Open session',
+    label: 'sessions.actions.open',
     icon: 'arrow-forward-circle-outline',
     color: 'primary',
   },
   {
     id: SessionActionIds.CheckIn,
-    label: 'Check in attendees',
+    label: 'sessions.actions.checkIn',
     icon: 'checkmark-circle-outline',
     color: 'success',
   },
   {
     id: SessionActionIds.Message,
-    label: 'Message all signups',
+    label: 'sessions.actions.message',
     icon: 'send-outline',
     color: 'info',
   },
-  { id: SessionActionIds.Edit, label: 'Edit session', icon: 'create-outline', color: 'medium' },
-  { id: SessionActionIds.Duplicate, label: 'Duplicate', icon: 'copy-outline', color: 'medium' },
-  { id: SessionActionIds.Share, label: 'Share booking link', icon: 'share-outline', color: 'medium' },
+  {
+    id: SessionActionIds.Edit,
+    label: 'sessions.actions.edit',
+    icon: 'create-outline',
+    color: 'medium',
+  },
+  {
+    id: SessionActionIds.Duplicate,
+    label: 'button.duplicate',
+    icon: 'copy-outline',
+    color: 'medium',
+  },
+  {
+    id: SessionActionIds.Share,
+    label: 'sessions.actions.share',
+    icon: 'share-outline',
+    color: 'medium',
+  },
   {
     id: SessionActionIds.Cancel,
-    label: 'Cancel session…',
+    label: 'sessions.actions.cancel',
     icon: 'close-circle-outline',
     color: 'danger',
     destructive: true,
@@ -341,11 +395,12 @@ export type RecurrenceEndMode =
 
 export const RECURRENCE_END_OPTIONS: readonly {
   value: RecurrenceEndMode;
+  /** Translation key — the form's template translates it. */
   label: string;
 }[] = [
-  { value: RecurrenceEndModes.Never, label: 'Never' },
-  { value: RecurrenceEndModes.OnDate, label: 'On date' },
-  { value: RecurrenceEndModes.After, label: 'After N' },
+  { value: RecurrenceEndModes.Never, label: 'sessions.form.endMode.never' },
+  { value: RecurrenceEndModes.OnDate, label: 'sessions.form.endMode.onDate' },
+  { value: RecurrenceEndModes.After, label: 'sessions.form.endMode.after' },
 ];
 
 /** How many occurrences to materialise when the rule has no count of its own. */
@@ -463,11 +518,15 @@ export function findOverlap(
  * What a cancel applies to. Values are core's `CancelScope` members; the copy
  * is filled in per-session, since the details differ every time.
  */
-export const CANCEL_SCOPE_OPTIONS: readonly { value: CancelScope; label: string }[] = [
-  CancelScope.This,
-  CancelScope.ThisAndFuture,
-  CancelScope.Series,
-].map((value) => ({ value, label: CANCEL_SCOPES[value].label }));
+export const CANCEL_SCOPE_OPTIONS: readonly {
+  readonly value: CancelScope;
+  readonly label: string;
+}[] = [CancelScope.This, CancelScope.ThisAndFuture, CancelScope.Series].map((value) => ({
+  value,
+  get label() {
+    return CANCEL_SCOPES[value].label;
+  },
+}));
 
 /**
  * Spine colour for an occurrence. Wraps core's `sessionTone`, which needs a
@@ -497,7 +556,9 @@ export function instanceBaseTone(instance: SessionInstance): SessionTone {
 export function instanceCapacityLabel(instance: SessionInstance): string {
   const capacity = instance.capacityOverride ?? instance.template?.capacity ?? null;
   const confirmed = instance.confirmedCount;
-  return capacity === null ? `${confirmed} booked` : `${confirmed}/${capacity}`;
+  return capacity === null
+    ? translate('sessions.booked', { count: confirmed })
+    : `${confirmed}/${capacity}`;
 }
 
 /** Where it happens — the meeting provider online, else the venue name. */
@@ -527,11 +588,31 @@ export function instanceMeta(instance: SessionInstance): string {
  * `SESSION_TYPES` (location no longer plays), every promise here is one the
  * dots actually keep.
  */
-export const MONTH_LEGEND: readonly { tone: SessionTone; label: string }[] = [
-  { tone: 'honey', label: 'Group' },
-  { tone: 'navy', label: '1-on-1' },
-  { tone: 'teal', label: 'Open' },
-  { tone: 'coral', label: 'Conflict' },
+export const MONTH_LEGEND: readonly { readonly tone: SessionTone; readonly label: string }[] = [
+  {
+    tone: 'honey',
+    get label() {
+      return sessionTypeLabel(SessionType.Group);
+    },
+  },
+  {
+    tone: 'navy',
+    get label() {
+      return sessionTypeLabel(SessionType.Private);
+    },
+  },
+  {
+    tone: 'teal',
+    get label() {
+      return sessionTypeLabel(SessionType.Open);
+    },
+  },
+  {
+    tone: 'coral',
+    get label() {
+      return translate('sessions.status.conflict');
+    },
+  },
 ];
 
 // ─── Filters ──────────────────────────────────────────────────────────────
@@ -551,10 +632,14 @@ export const AgendaStatuses = {
 
 export type AgendaStatus = (typeof AgendaStatuses)[keyof typeof AgendaStatuses];
 
-export const STATUS_OPTIONS: readonly { value: AgendaStatus; label: string }[] = [
-  { value: AgendaStatuses.Scheduled, label: 'Scheduled' },
-  { value: AgendaStatuses.ApprovalNeeded, label: 'Approval needed' },
-  { value: AgendaStatuses.Conflict, label: 'Conflict' },
+export const STATUS_OPTIONS: readonly {
+  value: AgendaStatus;
+  /** Translation key — the filter sheet's template translates it. */
+  label: string;
+}[] = [
+  { value: AgendaStatuses.Scheduled, label: 'sessions.status.scheduled' },
+  { value: AgendaStatuses.ApprovalNeeded, label: 'sessions.status.approvalNeeded' },
+  { value: AgendaStatuses.Conflict, label: 'sessions.status.conflict' },
 ];
 
 /**

@@ -8,5 +8,9 @@
   (click)="toggle()"
 >
   <i [class]="reacted() ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-up'"></i>
-  {{ count() > 0 ? count().toString() : 'Like' }}
+  @if (count() > 0) {
+  {{ count() }}
+  } @else {
+  {{ 'groups.post.like' | translate }}
+  }
 </button>

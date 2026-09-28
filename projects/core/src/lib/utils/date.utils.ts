@@ -5,6 +5,8 @@
  * one zone can land on a different calendar day in another.
  */
 
+import { appLocale } from '../i18n/app-language';
+
 export function startOfDay(d: Date): Date {
   const out = new Date(d);
   out.setHours(0, 0, 0, 0);
@@ -58,13 +60,32 @@ export function formatCalendarShort(iso: string): string {
 
   const now = new Date();
   if (sameDay(date, now)) {
-    return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(appLocale(), { hour: '2-digit', minute: '2-digit' });
   }
 
   const daysAgo = (startOfDay(now).getTime() - startOfDay(date).getTime()) / 86_400_000;
   if (daysAgo > 0 && daysAgo < 7) {
-    return date.toLocaleDateString(undefined, { weekday: 'short' });
+    return date.toLocaleDateString(appLocale(), { weekday: 'short' });
   }
 
-  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  return date.toLocaleDateString(appLocale(), { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Weekday names in the UI locale, Monday first (ISO order, matching
+ * `weekStart`): `'narrow'` → M T W…, `'short'` → Mon Tue…, `'long'` → Monday….
+ *
+ * Replaces hand-written `['M', 'T', …]` / `['Mon', …]` arrays, which can't
+ * follow the language.
+ */
+export function weekdayNames(style: 'narrow' | 'short' | 'long' = 'short'): string[] {
+  const format = new Intl.DateTimeFormat(appLocale(), { weekday: style });
+  // 1 January 2024 was a Monday.
+  return Array.from({ length: 7 }, (_, i) => format.format(new Date(2024, 0, 1 + i)));
+}
+
+/** Month names in the UI locale, January first. */
+export function monthNames(style: 'short' | 'long' = 'long'): string[] {
+  const format = new Intl.DateTimeFormat(appLocale(), { month: style });
+  return Array.from({ length: 12 }, (_, i) => format.format(new Date(2024, i, 1)));
 }

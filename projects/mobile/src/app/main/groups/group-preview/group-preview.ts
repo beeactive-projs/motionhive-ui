@@ -18,6 +18,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { GroupsRefreshService, SelfJoinResult } from 'core';
@@ -56,6 +57,7 @@ import { GroupPreviewStore } from './group-preview.store';
     IonSpinner,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './group-preview.html',
   styleUrl: './group-preview.scss',
@@ -66,6 +68,7 @@ export class GroupPreview {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _groupsRefresh = inject(GroupsRefreshService);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -76,10 +79,9 @@ export class GroupPreview {
 
   readonly group = computed(() => this.store.profile()?.group ?? null);
 
-  readonly memberCountLabel = computed(() => {
-    const count = this.group()?.memberCount ?? 0;
-    return `${count} ${count === 1 ? 'member' : 'members'}`;
-  });
+  readonly memberCountLabel = computed(() =>
+    this._translateService.instant('count.members', { count: this.group()?.memberCount ?? 0 }),
+  );
 
   readonly policyLabel = computed(() => {
     const group = this.group();
@@ -140,7 +142,9 @@ export class GroupPreview {
         this._groupsRefresh.notify();
 
         if (result.status === 'JOINED') {
-          void this._feedbackService.success('You joined the group');
+          void this._feedbackService.success(
+            this._translateService.instant('groups.preview.toast.joined'),
+          );
           // Straight in: the group's own page works now, and it is what they
           // were trying to reach.
           void this._router.navigate(['/tabs/groups', this.group()?.id ?? ''], {
@@ -148,11 +152,16 @@ export class GroupPreview {
           });
           return;
         }
-        void this._feedbackService.success('Request sent');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.preview.toast.requestSent'),
+        );
       },
       error: (error: unknown) => {
         this.joining.set(false);
-        void this._feedbackService.error(error, 'Could not join this group.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.preview.toast.joinFailed'),
+        );
       },
     });
   }
@@ -165,11 +174,16 @@ export class GroupPreview {
       next: () => {
         this.joining.set(false);
         this._groupsRefresh.notify();
-        void this._feedbackService.success('Request withdrawn');
+        void this._feedbackService.success(
+          this._translateService.instant('groups.preview.toast.withdrawn'),
+        );
       },
       error: (error: unknown) => {
         this.joining.set(false);
-        void this._feedbackService.error(error, 'Could not withdraw that request.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('groups.preview.toast.withdrawFailed'),
+        );
       },
     });
   }

@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { SessionParticipant, formatSessionDuration, formatSessionTime } from 'core';
 
@@ -25,7 +26,7 @@ import {
  */
 @Component({
   selector: 'mh-my-session-row',
-  imports: [IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './my-session-row.html',
   styleUrl: './my-session-row.scss',
 })

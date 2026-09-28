@@ -1,4 +1,6 @@
 import { SessionType } from '../models/session/session.enums';
+import { withEnumLabels } from '../i18n/enum-label';
+import { translate } from '../i18n/translator';
 
 /**
  * Session types — the single source of the words, the colour, and the icons.
@@ -24,30 +26,27 @@ export interface SessionTypeMeta {
   ionIcon: string;
 }
 
-export const SESSION_TYPES: Record<SessionType, SessionTypeMeta> = {
+export const SESSION_TYPES: Record<SessionType, SessionTypeMeta> = withEnumLabels('sessionType', {
   [SessionType.Group]: {
-    label: 'Group',
-    tone: 'honey',
+    tone: 'honey' as const,
     piIcon: 'pi pi-users',
     ionIcon: 'people-outline',
   },
   [SessionType.Private]: {
-    label: '1-on-1',
-    tone: 'navy',
+    tone: 'navy' as const,
     piIcon: 'pi pi-user',
     ionIcon: 'person-outline',
   },
   [SessionType.Open]: {
-    label: 'Open',
-    tone: 'teal',
+    tone: 'teal' as const,
     piIcon: 'pi pi-globe',
     ionIcon: 'globe-outline',
   },
-};
+});
 
 /** "Group" / "1-on-1" / "Open" — "Session" rather than an enum at a user. */
 export function sessionTypeLabel(type: SessionType | null | undefined): string {
-  return (type && SESSION_TYPES[type]?.label) || 'Session';
+  return (type && SESSION_TYPES[type]?.label) || translate('common.session');
 }
 
 /** The type's hue; honey when there is no type to speak of. */

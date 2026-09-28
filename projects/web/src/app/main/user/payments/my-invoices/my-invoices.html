@@ -1,14 +1,14 @@
 <!-- Status filter -->
 <div class="flex gap-2 mb-4 flex-wrap">
-  @for (opt of statusOptions; track opt.value) {
+  @for (opt of statusOptions; track opt) {
   <button pButton
     type="button"
     size="small"
-    [outlined]="statusFilter() !== opt.value"
-    [severity]="statusFilter() === opt.value ? 'primary' : 'secondary'"
-    (click)="onStatusFilterChange(opt.value)"
+    [outlined]="statusFilter() !== opt"
+    [severity]="statusFilter() === opt ? 'primary' : 'secondary'"
+    (click)="onStatusFilterChange(opt)"
   >
-    {{ opt.label }}
+    {{ opt ? (opt | enumLabel: 'invoiceStatus') : ('common.all' | translate) }}
   </button>
   }
 </div>
@@ -16,16 +16,17 @@
 <!-- Table -->
 <p-table [value]="invoices()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
   [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowTrackBy]="trackById" size="small"
-  [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices">
+  [showCurrentPageReport]="true"
+  [currentPageReportTemplate]="'billing.myInvoices.pageReport' | translate: pageReportParams">
 
   <ng-template #header>
     <tr>
-      <th>Invoice</th>
-      <th>Amount</th>
-      <th>Status</th>
-      <th>Date</th>
-      <th>Due</th>
-      <th>Actions</th>
+      <th>{{ 'billing.myInvoices.invoice' | translate }}</th>
+      <th>{{ 'form.label.amount' | translate }}</th>
+      <th>{{ 'form.label.status' | translate }}</th>
+      <th>{{ 'form.label.date' | translate }}</th>
+      <th>{{ 'billing.myInvoices.due' | translate }}</th>
+      <th>{{ 'common.actions' | translate }}</th>
     </tr>
   </ng-template>
 
@@ -37,12 +38,12 @@
         </a>
       </td>
       <td class="font-medium">{{ inv.amountDueCents | currencyRon:inv.currency }}</td>
-      <td><p-tag [value]="inv.status | statusLabel" [severity]="statusSeverity(inv.status)" /></td>
+      <td><p-tag [value]="inv.status | statusLabel: 'invoiceStatus'" [severity]="statusSeverity(inv.status)" /></td>
       <td>{{ inv.createdAt | date:'dd MMM yyyy' }}</td>
       <td>{{ inv.dueDate ? (inv.dueDate | date:'dd MMM yyyy') : '—' }}</td>
       <td>
         <a [routerLink]="['/profile/invoices', inv.id]">
-          <button pButton type="button" size="small" [text]="true" iconOnly><i class="pi pi-eye"></i></button>
+          <button pButton type="button" size="small" [text]="true" iconOnly [attr.aria-label]="'billing.myInvoices.viewInvoice' | translate"><i class="pi pi-eye"></i></button>
         </a>
       </td>
     </tr>
@@ -61,7 +62,7 @@
   <ng-template #emptymessage>
     <tr>
       <td colspan="6">
-        <mh-list-empty-state icon="pi pi-file" title="No invoices yet" />
+        <mh-list-empty-state icon="pi pi-file" [title]="'billing.myInvoices.empty' | translate" />
       </td>
     </tr>
   </ng-template>

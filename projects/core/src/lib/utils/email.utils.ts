@@ -1,3 +1,5 @@
+import { translate } from '../i18n/translator';
+
 /**
  * Address validation shared by every screen that takes one.
  *
@@ -53,7 +55,7 @@ export function emailErrorMessage(value: string): string | null {
   const email = value.trim();
   if (!email) return null;
   if (email.length > EMAIL_MAX_LENGTH) {
-    return `An email address cannot be longer than ${EMAIL_MAX_LENGTH} characters.`;
+    return translate('validation.emailTooLong', { max: EMAIL_MAX_LENGTH });
   }
-  return isValidEmail(email) ? null : 'Enter a valid email address, like client@example.com.';
+  return isValidEmail(email) ? null : translate('validation.emailWithExample');
 }

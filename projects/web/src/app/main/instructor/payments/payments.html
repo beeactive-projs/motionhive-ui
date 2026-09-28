@@ -5,12 +5,11 @@
   <!-- Header · shared across desktop + mobile -->
   <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Payments</h1>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">{{ 'nav.payments' | translate }}</h1>
       @if (isTabletDown()) {
-      <p class="text-xs text-surface-700 dark:text-surface-400">Invoices, memberships, and pricing.</p>
+      <p class="text-xs text-surface-700 dark:text-surface-400">{{ 'payments.hub.subtitleCompact' | translate }}</p>
       } @else {
-      <p class="text-sm text-surface-700 dark:text-surface-400">Issue invoices, manage memberships, and set the pricing
-        your clients pay.</p>
+      <p class="text-sm text-surface-700 dark:text-surface-400">{{ 'payments.hub.subtitle' | translate }}</p>
       }
     </div>
     <div class="flex gap-3 shrink-0">
@@ -36,12 +35,12 @@
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
         )"></i>
-        {{ 
-          !hasStripeAccount()
-            ? 'Set up payments'
+        {{
+          (!hasStripeAccount()
+            ? 'payments.hub.setUpPayments'
             : needsOnboardingFinish()
-              ? 'Finish setup'
-              : 'Open Stripe'
+              ? 'payments.common.finishSetup'
+              : 'payments.hub.openStripe') | translate
          }}
       </button>
       @if(stripeOnboarded()) {
@@ -49,14 +48,14 @@
         type="button"
         [size]="isTabletDown() ? 'small' : undefined"
         [disabled]="!stripeOnboarded()"
-        pTooltip="Complete Stripe setup first"
+        [pTooltip]="'payments.hub.completeSetupFirst' | translate"
         [tooltipDisabled]="stripeOnboarded()"
         fluid
         class="w-1/2 sm:w-auto"
         (click)="showCreateDialog.set(true)"
       >
         <i class="pi pi-plus"></i>
-        Create invoice
+        {{ 'payments.common.createInvoice' | translate }}
       </button>
       }
       }
@@ -70,16 +69,16 @@
     @if (summary(); as summary) {
     <p-card class="shadow-md">
       <div class="flex flex-col gap-1">
-        <span class="text-xs uppercase tracking-wide text-muted-color">Outstanding</span>
+        <span class="text-xs uppercase tracking-wide text-muted-color">{{ 'payments.hub.kpi.outstanding' | translate }}</span>
         <div class="flex items-baseline gap-2">
           <span class="font-heading text-sm md:text-xl font-semibold tabular-nums">
             {{ summary.outstandingInvoicesCents | currencyRon : summary.currency }}
           </span>
         </div>
         <span class="text-xs text-muted-color hidden sm:inline-flex">
-          {{ summary.openInvoiceCount }} open {{ summary.openInvoiceCount === 1 ? 'invoice' : 'invoices' }}
+          {{ 'payments.hub.kpi.openInvoices' | translate: { count: summary.openInvoiceCount } }}
           @if (summary.overdueInvoiceCount > 0) {
-          · <span class="text-red-500">{{ summary.overdueInvoiceCount }} overdue</span>
+          · <span class="text-red-500">{{ 'payments.hub.kpi.overdue' | translate: { count: summary.overdueInvoiceCount } }}</span>
           }
         </span>
       </div>
@@ -87,21 +86,21 @@
 
     <p-card class="shadow-md">
       <div class="flex flex-col gap-1">
-        <span class="text-xs uppercase tracking-wide text-muted-color">Available</span>
+        <span class="text-xs uppercase tracking-wide text-muted-color">{{ 'payments.hub.kpi.available' | translate }}</span>
         <span class="font-heading md:text-xl font-semibold tabular-nums">
           {{ summary.availableBalanceCents | currencyRon : summary.currency }}
         </span>
-        <span class="text-xs text-muted-color hidden sm:inline-flex">Ready to withdraw</span>
+        <span class="text-xs text-muted-color hidden sm:inline-flex">{{ 'payments.hub.kpi.readyToWithdraw' | translate }}</span>
       </div>
     </p-card>
 
     <p-card class="shadow-md">
       <div class="flex flex-col gap-1">
-        <span class="text-xs uppercase tracking-wide text-muted-color">Pending</span>
+        <span class="text-xs uppercase tracking-wide text-muted-color">{{ 'payments.hub.kpi.pending' | translate }}</span>
         <span class="font-heading md:text-xl font-semibold tabular-nums">
           {{ summary.pendingBalanceCents | currencyRon : summary.currency }}
         </span>
-        <span class="text-xs text-muted-color hidden sm:inline-flex">In transit · 2–3 days</span>
+        <span class="text-xs text-muted-color hidden sm:inline-flex">{{ 'payments.hub.kpi.inTransit' | translate }}</span>
       </div>
     </p-card>
     }
@@ -130,15 +129,15 @@
       <p-tablist>
         <p-tab [value]="Tabs.Invoices">
           <i class="pi pi-receipt"></i>
-          <span class="ml-2">Invoices</span>
+          <span class="ml-2">{{ 'payments.common.invoices' | translate }}</span>
         </p-tab>
         <p-tab [value]="Tabs.Memberships">
           <i class="pi pi-refresh"></i>
-          <span class="ml-2">Memberships</span>
+          <span class="ml-2">{{ 'payments.common.memberships' | translate }}</span>
         </p-tab>
         <p-tab [value]="Tabs.Pricing">
           <i class="pi pi-tag"></i>
-          <span class="ml-2">Pricing</span>
+          <span class="ml-2">{{ 'payments.common.pricing' | translate }}</span>
         </p-tab>
       </p-tablist>
 
@@ -150,8 +149,8 @@
           } @else {
           @if(!stripeOnboarded()) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
-            title: 'Connect Stripe to start invoicing',
-            description: 'Connect your Stripe account to start sending invoices, tracking outstanding balances, and collecting payments directly from your clients.'
+            title: 'payments.hub.gate.invoices.title',
+            description: 'payments.hub.gate.invoices.description'
           }"></ng-container>
           } @else {
           <mh-invoices />
@@ -166,8 +165,8 @@
           } @else {
           @if(!stripeOnboarded()) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
-            title: 'Set up payments to offer memberships',
-            description: 'Membership plans and recurring subscriptions are powered by Stripe. Complete your onboarding to offer flexible billing cycles and automate client renewals.'
+            title: 'payments.hub.gate.memberships.title',
+            description: 'payments.hub.gate.memberships.description'
           }"></ng-container>
           } @else {<mh-subscriptions /> }}
           }
@@ -179,8 +178,8 @@
           } @else {
           @if(!stripeOnboarded()) {
           <ng-container [ngTemplateOutlet]="onboarding" [ngTemplateOutletContext]="{
-            title: 'Your plans are ready — finish Stripe setup',
-            description: 'Define your service packages and set your rates — once your Stripe account is connected, clients will be able to browse and purchase your plans directly.'
+            title: 'payments.hub.gate.pricing.title',
+            description: 'payments.hub.gate.pricing.description'
           }"></ng-container>
           } @else { <mh-products /> }}}
         </p-tabpanel>
@@ -201,8 +200,8 @@
     <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
       <div class="flex items-center gap-3">
         <div>
-          <span class="font-semibold">{{ title }}</span>
-          <p class="text-sm mt-1">{{ description }}</p>
+          <span class="font-semibold">{{ title | translate }}</span>
+          <p class="text-sm mt-1">{{ description | translate }}</p>
         </div>
       </div>
       <button pButton type="button" class="ml-auto" (click)="openStripeOnboarding()" [disabled]="dashboardLoading()">
@@ -213,12 +212,12 @@
               ? 'pi pi-arrow-right'
               : 'pi pi-external-link'
         )"></i>
-        {{ 
-          !hasStripeAccount()
-            ? 'Set up payments'
+        {{
+          (!hasStripeAccount()
+            ? 'payments.hub.setUpPayments'
             : needsOnboardingFinish()
-              ? 'Finish setup'
-              : 'Open Stripe'
+              ? 'payments.common.finishSetup'
+              : 'payments.hub.openStripe') | translate
          }}
       </button>
     </div>

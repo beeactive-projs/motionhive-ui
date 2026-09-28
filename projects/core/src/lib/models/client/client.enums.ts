@@ -1,3 +1,6 @@
+import { enumLabelMap } from '../../i18n/enum-label';
+import { translate } from '../../i18n/translator';
+
 export const InstructorClientStatuses = {
   Pending: 'PENDING',
   Active: 'ACTIVE',
@@ -29,14 +32,21 @@ export const ClientRequestStatuses = {
 
 export type ClientRequestStatus = (typeof ClientRequestStatuses)[keyof typeof ClientRequestStatuses];
 
-export const ClientStatusLabels: Record<InstructorClientStatus, string> = {
-  [InstructorClientStatuses.Active]: 'Active',
-  [InstructorClientStatuses.Archived]: 'Archived',
-  [InstructorClientStatuses.Pending]: 'Pending',
-};
+/** Translated on read — see `enumLabelMap`. */
+export const ClientStatusLabels: Record<InstructorClientStatus, string> = enumLabelMap(
+  'clientStatus',
+  Object.values(InstructorClientStatuses),
+);
 
+/** Which kind of pending row a client is — each word translated on read. */
 export const PendingClientLabels = {
-  Invited: 'Invited',
-  EmailSent: 'Email sent',
-  Request: 'Request',
-} as const;
+  get Invited(): string {
+    return translate('enum.pendingClient.INVITED');
+  },
+  get EmailSent(): string {
+    return translate('enum.pendingClient.EMAIL_SENT');
+  },
+  get Request(): string {
+    return translate('enum.pendingClient.REQUEST');
+  },
+};

@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import {
   AuthStore,
   Group,
@@ -9,7 +10,9 @@ import {
   GroupService,
   GroupsRefreshService,
   Post,
+  escapeHtml,
   showApiError,
+  UpdateMemberRolePayload,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -21,6 +24,7 @@ export class GroupDetailContext {
   private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly group = signal<Group | null>(null);
   readonly members = signal<GroupMember[]>([]);
@@ -93,7 +97,12 @@ export class GroupDetailContext {
       },
       error: (err) => {
         this.loading.set(false);
-        showApiError(this._messageService, 'Failed to load group details', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.detailsLoadFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -108,7 +117,12 @@ export class GroupDetailContext {
       },
       error: (err) => {
         this.membersLoading.set(false);
-        showApiError(this._messageService, 'Failed to load group members', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.membersLoadFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -147,15 +161,20 @@ export class GroupDetailContext {
         this.copyToClipboard(link);
         this._messageService.add({
           severity: 'success',
-          summary: 'Join link generated',
-          detail: 'Link has been copied to your clipboard',
+          summary: this._translateService.instant('groups.toast.joinLinkGenerated.summary'),
+          detail: this._translateService.instant('groups.toast.joinLinkGenerated.detail'),
         });
         this.loadGroup(group.id);
         onLink?.(link);
       },
       error: (err) => {
         this.generatingLink.set(false);
-        showApiError(this._messageService, 'Failed to generate join link', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.generateLinkFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -165,8 +184,8 @@ export class GroupDetailContext {
     if (!group?.joinToken) {
       this._messageService.add({
         severity: 'warn',
-        summary: 'Link unavailable',
-        detail: 'Please generate a new join link to copy it.',
+        summary: this._translateService.instant('groups.toast.linkUnavailable.summary'),
+        detail: this._translateService.instant('groups.toast.linkUnavailable.detail'),
       });
       return;
     }
@@ -174,8 +193,8 @@ export class GroupDetailContext {
     this.copyToClipboard(link);
     this._messageService.add({
       severity: 'info',
-      summary: 'Copied',
-      detail: 'Join link copied to clipboard',
+      summary: this._translateService.instant('toast.summary.copied'),
+      detail: this._translateService.instant('groups.toast.joinLinkCopied'),
     });
   }
 
@@ -184,9 +203,8 @@ export class GroupDetailContext {
     if (!group) return;
 
     this._confirmationService.confirm({
-      message:
-        'Are you sure you want to revoke the current join link? Existing links will stop working.',
-      header: 'Revoke join link',
+      message: this._translateService.instant('groups.confirm.revokeLink.message'),
+      header: this._translateService.instant('groups.confirm.revokeLink.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
@@ -194,13 +212,18 @@ export class GroupDetailContext {
           next: () => {
             this._messageService.add({
               severity: 'success',
-              summary: 'Link revoked',
-              detail: 'The join link has been revoked',
+              summary: this._translateService.instant('groups.toast.linkRevoked.summary'),
+              detail: this._translateService.instant('groups.toast.linkRevoked.detail'),
             });
             this.loadGroup(group.id);
           },
           error: (err) => {
-            showApiError(this._messageService, 'Failed to revoke join link', '', err);
+            showApiError(
+              this._messageService,
+              this._translateService.instant('groups.toast.revokeLinkFailed'),
+              '',
+              err,
+            );
           },
         });
       },
@@ -212,8 +235,10 @@ export class GroupDetailContext {
     if (!group) return;
 
     this._confirmationService.confirm({
-      message: `Are you sure you want to leave "${group.name}"?`,
-      header: 'Leave group',
+      message: this._translateService.instant('groups.confirm.leave.message', {
+        name: escapeHtml(group.name),
+      }),
+      header: this._translateService.instant('groups.confirm.leave.header'),
       icon: 'pi pi-sign-out',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
@@ -221,14 +246,19 @@ export class GroupDetailContext {
           next: () => {
             this._messageService.add({
               severity: 'success',
-              summary: 'Left group',
-              detail: `You have left "${group.name}"`,
+              summary: this._translateService.instant('groups.toast.left.summary'),
+              detail: this._translateService.instant('groups.toast.left.detail', { name: group.name }),
             });
             this._groupsRefreshService.notify();
             this._router.navigate(['/groups']);
           },
           error: (err) => {
-            showApiError(this._messageService, 'Failed to leave group', '', err);
+            showApiError(
+              this._messageService,
+              this._translateService.instant('groups.toast.leaveFailed'),
+              '',
+              err,
+            );
           },
         });
       },
@@ -236,20 +266,22 @@ export class GroupDetailContext {
   }
 
   promoteMember(member: GroupMember): void {
-    this._setRole(member, 'MODERATOR');
+    this._setRole(member, GroupMemberRoles.Moderator);
   }
 
   demoteMember(member: GroupMember): void {
-    this._setRole(member, 'MEMBER');
+    this._setRole(member, GroupMemberRoles.Member);
   }
 
   confirmRemoveMember(member: GroupMember): void {
-    const name = member.user
-      ? `${member.user.firstName} ${member.user.lastName}`
-      : 'this member';
+    const message = member.user
+      ? this._translateService.instant('groups.confirm.removeMember.message', {
+          name: escapeHtml(`${member.user.firstName} ${member.user.lastName}`),
+        })
+      : this._translateService.instant('groups.confirm.removeMember.messageUnknown');
     this._confirmationService.confirm({
-      message: `Are you sure you want to remove ${name} from this group?`,
-      header: 'Remove member',
+      message,
+      header: this._translateService.instant('groups.confirm.removeMember.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this._removeMember(member),
@@ -270,7 +302,7 @@ export class GroupDetailContext {
     this.showEditPostDialog.set(true);
   }
 
-  private _setRole(member: GroupMember, role: 'MEMBER' | 'MODERATOR'): void {
+  private _setRole(member: GroupMember, role: UpdateMemberRolePayload['role']): void {
     const group = this.group();
     if (!group) return;
     this.promotingMemberId.set(member.userId);
@@ -282,12 +314,21 @@ export class GroupDetailContext {
         );
         this._messageService.add({
           severity: 'success',
-          summary: role === 'MODERATOR' ? 'Member promoted' : 'Member demoted',
+          summary: this._translateService.instant(
+            role === GroupMemberRoles.Moderator
+              ? 'groups.toast.memberPromoted'
+              : 'groups.toast.memberDemoted',
+          ),
         });
       },
       error: (err) => {
         this.promotingMemberId.set(null);
-        showApiError(this._messageService, 'Could not change role', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.changeRoleFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -300,14 +341,19 @@ export class GroupDetailContext {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Member removed',
-          detail: 'Member has been removed from the group',
+          summary: this._translateService.instant('groups.toast.memberRemoved.summary'),
+          detail: this._translateService.instant('groups.toast.memberRemoved.detail'),
         });
         this.loadMembers(group.id);
         this.loadGroup(group.id);
       },
       error: (err) => {
-        showApiError(this._messageService, 'Failed to remove member', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.removeMemberFailed'),
+          '',
+          err,
+        );
       },
     });
   }

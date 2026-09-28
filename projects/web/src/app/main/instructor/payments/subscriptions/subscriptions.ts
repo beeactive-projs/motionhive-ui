@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -12,6 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
@@ -26,6 +26,8 @@ import {
   SubscriptionService,
   SubscriptionStatuses,
   CurrencyRonPipe,
+  enumLabel,
+  EnumLabelPipe,
   StatusLabelPipe,
   getSubscriptionStatusSeverity,
   showApiError,
@@ -37,6 +39,11 @@ import { CreateSubscriptionDialog } from '../../_dialogs/create-subscription-dia
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
 import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
+import {
+  subscriptionPlanCycle,
+  subscriptionPlanLabel,
+  subscriptionPlanName,
+} from '../shared/payment-labels';
 
 @Component({
   selector: 'mh-subscriptions',
@@ -51,22 +58,24 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     Tooltip,
     CurrencyRonPipe,
     StatusLabelPipe,
+    EnumLabelPipe,
     DataView,
     CreateSubscriptionDialog,
     ListCard,
     ListEmptyState,
     Menu,
     UserInfo,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './subscriptions.html',
   styleUrl: './subscriptions.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Subscriptions {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -87,16 +96,19 @@ export class Subscriptions {
 
   readonly statusFilter = signal<SubscriptionStatus | undefined>(undefined);
   readonly statusOptions: { label: string; value: SubscriptionStatus | undefined }[] = [
-    { label: 'All', value: undefined },
-    { label: 'Active', value: SubscriptionStatuses.Active },
-    { label: 'Trialing', value: SubscriptionStatuses.Trialing },
+    { label: this._translateService.instant('common.all'), value: undefined },
+    { label: enumLabel('subscriptionStatus', SubscriptionStatuses.Active), value: SubscriptionStatuses.Active },
+    { label: enumLabel('subscriptionStatus', SubscriptionStatuses.Trialing), value: SubscriptionStatuses.Trialing },
     // Awaiting client confirmation — shown so instructors can find
     // subscriptions where the client hasn't yet confirmed and paid the
     // first invoice.
-    { label: 'Awaiting confirmation', value: SubscriptionStatuses.Incomplete },
-    { label: 'Past due', value: SubscriptionStatuses.PastDue },
-    { label: 'Canceled', value: SubscriptionStatuses.Canceled },
-    { label: 'Paused', value: SubscriptionStatuses.Paused },
+    {
+      label: this._translateService.instant('payments.subscriptions.filter.awaitingConfirmation'),
+      value: SubscriptionStatuses.Incomplete,
+    },
+    { label: enumLabel('subscriptionStatus', SubscriptionStatuses.PastDue), value: SubscriptionStatuses.PastDue },
+    { label: enumLabel('subscriptionStatus', SubscriptionStatuses.Canceled), value: SubscriptionStatuses.Canceled },
+    { label: enumLabel('subscriptionStatus', SubscriptionStatuses.Paused), value: SubscriptionStatuses.Paused },
   ];
 
   readonly showCreateDialog = signal(false);
@@ -107,7 +119,7 @@ export class Subscriptions {
     if (!sub) return [];
     const items: MenuItem[] = [
       {
-        label: 'View details',
+        label: this._translateService.instant('payments.subscriptions.viewDetails'),
         icon: 'pi pi-arrow-right',
         command: () => this.openDetail(sub),
       },
@@ -119,13 +131,13 @@ export class Subscriptions {
       items.push({ separator: true });
       if (!sub.cancelAt) {
         items.push({
-          label: 'Cancel at period end',
+          label: this._translateService.instant('payments.subscriptions.cancelAtPeriodEnd'),
           icon: 'pi pi-times',
           command: () => this.confirmCancel(sub),
         });
       }
       items.push({
-        label: 'Cancel immediately',
+        label: this._translateService.instant('payments.subscriptions.cancelImmediately'),
         icon: 'pi pi-trash',
         styleClass: 'text-red-500',
         command: () => this.confirmCancelImmediately(sub),
@@ -150,7 +162,12 @@ export class Subscriptions {
             })
             .pipe(
               catchError((err) => {
-                showApiError(this._messageService, 'Error', 'Failed to load memberships', err);
+                showApiError(
+                  this._messageService,
+                  this._translateService.instant('toast.summary.error'),
+                  this._translateService.instant('payments.subscriptions.toast.loadFailed'),
+                  err,
+                );
                 return of(null);
               }),
             );
@@ -202,21 +219,10 @@ export class Subscriptions {
    * Falls back to a short product-id stub if the join didn't return a
    * product (legacy rows from before the snapshot was added).
    */
-  planName(sub: Subscription): string {
-    if (sub.product?.name) return sub.product.name;
-    return sub.productId
-      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
-      : 'Plan';
-  }
+  readonly planName = subscriptionPlanName;
 
   /** Cadence subtitle for the Plan cell, e.g. "every 2 months" or "monthly". */
-  planCycle(sub: Subscription): string | null {
-    const p = sub.product;
-    if (!p?.interval) return null;
-    return p.intervalCount && p.intervalCount > 1
-      ? `every ${p.intervalCount} ${p.interval}s`
-      : `${p.interval}ly`;
-  }
+  readonly planCycle = subscriptionPlanCycle;
 
   onPageChange(event: { first?: number | null; rows?: number | null }): void {
     const first = event.first ?? 0;
@@ -250,7 +256,12 @@ export class Subscriptions {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Error', 'Failed to load more memberships', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.subscriptions.toast.loadMoreFailed'),
+            err,
+          );
         },
       });
   }
@@ -262,8 +273,8 @@ export class Subscriptions {
 
   confirmCancel(sub: Subscription): void {
     this._confirmationService.confirm({
-      message: 'Cancel this subscription at the end of the current billing period?',
-      header: 'Cancel subscription',
+      message: this._translateService.instant('payments.subscriptions.confirm.cancel.message'),
+      header: this._translateService.instant('payments.subscriptions.confirm.cancel.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.cancelSubscription(sub),
@@ -272,8 +283,8 @@ export class Subscriptions {
 
   confirmCancelImmediately(sub: Subscription): void {
     this._confirmationService.confirm({
-      message: 'Cancel this subscription immediately? The client will lose access right away.',
-      header: 'Cancel immediately',
+      message: this._translateService.instant('payments.subscriptions.confirm.cancelImmediately.message'),
+      header: this._translateService.instant('payments.subscriptions.confirm.cancelImmediately.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.cancelSubscription(sub, true),
@@ -286,17 +297,21 @@ export class Subscriptions {
       .pipe(take(1))
       .subscribe({
         next: () => {
+          const toast = immediate ? 'canceled' : 'willCancel';
           this._messageService.add({
             severity: 'success',
-            summary: immediate ? 'Subscription canceled' : 'Subscription will cancel',
-            detail: immediate
-              ? 'Subscription has been canceled immediately'
-              : 'Subscription will cancel at the end of the billing period',
+            summary: this._translateService.instant(`payments.subscriptions.toast.${toast}.summary`),
+            detail: this._translateService.instant(`payments.subscriptions.toast.${toast}.detail`),
           });
           this.reload();
         },
         error: (err) => {
-          showApiError(this._messageService, 'Error', 'Failed to cancel subscription', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.subscriptions.toast.cancelFailed'),
+            err,
+          );
         },
       });
   }
@@ -314,8 +329,10 @@ export class Subscriptions {
       const fullName = `${c.firstName ?? ''} ${c.lastName ?? ''}`.trim();
       return fullName || c.email;
     }
-    if (!sub.clientId) return 'Unknown client';
-    return `Client #${sub.clientId.slice(0, 8).toUpperCase()}`;
+    if (!sub.clientId) return this._translateService.instant('payments.common.unknownClient');
+    return this._translateService.instant('payments.subscriptions.clientWithId', {
+      id: sub.clientId.slice(0, 8).toUpperCase(),
+    });
   }
 
   clientEmail(sub: Subscription): string | null {
@@ -336,20 +353,7 @@ export class Subscriptions {
    * cadence suffix (e.g. "Premium · monthly"). Falls back to the
    * legacy ID-prefix when the row pre-dates the join.
    */
-  planDisplay(sub: Subscription): string {
-    const p = sub.product;
-    if (p?.name) {
-      const cadence = p.interval
-        ? p.intervalCount && p.intervalCount > 1
-          ? ` · every ${p.intervalCount} ${p.interval}s`
-          : ` · ${p.interval}ly`
-        : '';
-      return `${p.name}${cadence}`;
-    }
-    return sub.productId
-      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
-      : 'Plan';
-  }
+  readonly planDisplay = subscriptionPlanLabel;
 
   cardAccent(sub: Subscription): 'none' | 'primary' | 'danger' | 'success' {
     if (sub.status === SubscriptionStatuses.PastDue) return 'danger';

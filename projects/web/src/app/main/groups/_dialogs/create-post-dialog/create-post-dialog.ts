@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -18,6 +17,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AuthStore,
   CreatePostPayload,
@@ -27,6 +27,7 @@ import {
   PostService,
   noWhitespaceValidator,
   showApiError,
+  validationMessage,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -60,16 +61,24 @@ const minSelectedValidator =
 
 @Component({
   selector: 'mh-create-post-dialog',
-  imports: [ReactiveFormsModule, ButtonDirective, Dialog, Message, MultiSelect, Textarea],
+  imports: [
+    ReactiveFormsModule,
+    ButtonDirective,
+    Dialog,
+    Message,
+    MultiSelect,
+    Textarea,
+    TranslatePipe,
+  ],
   templateUrl: './create-post-dialog.html',
   styleUrl: './create-post-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreatePostDialog {
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
   private readonly _authStore = inject(AuthStore);
   private readonly _formBuilder = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly preselectedGroupId = input<string | undefined>(undefined);
@@ -158,15 +167,16 @@ export class CreatePostDialog {
 
   getFieldError(field: PostFormField): string {
     const errors = this.form.controls[field].errors;
-    if (!errors) return '';
     if (field === 'content') {
-      if (errors['required']) return 'Write something to share.';
-      if (errors['maxlength']) return `Keep posts under ${MAX_CONTENT} characters.`;
+      return validationMessage(errors, {
+        required: 'groups.postDialog.validation.contentRequired',
+        maxlength: 'groups.postDialog.validation.contentTooLong',
+      });
     }
-    if (field === 'groupIds' && (errors['minSelected'] || errors['required'])) {
-      return 'Pick at least one group.';
-    }
-    return '';
+    return validationMessage(errors, {
+      required: 'groups.postDialog.validation.groupsRequired',
+      minSelected: 'groups.postDialog.validation.groupsRequired',
+    });
   }
 
   onFileSelected(event: Event): void {
@@ -178,24 +188,24 @@ export class CreatePostDialog {
       if (this.uploads().length >= MAX_IMAGES) {
         this._messageService.add({
           severity: 'warn',
-          summary: 'Image limit reached',
-          detail: `Up to ${MAX_IMAGES} images per post.`,
+          summary: this._translateService.instant('groups.toast.imageLimit.summary'),
+          detail: this._translateService.instant('groups.toast.imageLimit.detail', { max: MAX_IMAGES }),
         });
         break;
       }
       if (!file.type.startsWith('image/')) {
         this._messageService.add({
           severity: 'warn',
-          summary: 'Skipped file',
-          detail: `${file.name}: not an image.`,
+          summary: this._translateService.instant('groups.toast.skippedFile.summary'),
+          detail: this._translateService.instant('groups.toast.skippedFile.notImage', { name: file.name }),
         });
         continue;
       }
       if (file.size > MAX_BYTES) {
         this._messageService.add({
           severity: 'warn',
-          summary: 'Skipped file',
-          detail: `${file.name}: larger than 5 MB.`,
+          summary: this._translateService.instant('groups.toast.skippedFile.summary'),
+          detail: this._translateService.instant('groups.toast.skippedFile.tooLarge', { name: file.name }),
         });
         continue;
       }
@@ -230,7 +240,12 @@ export class CreatePostDialog {
               : u,
           ),
         );
-        showApiError(this._messageService, 'Image upload failed', file.name, err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.imageUploadFailed'),
+          file.name,
+          err,
+        );
       },
     });
   }
@@ -263,14 +278,19 @@ export class CreatePostDialog {
             this.visible.set(false);
             this._messageService.add({
               severity: 'success',
-              summary: 'Post updated',
-              detail: 'Your changes are live.',
+              summary: this._translateService.instant('groups.toast.postUpdated.summary'),
+              detail: this._translateService.instant('groups.toast.postUpdated.detail'),
             });
             this.saved.emit([updated]);
           },
           error: (err) => {
             this.submitting.set(false);
-            showApiError(this._messageService, 'Could not update post', '', err);
+            showApiError(
+              this._messageService,
+              this._translateService.instant('groups.toast.postUpdateFailed'),
+              '',
+              err,
+            );
           },
         });
       return;
@@ -288,17 +308,24 @@ export class CreatePostDialog {
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Post created',
+          summary: this._translateService.instant('groups.toast.postCreated.summary'),
           detail:
             result.posts.length > 1
-              ? `Shared with ${result.posts.length} groups.`
-              : 'Your post is live.',
+              ? this._translateService.instant('groups.toast.postCreated.detailShared', {
+                  count: result.posts.length,
+                })
+              : this._translateService.instant('groups.toast.postCreated.detail'),
         });
         this.saved.emit(result.posts);
       },
       error: (err) => {
         this.submitting.set(false);
-        showApiError(this._messageService, 'Could not create post', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.postCreateFailed'),
+          '',
+          err,
+        );
       },
     });
   }

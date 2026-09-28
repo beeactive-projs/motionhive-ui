@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/auth/login" />
     </ion-buttons>
-    <ion-title>Create account</ion-title>
+    <ion-title>{{ 'auth.signUp.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -19,11 +19,11 @@
       <div class="ion-margin-horizontal">
         <ion-input
           fill="outline"
-          label="First name"
+          [label]="'form.label.firstName' | translate"
           labelPlacement="stacked"
           type="text"
           formControlName="firstName"
-          placeholder="John"
+          [placeholder]="'auth.signUp.firstNamePlaceholder' | translate"
           autocomplete="given-name"
           enterkeyhint="next"
           [errorText]="getFieldError('firstName')"
@@ -33,11 +33,11 @@
         <ion-input
           class="ion-margin-top"
           fill="outline"
-          label="Last name"
+          [label]="'form.label.lastName' | translate"
           labelPlacement="stacked"
           type="text"
           formControlName="lastName"
-          placeholder="Doe"
+          [placeholder]="'auth.signUp.lastNamePlaceholder' | translate"
           autocomplete="family-name"
           enterkeyhint="next"
           [errorText]="getFieldError('lastName')"
@@ -47,12 +47,12 @@
         <ion-input
           class="ion-margin-top"
           fill="outline"
-          label="Email address"
+          [label]="'auth.common.emailLabel' | translate"
           labelPlacement="stacked"
           type="email"
           inputmode="email"
           formControlName="email"
-          placeholder="you@example.com"
+          [placeholder]="'form.placeholder.email' | translate"
           autocomplete="email"
           enterkeyhint="next"
           [errorText]="getFieldError('email')"
@@ -62,11 +62,11 @@
         <ion-input
           class="ion-margin-top"
           fill="outline"
-          label="Password"
+          [label]="'form.label.password' | translate"
           labelPlacement="stacked"
           type="password"
           formControlName="password"
-          placeholder="Min. 8 characters"
+          [placeholder]="'form.hint.passwordMinLength' | translate"
           autocomplete="new-password"
           enterkeyhint="next"
           [errorText]="getFieldError('password')"
@@ -78,11 +78,11 @@
         <ion-input
           class="ion-margin-top"
           fill="outline"
-          label="Confirm password"
+          [label]="'form.label.confirmPassword' | translate"
           labelPlacement="stacked"
           type="password"
           formControlName="confirmPassword"
-          placeholder="Re-enter your password"
+          [placeholder]="'form.hint.reenterPassword' | translate"
           autocomplete="new-password"
           enterkeyhint="done"
           [errorText]="getConfirmPasswordError()"
@@ -98,8 +98,8 @@
           justify="start"
         >
           <ion-label class="ion-text-wrap">
-            Register as coach
-            <p>Coaches can create and manage sessions and clients</p>
+            {{ 'auth.signUp.registerAsCoach' | translate }}
+            <p>{{ 'auth.signUp.registerAsCoachHint' | translate }}</p>
           </ion-label>
         </ion-checkbox>
       </div>
@@ -113,7 +113,7 @@
         @if (isLoading()) {
           <ion-spinner name="crescent" />
         } @else {
-          Create account
+          {{ 'auth.signUp.submit' | translate }}
         }
       </ion-button>
     </form>
@@ -121,7 +121,7 @@
     <div class="ion-text-center ion-padding">
       <ion-text color="medium">
         <p class="ion-no-margin">
-          By signing up, you agree to our terms of service and privacy policy.
+          {{ 'auth.signUp.terms' | translate }}
         </p>
       </ion-text>
     </div>

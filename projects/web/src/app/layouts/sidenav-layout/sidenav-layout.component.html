@@ -4,7 +4,7 @@
   <aside class="sidebar sidebar-open" [class.sidebar-open]="sidebarOpen()"
     [class.sidebar-animating]="sidebarAnimating()" (transitionend)="onSidebarTransitionEnd($event)">
     <div class="honeycomb-bg"></div>
-    <a routerLink="/home" aria-label="MotionHive home" class="mx-4">
+    <a routerLink="/home" [attr.aria-label]="'shell.sidenav.homeLink' | translate" class="mx-4">
       <mh-logo />
     </a>
 
@@ -14,7 +14,7 @@
       <mh-segmented
         class="mode-seg"
         variant="honey"
-        ariaLabel="Workspace"
+        [ariaLabel]="'shell.sidenav.workspace' | translate"
         [options]="modeOptions"
         [value]="mode()"
         (valueChange)="setMode($event!)"
@@ -22,7 +22,7 @@
       }
       @if (section.label && !(showModeToggle() && section.mode)) {
       <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider">
-        {{ section.label }}
+        {{ section.label | translate }}
       </div>
       }
       <ul class="flex flex-col gap-1 mb-2">
@@ -32,23 +32,23 @@
           <a href="#" (click)="onNavItemClick(item, $event)" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
-            <span class="flex-1">{{ item.label }}</span>
+            <span class="flex-1">{{ item.label | translate }}</span>
           </a>
           } @else if (item.external) {
           <a [href]="item.route" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
-            <span class="flex-1">{{ item.label }}</span>
+            <span class="flex-1">{{ item.label | translate }}</span>
           </a>
           } @else {
           <a [routerLink]="item.route"
             routerLinkActive="mh-nav-active bg-primary-500/10 text-primary-700 dark:text-primary-500 font-semibold" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
                   transition-colors hover:bg-surface-300 hover:text-surface-800">
             <i [class]="item.icon + ' text-base'"></i>
-            <span class="flex-1">{{ item.label }}</span>
+            <span class="flex-1">{{ item.label | translate }}</span>
             @if (item.badge && item.badge() > 0) {
             <span class="mh-nav-badge" aria-hidden="true">{{ item.badge()! > 99 ? '99+' : item.badge() }}</span>
-            <span class="sr-only">{{ item.badge() }} unread</span>
+            <span class="sr-only">{{ 'shell.sidenav.unread' | translate: { count: item.badge() } }}</span>
             }
           </a>
           }
@@ -89,15 +89,16 @@
   <div class="content" [class.sidebar-open]="sidebarOpen()">
     <p-toolbar>
       <ng-template #start>
-        <button pButton type="button" class="mr-3" size="small" text rounded (click)="toggleSidebar()" iconOnly>
+        <button pButton type="button" class="mr-3" size="small" text rounded (click)="toggleSidebar()" iconOnly
+          [attr.aria-label]="'a11y.openMenu' | translate">
           <i class="pi pi-bars"></i>
         </button>
-        <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()" aria-label="Open search">
+        <button type="button" class="search-trigger hidden sm:flex" (click)="openSearch()" [attr.aria-label]="'shell.toolbar.openSearch' | translate">
           <i class="pi pi-search search-trigger__icon"></i>
-          <span class="search-trigger__placeholder">Search coaches, groups, sessions…</span>
+          <span class="search-trigger__placeholder">{{ 'shell.toolbar.searchPlaceholder' | translate }}</span>
           <kbd class="search-trigger__kbd">⌘K</kbd>
         </button>
-        <button pButton type="button" class="sm:hidden" size="small" text rounded (click)="openSearch()" aria-label="Open search" iconOnly>
+        <button pButton type="button" class="sm:hidden" size="small" text rounded (click)="openSearch()" [attr.aria-label]="'shell.toolbar.openSearch' | translate" iconOnly>
           <i class="pi pi-search"></i>
         </button>
       </ng-template>

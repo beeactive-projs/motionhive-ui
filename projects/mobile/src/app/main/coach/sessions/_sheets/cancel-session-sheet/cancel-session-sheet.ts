@@ -7,6 +7,7 @@ import {
   IonRadioGroup,
   IonTextarea,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import {
@@ -34,13 +35,23 @@ import { CANCEL_SCOPE_OPTIONS } from '../../sessions.config';
  */
 @Component({
   selector: 'mh-cancel-session-sheet',
-  imports: [IonItem, IonLabel, IonNote, IonRadio, IonRadioGroup, IonTextarea, SheetShell],
+  imports: [
+    IonItem,
+    IonLabel,
+    IonNote,
+    IonRadio,
+    IonRadioGroup,
+    IonTextarea,
+    SheetShell,
+    TranslatePipe,
+  ],
   templateUrl: './cancel-session-sheet.html',
   styleUrl: './cancel-session-sheet.scss',
 })
 export class CancelSessionSheet {
   private readonly _sessionService = inject(SessionService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly instance = input<SessionInstance | null>(null);
@@ -73,15 +84,16 @@ export class CancelSessionSheet {
     const instance = this.instance();
     const day = instance ? formatSessionDayShort(instance.startAt) : '';
     return CANCEL_SCOPE_OPTIONS.map((option) => ({
-      ...option,
+      value: option.value,
+      label: option.label,
       detail: this._detailFor(option.value, day),
     }));
   });
 
   readonly messageLabel = computed(() => {
     const count = this.signupCount();
-    if (count === 0) return 'Message · optional';
-    return `Message to ${count} ${count === 1 ? 'signup' : 'signups'} · optional`;
+    if (count === 0) return this._translateService.instant('sessions.cancelSheet.message');
+    return this._translateService.instant('sessions.cancelSheet.messageTo', { count });
   });
 
   constructor() {
@@ -111,15 +123,18 @@ export class CancelSessionSheet {
         next: (result) => {
           this.saving.set(false);
           this.open.set(false);
-          const count = result.cancelledInstanceIds.length;
+          const count = Math.max(1, result.cancelledInstanceIds.length);
           void this._feedbackService.success(
-            count > 1 ? `${count} sessions cancelled` : 'Session cancelled'
+            this._translateService.instant('sessions.toast.cancelled', { count })
           );
           this.cancelled.emit();
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not cancel the session.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('sessions.toast.cancelFailed')
+          );
         },
       });
   }
@@ -133,11 +148,13 @@ export class CancelSessionSheet {
   private _detailFor(scope: CancelScope, day: string): string {
     switch (scope) {
       case CancelScope.This:
-        return day ? `${day} — the series continues.` : 'The series continues.';
+        return day
+          ? this._translateService.instant('sessions.cancelSheet.scope.thisOnDay', { day })
+          : this._translateService.instant('sessions.cancelSheet.scope.this');
       case CancelScope.ThisAndFuture:
-        return 'This and every later occurrence.';
+        return this._translateService.instant('sessions.cancelSheet.scope.thisAndFuture');
       default:
-        return 'Every session in this series. The template is ended.';
+        return this._translateService.instant('sessions.cancelSheet.scope.series');
     }
   }
 }

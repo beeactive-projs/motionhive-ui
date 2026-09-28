@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CardModule } from 'primeng/card';
 import { ButtonDirective } from 'primeng/button';
 import { Post } from 'core';
@@ -23,10 +23,10 @@ import { PostHeader } from '../post-header/post-header';
     PostHeader,
     PostReactionBar,
     PostCommentList,
+    TranslatePipe,
   ],
   templateUrl: './post-card.html',
   styleUrl: './post-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostCard {
   private readonly _router = inject(Router);

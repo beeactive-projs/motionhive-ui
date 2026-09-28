@@ -1,17 +1,21 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
+  inject,
   input,
   model,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
+import { appLocale, weekdayNames } from 'core';
 import type { RecurrenceRule } from 'core';
+
+const SUMMARY_KEY = 'components.recurrenceBuilder.summary';
 
 /**
  * `mh-recurrence-builder` — interactive editor for `RecurrenceRule`.
@@ -32,33 +36,33 @@ import type { RecurrenceRule } from 'core';
  */
 @Component({
   selector: 'mh-recurrence-builder',
-  imports: [CommonModule, FormsModule, InputNumberModule, DatePickerModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, InputNumberModule, DatePickerModule, TranslatePipe],
   templateUrl: './recurrence-builder.html',
   styleUrl: './recurrence-builder.scss',
 })
 export class RecurrenceBuilder {
+  private readonly _translateService = inject(TranslateService);
+
   readonly rule = model.required<RecurrenceRule>();
   // `firstStartAt` is only read lazily inside the methods that need it
   // — avoid `new Date()` as a class-field default because it snapshots
   // the time at class instantiation and leaks `Date.now()` into tests.
   readonly firstStartAt = input<string | null>(null);
 
+  /** Labels are translation keys — the template translates them. */
   protected readonly frequencies = [
-    { value: 'DAILY' as const, label: 'Daily' },
-    { value: 'WEEKLY' as const, label: 'Weekly' },
-    { value: 'MONTHLY' as const, label: 'Monthly' },
+    { value: 'DAILY' as const, label: 'components.recurrenceBuilder.frequency.DAILY' },
+    { value: 'WEEKLY' as const, label: 'components.recurrenceBuilder.frequency.WEEKLY' },
+    { value: 'MONTHLY' as const, label: 'components.recurrenceBuilder.frequency.MONTHLY' },
   ];
-  // Mon-first ISO 8601: 1..7
-  protected readonly dayLabels = [
-    { iso: 1, short: 'M' },
-    { iso: 2, short: 'T' },
-    { iso: 3, short: 'W' },
-    { iso: 4, short: 'T' },
-    { iso: 5, short: 'F' },
-    { iso: 6, short: 'S' },
-    { iso: 7, short: 'S' },
-  ];
+  // Mon-first ISO 8601: 1..7, named in the UI locale.
+  private readonly _shortDayNames = weekdayNames('short');
+  private readonly _longDayNames = weekdayNames('long');
+  protected readonly dayLabels = weekdayNames('narrow').map((short, i) => ({
+    iso: i + 1,
+    short,
+    long: this._longDayNames[i],
+  }));
 
   // Local writable signals for inputs (ngModel-binding intermediates).
   protected readonly intervalValue = signal(1);
@@ -86,12 +90,10 @@ export class RecurrenceBuilder {
   }
 
   protected periodLabel(): string {
-    const n = this.intervalValue();
-    switch (this.rule().frequency) {
-      case 'DAILY': return n === 1 ? 'day' : 'days';
-      case 'WEEKLY': return n === 1 ? 'week' : 'weeks';
-      case 'MONTHLY': return n === 1 ? 'month' : 'months';
-    }
+    return this._translateService.instant(
+      `components.recurrenceBuilder.period.${this.rule().frequency}`,
+      { count: this.intervalValue() },
+    );
   }
 
   protected isDowSelected(iso: number): boolean {
@@ -157,25 +159,38 @@ export class RecurrenceBuilder {
     });
   }
 
+  /** Human summary of the rule, e.g. "Every 2 weeks on Mon, Wed · 12 occurrences". */
   protected plainEnglish(): string {
     const r = this.rule();
-    const interval = r.interval > 1 ? `every ${r.interval} ` : 'every ';
-    let body = '';
-    if (r.frequency === 'DAILY') body = `${interval}${r.interval > 1 ? 'days' : 'day'}`;
-    else if (r.frequency === 'MONTHLY') body = `${interval}${r.interval > 1 ? 'months' : 'month'}`;
-    else {
-      const days = (r.daysOfWeek ?? []).map((iso) => this._dayName(iso)).join(', ');
-      body = days ? `${interval}${r.interval > 1 ? 'weeks' : 'week'} on ${days}` : 'weekly';
+    let rule: string;
+    if (r.frequency === 'WEEKLY') {
+      const days = (r.daysOfWeek ?? [])
+        .map((iso) => this._shortDayNames[iso - 1] ?? '')
+        .filter(Boolean)
+        .join(', ');
+      rule = days
+        ? this._translateService.instant(`${SUMMARY_KEY}.WEEKLY`, { interval: r.interval, days })
+        : this._translateService.instant(`${SUMMARY_KEY}.weeklyNoDays`);
+    } else {
+      rule = this._translateService.instant(`${SUMMARY_KEY}.${r.frequency}`, {
+        interval: r.interval,
+      });
     }
-    let tail = '';
-    if (r.endAfterOccurrences) tail = ` · ${r.endAfterOccurrences} occurrences`;
-    else if (r.endDate) tail = ` · until ${new Date(r.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-    if (!body) return tail.trim() || 'Custom schedule';
-    return body[0].toUpperCase() + body.slice(1) + tail;
-  }
-
-  private _dayName(iso: number): string {
-    return ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][iso] ?? '';
+    if (r.endAfterOccurrences) {
+      return this._translateService.instant(`${SUMMARY_KEY}.withCount`, {
+        rule,
+        count: r.endAfterOccurrences,
+      });
+    }
+    if (r.endDate) {
+      const date = new Date(r.endDate).toLocaleDateString(appLocale(), {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+      return this._translateService.instant(`${SUMMARY_KEY}.withEndDate`, { rule, date });
+    }
+    return rule;
   }
 
   // Emit only — the parent owns the `rule` model and receives the next

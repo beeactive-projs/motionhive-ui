@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
@@ -9,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -31,13 +31,13 @@ import {
  */
 @Component({
   selector: 'mh-cancel-booking-dialog',
-  imports: [FormsModule, Dialog, ButtonDirective, Message, Textarea, InputText],
+  imports: [FormsModule, Dialog, ButtonDirective, Message, Textarea, InputText, TranslatePipe],
   templateUrl: './cancel-booking-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelBookingDialog {
   private readonly _sessionService = inject(SessionService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly participant = input<SessionParticipant | null>(null);
@@ -71,14 +71,15 @@ export class CancelBookingDialog {
         next: (res) => {
           this.busy.set(false);
           this.visible.set(false);
-          const summary =
+          const detail = this._translateService.instant(
             res.cancellation === 'WITHIN_WINDOW'
-              ? 'Booking cancelled — no charge.'
-              : 'Booking cancelled (outside cancel window — charges may still apply).';
+              ? 'mySessions.toast.cancelled.withinWindow'
+              : 'mySessions.toast.cancelled.outsideWindow',
+          );
           this._messageService.add({
             severity: 'success',
-            summary: 'Cancelled',
-            detail: summary,
+            summary: this._translateService.instant('mySessions.toast.cancelled.summary'),
+            detail,
           });
           this.cancelled.emit(res);
         },
@@ -86,8 +87,8 @@ export class CancelBookingDialog {
           this.busy.set(false);
           showApiError(
             this._messageService,
-            'Could not cancel',
-            'Please try again.',
+            this._translateService.instant('mySessions.toast.cancelFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
             err,
           );
         },

@@ -11,8 +11,9 @@ import {
   IonText,
   NavController,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { AuthService, LoginRequest } from 'core';
+import { AuthService, LoginRequest, validationMessage } from 'core';
 
 @Component({
   selector: 'mh-login',
@@ -26,6 +27,7 @@ import { AuthService, LoginRequest } from 'core';
     IonRouterLink,
     IonSpinner,
     IonText,
+    TranslatePipe,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -35,6 +37,7 @@ export class Login {
   private readonly _authService = inject(AuthService);
   private readonly _navController = inject(NavController);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -69,7 +72,7 @@ export class Login {
       error: (error) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          error.error?.message || 'Invalid email or password. Please try again.',
+          error.error?.message || this._translateService.instant('auth.login.error'),
         );
       },
     });
@@ -81,24 +84,11 @@ export class Login {
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.loginForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return `${this.capitalize(fieldName)} is required`;
-    if (field.errors['email']) return 'Please enter a valid email address';
-    if (field.errors['minlength']) {
-      return `${this.capitalize(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
-    }
-
-    return '';
+    return validationMessage(this.loginForm.get(fieldName)?.errors);
   }
 
   private navigateToApp(): void {
     const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl');
     this._navController.navigateRoot(returnUrl || '/tabs/home');
-  }
-
-  private capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

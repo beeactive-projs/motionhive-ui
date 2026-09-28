@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, finalize, take, tap } from 'rxjs';
 
 import {
@@ -15,7 +16,7 @@ import {
 import { ROSTER_WINDOW } from '../roster-labels';
 
 /** How far ahead the Upcoming sessions section looks. */
-const UPCOMING_DAYS = 30;
+export const UPCOMING_DAYS = 30;
 const UPCOMING_LIMIT = 5;
 
 /**
@@ -36,6 +37,7 @@ export class ClientDetailStore {
   private readonly _clientService = inject(ClientService);
   private readonly _rosterService = inject(RosterService);
   private readonly _sessionService = inject(SessionService);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _clientId = signal<string | null>(null);
   private readonly _client = signal<InstructorClient | null>(null);
@@ -145,7 +147,12 @@ export class ClientDetailStore {
         },
         error: (error: unknown) => {
           if (!silent || !this._client()) {
-            this._error.set(apiErrorMessage(error, "Couldn't load this client."));
+            this._error.set(
+              apiErrorMessage(
+                error,
+                this._translateService.instant('clients.detail.loadError.message'),
+              ),
+            );
           }
           this._loading.set(false);
         },

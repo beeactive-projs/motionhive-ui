@@ -19,7 +19,13 @@
       [class.pending]="isPending()"
       [style.border-radius]="radius()"
     >
-      {{ message().body }}
+      <!-- A deleted message's body is the BE's '[deleted]' placeholder, not
+           anything the sender wrote, so it gets the local wording. -->
+      @if (isDeleted()) {
+        {{ 'messages.bubble.deleted' | translate }}
+      } @else {
+        {{ message().body }}
+      }
     </div>
 
     @if (showMeta()) {
@@ -29,7 +35,7 @@
           <ion-icon
             name="checkmark-done"
             [class.read]="isRead()"
-            [attr.aria-label]="isRead() ? 'Read' : 'Sent'"
+            [attr.aria-label]="(isRead() ? 'messages.bubble.read' : 'messages.bubble.sent') | translate"
           />
         }
       </div>

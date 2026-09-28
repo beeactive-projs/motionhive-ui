@@ -24,6 +24,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -85,6 +86,7 @@ import { GROUP_ICONS } from '../groups.icons';
     IonTitle,
     IonToggle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './group-edit.html',
   styleUrl: './group-edit.scss',
@@ -95,6 +97,7 @@ export class GroupEdit implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly joinPolicyOptions = JOIN_POLICY_OPTIONS;
@@ -108,8 +111,13 @@ export class GroupEdit implements ViewWillEnter {
   private readonly _groupId = signal('');
 
   readonly isEdit = computed(() => !!this._groupId());
-  readonly heading = computed(() => (this.isEdit() ? 'Edit group' : 'New group'));
-  readonly saveLabel = computed(() => (this.isEdit() ? 'Save changes' : 'Create group'));
+  /** Translation keys — the template translates. */
+  readonly headingKey = computed(() =>
+    this.isEdit() ? 'groups.edit.heading.edit' : 'groups.edit.heading.create',
+  );
+  readonly saveLabelKey = computed(() =>
+    this.isEdit() ? 'button.saveChanges' : 'groups.edit.saveCreate',
+  );
 
   readonly loading = signal(false);
   readonly loadError = signal(false);
@@ -153,12 +161,13 @@ export class GroupEdit implements ViewWillEnter {
   /**
    * A private group cannot be found, so an open join policy on one is a
    * setting nobody can act on. Said out loud rather than silently corrected:
-   * the owner may be about to flip the toggle next.
+   * the owner may be about to flip the toggle next. A translation key, or
+   * empty when there is nothing to say.
    */
-  readonly joinPolicyNote = computed(() => {
+  readonly joinPolicyNoteKey = computed(() => {
     if (this.isPublic()) return '';
     if (this.joinPolicy() === JoinPolicies.InviteOnly) return '';
-    return 'This group is private, so people can only join from a link or an invite.';
+    return 'groups.edit.privateNote';
   });
 
   constructor() {
@@ -220,7 +229,11 @@ export class GroupEdit implements ViewWillEnter {
       next: (group) => {
         this.saving.set(false);
         this._groupsRefresh.notify();
-        void this._feedbackService.success(this.isEdit() ? 'Group updated' : 'Group created');
+        void this._feedbackService.success(
+          this._translateService.instant(
+            this.isEdit() ? 'groups.edit.toast.updated' : 'groups.edit.toast.created',
+          ),
+        );
         // Into the group either way: after a create there is nowhere else
         // sensible to land, and after an edit the changes are what you want
         // to see.
@@ -230,7 +243,9 @@ export class GroupEdit implements ViewWillEnter {
         this.saving.set(false);
         void this._feedbackService.error(
           error,
-          this.isEdit() ? 'Could not save those changes.' : 'Could not create that group.',
+          this._translateService.instant(
+            this.isEdit() ? 'groups.edit.toast.saveFailed' : 'groups.edit.toast.createFailed',
+          ),
         );
       },
     });
@@ -252,12 +267,17 @@ export class GroupEdit implements ViewWillEnter {
           this.deleting.set(false);
           this.deleteOpen.set(false);
           this._groupsRefresh.notify();
-          void this._feedbackService.success('Group deleted');
+          void this._feedbackService.success(
+            this._translateService.instant('groups.edit.toast.deleted'),
+          );
           void this._router.navigateByUrl('/tabs/groups', { replaceUrl: true });
         },
         error: (error: unknown) => {
           this.deleting.set(false);
-          void this._feedbackService.error(error, 'Could not delete this group.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('groups.edit.toast.deleteFailed'),
+          );
         },
       });
   }

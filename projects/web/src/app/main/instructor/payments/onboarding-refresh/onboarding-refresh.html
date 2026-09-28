@@ -5,10 +5,10 @@
         <p-progress-spinner strokeWidth="4" [style]="{ width: '50px', height: '50px' }" />
         <div>
           <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">
-            Redirecting to Stripe...
+            {{ 'payments.onboardingRefresh.redirecting' | translate }}
           </h3>
           <p class="text-surface-500 text-sm mt-2 mb-0">
-            Generating a fresh onboarding link.
+            {{ 'payments.onboardingRefresh.generating' | translate }}
           </p>
         </div>
       </div>
@@ -17,15 +17,15 @@
         <i class="pi pi-times-circle text-5xl" style="color: var(--p-red-500)"></i>
         <div>
           <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 m-0">
-            Something went wrong
+            {{ 'error.dialog.generic' | translate }}
           </h3>
           <p class="text-surface-500 text-sm mt-2 mb-0">
-            We couldn't generate a new onboarding link. Please try again.
+            {{ 'payments.onboardingRefresh.errorBody' | translate }}
           </p>
         </div>
         <button pButton type="button" severity="secondary" [outlined]="true" (click)="retry()">
           <i class="pi pi-refresh"></i>
-          Try again
+          {{ 'button.tryAgain' | translate }}
         </button>
       </div>
     }

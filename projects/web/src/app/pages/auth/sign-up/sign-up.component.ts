@@ -3,7 +3,6 @@ import {
   signal,
   computed,
   inject,
-  ChangeDetectionStrategy,
   afterNextRender,
   ElementRef,
   viewChild,
@@ -17,6 +16,7 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -36,6 +36,7 @@ import {
   TERMS_OF_SERVICE_URL,
   UserRoles,
   UserService,
+  validationMessage,
 } from 'core';
 import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/theme-toggle.component';
 
@@ -52,10 +53,10 @@ import { ThemeToggleComponent } from '../../../_shared/components/theme-toggle/t
     Divider,
     ThemeToggleComponent,
     Logo,
+    TranslatePipe,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignUpComponent {
   private readonly _formBuilder = inject(FormBuilder);
@@ -66,6 +67,7 @@ export class SignUpComponent {
   private readonly _facebookAuthService = inject(FacebookAuthService);
   private readonly _userService = inject(UserService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
   protected readonly _route = inject(ActivatedRoute);
 
   // Legal pages live on the marketing site — link out absolutely (the app
@@ -113,7 +115,9 @@ export class SignUpComponent {
           this.registerForm.get('email')?.disable();
         },
         error: () => {
-          this.errorMessage.set('This invitation link is invalid or has expired.');
+          this.errorMessage.set(
+            this._translateService.instant('auth.signUp.error.invalidInvitation'),
+          );
           localStorage.removeItem(SignUpComponent.INVITE_TOKEN_KEY);
         },
       });
@@ -177,7 +181,10 @@ export class SignUpComponent {
       },
       error: (error) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error?.message || 'Registration failed. Please try again.');
+        this.errorMessage.set(
+          error.error?.message ||
+            this._translateService.instant('auth.signUp.error.registrationFailed'),
+        );
       },
     });
   }
@@ -193,7 +200,9 @@ export class SignUpComponent {
       },
       error: (error: { error?: { message?: string } }) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error?.message || 'Google sign-in failed. Please try again.');
+        this.errorMessage.set(
+          error.error?.message || this._translateService.instant('auth.common.googleFailed'),
+        );
       },
     });
   }
@@ -213,7 +222,8 @@ export class SignUpComponent {
           error: (error: { error?: { message?: string } }) => {
             this.isLoading.set(false);
             this.errorMessage.set(
-              error.error?.message || 'Facebook sign-up failed. Please try again.',
+              error.error?.message ||
+                this._translateService.instant('auth.signUp.error.facebookFailed'),
             );
           },
         });
@@ -237,29 +247,18 @@ export class SignUpComponent {
   getConfirmPasswordError(): string {
     const field = this.registerForm.get('confirmPassword');
     if (!field) return '';
-    if (field.hasError('required')) return 'Please confirm your password';
-    if (this.registerForm.hasError('passwordMismatch')) return 'Passwords do not match';
+    if (field.hasError('required')) {
+      return this._translateService.instant('auth.common.confirmPasswordRequired');
+    }
+    if (this.registerForm.hasError('passwordMismatch')) {
+      return this._translateService.instant('validation.passwordMismatch');
+    }
     return '';
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.registerForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return `${this.capitalize(fieldName)} is required`;
-    if (field.errors['email']) return 'Please enter a valid email address';
-    if (field.errors['minlength']) {
-      const minLength = field.errors['minlength'].requiredLength;
-      return `${this.capitalize(fieldName)} must be at least ${minLength} characters`;
-    }
-    if (field.errors['passwordStrength']) {
-      return 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
-    }
-    if (field.errors['pattern'] && fieldName === 'phone') {
-      return 'Please enter a valid phone number';
-    }
-
-    return '';
+    const overrides = fieldName === 'phone' ? { pattern: 'validation.phone' } : undefined;
+    return validationMessage(this.registerForm.get(fieldName)?.errors, overrides);
   }
 
   private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
@@ -310,12 +309,5 @@ export class SignUpComponent {
     }
 
     this._router.navigate(['/profile']);
-  }
-
-  private capitalize(str: string): string {
-    if (str === 'firstName') return 'First name';
-    if (str === 'lastName') return 'Last name';
-    if (str === 'confirmPassword') return 'Confirm password';
-    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

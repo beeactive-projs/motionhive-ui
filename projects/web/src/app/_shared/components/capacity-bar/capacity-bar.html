@@ -1,6 +1,6 @@
 @if (cap() == null) {
   <div class="mh-capacity mh-capacity--uncapped">
-    <span class="mh-capacity__label">{{ signups() }} going · no capacity limit</span>
+    <span class="mh-capacity__label">{{ 'components.capacityBar.uncapped' | translate: { count: signups() } }}</span>
   </div>
 } @else {
   <div class="mh-capacity">
@@ -20,10 +20,10 @@
     <span class="mh-capacity__label">
       <strong>{{ signups() }}</strong> / {{ cap() }}
       @if (spotsLeft() <= 3 && spotsLeft() > 0) {
-        <span class="mh-capacity__hot">· {{ spotsLeft() }} spot{{ spotsLeft() === 1 ? '' : 's' }} left</span>
+        <span class="mh-capacity__hot">· {{ 'components.capacityBar.spotsLeft' | translate: { count: spotsLeft() } }}</span>
       }
       @if (signups() >= cap()!) {
-        <span class="mh-capacity__hot">· full</span>
+        <span class="mh-capacity__hot">· {{ 'components.capacityBar.full' | translate }}</span>
       }
     </span>
   </div>

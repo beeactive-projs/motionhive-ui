@@ -1,5 +1,6 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 
@@ -14,19 +15,21 @@ import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avat
  */
 @Component({
   selector: 'mh-my-sessions-empty',
-  imports: [HexAvatar, IonButton],
+  imports: [HexAvatar, IonButton, TranslatePipe],
   templateUrl: './my-sessions-empty.html',
   styleUrl: './my-sessions-empty.scss',
 })
 export class MySessionsEmpty {
+  private readonly _translateService = inject(TranslateService);
+
   /** True once we know the trainee has no coach yet — swaps the copy. */
   readonly noCoach = input(false);
 
   readonly browse = output<void>();
 
   readonly message = computed(() =>
-    this.noCoach()
-      ? 'Find a coach on Discover and book your first session.'
-      : 'Sessions you book with a coach show up here.',
+    this._translateService.instant(
+      this.noCoach() ? 'mySessions.empty.noCoachMessage' : 'mySessions.empty.message',
+    ),
   );
 }

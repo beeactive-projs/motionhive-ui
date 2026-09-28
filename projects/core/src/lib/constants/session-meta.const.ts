@@ -11,6 +11,8 @@ import {
   SessionTemplateStatus,
   TemplateTab,
 } from '../models/session/session.enums';
+import { withEnumLabels } from '../i18n/enum-label';
+import { translate } from '../i18n/translator';
 
 /**
  * Display metadata for the session-domain enums — the single source of the
@@ -19,6 +21,9 @@ import {
  * paint (Tailwind/PrimeNG on web, `--ion-color-*` washes on mobile), and
  * icons carry a dialect per platform (`piIcon` PrimeIcons, `ionIcon`
  * ionicons) where both apps draw them.
+ *
+ * The words are translation keys (`enum.<domain>.<VALUE>`) read through
+ * `label` getters, so every `SESSION_*[value].label` stays a plain string.
  *
  * Deliberately NOT here: sentence-length, surface-specific copy — banners,
  * empty states, confirmation prose ("You're booked", "Request sent!"). That
@@ -40,36 +45,35 @@ export interface SessionAccessMeta {
   ionIcon: string;
 }
 
-export const SESSION_ACCESS_LEVELS: Record<SessionAccess, SessionAccessMeta> = {
-  [SessionAccess.Open]: {
-    label: 'Paid',
-    sub: 'Anyone with the link can book.',
-    tone: 'teal',
-    piIcon: 'pi pi-money-bill',
-    ionIcon: 'cash-outline',
-  },
-  [SessionAccess.Free]: {
-    label: 'Free',
-    sub: 'Listed publicly with no price tag.',
-    tone: 'success',
-    piIcon: 'pi pi-heart',
-    ionIcon: 'heart-outline',
-  },
-  [SessionAccess.ClientsOnly]: {
-    label: 'Clients only',
-    sub: 'Only your active clients can book.',
-    tone: 'honey',
-    piIcon: 'pi pi-user',
-    ionIcon: 'person-outline',
-  },
-  [SessionAccess.GroupOnly]: {
-    label: 'Group members',
-    sub: 'Only members of a specific group.',
-    tone: 'sky',
-    piIcon: 'pi pi-sitemap',
-    ionIcon: 'people-outline',
-  },
-};
+export const SESSION_ACCESS_LEVELS: Record<SessionAccess, SessionAccessMeta> = withAccessHints(
+  withEnumLabels('sessionAccess', {
+    [SessionAccess.Open]: { tone: 'teal' as const, piIcon: 'pi pi-money-bill', ionIcon: 'cash-outline' },
+    [SessionAccess.Free]: { tone: 'success' as const, piIcon: 'pi pi-heart', ionIcon: 'heart-outline' },
+    [SessionAccess.ClientsOnly]: {
+      tone: 'honey' as const,
+      piIcon: 'pi pi-user',
+      ionIcon: 'person-outline',
+    },
+    [SessionAccess.GroupOnly]: {
+      tone: 'sky' as const,
+      piIcon: 'pi pi-sitemap',
+      ionIcon: 'people-outline',
+    },
+  }),
+);
+
+/** `sub` getters from `enum.sessionAccessHint.<VALUE>`. */
+function withAccessHints<T extends object>(
+  record: Record<SessionAccess, T>,
+): Record<SessionAccess, T & { sub: string }> {
+  for (const value of Object.keys(record) as SessionAccess[]) {
+    Object.defineProperty(record[value], 'sub', {
+      get: () => translate(`enum.sessionAccessHint.${value}`),
+      enumerable: true,
+    });
+  }
+  return record as Record<SessionAccess, T & { sub: string }>;
+}
 
 // ─── Location ─────────────────────────────────────────────────────────────
 
@@ -78,23 +82,22 @@ export type SessionLocationTone = 'teal' | 'honey';
 export const SESSION_LOCATION_KINDS: Record<
   SessionLocationKind,
   { label: string; tone: SessionLocationTone; piIcon: string; ionIcon: string }
-> = {
+> = withEnumLabels('sessionLocationKind', {
   [SessionLocationKind.InPerson]: {
-    label: 'In-person',
-    tone: 'honey',
+    tone: 'honey' as const,
     piIcon: 'pi pi-map-marker',
     ionIcon: 'location-outline',
   },
   [SessionLocationKind.Online]: {
-    label: 'Online',
-    tone: 'teal',
+    tone: 'teal' as const,
     piIcon: 'pi pi-video',
     ionIcon: 'videocam-outline',
   },
-};
+});
 
 // ─── Meeting provider ─────────────────────────────────────────────────────
 
+/** Product names — the same in every language, so not translated. */
 export const SESSION_MEETING_PROVIDERS: Record<
   SessionMeetingProvider,
   { label: string; piIcon: string }
@@ -109,7 +112,8 @@ export function meetingProviderLabel(
   provider: SessionMeetingProvider | string | null | undefined
 ): string {
   return (
-    (provider && SESSION_MEETING_PROVIDERS[provider as SessionMeetingProvider]?.label) || 'Online'
+    (provider && SESSION_MEETING_PROVIDERS[provider as SessionMeetingProvider]?.label) ||
+    SESSION_LOCATION_KINDS[SessionLocationKind.Online].label
   );
 }
 
@@ -124,52 +128,32 @@ export type SessionStatusTone = 'success' | 'warn' | 'info' | 'danger' | 'second
 export const SESSION_PARTICIPANT_STATUSES: Record<
   SessionParticipantStatus,
   { label: string; tone: SessionStatusTone; piIcon: string }
-> = {
-  [SessionParticipantStatus.Confirmed]: {
-    label: 'Confirmed',
-    tone: 'success',
-    piIcon: 'pi pi-verified',
-  },
-  [SessionParticipantStatus.PendingApproval]: {
-    label: 'Pending',
-    tone: 'warn',
-    piIcon: 'pi pi-hourglass',
-  },
-  [SessionParticipantStatus.Waitlisted]: {
-    label: 'Waitlisted',
-    tone: 'info',
-    piIcon: 'pi pi-clock',
-  },
-  [SessionParticipantStatus.Cancelled]: {
-    label: 'Cancelled',
-    tone: 'danger',
-    piIcon: 'pi pi-times-circle',
-  },
-  [SessionParticipantStatus.Declined]: {
-    label: 'Declined',
-    tone: 'danger',
-    piIcon: 'pi pi-times-circle',
-  },
-};
+> = withEnumLabels('sessionParticipantStatus', {
+  [SessionParticipantStatus.Confirmed]: { tone: 'success' as const, piIcon: 'pi pi-verified' },
+  [SessionParticipantStatus.PendingApproval]: { tone: 'warn' as const, piIcon: 'pi pi-hourglass' },
+  [SessionParticipantStatus.Waitlisted]: { tone: 'info' as const, piIcon: 'pi pi-clock' },
+  [SessionParticipantStatus.Cancelled]: { tone: 'danger' as const, piIcon: 'pi pi-times-circle' },
+  [SessionParticipantStatus.Declined]: { tone: 'danger' as const, piIcon: 'pi pi-times-circle' },
+});
 
 export const SESSION_INSTANCE_STATUSES: Record<
   SessionInstanceStatus,
   { label: string; tone: SessionStatusTone }
-> = {
-  [SessionInstanceStatus.Scheduled]: { label: 'Scheduled', tone: 'secondary' },
-  [SessionInstanceStatus.InProgress]: { label: 'In progress', tone: 'success' },
-  [SessionInstanceStatus.Completed]: { label: 'Completed', tone: 'secondary' },
-  [SessionInstanceStatus.Cancelled]: { label: 'Cancelled', tone: 'danger' },
-};
+> = withEnumLabels('sessionInstanceStatus', {
+  [SessionInstanceStatus.Scheduled]: { tone: 'secondary' as const },
+  [SessionInstanceStatus.InProgress]: { tone: 'success' as const },
+  [SessionInstanceStatus.Completed]: { tone: 'secondary' as const },
+  [SessionInstanceStatus.Cancelled]: { tone: 'danger' as const },
+});
 
 export const SESSION_TEMPLATE_STATUSES: Record<
   SessionTemplateStatus,
   { label: string; tone: SessionStatusTone }
-> = {
-  [SessionTemplateStatus.Active]: { label: 'Active', tone: 'success' },
-  [SessionTemplateStatus.Ended]: { label: 'Ended', tone: 'secondary' },
-  [SessionTemplateStatus.Cancelled]: { label: 'Cancelled', tone: 'danger' },
-};
+> = withEnumLabels('sessionTemplateStatus', {
+  [SessionTemplateStatus.Active]: { tone: 'success' as const },
+  [SessionTemplateStatus.Ended]: { tone: 'secondary' as const },
+  [SessionTemplateStatus.Cancelled]: { tone: 'danger' as const },
+});
 
 // ─── Reminders ────────────────────────────────────────────────────────────
 
@@ -181,48 +165,51 @@ export const SESSION_TEMPLATE_STATUSES: Record<
 export const SESSION_REMINDER_KINDS: Record<
   SessionReminderKind,
   { label: string; offsetMs: number }
-> = {
-  [SessionReminderKind.Reminder24h]: {
-    label: '24 hours before',
-    offsetMs: 24 * 3_600_000,
-  },
-  [SessionReminderKind.Reminder1h]: { label: '1 hour before', offsetMs: 3_600_000 },
-};
+> = withEnumLabels('sessionReminderKind', {
+  [SessionReminderKind.Reminder24h]: { offsetMs: 24 * 3_600_000 },
+  [SessionReminderKind.Reminder1h]: { offsetMs: 3_600_000 },
+});
 
 // ─── Cancel scope ─────────────────────────────────────────────────────────
 
 /** Labels only — the per-scope help copy is written per surface (mobile's
     weaves the occurrence date in). */
-export const CANCEL_SCOPES: Record<CancelScope, { label: string }> = {
-  [CancelScope.This]: { label: 'Only this session' },
-  [CancelScope.ThisAndFuture]: { label: 'This and all future' },
-  [CancelScope.Series]: { label: 'The whole series' },
-};
+export const CANCEL_SCOPES: Record<CancelScope, { label: string }> = withEnumLabels('cancelScope', {
+  [CancelScope.This]: {},
+  [CancelScope.ThisAndFuture]: {},
+  [CancelScope.Series]: {},
+});
 
 // ─── Follow-up audience ───────────────────────────────────────────────────
 
-export const FOLLOW_UP_AUDIENCES: Record<FollowUpAudience, { label: string }> = {
-  [FollowUpAudience.All]: { label: 'Everyone' },
-  [FollowUpAudience.Attended]: { label: 'Attended only' },
-  [FollowUpAudience.NoShow]: { label: 'No-shows only' },
-  [FollowUpAudience.UserIds]: { label: 'Selected people' },
-};
+export const FOLLOW_UP_AUDIENCES: Record<FollowUpAudience, { label: string }> = withEnumLabels(
+  'followUpAudience',
+  {
+    [FollowUpAudience.All]: {},
+    [FollowUpAudience.Attended]: {},
+    [FollowUpAudience.NoShow]: {},
+    [FollowUpAudience.UserIds]: {},
+  },
+);
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────
 
-export const MY_TABS: Record<MyTab, { label: string; piIcon: string }> = {
-  [MyTab.Upcoming]: { label: 'Upcoming', piIcon: 'pi pi-calendar' },
-  [MyTab.PendingApproval]: { label: 'Pending', piIcon: 'pi pi-hourglass' },
-  [MyTab.Waitlisted]: { label: 'Waitlisted', piIcon: 'pi pi-clock' },
-  [MyTab.Past]: { label: 'Past', piIcon: 'pi pi-history' },
-  [MyTab.Cancelled]: { label: 'Cancelled', piIcon: 'pi pi-times-circle' },
-};
+export const MY_TABS: Record<MyTab, { label: string; piIcon: string }> = withEnumLabels('myTab', {
+  [MyTab.Upcoming]: { piIcon: 'pi pi-calendar' },
+  [MyTab.PendingApproval]: { piIcon: 'pi pi-hourglass' },
+  [MyTab.Waitlisted]: { piIcon: 'pi pi-clock' },
+  [MyTab.Past]: { piIcon: 'pi pi-history' },
+  [MyTab.Cancelled]: { piIcon: 'pi pi-times-circle' },
+});
 
-/** `Active` reads "Upcoming" and `Ended` reads "Past" on purpose — the enum
+/** `active` reads "Upcoming" and `ended` reads "Past" on purpose — the enum
     names the template state, the label names what the coach is looking at. */
-export const TEMPLATE_TABS: Record<TemplateTab, { label: string; piIcon: string }> = {
-  [TemplateTab.Active]: { label: 'Upcoming', piIcon: 'pi pi-calendar' },
-  [TemplateTab.Recurring]: { label: 'Recurring templates', piIcon: 'pi pi-replay' },
-  [TemplateTab.Ended]: { label: 'Past', piIcon: 'pi pi-history' },
-  [TemplateTab.Cancelled]: { label: 'Cancelled', piIcon: 'pi pi-times-circle' },
-};
+export const TEMPLATE_TABS: Record<TemplateTab, { label: string; piIcon: string }> = withEnumLabels(
+  'templateTab',
+  {
+    [TemplateTab.Active]: { piIcon: 'pi pi-calendar' },
+    [TemplateTab.Recurring]: { piIcon: 'pi pi-replay' },
+    [TemplateTab.Ended]: { piIcon: 'pi pi-history' },
+    [TemplateTab.Cancelled]: { piIcon: 'pi pi-times-circle' },
+  },
+);

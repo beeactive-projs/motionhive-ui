@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
+import { Component, computed, inject, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Message } from 'primeng/message';
@@ -6,10 +7,9 @@ import { GroupDetailContext } from '../../group-detail.context';
 
 @Component({
   selector: 'mh-group-owner-actions-card',
-  imports: [ButtonDirective, CardModule, Message],
+  imports: [ButtonDirective, CardModule, Message, TranslatePipe],
   templateUrl: './group-owner-actions-card.html',
   styleUrl: './group-owner-actions-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupOwnerActionsCard {
   readonly context = inject(GroupDetailContext);
@@ -19,9 +19,10 @@ export class GroupOwnerActionsCard {
   readonly hasActiveLink = this.context.hasActiveJoinToken;
   readonly generating = this.context.generatingLink;
 
+  /** Translation key for the onboarding hint, or null. */
   readonly hint = computed(() => {
     if (this.context.totalMembers() <= 1) {
-      return 'Send the join link to your clients to grow the group.';
+      return 'groups.ownerActions.hint';
     }
     return null;
   });

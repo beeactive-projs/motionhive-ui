@@ -1,0 +1,1433 @@
+{
+  "account": {
+    "hero": {
+      "changePhoto": "Change your photo",
+      "copyLink": "Copy profile link",
+      "verified": "Verified",
+      "viewProfile": "View profile"
+    },
+    "manage": {
+      "deleteAccount": "Delete account",
+      "deleteNote": "Deleting your account removes your profile, programs and messages permanently. This can't be undone.",
+      "logOut": "Log out",
+      "soon": "Soon"
+    },
+    "memberSince": "Member since {date}",
+    "rows": {
+      "accepting": "Accepting",
+      "appearance": "Appearance",
+      "blockedUsers": "Blocked users",
+      "coachingProfile": "Coaching profile",
+      "manageAccount": "Manage account",
+      "manageAccountHint": "Log out, delete",
+      "profile": "Profile",
+      "profileHint": "Name, photo, handle"
+    },
+    "sections": {
+      "account": "Account",
+      "preferences": "Preferences",
+      "privacy": "Privacy & account",
+      "profile": "Profile"
+    },
+    "theme": {
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
+    },
+    "toast": {
+      "copyFailed": "Could not copy the link.",
+      "timezoneFailed": "Could not update your timezone.",
+      "timezoneUpdated": "Timezone updated"
+    }
+  },
+  "auth": {
+    "common": {
+      "emailLabel": "Email address"
+    },
+    "login": {
+      "createAccount": "Create one for free",
+      "error": "Invalid email or password. Please try again.",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "passwordPlaceholder": "Enter your password",
+      "subtitle": "Sign in to manage your clients and requests.",
+      "title": "Welcome back"
+    },
+    "newPassword": {
+      "confirmPlaceholder": "Re-enter your new password",
+      "error": "Failed to reset password. The link may have expired.",
+      "missingToken": "Invalid or missing reset token. Please request a new password reset link.",
+      "requestNewLink": "Request a new link",
+      "submit": "Reset password",
+      "subtitle": "Choose a new password for your account.",
+      "success": "Your password has been reset successfully. Redirecting to sign in…",
+      "title": "New password"
+    },
+    "resetPassword": {
+      "error": "Failed to send reset instructions. Please try again.",
+      "submit": "Send reset instructions",
+      "subtitle": "Enter the email address linked to your account and we'll send you instructions to reset your password.",
+      "success": "If an account exists with this email, you will receive password reset instructions shortly.",
+      "title": "Reset password"
+    },
+    "signUp": {
+      "confirmPasswordRequired": "Please confirm your password.",
+      "error": "Registration failed. Please try again.",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "registerAsCoach": "Register as coach",
+      "registerAsCoachHint": "Coaches can create and manage sessions and clients",
+      "submit": "Create account",
+      "terms": "By signing up, you agree to our terms of service and privacy policy.",
+      "title": "Create account"
+    },
+    "verifyEmail": {
+      "backToSignIn": "Back to sign in",
+      "continue": "Continue to sign in",
+      "failedMessage": "This verification link is no longer valid. Request a new one and try again.",
+      "failedTitle": "Verification failed",
+      "missingMessage": "This verification link is incomplete. Open the link from your email again, or sign in to request a new one.",
+      "missingTitle": "Link incomplete",
+      "successMessage": "Your email has been verified. Redirecting you to sign in…",
+      "successTitle": "Email verified",
+      "verifying": "Verifying your email…"
+    }
+  },
+  "clients": {
+    "actions": {
+      "archiveClient": "Archive client",
+      "archiveClientEllipsis": "Archive client…",
+      "editNotes": "Edit notes",
+      "message": "Message",
+      "notes": "Notes",
+      "resent": "Resent",
+      "unarchiveClient": "Unarchive client",
+      "withdraw": "Withdraw"
+    },
+    "actionsSheet": {
+      "title": "Client actions"
+    },
+    "clientFallback": "Client",
+    "confirm": {
+      "archive": {
+        "body": "They keep their account and history, and you can unarchive them later. They will not be told.",
+        "title": "Archive {name}?",
+        "titleFallback": "Archive this client?"
+      },
+      "withdraw": {
+        "body": "{name} will no longer be able to accept it. You can invite them again later.",
+        "cancel": "Keep it",
+        "title": "Withdraw this invitation?"
+      }
+    },
+    "detail": {
+      "addNote": "Add a private note",
+      "expires": "Expires {date}",
+      "loadError": {
+        "message": "Couldn't load this client.",
+        "title": "Couldn't load this client"
+      },
+      "plan": {
+        "count": "{count, plural, one {# active plan} other {# active plans}}",
+        "webOnly": "Plans are managed on the web for now."
+      },
+      "sections": {
+        "notes": "Notes · private",
+        "plan": "Plan",
+        "thisWeek": "This week",
+        "training": "Training",
+        "upcoming": "Upcoming sessions"
+      },
+      "since": "Since {date}",
+      "trainingLink": "Plan & logged workouts",
+      "upcomingWindow": "Next {count, plural, one {# day} other {# days}}",
+      "week": {
+        "count": "{completed} of {due}",
+        "footnote": "{completed} done · {skipped} skipped · {remaining} remaining",
+        "label": "workouts done"
+      }
+    },
+    "directory": {
+      "noMatch": {
+        "message": "No client matches that. Try another name or email."
+      },
+      "noStatus": {
+        "action": "Show all",
+        "message": "No clients with this status. Try another filter.",
+        "title": "Nothing here"
+      }
+    },
+    "empty": {
+      "byEmailHint": "Works before they join",
+      "cta": "Invite your first client",
+      "message": "Invite the people you already train, or wait for requests — anyone on MotionHive can find you on Discover and ask to connect.",
+      "onPlatformHint": "Already on MotionHive",
+      "title": "No clients yet"
+    },
+    "filters": {
+      "active": "Active",
+      "all": "All",
+      "archived": "Archived",
+      "requests": "Requests"
+    },
+    "inviteClient": "Invite client",
+    "inviteSheet": {
+      "byEmail": "Invite by email",
+      "emailHint": "They'll get an email with a link to join and connect with you.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "client@example.com",
+      "expiry": "Invitations expire after {count, plural, one {# day} other {# days}}.",
+      "messageLabel": "Message",
+      "messagePlaceholder": "A personal note to include — optional",
+      "minChars": "Type at least {count, plural, one {# character} other {# characters}}.",
+      "noResults": {
+        "message": "Check the spelling, or try their email.",
+        "title": "Nobody found"
+      },
+      "onPlatform": "Find on platform",
+      "searchLabel": "Search people",
+      "searchPlaceholder": "Search by name or email",
+      "searchScope": "Only platform users without an existing relationship with you are shown.",
+      "send": "Send invitation",
+      "sendTo": "Send invitation · {name}",
+      "sent": {
+        "message": "We emailed {email} a link to join and connect with you. You can also share it yourself.",
+        "shareLink": "Share invite link",
+        "title": "Invitation sent"
+      },
+      "share": {
+        "text": "Join me on MotionHive so we can plan your training in one place.",
+        "title": "Join me on MotionHive"
+      }
+    },
+    "list": {
+      "filterByStatus": "Filter clients by status",
+      "loadError": "Couldn't load your clients",
+      "requestsPending": "Requests, {count} pending",
+      "results": {
+        "count": "{count, plural, one {# client} other {# clients}}.",
+        "none": "No clients match that."
+      },
+      "search": "Search clients",
+      "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search every client.",
+      "searchScope": "{lens} · {filter}"
+    },
+    "notesSheet": {
+      "helper": "Only you can see this. It stays with this client.",
+      "placeholder": "Goals, injuries, what keeps them motivated…",
+      "save": "Save note",
+      "title": "Notes",
+      "titleWithName": "Notes · {name}"
+    },
+    "requests": {
+      "empty": {
+        "message": "Invitations you send and incoming client requests will show up here.",
+        "title": "No pending requests"
+      },
+      "expires": {
+        "inDays": "expires in {count, plural, one {# day} other {# days}}",
+        "today": "expires today",
+        "tomorrow": "expires tomorrow"
+      },
+      "incoming": "Incoming",
+      "invitationsSent": "Invitations sent",
+      "loadError": "Couldn't load your requests",
+      "quote": "“{message}”",
+      "received": {
+        "daysAgo": "Received {count, plural, one {# day ago} other {# days ago}}",
+        "today": "Received today",
+        "yesterday": "Received yesterday"
+      },
+      "sent": {
+        "daysAgo": "Sent {count, plural, one {# day ago} other {# days ago}}",
+        "today": "Sent today",
+        "yesterday": "Sent yesterday"
+      },
+      "sentMeta": "{sent} · {expires}"
+    },
+    "roster": {
+      "attention": {
+        "behind": "Behind plan",
+        "dropped": "Dropping off",
+        "inactive": "Inactive for {count, plural, one {# day} other {# days}}",
+        "neverStarted": "Has not started",
+        "noPlan": "No plan assigned"
+      },
+      "detail": {
+        "behind": "{completed} of {due} workouts done.",
+        "dropped": "Down from {previous}% to {current}% against the previous window.",
+        "neverStarted": "Assigned a plan but has never logged a workout.",
+        "noPlan": "Nothing is assigned, so there is nothing for them to follow.",
+        "silent": "{completed} of {due} workouts done in this window.",
+        "silentNone": "No workouts logged recently."
+      },
+      "lastActive": {
+        "daysAgo": "Last active {count, plural, one {# day ago} other {# days ago}}",
+        "today": "Trained today",
+        "yesterday": "Last active yesterday"
+      },
+      "lastActiveShort": {
+        "daysAgo": "{count}d ago",
+        "today": "today"
+      },
+      "noActivePlan": "No active plan",
+      "nothingScheduled": "Nothing scheduled in this window",
+      "progress": "{completed} of {due} workouts",
+      "stat": {
+        "adherence": "adherence",
+        "days": "{count}d",
+        "lastActive": "last active",
+        "noPlan": "no plan"
+      }
+    },
+    "row": {
+      "notOnPlatform": "Not on MotionHive yet"
+    },
+    "segments": {
+      "all": "All clients",
+      "allWithCount": "All clients · {count}",
+      "attention": "Needs attention"
+    },
+    "thisPerson": "this person",
+    "toast": {
+      "archiveFailed": "Could not archive this client.",
+      "archived": "Client archived",
+      "invitationResent": "Invitation resent",
+      "invitationSent": "Invitation sent",
+      "invitationWithdrawn": "Invitation withdrawn",
+      "noteFailed": "Could not save the note.",
+      "noteSaved": "Note saved",
+      "requestAccepted": "Request accepted",
+      "requestDeclined": "Request declined",
+      "requestFailed": "Could not update this request.",
+      "resendFailed": "Could not resend the invitation.",
+      "sendFailed": "Could not send the invitation.",
+      "shareFailed": "Could not share the link.",
+      "unarchiveFailed": "Could not unarchive this client.",
+      "unarchived": "Client unarchived",
+      "withdrawFailed": "Could not withdraw the invitation."
+    },
+    "triage": {
+      "allClear": {
+        "message": "No one needs a nudge this week.",
+        "title": "Everyone is on track"
+      },
+      "empty": {
+        "action": "See all clients",
+        "message": "Once someone accepts your invitation, their week shows up here.",
+        "title": "No active clients yet"
+      },
+      "noMatch": {
+        "action": "Search all clients",
+        "message": "Nobody on this week's roster matches that. Try All clients."
+      },
+      "note": "{needs} of {total, plural, one {# active client} other {# active clients}} {needs, plural, one {needs} other {need}} a look",
+      "onTrack": "On track",
+      "thisWeek": "This week"
+    }
+  },
+  "groups": {
+    "addMembers": {
+      "empty": {
+        "message": "Everyone you coach is already in this group.",
+        "title": "Nobody left to add"
+      },
+      "noMatch": "No client matches that name.",
+      "save": "Add {count}",
+      "search": "Search your clients",
+      "subtitle": "From the people you coach",
+      "title": "Add members",
+      "toast": {
+        "addFailed": "Could not add those members.",
+        "added": "{count, plural, one {# member added} other {# members added}}",
+        "loadFailed": "Could not load your clients."
+      }
+    },
+    "common": {
+      "about": "About",
+      "cannotBeUndone": "This cannot be undone.",
+      "group": "Group",
+      "groupTags": "Group tags",
+      "joining": "Joining",
+      "loadGroupError": "Couldn't load this group",
+      "member": "Member",
+      "members": "Members",
+      "nobodyMatches": "Nobody matches",
+      "postContent": "Post content",
+      "posts": "Posts",
+      "where": "Where"
+    },
+    "compose": {
+      "cannotPost": {
+        "message": "Only the group's owner and moderators can post in this group.",
+        "title": "Posting is off here"
+      },
+      "photo": "Photo",
+      "photos": "Photos on this post",
+      "placeholder": "Share something with the group",
+      "postingIn": "Posting in",
+      "remaining": "{count} left",
+      "removePhoto": "Remove {name}",
+      "reviewNote": "Posts here are reviewed before they appear.",
+      "submit": "Post",
+      "title": "New post",
+      "toast": {
+        "blocked": "You can no longer post in this group.",
+        "failed": "Could not publish that post.",
+        "posted": "Posted",
+        "sentForReview": "Post sent for review",
+        "tooLarge": "{name} is larger than 5 MB.",
+        "tooMany": "You can add up to {count, plural, one {# photo} other {# photos}}."
+      }
+    },
+    "detail": {
+      "a11y": {
+        "manage": "Review requests and posts",
+        "settings": "Group settings"
+      },
+      "announce": {
+        "count": "{count, plural, one {# member} other {# members}}.",
+        "none": "No members match that."
+      },
+      "inviteLink": {
+        "active": "A link is active",
+        "none": "No link yet"
+      },
+      "leave": {
+        "body": "You'll stop seeing its posts. You can ask to join again later.",
+        "button": "Leave group",
+        "title": "Leave this group?"
+      },
+      "members": {
+        "empty": {
+          "message": "People who join this group will show up here.",
+          "title": "No members yet"
+        },
+        "loadError": "Couldn't load members",
+        "needsMore": {
+          "message": "Not everyone is loaded. Load more members and search again.",
+          "title": "Nobody matches yet"
+        },
+        "noMatch": "No member matches that. Try a different name.",
+        "search": "Search members"
+      },
+      "posts": {
+        "empty": {
+          "canPost": "Be the first to share something.",
+          "message": "Posts from this group will show up here.",
+          "title": "No posts yet"
+        },
+        "loadError": "Couldn't load posts"
+      },
+      "toast": {
+        "leaveFailed": "Could not leave this group.",
+        "left": "You left the group"
+      }
+    },
+    "edit": {
+      "addTag": "Add tag",
+      "delete": {
+        "body": "Its posts, members and comments go with it.",
+        "button": "Delete group",
+        "title": "Delete this group?"
+      },
+      "descriptionPlaceholder": "What is this group for?",
+      "heading": {
+        "create": "New group",
+        "edit": "Edit group"
+      },
+      "namePlaceholder": "Morning Crew",
+      "notAllowed": {
+        "message": "Ask the group's owner if something needs updating.",
+        "title": "Only the owner can change this"
+      },
+      "posting": "Posting",
+      "privateNote": "This group is private, so people can only join from a link or an invite.",
+      "public": {
+        "hint": "Anyone can find it in Discover.",
+        "label": "Public group"
+      },
+      "removeTag": "Remove tag {tag}",
+      "saveCreate": "Create group",
+      "tagLabel": "Add a tag",
+      "tagPlaceholder": "strength",
+      "tags": "Tags",
+      "toast": {
+        "createFailed": "Could not create that group.",
+        "created": "Group created",
+        "deleteFailed": "Could not delete this group.",
+        "deleted": "Group deleted",
+        "saveFailed": "Could not save those changes.",
+        "updated": "Group updated"
+      }
+    },
+    "gallery": {
+      "openPhoto": "Open photo {index} of {total}",
+      "openPhotoBy": "Open photo {index} of {total} by {name}"
+    },
+    "join": {
+      "closed": "Invite only",
+      "join": "Join group",
+      "pending": "Request pending",
+      "request": "Request to join"
+    },
+    "joinLink": {
+      "create": "Create invite link",
+      "empty": {
+        "hint": "Create one to let people join without an invitation, even if the group is invite only.",
+        "title": "No invite link yet"
+      },
+      "hint": "Anyone with this link can join. Revoking it stops every copy you have already shared.",
+      "revoke": "Revoke",
+      "share": "Share link",
+      "shareText": "Join {name} on MotionHive",
+      "shareTextNoName": "Join my group on MotionHive",
+      "shareTitle": "Join my group",
+      "title": "Invite link",
+      "toast": {
+        "createFailed": "Could not create an invite link.",
+        "ready": "Invite link ready",
+        "revokeFailed": "Could not revoke that link.",
+        "revoked": "Invite link revoked"
+      }
+    },
+    "joinPolicy": {
+      "APPROVAL": "Approval required",
+      "INVITE_ONLY": "Invite only",
+      "OPEN": "Open"
+    },
+    "joinPolicyHint": {
+      "APPROVAL": "People request to join and you decide.",
+      "INVITE_ONLY": "Only people you invite can join.",
+      "OPEN": "Anyone can join instantly."
+    },
+    "list": {
+      "announce": {
+        "count": "{count, plural, one {# group} other {# groups}}.",
+        "none": "No groups match that."
+      },
+      "createGroup": "Create a group",
+      "discover": {
+        "empty": {
+          "message": "Public groups show up here as coaches create them.",
+          "title": "No public groups yet"
+        },
+        "noMatch": "No public group matches that. Try a different word."
+      },
+      "discoverGroups": "Discover groups",
+      "feed": {
+        "empty": {
+          "message": "Posts from your groups will show up here.",
+          "title": "Nothing posted yet"
+        },
+        "seeGroups": "See your groups"
+      },
+      "loadError": "Couldn't load groups",
+      "mine": {
+        "empty": {
+          "message": "Find a group to join and it shows up here.",
+          "title": "You're not in any groups"
+        }
+      },
+      "noGroups": {
+        "coachMessage": "Create a group to bring your clients together in one place.",
+        "memberMessage": "Join a group and posts from it show up here.",
+        "title": "No groups yet"
+      },
+      "private": "Private",
+      "search": "Search groups",
+      "searchHint": "Type at least {count, plural, one {# character} other {# characters}} to search.",
+      "segments": {
+        "discover": "Discover",
+        "feed": "Feed",
+        "mine": "Your groups"
+      }
+    },
+    "manage": {
+      "a11y": {
+        "approve": "Approve {name}",
+        "decline": "Decline {name}",
+        "publish": "Publish post by {name}",
+        "reject": "Reject post by {name}"
+      },
+      "asked": "Asked {time}",
+      "forbidden": {
+        "message": "Join requests and pending posts are handled by the group's owner.",
+        "title": "Only the owner can review these"
+      },
+      "heading": "Manage group",
+      "loadError": "Couldn't load these queues",
+      "posts": {
+        "empty": {
+          "message": "Posts waiting for approval will show up here.",
+          "title": "Nothing to review"
+        }
+      },
+      "publish": "Publish",
+      "requests": {
+        "empty": {
+          "message": "People asking to join will show up here.",
+          "title": "No requests waiting"
+        },
+        "tab": "Requests"
+      },
+      "title": "Manage",
+      "toast": {
+        "approved": "{name} joined",
+        "declined": "Request declined",
+        "failed": "Could not save that decision.",
+        "published": "Post published",
+        "rejected": "Post rejected"
+      },
+      "written": "Written {time}"
+    },
+    "photos": {
+      "alt": "Photo {index} of {total}",
+      "counter": "{index} of {total}",
+      "empty": {
+        "message": "It may have been edited since you opened it.",
+        "title": "No photos on this post"
+      },
+      "loadError": "Couldn't load these photos",
+      "next": "Next photo",
+      "previous": "Previous photo"
+    },
+    "post": {
+      "a11y": {
+        "comments": "Comments on post by {name}",
+        "deleteBy": "Delete post by {name}",
+        "deleteComment": "Delete comment by {name}",
+        "deleteThis": "Delete this post",
+        "editThis": "Edit this post",
+        "like": "Like post by {name}",
+        "likeThis": "Like this post",
+        "openBy": "Open post by {name}",
+        "openByMember": "Open post by a member",
+        "postComment": "Post comment",
+        "unlike": "Unlike post by {name}",
+        "unlikeThis": "Unlike this post",
+        "viewProfile": "View {name}’s profile"
+      },
+      "addComment": "Add a comment",
+      "commentCount": "{count, plural, one {# comment} other {# comments}}",
+      "comments": "Comments",
+      "commentsLoadError": "Couldn't load comments",
+      "deleteComment": {
+        "body": "It will be removed for everyone. Replies to it go too.",
+        "title": "Delete this comment?"
+      },
+      "deletePost": {
+        "body": "It will be removed for everyone, along with its comments.",
+        "title": "Delete this post?"
+      },
+      "editTitle": "Edit post",
+      "empty": {
+        "message": "Be the first to say something.",
+        "title": "No comments yet"
+      },
+      "loadError": {
+        "message": "It may have been deleted, or you may be offline.",
+        "title": "Couldn't load this post"
+      },
+      "remaining": "{count, plural, one {# character left} other {# characters left}}",
+      "reply": "Reply",
+      "replyTo": "Reply to {name}",
+      "replyingTo": "Replying to {name}",
+      "title": "Post",
+      "toast": {
+        "commentDeleted": "Comment deleted",
+        "commentFailed": "Could not post that comment.",
+        "deleteCommentFailed": "Could not delete that comment.",
+        "deleteFailed": "Could not delete that post.",
+        "deleted": "Post deleted",
+        "editFailed": "Could not save that change.",
+        "reactionFailed": "Could not save that reaction.",
+        "updated": "Post updated"
+      }
+    },
+    "postPolicy": {
+      "APPROVAL_REQUIRED": "Posts need approval",
+      "DISABLED": "Only staff can post",
+      "OPEN": "Anyone can post"
+    },
+    "postPolicyHint": {
+      "APPROVAL_REQUIRED": "You and your moderators review each one.",
+      "DISABLED": "Members can read and comment.",
+      "OPEN": "Members post straight to the feed."
+    },
+    "preview": {
+      "locked": "Posts and members are visible once you join.",
+      "notFound": {
+        "message": "Ask the owner for an invite, or look for another group.",
+        "title": "This group is private"
+      },
+      "runBy": "Run by",
+      "toast": {
+        "joinFailed": "Could not join this group.",
+        "joined": "You joined the group",
+        "requestSent": "Request sent",
+        "withdrawFailed": "Could not withdraw that request.",
+        "withdrawn": "Request withdrawn"
+      },
+      "withdraw": "Withdraw"
+    }
+  },
+  "messages": {
+    "blockSheet": {
+      "body": "They will not be able to message you, and you will not see this conversation.",
+      "title": "Block {name}?"
+    },
+    "bubble": {
+      "deleted": "[deleted]",
+      "read": "Read",
+      "sent": "Sent"
+    },
+    "chat": {
+      "detailsAria": "Conversation details",
+      "draftStart": "This is the start of your conversation with {name}.",
+      "empty": "No messages yet. Say hello.",
+      "loadEarlier": "Load earlier messages",
+      "placeholder": "Message {name}…",
+      "placeholderGeneric": "Message…"
+    },
+    "composer": {
+      "sendingPaused": "Sending paused",
+      "tooLong": "That message is too long. Trim it and try again."
+    },
+    "details": {
+      "block": "Block {name}",
+      "blockManageNote": "Manage blocked people in Account → Blocked users.",
+      "blockNote": "Blocking stops messages both ways.",
+      "mute": "Mute notifications",
+      "muteHint": "You'll still see the unread badge.",
+      "sectionConversation": "Conversation",
+      "sectionPrivacy": "Privacy",
+      "thisPerson": "this person",
+      "title": "Details",
+      "viewProfile": "View profile"
+    },
+    "inbox": {
+      "caughtUp": {
+        "heading": "All caught up",
+        "message": "You have no unread messages."
+      },
+      "empty": {
+        "heading": "No messages yet",
+        "message": "Conversations with your coaches and clients will show up here."
+      },
+      "filterUnread": "Unread",
+      "loadError": "Couldn't load your messages",
+      "noResultsMessage": "Nothing matched that. Try a different name or word.",
+      "reconnecting": "Reconnecting…",
+      "searchAria": "Search messages",
+      "searchPlaceholder": "Search messages & people",
+      "sectionPeople": "People"
+    },
+    "newMessage": "New message",
+    "newMessageSheet": {
+      "intro": "Search for a coach, a client or anyone else on MotionHive to start a conversation.",
+      "noneHeading": "Nobody found",
+      "noneMessage": "Check the spelling, or try their last name.",
+      "searchPlaceholder": "Search people"
+    },
+    "row": {
+      "markRead": "Mark read",
+      "mute": "Mute",
+      "noPreview": "No messages yet",
+      "unmute": "Unmute",
+      "unreadAria": "{count} unread"
+    },
+    "toast": {
+      "blockFailed": "Could not block them.",
+      "blocked": "{name} blocked",
+      "muteFailed": "Could not update notifications.",
+      "muted": "Muted",
+      "notificationsMuted": "Notifications muted",
+      "notificationsOn": "Notifications on",
+      "unmuted": "Unmuted"
+    }
+  },
+  "mySessions": {
+    "cancelSheet": {
+      "agreed": "Agreed when you booked on {date}",
+      "confirmed": {
+        "dismiss": "Keep booking",
+        "save": "Cancel booking",
+        "title": "Cancel this booking?"
+      },
+      "late": {
+        "detail": "{name} may still charge for this spot by invoice.",
+        "detailNoCoach": "The coach may still charge for this spot by invoice.",
+        "hoursBefore": "It's {count} h before start — this is a late cancel",
+        "minutesBefore": "It's {count} min before start — this is a late cancel",
+        "started": "The session has already started — this is a late cancel"
+      },
+      "nothingCharged": "Nothing is charged for this — your spot simply goes back to the coach.",
+      "pending": {
+        "dismiss": "Keep request",
+        "save": "Withdraw request",
+        "success": "Request withdrawn.",
+        "title": "Withdraw request?"
+      },
+      "terms": {
+        "anyTime": "Your terms — free cancellation any time",
+        "cutoff": "Your terms — free cancel up to {hours} h before start"
+      },
+      "waitlisted": {
+        "dismiss": "Keep my spot",
+        "save": "Leave waitlist",
+        "success": "You left the waitlist.",
+        "title": "Leave the waitlist?"
+      }
+    },
+    "cancelled": {
+      "empty": {
+        "message": "Cancelled and declined bookings show up here.",
+        "title": "Nothing here"
+      },
+      "loadError": "Couldn't load these bookings",
+      "title": "Cancelled & declined"
+    },
+    "chip": {
+      "attended": "Attended",
+      "awaitingApproval": "Awaiting approval",
+      "cancelled": "Cancelled",
+      "declined": "Declined",
+      "missed": "Missed",
+      "waitlist": "Waitlist"
+    },
+    "detail": {
+      "badge": {
+        "inPerson": "In person",
+        "membersOnly": "Members only"
+      },
+      "band": {
+        "booked": "You're booked",
+        "cancelAnyTime": "Free to cancel any time before it starts",
+        "cancelUntil": "Free to cancel until {date} {time} · {hours} h before start",
+        "live": "Live now",
+        "pending": "Awaiting approval",
+        "pendingDetail": "{name} approves bookings for this session — you'll get a notification either way.",
+        "pendingDetailNoCoach": "You'll get a notification either way — nothing else to do.",
+        "startedAgo": "Started {minutes} min ago · join closes {time}",
+        "startingNow": "Starting now · join closes {time}",
+        "startsIn": "Starts in {minutes} min · join closes {time}",
+        "waitlist": "You're on the waitlist",
+        "waitlistDetail": "If a spot opens you're booked automatically — we'll notify you."
+      },
+      "blocked": {
+        "message": "Join the club to see where and book.",
+        "title": "Location is for club members"
+      },
+      "cancelledBanner": {
+        "detail": "Cancelled {date} · everyone booked was notified.",
+        "detailNoDate": "Everyone booked was notified.",
+        "title": "Session cancelled"
+      },
+      "coach": "Coach",
+      "copyLink": "Copy meeting link",
+      "footer": {
+        "book": "Book",
+        "cancelBooking": "Cancel booking",
+        "full": "Session full",
+        "joinOpens": "Join · opens {time}",
+        "joinSession": "Join session",
+        "joinWaitlist": "Join waitlist",
+        "leaveWaitlist": "Leave the waitlist",
+        "withdraw": "Withdraw request"
+      },
+      "invoiceNote": "Settled by invoice — nothing to pay now.",
+      "link": {
+        "afterBooking": "The meeting link appears here once you're booked.",
+        "availableFrom": "Available from {time}",
+        "locked": "Meeting link unlocks 5 min before start"
+      },
+      "loadError": {
+        "message": "Couldn't load this session.",
+        "title": "Couldn't load this session"
+      },
+      "message": "Message",
+      "price": "Price",
+      "spots": "Spots",
+      "spotsBooked": "{taken} of {capacity} booked",
+      "tba": "To be announced",
+      "when": "When",
+      "where": "Where"
+    },
+    "empty": {
+      "browse": "Browse Discover",
+      "message": "Sessions you book with a coach show up here.",
+      "noCoachMessage": "Find a coach on Discover and book your first session.",
+      "title": "Nothing booked yet"
+    },
+    "list": {
+      "cancelledLink": "Cancelled & declined · {count}",
+      "loadError": "Couldn't load your sessions",
+      "past": "Past",
+      "pastEmpty": {
+        "message": "Sessions you've been to show up here.",
+        "title": "No past sessions yet"
+      },
+      "truncated": "Showing your next 100 bookings — the rest appear as these pass.",
+      "upcoming": "Upcoming",
+      "upcomingCount": "Upcoming · {count}"
+    },
+    "meta": {
+      "withCoach": "with {name}"
+    },
+    "outcome": {
+      "confirmed": {
+        "copy": "Your spot in this session is confirmed.",
+        "title": "You're booked"
+      },
+      "gotIt": "Got it",
+      "pending": {
+        "badge": "Pending",
+        "copy": "{name} approves bookings for this session. You'll get a notification either way — nothing else to do.",
+        "copyNoCoach": "The coach approves bookings for this session. You'll get a notification either way — nothing else to do.",
+        "title": "Request sent"
+      },
+      "waitlisted": {
+        "copy": "This session is full. If a spot opens you're booked automatically — we'll notify you.",
+        "footnote": "Spots go in the order people joined the list.",
+        "title": "You're on the waitlist"
+      }
+    },
+    "price": {
+      "free": "Free"
+    },
+    "row": {
+      "join": "Join"
+    },
+    "toast": {
+      "bookFailed": "Couldn't book this session.",
+      "calendarDownloaded": "Calendar file downloaded",
+      "calendarFailed": "Couldn't download the invite.",
+      "cancelFailed": "Couldn't cancel this booking.",
+      "cancelledOutside": "Cancelled — outside the window, charges may still apply.",
+      "cancelledWithin": "Booking cancelled — no charge.",
+      "copyFailed": "Couldn't copy the link.",
+      "linkFailed": "Couldn't get the meeting link."
+    }
+  },
+  "payments": {
+    "badge": {
+      "overdue": "Overdue"
+    },
+    "client": {
+      "detail": {
+        "checking": "Checking with Stripe…",
+        "handoff": "Payment happens on Stripe's secure page. Come back here when you're done and we'll confirm it.",
+        "paidBody": "{name} has been notified. Nothing else to do.",
+        "paidTitle": "Your payment went through",
+        "pay": "Pay on Stripe",
+        "payAmount": "Pay {amount} {currency} on Stripe",
+        "unfinishedBody": "If you did pay, the status catches up on its own within a few minutes. You can safely try again.",
+        "unfinishedTitle": "Nothing was charged, as far as we can see"
+      },
+      "dueNow": "Due now",
+      "empty": {
+        "message": "When a coach bills you, it shows up here.",
+        "title": "No invoices"
+      },
+      "memberships": {
+        "cancel": "Cancel membership",
+        "emptyMessage": "Recurring plans you join will show up here.",
+        "emptyTitle": "No memberships",
+        "endsOn": "Ends {date}",
+        "paymentOverdue": "Payment overdue",
+        "perInterval": "/ {interval, select, day {day} week {week} month {month} year {year} other {{interval}}}",
+        "renewsOn": "Renews {date}"
+      },
+      "paymentMethods": "Payment methods",
+      "sections": {
+        "paid": "Paid"
+      }
+    },
+    "coach": {
+      "createInvoice": "Create invoice",
+      "earnings": {
+        "available": "{amount} available",
+        "open": "{count} open",
+        "openOverdue": "{open} open · {overdue} overdue",
+        "outstanding": "Outstanding",
+        "thisMonth": "This month"
+      },
+      "empty": {
+        "message": "Bill a client for a session or a block of coaching.",
+        "title": "No invoices yet"
+      },
+      "memberships": {
+        "message": "Recurring plans you sell are managed there for now.",
+        "title": "Memberships live on the web"
+      },
+      "sections": {
+        "overdue": "Overdue",
+        "rest": "Everything else"
+      }
+    },
+    "confirm": {
+      "cancelMembership": {
+        "body": "You keep access until the end of the period you have already paid for. Nothing is charged after that.",
+        "confirm": "Cancel membership",
+        "title": "Cancel this membership?"
+      },
+      "deleteDraft": {
+        "body": "The draft is removed. Nothing was ever sent to the client.",
+        "confirm": "Delete draft",
+        "title": "Delete this draft?"
+      },
+      "keepIt": "Keep it",
+      "markPaid": {
+        "body": "Use this when the client paid you directly — cash or a bank transfer. Stripe records it as paid outside the platform.",
+        "confirm": "Mark paid",
+        "title": "Mark as paid?"
+      },
+      "refund": {
+        "body": "The full amount goes back to the client's card. Stripe's refund window is 14 days from payment.",
+        "confirm": "Refund",
+        "title": "Refund this payment?",
+        "windowClosed": "The 14-day refund window for this payment has closed. Refunds after that are handled in the Stripe dashboard."
+      },
+      "send": {
+        "body": "This finalises the invoice and generates its payment page and PDF. Stripe emails it to the client.",
+        "confirm": "Send it",
+        "irreversible": "A sent invoice can no longer be edited — only voided.",
+        "title": "Send this invoice?"
+      },
+      "void": {
+        "body": "The client can no longer pay it, and it stops counting towards what you are owed.",
+        "confirm": "Void invoice",
+        "title": "Void this invoice?"
+      }
+    },
+    "create": {
+      "addLine": "Add another line",
+      "billing": "Billing",
+      "chooseClient": "Choose a client",
+      "createAndSend": "Create & send",
+      "descriptionPlaceholder": "Personal training session",
+      "dueDate": "Due date (optional)",
+      "fewer": "Fewer",
+      "more": "More",
+      "noClients": "You have no active clients yet. Invoices go to people you already coach.",
+      "saveDraft": "Save draft",
+      "sections": {
+        "due": "When it's due",
+        "whatFor": "What for",
+        "who": "Who"
+      },
+      "sendNote": "Sending finalises the invoice and Stripe emails it to your client.",
+      "title": "New invoice",
+      "total": "Total"
+    },
+    "detail": {
+      "actions": {
+        "deleteDraft": "Delete draft",
+        "markPaid": "Mark paid",
+        "refund": "Refund",
+        "send": "Send to client",
+        "void": "Void"
+      },
+      "billedTo": "Billed to",
+      "document": "Document",
+      "due": "Due",
+      "from": "From",
+      "invoicePdf": "Invoice (PDF)",
+      "items": "Items",
+      "kicker": {
+        "amountDue": "Amount due",
+        "paid": "Paid"
+      },
+      "loadError": "Couldn't load this invoice",
+      "openPdf": "Open the PDF",
+      "paidOn": "Paid on",
+      "partial": "{paid} paid · {remaining} remaining",
+      "receiptPdf": "Receipt (PDF)",
+      "title": "Invoice",
+      "wasDue": "Was due"
+    },
+    "facts": {
+      "accessUntil": "Access until",
+      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+      "endOfPeriod": "the end of this period",
+      "from": "From",
+      "plan": "Plan",
+      "to": "To",
+      "windowCloses": "Window closes"
+    },
+    "fallback": {
+      "client": "Client",
+      "invoice": "Invoice",
+      "item": "Item",
+      "membership": "Membership",
+      "yourCoach": "Your coach"
+    },
+    "gate": {
+      "alreadyDone": "I've already done this",
+      "connect": {
+        "action": "Connect Stripe",
+        "body": "Invoices and payouts run through Stripe. Setting up takes a few minutes and opens outside the app.",
+        "title": "Connect Stripe to get paid"
+      },
+      "needsMore": {
+        "action": "Continue verification",
+        "body": "Your account is set up but Stripe is still waiting on some details before you can take payments.",
+        "title": "Stripe needs more from you"
+      }
+    },
+    "list": {
+      "loadError": "Couldn't load your invoices"
+    },
+    "row": {
+      "due": "Due {date}",
+      "paidOn": "Paid {date}",
+      "wasDue": "Was due {date}"
+    },
+    "segment": {
+      "invoices": "Invoices",
+      "memberships": "Memberships"
+    },
+    "toast": {
+      "actionFailed": "That did not go through.",
+      "cancelMembershipFailed": "Could not cancel that membership.",
+      "createFailed": "Could not create the invoice.",
+      "draftSaved": "Draft saved",
+      "invoiceSent": "Invoice sent",
+      "markedPaid": "Marked as paid",
+      "membershipCanceled": "Membership will end at the period end",
+      "noPaymentToRefund": "No payment found for this invoice to refund.",
+      "onboardingFailed": "Could not open Stripe onboarding.",
+      "payFailed": "Could not open the payment page.",
+      "paymentNotFound": "Could not find the payment.",
+      "portalFailed": "Could not open your payment settings.",
+      "refundFailed": "Could not issue the refund.",
+      "refunded": "Refund issued",
+      "sent": "Sent to the client",
+      "voided": "Invoice voided"
+    }
+  },
+  "role": {
+    "coach": {
+      "description": "Your clients, sessions and earnings.",
+      "label": "Coach"
+    },
+    "switch": "Switch role",
+    "train": {
+      "description": "Your workouts, coaches and plans.",
+      "label": "Trainee"
+    }
+  },
+  "sessions": {
+    "actions": {
+      "cancel": "Cancel session…",
+      "checkIn": "Check in attendees",
+      "edit": "Edit session",
+      "message": "Message all signups",
+      "open": "Open session",
+      "share": "Share booking link"
+    },
+    "actionsSheet": {
+      "title": "Session actions"
+    },
+    "agenda": {
+      "backToAgenda": "Back to agenda",
+      "dayConflicts": "{count, plural, one {# conflict at {time}} other {# conflicts at {time}}}",
+      "dayTotal": "{sessions} · {duration} scheduled",
+      "loadError": {
+        "title": "Couldn't load your sessions"
+      },
+      "newSession": "New session",
+      "noMatch": {
+        "message": "No sessions in this range match what you're looking for."
+      },
+      "search": "Search sessions",
+      "summary": {
+        "conflicts": "{count, plural, one {# conflict} other {# conflicts}}",
+        "signups": "{count, plural, one {signup} other {signups}}",
+        "thisWeek": "this week"
+      },
+      "truncated": "Showing the first 100 sessions in this range. Narrow the dates to see further ahead.",
+      "view": {
+        "agenda": "Agenda",
+        "day": "Day"
+      }
+    },
+    "badge": {
+      "pending": "{count} pending"
+    },
+    "booked": "{count} booked",
+    "cancelSheet": {
+      "confirm": "Cancel session",
+      "helper": "Everyone who signed up is notified either way. This adds your reason.",
+      "message": "Message · optional",
+      "messageTo": "{count, plural, one {Message to # signup · optional} other {Message to # signups · optional}}",
+      "placeholder": "Sorry — have to cancel. Let's regroup next week.",
+      "recurringNote": "This is part of a recurring series. Choose what to cancel.",
+      "scope": {
+        "series": "Every session in this series. The template is ended.",
+        "this": "The series continues.",
+        "thisAndFuture": "This and every later occurrence.",
+        "thisOnDay": "{day} — the series continues."
+      },
+      "title": "Cancel session"
+    },
+    "capacitySheet": {
+      "alreadyBooked": "{count, plural, one {# person is already booked in.} other {# people are already booked in.}}",
+      "helper": "This changes only this session, not the rest of the series. People on the waitlist are not moved in automatically when you raise capacity — message them to let them know there is room.",
+      "max": "The most a session can hold is {max}.",
+      "save": "Save capacity",
+      "spots": "Spots",
+      "suggestion": "Set {count} to fit everyone waiting",
+      "title": "Raise capacity"
+    },
+    "dayRail": {
+      "newSessionAt": "New session at {time}",
+      "overlaps": "Overlaps another session"
+    },
+    "detail": {
+      "attendance": "Attendance",
+      "attendanceHint": "Mark who turned up. Tapping the same choice again clears it.",
+      "attendanceSummary": "{attended} of {total} attended",
+      "attended": "Attended",
+      "attendees": "Attendees",
+      "booked": "{confirmed} of {capacity} booked",
+      "cancelled": {
+        "notified": "Everyone booked in was notified.",
+        "notifiedOn": "Cancelled {date} · everyone booked in was notified.",
+        "title": "Session cancelled"
+      },
+      "copy": "Copy",
+      "details": "Details",
+      "doneMarking": "Done marking",
+      "duplicate": "Duplicate session",
+      "editAttendance": "Edit attendance",
+      "full": "Session is full · {spots}",
+      "join": "Join meeting",
+      "joinOpens": "Join opens {minutes} min before",
+      "joinProvider": "Join {provider}",
+      "liveBanner": "{booked} · {note}",
+      "liveIn": "live {until}",
+      "liveNow": "live now",
+      "loadError": "Couldn't load this session",
+      "message": "Message",
+      "messageSignups": "Message signups",
+      "messageWaitlist": "Message waitlist",
+      "noMeetingLink": "No meeting link on this session yet",
+      "noShow": "No-show",
+      "noSignups": "Nobody has signed up yet.",
+      "noVenue": "No venue set",
+      "notMarked": "{count} not marked yet",
+      "privateNote": "Add a private note",
+      "raiseCapacity": "Raise capacity",
+      "reminderPush": "Push · {date}",
+      "reminders": "Reminders",
+      "remindersHint": "Sent automatically to everyone booked in. Anyone who books after one of these times does not get that reminder.",
+      "rows": {
+        "approvalNeeded": "Approval needed for every booking",
+        "cancelAnyTime": "Cancel any time",
+        "cancelUpTo": "Cancel up to {hours}h before",
+        "cancellationPolicy": "Cancellation policy",
+        "edited": "{position} · edited",
+        "free": "Free",
+        "group": "Group",
+        "pricePerSpot": "Price per spot",
+        "repeats": "Repeats",
+        "seriesPosition": "Session {index} of the series",
+        "waitlistOff": "Waitlist off",
+        "waitlistOffHint": "Booking closes once it is full",
+        "waitlistOn": "Waitlist on",
+        "waitlistOnHint": "A full session queues new signups"
+      },
+      "showAll": "Show all {count}",
+      "spots": "Spots",
+      "status": {
+        "live": "Live now"
+      },
+      "waiting": "{count} waiting for a place",
+      "waitingSince": "Waiting since {since}",
+      "waitlist": "Waitlist",
+      "waitlistHint": "The next in line moves in automatically when someone cancels, up to two hours before the start. Raising capacity does not move anyone in — tell them yourself if you open more spots."
+    },
+    "empty": {
+      "create": "Create your first session",
+      "fromTemplate": "Start from a template",
+      "groupClasses": {
+        "hint": "Set capacity, invite clients",
+        "title": "Group classes"
+      },
+      "message": "Sessions let you schedule and showcase your training. Your public sessions are visible even to people not on MotionHive yet.",
+      "openFree": {
+        "hint": "Showcase community runs",
+        "title": "Open & free"
+      },
+      "title": "No sessions yet"
+    },
+    "filterSheet": {
+      "anyGroup": "Any group",
+      "apply": "{count, plural, one {Apply · # filter} other {Apply · # filters}}",
+      "clearDates": "Clear dates",
+      "from": "From",
+      "group": "Group",
+      "note": "Filters apply to the sessions already loaded. Picking dates outside that range loads them.",
+      "rangeBackwards": "The end date is before the start date.",
+      "rangeTooWide": "Pick a range of six months or less.",
+      "to": "To"
+    },
+    "filters": {
+      "allTypes": "All types"
+    },
+    "form": {
+      "approval": {
+        "hint": "You confirm each signup before it books.",
+        "title": "Approval required"
+      },
+      "cancellation": "Cancellation",
+      "cancellationCutoff": "Cancellation cutoff",
+      "cancellationHint": "hours before start — signups can cancel until then",
+      "capacity": "Capacity",
+      "conflict": {
+        "anotherSession": "another session",
+        "detail": "{time} overlaps \"{title}\". You can still save.",
+        "title": "Conflict on {date}"
+      },
+      "createAndPublish": "Create & publish",
+      "createSession": "Create session",
+      "descriptionPlaceholder": "What signups should know — optional",
+      "duration": {
+        "hours": "{hours} h",
+        "hoursMinutes": "{hours} h {minutes} min",
+        "hoursSuffix": "h",
+        "minutesSuffix": "min"
+      },
+      "endMode": {
+        "after": "After N",
+        "never": "Never",
+        "onDate": "On date"
+      },
+      "ends": "Ends",
+      "group": "Group",
+      "groupPlaceholder": "Pick a group",
+      "lastSession": "Last session",
+      "meetingLink": "Meeting link",
+      "meetingLinkHint": "Signups see this link once they're confirmed.",
+      "noGroup": "You don't have a group yet — group members access needs one.",
+      "noVenue": "No venue",
+      "occurrences": "Occurrences",
+      "occurrencesUnit": "{count, plural, one {occurrence} other {occurrences}}",
+      "onDays": "On days",
+      "preview": "Preview",
+      "previewMore": "+ {count} more",
+      "priceHint": "Price is shown to signups. Taking payment isn't wired up yet, so nothing is charged.",
+      "repeat": {
+        "lockedHint": "Can't be changed once created",
+        "off": "Doesn't repeat",
+        "offHint": "Toggle to set up a series",
+        "on": "Repeats weekly"
+      },
+      "rule": {
+        "after": "{count, plural, one {Every {days} · # session} other {Every {days} · # sessions}}",
+        "never": "Every {days}, with no end date",
+        "noDays": "Pick at least one day",
+        "onDate": "Every {days} until {date}",
+        "onDateMissing": "Every {days} — pick an end date"
+      },
+      "short": {
+        "after": "{count, plural, one {{days} · # occurrence} other {{days} · # occurrences}}",
+        "never": "{days} · ongoing",
+        "noDays": "Pick the days it repeats",
+        "onDate": "{days} · until {date}",
+        "onDateMissing": "{days} · pick an end date"
+      },
+      "spots": "Spots",
+      "spotsUnit": "spots",
+      "startLocked": "Start time can't be changed — duplicate the session to move it.",
+      "starts": "Starts",
+      "subtitleOneOff": "One-off · {date}",
+      "title": {
+        "duplicate": "Duplicate session",
+        "edit": "Edit session",
+        "new": "New session"
+      },
+      "titlePlaceholder": "Morning yoga flow",
+      "venue": "Venue",
+      "waitlist": {
+        "hint": "Queue signups once it's full.",
+        "title": "Waitlist"
+      },
+      "when": "When",
+      "where": "Where",
+      "whoCanBook": "Who can book"
+    },
+    "messageSheet": {
+      "placeholder": "Write your message…",
+      "quickFills": "Quick fills",
+      "recipients": {
+        "all": "Goes to everyone booked in.",
+        "waitlist": "{count, plural, one {Goes to one person on the waitlist.} other {Goes to the # people waiting.}}"
+      },
+      "suggestions": {
+        "bring": "Don't forget water and a towel.",
+        "change": "Change of plan for this one — details to follow.",
+        "late": "Running a few minutes late — see you shortly."
+      },
+      "title": "Message signups"
+    },
+    "monthSheet": {
+      "jump": "Jump",
+      "jumpTo": "Jump to {date}",
+      "title": "Jump to"
+    },
+    "noteSheet": {
+      "helper": "Only you can see this. It stays with this person on this session.",
+      "placeholder": "Kept favouring the left knee — check next week.",
+      "save": "Save note",
+      "title": "Note",
+      "titleWithName": "Note · {name}"
+    },
+    "quote": "“{text}”",
+    "recurrence": {
+      "dayList": "{list} & {last}",
+      "everyDays": "{count, plural, one {Every day} other {Every # days}}",
+      "everyMonths": "{count, plural, one {Every month} other {Every # months}}",
+      "everyWeeks": "{count, plural, one {Every week} other {Every # weeks}}",
+      "everyWeeksOn": "{count, plural, one {Every {days}} other {Every # weeks on {days}}}",
+      "occurrences": "{count, plural, one {# occurrence} other {# occurrences}}",
+      "summary": "{frequency} · {end}",
+      "until": "until {date}"
+    },
+    "row": {
+      "live": "Live"
+    },
+    "share": {
+      "text": "{title} · {day}, {time}"
+    },
+    "status": {
+      "approvalNeeded": "Approval needed",
+      "conflict": "Conflict",
+      "scheduled": "Scheduled"
+    },
+    "toast": {
+      "cancelFailed": "Could not cancel the session.",
+      "cancelled": "{count, plural, one {Session cancelled} other {# sessions cancelled}}",
+      "capacityFailed": "Could not change the capacity.",
+      "capacityUpdated": "Capacity updated",
+      "copyFailed": "Could not copy the link.",
+      "createFailed": "Could not create the session.",
+      "created": "Session created",
+      "createdWithOverlap": "Session created · overlaps another",
+      "messageFailed": "Could not send the message.",
+      "messageSent": "{count, plural, one {Sent to # person} other {Sent to # people}}",
+      "nobodyToNotify": "Nobody to notify",
+      "shareFailed": "Could not share the link.",
+      "updateFailed": "Could not update the session.",
+      "updated": "Session updated"
+    }
+  },
+  "shell": {
+    "menuDot": {
+      "billDue": "You have a bill due",
+      "requestsWaiting": "You have client requests waiting"
+    }
+  }
+}

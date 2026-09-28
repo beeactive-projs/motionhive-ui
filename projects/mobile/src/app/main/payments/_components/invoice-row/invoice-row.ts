@@ -1,7 +1,8 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { CurrencyRonPipe, Invoice, displayName } from 'core';
+import { CurrencyRonPipe, Invoice, InvoiceStatuses, appLocale, displayName } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
@@ -20,7 +21,16 @@ import { invoiceStatusStyle, isOverdue } from '../../payments.config';
  */
 @Component({
   selector: 'mh-invoice-row',
-  imports: [CurrencyRonPipe, HexAvatar, IonBadge, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [
+    CurrencyRonPipe,
+    HexAvatar,
+    IonBadge,
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonNote,
+    TranslatePipe,
+  ],
   templateUrl: './invoice-row.html',
   styleUrl: './invoice-row.scss',
   host: {
@@ -28,6 +38,8 @@ import { invoiceStatusStyle, isOverdue } from '../../payments.config';
   },
 })
 export class InvoiceRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly invoice = input.required<Invoice>();
   /** Whose name to lead with — the other side of this invoice. */
   readonly party = input<'client' | 'instructor'>('client');
@@ -38,7 +50,7 @@ export class InvoiceRow {
   );
 
   readonly personName = computed(() =>
-    displayName(this._person() ?? null, this.invoice().clientEmail || 'Someone'),
+    displayName(this._person() ?? null, this.invoice().clientEmail || this._translateService.instant('common.someone')),
   );
 
   readonly avatarUrl = computed(() => this._person()?.avatarUrl ?? null);
@@ -55,20 +67,30 @@ export class InvoiceRow {
   readonly tone = computed(() => (this.overdue() ? 'coral' : this.style().tone));
 
   readonly reference = computed(
-    () => this.invoice().number ?? this.invoice().description ?? 'Invoice',
+    () =>
+      this.invoice().number ??
+      this.invoice().description ??
+      this._translateService.instant('payments.fallback.invoice'),
   );
 
   readonly dueLabel = computed(() => {
     const invoice = this.invoice();
-    if (invoice.status === 'paid') {
-      return invoice.paidAt ? `Paid ${this._short(invoice.paidAt)}` : 'Paid';
+    if (invoice.status === InvoiceStatuses.Paid) {
+      return invoice.paidAt
+        ? this._translateService.instant('payments.row.paidOn', {
+            date: this._short(invoice.paidAt),
+          })
+        : this._translateService.instant('enum.invoiceStatus.paid');
     }
     if (!invoice.dueDate) return '';
-    return `${this.overdue() ? 'Was due' : 'Due'} ${this._short(invoice.dueDate)}`;
+    return this._translateService.instant(
+      this.overdue() ? 'payments.row.wasDue' : 'payments.row.due',
+      { date: this._short(invoice.dueDate) },
+    );
   });
 
   private _short(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString(appLocale(), {
       day: 'numeric',
       month: 'short',
     });

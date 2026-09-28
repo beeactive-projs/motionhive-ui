@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * `mh-capacity-bar` — visual fill bar with "N / M" label.
@@ -14,8 +15,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
  */
 @Component({
   selector: 'mh-capacity-bar',
-  imports: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
   templateUrl: './capacity-bar.html',
   styleUrl: './capacity-bar.scss',
 })

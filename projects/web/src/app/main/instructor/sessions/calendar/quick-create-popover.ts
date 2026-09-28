@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -10,11 +9,20 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { SESSION_TYPES, VenueService, sessionTypeLabel } from 'core';
-import type { CreateTemplateRequest, SessionType, Venue } from 'core';
+import {
+  EnumLabelPipe,
+  SESSION_TYPES,
+  SessionAccess,
+  SessionLocationKind,
+  SessionType,
+  VenueService,
+  sessionTypeLabel,
+} from 'core';
+import type { CreateTemplateRequest, Venue } from 'core';
 
 /**
  * Drag-to-create popover.
@@ -40,7 +48,6 @@ import type { CreateTemplateRequest, SessionType, Venue } from 'core';
  */
 @Component({
   selector: 'mh-quick-create-popover',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -48,29 +55,34 @@ import type { CreateTemplateRequest, SessionType, Venue } from 'core';
     ButtonDirective,
     InputTextModule,
     Select,
+    TranslatePipe,
+    EnumLabelPipe,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       class="mh-qcp"
       [style.left.px]="anchor.x"
       [style.top.px]="anchor.y"
       role="dialog"
-      aria-label="Quick create session"
+      [attr.aria-label]="'sessions.quickCreate.ariaLabel' | translate"
     >
       <div class="mh-qcp__head">
         <span class="mh-qcp__eyebrow">
-          {{ range.start | date: 'EEE d MMM · HH:mm' : '' : 'en-GB' }}
-          –
-          {{ range.end | date: 'HH:mm' : '' : 'en-GB' }}
-          ·
-          {{ minutes() }} min
+          {{
+            'sessions.quickCreate.eyebrow'
+              | translate
+                : {
+                    start: (range.start | date: 'EEE d MMM · HH:mm'),
+                    end: (range.end | date: 'HH:mm'),
+                    minutes: minutes()
+                  }
+          }}
         </span>
         <button
           type="button"
           class="mh-qcp__close"
           (click)="dismiss.emit()"
-          aria-label="Dismiss"
+          [attr.aria-label]="'button.dismiss' | translate"
         >
           <i class="pi pi-times"></i>
         </button>
@@ -81,13 +93,13 @@ import type { CreateTemplateRequest, SessionType, Venue } from 'core';
           pInputText
           type="text"
           formControlName="title"
-          placeholder="Session title"
+          [placeholder]="'sessions.quickCreate.titlePlaceholder' | translate"
           autofocus
           maxlength="255"
-          aria-label="Session title"
+          [attr.aria-label]="'sessions.quickCreate.titlePlaceholder' | translate"
         />
 
-        <div class="mh-qcp__types" role="radiogroup" aria-label="Type">
+        <div class="mh-qcp__types" role="radiogroup" [attr.aria-label]="'form.label.type' | translate">
           @for (opt of typeOptions; track opt.value) {
             <button
               type="button"
@@ -107,26 +119,26 @@ import type { CreateTemplateRequest, SessionType, Venue } from 'core';
              a venue picker right below — the instructor's saved venues
              only; "Add new" is left to the full form. -->
         <div class="mh-qcp__where">
-          <div class="mh-qcp__seg" role="radiogroup" aria-label="Location">
+          <div class="mh-qcp__seg" role="radiogroup" [attr.aria-label]="'form.label.location' | translate">
             <button
               type="button"
               class="mh-qcp__seg-btn"
-              [class.is-active]="locationKind() === 'ONLINE'"
-              (click)="selectLocation('ONLINE')"
+              [class.is-active]="locationKind() === LocationKind.Online"
+              (click)="selectLocation(LocationKind.Online)"
             >
-              <i class="pi pi-video" aria-hidden="true"></i> Online
+              <i class="pi pi-video" aria-hidden="true"></i> {{ LocationKind.Online | enumLabel: 'sessionLocationKind' }}
             </button>
             <button
               type="button"
               class="mh-qcp__seg-btn"
-              [class.is-active]="locationKind() === 'IN_PERSON'"
-              (click)="selectLocation('IN_PERSON')"
+              [class.is-active]="locationKind() === LocationKind.InPerson"
+              (click)="selectLocation(LocationKind.InPerson)"
             >
-              <i class="pi pi-map-marker" aria-hidden="true"></i> In-person
+              <i class="pi pi-map-marker" aria-hidden="true"></i> {{ LocationKind.InPerson | enumLabel: 'sessionLocationKind' }}
             </button>
           </div>
 
-          @if (locationKind() === 'IN_PERSON') {
+          @if (locationKind() === LocationKind.InPerson) {
             <p-select
               [options]="venues()"
               optionLabel="name"
@@ -134,7 +146,7 @@ import type { CreateTemplateRequest, SessionType, Venue } from 'core';
               [ngModel]="selectedVenueId()"
               (ngModelChange)="selectedVenueId.set($event)"
               [ngModelOptions]="{ standalone: true }"
-              placeholder="Pick a venue"
+              [placeholder]="'sessions.common.pickVenue' | translate"
               [showClear]="true"
               appendTo="body"
               styleClass="mh-qcp__venue"
@@ -146,10 +158,10 @@ import type { CreateTemplateRequest, SessionType, Venue } from 'core';
         <div class="mh-qcp__footer">
           <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="onOpenFull()">
             <i class="pi pi-arrow-up-right"></i>
-            Open full form
+            {{ 'sessions.quickCreate.openFullForm' | translate }}
           </button>
-          <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="dismiss.emit()">Cancel</button>
-          <button pButton type="submit" size="small" [disabled]="form.invalid"><i class="pi pi-check"></i> Create</button>
+          <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="dismiss.emit()">{{ 'button.cancel' | translate }}</button>
+          <button pButton type="submit" size="small" [disabled]="form.invalid"><i class="pi pi-check"></i> {{ 'button.create' | translate }}</button>
         </div>
       </form>
     </div>
@@ -277,10 +289,12 @@ export class QuickCreatePopover implements OnInit {
   @Output() openFullForm = new EventEmitter<CreateTemplateRequest>();
   @Output() dismiss = new EventEmitter<void>();
 
-  protected readonly selectedType = signal<SessionType>('GROUP');
+  protected readonly LocationKind = SessionLocationKind;
+
+  protected readonly selectedType = signal<SessionType>(SessionType.Group);
   /** Words and icons from core's `SESSION_TYPES`, in its PrimeIcons dialect. */
   protected readonly typeOptions: { value: SessionType; label: string; icon: string }[] = (
-    ['GROUP', 'PRIVATE', 'OPEN'] as SessionType[]
+    [SessionType.Group, SessionType.Private, SessionType.Open] as SessionType[]
   ).map((value) => ({
     value,
     label: sessionTypeLabel(value),
@@ -288,14 +302,14 @@ export class QuickCreatePopover implements OnInit {
   }));
 
   /** Location toggle — ONLINE skips the venue picker; IN_PERSON shows it. */
-  protected readonly locationKind = signal<'ONLINE' | 'IN_PERSON'>('ONLINE');
+  protected readonly locationKind = signal<SessionLocationKind>(SessionLocationKind.Online);
   /** Instructor's saved venues — loaded once on init. */
   protected readonly venues = signal<Venue[]>([]);
   protected readonly selectedVenueId = signal<string | null>(null);
 
-  private readonly _fb = inject(FormBuilder);
+  private readonly _formBuilder = inject(FormBuilder);
   private readonly _venueService = inject(VenueService);
-  protected readonly form = this._fb.nonNullable.group({
+  protected readonly form = this._formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
   });
 
@@ -307,9 +321,9 @@ export class QuickCreatePopover implements OnInit {
     });
   }
 
-  protected selectLocation(kind: 'ONLINE' | 'IN_PERSON'): void {
+  protected selectLocation(kind: SessionLocationKind): void {
     this.locationKind.set(kind);
-    if (kind === 'ONLINE') this.selectedVenueId.set(null);
+    if (kind === SessionLocationKind.Online) this.selectedVenueId.set(null);
   }
 
   protected minutes(): number {
@@ -347,7 +361,8 @@ export class QuickCreatePopover implements OnInit {
       type: this.selectedType(),
       // Default access depends on type — Open type → OPEN, Group/Private
       // start CLIENTS_ONLY (more conservative; user can change in full form).
-      access: this.selectedType() === 'OPEN' ? 'OPEN' : 'CLIENTS_ONLY',
+      access:
+        this.selectedType() === SessionType.Open ? SessionAccess.Open : SessionAccess.ClientsOnly,
       locationKind: kind,
       // For IN_PERSON we pass through the picked venue; the BE still
       // requires `meetingUrl` for ONLINE so the full form catches that.

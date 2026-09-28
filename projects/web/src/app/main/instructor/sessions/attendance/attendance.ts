@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,10 +7,11 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { SessionsDetailStore } from 'core';
+import { SessionParticipantStatus, SessionsDetailStore } from 'core';
 import { ParticipantsTable } from '../../../../_shared/components/participants-table/participants-table';
 import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
 
@@ -28,18 +28,17 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
  */
 @Component({
   selector: 'mh-instructor-attendance',
-  standalone: true,
   imports: [
     CommonModule,
     ButtonDirective,
     ParticipantsTable,
     FollowUpDialog,
     ToastModule,
+    TranslatePipe,
   ],
   providers: [SessionsDetailStore, MessageService],
   templateUrl: './attendance.html',
   styleUrl: './attendance.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InstructorAttendance implements OnInit {
   private readonly _route = inject(ActivatedRoute);
@@ -50,7 +49,7 @@ export class InstructorAttendance implements OnInit {
   readonly followUpOpen = signal(false);
 
   protected readonly confirmedOnly = computed(() =>
-    this.store.participants().filter((p) => p.status === 'CONFIRMED'),
+    this.store.participants().filter((p) => p.status === SessionParticipantStatus.Confirmed),
   );
 
   protected readonly pendingMark = computed(() =>

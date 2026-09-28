@@ -1,7 +1,7 @@
 @if (tags().length > 0) {
   <p-card class="mh-side-card shadow-md">
     <ng-template #title>
-      <span class="mh-side-card__title">Tags</span>
+      <span class="mh-side-card__title">{{ 'groups.common.tags' | translate }}</span>
     </ng-template>
     <div class="mh-side-card__chips">
       @for (tag of tags(); track tag) {

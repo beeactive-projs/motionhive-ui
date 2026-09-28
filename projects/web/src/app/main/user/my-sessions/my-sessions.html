@@ -2,9 +2,9 @@
   <!-- Header · mirrors the instructor sessions list header -->
   <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1 min-w-0">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Sessions</h1>
-      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">Your bookings, waitlists, and past
-        sessions.</p>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ 'mySessions.list.title' | translate }}</h1>
+      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
+        {{ 'mySessions.list.subtitle' | translate }}</p>
     </div>
     @if (!isMobile()) {
     <div class="flex gap-3 shrink-0">
@@ -16,7 +16,7 @@
         routerLink="/user/sessions/discover"
       >
         <i class="pi pi-search"></i>
-        Discover
+        {{ 'nav.discover' | translate }}
       </button>
     </div>
     }
@@ -52,10 +52,10 @@
         (click)="filtersPopover.toggle($event)"
       >
         <i class="pi pi-filter"></i>
-        {{ appliedFilterCount() > 0 ? 'Filters · ' + appliedFilterCount() : 'Filters' }}
+        {{ appliedFilterCount() > 0 ? ('common.filtersCount' | translate: { count: appliedFilterCount() }) : ('common.filters' | translate) }}
       </button>
       } @else {
-      <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+      <div class="flex flex-wrap items-center gap-1.5" role="group" [attr.aria-label]="'mySessions.filters.quickFilters' | translate">
         <button pButton
           type="button"
           size="small"
@@ -65,7 +65,7 @@
           (click)="clearQuickFilters()"
           class="py-0.5 min-w-10"
         >
-          All
+          {{ 'common.all' | translate }}
         </button>
 
         <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
@@ -81,7 +81,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-video"></i>
-          Online
+          {{ 'enum.sessionLocationKind.ONLINE' | translate }}
         </button>
         <button pButton
           type="button"
@@ -93,7 +93,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-map-marker"></i>
-          In-person
+          {{ 'enum.sessionLocationKind.IN_PERSON' | translate }}
         </button>
 
         <span class="h-5 w-px bg-surface-300 dark:bg-surface-600" aria-hidden="true"></span>
@@ -107,7 +107,7 @@
           (click)="toggleType(SessionType.Group)"
           class="py-0.5 min-w-10"
         >
-          Group
+          {{ 'enum.sessionType.GROUP' | translate }}
         </button>
         <button pButton
           type="button"
@@ -118,7 +118,7 @@
           (click)="toggleType(SessionType.Private)"
           class="py-0.5 min-w-10"
         >
-          1-on-1
+          {{ 'enum.sessionType.PRIVATE' | translate }}
         </button>
         <button pButton
           type="button"
@@ -129,13 +129,14 @@
           (click)="toggleType(SessionType.Open)"
           class="py-0.5 min-w-10"
         >
-          Open
+          {{ 'enum.sessionType.OPEN' | translate }}
         </button>
       </div>
       }
       <p-iconfield class="flex-1 md:flex-[0_1_320px]">
         <p-inputicon class="pi pi-search" />
-        <input pInputText type="text" fluid placeholder="Search sessions…" aria-label="Search sessions"
+        <input pInputText type="text" fluid [placeholder]="'mySessions.filters.searchPlaceholder' | translate"
+          [attr.aria-label]="'mySessions.filters.search' | translate"
           [ngModel]="searchInput()" (ngModelChange)="onSearchInput($event)" />
         @if (searchInput() !== '') {
         <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchInput('')" />
@@ -157,7 +158,7 @@
 
 @if (isMobile()) {
 <!-- Mobile FAB (single primary action). -->
-<mh-mobile-fab icon="pi pi-search" label="Discover" (tap)="goToDiscover()" />
+<mh-mobile-fab icon="pi pi-search" [label]="'nav.discover' | translate" (tap)="goToDiscover()" />
 }
 
 <!--
@@ -168,7 +169,7 @@
   @if (store.error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
     <span class="text-(--p-red-700)">{{ store.error() }}</span>
-    <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="store.load()">Retry</button>
+    <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="store.load()">{{ 'button.retry' | translate }}</button>
   </p-message>
   } @else if (store.loading() && store.items().length === 0) {
   <div class="flex flex-col gap-2">
@@ -178,13 +179,14 @@
   </div>
   } @else if (filteredItems().length === 0) {
   @if (store.items().length === 0) {
-  <mh-list-empty-state icon="pi pi-calendar-clock" title="Nothing here yet"
-    message="Sessions you book will show up here. Find one to get started."
-    [actionLabel]="store.tab() === 'upcoming' ? 'Find a session' : undefined" actionIcon="pi pi-search"
-    (action)="goToDiscover()" />
+  <mh-list-empty-state icon="pi pi-calendar-clock" [title]="'empty.nothingYet' | translate"
+    [message]="'mySessions.list.emptyMessage' | translate"
+    [actionLabel]="store.tab() === MyTab.Upcoming ? ('mySessions.list.emptyAction' | translate) : undefined"
+    actionIcon="pi pi-search" (action)="goToDiscover()" />
   } @else {
-  <mh-list-empty-state icon="pi pi-filter-slash" title="No sessions match your filters"
-    message="Try a different filter or clear the search." actionLabel="Clear filters" actionIcon="pi pi-filter-slash"
+  <mh-list-empty-state icon="pi pi-filter-slash" [title]="'mySessions.list.noMatchTitle' | translate"
+    [message]="'mySessions.list.noMatchMessage' | translate"
+    [actionLabel]="'button.clearFilters' | translate" actionIcon="pi pi-filter-slash"
     actionSeverity="secondary" [actionOutlined]="true" (action)="clearFilters()" />
   }
   } @else {
@@ -207,7 +209,7 @@
     <div class="flex justify-center p-4">
       <button pButton type="button" severity="secondary" [outlined]="true" (click)="store.loadMore()" [disabled]="store.loading()">
         @if (store.loading()) {<i class="pi pi-spinner pi-spin"></i>}
-        Load more
+        {{ 'button.loadMore' | translate }}
       </button>
     </div>
     }
@@ -240,12 +242,12 @@
         (click)="clearQuickFilters()"
         class="py-0.5 min-w-10"
       >
-        All
+        {{ 'common.all' | translate }}
       </button>
     </div>
 
     <div class="flex flex-col gap-2">
-      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Type</p>
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">{{ 'form.label.type' | translate }}</p>
       <div class="flex flex-wrap gap-1.5">
         <button pButton
           type="button"
@@ -257,7 +259,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-users"></i>
-          Group
+          {{ 'enum.sessionType.GROUP' | translate }}
         </button>
         <button pButton
           type="button"
@@ -269,7 +271,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-user"></i>
-          1-on-1
+          {{ 'enum.sessionType.PRIVATE' | translate }}
         </button>
         <button pButton
           type="button"
@@ -281,13 +283,13 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-globe"></i>
-          Open
+          {{ 'enum.sessionType.OPEN' | translate }}
         </button>
       </div>
     </div>
 
     <div class="flex flex-col gap-2">
-      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">Location</p>
+      <p class="m-0 text-[10px] font-bold uppercase tracking-[0.06em] text-muted-color">{{ 'form.label.location' | translate }}</p>
       <div class="flex flex-wrap gap-1.5">
         <button pButton
           type="button"
@@ -299,7 +301,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-video"></i>
-          Online
+          {{ 'enum.sessionLocationKind.ONLINE' | translate }}
         </button>
         <button pButton
           type="button"
@@ -311,7 +313,7 @@
           class="py-0.5 min-w-10"
         >
           <i class="pi pi-map-marker"></i>
-          In-person
+          {{ 'enum.sessionLocationKind.IN_PERSON' | translate }}
         </button>
       </div>
     </div>

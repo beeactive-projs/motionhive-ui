@@ -1,6 +1,5 @@
 import { Location } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -8,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
 import { MessageService } from 'primeng/api';
@@ -33,11 +33,11 @@ interface GalleriaItem {
     PostHeader,
     PostReactionBar,
     PostCommentList,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './photo-viewer.html',
   styleUrl: './photo-viewer.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'photo-viewer-host',
     '(document:keydown.escape)': 'close()',
@@ -49,6 +49,7 @@ export class PhotoViewer {
   private readonly _location = inject(Location);
   private readonly _postService = inject(PostService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -58,7 +59,7 @@ export class PhotoViewer {
   readonly images = computed<GalleriaItem[]>(() =>
     (this.post()?.mediaUrls ?? []).map((src, i) => ({
       itemImageSrc: src,
-      alt: `Photo ${i + 1}`,
+      alt: this._translateService.instant('groups.photoViewer.alt', { index: i + 1 }),
     })),
   );
 
@@ -91,7 +92,7 @@ export class PhotoViewer {
 
     if (!postId) {
       this.loading.set(false);
-      this.error.set('Photo not found.');
+      this.error.set(this._translateService.instant('groups.photoViewer.notFound'));
       return;
     }
 
@@ -106,8 +107,13 @@ export class PhotoViewer {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set('Could not load this photo.');
-        showApiError(this._messageService, 'Could not load photo', '', err);
+        this.error.set(this._translateService.instant('groups.photoViewer.loadFailed'));
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.photoLoadFailed'),
+          '',
+          err,
+        );
       },
     });
   }

@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'mh-facebook-callback',
-  template: '<p>Signing in with Facebook...</p>',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
+  template: `<p>{{ 'auth.oauthCallback.facebook' | translate }}</p>`,
 })
 export class FacebookCallbackComponent implements OnInit {
   ngOnInit(): void {

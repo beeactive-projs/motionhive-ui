@@ -1,6 +1,6 @@
 <p-card class="mh-side-card shadow-md">
   <ng-template #title>
-    <span class="mh-side-card__title">Owner</span>
+    <span class="mh-side-card__title">{{ 'groups.ownerCard.title' | translate }}</span>
   </ng-template>
 
   <div class="mh-side-card__row">
@@ -14,7 +14,7 @@
   </div>
 
   <div class="mh-side-card__actions">
-    <button pButton type="button" severity="secondary" outlined size="small" fluid><i class="pi pi-envelope"></i> Message</button>
-    <button pButton type="button" severity="secondary" outlined size="small" fluid><i class="pi pi-user"></i> Profile</button>
+    <button pButton type="button" severity="secondary" outlined size="small" fluid><i class="pi pi-envelope"></i> {{ 'groups.ownerCard.message' | translate }}</button>
+    <button pButton type="button" severity="secondary" outlined size="small" fluid><i class="pi pi-user"></i> {{ 'groups.ownerCard.profile' | translate }}</button>
   </div>
 </p-card>

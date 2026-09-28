@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonBackButton,
   IonBadge,
@@ -66,6 +67,7 @@ import { RequestsStore } from './requests.store';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './requests.html',
   styleUrl: './requests.scss',
@@ -75,6 +77,7 @@ export class Requests implements ViewWillEnter {
   readonly store = inject(RequestsStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3];
 
@@ -94,8 +97,9 @@ export class Requests implements ViewWillEnter {
 
   readonly withdrawBody = computed(() => {
     const row = this.withdrawing();
-    const who = row ? clientDisplayName(row, 'this person') : 'this person';
-    return `${who} will no longer be able to accept it. You can invite them again later.`;
+    const fallback = this._translateService.instant('clients.thisPerson');
+    const who = row ? clientDisplayName(row, fallback) : fallback;
+    return this._translateService.instant('clients.confirm.withdraw.body', { name: who });
   });
 
   constructor() {
@@ -141,17 +145,29 @@ export class Requests implements ViewWillEnter {
 
   accept(row: InstructorClient): void {
     this.store.accept(row).subscribe({
-      next: () => void this._feedbackService.success('Request accepted'),
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.requestAccepted'),
+        ),
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not update this request.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.requestFailed'),
+        ),
     });
   }
 
   decline(row: InstructorClient): void {
     this.store.decline(row).subscribe({
-      next: () => void this._feedbackService.success('Request declined'),
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.requestDeclined'),
+        ),
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not update this request.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.requestFailed'),
+        ),
     });
   }
 
@@ -160,10 +176,15 @@ export class Requests implements ViewWillEnter {
     this.store.resend(row).subscribe({
       next: () => {
         this._resent.update((ids) => new Set(ids).add(row.id));
-        void this._feedbackService.success('Invitation resent');
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.invitationResent'),
+        );
       },
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not resend the invitation.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.resendFailed'),
+        ),
     });
   }
 
@@ -181,11 +202,16 @@ export class Requests implements ViewWillEnter {
       next: () => {
         this.withdrawSaving.set(false);
         this.withdrawOpen.set(false);
-        void this._feedbackService.success('Invitation withdrawn');
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.invitationWithdrawn'),
+        );
       },
       error: (error: unknown) => {
         this.withdrawSaving.set(false);
-        void this._feedbackService.error(error, 'Could not withdraw the invitation.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.withdrawFailed'),
+        );
       },
     });
   }

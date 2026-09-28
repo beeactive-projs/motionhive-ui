@@ -30,6 +30,7 @@ export type TabId = (typeof TabIds)[keyof typeof TabIds];
 
 export interface TabItem {
   readonly id: TabId;
+  /** Translation key. */
   readonly label: string;
   /** ionicons name, registered through `TAB_ICONS`. */
   readonly icon: string;
@@ -42,6 +43,7 @@ export interface TabItem {
 
 /** A row of the menu page behind the Menu tab — reachable, but not worth a tab slot. */
 export interface MoreTile {
+  /** Translation key. */
   readonly label: string;
   readonly icon: string;
   /** Ionic palette name for the row's icon tile. */
@@ -63,7 +65,7 @@ export interface MoreTile {
  * so the two menus keep the same grouped-by-intent architecture.
  */
 export interface MoreSection {
-  /** Section kicker; '' renders the card without a label (web's shared block). */
+  /** Section kicker (translation key); '' renders the card without a label (web's shared block). */
   readonly label: string;
   readonly items: readonly MoreTile[];
 }

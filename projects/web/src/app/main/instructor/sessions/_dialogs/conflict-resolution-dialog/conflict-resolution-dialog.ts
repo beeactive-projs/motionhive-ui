@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
@@ -18,6 +18,7 @@ import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import {
+  CancelScope,
   SessionInstance,
   SessionService,
   showApiError,
@@ -43,15 +44,14 @@ import {
  */
 @Component({
   selector: 'mh-conflict-resolution-dialog',
-  standalone: true,
-  imports: [CommonModule, FormsModule, Dialog, ButtonDirective, DatePickerModule],
+  imports: [CommonModule, FormsModule, Dialog, ButtonDirective, DatePickerModule, TranslatePipe],
   templateUrl: './conflict-resolution-dialog.html',
   styleUrl: './conflict-resolution-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConflictResolutionDialog {
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly conflictingInstanceIds = input<string[]>([]);
@@ -80,7 +80,7 @@ export class ConflictResolutionDialog {
     this.loading.set(true);
     forkJoin(
       ids.map((id) =>
-        this._svc.getInstance(id).pipe(catchError(() => of(null))),
+        this._sessionService.getInstance(id).pipe(catchError(() => of(null))),
       ),
     )
       .pipe(map((rs) => rs.filter((x): x is SessionInstance => x != null)))
@@ -92,10 +92,12 @@ export class ConflictResolutionDialog {
         // and now), warn so the user doesn't think the list is complete.
         const missing = ids.length - rs.length;
         if (missing > 0) {
-          this._msg.add({
+          this._messageService.add({
             severity: 'info',
-            summary: 'Some conflicts already resolved',
-            detail: `${missing} session(s) couldn’t be loaded — they may have already been cancelled or moved.`,
+            summary: this._translateService.instant('sessions.conflictDialog.partial.summary'),
+            detail: this._translateService.instant('sessions.conflictDialog.partial.detail', {
+              count: missing,
+            }),
           });
         }
       });
@@ -118,48 +120,65 @@ export class ConflictResolutionDialog {
     const newDate = this.rescheduleDate().get(id);
     if (!newDate) return;
     if (newDate.getTime() < Date.now()) {
-      this._msg.add({
+      this._messageService.add({
         severity: 'warn',
-        summary: 'Pick a future date',
-        detail: 'You can’t reschedule into the past.',
+        summary: this._translateService.instant('sessions.conflictDialog.pastDate.summary'),
+        detail: this._translateService.instant('sessions.conflictDialog.pastDate.detail'),
       });
       return;
     }
     this._setRowState(id, 'busy');
-    this._svc
+    this._sessionService
       .rescheduleInstance(id, { newStartAt: newDate.toISOString() })
       .subscribe({
         next: (res) => {
           this._setRowState(id, 'done');
-          this._msg.add({
+          this._messageService.add({
             severity: 'success',
-            summary: 'Rescheduled',
-            detail: `${res.notifiedUserIds.length} attendee(s) notified.${res.warnings.length > 0 ? ' (still has conflicts)' : ''}`,
+            summary: this._translateService.instant('sessions.conflictDialog.rescheduled'),
+            detail: this._translateService.instant(
+              res.warnings.length > 0
+                ? 'sessions.conflictDialog.rescheduledStillConflicts'
+                : 'sessions.common.attendeesNotified',
+              { count: res.notifiedUserIds.length },
+            ),
           });
         },
         error: (err: unknown) => {
           this._setRowState(id, 'idle');
-          showApiError(this._msg, 'Reschedule failed', 'Please try again.', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('sessions.conflictDialog.rescheduleFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
+            err,
+          );
         },
       });
   }
 
   cancelOne(id: string): void {
     this._setRowState(id, 'busy');
-    this._svc
-      .cancelInstance(id, { scope: 'this' as const })
+    this._sessionService
+      .cancelInstance(id, { scope: CancelScope.This })
       .subscribe({
         next: (res) => {
           this._setRowState(id, 'done');
-          this._msg.add({
+          this._messageService.add({
             severity: 'success',
-            summary: 'Session cancelled',
-            detail: `${res.notifiedUserIds.length} attendee(s) notified.`,
+            summary: this._translateService.instant('sessions.common.sessionCancelled'),
+            detail: this._translateService.instant('sessions.common.attendeesNotified', {
+              count: res.notifiedUserIds.length,
+            }),
           });
         },
         error: (err: unknown) => {
           this._setRowState(id, 'idle');
-          showApiError(this._msg, 'Cancel failed', 'Please try again.', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('sessions.conflictDialog.cancelFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
+            err,
+          );
         },
       });
   }

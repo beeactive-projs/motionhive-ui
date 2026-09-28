@@ -38,8 +38,8 @@
   @if (event().ring === 'conflict') {
     <span
       class="mh-event-block__conflict-badge"
-      aria-label="Schedule conflict"
-      title="Schedule conflict"
+      [attr.aria-label]="'components.calendar.scheduleConflict' | translate"
+      [title]="'components.calendar.scheduleConflict' | translate"
     >!</span>
   }
 </div>

@@ -9,6 +9,7 @@ import {
   IonText,
   NavController,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, checkmarkCircleOutline, mailUnreadOutline } from 'ionicons/icons';
 
@@ -31,7 +32,7 @@ export type VerifyState = (typeof VerifyStates)[keyof typeof VerifyStates];
  */
 @Component({
   selector: 'mh-verify-email',
-  imports: [IonButton, IonContent, IonIcon, IonSpinner, IonText],
+  imports: [IonButton, IonContent, IonIcon, IonSpinner, IonText, TranslatePipe],
   templateUrl: './verify-email.html',
   styleUrl: './verify-email.scss',
 })
@@ -40,13 +41,14 @@ export class VerifyEmail implements OnInit {
   private readonly _navController = inject(NavController);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   readonly VerifyStates = VerifyStates;
 
   readonly state = signal<VerifyState>(VerifyStates.Verifying);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string>(
-    'Your email has been verified. Redirecting you to sign in…',
+    this._translateService.instant('auth.verifyEmail.successMessage'),
   );
 
   constructor() {
@@ -88,7 +90,7 @@ export class VerifyEmail implements OnInit {
           this.state.set(VerifyStates.Invalid);
           this.errorMessage.set(
             (err?.error?.message as string) ||
-              'This verification link is no longer valid. Request a new one and try again.',
+              this._translateService.instant('auth.verifyEmail.failedMessage'),
           );
         },
       });

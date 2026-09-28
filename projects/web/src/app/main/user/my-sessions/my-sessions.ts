@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -9,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -78,16 +78,17 @@ const VALID_TABS = new Set<string>(Object.values(MyTab));
     CancelBookingDialog,
     Badge,
     Popover,
+    TranslatePipe,
   ],
   providers: [SessionsMyStore, MessageService],
   templateUrl: './my-sessions.html',
   styleUrl: './my-sessions.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MySessions implements OnInit {
   protected readonly store = inject(SessionsMyStore);
   private readonly _bookings = inject(MyBookingsIndexStore);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
   protected readonly isTablet = injectIsTablet();
@@ -97,6 +98,7 @@ export class MySessions implements OnInit {
   // raw string literals (see CLAUDE.md).
   protected readonly SessionLocationKind = SessionLocationKind;
   protected readonly SessionType = SessionType;
+  protected readonly MyTab = MyTab;
 
   // Cancel-booking dialog state.
   protected readonly cancelOpen = signal(false);
@@ -250,7 +252,11 @@ export class MySessions implements OnInit {
 
   protected sessionTitle(p: SessionParticipant): string {
     const i = p.instance;
-    return i?.titleOverride ?? i?.template?.title ?? '(Session)';
+    return (
+      i?.titleOverride ??
+      i?.template?.title ??
+      this._translateService.instant('mySessions.common.untitled')
+    );
   }
 
   protected startAt(p: SessionParticipant): string | null {

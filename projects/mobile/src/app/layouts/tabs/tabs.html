@@ -8,7 +8,7 @@
     @for (tab of tabs(); track tab.id) {
       <ion-tab-button [tab]="tab.id">
         <ion-icon [name]="tab.icon" aria-hidden="true" />
-        <ion-label>{{ tab.label }}</ion-label>
+        <ion-label>{{ tab.label | translate }}</ion-label>
         @if (tab.badge; as unread) {
           @if (unread() > 0) {
             <ion-badge color="danger">{{ unread() }}</ion-badge>
@@ -21,7 +21,7 @@
          and the button lights up while you are in it. -->
     <ion-tab-button tab="more">
       <ion-icon name="menu-outline" aria-hidden="true" />
-      <ion-label>Menu</ion-label>
+      <ion-label>{{ 'nav.menu' | translate }}</ion-label>
       <!-- A dot, not a count: it only has to say "something is in here". -->
       @if (hasBillDue() || hasPendingRequests()) {
         <ion-badge color="danger" class="dot" [attr.aria-label]="moreDotLabel()"></ion-badge>

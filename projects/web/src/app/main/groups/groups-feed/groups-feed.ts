@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -11,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { take } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -33,11 +33,11 @@ import { DeletePostDialog } from '../_dialogs/delete-post-dialog/delete-post-dia
     ListEmptyState,
     CreatePostDialog,
     DeletePostDialog,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './groups-feed.html',
   styleUrl: './groups-feed.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupsFeed implements OnInit {
   private readonly _postService = inject(PostService);
@@ -46,6 +46,7 @@ export class GroupsFeed implements OnInit {
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   goToDiscover(): void {
     this._router.navigate(['../discover'], { relativeTo: this._route });
@@ -137,7 +138,12 @@ export class GroupsFeed implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        showApiError(this._messageService, 'Could not load feed', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.feedLoadFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -162,7 +168,7 @@ export class GroupsFeed implements OnInit {
           this.loadingMore.set(false);
           showApiError(
             this._messageService,
-            'Could not load more posts',
+            this._translateService.instant('groups.toast.postsLoadMoreFailed'),
             '',
             err,
           );

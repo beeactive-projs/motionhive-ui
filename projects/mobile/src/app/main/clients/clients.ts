@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   InfiniteScrollCustomEvent,
   IonBadge,
@@ -107,6 +108,7 @@ import { triageNote } from './roster-labels';
     OnTrackRow,
     RouterLink,
     SearchbarAutofocusDirective,
+    TranslatePipe,
   ],
   templateUrl: './clients.html',
   styleUrl: './clients.scss',
@@ -116,6 +118,7 @@ export class Clients implements ViewWillEnter {
   readonly store = inject(ClientsStore);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
 
   readonly Segments = ClientsSegments;
@@ -153,13 +156,18 @@ export class Clients implements ViewWillEnter {
 
   readonly archiveTitle = computed(() => {
     const client = this.archiving();
-    return `Archive ${client ? clientDisplayName(client) : 'this client'}?`;
+    return client
+      ? this._translateService.instant('clients.confirm.archive.title', {
+          name: clientDisplayName(client),
+        })
+      : this._translateService.instant('clients.confirm.archive.titleFallback');
   });
 
   readonly withdrawBody = computed(() => {
     const client = this.withdrawing();
-    const who = client ? clientDisplayName(client, 'this person') : 'this person';
-    return `${who} will no longer be able to accept it. You can invite them again later.`;
+    const fallback = this._translateService.instant('clients.thisPerson');
+    const who = client ? clientDisplayName(client, fallback) : fallback;
+    return this._translateService.instant('clients.confirm.withdraw.body', { name: who });
   });
 
   readonly isAttention = computed(() => this.store.segment() === ClientsSegments.Attention);
@@ -177,15 +185,18 @@ export class Clients implements ViewWillEnter {
   );
 
   /** Counts what is under it, so it still adds up while a search narrows. */
-  readonly onTrackNote = computed(() => {
-    const count = this.store.visibleOnTrackClients().length;
-    return `${count} ${count === 1 ? 'client' : 'clients'}`;
-  });
+  readonly onTrackNote = computed(() =>
+    this._translateService.instant('count.clients', {
+      count: this.store.visibleOnTrackClients().length,
+    }),
+  );
 
   /** The count lives in the label only — the dot itself says "some", never how many. */
   readonly requestsLabel = computed(() => {
     const count = this.store.pendingCount();
-    return count > 0 ? `Requests, ${count} pending` : 'Requests';
+    return count > 0
+      ? this._translateService.instant('clients.list.requestsPending', { count })
+      : this._translateService.instant('nav.requests');
   });
 
   /**
@@ -198,9 +209,16 @@ export class Clients implements ViewWillEnter {
    * list. This line keeps the scope on screen, and the chip clearable.
    */
   readonly searchScope = computed(() => {
-    const lens = this.isAttention() ? 'Needs attention' : 'All clients';
+    const lens = this._translateService.instant(
+      this.isAttention() ? 'clients.segments.attention' : 'clients.segments.all',
+    );
     const chip = this.filters.find((filter) => filter.id === this.store.filter());
-    return chip && chip.id !== ClientFilterIds.All ? `${lens} · ${chip.label}` : lens;
+    return chip && chip.id !== ClientFilterIds.All
+      ? this._translateService.instant('clients.list.searchScope', {
+          lens,
+          filter: this._translateService.instant(chip.label),
+        })
+      : lens;
   });
 
   /**
@@ -223,8 +241,8 @@ export class Clients implements ViewWillEnter {
     if (!narrowing || !this.store.searchSettled() || this.store.showSkeleton()) return '';
 
     const count = this.store.visibleCount();
-    if (count === 0) return 'No clients match that.';
-    return `${count} ${count === 1 ? 'client' : 'clients'}.`;
+    if (count === 0) return this._translateService.instant('clients.list.results.none');
+    return this._translateService.instant('clients.list.results.count', { count });
   });
 
   constructor() {
@@ -327,11 +345,14 @@ export class Clients implements ViewWillEnter {
       next: () => {
         this.notesSaving.set(false);
         this.notesOpen.set(false);
-        void this._feedbackService.success('Note saved');
+        void this._feedbackService.success(this._translateService.instant('clients.toast.noteSaved'));
       },
       error: (error: unknown) => {
         this.notesSaving.set(false);
-        void this._feedbackService.error(error, 'Could not save the note.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.noteFailed'),
+        );
       },
     });
   }
@@ -350,11 +371,14 @@ export class Clients implements ViewWillEnter {
       next: () => {
         this.archiveSaving.set(false);
         this.archiveOpen.set(false);
-        void this._feedbackService.success('Client archived');
+        void this._feedbackService.success(this._translateService.instant('clients.toast.archived'));
       },
       error: (error: unknown) => {
         this.archiveSaving.set(false);
-        void this._feedbackService.error(error, 'Could not archive this client.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.archiveFailed'),
+        );
       },
     });
   }
@@ -362,9 +386,15 @@ export class Clients implements ViewWillEnter {
   /** Restoring is its own undo, so no sheet — one swipe, done. */
   unarchive(client: InstructorClient): void {
     this.store.unarchive(client).subscribe({
-      next: () => void this._feedbackService.success('Client unarchived'),
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.unarchived'),
+        ),
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not unarchive this client.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.unarchiveFailed'),
+        ),
     });
   }
 
@@ -382,11 +412,16 @@ export class Clients implements ViewWillEnter {
       next: () => {
         this.withdrawSaving.set(false);
         this.withdrawOpen.set(false);
-        void this._feedbackService.success('Invitation withdrawn');
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.invitationWithdrawn'),
+        );
       },
       error: (error: unknown) => {
         this.withdrawSaving.set(false);
-        void this._feedbackService.error(error, 'Could not withdraw the invitation.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.withdrawFailed'),
+        );
       },
     });
   }

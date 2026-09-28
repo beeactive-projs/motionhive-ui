@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
+import { translate } from '../i18n/translator';
 import { HttpErrorInfo, ErrorDialogService } from '../services/error-dialog/error-dialog.service';
 import { friendlyStatusMessage } from '../utils/api-error.utils';
 import { isSilentRequest } from './silent-request.context';
@@ -20,24 +21,24 @@ function mapError(error: HttpErrorResponse): HttpErrorInfo {
 
   switch (status) {
     case 0:
-      return { status, title: 'No connection', message: friendlyStatusMessage(0)! };
+      return { status, title: translate('error.dialog.noConnection'), message: friendlyStatusMessage(0)! };
     case 403:
       return {
         status,
-        title: 'Access denied',
-        message: serverMessage ?? 'You do not have permission to do that.',
+        title: translate('error.dialog.accessDenied'),
+        message: serverMessage ?? translate('error.http.forbidden'),
       };
     case 404:
       return {
         status,
-        title: 'Not found',
-        message: serverMessage ?? 'What you asked for could not be found.',
+        title: translate('error.dialog.notFound'),
+        message: serverMessage ?? translate('error.http.notFound'),
       };
     case 409:
       return {
         status,
-        title: 'Cannot do that right now',
-        message: serverMessage ?? 'This clashes with something that already exists.',
+        title: translate('error.dialog.conflict'),
+        message: serverMessage ?? translate('error.http.conflict'),
       };
     case 500:
     case 502:
@@ -45,12 +46,16 @@ function mapError(error: HttpErrorResponse): HttpErrorInfo {
     case 504:
       // A 5xx body is written for logs, not for the person reading the
       // dialog — "Internal server error" tells them nothing they can act on.
-      return { status, title: 'Something went wrong', message: friendlyStatusMessage(status)! };
+      return {
+        status,
+        title: translate('error.dialog.generic'),
+        message: friendlyStatusMessage(status)!,
+      };
     default:
       return {
         status,
-        title: 'Something went wrong',
-        message: serverMessage ?? 'An unexpected error occurred. Please try again.',
+        title: translate('error.dialog.generic'),
+        message: serverMessage ?? translate('error.http.unexpected'),
       };
   }
 }

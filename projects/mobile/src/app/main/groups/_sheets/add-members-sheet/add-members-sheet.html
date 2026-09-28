@@ -1,5 +1,6 @@
 <ng-template #sticky>
-  <ion-searchbar placeholder="Search your clients" aria-label="Search your clients"
+  <ion-searchbar [placeholder]="'groups.addMembers.search' | translate"
+    [attr.aria-label]="'groups.addMembers.search' | translate"
     inputmode="search" [value]="query()" (ionInput)="onQuery($event.detail.value ?? '')" />
 </ng-template>
 
@@ -17,11 +18,11 @@
   </ion-list>
   } @else if (isEmpty()) {
   <!-- Either they have no clients yet, or every one of them is already in. -->
-  <mh-empty-state icon="people-outline" heading="Nobody left to add"
-    message="Everyone you coach is already in this group." />
+  <mh-empty-state icon="people-outline" [heading]="'groups.addMembers.empty.title' | translate"
+    [message]="'groups.addMembers.empty.message' | translate" />
   } @else if (isFilteredEmpty()) {
-  <mh-empty-state icon="search-outline" heading="Nobody matches"
-    message="No client matches that name." />
+  <mh-empty-state icon="search-outline" [heading]="'groups.common.nobodyMatches' | translate"
+    [message]="'groups.addMembers.noMatch' | translate" />
   } @else {
   <ion-list [inset]="true" class="mh-card-list">
     @for (client of visible(); track client.clientId; let last = $last) {
@@ -41,6 +42,7 @@
   }
 </ng-template>
 
-<mh-sheet-shell [(open)]="open" title="Add members" subtitle="From the people you coach"
+<mh-sheet-shell [(open)]="open" [title]="'groups.addMembers.title' | translate"
+  [subtitle]="'groups.addMembers.subtitle' | translate"
   [body]="body" [sticky]="sticky" [saveLabel]="saveLabel()" [canSave]="canSave()"
   [saving]="saving()" (save)="save()" />

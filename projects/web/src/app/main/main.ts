@@ -76,51 +76,52 @@ export class Main {
   // everyone, a "My training" group for the consumer self, and a "Coaching"
   // group only for instructors. Account/Billing/Notifications/Safety moved
   // out of the rail into the avatar menu (see ProfileMenu).
+  // Labels are translation keys; the sidenav translates them as it renders.
   readonly navSections = computed<ReadonlyArray<NavSection>>(() => {
     const sections: NavSection[] = [
       {
         label: '',
         items: [
-          { label: 'Home', route: '/home', icon: 'pi pi-home' },
+          { label: 'nav.home', route: '/home', icon: 'pi pi-home' },
           // Unified discovery hub — coaches, sessions, groups in one place.
           // Replaces the Explore stub and the old duplicate Fitness ▸ Discover.
-          { label: 'Discover', route: '/discover', icon: 'pi pi-compass' },
+          { label: 'nav.discover', route: '/discover', icon: 'pi pi-compass' },
           // Live unread badge wired straight to the store's signal — the
           // sidenav re-renders the pill without us touching the section array.
           {
-            label: 'Messages',
+            label: 'nav.messages',
             route: '/messages',
             icon: 'pi pi-comment',
             badge: this._messagingStore.unreadTotal,
           },
-          { label: 'Groups', route: '/groups', icon: 'pi pi-users' },
+          { label: 'nav.groups', route: '/groups', icon: 'pi pi-users' },
         ],
       },
       {
         // Tagged `train` → folds into the Coach/Train sidebar toggle for
         // instructors. Non-instructors have no `coach` section, so no toggle
         // renders and this just shows as their normal nav.
-        label: 'My training',
+        label: 'nav.myTraining',
         mode: 'train',
         items: [
-          { label: 'Sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
+          { label: 'nav.sessions', route: '/user/sessions', icon: 'pi pi-calendar-clock' },
           // One destination for your own training: Today / Plans /
           // History. It replaced three items that were one loop cut
           // into thirds — Progress was arithmetic over the very log
           // that Workouts listed, so they were the same data twice.
-          { label: 'Workouts', route: '/user/training', icon: 'pi pi-bolt' },
+          { label: 'nav.workouts', route: '/user/training', icon: 'pi pi-bolt' },
           // Plans is a first-class destination again — without a nav
           // entry, a client's assigned programme was only reachable
           // through the notification, and only until the notification
           // was dismissed.
-          { label: 'Plans', route: '/user/plans', icon: 'pi pi-list-check' },
+          { label: 'nav.plans', route: '/user/plans', icon: 'pi pi-list-check' },
         ],
       },
     ];
 
     if (this.isInstructor()) {
       sections.push({
-        label: 'Coaching',
+        label: 'nav.coaching',
         mode: 'coach',
         items: [
           // Overview pulled from the rail — the current dashboard is mostly
@@ -129,33 +130,33 @@ export class Main {
           // One destination for people. The roster (who is slipping) and
           // the directory (invite / notes / archive) are two lenses on
           // the same list, switched inside the page, not two nav items.
-          { label: 'Clients', route: '/coaching/clients', icon: 'pi pi-id-card' },
+          { label: 'nav.clients', route: '/coaching/clients', icon: 'pi pi-id-card' },
           // "Manage sessions" (not bare "Sessions") to disambiguate from the
           // trainee-side "Sessions" item in the My training section above.
-          { label: 'Manage sessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
-          { label: 'Programs', route: '/coaching/programs', icon: 'pi pi-objects-column' },
-          { label: 'Exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },
+          { label: 'nav.manageSessions', route: '/coaching/sessions', icon: 'pi pi-calendar' },
+          { label: 'nav.programs', route: '/coaching/programs', icon: 'pi pi-objects-column' },
+          { label: 'nav.exercises', route: '/coaching/exercises', icon: 'pi pi-bolt' },
           // Payments lives in Coaching now (the one-item "Revenue" group is gone).
-          { label: 'Payments', route: '/coaching/payments', icon: 'pi pi-credit-card' },
+          { label: 'nav.payments', route: '/coaching/payments', icon: 'pi pi-credit-card' },
         ],
       });
     }
 
     if (this.isSuperAdmin()) {
       sections.push({
-        label: 'Admin',
+        label: 'nav.admin',
         items: [
-          { label: 'Dashboard', route: '/super-admin/dashboard', icon: 'pi pi-objects-column' },
-          { label: 'Users', route: '/super-admin/users', icon: 'pi pi-users' },
-          { label: 'Groups', route: '/super-admin/groups', icon: 'pi pi-sitemap' },
+          { label: 'nav.dashboard', route: '/super-admin/dashboard', icon: 'pi pi-objects-column' },
+          { label: 'nav.users', route: '/super-admin/users', icon: 'pi pi-users' },
+          { label: 'nav.groups', route: '/super-admin/groups', icon: 'pi pi-sitemap' },
         ],
       });
     }
 
     if (this.isWriter()) {
       sections.push({
-        label: 'Content',
-        items: [{ label: 'Posts', route: '/writer/posts', icon: 'pi pi-book' }],
+        label: 'nav.content',
+        items: [{ label: 'nav.posts', route: '/writer/posts', icon: 'pi pi-book' }],
       });
     }
 

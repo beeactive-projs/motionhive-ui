@@ -1,5 +1,6 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { SessionInstance, formatSessionTime } from 'core';
 
@@ -41,11 +42,13 @@ interface RailBlock {
  */
 @Component({
   selector: 'mh-day-rail',
-  imports: [IonIcon],
+  imports: [IonIcon, TranslatePipe],
   templateUrl: './day-rail.html',
   styleUrl: './day-rail.scss',
 })
 export class DayRail {
+  private readonly _translateService = inject(TranslateService);
+
   readonly instances = input.required<SessionInstance[]>();
 
   readonly select = output<SessionInstance>();
@@ -138,7 +141,10 @@ export class DayRail {
         // Base tone, so an overlapping pair still reads as "1-on-1 against a
         // group class" while the ring says they clash. Two facts, two channels.
         tone: instanceBaseTone(instance),
-        title: instance.titleOverride ?? template?.title ?? 'Session',
+        title:
+          instance.titleOverride ??
+          template?.title ??
+          this._translateService.instant('common.session'),
         meta: `${formatSessionTime(instance.startAt)} · ${instanceMeta(instance)}`,
       };
     });

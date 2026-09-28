@@ -5,7 +5,7 @@
            the trailing ones archives. -->
       <ion-item-option color="primary" (click)="emitAndClose(sliding, message)">
         <ion-icon slot="top" name="chatbubble-outline" aria-hidden="true" />
-        Message
+        {{ 'clients.actions.message' | translate }}
       </ion-item-option>
     </ion-item-options>
   }
@@ -64,21 +64,21 @@
       @if (isActive()) {
         <ion-item-option color="medium" (click)="emitAndClose(sliding, notes)">
           <ion-icon slot="top" name="create-outline" aria-hidden="true" />
-          Notes
+          {{ 'clients.actions.notes' | translate }}
         </ion-item-option>
         <ion-item-option color="danger" (click)="emitAndClose(sliding, archive)">
           <ion-icon slot="top" name="archive-outline" aria-hidden="true" />
-          Archive
+          {{ 'button.archive' | translate }}
         </ion-item-option>
       } @else if (isArchived()) {
         <ion-item-option color="success" (click)="emitAndClose(sliding, unarchive)">
           <ion-icon slot="top" name="arrow-undo-outline" aria-hidden="true" />
-          Unarchive
+          {{ 'button.unarchive' | translate }}
         </ion-item-option>
       } @else {
         <ion-item-option color="danger" (click)="emitAndClose(sliding, withdraw)">
           <ion-icon slot="top" name="close-circle-outline" aria-hidden="true" />
-          Withdraw
+          {{ 'clients.actions.withdraw' | translate }}
         </ion-item-option>
       }
     </ion-item-options>

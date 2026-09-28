@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" />
     </ion-buttons>
-    <ion-title>Account</ion-title>
+    <ion-title>{{ 'nav.account' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -22,7 +22,7 @@
     } @else {
     <!-- Hero -->
     <div class="hero">
-      <button type="button" class="hero-avatar" aria-label="Change your photo" (click)="photoSheetOpen.set(true)">
+      <button type="button" class="hero-avatar" [attr.aria-label]="'account.hero.changePhoto' | translate" (click)="photoSheetOpen.set(true)">
         <mh-hex-avatar size="2xl" [name]="store.fullName()" [imageUrl]="store.avatarUrl()" />
       </button>
 
@@ -31,7 +31,7 @@
       @if (handle(); as tag) {
       <div class="hero-handle">
         <ion-note class="handle-chip">{{ '@' + tag }}</ion-note>
-        <ion-button fill="clear" size="small" aria-label="Copy profile link" (click)="copyHandle()">
+        <ion-button fill="clear" size="small" [attr.aria-label]="'account.hero.copyLink' | translate" (click)="copyHandle()">
           <ion-icon slot="icon-only" name="copy-outline" />
         </ion-button>
       </div>
@@ -39,11 +39,11 @@
 
       @if (isInstructor()) {
       <div class="hero-badges">
-        <ion-badge class="chip-info">Coach</ion-badge>
+        <ion-badge class="chip-info">{{ 'role.coach.label' | translate }}</ion-badge>
         @if (isVerified()) {
         <ion-badge class="chip-success">
           <ion-icon name="checkmark-circle" aria-hidden="true" />
-          Verified
+          {{ 'account.hero.verified' | translate }}
         </ion-badge>
         }
       </div>
@@ -51,23 +51,24 @@
 
       <div class="hero-actions">
         <ion-button expand="block" [disabled]="!handle()" (click)="openPublicProfile()">
-          View profile
+          {{ 'account.hero.viewProfile' | translate }}
         </ion-button>
         <ion-button expand="block" fill="outline" color="medium" [disabled]="!handle()"
           (click)="shareSheetOpen.set(true)">
-          Share
+          {{ 'button.share' | translate }}
         </ion-button>
       </div>
     </div>
 
     <!-- Profile -->
     <section class="mh-section">
-      <ion-note class="mh-kicker" color="medium">Profile</ion-note>
+      <ion-note class="mh-kicker" color="medium">{{ 'account.sections.profile' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
-        <mh-settings-row label="Profile" icon="person-outline" iconColor="primary" value="Name, photo, handle"
+        <mh-settings-row [label]="'account.rows.profile' | translate" icon="person-outline" iconColor="primary"
+          [value]="'account.rows.profileHint' | translate"
           (select)="go('profile')" />
         @if (isInstructor()) {
-        <mh-settings-row label="Coaching profile" icon="ribbon-outline" iconColor="info" iconTone="shade"
+        <mh-settings-row [label]="'account.rows.coachingProfile' | translate" icon="ribbon-outline" iconColor="info" iconTone="shade"
           [badge]="acceptingBadge()" (select)="go('coaching')" />
         }
       </ion-list>
@@ -75,19 +76,19 @@
 
     <!-- Preferences -->
     <section class="mh-section">
-      <ion-note class="mh-kicker" color="medium">Preferences</ion-note>
+      <ion-note class="mh-kicker" color="medium">{{ 'account.sections.preferences' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
         @if (isInstructor()) {
-        <mh-settings-row label="Switch role" icon="swap-horizontal-outline" iconColor="medium" [value]="roleLabel()"
+        <mh-settings-row [label]="'role.switch' | translate" icon="swap-horizontal-outline" iconColor="medium" [value]="roleLabel()"
           (select)="openSwitchRole()" />
         }
-        <mh-settings-row label="Notifications" icon="notifications-outline" iconColor="danger"
+        <mh-settings-row [label]="'nav.notifications' | translate" icon="notifications-outline" iconColor="danger"
           (select)="go('notifications')" />
-        <mh-settings-row label="Appearance" icon="color-palette-outline" iconColor="violet" [value]="themeLabel()"
+        <mh-settings-row [label]="'account.rows.appearance' | translate" icon="color-palette-outline" iconColor="violet" [value]="themeLabel()"
           (select)="go('manage')" />
-        <mh-settings-row label="Language" icon="language-outline" iconColor="medium" [value]="languageLabel()"
+        <mh-settings-row [label]="'form.label.language' | translate" icon="language-outline" iconColor="medium" [value]="languageLabel"
           (select)="go('manage')" />
-        <mh-settings-row label="Timezone" icon="time-outline" iconColor="medium" [value]="timezoneLabel()"
+        <mh-settings-row [label]="'form.label.timezone' | translate" icon="time-outline" iconColor="medium" [value]="timezoneLabel()"
           (select)="go('manage')" />
       </ion-list>
     </section>
@@ -95,24 +96,25 @@
     <!-- Privacy & account -->
     <section class="mh-section">
       <ion-note class="mh-kicker" color="medium">
-        Privacy &amp; account
+        {{ 'account.sections.privacy' | translate }}
       </ion-note>
       <ion-list [inset]="true" class="mh-card-list">
-        <mh-settings-row label="Blocked users" icon="ban-outline" iconColor="success" iconTone="shade"
+        <mh-settings-row [label]="'account.rows.blockedUsers' | translate" icon="ban-outline" iconColor="success" iconTone="shade"
           (select)="go('blocked')" />
-        <mh-settings-row label="Manage account" icon="log-in-outline" iconColor="dark" value="Log out, delete"
+        <mh-settings-row [label]="'account.rows.manageAccount' | translate" icon="log-in-outline" iconColor="dark"
+          [value]="'account.rows.manageAccountHint' | translate"
           (select)="go('manage')" />
       </ion-list>
     </section>
 
     <ion-list [inset]="true" class="mh-card-list">
-      <mh-settings-row label="Sign out" icon="log-out-outline" iconColor="danger" [detail]="false"
+      <mh-settings-row [label]="'button.signOut' | translate" icon="log-out-outline" iconColor="danger" [detail]="false"
         [disabled]="signingOut()" (select)="onSignOut()" />
     </ion-list>
 
     @if (memberSince(); as since) {
     <ion-text color="medium">
-      <p class="mh-footnote ion-text-center">Member since {{ since }}</p>
+      <p class="mh-footnote ion-text-center">{{ 'account.memberSince' | translate: { date: since } }}</p>
     </ion-text>
     }
     }

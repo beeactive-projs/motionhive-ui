@@ -6,20 +6,22 @@
   <!-- Header · back button + title + subtitle (mirrors the discover header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ inst?.titleOverride ??
           t?.title
-          ?? blocked?.template?.title ?? 'Session' }}</h1>
+          ?? blocked?.template?.title ?? ('common.session' | translate) }}</h1>
         @if (inst && t) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ inst.startAt | date: 'EEE d MMM y, HH:mm' }} · {{ t.durationMinutes }} min
+          {{ inst.startAt | date: 'EEE d MMM y, HH:mm' }} ·
+          {{ 'time.minutesShort' | translate: { minutes: t.durationMinutes } }}
         </p>
         } @else if (blocked?.template) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ blocked!.startAt | date: 'EEE d MMM y, HH:mm' }} · {{ blocked!.template.durationMinutes }} min
+          {{ blocked!.startAt | date: 'EEE d MMM y, HH:mm' }} ·
+          {{ 'time.minutesShort' | translate: { minutes: blocked!.template.durationMinutes } }}
         </p>
         }
       </div>
@@ -29,7 +31,7 @@
   <!-- States -->
   @if (loading() && !inst && !blocked) {
   <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
-    <i class="pi pi-spinner pi-spin"></i> Loading session…
+    <i class="pi pi-spinner pi-spin"></i> {{ 'mySessions.common.loadingSession' | translate }}
   </div>
   } @else if (error()) {
   <p-message severity="error" icon="pi pi-exclamation-triangle" [closable]="false" class="w-full">{{ error()
@@ -45,15 +47,16 @@
         </div>
         @if (blocked.instructor) {
         <p class="m-0 text-sm text-surface-500">
-          with <strong class="text-color">{{ blocked.instructor.firstName }} {{ blocked.instructor.lastName }}</strong>
+          {{ 'mySessions.showcase.with' | translate }}
+          <strong class="text-color">{{ blocked.instructor.firstName }} {{ blocked.instructor.lastName }}</strong>
         </p>
         }
         <div class="flex flex-col items-center text-center gap-2 py-10">
           <span class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-50 text-primary-700">
             <i class="pi pi-lock text-lg"></i>
           </span>
-          <strong class="text-base">Members only</strong>
-          <span class="text-sm text-surface-500 max-w-xs">Session details unlock when you join the group.</span>
+          <strong class="text-base">{{ 'mySessions.showcase.membersOnly' | translate }}</strong>
+          <span class="text-sm text-surface-500 max-w-xs">{{ 'mySessions.showcase.membersOnlyHint' | translate }}</span>
         </div>
       </div>
     </p-card>
@@ -61,10 +64,12 @@
     <p-card class="h-max shadow-md">
       <div class="flex flex-col gap-3">
         @if (blocked.template.groupId) {
-        <button pButton type="button" fluid (click)="goToGroup()"><i class="pi pi-users"></i> Request to join group</button>
+        <button pButton type="button" fluid (click)="goToGroup()">
+          <i class="pi pi-users"></i> {{ 'mySessions.showcase.requestToJoinGroup' | translate }}
+        </button>
         }
         <small class="text-center text-xs text-surface-500">
-          The coach will review group requests before granting access.
+          {{ 'mySessions.showcase.groupReviewHint' | translate }}
         </small>
       </div>
     </p-card>
@@ -81,7 +86,7 @@
           <mh-provider-chip [provider]="t.meetingProvider" />
           }
           @if (isFull()) {
-          <p-tag value="Full" severity="danger" class="text-xs!" icon="pi pi-times-circle" rounded />
+          <p-tag [value]="'mySessions.showcase.full' | translate" severity="danger" class="text-xs!" icon="pi pi-times-circle" rounded />
           }
         </div>
 
@@ -91,25 +96,25 @@
 
         <dl class="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt class="text-xs uppercase tracking-wide text-surface-500">Location</dt>
+            <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.location' | translate }}</dt>
             <dd class="mt-1 text-sm font-medium flex items-center gap-2">
               <i class="text-surface-500" [class]="isOnline() ? 'pi pi-video' : 'pi pi-map-marker'"
                 aria-hidden="true"></i>
-              {{ isOnline() ? 'Online' : 'In-person' }}
+              {{ (isOnline() ? 'enum.sessionLocationKind.ONLINE' : 'enum.sessionLocationKind.IN_PERSON') | translate }}
             </dd>
           </div>
           <div>
-            <dt class="text-xs uppercase tracking-wide text-surface-500">Duration</dt>
+            <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.duration' | translate }}</dt>
             <dd class="mt-1 text-sm font-medium flex items-center gap-2">
-              <i class="pi pi-clock text-surface-500" aria-hidden="true"></i>{{ t.durationMinutes }} min
+              <i class="pi pi-clock text-surface-500" aria-hidden="true"></i>
+              {{ 'time.minutesShort' | translate: { minutes: t.durationMinutes } }}
             </dd>
           </div>
           <div>
-            <dt class="text-xs uppercase tracking-wide text-surface-500">Cancellation</dt>
+            <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'mySessions.showcase.cancellation' | translate }}</dt>
             <dd class="mt-1 text-sm font-medium flex items-center gap-2">
-              <i class="pi pi-check-circle text-surface-500" aria-hidden="true"></i>Up to {{ t.cancellationCutoffHours
-              }}h
-              before
+              <i class="pi pi-check-circle text-surface-500" aria-hidden="true"></i>
+              {{ 'mySessions.showcase.cancellationValue' | translate: { hours: t.cancellationCutoffHours } }}
             </dd>
           </div>
         </dl>
@@ -123,7 +128,7 @@
         <div class="flex items-center gap-3">
           <mh-avatar [user]="inst.instructor" size="large" />
           <div>
-            <span class="block text-xs uppercase tracking-wide text-surface-500">Coach</span>
+            <span class="block text-xs uppercase tracking-wide text-surface-500">{{ 'nav.coach' | translate }}</span>
             <span class="text-sm font-medium">{{ inst.instructor.firstName }} {{ inst.instructor.lastName }}</span>
           </div>
         </div>
@@ -136,9 +141,9 @@
       @let booking = myBooking();
       <div class="flex flex-col gap-4">
         <div class="flex items-baseline justify-between">
-          <span class="text-sm text-surface-500">Price</span>
+          <span class="text-sm text-surface-500">{{ 'form.label.price' | translate }}</span>
           @if (isFree()) {
-          <span class="font-heading font-semibold text-lg text-green-600">Free</span>
+          <span class="font-heading font-semibold text-lg text-green-600">{{ 'mySessions.common.free' | translate }}</span>
           } @else {
           <span class="font-heading font-semibold text-lg">{{ priceCents() | currencyRon: currency() }}</span>
           }
@@ -149,54 +154,64 @@
           <span class="flex flex-col">
             <strong>
               @switch (booking.status) {
-              @case (ParticipantStatuses.Confirmed) { You're booked }
-              @case (ParticipantStatuses.PendingApproval) { Pending coach approval }
-              @case (ParticipantStatuses.Waitlisted) { You're on the waitlist }
-              @default { Booked }
+              @case (ParticipantStatuses.Confirmed) { {{ 'mySessions.showcase.status.confirmed' | translate }} }
+              @case (ParticipantStatuses.PendingApproval) { {{ 'mySessions.showcase.status.pending' | translate }} }
+              @case (ParticipantStatuses.Waitlisted) { {{ 'mySessions.showcase.status.waitlisted' | translate }} }
+              @default { {{ 'mySessions.common.booked' | translate }} }
               }
             </strong>
-            <small class="text-surface-500">Booked {{ booking.bookedAt | date: 'd MMM' }}</small>
+            <small class="text-surface-500">
+              {{ 'mySessions.common.bookedOn' | translate: { date: (booking.bookedAt | date: 'd MMM') } }}
+            </small>
           </span>
         </p-message>
-        <button pButton type="button" fluid (click)="goToMySessions()"><i class="pi pi-arrow-right"></i> Go to Sessions</button>
+        <button pButton type="button" fluid (click)="goToMySessions()">
+          <i class="pi pi-arrow-right"></i> {{ 'mySessions.common.goToSessions' | translate }}
+        </button>
         @if (canCancelBooking()) {
         <button pButton type="button" severity="danger" [outlined]="true" fluid (click)="cancelOpen.set(true)">
           <i class="pi pi-times"></i>
-          Cancel booking
+          {{ 'mySessions.common.cancelBooking' | translate }}
         </button>
         }
         } @else if (isPast()) {
         <p-message severity="secondary" icon="pi pi-history" [closable]="false" class="w-full">
           <span class="flex flex-col">
-            <strong>This session has already started</strong>
-            <small class="text-surface-500">Bookings are closed.</small>
+            <strong>{{ 'mySessions.showcase.alreadyStarted' | translate }}</strong>
+            <small class="text-surface-500">{{ 'mySessions.showcase.bookingsClosed' | translate }}</small>
           </span>
         </p-message>
         } @else if (isFull()) {
         <p-message severity="warn" icon="pi pi-clock" [closable]="false" class="w-full">
           <span class="flex flex-col">
-            <strong>Session is full · {{ inst.confirmedCount }} / {{ cap() }}</strong>
+            <strong>
+              {{ 'mySessions.showcase.fullTitle' | translate: { confirmed: inst.confirmedCount, capacity: cap() } }}
+            </strong>
             @if (waitlistEnabled()) {
-            <small class="text-surface-500">Join the waitlist — you'll get a notification if a spot opens.</small>
+            <small class="text-surface-500">{{ 'mySessions.showcase.waitlistHint' | translate }}</small>
             } @else {
-            <small class="text-surface-500">This session is full and the waitlist is closed.</small>
+            <small class="text-surface-500">{{ 'mySessions.showcase.waitlistClosed' | translate }}</small>
             }
           </span>
         </p-message>
         @if (waitlistEnabled()) {
-        <button pButton type="button" fluid (click)="bookOpen.set(true)"><i class="pi pi-clock"></i> Join waitlist</button>
+        <button pButton type="button" fluid (click)="bookOpen.set(true)">
+          <i class="pi pi-clock"></i> {{ 'mySessions.showcase.joinWaitlist' | translate }}
+        </button>
         } @else {
-        <button pButton type="button" severity="secondary" [disabled]="true" fluid><i class="pi pi-times"></i> Session full</button>
+        <button pButton type="button" severity="secondary" [disabled]="true" fluid>
+          <i class="pi pi-times"></i> {{ 'mySessions.showcase.sessionFull' | translate }}
+        </button>
         }
         } @else {
         <button pButton type="button" [disabled]="!canBook()" fluid (click)="bookOpen.set(true)">
           <i class="pi pi-bookmark"></i>
-          {{ t.approvalRequired ? 'Request to join' : 'Book' }}
+          {{ (t.approvalRequired ? 'mySessions.common.requestToJoin' : 'mySessions.common.book') | translate }}
         </button>
         }
 
         <small class="text-center text-xs text-surface-500">
-          Cancel up to {{ t.cancellationCutoffHours }}h before the session starts.
+          {{ 'mySessions.showcase.cancelHint' | translate: { hours: t.cancellationCutoffHours } }}
         </small>
       </div>
     </p-card>
