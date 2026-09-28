@@ -2,7 +2,7 @@
 <div class="flex justify-end mb-4">
   <button pButton type="button" size="small" [outlined]="true" (click)="openCustomerPortal()" [disabled]="portalLoading()">
     <i class="pi" [class]="portalLoading() ? 'pi-spinner pi-spin' : 'pi-cog'"></i>
-    Manage billing
+    {{ 'billing.mySubscriptions.manageBilling' | translate }}
   </button>
 </div>
 
@@ -11,8 +11,9 @@
   <div class="flex items-start gap-3">
     <i class="pi pi-info-circle text-xl text-primary-500"></i>
     <div class="text-sm text-surface-600 dark:text-surface-300">
-      Use <strong>Manage billing</strong> to update your payment method, view payment history, or download receipts.
-      You can cancel a membership directly below.
+      {{ 'billing.mySubscriptions.info.before' | translate }}
+      <strong>{{ 'billing.mySubscriptions.manageBilling' | translate }}</strong>
+      {{ 'billing.mySubscriptions.info.after' | translate }}
     </div>
   </div>
 </p-card>
@@ -20,16 +21,17 @@
 <!-- Table -->
 <p-table [value]="subscriptions()" [lazy]="true" [paginator]="true" [rows]="rows" [totalRecords]="totalRecords()"
   [loading]="loading()" (onLazyLoad)="onPageChange($event)" [rowTrackBy]="trackById" size="small"
-  [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} subscriptions">
+  [showCurrentPageReport]="true"
+  [currentPageReportTemplate]="'billing.mySubscriptions.pageReport' | translate: pageReportParams">
 
   <ng-template #header>
     <tr>
-      <th>Plan</th>
-      <th class="text-end">Amount</th>
-      <th class="text-center">Status</th>
-      <th class="text-center">Current period</th>
-      <th class="text-center">Renews</th>
-      <th class="text-end">Actions</th>
+      <th>{{ 'billing.mySubscriptions.plan' | translate }}</th>
+      <th class="text-end">{{ 'form.label.amount' | translate }}</th>
+      <th class="text-center">{{ 'form.label.status' | translate }}</th>
+      <th class="text-center">{{ 'billing.mySubscriptions.currentPeriod' | translate }}</th>
+      <th class="text-center">{{ 'billing.mySubscriptions.renews' | translate }}</th>
+      <th class="text-end">{{ 'common.actions' | translate }}</th>
     </tr>
   </ng-template>
 
@@ -38,9 +40,9 @@
       <td class="font-medium">{{ planLabel(sub) }}</td>
       <td class="text-end tabular-nums">{{ sub.amountCents | currencyRon:sub.currency }}</td>
       <td class="text-center">
-        <p-tag [value]="sub.status | statusLabel" [severity]="statusSeverity(sub.status)" />
+        <p-tag [value]="sub.status | statusLabel: 'subscriptionStatus'" [severity]="statusSeverity(sub.status)" />
         @if (sub.cancelAt) {
-          <div class="text-xs text-surface-500 mt-1">cancels {{ sub.cancelAt | date:'dd MMM yyyy' }}</div>
+          <div class="text-xs text-surface-500 mt-1">{{ 'billing.mySubscriptions.cancelsOn' | translate: { date: (sub.cancelAt | date:'dd MMM yyyy') } }}</div>
         }
       </td>
       <td class="text-center text-sm">
@@ -50,7 +52,7 @@
           <span class="text-surface-500">—</span>
         }
         @if (sub.trialEnd) {
-          <div class="text-xs text-surface-500">Trial until {{ sub.trialEnd | date:'dd MMM yyyy' }}</div>
+          <div class="text-xs text-surface-500">{{ 'billing.mySubscriptions.trialUntil' | translate: { date: (sub.trialEnd | date:'dd MMM yyyy') } }}</div>
         }
       </td>
       <td class="text-center text-sm">
@@ -67,13 +69,13 @@
             size="small"
             severity="danger"
             [text]="true"
-            pTooltip="You'll keep access until the end of the current period"
+            [pTooltip]="'billing.mySubscriptions.cancelTooltip' | translate"
             tooltipPosition="left"
             [disabled]="(cancellingId() !== null) || cancellingId() === sub.id"
             (click)="confirmCancel(sub)"
           >
             <i class="pi" [class]="cancellingId() === sub.id ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-            Cancel
+            {{ 'button.cancel' | translate }}
           </button>
         }
       </td>
@@ -93,7 +95,7 @@
   <ng-template #emptymessage>
     <tr>
       <td colspan="6">
-        <mh-list-empty-state icon="pi pi-sync" title="No subscriptions" />
+        <mh-list-empty-state icon="pi pi-sync" [title]="'billing.mySubscriptions.empty' | translate" />
       </td>
     </tr>
   </ng-template>

@@ -4,43 +4,43 @@
       @switch (state()) {
         @case ('loading') {
           <p-progress-spinner styleClass="w-16 h-16" />
-          <h2 class="font-heading font-semibold text-xl m-0">Processing your payment...</h2>
+          <h2 class="font-heading font-semibold text-xl m-0">{{ 'billing.checkoutReturn.loading.title' | translate }}</h2>
           <p class="text-sm text-surface-500">
-            This may take a few seconds. Please don't close this window.
+            {{ 'billing.checkoutReturn.loading.body' | translate }}
           </p>
         }
         @case ('paid') {
           <div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
             <i class="pi pi-check text-3xl text-green-600 dark:text-green-400"></i>
           </div>
-          <h2 class="font-heading font-semibold text-xl m-0">Payment successful</h2>
+          <h2 class="font-heading font-semibold text-xl m-0">{{ 'billing.checkoutReturn.paid.title' | translate }}</h2>
           <p class="text-sm text-surface-500">
-            Your invoice has been paid. A receipt will be sent to your email.
+            {{ 'billing.checkoutReturn.paid.body' | translate }}
           </p>
-          <button pButton type="button" (click)="goToInvoices()"><i class="pi pi-file"></i> View my invoices</button>
+          <button pButton type="button" (click)="goToInvoices()"><i class="pi pi-file"></i> {{ 'billing.checkoutReturn.viewInvoices' | translate }}</button>
         }
         @case ('pending') {
           <div class="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
             <i class="pi pi-clock text-3xl text-orange-600 dark:text-orange-400"></i>
           </div>
-          <h2 class="font-heading font-semibold text-xl m-0">Payment processing</h2>
+          <h2 class="font-heading font-semibold text-xl m-0">{{ 'billing.checkoutReturn.pending.title' | translate }}</h2>
           <p class="text-sm text-surface-500">
-            Your payment is still processing. We'll update your invoice status shortly.
+            {{ 'billing.checkoutReturn.pending.body' | translate }}
           </p>
           <button pButton type="button" severity="secondary" [outlined]="true" (click)="goToInvoices()">
             <i class="pi pi-file"></i>
-            View my invoices
+            {{ 'billing.checkoutReturn.viewInvoices' | translate }}
           </button>
         }
         @case ('error') {
           <div class="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
             <i class="pi pi-times text-3xl text-red-600 dark:text-red-400"></i>
           </div>
-          <h2 class="font-heading font-semibold text-xl m-0">Something went wrong</h2>
+          <h2 class="font-heading font-semibold text-xl m-0">{{ 'error.dialog.generic' | translate }}</h2>
           <p class="text-sm text-surface-500">
-            We couldn't verify your payment. Please check your invoices.
+            {{ 'billing.checkoutReturn.error.body' | translate }}
           </p>
-          <button pButton type="button" (click)="goToInvoices()"><i class="pi pi-file"></i> View my invoices</button>
+          <button pButton type="button" (click)="goToInvoices()"><i class="pi pi-file"></i> {{ 'billing.checkoutReturn.viewInvoices' | translate }}</button>
         }
       }
     </div>

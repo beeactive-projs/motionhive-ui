@@ -38,6 +38,7 @@
     "decline": "Decline",
     "delete": "Delete",
     "discard": "Discard",
+    "dismiss": "Dismiss",
     "done": "Done",
     "duplicate": "Duplicate",
     "edit": "Edit",
@@ -86,7 +87,9 @@
     "filtersCount": "Filters · {count}",
     "loading": "Loading…",
     "none": "None",
+    "oneOff": "One-off",
     "or": "or",
+    "paginator": "View {first} - {last} of {total}",
     "pleaseTryAgain": "Please try again.",
     "session": "Session",
     "someone": "Someone",
@@ -158,6 +161,13 @@
       "MODERATOR": "Moderator",
       "OWNER": "Owner"
     },
+    "invoiceStatus": {
+      "draft": "Draft",
+      "open": "Open",
+      "paid": "Paid",
+      "uncollectible": "Uncollectible",
+      "void": "Void"
+    },
     "joinPolicy": {
       "APPROVAL": "Approval",
       "INVITE_ONLY": "Invite only",
@@ -169,6 +179,13 @@
       "pendingApproval": "Pending",
       "upcoming": "Upcoming",
       "waitlisted": "Waitlisted"
+    },
+    "paymentStatus": {
+      "failed": "Failed",
+      "partially_refunded": "Partially refunded",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "succeeded": "Succeeded"
     },
     "pendingClient": {
       "EMAIL_SENT": "Email sent",
@@ -186,6 +203,11 @@
       "COMPLETED": "Completed",
       "PAUSED": "Paused",
       "PENDING": "Pending"
+    },
+    "refundReason": {
+      "duplicate": "Duplicate",
+      "fraudulent": "Fraudulent",
+      "requested_by_customer": "Requested by customer"
     },
     "sessionAccess": {
       "CLIENTS_ONLY": "Clients only",
@@ -229,6 +251,24 @@
       "GROUP": "Group",
       "OPEN": "Open",
       "PRIVATE": "1-on-1"
+    },
+    "stripeAccountStatus": {
+      "ACTIVE": "Active",
+      "DISCONNECTED": "Disconnected",
+      "NOT_STARTED": "Not started",
+      "PENDING": "Pending",
+      "RESTRICTED": "Restricted"
+    },
+    "subscriptionStatus": {
+      "active": "Active",
+      "canceled": "Canceled",
+      "incomplete": "Incomplete",
+      "incomplete_expired": "Incomplete expired",
+      "incomplete_payment_failed": "Incomplete payment failed",
+      "past_due": "Past due",
+      "paused": "Paused",
+      "trialing": "Trialing",
+      "unpaid": "Unpaid"
     },
     "templateTab": {
       "active": "Upcoming",
@@ -283,12 +323,14 @@
       "reenterPassword": "Re-enter your password"
     },
     "label": {
+      "amount": "Amount",
       "city": "City",
       "confirmPassword": "Confirm password",
       "country": "Country",
       "currency": "Currency",
       "date": "Date",
       "description": "Description",
+      "dueDate": "Due date",
       "duration": "Duration",
       "email": "Email",
       "endDate": "End date",
@@ -388,11 +430,13 @@
       "earlierThisWeek": "Earlier this week",
       "thisWeek": "This week"
     },
+    "cadence": "{interval, select, day {{count, plural, one {daily} other {every # days}}} week {{count, plural, one {weekly} other {every # weeks}}} month {{count, plural, one {monthly} other {every # months}}} year {{count, plural, one {yearly} other {every # years}}} other {}}",
     "durationMinutes": "{minutes}min",
     "inHours": "in {hours} h",
     "inMinutes": "in {minutes} min",
     "minutesShort": "{minutes} min",
     "now": "now",
+    "perInterval": "{interval, select, day {{count, plural, one {/ day} other {/ # days}}} week {{count, plural, one {/ week} other {/ # weeks}}} month {{count, plural, one {/ month} other {/ # months}}} year {{count, plural, one {/ year} other {/ # years}}} other {}}",
     "startingNow": "starting now",
     "today": "Today",
     "todayWithDate": "Today · {date}",

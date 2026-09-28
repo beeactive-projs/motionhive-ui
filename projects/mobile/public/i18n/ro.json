@@ -691,7 +691,6 @@
       "placeholderGeneric": "Mesaj…"
     },
     "composer": {
-      "dismissError": "Închide",
       "sendingPaused": "Trimitere în pauză",
       "tooLong": "Mesajul e prea lung. Scurtează-l și încearcă din nou."
     },
@@ -909,6 +908,203 @@
       "cancelledWithin": "Rezervare anulată — fără costuri.",
       "copyFailed": "Linkul nu a putut fi copiat.",
       "linkFailed": "Linkul întâlnirii nu a putut fi obținut."
+    }
+  },
+  "payments": {
+    "badge": {
+      "overdue": "Restantă"
+    },
+    "client": {
+      "detail": {
+        "checking": "Verificăm cu Stripe…",
+        "handoff": "Plata se face pe pagina securizată Stripe. Revino aici când ai terminat și o confirmăm.",
+        "paidBody": "{name} a fost anunțat. Nu mai ai nimic de făcut.",
+        "paidTitle": "Plata ta a reușit",
+        "pay": "Plătește pe Stripe",
+        "payAmount": "Plătește {amount} {currency} pe Stripe",
+        "unfinishedBody": "Dacă ai plătit, statusul se actualizează singur în câteva minute. Poți încerca din nou fără grijă.",
+        "unfinishedTitle": "Din ce vedem, nu ți s-a retras nimic"
+      },
+      "dueNow": "De plată acum",
+      "empty": {
+        "message": "Când un antrenor îți trimite o factură, apare aici.",
+        "title": "Nicio factură"
+      },
+      "memberships": {
+        "cancel": "Anulează abonamentul",
+        "emptyMessage": "Planurile recurente la care te abonezi apar aici.",
+        "emptyTitle": "Niciun abonament",
+        "endsOn": "Se încheie pe {date}",
+        "paymentOverdue": "Plată restantă",
+        "perInterval": "/ {interval, select, day {zi} week {săptămână} month {lună} year {an} other {{interval}}}",
+        "renewsOn": "Se reînnoiește pe {date}"
+      },
+      "paymentMethods": "Metode de plată",
+      "sections": {
+        "paid": "Plătite"
+      }
+    },
+    "coach": {
+      "createInvoice": "Creează factură",
+      "earnings": {
+        "available": "{amount} disponibil",
+        "open": "{count, plural, one {# deschisă} few {# deschise} other {# deschise}}",
+        "openOverdue": "{open, plural, one {# deschisă} few {# deschise} other {# deschise}} · {overdue, plural, one {# restantă} few {# restante} other {# restante}}",
+        "outstanding": "De încasat",
+        "thisMonth": "Luna aceasta"
+      },
+      "empty": {
+        "message": "Facturează un client pentru o sesiune sau un pachet de antrenamente.",
+        "title": "Nicio factură încă"
+      },
+      "memberships": {
+        "message": "Deocamdată, planurile recurente pe care le vinzi se gestionează acolo.",
+        "title": "Abonamentele sunt pe web"
+      },
+      "sections": {
+        "overdue": "Restante",
+        "rest": "Restul"
+      }
+    },
+    "confirm": {
+      "cancelMembership": {
+        "body": "Păstrezi accesul până la sfârșitul perioadei deja plătite. După aceea nu se mai percepe nimic.",
+        "confirm": "Anulează abonamentul",
+        "title": "Anulezi abonamentul?"
+      },
+      "deleteDraft": {
+        "body": "Ciorna este eliminată. Clientul nu a primit nimic.",
+        "confirm": "Șterge ciorna",
+        "title": "Ștergi ciorna?"
+      },
+      "keepIt": "Păstrează",
+      "markPaid": {
+        "body": "Folosește asta când clientul te-a plătit direct — numerar sau transfer bancar. Stripe o înregistrează ca plătită în afara platformei.",
+        "confirm": "Marchează plătită",
+        "title": "Marchezi ca plătită?"
+      },
+      "refund": {
+        "body": "Toată suma se întoarce pe cardul clientului. Fereastra de rambursare Stripe este de 14 zile de la plată.",
+        "confirm": "Rambursează",
+        "title": "Rambursezi plata?",
+        "windowClosed": "Fereastra de rambursare de 14 zile pentru această plată s-a închis. Rambursările ulterioare se fac din dashboard-ul Stripe."
+      },
+      "send": {
+        "body": "Factura se finalizează și primește pagina de plată și PDF-ul. Stripe o trimite clientului pe email.",
+        "confirm": "Trimite",
+        "irreversible": "O factură trimisă nu mai poate fi editată — doar anulată.",
+        "title": "Trimiți factura?"
+      },
+      "void": {
+        "body": "Clientul nu o mai poate plăti și nu mai intră în suma care ți se datorează.",
+        "confirm": "Anulează factura",
+        "title": "Anulezi factura?"
+      }
+    },
+    "create": {
+      "addLine": "Adaugă încă un articol",
+      "billing": "Factură pentru",
+      "chooseClient": "Alege un client",
+      "createAndSend": "Creează și trimite",
+      "descriptionPlaceholder": "Sesiune de antrenament personal",
+      "dueDate": "Scadență (opțional)",
+      "fewer": "Mai puțin",
+      "more": "Mai mult",
+      "noClients": "Nu ai încă clienți activi. Facturile merg la persoanele pe care le antrenezi deja.",
+      "saveDraft": "Salvează ciorna",
+      "sections": {
+        "due": "Scadența",
+        "whatFor": "Pentru ce",
+        "who": "Cui"
+      },
+      "sendNote": "Trimiterea finalizează factura, iar Stripe o trimite clientului pe email.",
+      "title": "Factură nouă",
+      "total": "Total"
+    },
+    "detail": {
+      "actions": {
+        "deleteDraft": "Șterge ciorna",
+        "markPaid": "Marchează plătită",
+        "refund": "Rambursează",
+        "send": "Trimite clientului",
+        "void": "Anulează"
+      },
+      "billedTo": "Facturat către",
+      "document": "Document",
+      "due": "Scadență",
+      "from": "De la",
+      "invoicePdf": "Factură (PDF)",
+      "items": "Articole",
+      "kicker": {
+        "amountDue": "Sumă de plată",
+        "paid": "Plătit"
+      },
+      "loadError": "Factura nu a putut fi încărcată",
+      "openPdf": "Deschide PDF-ul",
+      "paidOn": "Plătită pe",
+      "partial": "{paid} plătit · {remaining} rămas",
+      "receiptPdf": "Chitanță (PDF)",
+      "title": "Factură",
+      "wasDue": "Scadența era"
+    },
+    "facts": {
+      "accessUntil": "Acces până la",
+      "daysLeft": "{count, plural, one {# zi rămasă} few {# zile rămase} other {# de zile rămase}}",
+      "endOfPeriod": "sfârșitul acestei perioade",
+      "from": "De la",
+      "plan": "Plan",
+      "to": "Către",
+      "windowCloses": "Fereastra se închide"
+    },
+    "fallback": {
+      "client": "Client",
+      "invoice": "Factură",
+      "item": "Articol",
+      "membership": "Abonament",
+      "yourCoach": "Antrenorul tău"
+    },
+    "gate": {
+      "alreadyDone": "Am făcut deja asta",
+      "connect": {
+        "action": "Conectează Stripe",
+        "body": "Facturile și plățile trec prin Stripe. Configurarea durează câteva minute și se deschide în afara aplicației.",
+        "title": "Conectează Stripe ca să fii plătit"
+      },
+      "needsMore": {
+        "action": "Continuă verificarea",
+        "body": "Contul tău e configurat, dar Stripe mai așteaptă câteva detalii înainte să poți primi plăți.",
+        "title": "Stripe mai are nevoie de câteva detalii"
+      }
+    },
+    "list": {
+      "loadError": "Facturile nu au putut fi încărcate"
+    },
+    "row": {
+      "due": "Scadență {date}",
+      "paidOn": "Plătită {date}",
+      "wasDue": "Scadentă din {date}"
+    },
+    "segment": {
+      "invoices": "Facturi",
+      "memberships": "Abonamente"
+    },
+    "toast": {
+      "actionFailed": "Acțiunea nu a reușit.",
+      "cancelMembershipFailed": "Abonamentul nu a putut fi anulat.",
+      "createFailed": "Factura nu a putut fi creată.",
+      "draftSaved": "Ciornă salvată",
+      "invoiceSent": "Factură trimisă",
+      "markedPaid": "Marcată ca plătită",
+      "membershipCanceled": "Abonamentul se încheie la sfârșitul perioadei",
+      "noPaymentToRefund": "Nu am găsit nicio plată de rambursat pentru această factură.",
+      "onboardingFailed": "Nu am putut deschide configurarea Stripe.",
+      "payFailed": "Nu am putut deschide pagina de plată.",
+      "paymentNotFound": "Nu am găsit plata.",
+      "portalFailed": "Nu am putut deschide setările de plată.",
+      "refundFailed": "Rambursarea nu a putut fi emisă.",
+      "refunded": "Rambursare emisă",
+      "sent": "Trimisă clientului",
+      "voided": "Factură anulată"
     }
   },
   "role": {

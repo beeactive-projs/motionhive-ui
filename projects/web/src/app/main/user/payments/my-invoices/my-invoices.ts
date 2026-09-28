@@ -1,12 +1,12 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -17,6 +17,7 @@ import {
   ClientPaymentService,
   InvoiceStatuses,
   CurrencyRonPipe,
+  EnumLabelPipe,
   StatusLabelPipe,
   getInvoiceStatusSeverity,
   type Invoice,
@@ -29,23 +30,25 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   imports: [
     DatePipe,
     RouterLink,
+    TranslatePipe,
     ButtonDirective,
     TableModule,
     TagModule,
     SkeletonModule,
     ToastModule,
     CurrencyRonPipe,
+    EnumLabelPipe,
     StatusLabelPipe,
     ListEmptyState,
   ],
   providers: [MessageService],
   templateUrl: './my-invoices.html',
   styleUrl: './my-invoices.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyInvoices implements OnInit {
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   invoices = signal<Invoice[]>([]);
   totalRecords = signal(0);
@@ -54,12 +57,16 @@ export class MyInvoices implements OnInit {
   readonly rows = 10;
   currentPage = signal(1);
 
+  /** PrimeNG fills these placeholders itself, so the message keeps them literal. */
+  readonly pageReportParams = { first: '{first}', last: '{last}', totalRecords: '{totalRecords}' };
+
   statusFilter = signal<InvoiceStatus | undefined>(undefined);
-  readonly statusOptions: { label: string; value: InvoiceStatus | undefined }[] = [
-    { label: 'All', value: undefined },
-    { label: 'Open', value: InvoiceStatuses.Open },
-    { label: 'Paid', value: InvoiceStatuses.Paid },
-    { label: 'Void', value: InvoiceStatuses.Void },
+  /** `undefined` = no filter ("All"); the template labels the rest via `enumLabel`. */
+  readonly statusOptions: (InvoiceStatus | undefined)[] = [
+    undefined,
+    InvoiceStatuses.Open,
+    InvoiceStatuses.Paid,
+    InvoiceStatuses.Void,
   ];
 
   ngOnInit(): void {
@@ -84,8 +91,8 @@ export class MyInvoices implements OnInit {
           this.loading.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load invoices',
+            summary: this._translateService.instant('toast.summary.error'),
+            detail: this._translateService.instant('billing.myInvoices.toast.loadFailed'),
           });
         },
       });

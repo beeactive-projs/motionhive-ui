@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonDirective } from 'primeng/button';
@@ -8,9 +9,8 @@ import { StripeOnboardingService, deriveStripeAccountStatus, StripeAccountStatus
 
 @Component({
   selector: 'mh-onboarding-return',
-  imports: [CardModule, ProgressSpinnerModule, ButtonDirective, TagModule],
+  imports: [CardModule, ProgressSpinnerModule, ButtonDirective, TagModule, TranslatePipe],
   templateUrl: './onboarding-return.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingReturn implements OnInit, OnDestroy {
   private readonly _onboardingService = inject(StripeOnboardingService);

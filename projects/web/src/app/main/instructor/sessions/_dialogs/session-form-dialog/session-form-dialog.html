@@ -327,7 +327,7 @@
       </header>
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
-          <label>{{ 'sessions.formDialog.amount' | translate }}</label>
+          <label>{{ 'form.label.amount' | translate }}</label>
           <p-inputnumber
             [ngModel]="form().priceAmountCents / 100"
             (ngModelChange)="updateField('priceAmountCents', ($event ?? 0) * 100)"

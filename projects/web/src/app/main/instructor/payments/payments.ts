@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,12 +7,14 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   CurrencyRonPipe,
   EarningsService,
   StripeOnboardingService,
   StripeOnboardingStore,
   injectIsTabletDown,
+  showApiError,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -57,11 +58,11 @@ const VALID_TABS = new Set<string>(Object.values(PaymentTabs));
     Products,
     CreateInvoiceDialog,
     NgTemplateOutlet,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './payments.html',
   styleUrl: './payments.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Payments {
   private readonly _route = inject(ActivatedRoute);
@@ -70,6 +71,7 @@ export class Payments {
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _reloadSummary$ = new Subject<void>();
 
@@ -145,11 +147,12 @@ export class Payments {
           },
           error: (err) => {
             this.dashboardLoading.set(false);
-            this._messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: err.error?.message || 'Failed to start onboarding',
-            });
+            showApiError(
+              this._messageService,
+              this._translateService.instant('toast.summary.error'),
+              this._translateService.instant('payments.common.startOnboardingFailed'),
+              err,
+            );
           },
         });
       return;
@@ -162,11 +165,12 @@ export class Payments {
       },
       error: (err) => {
         this.dashboardLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to open Stripe Dashboard',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('payments.common.openDashboardFailed'),
+          err,
+        );
       },
     });
   }

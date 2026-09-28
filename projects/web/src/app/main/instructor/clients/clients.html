@@ -221,7 +221,7 @@
 
       <ng-template #paginatorleft let-state>
         <p-tag [rounded]="true">
-          {{ 'clients.common.paginator' | translate: {
+          {{ 'common.paginator' | translate: {
             first: state.first + 1,
             last: state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows,
             total: state.totalRecords

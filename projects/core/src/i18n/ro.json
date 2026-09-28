@@ -38,6 +38,7 @@
     "decline": "Refuză",
     "delete": "Șterge",
     "discard": "Renunță",
+    "dismiss": "Închide",
     "done": "Gata",
     "duplicate": "Duplică",
     "edit": "Editează",
@@ -86,7 +87,9 @@
     "filtersCount": "Filtre · {count}",
     "loading": "Se încarcă…",
     "none": "Niciunul",
+    "oneOff": "Plată unică",
     "or": "sau",
+    "paginator": "Afișezi {first} - {last} din {total}",
     "pleaseTryAgain": "Încearcă din nou.",
     "session": "Sesiune",
     "someone": "Cineva",
@@ -158,6 +161,13 @@
       "MODERATOR": "Moderator",
       "OWNER": "Administrator"
     },
+    "invoiceStatus": {
+      "draft": "Ciornă",
+      "open": "Deschisă",
+      "paid": "Plătită",
+      "uncollectible": "Irecuperabilă",
+      "void": "Anulată"
+    },
     "joinPolicy": {
       "APPROVAL": "Cu aprobare",
       "INVITE_ONLY": "Doar cu invitație",
@@ -169,6 +179,13 @@
       "pendingApproval": "În așteptare",
       "upcoming": "Viitoare",
       "waitlisted": "Pe lista de așteptare"
+    },
+    "paymentStatus": {
+      "failed": "Eșuată",
+      "partially_refunded": "Rambursată parțial",
+      "pending": "În așteptare",
+      "refunded": "Rambursată",
+      "succeeded": "Reușită"
     },
     "pendingClient": {
       "EMAIL_SENT": "Email trimis",
@@ -186,6 +203,11 @@
       "COMPLETED": "Finalizat",
       "PAUSED": "Pe pauză",
       "PENDING": "În așteptare"
+    },
+    "refundReason": {
+      "duplicate": "Duplicat",
+      "fraudulent": "Fraudulos",
+      "requested_by_customer": "La cererea clientului"
     },
     "sessionAccess": {
       "CLIENTS_ONLY": "Doar clienți",
@@ -229,6 +251,24 @@
       "GROUP": "Grup",
       "OPEN": "Deschisă",
       "PRIVATE": "1 la 1"
+    },
+    "stripeAccountStatus": {
+      "ACTIVE": "Activ",
+      "DISCONNECTED": "Deconectat",
+      "NOT_STARTED": "Neînceput",
+      "PENDING": "În așteptare",
+      "RESTRICTED": "Restricționat"
+    },
+    "subscriptionStatus": {
+      "active": "Activ",
+      "canceled": "Anulat",
+      "incomplete": "Incomplet",
+      "incomplete_expired": "Incomplet, expirat",
+      "incomplete_payment_failed": "Plată eșuată",
+      "past_due": "Restant",
+      "paused": "În pauză",
+      "trialing": "Perioadă de probă",
+      "unpaid": "Neplătit"
     },
     "templateTab": {
       "active": "Viitoare",
@@ -283,12 +323,14 @@
       "reenterPassword": "Introdu parola din nou"
     },
     "label": {
+      "amount": "Sumă",
       "city": "Oraș",
       "confirmPassword": "Confirmă parola",
       "country": "Țară",
       "currency": "Monedă",
       "date": "Dată",
       "description": "Descriere",
+      "dueDate": "Scadență",
       "duration": "Durată",
       "email": "Email",
       "endDate": "Data de sfârșit",
@@ -388,11 +430,13 @@
       "earlierThisWeek": "Mai devreme săptămâna asta",
       "thisWeek": "Săptămâna asta"
     },
+    "cadence": "{interval, select, day {{count, plural, one {zilnic} few {la fiecare # zile} other {la fiecare # de zile}}} week {{count, plural, one {săptămânal} few {la fiecare # săptămâni} other {la fiecare # de săptămâni}}} month {{count, plural, one {lunar} few {la fiecare # luni} other {la fiecare # de luni}}} year {{count, plural, one {anual} few {la fiecare # ani} other {la fiecare # de ani}}} other {}}",
     "durationMinutes": "{minutes} min",
     "inHours": "în {hours} h",
     "inMinutes": "în {minutes} min",
     "minutesShort": "{minutes} min",
     "now": "acum",
+    "perInterval": "{interval, select, day {{count, plural, one {/ zi} few {/ # zile} other {/ # de zile}}} week {{count, plural, one {/ săptămână} few {/ # săptămâni} other {/ # de săptămâni}}} month {{count, plural, one {/ lună} few {/ # luni} other {/ # de luni}}} year {{count, plural, one {/ an} few {/ # ani} other {/ # de ani}}} other {}}",
     "startingNow": "începe acum",
     "today": "Azi",
     "todayWithDate": "Azi · {date}",

@@ -16,7 +16,7 @@
     }
   </div>
 
-  <button pButton type="button" size="small" (click)="openCreateDialog()"><i class="pi pi-plus"></i> Create product</button>
+  <button pButton type="button" size="small" (click)="openCreateDialog()"><i class="pi pi-plus"></i> {{ 'payments.products.create' | translate }}</button>
 </header>
 
 
@@ -27,13 +27,13 @@
     [scrollable]="true" scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
-        <th>Name</th>
-        <th class="text-center" style="width: 10%;">Type</th>
-        <th class="text-center" style="width: 1%;">Price</th>
-        <th class="text-center" style="width: 10%;">Billing</th>
-        <th class="text-center" style="width: 10%;">Status</th>
-        <th class="text-center" style="width: 10%;">On profile</th>
-        <th class="text-center" style="width: 1%;">Actions</th>
+        <th>{{ 'form.label.name' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'form.label.type' | translate }}</th>
+        <th class="text-center" style="width: 1%;">{{ 'form.label.price' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'payments.products.table.billing' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'form.label.status' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'payments.products.onProfile' | translate }}</th>
+        <th class="text-center" style="width: 1%;">{{ 'common.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -58,7 +58,7 @@
           }
         </td>
         <td>
-          <p-tag [value]="(product.isActive ? 'Active' : 'Inactive') | statusLabel"
+          <p-tag [value]="activeLabel(product.isActive) | statusLabel"
             [severity]="activeSeverity(product.isActive)" class="w-full" rounded />
         </td>
         <td class="text-center">
@@ -72,7 +72,8 @@
               [rounded]="true"
               [text]="true"
               size="small"
-              pTooltip="Edit"
+              [pTooltip]="'button.edit' | translate"
+              [attr.aria-label]="'button.edit' | translate"
               tooltipPosition="left"
               (click)="openEditDialog(product)"
               iconOnly
@@ -86,7 +87,8 @@
               [text]="true"
               size="small"
               severity="danger"
-              pTooltip="Deactivate"
+              [pTooltip]="'payments.products.deactivate' | translate"
+              [attr.aria-label]="'payments.products.deactivate' | translate"
               tooltipPosition="left"
               (click)="confirmDeactivate(product)"
               iconOnly
@@ -124,8 +126,9 @@
     <ng-template #emptymessage>
       <tr>
         <td colspan="7">
-          <mh-list-empty-state icon="pi pi-box" title="No products yet"
-            message="Create your first product to start sending invoices." actionLabel="Create product"
+          <mh-list-empty-state icon="pi pi-box" [title]="'payments.products.empty.title' | translate"
+            [message]="'payments.products.empty.message' | translate"
+            [actionLabel]="'payments.products.create' | translate"
             actionIcon="pi pi-plus" (action)="openCreateDialog()" />
         </td>
       </tr>
@@ -133,9 +136,11 @@
 
     <ng-template #paginatorleft let-state>
       <p-tag [rounded]="true">
-        View {{ state.first + 1 }} -
-        {{ state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows }} of
-        {{ state.totalRecords }}
+        {{ 'common.paginator' | translate: {
+          first: state.first + 1,
+          last: state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows,
+          total: state.totalRecords
+        } }}
       </p-tag>
     </ng-template>
   </p-table>
@@ -172,7 +177,7 @@
           (click)="openEditDialog(product)">
           <div badges class="flex items-center gap-2">
             @if (!product.isActive) {
-            <p-tag value="Inactive" severity="danger" rounded class="text-xs!" />
+            <p-tag [value]="activeLabel(false)" severity="danger" rounded class="text-xs!" />
             }
           </div>
           <div amount class="flex flex-col items-end">
@@ -187,7 +192,7 @@
             (click)="$event.stopPropagation()">
             <div class="flex items-center gap-2">
               <i class="pi" [class.pi-eye]="product.showOnProfile" [class.pi-eye-slash]="!product.showOnProfile"></i>
-              <span>{{ product.showOnProfile ? 'On profile' : 'Hidden' }}</span>
+              <span>{{ (product.showOnProfile ? 'payments.products.onProfile' : 'payments.products.hidden') | translate }}</span>
             </div>
             <p-toggleswitch [ngModel]="product.showOnProfile" [disabled]="togglingProfileIds().has(product.id)"
               (ngModelChange)="toggleShowOnProfile(product, $event)" />
@@ -212,8 +217,9 @@
       </div>
     </ng-template>
     <ng-template #empty>
-      <mh-list-empty-state icon="pi pi-box" title="No products yet"
-        message="Create your first product to start sending invoices." actionLabel="Create product"
+      <mh-list-empty-state icon="pi pi-box" [title]="'payments.products.empty.title' | translate"
+        [message]="'payments.products.empty.message' | translate"
+        [actionLabel]="'payments.products.create' | translate"
         actionIcon="pi pi-plus" (action)="openCreateDialog()" />
     </ng-template>
   </p-dataview>

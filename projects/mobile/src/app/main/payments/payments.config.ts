@@ -1,4 +1,4 @@
-import { InvoiceStatus, InvoiceStatuses } from 'core';
+import { InvoiceStatus, InvoiceStatuses, appLocale, enumLabel } from 'core';
 import {
   addOutline,
   alertCircleOutline,
@@ -42,35 +42,62 @@ export const PAYMENT_ICONS = {
  * the section heading carry the ordinary case; only the unusual ones speak.
  */
 export interface InvoiceStatusStyle {
-  label: string;
-  chip: string | null;
-  tone: 'honey' | 'emerald' | 'slate' | 'coral';
+  readonly label: string;
+  readonly chip: string | null;
+  readonly tone: 'honey' | 'emerald' | 'slate' | 'coral';
+}
+
+/**
+ * Labels are getters over `enum.invoiceStatus.*`: this table is a module
+ * constant, evaluated before the language file has loaded.
+ */
+function statusStyle(
+  status: InvoiceStatus,
+  tone: InvoiceStatusStyle['tone'],
+  showChip: boolean,
+): InvoiceStatusStyle {
+  return {
+    get label() {
+      return enumLabel('invoiceStatus', status);
+    },
+    get chip() {
+      return showChip ? enumLabel('invoiceStatus', status) : null;
+    },
+    tone,
+  };
 }
 
 export const INVOICE_STATUS_STYLES: Record<InvoiceStatus, InvoiceStatusStyle> = {
-  [InvoiceStatuses.Draft]: { label: 'Draft', chip: 'Draft', tone: 'slate' },
-  [InvoiceStatuses.Open]: { label: 'Open', chip: null, tone: 'honey' },
-  [InvoiceStatuses.Paid]: { label: 'Paid', chip: null, tone: 'emerald' },
-  [InvoiceStatuses.Void]: { label: 'Void', chip: 'Void', tone: 'slate' },
-  [InvoiceStatuses.Uncollectible]: {
-    label: 'Uncollectible',
-    chip: 'Uncollectible',
-    tone: 'slate',
-  },
+  [InvoiceStatuses.Draft]: statusStyle(InvoiceStatuses.Draft, 'slate', true),
+  [InvoiceStatuses.Open]: statusStyle(InvoiceStatuses.Open, 'honey', false),
+  [InvoiceStatuses.Paid]: statusStyle(InvoiceStatuses.Paid, 'emerald', false),
+  [InvoiceStatuses.Void]: statusStyle(InvoiceStatuses.Void, 'slate', true),
+  [InvoiceStatuses.Uncollectible]: statusStyle(InvoiceStatuses.Uncollectible, 'slate', true),
 };
 
 export function invoiceStatusStyle(status: InvoiceStatus): InvoiceStatusStyle {
   return INVOICE_STATUS_STYLES[status] ?? INVOICE_STATUS_STYLES[InvoiceStatuses.Draft];
 }
 
-/** The coach's filter rail, mirroring the web app's tabs. */
+/**
+ * The coach's filter rail, mirroring the web app's tabs. `label` is a
+ * translation key — the template translates it.
+ */
 export const INVOICE_FILTERS = [
-  { value: null, label: 'All' },
-  { value: InvoiceStatuses.Open, label: 'Open' },
-  { value: InvoiceStatuses.Paid, label: 'Paid' },
-  { value: InvoiceStatuses.Draft, label: 'Draft' },
-  { value: InvoiceStatuses.Void, label: 'Void' },
+  { value: null, label: 'common.all' },
+  { value: InvoiceStatuses.Open, label: 'enum.invoiceStatus.open' },
+  { value: InvoiceStatuses.Paid, label: 'enum.invoiceStatus.paid' },
+  { value: InvoiceStatuses.Draft, label: 'enum.invoiceStatus.draft' },
+  { value: InvoiceStatuses.Void, label: 'enum.invoiceStatus.void' },
 ] as const;
+
+/** Invoices / Memberships, shared by the coach hub and the client's bills. */
+export const PAYMENT_SEGMENTS = [
+  { value: 'invoices', label: 'payments.segment.invoices' },
+  { value: 'memberships', label: 'payments.segment.memberships' },
+] as const;
+
+export type PaymentSegment = (typeof PAYMENT_SEGMENTS)[number]['value'];
 
 /** Stripe's refund window, mirrored from `RefundService` on the API. */
 export const REFUND_WINDOW_DAYS = 14;
@@ -94,11 +121,23 @@ export function isOverdue(status: InvoiceStatus, dueDate: string | null): boolea
  * produces, so an amount never reads two ways in one flow.
  */
 export function formatMoney(cents: number, currency: string): string {
-  return new Intl.NumberFormat('ro-RO', {
+  return new Intl.NumberFormat(appLocale(), {
     style: 'currency',
     currency: (currency || 'RON').toUpperCase(),
     currencyDisplay: 'code',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
+  }).format(cents / 100);
+}
+
+/**
+ * The bare number, two decimals, no grouping — for copy that names the
+ * currency itself ("Pay 50.00 RON on Stripe").
+ */
+export function formatAmount(cents: number): string {
+  return new Intl.NumberFormat(appLocale(), {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: false,
   }).format(cents / 100);
 }

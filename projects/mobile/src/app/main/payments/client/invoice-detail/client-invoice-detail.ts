@@ -19,15 +19,18 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
 import {
   ClientPaymentService,
   CurrencyRonPipe,
+  EnumLabelPipe,
   Invoice,
   InvoiceLineItemDetail,
   InvoiceStatuses,
+  appLocale,
   displayName,
 } from 'core';
 
@@ -35,7 +38,7 @@ import { EmptyState } from '../../../../_shared/components/empty-state/empty-sta
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
 import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
-import { PAYMENT_ICONS, isOverdue } from '../../payments.config';
+import { PAYMENT_ICONS, formatAmount, isOverdue } from '../../payments.config';
 
 /** How long to keep asking the API whether the payment landed. */
 const POLL_ATTEMPTS = 6;
@@ -60,6 +63,7 @@ const POLL_INTERVAL_MS = 2000;
   imports: [
     CurrencyRonPipe,
     EmptyState,
+    EnumLabelPipe,
     HexAvatar,
     IonBackButton,
     IonBadge,
@@ -77,6 +81,7 @@ const POLL_INTERVAL_MS = 2000;
     IonSpinner,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './client-invoice-detail.html',
   styleUrl: './client-invoice-detail.scss',
@@ -86,6 +91,9 @@ export class ClientInvoiceDetail {
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _service = inject(ClientPaymentService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
+
+  readonly Statuses = InvoiceStatuses;
 
   readonly invoiceId = signal<string | null>(null);
   readonly invoice = signal<Invoice | null>(null);
@@ -104,7 +112,10 @@ export class ClientInvoiceDetail {
   private _pollTimer?: ReturnType<typeof setTimeout>;
 
   readonly coachName = computed(() =>
-    displayName(this.invoice()?.instructor ?? null, 'Your coach'),
+    displayName(
+      this.invoice()?.instructor ?? null,
+      this._translateService.instant('payments.fallback.yourCoach'),
+    ),
   );
 
   readonly coachTone = computed(() =>
@@ -122,7 +133,7 @@ export class ClientInvoiceDetail {
     const invoice = this.invoice();
     const iso = this.isPaid() ? invoice?.paidAt : invoice?.dueDate;
     if (!iso) return null;
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString(appLocale(), {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
@@ -133,9 +144,11 @@ export class ClientInvoiceDetail {
   /** The button says where it is going, and in what currency. */
   readonly payLabel = computed(() => {
     const invoice = this.invoice();
-    if (!invoice) return 'Pay on Stripe';
-    const amount = (invoice.amountDueCents / 100).toFixed(2);
-    return `Pay ${amount} ${invoice.currency.toUpperCase()} on Stripe`;
+    if (!invoice) return this._translateService.instant('payments.client.detail.pay');
+    return this._translateService.instant('payments.client.detail.payAmount', {
+      amount: formatAmount(invoice.amountDueCents),
+      currency: invoice.currency.toUpperCase(),
+    });
   });
 
   readonly canPay = computed(
@@ -183,7 +196,10 @@ export class ClientInvoiceDetail {
         },
         error: (error: unknown) => {
           this.paying.set(false);
-          void this._feedbackService.error(error, 'Could not open the payment page.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.payFailed'),
+          );
         },
       });
   }

@@ -96,11 +96,115 @@
       "verified": "Your email has been verified. Redirecting you to sign in…"
     }
   },
+  "billing": {
+    "checkoutReturn": {
+      "error": {
+        "body": "We couldn't verify your payment. Please check your invoices."
+      },
+      "loading": {
+        "body": "This may take a few seconds. Please don't close this window.",
+        "title": "Processing your payment..."
+      },
+      "paid": {
+        "body": "Your invoice has been paid. A receipt will be sent to your email.",
+        "title": "Payment successful"
+      },
+      "pending": {
+        "body": "Your payment is still processing. We'll update your invoice status shortly.",
+        "title": "Payment processing"
+      },
+      "viewInvoices": "View my invoices"
+    },
+    "invoiceDetail": {
+      "activity": "Activity",
+      "activityLog": {
+        "issued": "Invoice issued",
+        "paid": "Invoice paid",
+        "sent": "Invoice sent",
+        "voided": "Invoice voided"
+      },
+      "amountLabel": {
+        "due": "Amount due",
+        "paid": "Paid in full",
+        "voided": "Voided"
+      },
+      "breadcrumb": "Invoices",
+      "downloadPdf": "Download invoice PDF",
+      "dueOn": "Due {date}",
+      "issuedOn": "Issued {date}",
+      "itemsCount": "{count, plural, one {# item} other {# items}}",
+      "lineItems": "Line items",
+      "noLineItems": "No line items available.",
+      "paid": "Paid",
+      "paidOutOfBand": "PAID OUT OF BAND",
+      "payNow": "Pay now",
+      "payTitle": "Pay this invoice",
+      "payment": "Payment",
+      "qty": "Qty",
+      "settledDirectly": "Settled directly with your coach (cash or bank transfer).",
+      "subtotal": "Subtotal",
+      "toast": {
+        "notFound": "Invoice not found",
+        "payFailed": "Failed to start payment"
+      },
+      "total": "Total",
+      "tracker": {
+        "draft": "Draft",
+        "paid": "Paid",
+        "pending": "pending",
+        "sent": "Sent"
+      },
+      "unit": "Unit"
+    },
+    "myInvoices": {
+      "due": "Due",
+      "empty": "No invoices yet",
+      "invoice": "Invoice",
+      "pageReport": "Showing {first} to {last} of {totalRecords} invoices",
+      "toast": {
+        "loadFailed": "Failed to load invoices"
+      },
+      "viewInvoice": "View invoice"
+    },
+    "mySubscriptions": {
+      "cancelTooltip": "You'll keep access until the end of the current period",
+      "cancelsOn": "cancels {date}",
+      "confirmCancel": {
+        "header": "Cancel membership",
+        "message": "Your membership will end on {date}. You'll keep access until then. Continue?",
+        "messageNoDate": "Your membership will end at the end of the current period. You'll keep access until then. Continue?"
+      },
+      "currentPeriod": "Current period",
+      "empty": "No subscriptions",
+      "info": {
+        "after": "to update your payment method, view payment history, or download receipts. You can cancel a membership directly below.",
+        "before": "Use"
+      },
+      "manageBilling": "Manage billing",
+      "membership": "Membership",
+      "pageReport": "Showing {first} to {last} of {totalRecords} subscriptions",
+      "plan": "Plan",
+      "planWithCadence": "{name} · {cadence}",
+      "renews": "Renews",
+      "toast": {
+        "cancelFailed": {
+          "detail": "Please try again in a moment.",
+          "summary": "Could not cancel"
+        },
+        "cancelScheduled": {
+          "detail": "Your membership will end at the close of the current period.",
+          "summary": "Cancellation scheduled"
+        },
+        "loadFailed": "Failed to load subscriptions",
+        "portalFailed": "Failed to open customer portal"
+      },
+      "trialUntil": "Trial until {date}"
+    }
+  },
   "clients": {
     "common": {
       "editNotes": "Edit notes",
       "inviteClient": "Invite client",
-      "paginator": "View {first} - {last} of {total}",
       "retryInAMoment": "Please retry in a moment.",
       "shownOfTotal": "{shown} of {total}",
       "thisClient": "this client"
@@ -1174,6 +1278,625 @@
       "tryAgain": "Try again."
     }
   },
+  "paymentDialogs": {
+    "createInvoice": {
+      "activeClient": "Active client",
+      "addLineItem": "Add line item",
+      "autoSaveHint": "Changes are auto-saved as you type.",
+      "billTo": "Bill to",
+      "billingClientHint": "Billing this client will send the invoice to their email.",
+      "closeTooltip": "Changes are kept as a draft",
+      "createButton": "Create invoice",
+      "delivery": "Delivery",
+      "deliveryHint": "Leave unchecked to keep it as a draft — you can review it and send it from the list later.",
+      "descriptionOptional": "Description (optional)",
+      "descriptionPlaceholder": "Longer details shown on the invoice",
+      "draft": "Draft",
+      "draftSavedAt": "Draft saved · {time}",
+      "due": {
+        "custom": "Custom",
+        "onReceipt": "On receipt"
+      },
+      "dueOn": "Due {date}",
+      "editAsCustom": "Edit as custom",
+      "editAsCustomTooltip": "Unlock all fields. The pricing item stays untouched.",
+      "emailNow": "Email the invoice to the client now",
+      "existingClient": "Existing client",
+      "fromPricing": "From pricing · {name}",
+      "guestEmailPlaceholder": "client@example.com",
+      "issueDate": "Issue date",
+      "itemNumber": "Item {number}",
+      "itemsCount": "{count, plural, one {# item} other {# items}}",
+      "lineItems": "Line items",
+      "lineSubtotal": "Line subtotal",
+      "loadingRecipient": "Loading recipient…",
+      "locked": "Locked",
+      "namePlaceholder": "e.g. Single PT Session",
+      "newRecipient": "New recipient",
+      "notesOptional": "Notes (optional)",
+      "notesPlaceholder": "Shown on the invoice. e.g. “Thanks — see you next week!”",
+      "oneOffPriceHint": "Need a one-off price or description for this invoice?",
+      "orEnterCustom": "or enter custom",
+      "pickFromPricing": "Pick from pricing (optional)",
+      "pricingPlaceholder": "Pick a pricing item or enter custom below",
+      "quantity": "Quantity",
+      "recipient": "Recipient",
+      "saveAsDraft": "Save as draft",
+      "searchClients": "Search clients...",
+      "searchPricings": "Search pricings...",
+      "selectClient": "Select a client",
+      "sendInvoiceAmount": "Send invoice · {amount}",
+      "subtotal": "Subtotal",
+      "title": {
+        "create": "Create invoice",
+        "edit": "Edit draft invoice"
+      },
+      "toast": {
+        "clientRequired": {
+          "detail": "Please select a client or enter an email address.",
+          "summary": "Client required"
+        },
+        "createFailed": "Failed to create invoice",
+        "draftSaved": {
+          "detail": "Invoice saved as draft",
+          "summary": "Draft saved"
+        },
+        "dueDateRequired": {
+          "detail": "Pick a date or choose one of the presets.",
+          "summary": "Due date required"
+        },
+        "emailRequired": {
+          "detail": "Please enter a valid email address for the recipient.",
+          "summary": "Email required"
+        },
+        "lineAmountInvalid": "Line {line}: amount must be ≥ 0.50 RON",
+        "lineItemsInvalid": {
+          "detail": "Check all line items",
+          "summary": "Line items invalid"
+        },
+        "lineQuantityInvalid": "Line {line}: quantity must be ≥ 1",
+        "loadFailed": {
+          "detail": "Try again in a moment.",
+          "summary": "Could not load invoice"
+        },
+        "nameRequired": {
+          "detail": "Please enter at least a first name for the recipient.",
+          "summary": "Name required"
+        },
+        "sent": {
+          "detail": "Invoice created and sent",
+          "summary": "Invoice sent"
+        },
+        "updateFailed": "Failed to update invoice",
+        "updated": {
+          "detail": "Invoice changes saved.",
+          "summary": "Draft updated"
+        }
+      },
+      "total": "Total",
+      "unitPrice": "Unit price"
+    },
+    "createSubscription": {
+      "client": "Client",
+      "firstChargeAfter": "from now.",
+      "firstChargeBefore": "The first charge happens",
+      "freeTrial": "Free trial (optional)",
+      "noFreeTrial": "No free trial",
+      "plan": "Plan",
+      "planDetails": "Plan details",
+      "searchClients": "Search clients...",
+      "selectClient": "Select a client",
+      "selectPlan": "Select a subscription plan",
+      "submit": "Create subscription",
+      "title": "Create subscription",
+      "toast": {
+        "createFailed": "Could not create subscription",
+        "created": {
+          "detail": "The subscription has been created successfully",
+          "summary": "Subscription created"
+        },
+        "pending": {
+          "detail": "We emailed the client a link to confirm and start their membership. They'll see the plan, amount, and cycle, then pay with a saved or new card. Nothing is charged until they confirm.",
+          "summary": "Membership pending client confirmation"
+        }
+      },
+      "trialHint": "Number of days the client can use the plan before being charged. Leave empty to bill immediately.",
+      "trialSuffix": " days"
+    },
+    "interval": {
+      "billedEvery": {
+        "day": "{count, plural, one {Billed every day} other {Billed every # days}}",
+        "month": "{count, plural, one {Billed every month} other {Billed every # months}}",
+        "week": "{count, plural, one {Billed every week} other {Billed every # weeks}}",
+        "year": "{count, plural, one {Billed every year} other {Billed every # years}}"
+      },
+      "chargedEvery": {
+        "day": "{count, plural, one {Clients are charged every day.} other {Clients are charged every # days.}}",
+        "month": "{count, plural, one {Clients are charged every month.} other {Clients are charged every # months.}}",
+        "week": "{count, plural, one {Clients are charged every week.} other {Clients are charged every # weeks.}}",
+        "year": "{count, plural, one {Clients are charged every year.} other {Clients are charged every # years.}}"
+      },
+      "option": {
+        "day": "Day",
+        "month": "Month",
+        "week": "Week",
+        "year": "Year"
+      },
+      "short": {
+        "day": "day",
+        "month": "month",
+        "week": "week",
+        "year": "year"
+      }
+    },
+    "productForm": {
+      "active": "Active",
+      "billingCadence": "Billing cadence",
+      "descriptionPlaceholder": "Optional description",
+      "inactive": "Inactive",
+      "lockedInfo": "Price and type cannot be changed after creation. To change the price, deactivate this product and create a new one.",
+      "namePlaceholder": "e.g. Single PT Session",
+      "showOnProfile": "Show on public profile",
+      "showOnProfileHint": "List this under \"Services\" on your public coaching profile.",
+      "title": {
+        "create": "Create product",
+        "edit": "Edit product"
+      },
+      "toast": {
+        "createFailed": "Failed to create product",
+        "created": {
+          "detail": "\"{name}\" has been created",
+          "summary": "Product created"
+        },
+        "updateFailed": "Failed to update product",
+        "updated": {
+          "detail": "\"{name}\" has been updated",
+          "summary": "Product updated"
+        }
+      },
+      "type": {
+        "ONE_OFF": "One-off",
+        "SUBSCRIPTION": "Subscription"
+      }
+    },
+    "refund": {
+      "alreadyRefunded": "Already refunded: {amount}",
+      "amount": "Refund amount",
+      "notesOptional": "Notes (optional)",
+      "notesPlaceholder": "Internal notes about this refund",
+      "originalPayment": "Original payment",
+      "reason": "Reason",
+      "selectReason": "Select a reason",
+      "submit": "Issue refund",
+      "title": "Issue refund",
+      "toast": {
+        "failed": "Failed to issue refund",
+        "issued": {
+          "detail": "Refund of {amount} {currency} has been issued",
+          "summary": "Refund issued"
+        }
+      }
+    },
+    "sendInvoiceEmail": {
+      "emailPlaceholder": "name@example.com",
+      "intro": "We'll email the invoice to this address. Leave the on-file email to send through Stripe, or type a different one to send a copy elsewhere (e.g. an accountant, a parent, a second contact).",
+      "onFile": "On file:",
+      "overrideInfo": "This copy will be sent from MotionHive to the address above. The customer's on-file email won't be notified.",
+      "sendTo": "Send to",
+      "title": "Send invoice",
+      "toast": {
+        "failed": "Failed to send invoice",
+        "sent": {
+          "detail": "Email delivered",
+          "detailTo": "Sent to {email}",
+          "summary": "Invoice sent"
+        }
+      }
+    }
+  },
+  "payments": {
+    "common": {
+      "client": "Client",
+      "copy": "Copy",
+      "copyFailed": "Copy failed",
+      "copyManually": "Select and copy the link manually.",
+      "createInvoice": "Create invoice",
+      "currentPeriod": "Current period",
+      "finishSetup": "Finish setup",
+      "invoices": "Invoices",
+      "memberships": "Memberships",
+      "openDashboardFailed": "Failed to open Stripe Dashboard",
+      "paid": "Paid",
+      "perCycle": "per cycle",
+      "plan": "Plan",
+      "planWithCadence": "{name} · {cadence}",
+      "planWithId": "Plan #{id}",
+      "pricing": "Pricing",
+      "startOnboardingFailed": "Failed to start onboarding",
+      "unknownClient": "Unknown client"
+    },
+    "earnings": {
+      "availableBalance": "Available balance",
+      "connectStripe": "Connect Stripe",
+      "finishSetupBanner": "Finish Stripe setup to start receiving money.",
+      "history": "Payment history",
+      "monthToDate": "Month to date",
+      "nextPayout": "Next payout",
+      "noPaymentsYet": "No payments yet",
+      "noPayoutScheduled": "No payout scheduled",
+      "openStripeDashboard": "Open Stripe Dashboard",
+      "outstandingInvoices": "Outstanding invoices",
+      "pageReport": "Showing {first} to {last} of {total} payments",
+      "pendingBalance": "Pending balance",
+      "refunded": "({amount} refunded)",
+      "setUpPayoutsBanner": "Set up payouts to start receiving money.",
+      "table": {
+        "fee": "Fee",
+        "method": "Method"
+      },
+      "toast": {
+        "loadPaymentsFailed": "Failed to load payment history",
+        "loadSummaryFailed": "Failed to load earnings summary",
+        "startOnboardingFailed": "Failed to start Stripe onboarding"
+      },
+      "topClients": "Top clients"
+    },
+    "hub": {
+      "completeSetupFirst": "Complete Stripe setup first",
+      "gate": {
+        "invoices": {
+          "description": "Connect your Stripe account to start sending invoices, tracking outstanding balances, and collecting payments directly from your clients.",
+          "title": "Connect Stripe to start invoicing"
+        },
+        "memberships": {
+          "description": "Membership plans and recurring subscriptions are powered by Stripe. Complete your onboarding to offer flexible billing cycles and automate client renewals.",
+          "title": "Set up payments to offer memberships"
+        },
+        "pricing": {
+          "description": "Define your service packages and set your rates — once your Stripe account is connected, clients will be able to browse and purchase your plans directly.",
+          "title": "Your plans are ready — finish Stripe setup"
+        }
+      },
+      "kpi": {
+        "available": "Available",
+        "inTransit": "In transit · 2–3 days",
+        "openInvoices": "{count, plural, one {# open invoice} other {# open invoices}}",
+        "outstanding": "Outstanding",
+        "overdue": "{count} overdue",
+        "pending": "Pending",
+        "readyToWithdraw": "Ready to withdraw"
+      },
+      "openStripe": "Open Stripe",
+      "setUpPayments": "Set up payments",
+      "subtitle": "Issue invoices, manage memberships, and set the pricing your clients pay.",
+      "subtitleCompact": "Invoices, memberships, and pricing."
+    },
+    "invoiceDetail": {
+      "action": {
+        "copyPaymentLink": "Copy payment link",
+        "downloadInvoicePdf": "Download invoice PDF",
+        "downloadPdf": "Download PDF",
+        "markPaid": "Mark paid",
+        "more": "More",
+        "openHostedPage": "Open hosted page",
+        "resendEmail": "Resend email",
+        "sendInvoice": "Send invoice",
+        "void": "Void"
+      },
+      "activity": {
+        "draftCreated": "Draft created",
+        "invoicePaid": "Invoice paid",
+        "invoiceSent": "Invoice sent",
+        "invoiceVoided": "Invoice voided",
+        "title": "Activity"
+      },
+      "amountLabel": {
+        "awaitingPayment": "Awaiting payment",
+        "due": "Amount due",
+        "paidInFull": "Paid in full",
+        "voided": "Voided"
+      },
+      "confirm": {
+        "markPaid": {
+          "header": "Mark as paid",
+          "message": "Mark this invoice as paid out of band (cash or bank transfer)?"
+        },
+        "void": {
+          "header": "Void invoice",
+          "message": "Are you sure you want to void this invoice? This cannot be undone."
+        }
+      },
+      "draftHint": "No emails have gone out yet. Review, then send.",
+      "due": "Due {date}",
+      "guest": "Guest",
+      "issued": "Issued {date}",
+      "lineItems": {
+        "count": "{count, plural, one {# item} other {# items}}",
+        "empty": "No line items available.",
+        "qty": "Qty",
+        "subtotal": "Subtotal",
+        "title": "Line items",
+        "total": "Total",
+        "unit": "Unit"
+      },
+      "notSent": {
+        "body": "Once you send, the client gets an email with a Stripe payment link. You can cancel and edit until then.",
+        "title": "Not sent yet"
+      },
+      "notes": {
+        "empty": "No notes — add a short message before sending.",
+        "title": "Notes to client"
+      },
+      "paidOutOfBand": "Paid out of band",
+      "paidOutOfBandNote": "Paid out of band (no Stripe fees)",
+      "payment": "Payment",
+      "paymentLink": {
+        "sharedViaEmail": "Shared via email · sent {date}",
+        "title": "Payment link"
+      },
+      "toast": {
+        "linkCopied": "Payment link copied to clipboard",
+        "markPaidFailed": "Failed to mark as paid",
+        "markedPaid": "Invoice marked paid",
+        "notFound": "Invoice not found",
+        "voidFailed": "Failed to void invoice",
+        "voided": "Invoice voided"
+      },
+      "tracker": {
+        "draft": "Draft",
+        "paid": "Paid",
+        "pending": "pending",
+        "sent": "Sent"
+      }
+    },
+    "invoices": {
+      "action": {
+        "downloadPdf": "Download PDF",
+        "markPaid": "Mark paid",
+        "resendEmail": "Resend email",
+        "viewHostedPage": "View hosted page",
+        "void": "Void"
+      },
+      "card": {
+        "dueSubtitle": "{number} · Due",
+        "manual": "manual",
+        "overdue": "Overdue",
+        "paidSubtitle": "{number} · Paid"
+      },
+      "confirm": {
+        "markPaid": {
+          "header": "Mark as paid",
+          "message": "Mark this invoice as paid out of band (cash or bank transfer)? No Stripe fees will be charged."
+        },
+        "void": {
+          "header": "Void invoice",
+          "message": "Are you sure you want to void invoice {number}? This cannot be undone."
+        }
+      },
+      "draftSuffix": "(draft)",
+      "empty": {
+        "message": "Create your first invoice to start billing clients.",
+        "title": "No invoices yet"
+      },
+      "manualSuffix": "(manual)",
+      "table": {
+        "invoiceNumber": "Invoice #"
+      },
+      "toast": {
+        "loadFailed": "Failed to load invoices",
+        "loadMoreFailed": "Failed to load more invoices",
+        "markPaidFailed": "Failed to mark invoice as paid",
+        "markedPaid": {
+          "detail": "Invoice has been marked as paid (out of band)",
+          "summary": "Invoice marked paid"
+        },
+        "voidFailed": "Failed to void invoice",
+        "voided": {
+          "detail": "Invoice {number} has been voided",
+          "summary": "Invoice voided"
+        }
+      }
+    },
+    "onboarding": {
+      "subtitle": "Connect your Stripe account to start accepting payments from clients.",
+      "title": "Payments setup"
+    },
+    "onboardingCard": {
+      "active": {
+        "body": "You're all set to send invoices and receive payments.",
+        "title": "Payments enabled"
+      },
+      "disconnected": {
+        "action": "Reconnect with Stripe",
+        "body": "Your Stripe account has been disconnected. Please reconnect to continue accepting payments.",
+        "title": "Account disconnected"
+      },
+      "notStarted": {
+        "action": "Connect with Stripe",
+        "body": "Connect your bank account with Stripe to start sending invoices and receiving payments from your clients. Setup takes about 3 minutes.",
+        "title": "Start accepting payments"
+      },
+      "pending": {
+        "action": "Resume onboarding",
+        "body": "Stripe is verifying your details. This usually takes a few minutes but can take up to 24 hours. We'll notify you when it's ready.",
+        "title": "Account under review"
+      },
+      "restricted": {
+        "action": "Complete requirements",
+        "body": "Stripe needs additional information to keep your account active. Please complete the remaining requirements.",
+        "outstanding": "{count, plural, one {# requirement outstanding} other {# requirements outstanding}}",
+        "title": "Action required"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "DISCONNECTED": "Disconnected",
+        "NOT_STARTED": "Not connected",
+        "PENDING": "Pending review",
+        "RESTRICTED": "Action required"
+      },
+      "tiles": {
+        "earnings": {
+          "description": "Balance, payouts, and payment history",
+          "title": "Earnings"
+        },
+        "invoice": {
+          "description": "Bill a client for a session or package"
+        },
+        "plans": {
+          "description": "Manage your products and pricing"
+        },
+        "subscriptions": {
+          "description": "Recurring billing for your clients",
+          "title": "Subscriptions"
+        }
+      }
+    },
+    "onboardingRefresh": {
+      "errorBody": "We couldn't generate a new onboarding link. Please try again.",
+      "generating": "Generating a fresh onboarding link.",
+      "redirecting": "Redirecting to Stripe..."
+    },
+    "onboardingReturn": {
+      "almostThere": "Almost there!",
+      "enabledBody": "Your Stripe account is verified and ready. You can now create products and send invoices.",
+      "enabledTitle": "Payments enabled!",
+      "goToPayments": "Go to Payments",
+      "pleaseWait": "Please wait while we confirm your Stripe setup.",
+      "stillVerifying": "Stripe is still verifying your details. This usually takes a few minutes. We'll notify you when it's ready.",
+      "verifying": "Verifying your account..."
+    },
+    "productType": {
+      "ONE_OFF": "One-off",
+      "SUBSCRIPTION": "Subscription"
+    },
+    "products": {
+      "confirm": {
+        "deactivate": {
+          "header": "Deactivate product",
+          "message": "Are you sure you want to deactivate \"{name}\"? It will no longer appear in product lists."
+        }
+      },
+      "create": "Create product",
+      "deactivate": "Deactivate",
+      "empty": {
+        "message": "Create your first product to start sending invoices.",
+        "title": "No products yet"
+      },
+      "hidden": "Hidden",
+      "onProfile": "On profile",
+      "oneOffProduct": "One-off product",
+      "state": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "billing": "Billing"
+      },
+      "toast": {
+        "deactivateFailed": "Failed to deactivate product",
+        "deactivated": {
+          "detail": "\"{name}\" has been deactivated",
+          "summary": "Product deactivated"
+        },
+        "hidden": {
+          "detail": "\"{name}\" is hidden from your public profile.",
+          "summary": "Hidden from profile"
+        },
+        "loadFailed": "Failed to load products",
+        "loadMoreFailed": "Failed to load more products",
+        "shown": {
+          "detail": "\"{name}\" now shows on your public profile.",
+          "summary": "Showing on profile"
+        },
+        "visibilityFailed": "Failed to update visibility"
+      }
+    },
+    "subscriptionDetail": {
+      "amountPerCycle": "{amount} per cycle",
+      "backToList": "Back to memberships",
+      "cancelled": "Cancelled",
+      "clientUnavailable": "Client information unavailable.",
+      "confirm": {
+        "cancelAtEnd": {
+          "header": "Cancel at period end",
+          "message": "The subscription will be cancelled at the end of the current period. The client keeps access until then."
+        },
+        "cancelImmediately": {
+          "header": "Cancel immediately",
+          "message": "The subscription will be cancelled immediately. The client loses access right away."
+        }
+      },
+      "detail": "Detail",
+      "getConfirmationLink": "Get confirmation link",
+      "membership": "Membership",
+      "paymentSetup": "Payment setup",
+      "pendingSetup": {
+        "body": "An email with the setup link was sent. The membership activates automatically once they're done.",
+        "title": "Waiting for the client to confirm and pay the first invoice."
+      },
+      "periodPending": "Period dates pending — Stripe will populate once activated.",
+      "renewsAutomatically": "Renews automatically at period end",
+      "scheduledCancel": "Scheduled to cancel on {date}",
+      "setupHint": "Generate a fresh hosted link to share with the client. The original one we emailed still works too.",
+      "toast": {
+        "alreadyActivated": {
+          "detail": "The client has already confirmed this membership.",
+          "summary": "Already activated"
+        },
+        "cancelFailed": "Failed to cancel subscription",
+        "cancellationScheduled": "Cancellation scheduled",
+        "cancelled": "Subscription cancelled",
+        "notFound": "Subscription not found",
+        "setupLinkCopied": "Setup link copied to clipboard.",
+        "setupLinkFailed": "Could not fetch setup link."
+      },
+      "trial": "Trial",
+      "trialEnds": "Ends {date}"
+    },
+    "subscriptions": {
+      "cancelAtPeriodEnd": "Cancel at period end",
+      "cancelImmediately": "Cancel immediately",
+      "cancels": "Cancels {date}",
+      "cancelsLower": "cancels {date}",
+      "clientWithId": "Client #{id}",
+      "confirm": {
+        "cancel": {
+          "header": "Cancel subscription",
+          "message": "Cancel this subscription at the end of the current billing period?"
+        },
+        "cancelImmediately": {
+          "header": "Cancel immediately",
+          "message": "Cancel this subscription immediately? The client will lose access right away."
+        }
+      },
+      "empty": {
+        "message": "Subscribe clients to recurring plans to get started.",
+        "notFound": "No memberships found",
+        "title": "No memberships yet"
+      },
+      "filter": {
+        "awaitingConfirmation": "Awaiting confirmation"
+      },
+      "new": "New membership",
+      "renews": "Renews {date}",
+      "toast": {
+        "cancelFailed": "Failed to cancel subscription",
+        "canceled": {
+          "detail": "Subscription has been canceled immediately",
+          "summary": "Subscription canceled"
+        },
+        "loadFailed": "Failed to load memberships",
+        "loadMoreFailed": "Failed to load more memberships",
+        "willCancel": {
+          "detail": "Subscription will cancel at the end of the billing period",
+          "summary": "Subscription will cancel"
+        }
+      },
+      "trialEnds": "Trial ends {date}",
+      "trialUntil": "Trial until {date}",
+      "viewDetails": "View details"
+    }
+  },
   "sessions": {
     "approvals": {
       "empty": "You're all caught up — no pending approvals.",
@@ -1342,7 +2065,6 @@
     },
     "formDialog": {
       "accessAria": "Access requirement",
-      "amount": "Amount",
       "basics": "Basics",
       "cancelCutoff": "Cancel cutoff (hours)",
       "capacity": "Capacity (blank = unlimited)",
@@ -1494,7 +2216,6 @@
     },
     "quickCreate": {
       "ariaLabel": "Quick create session",
-      "dismiss": "Dismiss",
       "eyebrow": "{start} – {end} · {minutes} min",
       "openFullForm": "Open full form",
       "titlePlaceholder": "Session title"

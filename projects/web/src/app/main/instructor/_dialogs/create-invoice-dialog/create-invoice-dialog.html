@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="isEditMode() ? 'Edit draft invoice' : 'Create invoice'"
+  [header]="(isEditMode() ? 'paymentDialogs.createInvoice.title.edit' : 'paymentDialogs.createInvoice.title.create') | translate"
   [(visible)]="visible"
   [modal]="true"
   [style]="{ width: '68rem', maxWidth: '95vw' }"
@@ -18,7 +18,7 @@
            instead of the picker. In CREATE mode show the full picker. -->
       @if (isEditMode()) {
         <section class="flex flex-col gap-2">
-          <span class="text-xs uppercase tracking-wide text-surface-500">Bill to</span>
+          <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.billTo' | translate }}</span>
           @if (_editRecipient(); as r) {
             <div class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/40 px-3 py-2.5">
               <i class="pi pi-user text-surface-500"></i>
@@ -28,16 +28,16 @@
                   <span class="text-xs text-surface-500 truncate">{{ r.email }}</span>
                 }
               </div>
-              <span class="ml-auto text-[10px] uppercase tracking-wide text-surface-500 shrink-0">Locked</span>
+              <span class="ml-auto text-[10px] uppercase tracking-wide text-surface-500 shrink-0">{{ 'paymentDialogs.createInvoice.locked' | translate }}</span>
             </div>
           } @else {
-            <div class="text-sm text-surface-500">Loading recipient…</div>
+            <div class="text-sm text-surface-500">{{ 'paymentDialogs.createInvoice.loadingRecipient' | translate }}</div>
           }
         </section>
       }
       @if (!isEditMode()) {
       <section class="flex flex-col gap-2">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Bill to</span>
+        <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.billTo' | translate }}</span>
         <div class="inline-flex rounded-md bg-surface-100 dark:bg-surface-800 p-1 w-fit">
           <button
             type="button"
@@ -47,7 +47,7 @@
             [class.font-semibold]="!useManualEmail()"
             [class.text-surface-500]="useManualEmail()"
             (click)="onRecipientModeChange(false)"
-          >Existing client</button>
+          >{{ 'paymentDialogs.createInvoice.existingClient' | translate }}</button>
           <button
             type="button"
             class="px-3 py-1.5 text-sm rounded-sm transition-colors"
@@ -56,7 +56,7 @@
             [class.font-semibold]="useManualEmail()"
             [class.text-surface-500]="!useManualEmail()"
             (click)="onRecipientModeChange(true)"
-          >New recipient</button>
+          >{{ 'paymentDialogs.createInvoice.newRecipient' | translate }}</button>
         </div>
 
         @if (!useManualEmail()) {
@@ -73,7 +73,7 @@
                     <span class="text-sm font-semibold truncate">{{ sc.firstName }} {{ sc.lastName }}</span>
                     <span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide text-green-600 dark:text-green-400">
                       <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                      Active client
+                      {{ 'paymentDialogs.createInvoice.activeClient' | translate }}
                     </span>
                   </div>
                   <span class="text-xs text-surface-500 truncate">{{ sc.email }}</span>
@@ -83,10 +83,10 @@
                 type="button"
                 class="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline underline-offset-2 shrink-0"
                 (click)="clearSelectedClient()"
-              >Change</button>
+              >{{ 'button.change' | translate }}</button>
             </div>
             <span class="text-xs text-surface-500">
-              Billing this client will send the invoice to their email.
+              {{ 'paymentDialogs.createInvoice.billingClientHint' | translate }}
             </span>
           } @else {
             <p-select
@@ -95,10 +95,10 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
-              filterPlaceholder="Search clients..."
-              placeholder="Select a client"
+              [filterPlaceholder]="'paymentDialogs.createInvoice.searchClients' | translate"
+              [placeholder]="'paymentDialogs.createInvoice.selectClient' | translate"
               [loading]="clientsLoading()"
-              appendTo="body"
+              [appendTo]="'body'"
               class="w-full"
             />
           }
@@ -106,17 +106,17 @@
           <!-- New recipient fields -->
           <div class="flex flex-col gap-3">
             <div class="flex flex-col gap-1">
-              <label for="guestEmail" class="text-xs text-surface-500">Email</label>
-              <input id="guestEmail" pInputText formControlName="guestEmail" placeholder="client@example.com" />
+              <label for="guestEmail" class="text-xs text-surface-500">{{ 'form.label.email' | translate }}</label>
+              <input id="guestEmail" pInputText formControlName="guestEmail" [placeholder]="'paymentDialogs.createInvoice.guestEmailPlaceholder' | translate" />
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div class="flex flex-col gap-1">
-                <label for="guestFirstName" class="text-xs text-surface-500">First name</label>
-                <input id="guestFirstName" pInputText formControlName="guestFirstName" placeholder="First name" />
+                <label for="guestFirstName" class="text-xs text-surface-500">{{ 'form.label.firstName' | translate }}</label>
+                <input id="guestFirstName" pInputText formControlName="guestFirstName" [placeholder]="'form.label.firstName' | translate" />
               </div>
               <div class="flex flex-col gap-1">
-                <label for="guestLastName" class="text-xs text-surface-500">Last name</label>
-                <input id="guestLastName" pInputText formControlName="guestLastName" placeholder="Optional" />
+                <label for="guestLastName" class="text-xs text-surface-500">{{ 'form.label.lastName' | translate }}</label>
+                <input id="guestLastName" pInputText formControlName="guestLastName" [placeholder]="'form.placeholder.optional' | translate" />
               </div>
             </div>
           </div>
@@ -127,8 +127,8 @@
       <!-- Line items -->
       <section class="flex flex-col gap-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs uppercase tracking-wide text-surface-500">Line items</span>
-          <span class="text-xs text-surface-500">{{ lineItems.length }} {{ lineItems.length === 1 ? 'item' : 'items' }}</span>
+          <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.lineItems' | translate }}</span>
+          <span class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.itemsCount' | translate: { count: lineItems.length } }}</span>
         </div>
 
         <div class="flex flex-col gap-3" formArrayName="lineItems">
@@ -138,11 +138,11 @@
 
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 flex-wrap min-w-0">
-                  <span class="text-xs uppercase tracking-wide text-surface-500">Item {{ i + 1 }}</span>
+                  <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.itemNumber' | translate: { number: i + 1 } }}</span>
                   @if (isFromPricing(i) && linkedProduct(i); as p) {
                     <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-primary-500/10 text-primary-700 dark:text-primary-400 border border-primary-500/30">
                       <i class="pi pi-tag" style="font-size: 0.65rem;"></i>
-                      From pricing · {{ p.product.name }}
+                      {{ 'paymentDialogs.createInvoice.fromPricing' | translate: { name: p.product.name } }}
                     </span>
                   }
                 </div>
@@ -153,7 +153,8 @@
                     [text]="true"
                     severity="secondary"
                     size="small"
-                    pTooltip="Remove"
+                    [pTooltip]="'button.remove' | translate"
+                    [attr.aria-label]="'button.remove' | translate"
                     (click)="removeLineItem(i)"
                     iconOnly
                   >
@@ -181,7 +182,7 @@
                     </div>
                   }
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs text-surface-500">Quantity</label>
+                    <label class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.quantity' | translate }}</label>
                     <div class="flex items-center gap-1 max-w-56">
                       <button pButton
                         type="button"
@@ -223,19 +224,19 @@
                        invoice without changing the catalog item. -->
                   <div class="flex items-center justify-between gap-3 pt-2 border-t border-surface-200 dark:border-surface-700/50">
                     <span class="text-xs text-surface-500 leading-tight">
-                      Need a one-off price or description for this invoice?
+                      {{ 'paymentDialogs.createInvoice.oneOffPriceHint' | translate }}
                     </span>
                     <button pButton
                       type="button"
                       severity="secondary"
                       [outlined]="true"
                       size="small"
-                      pTooltip="Unlock all fields. The pricing item stays untouched."
+                      [pTooltip]="'paymentDialogs.createInvoice.editAsCustomTooltip' | translate"
                       tooltipPosition="top"
                       (click)="unlinkPricing(i)"
                     >
                       <i class="pi pi-pencil"></i>
-                      Edit as custom
+                      {{ 'paymentDialogs.createInvoice.editAsCustom' | translate }}
                     </button>
                   </div>
                 </div>
@@ -243,17 +244,17 @@
                 <!-- Custom state: freeform fields + link to pricing catalog -->
                 @if (productOptions().length > 0) {
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs text-surface-500">Pick from pricing (optional)</label>
+                    <label class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.pickFromPricing' | translate }}</label>
                     <p-select
                       formControlName="productId"
                       [options]="productOptions()"
                       optionLabel="label"
                       optionValue="value"
                       [filter]="true"
-                      filterPlaceholder="Search pricings..."
-                      placeholder="Pick a pricing item or enter custom below"
+                      [filterPlaceholder]="'paymentDialogs.createInvoice.searchPricings' | translate"
+                      [placeholder]="'paymentDialogs.createInvoice.pricingPlaceholder' | translate"
                       [showClear]="true"
-                      appendTo="body"
+                      [appendTo]="'body'"
                       class="w-full"
                       (onChange)="fillLineFromProduct(i, $any($event).value)"
                     />
@@ -261,33 +262,33 @@
 
                   <div class="flex items-center gap-2 -my-1">
                     <div class="flex-1 h-px bg-surface-200 dark:bg-surface-700"></div>
-                    <span class="text-xs text-surface-500">or enter custom</span>
+                    <span class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.orEnterCustom' | translate }}</span>
                     <div class="flex-1 h-px bg-surface-200 dark:bg-surface-700"></div>
                   </div>
                 }
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs text-surface-500">Name</label>
+                  <label class="text-xs text-surface-500">{{ 'form.label.name' | translate }}</label>
                   <input
                     pInputText
                     formControlName="name"
-                    placeholder="e.g. Single PT Session"
+                    [placeholder]="'paymentDialogs.createInvoice.namePlaceholder' | translate"
                   />
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs text-surface-500">Description (optional)</label>
+                  <label class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.descriptionOptional' | translate }}</label>
                   <textarea
                     pTextarea
                     formControlName="description"
                     rows="2"
-                    placeholder="Longer details shown on the invoice"
+                    [placeholder]="'paymentDialogs.createInvoice.descriptionPlaceholder' | translate"
                   ></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs text-surface-500">Unit price</label>
+                    <label class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.unitPrice' | translate }}</label>
                     <p-inputnumber
                       formControlName="amount"
                       mode="currency"
@@ -302,7 +303,7 @@
                     />
                   </div>
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs text-surface-500">Quantity</label>
+                    <label class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.quantity' | translate }}</label>
                     <div class="flex items-center gap-1">
                       <button pButton
                         type="button"
@@ -341,8 +342,8 @@
               }
 
               <div class="flex justify-between items-center pt-2 border-t border-surface-200 dark:border-surface-700/50">
-                <span class="text-xs text-surface-500">Line subtotal</span>
-                <span class="text-sm font-semibold tabular-nums">{{ (lineSubtotalCents(i) / 100).toFixed(2) }} {{ displayCurrency() }}</span>
+                <span class="text-xs text-surface-500">{{ 'paymentDialogs.createInvoice.lineSubtotal' | translate }}</span>
+                <span class="text-sm font-semibold tabular-nums">{{ lineSubtotalCents(i) | currencyRon : displayCurrency() : 'code' }}</span>
               </div>
             </div>
           }
@@ -350,7 +351,7 @@
           <div class="flex gap-2">
             <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="addLineItem()">
               <i class="pi pi-plus"></i>
-              Add line item
+              {{ 'paymentDialogs.createInvoice.addLineItem' | translate }}
             </button>
           </div>
         </div>
@@ -358,13 +359,13 @@
 
       <!-- Notes -->
       <section class="flex flex-col gap-1">
-        <label for="invoiceNotes" class="text-xs uppercase tracking-wide text-surface-500">Notes (optional)</label>
+        <label for="invoiceNotes" class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.notesOptional' | translate }}</label>
         <textarea
           id="invoiceNotes"
           pTextarea
           formControlName="notes"
           rows="2"
-          placeholder="Shown on the invoice. e.g. “Thanks — see you next week!”"
+          [placeholder]="'paymentDialogs.createInvoice.notesPlaceholder' | translate"
         ></textarea>
       </section>
     </div>
@@ -376,7 +377,7 @@
 
       <!-- Issue date (today, read-only for now) -->
       <section class="flex flex-col gap-2">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Issue date</span>
+        <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.issueDate' | translate }}</span>
         <div class="flex items-center gap-2 rounded-md border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm">
           <i class="pi pi-calendar text-surface-500"></i>
           <span class="tabular-nums">{{ today() | date: 'dd MMM yyyy' }}</span>
@@ -385,7 +386,7 @@
 
       <!-- Due date chips -->
       <section class="flex flex-col gap-2">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Due date</span>
+        <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.dueDate' | translate }}</span>
         <div class="flex flex-wrap gap-2">
           @for (chip of dueChipOptions; track chip.value) {
             <button
@@ -397,23 +398,23 @@
               [class.dark:bg-surface-700]="duePreset() === chip.value"
               [class.font-semibold]="duePreset() === chip.value"
               (click)="onDuePresetChange(chip.value)"
-            >{{ chip.label }}</button>
+            >{{ chip.labelKey | translate: { count: chip.value } }}</button>
           }
         </div>
         @if (duePreset() === 'custom') {
           <p-datepicker
             formControlName="customDueDate"
             [showIcon]="true"
-            appendTo="body"
+            [appendTo]="'body'"
             dateFormat="dd/mm/yy"
-            placeholder="Pick a date"
+            [placeholder]="'form.placeholder.pickDate' | translate"
             [minDate]="today()"
             class="w-full"
           />
         }
         @if (resolvedDueDate(); as due) {
           <span class="text-xs text-surface-500">
-            Due {{ due | date: 'dd MMM yyyy' }}
+            {{ 'paymentDialogs.createInvoice.dueOn' | translate: { date: (due | date: 'dd MMM yyyy') } }}
           </span>
         }
       </section>
@@ -421,14 +422,14 @@
       <!-- Totals card -->
       <section class="rounded-lg border border-surface-200 dark:border-surface-700 p-4 bg-surface-50 dark:bg-surface-900/60">
         <div class="flex items-center justify-between py-1 text-sm text-surface-600 dark:text-surface-400">
-          <span>Subtotal</span>
-          <span class="tabular-nums">{{ (subtotalCents() / 100).toFixed(2) }} {{ displayCurrency() }}</span>
+          <span>{{ 'paymentDialogs.createInvoice.subtotal' | translate }}</span>
+          <span class="tabular-nums">{{ subtotalCents() | currencyRon : displayCurrency() : 'code' }}</span>
         </div>
         <div class="h-px bg-surface-200 dark:bg-surface-700 my-2"></div>
         <div class="flex items-center justify-between py-1">
-          <span class="text-xs uppercase tracking-wide text-surface-500">Total</span>
+          <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.total' | translate }}</span>
           <span class="font-heading text-2xl font-semibold text-primary-500 tabular-nums">
-            {{ (totalCents() / 100).toFixed(2) }} {{ displayCurrency() }}
+            {{ totalCents() | currencyRon : displayCurrency() : 'code' }}
           </span>
         </div>
       </section>
@@ -436,13 +437,13 @@
       <!-- Delivery — hidden in edit mode (use the "Send" action on the list) -->
       @if (!isEditMode()) {
       <section class="flex flex-col gap-2">
-        <span class="text-xs uppercase tracking-wide text-surface-500">Delivery</span>
+        <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.delivery' | translate }}</span>
         <label class="flex items-center gap-2 cursor-pointer select-none">
           <p-checkbox formControlName="sendImmediately" [binary]="true" inputId="sendImm" />
-          <span class="text-sm">Email the invoice to the client now</span>
+          <span class="text-sm">{{ 'paymentDialogs.createInvoice.emailNow' | translate }}</span>
         </label>
         <p class="text-xs text-surface-500 m-0">
-          Leave unchecked to keep it as a draft — you can review it and send it from the list later.
+          {{ 'paymentDialogs.createInvoice.deliveryHint' | translate }}
         </p>
       </section>
       }
@@ -455,19 +456,19 @@
       <div class="hidden sm:flex items-center gap-2 text-xs text-surface-500">
         @if (draftSavedAt(); as savedAt) {
           <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-500"></span>
-          <span>Draft saved · {{ savedAt | date: 'HH:mm' }}</span>
+          <span>{{ 'paymentDialogs.createInvoice.draftSavedAt' | translate: { time: (savedAt | date: 'HH:mm') } }}</span>
         } @else {
-          <span>Changes are auto-saved as you type.</span>
+          <span>{{ 'paymentDialogs.createInvoice.autoSaveHint' | translate }}</span>
         }
       </div>
 
       <!-- Action row -->
       <div class="flex items-center gap-2 justify-end">
         @if (isEditMode()) {
-          <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="visible.set(false)">Cancel</button>
+          <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
           <button pButton type="button" size="small" [disabled]="(loadingForEdit()) || saving()" (click)="submit()">
             <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-            Save changes
+            {{ 'button.saveChanges' | translate }}
           </button>
         } @else {
           <!-- All action buttons are disabled while saving() is true.
@@ -481,12 +482,12 @@
             severity="secondary"
             [text]="true"
             size="small"
-            pTooltip="Changes are kept as a draft"
+            [pTooltip]="'paymentDialogs.createInvoice.closeTooltip' | translate"
             tooltipPosition="top"
             [disabled]="saving()"
             (click)="visible.set(false)"
           >
-            Close
+            {{ 'button.close' | translate }}
           </button>
           <!-- Save-as-draft: full label on desktop, short on mobile.
                We render two buttons conditionally on breakpoint because
@@ -502,21 +503,21 @@
             class="hidden sm:inline-flex"
           >
             <i class="pi" [class]="saving() && !form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-save'"></i>
-            Save as draft
+            {{ 'paymentDialogs.createInvoice.saveAsDraft' | translate }}
           </button>
           <button pButton
             type="button"
             severity="secondary"
             [outlined]="true"
             size="small"
-            pTooltip="Save as draft"
+            [pTooltip]="'paymentDialogs.createInvoice.saveAsDraft' | translate"
             tooltipPosition="top"
             [disabled]="(saving()) || saving() && !form.controls.sendImmediately.value"
             (click)="saveAsDraft()"
             class="sm:hidden"
           >
             <i class="pi" [class]="saving() && !form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-save'"></i>
-            Draft
+            {{ 'paymentDialogs.createInvoice.draft' | translate }}
           </button>
           <!-- Send: full label with amount on desktop, short on mobile -->
           <button pButton
@@ -527,9 +528,11 @@
             class="hidden sm:inline-flex"
           >
             <i class="pi" [class]="saving() && !!form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-            {{ form.controls.sendImmediately.value
-              ? 'Send invoice · ' + ((totalCents() / 100).toFixed(2)) + ' ' + displayCurrency()
-              : 'Create invoice' }}
+            @if (form.controls.sendImmediately.value) {
+              {{ 'paymentDialogs.createInvoice.sendInvoiceAmount' | translate: { amount: (totalCents() | currencyRon : displayCurrency() : 'code') } }}
+            } @else {
+              {{ 'paymentDialogs.createInvoice.createButton' | translate }}
+            }
           </button>
           <button pButton
             type="button"
@@ -539,7 +542,7 @@
             class="sm:hidden"
           >
             <i class="pi" [class]="saving() && !!form.controls.sendImmediately.value ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-            {{ form.controls.sendImmediately.value ? 'Send' : 'Create' }}
+            {{ (form.controls.sendImmediately.value ? 'button.send' : 'button.create') | translate }}
           </button>
         }
       </div>

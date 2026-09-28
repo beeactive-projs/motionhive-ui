@@ -691,7 +691,6 @@
       "placeholderGeneric": "Message…"
     },
     "composer": {
-      "dismissError": "Dismiss",
       "sendingPaused": "Sending paused",
       "tooLong": "That message is too long. Trim it and try again."
     },
@@ -909,6 +908,203 @@
       "cancelledWithin": "Booking cancelled — no charge.",
       "copyFailed": "Couldn't copy the link.",
       "linkFailed": "Couldn't get the meeting link."
+    }
+  },
+  "payments": {
+    "badge": {
+      "overdue": "Overdue"
+    },
+    "client": {
+      "detail": {
+        "checking": "Checking with Stripe…",
+        "handoff": "Payment happens on Stripe's secure page. Come back here when you're done and we'll confirm it.",
+        "paidBody": "{name} has been notified. Nothing else to do.",
+        "paidTitle": "Your payment went through",
+        "pay": "Pay on Stripe",
+        "payAmount": "Pay {amount} {currency} on Stripe",
+        "unfinishedBody": "If you did pay, the status catches up on its own within a few minutes. You can safely try again.",
+        "unfinishedTitle": "Nothing was charged, as far as we can see"
+      },
+      "dueNow": "Due now",
+      "empty": {
+        "message": "When a coach bills you, it shows up here.",
+        "title": "No invoices"
+      },
+      "memberships": {
+        "cancel": "Cancel membership",
+        "emptyMessage": "Recurring plans you join will show up here.",
+        "emptyTitle": "No memberships",
+        "endsOn": "Ends {date}",
+        "paymentOverdue": "Payment overdue",
+        "perInterval": "/ {interval, select, day {day} week {week} month {month} year {year} other {{interval}}}",
+        "renewsOn": "Renews {date}"
+      },
+      "paymentMethods": "Payment methods",
+      "sections": {
+        "paid": "Paid"
+      }
+    },
+    "coach": {
+      "createInvoice": "Create invoice",
+      "earnings": {
+        "available": "{amount} available",
+        "open": "{count} open",
+        "openOverdue": "{open} open · {overdue} overdue",
+        "outstanding": "Outstanding",
+        "thisMonth": "This month"
+      },
+      "empty": {
+        "message": "Bill a client for a session or a block of coaching.",
+        "title": "No invoices yet"
+      },
+      "memberships": {
+        "message": "Recurring plans you sell are managed there for now.",
+        "title": "Memberships live on the web"
+      },
+      "sections": {
+        "overdue": "Overdue",
+        "rest": "Everything else"
+      }
+    },
+    "confirm": {
+      "cancelMembership": {
+        "body": "You keep access until the end of the period you have already paid for. Nothing is charged after that.",
+        "confirm": "Cancel membership",
+        "title": "Cancel this membership?"
+      },
+      "deleteDraft": {
+        "body": "The draft is removed. Nothing was ever sent to the client.",
+        "confirm": "Delete draft",
+        "title": "Delete this draft?"
+      },
+      "keepIt": "Keep it",
+      "markPaid": {
+        "body": "Use this when the client paid you directly — cash or a bank transfer. Stripe records it as paid outside the platform.",
+        "confirm": "Mark paid",
+        "title": "Mark as paid?"
+      },
+      "refund": {
+        "body": "The full amount goes back to the client's card. Stripe's refund window is 14 days from payment.",
+        "confirm": "Refund",
+        "title": "Refund this payment?",
+        "windowClosed": "The 14-day refund window for this payment has closed. Refunds after that are handled in the Stripe dashboard."
+      },
+      "send": {
+        "body": "This finalises the invoice and generates its payment page and PDF. Stripe emails it to the client.",
+        "confirm": "Send it",
+        "irreversible": "A sent invoice can no longer be edited — only voided.",
+        "title": "Send this invoice?"
+      },
+      "void": {
+        "body": "The client can no longer pay it, and it stops counting towards what you are owed.",
+        "confirm": "Void invoice",
+        "title": "Void this invoice?"
+      }
+    },
+    "create": {
+      "addLine": "Add another line",
+      "billing": "Billing",
+      "chooseClient": "Choose a client",
+      "createAndSend": "Create & send",
+      "descriptionPlaceholder": "Personal training session",
+      "dueDate": "Due date (optional)",
+      "fewer": "Fewer",
+      "more": "More",
+      "noClients": "You have no active clients yet. Invoices go to people you already coach.",
+      "saveDraft": "Save draft",
+      "sections": {
+        "due": "When it's due",
+        "whatFor": "What for",
+        "who": "Who"
+      },
+      "sendNote": "Sending finalises the invoice and Stripe emails it to your client.",
+      "title": "New invoice",
+      "total": "Total"
+    },
+    "detail": {
+      "actions": {
+        "deleteDraft": "Delete draft",
+        "markPaid": "Mark paid",
+        "refund": "Refund",
+        "send": "Send to client",
+        "void": "Void"
+      },
+      "billedTo": "Billed to",
+      "document": "Document",
+      "due": "Due",
+      "from": "From",
+      "invoicePdf": "Invoice (PDF)",
+      "items": "Items",
+      "kicker": {
+        "amountDue": "Amount due",
+        "paid": "Paid"
+      },
+      "loadError": "Couldn't load this invoice",
+      "openPdf": "Open the PDF",
+      "paidOn": "Paid on",
+      "partial": "{paid} paid · {remaining} remaining",
+      "receiptPdf": "Receipt (PDF)",
+      "title": "Invoice",
+      "wasDue": "Was due"
+    },
+    "facts": {
+      "accessUntil": "Access until",
+      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+      "endOfPeriod": "the end of this period",
+      "from": "From",
+      "plan": "Plan",
+      "to": "To",
+      "windowCloses": "Window closes"
+    },
+    "fallback": {
+      "client": "Client",
+      "invoice": "Invoice",
+      "item": "Item",
+      "membership": "Membership",
+      "yourCoach": "Your coach"
+    },
+    "gate": {
+      "alreadyDone": "I've already done this",
+      "connect": {
+        "action": "Connect Stripe",
+        "body": "Invoices and payouts run through Stripe. Setting up takes a few minutes and opens outside the app.",
+        "title": "Connect Stripe to get paid"
+      },
+      "needsMore": {
+        "action": "Continue verification",
+        "body": "Your account is set up but Stripe is still waiting on some details before you can take payments.",
+        "title": "Stripe needs more from you"
+      }
+    },
+    "list": {
+      "loadError": "Couldn't load your invoices"
+    },
+    "row": {
+      "due": "Due {date}",
+      "paidOn": "Paid {date}",
+      "wasDue": "Was due {date}"
+    },
+    "segment": {
+      "invoices": "Invoices",
+      "memberships": "Memberships"
+    },
+    "toast": {
+      "actionFailed": "That did not go through.",
+      "cancelMembershipFailed": "Could not cancel that membership.",
+      "createFailed": "Could not create the invoice.",
+      "draftSaved": "Draft saved",
+      "invoiceSent": "Invoice sent",
+      "markedPaid": "Marked as paid",
+      "membershipCanceled": "Membership will end at the period end",
+      "noPaymentToRefund": "No payment found for this invoice to refund.",
+      "onboardingFailed": "Could not open Stripe onboarding.",
+      "payFailed": "Could not open the payment page.",
+      "paymentNotFound": "Could not find the payment.",
+      "portalFailed": "Could not open your payment settings.",
+      "refundFailed": "Could not issue the refund.",
+      "refunded": "Refund issued",
+      "sent": "Sent to the client",
+      "voided": "Invoice voided"
     }
   },
   "role": {

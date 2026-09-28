@@ -1,6 +1,5 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   computed,
   inject,
   OnInit,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -23,6 +23,7 @@ import {
   CurrencyRonPipe,
   StatusLabelPipe,
   getInvoiceStatusSeverity,
+  showApiError,
   type Invoice,
   type InvoiceLineItemDetail,
 } from 'core';
@@ -64,11 +65,11 @@ interface ActivityEntry {
     CurrencyRonPipe,
     StatusLabelPipe,
     SendInvoiceEmailDialog,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './invoice-detail.html',
   styleUrl: './invoice-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
@@ -76,6 +77,7 @@ export class InvoiceDetail implements OnInit {
   private readonly _invoiceService = inject(PaymentInvoiceService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly invoice = signal<Invoice | null>(null);
   readonly lineItems = signal<InvoiceLineItemDetail[]>([]);
@@ -104,19 +106,19 @@ export class InvoiceDetail implements OnInit {
 
     const draft: TrackerStep = {
       key: 'draft',
-      label: 'Draft',
+      label: this._translateService.instant('payments.invoiceDetail.tracker.draft'),
       date: inv.createdAt,
       state: 'done',
     };
     const sent: TrackerStep = {
       key: 'sent',
-      label: 'Sent',
+      label: this._translateService.instant('payments.invoiceDetail.tracker.sent'),
       date: inv.finalizedAt,
       state: inv.finalizedAt ? 'done' : 'pending',
     };
     const paid: TrackerStep = {
       key: 'paid',
-      label: 'Paid',
+      label: this._translateService.instant('payments.invoiceDetail.tracker.paid'),
       date: inv.paidAt,
       state: inv.paidAt ? 'done' : 'pending',
     };
@@ -138,17 +140,18 @@ export class InvoiceDetail implements OnInit {
   readonly activity = computed<ActivityEntry[]>(() => {
     const inv = this.invoice();
     if (!inv) return [];
+    const t = (key: string) => this._translateService.instant(`payments.invoiceDetail.activity.${key}`);
     const events: ActivityEntry[] = [
-      { label: 'Draft created', at: inv.createdAt, kind: 'neutral' },
+      { label: t('draftCreated'), at: inv.createdAt, kind: 'neutral' },
     ];
     if (inv.finalizedAt) {
-      events.push({ label: 'Invoice sent', at: inv.finalizedAt, kind: 'neutral' });
+      events.push({ label: t('invoiceSent'), at: inv.finalizedAt, kind: 'neutral' });
     }
     if (inv.paidAt) {
-      events.push({ label: 'Invoice paid', at: inv.paidAt, kind: 'success' });
+      events.push({ label: t('invoicePaid'), at: inv.paidAt, kind: 'success' });
     }
     if (inv.voidedAt) {
-      events.push({ label: 'Invoice voided', at: inv.voidedAt, kind: 'danger' });
+      events.push({ label: t('invoiceVoided'), at: inv.voidedAt, kind: 'danger' });
     }
     return events.sort(
       (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime(),
@@ -162,7 +165,7 @@ export class InvoiceDetail implements OnInit {
     if (c?.firstName) {
       return `${c.firstName}${c.lastName ? ' ' + c.lastName : ''}`;
     }
-    return inv.clientEmail ?? 'Guest';
+    return inv.clientEmail ?? this._translateService.instant('payments.invoiceDetail.guest');
   });
 
   /** Overflow menu for secondary actions (hosted page, PDF). */
@@ -172,14 +175,14 @@ export class InvoiceDetail implements OnInit {
     const items: MenuItem[] = [];
     if (inv.hostedInvoiceUrl) {
       items.push({
-        label: 'Open hosted page',
+        label: this._translateService.instant('payments.invoiceDetail.action.openHostedPage'),
         icon: 'pi pi-external-link',
         command: () => window.open(inv.hostedInvoiceUrl!, '_blank'),
       });
     }
     if (inv.invoicePdf) {
       items.push({
-        label: 'Download PDF',
+        label: this._translateService.instant('payments.invoiceDetail.action.downloadPdf'),
         icon: 'pi pi-download',
         command: () => window.open(inv.invoicePdf!, '_blank'),
       });
@@ -228,8 +231,8 @@ export class InvoiceDetail implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Invoice not found',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('payments.invoiceDetail.toast.notFound'),
         });
         this.goBackToList();
       },
@@ -257,9 +260,8 @@ export class InvoiceDetail implements OnInit {
     const inv = this.invoice();
     if (!inv) return;
     this._confirmationService.confirm({
-      message:
-        'Are you sure you want to void this invoice? This cannot be undone.',
-      header: 'Void invoice',
+      message: this._translateService.instant('payments.invoiceDetail.confirm.void.message'),
+      header: this._translateService.instant('payments.invoiceDetail.confirm.void.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
@@ -270,16 +272,17 @@ export class InvoiceDetail implements OnInit {
             this.actionLoading.set(false);
             this._messageService.add({
               severity: 'success',
-              summary: 'Invoice voided',
+              summary: this._translateService.instant('payments.invoiceDetail.toast.voided'),
             });
           },
           error: (err) => {
             this.actionLoading.set(false);
-            this._messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: err.error?.message || 'Failed to void invoice',
-            });
+            showApiError(
+              this._messageService,
+              this._translateService.instant('toast.summary.error'),
+              this._translateService.instant('payments.invoiceDetail.toast.voidFailed'),
+              err,
+            );
           },
         });
       },
@@ -290,9 +293,8 @@ export class InvoiceDetail implements OnInit {
     const inv = this.invoice();
     if (!inv) return;
     this._confirmationService.confirm({
-      message:
-        'Mark this invoice as paid out of band (cash or bank transfer)?',
-      header: 'Mark as paid',
+      message: this._translateService.instant('payments.invoiceDetail.confirm.markPaid.message'),
+      header: this._translateService.instant('payments.invoiceDetail.confirm.markPaid.header'),
       icon: 'pi pi-info-circle',
       accept: () => {
         this.actionLoading.set(true);
@@ -302,16 +304,17 @@ export class InvoiceDetail implements OnInit {
             this.actionLoading.set(false);
             this._messageService.add({
               severity: 'success',
-              summary: 'Invoice marked paid',
+              summary: this._translateService.instant('payments.invoiceDetail.toast.markedPaid'),
             });
           },
           error: (err) => {
             this.actionLoading.set(false);
-            this._messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: err.error?.message || 'Failed to mark as paid',
-            });
+            showApiError(
+              this._messageService,
+              this._translateService.instant('toast.summary.error'),
+              this._translateService.instant('payments.invoiceDetail.toast.markPaidFailed'),
+              err,
+            );
           },
         });
       },
@@ -325,14 +328,14 @@ export class InvoiceDetail implements OnInit {
       () =>
         this._messageService.add({
           severity: 'success',
-          summary: 'Copied',
-          detail: 'Payment link copied to clipboard',
+          summary: this._translateService.instant('toast.summary.copied'),
+          detail: this._translateService.instant('payments.invoiceDetail.toast.linkCopied'),
         }),
       () =>
         this._messageService.add({
           severity: 'error',
-          summary: 'Copy failed',
-          detail: 'Select and copy the link manually.',
+          summary: this._translateService.instant('payments.common.copyFailed'),
+          detail: this._translateService.instant('payments.common.copyManually'),
         }),
     );
   }

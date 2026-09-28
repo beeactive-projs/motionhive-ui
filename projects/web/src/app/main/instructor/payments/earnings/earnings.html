@@ -2,12 +2,11 @@
 <p-message severity="warn" class="w-full mb-4">
   <div class="flex items-center gap-3">
     <span>
-      {{ hasStripeAccount() ? 'Finish Stripe setup to start receiving money.' : 'Set up payouts to start receiving
-      money.' }}
+      {{ (hasStripeAccount() ? 'payments.earnings.finishSetupBanner' : 'payments.earnings.setUpPayoutsBanner') | translate }}
     </span>
     <button pButton type="button" size="small" (click)="startOnboarding()">
       <i [class]="hasStripeAccount() ? 'pi pi-arrow-right' : 'pi pi-external-link'"></i>
-      {{ hasStripeAccount() ? 'Finish setup' : 'Connect Stripe' }}
+      {{ (hasStripeAccount() ? 'payments.common.finishSetup' : 'payments.earnings.connectStripe') | translate }}
     </button>
   </div>
 </p-message>
@@ -24,7 +23,7 @@
     (click)="openStripeDashboard()"
     [disabled]="dashboardLoading()"
   >
-    Open Stripe Dashboard
+    {{ 'payments.earnings.openStripeDashboard' | translate }}
     <i class="pi" [class]="dashboardLoading() ? 'pi-spinner pi-spin' : 'pi-external-link'"></i>
   </button>
 </div>
@@ -43,19 +42,19 @@
 } @else if (summary(); as s) {
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
   <p-card class="shadow-md">
-    <div class="text-sm text-surface-500 mb-1">Month to date</div>
+    <div class="text-sm text-surface-500 mb-1">{{ 'payments.earnings.monthToDate' | translate }}</div>
     <div class="font-semibold text-xl text-primary-600">{{ s.monthToDateRevenueCents | currencyRon:s.currency }}</div>
   </p-card>
   <p-card class="shadow-md">
-    <div class="text-sm text-surface-500 mb-1">Available balance</div>
+    <div class="text-sm text-surface-500 mb-1">{{ 'payments.earnings.availableBalance' | translate }}</div>
     <div class="font-semibold text-xl">{{ s.availableBalanceCents | currencyRon:s.currency }}</div>
   </p-card>
   <p-card class="shadow-md">
-    <div class="text-sm text-surface-500 mb-1">Pending balance</div>
+    <div class="text-sm text-surface-500 mb-1">{{ 'payments.earnings.pendingBalance' | translate }}</div>
     <div class="font-semibold text-xl">{{ s.pendingBalanceCents | currencyRon:s.currency }}</div>
   </p-card>
   <p-card class="shadow-md">
-    <div class="text-sm text-surface-500 mb-1">Outstanding invoices</div>
+    <div class="text-sm text-surface-500 mb-1">{{ 'payments.earnings.outstandingInvoices' | translate }}</div>
     <div class="font-semibold text-xl text-orange-500">{{ s.outstandingInvoicesCents | currencyRon:s.currency }}</div>
   </p-card>
 </div>
@@ -67,12 +66,12 @@
     <div class="flex items-center gap-3">
       <i class="pi pi-calendar text-2xl text-primary-500"></i>
       <div>
-        <div class="text-sm text-surface-500">Next payout</div>
+        <div class="text-sm text-surface-500">{{ 'payments.earnings.nextPayout' | translate }}</div>
         <div class="font-semibold">
           @if (s.nextPayoutDate) {
           {{ s.nextPayoutDate | date:'dd MMM yyyy' }}
           } @else {
-          No payout scheduled
+          {{ 'payments.earnings.noPayoutScheduled' | translate }}
           }
         </div>
       </div>
@@ -81,9 +80,9 @@
 
   <!-- Top clients -->
   <p-card class="shadow-md">
-    <div class="text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">Top clients</div>
+    <div class="text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">{{ 'payments.earnings.topClients' | translate }}</div>
     @if (s.topClients.length === 0) {
-    <p class="text-sm text-surface-500">No payments yet</p>
+    <p class="text-sm text-surface-500">{{ 'payments.earnings.noPaymentsYet' | translate }}</p>
     } @else {
     <div class="flex flex-col gap-2">
       @for (client of s.topClients; track client.clientId) {
@@ -105,20 +104,20 @@
 }
 
 <!-- Recent payments table -->
-<h2 class="font-heading font-semibold text-lg mb-3">Payment history</h2>
+<h2 class="font-heading font-semibold text-lg mb-3">{{ 'payments.earnings.history' | translate }}</h2>
 
 <p-table [value]="payments()" [lazy]="true" [paginator]="true" [rows]="paymentsRows"
   [totalRecords]="paymentsTotalRecords()" [loading]="paymentsLoading()" (onLazyLoad)="onPaymentsPageChange($event)"
   [rowTrackBy]="trackById" size="small" [showCurrentPageReport]="true"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} payments">
+  [currentPageReportTemplate]="'payments.earnings.pageReport' | translate: pageReportParams">
 
   <ng-template #header>
     <tr>
-      <th>Date</th>
-      <th>Amount</th>
-      <th>Status</th>
-      <th>Method</th>
-      <th>Fee</th>
+      <th>{{ 'form.label.date' | translate }}</th>
+      <th>{{ 'form.label.amount' | translate }}</th>
+      <th>{{ 'form.label.status' | translate }}</th>
+      <th>{{ 'payments.earnings.table.method' | translate }}</th>
+      <th>{{ 'payments.earnings.table.fee' | translate }}</th>
     </tr>
   </ng-template>
 
@@ -128,10 +127,10 @@
         HH:mm') }}</td>
       <td class="font-medium">{{ payment.amountCents | currencyRon:payment.currency }}</td>
       <td>
-        <p-tag [value]="payment.status" [severity]="paymentStatusSeverity(payment.status)" />
+        <p-tag [value]="payment.status | statusLabel: 'paymentStatus'" [severity]="paymentStatusSeverity(payment.status)" />
         @if (payment.amountRefundedCents > 0) {
         <span class="text-xs text-surface-500 ml-1">
-          ({{ payment.amountRefundedCents | currencyRon:payment.currency }} refunded)
+          {{ 'payments.earnings.refunded' | translate: { amount: (payment.amountRefundedCents | currencyRon:payment.currency) } }}
         </span>
         }
       </td>
@@ -159,7 +158,7 @@
   <ng-template #emptymessage>
     <tr>
       <td colspan="5">
-        <mh-list-empty-state icon="pi pi-wallet" title="No payments yet" />
+        <mh-list-empty-state icon="pi pi-wallet" [title]="'payments.earnings.noPaymentsYet' | translate" />
       </td>
     </tr>
   </ng-template>

@@ -3,14 +3,14 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" />
     </ion-buttons>
-    <ion-title>Billing</ion-title>
+    <ion-title>{{ 'nav.billing' | translate }}</ion-title>
   </ion-toolbar>
 
   <ion-toolbar>
     <ion-segment [value]="segment()" (ionChange)="onSegmentChange($event)">
       @for (option of segments; track option.value) {
         <ion-segment-button [value]="option.value">
-          <ion-label>{{ option.label }}</ion-label>
+          <ion-label>{{ option.label | translate }}</ion-label>
         </ion-segment-button>
       }
     </ion-segment>
@@ -26,8 +26,8 @@
     @if (subscriptions().length === 0) {
       <mh-empty-state
         icon="card-outline"
-        heading="No memberships"
-        message="Recurring plans you join will show up here."
+        [heading]="'payments.client.memberships.emptyTitle' | translate"
+        [message]="'payments.client.memberships.emptyMessage' | translate"
       />
     } @else {
       <div class="rows">
@@ -36,26 +36,37 @@
                not simply active. -->
           <div class="membership">
             <div class="head">
-              <span class="name">{{ sub.product?.name ?? 'Membership' }}</span>
-              @if (sub.status !== 'active') {
-                <ion-note class="status" [class.warn]="sub.status === 'past_due'">
-                  {{ sub.status === 'past_due' ? 'Payment overdue' : sub.status }}
+              <span class="name">{{ sub.product?.name ?? ('payments.fallback.membership' | translate) }}</span>
+              @if (sub.status !== SubscriptionStatuses.Active) {
+                <ion-note class="status" [class.warn]="sub.status === SubscriptionStatuses.PastDue">
+                  @if (sub.status === SubscriptionStatuses.PastDue) {
+                    {{ 'payments.client.memberships.paymentOverdue' | translate }}
+                  } @else {
+                    {{ sub.status | enumLabel: 'subscriptionStatus' }}
+                  }
                 </ion-note>
               }
             </div>
             <div class="price">
               {{ sub.amountCents | currencyRon: sub.currency : 'code' }}
-              <span class="interval">/ {{ sub.product?.interval ?? 'month' }}</span>
+              <span class="interval">{{
+                'payments.client.memberships.perInterval'
+                  | translate: { interval: sub.product?.interval ?? 'month' }
+              }}</span>
             </div>
             @if (sub.currentPeriodEnd) {
               <div class="renews">
-                {{ sub.cancelAtPeriodEnd ? 'Ends' : 'Renews' }}
-                {{ sub.currentPeriodEnd | date: 'd MMM yyyy' }}
+                {{
+                  (sub.cancelAtPeriodEnd
+                    ? 'payments.client.memberships.endsOn'
+                    : 'payments.client.memberships.renewsOn'
+                  ) | translate: { date: (sub.currentPeriodEnd | date: 'd MMM yyyy') }
+                }}
               </div>
             }
             @if (!sub.cancelAtPeriodEnd) {
               <ion-button fill="clear" size="small" color="medium" (click)="askCancel(sub)">
-                Cancel membership
+                {{ 'payments.client.memberships.cancel' | translate }}
               </ion-button>
             }
           </div>
@@ -65,9 +76,9 @@
   } @else if (showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your invoices"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'payments.list.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
@@ -87,14 +98,14 @@
     <!-- 4l: no action. Nothing a client can do makes invoices exist. -->
     <mh-empty-state
       icon="receipt-outline"
-      heading="No invoices"
-      message="When a coach bills you, it shows up here."
+      [heading]="'payments.client.empty.title' | translate"
+      [message]="'payments.client.empty.message' | translate"
     />
   } @else {
     <div class="rows">
       @if (due().length > 0) {
         <div class="due-strip">
-          <span class="mh-kicker">Due now</span>
+          <span class="mh-kicker">{{ 'payments.client.dueNow' | translate }}</span>
           <div class="chips">
             <!-- One chip per currency — never a merged total. -->
             @for (total of dueTotals(); track total.currency) {
@@ -108,7 +119,7 @@
       }
 
       @if (paid().length > 0) {
-        <div class="mh-section-label">Paid</div>
+        <div class="mh-section-label">{{ 'payments.client.sections.paid' | translate }}</div>
         @for (invoice of paid(); track invoice.id) {
           <mh-invoice-row [invoice]="invoice" party="instructor" (select)="open(invoice)" />
         }
@@ -124,17 +135,17 @@
        segments because it belongs to neither. -->
   <ion-button class="portal" fill="clear" size="small" (click)="openPortal()">
     <ion-icon slot="start" name="card-outline" />
-    Payment methods
+    {{ 'payments.client.paymentMethods' | translate }}
     <ion-icon slot="end" name="open-outline" />
   </ion-button>
 </ion-content>
 
 <mh-confirm-sheet
   [(open)]="cancelOpen"
-  title="Cancel this membership?"
-  body="You keep access until the end of the period you have already paid for. Nothing is charged after that."
-  confirmLabel="Cancel membership"
-  cancelLabel="Keep it"
+  [title]="'payments.confirm.cancelMembership.title' | translate"
+  [body]="'payments.confirm.cancelMembership.body' | translate"
+  [confirmLabel]="'payments.confirm.cancelMembership.confirm' | translate"
+  [cancelLabel]="'payments.confirm.keepIt' | translate"
   tone="danger"
   [facts]="cancelFacts()"
   [saving]="acting()"

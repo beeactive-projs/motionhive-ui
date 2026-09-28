@@ -82,7 +82,7 @@ import type { CreateTemplateRequest, Venue } from 'core';
           type="button"
           class="mh-qcp__close"
           (click)="dismiss.emit()"
-          [attr.aria-label]="'sessions.quickCreate.dismiss' | translate"
+          [attr.aria-label]="'button.dismiss' | translate"
         >
           <i class="pi pi-times"></i>
         </button>

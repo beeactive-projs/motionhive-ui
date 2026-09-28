@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
@@ -27,7 +27,6 @@ import {
   TagSeverity,
   CurrencyRonPipe,
   StatusLabelPipe,
-  getProductBillingLabel,
   showApiError,
   type Product,
   type ProductType,
@@ -36,6 +35,7 @@ import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { ProductFormDialog } from '../../_dialogs/product-form-dialog/product-form-dialog';
 import { ListCard } from '../../../../_shared/components/list-card/list-card';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
+import { productBillingLabel } from '../shared/payment-labels';
 
 @Component({
   selector: 'mh-products',
@@ -55,16 +55,17 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     ProductFormDialog,
     ListCard,
     ListEmptyState,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './products.html',
   styleUrl: './products.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Products {
   private readonly _productService = inject(ProductService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _scrollSentinel = viewChild<ElementRef>('scrollSentinel');
@@ -83,10 +84,10 @@ export class Products {
   readonly hasMore = computed(() => this.products().length < this.totalRecords());
 
   readonly typeFilter = signal<ProductType | undefined>(undefined);
-  readonly typeOptions = [
-    { label: 'All', value: undefined },
-    { label: 'One-off', value: ProductTypes.OneOff as ProductType },
-    { label: 'Subscription', value: ProductTypes.Subscription as ProductType },
+  readonly typeOptions: { label: string; value: ProductType | undefined }[] = [
+    { label: this._translateService.instant('common.all'), value: undefined },
+    { label: this.typeLabel(ProductTypes.OneOff), value: ProductTypes.OneOff },
+    { label: this.typeLabel(ProductTypes.Subscription), value: ProductTypes.Subscription },
   ];
 
   readonly showProductFormDialog = signal(false);
@@ -107,7 +108,12 @@ export class Products {
             })
             .pipe(
               catchError((err) => {
-                showApiError(this._messageService, 'Error', 'Failed to load products', err);
+                showApiError(
+                  this._messageService,
+                  this._translateService.instant('toast.summary.error'),
+                  this._translateService.instant('payments.products.toast.loadFailed'),
+                  err,
+                );
                 return of(null);
               }),
             );
@@ -168,7 +174,12 @@ export class Products {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Error', 'Failed to load more products', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.products.toast.loadMoreFailed'),
+            err,
+          );
         },
       });
   }
@@ -213,18 +224,24 @@ export class Products {
             list.map((p) => (p.id === updated.id ? updated : p)),
           );
           this._clearTogglingProfileId(product.id);
+          const toast = nextValue ? 'shown' : 'hidden';
           this._messageService.add({
             severity: 'success',
-            summary: nextValue ? 'Showing on profile' : 'Hidden from profile',
-            detail: nextValue
-              ? `"${product.name}" now shows on your public profile.`
-              : `"${product.name}" is hidden from your public profile.`,
+            summary: this._translateService.instant(`payments.products.toast.${toast}.summary`),
+            detail: this._translateService.instant(`payments.products.toast.${toast}.detail`, {
+              name: product.name,
+            }),
           });
         },
         error: (err) => {
           this._patchLocalProduct(product.id, { showOnProfile: previousValue });
           this._clearTogglingProfileId(product.id);
-          showApiError(this._messageService, 'Error', 'Failed to update visibility', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.products.toast.visibilityFailed'),
+            err,
+          );
         },
       });
   }
@@ -243,8 +260,10 @@ export class Products {
 
   confirmDeactivate(product: Product): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to deactivate "${product.name}"? It will no longer appear in product lists.`,
-      header: 'Deactivate product',
+      message: this._translateService.instant('payments.products.confirm.deactivate.message', {
+        name: product.name,
+      }),
+      header: this._translateService.instant('payments.products.confirm.deactivate.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.deactivateProduct(product),
@@ -259,13 +278,20 @@ export class Products {
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: 'Product deactivated',
-            detail: `"${product.name}" has been deactivated`,
+            summary: this._translateService.instant('payments.products.toast.deactivated.summary'),
+            detail: this._translateService.instant('payments.products.toast.deactivated.detail', {
+              name: product.name,
+            }),
           });
           this.reload();
         },
         error: (err) => {
-          showApiError(this._messageService, 'Error', 'Failed to deactivate product', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.products.toast.deactivateFailed'),
+            err,
+          );
         },
       });
   }
@@ -275,21 +301,29 @@ export class Products {
   }
 
   typeLabel(type: ProductType): string {
-    return type === ProductTypes.Subscription ? 'Subscription' : 'One-off';
+    return this._translateService.instant(`payments.productType.${type}`);
+  }
+
+  activeLabel(isActive: boolean): string {
+    return this._translateService.instant(
+      isActive ? 'payments.products.state.active' : 'payments.products.state.inactive',
+    );
   }
 
   activeSeverity(isActive: boolean): TagSeverity {
     return isActive ? TagSeverity.Success : TagSeverity.Danger;
   }
 
-  readonly billingLabel = getProductBillingLabel;
+  readonly billingLabel = productBillingLabel;
 
   productIcon(product: Product): string {
     return product.type === ProductTypes.Subscription ? 'pi pi-sync' : 'pi pi-box';
   }
 
   subtitleFor(product: Product): string {
-    return product.interval ? this.billingLabel(product) : 'One-off product';
+    return product.interval
+      ? this.billingLabel(product)
+      : this._translateService.instant('payments.products.oneOffProduct');
   }
 
   cardAccent(product: Product): 'none' | 'primary' | 'danger' | 'success' {

@@ -11,7 +11,7 @@
     <h2>{{ personName() }}</h2>
     <div class="tags">
       @if (overdue()) {
-        <ion-badge color="danger">Overdue</ion-badge>
+        <ion-badge color="danger">{{ 'payments.badge.overdue' | translate }}</ion-badge>
       } @else if (style().chip; as chip) {
         <ion-badge color="medium">{{ chip }}</ion-badge>
       }

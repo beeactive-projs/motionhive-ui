@@ -1,11 +1,11 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { StripeOnboardingCard } from '../shared/stripe-onboarding-card/stripe-onboarding-card';
 
 @Component({
   selector: 'mh-payments-onboarding',
-  imports: [StripeOnboardingCard],
+  imports: [StripeOnboardingCard, TranslatePipe],
   templateUrl: './onboarding.html',
   styleUrl: './onboarding.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentsOnboarding {}

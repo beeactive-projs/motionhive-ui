@@ -1,11 +1,11 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
@@ -21,6 +21,8 @@ import {
   PaymentStatuses,
   TagSeverity,
   CurrencyRonPipe,
+  StatusLabelPipe,
+  showApiError,
   type EarningsSummary,
   type Payment,
   type PaymentStatus,
@@ -39,18 +41,26 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     ToastModule,
     MessageModule,
     CurrencyRonPipe,
+    StatusLabelPipe,
     ListEmptyState,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './earnings.html',
   styleUrl: './earnings.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Earnings implements OnInit {
   private readonly _earningsService = inject(EarningsService);
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
+
+  /**
+   * PrimeNG fills `{first}` / `{last}` / `{totalRecords}` into the page
+   * report itself, so the translated template keeps those placeholders.
+   */
+  readonly pageReportParams = { first: '{first}', last: '{last}', total: '{totalRecords}' };
 
   readonly dashboardLoading = signal(false);
   // Read directly from the shared store — no per-page fetch needed.
@@ -83,8 +93,8 @@ export class Earnings implements OnInit {
       error: () => {
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to start Stripe onboarding',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('payments.earnings.toast.startOnboardingFailed'),
         });
       },
     });
@@ -101,8 +111,8 @@ export class Earnings implements OnInit {
         this.summaryLoading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load earnings summary',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('payments.earnings.toast.loadSummaryFailed'),
         });
       },
     });
@@ -122,8 +132,8 @@ export class Earnings implements OnInit {
           this.paymentsLoading.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load payment history',
+            summary: this._translateService.instant('toast.summary.error'),
+            detail: this._translateService.instant('payments.earnings.toast.loadPaymentsFailed'),
           });
         },
       });
@@ -160,11 +170,12 @@ export class Earnings implements OnInit {
       },
       error: (err) => {
         this.dashboardLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to open Stripe Dashboard',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('payments.common.openDashboardFailed'),
+          err,
+        );
       },
     });
   }

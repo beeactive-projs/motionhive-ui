@@ -96,11 +96,115 @@
       "verified": "Emailul tău a fost verificat. Te redirecționăm la autentificare…"
     }
   },
+  "billing": {
+    "checkoutReturn": {
+      "error": {
+        "body": "Nu am putut verifica plata. Verifică-ți facturile."
+      },
+      "loading": {
+        "body": "Poate dura câteva secunde. Nu închide această fereastră.",
+        "title": "Îți procesăm plata..."
+      },
+      "paid": {
+        "body": "Factura ta a fost plătită. Vei primi o chitanță pe email.",
+        "title": "Plată reușită"
+      },
+      "pending": {
+        "body": "Plata ta este încă în procesare. Actualizăm în curând starea facturii.",
+        "title": "Plată în procesare"
+      },
+      "viewInvoices": "Vezi facturile mele"
+    },
+    "invoiceDetail": {
+      "activity": "Activitate",
+      "activityLog": {
+        "issued": "Factură emisă",
+        "paid": "Factură plătită",
+        "sent": "Factură trimisă",
+        "voided": "Factură anulată"
+      },
+      "amountLabel": {
+        "due": "Sumă de plată",
+        "paid": "Plătită integral",
+        "voided": "Anulată"
+      },
+      "breadcrumb": "Facturi",
+      "downloadPdf": "Descarcă factura PDF",
+      "dueOn": "Scadență {date}",
+      "issuedOn": "Emisă {date}",
+      "itemsCount": "{count, plural, one {# articol} few {# articole} other {# de articole}}",
+      "lineItems": "Articole",
+      "noLineItems": "Nu există articole.",
+      "paid": "Plătită",
+      "paidOutOfBand": "PLĂTITĂ ÎN AFARA PLATFORMEI",
+      "payNow": "Plătește acum",
+      "payTitle": "Plătește această factură",
+      "payment": "Plată",
+      "qty": "Cant.",
+      "settledDirectly": "Achitată direct cu antrenorul tău (numerar sau transfer bancar).",
+      "subtotal": "Subtotal",
+      "toast": {
+        "notFound": "Factura nu a fost găsită",
+        "payFailed": "Plata nu a putut fi inițiată"
+      },
+      "total": "Total",
+      "tracker": {
+        "draft": "Ciornă",
+        "paid": "Plătită",
+        "pending": "în așteptare",
+        "sent": "Trimisă"
+      },
+      "unit": "Unitar"
+    },
+    "myInvoices": {
+      "due": "Scadență",
+      "empty": "Nicio factură încă",
+      "invoice": "Factură",
+      "pageReport": "Facturile {first}–{last} din {totalRecords}",
+      "toast": {
+        "loadFailed": "Facturile nu au putut fi încărcate"
+      },
+      "viewInvoice": "Vezi factura"
+    },
+    "mySubscriptions": {
+      "cancelTooltip": "Vei păstra accesul până la finalul perioadei curente",
+      "cancelsOn": "se anulează pe {date}",
+      "confirmCancel": {
+        "header": "Anulează abonamentul",
+        "message": "Abonamentul tău se va încheia pe {date}. Vei păstra accesul până atunci. Continui?",
+        "messageNoDate": "Abonamentul tău se va încheia la finalul perioadei curente. Vei păstra accesul până atunci. Continui?"
+      },
+      "currentPeriod": "Perioada curentă",
+      "empty": "Niciun abonament",
+      "info": {
+        "after": "ca să-ți actualizezi metoda de plată, să vezi istoricul plăților sau să descarci chitanțe. Poți anula un abonament direct mai jos.",
+        "before": "Folosește"
+      },
+      "manageBilling": "Gestionează facturarea",
+      "membership": "Abonament",
+      "pageReport": "Abonamentele {first}–{last} din {totalRecords}",
+      "plan": "Plan",
+      "planWithCadence": "{name} · {cadence}",
+      "renews": "Se reînnoiește",
+      "toast": {
+        "cancelFailed": {
+          "detail": "Încearcă din nou peste câteva momente.",
+          "summary": "Nu s-a putut anula"
+        },
+        "cancelScheduled": {
+          "detail": "Abonamentul tău se va încheia la finalul perioadei curente.",
+          "summary": "Anulare programată"
+        },
+        "loadFailed": "Abonamentele nu au putut fi încărcate",
+        "portalFailed": "Portalul de facturare nu a putut fi deschis"
+      },
+      "trialUntil": "Probă până pe {date}"
+    }
+  },
   "clients": {
     "common": {
       "editNotes": "Editează notițele",
       "inviteClient": "Invită un client",
-      "paginator": "Afișezi {first} - {last} din {total}",
       "retryInAMoment": "Reîncearcă în câteva momente.",
       "shownOfTotal": "{shown} din {total}",
       "thisClient": "acest client"
@@ -1174,6 +1278,625 @@
       "tryAgain": "Încearcă din nou."
     }
   },
+  "paymentDialogs": {
+    "createInvoice": {
+      "activeClient": "Client activ",
+      "addLineItem": "Adaugă articol",
+      "autoSaveHint": "Modificările se salvează automat pe măsură ce scrii.",
+      "billTo": "Facturează către",
+      "billingClientHint": "Factura va fi trimisă pe emailul acestui client.",
+      "closeTooltip": "Modificările rămân salvate ca ciornă",
+      "createButton": "Creează factura",
+      "delivery": "Trimitere",
+      "deliveryHint": "Lasă nebifat ca s-o păstrezi ca ciornă — o poți verifica și trimite mai târziu din listă.",
+      "descriptionOptional": "Descriere (opțional)",
+      "descriptionPlaceholder": "Detalii suplimentare afișate pe factură",
+      "draft": "Ciornă",
+      "draftSavedAt": "Ciornă salvată · {time}",
+      "due": {
+        "custom": "Personalizat",
+        "onReceipt": "La primire"
+      },
+      "dueOn": "Scadență {date}",
+      "editAsCustom": "Editează manual",
+      "editAsCustomTooltip": "Deblochează toate câmpurile. Produsul din lista de prețuri rămâne neschimbat.",
+      "emailNow": "Trimite acum factura pe email clientului",
+      "existingClient": "Client existent",
+      "fromPricing": "Din prețuri · {name}",
+      "guestEmailPlaceholder": "client@exemplu.ro",
+      "issueDate": "Data emiterii",
+      "itemNumber": "Articolul {number}",
+      "itemsCount": "{count, plural, one {# articol} few {# articole} other {# de articole}}",
+      "lineItems": "Articole",
+      "lineSubtotal": "Subtotal articol",
+      "loadingRecipient": "Se încarcă destinatarul…",
+      "locked": "Blocat",
+      "namePlaceholder": "ex. Ședință PT individuală",
+      "newRecipient": "Destinatar nou",
+      "notesOptional": "Note (opțional)",
+      "notesPlaceholder": "Apare pe factură. ex. „Mulțumesc — ne vedem săptămâna viitoare!”",
+      "oneOffPriceHint": "Ai nevoie de un preț sau o descriere unică pentru această factură?",
+      "orEnterCustom": "sau introdu manual",
+      "pickFromPricing": "Alege din prețuri (opțional)",
+      "pricingPlaceholder": "Alege un produs sau introdu manual mai jos",
+      "quantity": "Cantitate",
+      "recipient": "Destinatar",
+      "saveAsDraft": "Salvează ca ciornă",
+      "searchClients": "Caută clienți...",
+      "searchPricings": "Caută prețuri...",
+      "selectClient": "Alege un client",
+      "sendInvoiceAmount": "Trimite factura · {amount}",
+      "subtotal": "Subtotal",
+      "title": {
+        "create": "Creează factură",
+        "edit": "Editează ciorna facturii"
+      },
+      "toast": {
+        "clientRequired": {
+          "detail": "Alege un client sau introdu o adresă de email.",
+          "summary": "Clientul e obligatoriu"
+        },
+        "createFailed": "Factura nu a putut fi creată",
+        "draftSaved": {
+          "detail": "Factura a fost salvată ca ciornă",
+          "summary": "Ciornă salvată"
+        },
+        "dueDateRequired": {
+          "detail": "Alege o dată sau una dintre opțiunile predefinite.",
+          "summary": "Scadența e obligatorie"
+        },
+        "emailRequired": {
+          "detail": "Introdu o adresă de email validă pentru destinatar.",
+          "summary": "Emailul e obligatoriu"
+        },
+        "lineAmountInvalid": "Articolul {line}: suma trebuie să fie ≥ 0,50 RON",
+        "lineItemsInvalid": {
+          "detail": "Verifică toate articolele",
+          "summary": "Articole invalide"
+        },
+        "lineQuantityInvalid": "Articolul {line}: cantitatea trebuie să fie ≥ 1",
+        "loadFailed": {
+          "detail": "Încearcă din nou peste câteva momente.",
+          "summary": "Factura nu a putut fi încărcată"
+        },
+        "nameRequired": {
+          "detail": "Introdu cel puțin prenumele destinatarului.",
+          "summary": "Numele e obligatoriu"
+        },
+        "sent": {
+          "detail": "Factura a fost creată și trimisă",
+          "summary": "Factură trimisă"
+        },
+        "updateFailed": "Factura nu a putut fi actualizată",
+        "updated": {
+          "detail": "Modificările facturii au fost salvate.",
+          "summary": "Ciornă actualizată"
+        }
+      },
+      "total": "Total",
+      "unitPrice": "Preț unitar"
+    },
+    "createSubscription": {
+      "client": "Client",
+      "firstChargeAfter": "de acum.",
+      "firstChargeBefore": "Prima plată are loc la",
+      "freeTrial": "Perioadă de probă gratuită (opțional)",
+      "noFreeTrial": "Fără perioadă de probă",
+      "plan": "Plan",
+      "planDetails": "Detaliile planului",
+      "searchClients": "Caută clienți...",
+      "selectClient": "Alege un client",
+      "selectPlan": "Alege un plan de abonament",
+      "submit": "Creează abonamentul",
+      "title": "Creează abonament",
+      "toast": {
+        "createFailed": "Abonamentul nu a putut fi creat",
+        "created": {
+          "detail": "Abonamentul a fost creat cu succes",
+          "summary": "Abonament creat"
+        },
+        "pending": {
+          "detail": "I-am trimis clientului pe email un link ca să confirme și să-și înceapă abonamentul. Va vedea planul, suma și ciclul, apoi va plăti cu un card salvat sau nou. Nu se încasează nimic până nu confirmă.",
+          "summary": "Abonamentul așteaptă confirmarea clientului"
+        }
+      },
+      "trialHint": "Numărul de zile în care clientul poate folosi planul înainte să plătească. Lasă gol ca să facturezi imediat.",
+      "trialSuffix": " zile"
+    },
+    "interval": {
+      "billedEvery": {
+        "day": "{count, plural, one {Facturat zilnic} few {Facturat la fiecare # zile} other {Facturat la fiecare # de zile}}",
+        "month": "{count, plural, one {Facturat lunar} few {Facturat la fiecare # luni} other {Facturat la fiecare # de luni}}",
+        "week": "{count, plural, one {Facturat săptămânal} few {Facturat la fiecare # săptămâni} other {Facturat la fiecare # de săptămâni}}",
+        "year": "{count, plural, one {Facturat anual} few {Facturat la fiecare # ani} other {Facturat la fiecare # de ani}}"
+      },
+      "chargedEvery": {
+        "day": "{count, plural, one {Clienții plătesc zilnic.} few {Clienții plătesc la fiecare # zile.} other {Clienții plătesc la fiecare # de zile.}}",
+        "month": "{count, plural, one {Clienții plătesc lunar.} few {Clienții plătesc la fiecare # luni.} other {Clienții plătesc la fiecare # de luni.}}",
+        "week": "{count, plural, one {Clienții plătesc săptămânal.} few {Clienții plătesc la fiecare # săptămâni.} other {Clienții plătesc la fiecare # de săptămâni.}}",
+        "year": "{count, plural, one {Clienții plătesc anual.} few {Clienții plătesc la fiecare # ani.} other {Clienții plătesc la fiecare # de ani.}}"
+      },
+      "option": {
+        "day": "Zi",
+        "month": "Lună",
+        "week": "Săptămână",
+        "year": "An"
+      },
+      "short": {
+        "day": "zi",
+        "month": "lună",
+        "week": "săptămână",
+        "year": "an"
+      }
+    },
+    "productForm": {
+      "active": "Activ",
+      "billingCadence": "Frecvența facturării",
+      "descriptionPlaceholder": "Descriere opțională",
+      "inactive": "Inactiv",
+      "lockedInfo": "Prețul și tipul nu mai pot fi schimbate după creare. Ca să schimbi prețul, dezactivează acest produs și creează unul nou.",
+      "namePlaceholder": "ex. Ședință PT individuală",
+      "showOnProfile": "Afișează pe profilul public",
+      "showOnProfileHint": "Apare la „Servicii” pe profilul tău public de antrenor.",
+      "title": {
+        "create": "Creează produs",
+        "edit": "Editează produsul"
+      },
+      "toast": {
+        "createFailed": "Produsul nu a putut fi creat",
+        "created": {
+          "detail": "„{name}” a fost creat",
+          "summary": "Produs creat"
+        },
+        "updateFailed": "Produsul nu a putut fi actualizat",
+        "updated": {
+          "detail": "„{name}” a fost actualizat",
+          "summary": "Produs actualizat"
+        }
+      },
+      "type": {
+        "ONE_OFF": "Plată unică",
+        "SUBSCRIPTION": "Abonament"
+      }
+    },
+    "refund": {
+      "alreadyRefunded": "Deja rambursat: {amount}",
+      "amount": "Suma rambursată",
+      "notesOptional": "Note (opțional)",
+      "notesPlaceholder": "Note interne despre această rambursare",
+      "originalPayment": "Plata inițială",
+      "reason": "Motiv",
+      "selectReason": "Alege un motiv",
+      "submit": "Emite rambursarea",
+      "title": "Emite o rambursare",
+      "toast": {
+        "failed": "Rambursarea nu a putut fi emisă",
+        "issued": {
+          "detail": "Rambursarea de {amount} {currency} a fost emisă",
+          "summary": "Rambursare emisă"
+        }
+      }
+    },
+    "sendInvoiceEmail": {
+      "emailPlaceholder": "nume@exemplu.ro",
+      "intro": "Trimitem factura pe email la această adresă. Lasă adresa salvată ca s-o trimiți prin Stripe sau scrie alta ca să trimiți o copie în altă parte (de ex. unui contabil, unui părinte, unui al doilea contact).",
+      "onFile": "Adresa salvată:",
+      "overrideInfo": "Această copie va fi trimisă de MotionHive la adresa de mai sus. Clientul nu va fi notificat pe adresa salvată.",
+      "sendTo": "Trimite la",
+      "title": "Trimite factura",
+      "toast": {
+        "failed": "Factura nu a putut fi trimisă",
+        "sent": {
+          "detail": "Email trimis",
+          "detailTo": "Trimisă la {email}",
+          "summary": "Factură trimisă"
+        }
+      }
+    }
+  },
+  "payments": {
+    "common": {
+      "client": "Client",
+      "copy": "Copiază",
+      "copyFailed": "Nu am putut copia",
+      "copyManually": "Selectează și copiază linkul manual.",
+      "createInvoice": "Creează factură",
+      "currentPeriod": "Perioada curentă",
+      "finishSetup": "Finalizează configurarea",
+      "invoices": "Facturi",
+      "memberships": "Abonamente",
+      "openDashboardFailed": "Nu am putut deschide Stripe Dashboard",
+      "paid": "Plătită",
+      "perCycle": "per ciclu",
+      "plan": "Plan",
+      "planWithCadence": "{name} · {cadence}",
+      "planWithId": "Plan #{id}",
+      "pricing": "Prețuri",
+      "startOnboardingFailed": "Nu am putut porni configurarea contului",
+      "unknownClient": "Client necunoscut"
+    },
+    "earnings": {
+      "availableBalance": "Sold disponibil",
+      "connectStripe": "Conectează Stripe",
+      "finishSetupBanner": "Finalizează configurarea Stripe ca să începi să primești bani.",
+      "history": "Istoricul plăților",
+      "monthToDate": "Luna aceasta",
+      "nextPayout": "Următorul transfer",
+      "noPaymentsYet": "Nicio plată încă",
+      "noPayoutScheduled": "Niciun transfer programat",
+      "openStripeDashboard": "Deschide Stripe Dashboard",
+      "outstandingInvoices": "Facturi neîncasate",
+      "pageReport": "Plățile {first}–{last} din {total}",
+      "pendingBalance": "Sold în așteptare",
+      "refunded": "(rambursat: {amount})",
+      "setUpPayoutsBanner": "Configurează transferurile ca să începi să primești bani.",
+      "table": {
+        "fee": "Comision",
+        "method": "Metodă"
+      },
+      "toast": {
+        "loadPaymentsFailed": "Nu am putut încărca istoricul plăților",
+        "loadSummaryFailed": "Nu am putut încărca sumarul câștigurilor",
+        "startOnboardingFailed": "Nu am putut porni configurarea contului Stripe"
+      },
+      "topClients": "Top clienți"
+    },
+    "hub": {
+      "completeSetupFirst": "Finalizează mai întâi configurarea Stripe",
+      "gate": {
+        "invoices": {
+          "description": "Conectează-ți contul Stripe ca să trimiți facturi, să urmărești sumele neîncasate și să încasezi plăți direct de la clienți.",
+          "title": "Conectează Stripe ca să emiți facturi"
+        },
+        "memberships": {
+          "description": "Abonamentele și plățile recurente funcționează prin Stripe. Finalizează configurarea contului ca să oferi cicluri de facturare flexibile și reînnoiri automate pentru clienți.",
+          "title": "Configurează plățile ca să oferi abonamente"
+        },
+        "pricing": {
+          "description": "Definește-ți pachetele de servicii și stabilește-ți tarifele — după ce îți conectezi contul Stripe, clienții îți vor putea vedea și cumpăra planurile direct.",
+          "title": "Planurile tale sunt gata — finalizează configurarea Stripe"
+        }
+      },
+      "kpi": {
+        "available": "Disponibil",
+        "inTransit": "În tranzit · 2–3 zile",
+        "openInvoices": "{count, plural, one {# factură deschisă} few {# facturi deschise} other {# de facturi deschise}}",
+        "outstanding": "De încasat",
+        "overdue": "{count, plural, one {# restantă} few {# restante} other {# de restante}}",
+        "pending": "În așteptare",
+        "readyToWithdraw": "Gata de retras"
+      },
+      "openStripe": "Deschide Stripe",
+      "setUpPayments": "Configurează plățile",
+      "subtitle": "Emite facturi, gestionează abonamentele și stabilește prețurile pe care le plătesc clienții tăi.",
+      "subtitleCompact": "Facturi, abonamente și prețuri."
+    },
+    "invoiceDetail": {
+      "action": {
+        "copyPaymentLink": "Copiază linkul de plată",
+        "downloadInvoicePdf": "Descarcă factura PDF",
+        "downloadPdf": "Descarcă PDF",
+        "markPaid": "Marchează plătită",
+        "more": "Mai multe",
+        "openHostedPage": "Deschide pagina facturii",
+        "resendEmail": "Retrimite emailul",
+        "sendInvoice": "Trimite factura",
+        "void": "Anulează"
+      },
+      "activity": {
+        "draftCreated": "Ciornă creată",
+        "invoicePaid": "Factură plătită",
+        "invoiceSent": "Factură trimisă",
+        "invoiceVoided": "Factură anulată",
+        "title": "Activitate"
+      },
+      "amountLabel": {
+        "awaitingPayment": "Se așteaptă plata",
+        "due": "Sumă de plată",
+        "paidInFull": "Plătită integral",
+        "voided": "Anulată"
+      },
+      "confirm": {
+        "markPaid": {
+          "header": "Marchează ca plătită",
+          "message": "Marchezi factura ca plătită în afara platformei (numerar sau transfer bancar)?"
+        },
+        "void": {
+          "header": "Anulează factura",
+          "message": "Sigur vrei să anulezi această factură? Nu mai poți reveni asupra acțiunii."
+        }
+      },
+      "draftHint": "Încă nu s-a trimis niciun email. Verifică, apoi trimite.",
+      "due": "Scadență {date}",
+      "guest": "Invitat",
+      "issued": "Emisă {date}",
+      "lineItems": {
+        "count": "{count, plural, one {# articol} few {# articole} other {# de articole}}",
+        "empty": "Niciun articol disponibil.",
+        "qty": "Cant.",
+        "subtotal": "Subtotal",
+        "title": "Articole",
+        "total": "Total",
+        "unit": "Preț unitar"
+      },
+      "notSent": {
+        "body": "După ce o trimiți, clientul primește un email cu un link de plată Stripe. Până atunci o poți anula sau edita.",
+        "title": "Netrimisă încă"
+      },
+      "notes": {
+        "empty": "Nicio notă — adaugă un scurt mesaj înainte să trimiți.",
+        "title": "Note pentru client"
+      },
+      "paidOutOfBand": "Plătită în afara platformei",
+      "paidOutOfBandNote": "Plătită în afara platformei (fără comisioane Stripe)",
+      "payment": "Plată",
+      "paymentLink": {
+        "sharedViaEmail": "Trimis pe email · {date}",
+        "title": "Link de plată"
+      },
+      "toast": {
+        "linkCopied": "Linkul de plată a fost copiat",
+        "markPaidFailed": "Nu am putut marca factura ca plătită",
+        "markedPaid": "Factură marcată ca plătită",
+        "notFound": "Factura nu a fost găsită",
+        "voidFailed": "Nu am putut anula factura",
+        "voided": "Factură anulată"
+      },
+      "tracker": {
+        "draft": "Ciornă",
+        "paid": "Plătită",
+        "pending": "în așteptare",
+        "sent": "Trimisă"
+      }
+    },
+    "invoices": {
+      "action": {
+        "downloadPdf": "Descarcă PDF",
+        "markPaid": "Marchează plătită",
+        "resendEmail": "Retrimite emailul",
+        "viewHostedPage": "Vezi pagina facturii",
+        "void": "Anulează"
+      },
+      "card": {
+        "dueSubtitle": "{number} · Scadență",
+        "manual": "manual",
+        "overdue": "Restantă",
+        "paidSubtitle": "{number} · Plătită"
+      },
+      "confirm": {
+        "markPaid": {
+          "header": "Marchează ca plătită",
+          "message": "Marchezi factura ca plătită în afara platformei (numerar sau transfer bancar)? Nu se percep comisioane Stripe."
+        },
+        "void": {
+          "header": "Anulează factura",
+          "message": "Sigur vrei să anulezi factura {number}? Nu mai poți reveni asupra acțiunii."
+        }
+      },
+      "draftSuffix": "(ciornă)",
+      "empty": {
+        "message": "Creează prima factură ca să începi să-ți facturezi clienții.",
+        "title": "Nicio factură încă"
+      },
+      "manualSuffix": "(manual)",
+      "table": {
+        "invoiceNumber": "Factura nr."
+      },
+      "toast": {
+        "loadFailed": "Nu am putut încărca facturile",
+        "loadMoreFailed": "Nu am putut încărca mai multe facturi",
+        "markPaidFailed": "Nu am putut marca factura ca plătită",
+        "markedPaid": {
+          "detail": "Factura a fost marcată ca plătită (în afara platformei)",
+          "summary": "Factură marcată ca plătită"
+        },
+        "voidFailed": "Nu am putut anula factura",
+        "voided": {
+          "detail": "Factura {number} a fost anulată",
+          "summary": "Factură anulată"
+        }
+      }
+    },
+    "onboarding": {
+      "subtitle": "Conectează-ți contul Stripe ca să începi să accepți plăți de la clienți.",
+      "title": "Configurarea plăților"
+    },
+    "onboardingCard": {
+      "active": {
+        "body": "Totul e pregătit ca să trimiți facturi și să primești plăți.",
+        "title": "Plăți activate"
+      },
+      "disconnected": {
+        "action": "Reconectează-te cu Stripe",
+        "body": "Contul tău Stripe a fost deconectat. Reconectează-l ca să poți accepta plăți în continuare.",
+        "title": "Cont deconectat"
+      },
+      "notStarted": {
+        "action": "Conectează-te cu Stripe",
+        "body": "Conectează-ți contul bancar prin Stripe ca să trimiți facturi și să primești plăți de la clienți. Configurarea durează cam 3 minute.",
+        "title": "Începe să accepți plăți"
+      },
+      "pending": {
+        "action": "Reia configurarea contului",
+        "body": "Stripe îți verifică datele. De obicei durează câteva minute, dar poate dura până la 24 de ore. Te anunțăm când e gata.",
+        "title": "Cont în verificare"
+      },
+      "restricted": {
+        "action": "Completează cerințele",
+        "body": "Stripe are nevoie de informații suplimentare ca să-ți păstreze contul activ. Completează cerințele rămase.",
+        "outstanding": "{count, plural, one {# cerință nerezolvată} few {# cerințe nerezolvate} other {# de cerințe nerezolvate}}",
+        "title": "Acțiune necesară"
+      },
+      "status": {
+        "ACTIVE": "Activ",
+        "DISCONNECTED": "Deconectat",
+        "NOT_STARTED": "Neconectat",
+        "PENDING": "În verificare",
+        "RESTRICTED": "Acțiune necesară"
+      },
+      "tiles": {
+        "earnings": {
+          "description": "Sold, transferuri și istoricul plăților",
+          "title": "Câștiguri"
+        },
+        "invoice": {
+          "description": "Facturează un client pentru o sesiune sau un pachet"
+        },
+        "plans": {
+          "description": "Gestionează-ți produsele și prețurile"
+        },
+        "subscriptions": {
+          "description": "Facturare recurentă pentru clienții tăi",
+          "title": "Abonamente"
+        }
+      }
+    },
+    "onboardingRefresh": {
+      "errorBody": "Nu am putut genera un link nou de configurare. Încearcă din nou.",
+      "generating": "Generăm un link nou de configurare.",
+      "redirecting": "Te redirecționăm către Stripe..."
+    },
+    "onboardingReturn": {
+      "almostThere": "Aproape gata!",
+      "enabledBody": "Contul tău Stripe e verificat și pregătit. Acum poți crea produse și trimite facturi.",
+      "enabledTitle": "Plăți activate!",
+      "goToPayments": "Mergi la Plăți",
+      "pleaseWait": "Așteaptă puțin cât confirmăm configurarea Stripe.",
+      "stillVerifying": "Stripe încă îți verifică datele. De obicei durează câteva minute. Te anunțăm când e gata.",
+      "verifying": "Îți verificăm contul..."
+    },
+    "productType": {
+      "ONE_OFF": "Plată unică",
+      "SUBSCRIPTION": "Abonament"
+    },
+    "products": {
+      "confirm": {
+        "deactivate": {
+          "header": "Dezactivează produsul",
+          "message": "Sigur vrei să dezactivezi „{name}”? Nu va mai apărea în listele de produse."
+        }
+      },
+      "create": "Creează produs",
+      "deactivate": "Dezactivează",
+      "empty": {
+        "message": "Creează primul produs ca să începi să trimiți facturi.",
+        "title": "Niciun produs încă"
+      },
+      "hidden": "Ascuns",
+      "onProfile": "Pe profil",
+      "oneOffProduct": "Produs cu plată unică",
+      "state": {
+        "active": "Activ",
+        "inactive": "Inactiv"
+      },
+      "table": {
+        "billing": "Facturare"
+      },
+      "toast": {
+        "deactivateFailed": "Nu am putut dezactiva produsul",
+        "deactivated": {
+          "detail": "„{name}” a fost dezactivat",
+          "summary": "Produs dezactivat"
+        },
+        "hidden": {
+          "detail": "„{name}” e ascuns de pe profilul tău public.",
+          "summary": "Ascuns de pe profil"
+        },
+        "loadFailed": "Nu am putut încărca produsele",
+        "loadMoreFailed": "Nu am putut încărca mai multe produse",
+        "shown": {
+          "detail": "„{name}” apare acum pe profilul tău public.",
+          "summary": "Afișat pe profil"
+        },
+        "visibilityFailed": "Nu am putut actualiza vizibilitatea"
+      }
+    },
+    "subscriptionDetail": {
+      "amountPerCycle": "{amount} per ciclu",
+      "backToList": "Înapoi la abonamente",
+      "cancelled": "Anulat",
+      "clientUnavailable": "Informațiile clientului nu sunt disponibile.",
+      "confirm": {
+        "cancelAtEnd": {
+          "header": "Anulează la finalul perioadei",
+          "message": "Abonamentul va fi anulat la finalul perioadei curente. Clientul păstrează accesul până atunci."
+        },
+        "cancelImmediately": {
+          "header": "Anulează imediat",
+          "message": "Abonamentul va fi anulat imediat. Clientul pierde accesul pe loc."
+        }
+      },
+      "detail": "Detalii",
+      "getConfirmationLink": "Obține linkul de confirmare",
+      "membership": "Abonament",
+      "paymentSetup": "Configurarea plății",
+      "pendingSetup": {
+        "body": "I-am trimis un email cu linkul de configurare. Abonamentul se activează automat după ce termină.",
+        "title": "Așteptăm ca clientul să confirme și să plătească prima factură."
+      },
+      "periodPending": "Datele perioadei sunt în așteptare — Stripe le completează după activare.",
+      "renewsAutomatically": "Se reînnoiește automat la finalul perioadei",
+      "scheduledCancel": "Programat pentru anulare pe {date}",
+      "setupHint": "Generează un link nou pe care să i-l trimiți clientului. Cel trimis inițial pe email funcționează în continuare.",
+      "toast": {
+        "alreadyActivated": {
+          "detail": "Clientul a confirmat deja acest abonament.",
+          "summary": "Deja activat"
+        },
+        "cancelFailed": "Nu am putut anula abonamentul",
+        "cancellationScheduled": "Anulare programată",
+        "cancelled": "Abonament anulat",
+        "notFound": "Abonamentul nu a fost găsit",
+        "setupLinkCopied": "Linkul de configurare a fost copiat.",
+        "setupLinkFailed": "Nu am putut obține linkul de configurare."
+      },
+      "trial": "Perioadă de probă",
+      "trialEnds": "Se încheie pe {date}"
+    },
+    "subscriptions": {
+      "cancelAtPeriodEnd": "Anulează la finalul perioadei",
+      "cancelImmediately": "Anulează imediat",
+      "cancels": "Se anulează pe {date}",
+      "cancelsLower": "se anulează pe {date}",
+      "clientWithId": "Client #{id}",
+      "confirm": {
+        "cancel": {
+          "header": "Anulează abonamentul",
+          "message": "Anulezi abonamentul la finalul perioadei de facturare curente?"
+        },
+        "cancelImmediately": {
+          "header": "Anulează imediat",
+          "message": "Anulezi abonamentul imediat? Clientul va pierde accesul pe loc."
+        }
+      },
+      "empty": {
+        "message": "Abonează-ți clienții la planuri recurente ca să începi.",
+        "notFound": "Niciun abonament găsit",
+        "title": "Niciun abonament încă"
+      },
+      "filter": {
+        "awaitingConfirmation": "Așteaptă confirmarea"
+      },
+      "new": "Abonament nou",
+      "renews": "Se reînnoiește pe {date}",
+      "toast": {
+        "cancelFailed": "Nu am putut anula abonamentul",
+        "canceled": {
+          "detail": "Abonamentul a fost anulat imediat",
+          "summary": "Abonament anulat"
+        },
+        "loadFailed": "Nu am putut încărca abonamentele",
+        "loadMoreFailed": "Nu am putut încărca mai multe abonamente",
+        "willCancel": {
+          "detail": "Abonamentul se va anula la finalul perioadei de facturare",
+          "summary": "Abonamentul se va anula"
+        }
+      },
+      "trialEnds": "Perioada de probă se încheie pe {date}",
+      "trialUntil": "Probă până pe {date}",
+      "viewDetails": "Vezi detaliile"
+    }
+  },
   "sessions": {
     "approvals": {
       "empty": "Ești la zi — nicio aprobare în așteptare.",
@@ -1342,7 +2065,6 @@
     },
     "formDialog": {
       "accessAria": "Cine are acces",
-      "amount": "Sumă",
       "basics": "De bază",
       "cancelCutoff": "Termen de anulare (ore)",
       "capacity": "Capacitate (gol = nelimitat)",
@@ -1494,7 +2216,6 @@
     },
     "quickCreate": {
       "ariaLabel": "Creare rapidă de sesiune",
-      "dismiss": "Închide",
       "eyebrow": "{start} – {end} · {minutes} min",
       "openFullForm": "Deschide formularul complet",
       "titlePlaceholder": "Titlul sesiunii"
