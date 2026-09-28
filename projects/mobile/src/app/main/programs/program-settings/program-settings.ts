@@ -97,6 +97,19 @@ export class ProgramSettings implements ViewWillEnter {
 
   readonly dayCount = computed(() => (this.program()?.workouts ?? []).length);
 
+  /**
+   * Days that the length now on the stepper would delete.
+   *
+   * Shortening a program drops the weeks that no longer fit — a declared
+   * length the workouts contradict is what gave clients an end date before
+   * their own last session. Named before the save, not after.
+   */
+  readonly doomedDays = computed(() => {
+    const workouts = this.program()?.workouts ?? [];
+    const weeks = this.weeks();
+    return workouts.filter((w) => w.weekIndex >= weeks).length;
+  });
+
   /** "9 days of work so far" — the status card counts what is actually built. */
   readonly dayCountLabel = computed(() => {
     const n = this.dayCount();
