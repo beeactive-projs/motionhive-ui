@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { chevronForward, ellipsisHorizontal } from 'ionicons/icons';
 
@@ -19,7 +20,7 @@ import { chevronForward, ellipsisHorizontal } from 'ionicons/icons';
  */
 @Component({
   selector: 'mh-exercise-card',
-  imports: [IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel],
+  imports: [IonButton, IonCard, IonCardContent, IonIcon, IonItem, IonLabel, TranslatePipe],
   templateUrl: './exercise-card.html',
   styleUrl: './exercise-card.scss',
   host: {

@@ -1,10 +1,10 @@
 <section class="mh-section">
-  <span class="mh-kicker">Classification</span>
-  <ion-note class="mh-note-block">All optional — leave them for later if you like.</ion-note>
+  <span class="mh-kicker">{{ 'exercises.fields.classification' | translate }}</span>
+  <ion-note class="mh-note-block">{{ 'exercises.detailsFields.classificationHint' | translate }}</ion-note>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item lines="full">
-      <ion-select label="Pattern" labelPlacement="start" interface="action-sheet"
-        placeholder="Not set" [value]="form().draft().movementPattern"
+      <ion-select [label]="'exercises.detailsFields.pattern' | translate" labelPlacement="start"
+        interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().movementPattern"
         (ionChange)="form().patch({ movementPattern: $event.detail.value })">
         @for (option of patternOptions; track option.value) {
         <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
@@ -12,8 +12,8 @@
       </ion-select>
     </ion-item>
     <ion-item lines="full">
-      <ion-select label="Mechanic" labelPlacement="start" interface="action-sheet"
-        placeholder="Not set" [value]="form().draft().mechanic"
+      <ion-select [label]="'exercises.detailsFields.mechanic' | translate" labelPlacement="start"
+        interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().mechanic"
         (ionChange)="form().patch({ mechanic: $event.detail.value })">
         @for (option of mechanicOptions; track option.value) {
         <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
@@ -21,8 +21,8 @@
       </ion-select>
     </ion-item>
     <ion-item lines="full">
-      <ion-select label="Force" labelPlacement="start" interface="action-sheet"
-        placeholder="Not set" [value]="form().draft().force"
+      <ion-select [label]="'exercises.detailsFields.force' | translate" labelPlacement="start"
+        interface="action-sheet" [placeholder]="'form.placeholder.notSet' | translate" [value]="form().draft().force"
         (ionChange)="form().patch({ force: $event.detail.value })">
         @for (option of forceOptions; track option.value) {
         <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
@@ -31,10 +31,10 @@
     </ion-item>
     <ion-item lines="none">
       <ion-label class="ion-text-wrap">
-        <h3>Unilateral movement</h3>
-        <p>Single-arm or single-leg — drives left vs right tracking later.</p>
+        <h3>{{ 'exercises.detailsFields.unilateral' | translate }}</h3>
+        <p>{{ 'exercises.detailsFields.unilateralHint' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" aria-label="Unilateral movement"
+      <ion-toggle slot="end" [attr.aria-label]="'exercises.detailsFields.unilateral' | translate"
         [checked]="form().draft().isUnilateral"
         (ionChange)="form().patch({ isUnilateral: $event.detail.checked })" />
     </ion-item>
@@ -42,46 +42,46 @@
 </section>
 
 <section class="mh-section">
-  <span class="mh-kicker">Demo &amp; cues</span>
+  <span class="mh-kicker">{{ 'exercises.detailsFields.demo' | translate }}</span>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item lines="full">
-      <ion-input label="YouTube demo" labelPlacement="stacked" inputmode="url"
+      <ion-input [label]="'exercises.detailsFields.youtube' | translate" labelPlacement="stacked" inputmode="url"
         placeholder="https://youtube.com/watch?v=…" [value]="form().draft().youtubeUrl"
         (ionInput)="form().patch({ youtubeUrl: $event.detail.value ?? '' })" />
     </ion-item>
     <ion-item lines="full">
-      <ion-textarea label="Description" labelPlacement="stacked" [autoGrow]="true" [rows]="2"
-        placeholder="One to three sentences about the movement"
+      <ion-textarea [label]="'form.label.description' | translate" labelPlacement="stacked" [autoGrow]="true" [rows]="2"
+        [placeholder]="'exercises.detailsFields.descriptionPlaceholder' | translate"
         [value]="form().draft().description"
         (ionInput)="form().patch({ description: $event.detail.value ?? '' })" />
     </ion-item>
     <ion-item lines="none">
-      <ion-textarea label="Instructions" labelPlacement="stacked" [autoGrow]="true" [rows]="3"
-        placeholder="Step-by-step form cues, one per line" [value]="form().draft().instructions"
+      <ion-textarea [label]="'exercises.fields.instructions' | translate" labelPlacement="stacked" [autoGrow]="true" [rows]="3"
+        [placeholder]="'exercises.detailsFields.instructionsPlaceholder' | translate" [value]="form().draft().instructions"
         (ionInput)="form().patch({ instructions: $event.detail.value ?? '' })" />
     </ion-item>
   </ion-list>
   @if (!form().isYoutubeValid()) {
   <ion-note class="mh-footnote invalid">
-    That does not look like a YouTube link. Paste a watch, youtu.be or shorts URL.
+    {{ 'exercises.detailsFields.youtubeInvalid' | translate }}
   </ion-note>
   } @else {
   <ion-note class="mh-footnote">
-    Uploading your own video comes later. A YouTube link gives the exercise a thumbnail.
+    {{ 'exercises.detailsFields.youtubeHint' | translate }}
   </ion-note>
   }
 </section>
 
 <section class="mh-section">
-  <span class="mh-kicker">Visibility</span>
+  <span class="mh-kicker">{{ 'exercises.fields.visibility' | translate }}</span>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item lines="none">
       <ion-icon slot="start" name="lock-closed-outline" color="medium" aria-hidden="true" />
       <ion-label class="ion-text-wrap">
-        <h3>Private</h3>
-        <p>Only you can see and use it. Turn off to publish it for other coaches.</p>
+        <h3>{{ 'exercises.fields.private' | translate }}</h3>
+        <p>{{ 'exercises.detailsFields.privateHint' | translate }}</p>
       </ion-label>
-      <ion-toggle slot="end" aria-label="Private" [checked]="form().isPrivate()"
+      <ion-toggle slot="end" [attr.aria-label]="'exercises.fields.private' | translate" [checked]="form().isPrivate()"
         (ionChange)="form().setPrivate($event.detail.checked)" />
     </ion-item>
   </ion-list>

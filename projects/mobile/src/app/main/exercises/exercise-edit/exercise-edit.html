@@ -3,14 +3,14 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="backHref()" />
     </ion-buttons>
-    <ion-title>Edit exercise</ion-title>
+    <ion-title>{{ 'exercises.edit.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   @if (loadError(); as message) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't open this exercise"
-    [message]="message" actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'exercises.edit.loadError.title' | translate"
+    [message]="message" [actionLabel]="'button.tryAgain' | translate" (action)="retry()" />
   } @else if (loading() && !exercise()) {
   <div class="mh-page">
     <ion-skeleton-text [animated]="true" style="width: 70%; height: 1.25rem" />
@@ -21,18 +21,18 @@
   <div class="mh-page">
     <section class="mh-section">
       <div class="mh-section-head">
-        <span class="mh-kicker">Name</span>
+        <span class="mh-kicker">{{ 'form.label.name' | translate }}</span>
         <ion-note>{{ form.nameCount() }} / {{ maxNameLength }}</ion-note>
       </div>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item lines="full">
-          <ion-input aria-label="Name" autocapitalize="sentences" [maxlength]="maxNameLength"
+          <ion-input [attr.aria-label]="'form.label.name' | translate" autocapitalize="sentences" [maxlength]="maxNameLength"
             [value]="form.draft().name" (ionInput)="form.patch({ name: $event.detail.value ?? '' })" />
         </ion-item>
         <!-- Kind is a select here, not the create form's grid: the tracking
              promise has already been made, and changing it is a correction. -->
         <ion-item lines="none">
-          <ion-select label="Kind" labelPlacement="start" interface="action-sheet"
+          <ion-select [label]="'exercises.fields.kind' | translate" labelPlacement="start" interface="action-sheet"
             [value]="form.draft().kind" (ionChange)="form.patch({ kind: $event.detail.value })">
             @for (kind of kinds; track kind) {
             <ion-select-option [value]="kind">{{ kindLabel(kind) }}</ion-select-option>
@@ -43,7 +43,7 @@
     </section>
 
     <section class="mh-section">
-      <span class="mh-kicker">Level</span>
+      <span class="mh-kicker">{{ 'exercises.fields.level' | translate }}</span>
       <mh-level-segment [level]="form.draft().level"
         (levelChange)="form.patch({ level: $event })" />
     </section>
@@ -59,8 +59,8 @@
       <ion-item button detail="false" lines="none" class="danger" (click)="confirmDelete()">
         <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
         <ion-label>
-          <h3>Delete exercise…</h3>
-          <p>Programs that already use it keep working.</p>
+          <h3>{{ 'exercises.edit.deleteAction' | translate }}</h3>
+          <p>{{ 'exercises.edit.deleteHint' | translate }}</p>
         </ion-label>
       </ion-item>
     </ion-list>
@@ -75,7 +75,7 @@
       @if (saving()) {
       <ion-spinner name="crescent" />
       } @else {
-      Save changes
+      {{ 'button.saveChanges' | translate }}
       }
     </ion-button>
   </ion-toolbar>
@@ -83,6 +83,7 @@
 }
 
 <mh-confirm-sheet [(open)]="deleteOpen" [title]="deleteTitle()"
-  body="It comes out of your library and out of the picker. Programs and logged workouts that already reference it are not touched."
-  confirmLabel="Delete exercise" cancelLabel="Keep it" tone="danger" [saving]="deleting()"
+  [body]="'exercises.edit.deleteConfirm.body' | translate"
+  [confirmLabel]="'exercises.edit.deleteConfirm.confirm' | translate"
+  [cancelLabel]="'button.keepIt' | translate" tone="danger" [saving]="deleting()"
   (confirm)="remove()" />

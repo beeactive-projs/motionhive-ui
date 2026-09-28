@@ -18,6 +18,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -63,6 +64,7 @@ import { WORKOUT_ICONS, planPositionLabel, workoutMetaLine } from '../workouts.c
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './preview.html',
   styleUrl: './preview.scss',
@@ -73,6 +75,7 @@ export class Preview implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly assignment = signal<ProgramAssignment | null>(null);
   readonly workout = signal<AssignedWorkout | null>(null);
@@ -149,12 +152,11 @@ export class Preview implements ViewWillEnter {
   }
 
   exerciseName(exercise: AssignedExercise): string {
-    return exercise.exercise?.name ?? 'Exercise';
+    return exercise.exercise?.name ?? this._translateService.instant('workouts.common.exercise');
   }
 
   setsLabel(exercise: AssignedExercise): string {
-    const n = (exercise.sets ?? []).length;
-    return `${n} ${n === 1 ? 'set' : 'sets'}`;
+    return this._translateService.instant('count.sets', { count: (exercise.sets ?? []).length });
   }
 
   /** The kind-tinted hex tile, same as the library row draws it. */
@@ -185,7 +187,10 @@ export class Preview implements ViewWillEnter {
         },
         error: (err) => {
           this.starting.set(false);
-          void this._feedbackService.error(err, 'Could not start the workout');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.common.startFailed'),
+          );
         },
       });
   }
@@ -198,10 +203,16 @@ export class Preview implements ViewWillEnter {
       .pipe(take(1))
       .subscribe({
         next: () => {
-          void this._feedbackService.success('Marked as skipped');
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.preview.toast.skipped'),
+          );
           void this._router.navigate(['/tabs/workouts']);
         },
-        error: (err) => void this._feedbackService.error(err, 'Could not skip that'),
+        error: (err) =>
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.preview.toast.skipFailed'),
+          ),
       });
   }
 

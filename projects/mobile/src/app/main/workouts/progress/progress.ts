@@ -12,6 +12,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -19,7 +20,7 @@ import { ProgressOverview, ProgressRange, ProgressService } from 'core';
 
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
-import { WORKOUT_ICONS } from '../workouts.config';
+import { WORKOUT_ICONS, formatMeasure } from '../workouts.config';
 
 /** The window the page reads — twelve weeks is a training block. */
 const RANGE: ProgressRange = '12w';
@@ -46,12 +47,14 @@ const RANGE: ProgressRange = '12w';
     IonTitle,
     IonToolbar,
     StatTile,
+    TranslatePipe,
   ],
   templateUrl: './progress.html',
   styleUrl: './progress.scss',
 })
 export class Progress implements ViewWillEnter {
   private readonly _progressService = inject(ProgressService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly overview = signal<ProgressOverview | null>(null);
   readonly loading = signal(false);
@@ -72,9 +75,22 @@ export class Progress implements ViewWillEnter {
     if (!overview) return [];
     const hours = Math.round(overview.totals.trainingSeconds / 360) / 10;
     return [
-      { label: 'Workouts', value: String(overview.totals.workouts) },
-      { label: 'Volume', value: `${Math.round(overview.totals.volumeKg)} kg` },
-      { label: 'Time', value: `${hours} h` },
+      {
+        label: this._translateService.instant('workouts.tiles.workouts'),
+        value: formatMeasure(overview.totals.workouts),
+      },
+      {
+        label: this._translateService.instant('workouts.tiles.volume'),
+        value: this._translateService.instant('workouts.units.kg', {
+          value: formatMeasure(Math.round(overview.totals.volumeKg)),
+        }),
+      },
+      {
+        label: this._translateService.instant('workouts.tiles.time'),
+        value: this._translateService.instant('workouts.units.hours', {
+          value: formatMeasure(hours, 1),
+        }),
+      },
     ];
   });
 
@@ -82,6 +98,11 @@ export class Progress implements ViewWillEnter {
 
   constructor() {
     addIcons(WORKOUT_ICONS);
+  }
+
+  /** "82.5 kg" — a record's weight, in the reader's number format. */
+  recordWeight(weightKg: number): string {
+    return this._translateService.instant('workouts.units.kg', { value: formatMeasure(weightKg) });
   }
 
   // Always re-read: a workout finished since changes every number here.

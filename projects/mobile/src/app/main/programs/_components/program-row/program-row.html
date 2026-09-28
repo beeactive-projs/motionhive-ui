@@ -10,10 +10,10 @@
     <h2>{{ program().name }}</h2>
     <div class="tags">
       @if (isDraft()) {
-        <ion-badge data-tone="medium">Draft</ion-badge>
+        <ion-badge data-tone="medium">{{ 'enum.programStatus.DRAFT' | translate }}</ion-badge>
       }
       @if (isRoutine()) {
-        <ion-badge data-tone="teal">Routine</ion-badge>
+        <ion-badge data-tone="teal">{{ 'programs.row.routine' | translate }}</ion-badge>
       }
       <!-- Says whose it is. Without it a coach cannot tell a starter from
            their own work, which is the question this list kept raising. -->

@@ -1,18 +1,17 @@
 <ng-template #body>
   <ion-note class="mh-note-block">
-    This day is copied into the weeks you pick. The rest of those weeks is
-    left alone.
+    {{ 'programs.copyDay.note' | translate }}
   </ion-note>
 
   <ion-list lines="none">
     @for (index of targets(); track index) {
       <ion-item button [detail]="false" (click)="toggle(index)">
         <ion-label>
-          Week {{ index + 1 }}
+          {{ 'programs.common.week' | translate: { number: index + 1 } }}
           <!-- Marked on the row itself, so the cost is visible while
                choosing rather than only in the summary below. -->
           @if (isOccupied(index)) {
-            <p>Has training on this day</p>
+            <p>{{ 'programs.copyDay.hasTraining' | translate }}</p>
           }
         </ion-label>
         @if (isOn(index)) {
@@ -26,8 +25,8 @@
        answer, so the question is not asked until it has one. -->
   @if (canChooseDay()) {
     <div class="target-day">
-      <p class="label">Land it on</p>
-      <div class="mh-chip-row" role="group" aria-label="Day to copy into">
+      <p class="label">{{ 'programs.copyDay.landOn' | translate }}</p>
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'programs.copyDay.dayGroup' | translate">
         @for (label of dayLabels; track $index) {
           <ion-button
             class="chip"

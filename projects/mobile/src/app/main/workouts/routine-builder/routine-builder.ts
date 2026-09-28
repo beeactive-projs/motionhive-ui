@@ -20,6 +20,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -37,7 +38,13 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { ExercisePickerSheet } from '../../exercises/_sheets/exercise-picker-sheet/exercise-picker-sheet';
 import { ExerciseCard } from '../_components/exercise-card/exercise-card';
 import { NumericKeypad } from '../_components/numeric-keypad/numeric-keypad';
-import { DEFAULT_SETS, KeypadField, KeypadFields, WORKOUT_ICONS } from '../workouts.config';
+import {
+  DEFAULT_SETS,
+  KeypadField,
+  KeypadFields,
+  WORKOUT_ICONS,
+  formatMeasure,
+} from '../workouts.config';
 
 /** The two targets a routine prescribes per exercise. */
 const TargetFields = {
@@ -105,6 +112,7 @@ const NEW = 'new';
     IonTitle,
     IonToolbar,
     NumericKeypad,
+    TranslatePipe,
   ],
   templateUrl: './routine-builder.html',
   styleUrl: './routine-builder.scss',
@@ -114,6 +122,7 @@ export class RoutineBuilder implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Targets = TargetFields;
   readonly skeletonCards = [1, 2];
@@ -152,7 +161,9 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly readOnly = computed(() => this.routine()?.source === RoutineSources.System);
 
   readonly title = computed(() =>
-    this.isNew() ? 'New routine' : (this.routine()?.name ?? 'Routine'),
+    this.isNew()
+      ? this._translateService.instant('workouts.common.newRoutine')
+      : (this.routine()?.name ?? this._translateService.instant('workouts.routineBuilder.title')),
   );
 
   readonly canSave = computed(
@@ -166,16 +177,22 @@ export class RoutineBuilder implements ViewWillEnter {
   readonly keypadLabel = computed(() => {
     const edit = this.editing();
     if (!edit) return '';
-    return edit.field === TargetFields.Weight ? 'Target weight (kg)' : 'Target reps';
+    return this._translateService.instant(
+      edit.field === TargetFields.Weight
+        ? 'workouts.routineBuilder.targets.weightKeypad'
+        : 'workouts.routineBuilder.targets.repsKeypad',
+    );
   });
 
   /** What the picker should already show as taken. */
   readonly addedIds = computed(() => this.exercises().map((row) => row.exerciseId));
 
-  readonly deleteBody = computed(
-    () =>
-      `Delete ${this.routine()?.name ?? 'this routine'}? Workouts already logged from it are kept.`,
-  );
+  readonly deleteBody = computed(() => {
+    const name =
+      this.routine()?.name ??
+      this._translateService.instant('workouts.routineBuilder.thisRoutine');
+    return this._translateService.instant('workouts.routineBuilder.delete.message', { name });
+  });
 
   constructor() {
     addIcons(WORKOUT_ICONS);
@@ -218,7 +235,7 @@ export class RoutineBuilder implements ViewWillEnter {
             (routine.exercises ?? []).map((e) => ({
               key: e.id,
               exerciseId: e.exerciseId,
-              name: e.exercise?.name ?? 'Exercise',
+              name: e.exercise?.name ?? this._translateService.instant('workouts.common.exercise'),
               sets: e.defaultSets || DEFAULT_SETS,
               targetRepsMin: e.targetRepsMin,
               targetRepsMax: e.targetRepsMax,
@@ -266,9 +283,9 @@ export class RoutineBuilder implements ViewWillEnter {
 
     if (skipped > 0) {
       void this._feedbackService.info(
-        skipped === 1
-          ? 'That exercise is already in this routine'
-          : `${skipped} were already in this routine`,
+        this._translateService.instant('workouts.routineBuilder.toast.alreadyIn', {
+          count: skipped,
+        }),
       );
     }
   }
@@ -285,7 +302,7 @@ export class RoutineBuilder implements ViewWillEnter {
   }
 
   setsLabel(row: DraftExercise): string {
-    return `${row.sets} ${row.sets === 1 ? 'set' : 'sets'}`;
+    return this._translateService.instant('count.sets', { count: row.sets });
   }
 
   remove(index: number): void {
@@ -329,7 +346,7 @@ export class RoutineBuilder implements ViewWillEnter {
 
   targetLabel(row: DraftExercise, field: TargetField): string {
     if (field === TargetFields.Weight) {
-      return row.targetWeightKg == null ? '–' : `${row.targetWeightKg}`;
+      return row.targetWeightKg == null ? '–' : formatMeasure(row.targetWeightKg);
     }
     const { targetRepsMin: min, targetRepsMax: max } = row;
     if (min == null && max == null) return '–';
@@ -361,12 +378,17 @@ export class RoutineBuilder implements ViewWillEnter {
     request.pipe(take(1)).subscribe({
       next: () => {
         this.saving.set(false);
-        void this._feedbackService.success('Routine saved');
+        void this._feedbackService.success(
+          this._translateService.instant('workouts.routineBuilder.toast.saved'),
+        );
         void this._router.navigate(['/tabs/workouts']);
       },
       error: (err) => {
         this.saving.set(false);
-        void this._feedbackService.error(err, 'Could not save the routine');
+        void this._feedbackService.error(
+          err,
+          this._translateService.instant('workouts.routineBuilder.toast.saveFailed'),
+        );
       },
     });
   }
@@ -383,12 +405,17 @@ export class RoutineBuilder implements ViewWillEnter {
         next: () => {
           this.deleting.set(false);
           this.deleteOpen.set(false);
-          void this._feedbackService.success('Routine deleted');
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.routineBuilder.toast.deleted'),
+          );
           void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
         },
         error: (err) => {
           this.deleting.set(false);
-          void this._feedbackService.error(err, 'Could not delete the routine');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.routineBuilder.toast.deleteFailed'),
+          );
         },
       });
   }
@@ -409,7 +436,10 @@ export class RoutineBuilder implements ViewWillEnter {
         },
         error: (err) => {
           this.starting.set(false);
-          void this._feedbackService.error(err, 'Could not start that routine');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.routineBuilder.toast.startFailed'),
+          );
         },
       });
   }

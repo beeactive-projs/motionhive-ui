@@ -18,6 +18,7 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
@@ -64,6 +65,7 @@ import { PROGRAM_ICONS, dayLabel, weekLabel } from '../programs.config';
     IonTextarea,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './day-editor.html',
   styleUrl: './day-editor.scss',
@@ -73,6 +75,7 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonCards = [1, 2];
 
@@ -127,7 +130,11 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
 
   readonly removeBody = computed(() => {
     const row = this.removeTarget();
-    return row ? `Remove ${this.exerciseName(row)} from this day?` : '';
+    return row
+      ? this._translateService.instant('programs.dayEditor.remove.body', {
+          name: this.exerciseName(row),
+        })
+      : '';
   });
 
   constructor() {
@@ -156,12 +163,11 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
   }
 
   exerciseName(row: PrescribedExercise): string {
-    return row.exercise?.name ?? 'Exercise';
+    return row.exercise?.name ?? this._translateService.instant('programs.dayEditor.exerciseFallback');
   }
 
   setsLabel(row: PrescribedExercise): string {
-    const n = (row.sets ?? []).length;
-    return `${n} ${n === 1 ? 'set' : 'sets'}`;
+    return this._translateService.instant('count.sets', { count: (row.sets ?? []).length });
   }
 
   // ─── Editing ──────────────────────────────────────────────────
@@ -190,7 +196,12 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
       .subscribe((results) => {
         this.saving.set(false);
         const failure = results.find((r) => !(r as PrescribedExercise)?.id);
-        if (failure) void this._feedbackService.error(failure, 'Some exercises were not added');
+        if (failure) {
+          void this._feedbackService.error(
+            failure,
+            this._translateService.instant('programs.dayEditor.toast.someNotAdded'),
+          );
+        }
         this.load();
       });
   }
@@ -228,7 +239,8 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
     const workoutId = this._workoutId;
     if (!programId || !workoutId || !this._fieldsSeeded) return Promise.resolve(true);
 
-    const name = this.name().trim() || 'Untitled day';
+    const name =
+      this.name().trim() || this._translateService.instant('programs.dayEditor.untitledDay');
     const note = this.note().trim();
     if (name === this._saved.name && note === this._saved.note) {
       return this._pendingSave ?? Promise.resolve(true);
@@ -242,7 +254,10 @@ export class DayEditor implements ViewWillEnter, ViewWillLeave {
       .then(() => true)
       .catch((err: unknown) => {
         this._saved = previous;
-        void this._feedbackService.error(err, 'Could not save the day');
+        void this._feedbackService.error(
+          err,
+          this._translateService.instant('programs.dayEditor.toast.saveFailed'),
+        );
         return false;
       })
       .finally(() => {

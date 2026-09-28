@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -16,19 +15,14 @@ import { InputNumber } from 'primeng/inputnumber';
 import { MessageService } from 'primeng/api';
 import { SelectButton } from 'primeng/selectbutton';
 import { ToggleButton } from 'primeng/togglebutton';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { ProgramAssignmentService, Routine, showApiError } from 'core';
-
-/** ISO 8601: 1 = Monday through 7 = Sunday, matching the API. */
-const WEEKDAYS = [
-  { iso: 1, label: 'Mon' },
-  { iso: 2, label: 'Tue' },
-  { iso: 3, label: 'Wed' },
-  { iso: 4, label: 'Thu' },
-  { iso: 5, label: 'Fri' },
-  { iso: 6, label: 'Sat' },
-  { iso: 7, label: 'Sun' },
-];
+import {
+  ProgramAssignmentService,
+  Routine,
+  showApiError,
+  weekdayNames,
+} from 'core';
 
 /**
  * `mh-schedule-routine-dialog` — put one of your own routines on the
@@ -48,10 +42,10 @@ const WEEKDAYS = [
     InputNumber,
     SelectButton,
     ToggleButton,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './schedule-routine-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleRoutineDialog {
   readonly routine = input.required<Routine | null>();
@@ -60,16 +54,27 @@ export class ScheduleRoutineDialog {
 
   private readonly _service = inject(ProgramAssignmentService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
-  readonly weekdays = WEEKDAYS;
+  /** ISO 8601: 1 = Monday through 7 = Sunday, matching the API. */
+  readonly weekdays = weekdayNames('short').map((label, i) => ({
+    iso: i + 1,
+    label,
+  }));
   readonly selectedDays = signal<number[]>([]);
   readonly repeatMode = signal<'WEEKLY' | 'BLOCK'>('WEEKLY');
   readonly repeatWeeks = signal<number>(4);
   readonly submitting = signal(false);
 
   readonly repeatOptions = [
-    { label: 'Every week', value: 'WEEKLY' as const },
-    { label: 'For a block', value: 'BLOCK' as const },
+    {
+      label: this._translateService.instant('myWorkouts.schedule.everyWeek'),
+      value: 'WEEKLY' as const,
+    },
+    {
+      label: this._translateService.instant('myWorkouts.schedule.forBlock'),
+      value: 'BLOCK' as const,
+    },
   ];
 
   readonly canSubmit = computed(
@@ -79,13 +84,19 @@ export class ScheduleRoutineDialog {
   /** Plain-language echo of the choice, so nobody has to infer it. */
   readonly summary = computed(() => {
     const days = this.selectedDays();
-    if (!days.length) return 'Pick at least one day.';
-    const names = WEEKDAYS.filter((d) => days.includes(d.iso))
+    if (!days.length) {
+      return this._translateService.instant('myWorkouts.schedule.summary.pickDay');
+    }
+    const names = this.weekdays
+      .filter((d) => days.includes(d.iso))
       .map((d) => d.label)
       .join(', ');
     return this.repeatMode() === 'BLOCK'
-      ? `${names}, for ${this.repeatWeeks()} week${this.repeatWeeks() === 1 ? '' : 's'}.`
-      : `${names}, every week.`;
+      ? this._translateService.instant('myWorkouts.schedule.summary.block', {
+          days: names,
+          count: this.repeatWeeks(),
+        })
+      : this._translateService.instant('myWorkouts.schedule.summary.weekly', { days: names });
   });
 
   constructor() {
@@ -132,8 +143,10 @@ export class ScheduleRoutineDialog {
           this.submitting.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Added to your week',
-            detail: `${r.name} is on your schedule.`,
+            summary: this._translateService.instant('myWorkouts.common.addedToWeek'),
+            detail: this._translateService.instant('myWorkouts.common.onSchedule', {
+              name: r.name,
+            }),
             life: 3000,
           });
           this.scheduled.emit();
@@ -143,8 +156,8 @@ export class ScheduleRoutineDialog {
           this.submitting.set(false);
           showApiError(
             this._messageService,
-            "Couldn't schedule that routine",
-            'Please try again.',
+            this._translateService.instant('myWorkouts.schedule.toast.failed'),
+            this._translateService.instant('common.pleaseTryAgain'),
             err,
           );
         },

@@ -3,40 +3,40 @@
   [header]="dialogHeader()">
   <div class="flex flex-col gap-3.5">
     <div class="flex flex-col gap-1.5">
-      <label for="rname" class="text-xs font-semibold">Routine name *</label>
+      <label for="rname" class="text-xs font-semibold">{{ 'myWorkouts.common.routineNameRequired' | translate }}</label>
       <input pInputText id="rname" fluid [ngModel]="name()" (ngModelChange)="name.set($event)" maxlength="200"
-        placeholder="e.g. Push day A" autocomplete="off" />
+        [placeholder]="'myWorkouts.common.routineNamePlaceholder' | translate" autocomplete="off" />
     </div>
 
     <div class="flex flex-col gap-1.5">
       <label for="rfolder" class="text-xs font-semibold">
-        Folder <span class="font-normal text-muted-color">(optional)</span>
+        {{ 'myWorkouts.common.folder' | translate }} <span class="font-normal text-muted-color">{{ 'myWorkouts.common.optional' | translate }}</span>
       </label>
       <input pInputText id="rfolder" fluid [ngModel]="folder()" (ngModelChange)="folder.set($event)" maxlength="100"
-        placeholder="e.g. PPL split" autocomplete="off" />
+        [placeholder]="'myWorkouts.common.folderPlaceholder' | translate" autocomplete="off" />
     </div>
 
     <div class="flex flex-col gap-1.5">
       <label for="rnotes" class="text-xs font-semibold">
-        Notes <span class="font-normal text-muted-color">(optional)</span>
+        {{ 'form.label.notes' | translate }} <span class="font-normal text-muted-color">{{ 'myWorkouts.common.optional' | translate }}</span>
       </label>
       <textarea pTextarea id="rnotes" rows="2" maxlength="2000" fluid [ngModel]="notes()"
-        (ngModelChange)="notes.set($event)" placeholder="Anything to remember about this routine…"></textarea>
+        (ngModelChange)="notes.set($event)" [placeholder]="'myWorkouts.routineForm.notesPlaceholder' | translate"></textarea>
     </div>
 
     <div>
       <div class="mb-2 flex items-center justify-between">
-        <h4 class="m-0 font-heading text-[13px] font-semibold">Exercises</h4>
+        <h4 class="m-0 font-heading text-[13px] font-semibold">{{ 'myWorkouts.routineForm.exercises' | translate }}</h4>
         <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="openPicker()">
           <i class="pi pi-plus"></i>
-          Add exercise
+          {{ 'myWorkouts.common.addExercise' | translate }}
         </button>
       </div>
 
       @if (exercises().length === 0) {
       <div
         class="rounded-lg border border-dashed border-surface bg-surface-50 p-4 text-center text-xs text-muted-color dark:bg-surface-800">
-        No exercises yet — tap "Add exercise" to start building.
+        {{ 'myWorkouts.routineForm.noExercises' | translate }}
       </div>
       } @else {
       <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
@@ -63,10 +63,10 @@
                 [text]="true"
                 rounded
                 size="small"
-                pTooltip="Move up"
+                [pTooltip]="'myWorkouts.routineForm.moveUp' | translate"
                 [disabled]="i === 0"
                 (click)="moveUp(e.uiKey)"
-                aria-label="Move up"
+                [attr.aria-label]="'myWorkouts.routineForm.moveUp' | translate"
                 iconOnly
               >
                 <i class="pi pi-arrow-up"></i>
@@ -77,10 +77,10 @@
                 [text]="true"
                 rounded
                 size="small"
-                pTooltip="Move down"
+                [pTooltip]="'myWorkouts.routineForm.moveDown' | translate"
                 [disabled]="i === exercises().length - 1"
                 (click)="moveDown(e.uiKey)"
-                aria-label="Move down"
+                [attr.aria-label]="'myWorkouts.routineForm.moveDown' | translate"
                 iconOnly
               >
                 <i class="pi pi-arrow-down"></i>
@@ -91,9 +91,9 @@
                 [text]="true"
                 rounded
                 size="small"
-                pTooltip="Remove"
+                [pTooltip]="'button.remove' | translate"
                 (click)="removeExercise(e.uiKey)"
-                aria-label="Remove"
+                [attr.aria-label]="'button.remove' | translate"
                 iconOnly
               >
                 <i class="pi pi-trash"></i>
@@ -103,34 +103,34 @@
           @if (!e.expanded) {
           <div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Sets</label>
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.routineForm.sets' | translate }}</label>
               <p-inputnumber [ngModel]="e.defaultSets"
                 (ngModelChange)="patchExercise(e.uiKey, { defaultSets: $event ?? 3 })" [min]="1" [max]="30"
                 [showButtons]="false" class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Reps min</label>
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.routineForm.repsMin' | translate }}</label>
               <p-inputnumber [ngModel]="e.targetRepsMin"
                 (ngModelChange)="patchExercise(e.uiKey, { targetRepsMin: $event })" [min]="0" [max]="1000"
                 [allowEmpty]="true" placeholder="—"
                 class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Reps max</label>
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.routineForm.repsMax' | translate }}</label>
               <p-inputnumber [ngModel]="e.targetRepsMax"
                 (ngModelChange)="patchExercise(e.uiKey, { targetRepsMax: $event })" [min]="0" [max]="1000"
                 [allowEmpty]="true" placeholder="—"
                 class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Weight (kg)</label>
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.routineForm.weightKg' | translate }}</label>
               <p-inputnumber [ngModel]="e.targetWeightKg"
                 (ngModelChange)="patchExercise(e.uiKey, { targetWeightKg: $event })" [min]="0" [max]="9999"
                 [maxFractionDigits]="2" [allowEmpty]="true" placeholder="—"
                 class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Rest (s)</label>
+              <label class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.routineForm.restSeconds' | translate }}</label>
               <p-inputnumber [ngModel]="e.restAfterSeconds"
                 (ngModelChange)="patchExercise(e.uiKey, { restAfterSeconds: $event })" [min]="0" [max]="600"
                 [allowEmpty]="true" placeholder="—"
@@ -141,7 +141,7 @@
             <button pButton type="button" severity="secondary" [text]="true" size="small"
               (click)="toggleSetRows(e.uiKey)">
               <i class="pi pi-list"></i>
-              Set each set separately
+              {{ 'myWorkouts.routineForm.setEachSeparately' | translate }}
             </button>
           </div>
           } @else {
@@ -153,9 +153,9 @@
           <div class="flex flex-col gap-1.5">
             <div class="grid grid-cols-[2rem_1fr_1fr_1fr_2rem] items-center gap-2 px-0.5">
               <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">#</span>
-              <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Type</span>
-              <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Reps</span>
-              <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">Weight (kg)</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'form.label.type' | translate }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.common.reps' | translate }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide text-muted-color">{{ 'myWorkouts.routineForm.weightKg' | translate }}</span>
               <span></span>
             </div>
 
@@ -175,7 +175,7 @@
                 class="[&_.p-inputnumber-input]:w-full [&_.p-inputnumber-input]:text-center" />
               <button pButton type="button" severity="danger" [text]="true" rounded size="small"
                 [disabled]="e.sets.length <= 1" (click)="removeSetRow(e.uiKey, st.uiKey)"
-                aria-label="Remove set" iconOnly>
+                [attr.aria-label]="'myWorkouts.routineForm.removeSet' | translate" iconOnly>
                 <i class="pi pi-times"></i>
               </button>
             </div>
@@ -185,12 +185,12 @@
               <button pButton type="button" severity="secondary" [text]="true" size="small"
                 (click)="addSetRow(e.uiKey)">
                 <i class="pi pi-plus"></i>
-                Add set
+                {{ 'myWorkouts.common.addSet' | translate }}
               </button>
               <button pButton type="button" severity="secondary" [text]="true" size="small"
                 (click)="toggleSetRows(e.uiKey)">
                 <i class="pi pi-arrow-left"></i>
-                Back to simple
+                {{ 'myWorkouts.routineForm.backToSimple' | translate }}
               </button>
             </div>
           </div>
@@ -211,24 +211,24 @@
     <div class="flex items-center gap-2">
       <p-checkbox [ngModel]="repeatEnabled()" (ngModelChange)="repeatEnabled.set($event)" [binary]="true"
         inputId="repeat" />
-      <label for="repeat" class="cursor-pointer text-sm font-medium">Repeat this on a schedule</label>
+      <label for="repeat" class="cursor-pointer text-sm font-medium">{{ 'myWorkouts.routineForm.repeat' | translate }}</label>
     </div>
 
     @if (repeatEnabled()) {
     <div class="mt-3 flex flex-col gap-3">
       <div class="flex flex-col gap-1.5">
-        <span class="text-xs font-semibold">Which days</span>
+        <span class="text-xs font-semibold">{{ 'myWorkouts.common.whichDays' | translate }}</span>
         <p-selectbutton [options]="weekdayOptions" [ngModel]="repeatDays()" (ngModelChange)="repeatDays.set($event)"
-          optionLabel="label" optionValue="value" [multiple]="true" size="small" aria-label="Days of the week" />
+          optionLabel="label" optionValue="value" [multiple]="true" size="small" [attr.aria-label]="'myWorkouts.routineForm.daysOfWeek' | translate" />
       </div>
       <div class="flex items-center gap-2">
-        <label for="weeks" class="text-xs font-semibold">For</label>
+        <label for="weeks" class="text-xs font-semibold">{{ 'myWorkouts.routineForm.repeatFor' | translate }}</label>
         <p-inputnumber inputId="weeks" [ngModel]="repeatWeeks()" (ngModelChange)="repeatWeeks.set($event || 1)"
           [min]="1" [max]="52" [showButtons]="true" size="small" styleClass="w-28" />
-        <span class="text-xs text-muted-color">weeks</span>
+        <span class="text-xs text-muted-color">{{ 'myWorkouts.routineForm.repeatWeeks' | translate: { count: repeatWeeks() } }}</span>
       </div>
       @if (!repeatDays().length) {
-      <small class="text-xs text-muted-color">Pick at least one day, or turn the repeat off.</small>
+      <small class="text-xs text-muted-color">{{ 'myWorkouts.routineForm.pickDay' | translate }}</small>
       }
     </div>
     }
@@ -236,7 +236,7 @@
   }
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
       <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
       {{ submitLabel() }}

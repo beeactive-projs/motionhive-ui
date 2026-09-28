@@ -1,5 +1,6 @@
 import { Component, input, model, output } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { ExerciseSortKey } from 'core';
 
@@ -17,7 +18,7 @@ import { SORT_OPTIONS } from '../../exercises.config';
  */
 @Component({
   selector: 'mh-exercise-sort-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './exercise-sort-sheet.html',
   styleUrl: './exercise-sort-sheet.scss',
 })

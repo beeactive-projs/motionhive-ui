@@ -30,20 +30,19 @@
         -->
         @if (provenance().kind === 'freestyle') {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-bolt text-sm" aria-hidden="true"></i>Freestyle
+          <i class="pi pi-bolt text-sm" aria-hidden="true"></i>{{ 'myWorkouts.workoutRow.freestyle' | translate }}
         </span>
         } @else {
         <button type="button" class="inline-flex items-center gap-1 underline decoration-dotted underline-offset-2 hover:text-primary-600"
           (click)="onOpenSource($event)"
-          [attr.aria-label]="(provenance().kind === 'plan' ? 'Open plan ' : 'Open routine ') + provenance().label">
+          [attr.aria-label]="(provenance().kind === 'plan' ? 'myWorkouts.workoutRow.openPlan' : 'myWorkouts.workoutRow.openRoutine') | translate: { name: provenance().label }">
           <i class="pi text-sm" aria-hidden="true"
             [class]="provenance().kind === 'plan' ? 'pi-bookmark' : 'pi-clone'"></i>{{ subtitle() }}
         </button>
         }
         @if (exerciseCount() > 0) {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-bolt text-sm" aria-hidden="true"></i>{{ exerciseCount() }}
-          {{ exerciseCount() === 1 ? 'exercise' : 'exercises' }}
+          <i class="pi pi-bolt text-sm" aria-hidden="true"></i>{{ 'count.exercises' | translate: { count: exerciseCount() } }}
         </span>
         }
         @if (setsTotal() > 0) {
@@ -52,7 +51,7 @@
         </span>
         }
         @if (hasNotes()) {
-        <span class="inline-flex items-center gap-1" aria-label="You left a note">
+        <span class="inline-flex items-center gap-1" [attr.aria-label]="'myWorkouts.workoutRow.leftNote' | translate">
           <i class="pi pi-comment text-sm" aria-hidden="true"></i>
         </span>
         }

@@ -4,6 +4,8 @@ import {
   PrescribedSet,
   ProgramWorkout,
   TagSeverity,
+  appLocale,
+  translate,
 } from 'core';
 
 /** Workouts grouped by week — the shape both the rail and the editor consume. */
@@ -40,24 +42,41 @@ export function nearestFreeDay(occupiedDays: number[], toIndex: number): number 
   return free.reduce((best, d) => (Math.abs(d - ideal) < Math.abs(best - ideal) ? d : best));
 }
 
+/**
+ * Numbers inside the set summary, in the UI locale. No grouping, so a
+ * 1200 kg sled push reads the way it was typed.
+ */
+function num(value: number): string {
+  return new Intl.NumberFormat(appLocale(), { maximumFractionDigits: 2, useGrouping: false }).format(
+    value,
+  );
+}
+
 /** One-line target summary for a prescribed set — "8–12 reps · 60 kg · RPE 8". */
 export function setSummary(s: PrescribedSet): string {
   const parts: string[] = [];
   if (s.targetRepsMin != null && s.targetRepsMax != null) {
     parts.push(
       s.targetRepsMin === s.targetRepsMax
-        ? `${s.targetRepsMin} reps`
-        : `${s.targetRepsMin}–${s.targetRepsMax} reps`,
+        ? translate('count.reps', { count: s.targetRepsMin })
+        : translate('programs.setSummary.repsRange', { min: s.targetRepsMin, max: s.targetRepsMax }),
     );
   } else if (s.targetRepsMin != null) {
-    parts.push(`${s.targetRepsMin}+ reps`);
+    parts.push(translate('programs.setSummary.repsPlus', { min: s.targetRepsMin }));
   }
-  if (s.targetWeightKg != null) parts.push(`${s.targetWeightKg} kg`);
-  else if (s.targetWeightPercent1rm != null) parts.push(`${s.targetWeightPercent1rm}% 1RM`);
-  if (s.targetDurationSeconds != null) parts.push(`${s.targetDurationSeconds}s`);
-  if (s.targetDistanceMeters != null) parts.push(`${s.targetDistanceMeters}m`);
-  if (s.targetRpe != null) parts.push(`RPE ${s.targetRpe}`);
-  if (s.targetRir != null) parts.push(`${s.targetRir} RIR`);
+  if (s.targetWeightKg != null) {
+    parts.push(translate('programs.setSummary.weightKg', { value: num(s.targetWeightKg) }));
+  } else if (s.targetWeightPercent1rm != null) {
+    parts.push(translate('programs.setSummary.percent1rm', { value: num(s.targetWeightPercent1rm) }));
+  }
+  if (s.targetDurationSeconds != null) {
+    parts.push(translate('time.secondsShort', { seconds: s.targetDurationSeconds }));
+  }
+  if (s.targetDistanceMeters != null) {
+    parts.push(translate('programs.setSummary.meters', { value: num(s.targetDistanceMeters) }));
+  }
+  if (s.targetRpe != null) parts.push(translate('programs.setSummary.rpe', { value: num(s.targetRpe) }));
+  if (s.targetRir != null) parts.push(translate('programs.setSummary.rir', { value: num(s.targetRir) }));
   return parts.length ? parts.join(' · ') : '—';
 }
 
@@ -117,15 +136,22 @@ export function estimateWorkoutMinutes(workout: ProgramWorkout): number | null {
  */
 export function prescriptionSummary(ex: PrescribedExercise): string {
   const sets = ex.sets ?? [];
-  if (sets.length === 0) return 'No sets';
+  if (sets.length === 0) return translate('programs.prescription.noSets');
   const sig = (s: PrescribedSet): string => `${s.setType}|${setSummary(s)}`;
   if (sets.every((s) => sig(s) === sig(sets[0]))) {
-    return `${sets.length} × ${setSummary(sets[0])}`;
+    return translate('programs.prescription.uniform', {
+      count: sets.length,
+      summary: setSummary(sets[0]),
+    });
   }
   const working = sets.filter((s) => s.setType !== ExerciseSetType.Warmup);
   const warmups = sets.length - working.length;
   if (warmups > 0 && working.length > 0 && working.every((s) => sig(s) === sig(working[0]))) {
-    return `${warmups} warm-up + ${working.length} × ${setSummary(working[0])}`;
+    return translate('programs.prescription.withWarmups', {
+      warmups,
+      count: working.length,
+      summary: setSummary(working[0]),
+    });
   }
-  return `${sets.length} sets · mixed`;
+  return translate('programs.prescription.mixed', { count: sets.length });
 }

@@ -1,5 +1,6 @@
 <ng-template #sticky>
-  <ion-searchbar mhAutofocus placeholder="Search exercises" inputmode="search" [debounce]="0"
+  <ion-searchbar mhAutofocus [placeholder]="'exercises.library.search' | translate" inputmode="search"
+    [debounce]="0"
     [value]="query()" (ionInput)="onQuery($any($event).detail.value ?? '')" />
 </ng-template>
 
@@ -22,7 +23,7 @@
   } @else {
     <!-- Your own last picks first: the fastest path to the movement you meant. -->
     @if (recents().length) {
-      <div class="mh-section-label">Recently used</div>
+      <div class="mh-section-label">{{ 'exercises.picker.recentlyUsed' | translate }}</div>
       <ion-list [inset]="true" class="mh-card-list">
         @for (exercise of recents(); track exercise.id) {
           <mh-exercise-row [exercise]="exercise" [selected]="isOn(exercise.id)"
@@ -50,6 +51,6 @@
   }
 </ng-template>
 
-<mh-sheet-shell [(open)]="open" [title]="title()" [subtitle]="context()"
+<mh-sheet-shell [(open)]="open" [title]="sheetTitle()" [subtitle]="context()"
   [sticky]="sticky" [body]="body" [saveLabel]="addLabel()" [canSave]="canAdd()"
   [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9" (save)="add()" />

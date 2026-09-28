@@ -18,6 +18,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { ProgramAssignment, ProgramAssignmentStatus } from 'core';
@@ -57,6 +58,7 @@ import { AssignmentsStore } from './assignments.store';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './assignments.html',
   styleUrl: './assignments.scss',
@@ -66,6 +68,7 @@ export class Assignments implements ViewWillEnter {
   readonly store = inject(AssignmentsStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Statuses = ProgramAssignmentStatus;
   readonly skeletonRows = [1, 2, 3];
@@ -96,14 +99,27 @@ export class Assignments implements ViewWillEnter {
 
   onAssign(request: AssignRequest): void {
     this.store.assign(request, (error) => {
-      if (error) void this._feedbackService.error(error, 'Could not assign the program');
-      else void this._feedbackService.success('Program assigned');
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.assignments.toast.assignFailed'),
+        );
+      } else {
+        void this._feedbackService.success(
+          this._translateService.instant('programs.assignments.toast.assigned'),
+        );
+      }
     });
   }
 
   setStatus(row: ProgramAssignment, status: ProgramAssignmentStatus): void {
     this.store.setStatus(row, status, (error) => {
-      if (error) void this._feedbackService.error(error, 'Could not change that assignment');
+      if (error) {
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('programs.assignments.toast.statusFailed'),
+        );
+      }
     });
   }
 }

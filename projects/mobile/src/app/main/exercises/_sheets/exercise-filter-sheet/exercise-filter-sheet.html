@@ -1,5 +1,5 @@
 <ng-template #body>
-  <div class="mh-section-label">Kind</div>
+  <div class="mh-section-label">{{ 'exercises.fields.kind' | translate }}</div>
   <div class="chips">
     @for (chip of kindChips(); track chip.value) {
       <ion-chip
@@ -15,7 +15,7 @@
     }
   </div>
 
-  <div class="mh-section-label">Level</div>
+  <div class="mh-section-label">{{ 'exercises.fields.level' | translate }}</div>
   <div class="chips">
     @for (chip of levelChips(); track chip.value) {
       <ion-chip
@@ -31,7 +31,7 @@
     }
   </div>
 
-  <div class="mh-section-label">Primary muscle</div>
+  <div class="mh-section-label">{{ 'exercises.filterSheet.primaryMuscle' | translate }}</div>
   <div class="chips">
     @for (chip of muscleChips(); track chip.value) {
       <ion-chip
@@ -52,7 +52,7 @@
     }
   </div>
 
-  <div class="mh-section-label">Equipment</div>
+  <div class="mh-section-label">{{ 'exercises.fields.equipment' | translate }}</div>
   <div class="chips">
     @for (chip of equipmentChips(); track chip.value) {
       <ion-chip
@@ -69,14 +69,14 @@
   </div>
 
   <ion-note class="mh-footnote">
-    Movement pattern, mechanic and force are on the web app.
+    {{ 'exercises.filterSheet.webOnly' | translate }}
   </ion-note>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Filters"
-  actionLabel="Reset"
+  [title]="'common.filters' | translate"
+  [actionLabel]="'button.reset' | translate"
   [actionDisabled]="count() === 0"
   [saveLabel]="applyLabel()"
   [body]="body"

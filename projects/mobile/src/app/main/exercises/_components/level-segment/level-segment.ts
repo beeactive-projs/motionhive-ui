@@ -1,5 +1,6 @@
 import { Component, model } from '@angular/core';
 import { IonLabel, IonSegment, IonSegmentButton } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { ExerciseLevel } from 'core';
 
@@ -13,7 +14,7 @@ import { LEVEL_ORDER, levelLabel } from '../../exercises.config';
  */
 @Component({
   selector: 'mh-level-segment',
-  imports: [IonLabel, IonSegment, IonSegmentButton],
+  imports: [IonLabel, IonSegment, IonSegmentButton, TranslatePipe],
   templateUrl: './level-segment.html',
   styleUrl: './level-segment.scss',
 })

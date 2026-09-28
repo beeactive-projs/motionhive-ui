@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/clients" />
     </ion-buttons>
-    <ion-title>{{ clientName() || 'Training' }}</ion-title>
+    <ion-title>{{ clientName() || ('programs.clientTraining.titleFallback' | translate) }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,16 +11,16 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load their training"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'programs.clientTraining.error' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
     <!-- Mirrors the row shape so nothing shifts when data lands. -->
     <div class="mh-page">
       <section class="mh-section">
-        <span class="mh-kicker">Plan</span>
+        <span class="mh-kicker">{{ 'programs.clientTraining.plan' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
           <ion-item lines="none">
             <ion-label>
@@ -31,7 +31,7 @@
         </ion-list>
       </section>
       <section class="mh-section">
-        <span class="mh-kicker">Recent workouts</span>
+        <span class="mh-kicker">{{ 'programs.clientTraining.recentWorkouts' | translate }}</span>
         <div>
           @for (_ of skeletonRows; track $index) {
             <mh-session-row-skeleton />
@@ -42,14 +42,14 @@
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="albums-outline"
-      heading="Nothing yet"
-      message="Assign a program and their work will show up here."
+      [heading]="'programs.clientTraining.empty.heading' | translate"
+      [message]="'programs.clientTraining.empty.message' | translate"
     />
   } @else {
     <div class="mh-page">
       @if (activePlans().length) {
         <section class="mh-section">
-          <span class="mh-kicker">Plan</span>
+          <span class="mh-kicker">{{ 'programs.clientTraining.plan' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
             @for (plan of activePlans(); track plan.id; let last = $last) {
               <ion-item [lines]="last ? 'none' : 'full'">
@@ -65,7 +65,7 @@
       }
 
       <section class="mh-section">
-        <span class="mh-kicker">Recent workouts</span>
+        <span class="mh-kicker">{{ 'programs.clientTraining.recentWorkouts' | translate }}</span>
         @if (logs().length) {
           <div>
             @for (log of logs(); track log.id) {
@@ -73,7 +73,7 @@
             }
           </div>
         } @else {
-          <ion-note class="mh-note-block">Nothing logged in this window.</ion-note>
+          <ion-note class="mh-note-block">{{ 'programs.clientTraining.nothingLogged' | translate }}</ion-note>
         }
       </section>
 
@@ -91,10 +91,7 @@
             aria-hidden="true"
           />
           <ion-label class="ion-text-wrap">
-            <p>
-              Workouts your client does outside their plan stay private unless they
-              share them, so this list may not be everything they did.
-            </p>
+            <p>{{ 'programs.clientTraining.privacyNote' | translate }}</p>
           </ion-label>
         </ion-item>
       </ion-list>

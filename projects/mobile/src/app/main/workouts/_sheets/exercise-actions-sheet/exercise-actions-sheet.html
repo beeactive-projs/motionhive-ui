@@ -9,7 +9,7 @@
     @for (item of actions(); track item.id) {
       <ion-item button [detail]="false" (click)="choose(item.id)">
         <ion-icon slot="start" [name]="item.icon" [color]="item.color" aria-hidden="true" />
-        <ion-label [color]="item.destructive ? 'danger' : undefined">{{ item.label }}</ion-label>
+        <ion-label [color]="item.destructive ? 'danger' : undefined">{{ item.label | translate }}</ion-label>
       </ion-item>
     }
   </ion-list>
@@ -17,7 +17,7 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Exercise actions"
+  [title]="'workouts.exerciseActions.title' | translate"
   [body]="body"
   [showHeader]="false"
   [showFooter]="false"

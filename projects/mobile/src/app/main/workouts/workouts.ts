@@ -21,6 +21,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { Routine, TrainingDayPlan, displayName } from 'core';
@@ -69,6 +70,7 @@ import { WorkoutsStore } from './workouts.store';
     SessionRowSkeleton,
     SettingsRow,
     TodayHero,
+    TranslatePipe,
   ],
   providers: [WorkoutsStore],
   templateUrl: './workouts.html',
@@ -78,6 +80,7 @@ export class Workouts implements ViewWillEnter {
   readonly store = inject(WorkoutsStore);
   private readonly _router = inject(Router);
   private readonly _clockService = inject(ClockService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3];
   readonly routineTone = routineTone;
@@ -112,9 +115,13 @@ export class Workouts implements ViewWillEnter {
   planSubline(plan: TrainingDayPlan): string {
     const parts: string[] = [];
     if (plan.instructor && plan.assignmentKind !== 'SELF') {
-      parts.push(displayName(plan.instructor, 'Your coach'));
+      parts.push(
+        displayName(plan.instructor, this._translateService.instant('workouts.home.yourCoach')),
+      );
     }
-    parts.push(`${plan.completionPercent}% done`);
+    parts.push(
+      this._translateService.instant('workouts.home.percentDone', { percent: plan.completionPercent }),
+    );
     return parts.join(' · ');
   }
 

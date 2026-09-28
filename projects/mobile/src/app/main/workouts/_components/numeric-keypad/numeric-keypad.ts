@@ -1,5 +1,6 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   KeypadField,
@@ -50,11 +51,13 @@ const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
  */
 @Component({
   selector: 'mh-numeric-keypad',
-  imports: [IonButton, IonIcon],
+  imports: [IonButton, IonIcon, TranslatePipe],
   templateUrl: './numeric-keypad.html',
   styleUrl: './numeric-keypad.scss',
 })
 export class NumericKeypad {
+  private readonly _translateService = inject(TranslateService);
+
   readonly field = input.required<KeypadField>();
   readonly value = input('');
   /** What the row above is editing, so the pad says what it is changing. */
@@ -80,7 +83,9 @@ export class NumericKeypad {
 
   readonly stepLabel = computed(() => {
     const step = STEP[this.field()];
-    return this.isClock() ? `${step}s` : `${step}`;
+    return this.isClock()
+      ? this._translateService.instant('workouts.keypad.stepSeconds', { step })
+      : `${step}`;
   });
 
   /**

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>{{ isReview() ? 'Workout' : 'Finish' }}</ion-title>
+    <ion-title>{{ (isReview() ? 'workouts.common.workout' : 'workouts.logger.finish') | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,9 +11,9 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this workout"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.workout' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
@@ -35,7 +35,7 @@
     <div class="mh-page">
       <ion-card class="hero">
         <ion-card-content>
-          <span class="mh-kicker done">{{ isReview() ? 'Logged' : 'Done' }}</span>
+          <span class="mh-kicker done">{{ (isReview() ? 'workouts.finish.logged' : 'workouts.finish.done') | translate }}</span>
           <h2>{{ log.name }}</h2>
           <p class="duration">{{ durationLabel() }}</p>
         </ion-card-content>
@@ -50,7 +50,7 @@
 
       @if (!isReview()) {
         <section class="mh-section">
-          <span class="mh-kicker">How did it feel?</span>
+          <span class="mh-kicker">{{ 'workouts.finish.howDidItFeel' | translate }}</span>
           <!-- A rating affordance sized for a thumb: five same-sized tiles, one
                of which is pressed. A grid, so the tiles stay plain buttons. -->
           <div class="feelings">
@@ -59,7 +59,7 @@
                 type="button"
                 class="feeling"
                 [class.on]="feeling() === f.value"
-                [attr.aria-label]="'Rating ' + f.value + ' of 5'"
+                [attr.aria-label]="'workouts.finish.rating' | translate: { value: f.value }"
                 [attr.aria-pressed]="feeling() === f.value"
                 (click)="feeling.set(f.value)"
               >
@@ -70,11 +70,11 @@
         </section>
 
         <section class="mh-section">
-          <span class="mh-kicker">Notes</span>
+          <span class="mh-kicker">{{ 'form.label.notes' | translate }}</span>
           <ion-textarea
             fill="outline"
             [autoGrow]="true"
-            placeholder="Anything worth remembering next time?"
+            [placeholder]="'workouts.finish.notesPlaceholder' | translate"
             [value]="note()"
             (ionInput)="note.set($any($event).detail.value ?? '')"
           />
@@ -86,11 +86,11 @@
       @if (canSaveAsRoutine()) {
         <ion-card class="prompt">
           <ion-card-content>
-            <span class="mh-kicker">Save as routine?</span>
-            <p>Keep this workout to repeat later.</p>
+            <span class="mh-kicker">{{ 'workouts.finish.saveAsRoutine.title' | translate }}</span>
+            <p>{{ 'workouts.finish.saveAsRoutine.message' | translate }}</p>
             <ion-input
               fill="outline"
-              label="Name"
+              [label]="'form.label.name' | translate"
               labelPlacement="stacked"
               [value]="routineName()"
               (ionInput)="routineName.set($any($event).detail.value ?? '')"
@@ -101,14 +101,14 @@
               [disabled]="savingRoutine() || !routineName().trim()"
               (click)="saveAsRoutine()"
             >
-              Save routine
+              {{ 'workouts.finish.saveAsRoutine.action' | translate }}
             </ion-button>
           </ion-card-content>
         </ion-card>
       }
 
       <section class="mh-section">
-        <span class="mh-kicker">What you did</span>
+        <span class="mh-kicker">{{ 'workouts.finish.whatYouDid' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
           @for (exercise of exercises(); track exercise.id; let last = $last) {
             <ion-item [lines]="last ? 'none' : 'full'" [class.skipped]="exercise.isSkipped">
@@ -128,7 +128,7 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
-        <ion-button expand="block" [disabled]="saving()" (click)="save()">Save &amp; finish</ion-button>
+        <ion-button expand="block" [disabled]="saving()" (click)="save()">{{ 'workouts.finish.saveAndFinish' | translate }}</ion-button>
       </div>
     </ion-toolbar>
   </ion-footer>

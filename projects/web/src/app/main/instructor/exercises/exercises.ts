@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonDirective } from 'primeng/button';
@@ -18,6 +11,7 @@ import { Menu } from 'primeng/menu';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Skeleton } from 'primeng/skeleton';
 import { Toast } from 'primeng/toast';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   AuthStore,
@@ -30,6 +24,7 @@ import {
   ExerciseSortKey,
   ExerciseTaxonomyStore,
   ListExercisesQuery,
+  enumLabel,
   injectIsMobile,
   injectIsTablet,
   injectIsTabletDown,
@@ -56,7 +51,6 @@ import { ExerciseFormDialog } from './exercise-form-dialog/exercise-form-dialog'
  */
 @Component({
   selector: 'mh-exercises',
-  standalone: true,
   imports: [
     NgTemplateOutlet,
     FormsModule,
@@ -74,16 +68,17 @@ import { ExerciseFormDialog } from './exercise-form-dialog/exercise-form-dialog'
     ExerciseDetailDialog,
     ExerciseFilterPanel,
     ExerciseFormDialog,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './exercises.html',
   styleUrl: './exercises.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Exercises {
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _messageService = inject(MessageService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
   readonly taxonomy = inject(ExerciseTaxonomyStore);
 
   // ── Responsive ───────────────────────────────────────────────────
@@ -163,47 +158,53 @@ export class Exercises {
     { value: ExerciseOwnershipFilter; label: string }[]
   >(() => {
     const base: { value: ExerciseOwnershipFilter; label: string }[] = [
-      { value: ExerciseOwnershipFilter.All, label: 'All' },
-      { value: ExerciseOwnershipFilter.System, label: 'System' },
+      { value: ExerciseOwnershipFilter.All, label: this._translateService.instant('common.all') },
+      {
+        value: ExerciseOwnershipFilter.System,
+        label: this._translateService.instant('exercises.catalog.ownership.system'),
+      },
     ];
     if (this.isInstructor()) {
-      base.push({ value: ExerciseOwnershipFilter.Mine, label: 'My exercises' });
+      base.push({
+        value: ExerciseOwnershipFilter.Mine,
+        label: this._translateService.instant('exercises.catalog.ownership.mine'),
+      });
       base.push({
         value: ExerciseOwnershipFilter.PublicOthers,
-        label: 'Public · others',
+        label: this._translateService.instant('exercises.catalog.ownership.publicOthers'),
       });
     }
     return base;
   });
 
   readonly kindOptions: { value: ExerciseKind; label: string }[] = [
-    { value: ExerciseKind.Strength, label: 'Strength' },
-    { value: ExerciseKind.Cardio, label: 'Cardio' },
-    { value: ExerciseKind.Bodyweight, label: 'Bodyweight' },
-    { value: ExerciseKind.Mobility, label: 'Mobility' },
-    { value: ExerciseKind.Duration, label: 'Duration' },
-    { value: ExerciseKind.Distance, label: 'Distance' },
-  ];
+    ExerciseKind.Strength,
+    ExerciseKind.Cardio,
+    ExerciseKind.Bodyweight,
+    ExerciseKind.Mobility,
+    ExerciseKind.Duration,
+    ExerciseKind.Distance,
+  ].map((value) => ({ value, label: enumLabel('exerciseKind', value) }));
 
   readonly levelOptions: { value: ExerciseLevel; label: string }[] = [
-    { value: ExerciseLevel.Beginner, label: 'Beginner' },
-    { value: ExerciseLevel.Intermediate, label: 'Intermediate' },
-    { value: ExerciseLevel.Advanced, label: 'Advanced' },
-  ];
+    ExerciseLevel.Beginner,
+    ExerciseLevel.Intermediate,
+    ExerciseLevel.Advanced,
+  ].map((value) => ({ value, label: enumLabel('exerciseLevel', value) }));
 
   readonly sortItems: MenuItem[] = [
     {
-      label: 'Name (A–Z)',
+      label: this._translateService.instant('exercises.catalog.sort.menu.name'),
       icon: 'pi pi-sort-alpha-down',
       command: () => this.setSort(ExerciseSortKey.Name),
     },
     {
-      label: 'Newest first',
+      label: this._translateService.instant('exercises.catalog.sort.menu.newest'),
       icon: 'pi pi-clock',
       command: () => this.setSort(ExerciseSortKey.Newest),
     },
     {
-      label: 'Most forked',
+      label: this._translateService.instant('exercises.catalog.sort.menu.mostForked'),
       icon: 'pi pi-share-alt',
       command: () => this.setSort(ExerciseSortKey.MostForked),
     },
@@ -212,11 +213,11 @@ export class Exercises {
   readonly sortLabel = computed(() => {
     switch (this.sort()) {
       case ExerciseSortKey.Newest:
-        return 'Newest';
+        return this._translateService.instant('exercises.catalog.sort.short.newest');
       case ExerciseSortKey.MostForked:
-        return 'Most forked';
+        return this._translateService.instant('exercises.catalog.sort.short.mostForked');
       default:
-        return 'Name';
+        return this._translateService.instant('exercises.catalog.sort.short.name');
     }
   });
 
@@ -390,8 +391,8 @@ export class Exercises {
         settle();
         showApiError(
           this._messageService,
-          "Couldn't load exercises",
-          'Check your connection and try again.',
+          this._translateService.instant('exercises.toast.loadFailed'),
+          this._translateService.instant('error.checkConnection'),
           err,
         );
       },

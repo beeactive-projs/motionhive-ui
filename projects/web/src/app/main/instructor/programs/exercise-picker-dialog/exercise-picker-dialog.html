@@ -1,14 +1,14 @@
 <p-dialog [(visible)]="visible" [modal]="true" [closable]="!submitting()" [closeOnEscape]="!submitting()"
   [dismissableMask]="!submitting()" [appendTo]="'body'" [style]="{ width: '40rem' }"
-  [header]="multi() ? 'Add exercises' : 'Add exercise'" styleClass="exercise-picker">
+  [header]="(multi() ? 'programs.picker.titleMulti' : 'programs.picker.titleSingle') | translate" styleClass="exercise-picker">
   <div class="flex min-h-80 flex-col gap-3 pt-3">
     <p-iconfield>
       <p-inputicon [class]="loading() ? 'pi pi-spinner pi-spin' : 'pi pi-search'" />
-      <input pInputText type="text" fluid placeholder="Search exercises…" aria-label="Search exercises"
-        autocomplete="off" [ngModel]="query()" (ngModelChange)="onSearchChange($event)" />
+      <input pInputText type="text" fluid [placeholder]="'programs.picker.searchPlaceholder' | translate"
+        [attr.aria-label]="'programs.picker.searchAria' | translate" autocomplete="off" [ngModel]="query()" (ngModelChange)="onSearchChange($event)" />
       @if (query() !== '') {
       <!-- pi-times-circle (not pi-times) so it doesn't mirror the dialog's ✕ close button. -->
-      <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" aria-label="Clear search"
+      <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" [attr.aria-label]="'button.clearSearch' | translate"
         (click)="onSearchChange('')" (keydown.enter)="onSearchChange('')" />
       }
     </p-iconfield>
@@ -17,10 +17,10 @@
     <div class="flex items-center justify-between gap-3 rounded-lg bg-surface-100 px-3 py-1.5 dark:bg-surface-800"
       role="status" aria-live="polite">
       <span class="text-xs font-semibold text-surface-700 dark:text-surface-200">
-        {{ selectedCount() }} selected
+        {{ 'programs.picker.selected' | translate: { count: selectedCount() } }}
       </span>
       <button pButton type="button" size="small" severity="secondary" [text]="true" [disabled]="submitting()" (click)="clearSelection()">
-        Clear
+        {{ 'button.clear' | translate }}
       </button>
     </div>
     }
@@ -41,12 +41,12 @@
     } @else if (results().length === 0) {
     <div class="flex flex-col items-center gap-1 px-2 py-10 text-center">
       <i class="pi pi-search mb-1 text-3xl text-surface-300"></i>
-      <p class="m-0 text-sm font-medium text-surface-700 dark:text-surface-200">No exercises found.</p>
-      <small class="text-xs text-surface-500">Try a different search term.</small>
+      <p class="m-0 text-sm font-medium text-surface-700 dark:text-surface-200">{{ 'programs.picker.noResults.title' | translate }}</p>
+      <small class="text-xs text-surface-500">{{ 'programs.picker.noResults.message' | translate }}</small>
     </div>
     } @else {
     <div class="flex max-h-110 flex-col gap-1.5 overflow-y-auto transition-opacity" [class.opacity-60]="loading()"
-      role="group" aria-label="Exercises">
+      role="group" [attr.aria-label]="'programs.picker.listAria' | translate">
       @for (ex of results(); track ex.id) {
       <button pButton
         type="button"
@@ -69,7 +69,7 @@
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="truncate text-sm font-semibold text-surface-900 dark:text-surface-100">{{ ex.name }}</span>
             <span class="truncate text-xs text-surface-500">
-              {{ ex.kind | lowercase }} · {{ ex.level | lowercase }}@if (ex.equipment && ex.equipment.length > 0) { ·
+              {{ ex.kind | enumLabel: 'exerciseKind' | lowercase }} · {{ ex.level | enumLabel: 'exerciseLevel' | lowercase }}@if (ex.equipment && ex.equipment.length > 0) { ·
               {{ ex.equipment[0].name }} }
             </span>
           </span>
@@ -91,7 +91,7 @@
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
       <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-plus'"></i>
       {{ submitLabel() }}

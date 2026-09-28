@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -17,6 +16,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectButton } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   LoggedExercise,
@@ -64,17 +64,18 @@ interface FeelingOption {
     SelectButton,
     TextareaModule,
     Toast,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './workout-complete.html',
   styleUrl: './workout-complete.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkoutComplete implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _service = inject(WorkoutLogService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly log = signal<WorkoutLog | null>(null);
   readonly loading = signal(false);
@@ -88,8 +89,14 @@ export class WorkoutComplete implements OnInit {
   /** Carry today's numbers across, or keep the shape only. */
   readonly routineMode = signal<'TARGETS' | 'STRUCTURE'>('TARGETS');
   readonly routineModeOptions = [
-    { label: 'From what I did', value: 'TARGETS' as const },
-    { label: 'Structure only', value: 'STRUCTURE' as const },
+    {
+      label: this._translateService.instant('myWorkouts.complete.saveRoutine.mode.targets'),
+      value: 'TARGETS' as const,
+    },
+    {
+      label: this._translateService.instant('myWorkouts.complete.saveRoutine.mode.structure'),
+      value: 'STRUCTURE' as const,
+    },
   ];
   readonly routineName = signal('');
   readonly routineFolder = signal('');
@@ -99,11 +106,11 @@ export class WorkoutComplete implements OnInit {
   readonly savedRoutineId = signal<string | null>(null);
 
   readonly feelingOptions: FeelingOption[] = [
-    { value: 1, glyph: '😣', label: 'Rough' },
-    { value: 2, glyph: '😕', label: 'Tough' },
-    { value: 3, glyph: '😐', label: 'OK' },
-    { value: 4, glyph: '🙂', label: 'Good' },
-    { value: 5, glyph: '💪', label: 'Great' },
+    { value: 1, glyph: '😣', label: this._translateService.instant('myWorkouts.complete.feeling.rough') },
+    { value: 2, glyph: '😕', label: this._translateService.instant('myWorkouts.complete.feeling.tough') },
+    { value: 3, glyph: '😐', label: this._translateService.instant('myWorkouts.complete.feeling.ok') },
+    { value: 4, glyph: '🙂', label: this._translateService.instant('myWorkouts.complete.feeling.good') },
+    { value: 5, glyph: '💪', label: this._translateService.instant('myWorkouts.complete.feeling.great') },
   ];
 
   // ── Derived stats ────────────────────────────────────────────────
@@ -197,14 +204,19 @@ export class WorkoutComplete implements OnInit {
           this.saving.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Feedback saved',
+            summary: this._translateService.instant('myWorkouts.complete.toast.feedbackSaved'),
             life: 2000,
           });
           this.backToPlan();
         },
         error: (err) => {
           this.saving.set(false);
-          showApiError(this._messageService, "Couldn't save feedback", 'Please retry.', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('myWorkouts.complete.toast.saveFeedbackFailed'),
+            this._translateService.instant('myWorkouts.common.pleaseRetry'),
+            err,
+          );
         },
       });
   }
@@ -218,15 +230,19 @@ export class WorkoutComplete implements OnInit {
   readonly isCoached = computed(() => !!this.log()?.programAssignmentId);
 
   readonly notesPlaceholder = computed(() =>
-    this.isCoached()
-      ? 'Anything to note for your coach? (optional)'
-      : 'Anything worth remembering next time? (optional)',
+    this._translateService.instant(
+      this.isCoached()
+        ? 'myWorkouts.complete.notes.placeholderCoached'
+        : 'myWorkouts.complete.notes.placeholderSolo',
+    ),
   );
 
   readonly notesAudience = computed(() =>
-    this.isCoached()
-      ? 'Your coach can see this note and how it felt.'
-      : 'Only you can see this. Solo sessions are not shared with a coach.',
+    this._translateService.instant(
+      this.isCoached()
+        ? 'myWorkouts.complete.notes.audienceCoached'
+        : 'myWorkouts.complete.notes.audienceSolo',
+    ),
   );
 
   /** Leave without persisting the note or the rating. */
@@ -284,8 +300,10 @@ export class WorkoutComplete implements OnInit {
           this.savedRoutineId.set(saved.id);
           this._messageService.add({
             severity: 'success',
-            summary: 'Routine saved',
-            detail: `"${saved.name}" is in your routines tab.`,
+            summary: this._translateService.instant('myWorkouts.complete.toast.routineSaved'),
+            detail: this._translateService.instant('myWorkouts.complete.toast.routineSavedDetail', {
+              name: saved.name,
+            }),
             life: 3000,
           });
         },
@@ -293,8 +311,8 @@ export class WorkoutComplete implements OnInit {
           this.savingRoutine.set(false);
           showApiError(
             this._messageService,
-            "Couldn't save routine",
-            'Please retry.',
+            this._translateService.instant('myWorkouts.common.saveRoutineFailed'),
+            this._translateService.instant('myWorkouts.common.pleaseRetry'),
             err,
           );
         },
@@ -322,8 +340,8 @@ export class WorkoutComplete implements OnInit {
         this.loading.set(false);
         showApiError(
           this._messageService,
-          "Couldn't load workout",
-          'It may have been removed or you may not have access.',
+          this._translateService.instant('myWorkouts.common.loadWorkoutFailed'),
+          this._translateService.instant('error.mayBeRemoved'),
           err,
         );
         this._router.navigate(['/user/plans']);

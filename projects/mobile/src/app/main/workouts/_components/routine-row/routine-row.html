@@ -10,7 +10,7 @@
     <h2>{{ routine().name }}</h2>
     <div class="tags">
       @if (starter()) {
-        <ion-badge data-tone="medium">Starter</ion-badge>
+        <ion-badge data-tone="medium">{{ 'workouts.routineRow.starter' | translate }}</ion-badge>
       }
       <ion-note>{{ exerciseCount() }}</ion-note>
     </div>

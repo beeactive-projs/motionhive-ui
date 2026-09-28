@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -13,6 +12,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
@@ -63,11 +63,11 @@ type ClientOption = SelectItem<string> & {
     Textarea,
     Toast,
     HexAvatar,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './assign-program-dialog.html',
   styleUrl: './assign-program-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssignProgramDialog {
   readonly program = input.required<Program>();
@@ -78,6 +78,7 @@ export class AssignProgramDialog {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly clients = signal<ClientOption[]>([]);
   readonly loadingClients = signal(false);
@@ -151,8 +152,11 @@ export class AssignProgramDialog {
         this.submitting.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Program assigned',
-          detail: `${this.program().name} sent to ${this._clientLabel(clientId)}.`,
+          summary: this._translateService.instant('programs.toast.assigned.summary'),
+          detail: this._translateService.instant('programs.toast.assigned.detail', {
+            program: this.program().name,
+            client: this._clientLabel(clientId),
+          }),
           life: 3500,
         });
         this.assigned.emit(assignment);
@@ -162,8 +166,8 @@ export class AssignProgramDialog {
         this.submitting.set(false);
         showApiError(
           this._messageService,
-          "Couldn't assign program",
-          'Please check the client relationship and try again.',
+          this._translateService.instant('programs.toast.assignError.summary'),
+          this._translateService.instant('programs.toast.assignError.detail'),
           err,
         );
       },
@@ -187,8 +191,8 @@ export class AssignProgramDialog {
           this.loadingClients.set(false);
           showApiError(
             this._messageService,
-            "Couldn't load clients",
-            'Refresh and try again.',
+            this._translateService.instant('programs.toast.loadClientsError.summary'),
+            this._translateService.instant('programs.toast.loadClientsError.detail'),
             err,
           );
         },
@@ -199,7 +203,8 @@ export class AssignProgramDialog {
     const u = c.client;
     const first = u?.firstName ?? '';
     const last = u?.lastName ?? '';
-    const fallback = u?.email ?? c.invitedEmail ?? 'Client';
+    const fallback =
+      u?.email ?? c.invitedEmail ?? this._translateService.instant('programs.assignDialog.clientFallback');
     const name = `${first} ${last}`.trim() || fallback;
     return {
       value: c.clientId,
@@ -210,7 +215,10 @@ export class AssignProgramDialog {
   }
 
   private _clientLabel(clientId: string): string {
-    return this.clients().find((c) => c.value === clientId)?.label ?? 'client';
+    return (
+      this.clients().find((c) => c.value === clientId)?.label ??
+      this._translateService.instant('programs.assignDialog.clientFallbackLower')
+    );
   }
 
   private _today(): Date {

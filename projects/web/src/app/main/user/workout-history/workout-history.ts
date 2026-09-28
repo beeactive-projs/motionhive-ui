@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -9,6 +8,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -47,7 +47,6 @@ interface HistoryGroup {
  */
 @Component({
   selector: 'mh-workout-history',
-  standalone: true,
   imports: [
     FormsModule,
     ButtonDirective,
@@ -58,14 +57,15 @@ interface HistoryGroup {
     SectionLabel,
     TimeRowSkeleton,
     WorkoutRow,
+    TranslatePipe,
   ],
   templateUrl: './workout-history.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkoutHistory implements OnInit {
   private readonly _service = inject(WorkoutLogService);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
 
@@ -172,8 +172,8 @@ export class WorkoutHistory implements OnInit {
         settle();
         showApiError(
           this._messageService,
-          "Couldn't load your history",
-          'Check your connection and try again.',
+          this._translateService.instant('training.history.loadFailed'),
+          this._translateService.instant('error.checkConnection'),
           err,
         );
       },

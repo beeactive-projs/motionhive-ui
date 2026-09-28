@@ -16,6 +16,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -56,6 +57,7 @@ import { PROGRAM_ICONS } from '../programs.config';
     IonTitle,
     IonToolbar,
     StatTile,
+    TranslatePipe,
   ],
   templateUrl: './log-review.html',
   styleUrl: './log-review.scss',

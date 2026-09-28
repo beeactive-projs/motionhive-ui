@@ -10,6 +10,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -42,6 +43,7 @@ const STARTER_LIMIT = 50;
     IonToolbar,
     RoutineRow,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './starters.html',
   styleUrl: './starters.scss',

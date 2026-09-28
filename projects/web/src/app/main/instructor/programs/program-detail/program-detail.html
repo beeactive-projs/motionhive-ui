@@ -2,29 +2,27 @@
   <!-- Slim header · back + title + status + saving pill + meta line; actions right -->
   <header class="flex items-center justify-between gap-3 pb-3">
     <div class="flex min-w-0 items-center gap-2 md:gap-3">
-      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="min-w-0 space-y-1">
         <div class="flex min-w-0 items-center gap-2">
           <h1 class="truncate font-heading text-lg font-semibold md:text-xl">
-            {{ program()?.name ?? 'Program' }}
+            {{ program()?.name ?? ('programs.detail.fallbackTitle' | translate) }}
           </h1>
           @if (program(); as p) {
-          <p-tag class="shrink-0" [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
+          <p-tag class="shrink-0" [value]="p.status | enumLabel: 'programStatus'" [severity]="statusSeverity(p.status)" />
           }
         </div>
         @if (program(); as p) {
         <p class="m-0 hidden truncate text-xs text-muted-color md:block">
-          {{ weekCount() }} {{ weekCount() === 1 ? 'week' : 'weeks' }} · {{ totalWorkouts() }}
-          {{ totalWorkouts() === 1 ? 'workout' : 'workouts' }}
+          {{ 'count.weeks' | translate: { count: weekCount() } }} ·
+          {{ 'count.workouts' | translate: { count: totalWorkouts() } }}
           @if (activeWorkout(); as w) {
-          · {{ selectedWeekSetCount() }} {{ selectedWeekSetCount() === 1 ? 'set' : 'sets' }} in
-          week
-          {{ w.weekIndex + 1 }}
+          · {{ 'programs.detail.setsInWeek' | translate: { count: selectedWeekSetCount() ?? 0, week: w.weekIndex + 1 } }}
           }
           @if (p.periodizationModel; as model) {
-          · {{ model | titlecase }}
+          · {{ periodizationLabel(model) }}
           }
           @if (p.description; as description) {
           <span [pTooltip]="description" tooltipPosition="bottom"> · {{ description }}</span>
@@ -44,7 +42,7 @@
         severity="secondary"
         size="small"
         (click)="openActionsSheet()"
-        aria-label="More actions"
+        [attr.aria-label]="'a11y.moreActions' | translate"
         iconOnly
       >
         <i class="pi pi-ellipsis-v"></i>
@@ -52,7 +50,7 @@
       } @else {
       <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="openEdit()">
         <i class="pi pi-pencil"></i>
-        Edit
+        {{ 'button.edit' | translate }}
       </button>
       <!-- A copy to build the next block from, leaving this one untouched. -->
       <button pButton
@@ -64,11 +62,11 @@
         [disabled]="duplicating()"
       >
         <i class="pi" [class]="duplicating() ? 'pi-spinner pi-spin' : 'pi-copy'"></i>
-        Duplicate
+        {{ 'button.duplicate' | translate }}
       </button>
       <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openAssign()">
         <i class="pi pi-user-plus"></i>
-        Assign to client
+        {{ 'programs.detail.assign' | translate }}
       </button>
       <button pButton
         type="button"
@@ -79,7 +77,7 @@
         [disabled]="deleting()"
       >
         <i class="pi" [class]="deleting() ? 'pi-spinner pi-spin' : 'pi-trash'"></i>
-        Delete
+        {{ 'button.delete' | translate }}
       </button>
       }
     </div>
@@ -89,7 +87,7 @@
   <!-- States -->
   @if (loading() && !program()) {
   <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
-    <i class="pi pi-spinner pi-spin"></i> Loading program…
+    <i class="pi pi-spinner pi-spin"></i> {{ 'programs.detail.loading' | translate }}
   </div>
   } @else if (program(); as p) {
   <!-- Archived banner -->
@@ -98,8 +96,8 @@
     role="status">
     <i class="pi pi-inbox shrink-0 text-xl"></i>
     <div>
-      <strong class="font-bold">This program is archived.</strong> It's hidden from new
-      assignments but not deleted.
+      <strong class="font-bold">{{ 'programs.detail.archivedBanner.title' | translate }}</strong>
+      {{ 'programs.detail.archivedBanner.message' | translate }}
     </div>
   </div>
   }
@@ -132,9 +130,9 @@
         (removeSet)="confirmDeleteSet(w, $event.exercise, $event.set)"
         (setsReordered)="onSetsReordered(w, $event.exercise, $event.sets)" />
       } @else if (totalWorkouts() === 0) {
-      <mh-list-empty-state icon="pi pi-calendar-plus" title="No workouts yet"
-        message="A program is a series of workouts grouped into weeks. Add your first workout to start building this plan."
-        actionLabel="Add workout" actionIcon="pi pi-plus" actionSeverity="secondary" [actionOutlined]="true"
+      <mh-list-empty-state icon="pi pi-calendar-plus" [title]="'programs.detail.empty.title' | translate"
+        [message]="'programs.detail.empty.message' | translate"
+        [actionLabel]="'programs.detail.empty.action' | translate" actionIcon="pi pi-plus" actionSeverity="secondary" [actionOutlined]="true"
         (action)="openAddWorkout(0)" />
       }
     </section>

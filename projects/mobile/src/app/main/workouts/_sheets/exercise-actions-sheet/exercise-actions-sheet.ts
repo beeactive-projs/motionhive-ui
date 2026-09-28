@@ -1,5 +1,6 @@
 import { Component, computed, input, model, output } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { LoggedExercise } from 'core';
 
@@ -16,7 +17,7 @@ import { ExerciseActionId, exerciseActions } from '../../workouts.config';
  */
 @Component({
   selector: 'mh-exercise-actions-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './exercise-actions-sheet.html',
   styleUrl: './exercise-actions-sheet.scss',
 })

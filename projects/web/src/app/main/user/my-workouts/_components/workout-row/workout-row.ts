@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   LoggedExercise,
   LoggedSet,
@@ -38,10 +39,9 @@ type WorkoutRowTone = (typeof WorkoutRowTone)[keyof typeof WorkoutRowTone];
 @Component({
   selector: 'mh-workout-row',
   standalone: true,
-  imports: [Card, Tag],
+  imports: [Card, Tag, TranslatePipe],
   templateUrl: './workout-row.html',
   styleUrl: './workout-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     role: 'button',
     tabindex: '0',
@@ -51,6 +51,8 @@ type WorkoutRowTone = (typeof WorkoutRowTone)[keyof typeof WorkoutRowTone];
   },
 })
 export class WorkoutRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly log = input.required<WorkoutLog>();
   /** Mobile viewport flag (from the page's `injectIsMobile()`). */
   readonly mobile = input<boolean>(false);
@@ -76,7 +78,9 @@ export class WorkoutRow {
   /** "45 min" — empty when the duration is unknown. */
   protected readonly durationLabel = computed(() => {
     const s = this.log().durationSeconds;
-    return s != null ? `${Math.round(s / 60)} min` : '';
+    return s != null
+      ? this._translateService.instant('time.minutesShort', { minutes: Math.round(s / 60) })
+      : '';
   });
 
   /**
@@ -99,7 +103,11 @@ export class WorkoutRow {
     if (routine) {
       return { label: routine.name, kind: 'routine', targetId: routine.id };
     }
-    return { label: 'Freestyle', kind: 'freestyle', targetId: null };
+    return {
+      label: this._translateService.instant('myWorkouts.workoutRow.freestyle'),
+      kind: 'freestyle',
+      targetId: null,
+    };
   });
 
   protected readonly subtitle = computed(() => this.provenance().label);
@@ -143,8 +151,9 @@ export class WorkoutRow {
     const total = this.setsTotal();
     if (total === 0) return '';
     const done = this.setsDone();
-    const count = done === total ? `${total}` : `${done}/${total}`;
-    return `${count} ${total === 1 ? 'set' : 'sets'}`;
+    return done === total
+      ? this._translateService.instant('count.sets', { count: total })
+      : this._translateService.instant('myWorkouts.workoutRow.setsPartial', { done, total });
   });
 
   /** Session notes, trimmed — drives the comment indicator + its tooltip. */
@@ -162,7 +171,9 @@ export class WorkoutRow {
   /** "PR" / "3 PRs" badge text — empty when no PRs. */
   protected readonly prLabel = computed(() => {
     const n = this.prCount();
-    return n === 0 ? '' : n === 1 ? 'PR' : `${n} PRs`;
+    return n === 0
+      ? ''
+      : this._translateService.instant('myWorkouts.workoutRow.prs', { count: n });
   });
 
   /** Left-edge tone — teal when a PR was set, honey otherwise. */

@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto pb-6">
-  <button pButton type="button" rounded text severity="secondary" class="self-start" aria-label="Back to routines"
+  <button pButton type="button" rounded text severity="secondary" class="self-start" [attr.aria-label]="'myWorkouts.routineDetail.backToRoutines' | translate"
     (click)="back()" iconOnly>
     <i class="pi pi-arrow-left"></i>
   </button>
@@ -12,8 +12,9 @@
   }
 
   @else if (!routine()) {
-  <mh-list-empty-state icon="pi pi-clone" title="Routine not found"
-    message="It may have been deleted, or it belongs to someone else." actionLabel="Back to routines"
+  <mh-list-empty-state icon="pi pi-clone" [title]="'myWorkouts.routineDetail.notFound.title' | translate"
+    [message]="'myWorkouts.routineDetail.notFound.message' | translate"
+    [actionLabel]="'myWorkouts.routineDetail.backToRoutines' | translate"
     actionIcon="pi pi-arrow-left" actionSeverity="secondary" [actionOutlined]="true" (action)="back()" />
   }
 
@@ -28,10 +29,10 @@
 
     <p class="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-color">
       <span class="inline-flex items-center gap-1">
-        <i class="pi pi-bolt text-sm"></i>{{ exercises().length }} exercise{{ exercises().length === 1 ? '' : 's' }}
+        <i class="pi pi-bolt text-sm"></i>{{ 'count.exercises' | translate: { count: exercises().length } }}
       </span>
       <span class="inline-flex items-center gap-1">
-        <i class="pi pi-check-circle text-sm"></i>{{ totalSets() }} set{{ totalSets() === 1 ? '' : 's' }}
+        <i class="pi pi-check-circle text-sm"></i>{{ 'count.sets' | translate: { count: totalSets() } }}
       </span>
       @if (r.folder) {
       <span class="inline-flex items-center gap-1"><i class="pi pi-folder text-sm"></i>{{ r.folder }}</span>
@@ -50,27 +51,27 @@
   <div class="flex flex-col gap-2 sm:flex-row">
     <button pButton type="button" class="w-full sm:w-auto" [disabled]="starting()" (click)="start()">
       <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>
-      Start workout
+      {{ 'myWorkouts.common.startWorkout' | translate }}
     </button>
     @if (isSystem()) {
     <button pButton type="button" severity="secondary" [outlined]="true" class="w-full sm:w-auto"
       (click)="duplicate()">
       <i class="pi pi-copy"></i>
-      Save a copy I can edit
+      {{ 'myWorkouts.common.saveCopy' | translate }}
     </button>
     } @else {
     <button pButton type="button" severity="secondary" [outlined]="true" class="w-full sm:w-auto" (click)="edit()">
       <i class="pi pi-pencil"></i>
-      Edit
+      {{ 'button.edit' | translate }}
     </button>
     }
   </div>
 
   <p-card>
-    <h2 class="m-0 mb-3 font-heading text-sm font-semibold">What's in it</h2>
+    <h2 class="m-0 mb-3 font-heading text-sm font-semibold">{{ 'myWorkouts.routineDetail.whatsInIt' | translate }}</h2>
 
     @if (exercises().length === 0) {
-    <p class="m-0 text-sm text-muted-color">This routine has no exercises yet.</p>
+    <p class="m-0 text-sm text-muted-color">{{ 'myWorkouts.routineDetail.noExercises' | translate }}</p>
     } @else {
     <ol class="m-0 flex list-none flex-col gap-2 p-0">
       @for (e of exercises(); track e.id) {
@@ -87,8 +88,10 @@
           <button type="button"
             class="min-w-0 flex-1 text-left cursor-pointer"
             (click)="openExerciseInfo(e.exerciseId)"
-            [attr.aria-label]="'View ' + (e.exercise?.name ?? 'exercise') + ' details'">
-            <span class="block truncate text-sm font-medium underline decoration-transparent hover:decoration-current underline-offset-2">{{ e.exercise?.name ?? 'Exercise' }}</span>
+            [attr.aria-label]="e.exercise?.name
+              ? ('myWorkouts.common.viewExerciseDetails' | translate: { name: e.exercise?.name })
+              : ('myWorkouts.routineDetail.viewExerciseDetails' | translate)">
+            <span class="block truncate text-sm font-medium underline decoration-transparent hover:decoration-current underline-offset-2">{{ e.exercise?.name ?? ('myWorkouts.common.exercise' | translate) }}</span>
             @if (e.notes) {
             <span class="block truncate text-xs text-muted-color">{{ e.notes }}</span>
             }
@@ -100,7 +103,8 @@
             }
           </span>
           <button pButton type="button" [text]="true" [rounded]="true" severity="secondary" size="small"
-            (click)="openExerciseInfo(e.exerciseId)" pTooltip="View exercise" aria-label="View exercise details">
+            (click)="openExerciseInfo(e.exerciseId)" [pTooltip]="'myWorkouts.routineDetail.viewExercise' | translate"
+            [attr.aria-label]="'myWorkouts.routineDetail.viewExerciseDetails' | translate">
             <i class="pi pi-info-circle"></i>
           </button>
         </div>

@@ -3,7 +3,7 @@
     <!-- Start-date block -->
     <div class="text-center">
       <span class="block text-[11px] text-muted-color whitespace-nowrap">
-        {{ isPending() ? 'Starts' : 'Started' }}
+        {{ (isPending() ? 'training.planRow.starts' : 'training.planRow.started') | translate }}
       </span>
       <span class="block font-heading text-lg font-semibold leading-none tabular-nums">
         {{ assignment().startDate | date: 'd' }}
@@ -42,15 +42,17 @@
         </span>
         <span class="inline-flex items-center gap-1">
           <i class="pi pi-calendar text-sm" aria-hidden="true"></i>
-          {{ isPending() ? 'Starts' : 'Started' }} {{ assignment().startDate | date: 'd MMM' }}
+          {{ (isPending() ? 'training.common.startsOn' : 'training.common.startedOn') | translate: {
+          date: (assignment().startDate | date: 'd MMM') } }}
         </span>
         @if (assignment().endDate; as end) {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-flag text-sm" aria-hidden="true"></i>Ends {{ end | date: 'd MMM' }}
+          <i class="pi pi-flag text-sm" aria-hidden="true"></i>{{ 'training.planRow.endsOn' | translate: {
+          date: (end | date: 'd MMM') } }}
         </span>
         } @else {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-flag text-sm" aria-hidden="true"></i>No end date
+          <i class="pi pi-flag text-sm" aria-hidden="true"></i>{{ 'training.common.noEndDate' | translate }}
         </span>
         }
       </div>

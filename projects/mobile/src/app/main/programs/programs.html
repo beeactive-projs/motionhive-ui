@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Programs</ion-title>
+    <ion-title>{{ 'nav.programs' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
     </ion-buttons>
@@ -17,7 +17,11 @@
         <ion-button class="filters" fill="clear" shape="round" size="small"
           [class.active]="activeFilterCount() > 0" (click)="openFilters()">
           <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
-          Filters@if (activeFilterCount() > 0) { · {{ activeFilterCount() }} }
+          @if (activeFilterCount() > 0) {
+            {{ 'common.filtersCount' | translate: { count: activeFilterCount() } }}
+          } @else {
+            {{ 'common.filters' | translate }}
+          }
         </ion-button>
 
         @if (store.originCounts().starters > 0 && store.originCounts().mine > 0) {
@@ -27,7 +31,7 @@
               [attr.aria-pressed]="store.origin() === pill.value"
               (click)="setOrigin(pill.value)"
             >
-              {{ pill.label }} · {{ store.originCounts()[pill.value] }}
+              {{ pill.label | translate }} · {{ store.originCounts()[pill.value] }}
             </ion-chip>
           }
         } @else {
@@ -39,7 +43,7 @@
               [attr.aria-pressed]="store.size() === pill.value"
               (click)="setSize(pill.value)"
             >
-              {{ pill.label }} · {{ countFor(pill.value) }}
+              {{ pill.label | translate }} · {{ countFor(pill.value) }}
             </ion-chip>
           }
         }
@@ -56,9 +60,9 @@
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your library"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'programs.library.error' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.showSkeleton()) {
@@ -74,23 +78,25 @@
     <!-- A beginning, not a void: both creation verbs, said plainly. -->
     <mh-empty-state
       icon="albums-outline"
-      heading="Nothing here yet"
-      message="Build a multi-week program or a single routine — both live here."
-      actionLabel="New program"
+      [heading]="'empty.nothingYet' | translate"
+      [message]="'programs.library.empty.message' | translate"
+      [actionLabel]="'programs.create.newProgram' | translate"
       (action)="onCreate(Choices.Program)"
     />
     <div class="secondary-actions">
-      <ion-button fill="outline" (click)="onCreate(Choices.Routine)">New routine</ion-button>
+      <ion-button fill="outline" (click)="onCreate(Choices.Routine)">
+        {{ 'programs.create.newRoutine' | translate }}
+      </ion-button>
       <ion-button fill="clear" size="small" (click)="onCreate(Choices.Starters)">
-        Or browse our starters
+        {{ 'programs.library.empty.browseStarters' | translate }}
       </ion-button>
     </div>
   } @else if (store.isFilteredEmpty()) {
     <mh-empty-state
       icon="albums-outline"
-      heading="Nothing of that kind yet"
-      message="Nothing in the library matches this pill."
-      actionLabel="Show all"
+      [heading]="'programs.library.filteredEmpty.heading' | translate"
+      [message]="'programs.library.filteredEmpty.message' | translate"
+      [actionLabel]="'programs.library.filteredEmpty.showAll' | translate"
       actionFill="outline"
       (action)="setSize(Sizes.All)"
     />
@@ -106,7 +112,7 @@
 
   <!-- The one place anything gets created: the FAB opens the three verbs. -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button aria-label="Create" (click)="openCreate()">
+    <ion-fab-button [attr.aria-label]="'button.create' | translate" (click)="openCreate()">
       <ion-icon name="add-outline" aria-hidden="true" />
     </ion-fab-button>
   </ion-fab>

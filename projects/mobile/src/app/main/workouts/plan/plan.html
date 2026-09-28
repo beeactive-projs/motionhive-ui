@@ -11,9 +11,9 @@
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this plan"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.plan' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.showSkeleton()) {
@@ -51,14 +51,14 @@
       @if (todayApart(); as day) {
         <section class="mh-section">
           <div class="mh-section-head warm">
-            <span class="mh-kicker">Today</span>
+            <span class="mh-kicker">{{ 'time.today' | translate }}</span>
           </div>
           <mh-assigned-day-row [day]="day" [startable]="true" (select)="open(day)" (start)="open(day)" />
         </section>
       } @else if (upNextApart(); as day) {
         <section class="mh-section">
           <div class="mh-section-head">
-            <span class="mh-kicker">Up next</span>
+            <span class="mh-kicker">{{ 'workouts.common.upNext' | translate }}</span>
           </div>
           <mh-assigned-day-row [day]="day" (select)="open(day)" />
         </section>
@@ -68,7 +68,7 @@
       @if (store.thisWeek().length) {
         <section class="mh-section">
           <div class="mh-section-head">
-            <span class="mh-kicker">This week</span>
+            <span class="mh-kicker">{{ 'workouts.plan.thisWeek' | translate }}</span>
             <ion-note>{{ positionLabel() }}</ion-note>
           </div>
           <div>
@@ -86,11 +86,11 @@
 
       <!-- How much is left. -->
       <section class="mh-section">
-        <span class="mh-kicker">All weeks</span>
+        <span class="mh-kicker">{{ 'workouts.plan.allWeeks' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
           @for (week of store.weeks(); track week.index; let last = $last) {
             <ion-item [lines]="last ? 'none' : 'full'" [class.current]="isCurrentWeek(week.index)">
-              <ion-label>Week {{ week.index + 1 }}</ion-label>
+              <ion-label>{{ 'workouts.meta.week' | translate: { number: week.index + 1 } }}</ion-label>
               <ion-note slot="end" class="count">{{ week.done }} / {{ week.days.length }}</ion-note>
             </ion-item>
           }

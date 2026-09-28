@@ -6,8 +6,9 @@ import {
   CdkDropList,
 } from '@angular/cdk/drag-drop';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -66,12 +67,14 @@ export interface RailWeekDrop {
     InputText,
     Tag,
     Tooltip,
+    TranslatePipe,
   ],
   templateUrl: './builder-rail.html',
   styleUrl: './builder-rail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BuilderRail {
+  private readonly _translateService = inject(TranslateService);
+
   /** All weeks, including empty ones (derived from program duration). */
   readonly weeks = input.required<WeekGroup[]>();
   readonly selectedWorkoutId = input<string | null>(null);
@@ -170,10 +173,14 @@ export class BuilderRail {
   }
 
   workoutMeta(w: ProgramWorkout): string {
-    const sets = workoutSetCount(w);
+    const t = (key: string, params: Record<string, unknown>): string =>
+      this._translateService.instant(key, params);
     const minutes = estimateWorkoutMinutes(w);
-    const parts = [`${workoutExerciseCount(w)} ex`, `${sets} ${sets === 1 ? 'set' : 'sets'}`];
-    if (minutes != null) parts.push(`~${minutes}m`);
+    const parts = [
+      t('programs.rail.exerciseCountShort', { count: workoutExerciseCount(w) }),
+      t('count.sets', { count: workoutSetCount(w) }),
+    ];
+    if (minutes != null) parts.push(t('programs.common.approxMinutes', { minutes }));
     return parts.join(' · ');
   }
 

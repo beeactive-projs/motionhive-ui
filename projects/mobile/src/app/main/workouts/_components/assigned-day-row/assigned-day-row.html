@@ -16,7 +16,7 @@
     <h2>{{ day().name }}</h2>
     <div class="tags">
       @if (isSkipped()) {
-        <ion-badge data-tone="medium">Skipped</ion-badge>
+        <ion-badge data-tone="medium">{{ day().status | enumLabel: 'workoutLogStatus' }}</ion-badge>
       }
       @if (meta()) {
         <ion-note>{{ meta() }}</ion-note>
@@ -26,7 +26,7 @@
 
   @if (startable()) {
     <ion-button slot="end" class="start" size="small" shape="round" color="primary" (click)="onStart($event)">
-      Start
+      {{ 'button.start' | translate }}
     </ion-button>
   } @else if (isDone()) {
     <ion-icon slot="end" class="tick" name="checkmark-circle-outline" color="success" aria-hidden="true" />

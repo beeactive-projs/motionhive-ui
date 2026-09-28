@@ -1,7 +1,8 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
-import { AssignedWorkout, WorkoutLogStatus } from 'core';
+import { AssignedWorkout, EnumLabelPipe, WorkoutLogStatus } from 'core';
 
 import { assignedDayTone, dateRail, workoutMetaLine } from '../../workouts.config';
 
@@ -16,7 +17,7 @@ import { assignedDayTone, dateRail, workoutMetaLine } from '../../workouts.confi
  */
 @Component({
   selector: 'mh-assigned-day-row',
-  imports: [IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [EnumLabelPipe, IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './assigned-day-row.html',
   styleUrl: './assigned-day-row.scss',
 })

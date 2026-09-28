@@ -16,6 +16,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { Program, ProgramSize, ProgramSizes } from 'core';
@@ -66,6 +67,7 @@ import { ProgramsStore } from './programs.store';
     NotificationBell,
     ProgramRow,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   providers: [ProgramsStore],
   templateUrl: './programs.html',

@@ -15,6 +15,7 @@
     "openNotifications": "Open notifications",
     "playVideo": "Play video",
     "previousMonth": "Previous month",
+    "removeItem": "Remove {name}",
     "showPassword": "Show password",
     "unread": "Unread"
   },
@@ -31,9 +32,11 @@
     "clear": "Clear",
     "clearFilter": "Clear filter",
     "clearFilters": "Clear filters",
+    "clearSearch": "Clear search",
     "close": "Close",
     "confirm": "Confirm",
     "continue": "Continue",
+    "copy": "Copy",
     "copyLink": "Copy link",
     "create": "Create",
     "decline": "Decline",
@@ -46,6 +49,7 @@
     "invite": "Invite",
     "join": "Join",
     "keep": "Keep",
+    "keepIt": "Keep it",
     "leave": "Leave",
     "loadMore": "Load more",
     "next": "Next",
@@ -58,6 +62,7 @@
     "resend": "Resend",
     "reset": "Reset",
     "restore": "Restore",
+    "resume": "Resume",
     "retry": "Retry",
     "save": "Save",
     "saveChanges": "Save changes",
@@ -72,6 +77,7 @@
     "signOut": "Sign out",
     "signUp": "Sign up",
     "skip": "Skip",
+    "start": "Start",
     "submit": "Submit",
     "tryAgain": "Try again",
     "unarchive": "Unarchive",
@@ -113,6 +119,7 @@
     "members": "{count, plural, one {# member} other {# members}}",
     "minutes": "{count, plural, one {# minute} other {# minutes}}",
     "programs": "{count, plural, one {# program} other {# programs}}",
+    "reps": "{count, plural, one {# rep} other {# reps}}",
     "sessions": "{count, plural, one {# session} other {# sessions}}",
     "sets": "{count, plural, one {# set} other {# sets}}",
     "weeks": "{count, plural, one {# week} other {# weeks}}",
@@ -135,10 +142,45 @@
       "ARCHIVED": "Archived",
       "PENDING": "Pending"
     },
+    "exerciseBlockKind": {
+      "AMRAP": "AMRAP",
+      "CIRCUIT": "Circuit",
+      "EMOM": "EMOM",
+      "NONE": "None",
+      "SUPERSET": "Superset",
+      "TABATA": "Tabata"
+    },
+    "exerciseForce": {
+      "PULL": "Pull",
+      "PUSH": "Push",
+      "STATIC": "Static"
+    },
+    "exerciseKind": {
+      "BODYWEIGHT": "Bodyweight",
+      "CARDIO": "Cardio",
+      "DISTANCE": "Distance",
+      "DURATION": "Duration",
+      "MOBILITY": "Mobility",
+      "STRENGTH": "Strength"
+    },
     "exerciseLevel": {
       "ADVANCED": "Advanced",
       "BEGINNER": "Beginner",
       "INTERMEDIATE": "Intermediate"
+    },
+    "exerciseMechanic": {
+      "COMPOUND": "Compound",
+      "ISOLATION": "Isolation"
+    },
+    "exerciseSetType": {
+      "AMRAP": "AMRAP",
+      "CLUSTER": "Cluster",
+      "DROPSET": "Drop set",
+      "FAILURE": "To failure",
+      "NORMAL": "Normal",
+      "REST_PAUSE": "Rest-pause",
+      "WARMUP": "Warm-up",
+      "WORKING": "Working"
     },
     "fitnessLevel": {
       "ADVANCED": "Advanced",
@@ -174,6 +216,25 @@
       "INVITE_ONLY": "Invite only",
       "OPEN": "Open"
     },
+    "movementPattern": {
+      "ANTI_ROTATION": "Anti-rotation",
+      "CARRY": "Carry",
+      "HINGE": "Hinge",
+      "ISOLATION": "Isolation",
+      "LOCOMOTION": "Locomotion",
+      "LUNGE": "Lunge",
+      "PULL_HORIZONTAL": "Horizontal pull",
+      "PULL_VERTICAL": "Vertical pull",
+      "PUSH_HORIZONTAL": "Horizontal push",
+      "PUSH_VERTICAL": "Vertical push",
+      "ROTATION": "Rotation",
+      "SQUAT": "Squat"
+    },
+    "muscleRole": {
+      "PRIMARY": "Primary",
+      "SECONDARY": "Secondary",
+      "STABILIZER": "Stabilizer"
+    },
     "myTab": {
       "cancelled": "Cancelled",
       "past": "Past",
@@ -204,6 +265,17 @@
       "COMPLETED": "Completed",
       "PAUSED": "Paused",
       "PENDING": "Pending"
+    },
+    "programKind": {
+      "HABIT": "Habit",
+      "HYBRID": "Hybrid",
+      "MEAL": "Meal",
+      "WORKOUT": "Workout"
+    },
+    "programStatus": {
+      "ARCHIVED": "Archived",
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published"
     },
     "refundReason": {
       "duplicate": "Duplicate",
@@ -283,6 +355,12 @@
       "OTHER": "Other",
       "SCAM": "Scam",
       "SPAM": "Spam"
+    },
+    "workoutLogStatus": {
+      "ABANDONED": "Abandoned",
+      "COMPLETED": "Completed",
+      "IN_PROGRESS": "In progress",
+      "SKIPPED": "Skipped"
     }
   },
   "error": {
@@ -307,6 +385,7 @@
       "unavailable": "The service is temporarily unavailable. Please try again in a moment.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
+    "mayBeRemoved": "It may have been removed or you may not have access.",
     "messaging": {
       "forbidden": "You can’t send this message.",
       "notDelivered": "Message couldn’t be delivered. They may have left or blocked messages from you.",
@@ -438,6 +517,7 @@
     "minutesShort": "{minutes} min",
     "now": "now",
     "perInterval": "{interval, select, day {{count, plural, one {/ day} other {/ # days}}} week {{count, plural, one {/ week} other {/ # weeks}}} month {{count, plural, one {/ month} other {/ # months}}} year {{count, plural, one {/ year} other {/ # years}}} other {}}",
+    "secondsShort": "{seconds}s",
     "startingNow": "starting now",
     "today": "Today",
     "todayWithDate": "Today · {date}",

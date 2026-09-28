@@ -14,7 +14,7 @@
       class="mh-exrow__main min-w-0 flex-1 gap-2.5"
       [attr.aria-expanded]="expanded()"
       [attr.aria-controls]="'exercise-body-' + exercise().id"
-      [attr.aria-label]="(expanded() ? 'Collapse ' : 'Expand ') + name()"
+      [attr.aria-label]="(expanded() ? 'programs.exerciseRow.collapse' : 'programs.exerciseRow.expand') | translate: { name: name() }"
       (click)="toggle.emit()"
     >
       @if (exercise().exercise?.thumbnailUrl; as thumbnailUrl) {
@@ -32,7 +32,7 @@
         }
       </span>
       @if (exercise().supersetGroupId != null) {
-        <p-tag [value]="'SS' + exercise().supersetGroupId" severity="warn" />
+        <p-tag [value]="'programs.exerciseRow.supersetTag' | translate: { group: exercise().supersetGroupId }" severity="warn" />
       }
       <span class="hidden shrink-0 text-xs font-medium tabular-nums text-muted-color sm:block">
         {{ prescription() }}
@@ -47,11 +47,11 @@
         [text]="true"
         [rounded]="true"
         [disabled]="index() === 0"
-        pTooltip="Move up"
+        [pTooltip]="'programs.exerciseRow.moveUp' | translate"
         tooltipPosition="left"
         (click)="moveUp.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Move ' + name() + ' up'"
+        [attr.aria-label]="'programs.exerciseRow.moveUpAria' | translate: { name: name() }"
         iconOnly
       >
         <i class="pi pi-arrow-up"></i>
@@ -63,11 +63,11 @@
         [text]="true"
         [rounded]="true"
         [disabled]="index() === count() - 1"
-        pTooltip="Move down"
+        [pTooltip]="'programs.exerciseRow.moveDown' | translate"
         tooltipPosition="left"
         (click)="moveDown.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Move ' + name() + ' down'"
+        [attr.aria-label]="'programs.exerciseRow.moveDownAria' | translate: { name: name() }"
         iconOnly
       >
         <i class="pi pi-arrow-down"></i>
@@ -79,11 +79,11 @@
         [text]="true"
         [rounded]="true"
         [disabled]="!canMoveAcross()"
-        pTooltip="Move to another workout"
+        [pTooltip]="'programs.exerciseRow.moveTo' | translate"
         tooltipPosition="left"
         (click)="moveTo.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Move ' + name() + ' to another workout'"
+        [attr.aria-label]="'programs.exerciseRow.moveToAria' | translate: { name: name() }"
         iconOnly
       >
         <i class="pi pi-arrow-right-arrow-left"></i>
@@ -94,11 +94,11 @@
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        pTooltip="View exercise"
+        [pTooltip]="'programs.exerciseRow.view' | translate"
         tooltipPosition="left"
         (click)="viewExercise.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'View ' + name() + ' details'"
+        [attr.aria-label]="'programs.exerciseRow.viewAria' | translate: { name: name() }"
         iconOnly
       >
         <i class="pi pi-info-circle"></i>
@@ -109,10 +109,10 @@
         severity="danger"
         [text]="true"
         [rounded]="true"
-        pTooltip="Remove exercise"
+        [pTooltip]="'programs.exerciseRow.remove' | translate"
         tooltipPosition="left"
         (click)="remove.emit()"
-        [attr.aria-label]="'Remove ' + name()"
+        [attr.aria-label]="'a11y.removeItem' | translate: { name: name() }"
         iconOnly
       >
         <i class="pi pi-trash"></i>
@@ -126,7 +126,7 @@
         [attr.aria-expanded]="expanded()"
         (click)="toggle.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="(expanded() ? 'Collapse ' : 'Expand ') + name() + ' sets'"
+        [attr.aria-label]="(expanded() ? 'programs.exerciseRow.collapseSets' : 'programs.exerciseRow.expandSets') | translate: { name: name() }"
         iconOnly
       >
         <i [class]="expanded() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
@@ -158,9 +158,9 @@
               <tr>
                 <th class="w-[1%]"></th>
                 <th>#</th>
-                <th>Type</th>
-                <th>Target</th>
-                <th>Rest</th>
+                <th>{{ 'form.label.type' | translate }}</th>
+                <th>{{ 'programs.exerciseRow.target' | translate }}</th>
+                <th>{{ 'programs.exerciseRow.rest' | translate }}</th>
                 <th class="w-[1%]"></th>
               </tr>
             </ng-template>
@@ -170,17 +170,17 @@
                   <span
                     pReorderableRowHandle
                     class="pi pi-bars cursor-grab text-[10px] text-muted-color"
-                    [attr.aria-label]="'Drag to reorder set ' + (rowIndex + 1)"
+                    [attr.aria-label]="'programs.exerciseRow.dragSet' | translate: { number: rowIndex + 1 }"
                   ></span>
                 </td>
                 <td>{{ s.orderIndex + 1 }}</td>
                 <td>
-                  <p-tag [value]="s.setType | titlecase" [severity]="setTypeSeverity(s.setType)" />
+                  <p-tag [value]="s.setType | enumLabel: 'exerciseSetType'" [severity]="setTypeSeverity(s.setType)" />
                 </td>
                 <td>{{ setSummary(s) }}</td>
                 <td>
                   @if (s.restAfterSeconds != null) {
-                    {{ s.restAfterSeconds }}s
+                    {{ 'time.secondsShort' | translate: { seconds: s.restAfterSeconds } }}
                   } @else {
                     —
                   }
@@ -193,10 +193,10 @@
                       severity="secondary"
                       [text]="true"
                       [rounded]="true"
-                      pTooltip="Duplicate set"
+                      [pTooltip]="'programs.exerciseRow.duplicateSet' | translate"
                       tooltipPosition="left"
                       (click)="duplicateSet.emit(s)"
-                      [attr.aria-label]="'Duplicate set ' + (rowIndex + 1)"
+                      [attr.aria-label]="'programs.exerciseRow.duplicateSetAria' | translate: { number: rowIndex + 1 }"
                       iconOnly
                     >
                       <i class="pi pi-clone"></i>
@@ -207,10 +207,10 @@
                       severity="secondary"
                       [text]="true"
                       [rounded]="true"
-                      pTooltip="Edit set"
+                      [pTooltip]="'programs.exerciseRow.editSet' | translate"
                       tooltipPosition="left"
                       (click)="editSet.emit(s)"
-                      [attr.aria-label]="'Edit set ' + (rowIndex + 1)"
+                      [attr.aria-label]="'programs.exerciseRow.editSetAria' | translate: { number: rowIndex + 1 }"
                       iconOnly
                     >
                       <i class="pi pi-pencil"></i>
@@ -221,10 +221,10 @@
                       severity="danger"
                       [text]="true"
                       [rounded]="true"
-                      pTooltip="Remove set"
+                      [pTooltip]="'programs.exerciseRow.removeSet' | translate"
                       tooltipPosition="left"
                       (click)="removeSet.emit(s)"
-                      [attr.aria-label]="'Remove set ' + (rowIndex + 1)"
+                      [attr.aria-label]="'programs.exerciseRow.removeSetAria' | translate: { number: rowIndex + 1 }"
                       iconOnly
                     >
                       <i class="pi pi-trash"></i>
@@ -235,13 +235,13 @@
             </ng-template>
           </p-table>
         } @else {
-          <div class="text-[11px] italic text-muted-color">No sets prescribed.</div>
+          <div class="text-[11px] italic text-muted-color">{{ 'programs.exerciseRow.noSets' | translate }}</div>
         }
 
         <div class="mt-2 flex justify-end">
           <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="addSet.emit()" class="mh-dashed-btn">
             <i class="pi pi-plus"></i>
-            Add set
+            {{ 'programs.exerciseRow.addSet' | translate }}
           </button>
         </div>
       </div>

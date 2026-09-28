@@ -1,6 +1,5 @@
 import { DatePipe, DecimalPipe, Location } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -15,13 +14,16 @@ import { Skeleton } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
+  EnumLabelPipe,
   LoggedExercise,
   LoggedSet,
   PersonalRecord,
   WorkoutLog,
   WorkoutLogService,
+  appLocale,
   showApiError,
 } from 'core';
 import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
@@ -58,17 +60,30 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     TableModule,
     Tag,
     Toast,
+    TranslatePipe,
+    EnumLabelPipe,
   ],
   providers: [MessageService],
   templateUrl: './workout-log-replay.html',
   styleUrl: './workout-log-replay.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkoutLogReplay implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _location = inject(Location);
   private readonly _service = inject(WorkoutLogService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
+
+  /** Plain numbers in the UI locale ("82.5" / "82,5"), no grouping. */
+  private readonly _numberFormat = new Intl.NumberFormat(appLocale(), {
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  });
+  private readonly _kmFormat = new Intl.NumberFormat(appLocale(), {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  });
 
   readonly log = signal<WorkoutLog | null>(null);
   readonly viewingExerciseId = signal<string | null>(null);
@@ -172,18 +187,22 @@ export class WorkoutLogReplay implements OnInit {
     const parts: string[] = [];
 
     if (s.reps != null && s.weightKg != null) {
-      parts.push(`${s.reps} × ${s.weightKg} kg`);
+      parts.push(`${s.reps} × ${this._numberFormat.format(s.weightKg)} kg`);
     } else if (s.reps != null) {
-      parts.push(`${s.reps} reps`);
+      parts.push(
+        this._translateService.instant('count.reps', {
+          count: s.reps,
+        }),
+      );
     } else if (s.weightKg != null) {
-      parts.push(`${s.weightKg} kg`);
+      parts.push(`${this._numberFormat.format(s.weightKg)} kg`);
     }
 
     if (s.distanceMeters != null) {
       parts.push(
         s.distanceMeters >= 1000
-          ? `${(s.distanceMeters / 1000).toFixed(2)} km`
-          : `${s.distanceMeters} m`,
+          ? `${this._kmFormat.format(s.distanceMeters / 1000)} km`
+          : `${this._numberFormat.format(s.distanceMeters)} m`,
       );
     }
 
@@ -203,7 +222,9 @@ export class WorkoutLogReplay implements OnInit {
    */
   swapLabel(ex: LoggedExercise): string {
     const from = this.swappedFromName(ex);
-    return from ? `Swapped from ${from}` : 'Swapped in';
+    return from
+      ? this._translateService.instant('myWorkouts.replay.swappedFrom', { name: from })
+      : this._translateService.instant('myWorkouts.common.swappedIn');
   }
 
   private swappedFromName(ex: LoggedExercise): string | null {
@@ -222,8 +243,13 @@ export class WorkoutLogReplay implements OnInit {
 
   /** "PR 80 kg +5" badge text for an exercise's session PR. */
   prTagLabel(p: PersonalRecord): string {
-    const base = `PR ${Math.round(p.weightKg)} kg`;
-    return p.deltaKg > 0 ? `${base} +${Math.round(p.deltaKg)}` : base;
+    const weight = Math.round(p.weightKg);
+    return p.deltaKg > 0
+      ? this._translateService.instant('myWorkouts.replay.prTagDelta', {
+          weight,
+          delta: Math.round(p.deltaKg),
+        })
+      : this._translateService.instant('myWorkouts.replay.prTag', { weight });
   }
 
   private fetch(id: string): void {
@@ -240,8 +266,8 @@ export class WorkoutLogReplay implements OnInit {
         this.loading.set(false);
         showApiError(
           this._messageService,
-          "Couldn't load workout",
-          'It may have been removed or you may not have access.',
+          this._translateService.instant('myWorkouts.common.loadWorkoutFailed'),
+          this._translateService.instant('error.mayBeRemoved'),
           err,
         );
       },

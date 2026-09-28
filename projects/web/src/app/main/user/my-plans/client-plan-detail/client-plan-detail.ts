@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   Accordion,
   AccordionContent,
@@ -32,6 +32,7 @@ import {
   AssignedExercise,
   AssignedSet,
   AssignedWorkout,
+  EnumLabelPipe,
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
@@ -39,6 +40,9 @@ import {
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
+  appLocale,
+  enumLabel,
+  escapeHtml,
   showApiError,
 } from 'core';
 import { ExerciseDetailDialog } from '../../../instructor/exercises/exercise-detail-dialog/exercise-detail-dialog';
@@ -78,9 +82,10 @@ interface PlanCta {
  */
 @Component({
   selector: 'mh-client-plan-detail',
-  standalone: true,
   imports: [
     DatePipe,
+    EnumLabelPipe,
+    TranslatePipe,
     Accordion,
     AccordionPanel,
     AccordionHeader,
@@ -104,7 +109,6 @@ interface PlanCta {
   providers: [MessageService, ConfirmationService],
   templateUrl: './client-plan-detail.html',
   styleUrl: './client-plan-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientPlanDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
@@ -114,6 +118,19 @@ export class ClientPlanDetail implements OnInit {
   private readonly _logService = inject(WorkoutLogService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
+
+  /** Weights, percentages and metres — locale decimals, no grouping (as before). */
+  private readonly _numberFormat = new Intl.NumberFormat(appLocale(), {
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  });
+  /** Kilometres, always two decimals (was `toFixed(2)`). */
+  private readonly _kmFormat = new Intl.NumberFormat(appLocale(), {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  });
 
   // Enum exposed for template comparisons — never compare against raw
   // string literals (see CLAUDE.md).
@@ -194,28 +211,30 @@ export class ClientPlanDetail implements OnInit {
   readonly primaryCta = computed<PlanCta | null>(() => {
     const s = this.assignment()?.status;
     if (!s) return null;
+    const label = (key: string): string =>
+      this._translateService.instant(`training.planDetail.cta.${key}`);
     if (s === ProgramAssignmentStatus.Paused) {
-      return { label: 'Plan paused', icon: 'pi pi-pause', disabled: true, kind: 'paused' };
+      return { label: label('paused'), icon: 'pi pi-pause', disabled: true, kind: 'paused' };
     }
     if (s === ProgramAssignmentStatus.Cancelled) {
       return {
-        label: 'Plan cancelled',
+        label: label('cancelled'),
         icon: 'pi pi-times-circle',
         disabled: true,
         kind: 'cancelled',
       };
     }
     if (s === ProgramAssignmentStatus.Completed) {
-      return { label: 'Review plan', icon: 'pi pi-eye', disabled: false, kind: 'review' };
+      return { label: label('review'), icon: 'pi pi-eye', disabled: false, kind: 'review' };
     }
     const next = this.nextWorkout();
     if (!next) {
-      return { label: 'All workouts done', icon: 'pi pi-check', disabled: true, kind: 'none' };
+      return { label: label('allDone'), icon: 'pi pi-check', disabled: true, kind: 'none' };
     }
     if (next.status === WorkoutLogStatus.InProgress) {
-      return { label: 'Resume workout', icon: 'pi pi-play', disabled: false, kind: 'resume' };
+      return { label: label('resume'), icon: 'pi pi-play', disabled: false, kind: 'resume' };
     }
-    return { label: 'Start next workout', icon: 'pi pi-play', disabled: false, kind: 'start' };
+    return { label: label('startNext'), icon: 'pi pi-play', disabled: false, kind: 'start' };
   });
 
   ngOnInit(): void {
@@ -276,8 +295,8 @@ export class ClientPlanDetail implements OnInit {
     if (this.assignment()?.status === ProgramAssignmentStatus.Paused) {
       this._messageService.add({
         severity: 'info',
-        summary: 'Plan paused',
-        detail: 'Your coach has paused this plan. Ask them to resume it to continue.',
+        summary: this._translateService.instant('training.planDetail.toast.paused.summary'),
+        detail: this._translateService.instant('training.planDetail.toast.paused.detail'),
         life: 3500,
       });
       return;
@@ -291,7 +310,12 @@ export class ClientPlanDetail implements OnInit {
       },
       error: (err) => {
         this.starting.set(null);
-        showApiError(this._messageService, "Couldn't start workout", 'Please retry.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('training.planDetail.toast.startFailed'),
+          this._translateService.instant('training.planDetail.toast.pleaseRetry'),
+          err,
+        );
       },
     });
   }
@@ -302,8 +326,10 @@ export class ClientPlanDetail implements OnInit {
     if (w.status === WorkoutLogStatus.Skipped) {
       this._messageService.add({
         severity: 'info',
-        summary: 'Nothing to replay',
-        detail: `"${w.name}" was skipped — no session was logged.`,
+        summary: this._translateService.instant('training.planDetail.toast.nothingToReplay.summary'),
+        detail: this._translateService.instant('training.planDetail.toast.nothingToReplay.detail', {
+          name: w.name,
+        }),
         life: 3000,
       });
       return;
@@ -314,8 +340,8 @@ export class ClientPlanDetail implements OnInit {
       error: (err: unknown) =>
         showApiError(
           this._messageService,
-          "Couldn't open the workout",
-          'Try again in a moment, or open the workout from Training.',
+          this._translateService.instant('training.planDetail.toast.openFailed.summary'),
+          this._translateService.instant('training.planDetail.toast.openFailed.detail'),
           err,
         ),
     });
@@ -325,12 +351,14 @@ export class ClientPlanDetail implements OnInit {
     const state = this.deriveState(w);
     if (state === 'done' || state === 'skip') return;
     this._confirmationService.confirm({
-      header: 'Skip workout?',
-      message: `Skip "${w.name}"? You can still come back to it later if you change your mind, but it won't count toward your weekly goal.`,
+      header: this._translateService.instant('training.planDetail.confirm.skip.header'),
+      message: this._translateService.instant('training.planDetail.confirm.skip.message', {
+        name: escapeHtml(w.name),
+      }),
       icon: 'pi pi-forward',
-      acceptLabel: 'Skip workout',
+      acceptLabel: this._translateService.instant('training.planDetail.skipWorkout'),
       acceptButtonProps: { severity: 'secondary' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._skipWorkout(w),
     });
@@ -353,12 +381,17 @@ export class ClientPlanDetail implements OnInit {
         this.assignment.set({ ...a, workouts, completionPercent: percent });
         this._messageService.add({
           severity: 'success',
-          summary: 'Workout skipped',
+          summary: this._translateService.instant('training.planDetail.toast.skipped'),
           life: 2000,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't skip workout", 'Please retry.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('training.planDetail.toast.skipFailed'),
+          this._translateService.instant('training.planDetail.toast.pleaseRetry'),
+          err,
+        );
       },
     });
   }
@@ -412,13 +445,13 @@ export class ClientPlanDetail implements OnInit {
   workoutTagLabel(w: AssignedWorkout): string {
     switch (this.deriveState(w)) {
       case 'done':
-        return 'Completed';
+        return enumLabel('workoutLogStatus', WorkoutLogStatus.Completed);
       case 'doing':
-        return 'In progress';
+        return enumLabel('workoutLogStatus', WorkoutLogStatus.InProgress);
       case 'skip':
-        return 'Skipped';
+        return enumLabel('workoutLogStatus', WorkoutLogStatus.Skipped);
       default:
-        return 'Not started';
+        return this._translateService.instant('training.planDetail.notStarted');
     }
   }
 
@@ -426,10 +459,14 @@ export class ClientPlanDetail implements OnInit {
     const exCount = w.exercises?.length ?? 0;
     const setCount = (w.exercises ?? []).reduce((n, e) => n + (e.sets?.length ?? 0), 0);
     const parts: string[] = [];
-    parts.push(`${exCount} ${exCount === 1 ? 'exercise' : 'exercises'}`);
-    parts.push(`${setCount} ${setCount === 1 ? 'set' : 'sets'}`);
+    parts.push(this._translateService.instant('count.exercises', { count: exCount }));
+    parts.push(this._translateService.instant('count.sets', { count: setCount }));
     if (w.estimatedDurationMinutes) {
-      parts.push(`~${w.estimatedDurationMinutes} min`);
+      parts.push(
+        this._translateService.instant('training.planDetail.approxMinutes', {
+          minutes: w.estimatedDurationMinutes,
+        }),
+      );
     }
     return parts.join(' · ');
   }
@@ -448,35 +485,42 @@ export class ClientPlanDetail implements OnInit {
    *   nothing  → "—"
    */
   setTargetLabel(s: AssignedSet): string {
+    const t = (key: string, params: Record<string, unknown>): string =>
+      this._translateService.instant(`training.planDetail.target.${key}`, params);
+    const num = (v: number): string => this._numberFormat.format(v);
     const parts: string[] = [];
     if (s.targetRepsMin != null && s.targetRepsMax != null) {
       parts.push(
         s.targetRepsMin === s.targetRepsMax
-          ? `${s.targetRepsMin} reps`
-          : `${s.targetRepsMin}–${s.targetRepsMax} reps`,
+          ? t('reps', { count: s.targetRepsMin })
+          : t('repsRange', { min: s.targetRepsMin, max: s.targetRepsMax }),
       );
     } else if (s.targetRepsMin != null) {
-      parts.push(`${s.targetRepsMin}+ reps`);
+      parts.push(t('repsMin', { min: s.targetRepsMin }));
     }
     if (s.targetWeightKg != null) {
-      parts.push(`${s.targetWeightKg} kg`);
+      parts.push(t('weightKg', { weight: num(s.targetWeightKg) }));
     } else if (s.targetWeightPercent1rm != null) {
-      parts.push(`${s.targetWeightPercent1rm}% 1RM`);
+      parts.push(t('percent1rm', { percent: num(s.targetWeightPercent1rm) }));
     }
     if (s.targetDurationSeconds != null) {
       const m = Math.round(s.targetDurationSeconds / 60);
-      parts.push(m > 0 ? `${m} min` : `${s.targetDurationSeconds}s`);
+      parts.push(
+        m > 0
+          ? this._translateService.instant('time.minutesShort', { minutes: m })
+          : t('seconds', { seconds: s.targetDurationSeconds }),
+      );
     }
     if (s.targetDistanceMeters != null) {
       parts.push(
         s.targetDistanceMeters >= 1000
-          ? `${(s.targetDistanceMeters / 1000).toFixed(2)} km`
-          : `${s.targetDistanceMeters} m`,
+          ? t('km', { distance: this._kmFormat.format(s.targetDistanceMeters / 1000) })
+          : t('meters', { distance: num(s.targetDistanceMeters) }),
       );
     }
     let label = parts.join(' · ') || '—';
-    if (s.targetRpe != null) label += ` @ RPE ${s.targetRpe}`;
-    else if (s.targetRir != null) label += ` @ RIR ${s.targetRir}`;
+    if (s.targetRpe != null) label += ` ${t('rpe', { value: num(s.targetRpe) })}`;
+    else if (s.targetRir != null) label += ` ${t('rir', { value: num(s.targetRir) })}`;
     return label;
   }
 
@@ -484,19 +528,15 @@ export class ClientPlanDetail implements OnInit {
   restLabel(s: AssignedSet): string {
     const r = s.restAfterSeconds;
     if (r == null) return '—';
-    if (r < 60) return `${r}s`;
+    if (r < 60) return this._translateService.instant('time.secondsShort', { seconds: r });
     const m = Math.floor(r / 60);
     const sec = r % 60;
-    return sec ? `${m}m ${sec}s` : `${m}m`;
-  }
-
-  /** "STRENGTH" → "Strength", "REST_PAUSE" → "Rest pause". */
-  titleCase(s: string | null | undefined): string {
-    if (!s) return '';
-    return s
-      .split('_')
-      .map((w) => (w ? w.charAt(0) + w.slice(1).toLowerCase() : ''))
-      .join(' ');
+    return sec
+      ? this._translateService.instant('training.common.rest.minutesSeconds', {
+          minutes: m,
+          seconds: sec,
+        })
+      : this._translateService.instant('time.totalMinutes', { minutes: m });
   }
 
   // ── Plan-level helpers (hero/sidebar) ────────────────────────────
@@ -530,7 +570,7 @@ export class ClientPlanDetail implements OnInit {
   }
 
   planLabel(s: ProgramAssignmentStatus): string {
-    return s.charAt(0) + s.slice(1).toLowerCase();
+    return enumLabel('programAssignmentStatus', s);
   }
 
   /** Sidebar status banner severity — mirrors showcase's booking messages. */
@@ -549,8 +589,8 @@ export class ClientPlanDetail implements OnInit {
 
   instructorName(): string {
     const i = this.assignment()?.instructor;
-    if (!i) return 'your coach';
-    return `${i.firstName} ${i.lastName}`.trim() || 'your coach';
+    const name = i ? `${i.firstName} ${i.lastName}`.trim() : '';
+    return name || this._translateService.instant('training.common.yourCoach');
   }
 
   isPaused(): boolean {
@@ -572,8 +612,8 @@ export class ClientPlanDetail implements OnInit {
         this.loading.set(false);
         showApiError(
           this._messageService,
-          "Couldn't load your plan",
-          'It may have been removed or you may not have access.',
+          this._translateService.instant('training.planDetail.toast.loadFailed.summary'),
+          this._translateService.instant('error.mayBeRemoved'),
           err,
         );
         this._router.navigate(['/user/plans']);

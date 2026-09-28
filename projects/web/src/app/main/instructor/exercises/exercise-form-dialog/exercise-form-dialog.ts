@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -32,6 +32,7 @@ import {
   MovementPattern,
   MuscleRole,
   UpdateExercisePayload,
+  enumLabel,
   showApiError,
   youtubeThumbnailUrl,
   youtubeVideoId,
@@ -41,7 +42,8 @@ interface KindCard {
   value: ExerciseKind;
   label: string;
   icon: string;
-  hint: string;
+  /** Translation key for the one-line "what gets tracked" hint. */
+  hintKey: string;
 }
 
 interface LevelOption {
@@ -52,6 +54,11 @@ interface LevelOption {
 interface MultiOption<T> {
   value: T;
   label: string;
+}
+
+/** `{ value, label }` options for an exercise enum, labelled from `enum.<domain>.*`. */
+function enumOptions<T extends string>(domain: string, values: T[]): MultiOption<T>[] {
+  return values.map((value) => ({ value, label: enumLabel(domain, value) }));
 }
 
 /**
@@ -71,7 +78,6 @@ interface MultiOption<T> {
  */
 @Component({
   selector: 'mh-exercise-form-dialog',
-  standalone: true,
   imports: [
     FormsModule,
     ButtonDirective,
@@ -81,10 +87,10 @@ interface MultiOption<T> {
     Select,
     TextareaModule,
     ToggleSwitch,
+    TranslatePipe,
   ],
   templateUrl: './exercise-form-dialog.html',
   styleUrl: './exercise-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExerciseFormDialog {
   readonly visible = model(false);
@@ -94,6 +100,7 @@ export class ExerciseFormDialog {
 
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
   readonly taxonomy = inject(ExerciseTaxonomyStore);
 
   readonly Visibilities = ExerciseVisibility;
@@ -136,7 +143,9 @@ export class ExerciseFormDialog {
   );
 
   readonly dialogTitle = computed(() =>
-    this.isEditMode() ? 'Edit exercise' : 'New custom exercise',
+    this._translateService.instant(
+      this.isEditMode() ? 'exercises.form.title.edit' : 'exercises.form.title.create',
+    ),
   );
 
   readonly nameCharCount = computed(() => this.name().length);
@@ -160,75 +169,49 @@ export class ExerciseFormDialog {
   });
 
   readonly kindCards: KindCard[] = [
-    {
-      value: ExerciseKind.Strength,
-      label: 'Strength',
-      icon: 'pi-bolt',
-      hint: 'Reps + weight',
-    },
-    {
-      value: ExerciseKind.Cardio,
-      label: 'Cardio',
-      icon: 'pi-heart',
-      hint: 'Duration + distance + HR',
-    },
-    {
-      value: ExerciseKind.Duration,
-      label: 'Duration',
-      icon: 'pi-clock',
-      hint: 'Time only — e.g. plank',
-    },
-    {
-      value: ExerciseKind.Distance,
-      label: 'Distance',
-      icon: 'pi-map',
-      hint: 'Distance only',
-    },
-    {
-      value: ExerciseKind.Bodyweight,
-      label: 'Bodyweight',
-      icon: 'pi-user',
-      hint: 'Reps, no load',
-    },
-    {
-      value: ExerciseKind.Mobility,
-      label: 'Mobility',
-      icon: 'pi-sync',
-      hint: 'Time / reps, mobility',
-    },
-  ];
+    { value: ExerciseKind.Strength, icon: 'pi-bolt' },
+    { value: ExerciseKind.Cardio, icon: 'pi-heart' },
+    { value: ExerciseKind.Duration, icon: 'pi-clock' },
+    { value: ExerciseKind.Distance, icon: 'pi-map' },
+    { value: ExerciseKind.Bodyweight, icon: 'pi-user' },
+    { value: ExerciseKind.Mobility, icon: 'pi-sync' },
+  ].map((card) => ({
+    ...card,
+    label: enumLabel('exerciseKind', card.value),
+    hintKey: `exercises.form.kindHint.${card.value}`,
+  }));
 
-  readonly levelOptions: LevelOption[] = [
-    { value: ExerciseLevel.Beginner, label: 'Beginner' },
-    { value: ExerciseLevel.Intermediate, label: 'Intermediate' },
-    { value: ExerciseLevel.Advanced, label: 'Advanced' },
-  ];
+  readonly levelOptions: LevelOption[] = enumOptions('exerciseLevel', [
+    ExerciseLevel.Beginner,
+    ExerciseLevel.Intermediate,
+    ExerciseLevel.Advanced,
+  ]);
 
-  readonly patternOptions: MultiOption<MovementPattern>[] = [
-    { value: MovementPattern.Squat, label: 'Squat' },
-    { value: MovementPattern.Hinge, label: 'Hinge' },
-    { value: MovementPattern.Lunge, label: 'Lunge' },
-    { value: MovementPattern.PushHorizontal, label: 'Horizontal push' },
-    { value: MovementPattern.PushVertical, label: 'Vertical push' },
-    { value: MovementPattern.PullHorizontal, label: 'Horizontal pull' },
-    { value: MovementPattern.PullVertical, label: 'Vertical pull' },
-    { value: MovementPattern.Carry, label: 'Carry' },
-    { value: MovementPattern.Rotation, label: 'Rotation' },
-    { value: MovementPattern.AntiRotation, label: 'Anti-rotation' },
-    { value: MovementPattern.Locomotion, label: 'Locomotion' },
-    { value: MovementPattern.Isolation, label: 'Isolation' },
-  ];
+  readonly patternOptions: MultiOption<MovementPattern>[] = enumOptions('movementPattern', [
+    MovementPattern.Squat,
+    MovementPattern.Hinge,
+    MovementPattern.Lunge,
+    MovementPattern.PushHorizontal,
+    MovementPattern.PushVertical,
+    MovementPattern.PullHorizontal,
+    MovementPattern.PullVertical,
+    MovementPattern.Carry,
+    MovementPattern.Rotation,
+    MovementPattern.AntiRotation,
+    MovementPattern.Locomotion,
+    MovementPattern.Isolation,
+  ]);
 
-  readonly mechanicOptions: MultiOption<ExerciseMechanic>[] = [
-    { value: ExerciseMechanic.Compound, label: 'Compound' },
-    { value: ExerciseMechanic.Isolation, label: 'Isolation' },
-  ];
+  readonly mechanicOptions: MultiOption<ExerciseMechanic>[] = enumOptions('exerciseMechanic', [
+    ExerciseMechanic.Compound,
+    ExerciseMechanic.Isolation,
+  ]);
 
-  readonly forceOptions: MultiOption<ExerciseForce>[] = [
-    { value: ExerciseForce.Push, label: 'Push' },
-    { value: ExerciseForce.Pull, label: 'Pull' },
-    { value: ExerciseForce.Static, label: 'Static' },
-  ];
+  readonly forceOptions: MultiOption<ExerciseForce>[] = enumOptions('exerciseForce', [
+    ExerciseForce.Push,
+    ExerciseForce.Pull,
+    ExerciseForce.Static,
+  ]);
 
   constructor() {
     this.taxonomy.ensureLoaded();
@@ -268,7 +251,9 @@ export class ExerciseFormDialog {
       next: (saved) => {
         this._messageService.add({
           severity: 'success',
-          summary: this.isEditMode() ? 'Exercise updated' : 'Exercise created',
+          summary: this._translateService.instant(
+            this.isEditMode() ? 'exercises.toast.updated' : 'exercises.toast.created',
+          ),
           detail: saved.name,
           life: 3000,
         });
@@ -278,8 +263,10 @@ export class ExerciseFormDialog {
       error: (err) =>
         showApiError(
           this._messageService,
-          this.isEditMode() ? 'Update failed' : 'Create failed',
-          'Check the highlighted fields and try again.',
+          this._translateService.instant(
+            this.isEditMode() ? 'exercises.toast.updateFailed' : 'exercises.toast.createFailed',
+          ),
+          this._translateService.instant('exercises.toast.saveFailedDetail'),
           err,
         ),
       complete: () => this.saving.set(false),

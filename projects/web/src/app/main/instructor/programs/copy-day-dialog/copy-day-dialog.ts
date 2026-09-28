@@ -1,31 +1,22 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
+  inject,
   input,
   model,
   output,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { SelectItem } from 'primeng/api';
 import { MultiSelect } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 
-import { Program, ProgramWorkout } from 'core';
-
-const DAY_NAMES = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
+import { Program, ProgramWorkout, weekdayNames } from 'core';
 
 /** What the parent needs to perform the copy. */
 export interface CopyDayChoice {
@@ -50,11 +41,12 @@ export interface CopyDayChoice {
  */
 @Component({
   selector: 'mh-copy-day-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, MultiSelect, Select],
+  imports: [FormsModule, TranslatePipe, ButtonDirective, Dialog, MultiSelect, Select],
   templateUrl: './copy-day-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CopyDayDialog {
+  private readonly _translateService = inject(TranslateService);
+
   readonly program = input.required<Program>();
   /** The day being copied — its week, its slot, and its name. */
   readonly sourceWorkout = input.required<ProgramWorkout>();
@@ -66,7 +58,8 @@ export class CopyDayDialog {
   /** Null while it matches the source day — the usual case. */
   readonly targetDay = signal<number | null>(null);
 
-  readonly dayNames = DAY_NAMES;
+  /** Monday-first, matching the BE's 0..6 `dayIndex`. */
+  readonly dayNames = weekdayNames('long');
 
   private readonly _totalWeeks = computed(() => {
     const days = this.program().durationDays ?? 84;
@@ -78,7 +71,11 @@ export class CopyDayDialog {
 
   readonly sourceLabel = computed(() => {
     const w = this.sourceWorkout();
-    return `${w.name} · ${DAY_NAMES[w.dayIndex]}, week ${w.weekIndex + 1}`;
+    return this._translateService.instant('programs.copyDay.sourceLabel', {
+      name: w.name,
+      day: this.dayNames[w.dayIndex],
+      week: w.weekIndex + 1,
+    });
   });
 
   /** The day this copy lands on — the source day unless changed. */
@@ -103,9 +100,10 @@ export class CopyDayDialog {
     const sameDay = this.effectiveDay() === this.sourceDay();
     return Array.from({ length: this._totalWeeks() }, (_, i) => ({
       value: i,
-      label: occupied.has(i)
-        ? `Week ${i + 1} · will be replaced`
-        : `Week ${i + 1} (empty that day)`,
+      label: this._translateService.instant(
+        occupied.has(i) ? 'programs.copyDay.weekReplaced' : 'programs.copyDay.weekEmpty',
+        { week: i + 1 },
+      ),
       // Copying onto its own slot is a no-op; a different day in the same
       // week is a real target.
       disabled: sameDay && i === source,
@@ -113,7 +111,7 @@ export class CopyDayDialog {
   });
 
   readonly dayOptions = computed<SelectItem<number>[]>(() =>
-    DAY_NAMES.map((name, i) => ({ value: i, label: name })),
+    this.dayNames.map((name, i) => ({ value: i, label: name })),
   );
 
   /** Chosen weeks that already hold training in the target slot. */
@@ -126,11 +124,11 @@ export class CopyDayDialog {
 
   readonly submitLabel = computed(() => {
     const n = this.targetWeeks().length;
-    if (n === 0) return 'Copy';
-    if (this.clashCount() > 0) {
-      return n === 1 ? 'Replace that day' : `Replace in ${n} weeks`;
-    }
-    return n === 1 ? 'Copy into 1 week' : `Copy into ${n} weeks`;
+    if (n === 0) return this._translateService.instant('button.copy');
+    return this._translateService.instant(
+      this.clashCount() > 0 ? 'programs.copyDay.submitReplace' : 'programs.copyDay.submitCopy',
+      { count: n },
+    );
   });
 
   constructor() {

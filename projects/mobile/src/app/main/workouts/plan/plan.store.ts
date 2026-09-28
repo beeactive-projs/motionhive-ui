@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 
 import {
@@ -28,6 +29,7 @@ export interface PlanWeek {
 @Injectable()
 export class PlanStore {
   private readonly _programAssignmentService = inject(ProgramAssignmentService);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _assignment = signal<ProgramAssignment | null>(null);
   private readonly _loading = signal(false);
@@ -46,7 +48,11 @@ export class PlanStore {
     // Your own scheduled routine has no coach to name, whatever the row's
     // `instructor` says — it is you.
     if (!assignment || assignment.assignmentKind === 'SELF') return null;
-    return assignment.instructor ? displayName(assignment.instructor, 'your coach') : null;
+    if (!assignment.instructor) return null;
+    return displayName(
+      assignment.instructor,
+      this._translateService.instant('workouts.plan.yourCoach'),
+    );
   });
 
   readonly workouts = computed<AssignedWorkout[]>(() => this._assignment()?.workouts ?? []);

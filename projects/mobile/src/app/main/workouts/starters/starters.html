@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>Starter routines</ion-title>
+    <ion-title>{{ 'workouts.common.starterRoutines' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,23 +11,23 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load the starters"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.starters' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="flash-outline"
-      heading="No starters yet"
-      message="MotionHive's starter routines are not available right now. Try again in a moment."
-      actionLabel="Try again"
+      [heading]="'workouts.starters.empty.title' | translate"
+      [message]="'workouts.starters.empty.message' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       actionFill="outline"
       (action)="load()"
     />
   } @else {
     <div class="mh-page">
-      <ion-note class="mh-note-block">Pick one to try — it becomes yours to edit.</ion-note>
+      <ion-note class="mh-note-block">{{ 'workouts.starters.note' | translate }}</ion-note>
 
       @if (showSkeleton()) {
         <!-- Mirrors the row shape so nothing shifts when the rows land. -->

@@ -20,6 +20,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -66,6 +67,7 @@ import {
     IonTextarea,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './program-settings.html',
   styleUrl: './program-settings.scss',
@@ -75,6 +77,7 @@ export class ProgramSettings implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly program = signal<Program | null>(null);
   readonly loading = signal(false);
@@ -98,34 +101,38 @@ export class ProgramSettings implements ViewWillEnter {
   readonly dayCount = computed(() => (this.program()?.workouts ?? []).length);
 
   /** "9 days of work so far" — the status card counts what is actually built. */
-  readonly dayCountLabel = computed(() => {
-    const n = this.dayCount();
-    return `${n} ${n === 1 ? 'day' : 'days'} of work so far.`;
-  });
+  readonly dayCountLabel = computed(() =>
+    this._translateService.instant('programs.settings.dayCount', { count: this.dayCount() }),
+  );
 
   /** What is still missing before this can be given to anyone. */
-  readonly blockers = computed(() => {
-    const list: string[] = [];
-    if (!this.name().trim()) list.push('a name');
-    if (this.dayCount() === 0) list.push('at least one day of work');
-    return list;
-  });
+  private readonly _needsName = computed(() => !this.name().trim());
+  private readonly _needsDays = computed(() => this.dayCount() === 0);
 
+  /** One full sentence per combination — the missing parts are never glued together. */
   readonly blockersLabel = computed(() => {
-    const blockers = this.blockers();
-    return blockers.length ? `Needs ${blockers.join(' and ')} before it can be assigned.` : '';
+    const needsName = this._needsName();
+    const needsDays = this._needsDays();
+    if (needsName && needsDays) return this._translateService.instant('programs.settings.needs.both');
+    if (needsName) return this._translateService.instant('programs.settings.needs.name');
+    if (needsDays) return this._translateService.instant('programs.settings.needs.days');
+    return '';
   });
 
-  readonly canPublish = computed(() => this.blockers().length === 0);
+  readonly canPublish = computed(() => !this._needsName() && !this._needsDays());
 
   readonly canSave = computed(() => !!this.name().trim() && !this.saving());
 
-  readonly weeksLabel = computed(() => (this.weeks() === 1 ? 'week' : 'weeks'));
-
-  readonly deleteBody = computed(
-    () =>
-      `Delete ${this.program()?.name ?? 'this program'}? Clients already assigned keep their own copy.`,
+  readonly weeksLabel = computed(() =>
+    this._translateService.instant('programs.settings.weeksUnit', { count: this.weeks() }),
   );
+
+  readonly deleteBody = computed(() => {
+    const name = this.program()?.name;
+    return name
+      ? this._translateService.instant('programs.settings.delete.body', { name })
+      : this._translateService.instant('programs.settings.delete.bodyFallback');
+  });
 
   constructor() {
     addIcons(PROGRAM_ICONS);
@@ -184,12 +191,19 @@ export class ProgramSettings implements ViewWillEnter {
         next: (program) => {
           this.saving.set(false);
           this.program.set(program);
-          void this._feedbackService.success(publish ? 'Program published' : 'Saved');
+          void this._feedbackService.success(
+            this._translateService.instant(
+              publish ? 'programs.settings.toast.published' : 'toast.summary.saved',
+            ),
+          );
           if (publish) void this._router.navigate(['/tabs/programs/program', id]);
         },
         error: (err) => {
           this.saving.set(false);
-          void this._feedbackService.error(err, 'Could not save the program');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('programs.settings.toast.saveFailed'),
+          );
         },
       });
   }
@@ -217,14 +231,19 @@ export class ProgramSettings implements ViewWillEnter {
       .subscribe({
         next: (copy) => {
           this.duplicating.set(false);
-          void this._feedbackService.success('Program duplicated');
+          void this._feedbackService.success(
+            this._translateService.instant('programs.settings.toast.duplicated'),
+          );
           void this._router.navigate(['/tabs/programs/program', copy.id], {
             replaceUrl: true,
           });
         },
         error: (err) => {
           this.duplicating.set(false);
-          void this._feedbackService.error(err, 'Could not duplicate the program');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('programs.settings.toast.duplicateFailed'),
+          );
         },
       });
   }
@@ -240,12 +259,17 @@ export class ProgramSettings implements ViewWillEnter {
         next: () => {
           this.deleting.set(false);
           this.deleteOpen.set(false);
-          void this._feedbackService.success('Program deleted');
+          void this._feedbackService.success(
+            this._translateService.instant('programs.settings.toast.deleted'),
+          );
           void this._router.navigate(['/tabs/programs'], { replaceUrl: true });
         },
         error: (err) => {
           this.deleting.set(false);
-          void this._feedbackService.error(err, 'Could not delete the program');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('programs.settings.toast.deleteFailed'),
+          );
         },
       });
   }

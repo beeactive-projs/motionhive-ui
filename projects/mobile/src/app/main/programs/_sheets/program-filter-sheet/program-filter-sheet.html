@@ -1,5 +1,5 @@
 <ng-template #body>
-  <div class="mh-section-label">Type</div>
+  <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
   <div class="chips">
     @for (chip of sizeChips; track chip.value) {
       <ion-chip
@@ -7,7 +7,7 @@
         [attr.aria-pressed]="isOn(chip.value)"
         (click)="choose(chip.value)"
       >
-        {{ chip.label }}
+        {{ chip.label | translate }}
         <span class="count">{{ countFor(chip.value) }}</span>
       </ion-chip>
     }
@@ -16,10 +16,10 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Filter programs"
+  [title]="'programs.filter.title' | translate"
   [body]="body"
-  saveLabel="Show results"
-  dismissLabel="Clear"
+  [saveLabel]="'programs.filter.showResults' | translate"
+  [dismissLabel]="'button.clear' | translate"
   [breakpoints]="[0, 0.5]"
   [initialBreakpoint]="0.5"
   (save)="commit()"

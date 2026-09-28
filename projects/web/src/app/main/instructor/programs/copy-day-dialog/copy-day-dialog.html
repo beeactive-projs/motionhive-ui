@@ -1,19 +1,19 @@
 <p-dialog [(visible)]="visible" [modal]="true" [appendTo]="'body'" [style]="{ width: '28rem' }"
-  [breakpoints]="{ '640px': '95vw' }" header="Copy this day">
+  [breakpoints]="{ '640px': '95vw' }" [header]="'programs.copyDay.title' | translate">
   <div class="flex flex-col gap-3.5 pt-1">
     <p class="m-0 text-sm text-muted-color">
-      Copy <strong class="text-color">{{ sourceLabel() }}</strong> — exercises
-      and prescribed sets included — into other weeks. The rest of those weeks
-      is left alone.
+      {{ 'programs.copyDay.intro.before' | translate }}
+      <strong class="text-color">{{ sourceLabel() }}</strong>
+      {{ 'programs.copyDay.intro.after' | translate }}
     </p>
 
     <div class="flex flex-col gap-1.5">
       <label for="copyDayWeeks" class="text-xs font-semibold text-surface-800 dark:text-surface-200">
-        Copy into
+        {{ 'programs.common.copyInto' | translate }}
       </label>
       <p-multiselect inputId="copyDayWeeks" [options]="weekOptions()" [ngModel]="targetWeeks()"
         (ngModelChange)="targetWeeks.set($event)" optionLabel="label" optionValue="value"
-        optionDisabled="disabled" placeholder="Pick one or more weeks" [appendTo]="'body'"
+        optionDisabled="disabled" [placeholder]="'programs.copyDay.weeksPlaceholder' | translate" [appendTo]="'body'"
         [showToggleAll]="false" class="w-full" />
     </div>
 
@@ -22,7 +22,7 @@
     @if (canChooseDay()) {
     <div class="flex flex-col gap-1.5">
       <label for="copyDayTargetDay" class="text-xs font-semibold text-surface-800 dark:text-surface-200">
-        Land it on
+        {{ 'programs.copyDay.landOn' | translate }}
       </label>
       <p-select inputId="copyDayTargetDay" [options]="dayOptions()" [ngModel]="effectiveDay()"
         (ngModelChange)="setTargetDay($event)" optionLabel="label" optionValue="value"
@@ -32,19 +32,17 @@
 
     @if (clashCount() > 0) {
     <p class="m-0 text-2xs text-warning-color">
-      {{ clashCount() === 1 ? 'One of those weeks already has' : clashCount() + ' of those weeks already have' }}
-      training on {{ dayNames[effectiveDay()] }}.
-      {{ clashCount() === 1 ? 'It' : 'They' }} will be replaced.
+      {{ 'programs.copyDay.clash' | translate: { count: clashCount(), day: dayNames[effectiveDay()] } }}
     </p>
     } @else if (targetWeeks().length > 0) {
     <p class="m-0 text-2xs text-muted-color">
-      Nothing to overwrite on {{ dayNames[effectiveDay()] }}.
+      {{ 'programs.copyDay.nothingToOverwrite' | translate: { day: dayNames[effectiveDay()] } }}
     </p>
     }
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="!canSubmit()" (click)="submit()">
       <i class="pi pi-copy"></i>
       {{ submitLabel() }}

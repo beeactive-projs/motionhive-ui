@@ -10,17 +10,17 @@
   <div class="mb-3">
     <div class="mb-1 flex items-center justify-between gap-2">
       <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
-        aria-label="Previous week" (click)="shiftWeek(-1)">
+        [attr.aria-label]="'myWorkouts.todayHero.previousWeek' | translate" (click)="shiftWeek(-1)">
         <i class="pi pi-chevron-left text-xs"></i>
       </button>
       <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">
         {{ dayLabel() }}
         @if (!isToday()) {
-        · <button type="button" class="underline hover:opacity-80" (click)="goToToday()">back to today</button>
+        · <button type="button" class="underline hover:opacity-80" (click)="goToToday()">{{ 'myWorkouts.todayHero.backToToday' | translate }}</button>
         }
       </span>
       <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
-        aria-label="Next week" (click)="shiftWeek(1)">
+        [attr.aria-label]="'myWorkouts.todayHero.nextWeek' | translate" (click)="shiftWeek(1)">
         <i class="pi pi-chevron-right text-xs"></i>
       </button>
     </div>
@@ -37,15 +37,15 @@
   @case ('in-progress') {
   <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
     <div class="min-w-0 flex-1">
-      <p-tag value="In progress" icon="pi pi-clock" severity="warn" rounded class="text-xs!" />
+      <p-tag [value]="'enum.workoutLogStatus.IN_PROGRESS' | translate" icon="pi pi-clock" severity="warn" rounded class="text-xs!" />
       <h2 class="mt-1.5 mb-0 truncate font-heading text-lg font-semibold">
         {{ inProgress()?.name }}
       </h2>
-      <p class="m-0 mt-0.5 text-xs text-muted-color">Left partway through. Carry on where you stopped.</p>
+      <p class="m-0 mt-0.5 text-xs text-muted-color">{{ 'myWorkouts.todayHero.inProgressHint' | translate }}</p>
     </div>
     <button pButton type="button" class="w-full sm:w-auto" (click)="resume.emit(inProgress()!)">
       <i class="pi pi-play"></i>
-      Resume workout
+      {{ 'myWorkouts.todayHero.resume' | translate }}
     </button>
   </div>
   }
@@ -66,12 +66,12 @@
     @if (canStart()) {
     <button pButton type="button" class="w-full sm:w-auto" (click)="startAssigned.emit(t!)">
       <i class="pi pi-bolt"></i>
-      Start workout
+      {{ 'myWorkouts.common.startWorkout' | translate }}
     </button>
     } @else if (timeframe() === 'future') {
-    <p-tag value="Scheduled" icon="pi pi-calendar" severity="secondary" rounded class="text-xs!" />
+    <p-tag [value]="'myWorkouts.todayHero.scheduled' | translate" icon="pi pi-calendar" severity="secondary" rounded class="text-xs!" />
     } @else {
-    <p-tag value="Not done" icon="pi pi-times-circle" severity="warn" rounded class="text-xs!" />
+    <p-tag [value]="'myWorkouts.todayHero.notDone' | translate" icon="pi pi-times-circle" severity="warn" rounded class="text-xs!" />
     }
   </div>
   }
@@ -80,16 +80,16 @@
   @case ('done') {
   <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
     <div class="min-w-0 flex-1">
-      <p-tag value="Done today" icon="pi pi-check" severity="success" rounded class="text-xs!" />
+      <p-tag [value]="'myWorkouts.todayHero.doneToday' | translate" icon="pi pi-check" severity="success" rounded class="text-xs!" />
       <h2 class="mt-1.5 mb-0 truncate font-heading text-lg font-semibold">{{ t?.name }}</h2>
       <p class="m-0 mt-0.5 text-xs text-muted-color">
-        {{ canStart() ? "That's today's work logged." : 'Logged.' }}@if (canStart() && nextUp(); as n) { Next up {{ n.name }}.}
+        {{ (canStart() ? 'myWorkouts.todayHero.todayLogged' : 'myWorkouts.todayHero.logged') | translate }}@if (canStart() && nextUp(); as n) { {{ 'myWorkouts.todayHero.nextUp' | translate: { name: n.name } }}}
       </p>
     </div>
     @if (canStart()) {
     <button pButton type="button" severity="secondary" [outlined]="true" class="w-full sm:w-auto" (click)="startFreestyle.emit()">
       <i class="pi pi-plus"></i>
-      Train anyway
+      {{ 'myWorkouts.todayHero.trainAnyway' | translate }}
     </button>
     }
   </div>
@@ -100,15 +100,15 @@
   <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
     <div class="min-w-0 flex-1">
       <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">{{ dayLabel() }}</span>
-      <h2 class="mt-0.5 mb-0 font-heading text-lg font-semibold">Rest day</h2>
+      <h2 class="mt-0.5 mb-0 font-heading text-lg font-semibold">{{ 'myWorkouts.todayHero.restDay' | translate }}</h2>
       <p class="m-0 mt-0.5 text-xs text-muted-color">
-        Nothing scheduled.{{ canStart() ? ' Recovery is part of the plan.' : '' }}@if (canStart() && nextUp(); as n) { Next up {{ n.name }}.}
+        {{ 'myWorkouts.todayHero.nothingScheduled' | translate }}@if (canStart()) { {{ 'myWorkouts.todayHero.recovery' | translate }}}@if (canStart() && nextUp(); as n) { {{ 'myWorkouts.todayHero.nextUp' | translate: { name: n.name } }}}
       </p>
     </div>
     @if (canStart()) {
     <button pButton type="button" severity="secondary" [outlined]="true" class="w-full sm:w-auto" (click)="startFreestyle.emit()">
       <i class="pi pi-bolt"></i>
-      Train anyway
+      {{ 'myWorkouts.todayHero.trainAnyway' | translate }}
     </button>
     }
   </div>
@@ -119,11 +119,11 @@
   <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
     <div class="min-w-0 flex-1">
       <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-color">{{ dayLabel() }}</span>
-      <h2 class="mt-0.5 mb-0 font-heading text-lg font-semibold">Your call today</h2>
+      <h2 class="mt-0.5 mb-0 font-heading text-lg font-semibold">{{ 'myWorkouts.todayHero.yourCall' | translate }}</h2>
       <p class="m-0 mt-0.5 text-xs text-muted-color">
-        {{ routineCount() > 0
-          ? 'Start one of your routines, or go freestyle and add exercises as you go.'
-          : 'Start a workout and add exercises as you go. Save it as a routine when you are done.' }}
+        {{ (routineCount() > 0
+          ? 'myWorkouts.todayHero.noPlanWithRoutines'
+          : 'myWorkouts.todayHero.noPlan') | translate }}
       </p>
     </div>
     <div class="flex flex-wrap gap-2">
@@ -134,7 +134,7 @@
       -->
       <button pButton type="button" (click)="startFreestyle.emit()">
         <i class="pi pi-bolt"></i>
-        Start workout
+        {{ 'myWorkouts.common.startWorkout' | translate }}
       </button>
     </div>
   </div>

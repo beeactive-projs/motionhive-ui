@@ -15,6 +15,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -62,6 +63,7 @@ type Step = (typeof STEPS)[number];
     IonToolbar,
     LevelSegment,
     MuscleEquipmentFields,
+    TranslatePipe,
   ],
   templateUrl: './exercise-create.html',
   styleUrl: './exercise-create.scss',
@@ -70,6 +72,7 @@ export class ExerciseCreate {
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly form = new ExerciseDraftForm();
   readonly step = signal<Step>(1);
@@ -90,8 +93,10 @@ export class ExerciseCreate {
     }
   });
 
-  readonly nextLabel = computed(() =>
-    this.step() === 1 ? 'Next · Muscles & equipment' : 'Next · Details',
+  readonly nextLabel = computed<string>(() =>
+    this._translateService.instant(
+      this.step() === 1 ? 'exercises.create.nextMuscles' : 'exercises.create.nextDetails',
+    ),
   );
 
   constructor() {
@@ -130,7 +135,9 @@ export class ExerciseCreate {
       .subscribe({
         next: (exercise) => {
           this.saving.set(false);
-          void this._feedbackService.success('Exercise created');
+          void this._feedbackService.success(
+            this._translateService.instant('exercises.create.toast.created'),
+          );
           // Replace, so Back from the new exercise returns to the library
           // rather than walking back into a form that has already been sent.
           void this._router.navigate(['/tabs/exercises', exercise.id], {
@@ -139,7 +146,10 @@ export class ExerciseCreate {
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not create this exercise.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('exercises.create.toast.createFailed'),
+          );
         },
       });
   }

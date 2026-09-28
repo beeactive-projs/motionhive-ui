@@ -1,10 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ProgressBar } from 'primeng/progressbar';
 import { Tag } from 'primeng/tag';
-import { ProgramAssignment, ProgramAssignmentStatus, TagSeverity } from 'core';
+import { ProgramAssignment, ProgramAssignmentStatus, TagSeverity, enumLabel } from 'core';
 import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avatar';
 
 /**
@@ -46,11 +47,9 @@ type PlanRowTone = (typeof PlanRowTone)[keyof typeof PlanRowTone];
  */
 @Component({
   selector: 'mh-my-plan-row',
-  standalone: true,
-  imports: [DatePipe, ButtonDirective, Card, ProgressBar, Tag, HexAvatar],
+  imports: [DatePipe, ButtonDirective, Card, ProgressBar, Tag, HexAvatar, TranslatePipe],
   templateUrl: './my-plan-row.html',
   styleUrl: './my-plan-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     role: 'button',
     tabindex: '0',
@@ -60,6 +59,8 @@ type PlanRowTone = (typeof PlanRowTone)[keyof typeof PlanRowTone];
   },
 })
 export class MyPlanRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly assignment = input.required<ProgramAssignment>();
   /** Mobile viewport flag (from the page's `injectIsMobile()`). */
   readonly mobile = input<boolean>(false);
@@ -85,16 +86,20 @@ export class MyPlanRow {
    * else's job title.
    */
   protected readonly originLabel = computed(() => {
-    if (this.isSelfScheduled()) return 'From your routine';
+    if (this.isSelfScheduled()) {
+      return this._translateService.instant('training.planRow.origin.routine');
+    }
     const i = this.instructor();
     const name = i ? `${i.firstName} ${i.lastName}`.trim() : '';
-    return name ? `From ${name}` : 'From your coach';
+    return name
+      ? this._translateService.instant('training.planRow.origin.coach', { name })
+      : this._translateService.instant('training.planRow.origin.yourCoach');
   });
 
   protected readonly instructorName = computed(() => {
     const i = this.instructor();
-    if (!i) return 'your coach';
-    return `${i.firstName} ${i.lastName}`.trim() || 'your coach';
+    const name = i ? `${i.firstName} ${i.lastName}`.trim() : '';
+    return name || this._translateService.instant('training.common.yourCoach');
   });
 
   protected readonly isPending = computed(() => this.status() === ProgramAssignmentStatus.Pending);
@@ -138,10 +143,9 @@ export class MyPlanRow {
     }
   });
 
-  protected readonly statusLabel = computed<string>(() => {
-    const s = this.status();
-    return s.charAt(0) + s.slice(1).toLowerCase();
-  });
+  protected readonly statusLabel = computed<string>(() =>
+    enumLabel('programAssignmentStatus', this.status()),
+  );
 
   // ─── Left-edge tone ───────────────────────────────────────────────────
 
@@ -161,11 +165,11 @@ export class MyPlanRow {
   protected readonly ctaLabel = computed<string>(() => {
     switch (this.status()) {
       case ProgramAssignmentStatus.Active:
-        return 'Continue';
+        return this._translateService.instant('button.continue');
       case ProgramAssignmentStatus.Completed:
-        return 'Review';
+        return this._translateService.instant('training.planRow.review');
       default:
-        return 'Open';
+        return this._translateService.instant('button.open');
     }
   });
 

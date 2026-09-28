@@ -15,6 +15,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
@@ -70,6 +71,7 @@ const LOG_LIMIT = 25;
     IonToolbar,
     LogRow,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './client-training.html',
   styleUrl: './client-training.scss',
@@ -79,6 +81,7 @@ export class ClientTraining implements ViewWillEnter {
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly assignments = signal<ProgramAssignment[]>([]);
   readonly logs = signal<WorkoutLog[]>([]);
@@ -158,7 +161,10 @@ export class ClientTraining implements ViewWillEnter {
 
   /** "23% done · started Mon 1 Sep" */
   planSubline(plan: ProgramAssignment): string {
-    return `${plan.completionPercent}% done · started ${shortDayLabel(plan.startDate)}`;
+    return this._translateService.instant('programs.clientTraining.planSubline', {
+      percent: plan.completionPercent,
+      date: shortDayLabel(plan.startDate),
+    });
   }
 
   openLog(log: WorkoutLog): void {

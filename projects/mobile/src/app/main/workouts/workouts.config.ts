@@ -5,7 +5,10 @@ import {
   LoggedSet,
   WorkoutLog,
   WorkoutLogStatus,
+  appLocale,
+  enumLabel,
   formatTotalDuration,
+  translate,
 } from 'core';
 import {
   addOutline,
@@ -123,11 +126,10 @@ export function assignedDayTone(day: AssignedWorkout): SpineTone {
 export function logChip(log: WorkoutLog): { label: string; tone: BadgeTone } | null {
   switch (log.status) {
     case WorkoutLogStatus.Skipped:
-      return { label: 'Skipped', tone: BadgeTones.Medium };
     case WorkoutLogStatus.Abandoned:
-      return { label: 'Abandoned', tone: BadgeTones.Medium };
+      return { label: enumLabel('workoutLogStatus', log.status), tone: BadgeTones.Medium };
     case WorkoutLogStatus.InProgress:
-      return { label: 'In progress', tone: BadgeTones.Honey };
+      return { label: enumLabel('workoutLogStatus', log.status), tone: BadgeTones.Honey };
     default:
       return null;
   }
@@ -142,10 +144,8 @@ export function workoutMetaLine(
   equipment?: string | null,
 ): string {
   const parts: string[] = [];
-  if (exerciseCount != null) {
-    parts.push(`${exerciseCount} ${exerciseCount === 1 ? 'exercise' : 'exercises'}`);
-  }
-  if (minutes != null) parts.push(`~${minutes} min`);
+  if (exerciseCount != null) parts.push(translate('count.exercises', { count: exerciseCount }));
+  if (minutes != null) parts.push(translate('workouts.meta.aboutMinutes', { minutes }));
   if (equipment) parts.push(equipment);
   return parts.join(' · ');
 }
@@ -160,7 +160,11 @@ export function planPositionLabel(
   weekIndex: number,
   dayIndex: number,
 ): string {
-  const parts = [planName, `Week ${weekIndex + 1}`, `Day ${dayIndex + 1}`];
+  const parts = [
+    planName,
+    translate('workouts.meta.week', { number: weekIndex + 1 }),
+    translate('workouts.meta.day', { number: dayIndex + 1 }),
+  ];
   return parts.filter(Boolean).join(' · ');
 }
 
@@ -182,7 +186,7 @@ export function logMeta(log: WorkoutLog): string {
   const parts: string[] = [];
   const duration = workoutDuration(log.durationSeconds);
   if (duration) parts.push(duration);
-  if (log.feelingRating) parts.push(`felt ${log.feelingRating}/5`);
+  if (log.feelingRating) parts.push(translate('workouts.meta.felt', { rating: log.feelingRating }));
   return parts.join(' · ');
 }
 
@@ -205,14 +209,14 @@ export function elapsedLabel(startedAt: string, now: number): string {
 export function dateRail(when: string): { weekday: string; day: string } {
   const date = calendarDate(when);
   return {
-    weekday: date.toLocaleDateString(undefined, { weekday: 'short' }),
+    weekday: date.toLocaleDateString(appLocale(), { weekday: 'short' }),
     day: String(date.getDate()),
   };
 }
 
 /** "Fri 12 Sep" — a calendar day as a row says it. */
 export function shortDayLabel(when: string): string {
-  return calendarDate(when).toLocaleDateString(undefined, {
+  return calendarDate(when).toLocaleDateString(appLocale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -261,14 +265,36 @@ export function clockDigitsToDisplay(digits: string): string {
 }
 
 /**
+ * Set types whose mark is a compact form of their own, not the enum's label:
+ * "W" for a warm-up, and the short names the set grid has room for.
+ */
+const SET_TYPE_MARK_KEYS: Partial<Record<ExerciseSetType, string>> = {
+  [ExerciseSetType.Warmup]: 'workouts.setTypeMark.WARMUP',
+  [ExerciseSetType.Dropset]: 'workouts.setTypeMark.DROPSET',
+  [ExerciseSetType.Failure]: 'workouts.setTypeMark.FAILURE',
+  [ExerciseSetType.RestPause]: 'workouts.setTypeMark.REST_PAUSE',
+};
+
+/**
  * The mark on a set's number when it is not a plain working set: "W" for a
  * warm-up, the type's name for the rarer kinds. Nothing for NORMAL and
  * WORKING, which between them are almost every set.
  */
 export function setTypeMark(type: ExerciseSetType | null | undefined): string {
   if (!type || type === ExerciseSetType.Normal || type === ExerciseSetType.Working) return '';
-  if (type === ExerciseSetType.Warmup) return 'W';
-  return type.charAt(0) + type.slice(1).toLowerCase().replace('_', ' ');
+  const key = SET_TYPE_MARK_KEYS[type];
+  return key ? translate(key) : enumLabel('exerciseSetType', type);
+}
+
+/**
+ * A measured number as the reader's locale writes it ("82.5" / "82,5"). No
+ * grouping, so a four-digit volume stays "1200" rather than gaining a comma.
+ */
+export function formatMeasure(value: number, maxFractionDigits = 2): string {
+  return new Intl.NumberFormat(appLocale(), {
+    maximumFractionDigits: maxFractionDigits,
+    useGrouping: false,
+  }).format(value);
 }
 
 /**
@@ -313,11 +339,30 @@ export function workoutTiles(log: WorkoutLog): WorkoutTile[] {
   const holdSeconds = sets.reduce((sum, set) => sum + (set.durationSeconds ?? 0), 0);
   const distance = sets.reduce((sum, set) => sum + (set.distanceMeters ?? 0), 0);
 
-  const tiles: WorkoutTile[] = [{ label: 'Sets', value: String(sets.length) }];
-  if (volume > 0) tiles.push({ label: 'Volume', value: `${Math.round(volume)} kg` });
-  if (bodyweightReps > 0) tiles.push({ label: 'Reps', value: String(bodyweightReps) });
-  if (holdSeconds > 0) tiles.push({ label: 'Time', value: `${Math.round(holdSeconds / 60)} min` });
-  if (distance > 0) tiles.push({ label: 'Distance', value: `${distance} m` });
+  const tiles: WorkoutTile[] = [
+    { label: translate('workouts.tiles.sets'), value: formatMeasure(sets.length) },
+  ];
+  if (volume > 0) {
+    tiles.push({
+      label: translate('workouts.tiles.volume'),
+      value: translate('workouts.units.kg', { value: formatMeasure(Math.round(volume)) }),
+    });
+  }
+  if (bodyweightReps > 0) {
+    tiles.push({ label: translate('workouts.tiles.reps'), value: formatMeasure(bodyweightReps) });
+  }
+  if (holdSeconds > 0) {
+    tiles.push({
+      label: translate('workouts.tiles.time'),
+      value: translate('time.minutesShort', { minutes: Math.round(holdSeconds / 60) }),
+    });
+  }
+  if (distance > 0) {
+    tiles.push({
+      label: translate('workouts.tiles.distance'),
+      value: translate('workouts.units.meters', { value: formatMeasure(distance) }),
+    });
+  }
   return tiles;
 }
 
@@ -331,10 +376,10 @@ function loadedVolume(set: LoggedSet): number {
  * skipping was a decision, and a zero would read as a failure.
  */
 export function exerciseSetSummary(exercise: LoggedExercise): string {
-  if (exercise.isSkipped) return 'Skipped';
+  if (exercise.isSkipped) return enumLabel('workoutLogStatus', WorkoutLogStatus.Skipped);
   const sets = exercise.sets ?? [];
   const done = sets.filter((set) => set.isCompleted).length;
-  return `${done} of ${sets.length} ${sets.length === 1 ? 'set' : 'sets'}`;
+  return translate('workouts.meta.setsDone', { done, total: sets.length });
 }
 
 /** The emoji scale, as a rating affordance rather than decorative copy. */
@@ -359,6 +404,7 @@ export type ExerciseActionId = (typeof ExerciseActionIds)[keyof typeof ExerciseA
 
 export interface ExerciseAction {
   id: ExerciseActionId;
+  /** Translation key — the sheet's template translates it. */
   label: string;
   icon: string;
   /** Ionic palette name for the leading glyph. */
@@ -373,16 +419,21 @@ export interface ExerciseAction {
  */
 export function exerciseActions(skipped: boolean): ExerciseAction[] {
   return [
-    { id: ExerciseActionIds.Swap, label: 'Swap exercise', icon: 'repeat-outline', color: 'medium' },
+    {
+      id: ExerciseActionIds.Swap,
+      label: 'workouts.exerciseActions.swap',
+      icon: 'repeat-outline',
+      color: 'medium',
+    },
     {
       id: ExerciseActionIds.Skip,
-      label: skipped ? 'Unskip exercise' : 'Skip exercise',
+      label: skipped ? 'workouts.exerciseActions.unskip' : 'workouts.exerciseActions.skip',
       icon: 'play-skip-forward-outline',
       color: 'medium',
     },
     {
       id: ExerciseActionIds.Remove,
-      label: 'Remove from workout',
+      label: 'workouts.exerciseActions.remove',
       icon: 'trash-outline',
       color: 'danger',
       destructive: true,

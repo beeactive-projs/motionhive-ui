@@ -4,19 +4,21 @@
   <!-- Header · back button + title + subtitle (mirrors the session showcase) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
         <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
-          {{ a?.programNameSnapshot ?? 'Plan' }}
+          {{ a?.programNameSnapshot ?? ('training.planDetail.fallbackTitle' | translate) }}
         </h1>
         @if (a) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          with {{ instructorName() }}
+          {{ 'training.planDetail.withCoach' | translate: { name: instructorName() } }}
           <span class="opacity-40">·</span>
-          {{ a.status === Status.Pending ? 'Starts' : 'Started' }} {{ a.startDate | date: 'd MMM y' }}
-          @if (a.endDate) { <span class="opacity-40">·</span> ends {{ a.endDate | date: 'd MMM y' }} }
+          {{ (a.status === Status.Pending ? 'training.common.startsOn' : 'training.common.startedOn') | translate: {
+          date: (a.startDate | date: 'd MMM y') } }}
+          @if (a.endDate) { <span class="opacity-40">·</span> {{ 'training.planDetail.endsOnLower' | translate: {
+          date: (a.endDate | date: 'd MMM y') } }} }
         </p>
         }
       </div>
@@ -48,11 +50,14 @@
   } @else if (a) {
 
   <!-- KPI strip -->
-  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-4" aria-label="Plan overview">
-    <mh-kpi-card icon="pi pi-chart-line" label="Progress" [value]="a.completionPercent + '%'" />
-    <mh-kpi-card icon="pi pi-check-circle" label="Workouts" [value]="completedCount() + '/' + workouts().length" />
-    <mh-kpi-card icon="pi pi-calendar" label="Weeks" [value]="weekCount()" />
-    <mh-kpi-card icon="pi pi-flag" label="Started" [value]="(a.startDate | date: 'd MMM') ?? '—'" />
+  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-4" [attr.aria-label]="'training.planDetail.overviewAria' | translate">
+    <mh-kpi-card icon="pi pi-chart-line" [label]="'training.planDetail.progress' | translate"
+      [value]="a.completionPercent + '%'" />
+    <mh-kpi-card icon="pi pi-check-circle" [label]="'training.planDetail.kpi.workouts' | translate"
+      [value]="completedCount() + '/' + workouts().length" />
+    <mh-kpi-card icon="pi pi-calendar" [label]="'training.planDetail.kpi.weeks' | translate" [value]="weekCount()" />
+    <mh-kpi-card icon="pi pi-flag" [label]="'training.planRow.started' | translate"
+      [value]="(a.startDate | date: 'd MMM') ?? '—'" />
   </section>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
@@ -68,32 +73,33 @@
 
           <dl class="grid gap-4 sm:grid-cols-2">
             <div>
-              <dt class="text-xs uppercase tracking-wide text-surface-500">Start date</dt>
+              <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.startDate' | translate }}</dt>
               <dd class="mt-1 text-sm font-medium flex items-center gap-2">
                 <i class="pi pi-calendar text-surface-500" aria-hidden="true"></i>{{ a.startDate | date: 'mediumDate' }}
               </dd>
             </div>
             <div>
-              <dt class="text-xs uppercase tracking-wide text-surface-500">End date</dt>
+              <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.endDate' | translate }}</dt>
               <dd class="mt-1 text-sm font-medium flex items-center gap-2">
                 <i class="pi pi-flag text-surface-500" aria-hidden="true"></i>
-                {{ a.endDate ? (a.endDate | date: 'mediumDate') : 'No end date' }}
+                {{ a.endDate ? (a.endDate | date: 'mediumDate') : ('training.common.noEndDate' | translate) }}
               </dd>
             </div>
             <div>
-              <dt class="text-xs uppercase tracking-wide text-surface-500">Schedule</dt>
+              <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'training.planDetail.schedule' | translate }}</dt>
               <dd class="mt-1 text-sm font-medium flex items-center gap-2">
                 <i class="pi pi-list text-surface-500" aria-hidden="true"></i>
-                {{ weekCount() }} {{ weekCount() === 1 ? 'week' : 'weeks' }}
+                {{ 'count.weeks' | translate: { count: weekCount() } }}
                 <span class="opacity-40">·</span>
-                {{ workouts().length }} {{ workouts().length === 1 ? 'workout' : 'workouts' }}
+                {{ 'count.workouts' | translate: { count: workouts().length } }}
               </dd>
             </div>
             <div>
-              <dt class="text-xs uppercase tracking-wide text-surface-500">Progress</dt>
+              <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'training.planDetail.progress' | translate }}</dt>
               <dd class="mt-1 text-sm font-medium flex items-center gap-2">
                 <i class="pi pi-chart-line text-surface-500" aria-hidden="true"></i>
-                {{ a.completionPercent }}% · {{ completedCount() }}/{{ workouts().length }} done
+                {{ 'training.planDetail.progressDone' | translate: { percent: a.completionPercent, done: completedCount(),
+                total: workouts().length } }}
               </dd>
             </div>
           </dl>
@@ -103,7 +109,7 @@
           <div class="flex items-center gap-3">
             <mh-hex-avatar [user]="a.instructor" [size]="40" />
             <div>
-              <span class="block text-xs uppercase tracking-wide text-surface-500">Coach</span>
+              <span class="block text-xs uppercase tracking-wide text-surface-500">{{ 'nav.coach' | translate }}</span>
               <span class="text-sm font-medium">{{ a.instructor.firstName }} {{ a.instructor.lastName }}</span>
             </div>
           </div>
@@ -114,27 +120,27 @@
       <!-- Notes card -->
       @if (a.notes) {
       <p-card class="shadow-md">
-        <h4 class="m-0 mb-1 font-heading text-xs font-semibold uppercase tracking-wide text-muted-color">Notes</h4>
+        <h4 class="m-0 mb-1 font-heading text-xs font-semibold uppercase tracking-wide text-muted-color">{{ 'form.label.notes' | translate }}</h4>
         <p class="m-0 whitespace-pre-line text-sm leading-relaxed">{{ a.notes }}</p>
       </p-card>
       }
 
       <!-- Schedule -->
       @if (workouts().length === 0) {
-      <mh-list-empty-state icon="pi pi-calendar-plus" title="No workouts in this plan yet"
-        message="Your coach will add workouts here. You'll get a notification when there's something new to do." />
+      <mh-list-empty-state icon="pi pi-calendar-plus" [title]="'training.planDetail.empty.title' | translate"
+        [message]="'training.planDetail.empty.message' | translate" />
       } @else {
       <p-accordion [value]="openWeeks()" [multiple]="true" (valueChange)="openWeeks.set($any($event))">
         @for (g of weeks(); track g.week) {
         <p-accordion-panel [value]="g.week">
           <p-accordion-header>
             <span class="flex flex-1 items-center gap-2">
-              <span class="font-heading text-sm font-semibold">Week {{ g.week + 1 }}</span>
+              <span class="font-heading text-sm font-semibold">{{ 'training.planDetail.week' | translate: { week: g.week + 1 } }}</span>
               @if (g.current) {
-              <p-tag value="This week" severity="info" rounded class="[&_.p-tag]:text-[10px]!" />
+              <p-tag [value]="'time.bucket.thisWeek' | translate" severity="info" rounded class="[&_.p-tag]:text-[10px]!" />
               }
               <span class="text-xs font-normal text-muted-color">
-                {{ g.workouts.length }} {{ g.workouts.length === 1 ? 'workout' : 'workouts' }}
+                {{ 'count.workouts' | translate: { count: g.workouts.length } }}
               </span>
             </span>
           </p-accordion-header>
@@ -163,7 +169,7 @@
                     @case ('start') {
                     <button pButton type="button" size="small" [disabled]="(isPaused()) || starting() === w.id" (click)="startWorkout(w)">
                       <i class="pi" [class]="starting() === w.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
-                      Start
+                      {{ 'button.start' | translate }}
                     </button>
                     <button pButton
                       type="button"
@@ -172,9 +178,9 @@
                       [text]="true"
                       [rounded]="true"
                       [disabled]="isPaused()"
-                      pTooltip="Skip workout"
+                      [pTooltip]="'training.planDetail.skipWorkout' | translate"
                       (click)="confirmSkip(w)"
-                      aria-label="Skip workout"
+                      [attr.aria-label]="'training.planDetail.skipWorkout' | translate"
                       iconOnly
                     >
                       <i class="pi pi-forward"></i>
@@ -183,7 +189,7 @@
                     @case ('resume') {
                     <button pButton type="button" size="small" [disabled]="(isPaused()) || starting() === w.id" (click)="startWorkout(w)">
                       <i class="pi" [class]="starting() === w.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
-                      Resume
+                      {{ 'button.resume' | translate }}
                     </button>
                     <button pButton
                       type="button"
@@ -192,16 +198,16 @@
                       [text]="true"
                       [rounded]="true"
                       [disabled]="isPaused()"
-                      pTooltip="Skip workout"
+                      [pTooltip]="'training.planDetail.skipWorkout' | translate"
                       (click)="confirmSkip(w)"
-                      aria-label="Skip workout"
+                      [attr.aria-label]="'training.planDetail.skipWorkout' | translate"
                       iconOnly
                     >
                       <i class="pi pi-forward"></i>
                     </button>
                     }
                     @case ('view') {
-                    <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="viewWorkout(w)">View</button>
+                    <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="viewWorkout(w)">{{ 'button.view' | translate }}</button>
                     }
                     }
                   </div>
@@ -218,7 +224,7 @@
                   (click)="toggleExpanded(w)"
                   class="justify-between rounded-none border-t border-surface"
                 >
-                  {{ isExpanded(w) ? 'Hide exercises' : 'Show exercises' }}
+                  {{ (isExpanded(w) ? 'training.planDetail.hideExercises' : 'training.planDetail.showExercises') | translate }}
                   <i [class]="isExpanded(w) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
                 </button>
 
@@ -241,15 +247,16 @@
                         <button type="button"
                           class="block w-full text-left truncate text-sm font-semibold text-surface-900 dark:text-surface-100 cursor-pointer underline decoration-transparent hover:decoration-current underline-offset-2"
                           (click)="openExerciseInfo(ex.exerciseId)"
-                          [attr.aria-label]="'View ' + (ex.exercise?.name ?? 'exercise') + ' details'">
-                          {{ ex.exercise?.name ?? 'Exercise' }}
+                          [attr.aria-label]="ex.exercise?.name
+                            ? ('training.planDetail.viewExerciseAria' | translate: { name: ex.exercise?.name })
+                            : ('training.planDetail.viewExerciseFallbackAria' | translate)">
+                          {{ ex.exercise?.name ?? ('exercises.common.exercise' | translate) }}
                         </button>
                         <div class="mt-0.5 text-[11.5px] text-muted-color">
-                          {{ titleCase(ex.exercise?.kind) }}
-                          @if (ex.exercise?.level) { <span class="opacity-40">·</span> {{ titleCase(ex.exercise?.level)
-                          }} }
-                          <span class="opacity-40">·</span> {{ exerciseSetCount(ex) }}
-                          {{ exerciseSetCount(ex) === 1 ? 'set' : 'sets' }}
+                          {{ ex.exercise?.kind | enumLabel: 'exerciseKind' }}
+                          @if (ex.exercise?.level) { <span class="opacity-40">·</span> {{ ex.exercise?.level | enumLabel:
+                          'exerciseLevel' }} }
+                          <span class="opacity-40">·</span> {{ 'count.sets' | translate: { count: exerciseSetCount(ex) } }}
                         </div>
                       </div>
                     </div>
@@ -259,16 +266,16 @@
                       <ng-template #header>
                         <tr>
                           <th class="w-12 text-center">#</th>
-                          <th class="w-1/5">Type</th>
-                          <th>Target</th>
-                          <th class="w-20 text-center">Rest</th>
+                          <th class="w-1/5">{{ 'form.label.type' | translate }}</th>
+                          <th>{{ 'training.planDetail.table.target' | translate }}</th>
+                          <th class="w-20 text-center">{{ 'training.planDetail.table.rest' | translate }}</th>
                         </tr>
                       </ng-template>
                       <ng-template #body let-s let-i="rowIndex">
                         <tr>
                           <td class="text-center font-semibold text-muted-color">{{ i + 1 }}</td>
                           <td class="text-[11px] font-bold uppercase tracking-wide text-muted-color">
-                            {{ titleCase(s.setType) }}
+                            {{ s.setType | enumLabel: 'exerciseSetType' }}
                           </td>
                           <td class="tabular-nums">{{ setTargetLabel(s) }}</td>
                           <td class="text-center tabular-nums text-muted-color">{{ restLabel(s) }}</td>
@@ -302,12 +309,13 @@
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <div class="flex items-baseline justify-between">
-            <span class="text-sm text-surface-500">Progress</span>
+            <span class="text-sm text-surface-500">{{ 'training.planDetail.progress' | translate }}</span>
             <span class="font-heading text-lg font-semibold tabular-nums"
               [class.text-(--p-green-600)]="a.completionPercent >= 100">{{ a.completionPercent }}%</span>
           </div>
           <p-progressbar [value]="a.completionPercent" [showValue]="false" class="[.p-progressbar]:h-2" />
-          <small class="text-surface-500">{{ completedCount() }} / {{ workouts().length }} workouts done</small>
+          <small class="text-surface-500">{{ 'training.planDetail.workoutsDone' | translate: { done: completedCount(),
+            total: workouts().length } }}</small>
         </div>
 
         <p-message [severity]="planMessageSeverity(a.status)" [icon]="planIcon(a.status)" [closable]="false"
@@ -315,24 +323,24 @@
           <span class="flex flex-col">
             @switch (a.status) {
             @case (Status.Active) {
-            <strong>Plan in progress</strong>
-            <small class="text-surface-500">Keep going — pick up your next workout.</small>
+            <strong>{{ 'training.planDetail.status.active.title' | translate }}</strong>
+            <small class="text-surface-500">{{ 'training.planDetail.status.active.message' | translate }}</small>
             }
             @case (Status.Pending) {
-            <strong>Starts {{ a.startDate | date: 'd MMM' }}</strong>
-            <small class="text-surface-500">You can start early — dates are guidance, not gates.</small>
+            <strong>{{ 'training.common.startsOn' | translate: { date: (a.startDate | date: 'd MMM') } }}</strong>
+            <small class="text-surface-500">{{ 'training.planDetail.status.pending.message' | translate }}</small>
             }
             @case (Status.Paused) {
-            <strong>Paused by your coach</strong>
-            <small class="text-surface-500">They'll resume it when you're ready to pick up again.</small>
+            <strong>{{ 'training.planDetail.status.paused.title' | translate }}</strong>
+            <small class="text-surface-500">{{ 'training.planDetail.status.paused.message' | translate }}</small>
             }
             @case (Status.Completed) {
-            <strong>Plan complete</strong>
-            <small class="text-surface-500">Nice work — every workout is done.</small>
+            <strong>{{ 'training.planDetail.status.completed.title' | translate }}</strong>
+            <small class="text-surface-500">{{ 'training.planDetail.status.completed.message' | translate }}</small>
             }
             @case (Status.Cancelled) {
-            <strong>Plan cancelled</strong>
-            <small class="text-surface-500">This plan is no longer active.</small>
+            <strong>{{ 'training.planDetail.cta.cancelled' | translate }}</strong>
+            <small class="text-surface-500">{{ 'training.planDetail.status.cancelled.message' | translate }}</small>
             }
             }
           </span>
@@ -345,7 +353,7 @@
         </button>
         @if (cta.kind === 'start' || cta.kind === 'resume') {
         @if (nextWorkout(); as nw) {
-        <small class="text-center text-xs text-surface-500">Next up · {{ nw.name }}</small>
+        <small class="text-center text-xs text-surface-500">{{ 'training.planDetail.nextUp' | translate: { name: nw.name } }}</small>
         }
         }
         }

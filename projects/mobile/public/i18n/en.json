@@ -116,7 +116,6 @@
       },
       "withdraw": {
         "body": "{name} will no longer be able to accept it. You can invite them again later.",
-        "cancel": "Keep it",
         "title": "Withdraw this invitation?"
       }
     },
@@ -326,6 +325,207 @@
       "thisWeek": "This week"
     }
   },
+  "exercises": {
+    "attribution": {
+      "custom": "Custom exercise",
+      "customBy": "Custom exercise · by {name}",
+      "system": "System exercise · MotionHive library",
+      "withForks": "{origin} · {count, plural, one {forked once} other {forked # times}}"
+    },
+    "create": {
+      "createExercise": "Create exercise",
+      "kindHint": "Determines what gets tracked when a client logs this.",
+      "namePlaceholder": "e.g. Tempo goblet squat",
+      "nextDetails": "Next · Details",
+      "nextMuscles": "Next · Muscles & equipment",
+      "stepOf": "Step {step} of {total}",
+      "title": "New exercise",
+      "toast": {
+        "createFailed": "Could not create this exercise.",
+        "created": "Exercise created"
+      }
+    },
+    "detail": {
+      "about": "About",
+      "editAction": "Edit exercise",
+      "editHint": "Change anything, or remove it from your library",
+      "fallbackName": "Exercise",
+      "forkAction": "Fork to my exercises",
+      "forkConfirm": {
+        "body": "A copy lands in your exercises. Edit anything — name, cues, media — without touching the original. Your version will say it was forked from this one.",
+        "confirm": "Fork exercise",
+        "irreversible": "You can keep one live fork of each exercise. If you already have one, we'll take you to it instead.",
+        "title": "Fork {name}?"
+      },
+      "forkHint": "Copy it, then edit your version freely",
+      "forkedFrom": "Forked from {name}",
+      "kindTile": "{kind} exercise",
+      "loadError": {
+        "message": "This exercise is not available.",
+        "title": "Couldn't load this exercise"
+      },
+      "sections": {
+        "details": "Details"
+      },
+      "toast": {
+        "alreadyForked": "You already have a fork of this exercise.",
+        "existingFork": "You already have a copy — here it is",
+        "forkFailed": "Could not fork this exercise.",
+        "forked": "Copied to your exercises"
+      }
+    },
+    "detailRows": {
+      "kindLevel": "Kind & level",
+      "noEquipment": "None needed",
+      "privateHint": "Only you can see it",
+      "publicHint": "Other coaches can find and fork it",
+      "unilateral": "Unilateral"
+    },
+    "detailsFields": {
+      "classificationHint": "All optional — leave them for later if you like.",
+      "demo": "Demo & cues",
+      "descriptionPlaceholder": "One to three sentences about the movement",
+      "force": "Force",
+      "instructionsPlaceholder": "Step-by-step form cues, one per line",
+      "mechanic": "Mechanic",
+      "pattern": "Pattern",
+      "privateHint": "Only you can see and use it. Turn off to publish it for other coaches.",
+      "unilateral": "Unilateral movement",
+      "unilateralHint": "Single-arm or single-leg — drives left vs right tracking later.",
+      "youtube": "YouTube demo",
+      "youtubeHint": "Uploading your own video comes later. A YouTube link gives the exercise a thumbnail.",
+      "youtubeInvalid": "That does not look like a YouTube link. Paste a watch, youtu.be or shorts URL."
+    },
+    "edit": {
+      "deleteAction": "Delete exercise…",
+      "deleteConfirm": {
+        "body": "It comes out of your library and out of the picker. Programs and logged workouts that already reference it are not touched.",
+        "confirm": "Delete exercise",
+        "title": "Delete {name}?",
+        "titleFallback": "Delete this exercise?"
+      },
+      "deleteHint": "Programs that already use it keep working.",
+      "forkNote": "{count, plural, one {# coach has} other {# coaches have}} forked this. Their copies keep what they have — your changes do not reach them.",
+      "loadError": {
+        "message": "This exercise is not available to edit.",
+        "title": "Couldn't open this exercise"
+      },
+      "title": "Edit exercise",
+      "toast": {
+        "deleteFailed": "Could not delete this exercise.",
+        "deleted": "Exercise deleted",
+        "saveFailed": "Could not save this exercise.",
+        "updated": "Exercise updated"
+      }
+    },
+    "fields": {
+      "classification": "Classification",
+      "equipment": "Equipment",
+      "instructions": "Instructions",
+      "kind": "Kind",
+      "level": "Level",
+      "musclesEquipment": "Muscles & equipment",
+      "private": "Private",
+      "public": "Public",
+      "visibility": "Visibility"
+    },
+    "filterSheet": {
+      "allMuscles": "All {count} muscles…",
+      "primaryMuscle": "Primary muscle",
+      "showCount": "Show {count, plural, one {# exercise} other {# exercises}}",
+      "showExercises": "Show exercises",
+      "webOnly": "Movement pattern, mechanic and force are on the web app."
+    },
+    "kindTracking": {
+      "BODYWEIGHT": "Reps, no load",
+      "CARDIO": "Duration + distance + HR",
+      "DISTANCE": "Distance only",
+      "DURATION": "Time only — e.g. plank",
+      "MOBILITY": "Time / reps, mobility",
+      "STRENGTH": "Reps + weight"
+    },
+    "library": {
+      "empty": {
+        "message": "No exercises are available yet. Try again in a moment.",
+        "title": "The library is empty"
+      },
+      "loadError": "Couldn't load the library",
+      "meta": "{count, plural, one {# exercise} other {# exercises}} · sorted by {sort}",
+      "mineEmpty": {
+        "action": "Create your first exercise",
+        "browse": "Browse public exercises to fork",
+        "message": "The system library already covers hundreds of movements. Create a custom one when a client needs something specific — or fork a public exercise and tweak it.",
+        "title": "No exercises of your own yet"
+      },
+      "newExercise": "New exercise",
+      "noMatch": "No exercise matches what you asked for. Try a different filter or a shorter search.",
+      "search": "Search exercises",
+      "searchPlaceholder": "Search by name"
+    },
+    "muscleFields": {
+      "bodyweight": "Bodyweight",
+      "noneYet": "None yet",
+      "optional": "Optional",
+      "primaryHint": "Pick up to three — the muscles this movement is actually for.",
+      "required": "Required",
+      "searchEquipment": "Search equipment",
+      "searchMuscles": "Search muscles"
+    },
+    "muscleRoleHints": {
+      "PRIMARY": "Does most of the work",
+      "SECONDARY": "Assists the movement",
+      "STABILIZER": "Holds you steady"
+    },
+    "muscleRoles": {
+      "PRIMARY": "Primary muscles",
+      "SECONDARY": "Secondary muscles",
+      "STABILIZER": "Stabilizers"
+    },
+    "ownership": {
+      "fromCoaches": "From coaches",
+      "mine": "My exercises",
+      "publicOthers": "Public · others",
+      "system": "System"
+    },
+    "picker": {
+      "addExercises": "Add exercises",
+      "allExercises": "All exercises",
+      "confirmCount": "{verb} {count, plural, one {# exercise} other {# exercises}}",
+      "confirmSingle": "{verb} exercise",
+      "loadError": "The catalog could not be loaded. Check your connection.",
+      "noMatch": "No exercise matches that name.",
+      "recentlyUsed": "Recently used",
+      "results": "Results"
+    },
+    "row": {
+      "equipmentMore": "{name} +{count}",
+      "mine": "Mine"
+    },
+    "sort": {
+      "mostForked": {
+        "hint": "Popular with other coaches",
+        "inline": "most forked",
+        "label": "Most forked"
+      },
+      "name": {
+        "hint": "A to Z",
+        "inline": "name",
+        "label": "Name"
+      },
+      "newest": {
+        "hint": "Recently added first",
+        "inline": "newest",
+        "label": "Newest"
+      },
+      "selected": "Selected",
+      "title": "Sort by"
+    },
+    "taxonomyPicker": {
+      "counter": "{count} of {max}",
+      "noMatch": "Nothing matches that.",
+      "selected": "{count} selected"
+    }
+  },
   "groups": {
     "addMembers": {
       "empty": {
@@ -367,7 +567,6 @@
       "placeholder": "Share something with the group",
       "postingIn": "Posting in",
       "remaining": "{count} left",
-      "removePhoto": "Remove {name}",
       "reviewNote": "Posts here are reviewed before they appear.",
       "submit": "Post",
       "title": "New post",
@@ -977,7 +1176,6 @@
         "confirm": "Delete draft",
         "title": "Delete this draft?"
       },
-      "keepIt": "Keep it",
       "markPaid": {
         "body": "Use this when the client paid you directly — cash or a bank transfer. Stripe records it as paid outside the platform.",
         "confirm": "Mark paid",
@@ -1107,6 +1305,208 @@
       "voided": "Invoice voided"
     }
   },
+  "programs": {
+    "assign": {
+      "assign": "Assign",
+      "client": "Client",
+      "loadingClients": "Loading your clients…",
+      "more": "+ {count} more",
+      "noClients": "No active clients yet. A client has to accept before they can be given work.",
+      "note": "Note",
+      "program": "Program",
+      "schedule": "Schedule",
+      "starts": "Starts",
+      "title": "Assign program"
+    },
+    "assignment": {
+      "notStarted": "Not started",
+      "pause": "Pause",
+      "pausedSubline": "Paused — resuming shifts the remaining schedule forward",
+      "percentDone": "{percent}% done",
+      "starts": "Starts {date}"
+    },
+    "assignments": {
+      "assignToClient": "Assign to a client",
+      "empty": {
+        "heading": "Nobody on this yet",
+        "message": "Assign it to a client and they will show up here."
+      },
+      "error": "Couldn't load the assignments",
+      "title": "Assignments",
+      "toast": {
+        "assignFailed": "Could not assign the program",
+        "assigned": "Program assigned",
+        "statusFailed": "Could not change that assignment"
+      }
+    },
+    "builder": {
+      "clear": {
+        "body": "Clear {name}? The day becomes a rest day and its exercises are removed.",
+        "title": "Clear day"
+      },
+      "clearDayAria": "Clear {name}",
+      "copyDayAria": "Copy {name} to other weeks",
+      "daysFilled": "{filled} of {total} days",
+      "error": "Couldn't open this program",
+      "jumpToWeek": "Jump to week",
+      "restDay": "Rest — tap to add",
+      "subtitle": "{weeks, plural, one {# week} other {# weeks}} · {days, plural, one {# day} other {# days}} of work",
+      "titleFallback": "Program",
+      "toast": {
+        "copyDayFailed": "Could not copy the day",
+        "copyWeekFailed": "Could not copy the week",
+        "dayCopiedToDay": "{name} copied to {day}, week {week}",
+        "dayCopiedToWeek": "{name} copied to week {week}",
+        "dayCopiedToWeeks": "{name} copied to {count, plural, one {# week} other {# weeks}}",
+        "startFailed": "Could not start the program",
+        "weekCopiedToWeek": "Week {from} copied to week {week}",
+        "weekCopiedToWeeks": "Week {from} copied to {count, plural, one {# week} other {# weeks}}"
+      },
+      "untitledProgram": "Untitled program"
+    },
+    "clientTraining": {
+      "empty": {
+        "heading": "Nothing yet",
+        "message": "Assign a program and their work will show up here."
+      },
+      "error": "Couldn't load their training",
+      "nothingLogged": "Nothing logged in this window.",
+      "plan": "Plan",
+      "planSubline": "{percent}% done · started {date}",
+      "privacyNote": "Workouts your client does outside their plan stay private unless they share them, so this list may not be everything they did.",
+      "recentWorkouts": "Recent workouts",
+      "titleFallback": "Training"
+    },
+    "common": {
+      "clientFallback": "Client",
+      "day": "Day {number}",
+      "notePlaceholder": "Anything they should know before starting.",
+      "week": "Week {number}"
+    },
+    "copy": {
+      "toEllipsis": "Copy to…",
+      "toWeeks": "Copy to {count, plural, one {# week} other {# weeks}}"
+    },
+    "copyDay": {
+      "dayGroup": "Day to copy into",
+      "hasTraining": "Has training on this day",
+      "landOn": "Land it on",
+      "note": "This day is copied into the weeks you pick. The rest of those weeks is left alone.",
+      "replaceWarning": "{count, plural, one {One of those weeks already has training on this day. It will be replaced.} other {# of those weeks already have training on this day. They will be replaced.}}",
+      "title": "Copy {name}",
+      "titleFallback": "Copy this day",
+      "toDay": "Copy to {day}"
+    },
+    "copyWeek": {
+      "note": "Every day of week {number} is copied across. Anything already in the target week is replaced.",
+      "title": "Copy week {number}"
+    },
+    "create": {
+      "browseStarters": "Browse starters",
+      "browseStartersHint": "Start from one of ours",
+      "newProgram": "New program",
+      "newProgramHint": "Multi-week, several days each",
+      "newRoutine": "New routine",
+      "newRoutineHint": "One session you repeat",
+      "title": "Create"
+    },
+    "dayEditor": {
+      "addExercises": "Add exercises",
+      "contextFallback": "this day",
+      "dayName": "Day name",
+      "dayNamePlaceholder": "Push day",
+      "empty": "No exercises yet — add the movements in the order they should be done.",
+      "error": {
+        "heading": "Couldn't open this day",
+        "message": "It may have been cleared from the program. Go back and try again."
+      },
+      "exerciseFallback": "Exercise",
+      "exercises": "Exercises",
+      "noteLabel": "Note for the client",
+      "remove": {
+        "body": "Remove {name} from this day?",
+        "title": "Remove exercise"
+      },
+      "titleFallback": "Day",
+      "toast": {
+        "saveFailed": "Could not save the day",
+        "someNotAdded": "Some exercises were not added"
+      },
+      "untitledDay": "Untitled day"
+    },
+    "filter": {
+      "showResults": "Show results",
+      "title": "Filter programs"
+    },
+    "library": {
+      "empty": {
+        "browseStarters": "Or browse our starters",
+        "message": "Build a multi-week program or a single routine — both live here."
+      },
+      "error": "Couldn't load your library",
+      "filteredEmpty": {
+        "heading": "Nothing of that kind yet",
+        "message": "Nothing in the library matches this pill.",
+        "showAll": "Show all"
+      },
+      "origin": {
+        "mine": "Mine",
+        "starters": "MotionHive"
+      },
+      "size": {
+        "programs": "Programs",
+        "routines": "Routines"
+      }
+    },
+    "logReview": {
+      "error": "Couldn't open this workout",
+      "felt": "Felt {rating} out of 5",
+      "howItWent": "How it went",
+      "logged": "Logged",
+      "quotedNote": "“{note}”",
+      "title": "Workout",
+      "whatTheyDid": "What they did"
+    },
+    "row": {
+      "daysPerWeek": "{count} days/week",
+      "noClients": "No clients",
+      "routine": "Routine"
+    },
+    "settings": {
+      "dayCount": "{count, plural, one {# day} other {# days}} of work so far.",
+      "delete": {
+        "body": "Delete {name}? Clients already assigned keep their own copy.",
+        "bodyFallback": "Delete this program? Clients already assigned keep their own copy.",
+        "row": "Delete program…",
+        "title": "Delete program"
+      },
+      "descriptionPlaceholder": "Who it is for, and what it builds.",
+      "duplicate": "Duplicate program",
+      "length": "Length",
+      "lengthAria": "Program length in weeks",
+      "namePlaceholder": "12-week strength block",
+      "needs": {
+        "both": "Needs a name and at least one day of work before it can be assigned.",
+        "days": "Needs at least one day of work before it can be assigned.",
+        "name": "Needs a name before it can be assigned."
+      },
+      "publish": "Publish",
+      "publishedNote": "Clients can be assigned to this program.",
+      "title": "Program settings",
+      "toast": {
+        "deleteFailed": "Could not delete the program",
+        "deleted": "Program deleted",
+        "duplicateFailed": "Could not duplicate the program",
+        "duplicated": "Program duplicated",
+        "published": "Program published",
+        "saveFailed": "Could not save the program"
+      },
+      "viewAssignments": "View assignments",
+      "weekFewer": "One week fewer",
+      "weekMore": "One week more",
+      "weeksUnit": "{count, plural, one {week} other {weeks}}"
+    }
+  },
   "role": {
     "coach": {
       "description": "Your clients, sessions and earnings.",
@@ -1197,7 +1597,6 @@
         "notifiedOn": "Cancelled {date} · everyone booked in was notified.",
         "title": "Session cancelled"
       },
-      "copy": "Copy",
       "details": "Details",
       "doneMarking": "Done marking",
       "duplicate": "Duplicate session",
@@ -1428,6 +1827,273 @@
     "menuDot": {
       "billDue": "You have a bill due",
       "requestsWaiting": "You have client requests waiting"
+    }
+  },
+  "workouts": {
+    "common": {
+      "addExercises": "Add exercises",
+      "exercise": "Exercise",
+      "exercises": "Exercises",
+      "history": "History",
+      "keepGoing": "Keep going",
+      "newRoutine": "New routine",
+      "progress": "Progress",
+      "startFailed": "Could not start the workout",
+      "startWorkout": "Start workout",
+      "starterRoutines": "Starter routines",
+      "upNext": "Up next",
+      "workout": "Workout"
+    },
+    "exerciseActions": {
+      "remove": "Remove from workout",
+      "skip": "Skip exercise",
+      "swap": "Swap exercise",
+      "title": "Exercise actions",
+      "unskip": "Unskip exercise"
+    },
+    "exerciseCard": {
+      "actionsFor": "Actions for {name}"
+    },
+    "finish": {
+      "done": "Done",
+      "howDidItFeel": "How did it feel?",
+      "logged": "Logged",
+      "notesPlaceholder": "Anything worth remembering next time?",
+      "rating": "Rating {value} of 5",
+      "saveAndFinish": "Save & finish",
+      "saveAsRoutine": {
+        "action": "Save routine",
+        "message": "Keep this workout to repeat later.",
+        "title": "Save as routine?"
+      },
+      "suggestedName": "{name} day",
+      "toast": {
+        "routineSaveFailed": "Could not save that routine",
+        "routineSaved": "Saved \"{name}\"",
+        "saveFailed": "Could not save the workout",
+        "saved": "Workout saved"
+      },
+      "whatYouDid": "What you did"
+    },
+    "history": {
+      "count": "{count, plural, one {# workout logged} other {# workouts logged}}",
+      "empty": {
+        "message": "Finish a workout and it will show up here.",
+        "title": "Nothing logged yet"
+      }
+    },
+    "home": {
+      "coldStart": {
+        "action": "Start an empty workout",
+        "browseStarters": "Browse starter routines",
+        "buildOwn": "Or build your own routine",
+        "message": "Workouts you start, save or follow will live here.",
+        "title": "Let's get you moving"
+      },
+      "fromYourCoach": "From your coach",
+      "inProgress": "In progress · {elapsed}",
+      "noRoutines": "Save a workout as a routine and it will show up here, ready to repeat.",
+      "percentDone": "{percent}% done",
+      "startEmpty": "Start empty workout",
+      "yourCoach": "Your coach",
+      "yourRoutines": "Your routines"
+    },
+    "keypad": {
+      "backspace": "Backspace",
+      "close": "Close number pad",
+      "minus": "Minus {step}",
+      "numberPad": "Number pad",
+      "plus": "Plus {step}",
+      "stepSeconds": "{step}s"
+    },
+    "loadError": {
+      "history": "Couldn't load your history",
+      "plan": "Couldn't open this plan",
+      "progress": "Couldn't load your progress",
+      "routine": "Couldn't open this routine",
+      "starters": "Couldn't load the starters",
+      "training": "Couldn't load your training",
+      "workout": "Couldn't open this workout"
+    },
+    "logRow": {
+      "repeat": "Repeat {name}"
+    },
+    "logger": {
+      "addExercise": "Add exercise",
+      "addSet": "Add set",
+      "addWeight": "Add weight",
+      "columns": {
+        "distance": "distance",
+        "reps": "reps",
+        "repsEach": "reps each",
+        "time": "time",
+        "weight": "kg"
+      },
+      "defaultName": "Workout — {date}",
+      "discard": {
+        "irreversible": "This cannot be undone",
+        "message": "Everything logged in this session is deleted. Skipping a planned workout is a different thing — that keeps the record.",
+        "title": "Discard workout"
+      },
+      "empty": {
+        "message": "Pick the movements as you go — nothing has to be planned up front.",
+        "title": "Add your first exercise"
+      },
+      "fieldLabel": {
+        "distance": "Distance (m)",
+        "duration": "Time (mm:ss)",
+        "reps": "Reps",
+        "weight": "Weight (kg)"
+      },
+      "finish": "Finish",
+      "finishConfirm": {
+        "message": "{count, plural, one {# set is still unticked. Finishing now records the workout as it stands.} other {# sets are still unticked. Finishing now records the workout as it stands.}}",
+        "title": "Finish workout"
+      },
+      "gridHead": {
+        "prev": "Prev",
+        "set": "Set"
+      },
+      "picker": {
+        "replacing": "Replacing {name}",
+        "swapFor": "Swap for"
+      },
+      "remove": {
+        "message": "Remove {name} from this workout?",
+        "messageWithSets": "{name} has {count, plural, one {# completed set} other {# completed sets}}. Removing it deletes them.",
+        "title": "Remove exercise"
+      },
+      "toast": {
+        "discardFailed": "Could not discard the workout",
+        "discarded": "Workout discarded",
+        "nothingToRepeat": "That workout had no exercises to repeat",
+        "removed": "Removed {name}",
+        "repeatFailed": "Could not load that workout to repeat"
+      }
+    },
+    "meta": {
+      "aboutMinutes": "~{minutes} min",
+      "day": "Day {number}",
+      "felt": "felt {rating}/5",
+      "setsDone": "{done} of {total, plural, one {# set} other {# sets}}",
+      "week": "Week {number}"
+    },
+    "plan": {
+      "allWeeks": "All weeks",
+      "doneCount": "{done} / {total} done",
+      "fromCoachStarted": "From {coach} · Started {date}",
+      "position": "Week {week} of {total}",
+      "started": "Started {date}",
+      "thisWeek": "This week",
+      "title": "Plan",
+      "yourCoach": "your coach"
+    },
+    "preview": {
+      "empty": {
+        "message": "This plan has no workouts in it. Your coach may still be building it.",
+        "title": "Nothing to do yet"
+      },
+      "noteFromCoach": "Note from your coach",
+      "skipToday": "Skip today",
+      "toast": {
+        "skipFailed": "Could not skip that",
+        "skipped": "Marked as skipped"
+      }
+    },
+    "progress": {
+      "empty": {
+        "message": "Log a few workouts and your numbers will build up here.",
+        "title": "Nothing to show yet"
+      },
+      "last12Weeks": "Last 12 weeks",
+      "records": "Records"
+    },
+    "restAlert": {
+      "body": "Time for your next set.",
+      "title": "Rest over"
+    },
+    "restTimer": {
+      "minusSeconds": "Minus {seconds} seconds",
+      "next": "Next: {target}",
+      "plusSeconds": "Plus {seconds} seconds",
+      "rest": "Rest",
+      "restOver": "Rest over"
+    },
+    "routineBuilder": {
+      "delete": {
+        "message": "Delete {name}? Workouts already logged from it are kept.",
+        "title": "Delete routine"
+      },
+      "deleteRow": "Delete routine…",
+      "name": {
+        "label": "Routine name",
+        "placeholder": "Push day"
+      },
+      "noExercises": "No exercises yet — add the movements in the order you do them.",
+      "starterNote": "A MotionHive starter. Start it and it becomes yours to edit.",
+      "stepper": {
+        "fewer": "One set fewer for {name}",
+        "group": "Sets for {name}",
+        "more": "One set more for {name}",
+        "unit": "{count, plural, one {set} other {sets}}"
+      },
+      "targets": {
+        "reps": "Reps",
+        "repsFor": "Target reps for {name}",
+        "repsKeypad": "Target reps",
+        "weight": "Weight",
+        "weightFor": "Target weight for {name}",
+        "weightKeypad": "Target weight (kg)"
+      },
+      "thisRoutine": "this routine",
+      "title": "Routine",
+      "toast": {
+        "alreadyIn": "{count, plural, one {That exercise is already in this routine} other {# were already in this routine}}",
+        "deleteFailed": "Could not delete the routine",
+        "deleted": "Routine deleted",
+        "saveFailed": "Could not save the routine",
+        "saved": "Routine saved",
+        "startFailed": "Could not start that routine"
+      }
+    },
+    "routineRow": {
+      "lastDone": "Last done {day}",
+      "starter": "Starter"
+    },
+    "setRow": {
+      "cellLabel": "{field, select, weight {weight} reps {reps} duration {duration} distance {distance} other {{field}}} for set {number}",
+      "complete": "Set {number} complete",
+      "lastTime": "Last time: {value}"
+    },
+    "setTypeMark": {
+      "DROPSET": "Dropset",
+      "FAILURE": "Failure",
+      "REST_PAUSE": "Rest pause",
+      "WARMUP": "W"
+    },
+    "starters": {
+      "empty": {
+        "message": "MotionHive's starter routines are not available right now. Try again in a moment.",
+        "title": "No starters yet"
+      },
+      "note": "Pick one to try — it becomes yours to edit."
+    },
+    "tiles": {
+      "distance": "Distance",
+      "reps": "Reps",
+      "sets": "Sets",
+      "time": "Time",
+      "volume": "Volume",
+      "workouts": "Workouts"
+    },
+    "todayHero": {
+      "upNextWithDate": "Up next · {date}"
+    },
+    "units": {
+      "hours": "{value} h",
+      "kg": "{value} kg",
+      "kgShort": "kg",
+      "meters": "{value} m"
     }
   }
 }

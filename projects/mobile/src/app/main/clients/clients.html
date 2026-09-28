@@ -272,5 +272,5 @@
 
 <mh-confirm-sheet [(open)]="withdrawOpen" [title]="'clients.confirm.withdraw.title' | translate"
   [body]="withdrawBody()" [confirmLabel]="'clients.actions.withdraw' | translate"
-  [cancelLabel]="'clients.confirm.withdraw.cancel' | translate" tone="danger" [saving]="withdrawSaving()"
+  [cancelLabel]="'button.keepIt' | translate" tone="danger" [saving]="withdrawSaving()"
   (confirm)="withdraw()" />

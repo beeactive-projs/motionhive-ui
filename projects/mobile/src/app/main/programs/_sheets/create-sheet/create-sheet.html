@@ -4,8 +4,8 @@
       <ion-item button [detail]="false" (click)="pick(option.id)">
         <ion-icon slot="start" [name]="option.icon" aria-hidden="true" />
         <ion-label>
-          <h3>{{ option.label }}</h3>
-          <p>{{ option.hint }}</p>
+          <h3>{{ option.label | translate }}</h3>
+          <p>{{ option.hint | translate }}</p>
         </ion-label>
       </ion-item>
     }
@@ -14,7 +14,7 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Create"
+  [title]="'programs.create.title' | translate"
   [body]="body"
   [showHeader]="false"
   [showFooter]="false"

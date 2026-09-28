@@ -1,5 +1,6 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   Program,
@@ -18,11 +19,13 @@ import { programMeta, programTone } from '../../programs.config';
  */
 @Component({
   selector: 'mh-program-row',
-  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './program-row.html',
   styleUrl: './program-row.scss',
 })
 export class ProgramRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly program = input.required<Program>();
   /** Clients currently on it. Null while unknown, which is not the same as 0. */
   readonly clientCount = input<number | null>(null);
@@ -52,7 +55,9 @@ export class ProgramRow {
   readonly trailing = computed(() => {
     const count = this.clientCount();
     if (count !== null) {
-      return count === 0 ? 'No clients' : `${count} ${count === 1 ? 'client' : 'clients'}`;
+      return count === 0
+        ? this._translateService.instant('programs.row.noClients')
+        : this._translateService.instant('count.clients', { count });
     }
     const at = this.program().updatedAt;
     return at ? dayDividerLabel(localDayKey(new Date(at))) : '';

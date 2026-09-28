@@ -1,4 +1,4 @@
-import { Component, computed, input, model, output, signal } from '@angular/core';
+import { Component, computed, inject, input, model, output, signal } from '@angular/core';
 import {
   IonButton,
   IonIcon,
@@ -7,10 +7,11 @@ import {
   IonList,
   IonNote,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
-import { DAY_LABELS } from '../../programs.config';
+import { dayLabels } from '../../programs.config';
 
 /**
  * Copy one day into the same day of other weeks — "Monday is the same for
@@ -32,11 +33,13 @@ import { DAY_LABELS } from '../../programs.config';
  */
 @Component({
   selector: 'mh-copy-day-sheet',
-  imports: [IonButton, IonIcon, IonItem, IonLabel, IonList, IonNote, SheetShell],
+  imports: [IonButton, IonIcon, IonItem, IonLabel, IonList, IonNote, SheetShell, TranslatePipe],
   templateUrl: './copy-day-sheet.html',
   styleUrl: './copy-day-sheet.scss',
 })
 export class CopyDaySheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly fromWeek = input.required<number>();
   readonly weekCount = input.required<number>();
@@ -63,7 +66,7 @@ export class CopyDaySheet {
   /** Null while it matches the source — the usual case. */
   readonly targetDay = signal<number | null>(null);
 
-  readonly dayLabels = DAY_LABELS;
+  readonly dayLabels = dayLabels();
 
   /** Every week but the one being copied from. */
   readonly targets = computed(() =>
@@ -74,7 +77,9 @@ export class CopyDaySheet {
 
   readonly title = computed(() => {
     const name = this.dayName().trim();
-    return name ? `Copy ${name}` : 'Copy this day';
+    return name
+      ? this._translateService.instant('programs.copyDay.title', { name })
+      : this._translateService.instant('programs.copyDay.titleFallback');
   });
 
   /**
@@ -88,11 +93,13 @@ export class CopyDaySheet {
 
   readonly confirmLabel = computed(() => {
     const n = this.selected().length;
-    if (n === 0) return 'Copy to…';
+    if (n === 0) return this._translateService.instant('programs.copy.toEllipsis');
     if (n === 1 && this.effectiveDay() !== this.sourceDay()) {
-      return `Copy to ${this.dayLabels[this.effectiveDay()]}`;
+      return this._translateService.instant('programs.copyDay.toDay', {
+        day: this.dayLabels[this.effectiveDay()],
+      });
     }
-    return `Copy to ${n} ${n === 1 ? 'week' : 'weeks'}`;
+    return this._translateService.instant('programs.copy.toWeeks', { count: n });
   });
 
   /** Chosen weeks that already hold training on this day. */
@@ -114,9 +121,7 @@ export class CopyDaySheet {
   readonly replaceWarning = computed(() => {
     const n = this._clashes().length;
     if (n === 0) return '';
-    return n === 1
-      ? 'One of those weeks already has training on this day. It will be replaced.'
-      : `${n} of those weeks already have training on this day. They will be replaced.`;
+    return this._translateService.instant('programs.copyDay.replaceWarning', { count: n });
   });
 
   setTargetDay(day: number): void {

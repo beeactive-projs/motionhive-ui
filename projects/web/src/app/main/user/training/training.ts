@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -10,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import {
   Accordion,
@@ -58,7 +58,6 @@ type TrainingLens = 'today' | 'plans' | 'routines' | 'exercises';
  */
 @Component({
   selector: 'mh-training',
-  standalone: true,
   imports: [
     FormsModule,
     SelectButton,
@@ -73,19 +72,20 @@ type TrainingLens = 'today' | 'plans' | 'routines' | 'exercises';
     Toast,
     TodayPanel,
     WorkoutHistory,
+    TranslatePipe,
   ],
   // One per destination rather than one per lens: the lenses are all
   // this page, so a toast raised in any of them belongs to the same
   // surface and should not stack three containers on top of each other.
   providers: [MessageService, ConfirmationService],
   templateUrl: './training.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Training implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _assignmentService = inject(ProgramAssignmentService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly lens = signal<TrainingLens>('today');
 
@@ -99,12 +99,12 @@ export class Training implements OnInit {
 
   readonly lensOptions = computed<{ label: string; value: TrainingLens }[]>(
     () => [
-      { label: 'Today', value: 'today' as const },
-      { label: 'Routines', value: 'routines' as const },
+      { label: this._lensLabel('today'), value: 'today' as const },
+      { label: this._lensLabel('routines'), value: 'routines' as const },
       ...(this.hasPlans()
-        ? [{ label: 'Plans', value: 'plans' as const }]
+        ? [{ label: this._lensLabel('plans'), value: 'plans' as const }]
         : []),
-      { label: 'Exercises', value: 'exercises' as const },
+      { label: this._lensLabel('exercises'), value: 'exercises' as const },
     ],
   );
 
@@ -115,18 +115,12 @@ export class Training implements OnInit {
     this.statsOpen.set(value === '0');
   }
 
-  readonly subtitle = computed(() => {
-    switch (this.lens()) {
-      case 'plans':
-        return 'What you are working through.';
-      case 'routines':
-        return 'Workouts you can start any time.';
-      case 'exercises':
-        return 'Every movement in the catalog, and the ones you have made.';
-      default:
-        return 'Your day, and what you have done.';
-    }
-  });
+  /** Translation key for the one-line read under the title, per lens. */
+  readonly subtitleKey = computed(() => `training.hub.subtitle.${this.lens()}`);
+
+  private _lensLabel(lens: TrainingLens): string {
+    return this._translateService.instant(`training.hub.lens.${lens}`);
+  }
 
   ngOnInit(): void {
     // Subscribed, not a one-off snapshot read. A child navigating to

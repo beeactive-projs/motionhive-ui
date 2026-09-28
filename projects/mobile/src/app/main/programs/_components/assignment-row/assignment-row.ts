@@ -1,5 +1,6 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ProgramAssignment, ProgramAssignmentStatus, displayName } from 'core';
 
@@ -17,11 +18,13 @@ import { assignmentChip, assignmentSubline, assignmentTone } from '../../program
  */
 @Component({
   selector: 'mh-assignment-row',
-  imports: [HexAvatar, IonBadge, IonButton, IonItem, IonLabel, IonNote],
+  imports: [HexAvatar, IonBadge, IonButton, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './assignment-row.html',
   styleUrl: './assignment-row.scss',
 })
 export class AssignmentRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly assignment = input.required<ProgramAssignment>();
   /** True while this row's status change is in flight. */
   readonly busy = input(false);
@@ -29,7 +32,12 @@ export class AssignmentRow {
   readonly pause = output<void>();
   readonly resume = output<void>();
 
-  readonly name = computed(() => displayName(this.assignment().client ?? null, 'Client'));
+  readonly name = computed(() =>
+    displayName(
+      this.assignment().client ?? null,
+      this._translateService.instant('programs.common.clientFallback'),
+    ),
+  );
 
   readonly avatarTone = computed(() => avatarToneFor(this.assignment().clientId));
 

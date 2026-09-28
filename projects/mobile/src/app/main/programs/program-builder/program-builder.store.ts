@@ -1,10 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import { Program, ProgramService, ProgramStatus, ProgramWorkout } from 'core';
 
-import { DAY_LABELS, DEFAULT_PROGRAM_WEEKS, weeksOf } from '../programs.config';
+import { DAYS_PER_WEEK, DEFAULT_PROGRAM_WEEKS, weeksOf } from '../programs.config';
 
 /** One week's worth of days, as the builder renders them. */
 export interface WeekCard {
@@ -12,8 +13,6 @@ export interface WeekCard {
   days: (ProgramWorkout | null)[];
   filled: number;
 }
-
-const DAYS_PER_WEEK = DAY_LABELS.length;
 
 /**
  * One program being authored.
@@ -26,6 +25,7 @@ const DAYS_PER_WEEK = DAY_LABELS.length;
 @Injectable()
 export class ProgramBuilderStore {
   private readonly _programService = inject(ProgramService);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _program = signal<Program | null>(null);
   private readonly _loading = signal(false);
@@ -113,7 +113,7 @@ export class ProgramBuilderStore {
 
     this._programService
       .addWorkout(program.id, {
-        name: `Day ${dayIndex + 1}`,
+        name: this._translateService.instant('programs.common.day', { number: dayIndex + 1 }),
         weekIndex,
         dayIndex,
       })

@@ -1,10 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { ButtonDirective } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { Card } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
-import { Routine } from 'core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { Routine, RoutineSources } from 'core';
 
 /**
  * Left-edge accent of a routine row — a single, honey-free axis
@@ -33,10 +34,9 @@ type RoutineRowTone = (typeof RoutineRowTone)[keyof typeof RoutineRowTone];
 @Component({
   selector: 'mh-routine-row',
   standalone: true,
-  imports: [Tag, DatePipe, ButtonDirective, Card, TooltipModule],
+  imports: [Tag, DatePipe, ButtonDirective, Card, TooltipModule, TranslatePipe],
   templateUrl: './routine-row.html',
   styleUrl: './routine-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-tone]': 'tone()',
   },
@@ -62,7 +62,7 @@ export class RoutineRow {
    * MotionHive's own. Runnable and copyable by anyone, editable by
    * nobody — one person's edit would rewrite it for every user.
    */
-  protected readonly isSystem = computed(() => this.routine().source === 'SYSTEM');
+  protected readonly isSystem = computed(() => this.routine().source === RoutineSources.System);
 
   // List rows carry a server-computed count; the tree is detail-only.
   protected readonly exerciseCount = computed(

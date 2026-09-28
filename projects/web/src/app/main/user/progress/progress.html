@@ -9,17 +9,21 @@
     <div class="space-y-1 min-w-0">
       <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
         @if (isEmpty()) {
-        Your records and trends will build up here as you train.
+        {{ 'training.progress.subtitle.empty' | translate }}
         } @else if (isEarly()) {
-        Your baseline is in. Keep logging and the trends appear.
+        {{ 'training.progress.subtitle.early' | translate }}
+        } @else if (trainingHours() > 0) {
+        {{ 'training.progress.subtitle.summaryWithHours' | translate: { count: lifetimeWorkouts(),
+        hours: formatNumber(trainingHours()) } }}
         } @else {
-        {{ lifetimeWorkouts() }} workouts logged{{ trainingHours() > 0 ? ' · ' + trainingHours() + 'h training time' : '' }}.
+        {{ 'training.progress.subtitle.summary' | translate: { count: lifetimeWorkouts() } }}
         }
       </p>
     </div>
     @if (!isEmpty()) {
     <p-selectbutton [options]="rangeOptions" [ngModel]="range()" (ngModelChange)="setRange($event)"
-      optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="Time range" />
+      optionLabel="label" optionValue="value" [allowEmpty]="false" size="small"
+      [attr.aria-label]="'training.progress.rangeAria' | translate" />
     }
   </header>
 
@@ -32,9 +36,9 @@
 
   @else if (isEmpty()) {
   <!-- Never trained. Point at training, not at a chart. -->
-  <mh-list-empty-state icon="pi pi-chart-line" title="No progress yet"
-    message="Log your first workout and your records, volume and streaks start showing up here."
-    actionLabel="Start a workout" actionIcon="pi pi-bolt" (action)="startWorkout.emit()" />
+  <mh-list-empty-state icon="pi pi-chart-line" [title]="'training.progress.empty.title' | translate"
+    [message]="'training.progress.empty.message' | translate"
+    [actionLabel]="'training.common.startWorkout' | translate" actionIcon="pi pi-bolt" (action)="startWorkout.emit()" />
   }
 
   @else if (d) {
@@ -47,12 +51,12 @@
         list and completion screen use, showing only numbers that aren't
         already on screen elsewhere.
       -->
-      <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3" aria-label="Training summary">
-        <mh-kpi-card icon="pi pi-check-circle" label="Workouts" [value]="workouts()"
-          [sub]="workoutsDeltaLabel()" />
-        <mh-kpi-card icon="pi pi-chart-bar" label="Volume kg" [value]="volumeLabel()"
-          [sub]="volumeDeltaLabel()" />
-        <mh-kpi-card icon="pi pi-bolt" label="Streak" [value]="streakLabel()"
+      <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3" [attr.aria-label]="'training.progress.summaryAria' | translate">
+        <mh-kpi-card icon="pi pi-check-circle" [label]="'training.progress.kpi.workouts' | translate"
+          [value]="workouts()" [sub]="workoutsDeltaLabel()" />
+        <mh-kpi-card icon="pi pi-chart-bar" [label]="'training.progress.kpi.volume' | translate"
+          [value]="volumeLabel()" [sub]="volumeDeltaLabel()" />
+        <mh-kpi-card icon="pi pi-bolt" [label]="'training.progress.kpi.streak' | translate" [value]="streakLabel()"
           [sub]="bestStreakLabel()" [severity]="d.streak.currentWeeks > 0 ? 'success' : undefined" />
       </section>
 
@@ -61,14 +65,16 @@
       <p-card>
         <div>
           <div class="mb-2 flex items-baseline justify-between">
-            <span class="text-sm font-semibold">Weekly volume</span>
-            <span class="text-[11px] text-muted-color">{{ weeklyPerWeek() }} workouts / week avg</span>
+            <span class="text-sm font-semibold">{{ 'training.progress.weeklyVolume.title' | translate }}</span>
+            <span class="text-[11px] text-muted-color">{{ 'training.progress.weeklyVolume.average' | translate: {
+              average: formatNumber(weeklyPerWeek()) } }}</span>
           </div>
           <!--
             Each column is full height so the hover target is the whole
             week, not just the bar. The bar itself sits at the bottom.
           -->
-          <div class="flex h-28 items-stretch gap-1 pb-5" role="img" aria-label="Weekly training volume">
+          <div class="flex h-28 items-stretch gap-1 pb-5" role="img"
+            [attr.aria-label]="'training.progress.weeklyVolume.aria' | translate">
             @for (w of volumeBars(); track w.weekStart; let last = $last) {
             <div class="group relative flex flex-1 flex-col justify-end">
               <div class="w-full rounded-t transition-colors"
@@ -82,12 +88,13 @@
                 {{ w.workouts }}
               </span>
               <div class="pointer-events-none absolute -top-6 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded bg-surface-900 px-1.5 py-0.5 text-[10px] text-surface-0 group-hover:block dark:bg-surface-100 dark:text-surface-900">
-                {{ w.volumeKg }} kg · {{ w.workouts }} workouts
+                {{ 'training.progress.weeklyVolume.barTooltip' | translate: { volume: formatNumber(w.volumeKg),
+                count: w.workouts } }}
               </div>
             </div>
             }
           </div>
-          <div class="mt-1 text-[10.5px] text-muted-color">Workouts per week below each bar.</div>
+          <div class="mt-1 text-[10.5px] text-muted-color">{{ 'training.progress.weeklyVolume.caption' | translate }}</div>
         </div>
       </p-card>
       }
@@ -96,12 +103,13 @@
       @if (showsConsistency()) {
       <p-card>
         <div class="mb-2 flex items-baseline justify-between">
-          <span class="text-sm font-semibold">Consistency</span>
-          <span class="text-[11px] text-muted-color">last 28 days</span>
+          <span class="text-sm font-semibold">{{ 'training.progress.consistency.title' | translate }}</span>
+          <span class="text-[11px] text-muted-color">{{ 'training.progress.consistency.window' | translate }}</span>
         </div>
         <div class="flex flex-wrap gap-1">
           @for (day of consistencyDays(); track day.date) {
-          <div class="size-4 rounded-sm" [title]="day.date + ' · ' + day.workouts + ' workouts'"
+          <div class="size-4 rounded-sm" [title]="'training.progress.consistency.dayTitle' | translate: {
+            date: (day.date | date: 'd MMM y'), count: day.workouts }"
             [class]="day.workouts > 0 ? 'bg-primary-500' : 'bg-surface-200 dark:bg-surface-700'"></div>
           }
         </div>
@@ -112,15 +120,14 @@
       @if (isEarly()) {
       <p-card>
         <div class="flex flex-col gap-2">
-          <h3 class="m-0 font-heading text-base font-semibold">Nice, your baseline is in.</h3>
+          <h3 class="m-0 font-heading text-base font-semibold">{{ 'training.progress.early.title' | translate }}</h3>
           <p class="m-0 text-sm text-muted-color leading-relaxed">
-            Every first lift is a personal record, so what you just logged is the number to beat.
-            Log a few more and your trends and streaks show up here.
+            {{ 'training.progress.early.message' | translate }}
           </p>
           <div>
             <button pButton type="button" size="small" (click)="startWorkout.emit()">
               <i class="pi pi-bolt"></i>
-              Log workout #{{ lifetimeWorkouts() + 1 }}
+              {{ 'training.progress.early.logNext' | translate: { number: lifetimeWorkouts() + 1 } }}
             </button>
           </div>
         </div>
@@ -132,15 +139,15 @@
     <aside class="flex flex-col gap-3 h-max lg:sticky lg:top-4">
       <p-card>
         <div class="mb-2 flex items-baseline justify-between">
-          <span class="text-sm font-semibold">Records</span>
+          <span class="text-sm font-semibold">{{ 'training.progress.records.title' | translate }}</span>
           @if (records().length) {
-          <span class="text-[11px] text-muted-color">estimated 1RM</span>
+          <span class="text-[11px] text-muted-color">{{ 'training.progress.records.estimated' | translate }}</span>
           }
         </div>
 
         @if (!records().length) {
         <p class="m-0 text-sm text-muted-color leading-relaxed">
-          Log a set with a weight on it and your first record lands here.
+          {{ 'training.progress.records.empty' | translate }}
         </p>
         } @else {
         <div class="flex flex-col">
@@ -156,11 +163,12 @@
               <span class="block text-[11px] text-muted-color">{{ r.recordedAt | date: 'd MMM y' }}</span>
             </span>
             <span class="shrink-0 text-right">
-              <span class="block font-heading text-sm font-semibold tabular-nums">{{ r.weightKg }} kg</span>
+              <span class="block font-heading text-sm font-semibold tabular-nums">{{ 'training.common.weightKg' | translate: {
+                weight: formatNumber(r.weightKg) } }}</span>
               @if (r.deltaKg > 0 && r.deltaKg < r.weightKg) {
-              <span class="block text-[11px] font-semibold text-green-600">+{{ r.deltaKg }}</span>
+              <span class="block text-[11px] font-semibold text-green-600">+{{ formatNumber(r.deltaKg) }}</span>
               } @else {
-              <span class="block text-[11px] text-muted-color">first</span>
+              <span class="block text-[11px] text-muted-color">{{ 'training.progress.records.first' | translate }}</span>
               }
             </span>
           </button>

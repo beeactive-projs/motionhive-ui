@@ -10,6 +10,7 @@ import {
   IonNote,
   IonTextarea,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
@@ -19,6 +20,7 @@ import {
   InstructorClientStatuses,
   Program,
   ProgramWorkout,
+  appLocale,
   displayName,
 } from 'core';
 
@@ -65,6 +67,7 @@ const PREVIEW_ROWS = 6;
     IonNote,
     IonTextarea,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './assign-sheet.html',
   styleUrl: './assign-sheet.scss',
@@ -76,6 +79,7 @@ export class AssignSheet {
   readonly assign = output<AssignRequest>();
 
   private readonly _clientService = inject(ClientService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly clients = signal<InstructorClient[]>([]);
   readonly loading = signal(false);
@@ -100,7 +104,7 @@ export class AssignSheet {
         name: workout.name,
         week: weekLabel(workout.weekIndex),
         date: scheduledDateFor(start, workout.weekIndex, workout.dayIndex).toLocaleDateString(
-          undefined,
+          appLocale(),
           { weekday: 'short', day: 'numeric', month: 'short' },
         ),
       }));
@@ -136,7 +140,10 @@ export class AssignSheet {
   }
 
   name(row: InstructorClient): string {
-    return displayName(row.client ?? null, 'Client');
+    return displayName(
+      row.client ?? null,
+      this._translateService.instant('programs.common.clientFallback'),
+    );
   }
 
   tone(row: InstructorClient): string {

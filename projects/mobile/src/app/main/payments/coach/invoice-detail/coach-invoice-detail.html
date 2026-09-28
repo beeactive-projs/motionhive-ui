@@ -188,7 +188,7 @@
     (isDraft() ? 'payments.confirm.deleteDraft.confirm' : 'payments.confirm.void.confirm') | translate
   "
   tone="danger"
-  [cancelLabel]="'payments.confirm.keepIt' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
   [saving]="acting()"
   (confirm)="voidInvoice()"
 />
@@ -199,7 +199,7 @@
   [body]="'payments.confirm.refund.body' | translate"
   [confirmLabel]="'payments.confirm.refund.confirm' | translate"
   tone="danger"
-  [cancelLabel]="'payments.confirm.keepIt' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
   [saving]="acting()"
   [blockedReason]="canRefund() ? null : ('payments.confirm.refund.windowClosed' | translate)"
   [facts]="refundFacts()"

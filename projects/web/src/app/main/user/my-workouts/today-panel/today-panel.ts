@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -12,6 +11,7 @@ import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   ProgramAssignmentService,
@@ -20,6 +20,7 @@ import {
   TrainingDayWorkout,
   WorkoutLog,
   WorkoutLogService,
+  appLocale,
   injectIsMobile,
   injectIsTablet,
   showApiError,
@@ -47,9 +48,9 @@ import { TodayHero } from '../_components/today-hero/today-hero';
     InputTextModule,
     MobileFab,
     TodayHero,
+    TranslatePipe,
   ],
   templateUrl: './today-panel.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TodayPanel implements OnInit {
   private readonly _service = inject(WorkoutLogService);
@@ -57,6 +58,7 @@ export class TodayPanel implements OnInit {
   private readonly _routineService = inject(RoutineService);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
   protected readonly isTablet = injectIsTablet();
@@ -114,16 +116,18 @@ export class TodayPanel implements OnInit {
       error: (err) =>
         showApiError(
           this._messageService,
-          "Couldn't start that workout",
-          'Please try again.',
+          this._translateService.instant('myWorkouts.todayPanel.toast.startAssignedFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         ),
     });
   }
 
   openStartFreestyle(): void {
-    const day = new Date().toLocaleDateString(undefined, { weekday: 'long' });
-    this.newWorkoutName.set(`${day} session`);
+    const day = new Date().toLocaleDateString(appLocale(), { weekday: 'long' });
+    this.newWorkoutName.set(
+      this._translateService.instant('myWorkouts.todayPanel.defaultName', { day }),
+    );
     this.startDialogOpen.set(true);
   }
 
@@ -141,8 +145,8 @@ export class TodayPanel implements OnInit {
         this.starting.set(false);
         showApiError(
           this._messageService,
-          "Couldn't start workout",
-          'Please try again.',
+          this._translateService.instant('myWorkouts.todayPanel.toast.startFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },

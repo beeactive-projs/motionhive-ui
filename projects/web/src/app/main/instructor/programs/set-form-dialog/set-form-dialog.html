@@ -5,20 +5,21 @@
     <div
       class="flex items-center gap-2 rounded-lg border border-surface bg-(--p-content-background) px-3 py-2 text-[13px] font-semibold">
       <i class="pi pi-bolt text-primary"></i>
-      <span>{{ exercise().exercise?.name ?? 'Exercise' }}</span>
+      <span>{{ exercise().exercise?.name ?? ('programs.setForm.exerciseFallback' | translate) }}</span>
     </div>
 
     <!-- Set type / Number of sets -->
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div class="flex flex-col gap-1.5">
-        <label for="setType" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Set type</label>
+        <label for="setType" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.setType' | translate }}</label>
         <p-select inputId="setType" [options]="setTypeOptions" formControlName="setType" optionLabel="label"
           optionValue="value" [appendTo]="'body'" class="w-full" />
       </div>
       @if (!isEdit()) {
       <div class="flex flex-col gap-1.5">
-        <label for="numSets" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Number of
-          sets</label>
+        <label for="numSets" class="text-xs font-semibold text-surface-800 dark:text-surface-200">
+          {{ 'programs.setForm.numberOfSets' | translate }}
+        </label>
         <p-inputnumber inputId="numSets" formControlName="numberOfSets" [min]="1" [max]="20" [showButtons]="true"
           class="w-full" />
       </div>
@@ -29,13 +30,13 @@
     <div class="flex flex-col gap-1.5">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div class="flex flex-col gap-1.5">
-          <label for="repsMin" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Reps (min)</label>
+          <label for="repsMin" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.repsMin' | translate }}</label>
           <p-inputnumber inputId="repsMin" formControlName="repsMin" [min]="0" [max]="1000" [allowEmpty]="true"
             placeholder="—" class="w-full" [attr.aria-invalid]="repsRangeError() !== null"
             [attr.aria-describedby]="repsRangeError() ? 'reps-error' : null" />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="repsMax" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Reps (max)</label>
+          <label for="repsMax" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.repsMax' | translate }}</label>
           <p-inputnumber inputId="repsMax" formControlName="repsMax" [min]="0" [max]="1000" [allowEmpty]="true"
             placeholder="—" class="w-full" [attr.aria-invalid]="repsRangeError() !== null"
             [attr.aria-describedby]="repsRangeError() ? 'reps-error' : null" />
@@ -49,12 +50,12 @@
     <!-- Weight / Rest -->
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div class="flex flex-col gap-1.5">
-        <label for="weightKg" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Weight (kg)</label>
+        <label for="weightKg" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.weightKg' | translate }}</label>
         <p-inputnumber inputId="weightKg" formControlName="weightKg" [min]="0" [max]="9999" [maxFractionDigits]="2"
           [allowEmpty]="true" placeholder="—" class="w-full" />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label for="rest" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Rest after (s)</label>
+        <label for="rest" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.restAfter' | translate }}</label>
         <p-inputnumber inputId="rest" formControlName="restSeconds" [min]="0" [allowEmpty]="true" placeholder="—"
           class="w-full" />
       </div>
@@ -64,10 +65,11 @@
     <div class="flex flex-col gap-1.5">
       <label for="snotes"
         class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-        Notes <span class="font-medium text-surface-400">— optional</span>
+        {{ 'form.label.notes' | translate }}
+        <span class="font-medium text-surface-400">{{ 'programs.form.optional' | translate }}</span>
       </label>
       <textarea id="snotes" pTextarea rows="2" formControlName="notes" maxlength="2000"
-        placeholder="Cue, focus, regression…" fluid></textarea>
+        [placeholder]="'programs.setForm.notesPlaceholder' | translate" fluid></textarea>
     </div>
 
     <button pButton
@@ -79,24 +81,24 @@
       (click)="toggleAdvanced()"
     >
       <i [class]="showAdvanced() ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
-      Advanced (intensity, time, distance, tempo)
+      {{ 'programs.setForm.advanced' | translate }}
     </button>
 
     @if (showAdvanced()) {
     <div class="flex flex-col gap-3.5 border-t border-dashed border-surface pt-3">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div class="flex flex-col gap-1.5">
-          <label for="pct" class="text-xs font-semibold text-surface-800 dark:text-surface-200">% 1RM</label>
+          <label for="pct" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.percent1rm' | translate }}</label>
           <p-inputnumber inputId="pct" formControlName="weightPercent1rm" [min]="0" [max]="100"
             [maxFractionDigits]="1" [allowEmpty]="true" placeholder="—" suffix="%" class="w-full" />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="rpe" class="text-xs font-semibold text-surface-800 dark:text-surface-200">RPE (1–10)</label>
+          <label for="rpe" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.rpe' | translate }}</label>
           <p-inputnumber inputId="rpe" formControlName="rpe" [min]="1" [max]="10" [maxFractionDigits]="1"
             [allowEmpty]="true" placeholder="—" class="w-full" />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="rir" class="text-xs font-semibold text-surface-800 dark:text-surface-200">RIR</label>
+          <label for="rir" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.rir' | translate }}</label>
           <p-inputnumber inputId="rir" formControlName="rir" [min]="0" [allowEmpty]="true" placeholder="—"
             class="w-full" />
         </div>
@@ -104,12 +106,12 @@
 
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div class="flex flex-col gap-1.5">
-          <label for="dur" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Duration (s)</label>
+          <label for="dur" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.durationSeconds' | translate }}</label>
           <p-inputnumber inputId="dur" formControlName="durationSeconds" [min]="0" [allowEmpty]="true" placeholder="—"
             class="w-full" />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="dist" class="text-xs font-semibold text-surface-800 dark:text-surface-200">Distance (m)</label>
+          <label for="dist" class="text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'programs.setForm.distanceMeters' | translate }}</label>
           <p-inputnumber inputId="dist" formControlName="distanceMeters" [min]="0" [allowEmpty]="true" placeholder="—"
             class="w-full" />
         </div>
@@ -118,9 +120,10 @@
       <div class="flex flex-col gap-1.5">
         <label for="tempo"
           class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-          Tempo <span class="font-medium text-surface-400">— e.g. 3-1-1-0</span>
+          {{ 'programs.setForm.tempo' | translate }}
+          <span class="font-medium text-surface-400">{{ 'programs.setForm.tempoHint' | translate }}</span>
         </label>
-        <input id="tempo" pInputText formControlName="tempo" maxlength="7" placeholder="e.g. 3-1-1-0"
+        <input id="tempo" pInputText formControlName="tempo" maxlength="7" [placeholder]="'programs.setForm.tempoPlaceholder' | translate"
           autocomplete="off" fluid [class.ng-invalid]="isFieldInvalid('tempo')"
           [class.ng-dirty]="isFieldInvalid('tempo')" [attr.aria-invalid]="isFieldInvalid('tempo')"
           [attr.aria-describedby]="isFieldInvalid('tempo') ? 'tempo-error' : null" />
@@ -134,7 +137,7 @@
   </form>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" (click)="submit()" [disabled]="submitting()">
       <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
       {{ submitLabel() }}

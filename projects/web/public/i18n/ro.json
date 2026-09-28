@@ -364,7 +364,6 @@
           "finishedSearch": "Niciun program încheiat pentru „{term}” — încearcă Toate."
         },
         "pause": "Pune pe pauză",
-        "resume": "Reia",
         "scope": {
           "ariaLabel": "Filtru programe",
           "current": "Curente",
@@ -595,7 +594,6 @@
         "sessions": "Sesiuni",
         "tags": "Etichete"
       },
-      "clear": "Șterge căutarea",
       "navigate": "Navighează",
       "noMatchesBody": "Încearcă alt cuvânt, mai puține litere sau un filtru de categorie.",
       "noMatchesTitle": "Niciun rezultat pentru „{query}”",
@@ -630,6 +628,171 @@
     },
     "weekStrip": {
       "navigator": "Navigare în săptămână"
+    }
+  },
+  "exercises": {
+    "badge": {
+      "mine": "Al meu",
+      "private": "Privat",
+      "public": "Public",
+      "system": "Sistem"
+    },
+    "card": {
+      "createdBy": "Creat de {name}",
+      "openAria": "Deschide {name}"
+    },
+    "catalog": {
+      "clearAll": "Șterge tot",
+      "clearAllFilters": "Șterge toate filtrele",
+      "emptyFiltered": {
+        "message": "Relaxează un filtru sau caută altfel ca să vezi mai multe.",
+        "title": "Niciun exercițiu nu se potrivește"
+      },
+      "emptyMine": {
+        "browse": "Răsfoiește catalogul ca să copiezi unul",
+        "create": "Creează primul tău exercițiu",
+        "message": "Construiește mișcări potrivite stilului tău de antrenor sau copiază unul public în biblioteca ta și fă-l al tău.",
+        "title": "Încă nu ai exerciții proprii"
+      },
+      "newExercise": "Exercițiu nou",
+      "ownership": {
+        "aria": "Filtru după proprietar",
+        "mine": "Exercițiile mele",
+        "publicOthers": "Publice · alții",
+        "system": "Sistem"
+      },
+      "searchAria": "Caută exerciții",
+      "searchPlaceholder": "Caută după nume…",
+      "showResults": "{count, plural, one {Arată # rezultat} few {Arată # rezultate} other {Arată # de rezultate}}",
+      "sort": {
+        "menu": {
+          "mostForked": "Cele mai copiate",
+          "name": "Nume (A–Z)",
+          "newest": "Cele mai noi întâi"
+        },
+        "short": {
+          "mostForked": "Cele mai copiate",
+          "name": "Nume",
+          "newest": "Cele mai noi"
+        }
+      },
+      "subtitle": "Răsfoiește și construiește biblioteca de mișcări pe care se sprijină programele tale.",
+      "subtitleShort": "Construiește-ți biblioteca de mișcări."
+    },
+    "common": {
+      "createExercise": "Creează exercițiu",
+      "exercise": "Exercițiu",
+      "forkedBy": "{count, plural, one {Copiat de # antrenor} few {Copiat de # antrenori} other {Copiat de # de antrenori}}"
+    },
+    "confirm": {
+      "delete": {
+        "accept": "Da, șterge",
+        "forked": "{count, plural, one {A fost deja copiat de # antrenor — copia lui e independentă și nu va fi afectată.} few {A fost deja copiat de # antrenori — copiile lor sunt independente și nu vor fi afectate.} other {A fost deja copiat de # de antrenori — copiile lor sunt independente și nu vor fi afectate.}}",
+        "header": "Ștergi „{name}”?",
+        "irreversible": "Nu îl vei putea recupera și va trebui să-l creezi de la zero dacă îl vrei înapoi mai târziu.",
+        "message": "Asta elimină definitiv „{name}” din biblioteca ta de exerciții."
+      }
+    },
+    "detail": {
+      "createdBy": "Creat de",
+      "fork": "Copiază în biblioteca mea",
+      "instructions": "Instrucțiuni",
+      "makePrivate": "Fă-l privat",
+      "makePublic": "Fă-l public",
+      "musclesWorked": "Mușchi lucrați",
+      "unilateral": "Unilateral"
+    },
+    "filters": {
+      "equipment": "Echipament",
+      "kind": "Tip",
+      "level": "Nivel",
+      "primaryMuscle": "Mușchi principal"
+    },
+    "form": {
+      "autoPick": "Automat / alege",
+      "classification": "Clasificare",
+      "creating": "Se creează…",
+      "descriptionPlaceholder": "1–3 propoziții despre mișcare…",
+      "equipmentHint": "— greutatea corpului dacă nu alegi nimic",
+      "force": "Forță",
+      "forkWarning": {
+        "message": "Copiile lor sunt independente — modificările tale nu le vor schimba.",
+        "title": "{count, plural, one {# antrenor l-a copiat.} few {# antrenori l-au copiat.} other {# de antrenori l-au copiat.}}"
+      },
+      "instructionsPlaceholder": "Indicații de execuție pas cu pas…",
+      "kindHelp": "Stabilește ce se înregistrează când un client îl notează.",
+      "kindHint": {
+        "BODYWEIGHT": "Repetări, fără greutate",
+        "CARDIO": "Durată + distanță + puls",
+        "DISTANCE": "Doar distanță",
+        "DURATION": "Doar timp — de ex. planșă",
+        "MOBILITY": "Timp / repetări, mobilitate",
+        "STRENGTH": "Repetări + greutate"
+      },
+      "mechanic": "Mecanică",
+      "namePlaceholder": "de ex. Genuflexiune goblet cu tempo",
+      "optionalSuffix": "— opțional",
+      "pattern": "Tipar",
+      "primaryMuscles": "Mușchi principali",
+      "primaryMusclesPlaceholder": "Alege cel puțin unul",
+      "primaryMusclesRange": "— între 1 și 3",
+      "privateHint": "Doar tu îl poți vedea și folosi.",
+      "publicHint": "Orice antrenor îl poate vedea și copia în biblioteca lui. Doar tu îl poți edita.",
+      "saving": "Se salvează…",
+      "secondaryMuscles": "Mușchi secundari",
+      "stabilizers": "Stabilizatori",
+      "title": {
+        "create": "Exercițiu propriu nou",
+        "edit": "Editează exercițiul"
+      },
+      "unilateral": "Mișcare unilaterală",
+      "unilateralHint": "Un singur braț / un singur picior — permite ulterior urmărirea separată stânga / dreapta.",
+      "visibility": "Vizibilitate",
+      "youtube": {
+        "hint": "Încărcarea directă vine în V2. Lipește orice link YouTube ca să obții o miniatură.",
+        "invalid": "Lipește un link YouTube valid (youtube.com sau youtu.be).",
+        "label": "Demonstrație YouTube",
+        "thumbnailAlt": "Previzualizare miniatură YouTube",
+        "thumbnailLoaded": "Miniatură încărcată",
+        "thumbnailUsage": "Folosită în cardurile din catalog"
+      }
+    },
+    "toast": {
+      "createFailed": "Crearea a eșuat",
+      "created": "Exercițiu creat",
+      "deleteFailed": {
+        "detail": "Nu am putut șterge exercițiul. Încearcă din nou peste câteva momente.",
+        "summary": "Ștergerea a eșuat"
+      },
+      "deleted": "Exercițiu șters",
+      "forkFailed": {
+        "detail": "Poate ai deja o copie a acestui exercițiu.",
+        "summary": "Copierea a eșuat"
+      },
+      "forked": {
+        "detail": "„{name}” e acum privat — îl poți edita oricând.",
+        "summary": "Copiat în biblioteca ta"
+      },
+      "loadFailed": "Nu am putut încărca exercițiile",
+      "loadOneFailed": {
+        "detail": "Poate a fost șters sau făcut privat.",
+        "summary": "Nu am putut încărca exercițiul"
+      },
+      "madePrivate": {
+        "detail": "Doar tu îl poți vedea. Programele care îl folosesc deja rămân neschimbate.",
+        "summary": "Acum e privat"
+      },
+      "madePublic": {
+        "detail": "Alți antrenori îl pot vedea și copia în biblioteca lor.",
+        "summary": "Acum e public"
+      },
+      "saveFailedDetail": "Verifică câmpurile evidențiate și încearcă din nou.",
+      "updateFailed": "Actualizarea a eșuat",
+      "updated": "Exercițiu actualizat",
+      "visibilityFailed": {
+        "detail": "Nu am putut actualiza exercițiul. Încearcă din nou peste câteva momente.",
+        "summary": "Schimbarea vizibilității a eșuat"
+      }
     }
   },
   "groups": {
@@ -1279,6 +1442,347 @@
       "tryAgain": "Încearcă din nou."
     }
   },
+  "myWorkouts": {
+    "common": {
+      "addExercise": "Adaugă exercițiu",
+      "addSet": "Adaugă serie",
+      "addedToWeek": "Adăugat în săptămâna ta",
+      "copyFailed": "Nu am putut salva copia",
+      "copySaved": "Salvată în rutinele tale",
+      "copySavedDetail": "„{name}” e a ta și o poți modifica.",
+      "createRoutine": "Creează rutina",
+      "done": "Gata",
+      "durationMinutesSeconds": "{minutes} min {seconds} s",
+      "exercise": "Exercițiu",
+      "folder": "Dosar",
+      "folderPlaceholder": "ex. Split PPL",
+      "loadWorkoutFailed": "Nu am putut încărca antrenamentul",
+      "newPrs": "{count, plural, one {Record nou 1RM} few {Recorduri noi 1RM} other {Recorduri noi 1RM}}",
+      "newRoutine": "Rutină nouă",
+      "onSchedule": "{name} e în programul tău.",
+      "optional": "(opțional)",
+      "pleaseRetry": "Încearcă din nou.",
+      "reps": "Repetări",
+      "routineNamePlaceholder": "ex. Ziua de împins A",
+      "routineNameRequired": "Numele rutinei *",
+      "saveCopy": "Salvează o copie pe care o pot edita",
+      "saveRoutineFailed": "Nu am putut salva rutina",
+      "setsDone": "Serii făcute",
+      "setsOfTotal": "{done} / {total, plural, one {# serie} few {# serii} other {# de serii}}",
+      "startRoutineFailed": "Nu am putut începe rutina",
+      "startWorkout": "Începe antrenamentul",
+      "swappedIn": "Înlocuit",
+      "totalVolume": "Volum total",
+      "viewExerciseDetails": "Vezi detaliile pentru {name}",
+      "whichDays": "În ce zile",
+      "workout": "Antrenament"
+    },
+    "complete": {
+      "distance": "Distanță",
+      "feeling": {
+        "good": "Bine",
+        "great": "Excelent",
+        "ok": "OK",
+        "rough": "Greu de tot",
+        "tough": "Solicitant"
+      },
+      "finish": "Termină",
+      "finishedAt": "terminat la {time}",
+      "howDidItFeel": "Cum te-ai simțit?",
+      "notes": {
+        "audienceCoached": "Antrenorul tău vede notița asta și cum te-ai simțit.",
+        "audienceSolo": "Doar tu vezi asta. Sesiunile pe cont propriu nu sunt partajate cu un antrenor.",
+        "placeholderCoached": "Vrei să-i spui ceva antrenorului? (opțional)",
+        "placeholderSolo": "Ceva de ținut minte pentru data viitoare? (opțional)"
+      },
+      "personalRecords": "Recorduri personale",
+      "routineSavedView": "Rutină salvată · vezi",
+      "saveAndFinish": "Salvează și termină",
+      "saveAsRoutine": "Salvează ca rutină",
+      "saveAsRoutineHint": "Salvează structura ca s-o poți relua cu o singură atingere.",
+      "saveRoutine": {
+        "hintStructure": "Aceleași exerciții și același număr de serii, fără greutăți preluate.",
+        "hintTargets": "Repetările și greutățile de azi devin țintele de data viitoare.",
+        "intro": "Păstrează antrenamentul ca să-l poți relua cu o singură atingere. Îl poți edita mai târziu din fila de rutine.",
+        "mode": {
+          "structure": "Doar structura",
+          "targets": "Din ce am făcut"
+        },
+        "submit": "Salvează rutina",
+        "whatToSave": "Ce salvezi"
+      },
+      "skipFeedback": "Sari peste, nu salva",
+      "title": "Antrenament terminat",
+      "toast": {
+        "feedbackSaved": "Feedback salvat",
+        "routineSaved": "Rutină salvată",
+        "routineSavedDetail": "„{name}” e în fila de rutine.",
+        "saveFeedbackFailed": "Nu am putut salva feedbackul"
+      },
+      "totalReps": "Total repetări"
+    },
+    "library": {
+      "confirm": {
+        "delete": {
+          "acceptAndCancel": "Șterge și anulează",
+          "header": "Ștergi rutina?",
+          "message": "Ștergi „{name}”? Antrenamentele deja înregistrate din ea rămân în istoric.",
+          "messageScheduled": "„{name}” are {count, plural, one {# sesiune programată} few {# sesiuni programate} other {# de sesiuni programate}} în calendar. Dacă ștergi rutina, le anulezi și pe acestea. Antrenamentele deja înregistrate din ea rămân în istoric."
+        }
+      },
+      "empty": {
+        "mine": {
+          "action": "Răsfoiește rutinele MotionHive",
+          "message": "Pornește de la una dintre rutinele MotionHive și salvează o copie sau construiește-ți una de la zero.",
+          "title": "Nu ai salvat încă nicio rutină"
+        },
+        "none": {
+          "message": "Salvează structura unui antrenament — nume, exerciții, serii implicite — și reia-l cu o singură atingere.",
+          "title": "Nicio rutină deocamdată"
+        },
+        "search": {
+          "message": "Încearcă alt nume sau dosar ori șterge căutarea ca să vezi tot.",
+          "title": "Nicio rutină nu se potrivește căutării"
+        }
+      },
+      "libraryFilter": "Biblioteca de rutine",
+      "loadMore": "Încarcă mai multe ({loaded} din {total})",
+      "mine": "Ale mele",
+      "noFolder": "Fără dosar",
+      "search": "Caută rutine",
+      "searchPlaceholder": "Caută rutine…",
+      "toast": {
+        "deleteFailed": "Nu am putut șterge rutina",
+        "deleted": "Rutină ștearsă",
+        "loadFailed": "Nu am putut încărca rutinele",
+        "openFailed": "Nu am putut deschide rutina"
+      }
+    },
+    "logger": {
+      "addWeight": "Adaugă greutate",
+      "assignedSession": "Sesiune atribuită",
+      "cancelWorkout": "Anulează antrenamentul",
+      "completeWorkout": "Termină antrenamentul",
+      "confirm": {
+        "discard": {
+          "header": "Anulezi antrenamentul?",
+          "message": "Antrenamentul va fi șters. Nu va apărea ca sărit — va fi ca și cum nu l-ai fi început.",
+          "messageWithSets": "Antrenamentul va fi șters, împreună cu {count, plural, one {# serie înregistrată} few {# serii înregistrate} other {# de serii înregistrate}}. Nu va apărea ca sărit — va fi ca și cum nu l-ai fi început."
+        },
+        "removeExercise": {
+          "header": "Elimini exercițiul?",
+          "message": "„{name}” și seriile lui goale dispar din acest antrenament."
+        }
+      },
+      "elapsed": "{time} scurse",
+      "empty": {
+        "message": "Adaugă exerciții din catalog, înregistrează seriile pe parcurs și încheie când ești gata.",
+        "title": "Construiește-ți antrenamentul"
+      },
+      "exerciseProgress": "{done} din {total, plural, one {# serie} few {# serii} other {# de serii}}",
+      "exerciseProgressDone": "{done} din {total, plural, one {# serie făcută} few {# serii făcute} other {# de serii făcute}}",
+      "finish": {
+        "header": "Termini antrenamentul?",
+        "markSkipped": "Marchează ca sărit",
+        "messageAllDone": "Toate seriile sunt bifate. Îl marchezi ca terminat?",
+        "messageEmpty": "Nu ai înregistrat încă nicio serie. Marchează-l ca sărit sau continuă.",
+        "messageRemaining": "Mai ai {count, plural, one {# serie nebifată} few {# serii nebifate} other {# de serii nebifate}}. Termini antrenamentul?",
+        "nothingLogged": "Nimic înregistrat încă"
+      },
+      "finishAndExit": "Termină și ieși",
+      "finishAndSave": "Termină și salvează",
+      "freestyleSession": "Sesiune liberă",
+      "keepGoing": "Continuă",
+      "lastTime": "Data trecută",
+      "markSetDone": "Marchează seria ca făcută",
+      "markSetIncomplete": "Marchează seria ca nefăcută",
+      "notCounted": "nu se numără",
+      "progress": "Progres",
+      "removeExercise": "Elimină exercițiul",
+      "rest": {
+        "allDone": "Toate seriile sunt gata · apasă pe termină",
+        "minus10": "Cu 10 secunde mai puțină pauză",
+        "next": "Urmează",
+        "plus10": "Cu 10 secunde mai multă pauză",
+        "skip": "Sari peste pauză"
+      },
+      "set": {
+        "repsEach": "{reps} pe parte",
+        "repsPlaceholder": "rep."
+      },
+      "setsDoneOfTotal": "{done} / {total, plural, one {# serie făcută} few {# serii făcute} other {# de serii făcute}}",
+      "skipExercise": "Sari peste exercițiu",
+      "swapExercise": "Înlocuiește exercițiul",
+      "table": {
+        "pace": "Ritm",
+        "target": "Țintă",
+        "time": "Timp"
+      },
+      "toast": {
+        "addExerciseFailed": "Nu am putut adăuga exercițiul",
+        "addSetFailed": "Nu am putut adăuga seria",
+        "cancelFailed": "Nu am putut anula antrenamentul",
+        "completeFailed": "Nu am putut termina antrenamentul",
+        "exerciseRemoved": "Exercițiu eliminat",
+        "loadFailed": "Nu am putut încărca antrenamentul",
+        "removeExerciseFailed": "Nu am putut elimina exercițiul",
+        "saveSetFailed": "Nu am putut salva seria",
+        "skipFailed": "Nu am putut sări peste",
+        "skipped": "Ai sărit peste {name}",
+        "skippedDetail": "Rămâne în jurnal, doar că nu se numără.",
+        "swapFailed": "Nu am putut înlocui exercițiul",
+        "swapped": "Înlocuit cu {name}",
+        "swappedDetail": "Seriile înregistrate s-au păstrat.",
+        "undoSkipFailed": "Nu am putut anula săritul",
+        "welcomeBack": "Bine ai revenit",
+        "welcomeBackDetail": "Ai lipsit o vreme — cronometrul de pauză a fost oprit. Continuă de unde ai rămas."
+      },
+      "undo": "Anulează",
+      "workoutCompleted": "Antrenament terminat"
+    },
+    "replay": {
+      "empty": {
+        "message": "Antrenamentul a fost terminat fără niciun exercițiu înregistrat.",
+        "title": "Niciun exercițiu înregistrat"
+      },
+      "feeling": "Cum s-a simțit",
+      "overview": "Rezumatul antrenamentului",
+      "prTag": "Record {weight} kg",
+      "prTagDelta": "Record {weight} kg +{delta}",
+      "readOnlyClientView": "doar citire · vizualizare client",
+      "swappedFrom": "Înlocuiește {name}",
+      "table": {
+        "result": "Rezultat"
+      },
+      "theyNoted": "Ce a notat",
+      "youNoted": "Ce ai notat"
+    },
+    "routineDetail": {
+      "backToRoutines": "Înapoi la rutine",
+      "noExercises": "Rutina nu are încă exerciții.",
+      "notFound": {
+        "message": "Poate a fost ștearsă sau e a altcuiva.",
+        "title": "Rutina nu a fost găsită"
+      },
+      "rest": "{duration} pauză",
+      "setRow": "Seria {index} · {target}",
+      "setRowWeight": "Seria {index} · {target} · {weight} kg",
+      "toast": {
+        "loadFailed": "Nu am putut încărca rutina"
+      },
+      "viewExercise": "Vezi exercițiul",
+      "viewExerciseDetails": "Vezi detaliile exercițiului",
+      "whatsInIt": "Ce conține"
+    },
+    "routineForm": {
+      "backToSimple": "Înapoi la varianta simplă",
+      "daysOfWeek": "Zilele săptămânii",
+      "editTitle": "Editează rutina",
+      "exercises": "Exerciții",
+      "moveDown": "Mută mai jos",
+      "moveUp": "Mută mai sus",
+      "noExercises": "Niciun exercițiu încă — apasă „Adaugă exercițiu” ca să începi.",
+      "notesPlaceholder": "Ceva de ținut minte despre rutina asta…",
+      "pickDay": "Alege cel puțin o zi sau oprește repetarea.",
+      "removeSet": "Elimină seria",
+      "repeat": "Repetă după un program",
+      "repeatFor": "Timp de",
+      "repeatWeeks": "{count, plural, one {săptămână} few {săptămâni} other {de săptămâni}}",
+      "repsMax": "Repetări max.",
+      "repsMin": "Repetări min.",
+      "restSeconds": "Pauză (s)",
+      "setEachSeparately": "Setează fiecare serie separat",
+      "setType": {
+        "drop": "Drop",
+        "failure": "Până la epuizare",
+        "working": "De lucru"
+      },
+      "sets": "Serii",
+      "toast": {
+        "checkForm": "Verifică formularul și încearcă din nou.",
+        "createFailed": "Nu am putut crea rutina",
+        "created": "Rutină creată",
+        "notScheduled": "Rutina a fost salvată, dar nu și programată",
+        "notScheduledDetail": "O poți programa din lista de rutine.",
+        "readyToUse": "{name} e gata de folosit.",
+        "updated": "Rutină actualizată"
+      },
+      "weightKg": "Greutate (kg)"
+    },
+    "routineRow": {
+      "delete": "Șterge rutina",
+      "edit": "Editează rutina",
+      "lastDone": "Ultima dată {date}",
+      "moves": "{count, plural, one {exercițiu} few {exerciții} other {de exerciții}}",
+      "neverStarted": "Neînceput încă",
+      "open": "Deschide {name}",
+      "saveCopy": "Salvează o copie a rutinei",
+      "schedule": "Programează rutina ca plan",
+      "scheduleTooltip": "Programează — pune-o în calendar ca plan",
+      "view": "Vezi rutina",
+      "viewTooltip": "Vezi — exercițiile, fără să le modifici"
+    },
+    "schedule": {
+      "everyWeek": "În fiecare săptămână",
+      "forBlock": "Pe un bloc",
+      "howLong": "Cât timp",
+      "introAfter": "în zilele în care te antrenezi. Apare în pagina Antrenamente ca orice alt plan.",
+      "introBefore": "Pune",
+      "submit": "Adaugă în săptămână",
+      "summary": {
+        "block": "{days}, timp de {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}.",
+        "pickDay": "Alege cel puțin o zi.",
+        "weekly": "{days}, în fiecare săptămână."
+      },
+      "title": "Adaugă în săptămâna ta",
+      "toast": {
+        "failed": "Nu am putut programa rutina"
+      },
+      "weeks": "Săptămâni"
+    },
+    "todayHero": {
+      "backToToday": "înapoi la azi",
+      "doneToday": "Făcut azi",
+      "estimate": "cam {minutes} min",
+      "inProgressHint": "L-ai lăsat la jumătate. Continuă de unde ai rămas.",
+      "logged": "Înregistrat.",
+      "nextUp": "Urmează {name}.",
+      "nextWeek": "Săptămâna următoare",
+      "noPlan": "Începe un antrenament și adaugă exerciții pe parcurs. Salvează-l ca rutină când termini.",
+      "noPlanWithRoutines": "Începe una dintre rutinele tale sau antrenează-te liber și adaugă exerciții pe parcurs.",
+      "notDone": "Nefăcut",
+      "nothingScheduled": "Nimic programat.",
+      "previousWeek": "Săptămâna anterioară",
+      "recovery": "Și recuperarea face parte din plan.",
+      "restDay": "Zi de pauză",
+      "resume": "Reia antrenamentul",
+      "scheduled": "Programat",
+      "todayLogged": "Antrenamentul de azi e înregistrat.",
+      "trainAnyway": "Antrenează-te oricum",
+      "yourCall": "Azi decizi tu"
+    },
+    "todayPanel": {
+      "defaultName": "Sesiune de {day}",
+      "dialog": {
+        "intro": "Niciun plan atribuit azi? Începe o sesiune liberă. Adaugi exercițiile pe parcurs.",
+        "nameLabel": "Numele antrenamentului",
+        "namePlaceholder": "ex. Sesiune de sâmbătă",
+        "title": "Începe un antrenament"
+      },
+      "toast": {
+        "startAssignedFailed": "Nu am putut începe antrenamentul",
+        "startFailed": "Nu am putut începe antrenamentul"
+      }
+    },
+    "workoutRow": {
+      "freestyle": "Liber",
+      "leftNote": "Ai lăsat o notiță",
+      "openPlan": "Deschide planul {name}",
+      "openRoutine": "Deschide rutina {name}",
+      "prs": "{count, plural, one {Record} few {# recorduri} other {# de recorduri}}",
+      "setsPartial": "{done}/{total, plural, one {# serie} few {# serii} other {# de serii}}"
+    }
+  },
   "paymentDialogs": {
     "createInvoice": {
       "activeClient": "Client activ",
@@ -1500,7 +2004,6 @@
   "payments": {
     "common": {
       "client": "Client",
-      "copy": "Copiază",
       "copyFailed": "Nu am putut copia",
       "copyManually": "Selectează și copiază linkul manual.",
       "createInvoice": "Creează factură",
@@ -1898,6 +2401,417 @@
       "trialEnds": "Perioada de probă se încheie pe {date}",
       "trialUntil": "Probă până pe {date}",
       "viewDetails": "Vezi detaliile"
+    }
+  },
+  "programs": {
+    "assignDialog": {
+      "client": "Client",
+      "clientFallback": "Client",
+      "clientFallbackLower": "client",
+      "clientPlaceholder": "Alege un client",
+      "introAfterName": "va fi copiat pentru clientul tău. Îl va vedea la planurile lui și îi poți urmări progresul pe măsură ce își înregistrează antrenamentele.",
+      "noClients": {
+        "action": "Mergi la Clienți",
+        "message": "Invită un client sau aprobă o cerere în așteptare înainte să atribui un program.",
+        "title": "Încă nu ai clienți activi."
+      },
+      "notesPlaceholder": "Orice ar trebui să știe clientul despre acest plan…",
+      "startHint": {
+        "after": ".",
+        "before": "Ziua 1 a programului cade pe"
+      },
+      "submit": "Atribuie programul",
+      "title": "Atribuie programul"
+    },
+    "common": {
+      "approxMinutes": "~{minutes} min",
+      "copyInto": "Copiază în",
+      "day": "Ziua {day}",
+      "week": "Săptămâna {week}"
+    },
+    "confirm": {
+      "archiveProgram": {
+        "header": "Arhivezi programul?",
+        "message": "„{name}” va fi ascuns din lista ta activă. Atribuirile existente își păstrează copia — doar că nu-l vei mai putea atribui clienților noi până nu-l restaurezi."
+      },
+      "clientCopiesNote": "Copiile clienților din programele deja atribuite își păstrează datele.",
+      "deleteProgram": {
+        "header": "Ștergi programul?",
+        "message": "{name} va fi eliminat din biblioteca ta.",
+        "note": "Atribuirile existente își păstrează copia, dar nu-l vei mai putea atribui clienților noi."
+      },
+      "deleteWorkout": {
+        "header": "Ștergi antrenamentul?",
+        "message": "{name} și exercițiile lui vor fi eliminate din acest program."
+      },
+      "removeExercise": {
+        "fallbackName": "acest exercițiu",
+        "header": "Elimini exercițiul?",
+        "message": "Elimini {name} și seriile prescrise din {workout}?"
+      },
+      "removeSet": {
+        "header": "Elimini seria?",
+        "message": "Elimini seria {number}? Acțiunea nu poate fi anulată — dar copiile clienților din programele deja atribuite își păstrează datele."
+      }
+    },
+    "copyDay": {
+      "clash": "{count, plural, one {Una dintre aceste săptămâni are deja antrenament {day}. Va fi înlocuit.} few {# dintre aceste săptămâni au deja antrenament {day}. Vor fi înlocuite.} other {# dintre aceste săptămâni au deja antrenament {day}. Vor fi înlocuite.}}",
+      "intro": {
+        "after": "— cu tot cu exerciții și serii prescrise — în alte săptămâni. Restul acelor săptămâni rămâne neschimbat.",
+        "before": "Copiază"
+      },
+      "landOn": "Ziua de destinație",
+      "nothingToOverwrite": "Nu se suprascrie nimic {day}.",
+      "sourceLabel": "{name} · {day}, săptămâna {week}",
+      "submitCopy": "{count, plural, one {Copiază în # săptămână} few {Copiază în # săptămâni} other {Copiază în # de săptămâni}}",
+      "submitReplace": "{count, plural, one {Înlocuiește ziua} few {Înlocuiește în # săptămâni} other {Înlocuiește în # de săptămâni}}",
+      "title": "Copiază această zi",
+      "weekEmpty": "Săptămâna {week} (liberă în acea zi)",
+      "weekReplaced": "Săptămâna {week} · va fi înlocuită",
+      "weeksPlaceholder": "Alege una sau mai multe săptămâni"
+    },
+    "copyWeek": {
+      "empty": "Săptămâna {week} e goală — nu se suprascrie nimic.",
+      "intro": {
+        "after": "— cu tot cu exerciții și serii prescrise — în altă săptămână.",
+        "before": "Copiază toate antrenamentele din"
+      },
+      "occupied": "Săptămâna {week} are deja {count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}. Vor fi înlocuite.",
+      "optionEmpty": "Săptămâna {week} (goală)",
+      "optionReplaced": "Săptămâna {week} · {count, plural, one {# antrenament va fi înlocuit} few {# antrenamente vor fi înlocuite} other {# de antrenamente vor fi înlocuite}}",
+      "submitReplace": "Înlocuiește săptămâna {week}",
+      "title": "Copiază săptămâna"
+    },
+    "detail": {
+      "actions": {
+        "assign": "Atribuie unui client",
+        "delete": "Șterge programul…",
+        "edit": "Editează programul"
+      },
+      "archivedBanner": {
+        "message": "E ascuns pentru atribuiri noi, dar nu e șters.",
+        "title": "Acest program este arhivat."
+      },
+      "assign": "Atribuie unui client",
+      "empty": {
+        "action": "Adaugă antrenament",
+        "message": "Un program e o serie de antrenamente grupate pe săptămâni. Adaugă primul antrenament ca să începi să construiești acest plan.",
+        "title": "Încă nu ai antrenamente"
+      },
+      "fallbackTitle": "Program",
+      "loading": "Se încarcă programul…",
+      "setsInWeek": "{count, plural, one {# serie} few {# serii} other {# de serii}} în săptămâna {week}"
+    },
+    "editor": {
+      "addExercise": "Adaugă exercițiu",
+      "back": "Înapoi la structura programului",
+      "copyDay": "Copiază această zi în alte săptămâni",
+      "copyDayAria": "Copiază {name} în alte săptămâni",
+      "delete": "Șterge antrenamentul",
+      "deleteAria": "Șterge {name}",
+      "edit": "Editează antrenamentul",
+      "editAria": "Editează {name}",
+      "empty": {
+        "message": "Adaugă exerciții și prescrie-le seriile ca să construiești acest antrenament.",
+        "title": "Încă nu ai exerciții în acest antrenament"
+      },
+      "moveDown": "Mută mai jos în săptămână",
+      "moveDownAria": "Mută {name} mai jos în săptămâna {week}",
+      "moveTo": "Mută în altă săptămână/zi",
+      "moveToAria": "Mută {name} în altă săptămână sau zi",
+      "moveUp": "Mută mai sus în săptămână",
+      "moveUpAria": "Mută {name} mai sus în săptămâna {week}"
+    },
+    "exerciseRow": {
+      "addSet": "Adaugă serie",
+      "collapse": "Restrânge {name}",
+      "collapseSets": "Restrânge seriile pentru {name}",
+      "dragSet": "Trage ca să reordonezi seria {number}",
+      "duplicateSet": "Duplică seria",
+      "duplicateSetAria": "Duplică seria {number}",
+      "editSet": "Editează seria",
+      "editSetAria": "Editează seria {number}",
+      "expand": "Extinde {name}",
+      "expandSets": "Extinde seriile pentru {name}",
+      "moveDown": "Mută mai jos",
+      "moveDownAria": "Mută {name} mai jos",
+      "moveTo": "Mută în alt antrenament",
+      "moveToAria": "Mută {name} în alt antrenament",
+      "moveUp": "Mută mai sus",
+      "moveUpAria": "Mută {name} mai sus",
+      "noSets": "Nicio serie prescrisă.",
+      "remove": "Elimină exercițiul",
+      "removeSet": "Elimină seria",
+      "removeSetAria": "Elimină seria {number}",
+      "rest": "Pauză",
+      "restLabel": "{seconds} s pauză",
+      "supersetTag": "SS{group}",
+      "target": "Țintă",
+      "view": "Vezi exercițiul",
+      "viewAria": "Vezi detaliile pentru {name}"
+    },
+    "form": {
+      "day": "Zi",
+      "optional": "— opțional",
+      "week": "Săptămână"
+    },
+    "list": {
+      "cardActions": "Acțiuni pentru program",
+      "create": "Creează program",
+      "empty": {
+        "all": {
+          "message": "Programele sunt felul în care îți construiești planurile de antrenament — antrenamente, exerciții și serii pe care le urmează clienții tăi. Creează-l pe primul ca să începi.",
+          "title": "Încă nu ai programe"
+        },
+        "archived": {
+          "message": "Programele arhivate sunt ascunse, dar nu șterse.",
+          "title": "Niciun program arhivat"
+        },
+        "draft": {
+          "message": "Programele la care încă lucrezi apar aici.",
+          "title": "Nicio ciornă de program"
+        },
+        "published": {
+          "message": "Publică un program ca să-l poți atribui clienților.",
+          "title": "Niciun program publicat"
+        }
+      },
+      "loadError": "Programele nu s-au putut încărca: {error}",
+      "menu": {
+        "archive": "Arhivează…",
+        "delete": "Șterge…",
+        "publish": "Publică",
+        "restore": "Restaurează ca ciornă"
+      },
+      "newProgram": "Program nou",
+      "origin": {
+        "mine": "Ale mele",
+        "starters": "MotionHive"
+      },
+      "originFilter": "Filtru după autor",
+      "searchAria": "Caută programe",
+      "searchPlaceholder": "Caută programe…",
+      "statusFilter": "Filtru după stare",
+      "subtitle": "Construiește antrenamentele, exercițiile și seriile pe care le urmează clienții tăi.",
+      "subtitleShort": "Construiește planurile pe care le urmează clienții.",
+      "title": "Programe",
+      "updated": "Actualizat {date}"
+    },
+    "moveDialog": {
+      "daysHint": "Zilele care au deja un antrenament sunt dezactivate.",
+      "destination": "Antrenament de destinație",
+      "destinationPlaceholder": "Alege un antrenament",
+      "exerciseFallback": "Exercițiu",
+      "exerciseHint": "Exercițiul ajunge la finalul antrenamentului de destinație — îl poți ajusta apoi din meniul Mută…",
+      "move": "Mută",
+      "titleExercise": "Mută exercițiul",
+      "titleWorkout": "Mută antrenamentul",
+      "where": {
+        "after": "?",
+        "before": "Unde vrei să ajungă"
+      },
+      "workoutOption": "Săptămâna {week} · {day} — {name}"
+    },
+    "periodization": {
+      "block": "Pe blocuri",
+      "conjugate": "Conjugată",
+      "linear": "Liniară",
+      "undulating": "Ondulatorie"
+    },
+    "picker": {
+      "addToWorkout": "Adaugă la antrenament",
+      "listAria": "Exerciții",
+      "noResults": {
+        "message": "Încearcă alt termen de căutare.",
+        "title": "Nu am găsit exerciții."
+      },
+      "searchAria": "Caută exerciții",
+      "searchPlaceholder": "Caută exerciții…",
+      "selected": "{count, plural, one {# selectat} few {# selectate} other {# selectate}}",
+      "submitAdd": "{count, plural, one {Adaugă exercițiu} few {Adaugă # exerciții} other {Adaugă # de exerciții}}",
+      "titleMulti": "Adaugă exerciții",
+      "titleSingle": "Adaugă exercițiu"
+    },
+    "prescription": {
+      "mixed": "{count, plural, one {# serie} few {# serii} other {# de serii}} · mixte",
+      "noSets": "Nicio serie",
+      "uniform": "{count} × {summary}",
+      "withWarmups": "{warmups} × încălzire + {count} × {summary}"
+    },
+    "programForm": {
+      "createNote": "După ce creezi programul, adaugi săptămâni, antrenamente și exerciții din pagina lui de detalii.",
+      "descriptionPlaceholder": "Ce acoperă programul, cui i se adresează, cât de des trebuie urmat…",
+      "durationHint": "— {unit, select, weeks {săptămâni} other {zile}}, opțional",
+      "goalTags": "Etichete de obiectiv",
+      "goalTagsError": "Sunt permise cel mult {max} etichete — ai {count}.",
+      "goalTagsHint": "— separate prin virgulă, cel mult {max}",
+      "goalTagsPlaceholder": "ex. hipertrofie, slăbire, începător",
+      "kind": "Tip",
+      "nameMinLength": "Numele trebuie să aibă cel puțin {min} caractere.",
+      "namePlaceholder": "ex. Bazele forței — 8 săptămâni",
+      "nameRequired": "Numele este obligatoriu.",
+      "periodization": "Periodizare",
+      "statusOption": {
+        "ARCHIVED": "Arhivat — ascuns, nu șters",
+        "DRAFT": "Ciornă — doar tu îl vezi",
+        "PUBLISHED": "Publicat — gata de atribuit"
+      },
+      "titleEdit": "Editează programul",
+      "titleNew": "Program nou",
+      "unit": {
+        "days": "Zile",
+        "weeks": "Săptămâni"
+      }
+    },
+    "rail": {
+      "addWorkout": "Adaugă antrenament",
+      "addWorkoutAnotherWeek": "Adaugă antrenament în altă săptămână",
+      "addWorkoutToWeek": "Adaugă antrenament în săptămâna {week}",
+      "copyWeek": "Copiază această săptămână",
+      "copyWeekAria": "Copiază săptămâna {week} în altă săptămână",
+      "dragWeek": "Trage ca să reordonezi săptămâna",
+      "exerciseCountShort": "{count} ex.",
+      "noMatches": "Niciun antrenament nu se potrivește cu „{query}”.",
+      "noWorkouts": "Încă nu ai antrenamente.",
+      "outline": "Structura programului",
+      "searchPlaceholder": "Caută în acest program"
+    },
+    "setForm": {
+      "advanced": "Avansat (intensitate, timp, distanță, tempo)",
+      "distanceMeters": "Distanță (m)",
+      "durationSeconds": "Durată (s)",
+      "exerciseFallback": "Exercițiu",
+      "notesPlaceholder": "Indicație, focus, variantă mai ușoară…",
+      "numberOfSets": "Număr de serii",
+      "percent1rm": "% 1RM",
+      "repsMax": "Repetări (max)",
+      "repsMin": "Repetări (min)",
+      "repsRangeError": "Minimul de repetări nu poate depăși maximul.",
+      "restAfter": "Pauză după (s)",
+      "rir": "RIR",
+      "rpe": "RPE (1–10)",
+      "setType": "Tip de serie",
+      "submitAdd": "{count, plural, one {Adaugă serie} few {Adaugă # serii} other {Adaugă # de serii}}",
+      "tempo": "Tempo",
+      "tempoHint": "— ex. 3-1-1-0",
+      "tempoPattern": "Tempoul trebuie să aibă patru cifre separate prin cratimă, ex. 3-1-1-0.",
+      "tempoPlaceholder": "ex. 3-1-1-0",
+      "titleAdd": "Adaugă serie",
+      "titleEdit": "Editează seria",
+      "weightKg": "Greutate (kg)"
+    },
+    "setSummary": {
+      "meters": "{value} m",
+      "percent1rm": "{value}% 1RM",
+      "repsPlus": "{min}+ repetări",
+      "repsRange": "{min}–{max} repetări",
+      "rir": "{value} RIR",
+      "rpe": "RPE {value}",
+      "weightKg": "{value} kg"
+    },
+    "toast": {
+      "addExercisesError": {
+        "partial": "{count, plural, one {# exercițiu adăugat} few {# exerciții adăugate} other {# de exerciții adăugate}} înainte de eroare — restul sunt încă selectate.",
+        "summary": "Nu s-au putut adăuga toate exercițiile"
+      },
+      "addSetsError": "Nu s-au putut adăuga toate seriile",
+      "addSetsPartial": "{added} din {total, plural, one {# serie} few {# serii} other {# de serii}} au fost adăugate înainte de eroare.",
+      "addWorkoutError": "Antrenamentul nu s-a putut adăuga",
+      "archived": "Program arhivat",
+      "assignError": {
+        "detail": "Verifică relația cu clientul și încearcă din nou.",
+        "summary": "Programul nu s-a putut atribui"
+      },
+      "assigned": {
+        "detail": "{program} a fost trimis către {client}.",
+        "summary": "Program atribuit"
+      },
+      "checkForm": "Verifică formularul și încearcă din nou.",
+      "copyDayError": "Ziua nu s-a putut copia",
+      "copyWeekError": "Săptămâna nu s-a putut copia",
+      "createProgramError": "Programul nu s-a putut crea",
+      "dayCopied": {
+        "detail": "Copiat în {count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}.",
+        "summary": "{name} a fost copiat",
+        "summaryToDay": "{name} a fost copiat în ziua de {day}"
+      },
+      "deleteError": "Programul nu s-a putut șterge",
+      "deleteWorkoutError": "Antrenamentul nu s-a putut șterge",
+      "deleted": "Program șters",
+      "duplicateSetError": "Seria nu s-a putut duplica",
+      "exerciseMoved": "Exercițiu mutat",
+      "exerciseRemoved": "Exercițiu eliminat",
+      "exercisesAdded": {
+        "detailMany": "{count, plural, one {# exercițiu adăugat} few {# exerciții adăugate} other {# de exerciții adăugate}} în {workout}.",
+        "detailOne": "{name} a fost adăugat în {workout}.",
+        "summary": "{count, plural, one {Exercițiu adăugat} few {Exerciții adăugate} other {Exerciții adăugate}}"
+      },
+      "loadClientsError": {
+        "detail": "Reîmprospătează și încearcă din nou.",
+        "summary": "Clienții nu s-au putut încărca"
+      },
+      "loadError": {
+        "summary": "Programul nu s-a putut încărca"
+      },
+      "loadExercisesError": {
+        "detail": "Reîmprospătează pagina și încearcă din nou.",
+        "summary": "Exercițiile nu s-au putut încărca"
+      },
+      "moveExerciseError": "Exercițiul nu s-a putut muta",
+      "moveWorkoutError": "Antrenamentul nu s-a putut muta",
+      "programCreated": {
+        "detail": "{name} e gata — adaugă-i antrenamente.",
+        "summary": "Program creat"
+      },
+      "programDuplicated": {
+        "detail": "Am deschis copia — originalul a rămas neschimbat.",
+        "error": "Programul nu s-a putut duplica",
+        "summary": "Program duplicat"
+      },
+      "programUpdated": {
+        "detail": "{name} a fost salvat.",
+        "summary": "Program actualizat"
+      },
+      "published": "Program publicat",
+      "removeExerciseError": "Exercițiul nu s-a putut elimina",
+      "removeSetError": "Seria nu s-a putut elimina",
+      "reorderError": "Noua ordine nu s-a putut salva",
+      "restored": "Program restaurat ca ciornă",
+      "saveProgramError": "Programul nu s-a putut salva",
+      "saveSetError": "Seria nu s-a putut salva",
+      "saveWorkoutError": "Antrenamentul nu s-a putut salva",
+      "setDuplicated": "Serie duplicată",
+      "setRemoved": "Serie eliminată",
+      "setUpdated": "Serie actualizată",
+      "setsAdded": "{count, plural, one {Serie adăugată} few {# serii adăugate} other {# de serii adăugate}}",
+      "updateError": "Programul nu s-a putut actualiza",
+      "weekCopied": {
+        "detail": "{count, plural, one {# antrenament copiat.} few {# antrenamente copiate.} other {# de antrenamente copiate.}}",
+        "summary": "Săptămâna {source} a fost copiată în săptămâna {target}"
+      },
+      "weekFull": {
+        "detail": "O săptămână poate avea cel mult 7 antrenamente.",
+        "summary": "Săptămâna e plină"
+      },
+      "workoutAdded": "Antrenament adăugat",
+      "workoutDeleted": "Antrenament șters",
+      "workoutMoved": {
+        "detail": "{name} → săptămâna {week}, ziua {day}.",
+        "summary": "Antrenament mutat"
+      },
+      "workoutUpdated": "Antrenament actualizat"
+    },
+    "workoutForm": {
+      "minutesSuffix": "— min",
+      "name": "Numele antrenamentului",
+      "namePlaceholder": "ex. Ziua 1 — Partea superioară",
+      "nameRequired": "Numele antrenamentului este obligatoriu.",
+      "notesPlaceholder": "Indicații, note de încălzire, scopul sesiunii…",
+      "phase": "Fază",
+      "phasePlaceholder": "ex. acumulare",
+      "submitAdd": "Adaugă antrenament",
+      "titleEdit": "Editează antrenamentul",
+      "titleNew": "Antrenament nou"
     }
   },
   "sessions": {
@@ -2326,6 +3240,240 @@
     "toolbar": {
       "openSearch": "Deschide căutarea",
       "searchPlaceholder": "Caută antrenori, grupuri, sesiuni…"
+    }
+  },
+  "training": {
+    "common": {
+      "emptySearchMessage": "Încearcă alt nume sau șterge căutarea ca să vezi tot.",
+      "noEndDate": "Fără dată de final",
+      "rest": {
+        "minutesSeconds": "{minutes}m {seconds}s"
+      },
+      "startWorkout": "Începe un antrenament",
+      "startedOn": "Început pe {date}",
+      "startsOn": "Începe pe {date}",
+      "weightKg": "{weight} kg",
+      "yourCoach": "antrenorul tău"
+    },
+    "exerciseProgress": {
+      "backAria": "Înapoi la progres",
+      "bestEstimated": "Cel mai bun 1RM estimat",
+      "empty": {
+        "message": "După ce notezi o serie din acest exercițiu, istoricul lui apare aici.",
+        "title": "Nimic notat încă"
+      },
+      "km": "{distance} km",
+      "loadFailed": "Nu am putut încărca acest exercițiu",
+      "sessions": "Sesiuni",
+      "sessionsLogged": "{count, plural, one {# sesiune notată} few {# sesiuni notate} other {# de sesiuni notate}}",
+      "weightTimesReps": "{weight} kg × {reps}"
+    },
+    "history": {
+      "empty": {
+        "message": "Notează-l pe primul și apare aici, cu seriile, recordurile și cum ți s-a părut.",
+        "title": "Încă nu ai antrenamente"
+      },
+      "emptySearchTitle": "Niciun antrenament nu se potrivește",
+      "endOfList": "Asta e tot — {count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}} în total.",
+      "loadFailed": "Nu am putut încărca istoricul",
+      "searchAria": "Caută antrenamente",
+      "searchPlaceholder": "Caută în antrenamentele tale…"
+    },
+    "hub": {
+      "everyWorkout": "Toate antrenamentele",
+      "lens": {
+        "exercises": "Exerciții",
+        "plans": "Planuri",
+        "routines": "Rutine",
+        "today": "Azi"
+      },
+      "lensAria": "Vizualizare antrenament",
+      "statsTitle": "Cum se adună",
+      "subtitle": {
+        "exercises": "Toate mișcările din catalog, plus cele create de tine.",
+        "plans": "Ce ai în lucru.",
+        "routines": "Antrenamente pe care le poți începe oricând.",
+        "today": "Ziua ta și ce ai făcut."
+      }
+    },
+    "myPlans": {
+      "empty": {
+        "action": "Programează o rutină",
+        "message": "Planurile sunt antrenamente cu date, întinse pe mai multe săptămâni. Un antrenor îți poate face unul sau poți repeta una dintre rutinele tale din fila Rutine.",
+        "title": "Încă nu ai planuri"
+      },
+      "emptySearchTitle": "Niciun plan nu se potrivește căutării",
+      "endOfList": "Asta e tot — {count, plural, one {# plan} few {# planuri} other {# de planuri}} în total.",
+      "help": {
+        "aria": "Care e diferența dintre un plan și o rutină?",
+        "tooltip": "O rutină e un antrenament salvat, gata oricând ești pregătit. Un plan e un antrenament cu date — fie ce ți-a pregătit un antrenor, fie o rutină de-a ta setată să se repete."
+      },
+      "loadFailed": "Nu am putut încărca planurile tale",
+      "searchAria": "Caută planuri",
+      "searchPlaceholder": "Caută planuri…",
+      "subtitleCount": "{count, plural, one {# plan în calendarul tău.} few {# planuri în calendarul tău.} other {# de planuri în calendarul tău.}}",
+      "subtitleEmpty": "Ce ai în lucru, fie că ți l-a setat un antrenor, fie că l-ai programat singur."
+    },
+    "planDetail": {
+      "approxMinutes": "~{minutes} min",
+      "confirm": {
+        "skip": {
+          "header": "Sari peste antrenament?",
+          "message": "Sari peste „{name}”? Poți reveni la el mai târziu dacă te răzgândești, dar nu va conta pentru obiectivul tău săptămânal."
+        }
+      },
+      "cta": {
+        "allDone": "Toate antrenamentele sunt gata",
+        "cancelled": "Plan anulat",
+        "paused": "Plan pus pe pauză",
+        "resume": "Reia antrenamentul",
+        "review": "Revezi planul",
+        "startNext": "Începe următorul antrenament"
+      },
+      "empty": {
+        "message": "Antrenorul tău va adăuga antrenamente aici. Vei primi o notificare când ai ceva nou de făcut.",
+        "title": "Încă nu există antrenamente în acest plan"
+      },
+      "endsOnLower": "se termină pe {date}",
+      "fallbackTitle": "Plan",
+      "hideExercises": "Ascunde exercițiile",
+      "kpi": {
+        "weeks": "Săptămâni",
+        "workouts": "Antrenamente"
+      },
+      "nextUp": "Urmează · {name}",
+      "notStarted": "Neînceput",
+      "overviewAria": "Prezentare generală a planului",
+      "progress": "Progres",
+      "progressDone": "{percent}% · {done}/{total} gata",
+      "schedule": "Program",
+      "showExercises": "Arată exercițiile",
+      "skipWorkout": "Sari peste antrenament",
+      "status": {
+        "active": {
+          "message": "Continuă — treci la următorul antrenament.",
+          "title": "Plan în desfășurare"
+        },
+        "cancelled": {
+          "message": "Acest plan nu mai este activ."
+        },
+        "completed": {
+          "message": "Bravo — ai terminat toate antrenamentele.",
+          "title": "Plan finalizat"
+        },
+        "paused": {
+          "message": "Îl va relua când ești pregătit să continui.",
+          "title": "Pus pe pauză de antrenorul tău"
+        },
+        "pending": {
+          "message": "Poți începe mai devreme — datele sunt orientative, nu obligatorii."
+        }
+      },
+      "table": {
+        "rest": "Pauză",
+        "target": "Țintă"
+      },
+      "target": {
+        "km": "{distance} km",
+        "meters": "{distance} m",
+        "percent1rm": "{percent}% 1RM",
+        "reps": "{count, plural, one {# repetare} few {# repetări} other {# de repetări}}",
+        "repsMin": "{min}+ repetări",
+        "repsRange": "{min}–{max} repetări",
+        "rir": "@ RIR {value}",
+        "rpe": "@ RPE {value}",
+        "seconds": "{seconds}s",
+        "weightKg": "{weight} kg"
+      },
+      "toast": {
+        "loadFailed": {
+          "summary": "Nu am putut încărca planul"
+        },
+        "nothingToReplay": {
+          "detail": "Ai sărit peste „{name}” — nu s-a notat nicio sesiune.",
+          "summary": "Nimic de revăzut"
+        },
+        "openFailed": {
+          "detail": "Încearcă din nou peste câteva momente sau deschide antrenamentul din Antrenamente.",
+          "summary": "Nu am putut deschide antrenamentul"
+        },
+        "paused": {
+          "detail": "Antrenorul tău a pus planul pe pauză. Roagă-l să-l reia ca să poți continua.",
+          "summary": "Plan pus pe pauză"
+        },
+        "pleaseRetry": "Te rugăm să reîncerci.",
+        "skipFailed": "Nu am putut sări peste antrenament",
+        "skipped": "Ai sărit peste antrenament",
+        "startFailed": "Nu am putut începe antrenamentul"
+      },
+      "viewExerciseAria": "Vezi detaliile pentru {name}",
+      "viewExerciseFallbackAria": "Vezi detaliile exercițiului",
+      "week": "Săptămâna {week}",
+      "withCoach": "cu {name}",
+      "workoutsDone": "{done} / {total} antrenamente gata"
+    },
+    "planRow": {
+      "endsOn": "Se termină pe {date}",
+      "origin": {
+        "coach": "De la {name}",
+        "routine": "Din rutina ta",
+        "yourCoach": "De la antrenorul tău"
+      },
+      "review": "Revezi",
+      "started": "Început",
+      "starts": "Începe"
+    },
+    "progress": {
+      "bestStreak": "record {count}",
+      "consistency": {
+        "dayTitle": "{date} · {count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}",
+        "title": "Constanță",
+        "window": "ultimele 28 de zile"
+      },
+      "delta": {
+        "count": "{delta} față de perioada anterioară",
+        "percent": "{delta}% față de perioada anterioară",
+        "same": "la fel ca în perioada anterioară"
+      },
+      "early": {
+        "logNext": "Notează antrenamentul nr. {number}",
+        "message": "Fiecare primă ridicare e un record personal, deci ce ai notat acum e cifra de depășit. Mai notează câteva și tendințele și seriile de zile apar aici.",
+        "title": "Bravo, ai punctul de plecare."
+      },
+      "empty": {
+        "message": "Notează primul antrenament și recordurile, volumul și seriile de zile încep să apară aici.",
+        "title": "Încă niciun progres"
+      },
+      "kpi": {
+        "streak": "Serie de zile",
+        "volume": "Volum kg",
+        "workouts": "Antrenamente"
+      },
+      "loadFailed": "Nu am putut încărca progresul tău",
+      "rangeAria": "Interval de timp",
+      "rangeOneYear": "1 an",
+      "records": {
+        "empty": "Notează o serie cu greutate și primul tău record apare aici.",
+        "estimated": "1RM estimat",
+        "first": "primul",
+        "title": "Recorduri"
+      },
+      "streakWeeks": "{count, plural, one {# săpt.} few {# săpt.} other {# de săpt.}}",
+      "subtitle": {
+        "early": "Ai punctul de plecare. Continuă să notezi și apar tendințele.",
+        "empty": "Recordurile și tendințele tale se adună aici pe măsură ce te antrenezi.",
+        "summary": "{count, plural, one {# antrenament notat.} few {# antrenamente notate.} other {# de antrenamente notate.}}",
+        "summaryWithHours": "{count, plural, one {# antrenament notat} few {# antrenamente notate} other {# de antrenamente notate}} · {hours} h de antrenament."
+      },
+      "summaryAria": "Rezumatul antrenamentelor",
+      "thousands": "{value}k",
+      "weeklyVolume": {
+        "aria": "Volumul săptămânal de antrenament",
+        "average": "{average} antrenamente / săptămână în medie",
+        "barTooltip": "{volume} kg · {count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}",
+        "caption": "Sub fiecare bară: antrenamentele din săptămâna respectivă.",
+        "title": "Volum săptămânal"
+      }
     }
   }
 }

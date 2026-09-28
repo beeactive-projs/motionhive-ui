@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ElementRef,
   computed,
@@ -18,6 +17,7 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
@@ -36,10 +36,14 @@ import {
   ProgramService,
   ProgramStatus,
   UpdateProgramPayload,
+  enumLabel,
   noWhitespaceValidator,
   showApiError,
   trimmedMinLength,
+  validationMessage,
 } from 'core';
+
+import { PERIODIZATION_MODELS } from '../program-labels';
 
 type DurationUnit = 'weeks' | 'days';
 
@@ -83,11 +87,11 @@ const maxTagsValidator =
     SelectButton,
     Textarea,
     Toast,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './program-form-dialog.html',
   styleUrl: './program-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramFormDialog {
   /** When set → edit mode. When null → create mode. */
@@ -98,6 +102,7 @@ export class ProgramFormDialog {
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
   private readonly _formBuilder = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _nameInput =
     viewChild<ElementRef<HTMLInputElement>>('nameInput');
@@ -122,27 +127,30 @@ export class ProgramFormDialog {
   // ── Options ──────────────────────────────────────────────────────
 
   readonly kindOptions: SelectItem<ProgramKind>[] = [
-    { value: ProgramKind.Workout, label: 'Workout' },
+    { value: ProgramKind.Workout, label: enumLabel('programKind', ProgramKind.Workout) },
     // Meal/Habit/Hybrid are intentionally hidden until those modules ship.
   ];
 
   readonly statusOptions: SelectItem<ProgramStatus>[] = [
-    { value: ProgramStatus.Draft, label: 'Draft — only you can see it' },
-    { value: ProgramStatus.Published, label: 'Published — ready to assign' },
-    { value: ProgramStatus.Archived, label: 'Archived — hidden, not deleted' },
-  ];
+    ProgramStatus.Draft,
+    ProgramStatus.Published,
+    ProgramStatus.Archived,
+  ].map((value) => ({
+    value,
+    label: this._translateService.instant(`programs.programForm.statusOption.${value}`),
+  }));
 
   readonly periodizationOptions: SelectItem<string>[] = [
-    { value: '', label: 'None' },
-    { value: 'linear', label: 'Linear' },
-    { value: 'undulating', label: 'Undulating' },
-    { value: 'block', label: 'Block' },
-    { value: 'conjugate', label: 'Conjugate' },
+    { value: '', label: this._translateService.instant('common.none') },
+    ...PERIODIZATION_MODELS.map((value) => ({
+      value,
+      label: this._translateService.instant(`programs.periodization.${value}`),
+    })),
   ];
 
   readonly unitOptions: SelectItem<DurationUnit>[] = [
-    { value: 'weeks', label: 'Weeks' },
-    { value: 'days', label: 'Days' },
+    { value: 'weeks', label: this._translateService.instant('programs.programForm.unit.weeks') },
+    { value: 'days', label: this._translateService.instant('programs.programForm.unit.days') },
   ];
 
   /** Cap derived from the unit. BE accepts 1..728 days = 1..104 weeks. */
@@ -154,10 +162,12 @@ export class ProgramFormDialog {
 
   readonly isEdit = computed(() => this.program() !== null);
   readonly dialogHeader = computed(() =>
-    this.isEdit() ? 'Edit program' : 'New program',
+    this._translateService.instant(
+      this.isEdit() ? 'programs.programForm.titleEdit' : 'programs.programForm.titleNew',
+    ),
   );
   readonly submitLabel = computed(() =>
-    this.isEdit() ? 'Save changes' : 'Create program',
+    this._translateService.instant(this.isEdit() ? 'button.saveChanges' : 'programs.list.create'),
   );
 
   // ── Validation ───────────────────────────────────────────────────
@@ -170,10 +180,10 @@ export class ProgramFormDialog {
   }
 
   getFieldError(field: 'name'): string {
-    const errors = this.form.controls[field].errors;
-    if (errors?.['required']) return 'Name is required.';
-    if (errors?.['minlength']) return 'Name must be at least 2 characters.';
-    return '';
+    return validationMessage(this.form.controls[field].errors, {
+      required: 'programs.programForm.nameRequired',
+      minlength: 'programs.programForm.nameMinLength',
+    });
   }
 
   /**
@@ -183,7 +193,10 @@ export class ProgramFormDialog {
   goalTagsError(): string | null {
     const errors = this.form.controls.goalTags.errors;
     return errors?.['maxTags']
-      ? `Up to 10 tags allowed — you have ${errors['maxTags'].actual}.`
+      ? this._translateService.instant('programs.programForm.goalTagsError', {
+          max: errors['maxTags'].max,
+          count: errors['maxTags'].actual,
+        })
       : null;
   }
 
@@ -246,10 +259,13 @@ export class ProgramFormDialog {
         this.submitting.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: existing ? 'Program updated' : 'Program created',
-          detail: existing
-            ? `${p.name} saved.`
-            : `${p.name} is ready — add workouts to it next.`,
+          summary: this._translateService.instant(
+            existing ? 'programs.toast.programUpdated.summary' : 'programs.toast.programCreated.summary',
+          ),
+          detail: this._translateService.instant(
+            existing ? 'programs.toast.programUpdated.detail' : 'programs.toast.programCreated.detail',
+            { name: p.name },
+          ),
           life: 3500,
         });
         this.saved.emit(p);
@@ -259,8 +275,10 @@ export class ProgramFormDialog {
         this.submitting.set(false);
         showApiError(
           this._messageService,
-          existing ? "Couldn't save program" : "Couldn't create program",
-          'Please check the form and try again.',
+          this._translateService.instant(
+            existing ? 'programs.toast.saveProgramError' : 'programs.toast.createProgramError',
+          ),
+          this._translateService.instant('programs.toast.checkForm'),
           err,
         );
       },

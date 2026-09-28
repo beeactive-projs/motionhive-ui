@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>Progress</ion-title>
+    <ion-title>{{ 'workouts.common.progress' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,15 +11,15 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your progress"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.progress' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
     <div class="mh-page">
       <section class="mh-section">
-        <span class="mh-kicker">Last 12 weeks</span>
+        <span class="mh-kicker">{{ 'workouts.progress.last12Weeks' | translate }}</span>
         <div class="mh-tiles">
           @for (_ of skeletonTiles; track $index) {
             <mh-stat-tile label="" value="" [loading]="true" />
@@ -30,13 +30,13 @@
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="trending-up-outline"
-      heading="Nothing to show yet"
-      message="Log a few workouts and your numbers will build up here."
+      [heading]="'workouts.progress.empty.title' | translate"
+      [message]="'workouts.progress.empty.message' | translate"
     />
   } @else {
     <div class="mh-page">
       <section class="mh-section">
-        <span class="mh-kicker">Last 12 weeks</span>
+        <span class="mh-kicker">{{ 'workouts.progress.last12Weeks' | translate }}</span>
         <div class="mh-tiles">
           @for (tile of tiles(); track tile.label) {
             <mh-stat-tile [label]="tile.label" [value]="tile.value" />
@@ -46,14 +46,14 @@
 
       @if (records().length) {
         <section class="mh-section">
-          <span class="mh-kicker">Records</span>
+          <span class="mh-kicker">{{ 'workouts.progress.records' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
             @for (record of records(); track record.exerciseId; let last = $last) {
               <ion-item [lines]="last ? 'none' : 'full'">
                 <ion-label>
                   <h2>{{ record.exerciseName }}</h2>
                 </ion-label>
-                <ion-note slot="end" class="value">{{ record.weightKg }} kg</ion-note>
+                <ion-note slot="end" class="value">{{ recordWeight(record.weightKg) }}</ion-note>
               </ion-item>
             }
           </ion-list>

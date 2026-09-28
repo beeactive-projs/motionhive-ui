@@ -15,6 +15,7 @@
     "openNotifications": "Deschide notificările",
     "playVideo": "Redă videoclipul",
     "previousMonth": "Luna anterioară",
+    "removeItem": "Elimină {name}",
     "showPassword": "Arată parola",
     "unread": "Necitită"
   },
@@ -31,9 +32,11 @@
     "clear": "Golește",
     "clearFilter": "Șterge filtrul",
     "clearFilters": "Șterge filtrele",
+    "clearSearch": "Șterge căutarea",
     "close": "Închide",
     "confirm": "Confirmă",
     "continue": "Continuă",
+    "copy": "Copiază",
     "copyLink": "Copiază linkul",
     "create": "Creează",
     "decline": "Refuză",
@@ -46,6 +49,7 @@
     "invite": "Invită",
     "join": "Alătură-te",
     "keep": "Păstrează",
+    "keepIt": "Păstrează",
     "leave": "Părăsește",
     "loadMore": "Încarcă mai multe",
     "next": "Înainte",
@@ -58,6 +62,7 @@
     "resend": "Retrimite",
     "reset": "Resetează",
     "restore": "Restaurează",
+    "resume": "Reia",
     "retry": "Reîncearcă",
     "save": "Salvează",
     "saveChanges": "Salvează modificările",
@@ -72,6 +77,7 @@
     "signOut": "Deconectează-te",
     "signUp": "Creează cont",
     "skip": "Sari peste",
+    "start": "Începe",
     "submit": "Trimite",
     "tryAgain": "Încearcă din nou",
     "unarchive": "Dezarhivează",
@@ -113,6 +119,7 @@
     "members": "{count, plural, one {# membru} few {# membri} other {# de membri}}",
     "minutes": "{count, plural, one {# minut} few {# minute} other {# de minute}}",
     "programs": "{count, plural, one {# program} few {# programe} other {# de programe}}",
+    "reps": "{count, plural, one {# repetare} few {# repetări} other {# de repetări}}",
     "sessions": "{count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}}",
     "sets": "{count, plural, one {# serie} few {# serii} other {# de serii}}",
     "weeks": "{count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
@@ -135,10 +142,45 @@
       "ARCHIVED": "Arhivat",
       "PENDING": "În așteptare"
     },
+    "exerciseBlockKind": {
+      "AMRAP": "AMRAP",
+      "CIRCUIT": "Circuit",
+      "EMOM": "EMOM",
+      "NONE": "Niciunul",
+      "SUPERSET": "Superset",
+      "TABATA": "Tabata"
+    },
+    "exerciseForce": {
+      "PULL": "Tracțiune",
+      "PUSH": "Împingere",
+      "STATIC": "Static"
+    },
+    "exerciseKind": {
+      "BODYWEIGHT": "Greutatea corpului",
+      "CARDIO": "Cardio",
+      "DISTANCE": "Distanță",
+      "DURATION": "Durată",
+      "MOBILITY": "Mobilitate",
+      "STRENGTH": "Forță"
+    },
     "exerciseLevel": {
       "ADVANCED": "Avansat",
       "BEGINNER": "Începător",
       "INTERMEDIATE": "Intermediar"
+    },
+    "exerciseMechanic": {
+      "COMPOUND": "Compus",
+      "ISOLATION": "Izolare"
+    },
+    "exerciseSetType": {
+      "AMRAP": "AMRAP",
+      "CLUSTER": "Cluster",
+      "DROPSET": "Drop set",
+      "FAILURE": "Până la epuizare",
+      "NORMAL": "Normală",
+      "REST_PAUSE": "Rest-pause",
+      "WARMUP": "Încălzire",
+      "WORKING": "De lucru"
     },
     "fitnessLevel": {
       "ADVANCED": "Avansat",
@@ -174,6 +216,25 @@
       "INVITE_ONLY": "Doar cu invitație",
       "OPEN": "Deschis"
     },
+    "movementPattern": {
+      "ANTI_ROTATION": "Anti-rotație",
+      "CARRY": "Transport",
+      "HINGE": "Flexie din șold",
+      "ISOLATION": "Izolare",
+      "LOCOMOTION": "Locomoție",
+      "LUNGE": "Fandare",
+      "PULL_HORIZONTAL": "Tracțiune orizontală",
+      "PULL_VERTICAL": "Tracțiune verticală",
+      "PUSH_HORIZONTAL": "Împingere orizontală",
+      "PUSH_VERTICAL": "Împingere verticală",
+      "ROTATION": "Rotație",
+      "SQUAT": "Genuflexiune"
+    },
+    "muscleRole": {
+      "PRIMARY": "Principal",
+      "SECONDARY": "Secundar",
+      "STABILIZER": "Stabilizator"
+    },
     "myTab": {
       "cancelled": "Anulate",
       "past": "Trecute",
@@ -204,6 +265,17 @@
       "COMPLETED": "Finalizat",
       "PAUSED": "Pe pauză",
       "PENDING": "În așteptare"
+    },
+    "programKind": {
+      "HABIT": "Obicei",
+      "HYBRID": "Hibrid",
+      "MEAL": "Alimentație",
+      "WORKOUT": "Antrenament"
+    },
+    "programStatus": {
+      "ARCHIVED": "Arhivat",
+      "DRAFT": "Ciornă",
+      "PUBLISHED": "Publicat"
     },
     "refundReason": {
       "duplicate": "Duplicat",
@@ -283,6 +355,12 @@
       "OTHER": "Altceva",
       "SCAM": "Înșelătorie",
       "SPAM": "Spam"
+    },
+    "workoutLogStatus": {
+      "ABANDONED": "Abandonat",
+      "COMPLETED": "Finalizat",
+      "IN_PROGRESS": "În desfășurare",
+      "SKIPPED": "Sărit"
     }
   },
   "error": {
@@ -307,6 +385,7 @@
       "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în câteva momente.",
       "unexpected": "A apărut o eroare neașteptată. Încearcă din nou."
     },
+    "mayBeRemoved": "Poate a fost șters sau nu ai acces la el.",
     "messaging": {
       "forbidden": "Nu poți trimite acest mesaj.",
       "notDelivered": "Mesajul nu a putut fi livrat. Poate a părăsit conversația sau a blocat mesajele de la tine.",
@@ -438,6 +517,7 @@
     "minutesShort": "{minutes} min",
     "now": "acum",
     "perInterval": "{interval, select, day {{count, plural, one {/ zi} few {/ # zile} other {/ # de zile}}} week {{count, plural, one {/ săptămână} few {/ # săptămâni} other {/ # de săptămâni}}} month {{count, plural, one {/ lună} few {/ # luni} other {/ # de luni}}} year {{count, plural, one {/ an} few {/ # ani} other {/ # de ani}}} other {}}",
+    "secondsShort": "{seconds} s",
     "startingNow": "începe acum",
     "today": "Azi",
     "todayWithDate": "Azi · {date}",

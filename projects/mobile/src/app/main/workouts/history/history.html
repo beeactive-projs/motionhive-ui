@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>History</ion-title>
+    <ion-title>{{ 'workouts.common.history' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,9 +15,9 @@
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your history"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.history' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.showSkeleton()) {
@@ -35,8 +35,8 @@
   } @else if (store.isEmpty()) {
     <mh-empty-state
       icon="time-outline"
-      heading="Nothing logged yet"
-      message="Finish a workout and it will show up here."
+      [heading]="'workouts.history.empty.title' | translate"
+      [message]="'workouts.history.empty.message' | translate"
     />
   } @else {
     <div class="mh-page">

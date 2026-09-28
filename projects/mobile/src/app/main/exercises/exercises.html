@@ -4,10 +4,11 @@
      the clients directory. -->
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-searchbar mhAutofocus placeholder="Search by name" inputmode="search" [debounce]="0"
-      [value]="searchInput()" (ionInput)="onQuery($event.detail.value ?? '')" />
+    <ion-searchbar mhAutofocus [placeholder]="'exercises.library.searchPlaceholder' | translate"
+      inputmode="search" [debounce]="0" [value]="searchInput()"
+      (ionInput)="onQuery($event.detail.value ?? '')" />
     <ion-buttons slot="end">
-      <ion-button (click)="closeSearch()">Cancel</ion-button>
+      <ion-button (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -17,9 +18,10 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="backHref" />
     </ion-buttons>
-    <ion-title>Exercises</ion-title>
+    <ion-title>{{ 'nav.exercises' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button shape="round" aria-label="Search exercises" (click)="openSearch()">
+      <ion-button shape="round" [attr.aria-label]="'exercises.library.search' | translate"
+        (click)="openSearch()">
         <ion-icon slot="icon-only" name="search-outline" />
       </ion-button>
     </ion-buttons>
@@ -33,7 +35,11 @@
       <ion-button class="filters" fill="clear" shape="round" size="small"
         [class.active]="store.activeFilterCount() > 0" (click)="openFilters()">
         <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
-        Filters@if (store.activeFilterCount() > 0) { · {{ store.activeFilterCount() }} }
+        @if (store.activeFilterCount() > 0) {
+        {{ 'common.filtersCount' | translate: { count: store.activeFilterCount() } }}
+        } @else {
+        {{ 'common.filters' | translate }}
+        }
       </ion-button>
 
       @for (pill of pills(); track pill.value) {
@@ -53,8 +59,9 @@
   </ion-refresher>
 
   @if (store.showError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load the library"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'exercises.library.loadError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else if (store.showSkeleton()) {
   <!-- Mirrors the row shape so nothing shifts when the rows land. -->
   <div class="mh-page">
@@ -76,22 +83,22 @@
   } @else if (isMineEmpty()) {
   <!-- The catalogue is the reason this is not a dead end: 700+ movements are
        already there, so writing one is a choice, not a chore you owe. -->
-  <mh-empty-state icon="flash-outline" heading="No exercises of your own yet"
-    message="The system library already covers hundreds of movements. Create a custom one when a client needs something specific — or fork a public exercise and tweak it."
-    actionLabel="Create your first exercise" (action)="create()" />
+  <mh-empty-state icon="flash-outline" [heading]="'exercises.library.mineEmpty.title' | translate"
+    [message]="'exercises.library.mineEmpty.message' | translate"
+    [actionLabel]="'exercises.library.mineEmpty.action' | translate" (action)="create()" />
   <div class="secondary-action">
     <ion-button fill="clear" size="small" (click)="browsePublic()">
-      Browse public exercises to fork
+      {{ 'exercises.library.mineEmpty.browse' | translate }}
     </ion-button>
   </div>
   } @else if (store.isFilteredEmpty()) {
-  <mh-empty-state icon="search-outline" heading="Nothing matches"
-    message="No exercise matches what you asked for. Try a different filter or a shorter search."
-    actionLabel="Clear filters" actionFill="outline" (action)="clearNarrowing()" />
+  <mh-empty-state icon="search-outline" [heading]="'empty.nothingMatches' | translate"
+    [message]="'exercises.library.noMatch' | translate"
+    [actionLabel]="'button.clearFilters' | translate" actionFill="outline" (action)="clearNarrowing()" />
   } @else if (store.isEmpty()) {
-  <mh-empty-state icon="barbell-outline" heading="The library is empty"
-    message="No exercises are available yet. Try again in a moment." actionLabel="Try again"
-    actionFill="outline" (action)="retry()" />
+  <mh-empty-state icon="barbell-outline" [heading]="'exercises.library.empty.title' | translate"
+    [message]="'exercises.library.empty.message' | translate"
+    [actionLabel]="'button.tryAgain' | translate" actionFill="outline" (action)="retry()" />
   } @else {
   <div class="mh-page">
     <span class="mh-kicker meta">{{ metaLabel() }}</span>
@@ -109,7 +116,7 @@
 
   @if (canAuthor()) {
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button aria-label="New exercise" (click)="create()">
+    <ion-fab-button [attr.aria-label]="'exercises.library.newExercise' | translate" (click)="create()">
       <ion-icon name="add-outline" />
     </ion-fab-button>
   </ion-fab>

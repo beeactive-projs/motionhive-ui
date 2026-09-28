@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IonChip, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subject, catchError, debounceTime, map, of, switchMap } from 'rxjs';
 
 import {
@@ -54,7 +55,7 @@ const MUSCLE_PREVIEW = 8;
  */
 @Component({
   selector: 'mh-exercise-filter-sheet',
-  imports: [IonChip, IonNote, SheetShell],
+  imports: [IonChip, IonNote, SheetShell, TranslatePipe],
   templateUrl: './exercise-filter-sheet.html',
   styleUrl: './exercise-filter-sheet.scss',
 })
@@ -69,7 +70,8 @@ export class ExerciseFilterSheet {
   readonly applied = output<ExerciseFilters>();
 
   private readonly _exerciseService = inject(ExerciseService);
-  private readonly _taxonomy = inject(ExerciseTaxonomyStore);
+  private readonly _exerciseTaxonomyStore = inject(ExerciseTaxonomyStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly draft = signal<ExerciseFilters>(NO_FILTERS);
   readonly musclesExpanded = signal(false);
@@ -104,7 +106,7 @@ export class ExerciseFilterSheet {
    */
   private readonly _allMuscleChips = computed<FilterChip<string>[]>(() => {
     const counts = this.facets()?.primaryMuscleId;
-    return this._taxonomy
+    return this._exerciseTaxonomyStore
       .muscles()
       .map((muscle) => ({
         value: muscle.id,
@@ -131,7 +133,7 @@ export class ExerciseFilterSheet {
 
   readonly equipmentChips = computed<FilterChip<string>[]>(() => {
     const counts = this.facets()?.equipmentId;
-    return this._taxonomy
+    return this._exerciseTaxonomyStore
       .equipment()
       .map((row) => ({
         value: row.id,
@@ -143,19 +145,20 @@ export class ExerciseFilterSheet {
 
   readonly count = computed(() => filterCount(this.draft()));
 
-  readonly applyLabel = computed(() => {
+  readonly applyLabel = computed<string>(() => {
     const total = this.previewTotal();
-    if (total === null) return 'Show exercises';
-    const noun = total === 1 ? 'exercise' : 'exercises';
-    return `Show ${total} ${noun}`;
+    if (total === null) return this._translateService.instant('exercises.filterSheet.showExercises');
+    return this._translateService.instant('exercises.filterSheet.showCount', { count: total });
   });
 
-  readonly showAllMusclesLabel = computed(
-    () => `All ${this._allMuscleChips().length} muscles…`,
+  readonly showAllMusclesLabel = computed<string>(() =>
+    this._translateService.instant('exercises.filterSheet.allMuscles', {
+      count: this._allMuscleChips().length,
+    }),
   );
 
   constructor() {
-    this._taxonomy.ensureLoaded();
+    this._exerciseTaxonomyStore.ensureLoaded();
 
     // Seed from what is applied each time it opens, so a dismissed edit is
     // discarded rather than carried into the next visit.

@@ -18,6 +18,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -89,6 +90,7 @@ const FRAME_MS = 1400;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
     YoutubeEmbed,
   ],
   templateUrl: './exercise-detail.html',
@@ -102,6 +104,7 @@ export class ExerciseDetail implements ViewWillEnter {
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   /** The row being shown, read off the route rather than passed in. */
   readonly exerciseId = signal('');
@@ -129,7 +132,9 @@ export class ExerciseDetail implements ViewWillEnter {
 
   // ── What it is ────────────────────────────────────────────────────────────
 
-  readonly name = computed(() => this.exercise()?.name ?? 'Exercise');
+  readonly name = computed<string>(
+    () => this.exercise()?.name ?? this._translateService.instant('exercises.detail.fallbackName'),
+  );
 
   readonly kindLabel = computed(() => {
     const exercise = this.exercise();
@@ -237,7 +242,9 @@ export class ExerciseDetail implements ViewWillEnter {
     // );
   });
 
-  readonly forkTitle = computed(() => `Fork ${this.name()}?`);
+  readonly forkTitle = computed<string>(() =>
+    this._translateService.instant('exercises.detail.forkConfirm.title', { name: this.name() }),
+  );
 
   constructor() {
     addIcons(EXERCISE_ICONS);
@@ -304,7 +311,11 @@ export class ExerciseDetail implements ViewWillEnter {
       .subscribe({
         next: (fork) => {
           this.forking.set(false);
-          void this._leaveFor(['/tabs/exercises', fork.id], 'Copied to your exercises', true);
+          void this._leaveFor(
+            ['/tabs/exercises', fork.id],
+            this._translateService.instant('exercises.detail.toast.forked'),
+            true,
+          );
         },
         error: (error: unknown) => {
           if (isConflict(error)) {
@@ -312,7 +323,10 @@ export class ExerciseDetail implements ViewWillEnter {
             return;
           }
           this.forking.set(false);
-          void this._feedbackService.error(error, 'Could not fork this exercise.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('exercises.detail.toast.forkFailed'),
+          );
         },
       });
   }
@@ -355,18 +369,22 @@ export class ExerciseDetail implements ViewWillEnter {
           if (existing) {
             void this._leaveFor(
               ['/tabs/exercises', existing.id],
-              'You already have a copy — here it is'
+              this._translateService.instant('exercises.detail.toast.existingFork'),
             );
             return;
           }
           // The copy exists — the API just said so — but the name search did
           // not find it (renamed, or past the first fifty). Say the true
           // thing rather than sending them nowhere.
-          void this._dismissFork('You already have a fork of this exercise.');
+          void this._dismissFork(
+            this._translateService.instant('exercises.detail.toast.alreadyForked'),
+          );
         },
         error: () => {
           this.forking.set(false);
-          void this._dismissFork('You already have a fork of this exercise.');
+          void this._dismissFork(
+            this._translateService.instant('exercises.detail.toast.alreadyForked'),
+          );
         },
       });
   }
@@ -390,7 +408,9 @@ export class ExerciseDetail implements ViewWillEnter {
         error: () => {
           // A quiet re-read that fails leaves what was on screen; only a
           // first load has nothing better to show than the error.
-          if (!opts.silent) this.error.set('This exercise is not available.');
+          if (!opts.silent) {
+            this.error.set(this._translateService.instant('exercises.detail.loadError.message'));
+          }
           this.loading.set(false);
         },
       });

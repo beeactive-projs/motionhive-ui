@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 
 import { WorkoutLog, WorkoutLogService } from 'core';
@@ -31,6 +32,7 @@ interface FetchOptions {
 @Injectable()
 export class HistoryStore {
   private readonly _workoutLogService = inject(WorkoutLogService);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _items = signal<WorkoutLog[]>([]);
   private readonly _total = signal(0);
@@ -57,10 +59,9 @@ export class HistoryStore {
   );
 
   /** "42 workouts logged" — the line that says how big the record is. */
-  readonly countLabel = computed(() => {
-    const total = this._total();
-    return `${total} ${total === 1 ? 'workout' : 'workouts'} logged`;
-  });
+  readonly countLabel = computed(() =>
+    this._translateService.instant('workouts.history.count', { count: this._total() }),
+  );
 
   /**
    * Re-read what is on screen, in place. Called on every entry to the page:

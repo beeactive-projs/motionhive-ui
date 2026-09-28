@@ -1,6 +1,6 @@
 <ng-template #body>
   @if (program(); as program) {
-    <div class="mh-section-label">Program</div>
+    <div class="mh-section-label">{{ 'programs.assign.program' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
       <ion-item lines="none">
         <ion-label>
@@ -10,12 +10,12 @@
     </ion-list>
   }
 
-  <div class="mh-section-label">Client</div>
+  <div class="mh-section-label">{{ 'programs.assign.client' | translate }}</div>
   @if (loading()) {
-    <ion-note class="mh-note-block">Loading your clients…</ion-note>
+    <ion-note class="mh-note-block">{{ 'programs.assign.loadingClients' | translate }}</ion-note>
   } @else if (!clients().length) {
     <ion-note class="mh-note-block">
-      No active clients yet. A client has to accept before they can be given work.
+      {{ 'programs.assign.noClients' | translate }}
     </ion-note>
   } @else {
     <ion-list [inset]="true" class="mh-card-list">
@@ -38,10 +38,10 @@
     </ion-list>
   }
 
-  <div class="mh-section-label">Starts</div>
+  <div class="mh-section-label">{{ 'programs.assign.starts' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item lines="none">
-      <ion-label>Start date</ion-label>
+      <ion-label>{{ 'form.label.startDate' | translate }}</ion-label>
       <ion-datetime-button slot="end" datetime="assign-start-date" />
     </ion-item>
   </ion-list>
@@ -63,7 +63,7 @@
   <!-- The real work of this sheet: which day lands on which date. A plan that
        puts Day 1 on a Saturday is caught here, not in chat on Wednesday. -->
   @if (preview().length) {
-    <div class="mh-section-label">Schedule</div>
+    <div class="mh-section-label">{{ 'programs.assign.schedule' | translate }}</div>
     <ion-list [inset]="true" class="mh-card-list">
       @for (row of previewHead(); track row.name + row.date; let last = $last) {
         <ion-item [lines]="last && !previewMore() ? 'none' : 'full'">
@@ -74,17 +74,17 @@
       }
       @if (previewMore()) {
         <ion-item lines="none">
-          <ion-note class="more">+ {{ previewMore() }} more</ion-note>
+          <ion-note class="more">{{ 'programs.assign.more' | translate: { count: previewMore() } }}</ion-note>
         </ion-item>
       }
     </ion-list>
   }
 
-  <div class="mh-section-label">Note</div>
+  <div class="mh-section-label">{{ 'programs.assign.note' | translate }}</div>
   <ion-textarea
     fill="outline"
     [autoGrow]="true"
-    placeholder="Anything they should know before starting."
+    [placeholder]="'programs.common.notePlaceholder' | translate"
     [value]="notes()"
     (ionInput)="notes.set($any($event).detail.value ?? '')"
   />
@@ -92,9 +92,9 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Assign program"
+  [title]="'programs.assign.title' | translate"
   [body]="body"
-  saveLabel="Assign"
+  [saveLabel]="'programs.assign.assign' | translate"
   [canSave]="canAssign()"
   [breakpoints]="[0, 0.9]"
   [initialBreakpoint]="0.9"

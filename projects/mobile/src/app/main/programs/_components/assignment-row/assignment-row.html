@@ -23,11 +23,11 @@
 
   @if (canPause()) {
     <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="pause.emit()">
-      Pause
+      {{ 'programs.assignment.pause' | translate }}
     </ion-button>
   } @else if (canResume()) {
     <ion-button slot="end" fill="clear" size="small" [disabled]="busy()" (click)="resume.emit()">
-      Resume
+      {{ 'button.resume' | translate }}
     </ion-button>
   }
 </ion-item>

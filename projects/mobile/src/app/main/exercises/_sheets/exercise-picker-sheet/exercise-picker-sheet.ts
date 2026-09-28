@@ -11,6 +11,7 @@ import {
   IonSearchbar,
   IonSkeletonText,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subject, catchError, debounceTime, map, of, switchMap } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -56,6 +57,7 @@ const PAGE_SIZE = 20;
     IonSkeletonText,
     SearchbarAutofocusDirective,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './exercise-picker-sheet.html',
   styleUrl: './exercise-picker-sheet.scss',
@@ -67,10 +69,12 @@ export class ExercisePickerSheet {
   /**
    * Swapping reuses this sheet, and a sheet headed "Add exercises" while it
    * is about to replace something is exactly the ambiguity we are trying to
-   * remove. Callers say what the sheet is for.
+   * remove. Callers say what the sheet is for. Empty falls back to
+   * "Add exercises".
    */
-  readonly title = input('Add exercises');
-  readonly confirmVerb = input('Add');
+  readonly title = input('');
+  /** Already translated by the caller ("Add", "Swap for"); empty falls back to "Add". */
+  readonly confirmVerb = input('');
   /** One out, one in: swapping is a single choice, not a batch. */
   readonly single = input(false);
   /** Already in the list behind the sheet; shown as picked and not re-addable. */
@@ -79,7 +83,8 @@ export class ExercisePickerSheet {
   readonly picked = output<Exercise[]>();
 
   private readonly _exerciseService = inject(ExerciseService);
-  private readonly _recents = inject(RecentExercisesStore);
+  private readonly _recentExercisesStore = inject(RecentExercisesStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly query = signal('');
   readonly results = signal<Exercise[]>([]);
@@ -96,7 +101,7 @@ export class ExercisePickerSheet {
 
   /** Your own last picks, hidden while searching. */
   readonly recents = computed(() =>
-    this.isSearching() ? [] : this._recents.exercises(),
+    this.isSearching() ? [] : this._recentExercisesStore.exercises(),
   );
 
   readonly rows = computed(() => {
@@ -115,27 +120,42 @@ export class ExercisePickerSheet {
     return this.alreadyAdded().includes(id);
   }
 
-  readonly sectionLabel = computed(() =>
-    this.isSearching() ? 'Results' : 'All exercises',
+  readonly sheetTitle = computed<string>(
+    () => this.title() || this._translateService.instant('exercises.picker.addExercises'),
+  );
+
+  private readonly _verb = computed<string>(
+    () => this.confirmVerb() || this._translateService.instant('button.add'),
+  );
+
+  readonly sectionLabel = computed<string>(() =>
+    this._translateService.instant(
+      this.isSearching() ? 'exercises.picker.results' : 'exercises.picker.allExercises',
+    ),
   );
 
   readonly isEmpty = computed(
     () => !this.loading() && this.rows().length === 0 && this.recents().length === 0,
   );
 
-  readonly emptyMessage = computed(() =>
-    this.isSearching()
-      ? 'No exercise matches that name.'
-      : 'The catalog could not be loaded. Check your connection.',
+  readonly emptyMessage = computed<string>(() =>
+    this._translateService.instant(
+      this.isSearching() ? 'exercises.picker.noMatch' : 'exercises.picker.loadError',
+    ),
   );
 
   readonly hasMore = computed(() => this.results().length < this._total());
 
-  readonly addLabel = computed(() => {
+  readonly addLabel = computed<string>(() => {
     const count = this.selectedIds().length;
-    if (this.single()) return count === 0 ? this.confirmVerb() : `${this.confirmVerb()} exercise`;
-    if (count === 0) return this.title();
-    return `${this.confirmVerb()} ${count} ${count === 1 ? 'exercise' : 'exercises'}`;
+    const verb = this._verb();
+    if (this.single()) {
+      return count === 0
+        ? verb
+        : this._translateService.instant('exercises.picker.confirmSingle', { verb });
+    }
+    if (count === 0) return this.sheetTitle();
+    return this._translateService.instant('exercises.picker.confirmCount', { verb, count });
   });
 
   readonly canAdd = computed(() => this.selectedIds().length > 0);
@@ -222,14 +242,14 @@ export class ExercisePickerSheet {
    */
   add(): void {
     const byId = new Map(
-      [...this._recents.exercises(), ...this.results()].map((row) => [row.id, row]),
+      [...this._recentExercisesStore.exercises(), ...this.results()].map((row) => [row.id, row]),
     );
     const chosen = this.selectedIds()
       .map((id) => byId.get(id))
       .filter((exercise): exercise is Exercise => !!exercise);
     if (chosen.length === 0) return;
 
-    chosen.forEach((exercise) => this._recents.push(exercise));
+    chosen.forEach((exercise) => this._recentExercisesStore.push(exercise));
     this.picked.emit(chosen);
     this.open.set(false);
   }
