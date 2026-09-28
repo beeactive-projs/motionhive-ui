@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,8 +9,15 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ClientService, UserRoles, UserSearchResult, showApiError } from 'core';
-import { MessageService } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  ClientService,
+  UserRoles,
+  UserSearchResult,
+  showApiError,
+  validationMessage,
+} from 'core';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
@@ -38,15 +44,16 @@ type InviteMode = 'find' | 'email';
     Tooltip,
     UserSearchAutocomplete,
     HexAvatar,
+    TranslatePipe,
   ],
   templateUrl: './invite-client-dialog.html',
   styleUrl: './invite-client-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InviteClientDialog {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _formBuilder = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly saved = output<void>();
@@ -61,9 +68,17 @@ export class InviteClientDialog {
 
   readonly userRole = UserRoles.User;
 
-  readonly modeOptions = [
-    { label: 'Find on platform', value: 'find', icon: 'pi pi-search' },
-    { label: 'Invite by email', value: 'email', icon: 'pi pi-envelope' },
+  readonly modeOptions: SelectItem<InviteMode>[] = [
+    {
+      label: this._translateService.instant('clients.inviteDialog.mode.find'),
+      value: 'find',
+      icon: 'pi pi-search',
+    },
+    {
+      label: this._translateService.instant('clients.inviteDialog.mode.email'),
+      value: 'email',
+      icon: 'pi pi-envelope',
+    },
   ];
 
   readonly form = this._formBuilder.group({
@@ -120,10 +135,7 @@ export class InviteClientDialog {
   }
 
   getFieldError(field: 'email'): string {
-    const errors = this.form.controls[field].errors;
-    if (errors?.['required']) return 'Email address is required.';
-    if (errors?.['email']) return 'Please enter a valid email address.';
-    return '';
+    return validationMessage(this.form.controls[field].errors);
   }
 
   sendInvitation(): void {
@@ -151,8 +163,8 @@ export class InviteClientDialog {
           this.visible.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Invitation sent',
-            detail: 'Client invitation has been sent successfully.',
+            summary: this._translateService.instant('clients.toast.invitationSent.summary'),
+            detail: this._translateService.instant('clients.toast.invitationSent.detail'),
           });
         }
       },
@@ -160,8 +172,8 @@ export class InviteClientDialog {
         this.inviteLoading.set(false);
         showApiError(
           this._messageService,
-          'Failed to send invitation',
-          'Could not send the invitation. Please try again.',
+          this._translateService.instant('clients.toast.sendInvitationFailed.summary'),
+          this._translateService.instant('clients.toast.sendInvitationFailed.detail'),
           err,
         );
       },

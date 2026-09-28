@@ -5,14 +5,14 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ?? 'Session' }}</h1>
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ?? ('common.session' | translate) }}</h1>
         @if (inst && tpl) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ inst.startAt | date: 'EEE d MMM, HH:mm' }} · {{ tpl.durationMinutes }} min
+          {{ 'sessions.detail.subtitle' | translate: { date: (inst.startAt | date: 'EEE d MMM, HH:mm'), minutes: tpl.durationMinutes } }}
         </p>
         }
       </div>
@@ -29,7 +29,7 @@
           severity="secondary"
           size="small"
           (click)="openActionsSheet()"
-          aria-label="More actions"
+          [attr.aria-label]="'sessions.detail.moreActions' | translate"
           iconOnly
         >
           <i class="pi pi-ellipsis-v"></i>
@@ -43,7 +43,7 @@
           routerLink="/coaching/sessions/calendar"
         >
           <i class="pi pi-calendar"></i>
-          Calendar
+          {{ 'sessions.common.calendar' | translate }}
         </button>
         @if (canMessageParticipants()) {
         <button pButton
@@ -54,16 +54,16 @@
           (click)="messageOpen.set(true)"
         >
           <i class="pi pi-send"></i>
-          Message
+          {{ 'sessions.detail.message' | translate }}
         </button>
         }
         <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="editOpen.set(true)">
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'button.edit' | translate }}
         </button>
         <button pButton type="button" text severity="danger" [size]="isTablet() ? 'small' : undefined" (click)="cancelOpen.set(true)">
           <i class="pi pi-times"></i>
-          Cancel
+          {{ 'button.cancel' | translate }}
         </button>
         }
       } @else {
@@ -76,7 +76,7 @@
   <!-- States -->
   @if (store.loading() && !inst) {
   <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
-    <i class="pi pi-spinner pi-spin"></i> Loading session…
+    <i class="pi pi-spinner pi-spin"></i> {{ 'sessions.detail.loading' | translate }}
   </div>
   } @else if (store.error()) {
   <p-message severity="error" [closable]="false">
@@ -88,15 +88,15 @@
   <div class="mh-sd-banner mh-sd-banner--cancelled flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
     <i class="pi pi-times-circle text-xl shrink-0"></i>
     <div>
-      <strong class="font-bold">Session cancelled.</strong>
-      @if (inst.cancelReason) { Reason: <em class="italic">{{ inst.cancelReason }}</em>. }
-      Attendees were notified.
+      <strong class="font-bold">{{ 'sessions.detail.cancelled' | translate }}</strong>
+      @if (inst.cancelReason) { {{ 'sessions.detail.reason' | translate }} <em class="italic">{{ inst.cancelReason }}</em>. }
+      {{ 'sessions.detail.attendeesNotified' | translate }}
     </div>
   </div>
   } @else if (inst.status === SessionStatus.Completed) {
   <div class="mh-sd-banner mh-sd-banner--ended flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
     <i class="pi pi-check-circle text-xl shrink-0"></i>
-    <div><strong class="font-bold">Session completed.</strong></div>
+    <div><strong class="font-bold">{{ 'sessions.detail.completed' | translate }}</strong></div>
   </div>
   }
 
@@ -119,12 +119,15 @@
       <div class="flex flex-col gap-2">
         <mh-capacity-bar [signups]="inst.confirmedCount" [cap]="inst.capacityOverride ?? tpl.capacity" />
         <div class="flex flex-wrap gap-3.5 text-xs text-muted-color">
-          <span><strong class="text-sm text-color mr-0.5">{{ inst.confirmedCount }}</strong> confirmed</span>
+          <span><strong class="text-sm text-color mr-0.5">{{ inst.confirmedCount }}</strong>
+            {{ 'sessions.common.stat.confirmed' | translate: { count: inst.confirmedCount } }}</span>
           @if (inst.pendingApprovalCount > 0) {
-          <span><strong class="text-sm text-(--p-yellow-700) mr-0.5">{{ inst.pendingApprovalCount }}</strong> pending</span>
+          <span><strong class="text-sm text-(--p-yellow-700) mr-0.5">{{ inst.pendingApprovalCount }}</strong>
+            {{ 'sessions.common.stat.pending' | translate: { count: inst.pendingApprovalCount } }}</span>
           }
           @if (inst.waitlistedCount > 0) {
-          <span><strong class="text-sm text-color mr-0.5">{{ inst.waitlistedCount }}</strong> waitlisted</span>
+          <span><strong class="text-sm text-color mr-0.5">{{ inst.waitlistedCount }}</strong>
+            {{ 'sessions.common.stat.waitlisted' | translate: { count: inst.waitlistedCount } }}</span>
           }
         </div>
       </div>
@@ -132,7 +135,7 @@
 
     <!-- Where & how -->
     <section class="rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
-      <h3 class="m-0 mb-3 text-[13px] font-bold uppercase tracking-wide text-muted-color">Where &amp; how</h3>
+      <h3 class="m-0 mb-3 text-[13px] font-bold uppercase tracking-wide text-muted-color">{{ 'sessions.detail.whereHow' | translate }}</h3>
       @if (isOnline()) {
       <div class="flex flex-col gap-2">
         <div
@@ -142,7 +145,7 @@
         </div>
         <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="copyMeetingUrl(inst, tpl)">
           <i class="pi pi-copy"></i>
-          Copy link
+          {{ 'button.copyLink' | translate }}
         </button>
       </div>
       } @else if (inst.venueOverride || tpl.venue) {
@@ -157,14 +160,14 @@
         </div>
       </div>
       } @else {
-      <p class="m-0 italic text-[13px] text-muted-color">No venue set.</p>
+      <p class="m-0 italic text-[13px] text-muted-color">{{ 'sessions.detail.noVenue' | translate }}</p>
       }
     </section>
 
     <!-- Participants -->
     <section class="lg:col-span-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
       <h3 class="m-0 mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-color">
-        Participants
+        {{ 'sessions.detail.participants' | translate }}
         <span class="rounded-full bg-(--p-surface-100) px-2 py-0.5 text-xs font-normal normal-case tracking-normal">
           {{ store.participants().length }}
         </span>

@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { IonInput, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import { SessionInstance, SessionService } from 'core';
@@ -24,13 +25,14 @@ const MAX_CAPACITY = 1000;
  */
 @Component({
   selector: 'mh-capacity-sheet',
-  imports: [IonInput, IonNote, SheetShell],
+  imports: [IonInput, IonNote, SheetShell, TranslatePipe],
   templateUrl: './capacity-sheet.html',
   styleUrl: './capacity-sheet.scss',
 })
 export class CapacitySheet {
   private readonly _sessionService = inject(SessionService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly instance = input<SessionInstance | null>(null);
@@ -74,9 +76,13 @@ export class CapacitySheet {
     const value = this.value();
     if (value === null) return null;
     if (value < this.floor()) {
-      return `${this.confirmed()} people are already booked in.`;
+      return this._translateService.instant('sessions.capacitySheet.alreadyBooked', {
+        count: this.confirmed(),
+      });
     }
-    if (value > MAX_CAPACITY) return `The most a session can hold is ${MAX_CAPACITY}.`;
+    if (value > MAX_CAPACITY) {
+      return this._translateService.instant('sessions.capacitySheet.max', { max: MAX_CAPACITY });
+    }
     return null;
   });
 
@@ -114,14 +120,19 @@ export class CapacitySheet {
         next: () => {
           this.saving.set(false);
           this.open.set(false);
-          void this._feedbackService.success('Capacity updated');
+          void this._feedbackService.success(
+            this._translateService.instant('sessions.toast.capacityUpdated'),
+          );
           // Raising capacity does NOT sweep the waitlist server-side, so the
           // roster has to be reloaded rather than assumed to have shifted.
           this.saved.emit();
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not change the capacity.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('sessions.toast.capacityFailed'),
+          );
         },
       });
   }

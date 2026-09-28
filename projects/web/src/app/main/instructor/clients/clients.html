@@ -2,24 +2,23 @@
   <!-- Header · shared across desktop + mobile -->
   <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Clients</h1>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">{{ 'clients.list.title' | translate }}</h1>
       @if (isTabletDown()) {
-      <p class="text-xs text-surface-700 dark:text-surface-400">Manage clients, invitations, and requests.</p>
+      <p class="text-xs text-surface-700 dark:text-surface-400">{{ 'clients.list.subtitleCompact' | translate }}</p>
       } @else {
-      <p class="text-sm text-surface-700 dark:text-surface-400">Manage your client relationships, invitations, and
-        requests.</p>
+      <p class="text-sm text-surface-700 dark:text-surface-400">{{ 'clients.list.subtitle' | translate }}</p>
       }
     </div>
     <div class="flex gap-3">
       @if (isMobile()) {
       @if (incomingRequestsCount() > 0) {
       <p-overlaybadge [value]="incomingRequestsCount()" severity="danger" badgeSize="small">
-        <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToPendingRequests()" iconOnly>
+        <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToPendingRequests()" [attr.aria-label]="'nav.requests' | translate" iconOnly>
           <i class="pi pi-hourglass"></i>
         </button>
       </p-overlaybadge>
       } @else {
-      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToPendingRequests()" iconOnly>
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goToPendingRequests()" [attr.aria-label]="'nav.requests' | translate" iconOnly>
         <i class="pi pi-hourglass"></i>
       </button>
       }
@@ -34,18 +33,18 @@
           (click)="goToPendingRequests()"
         >
           <i class="pi pi-hourglass"></i>
-          Requests
+          {{ 'nav.requests' | translate }}
         </button>
       </p-overlaybadge>
       } @else {
       <button pButton type="button" outlined severity="secondary" [size]="isTablet() ? 'small' : undefined" (click)="goToPendingRequests()">
         <i class="pi pi-hourglass"></i>
-        Requests
+        {{ 'nav.requests' | translate }}
       </button>
       }
       <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openInviteDialog()">
         <i class="pi pi-user-plus"></i>
-        Invite client
+        {{ 'clients.common.inviteClient' | translate }}
       </button>
       }
     </div>
@@ -57,7 +56,8 @@
     the directory, where invites, notes and archiving live.
   -->
   <p-selectbutton [options]="lensOptions" [ngModel]="lens()" (ngModelChange)="setLens($event)" optionLabel="label"
-    optionValue="value" [allowEmpty]="false" size="small" aria-label="Client view" styleClass="self-start" />
+    optionValue="value" [allowEmpty]="false" size="small" [attr.aria-label]="'clients.list.lens.ariaLabel' | translate"
+    styleClass="self-start" />
 
   @if (lens() === 'attention') {
   <mh-coach-roster />
@@ -65,7 +65,7 @@
 
   <!-- Filters -->
   <div class="flex items-center gap-3">
-    <span class="text-sm font-medium">Status:</span>
+    <span class="text-sm font-medium">{{ 'clients.list.statusFilter' | translate }}</span>
     @for (option of statusOptions; track option.label) {
     <button pButton
       type="button"
@@ -76,7 +76,7 @@
       (click)="onStatusFilterChange(option.value)"
       class="py-0.5 min-w-10"
     >
-      {{ option.label }}
+      {{ option.label! | translate }}
     </button>
     }
   </div>
@@ -91,12 +91,12 @@
       [stripedRows]="true" [rowHover]="true" sortField="client.firstName">
       <ng-template #header>
         <tr>
-          <th pSortableColumn="client.firstName">Name</th>
-          <th pSortableColumn="client.email">Email</th>
-          <th pSortableColumn="status" class="text-center">Status</th>
-          <th pSortableColumn="startedAt" class="text-center">Started</th>
-          <th>Notes</th>
-          <th class="w-32 text-center">Actions</th>
+          <th pSortableColumn="client.firstName">{{ 'form.label.name' | translate }}</th>
+          <th pSortableColumn="client.email">{{ 'form.label.email' | translate }}</th>
+          <th pSortableColumn="status" class="text-center">{{ 'form.label.status' | translate }}</th>
+          <th pSortableColumn="startedAt" class="text-center">{{ 'clients.list.columns.started' | translate }}</th>
+          <th>{{ 'form.label.notes' | translate }}</th>
+          <th class="w-32 text-center">{{ 'common.actions' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -135,9 +135,9 @@
                 text
                 severity="secondary"
                 tooltipPosition="left"
-                pTooltip="Edit notes"
+                [pTooltip]="'clients.common.editNotes' | translate"
                 (click)="openNotesDialog(client)"
-                aria-label="Edit notes"
+                [attr.aria-label]="'clients.common.editNotes' | translate"
                 iconOnly
               >
                 <i class="pi pi-pencil"></i>
@@ -148,9 +148,9 @@
                 text
                 severity="danger"
                 tooltipPosition="left"
-                pTooltip="Archive"
+                [pTooltip]="'button.archive' | translate"
                 (click)="confirmArchive(client)"
-                aria-label="Archive"
+                [attr.aria-label]="'button.archive' | translate"
                 iconOnly
               >
                 <i class="pi pi-inbox"></i>
@@ -161,9 +161,9 @@
                 rounded
                 severity="success"
                 tooltipPosition="left"
-                pTooltip="Unarchive"
+                [pTooltip]="'button.unarchive' | translate"
                 (click)="confirmUnarchive(client)"
-                aria-label="Unarchive"
+                [attr.aria-label]="'button.unarchive' | translate"
                 iconOnly
               >
                 <i class="pi pi-inbox"></i>
@@ -205,14 +205,15 @@
         <tr>
           <td colspan="6">
             @if (statusFilter()) {
-            <mh-list-empty-state icon="pi pi-filter-slash" title="No clients match this filter"
-              message="No clients with this status. Try a different one, or clear the filter to see everyone."
-              actionLabel="Clear filter" actionIcon="pi pi-filter-slash" actionSeverity="secondary"
-              [actionOutlined]="true" (action)="onStatusFilterChange(undefined)" />
+            <mh-list-empty-state icon="pi pi-filter-slash" [title]="'clients.list.emptyFiltered.title' | translate"
+              [message]="'clients.list.emptyFiltered.message' | translate"
+              [actionLabel]="'button.clearFilter' | translate" actionIcon="pi pi-filter-slash"
+              actionSeverity="secondary" [actionOutlined]="true" (action)="onStatusFilterChange(undefined)" />
             } @else {
-            <mh-list-empty-state icon="pi pi-users" title="No clients yet"
-              message="Invite your first client to start building your roster." actionLabel="Invite client"
-              actionIcon="pi pi-user-plus" (action)="openInviteDialog()" />
+            <mh-list-empty-state icon="pi pi-users" [title]="'clients.list.empty.title' | translate"
+              [message]="'clients.list.empty.message' | translate"
+              [actionLabel]="'clients.common.inviteClient' | translate" actionIcon="pi pi-user-plus"
+              (action)="openInviteDialog()" />
             }
           </td>
         </tr>
@@ -220,9 +221,11 @@
 
       <ng-template #paginatorleft let-state>
         <p-tag [rounded]="true">
-          View {{state.first+1}} -
-          {{state.first+state.rows>state.totalRecords?state.totalRecords:state.first+state.rows}} of
-          {{state.totalRecords}}
+          {{ 'clients.common.paginator' | translate: {
+            first: state.first + 1,
+            last: state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows,
+            total: state.totalRecords
+          } }}
         </p-tag>
       </ng-template>
     </p-table>
@@ -289,16 +292,16 @@
               @if (client.status === Statuses.Active) {
               <button pButton type="button" rounded text size="small" severity="secondary" (click)="openNotesDialog(client)">
                 <i class="pi pi-pencil"></i>
-                Notes
+                {{ 'clients.list.notes' | translate }}
               </button>
               <button pButton type="button" rounded text size="small" severity="danger" (click)="confirmArchive(client)">
                 <i class="pi pi-inbox"></i>
-                Archive
+                {{ 'button.archive' | translate }}
               </button>
               } @else if (client.status === Statuses.Archived) {
               <button pButton type="button" rounded size="small" severity="success" (click)="confirmUnarchive(client)">
                 <i class="pi pi-inbox"></i>
-                Unarchive
+                {{ 'button.unarchive' | translate }}
               </button>
               }
             </div>
@@ -310,14 +313,15 @@
 
       <ng-template #emptymessage>
         @if (statusFilter()) {
-        <mh-list-empty-state icon="pi pi-filter-slash" title="No clients match this filter"
-          message="No clients with this status. Try a different one, or clear the filter to see everyone."
-          actionLabel="Clear filter" actionIcon="pi pi-filter-slash" actionSeverity="secondary" [actionOutlined]="true"
-          (action)="onStatusFilterChange(undefined)" />
+        <mh-list-empty-state icon="pi pi-filter-slash" [title]="'clients.list.emptyFiltered.title' | translate"
+          [message]="'clients.list.emptyFiltered.message' | translate"
+          [actionLabel]="'button.clearFilter' | translate" actionIcon="pi pi-filter-slash"
+          actionSeverity="secondary" [actionOutlined]="true" (action)="onStatusFilterChange(undefined)" />
         } @else {
-        <mh-list-empty-state icon="pi pi-users" title="No clients yet"
-          message="Invite your first client to start building your roster." actionLabel="Invite client"
-          actionIcon="pi pi-user-plus" (action)="openInviteDialog()" />
+        <mh-list-empty-state icon="pi pi-users" [title]="'clients.list.empty.title' | translate"
+          [message]="'clients.list.empty.message' | translate"
+          [actionLabel]="'clients.common.inviteClient' | translate" actionIcon="pi pi-user-plus"
+          (action)="openInviteDialog()" />
         }
       </ng-template>
     </p-dataview>
@@ -338,7 +342,7 @@
 
 @if (isMobile()) {
 <!-- Mobile FAB (single primary action). -->
-<mh-mobile-fab icon="pi pi-user-plus" label="Invite client" (tap)="openInviteDialog()" />
+<mh-mobile-fab icon="pi pi-user-plus" [label]="'clients.common.inviteClient' | translate" (tap)="openInviteDialog()" />
 }
 
 <mh-invite-client-dialog [(visible)]="showInviteDialog" (saved)="loadClients()" />

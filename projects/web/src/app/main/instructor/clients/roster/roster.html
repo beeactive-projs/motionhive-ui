@@ -9,16 +9,17 @@
   <div class="flex flex-wrap items-center justify-between gap-2">
     <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400">
       @if (needsAttention().length) {
-      {{ needsAttention().length }} of {{ clients().length }} clients could use a nudge.
+      {{ 'clients.roster.nudge' | translate: { attention: needsAttention().length, total: clients().length } }}
       } @else if (clients().length) {
-      Everyone is on track.
+      {{ 'clients.roster.allOnTrack' | translate }}
       } @else {
-      Your clients and how they are training.
+      {{ 'clients.roster.intro' | translate }}
       }
     </p>
     @if (!isEmpty()) {
     <p-selectbutton [options]="windowOptions" [ngModel]="window()" (ngModelChange)="setWindow($event)"
-      optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="Time window" />
+      optionLabel="label" optionValue="value" [allowEmpty]="false" size="small"
+      [attr.aria-label]="'clients.roster.windowAriaLabel' | translate" />
     }
   </div>
 
@@ -30,16 +31,18 @@
   }
 
   @else if (isEmpty()) {
-  <mh-list-empty-state icon="pi pi-users" title="No clients yet"
-    message="Once someone becomes your client, their training shows up here so you can see who is on track." />
+  <mh-list-empty-state icon="pi pi-users" [title]="'clients.roster.empty.title' | translate"
+    [message]="'clients.roster.empty.message' | translate" />
   }
 
   @else if (d) {
-  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3" aria-label="Roster summary">
-    <mh-kpi-card icon="pi pi-users" label="Clients" [value]="d.totals.clients" />
-    <mh-kpi-card icon="pi pi-chart-line" label="Adherence" [value]="adherenceLabel()"
-      sub="across clients with work due" />
-    <mh-kpi-card icon="pi pi-flag" label="Needs attention" [value]="d.totals.needsAttention"
+  <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3"
+    [attr.aria-label]="'clients.roster.kpi.ariaLabel' | translate">
+    <mh-kpi-card icon="pi pi-users" [label]="'clients.roster.kpi.clients' | translate" [value]="d.totals.clients" />
+    <mh-kpi-card icon="pi pi-chart-line" [label]="'clients.roster.kpi.adherence' | translate"
+      [value]="adherenceLabel()" [sub]="'clients.roster.kpi.adherenceSub' | translate" />
+    <mh-kpi-card icon="pi pi-flag" [label]="'clients.roster.kpi.needsAttention' | translate"
+      [value]="d.totals.needsAttention"
       [severity]="d.totals.needsAttention > 0 ? 'warn' : 'success'" />
   </section>
 
@@ -50,8 +53,8 @@
   @if (needsAttention().length) {
   <p-card>
     <div class="mb-2 flex items-baseline justify-between">
-      <span class="text-sm font-semibold">Needs attention</span>
-      <span class="text-[11px] text-muted-color">most urgent first</span>
+      <span class="text-sm font-semibold">{{ 'clients.roster.attention.title' | translate }}</span>
+      <span class="text-[11px] text-muted-color">{{ 'clients.roster.attention.hint' | translate }}</span>
     </div>
     <div class="flex flex-col">
       @for (c of needsAttention(); track c.clientId) {
@@ -68,10 +71,11 @@
         </span>
         <span class="shrink-0 text-right">
           <span class="block font-heading text-sm font-semibold tabular-nums">{{ adherenceFor(c) }}</span>
-          <span class="block text-[11px] text-muted-color">adherence</span>
+          <span class="block text-[11px] text-muted-color">{{ 'clients.roster.adherence' | translate }}</span>
         </span>
         <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
-          (click)="messageClient(c, $event)" [attr.aria-label]="'Message ' + c.name" iconOnly>
+          (click)="messageClient(c, $event)"
+          [attr.aria-label]="'clients.roster.messageClient' | translate: { name: c.name }" iconOnly>
           <i class="pi pi-comment"></i>
         </button>
       </button>
@@ -83,8 +87,8 @@
   @if (onTrack().length) {
   <p-card>
     <div class="mb-2 flex items-baseline justify-between">
-      <span class="text-sm font-semibold">On track</span>
-      <span class="text-[11px] text-muted-color">{{ onTrack().length }} client{{ onTrack().length === 1 ? '' : 's' }}</span>
+      <span class="text-sm font-semibold">{{ 'clients.roster.onTrack' | translate }}</span>
+      <span class="text-[11px] text-muted-color">{{ 'count.clients' | translate: { count: onTrack().length } }}</span>
     </div>
     <div class="flex flex-col">
       @for (c of onTrack(); track c.clientId) {
@@ -102,7 +106,11 @@
           <span class="block font-heading text-sm font-semibold tabular-nums">{{ adherenceFor(c) }}</span>
           @if (c.daysSinceLastWorkout !== null) {
           <span class="block text-[11px] text-muted-color">
-            {{ c.daysSinceLastWorkout === 0 ? 'trained today' : c.daysSinceLastWorkout + 'd ago' }}
+            @if (c.daysSinceLastWorkout === 0) {
+            {{ 'clients.roster.trainedToday' | translate }}
+            } @else {
+            {{ 'clients.roster.daysAgo' | translate: { days: c.daysSinceLastWorkout } }}
+            }
           </span>
           }
         </span>

@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   effect,
@@ -12,6 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   clientDisplayName,
   clientEmail as clientEmailOf,
@@ -28,7 +28,7 @@ import {
   TagSeverity,
 } from 'core';
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DataView } from 'primeng/dataview';
@@ -70,11 +70,11 @@ type ClientsLens = 'attention' | 'all';
     CoachRoster,
     SelectButton,
     MobileFab,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './clients.html',
   styleUrl: './clients.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Clients implements OnInit {
   private readonly _router = inject(Router);
@@ -82,6 +82,7 @@ export class Clients implements OnInit {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Statuses = InstructorClientStatuses;
 
@@ -115,16 +116,17 @@ export class Clients implements OnInit {
    */
   readonly lens = signal<ClientsLens>('attention');
 
-  readonly lensOptions: { label: string; value: ClientsLens }[] = [
-    { label: 'Needs attention', value: 'attention' },
-    { label: 'All clients', value: 'all' },
+  readonly lensOptions: SelectItem<ClientsLens>[] = [
+    { label: this._translateService.instant('clients.list.lens.attention'), value: 'attention' },
+    { label: this._translateService.instant('clients.list.lens.all'), value: 'all' },
   ];
 
   statusFilter = signal<InstructorClientStatus | undefined>(undefined);
-  readonly statusOptions: { label: string; value: InstructorClientStatus | undefined }[] = [
-    { label: 'All', value: undefined },
-    { label: 'Active', value: InstructorClientStatuses.Active },
-    { label: 'Archived', value: InstructorClientStatuses.Archived },
+  /** Labels are translation keys — the template translates them. */
+  readonly statusOptions: SelectItem<InstructorClientStatus | undefined>[] = [
+    { label: 'common.all', value: undefined },
+    { label: 'enum.clientStatus.ACTIVE', value: InstructorClientStatuses.Active },
+    { label: 'enum.clientStatus.ARCHIVED', value: InstructorClientStatuses.Archived },
   ];
 
   showInviteDialog = signal(false);
@@ -302,11 +304,13 @@ export class Clients implements OnInit {
 
   confirmArchive(client: InstructorClient): void {
     this._confirmationService.confirm({
-      header: 'Archive client',
-      message: `Are you sure you want to archive <strong>${this.clientName(client)}</strong>?`,
+      header: this._translateService.instant('clients.confirm.archive.header'),
+      message: this._translateService.instant('clients.confirm.archive.message', {
+        name: `<strong>${this.clientName(client)}</strong>`,
+      }),
       acceptIcon: 'pi pi-inbox',
       acceptButtonProps: {
-        label: 'Yes, archive',
+        label: this._translateService.instant('clients.confirm.archive.accept'),
         severity: 'danger',
         iconPos: 'left',
       },
@@ -323,22 +327,32 @@ export class Clients implements OnInit {
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: 'Client archived',
-            detail: 'Client relationship has been archived',
+            summary: this._translateService.instant('clients.toast.archived.summary'),
+            detail: this._translateService.instant('clients.toast.archived.detail'),
           });
           this.loadClients();
         },
         error: (err) =>
-          showApiError(this._messageService, 'Error', 'Failed to archive client', err),
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('clients.toast.archiveFailed.detail'),
+            err,
+          ),
       });
   }
 
   confirmUnarchive(client: InstructorClient): void {
     this._confirmationService.confirm({
-      header: 'Unarchive client',
-      message: `Are you sure you want to unarchive <strong>${this.clientName(client)}</strong>?`,
+      header: this._translateService.instant('clients.confirm.unarchive.header'),
+      message: this._translateService.instant('clients.confirm.unarchive.message', {
+        name: `<strong>${this.clientName(client)}</strong>`,
+      }),
       acceptIcon: 'pi pi-inbox',
-      acceptButtonProps: { label: 'Yes, unarchive', iconPos: 'left' },
+      acceptButtonProps: {
+        label: this._translateService.instant('clients.confirm.unarchive.accept'),
+        iconPos: 'left',
+      },
       rejectButtonProps: { text: 'true', severity: 'contrast' },
       accept: () => this.unarchiveClient(client),
     });
@@ -352,20 +366,25 @@ export class Clients implements OnInit {
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: 'Client unarchived',
-            detail: 'Client relationship has been restored',
+            summary: this._translateService.instant('clients.toast.unarchived.summary'),
+            detail: this._translateService.instant('clients.toast.unarchived.detail'),
           });
           this.loadClients();
         },
         error: (err) =>
-          showApiError(this._messageService, 'Error', 'Failed to unarchive client', err),
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('clients.toast.unarchiveFailed.detail'),
+            err,
+          ),
       });
   }
 
   // --- Display helpers (shared with mobile through core's client.utils) ---
 
   clientName(client: InstructorClient): string {
-    return clientDisplayName(client, 'this client');
+    return clientDisplayName(client, this._translateService.instant('clients.common.thisClient'));
   }
 
   clientEmail(client: InstructorClient): string {

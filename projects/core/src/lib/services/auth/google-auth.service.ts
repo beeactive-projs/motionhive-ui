@@ -1,5 +1,6 @@
 import { Injectable, NgZone, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { appLanguage } from '../../i18n/app-language';
 
 interface CredentialResponse {
   credential: string;
@@ -75,6 +76,9 @@ export class GoogleAuthService {
       text: 'signin_with',
       shape: 'rectangular',
       width: container.offsetWidth,
+      // Google otherwise picks its own language (browser/geo), which can
+      // disagree with the page around the button.
+      locale: appLanguage(),
     });
   }
 }

@@ -1,7 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,11 +10,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin, Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
   ClientService,
   ClientStatusLabels,
+  EnumLabelPipe,
   InitiatedByOptions,
   InstructorClient,
   InstructorClientStatuses,
@@ -32,7 +33,7 @@ import {
   WorkoutLogService,
   showApiError,
 } from 'core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -61,11 +62,12 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
     ConfirmDialog,
     TooltipModule,
     EditClientNotesDialog,
+    EnumLabelPipe,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './client-profile.html',
   styleUrl: './client-profile.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientProfile {
   private readonly _router = inject(Router);
@@ -76,6 +78,7 @@ export class ClientProfile {
   private readonly _sessionService = inject(SessionService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Statuses = InstructorClientStatuses;
   readonly InitiatedBy = InitiatedByOptions;
@@ -85,12 +88,13 @@ export class ClientProfile {
   readonly activeTab = signal(0);
   readonly showNotesDialog = signal(false);
 
+  /** Labels are translation keys — the template translates them. */
   readonly tabs = [
-    { label: 'Overview', value: 0, icon: 'pi pi-home' },
-    { label: 'Sessions', value: 1, icon: 'pi pi-calendar' },
-    { label: 'Programs', value: 4, icon: 'pi pi-bookmark' },
-    { label: 'Workouts', value: 3, icon: 'pi pi-bolt' },
-    { label: 'Progress', value: 2, icon: 'pi pi-chart-line' },
+    { label: 'clients.profile.tabs.overview', value: 0, icon: 'pi pi-home' },
+    { label: 'clients.profile.tabs.sessions', value: 1, icon: 'pi pi-calendar' },
+    { label: 'clients.profile.tabs.programs', value: 4, icon: 'pi pi-bookmark' },
+    { label: 'clients.profile.tabs.workouts', value: 3, icon: 'pi pi-bolt' },
+    { label: 'clients.profile.tabs.progress', value: 2, icon: 'pi pi-chart-line' },
   ];
 
   // ── Workouts tab state ───────────────────────────────────────────
@@ -122,9 +126,9 @@ export class ClientProfile {
   readonly sessionsHasMore = computed(
     () => this.sessions().length < this.sessionsTotal(),
   );
-  readonly sessionScopes = [
-    { label: 'Upcoming', value: 'upcoming' as const },
-    { label: 'Past', value: 'past' as const },
+  readonly sessionScopes: SelectItem<'upcoming' | 'past'>[] = [
+    { label: this._translateService.instant('clients.profile.sessions.scope.upcoming'), value: 'upcoming' },
+    { label: this._translateService.instant('clients.profile.sessions.scope.past'), value: 'past' },
   ];
 
   // ── Plans tab state ──────────────────────────────────────────────
@@ -145,10 +149,10 @@ export class ClientProfile {
    * ACTIVE and PAUSED and merges — hence the multi-request branch in
    * the loader. Current + History must cover every status between them.
    */
-  readonly assignmentScopes = [
-    { label: 'Current', value: 'current' as const },
-    { label: 'History', value: 'history' as const },
-    { label: 'All', value: 'all' as const },
+  readonly assignmentScopes: SelectItem<'current' | 'history' | 'all'>[] = [
+    { label: this._translateService.instant('clients.profile.programs.scope.current'), value: 'current' },
+    { label: this._translateService.instant('clients.profile.programs.scope.history'), value: 'history' },
+    { label: this._translateService.instant('common.all'), value: 'all' },
   ];
   /** id of the assignment whose status is being mutated — drives per-row spinner. */
   readonly assignmentMutatingId = signal<string | null>(null);
@@ -167,7 +171,7 @@ export class ClientProfile {
     const c = this.client();
     if (!c) return '';
     if (c.client) return `${c.client.firstName} ${c.client.lastName}`;
-    return c.invitedEmail ?? 'Unknown';
+    return c.invitedEmail ?? this._translateService.instant('common.unknown');
   });
 
   readonly clientEmail = computed(() => {
@@ -192,9 +196,11 @@ export class ClientProfile {
    * still renders correctly — it just shows the empty state until the
    * Plans tab is switched back or the Overview reload picks up.
    */
+  readonly AssignmentStatus = ProgramAssignmentStatus;
+
   readonly activeAssignments = computed(() =>
     this.assignments().filter((a) =>
-      a.status === 'PENDING' || a.status === 'ACTIVE' || a.status === 'PAUSED',
+      a.status === ProgramAssignmentStatus.Pending || a.status === ProgramAssignmentStatus.Active || a.status === ProgramAssignmentStatus.Paused,
     ),
   );
 
@@ -215,11 +221,11 @@ export class ClientProfile {
 
   readonly statusSeverity = computed((): TagSeverity => {
     switch (this.client()?.status) {
-      case 'ACTIVE':
+      case InstructorClientStatuses.Active:
         return TagSeverity.Success;
-      case 'ARCHIVED':
+      case InstructorClientStatuses.Archived:
         return TagSeverity.Danger;
-      case 'PENDING':
+      case InstructorClientStatuses.Pending:
         return TagSeverity.Warn;
       default:
         return TagSeverity.Secondary;
@@ -304,8 +310,8 @@ export class ClientProfile {
         if (err.status !== 404) {
           showApiError(
             this._messageService,
-            "Couldn't load this client",
-            'Please try again.',
+            this._translateService.instant('clients.toast.loadClientFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
             err,
           );
         }
@@ -362,8 +368,8 @@ export class ClientProfile {
           this.sessionsLoaded.set(true);
           showApiError(
             this._messageService,
-            "Couldn't load sessions",
-            'Please retry in a moment.',
+            this._translateService.instant('clients.toast.loadSessionsFailed'),
+            this._translateService.instant('clients.common.retryInAMoment'),
             err,
           );
         },
@@ -382,7 +388,7 @@ export class ClientProfile {
   }
 
   sessionTitle(s: SessionInstance): string {
-    return s.titleOverride ?? s.template?.title ?? 'Session';
+    return s.titleOverride ?? s.template?.title ?? this._translateService.instant('common.session');
   }
 
   sessionVenue(s: SessionInstance): string | null {
@@ -400,12 +406,14 @@ export class ClientProfile {
 
   /** Core's status words/tones; a cancelled *session* outranks the booking. */
   participantLabel(s: SessionInstance): string {
-    if (s.status === SessionInstanceStatus.Cancelled) return 'Session cancelled';
+    if (s.status === SessionInstanceStatus.Cancelled) {
+      return this._translateService.instant('clients.profile.sessions.cancelled');
+    }
     const status = this._participantStatus(s);
     return (
       (status &&
         SESSION_PARTICIPANT_STATUSES[status as SessionParticipantStatus]?.label) ||
-      'Booked'
+      this._translateService.instant('clients.profile.sessions.booked')
     );
   }
 
@@ -450,9 +458,9 @@ export class ClientProfile {
     // work, so it belongs with Current, not History.
     const statuses: (ProgramAssignmentStatus | undefined)[] =
       scope === 'current'
-        ? ['PENDING', 'ACTIVE', 'PAUSED']
+        ? [ProgramAssignmentStatus.Pending, ProgramAssignmentStatus.Active, ProgramAssignmentStatus.Paused]
         : scope === 'history'
-          ? ['COMPLETED', 'CANCELLED']
+          ? [ProgramAssignmentStatus.Completed, ProgramAssignmentStatus.Cancelled]
           : [undefined];
 
     this.assignmentsLoading.set(true);
@@ -476,8 +484,8 @@ export class ClientProfile {
         this.assignmentsLoaded.set(true);
         showApiError(
           this._messageService,
-          "Couldn't load programs",
-          'Please retry in a moment.',
+          this._translateService.instant('clients.toast.loadProgramsFailed'),
+          this._translateService.instant('clients.common.retryInAMoment'),
           err,
         );
       },
@@ -507,49 +515,57 @@ export class ClientProfile {
   // ── Plans tab — actions ──────────────────────────────────────────
 
   pauseAssignment(a: ProgramAssignment): void {
-    this._mutateStatus(a, 'PAUSED', 'paused');
+    this._mutateStatus(a, ProgramAssignmentStatus.Paused, 'paused', 'pauseFailed');
   }
 
   resumeAssignment(a: ProgramAssignment): void {
-    this._mutateStatus(a, 'ACTIVE', 'resumed');
+    this._mutateStatus(a, ProgramAssignmentStatus.Active, 'resumed', 'resumeFailed');
   }
 
   confirmCancelAssignment(a: ProgramAssignment): void {
     this._confirmationService.confirm({
-      header: 'Cancel this program?',
-      message: `Cancel "${a.programNameSnapshot}" for ${this.clientName()}? Already-logged workouts stay in history, but no further sessions will be scheduled.`,
+      header: this._translateService.instant('clients.confirm.cancelProgram.header'),
+      message: this._translateService.instant('clients.confirm.cancelProgram.message', {
+        program: a.programNameSnapshot,
+        name: this.clientName(),
+      }),
       icon: 'pi pi-times-circle',
-      acceptLabel: 'Cancel plan',
+      acceptLabel: this._translateService.instant('clients.confirm.cancelProgram.accept'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Keep',
+      rejectLabel: this._translateService.instant('button.keep'),
       rejectButtonProps: { severity: 'secondary', text: true },
-      accept: () => this._mutateStatus(a, 'CANCELLED', 'cancelled'),
+      accept: () => this._mutateStatus(a, ProgramAssignmentStatus.Cancelled, 'cancelled', 'cancelFailed'),
     });
   }
 
   isAssignmentTerminal(a: ProgramAssignment): boolean {
-    return a.status === 'COMPLETED' || a.status === 'CANCELLED';
+    return a.status === ProgramAssignmentStatus.Completed || a.status === ProgramAssignmentStatus.Cancelled;
   }
 
   assignmentStatusSeverity(a: ProgramAssignment): TagSeverity {
     switch (a.status) {
-      case 'ACTIVE':
+      case ProgramAssignmentStatus.Active:
         return TagSeverity.Success;
-      case 'PAUSED':
+      case ProgramAssignmentStatus.Paused:
         return TagSeverity.Warn;
-      case 'COMPLETED':
+      case ProgramAssignmentStatus.Completed:
         return TagSeverity.Info;
-      case 'CANCELLED':
+      case ProgramAssignmentStatus.Cancelled:
         return TagSeverity.Danger;
       default:
         return TagSeverity.Secondary;
     }
   }
 
+  /**
+   * `doneKey` / `failedKey` name the `clients.toast.plan.*` messages for
+   * this transition — one full sentence each, never a spliced verb.
+   */
   private _mutateStatus(
     a: ProgramAssignment,
     next: ProgramAssignmentStatus,
-    verbPast: string,
+    doneKey: 'paused' | 'resumed' | 'cancelled',
+    failedKey: 'pauseFailed' | 'resumeFailed' | 'cancelFailed',
   ): void {
     if (this.assignmentMutatingId() || this.isAssignmentTerminal(a)) return;
     this.assignmentMutatingId.set(a.id);
@@ -563,7 +579,7 @@ export class ClientProfile {
         );
         this._messageService.add({
           severity: 'success',
-          summary: `Plan ${verbPast}`,
+          summary: this._translateService.instant(`clients.toast.plan.${doneKey}`),
           life: 2000,
         });
       },
@@ -571,8 +587,8 @@ export class ClientProfile {
         this.assignmentMutatingId.set(null);
         showApiError(
           this._messageService,
-          `Couldn't ${verbPast.replace(/d$/, '')} plan`,
-          'Please retry in a moment.',
+          this._translateService.instant(`clients.toast.plan.${failedKey}`),
+          this._translateService.instant('clients.common.retryInAMoment'),
           err,
         );
       },
@@ -599,8 +615,8 @@ export class ClientProfile {
         this.workoutsLoaded.set(true);
         showApiError(
           this._messageService,
-          "Couldn't load workouts",
-          'This client may not have logged any sessions yet.',
+          this._translateService.instant('clients.toast.loadWorkoutsFailed.summary'),
+          this._translateService.instant('clients.toast.loadWorkoutsFailed.detail'),
           err,
         );
       },
@@ -665,8 +681,10 @@ export class ClientProfile {
 
   confirmArchive(): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to archive ${this.clientName()}?`,
-      header: 'Archive client',
+      message: this._translateService.instant('clients.confirm.archive.message', {
+        name: this.clientName(),
+      }),
+      header: this._translateService.instant('clients.confirm.archive.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.doArchive(),
@@ -680,22 +698,29 @@ export class ClientProfile {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Client archived',
-          detail: 'Client relationship has been archived',
+          summary: this._translateService.instant('clients.toast.archived.summary'),
+          detail: this._translateService.instant('clients.toast.archived.detail'),
         });
         this.client.update((prev) =>
           prev ? { ...prev, status: InstructorClientStatuses.Archived } : prev,
         );
       },
       error: (err) =>
-        showApiError(this._messageService, 'Archive failed', 'Failed to archive client', err),
+        showApiError(
+          this._messageService,
+          this._translateService.instant('clients.toast.archiveFailed.summary'),
+          this._translateService.instant('clients.toast.archiveFailed.detail'),
+          err,
+        ),
     });
   }
 
   confirmUnarchive(): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to unarchive ${this.clientName()}?`,
-      header: 'Unarchive client',
+      message: this._translateService.instant('clients.confirm.unarchive.message', {
+        name: this.clientName(),
+      }),
+      header: this._translateService.instant('clients.confirm.unarchive.header'),
       icon: 'pi pi-exclamation-triangle',
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this.doUnarchive(),
@@ -709,15 +734,20 @@ export class ClientProfile {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Client unarchived',
-          detail: 'Client relationship has been restored',
+          summary: this._translateService.instant('clients.toast.unarchived.summary'),
+          detail: this._translateService.instant('clients.toast.unarchived.detail'),
         });
         this.client.update((prev) =>
           prev ? { ...prev, status: InstructorClientStatuses.Active } : prev,
         );
       },
       error: (err) =>
-        showApiError(this._messageService, 'Unarchive failed', 'Failed to unarchive client', err),
+        showApiError(
+          this._messageService,
+          this._translateService.instant('clients.toast.unarchiveFailed.summary'),
+          this._translateService.instant('clients.toast.unarchiveFailed.detail'),
+          err,
+        ),
     });
   }
 }

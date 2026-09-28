@@ -9,7 +9,8 @@
     "types": []
   },
   "exclude": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "src/test-setup.ts"
   ],
   "angularCompilerOptions": {
     "extendedDiagnostics": {

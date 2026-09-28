@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
   output,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
@@ -27,13 +27,13 @@ import {
  */
 @Component({
   selector: 'mh-booking-confirmed-dialog',
-  imports: [DatePipe, Dialog, ButtonDirective],
+  imports: [DatePipe, Dialog, ButtonDirective, TranslatePipe],
   templateUrl: './booking-confirmed-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookingConfirmedDialog {
   private readonly _sessionService = inject(SessionService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly instance = input<PublicSessionInstance | null>(null);
@@ -42,16 +42,29 @@ export class BookingConfirmedDialog {
    * render: PENDING_APPROVAL hides the calendar-export row (the session
    * isn't theirs yet); CONFIRMED / WAITLISTED show it.
    */
-  readonly status = input<SessionParticipantStatus>('CONFIRMED');
+  readonly status = input<SessionParticipantStatus>(SessionParticipantStatus.Confirmed);
   readonly goMySessions = output<void>();
 
   protected readonly isPending = computed(
-    () => this.status() === 'PENDING_APPROVAL',
+    () => this.status() === SessionParticipantStatus.PendingApproval,
   );
 
   protected readonly headerLabel = computed(() =>
-    this.isPending() ? 'Request sent!' : "You're in!",
+    this._translateService.instant(
+      this.isPending()
+        ? 'mySessions.bookingConfirmed.headerPending'
+        : 'mySessions.bookingConfirmed.headerConfirmed',
+    ),
   );
+
+  /** Calendar-event body: the description, then the meeting link if any. */
+  private _eventDetails(description: string, meetingUrl: string | null | undefined): string {
+    if (!meetingUrl) return description;
+    const join = this._translateService.instant('mySessions.bookingConfirmed.calendarJoin', {
+      url: meetingUrl,
+    });
+    return `${description}\n\n${join}`;
+  }
 
   protected googleUrl(): string {
     const inst = this.instance();
@@ -63,8 +76,7 @@ export class BookingConfirmedDialog {
     const text = encodeURIComponent(inst.titleOverride ?? tpl.title);
     const dates = `${fmt(inst.startAt)}/${fmt(inst.endAt)}`;
     const details = encodeURIComponent(
-      (inst.descriptionOverride ?? tpl.description ?? '') +
-        (tpl.meetingUrl ? `\n\nJoin: ${tpl.meetingUrl}` : ''),
+      this._eventDetails(inst.descriptionOverride ?? tpl.description ?? '', tpl.meetingUrl),
     );
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}`;
   }
@@ -75,8 +87,7 @@ export class BookingConfirmedDialog {
     if (!inst || !tpl) return '#';
     const subject = encodeURIComponent(inst.titleOverride ?? tpl.title);
     const body = encodeURIComponent(
-      (inst.descriptionOverride ?? tpl.description ?? '') +
-        (tpl.meetingUrl ? `\n\nJoin: ${tpl.meetingUrl}` : ''),
+      this._eventDetails(inst.descriptionOverride ?? tpl.description ?? '', tpl.meetingUrl),
     );
     return (
       'https://outlook.live.com/calendar/0/deeplink/compose' +
@@ -100,8 +111,8 @@ export class BookingConfirmedDialog {
       error: (err: unknown) =>
         showApiError(
           this._messageService,
-          'Could not download calendar file',
-          'Please try again.',
+          this._translateService.instant('mySessions.toast.downloadFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         ),
     });

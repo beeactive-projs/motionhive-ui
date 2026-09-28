@@ -1,6 +1,8 @@
 import { sessionTypeTone } from '../constants/session-types.const';
 import type { SessionTypeTone } from '../constants/session-types.const';
 import type { SessionInstance, SessionTemplate } from '../models/session/session.model';
+import { appLocale } from '../i18n/app-language';
+import { translate } from '../i18n/translator';
 
 /**
  * Pure formatting helpers for session-shaped data. Live here so every
@@ -8,14 +10,13 @@ import type { SessionInstance, SessionTemplate } from '../models/session/session
  * detail page, discover, my-sessions) can share the same formatting
  * without copy-pasting.
  *
- * Locale is fixed to `en-GB` for now — matches the rest of the app's
- * date formatting (24h time, day-first dates). If we ever ship a
- * locale switcher, swap the literal for an injected token.
+ * Dates follow the UI language's locale (`appLocale()`; en-GB for English —
+ * 24h time, day-first dates) and words come from the `time.*` keys.
  */
 
 /** "09:00" — 24h local time from an ISO date string. */
 export function formatSessionTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('en-GB', {
+  return new Date(iso).toLocaleTimeString(appLocale(), {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -24,7 +25,7 @@ export function formatSessionTime(iso: string): string {
 
 /** "60min" — short duration label for time-row chips. */
 export function formatSessionDuration(minutes: number): string {
-  return `${minutes}min`;
+  return translate('time.durationMinutes', { minutes });
 }
 
 /**
@@ -60,9 +61,9 @@ export function formatTotalDuration(minutes: number): string {
   const total = Math.max(0, Math.round(minutes));
   const hours = Math.floor(total / 60);
   const rest = total % 60;
-  if (hours === 0) return `${rest}m`;
-  if (rest === 0) return `${hours}h`;
-  return `${hours}h ${rest}m`;
+  if (hours === 0) return translate('time.totalMinutes', { minutes: rest });
+  if (rest === 0) return translate('time.totalHours', { hours });
+  return translate('time.totalHoursMinutes', { hours, minutes: rest });
 }
 
 /**
@@ -120,18 +121,18 @@ export function formatTimeUntil(
 
   const diff = start - now;
   if (diff <= 0) return null;
-  if (diff < 60_000) return 'starting now';
+  if (diff < 60_000) return translate('time.startingNow');
 
   const minutes = Math.round(diff / 60_000);
-  if (minutes < 60) return `in ${minutes} min`;
+  if (minutes < 60) return translate('time.inMinutes', { minutes });
 
   const hours = Math.round(diff / 3_600_000);
-  return hours <= 8 ? `in ${hours} h` : null;
+  return hours <= 8 ? translate('time.inHours', { hours }) : null;
 }
 
-/** "Wed 25 Jun" — compact weekday + day + short month, en-GB. */
+/** "Wed 25 Jun" — compact weekday + day + short month, in the UI locale. */
 export function formatSessionDayShort(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-GB', {
+  return new Date(iso).toLocaleDateString(appLocale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -178,13 +179,13 @@ export function sessionDayLabel(date: Date): string {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   const diffDays = Math.round((d.getTime() - today.getTime()) / 86_400_000);
-  const long = date.toLocaleDateString('en-GB', {
+  const long = date.toLocaleDateString(appLocale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
   });
-  if (diffDays === 0) return `Today · ${long}`;
-  if (diffDays === 1) return `Tomorrow · ${long}`;
+  if (diffDays === 0) return translate('time.todayWithDate', { date: long });
+  if (diffDays === 1) return translate('time.tomorrowWithDate', { date: long });
   return long;
 }
 
@@ -224,7 +225,7 @@ function _monthBucket(date: Date): SessionBucket {
   const m = String(date.getMonth() + 1).padStart(2, '0');
   return {
     key: `${y}-${m}`,
-    label: date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+    label: date.toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' }),
     multiDay: true,
   };
 }
@@ -241,21 +242,25 @@ export function sessionBucket(date: Date, direction: SessionGroupDirection = 'fu
   const diffDays = Math.round((d.getTime() - today.getTime()) / 86_400_000);
 
   if (direction === 'future') {
-    if (diffDays <= 0) return { key: 'today', label: 'Today', multiDay: false };
-    if (diffDays === 1) return { key: 'tomorrow', label: 'Tomorrow', multiDay: false };
+    if (diffDays <= 0) return { key: 'today', label: translate('time.today'), multiDay: false };
+    if (diffDays === 1) {
+      return { key: 'tomorrow', label: translate('time.tomorrow'), multiDay: false };
+    }
     const endOfWeekOffset = 7 - _isoDay(today); // days from today to Sunday
     if (diffDays <= endOfWeekOffset) {
-      return { key: 'this-week', label: 'This week', multiDay: true };
+      return { key: 'this-week', label: translate('time.bucket.thisWeek'), multiDay: true };
     }
     return _monthBucket(d);
   }
 
   // past
-  if (diffDays >= 0) return { key: 'today', label: 'Today', multiDay: false };
-  if (diffDays === -1) return { key: 'yesterday', label: 'Yesterday', multiDay: false };
+  if (diffDays >= 0) return { key: 'today', label: translate('time.today'), multiDay: false };
+  if (diffDays === -1) {
+    return { key: 'yesterday', label: translate('time.yesterday'), multiDay: false };
+  }
   const startOfWeekOffset = _isoDay(today) - 1; // days from Monday to today
   if (diffDays >= -startOfWeekOffset) {
-    return { key: 'this-week', label: 'Earlier this week', multiDay: true };
+    return { key: 'this-week', label: translate('time.bucket.earlierThisWeek'), multiDay: true };
   }
   return _monthBucket(d);
 }

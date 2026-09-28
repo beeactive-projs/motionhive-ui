@@ -7,6 +7,7 @@ import {
   ClientPaymentService,
   ClientService,
   NavModes,
+  translate,
 } from 'core';
 
 import { resolveMode } from '../config/tabs.config';
@@ -83,7 +84,7 @@ export class MoreBadgesService {
 
   /** Something is in the menu — which thing decides what the dot announces. */
   readonly moreDotLabel = computed(() =>
-    this.hasBillDue() ? 'You have a bill due' : 'You have client requests waiting',
+    translate(this.hasBillDue() ? 'shell.menuDot.billDue' : 'shell.menuDot.requestsWaiting'),
   );
 
   refresh(): void {

@@ -8,7 +8,7 @@
 >
   <span class="mh-ds__label">{{ label() }}</span>
   @if (count() != null) {
-    <span class="mh-ds__count">· {{ count() }} {{ count() === 1 ? 'session' : 'sessions' }}</span>
+    <span class="mh-ds__count">· {{ 'count.sessions' | translate: { count: count() } }}</span>
   }
   @if (note()) {
     <span class="mh-ds__note">· {{ note() }}</span>

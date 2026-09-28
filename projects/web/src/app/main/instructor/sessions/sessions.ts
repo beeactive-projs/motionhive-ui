@@ -1,6 +1,5 @@
-import { NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
@@ -14,6 +13,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { IconField } from 'primeng/iconfield';
@@ -28,6 +28,7 @@ import {
   ActionItem,
   ActionList,
   BottomSheet,
+  EnumLabelPipe,
   SessionInstanceStatus,
   SessionType,
   SessionLocationKind,
@@ -62,7 +63,6 @@ const VALID_TABS = new Set<string>(Object.values(TemplateTab));
   selector: 'mh-instructor-sessions',
   imports: [
     NgTemplateOutlet,
-    TitleCasePipe,
     FormsModule,
     ButtonDirective,
     IconField,
@@ -88,8 +88,9 @@ const VALID_TABS = new Set<string>(Object.values(TemplateTab));
     MobileFab,
     TimeRow,
     TimeRowSkeleton,
+    TranslatePipe,
+    EnumLabelPipe,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
   providers: [MessageService],
@@ -99,6 +100,7 @@ export class Sessions implements OnDestroy {
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   // The active tab is URL-driven (`?tab=`) so it survives reloads and
   // deep links, mirroring the payments page. A constructor effect syncs
@@ -120,6 +122,7 @@ export class Sessions implements OnDestroy {
   protected readonly TemplateTab = TemplateTab;
   protected readonly SessionType = SessionType;
   protected readonly SessionLocationKind = SessionLocationKind;
+  protected readonly SessionInstanceStatus = SessionInstanceStatus;
 
   /** Words and icons from core's `TEMPLATE_TABS`. */
   protected readonly tabs: MenuItem[] = [
@@ -163,7 +166,9 @@ export class Sessions implements OnDestroy {
     const total = this.store.cancelledTotal();
     const items = this.store.cancelledInstances().length;
     const isCap = items >= 100 && total >= 100;
-    return isCap ? '100+ cancelled (showing latest 100)' : `${total} cancelled`;
+    return isCap
+      ? this._translateService.instant('sessions.list.cancelledCapped')
+      : this._translateService.instant('sessions.list.cancelledCount', { count: total });
   });
 
   constructor() {
@@ -442,12 +447,33 @@ export class Sessions implements OnDestroy {
    * surfaces aren't wired.
    */
   protected readonly rowActions: ActionItem[] = [
-    { id: 'open', icon: 'pi pi-external-link', label: 'Open session' },
-    { id: 'edit', icon: 'pi pi-pencil', label: 'Edit' },
-    { id: 'message', icon: 'pi pi-send', label: 'Message all signups' },
-    { id: 'duplicate', icon: 'pi pi-copy', label: 'Duplicate' },
-    { id: 'share', icon: 'pi pi-share-alt', label: 'Share public link' },
-    { id: 'cancel', icon: 'pi pi-times', label: 'Cancel session…', danger: true },
+    {
+      id: 'open',
+      icon: 'pi pi-external-link',
+      label: this._translateService.instant('sessions.list.rowActions.open'),
+    },
+    { id: 'edit', icon: 'pi pi-pencil', label: this._translateService.instant('button.edit') },
+    {
+      id: 'message',
+      icon: 'pi pi-send',
+      label: this._translateService.instant('sessions.list.rowActions.message'),
+    },
+    {
+      id: 'duplicate',
+      icon: 'pi pi-copy',
+      label: this._translateService.instant('button.duplicate'),
+    },
+    {
+      id: 'share',
+      icon: 'pi pi-share-alt',
+      label: this._translateService.instant('sessions.list.rowActions.share'),
+    },
+    {
+      id: 'cancel',
+      icon: 'pi pi-times',
+      label: this._translateService.instant('sessions.common.cancelSession'),
+      danger: true,
+    },
   ];
 
   protected onRowAction(item: ActionItem, t: SessionTemplate): void {

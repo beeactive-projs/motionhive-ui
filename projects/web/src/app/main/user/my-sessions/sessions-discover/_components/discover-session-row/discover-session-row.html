@@ -37,11 +37,11 @@
         }
         <span class="inline-flex items-center gap-1">
           <i class="text-sm" [class]="isOnline() ? 'pi pi-video' : 'pi pi-map-marker'" aria-hidden="true"></i>
-          {{ isOnline() ? 'Online' : 'In-person' }}
+          {{ (isOnline() ? 'enum.sessionLocationKind.ONLINE' : 'enum.sessionLocationKind.IN_PERSON') | translate }}
         </span>
         @if (showCapacity()) {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-users text-sm" aria-hidden="true"></i>{{ confirmed() }} / {{ capacity() }} booked
+          <i class="pi pi-users text-sm" aria-hidden="true"></i>{{ 'mySessions.common.bookedCount' | translate: { confirmed: confirmed(), capacity: capacity() } }}
         </span>
         }
       </div>
@@ -49,9 +49,9 @@
       @if (mobile()) {
       <div class="flex flex-wrap items-center gap-3 shrink-0 mt-1">
         @if (booked()) {
-        <p-tag value="Booked" class="bg-green-50 text-green-800" icon="pi pi-check-circle" rounded />
+        <p-tag [value]="'mySessions.common.booked' | translate" class="bg-green-50 text-green-800" icon="pi pi-check-circle" rounded />
         } @else if (isFree()) {
-        <span class="font-semibold whitespace-nowrap text-green-500">Free</span>
+        <span class="font-semibold whitespace-nowrap text-green-500">{{ 'mySessions.common.free' | translate }}</span>
         } @else {
         <span class="font-semibold whitespace-nowrap">{{ priceCents() | currencyRon: currency() }}</span>
         }
@@ -71,14 +71,14 @@
     <div class="flex flex-col items-end gap-1.5 shrink-0">
       <div class="flex items-center gap-2">
         @if (isFree()) {
-        <span class="font-semibold whitespace-nowrap text-green-500">Free</span>
+        <span class="font-semibold whitespace-nowrap text-green-500">{{ 'mySessions.common.free' | translate }}</span>
         } @else {
         <span class="font-semibold whitespace-nowrap">{{ priceCents() | currencyRon: currency() }}</span>
         }
       </div>
 
       @if (booked()) {
-      <p-tag value="Booked" class="bg-green-50 text-green-800" icon="pi pi-bookmark-fill" rounded />
+      <p-tag [value]="'mySessions.common.booked' | translate" class="bg-green-50 text-green-800" icon="pi pi-bookmark-fill" rounded />
       } @else {
       <button pButton type="button" [disabled]="!canBook()" size="small" (click)="onBook($event)">
         <i class="pi pi-bookmark"></i>

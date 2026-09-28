@@ -1,9 +1,20 @@
-import { Component, ChangeDetectionStrategy, computed, inject, viewChild } from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { DividerModule } from 'primeng/divider';
-import { AuthStore, AuthService, BillingCountsStore, FeedbackService } from 'core';
+import { SelectButton } from 'primeng/selectbutton';
+import {
+  AppLanguage,
+  AuthStore,
+  AuthService,
+  BillingCountsStore,
+  FeedbackService,
+  LanguageService,
+} from 'core';
 import { Avatar } from '../avatar/avatar';
 
 interface AccountMenuItem {
@@ -21,10 +32,18 @@ interface AccountMenuGroup {
 
 @Component({
   selector: 'mh-profile-menu',
-  imports: [RouterLink, Avatar, ButtonDirective, PopoverModule, DividerModule],
+  imports: [
+    RouterLink,
+    FormsModule,
+    Avatar,
+    ButtonDirective,
+    PopoverModule,
+    DividerModule,
+    SelectButton,
+    TranslatePipe,
+  ],
   templateUrl: './profile-menu.html',
   styleUrl: './profile-menu.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileMenu {
   private readonly _authStore = inject(AuthStore);
@@ -32,6 +51,14 @@ export class ProfileMenu {
   private readonly _billingCounts = inject(BillingCountsStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _router = inject(Router);
+  private readonly _languageService = inject(LanguageService);
+  private readonly _translateService = inject(TranslateService);
+
+  /** Each language named in itself — someone lost in the wrong one can still find theirs. */
+  readonly languageOptions: SelectItem<AppLanguage>[] = this._languageService.languages.map(
+    (language) => ({ value: language, label: this._translateService.instant(`language.${language}`) }),
+  );
+  readonly currentLanguage = this._languageService.current;
 
   constructor() {
     // The account menu lives in the persistent layout, so this fires
@@ -43,7 +70,8 @@ export class ProfileMenu {
   /**
    * Account menu — the home for everything pulled out of the left rail in
    * the IA redesign (Model A): public profile, account, billing,
-   * notifications, safety. Grouped with optional section labels.
+   * notifications, safety. Grouped with optional section labels. Labels and
+   * hints are translation keys.
    */
   readonly accountGroups = computed(() => {
     const handle = this._authStore.user()?.handle;
@@ -55,10 +83,10 @@ export class ProfileMenu {
         label: '',
         items: [
           {
-            label: 'View public profile',
+            label: 'shell.profileMenu.viewPublicProfile',
             icon: 'pi pi-compass',
             routerLink: ['/@' + handle],
-            hint: 'your public page',
+            hint: 'shell.profileMenu.publicPageHint',
           },
         ],
       });
@@ -69,7 +97,7 @@ export class ProfileMenu {
     // specialties, certifications and venues.
     const settings: AccountMenuItem[] = [
       {
-        label: 'Account & profile',
+        label: 'shell.profileMenu.accountAndProfile',
         icon: 'pi pi-user',
         routerLink: ['/profile'],
         queryParams: { tab: 'details' },
@@ -80,7 +108,7 @@ export class ProfileMenu {
     // membership — driven by the cached counts, no extra request.
     if (this._billingCounts.hasBilling()) {
       settings.push({
-        label: 'Billing & payments',
+        label: 'shell.profileMenu.billing',
         icon: 'pi pi-credit-card',
         routerLink: ['/profile'],
         queryParams: { tab: 'billing' },
@@ -89,20 +117,20 @@ export class ProfileMenu {
 
     settings.push(
       {
-        label: 'Notifications',
+        label: 'nav.notifications',
         icon: 'pi pi-bell',
         routerLink: ['/profile'],
         queryParams: { tab: 'notifications' },
       },
       {
-        label: 'Safety & privacy',
+        label: 'shell.profileMenu.safety',
         icon: 'pi pi-shield',
         routerLink: ['/profile'],
         queryParams: { tab: 'safety' },
       },
     );
 
-    groups.push({ label: 'Settings', items: settings });
+    groups.push({ label: 'nav.settings', items: settings });
     return groups;
   });
 
@@ -129,6 +157,11 @@ export class ProfileMenu {
   openFeedback(): void {
     this._popover().hide();
     this._feedbackService.open();
+  }
+
+  /** Reloads the page in the new language (see LanguageService). */
+  setLanguage(language: AppLanguage): void {
+    this._languageService.use(language);
   }
 
   signOut(): void {

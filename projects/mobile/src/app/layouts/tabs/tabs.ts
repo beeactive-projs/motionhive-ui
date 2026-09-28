@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonBadge,
   IonIcon,
@@ -53,6 +54,7 @@ import { MoreBadgesService } from '../../_shared/services/more-badges.service';
     IonTabButton,
     IonTabs,
     NotificationBanner,
+    TranslatePipe,
   ],
   templateUrl: './tabs.html',
 })

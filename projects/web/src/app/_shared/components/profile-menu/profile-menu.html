@@ -1,9 +1,9 @@
 <button pButton type="button" text rounded (click)="toggle($event)"
-  [attr.aria-label]="'Open profile menu for ' + userName()">
+  [attr.aria-label]="'shell.profileMenu.open' | translate: { name: userName() }">
   <mh-avatar [user]="user()" [circle]="true" />
 </button>
 
-<p-popover #popover appendTo="body">
+<p-popover #popover [appendTo]="'body'">
   <div class="min-w-52">
     <div class="flex items-center gap-3 py-1">
       <mh-avatar [user]="user()" size="large" [circle]="true" />
@@ -11,9 +11,9 @@
         <span class="font-semibold text-sm truncate">{{ userName() }}</span>
         <span class="text-xs truncate text-muted-color">{{ user()?.email }}</span>
         @if (isInstructor()) {
-        <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-primary-500">Coach</span>
+        <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-primary-500">{{ 'shell.profileMenu.roleCoach' | translate }}</span>
         } @else {
-        <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-muted-color">Member</span>
+        <span class="text-[0.6875rem] font-semibold uppercase tracking-wider mt-0.5 text-muted-color">{{ 'shell.profileMenu.roleMember' | translate }}</span>
         }
       </div>
     </div>
@@ -23,7 +23,7 @@
     @for (group of accountGroups(); track group.label; let first = $first) {
     @if (group.label) {
     <p class="px-3 pt-2 pb-1 text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-color">
-      {{ group.label }}
+      {{ group.label | translate }}
     </p>
     }
     <ul class="flex flex-col gap-1" [class.mb-1]="!first">
@@ -33,9 +33,9 @@
           routerLinkActive="bg-primary-500 text-primary-contrast font-semibold" (click)="closeMenu()" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm
             transition-colors hover:bg-surface-300 hover:text-surface-800">
           <i [class]="item.icon + ' text-base'"></i>
-          <span class="flex-1">{{ item.label }}</span>
+          <span class="flex-1">{{ item.label | translate }}</span>
           @if (item.hint) {
-          <span class="text-[0.6875rem] text-muted-color">{{ item.hint }}</span>
+          <span class="text-[0.6875rem] text-muted-color">{{ item.hint | translate }}</span>
           }
         </a>
       </li>
@@ -44,9 +44,20 @@
     }
     <p-divider />
 
+    <div class="flex flex-col gap-2 px-3 pb-1">
+      <span id="profile-menu-language" class="text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-color">
+        {{ 'form.label.language' | translate }}
+      </span>
+      <p-selectbutton [options]="languageOptions" [ngModel]="currentLanguage" (ngModelChange)="setLanguage($event)"
+        optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" fluid
+        ariaLabelledBy="profile-menu-language" />
+    </div>
+
+    <p-divider />
+
     <button pButton type="button" text fluid (click)="openFeedback()" class="justify-start">
       <i class="pi pi-comment"></i>
-      Share feedback
+      {{ 'shell.profileMenu.shareFeedback' | translate }}
     </button>
 
 
@@ -54,7 +65,7 @@
 
     <button pButton type="button" text fluid severity="danger" (click)="signOut()" class="justify-start">
       <i class="pi pi-sign-out"></i>
-      Log out
+      {{ 'shell.profileMenu.logOut' | translate }}
     </button>
   </div>
 </p-popover>

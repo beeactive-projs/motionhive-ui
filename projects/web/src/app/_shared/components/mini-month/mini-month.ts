@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -8,13 +7,13 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { sameDay, startOfDay } from 'core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { sameDay, startOfDay, weekdayNames } from 'core';
 
 /** Small month calendar for navigation — date in, date out. */
 @Component({
   selector: 'mh-mini-month',
-  imports: [DatePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DatePipe, TranslatePipe],
   templateUrl: './mini-month.html',
   styleUrl: './mini-month.scss',
 })
@@ -25,8 +24,8 @@ export class MiniMonth {
   readonly rangeStart = input<Date | null>(null);
   readonly rangeEnd = input<Date | null>(null);
 
-  // ISO weekday labels (Mon-first).
-  protected readonly weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  // ISO weekday labels (Mon-first), in the UI locale.
+  protected readonly weekdayLabels = weekdayNames('narrow');
 
   /**
    * The month currently DISPLAYED. Decoupled from `selectedDate` after

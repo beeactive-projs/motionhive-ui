@@ -5,20 +5,18 @@
     [rows]="4"
     [maxlength]="1000"
     [counter]="true"
-    placeholder="Kept favouring the left knee — check next week."
+    [placeholder]="'sessions.noteSheet.placeholder' | translate"
     [value]="draft()"
     (ionInput)="draft.set($event.detail.value ?? '')"
   />
 
-  <p class="mh-helper">
-    Only you can see this. It stays with this person on this session.
-  </p>
+  <p class="mh-helper">{{ 'sessions.noteSheet.helper' | translate }}</p>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
   [title]="title()"
-  saveLabel="Save note"
+  [saveLabel]="'sessions.noteSheet.save' | translate"
   [body]="body"
   [saving]="saving()"
   [breakpoints]="[0, 0.6]"

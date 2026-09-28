@@ -31,6 +31,7 @@ import {
   IonTextarea,
   IonToggle,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { Subject, catchError, debounceTime, of, switchMap, take } from 'rxjs';
 
@@ -144,11 +145,13 @@ function deviceTimezone(): string {
     IonTextarea,
     IonToggle,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './session-form-sheet.html',
   styleUrl: './session-form-sheet.scss',
 })
 export class SessionFormSheet {
+  private readonly _translateService = inject(TranslateService);
   private readonly _sessionService = inject(SessionService);
   private readonly _venueService = inject(VenueService);
   private readonly _groupService = inject(GroupService);
@@ -270,8 +273,8 @@ export class SessionFormSheet {
 
   /** A copy announces itself, so nobody thinks they are editing the original. */
   readonly sheetTitle = computed(() => {
-    if (this.isEdit()) return 'Edit session';
-    return this.prefill() ? 'Duplicate session' : 'New session';
+    if (this.isEdit()) return this._t('sessions.form.title.edit');
+    return this._t(this.prefill() ? 'sessions.form.title.duplicate' : 'sessions.form.title.new');
   });
 
   /**
@@ -280,19 +283,22 @@ export class SessionFormSheet {
    */
   readonly recurrenceShort = computed(() => {
     const days = formatWeekdayList(this.daysOfWeek());
-    if (!days) return 'Pick the days it repeats';
+    if (!days) return this._t('sessions.form.short.noDays');
 
     switch (this.endMode()) {
       case RecurrenceEndModes.Never:
-        return `${days} · ongoing`;
+        return this._t('sessions.form.short.never', { days });
       case RecurrenceEndModes.OnDate: {
         const until = this.endDate();
         return until
-          ? `${days} · until ${formatSessionDayShort(until)}`
-          : `${days} · pick an end date`;
+          ? this._t('sessions.form.short.onDate', { days, date: formatSessionDayShort(until) })
+          : this._t('sessions.form.short.onDateMissing', { days });
       }
       default:
-        return `${days} · ${this.endAfterOccurrences()} occurrences`;
+        return this._t('sessions.form.short.after', {
+          days,
+          count: this.endAfterOccurrences(),
+        });
     }
   });
 
@@ -300,20 +306,22 @@ export class SessionFormSheet {
   readonly sheetSubtitle = computed(() =>
     this.isRecurring()
       ? this.recurrenceShort()
-      : `One-off · ${formatSessionDayShort(this.startAt())}`,
+      : this._t('sessions.form.subtitleOneOff', { date: formatSessionDayShort(this.startAt()) }),
   );
 
   readonly saveLabel = computed(() => {
-    if (this.isEdit()) return 'Save changes';
-    return this.isRecurring() ? 'Create & publish' : 'Create session';
+    if (this.isEdit()) return this._t('button.saveChanges');
+    return this._t(
+      this.isRecurring() ? 'sessions.form.createAndPublish' : 'sessions.form.createSession',
+    );
   });
 
   /** The repeat toggle's sub-line — why it is locked, when it is. */
   readonly repeatSub = computed(() => {
     if (this.isRecurring()) return this.recurrenceShort();
-    return this.isEdit()
-      ? "Can't be changed once created"
-      : 'Toggle to set up a series';
+    return this._t(
+      this.isEdit() ? 'sessions.form.repeat.lockedHint' : 'sessions.form.repeat.offHint',
+    );
   });
 
   /**
@@ -343,20 +351,20 @@ export class SessionFormSheet {
 
   /** Plain-English summary, so the rule is legible before it is committed. */
   readonly recurrenceSummary = computed(() => {
-    const list = formatWeekdayList(this.daysOfWeek());
-    if (!list) return 'Pick at least one day';
+    const days = formatWeekdayList(this.daysOfWeek());
+    if (!days) return this._t('sessions.form.rule.noDays');
 
     switch (this.endMode()) {
       case RecurrenceEndModes.Never:
-        return `Every ${list}, with no end date`;
+        return this._t('sessions.form.rule.never', { days });
       case RecurrenceEndModes.OnDate: {
         const until = this.endDate();
         return until
-          ? `Every ${list} until ${formatSessionDayShort(until)}`
-          : `Every ${list} — pick an end date`;
+          ? this._t('sessions.form.rule.onDate', { days, date: formatSessionDayShort(until) })
+          : this._t('sessions.form.rule.onDateMissing', { days });
       }
       default:
-        return `Every ${list} · ${this.endAfterOccurrences()} sessions`;
+        return this._t('sessions.form.rule.after', { days, count: this.endAfterOccurrences() });
     }
   });
 
@@ -392,10 +400,16 @@ export class SessionFormSheet {
     );
     if (!clash) return null;
 
-    const title = clash.titleOverride ?? clash.template?.title ?? 'another session';
+    const title =
+      clash.titleOverride ??
+      clash.template?.title ??
+      this._t('sessions.form.conflict.anotherSession');
     return {
-      title: `Conflict on ${formatSessionDayShort(startIso)}`,
-      detail: `${formatSessionTime(startIso)} overlaps "${title}". You can still save.`,
+      title: this._t('sessions.form.conflict.title', { date: formatSessionDayShort(startIso) }),
+      detail: this._t('sessions.form.conflict.detail', {
+        time: formatSessionTime(startIso),
+        title,
+      }),
     };
   });
 
@@ -461,10 +475,12 @@ export class SessionFormSheet {
 
   /** "1 h 15 min" reads better than "75 min" once past the hour. */
   durationLabel(minutes: number): string {
-    if (minutes < 60) return `${minutes} min`;
+    if (minutes < 60) return this._t('time.minutesShort', { minutes });
     const hours = Math.floor(minutes / 60);
     const rest = minutes % 60;
-    return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+    return rest === 0
+      ? this._t('sessions.form.duration.hours', { hours })
+      : this._t('sessions.form.duration.hoursMinutes', { hours, minutes: rest });
   }
 
   /**
@@ -585,12 +601,12 @@ export class SessionFormSheet {
         next: () => {
           this.saving.set(false);
           this.open.set(false);
-          void this._feedbackService.success('Session updated');
+          void this._feedbackService.success(this._t('sessions.toast.updated'));
           this.saved.emit();
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not update the session.');
+          void this._feedbackService.error(error, this._t('sessions.toast.updateFailed'));
         },
       });
   }
@@ -651,15 +667,21 @@ export class SessionFormSheet {
           // overlap is the coach's call to make, not ours.
           const conflicts = result.warnings?.length ?? 0;
           void this._feedbackService.success(
-            conflicts > 0 ? 'Session created · overlaps another' : 'Session created',
+            this._t(
+              conflicts > 0 ? 'sessions.toast.createdWithOverlap' : 'sessions.toast.created',
+            ),
           );
           this.saved.emit();
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not create the session.');
+          void this._feedbackService.error(error, this._t('sessions.toast.createFailed'));
         },
       });
+  }
+
+  private _t(key: string, params?: Record<string, unknown>): string {
+    return this._translateService.instant(key, params);
   }
 
   /**

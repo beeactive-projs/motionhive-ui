@@ -5,10 +5,10 @@
     </ion-buttons>
     <!-- The name, not "Client": on a phone the header is the orientation cue,
          and a generic one makes every client's page look like the same page. -->
-    <ion-title>{{ name() || 'Client' }}</ion-title>
+    <ion-title>{{ name() || ('clients.clientFallback' | translate) }}</ion-title>
     @if (store.client()) {
       <ion-buttons slot="end">
-        <ion-button aria-label="Client actions" (click)="openActions()">
+        <ion-button [attr.aria-label]="'clients.actionsSheet.title' | translate" (click)="openActions()">
           <ion-icon slot="icon-only" name="ellipsis-vertical" />
         </ion-button>
       </ion-buttons>
@@ -20,9 +20,9 @@
   @if (store.error(); as error) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load this client"
+      [heading]="'clients.detail.loadError.title' | translate"
       [message]="error"
-      actionLabel="Try again"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.loading() && !store.client()) {
@@ -60,9 +60,13 @@
         <div class="hero-badges">
           <ion-badge [attr.data-tone]="statusTone()">{{ statusLabel() }}</ion-badge>
           @if (isPending() && client.expiresAt) {
-            <ion-badge data-tone="medium">Expires {{ client.expiresAt | date: 'd MMM' }}</ion-badge>
+            <ion-badge data-tone="medium">
+              {{ 'clients.detail.expires' | translate: { date: (client.expiresAt | date: 'd MMM') } }}
+            </ion-badge>
           } @else if (client.startedAt) {
-            <ion-badge data-tone="medium">Since {{ client.startedAt | date: 'd MMM yyyy' }}</ion-badge>
+            <ion-badge data-tone="medium">
+              {{ 'clients.detail.since' | translate: { date: (client.startedAt | date: 'd MMM yyyy') } }}
+            </ion-badge>
           }
         </div>
       </div>
@@ -70,17 +74,19 @@
       @if (canMessage()) {
         <ion-button expand="block" class="message" (click)="message()">
           <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true" />
-          Message
+          {{ 'clients.actions.message' | translate }}
         </ion-button>
       }
 
       @if (store.week(); as week) {
         <section class="mh-section">
-          <span class="mh-kicker">This week</span>
+          <span class="mh-kicker">{{ 'clients.detail.sections.thisWeek' | translate }}</span>
           <ion-card class="week" [class.flagged]="week.flagged">
             <div class="week-head">
-              <span class="week-count">{{ week.completed }} of {{ week.due }}</span>
-              <span class="week-label">workouts done</span>
+              <span class="week-count">
+                {{ 'clients.detail.week.count' | translate: { completed: week.completed, due: week.due } }}
+              </span>
+              <span class="week-label">{{ 'clients.detail.week.label' | translate }}</span>
               <span class="week-percent">{{ weekPercent() }}</span>
             </div>
             <!-- Done, skipped, still to come — in the proportion they happened. -->
@@ -101,7 +107,7 @@
 
       @if (store.roster()) {
         <section class="mh-section">
-          <span class="mh-kicker">Plan</span>
+          <span class="mh-kicker">{{ 'clients.detail.sections.plan' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
             <ion-item lines="none">
               <mh-hex-avatar
@@ -114,7 +120,7 @@
               />
               <ion-label>
                 <h3>{{ planLabel() }}</h3>
-                <p>Plans are managed on the web for now.</p>
+                <p>{{ 'clients.detail.plan.webOnly' | translate }}</p>
               </ion-label>
             </ion-item>
           </ion-list>
@@ -124,8 +130,8 @@
       @if (store.sessions().length > 0) {
         <section class="mh-section">
           <div class="mh-section-head">
-            <span class="mh-kicker">Upcoming sessions</span>
-            <ion-note>Next 30 days</ion-note>
+            <span class="mh-kicker">{{ 'clients.detail.sections.upcoming' | translate }}</span>
+            <ion-note>{{ 'clients.detail.upcomingWindow' | translate: { count: upcomingDays } }}</ion-note>
           </div>
           <div>
             @for (instance of store.sessions(); track instance.id) {
@@ -140,7 +146,7 @@
              person, and a phone has no room for a section that says nothing. -->
         <section class="mh-section">
           <div class="mh-section-head">
-            <span class="mh-kicker">Groups</span>
+            <span class="mh-kicker">{{ 'nav.groups' | translate }}</span>
           </div>
           <div class="mh-chip-row">
             @for (group of client.groupMemberships; track group.groupId) {
@@ -156,18 +162,18 @@
            at the detail rather than duplicating it. -->
       <section class="mh-section">
         <div class="mh-section-head">
-          <span class="mh-kicker">Training</span>
+          <span class="mh-kicker">{{ 'clients.detail.sections.training' | translate }}</span>
         </div>
         <button class="training" type="button" (click)="openTraining()">
           <ion-icon name="barbell-outline" aria-hidden="true" />
-          <span class="t-label">Plan &amp; logged workouts</span>
+          <span class="t-label">{{ 'clients.detail.trainingLink' | translate }}</span>
           <ion-icon class="t-chev" name="chevron-forward" aria-hidden="true" />
         </button>
       </section>
 
       <section class="mh-section">
         <div class="mh-section-head">
-          <span class="mh-kicker">Notes · private</span>
+          <span class="mh-kicker">{{ 'clients.detail.sections.notes' | translate }}</span>
           <ion-icon name="lock-closed-outline" class="lock" aria-hidden="true" />
         </div>
         <ion-list [inset]="true" class="mh-card-list">
@@ -176,7 +182,7 @@
               @if (client.notes) {
                 <p class="notes">{{ client.notes }}</p>
               } @else {
-                <p class="notes empty">Add a private note</p>
+                <p class="notes empty">{{ 'clients.detail.addNote' | translate }}</p>
               }
             </ion-label>
             <ion-icon slot="end" name="create-outline" color="medium" aria-hidden="true" />
@@ -196,7 +202,7 @@
                  treatment the attention rows use. -->
             <ion-item button detail="false" lines="none" (click)="confirmArchive()">
               <ion-icon slot="start" name="archive-outline" color="danger" aria-hidden="true" />
-              <ion-label class="verb danger">Archive client…</ion-label>
+              <ion-label class="verb danger">{{ 'clients.actions.archiveClientEllipsis' | translate }}</ion-label>
             </ion-item>
           } @else {
             <ion-item
@@ -207,7 +213,7 @@
               (click)="unarchive()"
             >
               <ion-icon slot="start" name="arrow-undo-outline" color="success" aria-hidden="true" />
-              <ion-label class="verb success">Unarchive client</ion-label>
+              <ion-label class="verb success">{{ 'clients.actions.unarchiveClient' | translate }}</ion-label>
             </ion-item>
           }
         </ion-list>
@@ -232,9 +238,9 @@
 <mh-confirm-sheet
   [(open)]="archiveOpen"
   [title]="archiveTitle()"
-  body="They keep their account and history, and you can unarchive them later. They will not be told."
-  confirmLabel="Archive client"
-  cancelLabel="Keep"
+  [body]="'clients.confirm.archive.body' | translate"
+  [confirmLabel]="'clients.actions.archiveClient' | translate"
+  [cancelLabel]="'button.keep' | translate"
   tone="danger"
   [saving]="archiveSaving()"
   (confirm)="archive()"

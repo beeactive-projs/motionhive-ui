@@ -21,6 +21,7 @@ import {
   IonSpinner,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
 
@@ -63,6 +64,7 @@ export const SHEET_PRESENTED_CLASS = 'mh-presented';
     IonSpinner,
     IonToolbar,
     NgTemplateOutlet,
+    TranslatePipe,
   ],
   templateUrl: './sheet-shell.html',
   styleUrl: './sheet-shell.scss',
@@ -84,7 +86,8 @@ export class SheetShell {
    * search that scrolls away is a search you have to scroll back up to use.
    */
   readonly sticky = input<TemplateRef<unknown> | null>(null);
-  readonly saveLabel = input('Save');
+  /** Translated text; empty falls back to "Save". */
+  readonly saveLabel = input('');
   /** Ionic palette name for the confirm button — `danger` for destructive sheets. */
   readonly saveColor = input('primary');
   /**
@@ -92,7 +95,8 @@ export class SheetShell {
    * next to a destructive confirm that also says cancel — the cancel-session
    * sheet reads "Keep / Cancel session" instead of "Cancel / Cancel session".
    */
-  readonly dismissLabel = input('Cancel');
+  /** Translated text; empty falls back to "Cancel". */
+  readonly dismissLabel = input('');
   readonly canSave = input(true);
   readonly saving = input(false);
   /** Off for the sheets that are a list of actions rather than a form. */

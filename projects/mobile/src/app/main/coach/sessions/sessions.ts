@@ -22,6 +22,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
@@ -29,6 +30,7 @@ import {
   SessionInstance,
   SessionLocationKind,
   SessionsInstructorStore,
+  appLocale,
   endOfDay,
   formatSessionDayShort,
   formatSessionTime,
@@ -67,13 +69,13 @@ import {
   SessionActionId,
   SessionActionIds,
   SessionPrefill,
-  WEEKDAY_LETTERS,
   activeFilterCount,
   dayFromKey,
   fitWindow,
   instanceTone,
   matchesFilters,
   prefillFromInstance,
+  weekdayLetters,
 } from './sessions.config';
 
 type LoadOptions = { force?: boolean; done?: () => void };
@@ -129,6 +131,7 @@ interface AgendaDay {
     SessionRow,
     SessionRowSkeleton,
     SessionsEmpty,
+    TranslatePipe,
   ],
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
@@ -139,6 +142,7 @@ export class Sessions implements ViewWillEnter {
   private readonly _clockService = inject(ClockService);
   private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
   readonly locationFilters = LOCATION_QUICK_FILTERS;
@@ -322,6 +326,7 @@ export class Sessions implements ViewWillEnter {
   readonly weekDays = computed(() => {
     const start = this.weekStartDate();
     const todayKey = localDayKey(new Date());
+    const letters = weekdayLetters();
 
     const tones = new Map<string, string[]>();
     for (const instance of this.visibleInstances()) {
@@ -339,7 +344,7 @@ export class Sessions implements ViewWillEnter {
       const key = localDayKey(date);
       return {
         key,
-        initial: WEEKDAY_LETTERS[offset],
+        initial: letters[offset],
         dayOfMonth: date.getDate(),
         date,
         isToday: key === todayKey,
@@ -377,7 +382,7 @@ export class Sessions implements ViewWillEnter {
   readonly selectedDayKey = computed(() => localDayKey(this.selectedDay()));
 
   readonly selectedDayLabel = computed(() =>
-    this.selectedDay().toLocaleDateString(undefined, {
+    this.selectedDay().toLocaleDateString(appLocale(), {
       weekday: 'long',
       day: 'numeric',
       month: 'short',
@@ -385,23 +390,32 @@ export class Sessions implements ViewWillEnter {
   );
 
   readonly monthLabel = computed(() =>
-    this.selectedDay().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+    this.selectedDay().toLocaleDateString(appLocale(), { month: 'short', year: 'numeric' })
   );
 
   /** "5 sessions · 6h scheduled" — the day view's right-hand summary. */
   readonly dayTotalLabel = computed(() => {
     const instances = this.dayInstances();
-    const count = `${instances.length} ${instances.length === 1 ? 'session' : 'sessions'}`;
+    const sessions = this._translateService.instant('count.sessions', {
+      count: instances.length,
+    });
     const minutes = instances.reduce((sum, i) => sum + sessionMinutes(i), 0);
-    return minutes > 0 ? `${count} · ${formatTotalDuration(minutes)} scheduled` : count;
+    return minutes > 0
+      ? this._translateService.instant('sessions.agenda.dayTotal', {
+          sessions,
+          duration: formatTotalDuration(minutes),
+        })
+      : sessions;
   });
 
   /** "1 conflict at 17:00" — the day view's left-hand warning, or null. */
   readonly dayConflictLabel = computed(() => {
     const clashing = this.dayInstances().filter((i) => (i.conflictingInstanceIds?.length ?? 0) > 0);
     if (clashing.length === 0) return null;
-    const noun = clashing.length === 1 ? 'conflict' : 'conflicts';
-    return `${clashing.length} ${noun} at ${formatSessionTime(clashing[0].startAt)}`;
+    return this._translateService.instant('sessions.agenda.dayConflicts', {
+      count: clashing.length,
+      time: formatSessionTime(clashing[0].startAt),
+    });
   });
 
   /** Filters or a search hid everything, but the window itself is not empty. */
@@ -584,21 +598,30 @@ export class Sessions implements ViewWillEnter {
     const handle = this._authStore.user()?.handle;
     if (!handle) return;
 
-    const title = instance.titleOverride ?? instance.template?.title ?? 'Session';
-    const when = `${formatSessionDayShort(instance.startAt)}, ${formatSessionTime(
-      instance.startAt
-    )}`;
+    const title =
+      instance.titleOverride ??
+      instance.template?.title ??
+      this._translateService.instant('common.session');
 
     const outcome = await shareOrCopy({
       title,
-      text: `${title} · ${when}`,
+      text: this._translateService.instant('sessions.share.text', {
+        title,
+        day: formatSessionDayShort(instance.startAt),
+        time: formatSessionTime(instance.startAt),
+      }),
       url: publicProfileUrl(handle),
     });
 
     if (outcome === ShareOutcomes.Copied) {
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(
+        this._translateService.instant('toast.detail.linkCopied')
+      );
     } else if (outcome === ShareOutcomes.Failed) {
-      await this._feedbackService.error(null, 'Could not share the link.');
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('sessions.toast.shareFailed')
+      );
     }
   }
 

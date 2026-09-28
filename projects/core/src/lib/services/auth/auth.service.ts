@@ -15,6 +15,7 @@ import { User } from '../../models/user/user.model';
 import { UserRole } from '../../models/user/role.enums';
 import { TokenService } from './token.service';
 import { AuthStore } from '../../stores/auth.store';
+import { LanguageService } from '../i18n/language.service';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { environment } from '../../../environments/environment';
 
@@ -26,6 +27,7 @@ export class AuthService implements OnDestroy {
   private readonly _router = inject(Router);
   private readonly _tokenService = inject(TokenService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _languageService = inject(LanguageService);
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -189,6 +191,7 @@ export class AuthService implements OnDestroy {
         this._tokenService.setUser(user);
         this.currentUserSubject.next(user);
         this._authStore.setUser(user);
+        this._languageService.syncFromUser(user);
       }),
     );
   }

@@ -7,7 +7,8 @@
       Clients
     </button> -->
 
-    <button pButton type="button" rounded text severity="secondary" pTooltip="Back to Groups" (click)="goBack()" iconOnly>
+    <button pButton type="button" rounded text severity="secondary" [pTooltip]="'clients.profile.back' | translate"
+      [attr.aria-label]="'clients.profile.back' | translate" (click)="goBack()" iconOnly>
       <i class="pi pi-arrow-left"></i>
     </button>
 
@@ -33,24 +34,24 @@
           <!-- Info rows -->
           <div class="flex flex-col gap-3 text-sm">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-surface-500 shrink-0">Client since</span>
+              <span class="text-surface-500 shrink-0">{{ 'clients.profile.info.clientSince' | translate }}</span>
               <span class="font-medium text-right">
                 {{ c.startedAt ? (c.startedAt | date: 'dd MMM yyyy') : '—' }}
               </span>
             </div>
             <div class="flex items-center justify-between gap-2">
-              <span class="text-surface-500 shrink-0">Connected</span>
+              <span class="text-surface-500 shrink-0">{{ 'clients.profile.info.connected' | translate }}</span>
               <span class="font-medium text-right">{{ c.createdAt | date: 'dd MMM yyyy' }}</span>
             </div>
             <div class="flex items-center justify-between gap-2">
-              <span class="text-surface-500 shrink-0">Initiated by</span>
+              <span class="text-surface-500 shrink-0">{{ 'clients.profile.info.initiatedBy' | translate }}</span>
               <span class="font-medium text-right">
-                {{ c.initiatedBy === InitiatedBy.Instructor ? 'You' : 'Client' }}
+                {{ (c.initiatedBy === InitiatedBy.Instructor ? 'common.you' : 'clients.profile.info.initiatedByClient') | translate }}
               </span>
             </div>
             @if (c.status === Statuses.Pending && c.expiresAt) {
             <div class="flex items-center justify-between gap-2">
-              <span class="text-surface-500 shrink-0">Expires</span>
+              <span class="text-surface-500 shrink-0">{{ 'clients.profile.info.expires' | translate }}</span>
               <span class="font-medium text-right text-orange-500">
                 {{ c.expiresAt | date: 'dd MMM yyyy' }}
               </span>
@@ -64,21 +65,21 @@
             @if (c.status === Statuses.Active) {
             <button pButton type="button" fluid (click)="messageClient()">
               <i class="pi pi-comment"></i>
-              Message
+              {{ 'clients.profile.actions.message' | translate }}
             </button>
             <button pButton type="button" severity="secondary" fluid [outlined]="true" (click)="openNotesDialog()">
               <i class="pi pi-pencil"></i>
-              Edit notes
+              {{ 'clients.common.editNotes' | translate }}
             </button>
             <button pButton type="button" severity="danger" fluid [text]="true" (click)="confirmArchive()">
               <i class="pi pi-inbox"></i>
-              Archive client
+              {{ 'clients.profile.actions.archive' | translate }}
             </button>
             }
             @if (c.status === Statuses.Archived) {
             <button pButton type="button" severity="success" fluid (click)="confirmUnarchive()">
               <i class="pi pi-inbox"></i>
-              Unarchive client
+              {{ 'clients.profile.actions.unarchive' | translate }}
             </button>
             }
           </div>
@@ -103,7 +104,7 @@
             class="py-0.5"
           >
             <i [class]="tab.icon"></i>
-            {{ tab.label }}
+            {{ tab.label | translate }}
           </button>
           }
         </div>
@@ -117,9 +118,10 @@
 
           <p-card class="shadow-md">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold">Notes</h3>
+              <h3 class="font-semibold">{{ 'clients.profile.overview.notes.title' | translate }}</h3>
               @if (c.status === Statuses.Active) {
-              <button pButton type="button" [text]="true" size="small" severity="secondary" (click)="openNotesDialog()" iconOnly>
+              <button pButton type="button" [text]="true" size="small" severity="secondary" (click)="openNotesDialog()"
+                [attr.aria-label]="'clients.common.editNotes' | translate" iconOnly>
                 <i class="pi pi-pencil"></i>
               </button>
               }
@@ -127,12 +129,12 @@
             @if (c.notes) {
             <p class="text-sm whitespace-pre-line">{{ c.notes }}</p>
             } @else {
-            <p class="text-sm text-surface-400">No notes yet.</p>
+            <p class="text-sm text-surface-400">{{ 'clients.profile.overview.notes.empty' | translate }}</p>
             }
           </p-card>
 
           <p-card class="shadow-md">
-            <h3 class="font-semibold mb-3">Groups</h3>
+            <h3 class="font-semibold mb-3">{{ 'clients.profile.overview.groups.title' | translate }}</h3>
             @if (c.groupMemberships?.length) {
             <div class="flex flex-wrap gap-2">
               @for (group of c.groupMemberships; track group.groupId) {
@@ -140,7 +142,7 @@
               }
             </div>
             } @else {
-            <p class="text-sm text-surface-400">Not a member of any groups.</p>
+            <p class="text-sm text-surface-400">{{ 'clients.profile.overview.groups.empty' | translate }}</p>
             }
           </p-card>
 
@@ -149,30 +151,30 @@
             <p-card class="shadow-md">
               <div class="flex flex-col items-center gap-1 py-1 text-center">
                 <span class="text-2xl font-bold tabular-nums">{{ workoutsTotal() }}</span>
-                <span class="text-[11px] uppercase tracking-wide text-muted-color">Total workouts</span>
+                <span class="text-[11px] uppercase tracking-wide text-muted-color">{{ 'clients.profile.overview.stats.totalWorkouts' | translate }}</span>
               </div>
             </p-card>
             <p-card class="shadow-md">
               <div class="flex flex-col items-center gap-1 py-1 text-center">
                 <span class="text-2xl font-bold tabular-nums">{{ workoutsLast7Days() }}</span>
-                <span class="text-[11px] uppercase tracking-wide text-muted-color">Last 7 days</span>
+                <span class="text-[11px] uppercase tracking-wide text-muted-color">{{ 'clients.profile.overview.stats.last7Days' | translate }}</span>
               </div>
             </p-card>
             <p-card class="shadow-md">
               <div class="flex flex-col items-center gap-1 py-1 text-center">
                 <span class="text-2xl font-bold tabular-nums">{{ activeAssignments().length }}</span>
-                <span class="text-[11px] uppercase tracking-wide text-muted-color">Active plans</span>
+                <span class="text-[11px] uppercase tracking-wide text-muted-color">{{ 'clients.profile.overview.stats.activePlans' | translate }}</span>
               </div>
             </p-card>
           </div>
 
           <p-card class="shadow-md">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold">Recent workouts</h3>
+              <h3 class="font-semibold">{{ 'clients.profile.overview.recentWorkouts.title' | translate }}</h3>
               @if (workoutsTotal() > 3) {
               <button pButton type="button" [text]="true" size="small" severity="secondary"
                 (click)="activeTab.set(3)">
-                See all
+                {{ 'button.seeAll' | translate }}
                 <i class="pi pi-arrow-right text-[10px]"></i>
               </button>
               }
@@ -180,14 +182,14 @@
             @if (workoutsLoading() && !workouts().length) {
             <div class="flex items-center gap-2 py-4 text-sm text-surface-400">
               <i class="pi pi-spin pi-spinner"></i>
-              Loading recent workouts…
+              {{ 'clients.profile.overview.recentWorkouts.loading' | translate }}
             </div>
             } @else if (recentWorkouts().length === 0) {
             <div class="flex items-center gap-3 text-surface-400 py-2">
               <i class="pi pi-bolt text-2xl"></i>
               <div>
-                <p class="font-medium text-surface-500">No workouts yet</p>
-                <p class="text-sm">Workouts this client logs — assigned or freestyle — will appear here.</p>
+                <p class="font-medium text-surface-500">{{ 'clients.profile.overview.recentWorkouts.empty' | translate }}</p>
+                <p class="text-sm">{{ 'clients.profile.overview.recentWorkouts.emptyHint' | translate }}</p>
               </div>
             </div>
             } @else {
@@ -208,15 +210,15 @@
                     @if (w.assignment?.programNameSnapshot) {
                     {{ w.assignment?.programNameSnapshot }}
                     } @else {
-                    Freestyle workout
+                    {{ 'clients.profile.workouts.freestyle' | translate }}
                     }
                     @if ((w.prCount ?? 0) > 0) {
-                    · <i class="pi pi-trophy text-[10px]"></i> {{ w.prCount }} PR{{ w.prCount === 1 ? '' : 's' }}
+                    · <i class="pi pi-trophy text-[10px]"></i> {{ 'clients.profile.workouts.prs' | translate: { count: w.prCount } }}
                     }
                   </div>
                 </div>
                 <div class="text-xs text-surface-500 whitespace-nowrap">
-                  <span><i class="pi pi-check text-[10px] mr-1"></i>{{ workoutSetCount(w) }} {{ workoutSetCount(w) === 1 ? 'set' : 'sets' }}</span>
+                  <span><i class="pi pi-check text-[10px] mr-1"></i>{{ 'count.sets' | translate: { count: workoutSetCount(w) } }}</span>
                 </div>
               </li>
               }
@@ -226,11 +228,11 @@
 
           <p-card class="shadow-md">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold">Active programs</h3>
+              <h3 class="font-semibold">{{ 'clients.profile.overview.programs.title' | translate }}</h3>
               @if (activeAssignments().length > 3 || assignmentsTotal() > 0) {
               <button pButton type="button" [text]="true" size="small" severity="secondary"
                 (click)="activeTab.set(4)">
-                See all
+                {{ 'button.seeAll' | translate }}
                 <i class="pi pi-arrow-right text-[10px]"></i>
               </button>
               }
@@ -238,14 +240,14 @@
             @if (assignmentsLoading() && !assignments().length) {
             <div class="flex items-center gap-2 py-4 text-sm text-surface-400">
               <i class="pi pi-spin pi-spinner"></i>
-              Loading programs…
+              {{ 'clients.profile.programs.loading' | translate }}
             </div>
             } @else if (activeAssignments().length === 0) {
             <div class="flex items-center gap-3 text-surface-400 py-2">
               <i class="pi pi-bookmark text-2xl"></i>
               <div>
-                <p class="font-medium text-surface-500">No active programs</p>
-                <p class="text-sm">Assign one from the Programs area to schedule structured workouts.</p>
+                <p class="font-medium text-surface-500">{{ 'clients.profile.overview.programs.empty' | translate }}</p>
+                <p class="text-sm">{{ 'clients.profile.overview.programs.emptyHint' | translate }}</p>
               </div>
             </div>
             } @else {
@@ -255,11 +257,11 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="font-medium text-sm truncate">{{ a.programNameSnapshot }}</span>
-                    <p-tag [value]="a.status" [severity]="assignmentStatusSeverity(a)" rounded />
+                    <p-tag [value]="a.status | enumLabel: 'programAssignmentStatus'" [severity]="assignmentStatusSeverity(a)" rounded />
                   </div>
                   <div class="text-xs text-surface-400 mt-1">
-                    {{ hasStarted(a) ? 'Started' : 'Starts' }} {{ a.startDate | date: 'mediumDate' }}
-                    · {{ a.completionPercent }}% complete
+                    {{ (hasStarted(a) ? 'clients.profile.programs.started' : 'clients.profile.programs.starts') | translate: { date: (a.startDate | date: 'mediumDate') } }}
+                    · {{ 'clients.profile.programs.complete' | translate: { percent: a.completionPercent } }}
                   </div>
                 </div>
               </li>
@@ -274,16 +276,17 @@
         @case (1) {
         <p-card class="shadow-md">
           <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <span class="text-sm font-semibold">Sessions</span>
+            <span class="text-sm font-semibold">{{ 'clients.profile.sessions.title' | translate }}</span>
             <div class="flex items-center gap-2">
               @if (sessionsTotal()) {
               <span class="text-[11px] text-muted-color">
-                {{ sessions().length }} of {{ sessionsTotal() }}
+                {{ 'clients.common.shownOfTotal' | translate: { shown: sessions().length, total: sessionsTotal() } }}
               </span>
               }
               <p-selectbutton [options]="sessionScopes" [ngModel]="sessionsScope()"
                 (ngModelChange)="setSessionScope($event)" optionLabel="label" optionValue="value"
-                [allowEmpty]="false" size="small" aria-label="Session scope" />
+                [allowEmpty]="false" size="small"
+                [attr.aria-label]="'clients.profile.sessions.scope.ariaLabel' | translate" />
             </div>
           </div>
 
@@ -294,9 +297,9 @@
             <i class="pi pi-calendar text-4xl text-surface-300"></i>
             <p class="text-sm text-surface-400">
               @if (sessionsScope() === 'upcoming') {
-              {{ clientName() }} has nothing booked in the next 3 months.
+              {{ 'clients.profile.sessions.emptyUpcoming' | translate: { name: clientName() } }}
               } @else {
-              {{ clientName() }} attended none of your sessions in the last 3 months.
+              {{ 'clients.profile.sessions.emptyPast' | translate: { name: clientName() } }}
               }
             </p>
           </div>
@@ -331,7 +334,7 @@
           <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-2"
             [disabled]="sessionsLoading()" (click)="loadMoreSessions()">
             <i class="pi" [class]="sessionsLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
-            Load more
+            {{ 'button.loadMore' | translate }}
           </button>
           }
           }
@@ -342,16 +345,15 @@
         <p-card class="shadow-md">
           <div class="flex flex-col items-center gap-3 py-10 text-center">
             <i class="pi pi-chart-line text-4xl text-surface-300"></i>
-            <h3 class="text-lg font-semibold text-surface-500">Per-exercise progress isn't built yet</h3>
+            <h3 class="text-lg font-semibold text-surface-500">{{ 'clients.profile.progress.title' | translate }}</h3>
             <p class="text-sm text-surface-400">
-              For a per-exercise history, open a logged workout from the Workouts tab
-              or the Overview.<br />
-              Overall progress at a glance lives on the Overview tab.
+              {{ 'clients.profile.progress.hintWorkouts' | translate }}<br />
+              {{ 'clients.profile.progress.hintOverview' | translate }}
             </p>
             <button pButton type="button" severity="secondary" [outlined]="true" size="small"
               (click)="activeTab.set(0)">
               <i class="pi pi-arrow-left"></i>
-              Back to Overview
+              {{ 'clients.profile.progress.back' | translate }}
             </button>
           </div>
         </p-card>
@@ -363,43 +365,44 @@
             <div class="flex flex-wrap items-center justify-between gap-2">
               <!-- Coach vocabulary: they assign programs. The client experiences
                    the same row as their plan. -->
-              <h3 class="font-semibold">Assigned programs</h3>
+              <h3 class="font-semibold">{{ 'clients.profile.programs.title' | translate }}</h3>
               <div class="flex items-center gap-2">
                 @if (assignmentsTotal() > 0) {
                 <span class="text-xs text-surface-400">
-                  {{ assignments().length }} of {{ assignmentsTotal() }}
+                  {{ 'clients.common.shownOfTotal' | translate: { shown: assignments().length, total: assignmentsTotal() } }}
                 </span>
                 }
                 <p-selectbutton [options]="assignmentScopes" [ngModel]="assignmentsScope()"
                   (ngModelChange)="setAssignmentScope($event)" optionLabel="label" optionValue="value"
-                  [allowEmpty]="false" size="small" aria-label="Program scope" />
+                  [allowEmpty]="false" size="small"
+                  [attr.aria-label]="'clients.profile.programs.scope.ariaLabel' | translate" />
               </div>
             </div>
-            <input pInputText type="search" placeholder="Search programs by name…" class="w-full" fluid
+            <input pInputText type="search" [placeholder]="'clients.profile.programs.searchPlaceholder' | translate"
+              [attr.aria-label]="'clients.profile.programs.searchPlaceholder' | translate" class="w-full" fluid
               [ngModel]="assignmentsSearch()" (ngModelChange)="onAssignmentSearch($event)" />
           </div>
 
           @if (assignmentsLoading() && !assignments().length) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-spin pi-spinner text-2xl text-surface-400"></i>
-            <p class="text-sm text-surface-400">Loading programs…</p>
+            <p class="text-sm text-surface-400">{{ 'clients.profile.programs.loading' | translate }}</p>
           </div>
           } @else if (assignments().length === 0) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-bookmark text-4xl text-surface-300"></i>
             @if (assignmentsSearch().trim() || assignmentsScope() !== 'all') {
-            <h4 class="text-base font-semibold text-surface-500">Nothing matches</h4>
+            <h4 class="text-base font-semibold text-surface-500">{{ 'empty.nothingMatches' | translate }}</h4>
             <p class="text-sm text-surface-400">
-              No {{ assignmentsScope() === 'history' ? 'finished' : 'current' }} programs
-              @if (assignmentsSearch().trim()) { for “{{ assignmentsSearch().trim() }}” }
-              — try All.
+              @if (assignmentsSearch().trim(); as term) {
+              {{ (assignmentsScope() === 'history' ? 'clients.profile.programs.noMatch.finishedSearch' : 'clients.profile.programs.noMatch.currentSearch') | translate: { term: term } }}
+              } @else {
+              {{ (assignmentsScope() === 'history' ? 'clients.profile.programs.noMatch.finished' : 'clients.profile.programs.noMatch.current') | translate }}
+              }
             </p>
             } @else {
-            <h4 class="text-base font-semibold text-surface-500">No programs assigned yet</h4>
-            <p class="text-sm text-surface-400">
-              Assign a program from the Programs area to schedule
-              structured workouts for this client.
-            </p>
+            <h4 class="text-base font-semibold text-surface-500">{{ 'clients.profile.programs.empty.title' | translate }}</h4>
+            <p class="text-sm text-surface-400">{{ 'clients.profile.programs.empty.message' | translate }}</p>
             }
           </div>
           } @else {
@@ -409,18 +412,18 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="font-medium text-sm">{{ a.programNameSnapshot }}</span>
-                  <p-tag [value]="a.status" [severity]="assignmentStatusSeverity(a)" rounded />
+                  <p-tag [value]="a.status | enumLabel: 'programAssignmentStatus'" [severity]="assignmentStatusSeverity(a)" rounded />
                 </div>
                 <div class="text-xs text-surface-400 mt-1">
-                  {{ hasStarted(a) ? 'Started' : 'Starts' }} {{ a.startDate | date: 'mediumDate' }}
+                  {{ (hasStarted(a) ? 'clients.profile.programs.started' : 'clients.profile.programs.starts') | translate: { date: (a.startDate | date: 'mediumDate') } }}
                   @if (a.endDate) {
-                  · ends {{ a.endDate | date: 'mediumDate' }}
+                  · {{ 'clients.profile.programs.ends' | translate: { date: (a.endDate | date: 'mediumDate') } }}
                   }
-                  · {{ a.completionPercent }}% complete
+                  · {{ 'clients.profile.programs.complete' | translate: { percent: a.completionPercent } }}
                 </div>
               </div>
               <div class="flex items-center gap-1 shrink-0">
-                @if (a.status === 'ACTIVE') {
+                @if (a.status === AssignmentStatus.Active) {
                 <button pButton
                   type="button"
                   severity="secondary"
@@ -430,9 +433,9 @@
                   [disabled]="assignmentMutatingId() === a.id"
                 >
                   <i class="pi" [class]="assignmentMutatingId() === a.id ? 'pi-spinner pi-spin' : 'pi-pause'"></i>
-                  Pause
+                  {{ 'clients.profile.programs.pause' | translate }}
                 </button>
-                } @else if (a.status === 'PAUSED') {
+                } @else if (a.status === AssignmentStatus.Paused) {
                 <button pButton
                   type="button"
                   severity="success"
@@ -441,13 +444,14 @@
                   [disabled]="assignmentMutatingId() === a.id"
                 >
                   <i class="pi" [class]="assignmentMutatingId() === a.id ? 'pi-spinner pi-spin' : 'pi-play'"></i>
-                  Resume
+                  {{ 'clients.profile.programs.resume' | translate }}
                 </button>
                 }
                 @if (!isAssignmentTerminal(a)) {
                 <button pButton
                   type="button"
-                  pTooltip="Cancel program"
+                  [pTooltip]="'clients.profile.programs.cancel' | translate"
+                  [attr.aria-label]="'clients.profile.programs.cancel' | translate"
                   severity="danger"
                   [text]="true"
                   size="small"
@@ -466,7 +470,7 @@
           <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-2"
             [disabled]="assignmentsLoading()" (click)="loadMoreAssignments()">
             <i class="pi" [class]="assignmentsLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
-            Load more
+            {{ 'button.loadMore' | translate }}
           </button>
           }
           }
@@ -476,25 +480,22 @@
         @case (3) {
         <p-card class="shadow-md">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="font-semibold">Logged workouts</h3>
+            <h3 class="font-semibold">{{ 'clients.profile.workouts.title' | translate }}</h3>
             @if (workoutsTotal() > 0) {
-            <span class="text-xs text-surface-400">{{ workouts().length }} of {{ workoutsTotal() }}</span>
+            <span class="text-xs text-surface-400">{{ 'clients.common.shownOfTotal' | translate: { shown: workouts().length, total: workoutsTotal() } }}</span>
             }
           </div>
 
           @if (workoutsLoading() && !workouts().length) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-spin pi-spinner text-2xl text-surface-400"></i>
-            <p class="text-sm text-surface-400">Loading workouts…</p>
+            <p class="text-sm text-surface-400">{{ 'clients.profile.workouts.loading' | translate }}</p>
           </div>
           } @else if (workouts().length === 0) {
           <div class="flex flex-col items-center gap-3 py-12 text-center">
             <i class="pi pi-bolt text-4xl text-surface-300"></i>
-            <h4 class="text-base font-semibold text-surface-500">No workouts logged yet</h4>
-            <p class="text-sm text-surface-400">
-              Sessions this client completes will appear here, including
-              freestyle workouts and sessions from the programs you assigned.
-            </p>
+            <h4 class="text-base font-semibold text-surface-500">{{ 'clients.profile.workouts.empty.title' | translate }}</h4>
+            <p class="text-sm text-surface-400">{{ 'clients.profile.workouts.empty.message' | translate }}</p>
           </div>
           } @else {
           <ul class="flex flex-col gap-2 list-none m-0 p-0">
@@ -514,16 +515,16 @@
                   @if (w.assignment?.programNameSnapshot) {
                   {{ w.assignment?.programNameSnapshot }}
                   } @else {
-                  Freestyle workout
+                  {{ 'clients.profile.workouts.freestyle' | translate }}
                   }
                   @if ((w.prCount ?? 0) > 0) {
-                  · <i class="pi pi-trophy text-[10px]"></i> {{ w.prCount }} PR{{ w.prCount === 1 ? '' : 's' }}
+                  · <i class="pi pi-trophy text-[10px]"></i> {{ 'clients.profile.workouts.prs' | translate: { count: w.prCount } }}
                   }
                 </div>
               </div>
               <div class="text-xs text-surface-500 whitespace-nowrap">
-                <span class="mr-3"><i class="pi pi-stopwatch text-[10px] mr-1"></i>{{ workoutDurationMin(w) ?? '—' }}{{ workoutDurationMin(w) != null ? ' min' : '' }}</span>
-                <span><i class="pi pi-check text-[10px] mr-1"></i>{{ workoutSetCount(w) }} {{ workoutSetCount(w) === 1 ? 'set' : 'sets' }}</span>
+                <span class="mr-3"><i class="pi pi-stopwatch text-[10px] mr-1"></i>{{ workoutDurationMin(w) != null ? ('time.minutesShort' | translate: { minutes: workoutDurationMin(w) }) : '—' }}</span>
+                <span><i class="pi pi-check text-[10px] mr-1"></i>{{ 'count.sets' | translate: { count: workoutSetCount(w) } }}</span>
               </div>
             </li>
             }
@@ -532,7 +533,7 @@
           <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-2"
             [disabled]="workoutsLoading()" (click)="loadMoreWorkouts()">
             <i class="pi" [class]="workoutsLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
-            Load more
+            {{ 'button.loadMore' | translate }}
           </button>
           }
           }
@@ -552,9 +553,12 @@
     } @else {
     <div class="flex flex-col items-center justify-center gap-4 py-24 text-center">
       <i class="pi pi-user text-4xl text-surface-300"></i>
-      <h2 class="text-lg font-semibold text-surface-500">Client not found</h2>
-      <p class="text-sm text-surface-400">This person is not one of your clients, or the link is out of date.</p>
-      <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Go to clients</button>
+      <h2 class="text-lg font-semibold text-surface-500">{{ 'clients.profile.notFound.title' | translate }}</h2>
+      <p class="text-sm text-surface-400">{{ 'clients.profile.notFound.message' | translate }}</p>
+      <button pButton type="button" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+        {{ 'clients.profile.notFound.action' | translate }}
+      </button>
     </div>
     }
 

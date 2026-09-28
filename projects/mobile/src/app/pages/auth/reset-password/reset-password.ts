@@ -12,8 +12,9 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { AuthService } from 'core';
+import { AuthService, validationMessage } from 'core';
 
 @Component({
   selector: 'mh-reset-password',
@@ -29,6 +30,7 @@ import { AuthService } from 'core';
     IonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',
@@ -36,6 +38,7 @@ import { AuthService } from 'core';
 export class ResetPassword {
   private readonly _formBuilder = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -60,15 +63,13 @@ export class ResetPassword {
     this._authService.forgotPassword({ email }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set(
-          'If an account exists with this email, you will receive password reset instructions shortly.',
-        );
+        this.successMessage.set(this._translateService.instant('auth.resetPassword.success'));
         this.forgotPasswordForm.reset();
       },
       error: (error) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          error.error?.message || 'Failed to send reset instructions. Please try again.',
+          error.error?.message || this._translateService.instant('auth.resetPassword.error'),
         );
       },
     });
@@ -80,12 +81,6 @@ export class ResetPassword {
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.forgotPasswordForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    if (field.errors['required']) return 'Email is required';
-    if (field.errors['email']) return 'Please enter a valid email address';
-
-    return '';
+    return validationMessage(this.forgotPasswordForm.get(fieldName)?.errors);
   }
 }

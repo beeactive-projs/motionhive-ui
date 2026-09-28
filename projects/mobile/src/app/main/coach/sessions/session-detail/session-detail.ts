@@ -20,17 +20,22 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
   AuthStore,
   SESSION_ACCESS_LEVELS,
+  SESSION_INSTANCE_STATUSES,
   SESSION_PARTICIPANT_STATUSES,
   SESSION_REMINDER_KINDS,
   SessionInstance,
   SessionInstanceStatus,
+  SessionLocationKind,
   SessionParticipant,
+  SessionParticipantStatus,
   SessionsDetailStore,
+  appLocale,
   detectMeetingProvider,
   displayName,
   formatRelativeShort,
@@ -133,6 +138,7 @@ interface DetailRow {
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './session-detail.html',
   styleUrl: './session-detail.scss',
@@ -144,6 +150,7 @@ export class SessionDetail implements ViewWillEnter {
   private readonly _authStore = inject(AuthStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
+  private readonly _translateService = inject(TranslateService);
   readonly store = inject(SessionsDetailStore);
 
   readonly cancelOpen = signal(false);
@@ -171,7 +178,9 @@ export class SessionDetail implements ViewWillEnter {
     () => this.instance()?.titleOverride ?? this.template()?.title ?? '',
   );
 
-  readonly isOnline = computed(() => this.template()?.locationKind === 'ONLINE');
+  readonly isOnline = computed(
+    () => this.template()?.locationKind === SessionLocationKind.Online,
+  );
 
   /**
    * Derived from the timestamps, not `instance.status`: the status cron runs
@@ -201,7 +210,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly dayLabel = computed(() => {
     const instance = this.instance();
     if (!instance) return '';
-    return new Date(instance.startAt).toLocaleDateString(undefined, {
+    return new Date(instance.startAt).toLocaleDateString(appLocale(), {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -212,7 +221,10 @@ export class SessionDetail implements ViewWillEnter {
   readonly recurrenceLabel = computed(() => {
     const template = this.template();
     if (!template?.isRecurring) return null;
-    return formatRecurrenceSummary(template.recurrenceRule) || 'Repeats';
+    return (
+      formatRecurrenceSummary(template.recurrenceRule) ||
+      this._translateService.instant('sessions.detail.rows.repeats')
+    );
   });
 
   /** "Friday 22 May · 07:30" — the line the card leads with. */
@@ -244,9 +256,24 @@ export class SessionDetail implements ViewWillEnter {
    * `SessionStatusTone` vocabulary, which the SCSS maps to washes.
    */
   readonly statusChip = computed<{ label: string; tone: string } | null>(() => {
-    if (this.isCancelled()) return { label: 'Cancelled', tone: 'danger' };
-    if (this.lifecycle() === 'ongoing') return { label: 'Live now', tone: 'success' };
-    if (this.lifecycle() === 'past') return { label: 'Completed', tone: 'secondary' };
+    if (this.isCancelled()) {
+      return {
+        label: SESSION_INSTANCE_STATUSES[SessionInstanceStatus.Cancelled].label,
+        tone: 'danger',
+      };
+    }
+    if (this.lifecycle() === 'ongoing') {
+      return {
+        label: this._translateService.instant('sessions.detail.status.live'),
+        tone: 'success',
+      };
+    }
+    if (this.lifecycle() === 'past') {
+      return {
+        label: SESSION_INSTANCE_STATUSES[SessionInstanceStatus.Completed].label,
+        tone: 'secondary',
+      };
+    }
     return null;
   });
 
@@ -265,7 +292,7 @@ export class SessionDetail implements ViewWillEnter {
 
   readonly locationLabel = computed(() => {
     if (this.isOnline()) return this.providerLabel();
-    return this.venue()?.name ?? 'No venue set';
+    return this.venue()?.name ?? this._translateService.instant('sessions.detail.noVenue');
   });
 
   /**
@@ -310,15 +337,20 @@ export class SessionDetail implements ViewWillEnter {
 
   readonly spotsLabel = computed(() => {
     const capacity = this.capacity();
-    return capacity ? `${this.confirmed()} / ${capacity}` : `${this.confirmed()} booked`;
+    return capacity
+      ? `${this.confirmed()} / ${capacity}`
+      : this._translateService.instant('sessions.booked', { count: this.confirmed() });
   });
 
   /** The same number as a sentence, for the banner above the fold. */
   readonly bookedLabel = computed(() => {
     const capacity = this.capacity();
     return capacity
-      ? `${this.confirmed()} of ${capacity} booked`
-      : `${this.confirmed()} booked`;
+      ? this._translateService.instant('sessions.detail.booked', {
+          confirmed: this.confirmed(),
+          capacity,
+        })
+      : this._translateService.instant('sessions.booked', { count: this.confirmed() });
   });
 
   /**
@@ -359,14 +391,19 @@ export class SessionDetail implements ViewWillEnter {
   readonly liveNote = computed(() => {
     const instance = this.instance();
     if (!instance || this.isCancelled()) return null;
-    if (this.lifecycle() === 'ongoing') return 'live now';
+    if (this.lifecycle() === 'ongoing') {
+      return this._translateService.instant('sessions.detail.liveNow');
+    }
     if (this.lifecycle() === 'past') return null;
 
     const until = formatTimeUntil(instance.startAt, this._clockService.now());
     if (!until) return null;
     // "in 4 min" reads as a countdown only with the verb in front of it;
-    // "starting now" already is a sentence.
-    return until.startsWith('in ') ? `live ${until}` : until;
+    // "starting now" already is a sentence. Compared against the translated
+    // phrase rather than sniffing for "in ", which only works in English.
+    return until === this._translateService.instant('time.startingNow')
+      ? until
+      : this._translateService.instant('sessions.detail.liveIn', { until });
   });
 
   /**
@@ -375,7 +412,12 @@ export class SessionDetail implements ViewWillEnter {
    */
   readonly liveBanner = computed(() => {
     const note = this.liveNote();
-    return note ? `${this.bookedLabel()} · ${note}` : null;
+    return note
+      ? this._translateService.instant('sessions.detail.liveBanner', {
+          booked: this.bookedLabel(),
+          note,
+        })
+      : null;
   });
 
   /** Under the count in the footer: the countdown, or what a spot costs. */
@@ -389,7 +431,11 @@ export class SessionDetail implements ViewWillEnter {
   readonly joinLabel = computed(() => {
     const provider =
       this.template()?.meetingProvider ?? detectMeetingProvider(this.meetingUrl());
-    return provider ? `Join ${meetingProviderLabel(provider)}` : 'Join meeting';
+    return provider
+      ? this._translateService.instant('sessions.detail.joinProvider', {
+          provider: meetingProviderLabel(provider),
+        })
+      : this._translateService.instant('sessions.detail.join');
   });
 
   /**
@@ -409,14 +455,16 @@ export class SessionDetail implements ViewWillEnter {
 
     return Object.values(SESSION_REMINDER_KINDS).map(({ label, offsetMs }) => ({
       label,
-      detail: `Push · ${new Date(start - offsetMs).toLocaleString('en-GB', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })}`,
+      detail: this._translateService.instant('sessions.detail.reminderPush', {
+        date: new Date(start - offsetMs).toLocaleString(appLocale(), {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }),
+      }),
     }));
   });
 
@@ -431,14 +479,17 @@ export class SessionDetail implements ViewWillEnter {
     const { attended } = this.counts();
     const total = this.attendees().length;
     if (total === 0) return null;
-    return `${attended} of ${total} attended`;
+    return this._translateService.instant('sessions.detail.attendanceSummary', {
+      attended,
+      total,
+    });
   });
 
   /** How many are still unmarked — the register's own to-do line. */
   readonly attendanceDetail = computed(() => {
     const unmarked = this.attendees().length - this.markedCount();
     if (unmarked <= 0) return null;
-    return `${unmarked} not marked yet`;
+    return this._translateService.instant('sessions.detail.notMarked', { count: unmarked });
   });
 
   /**
@@ -451,7 +502,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly attendees = computed(() =>
     this.store
       .participants()
-      .filter((p) => p.status !== 'WAITLISTED')
+      .filter((p) => p.status !== SessionParticipantStatus.Waitlisted)
       .sort((a, b) => Number(this.isPending(b)) - Number(this.isPending(a))),
   );
 
@@ -475,7 +526,7 @@ export class SessionDetail implements ViewWillEnter {
   readonly waitlist = computed(() =>
     this.store
       .participants()
-      .filter((p) => p.status === 'WAITLISTED')
+      .filter((p) => p.status === SessionParticipantStatus.Waitlisted)
       .sort((a, b) => new Date(a.bookedAt).getTime() - new Date(b.bookedAt).getTime()),
   );
 
@@ -532,8 +583,10 @@ export class SessionDetail implements ViewWillEnter {
   /** The cancel banner's second line — when it happened, who heard about it. */
   readonly cancelDetail = computed(() => {
     const cancelledAt = this.instance()?.cancelledAt;
-    if (!cancelledAt) return 'Everyone booked in was notified.';
-    return `Cancelled ${formatSessionDayShort(cancelledAt)} · everyone booked in was notified.`;
+    if (!cancelledAt) return this._translateService.instant('sessions.detail.cancelled.notified');
+    return this._translateService.instant('sessions.detail.cancelled.notifiedOn', {
+      date: formatSessionDayShort(cancelledAt),
+    });
   });
 
   /**
@@ -547,13 +600,16 @@ export class SessionDetail implements ViewWillEnter {
     const instance = this.instance();
     if (!template) return [];
 
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this._translateService.instant(key, params);
+
     const rows: DetailRow[] = [
       {
         icon: 'pricetag-outline',
         color: 'success',
         tone: HexAvatarTones.Shade,
-        title: this.price() ?? 'Free',
-        detail: 'Price per spot',
+        title: this.price() ?? t('sessions.detail.rows.free'),
+        detail: t('sessions.detail.rows.pricePerSpot'),
       },
     ];
 
@@ -565,7 +621,7 @@ export class SessionDetail implements ViewWillEnter {
         tone: HexAvatarTones.Base,
         title: access.label,
         detail: template.approvalRequired
-          ? 'Approval needed for every booking'
+          ? t('sessions.detail.rows.approvalNeeded')
           : access.sub,
       });
     }
@@ -576,7 +632,7 @@ export class SessionDetail implements ViewWillEnter {
         color: 'info',
         tone: HexAvatarTones.Shade,
         title: template.group.name,
-        detail: 'Group',
+        detail: t('sessions.detail.rows.group'),
       });
     }
 
@@ -586,31 +642,36 @@ export class SessionDetail implements ViewWillEnter {
       tone: HexAvatarTones.Base,
       title:
         template.cancellationCutoffHours > 0
-          ? `Cancel up to ${template.cancellationCutoffHours}h before`
-          : 'Cancel any time',
-      detail: 'Cancellation policy',
+          ? t('sessions.detail.rows.cancelUpTo', { hours: template.cancellationCutoffHours })
+          : t('sessions.detail.rows.cancelAnyTime'),
+      detail: t('sessions.detail.rows.cancellationPolicy'),
     });
 
     rows.push({
       icon: 'hourglass-outline',
       color: 'medium',
       tone: HexAvatarTones.Base,
-      title: template.waitlistEnabled ? 'Waitlist on' : 'Waitlist off',
+      title: template.waitlistEnabled
+        ? t('sessions.detail.rows.waitlistOn')
+        : t('sessions.detail.rows.waitlistOff'),
       detail: template.waitlistEnabled
-        ? 'A full session queues new signups'
-        : 'Booking closes once it is full',
+        ? t('sessions.detail.rows.waitlistOnHint')
+        : t('sessions.detail.rows.waitlistOffHint'),
     });
 
     if (template.isRecurring) {
       const position = instance
-        ? `Session ${instance.occurrenceIndex + 1} of the series`
+        ? t('sessions.detail.rows.seriesPosition', { index: instance.occurrenceIndex + 1 })
         : null;
       rows.push({
         icon: 'repeat-outline',
         color: 'secondary',
         tone: HexAvatarTones.Base,
-        title: this.recurrenceLabel() ?? 'Repeats',
-        detail: instance?.isOverride ? `${position} · edited` : position,
+        title: this.recurrenceLabel() ?? t('sessions.detail.rows.repeats'),
+        detail:
+          instance?.isOverride && position
+            ? t('sessions.detail.rows.edited', { position })
+            : position,
       });
     }
 
@@ -619,7 +680,7 @@ export class SessionDetail implements ViewWillEnter {
       color: 'dark',
       tone: HexAvatarTones.Base,
       title: template.timezone,
-      detail: 'Timezone',
+      detail: t('form.label.timezone'),
     });
 
     return rows;
@@ -635,10 +696,14 @@ export class SessionDetail implements ViewWillEnter {
     this.messageAudience() === 'userIds' ? this.messageWaitlistIds() : [],
   );
 
-  readonly messageLabel = computed(() => {
-    if (this.messageAudience() !== 'userIds') return 'everyone booked in';
-    const count = this.messageWaitlistIds().length;
-    return count === 1 ? 'one person on the waitlist' : `the ${count} people waiting`;
+  /** "Goes to everyone booked in." — the sheet's one-line recipient note. */
+  readonly messageNote = computed(() => {
+    if (this.messageAudience() !== 'userIds') {
+      return this._translateService.instant('sessions.messageSheet.recipients.all');
+    }
+    return this._translateService.instant('sessions.messageSheet.recipients.waitlist', {
+      count: this.messageWaitlistIds().length,
+    });
   });
 
   constructor() {
@@ -665,7 +730,7 @@ export class SessionDetail implements ViewWillEnter {
   }
 
   nameOf(participant: SessionParticipant): string {
-    return displayName(participant.user, 'Someone');
+    return displayName(participant.user, this._translateService.instant('sessions.someone'));
   }
 
   toneFor(participant: SessionParticipant): AvatarTone {
@@ -686,14 +751,18 @@ export class SessionDetail implements ViewWillEnter {
   }
 
   statusLabel(participant: SessionParticipant): string {
-    if (participant.attended === true) return 'Attended';
-    if (participant.attended === false) return 'No-show';
+    if (participant.attended === true) {
+      return this._translateService.instant('sessions.detail.attended');
+    }
+    if (participant.attended === false) {
+      return this._translateService.instant('sessions.detail.noShow');
+    }
     return SESSION_PARTICIPANT_STATUSES[participant.status]?.label ?? participant.status;
   }
 
   /** Approve/decline only make sense while a request is still pending. */
   isPending(participant: SessionParticipant): boolean {
-    return participant.status === 'PENDING_APPROVAL';
+    return participant.status === SessionParticipantStatus.PendingApproval;
   }
 
   approve(participant: SessionParticipant): void {
@@ -727,9 +796,14 @@ export class SessionDetail implements ViewWillEnter {
     const url = this.meetingUrl();
     if (!url) return;
     if (await copyToClipboard(url)) {
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(
+        this._translateService.instant('toast.detail.linkCopied'),
+      );
     } else {
-      await this._feedbackService.error(null, 'Could not copy the link.');
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('sessions.toast.copyFailed'),
+      );
     }
   }
 
@@ -861,19 +935,27 @@ export class SessionDetail implements ViewWillEnter {
     const handle = this._authStore.user()?.handle;
     if (!handle) return;
 
-    const title = this.title() || 'Session';
-    const when = `${formatSessionDayShort(instance.startAt)}, ${formatSessionTime(instance.startAt)}`;
+    const title = this.title() || this._translateService.instant('common.session');
 
     const outcome = await shareOrCopy({
       title,
-      text: `${title} · ${when}`,
+      text: this._translateService.instant('sessions.share.text', {
+        title,
+        day: formatSessionDayShort(instance.startAt),
+        time: formatSessionTime(instance.startAt),
+      }),
       url: publicProfileUrl(handle),
     });
 
     if (outcome === ShareOutcomes.Copied) {
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(
+        this._translateService.instant('toast.detail.linkCopied'),
+      );
     } else if (outcome === ShareOutcomes.Failed) {
-      await this._feedbackService.error(null, 'Could not share the link.');
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('sessions.toast.shareFailed'),
+      );
     }
   }
 }

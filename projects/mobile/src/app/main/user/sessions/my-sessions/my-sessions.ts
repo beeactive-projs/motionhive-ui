@@ -21,6 +21,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -75,6 +76,7 @@ interface BookingDay {
     MySessionsEmpty,
     NotificationBell,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './my-sessions.html',
   styleUrl: './my-sessions.scss',
@@ -85,6 +87,7 @@ export class MySessions implements ViewWillEnter {
   private readonly _router = inject(Router);
   private readonly _clockService = inject(ClockService);
   private readonly _sessionService = inject(SessionService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
@@ -153,7 +156,9 @@ export class MySessions implements ViewWillEnter {
   /** "Upcoming · 4" once the counts land; a bare "Upcoming" until then. */
   readonly upcomingLabel = computed(() => {
     const count = this.store.upcomingCount();
-    return count === null ? 'Upcoming' : `Upcoming · ${count}`;
+    return count === null
+      ? this._translateService.instant('mySessions.list.upcoming')
+      : this._translateService.instant('mySessions.list.upcomingCount', { count });
   });
 
   constructor() {

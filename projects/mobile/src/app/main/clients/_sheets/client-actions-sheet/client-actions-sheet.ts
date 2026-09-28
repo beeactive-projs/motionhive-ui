@@ -1,4 +1,5 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
@@ -22,11 +23,13 @@ import { CLIENT_ICONS } from '../../clients.icons';
  */
 @Component({
   selector: 'mh-client-actions-sheet',
-  imports: [HexAvatar, IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [HexAvatar, IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './client-actions-sheet.html',
   styleUrl: './client-actions-sheet.scss',
 })
 export class ClientActionsSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly client = input<InstructorClient | null>(null);
 
@@ -38,7 +41,9 @@ export class ClientActionsSheet {
 
   readonly name = computed(() => {
     const client = this.client();
-    return client ? clientDisplayName(client) : 'Client';
+    return client
+      ? clientDisplayName(client)
+      : this._translateService.instant('clients.clientFallback');
   });
 
   readonly email = computed(() => {

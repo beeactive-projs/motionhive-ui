@@ -1,12 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { PrimeNG } from 'primeng/config';
 import { AuthService, environment } from 'core';
 import { ErrorDialog } from './_shared/components/error-dialog/error-dialog';
 import { FeedbackDialog } from './_shared/components/feedback-dialog/feedback-dialog';
 import { WaitlistDialog } from './_shared/components/waitlist-dialog/waitlist-dialog';
 import { ImpersonationBanner } from './_shared/components/impersonation-banner/impersonation-banner';
 import { PwaUpdate } from './_shared/components/pwa-update/pwa-update';
+import { primeNgTranslation } from './_shared/i18n/primeng-translation';
 
 @Component({
   selector: 'app-root',
@@ -27,8 +30,13 @@ export class App {
 
   private readonly _meta = inject(Meta);
   private readonly _authService = inject(AuthService);
+  private readonly _primeNg = inject(PrimeNG);
+  private readonly _translateService = inject(TranslateService);
 
   constructor() {
+    // Translations have loaded by now — bootstrap waits for them.
+    this._primeNg.setTranslation(primeNgTranslation(this._translateService));
+
     const imageUrl = `${environment.appUrl}/svg/logo-navy.svg`;
     this._meta.addTags([
       { property: 'og:type', content: 'website' },

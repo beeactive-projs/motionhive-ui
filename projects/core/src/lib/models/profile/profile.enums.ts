@@ -1,3 +1,5 @@
+import { enumLabelMap } from '../../i18n/enum-label';
+
 export const Genders = {
   Male: 'MALE',
   Female: 'FEMALE',
@@ -7,12 +9,7 @@ export const Genders = {
 
 export type Gender = (typeof Genders)[keyof typeof Genders];
 
-export const GenderLabels: Record<Gender, string> = {
-  [Genders.Male]: 'Male',
-  [Genders.Female]: 'Female',
-  [Genders.Other]: 'Other',
-  [Genders.PreferNotToSay]: 'Prefer not to say',
-};
+export const GenderLabels: Record<Gender, string> = enumLabelMap('gender', Object.values(Genders));
 
 export const FitnessLevels = {
   Beginner: 'BEGINNER',
@@ -22,11 +19,10 @@ export const FitnessLevels = {
 
 export type FitnessLevel = (typeof FitnessLevels)[keyof typeof FitnessLevels];
 
-export const FitnessLevelLabels: Record<FitnessLevel, string> = {
-  [FitnessLevels.Beginner]: 'Beginner',
-  [FitnessLevels.Intermediate]: 'Intermediate',
-  [FitnessLevels.Advanced]: 'Advanced',
-};
+export const FitnessLevelLabels: Record<FitnessLevel, string> = enumLabelMap(
+  'fitnessLevel',
+  Object.values(FitnessLevels),
+);
 
 export const GoalCategories = {
   WeightLoss: 'WEIGHT_LOSS',
@@ -86,11 +82,10 @@ export const ProfilePrivacy = {
 export type ProfilePrivacy =
   (typeof ProfilePrivacy)[keyof typeof ProfilePrivacy];
 
-export const ProfilePrivacyLabels: Record<ProfilePrivacy, string> = {
-  [ProfilePrivacy.Public]: 'Public',
-  [ProfilePrivacy.CoachesOnly]: 'Coaches only',
-  [ProfilePrivacy.OnlyMe]: 'Only me',
-};
+export const ProfilePrivacyLabels: Record<ProfilePrivacy, string> = enumLabelMap(
+  'profilePrivacy',
+  Object.values(ProfilePrivacy),
+);
 
 export const ProfilePrivacyIcons: Record<ProfilePrivacy, string> = {
   [ProfilePrivacy.Public]: 'pi pi-globe',

@@ -1,16 +1,17 @@
-import { Component, computed, effect, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { SessionInstance, localDayKey, startOfDay } from 'core';
+import { SessionInstance, appLocale, localDayKey, startOfDay } from 'core';
 
 import { SheetShell } from '../../../../../_shared/components/sheet-shell/sheet-shell';
 import {
   MONTH_LEGEND,
   SESSION_ICONS,
-  WEEKDAY_LETTERS,
   dayFromKey,
   instanceTone,
+  weekdayLetters,
 } from '../../sessions.config';
 
 interface MonthCell {
@@ -31,11 +32,13 @@ interface MonthCell {
  */
 @Component({
   selector: 'mh-month-sheet',
-  imports: [IonButton, IonIcon, SheetShell],
+  imports: [IonButton, IonIcon, SheetShell, TranslatePipe],
   templateUrl: './month-sheet.html',
   styleUrl: './month-sheet.scss',
 })
 export class MonthSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly instances = input.required<SessionInstance[]>();
   /** Which month the agenda is currently anchored on. */
@@ -45,7 +48,8 @@ export class MonthSheet {
   /** Asks the page to load a window covering this month. */
   readonly monthChanged = output<Date>();
 
-  readonly weekdayLabels = WEEKDAY_LETTERS;
+  /** Monday-first single letters in the UI locale. */
+  readonly weekdayLabels = weekdayLetters();
   readonly legend = MONTH_LEGEND;
 
   /** First of the month being shown. */
@@ -78,17 +82,17 @@ export class MonthSheet {
 
   readonly jumpLabel = computed(() => {
     const staged = this.staged();
-    if (!staged) return 'Jump';
-    const label = staged.toLocaleDateString('en-GB', {
+    if (!staged) return this._translateService.instant('sessions.monthSheet.jump');
+    const date = staged.toLocaleDateString(appLocale(), {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
     });
-    return `Jump to ${label}`;
+    return this._translateService.instant('sessions.monthSheet.jumpTo', { date });
   });
 
   readonly monthLabel = computed(() =>
-    this.cursor().toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
+    this.cursor().toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' }),
   );
 
   /** Session dots per day, capped at three so a row cannot grow. */

@@ -7,6 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 
 /**
@@ -34,7 +35,7 @@ import { ButtonDirective } from 'primeng/button';
 @Component({
   selector: 'mh-mobile-fab',
   standalone: true,
-  imports: [ButtonDirective],
+  imports: [ButtonDirective, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './mobile-fab.html',
   styleUrl: './mobile-fab.scss',

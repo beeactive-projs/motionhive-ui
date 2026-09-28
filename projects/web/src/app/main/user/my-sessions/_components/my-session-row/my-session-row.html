@@ -31,7 +31,7 @@
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
             <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
           </span>
-          Live now
+          {{ 'mySessions.row.liveNow' | translate }}
         </span>
         }
       </div>
@@ -45,11 +45,11 @@
         }
         <span class="inline-flex items-center gap-1">
           <i class="text-sm" [class]="isOnline() ? 'pi pi-video' : 'pi pi-map-marker'" aria-hidden="true"></i>
-          {{ isOnline() ? 'Online' : 'In-person' }}
+          {{ (isOnline() ? 'enum.sessionLocationKind.ONLINE' : 'enum.sessionLocationKind.IN_PERSON') | translate }}
         </span>
         @if (showCapacity()) {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-users text-sm" aria-hidden="true"></i>{{ confirmed() }} / {{ capacity() }} booked
+          <i class="pi pi-users text-sm" aria-hidden="true"></i>{{ 'mySessions.common.bookedCount' | translate: { confirmed: confirmed(), capacity: capacity() } }}
         </span>
         }
       </div>
@@ -64,11 +64,11 @@
         }
         @if (cancelReasonText(); as reason) {
         <span class="inline-flex items-center gap-1">
-          <i class="pi pi-times-circle text-sm" aria-hidden="true"></i>Cancelled: {{ reason }}
+          <i class="pi pi-times-circle text-sm" aria-hidden="true"></i>{{ 'mySessions.row.cancelReason' | translate: { reason: reason } }}
         </span>
         }
         @if (!mobile()) {
-        <span>Booked {{ participant().bookedAt | date: 'd MMM' }}</span>
+        <span>{{ 'mySessions.common.bookedOn' | translate: { date: (participant().bookedAt | date: 'd MMM') } }}</span>
         }
       </div>
       }
@@ -77,7 +77,7 @@
       <div class="flex flex-wrap items-center gap-3 shrink-0">
         <p-tag [value]="statusLabelText()" [class]="statusClass()" [icon]="statusIcon()" rounded />
         @if (isFree()) {
-        <span class=" font-semibold whitespace-nowrap text-green-500">Free</span>
+        <span class=" font-semibold whitespace-nowrap text-green-500">{{ 'mySessions.common.free' | translate }}</span>
         } @else {
         <span class="font-semibold whitespace-nowrap">
           {{ participant().snapshotPriceCents | currencyRon: participant().snapshotCurrency }}
@@ -86,7 +86,7 @@
       </div>
 
       @if (canJoin()) {
-      <button pButton type="button" size="small" (click)="onJoin($event)"><i class="pi pi-video"></i> Join</button>
+      <button pButton type="button" size="small" (click)="onJoin($event)"><i class="pi pi-video"></i> {{ 'mySessions.row.join' | translate }}</button>
       }
       }
     </div>
@@ -97,7 +97,7 @@
       <div class="flex items-center gap-2">
         <p-tag [value]="statusLabelText()" [class]="statusClass()" [icon]="statusIcon()" rounded />
         @if (isFree()) {
-        <span class=" font-semibold whitespace-nowrap text-green-500">Free</span>
+        <span class=" font-semibold whitespace-nowrap text-green-500">{{ 'mySessions.common.free' | translate }}</span>
         } @else {
         <span class="font-semibold whitespace-nowrap">
           {{ participant().snapshotPriceCents | currencyRon: participant().snapshotCurrency }}
@@ -108,7 +108,7 @@
       @if (canJoin() || canCancel()) {
       <div class="flex items-center gap-1.5">
         @if (canJoin()) {
-        <button pButton type="button" size="small" (click)="onJoin($event)"><i class="pi pi-video"></i> Join</button>
+        <button pButton type="button" size="small" (click)="onJoin($event)"><i class="pi pi-video"></i> {{ 'mySessions.row.join' | translate }}</button>
         }
         @if (canCancel()) {
         <button pButton
@@ -118,7 +118,7 @@
           outlined
           size="small"
           (click)="onCancel($event)"
-          aria-label="Cancel booking"
+          [attr.aria-label]="'mySessions.common.cancelBooking' | translate"
           iconOnly
         >
           <i class="pi pi-times"></i>
@@ -137,7 +137,7 @@
         outlined
         size="small"
         (click)="onCancel($event)"
-        aria-label="Cancel booking"
+        [attr.aria-label]="'mySessions.common.cancelBooking' | translate"
         iconOnly
       >
         <i class="pi pi-times"></i>

@@ -22,6 +22,7 @@ ng build web               # Production build — authenticated app
 ng build website           # Production build — marketing site
 ng build core              # Build core library (required before building web/website locally)
 ng test                    # Run tests (Vitest)
+npm run i18n:check         # Translation files: en/ro parity, ICU syntax, missing keys
 ```
 
 Package manager is **npm**. Prettier config is inline in `package.json`. Angular selector prefix is `mh` (see `angular.json`).
@@ -140,6 +141,43 @@ All routes use `loadComponent()` / `loadChildren()` for code splitting.
 - **The coach-facing role is called a "coach" in all user-visible copy** — labels, headings, placeholders, buttons, toasts, dialog titles. Never "instructor" in visible text.
 - **Code identifiers keep the historical "instructor" name** and must NOT be renamed: the `INSTRUCTOR` role enum, `/coaching` routes, `instructorGuard`, `instructorProfile` and other model/property names, component selectors, and CSS classes. Only the *displayed words* change.
 - **"Sessions" is ambiguous — qualify it.** The trainee-side nav item is "My sessions"; the coach-side one is "Manage sessions". Don't ship a bare "Sessions" label for the coaching surface.
+
+## Translations (i18n)
+
+`web` and `mobile` translate at runtime with **ngx-translate** (English + Romanian). The `website` does NOT — it uses compile-time `@angular/localize` (XLIFF in `projects/website/src/locale`); don't mix the two.
+
+**No new hardcoded user-visible strings in `web` or `mobile`** — text, `aria-label`s, placeholders, toasts, confirm dialogs, menu/tab labels all go through a key.
+
+### Files and namespaces
+
+- **Shared** — `projects/core/src/i18n/{en,ro}.json`, copied into both apps as `i18n/shared/`. Owns these reserved top-level namespaces:
+  `button` (generic actions), `form` (`label` / `placeholder` / `hint`), `validation`, `toast` (`summary` / `detail`), `error` (`http` / `dialog`), `confirm`, `empty`, `enum` (`enum.<domain>.<VALUE>`), `count` (ICU plurals), `time`, `nav`, `a11y` (aria-labels), `language`, `common`, `primeng`.
+- **Per app** — `projects/{web,mobile}/public/i18n/{en,ro}.json`. Top-level key = feature folder (`auth`, `clients`, `sessions`, …), then component/page, then element: `clients.inviteDialog.title`, `clients.toast.archived`, `clients.confirm.archive.header`. An app file must never redefine a shared namespace (the check fails).
+- Use a shared key only when the meaning is exactly generic (`button.cancel`). Context-specific wording ("Keep series", "Yes, delete") gets a feature key. Never change existing English copy just to reuse a shared key.
+- Keys are camelCase; enum sub-keys are the raw enum value so they can be looked up dynamically. Keep objects alphabetically sorted; `en` and `ro` must have identical key sets.
+
+### Message syntax — ICU MessageFormat
+
+Single braces: `"Member since {date}"`. Plurals: `"{count, plural, one {# member} other {# members}}"` — Romanian needs `one` / `few` / `other` (`"{count, plural, one {# membru} few {# membri} other {# de membri}}"`). Never hand-roll `count === 1 ? '' : 's'`, and never build sentences by concatenation — one key per full sentence, with params. Sentences wrapping a link are split into keys around the element; no HTML in JSON.
+
+### In code
+
+- Templates: `TranslatePipe` in `imports`; `{{ 'clients.list.title' | translate }}`, `[attr.aria-label]="'a11y.close' | translate"`, `{{ 'account.memberSince' | translate: { date: since } }}`.
+- TS: `private readonly _translateService = inject(TranslateService)` → `instant('key', params)`. Safe anywhere after bootstrap — `provideAppI18n()` blocks bootstrap until the language file has loaded.
+- Plain functions (no injection context): `translate(key, params)` from `core`. Core's formatting utils (`session-format`, `messaging`, `api-error`) use it.
+- Config constants (tab sets, option lists) hold **keys**, and the template translates. Where a PrimeNG/Ionic component renders a label itself (`MenuItem`, `SelectItem`, segmented options), build the array with `instant()`.
+- Enum labels: `value | enumLabel: 'invoiceStatus'` → `enum.invoiceStatus.<VALUE>` (humanised fallback if the key is missing). Core's label maps (`GenderLabels`, `ClientStatusLabels`, `SESSION_*` metadata) are built with `enumLabelMap` / `withEnumLabels` — getters that translate on read — so `Labels[value]` call sites need no change.
+- Validation: `validationMessage(control.errors, overrides?)` or `control.errors | fieldError`. Don't write new `getFieldError()` text; per-form wording goes in the overrides map (`{ required: 'auth.signUp.termsRequired' }`).
+- Dates/numbers: `LOCALE_ID` follows the language (en → `en-GB`, ro → `ro-RO`), so `DatePipe` is localised. In TS use `appLocale()` from `core` — never a literal `'en-GB'` or `undefined` in `toLocale*` / `Intl`. Weekday/month names come from `weekdayNames()` / `monthNames()`, not hand-written arrays.
+- Backend error messages (`err.error.message`) are shown as the server sends them — not translatable client-side.
+
+### Switching language
+
+`LanguageService` (core) — the choice is stored on the device (`STORAGE_KEYS.LANGUAGE`) and on the account (`User.language`), and **switching reloads the page** (LOCALE_ID and TS-built labels are fixed per load). On sign-in the account's language wins, unless this device has a choice the account never received. Pickers: web profile menu, mobile Account → Manage account.
+
+### Specs
+
+Core and mobile test setups register the real English translations, so specs assert English copy. Run `npm run i18n:check` after touching any translation file.
 
 ## Shared types and constants
 

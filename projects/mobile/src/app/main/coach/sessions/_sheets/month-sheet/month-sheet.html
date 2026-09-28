@@ -1,13 +1,13 @@
 <ng-template #body>
   <div class="nav">
-    <ion-button fill="clear" aria-label="Previous month" (click)="step(-1)">
+    <ion-button fill="clear" [attr.aria-label]="'a11y.previousMonth' | translate" (click)="step(-1)">
       <ion-icon slot="icon-only" name="chevron-back" />
     </ion-button>
     <span class="label">{{ monthLabel() }}</span>
-    <ion-button fill="clear" aria-label="Next month" (click)="step(1)">
+    <ion-button fill="clear" [attr.aria-label]="'a11y.nextMonth' | translate" (click)="step(1)">
       <ion-icon slot="icon-only" name="chevron-forward" />
     </ion-button>
-    <button type="button" class="today" (click)="goToday()">Today</button>
+    <button type="button" class="today" (click)="goToday()">{{ 'time.today' | translate }}</button>
   </div>
 
   <div class="grid heading">
@@ -38,7 +38,7 @@
   </div>
 
   <div class="legend">
-    @for (entry of legend; track entry.label) {
+    @for (entry of legend; track entry.tone) {
       <span class="entry">
         <i [attr.data-tone]="entry.tone"></i>
         {{ entry.label }}
@@ -49,7 +49,7 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Jump to"
+  [title]="'sessions.monthSheet.title' | translate"
   [body]="body"
   [saveLabel]="jumpLabel()"
   [canSave]="staged() !== null"

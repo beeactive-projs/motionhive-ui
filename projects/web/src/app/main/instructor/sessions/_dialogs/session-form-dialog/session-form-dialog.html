@@ -8,7 +8,7 @@
 
 @if (!isMobile()) {
   <p-dialog
-    [header]="isEdit() ? 'Edit session' : 'Create session'"
+    [header]="(isEdit() ? 'sessions.formDialog.title.edit' : 'sessions.formDialog.title.create') | translate"
     [(visible)]="visible"
     [modal]="true"
     [style]="{ width: '42rem', maxWidth: '95vw' }"
@@ -26,8 +26,8 @@
     [open]="visible()"
     (openChange)="visible.set($event)"
     size="large"
-    [title]="isEdit() ? 'Edit session' : 'New session'"
-    [subtitle]="form().isRecurring ? 'Repeats weekly' : 'One-off'"
+    [title]="(isEdit() ? 'sessions.formDialog.title.edit' : 'sessions.common.newSession') | translate"
+    [subtitle]="(form().isRecurring ? 'sessions.formDialog.repeatsWeekly' : 'sessions.formDialog.oneOff') | translate"
   >
     <ng-container *ngTemplateOutlet="formBody" />
     <ng-container foot>
@@ -43,11 +43,11 @@
     <section class="mh-sf__section">
       <header class="mh-sf__sec-h">
         <i class="pi pi-tag"></i>
-        <span>Basics</span>
+        <span>{{ 'sessions.formDialog.basics' | translate }}</span>
       </header>
       <div class="mh-sf__grid">
         <div class="mh-sf__field mh-sf__field--full">
-          <label for="sfTitle">Title</label>
+          <label for="sfTitle">{{ 'form.label.title' | translate }}</label>
           <input
             id="sfTitle"
             type="text"
@@ -55,12 +55,12 @@
             fluid
             [ngModel]="form().title"
             (ngModelChange)="updateField('title', $event)"
-            placeholder="e.g. Vinyasa flow — Tuesday morning"
+            [placeholder]="'sessions.formDialog.titlePlaceholder' | translate"
           />
         </div>
 
         <div class="mh-sf__field mh-sf__field--full">
-          <label for="sfDesc">Description (optional)</label>
+          <label for="sfDesc">{{ 'sessions.formDialog.descriptionLabel' | translate }}</label>
           <textarea
             id="sfDesc"
             pTextarea
@@ -68,12 +68,12 @@
             fluid
             [ngModel]="form().description"
             (ngModelChange)="updateField('description', $event)"
-            placeholder="What should attendees know?"
+            [placeholder]="'sessions.formDialog.descriptionPlaceholder' | translate"
           ></textarea>
         </div>
 
         <div class="mh-sf__field">
-          <label>Type</label>
+          <label>{{ 'form.label.type' | translate }}</label>
           <p-select
             [options]="typeOptions"
             optionLabel="label"
@@ -86,8 +86,8 @@
         </div>
 
         <div class="mh-sf__field mh-sf__field--full">
-          <label>Who can book</label>
-          <div class="mh-sf__access" role="radiogroup" aria-label="Access requirement">
+          <label>{{ 'sessions.formDialog.whoCanBook' | translate }}</label>
+          <div class="mh-sf__access" role="radiogroup" [attr.aria-label]="'sessions.formDialog.accessAria' | translate">
             @for (opt of accessOptions; track opt.value) {
               <button
                 type="button"
@@ -112,7 +112,7 @@
 
         @if (needsGroup()) {
           <div class="mh-sf__field mh-sf__field--full">
-            <label>Group</label>
+            <label>{{ 'sessions.formDialog.group' | translate }}</label>
             <p-select
               [options]="groups()"
               optionLabel="name"
@@ -121,7 +121,7 @@
               (ngModelChange)="updateField('groupId', $event)"
               appendTo="body"
               fluid
-              placeholder="Pick a group"
+              [placeholder]="'sessions.formDialog.pickGroup' | translate"
               [showClear]="true"
             />
           </div>
@@ -135,7 +135,7 @@
             (ngModelChange)="updateField('approvalRequired', $event)"
           />
           <label for="sfApproval" class="mh-sf__inline-label">
-            Require approval before confirming
+            {{ 'sessions.formDialog.requireApproval' | translate }}
           </label>
         </div>
       </div>
@@ -145,11 +145,11 @@
     <section class="mh-sf__section">
       <header class="mh-sf__sec-h">
         <i class="pi pi-map-marker"></i>
-        <span>Where</span>
+        <span>{{ 'sessions.formDialog.where' | translate }}</span>
       </header>
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
-          <label>Location</label>
+          <label>{{ 'form.label.location' | translate }}</label>
           <p-select
             [options]="locationOptions"
             optionLabel="label"
@@ -163,7 +163,7 @@
 
         @if (needsVenue()) {
           <div class="mh-sf__field">
-            <label>Venue</label>
+            <label>{{ 'sessions.formDialog.venue' | translate }}</label>
             <p-select
               [options]="venues()"
               optionLabel="name"
@@ -172,7 +172,7 @@
               (ngModelChange)="updateField('venueId', $event)"
               appendTo="body"
               fluid
-              placeholder="Pick a venue"
+              [placeholder]="'sessions.common.pickVenue' | translate"
               [showClear]="true"
             />
           </div>
@@ -180,7 +180,7 @@
 
         @if (isOnline()) {
           <div class="mh-sf__field mh-sf__field--full">
-            <label for="sfUrl">Meeting link</label>
+            <label for="sfUrl">{{ 'sessions.formDialog.meetingLink' | translate }}</label>
             <input
               id="sfUrl"
               type="url"
@@ -199,11 +199,11 @@
     <section class="mh-sf__section">
       <header class="mh-sf__sec-h">
         <i class="pi pi-clock"></i>
-        <span>When</span>
+        <span>{{ 'sessions.formDialog.when' | translate }}</span>
       </header>
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
-          <label>First start</label>
+          <label>{{ 'sessions.formDialog.firstStart' | translate }}</label>
           <p-datepicker
             [ngModel]="form().firstStartAt"
             (ngModelChange)="updateField('firstStartAt', $event)"
@@ -214,12 +214,12 @@
             appendTo="body"
             [touchUI]="isMobile()"
             fluid
-            placeholder="Pick date & time"
+            [placeholder]="'sessions.formDialog.pickDateTime' | translate"
           />
         </div>
 
         <div class="mh-sf__field">
-          <label>Duration (min)</label>
+          <label>{{ 'sessions.formDialog.duration' | translate }}</label>
           <p-inputnumber
             [ngModel]="form().durationMinutes"
             (ngModelChange)="updateField('durationMinutes', $event ?? 60)"
@@ -232,7 +232,7 @@
         </div>
 
         <div class="mh-sf__field mh-sf__field--full">
-          <label>Timezone</label>
+          <label>{{ 'form.label.timezone' | translate }}</label>
           <p-select
             [options]="timezones"
             optionLabel="label"
@@ -255,9 +255,9 @@
             [disabled]="isEdit()"
           />
           <label for="sfRecurring" class="mh-sf__inline-label">
-            Repeat on a schedule
+            {{ 'sessions.formDialog.repeat' | translate }}
             @if (isEdit()) {
-              <span class="mh-sf__hint"> (use cancel + recreate to change)</span>
+              <span class="mh-sf__hint"> {{ 'sessions.formDialog.repeatLocked' | translate }}</span>
             }
           </label>
         </div>
@@ -278,11 +278,11 @@
     <section class="mh-sf__section">
       <header class="mh-sf__sec-h">
         <i class="pi pi-users"></i>
-        <span>Capacity &amp; cancellation</span>
+        <span>{{ 'sessions.formDialog.capacitySection' | translate }}</span>
       </header>
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
-          <label>Capacity (blank = unlimited)</label>
+          <label>{{ 'sessions.formDialog.capacity' | translate }}</label>
           <p-inputnumber
             [ngModel]="form().capacity"
             (ngModelChange)="updateField('capacity', $event)"
@@ -294,7 +294,7 @@
         </div>
 
         <div class="mh-sf__field">
-          <label>Cancel cutoff (hours)</label>
+          <label>{{ 'sessions.formDialog.cancelCutoff' | translate }}</label>
           <p-inputnumber
             [ngModel]="form().cancellationCutoffHours"
             (ngModelChange)="updateField('cancellationCutoffHours', $event ?? 24)"
@@ -313,7 +313,7 @@
             (ngModelChange)="updateField('waitlistEnabled', $event)"
           />
           <label for="sfWl" class="mh-sf__inline-label">
-            Enable waitlist when full
+            {{ 'sessions.formDialog.waitlist' | translate }}
           </label>
         </div>
       </div>
@@ -323,11 +323,11 @@
     <section class="mh-sf__section">
       <header class="mh-sf__sec-h">
         <i class="pi pi-money-bill"></i>
-        <span>Price</span>
+        <span>{{ 'form.label.price' | translate }}</span>
       </header>
       <div class="mh-sf__grid">
         <div class="mh-sf__field">
-          <label>Amount</label>
+          <label>{{ 'sessions.formDialog.amount' | translate }}</label>
           <p-inputnumber
             [ngModel]="form().priceAmountCents / 100"
             (ngModelChange)="updateField('priceAmountCents', ($event ?? 0) * 100)"
@@ -340,7 +340,7 @@
           />
         </div>
         <div class="mh-sf__field">
-          <label>Currency</label>
+          <label>{{ 'form.label.currency' | translate }}</label>
           <p-select
             [options]="currencies"
             optionLabel="label"
@@ -358,9 +358,9 @@
 
 <!-- ─── Footer buttons (shared) ─────────────────────────────────── -->
 <ng-template #formFoot>
-  <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+  <button pButton type="button" severity="secondary" [text]="true" (click)="close()">{{ 'button.cancel' | translate }}</button>
   <button pButton type="button" (click)="save()" class="mh-sf__primary" [disabled]="saving()">
     <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-    {{ isEdit() ? 'Save changes' : 'Create session' }}
+    {{ (isEdit() ? 'button.saveChanges' : 'sessions.formDialog.title.create') | translate }}
   </button>
 </ng-template>

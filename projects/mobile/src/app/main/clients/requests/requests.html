@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/clients" />
     </ion-buttons>
-    <ion-title>Requests</ion-title>
+    <ion-title>{{ 'nav.requests' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,9 +15,9 @@
   @if (store.showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your requests"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'clients.requests.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.showSkeleton()) {
@@ -38,9 +38,9 @@
   } @else if (store.isEmpty()) {
     <mh-empty-state
       icon="hourglass-outline"
-      heading="No pending requests"
-      message="Invitations you send and incoming client requests will show up here."
-      actionLabel="Invite client"
+      [heading]="'clients.requests.empty.title' | translate"
+      [message]="'clients.requests.empty.message' | translate"
+      [actionLabel]="'clients.inviteClient' | translate"
       (action)="openInvite()"
     />
   } @else {
@@ -48,7 +48,7 @@
       @if (store.incoming().length > 0) {
         <section class="mh-section">
           <div class="mh-section-head warm">
-            <span class="mh-kicker">Incoming</span>
+            <span class="mh-kicker">{{ 'clients.requests.incoming' | translate }}</span>
             <ion-note>· {{ store.incoming().length }}</ion-note>
           </div>
           <div class="stack">
@@ -68,12 +68,12 @@
                     <h2>{{ name(row) }}</h2>
                     <p>{{ email(row) }}</p>
                   </ion-label>
-                  <ion-badge slot="end" data-tone="info">Incoming</ion-badge>
+                  <ion-badge slot="end" data-tone="info">{{ 'clients.requests.incoming' | translate }}</ion-badge>
                 </ion-item>
 
                 @if (row.notes; as message) {
-                  <!-- Their words, so quoted. -->
-                  <p class="quote">“{{ message }}”</p>
+                  <!-- Their words, so quoted — in the language's own quote marks. -->
+                  <p class="quote">{{ 'clients.requests.quote' | translate: { message: message } }}</p>
                 }
 
                 <ion-note class="mh-footnote when">{{ received(row) }}</ion-note>
@@ -85,10 +85,10 @@
                     [disabled]="store.isBusy(row.id)"
                     (click)="decline(row)"
                   >
-                    Decline
+                    {{ 'button.decline' | translate }}
                   </ion-button>
                   <ion-button expand="block" [disabled]="store.isBusy(row.id)" (click)="accept(row)">
-                    Accept
+                    {{ 'button.accept' | translate }}
                   </ion-button>
                 </div>
               </ion-card>
@@ -100,7 +100,7 @@
       @if (store.sent().length > 0) {
         <section class="mh-section">
           <div class="mh-section-head">
-            <span class="mh-kicker">Invitations sent</span>
+            <span class="mh-kicker">{{ 'clients.requests.invitationsSent' | translate }}</span>
             <ion-note>· {{ store.sent().length }}</ion-note>
           </div>
           <ion-list [inset]="true" class="mh-card-list">
@@ -144,7 +144,7 @@
                       [disabled]="store.isBusy(row.id) || isResent(row.id)"
                       (click)="resend(row)"
                     >
-                      {{ isResent(row.id) ? 'Resent' : 'Resend' }}
+                      {{ (isResent(row.id) ? 'clients.actions.resent' : 'button.resend') | translate }}
                     </ion-button>
                     <ion-button
                       fill="clear"
@@ -153,7 +153,7 @@
                       [disabled]="store.isBusy(row.id)"
                       (click)="confirmWithdraw(row)"
                     >
-                      Withdraw
+                      {{ 'clients.actions.withdraw' | translate }}
                     </ion-button>
                   </div>
                 </ion-label>
@@ -170,10 +170,10 @@
 
 <mh-confirm-sheet
   [(open)]="withdrawOpen"
-  title="Withdraw this invitation?"
+  [title]="'clients.confirm.withdraw.title' | translate"
   [body]="withdrawBody()"
-  confirmLabel="Withdraw"
-  cancelLabel="Keep it"
+  [confirmLabel]="'clients.actions.withdraw' | translate"
+  [cancelLabel]="'clients.confirm.withdraw.cancel' | translate"
   tone="danger"
   [saving]="withdrawSaving()"
   (confirm)="withdraw()"

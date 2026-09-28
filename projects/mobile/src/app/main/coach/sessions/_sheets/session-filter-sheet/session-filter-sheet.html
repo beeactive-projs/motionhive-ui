@@ -1,5 +1,5 @@
 <ng-template #body>
-  <div class="mh-section-label">Type</div>
+  <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
   <div class="chips">
     @for (option of typeOptions; track option.value) {
     <ion-chip [class.selected]="draft().type === option.value"
@@ -9,7 +9,7 @@
     }
   </div>
 
-  <div class="mh-section-label">Location</div>
+  <div class="mh-section-label">{{ 'form.label.location' | translate }}</div>
   <div class="chips">
     @for (option of locationOptions; track option.value) {
     <ion-chip [class.selected]="draft().locationKind === option.value"
@@ -19,24 +19,24 @@
     }
   </div>
 
-  <div class="mh-section-label">Status</div>
+  <div class="mh-section-label">{{ 'form.label.status' | translate }}</div>
   <div class="chips">
     @for (option of statusOptions; track option.value) {
     <ion-chip [class.selected]="draft().status === option.value"
       [attr.aria-pressed]="draft().status === option.value" (click)="toggleStatus(option.value)">
-      {{ option.label }}
+      {{ option.label | translate }}
     </ion-chip>
     }
   </div>
 
-  <div class="mh-section-label">Date</div>
+  <div class="mh-section-label">{{ 'form.label.date' | translate }}</div>
   <div class="pair">
     <ion-item lines="none" class="field">
-      <ion-label>From</ion-label>
+      <ion-label>{{ 'sessions.filterSheet.from' | translate }}</ion-label>
       <ion-datetime-button slot="end" datetime="filter-date-from" />
     </ion-item>
     <ion-item lines="none" class="field">
-      <ion-label>To</ion-label>
+      <ion-label>{{ 'sessions.filterSheet.to' | translate }}</ion-label>
       <ion-datetime-button slot="end" datetime="filter-date-to" />
     </ion-item>
   </div>
@@ -58,21 +58,22 @@
   </ion-modal>
 
   @if (rangeBackwards()) {
-  <p class="mh-helper error">The end date is before the start date.</p>
+  <p class="mh-helper error">{{ 'sessions.filterSheet.rangeBackwards' | translate }}</p>
   } @else if (rangeTooWide()) {
-  <p class="mh-helper error">Pick a range of six months or less.</p>
+  <p class="mh-helper error">{{ 'sessions.filterSheet.rangeTooWide' | translate }}</p>
   } @else if (draft().dateFrom || draft().dateTo) {
   <div class="reset-row">
-    <button type="button" class="reset" (click)="clearDates()">Clear dates</button>
+    <button type="button" class="reset" (click)="clearDates()">{{ 'sessions.filterSheet.clearDates' | translate }}</button>
   </div>
   }
 
   @if (groups().length > 0) {
-  <div class="mh-section-label">Group</div>
+  <div class="mh-section-label">{{ 'sessions.filterSheet.group' | translate }}</div>
   <ion-item lines="none" class="field">
-    <ion-select labelPlacement="stacked" interface="action-sheet" placeholder="Any group" [value]="draft().groupId"
+    <ion-select labelPlacement="stacked" interface="action-sheet" [placeholder]="'sessions.filterSheet.anyGroup' | translate"
+      [attr.aria-label]="'sessions.filterSheet.group' | translate" [value]="draft().groupId"
       (ionChange)="setGroup($event.detail.value)">
-      <ion-select-option [value]="null">Any group</ion-select-option>
+      <ion-select-option [value]="null">{{ 'sessions.filterSheet.anyGroup' | translate }}</ion-select-option>
       @for (group of groups(); track group.id) {
       <ion-select-option [value]="group.id">{{ group.name }}</ion-select-option>
       }
@@ -80,12 +81,10 @@
   </ion-item>
   }
 
-  <ion-note class="mh-note-block">
-    Filters apply to the sessions already loaded. Picking dates outside that
-    range loads them.
-  </ion-note>
+  <ion-note class="mh-note-block">{{ 'sessions.filterSheet.note' | translate }}</ion-note>
 </ng-template>
 
-<mh-sheet-shell [(open)]="open" title="Filters" actionLabel="Reset" [actionDisabled]="count() === 0"
-  [saveLabel]="applyLabel()" [canSave]="canApply()" [body]="body" [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9"
-  (action)="reset()" (save)="apply()" />
+<mh-sheet-shell [(open)]="open" [title]="'common.filters' | translate"
+  [actionLabel]="'button.reset' | translate" [actionDisabled]="count() === 0" [saveLabel]="applyLabel()"
+  [canSave]="canApply()" [body]="body" [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9" (action)="reset()"
+  (save)="apply()" />

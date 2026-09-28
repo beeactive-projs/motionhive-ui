@@ -1,4 +1,4 @@
-import { InstructorClient, InstructorClientStatuses, clientEmail } from 'core';
+import { InstructorClient, InstructorClientStatuses, clientEmail, translate } from 'core';
 
 /**
  * What a client row looks like and what can be done to one: the status tone
@@ -35,7 +35,7 @@ export function clientStatusTone(client: InstructorClient): ClientStatusTone {
 
 /** A row without an account has no address to show under the address. */
 export function clientSubline(client: InstructorClient): string {
-  return client.client ? clientEmail(client) : 'Not on MotionHive yet';
+  return client.client ? clientEmail(client) : translate('clients.row.notOnPlatform');
 }
 
 // ── Client actions ──────────────────────────────────────────────────────────
@@ -51,6 +51,7 @@ export type ClientActionId = (typeof ClientActionIds)[keyof typeof ClientActionI
 
 export interface ClientAction {
   id: ClientActionId;
+  /** Translation key — the sheet's template translates it. */
   label: string;
   icon: string;
   /** Ionic palette name for the leading glyph. */
@@ -64,17 +65,27 @@ export interface ClientAction {
  * and archiving is red and last. None of these encode a state.
  */
 export const CLIENT_ACTIONS: readonly ClientAction[] = [
-  { id: ClientActionIds.Message, label: 'Message', icon: 'chatbubble-outline', color: 'primary' },
-  { id: ClientActionIds.EditNotes, label: 'Edit notes', icon: 'create-outline', color: 'medium' },
+  {
+    id: ClientActionIds.Message,
+    label: 'clients.actions.message',
+    icon: 'chatbubble-outline',
+    color: 'primary',
+  },
+  {
+    id: ClientActionIds.EditNotes,
+    label: 'clients.actions.editNotes',
+    icon: 'create-outline',
+    color: 'medium',
+  },
   {
     id: ClientActionIds.Unarchive,
-    label: 'Unarchive client',
+    label: 'clients.actions.unarchiveClient',
     icon: 'arrow-undo-outline',
     color: 'success',
   },
   {
     id: ClientActionIds.Archive,
-    label: 'Archive client…',
+    label: 'clients.actions.archiveClientEllipsis',
     icon: 'archive-outline',
     color: 'danger',
     destructive: true,

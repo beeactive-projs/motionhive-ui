@@ -1,5 +1,6 @@
 import { Component, input, model, output, viewChild } from '@angular/core';
 import { IonIcon, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../sheet-shell/sheet-shell';
 
@@ -24,7 +25,7 @@ export interface ConfirmFact {
  */
 @Component({
   selector: 'mh-confirm-sheet',
-  imports: [IonIcon, IonNote, SheetShell],
+  imports: [IonIcon, IonNote, SheetShell, TranslatePipe],
   templateUrl: './confirm-sheet.html',
   styleUrl: './confirm-sheet.scss',
 })
@@ -33,8 +34,9 @@ export class ConfirmSheet {
   readonly title = input.required<string>();
   readonly body = input.required<string>();
   readonly facts = input<readonly ConfirmFact[]>([]);
-  readonly confirmLabel = input('Confirm');
-  readonly cancelLabel = input('Cancel');
+  /** Translated text; empty falls back to "Confirm" / the shell's "Cancel". */
+  readonly confirmLabel = input('');
+  readonly cancelLabel = input('');
   /** `danger` for anything that destroys or moves money back. */
   readonly tone = input<'primary' | 'danger'>('primary');
   /** Named consequence that cannot be undone — stated, never buried. */

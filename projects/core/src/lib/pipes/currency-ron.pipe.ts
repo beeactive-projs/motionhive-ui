@@ -1,5 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+import { appLocale } from '../i18n/app-language';
+
 @Pipe({
   name: 'currencyRon',
   standalone: true,
@@ -22,7 +24,7 @@ export class CurrencyRonPipe implements PipeTransform {
       return '';
     }
     const amount = amountCents / 100;
-    return new Intl.NumberFormat('ro-RO', {
+    return new Intl.NumberFormat(appLocale(), {
       style: 'currency',
       currency: currency.toUpperCase(),
       currencyDisplay: display,

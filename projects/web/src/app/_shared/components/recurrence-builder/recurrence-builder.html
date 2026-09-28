@@ -1,7 +1,7 @@
 <div class="mh-rec">
   <!-- Frequency -->
   <div class="mh-rec__row">
-    <span class="mh-rec__label">Repeats</span>
+    <span class="mh-rec__label">{{ 'components.recurrenceBuilder.repeats' | translate }}</span>
     <div class="mh-rec__chips">
       @for (f of frequencies; track f.value) {
         <button
@@ -10,7 +10,7 @@
           [class.is-active]="rule().frequency === f.value"
           (click)="setFrequency(f.value)"
         >
-          {{ f.label }}
+          {{ f.label | translate }}
         </button>
       }
     </div>
@@ -18,7 +18,7 @@
 
   <!-- Interval -->
   <div class="mh-rec__row">
-    <span class="mh-rec__label">Every</span>
+    <span class="mh-rec__label">{{ 'components.recurrenceBuilder.every' | translate }}</span>
     <p-inputnumber
       [(ngModel)]="intervalValue"
       (ngModelChange)="setInterval($event)"
@@ -33,8 +33,8 @@
   <!-- Days of week (WEEKLY only) -->
   @if (rule().frequency === 'WEEKLY') {
     <div class="mh-rec__row">
-      <span class="mh-rec__label">On</span>
-      <div class="mh-rec__dows" role="group" aria-label="Days of week">
+      <span class="mh-rec__label">{{ 'components.recurrenceBuilder.on' | translate }}</span>
+      <div class="mh-rec__dows" role="group" [attr.aria-label]="'components.recurrenceBuilder.daysOfWeek' | translate">
         @for (d of dayLabels; track d.iso) {
           <button
             type="button"
@@ -42,6 +42,7 @@
             [class.is-active]="isDowSelected(d.iso)"
             (click)="toggleDow(d.iso)"
             [attr.aria-pressed]="isDowSelected(d.iso)"
+            [attr.aria-label]="d.long"
           >
             {{ d.short }}
           </button>
@@ -52,26 +53,26 @@
 
   <!-- End conditions -->
   <div class="mh-rec__row mh-rec__row--end">
-    <span class="mh-rec__label">Ends</span>
+    <span class="mh-rec__label">{{ 'components.recurrenceBuilder.ends' | translate }}</span>
     <div class="mh-rec__seg" role="radiogroup">
       <button
         type="button"
         class="mh-rec__seg-btn"
         [class.is-active]="endMode() === 'never'"
         (click)="setEndMode('never')"
-      >Never</button>
+      >{{ 'components.recurrenceBuilder.never' | translate }}</button>
       <button
         type="button"
         class="mh-rec__seg-btn"
         [class.is-active]="endMode() === 'date'"
         (click)="setEndMode('date')"
-      >On date</button>
+      >{{ 'components.recurrenceBuilder.onDate' | translate }}</button>
       <button
         type="button"
         class="mh-rec__seg-btn"
         [class.is-active]="endMode() === 'count'"
         (click)="setEndMode('count')"
-      >After N times</button>
+      >{{ 'components.recurrenceBuilder.afterCount' | translate }}</button>
     </div>
     @if (endMode() === 'date') {
       <p-datepicker
@@ -79,7 +80,7 @@
         (ngModelChange)="setEndDate($event)"
         dateFormat="dd M yy"
         [appendTo]="'body'"
-        placeholder="Pick a date"
+        [placeholder]="'form.placeholder.pickDate' | translate"
       />
     }
     @if (endMode() === 'count') {
@@ -91,7 +92,7 @@
         [showButtons]="true"
         inputStyleClass="mh-rec__num"
       />
-      <span class="mh-rec__hint">occurrences (max 24)</span>
+      <span class="mh-rec__hint">{{ 'components.recurrenceBuilder.occurrencesHint' | translate }}</span>
     }
   </div>
 

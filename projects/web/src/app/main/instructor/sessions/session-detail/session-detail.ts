@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { MessageModule } from 'primeng/message';
@@ -40,7 +40,6 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
 /** Instructor-facing detail page for a single `SessionInstance`. */
 @Component({
   selector: 'mh-instructor-session-detail',
-  standalone: true,
   imports: [
     CommonModule,
     RouterLink,
@@ -58,17 +57,18 @@ import { FollowUpDialog } from '../_dialogs/follow-up-dialog/follow-up-dialog';
     TagModule,
     ActionList,
     BottomSheet,
+    TranslatePipe,
   ],
   providers: [SessionsDetailStore, MessageService],
   templateUrl: './session-detail.html',
   styleUrl: './session-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InstructorSessionDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _location = inject(Location);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
   protected readonly store = inject(SessionsDetailStore);
   // Root-scoped — reload after cancel so the list page reflects the new tab on next visit.
   private readonly _listStore = inject(SessionsInstructorStore);
@@ -131,8 +131,17 @@ export class InstructorSessionDetail implements OnInit {
     const url = inst.meetingUrlOverride ?? tpl?.meetingUrl;
     if (!url) return;
     navigator.clipboard.writeText(url).then(
-      () => this._messageService.add({ severity: 'success', summary: 'Meeting link copied' }),
-      () => this._messageService.add({ severity: 'warn', summary: 'Could not copy', detail: url }),
+      () =>
+        this._messageService.add({
+          severity: 'success',
+          summary: this._translateService.instant('sessions.detail.linkCopied'),
+        }),
+      () =>
+        this._messageService.add({
+          severity: 'warn',
+          summary: this._translateService.instant('sessions.detail.copyFailed'),
+          detail: url,
+        }),
     );
   }
 
@@ -172,19 +181,38 @@ export class InstructorSessionDetail implements OnInit {
   protected readonly detailActions = computed<ActionItem[]>(() => {
     const i = this.store.instance();
     if (!i) return [];
+    const t = (key: string): string => this._translateService.instant(key);
+    const openCalendar: ActionItem = {
+      id: 'calendar',
+      icon: 'pi pi-calendar',
+      label: t('sessions.detail.actions.openCalendar'),
+    };
     if (i.status !== SessionInstanceStatus.Scheduled) {
-      return [{ id: 'calendar', icon: 'pi pi-calendar', label: 'Open calendar' }];
+      return [openCalendar];
     }
     const items: ActionItem[] = [];
     if (this.canMessageParticipants()) {
-      items.push({ id: 'message', icon: 'pi pi-send', label: 'Message participants' });
+      items.push({
+        id: 'message',
+        icon: 'pi pi-send',
+        label: t('sessions.detail.actions.messageParticipants'),
+      });
     }
     if (this.isOnline()) {
-      items.push({ id: 'copy-link', icon: 'pi pi-copy', label: 'Copy meeting link' });
+      items.push({
+        id: 'copy-link',
+        icon: 'pi pi-copy',
+        label: t('sessions.detail.actions.copyMeetingLink'),
+      });
     }
-    items.push({ id: 'edit', icon: 'pi pi-pencil', label: 'Edit session' });
-    items.push({ id: 'calendar', icon: 'pi pi-calendar', label: 'Open calendar' });
-    items.push({ id: 'cancel', icon: 'pi pi-times', label: 'Cancel session…', danger: true });
+    items.push({ id: 'edit', icon: 'pi pi-pencil', label: t('sessions.detail.actions.editSession') });
+    items.push(openCalendar);
+    items.push({
+      id: 'cancel',
+      icon: 'pi pi-times',
+      label: t('sessions.common.cancelSession'),
+      danger: true,
+    });
     return items;
   });
 

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
@@ -9,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { clientDisplayName, ClientService, InstructorClient } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -18,14 +18,14 @@ import { UserInfo } from '../../../../_shared/components/user-info/user-info';
 
 @Component({
   selector: 'mh-edit-client-notes-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, TextareaModule, UserInfo],
+  imports: [FormsModule, ButtonDirective, Dialog, TextareaModule, UserInfo, TranslatePipe],
   templateUrl: './edit-client-notes-dialog.html',
   styleUrl: './edit-client-notes-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditClientNotesDialog {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly client = input<InstructorClient | null>(null);
@@ -44,7 +44,7 @@ export class EditClientNotesDialog {
   }
 
   clientName(client: InstructorClient): string {
-    return clientDisplayName(client, 'Unknown');
+    return clientDisplayName(client, this._translateService.instant('common.unknown'));
   }
 
   saveNotes(): void {
@@ -58,8 +58,8 @@ export class EditClientNotesDialog {
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Notes saved',
-          detail: 'Client notes updated successfully',
+          summary: this._translateService.instant('clients.toast.notesSaved.summary'),
+          detail: this._translateService.instant('clients.toast.notesSaved.detail'),
         });
         this.saved.emit();
       },
@@ -67,8 +67,8 @@ export class EditClientNotesDialog {
         this.notesLoading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save notes',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('clients.toast.notesSaveFailed'),
         });
       },
     });

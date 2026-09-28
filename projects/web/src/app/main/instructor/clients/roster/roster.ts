@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -8,9 +7,10 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
-import { MessageService } from 'primeng/api';
+import { MessageService, SelectItem } from 'primeng/api';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 
@@ -43,7 +43,6 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
  */
 @Component({
   selector: 'mh-coach-roster',
-  standalone: true,
   imports: [
     FormsModule,
     ButtonDirective,
@@ -53,22 +52,23 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     ListEmptyState,
     SelectButton,
     Skeleton,
+    TranslatePipe,
   ],
   templateUrl: './roster.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CoachRoster implements OnInit {
-  private readonly _service = inject(RosterService);
+  private readonly _rosterService = inject(RosterService);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly data = signal<RosterSummary | null>(null);
   readonly loading = signal(false);
   readonly window = signal<RosterWindow>('4w');
 
-  readonly windowOptions = [
-    { label: 'This week', value: '1w' as RosterWindow },
-    { label: '4 weeks', value: '4w' as RosterWindow },
+  readonly windowOptions: SelectItem<RosterWindow>[] = [
+    { label: this._translateService.instant('time.bucket.thisWeek'), value: '1w' },
+    { label: this._translateService.instant('count.weeks', { count: 4 }), value: '4w' },
   ];
 
   readonly clients = computed(() => this.data()?.clients ?? []);
@@ -100,7 +100,7 @@ export class CoachRoster implements OnInit {
 
   fetch(): void {
     this.loading.set(true);
-    this._service.roster(this.window()).subscribe({
+    this._rosterService.roster(this.window()).subscribe({
       next: (d) => {
         this.data.set(d);
         this.loading.set(false);
@@ -109,8 +109,8 @@ export class CoachRoster implements OnInit {
         this.loading.set(false);
         showApiError(
           this._messageService,
-          "Couldn't load your roster",
-          'Please try again.',
+          this._translateService.instant('clients.toast.loadRosterFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },
@@ -134,13 +134,15 @@ export class CoachRoster implements OnInit {
   attentionLabel(c: RosterClient): string {
     switch (c.attention) {
       case 'NEVER_STARTED':
-        return 'Has not started';
+        return this._translateService.instant('clients.roster.attention.reason.neverStarted');
       case 'SILENT':
-        return `Quiet ${c.daysSinceLastWorkout} days`;
+        return this._translateService.instant('clients.roster.attention.reason.silent', {
+          days: c.daysSinceLastWorkout,
+        });
       case 'DROPPED':
-        return 'Dropping off';
+        return this._translateService.instant('clients.roster.attention.reason.dropped');
       case 'BEHIND':
-        return 'Behind plan';
+        return this._translateService.instant('clients.roster.attention.reason.behind');
       default:
         return '';
     }
@@ -150,15 +152,24 @@ export class CoachRoster implements OnInit {
   attentionDetail(c: RosterClient): string {
     switch (c.attention) {
       case 'NEVER_STARTED':
-        return 'Assigned a plan but has never logged a workout.';
+        return this._translateService.instant('clients.roster.attention.detail.neverStarted');
       case 'SILENT':
         return c.due > 0
-          ? `${c.completed} of ${c.due} sessions done in this window.`
-          : 'No workouts logged recently.';
+          ? this._translateService.instant('clients.roster.attention.detail.silent', {
+              completed: c.completed,
+              due: c.due,
+            })
+          : this._translateService.instant('clients.roster.attention.detail.silentNoDue');
       case 'DROPPED':
-        return `Down from ${c.previousAdherencePercent}% to ${c.adherencePercent}% against the previous window.`;
+        return this._translateService.instant('clients.roster.attention.detail.dropped', {
+          previous: c.previousAdherencePercent,
+          current: c.adherencePercent,
+        });
       case 'BEHIND':
-        return `${c.completed} of ${c.due} sessions done.`;
+        return this._translateService.instant('clients.roster.attention.detail.behind', {
+          completed: c.completed,
+          due: c.due,
+        });
       default:
         return '';
     }
@@ -171,11 +182,16 @@ export class CoachRoster implements OnInit {
   /** Nothing scheduled is a fact about the plan, not about the person. */
   subtitleFor(c: RosterClient): string {
     if (c.due === 0) {
-      return c.activePlans === 0
-        ? 'No active plan'
-        : 'Nothing scheduled in this window';
+      return this._translateService.instant(
+        c.activePlans === 0
+          ? 'clients.roster.subtitle.noPlan'
+          : 'clients.roster.subtitle.nothingScheduled',
+      );
     }
-    return `${c.completed} of ${c.due} sessions`;
+    return this._translateService.instant('clients.roster.subtitle.sessions', {
+      completed: c.completed,
+      due: c.due,
+    });
   }
 
   /**

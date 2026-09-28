@@ -3,6 +3,8 @@
   REFRESH_TOKEN: 'motionhive_refresh_token',
   USER: 'motionhive_user',
   LANGUAGE: 'motionhive_language',
+  /** Set while a device language choice has not yet reached the account. */
+  LANGUAGE_PENDING_SYNC: 'motionhive_language_pending_sync',
   THEME: 'motionhive_theme',
   PERMISSIONS: 'motionhive_permissions',
   ROLES: 'motionhive_roles',

@@ -5,7 +5,7 @@
       class="hour"
       [style.top.px]="i * hourHeight"
       [style.height.px]="hourHeight"
-      [attr.aria-label]="'New session at ' + hour.label"
+      [attr.aria-label]="'sessions.dayRail.newSessionAt' | translate: { time: hour.label }"
       (click)="pickHour.emit(hour.hour)"
     >
       <span class="label">{{ hour.label }}</span>
@@ -28,7 +28,11 @@
       <span class="title">
         {{ block.title }}
         @if (block.hasConflict) {
-          <ion-icon name="alert-circle" color="danger" aria-label="Overlaps another session" />
+          <ion-icon
+            name="alert-circle"
+            color="danger"
+            [attr.aria-label]="'sessions.dayRail.overlaps' | translate"
+          />
         }
       </span>
       <span class="meta">{{ block.meta }}</span>

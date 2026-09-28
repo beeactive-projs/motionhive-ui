@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonBackButton,
   IonBadge,
@@ -43,7 +44,7 @@ import { ClientNotesSheet } from '../_sheets/client-notes-sheet/client-notes-she
 import { ClientActionId, ClientActionIds } from '../clients.config';
 import { CLIENT_ICONS } from '../clients.icons';
 import { adherenceLabel, lastActiveLabel } from '../roster-labels';
-import { ClientDetailStore } from './client-detail.store';
+import { ClientDetailStore, UPCOMING_DAYS } from './client-detail.store';
 
 /**
  * One client: who they are, how their week is going, what is coming up, and
@@ -80,6 +81,7 @@ import { ClientDetailStore } from './client-detail.store';
     IonTitle,
     IonToolbar,
     SessionRow,
+    TranslatePipe,
   ],
   templateUrl: './client-detail.html',
   styleUrl: './client-detail.scss',
@@ -91,10 +93,13 @@ export class ClientDetail implements ViewWillEnter {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
 
   readonly Statuses = InstructorClientStatuses;
   readonly skeletonRows = [1, 2, 3];
+  /** The Upcoming sessions window, named beside its kicker. */
+  readonly upcomingDays = UPCOMING_DAYS;
 
   readonly actionsOpen = signal(false);
   readonly notesOpen = signal(false);
@@ -159,16 +164,27 @@ export class ClientDetail implements ViewWillEnter {
   readonly weekFootnote = computed(() => {
     const week = this.store.week();
     if (!week) return '';
-    return `${week.completed} done · ${week.skipped} skipped · ${week.remaining} remaining`;
+    return this._translateService.instant('clients.detail.week.footnote', {
+      completed: week.completed,
+      skipped: week.skipped,
+      remaining: week.remaining,
+    });
   });
 
   readonly planLabel = computed(() => {
     const count = this.store.activePlans();
-    if (count === null || count === 0) return 'No active plan';
-    return count === 1 ? '1 active plan' : `${count} active plans`;
+    if (count === null || count === 0) {
+      return this._translateService.instant('clients.roster.noActivePlan');
+    }
+    return this._translateService.instant('clients.detail.plan.count', { count });
   });
 
-  readonly archiveTitle = computed(() => `Archive ${this.name() || 'this client'}?`);
+  readonly archiveTitle = computed(() => {
+    const name = this.name();
+    return name
+      ? this._translateService.instant('clients.confirm.archive.title', { name })
+      : this._translateService.instant('clients.confirm.archive.titleFallback');
+  });
 
   constructor() {
     addIcons(CLIENT_ICONS);
@@ -228,11 +244,14 @@ export class ClientDetail implements ViewWillEnter {
       next: () => {
         this.notesSaving.set(false);
         this.notesOpen.set(false);
-        void this._feedbackService.success('Note saved');
+        void this._feedbackService.success(this._translateService.instant('clients.toast.noteSaved'));
       },
       error: (error: unknown) => {
         this.notesSaving.set(false);
-        void this._feedbackService.error(error, 'Could not save the note.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.noteFailed'),
+        );
       },
     });
   }
@@ -248,20 +267,29 @@ export class ClientDetail implements ViewWillEnter {
       next: () => {
         this.archiveSaving.set(false);
         this.archiveOpen.set(false);
-        void this._feedbackService.success('Client archived');
+        void this._feedbackService.success(this._translateService.instant('clients.toast.archived'));
       },
       error: (error: unknown) => {
         this.archiveSaving.set(false);
-        void this._feedbackService.error(error, 'Could not archive this client.');
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.archiveFailed'),
+        );
       },
     });
   }
 
   unarchive(): void {
     this.store.unarchive().subscribe({
-      next: () => void this._feedbackService.success('Client unarchived'),
+      next: () =>
+        void this._feedbackService.success(
+          this._translateService.instant('clients.toast.unarchived'),
+        ),
       error: (error: unknown) =>
-        void this._feedbackService.error(error, 'Could not unarchive this client.'),
+        void this._feedbackService.error(
+          error,
+          this._translateService.instant('clients.toast.unarchiveFailed'),
+        ),
     });
   }
 

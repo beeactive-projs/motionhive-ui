@@ -1,5 +1,7 @@
 <ng-template #body>
-  <ion-note class="mh-note-block">Goes to {{ recipientLabel() }}.</ion-note>
+  <ion-note class="mh-note-block">
+    {{ recipientNote() ?? ('sessions.messageSheet.recipients.all' | translate) }}
+  </ion-note>
 
   <ion-textarea
     fill="outline"
@@ -7,16 +9,16 @@
     [rows]="4"
     [maxlength]="2000"
     [counter]="true"
-    placeholder="Write your message…"
+    [placeholder]="'sessions.messageSheet.placeholder' | translate"
     [value]="message()"
     (ionInput)="message.set($event.detail.value ?? '')"
   />
 
-  <div class="mh-section-label">Quick fills</div>
+  <div class="mh-section-label">{{ 'sessions.messageSheet.quickFills' | translate }}</div>
   <div class="suggestions">
     @for (suggestion of suggestions; track suggestion) {
       <button type="button" class="suggestion" (click)="use(suggestion)">
-        {{ suggestion }}
+        {{ suggestion | translate }}
       </button>
     }
   </div>
@@ -24,8 +26,8 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Message signups"
-  saveLabel="Send"
+  [title]="'sessions.messageSheet.title' | translate"
+  [saveLabel]="'button.send' | translate"
   [body]="body"
   [canSave]="canSend()"
   [saving]="sending()"

@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Sessions</ion-title>
+    <ion-title>{{ 'nav.sessions' | translate }}</ion-title>
     <ion-buttons slot="end">
       <mh-notification-bell />
     </ion-buttons>
@@ -12,7 +12,7 @@
         <ion-label>{{ upcomingLabel() }}</ion-label>
       </ion-segment-button>
       <ion-segment-button value="past">
-        <ion-label>Past</ion-label>
+        <ion-label>{{ 'mySessions.list.past' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
@@ -26,9 +26,9 @@
   @if (showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your sessions"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'mySessions.list.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
@@ -52,13 +52,13 @@
     } @else {
       <mh-empty-state
         icon="calendar-outline"
-        heading="No past sessions yet"
-        message="Sessions you've been to show up here."
+        [heading]="'mySessions.list.pastEmpty.title' | translate"
+        [message]="'mySessions.list.pastEmpty.message' | translate"
       />
     }
     @if (store.cancelledCount() > 0) {
       <ion-button class="ghost" fill="clear" color="medium" expand="block" (click)="openCancelled()">
-        Cancelled &amp; declined · {{ store.cancelledCount() }}
+        {{ 'mySessions.list.cancelledLink' | translate: { count: store.cancelledCount() } }}
         <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
       </ion-button>
     }
@@ -80,7 +80,7 @@
 
       @if (isUpcoming() && store.upcomingTruncated()) {
         <ion-note class="mh-note-block">
-          Showing your next 100 bookings — the rest appear as these pass.
+          {{ 'mySessions.list.truncated' | translate }}
         </ion-note>
       }
 
@@ -92,7 +92,7 @@
 
       @if (store.cancelledCount() > 0) {
         <ion-button class="ghost" fill="clear" color="medium" expand="block" (click)="openCancelled()">
-          Cancelled &amp; declined · {{ store.cancelledCount() }}
+          {{ 'mySessions.list.cancelledLink' | translate: { count: store.cancelledCount() } }}
           <ion-icon slot="end" name="chevron-forward" aria-hidden="true" />
         </ion-button>
       }

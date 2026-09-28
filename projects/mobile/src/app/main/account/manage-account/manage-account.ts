@@ -20,10 +20,17 @@ import {
   SelectCustomEvent,
 } from '@ionic/angular/standalone';
 
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
-import { AuthService, ProfileService, TIMEZONE_OPTIONS } from 'core';
+import {
+  AppLanguage,
+  AuthService,
+  LanguageService,
+  ProfileService,
+  TIMEZONE_OPTIONS,
+} from 'core';
 
 import { SettingsRow } from '../../../_shared/components/settings-row/settings-row';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
@@ -61,6 +68,7 @@ import { AccountStore } from '../account.store';
     IonSelectOption,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './manage-account.html',
   styleUrl: './manage-account.scss',
@@ -71,6 +79,8 @@ export class ManageAccount implements OnInit {
   private readonly _authService = inject(AuthService);
   private readonly _navController = inject(NavController);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
+  private readonly _languageService = inject(LanguageService);
 
   readonly store = inject(AccountStore);
 
@@ -88,10 +98,12 @@ export class ManageAccount implements OnInit {
 
   readonly account = this.store.account;
   readonly timezone = computed(() => this.account()?.timezone ?? null);
-  readonly languageLabel = computed(() => {
-    const language = this.account()?.language;
-    return language ? `English (${language})` : 'English (en)';
-  });
+  readonly currentLanguage = this._languageService.current;
+  /** Each language named in itself — someone lost in the wrong one can still find theirs. */
+  readonly languageOptions = this._languageService.languages.map((value) => ({
+    value,
+    label: this._translateService.instant(`language.${value}`),
+  }));
 
   constructor() {
     addIcons(ACCOUNT_ICONS);
@@ -109,6 +121,10 @@ export class ManageAccount implements OnInit {
     this._themeService.setPreference(preference);
   }
 
+  onLanguageChange(event: SelectCustomEvent<AppLanguage>): void {
+    this._languageService.use(event.detail.value);
+  }
+
   onTimezoneChange(event: SelectCustomEvent<string>): void {
     const timezone = event.detail.value;
     const previous = this.timezone();
@@ -122,12 +138,17 @@ export class ManageAccount implements OnInit {
       .subscribe({
         next: () => {
           this.savingTimezone.set(false);
-          void this._feedbackService.success('Timezone updated');
+          void this._feedbackService.success(
+            this._translateService.instant('account.toast.timezoneUpdated'),
+          );
         },
         error: (error: unknown) => {
           this.savingTimezone.set(false);
           this.store.patchAccount({ timezone: previous });
-          void this._feedbackService.error(error, 'Could not update your timezone.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.toast.timezoneFailed'),
+          );
         },
       });
   }

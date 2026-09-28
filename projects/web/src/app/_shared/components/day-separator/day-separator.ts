@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * `mh-day-separator` — sticky day header used between groups in any
@@ -16,8 +17,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
  */
 @Component({
   selector: 'mh-day-separator',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
   templateUrl: './day-separator.html',
   styleUrl: './day-separator.scss',
 })

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
@@ -49,10 +50,18 @@ type DiscoverRowTone = (typeof DiscoverRowTone)[keyof typeof DiscoverRowTone];
 @Component({
   selector: 'mh-discover-session-row',
   standalone: true,
-  imports: [ButtonDirective, Card, Tag, Avatar, TypeChip, ProviderChip, CurrencyRonPipe],
+  imports: [
+    ButtonDirective,
+    Card,
+    Tag,
+    Avatar,
+    TypeChip,
+    ProviderChip,
+    CurrencyRonPipe,
+    TranslatePipe,
+  ],
   templateUrl: './discover-session-row.html',
   styleUrl: './discover-session-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     role: 'button',
     tabindex: '0',
@@ -62,6 +71,8 @@ type DiscoverRowTone = (typeof DiscoverRowTone)[keyof typeof DiscoverRowTone];
   },
 })
 export class DiscoverSessionRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly instance = input.required<PublicSessionInstance>();
   /** Mobile viewport flag (from the page's `injectIsMobile()`). */
   readonly mobile = input<boolean>(false);
@@ -77,7 +88,11 @@ export class DiscoverSessionRow {
 
   protected readonly title = computed(() => {
     const i = this.instance();
-    return i.titleOverride ?? i.template?.title ?? '(Session)';
+    return (
+      i.titleOverride ??
+      i.template?.title ??
+      this._translateService.instant('mySessions.common.untitled')
+    );
   });
 
   protected readonly start = computed<string | null>(() => this.instance().startAt ?? null);
@@ -149,7 +164,11 @@ export class DiscoverSessionRow {
 
   /** Approval-required sessions request a booking rather than book instantly. */
   protected readonly bookLabel = computed(() =>
-    this.instance().template?.approvalRequired ? 'Request to join' : 'Book',
+    this._translateService.instant(
+      this.instance().template?.approvalRequired
+        ? 'mySessions.common.requestToJoin'
+        : 'mySessions.common.book',
+    ),
   );
 
   /** Start time has already passed — bookings are closed for past occurrences. */

@@ -17,12 +17,14 @@
     <h2>{{ title() }}</h2>
     <div class="tags">
       @if (isLive()) {
-        <ion-badge color="success">Live</ion-badge>
+        <ion-badge color="success">{{ 'sessions.row.live' | translate }}</ion-badge>
       } @else if (typeLabel()) {
         <ion-badge [color]="hasConflict() ? 'danger' : 'light'">{{ typeLabel() }}</ion-badge>
       }
       @if (pendingCount() > 0) {
-        <ion-badge color="warning">{{ pendingCount() }} pending</ion-badge>
+        <ion-badge color="warning">
+          {{ 'sessions.badge.pending' | translate: { count: pendingCount() } }}
+        </ion-badge>
       }
       <ion-note>{{ meta() }}</ion-note>
     </div>

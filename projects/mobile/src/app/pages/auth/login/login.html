@@ -1,8 +1,8 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="auth-container auth-container--center">
     <div class="ion-padding-horizontal">
-      <h1>Welcome back</h1>
-      <p>Sign in to manage your clients and requests.</p>
+      <h1>{{ 'auth.login.title' | translate }}</h1>
+      <p>{{ 'auth.login.subtitle' | translate }}</p>
     </div>
 
     @if (errorMessage()) {
@@ -15,12 +15,12 @@
       <div class="ion-margin-horizontal">
         <ion-input
           fill="outline"
-          label="Email address"
+          [label]="'auth.common.emailLabel' | translate"
           labelPlacement="stacked"
           type="email"
           inputmode="email"
           formControlName="email"
-          placeholder="you@example.com"
+          [placeholder]="'form.placeholder.email' | translate"
           autocomplete="email"
           enterkeyhint="next"
           [errorText]="getFieldError('email')"
@@ -30,11 +30,11 @@
         <ion-input
           class="ion-margin-top"
           fill="outline"
-          label="Password"
+          [label]="'form.label.password' | translate"
           labelPlacement="stacked"
           type="password"
           formControlName="password"
-          placeholder="Enter your password"
+          [placeholder]="'auth.login.passwordPlaceholder' | translate"
           autocomplete="current-password"
           enterkeyhint="go"
           [errorText]="getFieldError('password')"
@@ -47,7 +47,7 @@
 
       <div class="ion-text-end">
         <ion-button fill="clear" size="small" routerLink="/auth/reset-password">
-          Forgot password?
+          {{ 'auth.login.forgotPassword' | translate }}
         </ion-button>
       </div>
 
@@ -60,17 +60,17 @@
         @if (isLoading()) {
           <ion-spinner name="crescent" />
         } @else {
-          Sign in
+          {{ 'button.signIn' | translate }}
         }
       </ion-button>
     </form>
 
     <div class="ion-text-center ion-margin-top">
       <ion-text color="medium">
-        <p class="ion-no-margin">Don't have an account?</p>
+        <p class="ion-no-margin">{{ 'auth.login.noAccount' | translate }}</p>
       </ion-text>
       <ion-button fill="clear" routerLink="/auth/signup" [queryParams]="queryParams">
-        Create one for free
+        {{ 'auth.login.createAccount' | translate }}
       </ion-button>
     </div>
   </div>

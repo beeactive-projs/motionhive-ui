@@ -1,0 +1,1080 @@
+{
+  "auth": {
+    "common": {
+      "confirmPasswordRequired": "Confirmă-ți parola",
+      "createOneFree": "Creează unul gratuit",
+      "emailAddress": "Adresă de email",
+      "forgotPassword": "Ai uitat parola?",
+      "googleFailed": "Autentificarea cu Google a eșuat. Încearcă din nou.",
+      "haveAccount": "Ai deja cont?",
+      "homeLink": "Pagina principală MotionHive",
+      "noAccount": "Nu ai cont?",
+      "privacyPolicy": "Politica de confidențialitate",
+      "rememberPassword": "Îți amintești parola?",
+      "termsOfService": "Termenii și condițiile"
+    },
+    "login": {
+      "error": {
+        "facebookFailed": "Autentificarea cu Facebook a eșuat. Încearcă din nou.",
+        "invalidCredentials": "Email sau parolă greșită. Încearcă din nou."
+      },
+      "heroHighlight": "aici.",
+      "heroLine1": "Călătoria ta în fitness",
+      "heroLine2": "începe",
+      "heroSubtitle": "Ține evidența antrenamentelor, conectează-te cu antrenori și atinge-ți obiectivele — totul într-un singur loc, creat pentru oamenii care se mișcă.",
+      "orContinueWith": "sau continuă cu",
+      "passwordPlaceholder": "Introdu parola",
+      "termsIntro": "Autentificându-te, ești de acord cu",
+      "title": "Bine ai revenit"
+    },
+    "newPassword": {
+      "confirmPlaceholder": "Confirmă parola nouă",
+      "error": {
+        "missingToken": "Token de resetare invalid sau lipsă. Cere un nou link de resetare a parolei.",
+        "resetFailed": "Parola nu a putut fi resetată. Este posibil ca linkul să fi expirat."
+      },
+      "heroHighlight": "noua parolă.",
+      "heroLine1": "Setează-ți",
+      "heroSubtitle": "Alege o parolă puternică pentru a-ți păstra contul în siguranță. Aproape ai revenit pe drumul cel bun.",
+      "newPasswordPlaceholder": "Introdu parola nouă",
+      "submit": "Resetează parola",
+      "subtitle": "Introdu mai jos noua parolă.",
+      "success": "Parola a fost resetată cu succes. Te redirecționăm la autentificare...",
+      "title": "Creează o parolă nouă"
+    },
+    "oauthCallback": {
+      "facebook": "Te autentificăm cu Facebook..."
+    },
+    "resetPassword": {
+      "error": {
+        "sendFailed": "Nu am putut trimite instrucțiunile de resetare. Încearcă din nou."
+      },
+      "heroHighlight": "parola.",
+      "heroLine1": "Resetează-ți",
+      "heroSubtitle": "Nicio grijă — se întâmplă oricui. Te ajutăm să revii pe drumul cel bun imediat.",
+      "instructions": "Introdu adresa de email asociată contului tău și îți trimitem un link pentru resetarea parolei.",
+      "sent": "Dacă există un cont cu acest email, vei primi în curând instrucțiunile de resetare a parolei.",
+      "submit": "Trimite instrucțiunile de resetare"
+    },
+    "signUp": {
+      "coachHint": "Antrenorii pot crea și gestiona sesiuni și clienți",
+      "error": {
+        "facebookFailed": "Înregistrarea cu Facebook a eșuat. Încearcă din nou.",
+        "invalidInvitation": "Acest link de invitație este invalid sau a expirat.",
+        "registrationFailed": "Înregistrarea a eșuat. Încearcă din nou."
+      },
+      "firstNamePlaceholder": "Ion",
+      "heroHighlight": "mișcării.",
+      "heroLine1": "Alătură-te",
+      "heroSubtitle": "Creează-ți contul și începe să-ți urmărești antrenamentele, să te conectezi cu antrenori și să-ți atingi obiectivele.",
+      "invited": "Ai fost invitat să te alături ca client. Completează formularul de mai jos pentru a accepta.",
+      "invitedByEnd": "să te alături ca client. Completează formularul de mai jos pentru a accepta.",
+      "invitedByStart": "Ai fost invitat de",
+      "lastNamePlaceholder": "Popescu",
+      "orSignUpWith": "sau creează cont cu",
+      "registerAsCoach": "Înregistrează-te ca antrenor",
+      "submit": "Creează cont",
+      "termsIntro": "Creându-ți contul, ești de acord cu",
+      "title": "Creează-ți contul"
+    },
+    "verifyEmail": {
+      "goToSignIn": "Mergi la autentificare",
+      "heroHighlight": "emailul.",
+      "heroLine1": "Confirmă-ți",
+      "heroSubtitle": "O verificare rapidă și ai intrat. O folosim ca să-ți păstrăm contul în siguranță și să-ți trimitem actualizările importante doar ție.",
+      "invalidDefault": "Acest link de verificare nu mai este valid. Cere unul nou din profilul tău.",
+      "missingDetail": "Nu am găsit un token de verificare în acest link. Încearcă să deschizi direct linkul din email sau cere unul nou din profil după ce te autentifici.",
+      "requestNewHint": "și cere un nou email de verificare din profilul tău.",
+      "status": {
+        "invalid": "Acest link nu mai este valid.",
+        "missing": "Acestui link îi lipsește tokenul.",
+        "success": "Totul e gata.",
+        "verifying": "Așteaptă puțin cât confirmăm linkul."
+      },
+      "talkingToServer": "Comunicăm cu serverul…",
+      "title": "Îți verificăm emailul",
+      "verified": "Emailul tău a fost verificat. Te redirecționăm la autentificare…"
+    }
+  },
+  "clients": {
+    "common": {
+      "editNotes": "Editează notițele",
+      "inviteClient": "Invită un client",
+      "paginator": "Afișezi {first} - {last} din {total}",
+      "retryInAMoment": "Reîncearcă în câteva momente.",
+      "shownOfTotal": "{shown} din {total}",
+      "thisClient": "acest client"
+    },
+    "confirm": {
+      "archive": {
+        "accept": "Da, arhivează",
+        "header": "Arhivează clientul",
+        "message": "Sigur vrei să arhivezi relația cu {name}?"
+      },
+      "cancelInvitation": {
+        "accept": "Anulează invitația",
+        "header": "Anulează invitația",
+        "message": "Sigur vrei să anulezi invitația trimisă către {name}?"
+      },
+      "cancelProgram": {
+        "accept": "Anulează planul",
+        "header": "Anulezi acest program?",
+        "message": "Anulezi „{program}” pentru {name}? Antrenamentele deja înregistrate rămân în istoric, dar nu se vor mai programa alte sesiuni."
+      },
+      "resendInvitation": {
+        "accept": "Retrimite invitația",
+        "header": "Retrimite invitația",
+        "message": "Retrimiți invitația către {name}?"
+      },
+      "unarchive": {
+        "accept": "Da, dezarhivează",
+        "header": "Dezarhivează clientul",
+        "message": "Sigur vrei să dezarhivezi relația cu {name}?"
+      }
+    },
+    "inviteDialog": {
+      "changeSelection": "Schimbă selecția",
+      "copied": "Copiat!",
+      "emailLabel": "Adresă de email",
+      "emailPlaceholder": "Introdu adresa de email a clientului",
+      "messageLabel": "Mesaj (opțional)",
+      "messagePlaceholder": "Adaugă un mesaj personal...",
+      "mode": {
+        "email": "Invită prin email",
+        "find": "Caută pe platformă"
+      },
+      "referralLink": "Link de invitație",
+      "searchHint": "Scrie cel puțin 2 caractere. Apar doar utilizatorii platformei cu care nu ai deja o relație.",
+      "searchLabel": "Caută clienți",
+      "searchPlaceholder": "Caută după nume sau email…",
+      "send": "Trimite invitația",
+      "sentMessage": "Invitația a fost trimisă! Trimite-i clientului linkul de mai jos.",
+      "title": "Invită un client"
+    },
+    "list": {
+      "columns": {
+        "started": "Început"
+      },
+      "empty": {
+        "message": "Invită primul tău client ca să începi să-ți construiești lista de clienți.",
+        "title": "Niciun client încă"
+      },
+      "emptyFiltered": {
+        "message": "Niciun client cu acest status. Încearcă altul sau șterge filtrul ca să-i vezi pe toți.",
+        "title": "Niciun client nu corespunde acestui filtru"
+      },
+      "lens": {
+        "all": "Toți clienții",
+        "ariaLabel": "Vizualizare clienți",
+        "attention": "Necesită atenție"
+      },
+      "notes": "Notițe",
+      "statusFilter": "Status:",
+      "subtitle": "Gestionează relațiile cu clienții, invitațiile și cererile.",
+      "subtitleCompact": "Gestionează clienții, invitațiile și cererile.",
+      "title": "Clienți"
+    },
+    "notesDialog": {
+      "placeholder": "Adaugă notițe private despre acest client...",
+      "save": "Salvează notițele",
+      "title": "Editează notițele clientului"
+    },
+    "pendingRequests": {
+      "cancelInvitation": "Anulează invitația",
+      "columns": {
+        "expires": "Expiră",
+        "message": "Mesaj",
+        "sent": "Trimisă"
+      },
+      "empty": {
+        "message": "Invitațiile pe care le trimiți și cererile primite de la clienți vor apărea aici.",
+        "title": "Nicio cerere în așteptare"
+      },
+      "resendInvitation": "Retrimite invitația",
+      "subtitle": "Invitațiile trimise de tine și cererile care așteaptă răspunsul tău.",
+      "subtitleCompact": "Invitații trimise și cereri care așteaptă răspuns.",
+      "title": "Cereri în așteptare",
+      "type": {
+        "incoming": "Primite",
+        "outgoing": "Trimise"
+      }
+    },
+    "profile": {
+      "actions": {
+        "archive": "Arhivează clientul",
+        "message": "Trimite mesaj",
+        "unarchive": "Dezarhivează clientul"
+      },
+      "back": "Înapoi la clienți",
+      "info": {
+        "clientSince": "Client din",
+        "connected": "Conectat",
+        "expires": "Expiră",
+        "initiatedBy": "Inițiat de",
+        "initiatedByClient": "Client"
+      },
+      "notFound": {
+        "action": "Mergi la clienți",
+        "message": "Această persoană nu este unul dintre clienții tăi sau linkul nu mai este valabil.",
+        "title": "Clientul nu a fost găsit"
+      },
+      "overview": {
+        "groups": {
+          "empty": "Nu este membru în niciun grup.",
+          "title": "Grupuri"
+        },
+        "notes": {
+          "empty": "Nicio notiță încă.",
+          "title": "Notițe"
+        },
+        "programs": {
+          "empty": "Niciun program activ",
+          "emptyHint": "Atribuie unul din secțiunea Programe ca să programezi antrenamente structurate.",
+          "title": "Programe active"
+        },
+        "recentWorkouts": {
+          "empty": "Niciun antrenament încă",
+          "emptyHint": "Antrenamentele înregistrate de acest client — atribuite sau libere — vor apărea aici.",
+          "loading": "Se încarcă antrenamentele recente…",
+          "title": "Antrenamente recente"
+        },
+        "stats": {
+          "activePlans": "Planuri active",
+          "last7Days": "Ultimele 7 zile",
+          "totalWorkouts": "Total antrenamente"
+        }
+      },
+      "programs": {
+        "cancel": "Anulează programul",
+        "complete": "{percent}% finalizat",
+        "empty": {
+          "message": "Atribuie un program din secțiunea Programe ca să programezi antrenamente structurate pentru acest client.",
+          "title": "Niciun program atribuit încă"
+        },
+        "ends": "se termină pe {date}",
+        "loading": "Se încarcă programele…",
+        "noMatch": {
+          "current": "Niciun program curent — încearcă Toate.",
+          "currentSearch": "Niciun program curent pentru „{term}” — încearcă Toate.",
+          "finished": "Niciun program încheiat — încearcă Toate.",
+          "finishedSearch": "Niciun program încheiat pentru „{term}” — încearcă Toate."
+        },
+        "pause": "Pune pe pauză",
+        "resume": "Reia",
+        "scope": {
+          "ariaLabel": "Filtru programe",
+          "current": "Curente",
+          "history": "Istoric"
+        },
+        "searchPlaceholder": "Caută programe după nume…",
+        "started": "A început pe {date}",
+        "starts": "Începe pe {date}",
+        "title": "Programe atribuite"
+      },
+      "progress": {
+        "back": "Înapoi la prezentare",
+        "hintOverview": "Progresul general dintr-o privire îl găsești în fila Prezentare.",
+        "hintWorkouts": "Pentru istoricul pe exercițiu, deschide un antrenament înregistrat din fila Antrenamente sau din Prezentare.",
+        "title": "Progresul pe exercițiu nu este încă disponibil"
+      },
+      "sessions": {
+        "booked": "Rezervat",
+        "cancelled": "Sesiune anulată",
+        "emptyPast": "{name} nu a participat la niciuna dintre sesiunile tale în ultimele 3 luni.",
+        "emptyUpcoming": "{name} nu are nimic rezervat în următoarele 3 luni.",
+        "scope": {
+          "ariaLabel": "Filtru sesiuni",
+          "past": "Trecute",
+          "upcoming": "Viitoare"
+        },
+        "title": "Sesiuni"
+      },
+      "tabs": {
+        "overview": "Prezentare",
+        "programs": "Programe",
+        "progress": "Progres",
+        "sessions": "Sesiuni",
+        "workouts": "Antrenamente"
+      },
+      "workouts": {
+        "empty": {
+          "message": "Sesiunile finalizate de acest client vor apărea aici, inclusiv antrenamentele libere și sesiunile din programele pe care le-ai atribuit.",
+          "title": "Niciun antrenament înregistrat încă"
+        },
+        "freestyle": "Antrenament liber",
+        "loading": "Se încarcă antrenamentele…",
+        "prs": "{count, plural, one {# PR} few {# PR-uri} other {# de PR-uri}}",
+        "title": "Antrenamente înregistrate"
+      }
+    },
+    "roster": {
+      "adherence": "aderență",
+      "allOnTrack": "Toată lumea e pe drumul cel bun.",
+      "attention": {
+        "detail": {
+          "behind": "{due, plural, one {{completed} din # sesiune făcută.} few {{completed} din # sesiuni făcute.} other {{completed} din # de sesiuni făcute.}}",
+          "dropped": "A scăzut de la {previous}% la {current}% față de perioada anterioară.",
+          "neverStarted": "Are un plan atribuit, dar nu a înregistrat niciun antrenament.",
+          "silent": "{due, plural, one {{completed} din # sesiune făcută în această perioadă.} few {{completed} din # sesiuni făcute în această perioadă.} other {{completed} din # de sesiuni făcute în această perioadă.}}",
+          "silentNoDue": "Niciun antrenament înregistrat recent."
+        },
+        "hint": "cele mai urgente primele",
+        "reason": {
+          "behind": "În urmă cu planul",
+          "dropped": "În scădere",
+          "neverStarted": "Nu a început",
+          "silent": "{days, plural, one {Inactiv de # zi} few {Inactiv de # zile} other {Inactiv de # de zile}}"
+        },
+        "title": "Necesită atenție"
+      },
+      "daysAgo": "{days, plural, one {acum # zi} few {acum # zile} other {acum # de zile}}",
+      "empty": {
+        "message": "Când cineva devine clientul tău, antrenamentele lui apar aici ca să vezi cine e pe drumul cel bun.",
+        "title": "Niciun client încă"
+      },
+      "intro": "Clienții tăi și cum se antrenează.",
+      "kpi": {
+        "adherence": "Aderență",
+        "adherenceSub": "la clienții cu antrenamente programate",
+        "ariaLabel": "Sumarul listei de clienți",
+        "clients": "Clienți",
+        "needsAttention": "Necesită atenție"
+      },
+      "messageClient": "Trimite un mesaj către {name}",
+      "nudge": "Clienți care au nevoie de un impuls: {attention} din {total}.",
+      "onTrack": "Pe drumul cel bun",
+      "subtitle": {
+        "noPlan": "Niciun plan activ",
+        "nothingScheduled": "Nimic programat în această perioadă",
+        "sessions": "{due, plural, one {{completed} din # sesiune} few {{completed} din # sesiuni} other {{completed} din # de sesiuni}}"
+      },
+      "trainedToday": "s-a antrenat azi",
+      "windowAriaLabel": "Interval de timp"
+    },
+    "toast": {
+      "acceptFailed": "Cererea nu a putut fi acceptată",
+      "accepted": {
+        "detail": "Cererea clientului a fost acceptată",
+        "summary": "Cerere acceptată"
+      },
+      "archiveFailed": {
+        "detail": "Clientul nu a putut fi arhivat",
+        "summary": "Arhivarea a eșuat"
+      },
+      "archived": {
+        "detail": "Relația cu clientul a fost arhivată",
+        "summary": "Client arhivat"
+      },
+      "cancelInvitationFailed": "Invitația nu a putut fi anulată",
+      "declineFailed": "Cererea nu a putut fi refuzată",
+      "declined": {
+        "detail": "Cererea clientului a fost refuzată",
+        "summary": "Cerere refuzată"
+      },
+      "invitationCancelled": {
+        "detail": "Invitația a fost anulată",
+        "summary": "Invitație anulată"
+      },
+      "invitationResent": {
+        "detail": "Invitația a fost retrimisă",
+        "summary": "Invitație retrimisă"
+      },
+      "invitationSent": {
+        "detail": "Invitația a fost trimisă clientului.",
+        "summary": "Invitație trimisă"
+      },
+      "loadClientFailed": "Nu am putut încărca acest client",
+      "loadProgramsFailed": "Nu am putut încărca programele",
+      "loadRequestsFailed": "Nu am putut încărca cererile în așteptare",
+      "loadRosterFailed": "Nu am putut încărca lista de clienți",
+      "loadSessionsFailed": "Nu am putut încărca sesiunile",
+      "loadWorkoutsFailed": {
+        "detail": "Este posibil ca acest client să nu fi înregistrat încă nicio sesiune.",
+        "summary": "Nu am putut încărca antrenamentele"
+      },
+      "notesSaveFailed": "Notițele nu au putut fi salvate",
+      "notesSaved": {
+        "detail": "Notițele clientului au fost actualizate",
+        "summary": "Notițe salvate"
+      },
+      "plan": {
+        "cancelFailed": "Nu am putut anula planul",
+        "cancelled": "Plan anulat",
+        "pauseFailed": "Nu am putut pune planul pe pauză",
+        "paused": "Plan pus pe pauză",
+        "resumeFailed": "Nu am putut relua planul",
+        "resumed": "Plan reluat"
+      },
+      "resendInvitationFailed": "Invitația nu a putut fi retrimisă",
+      "sendInvitationFailed": {
+        "detail": "Nu am putut trimite invitația. Încearcă din nou.",
+        "summary": "Invitația nu a putut fi trimisă"
+      },
+      "unarchiveFailed": {
+        "detail": "Clientul nu a putut fi dezarhivat",
+        "summary": "Dezarhivarea a eșuat"
+      },
+      "unarchived": {
+        "detail": "Relația cu clientul a fost restaurată",
+        "summary": "Client dezarhivat"
+      }
+    }
+  },
+  "components": {
+    "accessChip": {
+      "approvalRequired": "Necesită aprobare",
+      "withApproval": "{label} · necesită aprobare"
+    },
+    "calendar": {
+      "conflict": "Suprapunere",
+      "currentTime": "Ora curentă: {time}",
+      "moreCount": "+{count} în plus",
+      "moreSessions": "{count, plural, one {încă # sesiune în această zi} few {încă # sesiuni în această zi} other {încă # de sesiuni în această zi}}",
+      "now": "Acum · {time}",
+      "recurring": "Recurentă",
+      "scheduleConflict": "Suprapunere în program"
+    },
+    "capacityBar": {
+      "full": "complet",
+      "spotsLeft": "{count, plural, one {# loc liber} few {# locuri libere} other {# de locuri libere}}",
+      "uncapped": "{count} participă · fără limită de capacitate"
+    },
+    "notificationBell": {
+      "caughtUp": "Ești la zi",
+      "emptyHint": "Notificările noi vor apărea aici.",
+      "endOfList": "Ești la zi.",
+      "markAllRead": "Marchează tot ca citit"
+    },
+    "participantsTable": {
+      "attended": "Prezent",
+      "booked": "Rezervat",
+      "empty": "Niciun participant încă.",
+      "markAttended": "Marchează prezent",
+      "markNoShow": "Marchează absent",
+      "member": "Membru",
+      "noShow": "Absent"
+    },
+    "recurrenceBuilder": {
+      "afterCount": "După N repetări",
+      "daysOfWeek": "Zilele săptămânii",
+      "ends": "Se termină",
+      "every": "La fiecare",
+      "frequency": {
+        "DAILY": "Zilnic",
+        "MONTHLY": "Lunar",
+        "WEEKLY": "Săptămânal"
+      },
+      "never": "Niciodată",
+      "occurrencesHint": "repetări (maximum 24)",
+      "on": "În",
+      "onDate": "La o dată",
+      "period": {
+        "DAILY": "{count, plural, one {zi} few {zile} other {de zile}}",
+        "MONTHLY": "{count, plural, one {lună} few {luni} other {de luni}}",
+        "WEEKLY": "{count, plural, one {săptămână} few {săptămâni} other {de săptămâni}}"
+      },
+      "repeats": "Se repetă",
+      "summary": {
+        "DAILY": "{interval, plural, one {În fiecare zi} few {La fiecare # zile} other {La fiecare # de zile}}",
+        "MONTHLY": "{interval, plural, one {În fiecare lună} few {La fiecare # luni} other {La fiecare # de luni}}",
+        "WEEKLY": "{interval, plural, one {În fiecare săptămână: {days}} few {La fiecare # săptămâni: {days}} other {La fiecare # de săptămâni: {days}}}",
+        "weeklyNoDays": "Săptămânal",
+        "withCount": "{rule} · {count, plural, one {# repetare} few {# repetări} other {# de repetări}}",
+        "withEndDate": "{rule} · până la {date}"
+      }
+    },
+    "sessionCard": {
+      "blockedHint": "Descrierea și înscrierea sunt ascunse — doar pentru membri",
+      "cta": {
+        "becomeClient": "Devino client",
+        "book": "Rezervă",
+        "membersOnly": "Doar pentru membri",
+        "requestToBook": "Cere rezervarea"
+      },
+      "recurring": "Recurentă",
+      "recurringSeries": "Serie recurentă",
+      "select": "Selectează {title}",
+      "untitled": "(fără titlu)"
+    },
+    "userSearch": {
+      "empty": "Niciun utilizator găsit. Încearcă să inviți pe email.",
+      "placeholder": "Caută după nume sau email…"
+    },
+    "weekStrip": {
+      "navigator": "Navigare în săptămână"
+    }
+  },
+  "mySessions": {
+    "book": {
+      "approval": "Aprobare",
+      "approvalHint": "Antrenorul îți va analiza cererea.",
+      "cancelUpTo": "Anulare până cu",
+      "cancelUpToValue": "{hours} h înainte de început",
+      "confirm": "Confirmă",
+      "confirmBooking": "Confirmă rezervarea",
+      "noteLabel": "Notă pentru antrenor (opțional)",
+      "notePlaceholder": "E ceva ce ar trebui să știe despre obiectivele sau experiența ta?",
+      "title": "Confirmă rezervarea"
+    },
+    "bookingConfirmed": {
+      "appleIcs": "Apple / .ics",
+      "calendarJoin": "Intră: {url}",
+      "confirmationOnWay": "Confirmarea e pe drum spre inboxul tău.",
+      "confirmedSummary": "{title} — {date}, la {time}.",
+      "emailWhenApproved": "Primești un email când antrenorul îți aprobă cererea.",
+      "freeToCancel": "Poți anula gratuit cu până la {hours} h înainte de început.",
+      "headerConfirmed": "Te-ai înscris!",
+      "headerPending": "Cerere trimisă!",
+      "pendingSummary": "{title} — {date}. Antrenorul îți va analiza cererea.",
+      "reminder": "Îți trimitem un memento cu 24 h și cu 1 h înainte.",
+      "whatNext": "Ce urmează"
+    },
+    "cancelBooking": {
+      "cutoffAfter": "înainte de sesiune ca să eviți taxele.",
+      "cutoffBefore": "Anulează cu cel puțin",
+      "cutoffHours": "{hours} h",
+      "keepBooking": "Păstrează rezervarea",
+      "messageLabel": "Mesaj pentru antrenor (opțional)",
+      "messagePlaceholder": "Orice vrei să știe.",
+      "reasonLabel": "Motiv (opțional)",
+      "reasonPlaceholder": "Suprapunere, boală etc."
+    },
+    "common": {
+      "book": "Rezervă",
+      "booked": "Rezervat",
+      "bookedCount": "{confirmed} / {capacity} rezervate",
+      "bookedOn": "Rezervat pe {date}",
+      "cancelBooking": "Anulează rezervarea",
+      "free": "Gratuit",
+      "goToSessions": "Mergi la sesiuni",
+      "loadingSession": "Se încarcă sesiunea…",
+      "requestToJoin": "Cere să participi",
+      "untitled": "(Sesiune)"
+    },
+    "dayOf": {
+      "backToMySessions": "Înapoi la sesiunile mele",
+      "coachInRoom": "Antrenorul tău a intrat deja.",
+      "coachNotified": "Îl anunțăm pe antrenor că ești aici.",
+      "expiredHint": "Ai întârziat? Linkul de intrare a rămas valabil 15 minute după început. După aceea expiră. Scrie-i antrenorului dacă mai ai nevoie de acces.",
+      "eyebrow": {
+        "active": "Poți intra acum",
+        "expired": "Fereastra a expirat",
+        "startsIn": "Începe în"
+      },
+      "fallbackTitle": "Sesiune online",
+      "goodToJoin": "Poți intra.",
+      "joinMeeting": "Intră în întâlnire",
+      "joinProvider": "Intră pe {provider}",
+      "joinUnavailable": "Informațiile de intrare nu sunt încă disponibile. Încearcă din nou mai aproape de început.",
+      "notVisible": "Nu ai acces la această sesiune.",
+      "preHint": "Butonul de intrare se activează cu 5 minute înainte de început. Lasă fila deschisă — îl activăm automat.",
+      "subtitle": "Începe la {time} · {minutes} min"
+    },
+    "discover": {
+      "emptyMessage": "Încearcă altă căutare sau alt filtru ca să găsești o sesiune de rezervat.",
+      "emptyTitle": "Nu am găsit sesiuni",
+      "loadError": "Sesiunile nu au putut fi încărcate — {error}",
+      "showing": "Se afișează {shown} din {total}",
+      "subtitle": "Găsește și rezervă sesiuni de la antrenorii de pe MotionHive.",
+      "title": "Descoperă sesiuni"
+    },
+    "error": {
+      "invalidLink": "Linkul acestei sesiuni pare invalid.",
+      "loadFailed": "Sesiunea nu a putut fi încărcată.",
+      "missingId": "Lipsește ID-ul sesiunii."
+    },
+    "filters": {
+      "quickFilters": "Filtre rapide",
+      "search": "Caută sesiuni",
+      "searchPlaceholder": "Caută sesiuni…"
+    },
+    "list": {
+      "emptyAction": "Găsește o sesiune",
+      "emptyMessage": "Sesiunile pe care le rezervi apar aici. Găsește una ca să începi.",
+      "noMatchMessage": "Încearcă alt filtru sau golește căutarea.",
+      "noMatchTitle": "Nicio sesiune nu se potrivește filtrelor",
+      "subtitle": "Rezervările, listele de așteptare și sesiunile trecute.",
+      "title": "Sesiuni"
+    },
+    "row": {
+      "cancelPolicy": "Anulare gratuită cu până la {hours} h înainte",
+      "cancelReason": "Anulat: {reason}",
+      "join": "Intră",
+      "liveNow": "Live acum",
+      "waitlistPosition": "{status} · #{position}"
+    },
+    "showcase": {
+      "alreadyStarted": "Sesiunea a început deja",
+      "bookingsClosed": "Rezervările s-au închis.",
+      "cancelHint": "Poți anula cu până la {hours} h înainte de începerea sesiunii.",
+      "cancellation": "Anulare",
+      "cancellationValue": "Cu până la {hours} h înainte",
+      "full": "Complet",
+      "fullTitle": "Sesiunea e completă · {confirmed} / {capacity}",
+      "groupReviewHint": "Antrenorul analizează cererile de intrare în grup înainte să acorde acces.",
+      "joinWaitlist": "Intră pe lista de așteptare",
+      "membersOnly": "Doar pentru membri",
+      "membersOnlyHint": "Detaliile sesiunii se deblochează când intri în grup.",
+      "requestToJoinGroup": "Cere să intri în grup",
+      "sessionFull": "Sesiune completă",
+      "status": {
+        "confirmed": "Ai rezervat",
+        "pending": "Așteaptă aprobarea antrenorului",
+        "waitlisted": "Ești pe lista de așteptare"
+      },
+      "waitlistClosed": "Sesiunea e completă și lista de așteptare e închisă.",
+      "waitlistHint": "Intră pe lista de așteptare — primești o notificare dacă se eliberează un loc.",
+      "with": "cu"
+    },
+    "toast": {
+      "bookConflict": {
+        "detail": "Ai deja o altă rezervare care se suprapune cu această sesiune. Anuleaz-o mai întâi sau alege altă oră.",
+        "summary": "Suprapunere în program"
+      },
+      "bookFailed": "Rezervarea nu a reușit",
+      "cancelFailed": "Anularea nu a reușit",
+      "cancelled": {
+        "outsideWindow": "Rezervare anulată (în afara perioadei de anulare — se pot aplica taxe).",
+        "summary": "Anulată",
+        "withinWindow": "Rezervare anulată — fără taxe."
+      },
+      "downloadFailed": "Fișierul de calendar nu a putut fi descărcat",
+      "joinUnavailable": {
+        "detail": "Încearcă din nou mai aproape de început.",
+        "summary": "Intrarea nu e disponibilă"
+      },
+      "loadFailed": "Sesiunea nu a putut fi încărcată",
+      "tryAgain": "Încearcă din nou."
+    }
+  },
+  "sessions": {
+    "approvals": {
+      "empty": "Ești la zi — nicio aprobare în așteptare.",
+      "intro": "Aici vezi sesiunile care așteaptă decizia ta. Apasă pe un rând ca să deschizi sesiunea și să aprobi sau să refuzi fiecare participant.",
+      "refresh": "Reîmprospătează",
+      "title": "Aprobări"
+    },
+    "attendance": {
+      "sendFollowUp": "Trimite follow-up",
+      "title": "Prezență",
+      "titleWithSession": "Prezență · {title}"
+    },
+    "calendar": {
+      "agenda": "Agendă",
+      "conflicts": "Conflicte",
+      "conflictsOnly": "Doar conflicte",
+      "day": "Zi",
+      "emptyWeek": "Nicio sesiune săptămâna aceasta.",
+      "filtersAria": "Filtre calendar",
+      "loadError": "Nu am putut încărca calendarul — {error}",
+      "month": "Lună",
+      "monthSheetSubtitle": "Alege ziua la care vrei să sari",
+      "pickMonth": "Alege luna",
+      "subtitle": "Răsfoiește și programează sesiuni pe zi, săptămână și lună.",
+      "tip": {
+        "drag": "trage peste orice interval liber ca să creezi o sesiune.",
+        "holdAfter": "pentru formularul complet.",
+        "holdBefore": "Ține apăsat",
+        "label": "Sfat:"
+      },
+      "title": "Calendarul sesiunilor",
+      "untitled": "(fără titlu)",
+      "untitledSession": "(Sesiune)",
+      "view": "Vizualizare",
+      "week": "Săptămână"
+    },
+    "cancelDialog": {
+      "cancelFailed": "Nu am putut anula",
+      "help": {
+        "series": "Anulează toate sesiunile din această serie. Șablonul se încheie.",
+        "this": "Anulează doar sesiunea de mai jos. Seria continuă.",
+        "thisAndFuture": "Anulează această sesiune și toate cele care urmează."
+      },
+      "messageLabel": "Mesaj pentru participanți (opțional)",
+      "messagePlaceholder": "Îmi pare rău — nu mă simt bine. Reprogramez săptămâna viitoare.",
+      "noParticipants": "Momentan nu e nimeni înscris.",
+      "participantsNotified": "{count, plural, one {participant va fi notificat.} few {participanți vor fi notificați.} other {de participanți vor fi notificați.}}",
+      "reasonLabel": "Motiv (intern, opțional)",
+      "reasonPlaceholder": "ex. boală, locație închisă",
+      "recurringWarning": "Sesiunea face parte dintr-o serie recurentă. Alege ce vrei să anulezi.",
+      "scopeLegend": "Ce vrei să anulezi?",
+      "subtitle": "{title} · {date}",
+      "title": "Anulează sesiunea"
+    },
+    "common": {
+      "attendeesNotified": "{count, plural, one {# participant notificat.} few {# participanți notificați.} other {# de participanți notificați.}}",
+      "calendar": "Calendar",
+      "cancelSession": "Anulează sesiunea…",
+      "cancelledNotified": "{cancelled, plural, one {# sesiune anulată} few {# sesiuni anulate} other {# de sesiuni anulate}} · {notified, plural, one {# participant notificat.} few {# participanți notificați.} other {# de participanți notificați.}}",
+      "confirmedCount": "{count, plural, one {# confirmat} few {# confirmați} other {# de confirmați}}",
+      "conflict": "Conflict",
+      "newSession": "Sesiune nouă",
+      "pendingCount": "{count} în așteptare",
+      "pickVenue": "Alege o locație",
+      "sessionCancelled": "Sesiune anulată",
+      "stat": {
+        "attended": "{count, plural, one {prezent} few {prezenți} other {de prezenți}}",
+        "confirmed": "{count, plural, one {confirmat} few {confirmați} other {de confirmați}}",
+        "noShow": "{count, plural, one {absent} few {absenți} other {de absenți}}",
+        "notMarked": "{count, plural, one {nemarcat} few {nemarcați} other {de nemarcați}}",
+        "pending": "în așteptare",
+        "waitlisted": "pe lista de așteptare"
+      },
+      "waitlistedCount": "{count} pe lista de așteptare"
+    },
+    "conflictDialog": {
+      "cancelFailed": "Anularea a eșuat",
+      "cancelReschedule": "Renunță la reprogramare",
+      "confirmReschedule": "Confirmă reprogramarea",
+      "empty": "Nu avem detalii despre sesiunile în conflict. Poate au fost deja anulate sau mutate.",
+      "intro": "Sesiunile de mai jos se suprapun cu cea pe care tocmai ai salvat-o. Reprogramează-le sau anulează-le ca să rezolvi conflictul.",
+      "loading": "Se încarcă sesiunile în conflict…",
+      "meta": "{confirmed, plural, one {# confirmat} few {# confirmați} other {# de confirmați}} · {pending} în așteptare",
+      "partial": {
+        "detail": "{count, plural, one {# sesiune nu a putut fi încărcată} few {# sesiuni nu au putut fi încărcate} other {# de sesiuni nu au putut fi încărcate}} — poate au fost deja anulate sau mutate.",
+        "summary": "Unele conflicte sunt deja rezolvate"
+      },
+      "pastDate": {
+        "detail": "Nu poți reprograma în trecut.",
+        "summary": "Alege o dată viitoare"
+      },
+      "remaining": "{count, plural, one {# conflict rămas} few {# conflicte rămase} other {# de conflicte rămase}}",
+      "reschedule": "Reprogramează",
+      "rescheduleFailed": "Reprogramarea a eșuat",
+      "rescheduled": "Reprogramată",
+      "rescheduledStillConflicts": "{count, plural, one {# participant notificat.} few {# participanți notificați.} other {# de participanți notificați.}} (încă are conflicte)",
+      "resolved": "Rezolvat",
+      "title": "Rezolvă conflictele",
+      "working": "Se procesează…"
+    },
+    "detail": {
+      "actions": {
+        "copyMeetingLink": "Copiază linkul întâlnirii",
+        "editSession": "Editează sesiunea",
+        "messageParticipants": "Scrie participanților",
+        "openCalendar": "Deschide calendarul"
+      },
+      "attendeesNotified": "Participanții au fost notificați.",
+      "cancelled": "Sesiune anulată.",
+      "completed": "Sesiune încheiată.",
+      "copyFailed": "Nu am putut copia",
+      "linkCopied": "Linkul întâlnirii a fost copiat",
+      "loading": "Se încarcă sesiunea…",
+      "message": "Mesaj",
+      "moreActions": "Mai multe acțiuni",
+      "noVenue": "Nicio locație setată.",
+      "participants": "Participanți",
+      "reason": "Motiv:",
+      "subtitle": "{date} · {minutes} min",
+      "whereHow": "Unde și cum"
+    },
+    "followUp": {
+      "audienceLabel": "Trimite către",
+      "error": {
+        "post": "Nu am putut trimite follow-up-ul",
+        "pre": "Nu am putut trimite mesajul"
+      },
+      "hint": "Fiecare destinatar îl primește ca notificare în aplicație și pe email.",
+      "messageLabel": "Mesaj",
+      "placeholder": {
+        "post": "Mersi că ați participat! Uite linkul către înregistrare…",
+        "pre": "Întârzii 10 minute — scuze! Ne vedem imediat."
+      },
+      "quickTemplates": "Șabloane rapide",
+      "recipientsNotified": "{count, plural, one {# destinatar notificat.} few {# destinatari notificați.} other {# de destinatari notificați.}}",
+      "template": {
+        "homework": {
+          "body": "Uite ce să exersați până la următoarea sesiune — trei serii din exercițiile de respirație pe care le-am făcut, zilnic dacă puteți.",
+          "label": "Temă"
+        },
+        "nextReminder": {
+          "body": "Următoarea sesiune e deja programată — nu uitați să vă rezervați locul dacă e o clasă publică.",
+          "label": "Următoarea sesiune"
+        },
+        "runningLate": {
+          "body": "Atenție — întârzii cam 10 minute. Începem imediat ce ajung. Mersi pentru răbdare!",
+          "label": "Întârzii"
+        },
+        "thankYou": {
+          "body": "Mersi că ați venit azi — ați lucrat super. Spuneți-mi cum vă simțiți mâine.",
+          "label": "Mulțumesc"
+        },
+        "venueUpdate": {
+          "body": "Un update rapid despre locul de întâlnire — aceeași oră, dar un loc puțin diferit. Vă trimit noua adresă în curând.",
+          "label": "Schimbare de locație"
+        },
+        "whatToBring": {
+          "body": "Aduceți o saltea, apă și haine în care vă puteți mișca. Abia aștept să ne vedem!",
+          "label": "Ce să aduceți"
+        }
+      },
+      "title": {
+        "post": "Trimite follow-up",
+        "pre": "Scrie participanților"
+      }
+    },
+    "formDialog": {
+      "accessAria": "Cine are acces",
+      "amount": "Sumă",
+      "basics": "De bază",
+      "cancelCutoff": "Termen de anulare (ore)",
+      "capacity": "Capacitate (gol = nelimitat)",
+      "capacitySection": "Capacitate și anulare",
+      "descriptionLabel": "Descriere (opțional)",
+      "descriptionPlaceholder": "Ce ar trebui să știe participanții?",
+      "duration": "Durată (min)",
+      "firstStart": "Prima sesiune",
+      "group": "Grup",
+      "meetingLink": "Link întâlnire",
+      "oneOff": "O singură dată",
+      "pickDateTime": "Alege data și ora",
+      "pickGroup": "Alege un grup",
+      "repeat": "Repetă după un program",
+      "repeatLocked": "(anulează și creează din nou ca s-o schimbi)",
+      "repeatsWeekly": "Se repetă săptămânal",
+      "requireApproval": "Cere aprobare înainte de confirmare",
+      "title": {
+        "create": "Creează sesiunea",
+        "edit": "Editează sesiunea"
+      },
+      "titlePlaceholder": "ex. Vinyasa flow — marți dimineața",
+      "toast": {
+        "conflicts": "{count, plural, one {# sesiune are conflicte} few {# sesiuni au conflicte} other {# de sesiuni au conflicte}} — verifică în calendar.",
+        "created": "Sesiune creată",
+        "duration": {
+          "detail": "Durata trebuie să fie între 5 și 480 de minute.",
+          "summary": "Durată"
+        },
+        "groupRequired": {
+          "detail": "Alege un grup pentru acest tip de acces.",
+          "summary": "Grupul e obligatoriu"
+        },
+        "invalidRecurrence": {
+          "detail": "Intervalul de repetare trebuie să fie cel puțin 1.",
+          "summary": "Recurență invalidă"
+        },
+        "meetingLinkHttps": {
+          "detail": "Folosește un URL https:// pentru siguranță.",
+          "summary": "Link întâlnire"
+        },
+        "meetingLinkInvalid": {
+          "detail": "URL-ul nu pare corect.",
+          "summary": "Link întâlnire"
+        },
+        "meetingLinkRequired": {
+          "detail": "Sesiunile online au nevoie de un URL.",
+          "summary": "Linkul întâlnirii e obligatoriu"
+        },
+        "pickDay": {
+          "detail": "Programele săptămânale au nevoie de cel puțin o zi a săptămânii.",
+          "summary": "Alege cel puțin o zi"
+        },
+        "saveFailed": "Nu am putut salva sesiunea",
+        "saved": "Salvat.",
+        "startInPast": {
+          "detail": "Alege o dată viitoare.",
+          "summary": "Data de început e în trecut"
+        },
+        "startRequired": {
+          "detail": "Alege când începe sesiunea.",
+          "summary": "Data de început e obligatorie"
+        },
+        "titleRequired": {
+          "detail": "Dă un nume sesiunii.",
+          "summary": "Titlul e obligatoriu"
+        },
+        "updated": "Sesiune actualizată",
+        "venueRequired": {
+          "detail": "Alege o locație pentru sesiunile cu prezență fizică.",
+          "summary": "Locația e obligatorie"
+        }
+      },
+      "venue": "Locație",
+      "waitlist": "Activează lista de așteptare când e plin",
+      "when": "Când",
+      "where": "Unde",
+      "whoCanBook": "Cine poate rezerva"
+    },
+    "list": {
+      "cancelledCapped": "100+ anulate (se afișează ultimele 100)",
+      "cancelledCount": "{count, plural, one {# anulată} few {# anulate} other {# de anulate}}",
+      "cancelledSession": "Sesiune anulată",
+      "empty": {
+        "cancelled": {
+          "message": "Sesiunile pe care le anulezi apar aici timp de 90 de zile.",
+          "title": "Nicio sesiune anulată"
+        },
+        "default": {
+          "action": "Creează prima ta sesiune",
+          "message": "Sesiunile te ajută să programezi antrenamente și să-ți arăți disponibilitatea. Oamenii îți pot vedea sesiunile publice pe profil — chiar dacă nu au încă cont pe MotionHive.",
+          "title": "Nicio sesiune încă"
+        },
+        "past": {
+          "action": "Creează o sesiune",
+          "message": "Sesiunile pe care le-ai ținut vor apărea aici după ce se termină.",
+          "title": "Nicio sesiune trecută încă"
+        },
+        "recurring": {
+          "action": "Creează o sesiune recurentă",
+          "message": "Creează o sesiune și bifează „Repetă după un program” ca să construiești o serie.",
+          "title": "Niciun șablon recurent"
+        }
+      },
+      "endOfList": {
+        "cancelled": "Asta e tot — {count, plural, one {# anulată} few {# anulate} other {# de anulate}} în total.",
+        "sessions": "Asta e tot — {count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}} în total.",
+        "total": "Asta e tot — {count} în total."
+      },
+      "filters": {
+        "quick": "Filtre rapide"
+      },
+      "kpi": {
+        "needsAttention": {
+          "clear": "Totul e în regulă",
+          "label": "Necesită atenție",
+          "pending": "Conflicte și cereri în așteptare"
+        },
+        "overview": "Prezentare generală",
+        "recurring": {
+          "label": "Recurente",
+          "sub": "Serii în desfășurare",
+          "value": "{count, plural, one {# activă} few {# active} other {# de active}}"
+        },
+        "thisWeek": {
+          "label": "Săptămâna aceasta",
+          "sub": "Sesiuni programate"
+        },
+        "totalSignups": {
+          "label": "Total înscrieri",
+          "sub": "În sesiunile viitoare"
+        }
+      },
+      "loadError": "Nu am putut încărca sesiunile: {error}",
+      "loadingMore": "Se încarcă mai multe…",
+      "loadingMoreSessions": "Se încarcă mai multe sesiuni…",
+      "rowActions": {
+        "message": "Scrie tuturor celor înscriși",
+        "open": "Deschide sesiunea",
+        "share": "Distribuie linkul public"
+      },
+      "search": {
+        "ariaLabel": "Caută sesiuni",
+        "placeholder": "Caută sesiuni, locații, clienți…"
+      },
+      "subtitle": "Programează antrenamente, gestionează înscrierile și arată-ți disponibilitatea.",
+      "subtitleCompact": "Programează antrenamente și gestionează înscrierile.",
+      "title": "Sesiuni"
+    },
+    "quickCreate": {
+      "ariaLabel": "Creare rapidă de sesiune",
+      "dismiss": "Închide",
+      "eyebrow": "{start} – {end} · {minutes} min",
+      "openFullForm": "Deschide formularul complet",
+      "titlePlaceholder": "Titlul sesiunii"
+    },
+    "templateDetail": {
+      "addLabel": "Adaugă",
+      "bulkActions": "Acțiuni în masă",
+      "cancelCutoff": "Termen de anulare",
+      "cancelSeries": "Anulează seria",
+      "cancelled": {
+        "message": "Toate sesiunile viitoare au fost anulate, iar participanții au fost notificați. Editarea și reprogramarea sunt dezactivate.",
+        "title": "Serie anulată."
+      },
+      "capacity": "Capacitate",
+      "comingSoon": {
+        "label": "În curând:",
+        "text": "mutarea tuturor orelor viitoare și schimbarea locației pentru restul seriei."
+      },
+      "confirm": {
+        "cancelSeries": {
+          "accept": "Da, anulează seria",
+          "header": "Anulezi toată seria?",
+          "message": "Toate sesiunile viitoare vor fi anulate, iar seria se va încheia. Participanții vor fi notificați."
+        },
+        "endAfterWeek": {
+          "accept": "Da, încheie după săptămâna asta",
+          "header": "Închei seria după săptămâna asta?",
+          "message": "{count, plural, one {Anulează # sesiune} few {Anulează # sesiuni} other {Anulează # de sesiuni}} începând cu {date}. Participanții vor fi notificați."
+        },
+        "keepSeries": "Păstrează seria"
+      },
+      "conflict": "conflict",
+      "endAfterWeek": "Încheie seria după săptămâna asta",
+      "endAfterWeekHint": "Anulează toate sesiunile de după următoarea și încheie seria.",
+      "ended": {
+        "message": "Nu se vor mai genera sesiuni noi.",
+        "title": "Serie încheiată."
+      },
+      "everyInterval": "la fiecare {interval}",
+      "firstStart": "prima sesiune",
+      "free": "Gratuit",
+      "frequency": {
+        "DAILY": "Zilnic",
+        "MONTHLY": "Lunar",
+        "WEEKLY": "Săptămânal"
+      },
+      "generateMore": "Generează încă {count}",
+      "moreLabel": "în plus",
+      "noUpcoming": "Nicio sesiune viitoare.",
+      "noUpcomingHint": {
+        "after": "de mai sus ca să generezi mai multe.",
+        "before": "Folosește"
+      },
+      "past": "Trecute",
+      "regenerate": {
+        "introAfter": "— sesiunile trecute rămân neschimbate.",
+        "introBefore": "Adaugă mai multe sesiuni după",
+        "title": "Generează în continuare"
+      },
+      "subtitle": "{minutes} min · {timezone}",
+      "title": "Sesiune recurentă",
+      "toast": {
+        "cancelSeriesFailed": "Nu am putut anula seria",
+        "endFailed": "Nu am putut încheia seria",
+        "extendFailed": "Nu am putut extinde programul",
+        "extended": {
+          "detail": "{count, plural, one {# sesiune nouă adăugată.} few {# sesiuni noi adăugate.} other {# de sesiuni noi adăugate.}}",
+          "detailWithConflicts": "{count, plural, one {# sesiune nouă adăugată.} few {# sesiuni noi adăugate.} other {# de sesiuni noi adăugate.}} ({conflicts} cu conflicte)",
+          "summary": "Program extins"
+        },
+        "loadFailed": "Nu am putut încărca șablonul",
+        "nothingToCancel": {
+          "detail": "Seria nu are încă nicio sesiune.",
+          "summary": "Nimic de anulat"
+        },
+        "nothingToEnd": {
+          "detail": "Nu există sesiuni programate după săptămâna asta.",
+          "summary": "Nimic de încheiat"
+        },
+        "seriesCancelled": "Serie anulată",
+        "seriesEnded": "Seria se încheie după săptămâna asta"
+      },
+      "unlimited": "Nelimitat",
+      "upcoming": "Viitoare"
+    }
+  },
+  "shell": {
+    "profileMenu": {
+      "accountAndProfile": "Cont și profil",
+      "billing": "Facturare și plăți",
+      "logOut": "Deconectează-te",
+      "open": "Deschide meniul de profil pentru {name}",
+      "publicPageHint": "pagina ta publică",
+      "roleCoach": "Antrenor",
+      "roleMember": "Membru",
+      "safety": "Siguranță și confidențialitate",
+      "shareFeedback": "Trimite feedback",
+      "viewPublicProfile": "Vezi profilul public"
+    },
+    "sidenav": {
+      "homeLink": "Pagina principală MotionHive",
+      "unread": "{count} necitite",
+      "workspace": "Spațiu de lucru"
+    },
+    "toolbar": {
+      "openSearch": "Deschide căutarea",
+      "searchPlaceholder": "Caută antrenori, grupuri, sesiuni…"
+    }
+  }
+}

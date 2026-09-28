@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
@@ -85,10 +86,19 @@ const STATUS_CLASSES: Record<SessionStatusTone, string> = {
 @Component({
   selector: 'mh-my-session-row',
   standalone: true,
-  imports: [DatePipe, ButtonDirective, Card, Tag, Avatar, TypeChip, ProviderChip, CurrencyRonPipe],
+  imports: [
+    DatePipe,
+    ButtonDirective,
+    Card,
+    Tag,
+    Avatar,
+    TypeChip,
+    ProviderChip,
+    CurrencyRonPipe,
+    TranslatePipe,
+  ],
   templateUrl: './my-session-row.html',
   styleUrl: './my-session-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     role: 'button',
     tabindex: '0',
@@ -98,6 +108,8 @@ const STATUS_CLASSES: Record<SessionStatusTone, string> = {
   },
 })
 export class MySessionRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly participant = input.required<SessionParticipant>();
   /** Mobile viewport flag (from the page's `injectIsMobile()`). */
   readonly mobile = input<boolean>(false);
@@ -114,7 +126,11 @@ export class MySessionRow {
 
   protected readonly title = computed(() => {
     const i = this.instance();
-    return i?.titleOverride ?? i?.template?.title ?? '(Session)';
+    return (
+      i?.titleOverride ??
+      i?.template?.title ??
+      this._translateService.instant('mySessions.common.untitled')
+    );
   });
 
   protected readonly start = computed<string | null>(() => this.instance()?.startAt ?? null);
@@ -216,7 +232,10 @@ export class MySessionRow {
     const p = this.participant();
     const base = this.statusLabel();
     if (p.status === SessionParticipantStatus.Waitlisted && p.waitlistPosition != null) {
-      return `${base} · #${p.waitlistPosition}`;
+      return this._translateService.instant('mySessions.row.waitlistPosition', {
+        status: base,
+        position: p.waitlistPosition,
+      });
     }
     return base;
   });
@@ -238,7 +257,9 @@ export class MySessionRow {
   protected readonly cancelPolicy = computed<string | null>(() => {
     const p = this.participant();
     if (!this.canCancel() || !p.snapshotCancelCutoffH) return null;
-    return `Free cancellation until ${p.snapshotCancelCutoffH}h before`;
+    return this._translateService.instant('mySessions.row.cancelPolicy', {
+      hours: p.snapshotCancelCutoffH,
+    });
   });
 
   /** Cancel reason for cancelled/declined rows. Null otherwise. */

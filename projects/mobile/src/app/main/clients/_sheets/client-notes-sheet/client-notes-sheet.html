@@ -5,18 +5,19 @@
     [rows]="5"
     [maxlength]="maxLength"
     [counter]="showCounter()"
-    placeholder="Goals, injuries, what keeps them motivated…"
+    [placeholder]="'clients.notesSheet.placeholder' | translate"
     [value]="draft()"
     (ionInput)="draft.set($event.detail.value ?? '')"
   />
 
-  <p class="mh-helper">Only you can see this. It stays with this client.</p>
+  <p class="mh-helper">{{ 'clients.notesSheet.helper' | translate }}</p>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
   [title]="title()"
-  saveLabel="Save note"
+  [saveLabel]="'clients.notesSheet.save' | translate"
+  [dismissLabel]="'button.cancel' | translate"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

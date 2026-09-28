@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, model, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import {
@@ -33,7 +34,7 @@ import {
  */
 @Component({
   selector: 'mh-cancel-booking-sheet',
-  imports: [IonIcon, SheetShell],
+  imports: [IonIcon, SheetShell, TranslatePipe],
   templateUrl: './cancel-booking-sheet.html',
   styleUrl: './cancel-booking-sheet.scss',
 })
@@ -41,6 +42,7 @@ export class CancelBookingSheet {
   private readonly _sessionService = inject(SessionService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _clockService = inject(ClockService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly participant = input<SessionParticipant | null>(null);
@@ -62,13 +64,17 @@ export class CancelBookingSheet {
   readonly termsTitle = computed(() => {
     const cutoff = this.participant()?.snapshotCancelCutoffH ?? 0;
     return cutoff > 0
-      ? `Your terms — free cancel up to ${cutoff} h before start`
-      : 'Your terms — free cancellation any time';
+      ? this._translateService.instant('mySessions.cancelSheet.terms.cutoff', { hours: cutoff })
+      : this._translateService.instant('mySessions.cancelSheet.terms.anyTime');
   });
 
   readonly agreedLine = computed(() => {
     const bookedAt = this.participant()?.bookedAt;
-    return bookedAt ? `Agreed when you booked on ${formatSessionDayShort(bookedAt)}` : '';
+    return bookedAt
+      ? this._translateService.instant('mySessions.cancelSheet.agreed', {
+          date: formatSessionDayShort(bookedAt),
+        })
+      : '';
   });
 
   readonly isLate = computed(() => {
@@ -87,18 +93,25 @@ export class CancelBookingSheet {
     const startAt = this.participant()?.instance?.startAt;
     if (!startAt) return '';
     const msUntil = new Date(startAt).getTime() - this._clockService.now();
-    if (msUntil <= 0) return 'The session has already started — this is a late cancel';
+    if (msUntil <= 0) {
+      return this._translateService.instant('mySessions.cancelSheet.late.started');
+    }
     const minutes = Math.round(msUntil / 60_000);
-    const when = minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h`;
-    return `It's ${when} before start — this is a late cancel`;
+    return minutes < 60
+      ? this._translateService.instant('mySessions.cancelSheet.late.minutesBefore', {
+          count: minutes,
+        })
+      : this._translateService.instant('mySessions.cancelSheet.late.hoursBefore', {
+          count: Math.floor(minutes / 60),
+        });
   });
 
   readonly lateDetail = computed(() => {
     const participant = this.participant();
     const first = participant ? bookingCoach(participant)?.firstName?.trim() : '';
     return first
-      ? `${first} may still charge for this spot by invoice.`
-      : 'The coach may still charge for this spot by invoice.';
+      ? this._translateService.instant('mySessions.cancelSheet.late.detail', { name: first })
+      : this._translateService.instant('mySessions.cancelSheet.late.detailNoCoach');
   });
 
   confirm(): void {
@@ -116,15 +129,20 @@ export class CancelBookingSheet {
           // The server's verdict, not our clock, decides what we promise.
           const toast =
             this.variant().successToast ??
-            (result.cancellation === 'WITHIN_WINDOW'
-              ? 'Booking cancelled — no charge.'
-              : 'Cancelled — outside the window, charges may still apply.');
+            this._translateService.instant(
+              result.cancellation === 'WITHIN_WINDOW'
+                ? 'mySessions.toast.cancelledWithin'
+                : 'mySessions.toast.cancelledOutside',
+            );
           void this._feedbackService.success(toast);
           this.cancelled.emit(result);
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, "Couldn't cancel this booking.");
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('mySessions.toast.cancelFailed'),
+          );
         },
       });
   }

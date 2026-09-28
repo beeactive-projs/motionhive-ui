@@ -29,7 +29,7 @@
   [(open)]="open"
   [title]="title()"
   [body]="sheetBody"
-  [saveLabel]="confirmLabel()"
+  [saveLabel]="confirmLabel() || ('button.confirm' | translate)"
   [dismissLabel]="cancelLabel()"
   [saveColor]="tone()"
   [canSave]="!blockedReason()"

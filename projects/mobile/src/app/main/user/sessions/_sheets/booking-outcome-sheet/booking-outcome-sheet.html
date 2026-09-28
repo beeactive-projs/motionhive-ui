@@ -10,7 +10,7 @@
     <h2>{{ heading() }}</h2>
     <p class="copy">{{ copy() }}</p>
     @if (isWaitlisted()) {
-      <ion-note class="footnote">Spots go in the order people joined the list.</ion-note>
+      <ion-note class="footnote">{{ 'mySessions.outcome.waitlisted.footnote' | translate }}</ion-note>
     }
   </div>
 
@@ -27,20 +27,20 @@
         <p>{{ summaryLine() }}</p>
       </div>
       @if (isPending()) {
-        <ion-badge>Pending</ion-badge>
+        <ion-badge>{{ 'mySessions.outcome.pending.badge' | translate }}</ion-badge>
       }
     </div>
   }
 
   <div class="actions">
     @if (isConfirmed()) {
-      <ion-button expand="block" (click)="dismiss()">Done</ion-button>
+      <ion-button expand="block" (click)="dismiss()">{{ 'button.done' | translate }}</ion-button>
       <ion-button expand="block" fill="outline" color="medium" (click)="addToCalendar()">
         <ion-icon slot="start" name="calendar-outline" />
-        Add to calendar
+        {{ 'button.addToCalendar' | translate }}
       </ion-button>
     } @else {
-      <ion-button expand="block" (click)="dismiss()">Got it</ion-button>
+      <ion-button expand="block" (click)="dismiss()">{{ 'mySessions.outcome.gotIt' | translate }}</ion-button>
     }
   </div>
 </ng-template>

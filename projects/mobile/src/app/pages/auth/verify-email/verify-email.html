@@ -3,37 +3,34 @@
     @switch (state()) {
       @case (VerifyStates.Verifying) {
         <ion-spinner name="crescent" />
-        <p>Verifying your email…</p>
+        <p>{{ 'auth.verifyEmail.verifying' | translate }}</p>
       }
       @case (VerifyStates.Success) {
         <ion-icon name="checkmark-circle-outline" color="success" size="large" aria-hidden="true" />
-        <h1>Email verified</h1>
+        <h1>{{ 'auth.verifyEmail.successTitle' | translate }}</h1>
         <ion-text role="status">
           <p>{{ successMessage() }}</p>
         </ion-text>
         <ion-button expand="block" class="ion-margin-top" (click)="goToLogin()">
-          Continue to sign in
+          {{ 'auth.verifyEmail.continue' | translate }}
         </ion-button>
       }
       @case (VerifyStates.Invalid) {
         <ion-icon name="alert-circle-outline" color="danger" size="large" aria-hidden="true" />
-        <h1>Verification failed</h1>
+        <h1>{{ 'auth.verifyEmail.failedTitle' | translate }}</h1>
         <ion-text color="danger" role="alert">
           <p>{{ errorMessage() }}</p>
         </ion-text>
         <ion-button expand="block" class="ion-margin-top" (click)="goToLogin()">
-          Back to sign in
+          {{ 'auth.verifyEmail.backToSignIn' | translate }}
         </ion-button>
       }
       @case (VerifyStates.Missing) {
         <ion-icon name="mail-unread-outline" color="medium" size="large" aria-hidden="true" />
-        <h1>Link incomplete</h1>
-        <p>
-          This verification link is incomplete. Open the link from your email again, or sign in to
-          request a new one.
-        </p>
+        <h1>{{ 'auth.verifyEmail.missingTitle' | translate }}</h1>
+        <p>{{ 'auth.verifyEmail.missingMessage' | translate }}</p>
         <ion-button expand="block" class="ion-margin-top" (click)="goToLogin()">
-          Back to sign in
+          {{ 'auth.verifyEmail.backToSignIn' | translate }}
         </ion-button>
       }
     }

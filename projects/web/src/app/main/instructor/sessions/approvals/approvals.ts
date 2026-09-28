@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -8,11 +7,13 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import {
   DateWindowsMs,
   SessionInstance,
+  SessionInstanceStatus,
   SessionService,
 } from 'core';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
@@ -36,14 +37,12 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
  */
 @Component({
   selector: 'mh-instructor-approvals',
-  standalone: true,
-  imports: [CommonModule, RouterLink, ButtonDirective, TagModule, ListEmptyState],
+  imports: [CommonModule, RouterLink, ButtonDirective, TagModule, ListEmptyState, TranslatePipe],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InstructorApprovals implements OnInit {
-  private readonly _svc = inject(SessionService);
+  private readonly _sessionService = inject(SessionService);
   private readonly _router = inject(Router);
   private readonly _location = inject(Location);
 
@@ -77,11 +76,11 @@ export class InstructorApprovals implements OnInit {
     this.loading.set(true);
     const now = new Date();
     const horizon = new Date(now.getTime() + DateWindowsMs.ApprovalsHorizon);
-    this._svc
+    this._sessionService
       .listInstances({
         dateFrom: now.toISOString(),
         dateTo: horizon.toISOString(),
-        status: 'SCHEDULED',
+        status: SessionInstanceStatus.Scheduled,
         limit: 100,
       })
       .subscribe({

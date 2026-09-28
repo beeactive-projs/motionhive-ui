@@ -1,6 +1,6 @@
 <p-tag [value]="label()" [icon]="icon()" rounded [class]="'text-xs! ' + colorClass()"
   [attr.aria-label]="ariaLabel()">
   @if (approvalRequired()) {
-  <i class="pi pi-shield ml-1" title="Approval required" aria-hidden="true"></i>
+  <i class="pi pi-shield ml-1" [title]="'components.accessChip.approvalRequired' | translate" aria-hidden="true"></i>
   }
 </p-tag>

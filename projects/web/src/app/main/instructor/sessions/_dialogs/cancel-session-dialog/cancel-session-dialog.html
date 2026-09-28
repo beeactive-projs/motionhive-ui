@@ -5,7 +5,7 @@
 
 @if (!isMobile()) {
   <p-dialog
-    header="Cancel session"
+    [header]="'sessions.cancelDialog.title' | translate"
     [(visible)]="visible"
     [modal]="true"
     [style]="{ width: '30rem' }"
@@ -22,9 +22,12 @@
     [open]="visible()"
     (openChange)="visible.set($event)"
     size="large"
-    title="Cancel session"
+    [title]="'sessions.cancelDialog.title' | translate"
     [subtitle]="instance()
-      ? ((template()?.title ?? 'Session') + ' · ' + (instance()!.startAt | date: 'EEE d MMM'))
+      ? ('sessions.cancelDialog.subtitle' | translate: {
+          title: template()?.title ?? ('common.session' | translate),
+          date: (instance()!.startAt | date: 'EEE d MMM')
+        })
       : ''"
   >
     <ng-container *ngTemplateOutlet="cancelBody" />
@@ -42,7 +45,7 @@
            series. Choose what to cancel." -->
       <div class="mh-cancel__warn">
         <i class="pi pi-info-circle"></i>
-        <span>This is part of a recurring series. Choose what to cancel.</span>
+        <span>{{ 'sessions.cancelDialog.recurringWarning' | translate }}</span>
       </div>
     }
 
@@ -51,16 +54,17 @@
       <i class="pi pi-exclamation-triangle"></i>
       <div>
         @if (affectedCount() > 0) {
-          <strong>{{ affectedCount() }}</strong> participant(s) will be notified.
+          <strong>{{ affectedCount() }}</strong>
+          {{ 'sessions.cancelDialog.participantsNotified' | translate: { count: affectedCount() } }}
         } @else {
-          No participants are currently booked.
+          {{ 'sessions.cancelDialog.noParticipants' | translate }}
         }
       </div>
     </div>
 
     <!-- Scope as radio cards -->
     <fieldset class="mh-cancel__scope" [class.is-single]="scopeOptions().length === 1">
-      <legend>What should be cancelled?</legend>
+      <legend>{{ 'sessions.cancelDialog.scopeLegend' | translate }}</legend>
       @for (opt of scopeOptions(); track opt.value) {
         <label
           class="mh-cancel__opt"
@@ -76,7 +80,7 @@
           <span class="mh-cancel__radio" aria-hidden="true"></span>
           <div class="mh-cancel__opt-text">
             <span class="mh-cancel__opt-label">{{ opt.label }}</span>
-            <span class="mh-cancel__opt-help">{{ opt.help }}</span>
+            <span class="mh-cancel__opt-help">{{ opt.help | translate }}</span>
           </div>
         </label>
       }
@@ -84,7 +88,7 @@
 
     <!-- Reason (internal) + message (to attendees) -->
     <div class="mh-cancel__field">
-      <label for="cdReason">Reason (internal, optional)</label>
+      <label for="cdReason">{{ 'sessions.cancelDialog.reasonLabel' | translate }}</label>
       <input
         id="cdReason"
         type="text"
@@ -92,12 +96,12 @@
         fluid
         [ngModel]="reason()"
         (ngModelChange)="reason.set($event)"
-        placeholder="e.g. illness, venue closure"
+        [placeholder]="'sessions.cancelDialog.reasonPlaceholder' | translate"
       />
     </div>
 
     <div class="mh-cancel__field">
-      <label for="cdMessage">Message to attendees (optional)</label>
+      <label for="cdMessage">{{ 'sessions.cancelDialog.messageLabel' | translate }}</label>
       <textarea
         id="cdMessage"
         pTextarea
@@ -105,7 +109,7 @@
         fluid
         [ngModel]="message()"
         (ngModelChange)="message.set($event)"
-        placeholder="Sorry — I'm feeling unwell. I'll reschedule next week."
+        [placeholder]="'sessions.cancelDialog.messagePlaceholder' | translate"
       ></textarea>
     </div>
   </div>
@@ -113,9 +117,9 @@
 
 <!-- ─── Foot (shared) ──────────────────────────────────────────── -->
 <ng-template #cancelFoot>
-  <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Keep</button>
+  <button pButton type="button" severity="secondary" [text]="true" (click)="close()">{{ 'button.keep' | translate }}</button>
   <button pButton type="button" severity="danger" (click)="submit()" class="mh-cancel__primary" [disabled]="busy()">
     <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-    Cancel session
+    {{ 'sessions.cancelDialog.title' | translate }}
   </button>
 </ng-template>

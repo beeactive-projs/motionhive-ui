@@ -1,0 +1,410 @@
+{
+  "a11y": {
+    "back": "Back",
+    "bottomSheet": "Bottom sheet",
+    "close": "Close",
+    "closePhoto": "Close photo",
+    "closeSearch": "Close search",
+    "dismissNotification": "Dismiss notification",
+    "hidePassword": "Hide password",
+    "loading": "Loading",
+    "nextMonth": "Next month",
+    "notificationsUnread": "Notifications, {count} unread",
+    "openMenu": "Open menu",
+    "openNotifications": "Open notifications",
+    "playVideo": "Play video",
+    "previousMonth": "Previous month",
+    "showPassword": "Show password",
+    "unread": "Unread"
+  },
+  "button": {
+    "accept": "Accept",
+    "add": "Add",
+    "addToCalendar": "Add to calendar",
+    "apply": "Apply",
+    "approve": "Approve",
+    "archive": "Archive",
+    "back": "Back",
+    "cancel": "Cancel",
+    "change": "Change",
+    "clear": "Clear",
+    "clearFilter": "Clear filter",
+    "clearFilters": "Clear filters",
+    "close": "Close",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "copyLink": "Copy link",
+    "create": "Create",
+    "decline": "Decline",
+    "delete": "Delete",
+    "discard": "Discard",
+    "done": "Done",
+    "duplicate": "Duplicate",
+    "edit": "Edit",
+    "invite": "Invite",
+    "join": "Join",
+    "keep": "Keep",
+    "leave": "Leave",
+    "loadMore": "Load more",
+    "next": "Next",
+    "no": "No",
+    "ok": "OK",
+    "open": "Open",
+    "previous": "Previous",
+    "remove": "Remove",
+    "resend": "Resend",
+    "reset": "Reset",
+    "restore": "Restore",
+    "retry": "Retry",
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "search": "Search",
+    "seeAll": "See all",
+    "select": "Select",
+    "send": "Send",
+    "share": "Share",
+    "showLess": "Show less",
+    "showMore": "Show more",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signUp": "Sign up",
+    "skip": "Skip",
+    "submit": "Submit",
+    "tryAgain": "Try again",
+    "unarchive": "Unarchive",
+    "update": "Update",
+    "upload": "Upload",
+    "view": "View",
+    "yes": "Yes"
+  },
+  "common": {
+    "actions": "Actions",
+    "all": "All",
+    "and": "and",
+    "filters": "Filters",
+    "filtersCount": "Filters · {count}",
+    "loading": "Loading…",
+    "none": "None",
+    "or": "or",
+    "pleaseTryAgain": "Please try again.",
+    "session": "Session",
+    "thisClient": "This client",
+    "unknown": "Unknown",
+    "you": "You"
+  },
+  "confirm": {
+    "discardChanges": {
+      "header": "Discard changes?",
+      "message": "You have unsaved changes. If you leave now, they will be lost."
+    }
+  },
+  "count": {
+    "clients": "{count, plural, one {# client} other {# clients}}",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "exercises": "{count, plural, one {# exercise} other {# exercises}}",
+    "groups": "{count, plural, one {# group} other {# groups}}",
+    "hours": "{count, plural, one {# hour} other {# hours}}",
+    "members": "{count, plural, one {# member} other {# members}}",
+    "minutes": "{count, plural, one {# minute} other {# minutes}}",
+    "programs": "{count, plural, one {# program} other {# programs}}",
+    "sessions": "{count, plural, one {# session} other {# sessions}}",
+    "sets": "{count, plural, one {# set} other {# sets}}",
+    "weeks": "{count, plural, one {# week} other {# weeks}}",
+    "workouts": "{count, plural, one {# workout} other {# workouts}}"
+  },
+  "empty": {
+    "noMatches": "Nothing matches your filters",
+    "noResults": "No results",
+    "nothingMatches": "Nothing matches",
+    "nothingYet": "Nothing here yet"
+  },
+  "enum": {
+    "cancelScope": {
+      "series": "The whole series",
+      "this": "Only this session",
+      "thisAndFuture": "This and all future"
+    },
+    "clientStatus": {
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived",
+      "PENDING": "Pending"
+    },
+    "exerciseLevel": {
+      "ADVANCED": "Advanced",
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate"
+    },
+    "fitnessLevel": {
+      "ADVANCED": "Advanced",
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate"
+    },
+    "followUpAudience": {
+      "all": "Everyone",
+      "attended": "Attended only",
+      "noshow": "No-shows only",
+      "userIds": "Selected people"
+    },
+    "gender": {
+      "FEMALE": "Female",
+      "MALE": "Male",
+      "OTHER": "Other",
+      "PREFER_NOT_TO_SAY": "Prefer not to say"
+    },
+    "myTab": {
+      "cancelled": "Cancelled",
+      "past": "Past",
+      "pendingApproval": "Pending",
+      "upcoming": "Upcoming",
+      "waitlisted": "Waitlisted"
+    },
+    "pendingClient": {
+      "EMAIL_SENT": "Email sent",
+      "INVITED": "Invited",
+      "REQUEST": "Request"
+    },
+    "profilePrivacy": {
+      "COACHES_ONLY": "Coaches only",
+      "ONLY_ME": "Only me",
+      "PUBLIC": "Public"
+    },
+    "programAssignmentStatus": {
+      "ACTIVE": "Active",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed",
+      "PAUSED": "Paused",
+      "PENDING": "Pending"
+    },
+    "sessionAccess": {
+      "CLIENTS_ONLY": "Clients only",
+      "FREE": "Free",
+      "GROUP_ONLY": "Group members",
+      "OPEN": "Paid"
+    },
+    "sessionAccessHint": {
+      "CLIENTS_ONLY": "Only your active clients can book.",
+      "FREE": "Listed publicly with no price tag.",
+      "GROUP_ONLY": "Only members of a specific group.",
+      "OPEN": "Anyone with the link can book."
+    },
+    "sessionInstanceStatus": {
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed",
+      "IN_PROGRESS": "In progress",
+      "SCHEDULED": "Scheduled"
+    },
+    "sessionLocationKind": {
+      "IN_PERSON": "In-person",
+      "ONLINE": "Online"
+    },
+    "sessionParticipantStatus": {
+      "CANCELLED": "Cancelled",
+      "CONFIRMED": "Confirmed",
+      "DECLINED": "Declined",
+      "PENDING_APPROVAL": "Pending",
+      "WAITLISTED": "Waitlisted"
+    },
+    "sessionReminderKind": {
+      "REMINDER_1H": "1 hour before",
+      "REMINDER_24H": "24 hours before"
+    },
+    "sessionTemplateStatus": {
+      "ACTIVE": "Active",
+      "CANCELLED": "Cancelled",
+      "ENDED": "Ended"
+    },
+    "sessionType": {
+      "GROUP": "Group",
+      "OPEN": "Open",
+      "PRIVATE": "1-on-1"
+    },
+    "templateTab": {
+      "active": "Upcoming",
+      "cancelled": "Cancelled",
+      "ended": "Past",
+      "recurring": "Recurring templates"
+    }
+  },
+  "error": {
+    "checkConnection": "Check your connection and try again.",
+    "dialog": {
+      "accessDenied": "Access denied",
+      "conflict": "Cannot do that right now",
+      "generic": "Something went wrong",
+      "noConnection": "No connection",
+      "notFound": "Not found"
+    },
+    "generic": "Something went wrong. Please try again.",
+    "http": {
+      "conflict": "This clashes with something that already exists.",
+      "forbidden": "You do not have permission to do that.",
+      "notFound": "What you asked for could not be found.",
+      "offline": "You seem to be offline. Check your connection and try again.",
+      "server": "Something went wrong on our side. Please try again.",
+      "timeout": "The server took too long to respond. Please try again.",
+      "tooManyRequests": "Too many requests at once — give it a moment and try again.",
+      "tooManyRequestsSummary": "Slow down a moment",
+      "unavailable": "The service is temporarily unavailable. Please try again in a moment.",
+      "unexpected": "An unexpected error occurred. Please try again."
+    }
+  },
+  "form": {
+    "hint": {
+      "passwordMinLength": "Min. 8 characters",
+      "reenterPassword": "Re-enter your password"
+    },
+    "label": {
+      "city": "City",
+      "confirmPassword": "Confirm password",
+      "country": "Country",
+      "currency": "Currency",
+      "date": "Date",
+      "description": "Description",
+      "duration": "Duration",
+      "email": "Email",
+      "endDate": "End date",
+      "firstName": "First name",
+      "fullName": "Full name",
+      "language": "Language",
+      "lastName": "Last name",
+      "location": "Location",
+      "name": "Name",
+      "newPassword": "New password",
+      "notes": "Notes",
+      "password": "Password",
+      "phone": "Phone",
+      "price": "Price",
+      "startDate": "Start date",
+      "status": "Status",
+      "time": "Time",
+      "timezone": "Timezone",
+      "title": "Title",
+      "type": "Type"
+    },
+    "placeholder": {
+      "email": "you@example.com",
+      "notProvided": "Not provided",
+      "notSet": "Not set",
+      "optional": "Optional",
+      "pickDate": "Pick a date",
+      "search": "Search",
+      "select": "Select"
+    }
+  },
+  "language": {
+    "en": "English",
+    "ro": "Română"
+  },
+  "nav": {
+    "account": "Account",
+    "admin": "Admin",
+    "billing": "Billing",
+    "clients": "Clients",
+    "coach": "Coach",
+    "coaching": "Coaching",
+    "community": "Community",
+    "content": "Content",
+    "dashboard": "Dashboard",
+    "discover": "Discover",
+    "exercises": "Exercises",
+    "groups": "Groups",
+    "home": "Home",
+    "manageSessions": "Manage sessions",
+    "menu": "Menu",
+    "messages": "Messages",
+    "myTraining": "My training",
+    "notifications": "Notifications",
+    "payments": "Payments",
+    "plans": "Plans",
+    "posts": "Posts",
+    "profile": "Profile",
+    "programs": "Programs",
+    "requests": "Requests",
+    "sessions": "Sessions",
+    "settings": "Settings",
+    "train": "Train",
+    "users": "Users",
+    "workouts": "Workouts"
+  },
+  "primeng": {
+    "accept": "Yes",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "choose": "Choose",
+    "clear": "Clear",
+    "emptyFilterMessage": "No results found",
+    "emptyMessage": "No available options",
+    "emptySearchMessage": "No results found",
+    "medium": "Medium",
+    "passwordPrompt": "Enter a password",
+    "reject": "No",
+    "strong": "Strong",
+    "today": "Today",
+    "upload": "Upload",
+    "weak": "Weak",
+    "weekHeader": "Wk"
+  },
+  "time": {
+    "ago": {
+      "days": "{count}d ago",
+      "hours": "{count}h ago",
+      "justNow": "just now",
+      "minutes": "{count}m ago",
+      "seconds": "{count}s ago",
+      "weeks": "{count}w ago"
+    },
+    "agoHours": "{hours}h",
+    "agoMinutes": "{minutes}m",
+    "bucket": {
+      "earlierThisWeek": "Earlier this week",
+      "thisWeek": "This week"
+    },
+    "durationMinutes": "{minutes}min",
+    "inHours": "in {hours} h",
+    "inMinutes": "in {minutes} min",
+    "minutesShort": "{minutes} min",
+    "now": "now",
+    "startingNow": "starting now",
+    "today": "Today",
+    "todayWithDate": "Today · {date}",
+    "tomorrow": "Tomorrow",
+    "tomorrowWithDate": "Tomorrow · {date}",
+    "totalHours": "{hours}h",
+    "totalHoursMinutes": "{hours}h {minutes}m",
+    "totalMinutes": "{minutes}m",
+    "yesterday": "Yesterday",
+    "yesterdayShort": "yesterday"
+  },
+  "toast": {
+    "detail": {
+      "linkCopied": "Link copied",
+      "noChanges": "No changes",
+      "saved": "Your changes have been saved.",
+      "somethingWentWrong": "Something went wrong"
+    },
+    "summary": {
+      "copied": "Copied",
+      "error": "Error",
+      "info": "Info",
+      "saved": "Saved",
+      "success": "Success",
+      "warning": "Warning"
+    }
+  },
+  "validation": {
+    "email": "Please enter a valid email address.",
+    "emailTooLong": "An email address cannot be longer than {max} characters.",
+    "emailWithExample": "Enter a valid email address, like client@example.com.",
+    "invalid": "Invalid value.",
+    "max": "Must be at most {max}.",
+    "maxLength": "Must be {max} characters or fewer.",
+    "min": "Must be at least {min}.",
+    "minLength": "Must be at least {min} characters.",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordStrength": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
+    "pattern": "Invalid format.",
+    "phone": "Please enter a valid phone number.",
+    "required": "This field is required.",
+    "url": "Enter a valid URL (e.g. https://example.com)."
+  }
+}

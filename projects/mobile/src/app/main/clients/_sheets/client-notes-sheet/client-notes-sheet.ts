@@ -1,4 +1,5 @@
-import { Component, computed, effect, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonTextarea } from '@ionic/angular/standalone';
 
 import { InstructorClient, clientDisplayName } from 'core';
@@ -21,11 +22,13 @@ import { NOTES_COUNTER_FROM, NOTES_MAX_LENGTH } from '../../clients.config';
  */
 @Component({
   selector: 'mh-client-notes-sheet',
-  imports: [IonTextarea, SheetShell],
+  imports: [IonTextarea, SheetShell, TranslatePipe],
   templateUrl: './client-notes-sheet.html',
   styleUrl: './client-notes-sheet.scss',
 })
 export class ClientNotesSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly client = input<InstructorClient | null>(null);
   readonly saving = input(false);
@@ -46,7 +49,11 @@ export class ClientNotesSheet {
 
   readonly title = computed(() => {
     const client = this.client();
-    return client ? `Notes · ${clientDisplayName(client)}` : 'Notes';
+    return client
+      ? this._translateService.instant('clients.notesSheet.titleWithName', {
+          name: clientDisplayName(client),
+        })
+      : this._translateService.instant('clients.notesSheet.title');
   });
 
   /** What would actually be sent — compared against what is already stored. */

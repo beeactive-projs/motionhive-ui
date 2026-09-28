@@ -1,24 +1,20 @@
 import { Component, DestroyRef, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   SessionInstance,
+  SessionLocationKind,
   formatSessionDuration,
   formatSessionTime,
   sessionLifecycle,
+  sessionTypeLabel,
 } from 'core';
 
 import { instanceMeta, instanceTone } from '../../sessions.config';
 
 /** Hold this long for the quick-actions sheet. */
 const LONG_PRESS_MS = 500;
-
-/** Chip copy per session type. The BE enum is terser than the UI wants. */
-const TYPE_LABELS: Record<string, string> = {
-  GROUP: 'Group',
-  PRIVATE: '1-on-1',
-  OPEN: 'Open',
-};
 
 /**
  * One agenda row: time and duration on the left, title and a status line on the
@@ -29,7 +25,7 @@ const TYPE_LABELS: Record<string, string> = {
  */
 @Component({
   selector: 'mh-session-row',
-  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './session-row.html',
   styleUrl: './session-row.scss',
   host: {
@@ -43,6 +39,8 @@ const TYPE_LABELS: Record<string, string> = {
   },
 })
 export class SessionRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly instance = input.required<SessionInstance>();
 
   readonly select = output<void>();
@@ -51,7 +49,10 @@ export class SessionRow {
   private readonly _template = computed(() => this.instance().template ?? null);
 
   readonly title = computed(
-    () => this.instance().titleOverride ?? this._template()?.title ?? 'Session',
+    () =>
+      this.instance().titleOverride ??
+      this._template()?.title ??
+      this._translateService.instant('common.session'),
   );
 
   readonly time = computed(() => formatSessionTime(this.instance().startAt));
@@ -65,15 +66,18 @@ export class SessionRow {
     () => (this.instance().conflictingInstanceIds?.length ?? 0) > 0,
   );
 
-  readonly isOnline = computed(() => this._template()?.locationKind === 'ONLINE');
+  readonly isOnline = computed(
+    () => this._template()?.locationKind === SessionLocationKind.Online,
+  );
 
   /** Drives the spine colour via a `data-tone` attribute. */
   readonly tone = computed(() => instanceTone(this.instance()));
 
+  /** Core's words for the type — the same ones the create sheet's tiles use. */
   readonly typeLabel = computed(() => {
-    if (this.hasConflict()) return 'Conflict';
+    if (this.hasConflict()) return this._translateService.instant('sessions.status.conflict');
     const type = this._template()?.type;
-    return type ? (TYPE_LABELS[type] ?? type) : '';
+    return type ? sessionTypeLabel(type) : '';
   });
 
   /**
