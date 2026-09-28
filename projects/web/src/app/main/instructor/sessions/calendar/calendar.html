@@ -11,19 +11,19 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Sessions calendar</h1>
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ 'sessions.calendar.title' | translate }}</h1>
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          Browse and schedule sessions across day, week, and month.
+          {{ 'sessions.calendar.subtitle' | translate }}
         </p>
       </div>
     </div>
     @if (!isMobile()) {
     <div class="flex gap-2 md:gap-3 shrink-0">
-      <button pButton type="button" (click)="onNewSession()"><i class="pi pi-plus"></i> New session</button>
+      <button pButton type="button" (click)="onNewSession()"><i class="pi pi-plus"></i> {{ 'sessions.common.newSession' | translate }}</button>
     </div>
     }
   </header>
@@ -32,31 +32,31 @@
   <!-- ────────────────────── DESKTOP ────────────────────── -->
   <div class="mh-cal__toolbar">
     <div class="mh-cal__toolbar-group">
-      <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="goToday()">Today</button>
-      <button type="button" class="mh-cal__nav" (click)="goPrev()" aria-label="Previous">
+      <button pButton type="button" severity="secondary" [outlined]="true" size="small" (click)="goToday()">{{ 'time.today' | translate }}</button>
+      <button type="button" class="mh-cal__nav" (click)="goPrev()" [attr.aria-label]="'button.previous' | translate">
         <i class="pi pi-chevron-left"></i>
       </button>
-      <button type="button" class="mh-cal__nav" (click)="goNext()" aria-label="Next">
+      <button type="button" class="mh-cal__nav" (click)="goNext()" [attr.aria-label]="'button.next' | translate">
         <i class="pi pi-chevron-right"></i>
       </button>
       <span class="mh-cal__range">{{ rangeLabel() }}</span>
       <span class="mh-cal__tz">Europe/Bucharest</span>
     </div>
 
-    <div class="mh-cal__view-seg" role="tablist" aria-label="View">
+    <div class="mh-cal__view-seg" role="tablist" [attr.aria-label]="'sessions.calendar.view' | translate">
       <button type="button" class="mh-cal__view-btn" [class.is-active]="view() === 'day'"
-        (click)="setView('day')">Day</button>
+        (click)="setView('day')">{{ 'sessions.calendar.day' | translate }}</button>
       <button type="button" class="mh-cal__view-btn" [class.is-active]="view() === 'week'"
-        (click)="setView('week')">Week</button>
+        (click)="setView('week')">{{ 'sessions.calendar.week' | translate }}</button>
       <button type="button" class="mh-cal__view-btn" [class.is-active]="view() === 'month'"
-        (click)="setView('month')">Month</button>
+        (click)="setView('month')">{{ 'sessions.calendar.month' | translate }}</button>
     </div>
   </div>
 
   @if (store.rangeError()) {
   <p-message severity="error" [closable]="false" class="mh-cal__error">
-    Couldn't load calendar — {{ store.rangeError() }}
-    <button pButton type="button" size="small" [outlined]="true" (click)="store.loadRange(range())">Retry</button>
+    {{ 'sessions.calendar.loadError' | translate: { error: store.rangeError() } }}
+    <button pButton type="button" size="small" [outlined]="true" (click)="store.loadRange(range())">{{ 'button.retry' | translate }}</button>
   </p-message>
   }
 
@@ -67,8 +67,8 @@
       <mh-week-filters-panel [filters]="filters()" (filtersChange)="onFiltersChange($event)" />
       <div class="mh-cal__tip">
         <p>
-          <strong>Tip:</strong> drag on any empty slot to create a session.
-          Hold <kbd>Shift</kbd> for the full form.
+          <strong>{{ 'sessions.calendar.tip.label' | translate }}</strong> {{ 'sessions.calendar.tip.drag' | translate }}
+          {{ 'sessions.calendar.tip.holdBefore' | translate }} <kbd>Shift</kbd> {{ 'sessions.calendar.tip.holdAfter' | translate }}
         </p>
       </div>
     </aside>
@@ -93,17 +93,17 @@
   <!-- ────────────────────── MOBILE (2A / 2B / 2C) ────────────────────── -->
   <!-- Top: 'May 2026 ▾' trigger + Today + Day|Agenda segment -->
   <div class="mh-mob-cal__top">
-    <button type="button" class="mh-mob-cal__month-trigger" (click)="openMonthSheet()" aria-label="Pick month">
+    <button type="button" class="mh-mob-cal__month-trigger" (click)="openMonthSheet()" [attr.aria-label]="'sessions.calendar.pickMonth' | translate">
       <span>{{ monthLabel() }}</span>
       <i class="pi pi-angle-down" aria-hidden="true"></i>
     </button>
     <div class="mh-mob-cal__top-right">
-      <button type="button" class="mh-mob-cal__today" (click)="goToday()">Today</button>
-      <div class="mh-mob-cal__view-seg" role="tablist" aria-label="View">
+      <button type="button" class="mh-mob-cal__today" (click)="goToday()">{{ 'time.today' | translate }}</button>
+      <div class="mh-mob-cal__view-seg" role="tablist" [attr.aria-label]="'sessions.calendar.view' | translate">
         <button type="button" class="mh-mob-cal__view-btn" [class.is-active]="!inAgenda()"
-          (click)="setMobileView('day')">Day</button>
+          (click)="setMobileView('day')">{{ 'sessions.calendar.day' | translate }}</button>
         <button type="button" class="mh-mob-cal__view-btn" [class.is-active]="inAgenda()"
-          (click)="setMobileView('agenda')">Agenda</button>
+          (click)="setMobileView('agenda')">{{ 'sessions.calendar.agenda' | translate }}</button>
       </div>
     </div>
   </div>
@@ -116,7 +116,7 @@
   }
 
   <!-- Filter pills — PrimeNG buttons, same pattern as the clients filter. -->
-  <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Quick filters">
+  <div class="flex flex-wrap items-center gap-2" role="group" [attr.aria-label]="'sessions.list.filters.quick' | translate">
     <button pButton
       type="button"
       size="small"
@@ -126,7 +126,7 @@
       (click)="clearMobileFilters()"
       class="py-0.5 min-w-10"
     >
-      All
+      {{ 'common.all' | translate }}
     </button>
     <button pButton
       type="button"
@@ -138,7 +138,7 @@
       class="py-0.5 min-w-10"
     >
       <i class="pi pi-video"></i>
-      Online
+      {{ SessionLocationKind.Online | enumLabel: 'sessionLocationKind' }}
     </button>
     <button pButton
       type="button"
@@ -150,7 +150,7 @@
       class="py-0.5 min-w-10"
     >
       <i class="pi pi-map-marker"></i>
-      In-person
+      {{ SessionLocationKind.InPerson | enumLabel: 'sessionLocationKind' }}
     </button>
     <button pButton
       type="button"
@@ -162,15 +162,15 @@
       class="py-0.5 min-w-10"
     >
       <i class="pi pi-exclamation-triangle"></i>
-      Conflicts
+      {{ 'sessions.calendar.conflicts' | translate }}
     </button>
   </div>
 
   <!-- Error -->
   @if (store.rangeError()) {
   <p-message severity="error" [closable]="false" class="mh-cal__error">
-    Couldn't load calendar — {{ store.rangeError() }}
-    <button pButton type="button" size="small" [outlined]="true" (click)="store.loadRange(range())">Retry</button>
+    {{ 'sessions.calendar.loadError' | translate: { error: store.rangeError() } }}
+    <button pButton type="button" size="small" [outlined]="true" (click)="store.loadRange(range())">{{ 'button.retry' | translate }}</button>
   </p-message>
   }
 
@@ -193,9 +193,9 @@
   <!-- Empty: no sessions in the visible week. -->
   <div class="mh-mob-cal__empty">
     <i class="pi pi-calendar"></i>
-    <p>No sessions this week.</p>
+    <p>{{ 'sessions.calendar.emptyWeek' | translate }}</p>
     @if (filters().conflictsOnly || !filters().online || !filters().inPerson) {
-    <button pButton type="button" severity="secondary" [outlined]="true" (click)="clearMobileFilters()">Clear filters</button>
+    <button pButton type="button" severity="secondary" [outlined]="true" (click)="clearMobileFilters()">{{ 'button.clearFilters' | translate }}</button>
     }
   </div>
   } @else {
@@ -213,15 +213,15 @@
         <span meta>
           @if (hasConflict(inst)) {
           <span class="mh-mob-cal__chip mh-mob-cal__chip--coral">
-            <i class="pi pi-exclamation-triangle"></i> Conflict
+            <i class="pi pi-exclamation-triangle"></i> {{ 'sessions.common.conflict' | translate }}
           </span>
           } @else if (inst.template?.type === SessionType.Private) {
-          <span class="mh-mob-cal__chip mh-mob-cal__chip--blue">1-on-1</span>
+          <span class="mh-mob-cal__chip mh-mob-cal__chip--blue">{{ SessionType.Private | enumLabel: 'sessionType' }}</span>
           } @else if (inst.template?.locationKind === SessionLocationKind.Online) {
-          <span class="mh-mob-cal__chip mh-mob-cal__chip--teal">Online</span>
+          <span class="mh-mob-cal__chip mh-mob-cal__chip--teal">{{ SessionLocationKind.Online | enumLabel: 'sessionLocationKind' }}</span>
           } @else {
           <span class="mh-mob-cal__chip mh-mob-cal__chip--honey">
-            {{ inst.template?.type | titlecase }}
+            {{ inst.template?.type | enumLabel: 'sessionType' }}
           </span>
           }
           @if ((inst.template?.capacity ?? 0) > 0) {
@@ -229,7 +229,7 @@
             {{ inst.confirmedCount }}/{{ inst.template?.capacity }}
           </span>
           } @else if (inst.confirmedCount > 0) {
-          <span class="mh-mob-cal__meta-text">{{ inst.confirmedCount }} confirmed</span>
+          <span class="mh-mob-cal__meta-text">{{ 'sessions.common.confirmedCount' | translate: { count: inst.confirmedCount } }}</span>
           }
         </span>
       </mh-time-row>
@@ -243,10 +243,10 @@
 
 <!-- Mobile FAB (single primary action) + month-picker sheet (2C). -->
 @if (isMobile()) {
-<mh-mobile-fab icon="pi pi-plus" label="New session" (tap)="onNewSession()" />
+<mh-mobile-fab icon="pi pi-plus" [label]="'sessions.common.newSession' | translate" (tap)="onNewSession()" />
 
 <mh-bottom-sheet [open]="monthSheetOpen()" (openChange)="monthSheetOpen.set($event)" size="medium" [title]="monthLabel()"
-  subtitle="Pick a day to jump to">
+  [subtitle]="'sessions.calendar.monthSheetSubtitle' | translate">
   <mh-mini-month [selectedDate]="anchor()" (selectedDateChange)="onMonthSheetSelect($event)" />
 </mh-bottom-sheet>
 }

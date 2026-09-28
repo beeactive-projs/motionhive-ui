@@ -4,7 +4,7 @@
   [class.mh-conv-row--active]="active()"
   [class.mh-conv-row--unread]="isUnread()"
   (click)="select.emit()"
-  [attr.aria-label]="title() + (isUnread() ? ', ' + conversation().unreadCount + ' unread' : '')"
+  [attr.aria-label]="isUnread() ? ('messages.row.ariaUnread' | translate: { name: title(), count: conversation().unreadCount }) : title()"
 >
   <mh-hex-avatar
     [size]="46"

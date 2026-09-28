@@ -23,7 +23,7 @@
         (click)="choose(item.id)"
       >
         <ion-icon slot="start" [name]="item.icon" [color]="item.color" aria-hidden="true" />
-        <ion-label>{{ item.label }}</ion-label>
+        <ion-label>{{ item.label | translate }}</ion-label>
       </ion-item>
     }
   </ion-list>
@@ -31,7 +31,7 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Client actions"
+  [title]="'clients.actionsSheet.title' | translate"
   [body]="body"
   [showHeader]="false"
   [showFooter]="false"

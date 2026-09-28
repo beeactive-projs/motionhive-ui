@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/user/sessions" />
     </ion-buttons>
-    <ion-title>Cancelled &amp; declined</ion-title>
+    <ion-title>{{ 'mySessions.cancelled.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,9 +15,9 @@
   @if (error() && bookings().length === 0) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load these bookings"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'mySessions.cancelled.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (loading() && bookings().length === 0) {
@@ -29,8 +29,8 @@
   } @else if (bookings().length === 0) {
     <mh-empty-state
       icon="calendar-outline"
-      heading="Nothing here"
-      message="Cancelled and declined bookings show up here."
+      [heading]="'mySessions.cancelled.empty.title' | translate"
+      [message]="'mySessions.cancelled.empty.message' | translate"
     />
   } @else {
     <div class="list">

@@ -26,6 +26,7 @@ import {
   SegmentCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { forkJoin, take } from 'rxjs';
 
@@ -44,7 +45,13 @@ import {
 import { EmptyState } from '../../../_shared/components/empty-state/empty-state';
 import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { InvoiceRow } from '../_components/invoice-row/invoice-row';
-import { INVOICE_FILTERS, PAYMENT_ICONS, isOverdue } from '../payments.config';
+import {
+  INVOICE_FILTERS,
+  PAYMENT_ICONS,
+  PAYMENT_SEGMENTS,
+  PaymentSegment,
+  isOverdue,
+} from '../payments.config';
 
 const PAGE_SIZE = 20;
 
@@ -87,6 +94,7 @@ const PAGE_SIZE = 20;
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './coach-payments.html',
   styleUrl: './coach-payments.scss',
@@ -97,16 +105,14 @@ export class CoachPayments implements ViewWillEnter {
   private readonly _onboardingService = inject(StripeOnboardingService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly filters = INVOICE_FILTERS;
   readonly skeletonRows = [1, 2, 3, 4, 5];
 
-  readonly segments = [
-    { value: 'invoices', label: 'Invoices' },
-    { value: 'memberships', label: 'Memberships' },
-  ] as const;
+  readonly segments = PAYMENT_SEGMENTS;
 
-  readonly segment = signal<'invoices' | 'memberships'>('invoices');
+  readonly segment = signal<PaymentSegment>('invoices');
   readonly status = signal<InvoiceStatus | null>(null);
   readonly invoices = signal<Invoice[]>([]);
   readonly earnings = signal<EarningsSummary | null>(null);
@@ -172,7 +178,7 @@ export class CoachPayments implements ViewWillEnter {
 
   onSegmentChange(event: SegmentCustomEvent): void {
     const value = event.detail.value;
-    if (typeof value === 'string') this.segment.set(value as 'invoices' | 'memberships');
+    if (typeof value === 'string') this.segment.set(value as PaymentSegment);
   }
 
   setStatus(status: InvoiceStatus | null): void {
@@ -204,7 +210,10 @@ export class CoachPayments implements ViewWillEnter {
         },
         error: (error: unknown) => {
           this.connecting.set(false);
-          void this._feedbackService.error(error, 'Could not open Stripe onboarding.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.onboardingFailed'),
+          );
         },
       });
   }

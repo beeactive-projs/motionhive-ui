@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, tap, of, catchError } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -28,13 +28,15 @@ import { SearchTriggerService } from './search-trigger.service';
 
 interface CategoryConfig {
   key: SearchEntityType;
-  label: string;
+  /** Translation key for the tab label. */
+  labelKey: string;
   /** Result-key in `SearchResponse.byCategory` this tab maps to. `null` = show all. */
   bucket: keyof SearchResponse['byCategory'] | null;
 }
 
 interface TrendingPill {
-  label: string;
+  /** Translation key for the pill label. */
+  labelKey: string;
   query: string;
   /** PrimeIcon class. */
   icon: string;
@@ -45,30 +47,29 @@ const MIN_QUERY_LENGTH = 2;
 
 @Component({
   selector: 'mh-search-modal',
-  imports: [ButtonDirective, DialogModule, InputTextModule, ProgressSpinnerModule],
+  imports: [ButtonDirective, DialogModule, InputTextModule, ProgressSpinnerModule, TranslatePipe],
   templateUrl: './search-modal.html',
   styleUrl: './search-modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchModal {
   private readonly _searchService = inject(SearchService);
   private readonly _sessionService = inject(SessionService);
-  private readonly _trigger = inject(SearchTriggerService);
-  private readonly _recents = inject(RecentSearchesStore);
+  private readonly _searchTriggerService = inject(SearchTriggerService);
+  private readonly _recentSearchesStore = inject(RecentSearchesStore);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
 
-  readonly isOpen = this._trigger.isOpen;
-  readonly recents = this._recents.entries;
+  readonly isOpen = this._searchTriggerService.isOpen;
+  readonly recents = this._recentSearchesStore.entries;
 
   // ----- Tabs -----
   protected readonly categories: CategoryConfig[] = [
-    { key: 'all', label: 'All', bucket: null },
-    { key: 'people', label: 'People', bucket: 'users' },
-    { key: 'instructors', label: 'Coaches', bucket: 'instructors' },
-    { key: 'groups', label: 'Groups', bucket: 'groups' },
-    { key: 'sessions', label: 'Sessions', bucket: 'sessions' },
-    { key: 'tags', label: 'Tags', bucket: 'tags' },
+    { key: 'all', labelKey: 'common.all', bucket: null },
+    { key: 'people', labelKey: 'components.searchModal.category.people', bucket: 'users' },
+    { key: 'instructors', labelKey: 'components.searchModal.category.coaches', bucket: 'instructors' },
+    { key: 'groups', labelKey: 'components.searchModal.category.groups', bucket: 'groups' },
+    { key: 'sessions', labelKey: 'components.searchModal.category.sessions', bucket: 'sessions' },
+    { key: 'tags', labelKey: 'components.searchModal.category.tags', bucket: 'tags' },
   ];
   protected readonly activeCategory = signal<SearchEntityType>('all');
 
@@ -81,10 +82,10 @@ export class SearchModal {
    *  trending arrives with the jobs module (v2). Keep these short and
    *  topical to the platform. */
   protected readonly trending: TrendingPill[] = [
-    { label: 'Yoga', query: 'yoga', icon: 'pi pi-bolt' },
-    { label: 'Running', query: 'running', icon: 'pi pi-bolt' },
-    { label: 'Strength', query: 'strength', icon: 'pi pi-bolt' },
-    { label: 'Pilates', query: 'pilates', icon: 'pi pi-bolt' },
+    { labelKey: 'components.searchModal.trendingTopic.yoga', query: 'yoga', icon: 'pi pi-bolt' },
+    { labelKey: 'components.searchModal.trendingTopic.running', query: 'running', icon: 'pi pi-bolt' },
+    { labelKey: 'components.searchModal.trendingTopic.strength', query: 'strength', icon: 'pi pi-bolt' },
+    { labelKey: 'components.searchModal.trendingTopic.pilates', query: 'pilates', icon: 'pi pi-bolt' },
   ];
 
   // ----- Derived for the template -----
@@ -218,7 +219,7 @@ export class SearchModal {
     // Save what they searched, not what they clicked — recents are query
     // memory, not click history. Click history is a different feature.
     if (this.query().trim().length >= MIN_QUERY_LENGTH) {
-      this._recents.push(this.query().trim());
+      this._recentSearchesStore.push(this.query().trim());
     }
     this._navigateToResult(item);
     this.close();
@@ -237,12 +238,12 @@ export class SearchModal {
   }
 
   protected onClearRecents(): void {
-    this._recents.clear();
+    this._recentSearchesStore.clear();
   }
 
   protected onRemoveRecent(query: string, event: Event): void {
     event.stopPropagation();
-    this._recents.remove(query);
+    this._recentSearchesStore.remove(query);
   }
 
   protected onSeeAll(category: CategoryConfig): void {
@@ -251,7 +252,7 @@ export class SearchModal {
   }
 
   close(): void {
-    this._trigger.close();
+    this._searchTriggerService.close();
     // Reset tab back to All for the next session, but preserve the
     // query — bringing the modal back up after closing it is usually
     // intentional, not a fresh thought.
@@ -318,18 +319,19 @@ export class SearchModal {
 
   // --- Template helpers ------------------------------------------------------
 
-  protected categoryLabel(type: keyof SearchResponse['byCategory']): string {
+  /** Translation key for a result bucket's section heading. */
+  protected categoryLabelKey(type: keyof SearchResponse['byCategory']): string {
     switch (type) {
       case 'instructors':
-        return 'Coaches';
+        return 'components.searchModal.category.coaches';
       case 'groups':
-        return 'Groups';
+        return 'components.searchModal.category.groups';
       case 'sessions':
-        return 'Sessions';
+        return 'components.searchModal.category.sessions';
       case 'tags':
-        return 'Tags';
+        return 'components.searchModal.category.tags';
       case 'users':
-        return 'People';
+        return 'components.searchModal.category.people';
     }
   }
 

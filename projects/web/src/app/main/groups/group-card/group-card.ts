@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output, viewChild } from '@angular/core';
+import { Component, inject, input, output, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Card } from 'primeng/card';
 import { Avatar } from 'primeng/avatar';
 import { AvatarGroup } from 'primeng/avatargroup';
@@ -8,17 +9,18 @@ import { ButtonDirective } from 'primeng/button';
 import { Menu } from 'primeng/menu';
 import { Tooltip } from 'primeng/tooltip';
 import { MenuItem } from 'primeng/api';
-import { Group, Hex, JoinPolicies, joinPolicyLabel, joinPolicySeverity, TagSeverity } from 'core';
+import { Group, Hex, JoinPolicies, joinPolicySeverity, TagSeverity } from 'core';
 import { paletteFor, monogramFromName } from '../_utils/group-palette.util';
 
 @Component({
   selector: 'mh-group-card',
-  imports: [RouterLink, Card, Avatar, AvatarGroup, Tag, ButtonDirective, Menu, Tooltip, Hex],
+  imports: [RouterLink, Card, Avatar, AvatarGroup, Tag, ButtonDirective, Menu, Tooltip, Hex, TranslatePipe],
   templateUrl: './group-card.html',
   styleUrl: './group-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupCard {
+  private readonly _translateService = inject(TranslateService);
+
   readonly group = input.required<Group>();
   readonly mode = input<'manage' | 'discover'>('manage');
   readonly isBusy = input<boolean>(false);
@@ -35,17 +37,17 @@ export class GroupCard {
 
   readonly menuItems: MenuItem[] = [
     {
-      label: 'Invite members',
+      label: this._translateService.instant('groups.card.menu.invite'),
       icon: 'pi pi-user-plus',
       command: () => this.action.emit({ kind: 'invite', group: this.group() }),
     },
     {
-      label: 'Edit group',
+      label: this._translateService.instant('groups.common.editGroup'),
       icon: 'pi pi-pencil',
       command: () => this.action.emit({ kind: 'edit', group: this.group() }),
     },
     {
-      label: 'Copy invite link',
+      label: this._translateService.instant('groups.card.menu.copyInviteLink'),
       icon: 'pi pi-link',
       command: () => this.action.emit({ kind: 'share', group: this.group() }),
     },
@@ -56,7 +58,7 @@ export class GroupCard {
     // },
     { separator: true },
     {
-      label: 'Delete group',
+      label: this._translateService.instant('groups.card.menu.delete'),
       icon: 'pi pi-trash',
       styleClass: 'gp-menu-danger',
       command: () => this.action.emit({ kind: 'delete', group: this.group() }),
@@ -83,7 +85,7 @@ export class GroupCard {
   }
 
   get policyLabel(): string {
-    return joinPolicyLabel(this.group().joinPolicy);
+    return this._translateService.instant(`groups.joinPolicy.${this.group().joinPolicy}`);
   }
 
   get policySeverity(): TagSeverity {
@@ -91,14 +93,7 @@ export class GroupCard {
   }
 
   get policyTooltip(): string {
-    switch (this.group().joinPolicy) {
-      case JoinPolicies.Open:
-        return 'Anyone with the link can join';
-      case JoinPolicies.Approval:
-        return 'Members request to join, you approve';
-      case JoinPolicies.InviteOnly:
-        return 'Members can only join with an invite';
-    }
+    return this._translateService.instant(`groups.joinPolicyHint.${this.group().joinPolicy}`);
   }
 
   get locationLabel(): string {

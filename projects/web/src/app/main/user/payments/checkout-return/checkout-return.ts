@@ -1,11 +1,11 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -13,10 +13,9 @@ import { ClientPaymentService, InvoiceStatuses, type Invoice } from 'core';
 
 @Component({
   selector: 'mh-checkout-return',
-  imports: [ButtonDirective, CardModule, ProgressSpinnerModule],
+  imports: [TranslatePipe, ButtonDirective, CardModule, ProgressSpinnerModule],
   templateUrl: './checkout-return.html',
   styleUrl: './checkout-return.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutReturn implements OnInit {
   private readonly _route = inject(ActivatedRoute);

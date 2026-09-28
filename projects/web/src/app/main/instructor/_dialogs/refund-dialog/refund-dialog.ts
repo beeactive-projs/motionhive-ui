@@ -1,15 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  input,
-  model,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, effect, inject, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
@@ -19,20 +11,32 @@ import {
   RefundService,
   CurrencyRonPipe,
   RefundReasons,
+  appLocale,
+  enumLabel,
+  showApiError,
   type Payment,
   type RefundReason,
 } from 'core';
 
 @Component({
   selector: 'mh-refund-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, InputNumber, Select, TextareaModule, CurrencyRonPipe],
+  imports: [
+    FormsModule,
+    TranslatePipe,
+    ButtonDirective,
+    Dialog,
+    InputNumber,
+    Select,
+    TextareaModule,
+    CurrencyRonPipe,
+  ],
   templateUrl: './refund-dialog.html',
   styleUrl: './refund-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RefundDialog {
   private readonly _refundService = inject(RefundService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly payment = input<Payment | null>(null);
@@ -44,11 +48,11 @@ export class RefundDialog {
   formReason: RefundReason | undefined = undefined;
   formNotes = '';
 
-  readonly reasonOptions = [
-    { label: 'Requested by customer', value: RefundReasons.RequestedByCustomer },
-    { label: 'Duplicate', value: RefundReasons.Duplicate },
-    { label: 'Fraudulent', value: RefundReasons.Fraudulent },
-  ];
+  readonly reasonOptions: SelectItem<RefundReason>[] = [
+    RefundReasons.RequestedByCustomer,
+    RefundReasons.Duplicate,
+    RefundReasons.Fraudulent,
+  ].map((value) => ({ label: enumLabel('refundReason', value), value }));
 
   get maxRefundable(): number {
     const p = this.payment();
@@ -81,19 +85,27 @@ export class RefundDialog {
           this.saving.set(false);
           this.visible.set(false);
           this.saved.emit();
+          const amount = this.formAmount.toLocaleString(appLocale(), {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
           this._messageService.add({
             severity: 'success',
-            summary: 'Refund issued',
-            detail: `Refund of ${this.formAmount.toFixed(2)} ${p.currency} has been issued`,
+            summary: this._translateService.instant('paymentDialogs.refund.toast.issued.summary'),
+            detail: this._translateService.instant('paymentDialogs.refund.toast.issued.detail', {
+              amount,
+              currency: p.currency,
+            }),
           });
         },
-        error: (err) => {
+        error: (err: unknown) => {
           this.saving.set(false);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to issue refund',
-          });
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('paymentDialogs.refund.toast.failed'),
+            err,
+          );
         },
       });
   }

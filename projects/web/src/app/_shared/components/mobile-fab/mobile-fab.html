@@ -8,7 +8,7 @@
     [rounded]="true"
     (click)="tap.emit()"
     class="mh-fab__btn w-13! h-13! p-0!"
-    [attr.aria-label]="label() || 'Create'"
+    [attr.aria-label]="label() || ('button.create' | translate)"
     iconOnly
   >
     <i [class]="icon()"></i>

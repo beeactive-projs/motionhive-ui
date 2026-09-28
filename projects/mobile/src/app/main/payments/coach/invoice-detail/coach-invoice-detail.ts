@@ -18,17 +18,20 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { Observable, take } from 'rxjs';
 
 import {
   CurrencyRonPipe,
   EarningsService,
+  EnumLabelPipe,
   Invoice,
   InvoiceLineItemDetail,
   InvoiceService,
   InvoiceStatuses,
   RefundService,
+  appLocale,
   displayName,
 } from 'core';
 
@@ -63,6 +66,7 @@ import {
     ConfirmSheet,
     CurrencyRonPipe,
     EmptyState,
+    EnumLabelPipe,
     HexAvatar,
     IonBackButton,
     IonBadge,
@@ -79,6 +83,7 @@ import {
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './coach-invoice-detail.html',
   styleUrl: './coach-invoice-detail.scss',
@@ -91,6 +96,7 @@ export class CoachInvoiceDetail {
   private readonly _refundService = inject(RefundService);
   private readonly _earningsService = inject(EarningsService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly invoiceId = signal<string | null>(null);
   readonly invoice = signal<Invoice | null>(null);
@@ -107,7 +113,10 @@ export class CoachInvoiceDetail {
   readonly Statuses = InvoiceStatuses;
 
   readonly clientName = computed(() =>
-    displayName(this.invoice()?.client ?? null, this.invoice()?.clientEmail ?? 'Client'),
+    displayName(
+      this.invoice()?.client ?? null,
+      this.invoice()?.clientEmail ?? this._translateService.instant('payments.fallback.client'),
+    ),
   );
 
   readonly clientTone = computed(() =>
@@ -151,28 +160,29 @@ export class CoachInvoiceDetail {
   });
 
   readonly sendFacts = computed(() => [
-    { label: 'To', value: this.clientName() },
-    { label: 'Amount', value: this.dueMoney() },
+    { label: this._translateService.instant('payments.facts.to'), value: this.clientName() },
+    { label: this._translateService.instant('form.label.amount'), value: this.dueMoney() },
   ]);
 
   readonly markPaidFacts = computed(() => [
-    { label: 'From', value: this.clientName() },
-    { label: 'Amount', value: this.dueMoney() },
+    { label: this._translateService.instant('payments.facts.from'), value: this.clientName() },
+    { label: this._translateService.instant('form.label.amount'), value: this.dueMoney() },
   ]);
 
   readonly refundFacts = computed(() => [
-    { label: 'Amount', value: this.paidMoney() },
+    { label: this._translateService.instant('form.label.amount'), value: this.paidMoney() },
     {
-      label: 'Window closes',
-      value:
-        this.refundDays() === 1 ? '1 day left' : `${this.refundDays()} days left`,
+      label: this._translateService.instant('payments.facts.windowCloses'),
+      value: this._translateService.instant('payments.facts.daysLeft', {
+        count: this.refundDays(),
+      }),
     },
   ]);
 
   readonly dueLabel = computed(() => {
     const invoice = this.invoice();
     if (!invoice?.dueDate) return null;
-    return new Date(invoice.dueDate).toLocaleDateString(undefined, {
+    return new Date(invoice.dueDate).toLocaleDateString(appLocale(), {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
@@ -191,20 +201,26 @@ export class CoachInvoiceDetail {
   }
 
   send(): void {
-    this._mutate((id) => this._invoiceService.send(id), 'Sent to the client', () =>
-      this.sendOpen.set(false),
+    this._mutate(
+      (id) => this._invoiceService.send(id),
+      this._translateService.instant('payments.toast.sent'),
+      () => this.sendOpen.set(false),
     );
   }
 
   markPaid(): void {
-    this._mutate((id) => this._invoiceService.markPaid(id), 'Marked as paid', () =>
-      this.markPaidOpen.set(false),
+    this._mutate(
+      (id) => this._invoiceService.markPaid(id),
+      this._translateService.instant('payments.toast.markedPaid'),
+      () => this.markPaidOpen.set(false),
     );
   }
 
   voidInvoice(): void {
-    this._mutate((id) => this._invoiceService.void(id), 'Invoice voided', () =>
-      this.voidOpen.set(false),
+    this._mutate(
+      (id) => this._invoiceService.void(id),
+      this._translateService.instant('payments.toast.voided'),
+      () => this.voidOpen.set(false),
     );
   }
 
@@ -228,7 +244,7 @@ export class CoachInvoiceDetail {
             this.acting.set(false);
             void this._feedbackService.error(
               null,
-              'No payment found for this invoice to refund.',
+              this._translateService.instant('payments.toast.noPaymentToRefund'),
             );
             return;
           }
@@ -239,18 +255,26 @@ export class CoachInvoiceDetail {
               next: () => {
                 this.acting.set(false);
                 this.refundOpen.set(false);
-                void this._feedbackService.success('Refund issued');
+                void this._feedbackService.success(
+                  this._translateService.instant('payments.toast.refunded'),
+                );
                 this._load(invoice.id);
               },
               error: (error: unknown) => {
                 this.acting.set(false);
-                void this._feedbackService.error(error, 'Could not issue the refund.');
+                void this._feedbackService.error(
+                  error,
+                  this._translateService.instant('payments.toast.refundFailed'),
+                );
               },
             });
         },
         error: (error: unknown) => {
           this.acting.set(false);
-          void this._feedbackService.error(error, 'Could not find the payment.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.paymentNotFound'),
+          );
         },
       });
   }
@@ -320,7 +344,10 @@ export class CoachInvoiceDetail {
         },
         error: (error: unknown) => {
           this.acting.set(false);
-          void this._feedbackService.error(error, 'That did not go through.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('payments.toast.actionFailed'),
+          );
         },
       });
   }

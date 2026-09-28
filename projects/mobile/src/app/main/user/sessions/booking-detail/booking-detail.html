@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="stackBase()" />
     </ion-buttons>
-    <ion-title>Session</ion-title>
+    <ion-title>{{ 'common.session' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,9 +11,9 @@
   @if (store.error(); as error) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load this session"
+      [heading]="'mySessions.detail.loadError.title' | translate"
       [message]="error"
-      actionLabel="Try again"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="store.reload()"
     />
   } @else if (store.loading() && !store.instance()) {
@@ -49,7 +49,7 @@
         <div class="banner">
           <ion-icon name="close-circle-outline" aria-hidden="true" />
           <div>
-            <strong>Session cancelled</strong>
+            <strong>{{ 'mySessions.detail.cancelledBanner.title' | translate }}</strong>
             <span>{{ cancelledDetail() }}</span>
           </div>
         </div>
@@ -80,12 +80,12 @@
               [color]="blockedInstance() ? 'secondary' : 'primary'"
             />
             <ion-label>
-              <p class="row-label">Coach</p>
+              <p class="row-label">{{ 'mySessions.detail.coach' | translate }}</p>
               <h3>{{ coachName() }}</h3>
             </ion-label>
             @if (!blockedInstance()) {
               <ion-button slot="end" fill="clear" size="small" class="row-action" (click)="messageCoach(); $event.stopPropagation()">
-                Message
+                {{ 'mySessions.detail.message' | translate }}
               </ion-button>
             }
           </ion-item>
@@ -95,8 +95,8 @@
           <ion-item lines="none">
             <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="violet" tone="wash" aria-hidden="true" />
             <ion-label>
-              <h3>Location is for club members</h3>
-              <p>Join the club to see where and book.</p>
+              <h3>{{ 'mySessions.detail.blocked.title' | translate }}</h3>
+              <p>{{ 'mySessions.detail.blocked.message' | translate }}</p>
             </ion-label>
           </ion-item>
         } @else {
@@ -110,7 +110,7 @@
                 }
               </ion-label>
               @if (meetingUrl()) {
-                <ion-button slot="end" fill="outline" size="small" aria-label="Copy meeting link" (click)="copyMeetingUrl()">
+                <ion-button slot="end" fill="outline" size="small" [attr.aria-label]="'mySessions.detail.copyLink' | translate" (click)="copyMeetingUrl()">
                   <ion-icon slot="icon-only" name="copy-outline" />
                 </ion-button>
               }
@@ -120,8 +120,8 @@
             <ion-item lines="full">
               <mh-hex-avatar slot="start" size="sm" icon="lock-closed-outline" color="medium" tone="wash" aria-hidden="true" />
               <ion-label>
-                <h3>Meeting link unlocks 5 min before start</h3>
-                <p>Available from {{ unlockTime() }}</p>
+                <h3>{{ 'mySessions.detail.link.locked' | translate }}</h3>
+                <p>{{ 'mySessions.detail.link.availableFrom' | translate: { time: unlockTime() } }}</p>
               </ion-label>
             </ion-item>
           } @else if (isOnlineSession()) {
@@ -130,7 +130,7 @@
               <ion-label>
                 <h3>{{ providerLabel() }}</h3>
                 @if (view() === Views.Showcase) {
-                  <p>The meeting link appears here once you're booked.</p>
+                  <p>{{ 'mySessions.detail.link.afterBooking' | translate }}</p>
                 }
               </ion-label>
             </ion-item>
@@ -138,7 +138,7 @@
             <ion-item lines="full">
               <mh-hex-avatar slot="start" size="sm" icon="location-outline" color="teal" aria-hidden="true" />
               <ion-label>
-                <p class="row-label">Where</p>
+                <p class="row-label">{{ 'mySessions.detail.where' | translate }}</p>
                 <h3>{{ whereLabel() }}</h3>
                 @if (whereCity(); as city) {
                   <p>{{ city }}</p>
@@ -150,12 +150,12 @@
           <ion-item lines="none">
             <mh-hex-avatar slot="start" size="sm" icon="calendar-outline" color="info" tone="shade" aria-hidden="true" />
             <ion-label>
-              <p class="row-label">When</p>
+              <p class="row-label">{{ 'mySessions.detail.when' | translate }}</p>
               <h3>{{ whenLabel() }}</h3>
             </ion-label>
             @if (canAddToCalendar()) {
               <ion-button slot="end" fill="clear" size="small" class="row-action" (click)="addToCalendar()">
-                Add to calendar
+                {{ 'button.addToCalendar' | translate }}
               </ion-button>
             }
           </ion-item>
@@ -167,10 +167,10 @@
           <ion-item [lines]="capacity() !== null ? 'full' : 'none'">
             <mh-hex-avatar slot="start" size="sm" icon="pricetag-outline" color="success" tone="shade" aria-hidden="true" />
             <ion-label>
-              <p class="row-label">Price</p>
+              <p class="row-label">{{ 'mySessions.detail.price' | translate }}</p>
               <h3>{{ priceLabel() }}</h3>
               @if (!isFree()) {
-                <p>Settled by invoice — nothing to pay now.</p>
+                <p>{{ 'mySessions.detail.invoiceNote' | translate }}</p>
               }
             </ion-label>
           </ion-item>
@@ -179,7 +179,7 @@
             <ion-item lines="none">
               <mh-hex-avatar slot="start" size="sm" icon="people-outline" color="medium" tone="wash" aria-hidden="true" />
               <ion-label>
-                <p class="row-label">Spots</p>
+                <p class="row-label">{{ 'mySessions.detail.spots' | translate }}</p>
                 <h3>{{ spotsLabel() }}</h3>
                 <ion-progress-bar [value]="spotsProgress()" />
               </ion-label>
@@ -200,45 +200,45 @@
             @switch (bookAction()) {
               @case ('book') {
                 <ion-button expand="block" class="action" [disabled]="bookingInFlight()" (click)="book()">
-                  Book
+                  {{ 'mySessions.detail.footer.book' | translate }}
                 </ion-button>
               }
               @case ('waitlist') {
                 <ion-button expand="block" class="action" [disabled]="bookingInFlight()" (click)="book()">
-                  Join waitlist
+                  {{ 'mySessions.detail.footer.joinWaitlist' | translate }}
                 </ion-button>
               }
               @case ('full') {
-                <div class="inert">Session full</div>
+                <div class="inert">{{ 'mySessions.detail.footer.full' | translate }}</div>
               }
             }
           }
           @case (Views.BookedInPerson) {
             <!-- Deliberately quiet: cancelling is available, never advertised. -->
             <ion-button expand="block" fill="outline" color="medium" class="action" (click)="openCancel()">
-              Cancel booking
+              {{ 'mySessions.detail.footer.cancelBooking' | translate }}
             </ion-button>
           }
           @case (Views.OnlinePre) {
             <ion-button fill="clear" color="medium" class="quiet" (click)="openCancel()">
-              Cancel booking
+              {{ 'mySessions.detail.footer.cancelBooking' | translate }}
             </ion-button>
-            <div class="inert action">Join · opens {{ unlockTime() }}</div>
+            <div class="inert action">{{ 'mySessions.detail.footer.joinOpens' | translate: { time: unlockTime() } }}</div>
           }
           @case (Views.OnlineLive) {
             <ion-button expand="block" class="action" (click)="joinSession()">
               <ion-icon slot="start" name="videocam-outline" />
-              Join session
+              {{ 'mySessions.detail.footer.joinSession' | translate }}
             </ion-button>
           }
           @case (Views.Pending) {
             <ion-button expand="block" fill="outline" color="medium" class="action" (click)="openCancel()">
-              Withdraw request
+              {{ 'mySessions.detail.footer.withdraw' | translate }}
             </ion-button>
           }
           @case (Views.Waitlist) {
             <ion-button expand="block" fill="outline" color="medium" class="action" (click)="openCancel()">
-              Leave the waitlist
+              {{ 'mySessions.detail.footer.leaveWaitlist' | translate }}
             </ion-button>
           }
         }

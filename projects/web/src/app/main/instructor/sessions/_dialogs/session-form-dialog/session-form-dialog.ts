@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -12,6 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -133,7 +133,6 @@ function blankForm(): SessionForm {
 
 @Component({
   selector: 'mh-session-form-dialog',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -147,16 +146,17 @@ function blankForm(): SessionForm {
     CheckboxModule,
     RecurrenceBuilder,
     BottomSheet,
+    TranslatePipe,
   ],
   templateUrl: './session-form-dialog.html',
   styleUrl: './session-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionFormDialog {
-  private readonly _svc = inject(SessionService);
-  private readonly _venueSvc = inject(VenueService);
-  private readonly _groupSvc = inject(GroupService);
-  private readonly _msg = inject(MessageService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _venueService = inject(VenueService);
+  private readonly _groupService = inject(GroupService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   /**
    * Mobile breakpoint — drives the template branch: `<p-dialog>`
@@ -231,13 +231,13 @@ export class SessionFormDialog {
       this.saving.set(false);
       // Lazy-load venues + groups on first open.
       if (this.venues().length === 0) {
-        this._venueSvc.list().subscribe({
+        this._venueService.list().subscribe({
           next: (vs) => this.venues.set(vs),
           error: () => this.venues.set([]),
         });
       }
       if (this.groups().length === 0) {
-        this._groupSvc.getMyGroups().subscribe({
+        this._groupService.getMyGroups().subscribe({
           next: (gs) => this.groups.set(gs),
           error: () => this.groups.set([]),
         });
@@ -275,11 +275,11 @@ export class SessionFormDialog {
     if (this.saving()) return;
     const f = this.form();
     if (!f.title.trim()) {
-      this._toast('warn', 'Title required', 'Give your session a name.');
+      this._warn('titleRequired');
       return;
     }
     if (!f.firstStartAt) {
-      this._toast('warn', 'Start date required', 'Pick when this session begins.');
+      this._warn('startRequired');
       return;
     }
     // Past-date guard only applies to NEW sessions. For edits the
@@ -287,50 +287,50 @@ export class SessionFormDialog {
     // of a series that has already begun) and the BE doesn't allow
     // moving it backwards anyway.
     if (!this.isEdit() && f.firstStartAt.getTime() < Date.now()) {
-      this._toast('warn', 'Start date in the past', 'Pick a future date.');
+      this._warn('startInPast');
       return;
     }
     if (f.durationMinutes < 5 || f.durationMinutes > 480) {
-      this._toast('warn', 'Duration', 'Duration must be 5–480 minutes.');
+      this._warn('duration');
       return;
     }
     if (this.isOnline()) {
       const url = f.meetingUrl.trim();
       if (!url) {
-        this._toast('warn', 'Meeting link required', 'Online sessions need a URL.');
+        this._warn('meetingLinkRequired');
         return;
       }
       let parsed: URL;
       try {
         parsed = new URL(url);
       } catch {
-        this._toast('warn', 'Meeting link', 'That URL doesn’t look right.');
+        this._warn('meetingLinkInvalid');
         return;
       }
       // BE requires HTTPS (CreateTemplateDto @IsUrl protocols: ['https']).
       // Catch it up front so the user gets a useful message instead of a
       // generic 400.
       if (parsed.protocol !== 'https:') {
-        this._toast('warn', 'Meeting link', 'Use an https:// URL for security.');
+        this._warn('meetingLinkHttps');
         return;
       }
     }
     if (this.needsVenue() && !f.venueId) {
-      this._toast('warn', 'Venue required', 'Pick a venue for in-person sessions.');
+      this._warn('venueRequired');
       return;
     }
     if (this.needsGroup() && !f.groupId) {
-      this._toast('warn', 'Group required', 'Pick a group for this access type.');
+      this._warn('groupRequired');
       return;
     }
     if (f.isRecurring) {
       const r = f.recurrenceRule;
       if (r.frequency === 'WEEKLY' && (!r.daysOfWeek || r.daysOfWeek.length === 0)) {
-        this._toast('warn', 'Pick at least one day', 'Weekly schedules need at least one day of the week.');
+        this._warn('pickDay');
         return;
       }
       if (r.interval < 1) {
-        this._toast('warn', 'Invalid recurrence', 'Repeat interval must be at least 1.');
+        this._warn('invalidRecurrence');
         return;
       }
     }
@@ -364,7 +364,7 @@ export class SessionFormDialog {
       // so we must NOT send `isRecurring`, `firstStartAt`, or
       // `generateInitialInstances`. Recurrence flag is fixed once the
       // template exists; users go through cancel+recreate to change it.
-      req$ = this._svc.updateTemplate(existing.id, common);
+      req$ = this._sessionService.updateTemplate(existing.id, common);
     } else {
       // Create path — full create-shape with the recurrence flag and
       // first-start anchor.
@@ -377,7 +377,7 @@ export class SessionFormDialog {
         // single occurrence by default).
         ...(f.isRecurring ? { generateInitialInstances: true } : {}),
       };
-      req$ = this._svc.createTemplate(createPayload);
+      req$ = this._sessionService.createTemplate(createPayload);
     }
 
     req$.subscribe({
@@ -387,24 +387,40 @@ export class SessionFormDialog {
         // createTemplate returns CreateTemplateResponse; update returns SessionTemplate.
         const tpl = 'template' in res ? res.template : res;
         const warns = 'warnings' in res ? res.warnings : [];
-        this._toast(
-          'success',
-          existing ? 'Session updated' : 'Session created',
-          warns.length > 0
-            ? `${warns.length} occurrence(s) had conflicts — review in the calendar.`
-            : 'Saved.',
-        );
+        this._messageService.add({
+          severity: 'success',
+          summary: this._translateService.instant(
+            existing ? 'sessions.formDialog.toast.updated' : 'sessions.formDialog.toast.created',
+          ),
+          detail:
+            warns.length > 0
+              ? this._translateService.instant('sessions.formDialog.toast.conflicts', {
+                  count: warns.length,
+                })
+              : this._translateService.instant('sessions.formDialog.toast.saved'),
+        });
         this.saved.emit(tpl);
       },
       error: (err: unknown) => {
         this.saving.set(false);
-        showApiError(this._msg, 'Could not save session', 'Please try again.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('sessions.formDialog.toast.saveFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
+          err,
+        );
       },
     });
   }
 
-  private _toast(severity: 'success' | 'warn' | 'error', summary: string, detail: string): void {
-    this._msg.add({ severity, summary, detail });
+  /** Validation warning toast — `key` names a `{ summary, detail }` pair under `sessions.formDialog.toast`. */
+  private _warn(key: string): void {
+    const base = `sessions.formDialog.toast.${key}`;
+    this._messageService.add({
+      severity: 'warn',
+      summary: this._translateService.instant(`${base}.summary`),
+      detail: this._translateService.instant(`${base}.detail`),
+    });
   }
 
   /**
@@ -444,7 +460,7 @@ export class SessionFormDialog {
     const needsHydrate =
       t.firstStartAt == null || t.isRecurring == null;
     if (needsHydrate && t.id) {
-      this._svc.getTemplate(t.id).subscribe({
+      this._sessionService.getTemplate(t.id).subscribe({
         next: (full) => {
           this.form.update((f) => ({
             ...f,

@@ -5,38 +5,37 @@
   [dismissableMask]="!submitting()"
   [draggable]="false"
   [resizable]="false"
-  header="Block this user?"
+  [header]="'messages.blockDialog.header' | translate"
   styleClass="mh-block-dialog"
   [style]="{ width: '440px', maxWidth: '94vw' }"
   (onHide)="onHide()"
 >
   <p class="mh-block__lead">
-    <strong>{{ displayName() }}</strong> won't be able to message you or see your
-    conversation history with them. You can unblock them later from your
-    safety settings.
+    <strong>{{ displayName() }}</strong>
+    {{ 'messages.blockDialog.leadAfterName' | translate }}
   </p>
 
   <div class="mh-block__reason">
-    <div class="mh-block__eyebrow">Reason (optional)</div>
+    <div class="mh-block__eyebrow">{{ 'messages.blockDialog.reason' | translate }}</div>
     <div class="mh-block__chips">
-      @for (r of reasons; track r.key) {
+      @for (r of reasons; track r) {
         <button
           type="button"
           class="mh-block__chip"
-          [class.mh-block__chip--active]="reason() === r.key"
-          (click)="selectReason(r.key)"
+          [class.mh-block__chip--active]="reason() === r"
+          (click)="selectReason(r)"
         >
-          {{ r.label }}
+          {{ r | enumLabel: 'userBlockReason' }}
         </button>
       }
     </div>
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" severity="danger" (click)="submit()" [disabled]="submitting()">
       <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-ban'"></i>
-      Block
+      {{ 'messages.blockDialog.block' | translate }}
     </button>
   </ng-template>
 </p-dialog>

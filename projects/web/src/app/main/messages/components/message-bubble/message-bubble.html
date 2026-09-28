@@ -30,7 +30,7 @@
       [style.border-radius]="bubbleRadius()"
     >
       <!-- Body is plaintext — bound via {{ }} so HTML is never injected. -->
-      {{ message().body }}
+      {{ isDeleted() ? ('messages.bubble.deleted' | translate) : message().body }}
     </div>
     @if (showMeta()) {
       <div
@@ -53,7 +53,7 @@
             <path d="M2 12l4 4 8-9" />
             <path d="M11 16l1 1 9-10" />
           </svg>
-          <span>{{ r === 'read' ? 'Read' : 'Sent' }}</span>
+          <span>{{ (r === 'read' ? 'messages.bubble.read' : 'messages.bubble.sent') | translate }}</span>
         }
       </div>
     }

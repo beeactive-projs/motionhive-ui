@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
   Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { sessionTypeLabel } from 'core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { EnumLabelPipe, SessionLocationKind, sessionTypeLabel } from 'core';
 import type { SessionType } from 'core';
 import { sessionTypeCssColor } from './mappers';
 
@@ -38,12 +38,10 @@ export const DEFAULT_CALENDAR_FILTERS: CalendarFilters = {
  */
 @Component({
   selector: 'mh-week-filters-panel',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, TranslatePipe, EnumLabelPipe],
   template: `
-    <section class="mh-wfp" aria-label="Calendar filters">
-      <h3 class="mh-wfp__title">Filters</h3>
+    <section class="mh-wfp" [attr.aria-label]="'sessions.calendar.filtersAria' | translate">
+      <h3 class="mh-wfp__title">{{ 'common.filters' | translate }}</h3>
 
       <div class="mh-wfp__group">
         @for (opt of typeOptions; track opt.value) {
@@ -69,7 +67,7 @@ export const DEFAULT_CALENDAR_FILTERS: CalendarFilters = {
             (change)="toggleLocation('online', $any($event.target).checked)"
           />
           <i class="pi pi-video mh-wfp__icon" aria-hidden="true"></i>
-          <span class="mh-wfp__label">Online</span>
+          <span class="mh-wfp__label">{{ LocationKind.Online | enumLabel: 'sessionLocationKind' }}</span>
         </label>
         <label class="mh-wfp__row">
           <input
@@ -78,7 +76,7 @@ export const DEFAULT_CALENDAR_FILTERS: CalendarFilters = {
             (change)="toggleLocation('inPerson', $any($event.target).checked)"
           />
           <i class="pi pi-map-marker mh-wfp__icon" aria-hidden="true"></i>
-          <span class="mh-wfp__label">In-person</span>
+          <span class="mh-wfp__label">{{ LocationKind.InPerson | enumLabel: 'sessionLocationKind' }}</span>
         </label>
       </div>
 
@@ -91,7 +89,7 @@ export const DEFAULT_CALENDAR_FILTERS: CalendarFilters = {
           (change)="toggleConflicts($any($event.target).checked)"
         />
         <i class="pi pi-exclamation-triangle mh-wfp__icon" aria-hidden="true"></i>
-        <span class="mh-wfp__label">Conflicts only</span>
+        <span class="mh-wfp__label">{{ 'sessions.calendar.conflictsOnly' | translate }}</span>
       </label>
     </section>
   `,
@@ -156,6 +154,8 @@ export const DEFAULT_CALENDAR_FILTERS: CalendarFilters = {
 export class WeekFiltersPanel {
   @Input({ required: true }) filters!: CalendarFilters;
   @Output() filtersChange = new EventEmitter<CalendarFilters>();
+
+  protected readonly LocationKind = SessionLocationKind;
 
   /** Words and dots from core's `SESSION_TYPES`, via the calendar's tone map. */
   protected readonly typeOptions: {

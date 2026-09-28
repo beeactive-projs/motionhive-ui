@@ -1,6 +1,6 @@
 <p-dialog
   [(visible)]="visible"
-  header="Delete post"
+  [header]="'groups.deletePost.header' | translate"
   [modal]="true"
   [closable]="!submitting()"
   [closeOnEscape]="!submitting()"
@@ -8,15 +8,15 @@
   [style]="{ width: '420px', maxWidth: '95vw' }">
 
   <p class="text-sm text-surface-700 dark:text-surface-300">
-    Delete this post permanently? Comments, reactions, and uploaded images will be removed too.
+    {{ 'groups.deletePost.message' | translate }}
   </p>
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <button pButton type="button" severity="secondary" text [disabled]="submitting()" (click)="cancel()">Cancel</button>
+      <button pButton type="button" severity="secondary" text [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
       <button pButton type="button" severity="danger" (click)="submit()" [disabled]="submitting()">
         @if (submitting()) {<i class="pi pi-spinner pi-spin"></i>}
-        Delete
+        {{ 'button.delete' | translate }}
       </button>
     </div>
   </ng-template>

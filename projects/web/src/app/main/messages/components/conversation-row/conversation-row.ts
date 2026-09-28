@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConversationListItem, displayName, formatRelativeShort, initialsOf } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { UnreadBadge } from '../unread-badge/unread-badge';
@@ -14,13 +15,13 @@ import { UnreadBadge } from '../unread-badge/unread-badge';
  */
 @Component({
   selector: 'mh-conversation-row',
-  standalone: true,
-  imports: [HexAvatar, UnreadBadge],
+  imports: [HexAvatar, UnreadBadge, TranslatePipe],
   templateUrl: './conversation-row.html',
   styleUrl: './conversation-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConversationRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly conversation = input.required<ConversationListItem>();
   readonly active = input<boolean>(false);
 
@@ -30,7 +31,7 @@ export class ConversationRow {
 
   protected readonly title = computed(() => {
     const c = this.conversation();
-    if (c.type === 'GROUP') return c.name ?? 'Untitled group';
+    if (c.type === 'GROUP') return c.name ?? this._translateService.instant('messages.untitledGroup');
     return displayName(c.otherUser);
   });
 
@@ -54,7 +55,9 @@ export class ConversationRow {
   });
 
   protected readonly preview = computed(
-    () => this.conversation().lastMessagePreview ?? 'No messages yet',
+    () =>
+      this.conversation().lastMessagePreview ??
+      this._translateService.instant('messages.row.noMessages'),
   );
 
   protected readonly relativeTime = computed(() => {

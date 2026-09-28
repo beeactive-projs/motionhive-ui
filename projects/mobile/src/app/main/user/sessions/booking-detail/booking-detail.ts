@@ -21,6 +21,7 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -103,6 +104,7 @@ interface StatusBand {
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './booking-detail.html',
   styleUrl: './booking-detail.scss',
@@ -117,6 +119,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   private readonly _myBookingsIndexStore = inject(MyBookingsIndexStore);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
   private readonly _openDirectMessage = injectOpenDirectMessage();
 
   readonly Views = DetailViews;
@@ -183,7 +186,11 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     const blocked = this.blockedInstance();
     if (blocked) return blocked.template.title;
     const instance = this.publicInstance();
-    return instance?.titleOverride ?? instance?.template?.title ?? 'Session';
+    return (
+      instance?.titleOverride ??
+      instance?.template?.title ??
+      this._translateService.instant('common.session')
+    );
   });
 
   /** "Sat 23 May · 08:00 – 09:30 · 90 min" */
@@ -196,7 +203,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     return [
       formatSessionDayShort(instance.startAt),
       `${formatSessionTime(instance.startAt)} – ${formatSessionTime(instance.endAt)}`,
-      minutes ? `${minutes} min` : '',
+      minutes ? this._translateService.instant('time.minutesShort', { minutes }) : '',
     ]
       .filter(Boolean)
       .join(' · ');
@@ -217,12 +224,13 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
 
   readonly heroBadges = computed<{ label: string; tone: string }[]>(() => {
     const badges: { label: string; tone: string }[] = [];
+    const membersOnly = this._translateService.instant('mySessions.detail.badge.membersOnly');
 
     // The redacted payload carries only the template's identity fields.
     const blocked = this.blockedInstance();
     if (blocked) {
       badges.push({ label: sessionTypeLabel(blocked.template.type), tone: 'type' });
-      badges.push({ label: 'Members only', tone: 'violet' });
+      badges.push({ label: membersOnly, tone: 'violet' });
       return badges;
     }
 
@@ -231,19 +239,32 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
 
     badges.push({ label: sessionTypeLabel(template.type), tone: 'type' });
     if (template.access === SessionAccess.GroupOnly) {
-      badges.push({ label: 'Members only', tone: 'violet' });
+      badges.push({ label: membersOnly, tone: 'violet' });
     }
     badges.push(
       template.locationKind === SessionLocationKind.Online
         ? { label: meetingProviderLabel(template.meetingProvider), tone: 'place' }
-        : { label: 'In person', tone: 'place' },
+        : {
+            label: this._translateService.instant('mySessions.detail.badge.inPerson'),
+            tone: 'place',
+          },
     );
 
     // A record's one fact worth a badge: whether they made it.
     if (this.view() === DetailViews.Past) {
       const attended = this.store.booking()?.attended;
-      if (attended === true) badges.push({ label: 'Attended', tone: 'success' });
-      if (attended === false) badges.push({ label: 'Missed', tone: 'medium' });
+      if (attended === true) {
+        badges.push({
+          label: this._translateService.instant('mySessions.chip.attended'),
+          tone: 'success',
+        });
+      }
+      if (attended === false) {
+        badges.push({
+          label: this._translateService.instant('mySessions.chip.missed'),
+          tone: 'medium',
+        });
+      }
     }
     return badges;
   });
@@ -258,14 +279,14 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
         return {
           tone: 'success',
           icon: 'checkmark-circle-outline',
-          title: "You're booked",
+          title: this._translateService.instant('mySessions.detail.band.booked'),
           detail: this._cancelByLine(booking),
         };
       case DetailViews.OnlineLive:
         return {
           tone: 'live',
           icon: null,
-          title: 'Live now',
+          title: this._translateService.instant('mySessions.detail.band.live'),
           detail: this._liveLine(),
         };
       case DetailViews.Pending: {
@@ -273,18 +294,20 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
         return {
           tone: 'warn',
           icon: 'hourglass-outline',
-          title: 'Awaiting approval',
+          title: this._translateService.instant('mySessions.detail.band.pending'),
           detail: first
-            ? `${first} approves bookings for this session — you'll get a notification either way.`
-            : "You'll get a notification either way — nothing else to do.",
+            ? this._translateService.instant('mySessions.detail.band.pendingDetail', {
+                name: first,
+              })
+            : this._translateService.instant('mySessions.detail.band.pendingDetailNoCoach'),
         };
       }
       case DetailViews.Waitlist:
         return {
           tone: 'info',
           icon: 'time-outline',
-          title: "You're on the waitlist",
-          detail: "If a spot opens you're booked automatically — we'll notify you.",
+          title: this._translateService.instant('mySessions.detail.band.waitlist'),
+          detail: this._translateService.instant('mySessions.detail.band.waitlistDetail'),
         };
       default:
         return null;
@@ -309,7 +332,7 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
       instance?.venueOverride?.name ??
       instance?.template?.venue?.name ??
       this.store.booking()?.snapshotLocationText ??
-      'To be announced'
+      this._translateService.instant('mySessions.detail.tba')
     );
   });
 
@@ -343,17 +366,27 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     return formatSessionTime(from.toISOString());
   });
 
-  readonly priceLabel = computed(() => {
+  /** The booking snapshot's price, else the template's; null when neither is known. */
+  private readonly _price = computed<{ cents: number; currency: string } | null>(() => {
     const booking = this.store.booking();
     if (booking) {
-      return bookingPriceLabel(booking.snapshotPriceCents, booking.snapshotCurrency);
+      return { cents: booking.snapshotPriceCents, currency: booking.snapshotCurrency };
     }
     const template = this.publicInstance()?.template;
-    if (!template) return '';
-    return bookingPriceLabel(template.priceAmountCents, template.priceCurrency);
+    if (!template) return null;
+    return { cents: template.priceAmountCents, currency: template.priceCurrency };
   });
 
-  readonly isFree = computed(() => this.priceLabel() === 'Free');
+  readonly priceLabel = computed(() => {
+    const price = this._price();
+    return price ? bookingPriceLabel(price.cents, price.currency) : '';
+  });
+
+  /** Same rule `bookingPriceLabel` uses for "Free" — no string comparison. */
+  readonly isFree = computed(() => {
+    const price = this._price();
+    return price !== null && price.cents <= 0;
+  });
 
   readonly capacity = computed(() => {
     const instance = this.publicInstance();
@@ -364,7 +397,9 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   readonly spotsLabel = computed(() => {
     const capacity = this.capacity();
     const taken = this.publicInstance()?.confirmedCount ?? 0;
-    return capacity === null ? '' : `${taken} of ${capacity} booked`;
+    return capacity === null
+      ? ''
+      : this._translateService.instant('mySessions.detail.spotsBooked', { taken, capacity });
   });
 
   readonly spotsProgress = computed(() => {
@@ -404,8 +439,10 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
   readonly cancelledDetail = computed(() => {
     const cancelledAt = this.publicInstance()?.cancelledAt;
     return cancelledAt
-      ? `Cancelled ${formatSessionDayShort(cancelledAt)} · everyone booked was notified.`
-      : 'Everyone booked was notified.';
+      ? this._translateService.instant('mySessions.detail.cancelledBanner.detail', {
+          date: formatSessionDayShort(cancelledAt),
+        })
+      : this._translateService.instant('mySessions.detail.cancelledBanner.detailNoDate');
   });
 
   /** "Sat 23 May, 08:00" — the When row. */
@@ -463,7 +500,10 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
         },
         error: (error: unknown) => {
           this.bookingInFlight.set(false);
-          void this._feedbackService.error(error, "Couldn't book this session.");
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('mySessions.toast.bookFailed'),
+          );
         },
       });
   }
@@ -493,7 +533,10 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
       .subscribe({
         next: (info) => window.open(info.meetingUrl, '_blank', 'noopener'),
         error: (error: unknown) =>
-          void this._feedbackService.error(error, "Couldn't get the meeting link."),
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('mySessions.toast.linkFailed'),
+          ),
       });
   }
 
@@ -501,8 +544,16 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     const url = this.meetingUrl();
     if (!url) return;
     const copied = await copyToClipboard(url);
-    if (copied) await this._feedbackService.success('Link copied');
-    else await this._feedbackService.error(null, "Couldn't copy the link.");
+    if (copied) {
+      await this._feedbackService.success(
+        this._translateService.instant('toast.detail.linkCopied'),
+      );
+    } else {
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('mySessions.toast.copyFailed'),
+      );
+    }
   }
 
   addToCalendar(): void {
@@ -512,9 +563,15 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
       .downloadIcs(id)
       .pipe(take(1))
       .subscribe({
-        next: () => void this._feedbackService.success('Calendar file downloaded'),
+        next: () =>
+          void this._feedbackService.success(
+            this._translateService.instant('mySessions.toast.calendarDownloaded'),
+          ),
         error: (error: unknown) =>
-          void this._feedbackService.error(error, "Couldn't download the invite."),
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('mySessions.toast.calendarFailed'),
+          ),
       });
   }
 
@@ -550,9 +607,15 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     const startAt = this.publicInstance()?.startAt;
     const cutoff = booking?.snapshotCancelCutoffH ?? 0;
     const cancelBy = startAt ? bookingCancelBy(startAt, cutoff) : null;
-    if (!cancelBy) return 'Free to cancel any time before it starts';
+    if (!cancelBy) {
+      return this._translateService.instant('mySessions.detail.band.cancelAnyTime');
+    }
     const iso = cancelBy.toISOString();
-    return `Free to cancel until ${formatSessionDayShort(iso)} ${formatSessionTime(iso)} · ${cutoff} h before start`;
+    return this._translateService.instant('mySessions.detail.band.cancelUntil', {
+      date: formatSessionDayShort(iso),
+      time: formatSessionTime(iso),
+      hours: cutoff,
+    });
   }
 
   /** "Started 2 min ago · join closes 18:15" — or the pre-start variant. */
@@ -560,11 +623,21 @@ export class BookingDetail implements ViewWillEnter, ViewDidEnter, ViewWillLeave
     const instance = this.publicInstance();
     if (!instance) return '';
     const { until } = bookingJoinWindow(instance.startAt, this.store.joinInfo());
-    const closes = `join closes ${formatSessionTime(until.toISOString())}`;
+    const time = formatSessionTime(until.toISOString());
     const now = this._clockService.now();
     const sinceStart = Math.round((now - new Date(instance.startAt).getTime()) / 60_000);
-    if (sinceStart < 0) return `Starts in ${-sinceStart} min · ${closes}`;
-    if (sinceStart === 0) return `Starting now · ${closes}`;
-    return `Started ${sinceStart} min ago · ${closes}`;
+    if (sinceStart < 0) {
+      return this._translateService.instant('mySessions.detail.band.startsIn', {
+        minutes: -sinceStart,
+        time,
+      });
+    }
+    if (sinceStart === 0) {
+      return this._translateService.instant('mySessions.detail.band.startingNow', { time });
+    }
+    return this._translateService.instant('mySessions.detail.band.startedAgo', {
+      minutes: sinceStart,
+      time,
+    });
   }
 }

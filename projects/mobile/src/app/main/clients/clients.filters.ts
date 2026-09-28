@@ -31,6 +31,7 @@ export type ClientFilterId = (typeof ClientFilterIds)[keyof typeof ClientFilterI
 
 export interface ClientFilter {
   id: ClientFilterId;
+  /** Translation key — the chip row and the search scope line translate it. */
   label: string;
   /** The server-side status the chip narrows to; none for "All". */
   status?: InstructorClientStatus;
@@ -41,10 +42,22 @@ export interface ClientFilter {
  * status: the API folds invitations and incoming requests into one bucket.
  */
 export const CLIENT_FILTERS: readonly ClientFilter[] = [
-  { id: ClientFilterIds.All, label: 'All' },
-  { id: ClientFilterIds.Active, label: 'Active', status: InstructorClientStatuses.Active },
-  { id: ClientFilterIds.Requests, label: 'Requests', status: InstructorClientStatuses.Pending },
-  { id: ClientFilterIds.Archived, label: 'Archived', status: InstructorClientStatuses.Archived },
+  { id: ClientFilterIds.All, label: 'clients.filters.all' },
+  {
+    id: ClientFilterIds.Active,
+    label: 'clients.filters.active',
+    status: InstructorClientStatuses.Active,
+  },
+  {
+    id: ClientFilterIds.Requests,
+    label: 'clients.filters.requests',
+    status: InstructorClientStatuses.Pending,
+  },
+  {
+    id: ClientFilterIds.Archived,
+    label: 'clients.filters.archived',
+    status: InstructorClientStatuses.Archived,
+  },
 ];
 
 export function filterStatus(id: ClientFilterId): InstructorClientStatus | undefined {

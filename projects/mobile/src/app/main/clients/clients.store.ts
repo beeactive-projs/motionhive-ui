@@ -1,5 +1,6 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, take, tap } from 'rxjs';
 
 import {
@@ -64,6 +65,7 @@ export class ClientsStore {
   private readonly _clientService = inject(ClientService);
   private readonly _rosterService = inject(RosterService);
   private readonly _moreBadgesService = inject(MoreBadgesService);
+  private readonly _translateService = inject(TranslateService);
   /**
    * The page's, since the store is provided by it. Every stream below is
    * cancelled with the page: `take(1)` caps how many values arrive but does
@@ -220,7 +222,9 @@ export class ClientsStore {
 
   readonly allCountLabel = computed(() => {
     const total = this._allTotal();
-    return total === null ? 'All clients' : `All clients · ${total}`;
+    return total === null
+      ? this._translateService.instant('clients.segments.all')
+      : this._translateService.instant('clients.segments.allWithCount', { count: total });
   });
 
   readonly hasPendingRequests = computed(() => this.pendingCount() > 0);

@@ -1,12 +1,15 @@
 import { Component, computed, inject, input, model, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import {
   PublicSessionInstance,
+  SESSION_LOCATION_KINDS,
   SessionLocationKind,
   SessionParticipantStatus,
   SessionService,
+  appLocale,
   formatSessionTime,
   sessionMinutes,
 } from 'core';
@@ -27,13 +30,14 @@ import { FeedbackService } from '../../../../../_shared/services/feedback.servic
  */
 @Component({
   selector: 'mh-booking-outcome-sheet',
-  imports: [HexAvatar, IonBadge, IonButton, IonIcon, IonNote, SheetShell],
+  imports: [HexAvatar, IonBadge, IonButton, IonIcon, IonNote, SheetShell, TranslatePipe],
   templateUrl: './booking-outcome-sheet.html',
   styleUrl: './booking-outcome-sheet.scss',
 })
 export class BookingOutcomeSheet {
   private readonly _sessionService = inject(SessionService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly status = input<SessionParticipantStatus | null>(null);
@@ -46,11 +50,11 @@ export class BookingOutcomeSheet {
   readonly heading = computed(() => {
     switch (this.status()) {
       case SessionParticipantStatus.PendingApproval:
-        return 'Request sent';
+        return this._translateService.instant('mySessions.outcome.pending.title');
       case SessionParticipantStatus.Waitlisted:
-        return "You're on the waitlist";
+        return this._translateService.instant('mySessions.outcome.waitlisted.title');
       default:
-        return "You're booked";
+        return this._translateService.instant('mySessions.outcome.confirmed.title');
     }
   });
 
@@ -59,13 +63,13 @@ export class BookingOutcomeSheet {
       case SessionParticipantStatus.PendingApproval: {
         const first = this._coachFirstName();
         return first
-          ? `${first} approves bookings for this session. You'll get a notification either way — nothing else to do.`
-          : "The coach approves bookings for this session. You'll get a notification either way — nothing else to do.";
+          ? this._translateService.instant('mySessions.outcome.pending.copy', { name: first })
+          : this._translateService.instant('mySessions.outcome.pending.copyNoCoach');
       }
       case SessionParticipantStatus.Waitlisted:
-        return "This session is full. If a spot opens you're booked automatically — we'll notify you.";
+        return this._translateService.instant('mySessions.outcome.waitlisted.copy');
       default:
-        return 'Your spot in this session is confirmed.';
+        return this._translateService.instant('mySessions.outcome.confirmed.copy');
     }
   });
 
@@ -98,14 +102,16 @@ export class BookingOutcomeSheet {
     if (!startAt) return null;
     const date = new Date(startAt);
     return {
-      weekday: date.toLocaleDateString('en-GB', { weekday: 'short' }),
+      weekday: date.toLocaleDateString(appLocale(), { weekday: 'short' }),
       day: date.getDate(),
     };
   });
 
   readonly title = computed(
     () =>
-      this.instance()?.titleOverride ?? this.instance()?.template?.title ?? 'Session',
+      this.instance()?.titleOverride ??
+      this.instance()?.template?.title ??
+      this._translateService.instant('common.session'),
   );
 
   /** "08:00 · 90 min · Herăstrău loop" */
@@ -115,9 +121,12 @@ export class BookingOutcomeSheet {
     const minutes = sessionMinutes(instance);
     const place =
       instance.template?.locationKind === SessionLocationKind.Online
-        ? 'Online'
+        ? SESSION_LOCATION_KINDS[SessionLocationKind.Online].label
         : (instance.venueOverride?.name ?? instance.template?.venue?.name ?? '');
-    return [formatSessionTime(instance.startAt), minutes ? `${minutes} min` : '', place]
+    const duration = minutes
+      ? this._translateService.instant('time.minutesShort', { minutes })
+      : '';
+    return [formatSessionTime(instance.startAt), duration, place]
       .filter(Boolean)
       .join(' · ');
   });
@@ -129,9 +138,15 @@ export class BookingOutcomeSheet {
       .downloadIcs(id)
       .pipe(take(1))
       .subscribe({
-        next: () => void this._feedbackService.success('Calendar file downloaded'),
+        next: () =>
+          void this._feedbackService.success(
+            this._translateService.instant('mySessions.toast.calendarDownloaded'),
+          ),
         error: (error: unknown) =>
-          void this._feedbackService.error(error, "Couldn't download the invite."),
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('mySessions.toast.calendarFailed'),
+          ),
       });
   }
 

@@ -1,5 +1,6 @@
 import { JoinPolicies, type JoinPolicy } from '../models/group/group.enums';
 import { TagSeverity } from '../models/common/ui.enums';
+import { enumLabel } from '../i18n/enum-label';
 
 /**
  * PrimeNG tag severity for a group's join policy.
@@ -18,14 +19,7 @@ export function joinPolicySeverity(policy: JoinPolicy): TagSeverity {
   }
 }
 
-/** Human-readable label for a group's join policy. Sentence case. */
+/** Short label for a group's join policy ("Open" / "Approval" / "Invite only"). */
 export function joinPolicyLabel(policy: JoinPolicy): string {
-  switch (policy) {
-    case JoinPolicies.Open:
-      return 'Open';
-    case JoinPolicies.Approval:
-      return 'Approval';
-    case JoinPolicies.InviteOnly:
-      return 'Invite only';
-  }
+  return enumLabel('joinPolicy', policy);
 }

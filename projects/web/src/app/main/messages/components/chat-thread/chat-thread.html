@@ -3,20 +3,20 @@
   class="mh-thread"
   role="log"
   aria-live="polite"
-  aria-label="Conversation messages"
+  [attr.aria-label]="'messages.thread.label' | translate"
   (scroll)="onScrollContainer()"
 >
   @if (hasOlder()) {
     <div class="mh-thread__loading-older">
       @if (loadingOlder()) {
-        <span class="mh-thread__loading-pill">Loading earlier messages…</span>
+        <span class="mh-thread__loading-pill">{{ 'messages.thread.loadingEarlier' | translate }}</span>
       } @else {
         <button
           type="button"
           class="mh-thread__loading-btn"
           (click)="loadOlder.emit()"
         >
-          Load earlier
+          {{ 'messages.thread.loadEarlier' | translate }}
         </button>
       }
     </div>

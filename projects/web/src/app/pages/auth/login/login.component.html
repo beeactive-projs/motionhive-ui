@@ -6,18 +6,17 @@
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
-    <a routerLink="/" aria-label="MotionHive home">
+    <a routerLink="/" [attr.aria-label]="'auth.common.homeLink' | translate">
       <mh-logo />
     </a>
 
     <div class="max-w-160">
       <h1 class="text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
-        Your fitness journey<br>
-        starts <span class="text-brand">here.</span>
+        {{ 'auth.login.heroLine1' | translate }}<br>
+        {{ 'auth.login.heroLine2' | translate }} <span class="text-brand">{{ 'auth.login.heroHighlight' | translate }}</span>
       </h1>
       <p class="text-base text-surface-600 dark:text-surface-400 leading-relaxed">
-        Track workouts, connect with trainers, and crush your goals — all in one place built for
-        people who move.
+        {{ 'auth.login.heroSubtitle' | translate }}
       </p>
     </div>
 
@@ -28,20 +27,20 @@
     <div class="hex-decoration"></div>
     <mh-theme-toggle class="theme-toggle-btn"></mh-theme-toggle>
 
-    <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" aria-label="MotionHive home">
+    <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" [attr.aria-label]="'auth.common.homeLink' | translate">
       <mh-logo />
     </a>
 
     <div class="header w-full">
       <div class="mb-8 animate-slide-down">
         <h1 class="font-heading text-3xl font-bold mb-2">
-          Welcome back
+          {{ 'auth.login.title' | translate }}
         </h1>
         <p class="text-sm">
-          Don't have an account?
+          {{ 'auth.common.noAccount' | translate }}
           <a routerLink="/auth/signup" [queryParams]="_route.snapshot.queryParams"
             class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
-            Create one for free
+            {{ 'auth.common.createOneFree' | translate }}
           </a>
         </p>
       </div>
@@ -60,9 +59,9 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
         <div class="flex flex-col gap-2">
           <label for="email" class="text-xs font-semibold text-surface-900 dark:text-surface-100">
-            Email address
+            {{ 'auth.common.emailAddress' | translate }}
           </label>
-          <input pInputText id="email" type="email" formControlName="email" placeholder="you@example.com" fluid
+          <input pInputText id="email" type="email" formControlName="email" [placeholder]="'form.placeholder.email' | translate" fluid
             pSize="large" [class.ng-dirty]="isFieldInvalid('email')" autocomplete="email"
             [attr.aria-invalid]="isFieldInvalid('email')"
             [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null" />
@@ -75,13 +74,13 @@
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between text-xs font-semibold">
             <label for="password" class="text-surface-900 dark:text-surface-100">
-              Password
+              {{ 'form.label.password' | translate }}
             </label>
             <a routerLink="/auth/reset-password" class="text-primary-600">
-              Forgot password?
+              {{ 'auth.common.forgotPassword' | translate }}
             </a>
           </div>
-          <p-password formControlName="password" inputId="password" placeholder="Enter your password" fluid size="large"
+          <p-password formControlName="password" inputId="password" [placeholder]="'auth.login.passwordPlaceholder' | translate" fluid size="large"
             [toggleMask]="true" [feedback]="false" [class]="isFieldInvalid('password') ? 'ng-invalid ng-dirty' : ''"
             autocomplete="current-password" [attr.aria-required]="true" [attr.aria-invalid]="isFieldInvalid('password')"
             [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null" />
@@ -93,12 +92,12 @@
         </div>
         <div class="flex flex-col">
           <button pButton type="submit" [disabled]="isLoading()" fluid size="large">
-            Sign in
+            {{ 'button.signIn' | translate }}
             <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-arrow-right'"></i>
           </button>
         </div>
         <p-divider [align]="'center'" type="solid">
-          or continue with
+          {{ 'auth.login.orContinueWith' | translate }}
         </p-divider>
         <div class="flex gap-3">
           <div class="social-btn-wrapper flex-1">
@@ -116,15 +115,15 @@
         </div>
         <div class="flex flex-col gap-3 text-center">
           <p class="text-xs text-surface-500 dark:text-surface-200 leading-relaxed">
-            By signing in, you agree to our
+            {{ 'auth.login.termsIntro' | translate }}
             <a [href]="termsUrl" target="_blank" rel="noopener"
               class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
-              Terms of Service
+              {{ 'auth.common.termsOfService' | translate }}
             </a>
-            and
+            {{ 'common.and' | translate }}
             <a [href]="privacyUrl" target="_blank" rel="noopener"
               class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
-              Privacy Policy
+              {{ 'auth.common.privacyPolicy' | translate }}
             </a>
           </p>
         </div>

@@ -1,5 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 
+import { translate } from 'core';
+
 import { POST_MAX_IMAGES } from '../../groups.config';
 
 /**
@@ -30,9 +32,9 @@ export class PostGallery {
   readonly extra = computed(() => Math.max(0, this.urls().length - POST_MAX_IMAGES));
 
   label(index: number): string {
-    const who = this.authorName();
-    const which = `photo ${index + 1} of ${this.visible().length}`;
-    return who ? `Open ${which} by ${who}` : `Open ${which}`;
+    const name = this.authorName();
+    const params = { index: index + 1, total: this.visible().length, name };
+    return translate(name ? 'groups.gallery.openPhotoBy' : 'groups.gallery.openPhoto', params);
   }
 
   open(index: number): void {

@@ -1,9 +1,11 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
   SessionInstance,
+  SessionInstanceStatus,
   formatSessionTime,
   sessionDayLabel,
   sessionLifecycle,
@@ -36,11 +38,13 @@ import {
  */
 @Component({
   selector: 'mh-session-actions-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './session-actions-sheet.html',
   styleUrl: './session-actions-sheet.scss',
 })
 export class SessionActionsSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly instance = input<SessionInstance | null>(null);
   /** Hides Share when the coach has not claimed a handle — there is no link yet. */
@@ -56,8 +60,9 @@ export class SessionActionsSheet {
 
   readonly title = computed(() => {
     const instance = this.instance();
-    if (!instance) return 'Session';
-    return instance.titleOverride ?? instance.template?.title ?? 'Session';
+    const fallback = this._translateService.instant('common.session');
+    if (!instance) return fallback;
+    return instance.titleOverride ?? instance.template?.title ?? fallback;
   });
 
   readonly time = computed(() => {
@@ -99,7 +104,7 @@ export class SessionActionsSheet {
 
     const started = sessionLifecycle(instance.startAt, instance.endAt) !== 'upcoming';
     const signups = instance.confirmedCount + instance.pendingApprovalCount;
-    const cancelled = instance.status === 'CANCELLED';
+    const cancelled = instance.status === SessionInstanceStatus.Cancelled;
     const onDetail = this.surface() === SessionSurfaces.Detail;
 
     return SESSION_ACTIONS.filter((action) => {

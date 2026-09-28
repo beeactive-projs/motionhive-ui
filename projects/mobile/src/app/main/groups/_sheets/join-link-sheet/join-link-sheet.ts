@@ -1,6 +1,7 @@
 import { Component, DestroyRef, computed, inject, input, model, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IonButton, IonIcon, IonNote, IonSpinner } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -24,13 +25,14 @@ import { GROUP_ICONS } from '../../groups.icons';
  */
 @Component({
   selector: 'mh-join-link-sheet',
-  imports: [IonButton, IonIcon, IonNote, IonSpinner, SheetShell],
+  imports: [IonButton, IonIcon, IonNote, IonSpinner, SheetShell, TranslatePipe],
   templateUrl: './join-link-sheet.html',
   styleUrl: './join-link-sheet.scss',
 })
 export class JoinLinkSheet {
   private readonly _groupService = inject(GroupService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly open = model(false);
@@ -70,12 +72,17 @@ export class JoinLinkSheet {
         next: (result) => {
           this.working.set(false);
           this._freshToken.set(result.token);
-          void this._feedbackService.success('Invite link ready');
+          void this._feedbackService.success(
+            this._translateService.instant('groups.joinLink.toast.ready'),
+          );
           this.changed.emit();
         },
         error: (error: unknown) => {
           this.working.set(false);
-          void this._feedbackService.error(error, 'Could not create an invite link.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('groups.joinLink.toast.createFailed'),
+          );
         },
       });
   }
@@ -86,15 +93,19 @@ export class JoinLinkSheet {
 
     const name = this.groupName();
     const outcome = await shareOrCopy({
-      title: name || 'Join my group',
-      text: name ? `Join ${name} on MotionHive` : 'Join my group on MotionHive',
+      title: name || this._translateService.instant('groups.joinLink.shareTitle'),
+      text: name
+        ? this._translateService.instant('groups.joinLink.shareText', { name })
+        : this._translateService.instant('groups.joinLink.shareTextNoName'),
       url,
     });
 
     // Only worth saying when it fell back to the clipboard — a native share
     // sheet already told them what happened.
     if (outcome === ShareOutcomes.Copied) {
-      void this._feedbackService.success('Link copied');
+      void this._feedbackService.success(
+        this._translateService.instant('toast.detail.linkCopied'),
+      );
     }
   }
 
@@ -109,12 +120,17 @@ export class JoinLinkSheet {
         next: () => {
           this.working.set(false);
           this._freshToken.set(null);
-          void this._feedbackService.success('Invite link revoked');
+          void this._feedbackService.success(
+            this._translateService.instant('groups.joinLink.toast.revoked'),
+          );
           this.changed.emit();
         },
         error: (error: unknown) => {
           this.working.set(false);
-          void this._feedbackService.error(error, 'Could not revoke that link.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('groups.joinLink.toast.revokeFailed'),
+          );
         },
       });
   }

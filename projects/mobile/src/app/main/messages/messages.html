@@ -5,27 +5,27 @@
     <ion-toolbar>
       <ion-searchbar
         mhAutofocus
-        placeholder="Search messages & people"
         inputmode="search"
+        [placeholder]="'messages.inbox.searchPlaceholder' | translate"
         [debounce]="0"
         [value]="people.query()"
         (ionInput)="onQueryChange($event.detail.value ?? '')"
       />
       <ion-buttons slot="end">
-        <ion-button (click)="closeSearch()">Cancel</ion-button>
+        <ion-button (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
 } @else {
   <ion-header [translucent]="true">
     <ion-toolbar>
-      <ion-title>Messages</ion-title>
+      <ion-title>{{ 'nav.messages' | translate }}</ion-title>
       <ion-buttons slot="end">
         <mh-notification-bell />
-        <ion-button aria-label="Search messages" (click)="openSearch()">
+        <ion-button [attr.aria-label]="'messages.inbox.searchAria' | translate" (click)="openSearch()">
           <ion-icon slot="icon-only" name="search-outline" />
         </ion-button>
-        <ion-button aria-label="New message" (click)="openCompose()">
+        <ion-button [attr.aria-label]="'messages.newMessage' | translate" (click)="openCompose()">
           <ion-icon slot="icon-only" name="create-outline" />
         </ion-button>
       </ion-buttons>
@@ -37,7 +37,7 @@
           @for (option of filters; track option.value) {
             <ion-segment-button [value]="option.value">
               <ion-label>
-                {{ option.label }}
+                {{ option.label | translate }}
                 @if (store.filterCounts()[option.value]; as count) {
                   <span class="count">{{ count }}</span>
                 }
@@ -56,7 +56,7 @@
   @if (!searchOpen()) {
     <ion-header collapse="condense">
       <ion-toolbar>
-        <ion-title size="large">Messages</ion-title>
+        <ion-title size="large">{{ 'nav.messages' | translate }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -66,15 +66,15 @@
   }
 
   @if (store.streamStatus() === 'closed') {
-    <ion-note class="mh-note-block">Reconnecting…</ion-note>
+    <ion-note class="mh-note-block">{{ 'messages.inbox.reconnecting' | translate }}</ion-note>
   }
 
   @if (showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load your messages"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'messages.inbox.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
@@ -97,13 +97,13 @@
     @if (isSearchEmpty()) {
       <mh-empty-state
         icon="search-outline"
-        heading="No results"
-        message="Nothing matched that. Try a different name or word."
+        [heading]="'empty.noResults' | translate"
+        [message]="'messages.inbox.noResultsMessage' | translate"
       />
     }
 
     @if (people.results().length > 0) {
-      <div class="mh-section-label">People</div>
+      <div class="mh-section-label">{{ 'messages.inbox.sectionPeople' | translate }}</div>
       <ion-list>
         @for (person of people.results(); track person.id) {
           <ion-item button detail="true" lines="full" (click)="openPerson(person)">
@@ -127,7 +127,7 @@
     }
 
     @if (store.visibleConversations().length > 0) {
-      <div class="mh-section-label">Messages</div>
+      <div class="mh-section-label">{{ 'nav.messages' | translate }}</div>
       <ion-list>
         @for (conversation of store.visibleConversations(); track conversation.id) {
           <mh-conversation-row
@@ -142,16 +142,16 @@
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="chatbubbles-outline"
-      heading="No messages yet"
-      message="Conversations with your coaches and clients will show up here."
-      actionLabel="New message"
+      [heading]="'messages.inbox.empty.heading' | translate"
+      [message]="'messages.inbox.empty.message' | translate"
+      [actionLabel]="'messages.newMessage' | translate"
       (action)="openCompose()"
     />
   } @else if (isFilteredEmpty()) {
     <mh-empty-state
       icon="checkmark-circle"
-      heading="All caught up"
-      message="You have no unread messages."
+      [heading]="'messages.inbox.caughtUp.heading' | translate"
+      [message]="'messages.inbox.caughtUp.message' | translate"
     />
   } @else {
     <ion-list>

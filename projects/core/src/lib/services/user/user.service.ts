@@ -26,6 +26,19 @@ export class UserService {
   }
 
   /**
+   * Store the UI language on the account. Silent — it runs in the background
+   * of a language switch or a sign-in sync, so a failure must neither flash
+   * the loader nor open the error dialog.
+   */
+  updateMyLanguage(language: string): Observable<User> {
+    return this._http.patch<User>(
+      `${environment.apiUrl}${API_ENDPOINTS.USERS.ME}`,
+      { language } satisfies UpdateUserPayload,
+      { context: silentRequest() },
+    );
+  }
+
+  /**
    * Upload a new profile picture. Backend accepts multipart/form-data
    * with a single `file` field. Returns the new Cloudinary URL so the
    * caller can swap the avatar in place without refetching the whole

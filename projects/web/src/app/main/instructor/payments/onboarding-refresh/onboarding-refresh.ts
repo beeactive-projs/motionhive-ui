@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonDirective } from 'primeng/button';
@@ -6,9 +7,8 @@ import { StripeOnboardingService } from 'core';
 
 @Component({
   selector: 'mh-onboarding-refresh',
-  imports: [CardModule, ProgressSpinnerModule, ButtonDirective],
+  imports: [CardModule, ProgressSpinnerModule, ButtonDirective, TranslatePipe],
   templateUrl: './onboarding-refresh.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingRefresh implements OnInit {
   private readonly _onboardingService = inject(StripeOnboardingService);

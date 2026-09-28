@@ -1,20 +1,20 @@
-<p-dialog header="Edit client notes" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }"
+<p-dialog [header]="'clients.notesDialog.title' | translate" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }"
   [closable]="true">
   <div class="flex flex-col gap-4">
     @if (client(); as c) {
     <mh-user-info [user]="c.client" />
     }
     <div class="flex flex-col gap-2">
-      <label for="editNotes" class="text-sm font-medium text-secondary-700">Notes</label>
+      <label for="editNotes" class="text-sm font-medium text-secondary-700">{{ 'form.label.notes' | translate }}</label>
       <textarea pTextarea id="editNotes" fluid [(ngModel)]="editNotes" [rows]="5"
-        placeholder="Add private notes about this client..."></textarea>
+        [placeholder]="'clients.notesDialog.placeholder' | translate"></textarea>
     </div>
   </div>
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" (click)="saveNotes()" [disabled]="notesLoading()">
       <i class="pi" [class]="notesLoading() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      Save notes
+      {{ 'clients.notesDialog.save' | translate }}
     </button>
   </ng-template>
 </p-dialog>

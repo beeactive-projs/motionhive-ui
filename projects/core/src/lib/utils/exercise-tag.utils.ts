@@ -1,4 +1,5 @@
 import { ExerciseLevel, MuscleRole } from '../models/exercise/exercise.enums';
+import { enumLabel } from '../i18n/enum-label';
 
 /**
  * Single source of truth for exercise tag colours. Before this, card and
@@ -47,10 +48,10 @@ export interface ExerciseLevelTag {
 export function exerciseLevelTag(level: ExerciseLevel): ExerciseLevelTag {
   switch (level) {
     case ExerciseLevel.Beginner:
-      return { text: 'Beginner', class: 'bg-green-100 text-green-800' };
+      return { text: enumLabel('exerciseLevel', level), class: 'bg-green-100 text-green-800' };
     case ExerciseLevel.Intermediate:
-      return { text: 'Intermediate', class: 'bg-yellow-100 text-yellow-800' };
+      return { text: enumLabel('exerciseLevel', level), class: 'bg-yellow-100 text-yellow-800' };
     case ExerciseLevel.Advanced:
-      return { text: 'Advanced', class: 'bg-red-100 text-red-800' };
+      return { text: enumLabel('exerciseLevel', level), class: 'bg-red-100 text-red-800' };
   }
 }

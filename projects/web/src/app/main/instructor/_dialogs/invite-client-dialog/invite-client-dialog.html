@@ -1,4 +1,4 @@
-<p-dialog header="Invite client" [(visible)]="visible" [modal]="true"
+<p-dialog [header]="'clients.inviteDialog.title' | translate" [(visible)]="visible" [modal]="true"
   [style]="{ width: '35rem', 'min-height': '35rem' }" [closable]="true">
 
   @if (!invitationSent()) {
@@ -9,12 +9,12 @@
 
     @if (mode() === 'find') {
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Search clients <span class="text-red-500">*</span></label>
+      <label class="text-sm font-medium">{{ 'clients.inviteDialog.searchLabel' | translate }} <span class="text-red-500">*</span></label>
       @if (!selectedUser()) {
-      <mh-user-search-autocomplete [role]="userRole" [excludeConnected]="true" placeholder="Search by name or email…"
+      <mh-user-search-autocomplete [role]="userRole" [excludeConnected]="true"
+        [placeholder]="'clients.inviteDialog.searchPlaceholder' | translate"
         (selected)="onUserSelected($event)" (cleared)="onUserCleared()" />
-      <span class="text-xs text-surface-400">Type at least 2 characters. Only platform users without an existing
-        relationship with you are shown.</span>
+      <span class="text-xs text-surface-400">{{ 'clients.inviteDialog.searchHint' | translate }}</span>
       } @else {
       <div
         class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 px-3 py-2">
@@ -29,7 +29,7 @@
           [rounded]="true"
           size="small"
           severity="secondary"
-          aria-label="Change selection"
+          [attr.aria-label]="'clients.inviteDialog.changeSelection' | translate"
           (click)="onUserCleared()"
           iconOnly
         >
@@ -40,9 +40,9 @@
     </div>
     } @else {
     <div class="flex flex-col gap-2">
-      <label for="inviteEmail" class="text-sm font-medium">Email address <span class="text-red-500">*</span></label>
+      <label for="inviteEmail" class="text-sm font-medium">{{ 'clients.inviteDialog.emailLabel' | translate }} <span class="text-red-500">*</span></label>
       <input id="inviteEmail" type="email" pInputText fluid formControlName="email"
-        placeholder="Enter the client's email address" [class.ng-invalid]="isFieldInvalid('email')"
+        [placeholder]="'clients.inviteDialog.emailPlaceholder' | translate" [class.ng-invalid]="isFieldInvalid('email')"
         [class.ng-dirty]="isFieldInvalid('email')" />
       @if (isFieldInvalid('email')) {
       <p-message severity="error" size="small" variant="simple">{{ getFieldError('email') }}</p-message>
@@ -51,33 +51,34 @@
     }
 
     <div class="flex flex-col gap-2">
-      <label for="inviteMessage" class="text-sm font-medium">Message (optional)</label>
+      <label for="inviteMessage" class="text-sm font-medium">{{ 'clients.inviteDialog.messageLabel' | translate }}</label>
       <textarea pTextarea id="inviteMessage" fluid formControlName="message" [rows]="3"
-        placeholder="Add a personal message..."></textarea>
+        [placeholder]="'clients.inviteDialog.messagePlaceholder' | translate"></textarea>
     </div>
 
   </form>
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(!canSubmit()) || inviteLoading()" (click)="sendInvitation()">
       <i class="pi" [class]="inviteLoading() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-      Send invitation
+      {{ 'clients.inviteDialog.send' | translate }}
     </button>
   </ng-template>
   } @else {
   <div class="flex flex-col gap-4">
     <p-message severity="success" variant="simple">
-      Invitation sent! Share the link below with your client.
+      {{ 'clients.inviteDialog.sentMessage' | translate }}
     </p-message>
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Referral link</label>
+      <label class="text-sm font-medium">{{ 'clients.inviteDialog.referralLink' | translate }}</label>
       <div class="flex gap-2">
         <input pInputText fluid [value]="referralLink()" [readonly]="true" class="text-xs" />
         <button pButton
           type="button"
           [severity]="linkCopied() ? 'success' : 'secondary'"
           [outlined]="true"
-          [pTooltip]="linkCopied() ? 'Copied!' : 'Copy link'"
+          [pTooltip]="(linkCopied() ? 'clients.inviteDialog.copied' : 'button.copyLink') | translate"
+          [attr.aria-label]="'button.copyLink' | translate"
           tooltipPosition="top"
           (click)="copyLink()"
           iconOnly
@@ -88,7 +89,7 @@
     </div>
   </div>
   <ng-template #footer>
-    <button pButton type="button" (click)="visible.set(false)">Done</button>
+    <button pButton type="button" (click)="visible.set(false)">{{ 'button.done' | translate }}</button>
   </ng-template>
   }
 

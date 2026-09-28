@@ -1,35 +1,36 @@
-<p-dialog header="Cancel booking" [(visible)]="visible" [modal]="true" [style]="{ width: '35rem'}" [closable]="true">
+<p-dialog [header]="'mySessions.common.cancelBooking' | translate" [(visible)]="visible" [modal]="true" [style]="{ width: '35rem'}" [closable]="true">
   @let p = participant();
   @if (p) {
   <div class="flex flex-col gap-3">
     <p-message severity="warn" styleClass="w-full">
-      Cancel up to <strong>{{ p.snapshotCancelCutoffH }}h</strong> before the
-      session to avoid charges.
+      {{ 'mySessions.cancelBooking.cutoffBefore' | translate }}
+      <strong>{{ 'mySessions.cancelBooking.cutoffHours' | translate: { hours: p.snapshotCancelCutoffH } }}</strong>
+      {{ 'mySessions.cancelBooking.cutoffAfter' | translate }}
     </p-message>
 
     <div class="flex flex-col gap-1">
       <label for="cbReason" class="text-sm font-medium text-surface-900 dark:text-surface-100">
-        Reason (optional)
+        {{ 'mySessions.cancelBooking.reasonLabel' | translate }}
       </label>
       <input id="cbReason" pInputText fluid [ngModel]="reason()" (ngModelChange)="reason.set($event)"
-        placeholder="Conflict, illness, etc." />
+        [placeholder]="'mySessions.cancelBooking.reasonPlaceholder' | translate" />
     </div>
 
     <div class="flex flex-col gap-1">
       <label for="cbMessage" class="text-sm font-medium text-surface-900 dark:text-surface-100">
-        Message to coach (optional)
+        {{ 'mySessions.cancelBooking.messageLabel' | translate }}
       </label>
       <textarea id="cbMessage" pTextarea rows="3" fluid [ngModel]="message()" (ngModelChange)="message.set($event)"
-        placeholder="Anything you want them to know."></textarea>
+        [placeholder]="'mySessions.cancelBooking.messagePlaceholder' | translate"></textarea>
     </div>
   </div>
   }
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Keep booking</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">{{ 'mySessions.cancelBooking.keepBooking' | translate }}</button>
     <button pButton type="button" severity="danger" (click)="submit()" [disabled]="busy()">
       <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-      Cancel booking
+      {{ 'mySessions.common.cancelBooking' | translate }}
     </button>
   </ng-template>
 </p-dialog>

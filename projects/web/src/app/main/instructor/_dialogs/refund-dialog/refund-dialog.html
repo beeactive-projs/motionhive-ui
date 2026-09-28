@@ -1,20 +1,20 @@
-<p-dialog header="Issue refund" [(visible)]="visible" [modal]="true" [style]="{ width: '26rem' }">
+<p-dialog [header]="'paymentDialogs.refund.title' | translate" [(visible)]="visible" [modal]="true" [style]="{ width: '26rem' }">
   @if (payment(); as p) {
   <div class="flex flex-col gap-4">
     <!-- Payment context -->
     <div class="bg-surface-100 dark:bg-surface-800 rounded-lg p-3">
-      <div class="text-sm text-surface-500 mb-1">Original payment</div>
+      <div class="text-sm text-surface-500 mb-1">{{ 'paymentDialogs.refund.originalPayment' | translate }}</div>
       <div class="font-semibold text-lg">{{ p.amountCents | currencyRon:p.currency }}</div>
       @if (p.amountRefundedCents > 0) {
       <div class="text-sm text-surface-500 mt-1">
-        Already refunded: {{ p.amountRefundedCents | currencyRon:p.currency }}
+        {{ 'paymentDialogs.refund.alreadyRefunded' | translate: { amount: (p.amountRefundedCents | currencyRon:p.currency) } }}
       </div>
       }
     </div>
 
     <!-- Amount -->
     <div class="flex flex-col gap-1">
-      <label for="refundAmount" class="text-sm font-medium">Refund amount</label>
+      <label for="refundAmount" class="text-sm font-medium">{{ 'paymentDialogs.refund.amount' | translate }}</label>
       <p-inputnumber id="refundAmount" [(ngModel)]="formAmount" mode="currency"
         [currency]="p.currency.toUpperCase()"
         [minFractionDigits]="2" [min]="0.01" [max]="maxRefundable" class="w-full" />
@@ -22,26 +22,26 @@
 
     <!-- Reason -->
     <div class="flex flex-col gap-1">
-      <label for="refundReason" class="text-sm font-medium">Reason</label>
+      <label for="refundReason" class="text-sm font-medium">{{ 'paymentDialogs.refund.reason' | translate }}</label>
       <p-select id="refundReason" [(ngModel)]="formReason" [options]="reasonOptions" optionLabel="label"
-        optionValue="value" placeholder="Select a reason" class="w-full" />
+        optionValue="value" [placeholder]="'paymentDialogs.refund.selectReason' | translate" class="w-full" />
     </div>
 
     <!-- Notes -->
     <div class="flex flex-col gap-1">
-      <label for="refundNotes" class="text-sm font-medium">Notes (optional)</label>
+      <label for="refundNotes" class="text-sm font-medium">{{ 'paymentDialogs.refund.notesOptional' | translate }}</label>
       <textarea id="refundNotes" pTextarea [(ngModel)]="formNotes" rows="2"
-        placeholder="Internal notes about this refund"></textarea>
+        [placeholder]="'paymentDialogs.refund.notesPlaceholder' | translate"></textarea>
     </div>
   </div>
   }
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+      <button pButton type="button" severity="secondary" text (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
       <button pButton type="button" severity="danger" (click)="submit()" [disabled]="saving()">
         <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-        Issue refund
+        {{ 'paymentDialogs.refund.submit' | translate }}
       </button>
     </div>
   </ng-template>

@@ -37,11 +37,13 @@ export const TAB_ICONS = {
   swapHorizontalOutline,
 };
 
+// Labels are translation keys — the tab bar and menu page translate them.
+
 // Tabs shared by both modes — same id, so Ionic keeps one stack across a swap.
-const HOME: TabItem = { id: TabIds.Home, label: 'Home', icon: 'home-outline' };
+const HOME: TabItem = { id: TabIds.Home, label: 'nav.home', icon: 'home-outline' };
 const MESSAGES: TabItem = {
   id: TabIds.Messages,
-  label: 'Messages',
+  label: 'nav.messages',
   icon: 'chatbubbles-outline',
 };
 
@@ -49,7 +51,7 @@ const MESSAGES: TabItem = {
 // Slate wash on purpose: honey is reserved for actions/selection, and the
 // coloured hues are taken by this row's coach-mode neighbours.
 const GROUPS: MoreTile = {
-  label: 'Groups',
+  label: 'nav.groups',
   icon: 'people-circle-outline',
   iconColor: 'medium',
   route: '/tabs/groups',
@@ -60,10 +62,10 @@ export const COACH_TAB_SET: TabSet = {
   defaultTab: TabIds.Home,
   tabs: [
     HOME,
-    { id: TabIds.Clients, label: 'Clients', icon: 'people-outline' },
+    { id: TabIds.Clients, label: 'nav.clients', icon: 'people-outline' },
     // Role segment as the id: the coach sessions area lives under
     // `/tabs/coach/sessions` (see tab.model.ts).
-    { id: TabIds.Coach, label: 'Sessions', icon: 'calendar-outline' },
+    { id: TabIds.Coach, label: 'nav.sessions', icon: 'calendar-outline' },
     MESSAGES,
   ],
   // Grouped by intent, mirroring web's rail: the coaching workspace first,
@@ -71,19 +73,19 @@ export const COACH_TAB_SET: TabSet = {
   // page's identity card is the way in.
   more: [
     {
-      label: 'Coaching',
+      label: 'nav.coaching',
       items: [
         {
-          label: 'Requests',
+          label: 'nav.requests',
           icon: 'person-add-outline',
           iconColor: 'info',
           route: '/tabs/clients/requests',
           requiresInstructor: true,
         },
-        { label: 'Programs', icon: 'albums-outline', iconColor: 'violet', route: '/tabs/programs' },
-        { label: 'Exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
+        { label: 'nav.programs', icon: 'albums-outline', iconColor: 'violet', route: '/tabs/programs' },
+        { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
         {
-          label: 'Payments',
+          label: 'nav.payments',
           icon: 'card-outline',
           iconColor: 'success',
           route: '/tabs/home/payments',
@@ -91,9 +93,9 @@ export const COACH_TAB_SET: TabSet = {
       ],
     },
     {
-      label: 'Community',
+      label: 'nav.community',
       items: [
-        { label: 'Discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
+        { label: 'nav.discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
         GROUPS,
       ],
     },
@@ -106,30 +108,30 @@ export const TRAIN_TAB_SET: TabSet = {
   tabs: [
     HOME,
     // The trainee's bookings — `/tabs/user/sessions`.
-    { id: TabIds.User, label: 'Sessions', icon: 'calendar-outline' },
+    { id: TabIds.User, label: 'nav.sessions', icon: 'calendar-outline' },
     // Training is the thing a trainee opens daily; finding a coach is
     // something they do once. Discover gave up the slot for it.
-    { id: TabIds.Workouts, label: 'Workouts', icon: 'barbell-outline' },
+    { id: TabIds.Workouts, label: 'nav.workouts', icon: 'barbell-outline' },
     MESSAGES,
   ],
   // "My training" mirrors web's mode group; the unlabeled card holds the
   // shared/general rows, the way web's shared block carries no heading.
   more: [
     {
-      label: 'My training',
+      label: 'nav.myTraining',
       items: [
         // The same library the coach side gets, read-only: a trainee looking
         // up a movement their plan names should not have to ask for it.
-        { label: 'Exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
+        { label: 'nav.exercises', icon: 'flash-outline', iconColor: 'coral', route: '/tabs/exercises' },
       ],
     },
     {
       label: '',
       items: [
-        { label: 'Discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
+        { label: 'nav.discover', icon: 'compass-outline', iconColor: 'teal', route: '/tabs/discover' },
         GROUPS,
         {
-          label: 'Billing',
+          label: 'nav.billing',
           icon: 'card-outline',
           iconColor: 'success',
           route: '/tabs/home/billing',

@@ -1,14 +1,14 @@
-<p-dialog header="Add members" [(visible)]="visible" [modal]="true" [style]="{ width: '38rem' }" [closable]="true">
+<p-dialog [header]="'groups.common.addMembers' | translate" [(visible)]="visible" [modal]="true" [style]="{ width: '38rem' }" [closable]="true">
 
   @if (loading()) {
   <div class="flex flex-col items-center gap-3 py-8">
     <p-progress-spinner strokeWidth="4" class="w-10 h-10" />
-    <span class="text-sm text-surface-500">Loading clients...</span>
+    <span class="text-sm text-surface-500">{{ 'groups.addMembers.loading' | translate }}</span>
   </div>
   } @else {
 
   <div class="mb-3">
-    <input pInputText fluid #filterInput placeholder="Search by name or email..."
+    <input pInputText fluid #filterInput [placeholder]="'groups.addMembers.searchPlaceholder' | translate"
       (input)="dt.filterGlobal(filterInput.value, 'contains')" />
   </div>
 
@@ -20,8 +20,8 @@
     <ng-template #header>
       <tr>
         <th style="width: 3rem"><p-table-header-checkbox /></th>
-        <th>Name</th>
-        <th>Email</th>
+        <th>{{ 'form.label.name' | translate }}</th>
+        <th>{{ 'form.label.email' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -40,7 +40,7 @@
         <td colspan="3">
           <div class="flex flex-col items-center gap-3 py-8 text-center">
             <i class="pi pi-users text-3xl text-surface-300"></i>
-            <p class="text-sm text-surface-500">All your active clients are already members of this group.</p>
+            <p class="text-sm text-surface-500">{{ 'groups.addMembers.empty' | translate }}</p>
           </div>
         </td>
       </tr>
@@ -50,10 +50,14 @@
   }
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(selectedCount() === 0 || loading()) || saving()" (click)="saveMembers()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-user-plus'"></i>
-      {{ selectedCount() > 0 ? 'Add ' + selectedCount() + ' ' + (selectedCount() === 1 ? 'member' : 'members') : 'Add members' }}
+      @if (selectedCount() > 0) {
+      {{ 'groups.addMembers.addCount' | translate: { count: selectedCount() } }}
+      } @else {
+      {{ 'groups.common.addMembers' | translate }}
+      }
     </button>
   </ng-template>
 </p-dialog>

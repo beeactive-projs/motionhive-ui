@@ -4,7 +4,7 @@
     class="w-full"
     [suggestions]="suggestions()"
     optionLabel="email"
-    [placeholder]="placeholder()"
+    [placeholder]="placeholder() || ('components.userSearch.placeholder' | translate)"
     [appendTo]="'body'"
     [delay]="0"
     (completeMethod)="search($event)"
@@ -23,7 +23,7 @@
       </div>
     </ng-template>
     <ng-template #empty>
-      <div class="p-3 text-sm text-surface-500">No matching users. Try inviting by email instead.</div>
+      <div class="p-3 text-sm text-surface-500">{{ 'components.userSearch.empty' | translate }}</div>
     </ng-template>
   </p-autocomplete>
 </p-iconfield>

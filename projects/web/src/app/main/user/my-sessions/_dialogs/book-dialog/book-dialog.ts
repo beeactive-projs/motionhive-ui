@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
@@ -10,6 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -30,13 +30,13 @@ import {
  */
 @Component({
   selector: 'mh-book-dialog',
-  imports: [DatePipe, DecimalPipe, FormsModule, Dialog, ButtonDirective, Textarea],
+  imports: [DatePipe, DecimalPipe, FormsModule, Dialog, ButtonDirective, Textarea, TranslatePipe],
   templateUrl: './book-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDialog {
   private readonly _sessionService = inject(SessionService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly instance = input<PublicSessionInstance | null>(null);
@@ -51,8 +51,10 @@ export class BookDialog {
 
   protected confirmLabel(): string {
     const tpl = this.instance()?.template;
-    if (!tpl) return 'Confirm';
-    return tpl.approvalRequired ? 'Request to join' : 'Confirm booking';
+    if (!tpl) return this._translateService.instant('mySessions.book.confirm');
+    return this._translateService.instant(
+      tpl.approvalRequired ? 'mySessions.common.requestToJoin' : 'mySessions.book.confirmBooking',
+    );
   }
 
   close(): void {
@@ -80,14 +82,18 @@ export class BookDialog {
           if (status === 409) {
             this._messageService.add({
               severity: 'warn',
-              summary: 'Time conflict',
-              detail:
-                'You already have another booking overlapping this session. Cancel that one first, or pick another time.',
+              summary: this._translateService.instant('mySessions.toast.bookConflict.summary'),
+              detail: this._translateService.instant('mySessions.toast.bookConflict.detail'),
               life: 6000,
             });
             return;
           }
-          showApiError(this._messageService, 'Could not book', 'Please try again.', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('mySessions.toast.bookFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
+            err,
+          );
         },
       });
   }

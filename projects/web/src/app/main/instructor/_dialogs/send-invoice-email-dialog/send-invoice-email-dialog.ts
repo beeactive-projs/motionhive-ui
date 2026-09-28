@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,12 +9,13 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
-import { InvoiceService, type Invoice } from 'core';
+import { InvoiceService, showApiError, type Invoice } from 'core';
 
 /**
  * Small confirmation dialog shown before firing an invoice-send request.
@@ -28,14 +28,14 @@ import { InvoiceService, type Invoice } from 'core';
  */
 @Component({
   selector: 'mh-send-invoice-email-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, InputText, MessageModule],
+  imports: [FormsModule, TranslatePipe, ButtonDirective, Dialog, InputText, MessageModule],
   templateUrl: './send-invoice-email-dialog.html',
   styleUrl: './send-invoice-email-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SendInvoiceEmailDialog {
   private readonly _invoiceService = inject(InvoiceService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly invoice = input<Invoice | null>(null);
@@ -88,18 +88,23 @@ export class SendInvoiceEmailDialog {
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Invoice sent',
-          detail: override ? `Sent to ${override}` : 'Email delivered',
+          summary: this._translateService.instant('paymentDialogs.sendInvoiceEmail.toast.sent.summary'),
+          detail: override
+            ? this._translateService.instant('paymentDialogs.sendInvoiceEmail.toast.sent.detailTo', {
+                email: override,
+              })
+            : this._translateService.instant('paymentDialogs.sendInvoiceEmail.toast.sent.detail'),
         });
         this.sent.emit();
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.sending.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.error?.message || 'Failed to send invoice',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('paymentDialogs.sendInvoiceEmail.toast.failed'),
+          err,
+        );
       },
     });
   }

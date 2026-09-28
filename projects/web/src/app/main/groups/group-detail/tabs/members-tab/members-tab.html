@@ -3,7 +3,7 @@
   @if (context.isOwner() && (loadingRequests() || joinRequests().length > 0)) {
   <section class="flex flex-col gap-3">
     <div class="flex items-center gap-2">
-      <h2 class="font-semibold">Pending requests</h2>
+      <h2 class="font-semibold">{{ 'groups.members.pendingRequests' | translate }}</h2>
       @if (!loadingRequests()) {
       <p-badge [value]="joinRequests().length.toString()" severity="warn" size="small" />
       }
@@ -40,7 +40,7 @@
         <div class="flex items-center gap-2 shrink-0">
           <button pButton type="button" size="small" severity="success" (click)="approveRequest(r)" [disabled]="isRequestBusy(r.id)">
             <i class="pi" [class]="isRequestBusy(r.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-            Approve
+            {{ 'button.approve' | translate }}
           </button>
           <button pButton
             type="button"
@@ -51,7 +51,7 @@
             [disabled]="isRequestBusy(r.id)"
           >
             <i class="pi" [class]="isRequestBusy(r.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-            Reject
+            {{ 'button.reject' | translate }}
           </button>
         </div>
       </li>
@@ -69,21 +69,21 @@
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
       <h1 class="font-heading font-semibold text-xl md:text-2xl">
-        Members · {{ context.totalMembers() }}
+        {{ 'groups.members.title' | translate: { count: context.totalMembers() } }}
       </h1>
       <p class="text-sm text-surface-700 dark:text-surface-400">
-        Manage the people in this group, their roles, and permissions.
+        {{ 'groups.members.subtitle' | translate }}
       </p>
     </div>
     @if (context.isOwner()) {
     <div class="flex flex-wrap gap-3">
-      <button pButton type="button" (click)="onAddMembers()"><i class="pi pi-user-plus"></i> Add members</button>
+      <button pButton type="button" (click)="onAddMembers()"><i class="pi pi-user-plus"></i> {{ 'groups.common.addMembers' | translate }}</button>
     </div>
     }
   </header>
 
   <div class="flex items-center gap-3">
-    <input pInputText type="search" placeholder="Search members…" [ngModel]="searchTerm()"
+    <input pInputText type="search" [placeholder]="'groups.members.searchPlaceholder' | translate" [ngModel]="searchTerm()"
       (ngModelChange)="searchTerm.set($event)" class="w-72 max-w-full" />
   </div>
 
@@ -92,11 +92,11 @@
       scrollHeight="flex" dataKey="id" size="small" stripedRows="true" rowHover="true">
       <ng-template #header>
         <tr>
-          <th>Name</th>
-          @if (context.isOwner()) { <th>Email</th> }
-          <th class="text-center">Role</th>
-          <th class="text-center">Joined</th>
-          @if (context.isOwner()) { <th class="w-32 text-center">Actions</th> }
+          <th>{{ 'form.label.name' | translate }}</th>
+          @if (context.isOwner()) { <th>{{ 'form.label.email' | translate }}</th> }
+          <th class="text-center">{{ 'groups.members.role' | translate }}</th>
+          <th class="text-center">{{ 'groups.members.joined' | translate }}</th>
+          @if (context.isOwner()) { <th class="w-32 text-center">{{ 'common.actions' | translate }}</th> }
         </tr>
       </ng-template>
 
@@ -109,7 +109,7 @@
           <td>{{ member.user?.email || '—' }}</td>
           }
           <td class="text-center">
-            <p-tag [value]="roleLabel(member.role)" [severity]="roleSeverity(member.role)" rounded />
+            <p-tag [value]="member.role | enumLabel: 'groupMemberRole'" [severity]="roleSeverity(member.role)" rounded />
           </td>
           <td class="text-center">{{ member.joinedAt | date: 'dd MMM yyyy' }}</td>
           @if (context.isOwner()) {
@@ -122,7 +122,8 @@
                 text
                 severity="secondary"
                 tooltipPosition="left"
-                pTooltip="Demote to member"
+                [pTooltip]="'groups.members.demote' | translate"
+                [attr.aria-label]="'groups.members.demote' | translate"
                 (click)="context.demoteMember(member)"
                 iconOnly
               >
@@ -135,7 +136,8 @@
                 text
                 severity="secondary"
                 tooltipPosition="left"
-                pTooltip="Promote to moderator"
+                [pTooltip]="'groups.members.promote' | translate"
+                [attr.aria-label]="'groups.members.promote' | translate"
                 (click)="context.promoteMember(member)"
                 iconOnly
               >
@@ -149,7 +151,8 @@
                 text
                 severity="danger"
                 tooltipPosition="left"
-                pTooltip="Remove member"
+                [pTooltip]="'groups.members.remove' | translate"
+                [attr.aria-label]="'groups.members.remove' | translate"
                 (click)="context.confirmRemoveMember(member)"
                 iconOnly
               >
@@ -194,9 +197,9 @@
             <div class="flex flex-col items-center gap-3 py-12 text-center">
               <i class="pi pi-users text-4xl text-secondary-300"></i>
               <h2 class="text-lg font-semibold text-secondary-700">
-                No members match your search
+                {{ 'groups.members.empty.title' | translate }}
               </h2>
-              <p class="text-sm text-secondary-500">Try a different search term.</p>
+              <p class="text-sm text-secondary-500">{{ 'groups.members.empty.message' | translate }}</p>
             </div>
           </td>
         </tr>

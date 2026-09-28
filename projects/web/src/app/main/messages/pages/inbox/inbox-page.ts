@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -7,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MessagingStore } from 'core';
 import { ConversationList } from '../../components/conversation-list/conversation-list';
 import { NewMessagePicker } from '../../components/new-message-picker/new-message-picker';
@@ -30,10 +30,9 @@ import { NewMessagePicker } from '../../components/new-message-picker/new-messag
  */
 @Component({
   selector: 'mh-inbox-page',
-  imports: [RouterOutlet, ConversationList, NewMessagePicker],
+  imports: [RouterOutlet, ConversationList, NewMessagePicker, TranslatePipe],
   templateUrl: './inbox-page.html',
   styleUrl: './inbox-page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InboxPage {
   protected readonly store = inject(MessagingStore);

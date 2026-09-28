@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
+  appLocale,
   BubblePosition,
   displayName,
   initialsOf,
@@ -25,11 +27,9 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
  */
 @Component({
   selector: 'mh-message-bubble',
-  standalone: true,
-  imports: [HexAvatar],
+  imports: [HexAvatar, TranslatePipe],
   templateUrl: './message-bubble.html',
   styleUrl: './message-bubble.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MessageBubble {
   readonly message = input.required<MessageView>();
@@ -110,7 +110,7 @@ export class MessageBubble {
     const iso = this.message().createdAt;
     const date = new Date(iso);
     // Same locale-aware short time as the rest of the app.
-    return date.toLocaleTimeString(undefined, {
+    return date.toLocaleTimeString(appLocale(), {
       hour: 'numeric',
       minute: '2-digit',
     });

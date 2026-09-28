@@ -1,8 +1,8 @@
 <ng-template #body>
   <ion-searchbar
     mhAutofocus
-    placeholder="Search people"
     inputmode="search"
+    [placeholder]="'messages.newMessageSheet.searchPlaceholder' | translate"
     [debounce]="0"
     [value]="people.query()"
     (ionInput)="people.setQuery($event.detail.value ?? '')"
@@ -10,7 +10,7 @@
 
   @if (!people.isActive()) {
     <ion-note class="mh-note-block">
-      Search for a coach, a client or anyone else on MotionHive to start a conversation.
+      {{ 'messages.newMessageSheet.intro' | translate }}
     </ion-note>
   } @else if (people.isSearching()) {
     <ion-list>
@@ -30,8 +30,8 @@
   } @else if (people.isEmpty()) {
     <mh-empty-state
       icon="person-outline"
-      heading="Nobody found"
-      message="Check the spelling, or try their last name."
+      [heading]="'messages.newMessageSheet.noneHeading' | translate"
+      [message]="'messages.newMessageSheet.noneMessage' | translate"
     />
   } @else {
     <ion-list>
@@ -59,7 +59,7 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="New message"
+  [title]="'messages.newMessage' | translate"
   [body]="body"
   [showFooter]="false"
   [breakpoints]="[0, 0.9]"

@@ -1,5 +1,6 @@
 import { ProductTypes, type BillingInterval, type ProductType } from './payment.enums';
 import type { PaginatedResponse } from '../common/pagination.model';
+import { translate } from '../../i18n/translator';
 
 export interface Product {
   id: string;
@@ -60,10 +61,10 @@ export function getProductBillingLabel(
   product: Pick<Product, 'type' | 'interval' | 'intervalCount'>,
 ): string {
   if (product.type !== ProductTypes.Subscription || !product.interval) {
-    return 'One-off';
+    return translate('common.oneOff');
   }
-  const count = product.intervalCount ?? 1;
-  return count === 1
-    ? `/ ${product.interval}`
-    : `/ ${count} ${product.interval}s`;
+  return translate('time.perInterval', {
+    interval: product.interval,
+    count: product.intervalCount ?? 1,
+  });
 }

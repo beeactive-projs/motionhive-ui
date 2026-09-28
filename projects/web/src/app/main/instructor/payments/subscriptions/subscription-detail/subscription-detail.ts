@@ -1,6 +1,5 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   computed,
   inject,
   OnInit,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
@@ -23,8 +23,10 @@ import {
   CurrencyRonPipe,
   StatusLabelPipe,
   getSubscriptionStatusSeverity,
+  showApiError,
   type Subscription,
 } from 'core';
+import { subscriptionPlanLabel } from '../../shared/payment-labels';
 
 /**
  * Subscription detail page — instructor view.
@@ -54,11 +56,11 @@ import {
     CurrencyRonPipe,
     StatusLabelPipe,
     Avatar,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './subscription-detail.html',
   styleUrl: './subscription-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SubscriptionDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
@@ -66,6 +68,7 @@ export class SubscriptionDetail implements OnInit {
   private readonly _subscriptionService = inject(SubscriptionService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly subscription = signal<Subscription | null>(null);
   readonly loading = signal(true);
@@ -77,24 +80,12 @@ export class SubscriptionDetail implements OnInit {
   /** "Personal trainings stuff · every 2 months" or fallback. */
   readonly planLabel = computed(() => {
     const sub = this.subscription();
-    if (!sub) return '';
-    const p = sub.product;
-    if (p?.name) {
-      const cadence = p.interval
-        ? p.intervalCount && p.intervalCount > 1
-          ? ` · every ${p.intervalCount} ${p.interval}s`
-          : ` · ${p.interval}ly`
-        : '';
-      return `${p.name}${cadence}`;
-    }
-    return sub.productId
-      ? `Plan #${sub.productId.slice(0, 8).toUpperCase()}`
-      : 'Plan';
+    return sub ? subscriptionPlanLabel(sub) : '';
   });
 
   readonly clientName = computed(() => {
     const c = this.subscription()?.client;
-    if (!c) return 'Unknown client';
+    if (!c) return this._translateService.instant('payments.common.unknownClient');
     if (c.firstName) return `${c.firstName}${c.lastName ? ' ' + c.lastName : ''}`;
     return c.email;
   });
@@ -135,7 +126,7 @@ export class SubscriptionDetail implements OnInit {
 
   goBackToList(): void {
     this._router.navigate(['/coaching/payments'], {
-      queryParams: { tab: 'subscriptions' },
+      queryParams: { tab: 'memberships' },
     });
   }
 
@@ -148,11 +139,12 @@ export class SubscriptionDetail implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Subscription not found',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('payments.subscriptionDetail.toast.notFound'),
+          err,
+        );
         this.goBackToList();
       },
     });
@@ -163,9 +155,8 @@ export class SubscriptionDetail implements OnInit {
     const sub = this.subscription();
     if (!sub) return;
     this._confirmationService.confirm({
-      message:
-        'The subscription will be cancelled at the end of the current period. The client keeps access until then.',
-      header: 'Cancel at period end',
+      message: this._translateService.instant('payments.subscriptionDetail.confirm.cancelAtEnd.message'),
+      header: this._translateService.instant('payments.subscriptionDetail.confirm.cancelAtEnd.header'),
       icon: 'pi pi-info-circle',
       accept: () => this.runCancel(sub.id, false),
     });
@@ -176,9 +167,8 @@ export class SubscriptionDetail implements OnInit {
     const sub = this.subscription();
     if (!sub) return;
     this._confirmationService.confirm({
-      message:
-        'The subscription will be cancelled immediately. The client loses access right away.',
-      header: 'Cancel immediately',
+      message: this._translateService.instant('payments.subscriptionDetail.confirm.cancelImmediately.message'),
+      header: this._translateService.instant('payments.subscriptionDetail.confirm.cancelImmediately.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.runCancel(sub.id, true),
@@ -200,19 +190,20 @@ export class SubscriptionDetail implements OnInit {
           // the new state (e.g. the client just paid via Stripe email).
           this._messageService.add({
             severity: 'info',
-            summary: 'Already activated',
-            detail: 'The client has already confirmed this membership.',
+            summary: this._translateService.instant('payments.subscriptionDetail.toast.alreadyActivated.summary'),
+            detail: this._translateService.instant('payments.subscriptionDetail.toast.alreadyActivated.detail'),
           });
           this.load(sub.id);
         }
       },
       error: (err) => {
         this.setupLinkLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Could not fetch setup link.',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('payments.subscriptionDetail.toast.setupLinkFailed'),
+          err,
+        );
       },
     });
   }
@@ -224,14 +215,14 @@ export class SubscriptionDetail implements OnInit {
       () =>
         this._messageService.add({
           severity: 'success',
-          summary: 'Copied',
-          detail: 'Setup link copied to clipboard.',
+          summary: this._translateService.instant('toast.summary.copied'),
+          detail: this._translateService.instant('payments.subscriptionDetail.toast.setupLinkCopied'),
         }),
       () =>
         this._messageService.add({
           severity: 'error',
-          summary: 'Copy failed',
-          detail: 'Select and copy the link manually.',
+          summary: this._translateService.instant('payments.common.copyFailed'),
+          detail: this._translateService.instant('payments.common.copyManually'),
         }),
     );
   }
@@ -249,16 +240,21 @@ export class SubscriptionDetail implements OnInit {
         this.actionLoading.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: immediate ? 'Subscription cancelled' : 'Cancellation scheduled',
+          summary: this._translateService.instant(
+            immediate
+              ? 'payments.subscriptionDetail.toast.cancelled'
+              : 'payments.subscriptionDetail.toast.cancellationScheduled',
+          ),
         });
       },
       error: (err) => {
         this.actionLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to cancel subscription',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('payments.subscriptionDetail.toast.cancelFailed'),
+          err,
+        );
       },
     });
   }

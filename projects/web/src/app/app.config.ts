@@ -4,7 +4,13 @@ import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/ht
 import { provideServiceWorker } from '@angular/service-worker';
 import { providePrimeNG } from 'primeng/config';
 
-import { authInterceptor, environment, errorInterceptor, loadingInterceptor } from 'core';
+import {
+  authInterceptor,
+  environment,
+  errorInterceptor,
+  loadingInterceptor,
+  provideAppI18n,
+} from 'core';
 
 import { routes } from './app.routes';
 import { MotionHiveLara } from '../../../core/src/styles/styles.primeng';
@@ -17,6 +23,7 @@ export const appConfig: ApplicationConfig = {
       withXhr(),
       withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor]),
     ),
+    provideAppI18n(),
     providePrimeNG({
       theme: {
         preset: MotionHiveLara,

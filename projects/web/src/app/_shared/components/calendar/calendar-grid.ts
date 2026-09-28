@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -10,7 +9,9 @@ import {
 } from '@angular/core';
 import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '@ngx-translate/core';
 import { interval } from 'rxjs';
+import { appLocale } from 'core';
 import type {
   CalendarCellClick,
   CalendarCellDrag,
@@ -25,8 +26,7 @@ import { EventBlock } from './event-block';
  *  `CalendarEvent` and wire the outputs. Imports nothing from `models/session/*`. */
 @Component({
   selector: 'mh-calendar-grid',
-  imports: [CommonModule, EventBlock],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, EventBlock, TranslatePipe],
   templateUrl: './calendar-grid.html',
   styleUrl: './calendar-grid.scss',
 })
@@ -123,7 +123,7 @@ export class CalendarGrid {
 
   /** "HH:mm" label for the now-line tooltip + pill. */
   protected readonly nowTimeLabel = computed(() =>
-    this._now().toLocaleTimeString('en-GB', {
+    this._now().toLocaleTimeString(appLocale(), {
       hour: '2-digit',
       minute: '2-digit',
     }),

@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonBackButton,
   IonBadge,
@@ -22,7 +23,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { AppModeStore, AuthService, WEB_APP_URL } from 'core';
+import { AppModeStore, AuthService, LanguageService, WEB_APP_URL, appLocale } from 'core';
 
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
@@ -39,10 +40,11 @@ import { AccountStore } from './account.store';
 import { PhotoSheet } from './_sheets/photo-sheet/photo-sheet';
 import { ShareSheet } from './_sheets/share-sheet/share-sheet';
 
-const THEME_LABELS: Record<ThemePreference, string> = {
-  [ThemePreferences.System]: 'System',
-  [ThemePreferences.Light]: 'Light',
-  [ThemePreferences.Dark]: 'Dark',
+/** Translation keys — shared with Manage account's radio group. */
+export const THEME_LABEL_KEYS: Record<ThemePreference, string> = {
+  [ThemePreferences.System]: 'account.theme.system',
+  [ThemePreferences.Light]: 'account.theme.light',
+  [ThemePreferences.Dark]: 'account.theme.dark',
 };
 
 /**
@@ -72,6 +74,7 @@ const THEME_LABELS: Record<ThemePreference, string> = {
     PhotoSheet,
     SettingsRow,
     ShareSheet,
+    TranslatePipe,
   ],
   templateUrl: './account.html',
   styleUrl: './account.scss',
@@ -83,6 +86,8 @@ export class Account implements OnInit, ViewWillEnter {
   private readonly _authService = inject(AuthService);
   private readonly _themeService = inject(ThemeService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
+  private readonly _languageService = inject(LanguageService);
 
   readonly store = inject(AccountStore);
 
@@ -95,10 +100,14 @@ export class Account implements OnInit, ViewWillEnter {
   readonly isVerified = computed(() => this.store.instructorProfile()?.isVerified === true);
   /** Only worth saying when it's true — "Not accepting" belongs on the page itself. */
   readonly acceptingBadge = computed(() =>
-    this.store.instructorProfile()?.isAcceptingClients ? 'Accepting' : null,
+    this.store.instructorProfile()?.isAcceptingClients
+      ? this._translateService.instant('account.rows.accepting')
+      : null,
   );
   readonly handle = computed(() => this.account()?.handle ?? null);
-  readonly themeLabel = computed(() => THEME_LABELS[this._themeService.preference()]);
+  readonly themeLabel = computed(() =>
+    this._translateService.instant(THEME_LABEL_KEYS[this._themeService.preference()]),
+  );
   /** Named the way the pill names it — "Coach"/"Trainee", never the mode word. */
   readonly roleLabel = computed(
     () => ROLES[resolveMode(this.isInstructor(), this._appModeStore.mode())].label,
@@ -107,19 +116,19 @@ export class Account implements OnInit, ViewWillEnter {
   readonly memberSince = computed(() => {
     const createdAt = this.account()?.createdAt;
     if (!createdAt) return null;
-    return new Date(createdAt).toLocaleDateString(undefined, {
+    return new Date(createdAt).toLocaleDateString(appLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
   });
 
-  readonly languageLabel = computed(() => {
-    const language = this.account()?.language;
-    return language ? `English (${language})` : 'English (en)';
-  });
+  /** The UI language — what this device renders in, which the account mirrors. */
+  readonly languageLabel = this._translateService.instant(`language.${this._languageService.current}`);
 
-  readonly timezoneLabel = computed(() => this.account()?.timezone ?? 'Not set');
+  readonly timezoneLabel = computed(
+    () => this.account()?.timezone ?? this._translateService.instant('form.placeholder.notSet'),
+  );
 
   constructor() {
     addIcons(ACCOUNT_ICONS);
@@ -152,9 +161,9 @@ export class Account implements OnInit, ViewWillEnter {
     if (!handle) return;
     try {
       await navigator.clipboard.writeText(`${WEB_APP_URL}/@${handle}`);
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(this._translateService.instant('toast.detail.linkCopied'));
     } catch {
-      await this._feedbackService.error(null, 'Could not copy the link.');
+      await this._feedbackService.error(null, this._translateService.instant('account.toast.copyFailed'));
     }
   }
 

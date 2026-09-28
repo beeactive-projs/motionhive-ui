@@ -5,23 +5,26 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ tpl?.title ? 'Attendance · ' +
-          tpl?.title : 'Attendance' }}</h1>
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
+          {{ tpl?.title
+            ? ('sessions.attendance.titleWithSession' | translate: { title: tpl?.title })
+            : ('sessions.attendance.title' | translate) }}
+        </h1>
       </div>
     </div>
     @if (inst) {
     <div class="flex gap-2 md:gap-3 shrink-0">
-      <button pButton type="button" (click)="followUpOpen.set(true)"><i class="pi pi-send"></i> Send follow-up</button>
+      <button pButton type="button" (click)="followUpOpen.set(true)"><i class="pi pi-send"></i> {{ 'sessions.attendance.sendFollowUp' | translate }}</button>
     </div>
     }
   </header>
 
   @if (store.loading() && !inst) {
-  <div class="mh-att__loading">Loading…</div>
+  <div class="mh-att__loading">{{ 'common.loading' | translate }}</div>
   } @else if (store.error()) {
   <div class="mh-att__error">
     <i class="pi pi-exclamation-circle"></i>
@@ -37,14 +40,17 @@
       <div class="mh-att__counters">
         <span class="mh-att__counter mh-att__counter--ok">
           <i class="pi pi-check-circle"></i>
-          <strong>{{ store.counts().attended }}</strong> attended
+          <strong>{{ store.counts().attended }}</strong>
+          {{ 'sessions.common.stat.attended' | translate: { count: store.counts().attended } }}
         </span>
         <span class="mh-att__counter mh-att__counter--no">
           <i class="pi pi-times-circle"></i>
-          <strong>{{ store.counts().noShow }}</strong> no-show
+          <strong>{{ store.counts().noShow }}</strong>
+          {{ 'sessions.common.stat.noShow' | translate: { count: store.counts().noShow } }}
         </span>
         <span class="mh-att__counter">
-          <strong>{{ pendingMark() }}</strong> not marked
+          <strong>{{ pendingMark() }}</strong>
+          {{ 'sessions.common.stat.notMarked' | translate: { count: pendingMark() } }}
         </span>
       </div>
     </header>

@@ -1,11 +1,11 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -20,7 +20,9 @@ import {
   CurrencyRonPipe,
   StatusLabelPipe,
   SubscriptionStatuses,
+  appLocale,
   getSubscriptionStatusSeverity,
+  showApiError,
   type Subscription,
 } from 'core';
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
@@ -29,6 +31,7 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   selector: 'mh-my-subscriptions',
   imports: [
     DatePipe,
+    TranslatePipe,
     ButtonDirective,
     TableModule,
     TagModule,
@@ -44,12 +47,12 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
   providers: [MessageService, ConfirmationService],
   templateUrl: './my-subscriptions.html',
   styleUrl: './my-subscriptions.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MySubscriptions implements OnInit {
   private readonly _clientPaymentService = inject(ClientPaymentService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   subscriptions = signal<Subscription[]>([]);
   totalRecords = signal(0);
@@ -63,6 +66,9 @@ export class MySubscriptions implements OnInit {
 
   readonly Statuses = SubscriptionStatuses;
 
+  /** PrimeNG fills these placeholders itself, so the message keeps them literal. */
+  readonly pageReportParams = { first: '{first}', last: '{last}', totalRecords: '{totalRecords}' };
+
   /**
    * Plan label for the table cell. Falls back gracefully when the
    * eager-loaded product join didn't return (legacy rows).
@@ -70,15 +76,18 @@ export class MySubscriptions implements OnInit {
   planLabel(sub: Subscription): string {
     const p = sub.product;
     if (p?.name) {
-      const cadence = p.interval
-        ? p.intervalCount && p.intervalCount > 1
-          ? ` · every ${p.intervalCount} ${p.interval}s`
-          : ` · ${p.interval}ly`
-        : '';
-      return `${p.name}${cadence}`;
+      if (!p.interval) return p.name;
+      const cadence = this._translateService.instant('time.cadence', {
+        interval: p.interval,
+        count: p.intervalCount ?? 1,
+      });
+      return this._translateService.instant('billing.mySubscriptions.planWithCadence', {
+        name: p.name,
+        cadence,
+      });
     }
     // Hide raw UUIDs from the user — they're meaningless to a non-dev.
-    return 'Membership';
+    return this._translateService.instant('billing.mySubscriptions.membership');
   }
 
   /** True when this row should expose a Cancel button. */
@@ -97,16 +106,18 @@ export class MySubscriptions implements OnInit {
    */
   confirmCancel(sub: Subscription): void {
     if (!this.canCancel(sub)) return;
-    const endLabel = sub.currentPeriodEnd
-      ? new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
+    const message = sub.currentPeriodEnd
+      ? this._translateService.instant('billing.mySubscriptions.confirmCancel.message', {
+          date: new Date(sub.currentPeriodEnd).toLocaleDateString(appLocale(), {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          }),
         })
-      : 'the end of the current period';
+      : this._translateService.instant('billing.mySubscriptions.confirmCancel.messageNoDate');
     this._confirmationService.confirm({
-      message: `Your membership will end on ${endLabel}. You'll keep access until then. Continue?`,
-      header: 'Cancel membership',
+      message,
+      header: this._translateService.instant('billing.mySubscriptions.confirmCancel.header'),
       icon: 'pi pi-info-circle',
       accept: () => this.runCancel(sub),
     });
@@ -124,17 +135,18 @@ export class MySubscriptions implements OnInit {
         );
         this._messageService.add({
           severity: 'success',
-          summary: 'Cancellation scheduled',
-          detail: 'Your membership will end at the close of the current period.',
+          summary: this._translateService.instant('billing.mySubscriptions.toast.cancelScheduled.summary'),
+          detail: this._translateService.instant('billing.mySubscriptions.toast.cancelScheduled.detail'),
         });
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.cancellingId.set(null);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Could not cancel',
-          detail: err.error?.message || 'Please try again in a moment.',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('billing.mySubscriptions.toast.cancelFailed.summary'),
+          this._translateService.instant('billing.mySubscriptions.toast.cancelFailed.detail'),
+          err,
+        );
       },
     });
   }
@@ -160,8 +172,8 @@ export class MySubscriptions implements OnInit {
           this.loading.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load subscriptions',
+            summary: this._translateService.instant('toast.summary.error'),
+            detail: this._translateService.instant('billing.mySubscriptions.toast.loadFailed'),
           });
         },
       });
@@ -180,13 +192,14 @@ export class MySubscriptions implements OnInit {
       next: (res) => {
         window.location.href = res.url;
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.portalLoading.set(false);
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to open customer portal',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('billing.mySubscriptions.toast.portalFailed'),
+          err,
+        );
       },
     });
   }

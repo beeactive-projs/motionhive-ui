@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Menu } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
@@ -16,12 +16,12 @@ import { HexAvatar } from '../../../../../_shared/components/hex-avatar/hex-avat
 
 @Component({
   selector: 'mh-post-header',
-  imports: [DatePipe, RouterLink, HexAvatar, ButtonDirective, Menu],
+  imports: [DatePipe, RouterLink, HexAvatar, ButtonDirective, Menu, TranslatePipe],
   templateUrl: './post-header.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostHeader {
   private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly post = input.required<Post>();
   readonly canModerate = input<boolean>(false);
@@ -40,14 +40,14 @@ export class PostHeader {
     const items: MenuItem[] = [];
     if (this.canEdit()) {
       items.push({
-        label: 'Edit',
+        label: this._translateService.instant('button.edit'),
         icon: 'pi pi-pencil',
         command: () => this.editRequested.emit(this.post()),
       });
     }
     if (this.canDelete()) {
       items.push({
-        label: 'Delete',
+        label: this._translateService.instant('button.delete'),
         icon: 'pi pi-trash',
         styleClass: 'mh-menu-danger',
         command: () => this.deleteRequested.emit(this.post()),
@@ -58,7 +58,7 @@ export class PostHeader {
 
   authorName(): string {
     const a = this.post().author;
-    if (!a) return 'Member';
+    if (!a) return this._translateService.instant('groups.post.unknownAuthor');
     return `${a.firstName} ${a.lastName}`;
   }
 }

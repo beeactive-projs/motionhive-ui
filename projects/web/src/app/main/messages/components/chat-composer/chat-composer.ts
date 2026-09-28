@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,7 +10,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MessagingStore } from 'core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MessagingStore, translate } from 'core';
 
 const MAX_BODY_LENGTH = 4000;
 
@@ -37,11 +37,9 @@ const MAX_BODY_LENGTH = 4000;
  */
 @Component({
   selector: 'mh-chat-composer',
-  standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './chat-composer.html',
   styleUrl: './chat-composer.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatComposer {
   protected readonly store = inject(MessagingStore);
@@ -53,7 +51,7 @@ export class ChatComposer {
   readonly recipientId = input<string | null>(null);
 
   /** Placeholder text, e.g. "Message Ana…" / "Message HIIT Strength Crew…" */
-  readonly placeholder = input<string>('Message…');
+  readonly placeholder = input<string>(translate('messages.composer.placeholder'));
 
   /** Disable the input entirely (e.g. picker without a recipient yet). */
   readonly disabled = input<boolean>(false);
@@ -66,6 +64,8 @@ export class ChatComposer {
 
   /** Local mirror of the draft to drive ngModel. */
   protected readonly value = signal('');
+
+  protected readonly maxBodyLength = MAX_BODY_LENGTH;
 
   protected readonly tickNow = signal(Date.now());
   private tickInterval?: ReturnType<typeof setInterval>;

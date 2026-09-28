@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { enumLabel } from 'core';
 import type { SessionInstance } from 'core';
 import { instanceToCalendarEvent } from './mappers';
 
@@ -109,8 +110,8 @@ describe('instanceToCalendarEvent', () => {
   it('in-person sessions get venue name as subtitle', () => {
     const inst = fakeInstance();
     const e = instanceToCalendarEvent(inst);
-    // No venue ref set → 'In-person' fallback
-    expect(e.subtitle).toBe('In-person');
+    // No venue ref set → the translated in-person label
+    expect(e.subtitle).toBe(enumLabel('sessionLocationKind', 'IN_PERSON'));
   });
 
   it('conflicting instance → ring=conflict', () => {

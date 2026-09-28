@@ -25,6 +25,7 @@ import {
   SegmentCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { InboxFilter, MessagingStore, UserSearchResult, displayName } from 'core';
@@ -80,6 +81,7 @@ import { MESSAGING_ICONS } from './messages.config';
     NewMessageSheet,
     NotificationBell,
     SearchbarAutofocusDirective,
+    TranslatePipe,
   ],
   templateUrl: './messages.html',
   styleUrl: './messages.scss',
@@ -88,6 +90,7 @@ export class Messages implements ViewWillEnter {
   readonly store = inject(MessagingStore);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly people = injectPeopleSearch();
 
@@ -95,10 +98,11 @@ export class Messages implements ViewWillEnter {
    * The subset of `InboxFilter` this app offers — the store also knows
    * 'groups' and 'coaches', which have no screen behind them yet. Narrower
    * than `InboxFilter` on purpose: these are the keys `filterCounts` returns.
+   * Labels are translation keys; the template translates them.
    */
   readonly filters = [
-    { value: 'all', label: 'All' },
-    { value: 'unread', label: 'Unread' },
+    { value: 'all', label: 'common.all' },
+    { value: 'unread', label: 'messages.inbox.filterUnread' },
   ] as const satisfies readonly { value: InboxFilter; label: string }[];
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -212,10 +216,15 @@ export class Messages implements ViewWillEnter {
     const wasMuted = this.store.conversations().find((c) => c.id === id)?.muted ?? false;
     const ok = await this.store.toggleMute(id);
     if (!ok) {
-      void this._feedbackService.error(null, 'Could not update notifications.');
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.muteFailed'),
+      );
       return;
     }
-    void this._feedbackService.success(wasMuted ? 'Unmuted' : 'Muted');
+    void this._feedbackService.success(
+      this._translateService.instant(wasMuted ? 'messages.toast.unmuted' : 'messages.toast.muted'),
+    );
   }
 
   retry(): void {

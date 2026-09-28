@@ -1,5 +1,7 @@
 import type { MessageService } from 'primeng/api';
 
+import { translate } from '../i18n/translator';
+
 /**
  * Shape of HttpErrorResponse-like errors. The actual `HttpErrorResponse`
  * type is in `@angular/common/http` but we keep this loose so the helper
@@ -19,13 +21,13 @@ interface MaybeApiError {
  * ours. Every 4xx from validation and business rules keeps the BE's own
  * message, which IS written for a person.
  */
-const FRIENDLY_BY_STATUS: Record<number, string> = {
-  0: 'You seem to be offline. Check your connection and try again.',
-  429: 'Too many requests at once — give it a moment and try again.',
-  500: 'Something went wrong on our side. Please try again.',
-  502: 'The service is temporarily unavailable. Please try again in a moment.',
-  503: 'The service is temporarily unavailable. Please try again in a moment.',
-  504: 'The server took too long to respond. Please try again.',
+const FRIENDLY_KEY_BY_STATUS: Record<number, string> = {
+  0: 'error.http.offline',
+  429: 'error.http.tooManyRequests',
+  500: 'error.http.server',
+  502: 'error.http.unavailable',
+  503: 'error.http.unavailable',
+  504: 'error.http.timeout',
 };
 
 /**
@@ -35,7 +37,8 @@ const FRIENDLY_BY_STATUS: Record<number, string> = {
  * written for the user and should reach them as is.
  */
 export function friendlyStatusMessage(status: number | undefined): string | null {
-  return status !== undefined ? (FRIENDLY_BY_STATUS[status] ?? null) : null;
+  const key = status !== undefined ? FRIENDLY_KEY_BY_STATUS[status] : undefined;
+  return key ? translate(key) : null;
 }
 
 export function apiErrorMessage(err: unknown, fallback: string): string {
@@ -76,7 +79,7 @@ export function showApiError(
   const severity: 'error' | 'warn' = status === 429 ? 'warn' : 'error';
   messageService.add({
     severity,
-    summary: status === 429 ? 'Slow down a moment' : summary,
+    summary: status === 429 ? translate('error.http.tooManyRequestsSummary') : summary,
     detail: apiErrorMessage(err, fallback),
   });
 }

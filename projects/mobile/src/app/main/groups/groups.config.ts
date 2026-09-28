@@ -7,6 +7,8 @@ import {
   GroupMemberRoles,
   JoinPolicies,
   JoinPolicy,
+  enumLabel,
+  translate,
 } from 'core';
 
 /**
@@ -147,15 +149,19 @@ export interface JoinCta {
  */
 export function joinCta(policy: JoinPolicy, hasPendingRequest: boolean): JoinCta {
   if (hasPendingRequest) {
-    return { action: JoinActions.Pending, label: 'Request pending', enabled: false };
+    return { action: JoinActions.Pending, label: translate('groups.join.pending'), enabled: false };
   }
   switch (policy) {
     case JoinPolicies.Open:
-      return { action: JoinActions.Join, label: 'Join group', enabled: true };
+      return { action: JoinActions.Join, label: translate('groups.join.join'), enabled: true };
     case JoinPolicies.Approval:
-      return { action: JoinActions.Request, label: 'Request to join', enabled: true };
+      return {
+        action: JoinActions.Request,
+        label: translate('groups.join.request'),
+        enabled: true,
+      };
     case JoinPolicies.InviteOnly:
-      return { action: JoinActions.Closed, label: 'Invite only', enabled: false };
+      return { action: JoinActions.Closed, label: translate('groups.join.closed'), enabled: false };
   }
 }
 
@@ -168,14 +174,7 @@ export function joinCta(policy: JoinPolicy, hasPendingRequest: boolean): JoinCta
  * so the pair lives here instead of half-importing one of them.
  */
 export function joinPolicyLabel(policy: JoinPolicy): string {
-  switch (policy) {
-    case JoinPolicies.Open:
-      return 'Open';
-    case JoinPolicies.Approval:
-      return 'Approval required';
-    case JoinPolicies.InviteOnly:
-      return 'Invite only';
-  }
+  return translate(`groups.joinPolicy.${policy}`);
 }
 
 /** Ionic colour slot for the policy chip. */
@@ -203,14 +202,7 @@ export function memberRoleTone(role: GroupMemberRole): string {
 }
 
 export function memberRoleLabel(role: GroupMemberRole): string {
-  switch (role) {
-    case GroupMemberRoles.Owner:
-      return 'Owner';
-    case GroupMemberRoles.Moderator:
-      return 'Moderator';
-    case GroupMemberRoles.Member:
-      return 'Member';
-  }
+  return enumLabel('groupMemberRole', role);
 }
 
 // ── Form options ─────────────────────────────────────────────────────────
@@ -219,26 +211,32 @@ export function memberRoleLabel(role: GroupMemberRole): string {
  * What each join policy means, in the order a new group should consider
  * them. The description matters more than the label here: "Approval" alone
  * tells an owner nothing about who ends up reviewing what.
+ *
+ * `label` and `hint` are translation keys — the form's template translates.
  */
 export const JOIN_POLICY_OPTIONS: ReadonlyArray<{
   value: JoinPolicy;
   label: string;
   hint: string;
 }> = [
-  { value: JoinPolicies.Open, label: 'Open', hint: 'Anyone can join instantly.' },
+  {
+    value: JoinPolicies.Open,
+    label: 'groups.joinPolicy.OPEN',
+    hint: 'groups.joinPolicyHint.OPEN',
+  },
   {
     value: JoinPolicies.Approval,
-    label: 'Approval required',
-    hint: 'People request to join and you decide.',
+    label: 'groups.joinPolicy.APPROVAL',
+    hint: 'groups.joinPolicyHint.APPROVAL',
   },
   {
     value: JoinPolicies.InviteOnly,
-    label: 'Invite only',
-    hint: 'Only people you invite can join.',
+    label: 'groups.joinPolicy.INVITE_ONLY',
+    hint: 'groups.joinPolicyHint.INVITE_ONLY',
   },
 ];
 
-/** Who may post, and whether it waits for review. */
+/** Who may post, and whether it waits for review. Keys, like the above. */
 export const POST_POLICY_OPTIONS: ReadonlyArray<{
   value: GroupMemberPostPolicy;
   label: string;
@@ -246,18 +244,18 @@ export const POST_POLICY_OPTIONS: ReadonlyArray<{
 }> = [
   {
     value: GroupMemberPostPolicies.Open,
-    label: 'Anyone can post',
-    hint: 'Members post straight to the feed.',
+    label: 'groups.postPolicy.OPEN',
+    hint: 'groups.postPolicyHint.OPEN',
   },
   {
     value: GroupMemberPostPolicies.ApprovalRequired,
-    label: 'Posts need approval',
-    hint: 'You and your moderators review each one.',
+    label: 'groups.postPolicy.APPROVAL_REQUIRED',
+    hint: 'groups.postPolicyHint.APPROVAL_REQUIRED',
   },
   {
     value: GroupMemberPostPolicies.Disabled,
-    label: 'Only staff can post',
-    hint: 'Members can read and comment.',
+    label: 'groups.postPolicy.DISABLED',
+    hint: 'groups.postPolicyHint.DISABLED',
   },
 ];
 
@@ -289,10 +287,8 @@ export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
  * WebView that is `capacitor://localhost`, which is meaningless to whoever
  * receives the link. Same reasoning as the client invite's `SIGNUP_URL`.
  *
- * The path is `/join/<token>`, which is where web's `mainRoutes` actually
- * mounts its accept screen. Web's own copy button builds
- * `/groups/join/<token>` and 404s — worth fixing there, but this generates
- * the address that works.
+ * The path is `/join/<token>`, which is where web's `mainRoutes` mounts its
+ * accept screen — the same address web's own copy button builds.
  */
 export function joinLinkUrl(token: string): string {
   return `${WEB_APP_URL}/join/${token}`;

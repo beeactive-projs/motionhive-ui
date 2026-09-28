@@ -1,4 +1,4 @@
-<p-dialog header="Confirm booking" [(visible)]="visible" [modal]="true" [style]="{ width: '35rem' }" [closable]="true">
+<p-dialog [header]="'mySessions.book.title' | translate" [(visible)]="visible" [modal]="true" [style]="{ width: '35rem' }" [closable]="true">
   @let inst = instance();
   @let tpl = inst?.template;
   @if (inst && tpl) {
@@ -16,23 +16,25 @@
 
     <dl class="grid grid-cols-2 gap-2.5 m-0">
       <div class="flex flex-col gap-0.5">
-        <dt class="text-xs uppercase tracking-wide text-surface-500">Price</dt>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.price' | translate }}</dt>
         <dd class="m-0 text-sm font-semibold text-color">
           @if (tpl.priceAmountCents > 0) {
           {{ tpl.priceAmountCents / 100 | number: '1.0-2' }} {{ tpl.priceCurrency }}
           } @else {
-          Free
+          {{ 'mySessions.common.free' | translate }}
           }
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="text-xs uppercase tracking-wide text-surface-500">Cancel up to</dt>
-        <dd class="m-0 text-sm font-semibold text-color">{{ tpl.cancellationCutoffHours }}h before start</dd>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'mySessions.book.cancelUpTo' | translate }}</dt>
+        <dd class="m-0 text-sm font-semibold text-color">
+          {{ 'mySessions.book.cancelUpToValue' | translate: { hours: tpl.cancellationCutoffHours } }}
+        </dd>
       </div>
       @if (tpl.approvalRequired) {
       <div class="col-span-2 flex flex-col gap-0.5">
-        <dt class="text-xs uppercase tracking-wide text-surface-500">Approval</dt>
-        <dd class="m-0 text-sm font-semibold text-color">Coach will review your request.</dd>
+        <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'mySessions.book.approval' | translate }}</dt>
+        <dd class="m-0 text-sm font-semibold text-color">{{ 'mySessions.book.approvalHint' | translate }}</dd>
       </div>
       }
     </dl>
@@ -40,17 +42,17 @@
     @if (tpl.approvalRequired) {
     <div class="flex flex-col gap-1">
       <label for="bookNote" class="text-sm font-medium text-surface-900 dark:text-surface-100">
-        Note for the coach (optional)
+        {{ 'mySessions.book.noteLabel' | translate }}
       </label>
       <textarea id="bookNote" pTextarea rows="3" fluid [ngModel]="note()" (ngModelChange)="note.set($event)"
-        placeholder="Anything they should know about your goals or experience?"></textarea>
+        [placeholder]="'mySessions.book.notePlaceholder' | translate"></textarea>
     </div>
     }
   </div>
   }
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" (click)="submit()" [disabled]="busy()">
       <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
       {{ confirmLabel() }}

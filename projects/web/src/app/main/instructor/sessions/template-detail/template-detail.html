@@ -4,15 +4,16 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ t?.title ?? 'Recurring
-          session' }}</h1>
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
+          {{ t?.title ?? ('sessions.templateDetail.title' | translate) }}
+        </h1>
         @if (t) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ t.durationMinutes }} min · {{ t.timezone }}
+          {{ 'sessions.templateDetail.subtitle' | translate: { minutes: t.durationMinutes, timezone: t.timezone } }}
         </p>
         }
       </div>
@@ -28,7 +29,7 @@
         severity="secondary"
         size="small"
         routerLink="/coaching/sessions/calendar"
-        aria-label="Calendar"
+        [attr.aria-label]="'sessions.common.calendar' | translate"
         iconOnly
       >
         <i class="pi pi-calendar"></i>
@@ -41,7 +42,7 @@
         severity="secondary"
         size="small"
         (click)="editOpen.set(true)"
-        aria-label="Edit"
+        [attr.aria-label]="'button.edit' | translate"
         iconOnly
       >
         <i class="pi pi-pencil"></i>
@@ -53,7 +54,7 @@
         severity="danger"
         size="small"
         (click)="cancelSeries()"
-        aria-label="Cancel series"
+        [attr.aria-label]="'sessions.templateDetail.cancelSeries' | translate"
         iconOnly
       >
         <i class="pi pi-times"></i>
@@ -68,16 +69,16 @@
         routerLink="/coaching/sessions/calendar"
       >
         <i class="pi pi-calendar"></i>
-        Calendar
+        {{ 'sessions.common.calendar' | translate }}
       </button>
       @if (t.status !== SessionTemplateStatus.Cancelled) {
       <button pButton type="button" severity="secondary" outlined [size]="isTablet() ? 'small' : undefined" (click)="editOpen.set(true)">
         <i class="pi pi-pencil"></i>
-        Edit
+        {{ 'button.edit' | translate }}
       </button>
       <button pButton type="button" text severity="danger" [size]="isTablet() ? 'small' : undefined" (click)="cancelSeries()">
         <i class="pi pi-times"></i>
-        Cancel series
+        {{ 'sessions.templateDetail.cancelSeries' | translate }}
       </button>
       }
       }
@@ -88,7 +89,7 @@
   <!-- States -->
   @if (loading() && !t) {
   <div class="flex items-center justify-center gap-2 p-8 text-center text-sm text-muted-color" role="status">
-    <i class="pi pi-spinner pi-spin"></i> Loading…
+    <i class="pi pi-spinner pi-spin"></i> {{ 'common.loading' | translate }}
   </div>
   } @else if (error()) {
   <p-message severity="error" [closable]="false">
@@ -102,14 +103,17 @@
       role="status">
       <i class="pi pi-times-circle text-xl shrink-0"></i>
       <div>
-        <strong class="font-bold">Series cancelled.</strong>
-        All upcoming occurrences were cancelled and attendees notified. Editing and rescheduling are disabled.
+        <strong class="font-bold">{{ 'sessions.templateDetail.cancelled.title' | translate }}</strong>
+        {{ 'sessions.templateDetail.cancelled.message' | translate }}
       </div>
     </div>
     } @else if (t.status === SessionTemplateStatus.Ended) {
     <div class="mh-td-banner mh-td-banner--ended flex items-center gap-3 rounded-xl px-4 py-3 text-sm" role="status">
       <i class="pi pi-check-circle text-xl shrink-0"></i>
-      <div><strong class="font-bold">Series ended.</strong> No new occurrences will be generated.</div>
+      <div>
+        <strong class="font-bold">{{ 'sessions.templateDetail.ended.title' | translate }}</strong>
+        {{ 'sessions.templateDetail.ended.message' | translate }}
+      </div>
     </div>
     }
 
@@ -124,11 +128,13 @@
         }
         @if (t.isRecurring) {
         <span
-          class="inline-flex items-center gap-1.5 rounded-full bg-(--p-primary-50) px-2.5 py-0.5 text-xs font-semibold capitalize text-(--p-primary-800)">
+          class="inline-flex items-center gap-1.5 rounded-full bg-(--p-primary-50) px-2.5 py-0.5 text-xs font-semibold text-(--p-primary-800)">
           <i class="pi pi-refresh"></i>
-          {{ t.recurrenceRule?.frequency | lowercase }}
+          @if (t.recurrenceRule?.frequency; as frequency) {
+          {{ 'sessions.templateDetail.frequency.' + frequency | translate }}
+          }
           @if (t.recurrenceRule?.interval && t.recurrenceRule!.interval > 1) {
-          · every {{ t.recurrenceRule!.interval }}
+          · {{ 'sessions.templateDetail.everyInterval' | translate: { interval: t.recurrenceRule!.interval } }}
           }
         </span>
         }
@@ -140,29 +146,29 @@
 
       <dl class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 m-0">
         <div class="flex flex-col gap-0.5">
-          <dt class="text-[11px] font-bold uppercase text-muted-color">Duration</dt>
-          <dd class="m-0 text-sm font-semibold text-color">{{ t.durationMinutes }} min</dd>
+          <dt class="text-[11px] font-bold uppercase text-muted-color">{{ 'form.label.duration' | translate }}</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ 'time.minutesShort' | translate: { minutes: t.durationMinutes } }}</dd>
         </div>
         <div class="flex flex-col gap-0.5">
-          <dt class="text-[11px] font-bold uppercase text-muted-color">Capacity</dt>
-          <dd class="m-0 text-sm font-semibold text-color">{{ t.capacity ?? 'Unlimited' }}</dd>
+          <dt class="text-[11px] font-bold uppercase text-muted-color">{{ 'sessions.templateDetail.capacity' | translate }}</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ t.capacity ?? ('sessions.templateDetail.unlimited' | translate) }}</dd>
         </div>
         <div class="flex flex-col gap-0.5">
-          <dt class="text-[11px] font-bold uppercase text-muted-color">Cancel cutoff</dt>
-          <dd class="m-0 text-sm font-semibold text-color">{{ t.cancellationCutoffHours }} hours</dd>
+          <dt class="text-[11px] font-bold uppercase text-muted-color">{{ 'sessions.templateDetail.cancelCutoff' | translate }}</dt>
+          <dd class="m-0 text-sm font-semibold text-color">{{ 'count.hours' | translate: { count: t.cancellationCutoffHours } }}</dd>
         </div>
         <div class="flex flex-col gap-0.5">
-          <dt class="text-[11px] font-bold uppercase text-muted-color">Price</dt>
+          <dt class="text-[11px] font-bold uppercase text-muted-color">{{ 'form.label.price' | translate }}</dt>
           <dd class="m-0 text-sm font-semibold text-color">
             @if (t.priceAmountCents > 0) {
             {{ t.priceAmountCents / 100 | number: '1.0-2' }} {{ t.priceCurrency }}
             } @else {
-            Free
+            {{ 'sessions.templateDetail.free' | translate }}
             }
           </dd>
         </div>
         <div class="flex flex-col gap-0.5">
-          <dt class="text-[11px] font-bold uppercase text-muted-color">Timezone</dt>
+          <dt class="text-[11px] font-bold uppercase text-muted-color">{{ 'form.label.timezone' | translate }}</dt>
           <dd class="m-0 text-sm font-semibold text-color">{{ t.timezone }}</dd>
         </div>
       </dl>
@@ -174,31 +180,32 @@
       <div
         class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
         <header>
-          <h3 class="m-0 mb-1 text-base font-semibold">Regenerate forward</h3>
+          <h3 class="m-0 mb-1 text-base font-semibold">{{ 'sessions.templateDetail.regenerate.title' | translate }}</h3>
           <p class="m-0 text-[13px] leading-relaxed text-muted-color">
-            Append more occurrences after <strong class="text-color">{{ lastOccurrenceLabel() }}</strong>
-            — past occurrences stay untouched.
+            {{ 'sessions.templateDetail.regenerate.introBefore' | translate }}
+            <strong class="text-color">{{ lastOccurrenceLabel() }}</strong>
+            {{ 'sessions.templateDetail.regenerate.introAfter' | translate }}
           </p>
         </header>
         <div class="flex flex-wrap items-center gap-3">
           <label class="inline-flex items-center gap-2 text-[13px] text-color">
-            <span>Add</span>
+            <span>{{ 'sessions.templateDetail.addLabel' | translate }}</span>
             <p-inputnumber [ngModel]="regenCount()" (ngModelChange)="regenCount.set($event ?? 1)" [min]="1" [max]="12"
               [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal" inputStyleClass="w-18 text-center"
               decrementButtonClass="p-button-text" incrementButtonClass="p-button-text" />
-            <span>more</span>
+            <span>{{ 'sessions.templateDetail.moreLabel' | translate }}</span>
           </label>
           <button pButton type="button" (click)="regenerate()" [disabled]="busyRegen()">
             <i class="pi" [class]="busyRegen() ? 'pi-spinner pi-spin' : 'pi-refresh'"></i>
-            {{ 'Generate ' + regenCount() + ' more' }}
+            {{ 'sessions.templateDetail.generateMore' | translate: { count: regenCount() } }}
           </button>
         </div>
       </div>
 
       <aside
         class="flex flex-col gap-3 rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5"
-        aria-label="Bulk actions">
-        <h4 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">Bulk actions</h4>
+        [attr.aria-label]="'sessions.templateDetail.bulkActions' | translate">
+        <h4 class="m-0 text-[13px] font-bold uppercase tracking-wide text-muted-color">{{ 'sessions.templateDetail.bulkActions' | translate }}</h4>
         <button pButton
           type="button"
           severity="danger"
@@ -208,15 +215,15 @@
           (click)="endAfterThisWeek()"
         >
           <i class="pi pi-stop-circle"></i>
-          End series after this week
+          {{ 'sessions.templateDetail.endAfterWeek' | translate }}
         </button>
         <small class="text-[11px] leading-snug text-muted-color">
-          Cancels every occurrence after the next one and ends the series.
+          {{ 'sessions.templateDetail.endAfterWeekHint' | translate }}
         </small>
         <div class="flex gap-2.5 rounded-lg bg-(--p-surface-50) px-3 py-2.5 text-xs leading-snug text-muted-color">
           <i class="pi pi-clock shrink-0 mt-px text-sm text-(--p-primary-700)" aria-hidden="true"></i>
-          <span><strong class="text-color">Coming soon:</strong> shift all upcoming times, update venue across the
-            remaining series.</span>
+          <span><strong class="text-color">{{ 'sessions.templateDetail.comingSoon.label' | translate }}</strong>
+            {{ 'sessions.templateDetail.comingSoon.text' | translate }}</span>
         </div>
       </aside>
     </section>
@@ -225,7 +232,7 @@
     <!-- Upcoming -->
     <section class="rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
       <h3 class="m-0 mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-color">
-        Upcoming
+        {{ 'sessions.templateDetail.upcoming' | translate }}
         <span class="rounded-full bg-(--p-surface-100) px-2 py-0.5 text-xs font-normal normal-case tracking-normal">
           {{ upcoming().length }}
         </span>
@@ -233,9 +240,11 @@
 
       @if (upcoming().length === 0) {
       <p class="m-0 italic text-[13px] text-muted-color">
-        No upcoming occurrences.
+        {{ 'sessions.templateDetail.noUpcoming' | translate }}
         @if (t.isRecurring) {
-        Use <strong>Regenerate forward</strong> above to generate more.
+        {{ 'sessions.templateDetail.noUpcomingHint.before' | translate }}
+        <strong>{{ 'sessions.templateDetail.regenerate.title' | translate }}</strong>
+        {{ 'sessions.templateDetail.noUpcomingHint.after' | translate }}
         }
       </p>
       } @else {
@@ -251,21 +260,22 @@
             @if (i.status === SessionInstanceStatus.Cancelled) {
             <span
               class="mh-td-status--cancelled inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
-              <i class="pi pi-times-circle text-xs"></i> Cancelled
+              <i class="pi pi-times-circle text-xs"></i> {{ SessionInstanceStatus.Cancelled | enumLabel: 'sessionInstanceStatus' }}
             </span>
             } @else {
             <span class="flex-1 text-xs text-muted-color">
-              <strong class="font-bold text-color">{{ i.confirmedCount }}</strong> confirmed
+              <strong class="font-bold text-color">{{ i.confirmedCount }}</strong>
+              {{ 'sessions.common.stat.confirmed' | translate: { count: i.confirmedCount } }}
               @if (i.pendingApprovalCount > 0) {
-              · <strong class="text-(--p-yellow-700)">{{ i.pendingApprovalCount }} pending</strong>
+              · <strong class="text-(--p-yellow-700)">{{ 'sessions.common.pendingCount' | translate: { count: i.pendingApprovalCount } }}</strong>
               }
               @if (i.waitlistedCount > 0) {
-              · {{ i.waitlistedCount }} waitlisted
+              · {{ 'sessions.common.waitlistedCount' | translate: { count: i.waitlistedCount } }}
               }
             </span>
             @if (i.conflictingInstanceIds?.length) {
             <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-(--p-red-700)">
-              <i class="pi pi-exclamation-triangle text-xs"></i> conflict
+              <i class="pi pi-exclamation-triangle text-xs"></i> {{ 'sessions.templateDetail.conflict' | translate }}
             </span>
             }
             }
@@ -281,7 +291,7 @@
     @if (past().length > 0) {
     <section class="rounded-xl border border-(--p-content-border-color) bg-(--p-content-background) p-4 md:p-5">
       <h3 class="m-0 mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-color">
-        Past
+        {{ 'sessions.templateDetail.past' | translate }}
         <span class="rounded-full bg-(--p-surface-100) px-2 py-0.5 text-xs font-normal normal-case tracking-normal">
           {{ past().length }}
         </span>
@@ -298,14 +308,16 @@
             @if (i.status === SessionInstanceStatus.Cancelled) {
             <span
               class="mh-td-status--cancelled inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
-              <i class="pi pi-times-circle text-xs"></i> Cancelled
+              <i class="pi pi-times-circle text-xs"></i> {{ SessionInstanceStatus.Cancelled | enumLabel: 'sessionInstanceStatus' }}
             </span>
             } @else {
             <span class="flex-1 text-xs text-muted-color">
               @if (i.attendedCount !== null) {
-              <strong class="font-bold text-color">{{ i.attendedCount }}</strong> attended
+              <strong class="font-bold text-color">{{ i.attendedCount }}</strong>
+              {{ 'sessions.common.stat.attended' | translate: { count: i.attendedCount } }}
               } @else {
-              <strong class="font-bold text-color">{{ i.confirmedCount }}</strong> confirmed
+              <strong class="font-bold text-color">{{ i.confirmedCount }}</strong>
+              {{ 'sessions.common.stat.confirmed' | translate: { count: i.confirmedCount } }}
               }
             </span>
             }

@@ -1,4 +1,11 @@
-import { meetingProviderLabel, sessionTypeTone } from 'core';
+import {
+  SessionInstanceStatus,
+  SessionLocationKind,
+  enumLabel,
+  meetingProviderLabel,
+  sessionTypeTone,
+  translate,
+} from 'core';
 import type { SessionInstance, SessionType, SessionTypeTone } from 'core';
 import type { CalendarEvent } from '../../../../_shared/components/calendar/calendar-event.model';
 
@@ -23,21 +30,23 @@ export function instanceToCalendarEvent(
   instance: SessionInstance,
 ): CalendarEvent {
   const template = instance.template;
-  const isOnline = template?.locationKind === 'ONLINE';
+  const isOnline = template?.locationKind === SessionLocationKind.Online;
   const venueName =
-    instance.venueOverride?.name ?? template?.venue?.name ?? 'In-person';
+    instance.venueOverride?.name ??
+    template?.venue?.name ??
+    enumLabel('sessionLocationKind', SessionLocationKind.InPerson);
   const subtitle = isOnline ? meetingProviderLabel(template?.meetingProvider) : venueName;
 
   const badges: CalendarEvent['badges'] = [];
   if (isOnline) badges.push('online');
   if (template?.isRecurring) badges.push('recurring');
-  if (instance.status === 'CANCELLED') badges.push('cancelled');
+  if (instance.status === SessionInstanceStatus.Cancelled) badges.push('cancelled');
 
   return {
     id: instance.id,
     start: new Date(instance.startAt),
     end: new Date(instance.endAt),
-    title: instance.titleOverride ?? template?.title ?? '(untitled)',
+    title: instance.titleOverride ?? template?.title ?? translate('sessions.calendar.untitled'),
     subtitle,
     color: template?.type ? sessionTypeCssColor(template.type) : 'var(--p-surface-500)',
     ring: (instance.conflictingInstanceIds?.length ?? 0) > 0 ? 'conflict' : 'none',

@@ -1,4 +1,4 @@
-<p-dialog [(visible)]="visible" [header]="editMode() ? 'Edit post' : 'Create post'" [modal]="true" [closable]="!submitting()"
+<p-dialog [(visible)]="visible" [header]="(editMode() ? 'groups.postDialog.editTitle' : 'groups.postDialog.createTitle') | translate" [modal]="true" [closable]="!submitting()"
   [closeOnEscape]="!submitting()" [dismissableMask]="false" [style]="{ width: '50rem', maxWidth: '95vw' }">
 
   <form [formGroup]="form" class="flex flex-col gap-4">
@@ -6,10 +6,10 @@
     <!-- Content -->
     <div class="flex flex-col gap-1.5">
       <label for="postContent" class="text-sm font-medium text-surface-900 dark:text-surface-100">
-        What's on your mind?
+        {{ 'groups.postDialog.contentLabel' | translate }}
       </label>
       <textarea pTextarea id="postContent" fluid rows="4" [autoResize]="true" [maxlength]="maxContent"
-        placeholder="Share an update with your group..." formControlName="content"
+        [placeholder]="'groups.postDialog.contentPlaceholder' | translate" formControlName="content"
         [class.ng-invalid]="isFieldInvalid('content')" [class.ng-dirty]="isFieldInvalid('content')"></textarea>
       <div class="flex items-center justify-between gap-2">
         @if (isFieldInvalid('content')) {
@@ -27,14 +27,14 @@
     @if (!editMode()) {
     <div class="flex flex-col gap-1.5">
       <label for="postGroups" class="text-sm font-medium text-surface-900 dark:text-surface-100">
-        Post to (1 or more)
+        {{ 'groups.postDialog.groupsLabel' | translate }}
       </label>
       <p-multiselect inputId="postGroups" [options]="postableGroups()" optionLabel="name" optionValue="id"
-        placeholder="Pick groups..." display="chip" [filter]="true" [appendTo]="'body'" fluid formControlName="groupIds"
+        [placeholder]="'groups.postDialog.groupsPlaceholder' | translate" display="chip" [filter]="true" [appendTo]="'body'" fluid formControlName="groupIds"
         [class.ng-invalid]="isFieldInvalid('groupIds')" [class.ng-dirty]="isFieldInvalid('groupIds')" />
       @if (postableGroups().length === 0) {
       <p-message severity="warn" size="small" variant="simple">
-        You don't have any groups where posting is allowed.
+        {{ 'groups.postDialog.noPostableGroups' | translate }}
       </p-message>
       } @else if (isFieldInvalid('groupIds')) {
       <p-message severity="error" size="small" variant="simple">
@@ -48,7 +48,7 @@
     <div class="flex flex-col gap-1.5">
       <div class="flex items-center justify-between">
         <label class="text-sm font-medium text-surface-900 dark:text-surface-100">
-          Images (optional, up to {{ maxImages }})
+          {{ 'groups.postDialog.imagesLabel' | translate: { max: maxImages } }}
         </label>
         <input #fileInput type="file" accept="image/*" multiple class="hidden" (change)="onFileSelected($event)" />
         <button pButton
@@ -60,7 +60,7 @@
           (click)="fileInput.click()"
         >
           <i class="pi pi-image"></i>
-          Add images
+          {{ 'groups.postDialog.addImages' | translate }}
         </button>
       </div>
 
@@ -78,7 +78,7 @@
           } @else {
           <div class="flex h-full w-full flex-col items-center justify-center text-center p-2">
             <i class="pi pi-times-circle text-danger-500"></i>
-            <span class="text-xs text-danger-500 mt-1">Failed</span>
+            <span class="text-xs text-danger-500 mt-1">{{ 'groups.postDialog.failed' | translate }}</span>
           </div>
           }
           <button pButton
@@ -86,7 +86,7 @@
             size="small"
             [rounded]="true"
             severity="secondary"
-            aria-label="Remove image"
+            [attr.aria-label]="'groups.postDialog.removeImage' | translate"
             (click)="removeUpload(upload)"
             class="!absolute !right-1 !top-1 !h-6 !w-6 !min-w-6 !bg-black/60 !text-white !border-0 hover:!bg-black/80"
             iconOnly
@@ -103,10 +103,10 @@
 
   <ng-template #footer>
     <div class="flex justify-end gap-2">
-      <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+      <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
       <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
         <i [class]="submitting() ? 'pi pi-spinner pi-spin' : (editMode() ? 'pi pi-check' : 'pi pi-send')"></i>
-        {{ editMode() ? 'Save changes' : 'Post' }}
+        {{ (editMode() ? 'button.saveChanges' : 'groups.postDialog.submit') | translate }}
       </button>
     </div>
   </ng-template>

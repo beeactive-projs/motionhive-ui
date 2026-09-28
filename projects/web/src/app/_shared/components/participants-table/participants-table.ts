@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
+  inject,
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -29,12 +30,13 @@ import type { SessionStatusTone } from 'core';
  */
 @Component({
   selector: 'mh-participants-table',
-  imports: [CommonModule, TableModule, ButtonDirective, TagModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, TableModule, ButtonDirective, TagModule, TranslatePipe],
   templateUrl: './participants-table.html',
   styleUrl: './participants-table.scss',
 })
 export class ParticipantsTable {
+  private readonly _translateService = inject(TranslateService);
+
   readonly participants = input.required<SessionParticipant[]>();
   readonly mode = input<'roster' | 'attendance' | 'readonly'>('roster');
   readonly pageSize = input(25);
@@ -49,7 +51,7 @@ export class ParticipantsTable {
 
   protected fullName(p: SessionParticipant): string {
     if (p.user) return `${p.user.firstName} ${p.user.lastName}`;
-    return 'Member';
+    return this._translateService.instant('components.participantsTable.member');
   }
 
   protected initials(p: SessionParticipant): string {

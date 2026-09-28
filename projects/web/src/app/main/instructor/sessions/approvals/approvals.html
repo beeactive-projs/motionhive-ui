@@ -2,43 +2,42 @@
   <!-- Header · back button + title + actions (mirrors the sessions list header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" text rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Approvals</h1>
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ 'sessions.approvals.title' | translate }}</h1>
       </div>
     </div>
     <div class="flex gap-2 md:gap-3 shrink-0">
       <button pButton type="button" severity="secondary" [outlined]="true" (click)="load()" [disabled]="loading()">
         <i class="pi" [class]="loading() ? 'pi-spinner pi-spin' : 'pi-refresh'"></i>
-        Refresh
+        {{ 'sessions.approvals.refresh' | translate }}
       </button>
     </div>
   </header>
 
   <div class="mh-app__beta">
     <i class="pi pi-info-circle"></i>
-    Approvals inbox shows sessions waiting on your decision. Click a row to open the session and approve / decline each
-    participant.
+    {{ 'sessions.approvals.intro' | translate }}
   </div>
 
   @if (loading() && rows().length === 0) {
-  <div class="mh-app__loading">Loading…</div>
+  <div class="mh-app__loading">{{ 'common.loading' | translate }}</div>
   } @else if (rows().length === 0) {
-  <mh-list-empty-state icon="pi pi-inbox" title="You're all caught up — no pending approvals." />
+  <mh-list-empty-state icon="pi pi-inbox" [title]="'sessions.approvals.empty' | translate" />
   } @else {
   <ul class="mh-app__rows">
     @for (i of rows(); track i.id) {
     <li>
       <a class="mh-app__row" [routerLink]="['/coaching/sessions', i.id]">
         <div class="mh-app__row-main">
-          <strong>{{ i.template?.title ?? 'Session' }}</strong>
+          <strong>{{ i.template?.title ?? ('common.session' | translate) }}</strong>
           <span class="mh-app__row-time">
             {{ i.startAt | date: 'EEE d MMM, HH:mm' }}
           </span>
         </div>
-        <p-tag [value]="i.pendingApprovalCount + ' pending'" severity="warn" />
+        <p-tag [value]="'sessions.common.pendingCount' | translate: { count: i.pendingApprovalCount }" severity="warn" />
         <i class="pi pi-chevron-right"></i>
       </a>
     </li>

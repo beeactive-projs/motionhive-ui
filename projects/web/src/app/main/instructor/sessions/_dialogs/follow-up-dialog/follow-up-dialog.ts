@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -38,11 +38,10 @@ import {
  */
 @Component({
   selector: 'mh-follow-up-dialog',
-  standalone: true,
-  imports: [CommonModule, FormsModule, Dialog, ButtonDirective, TextareaModule],
+  imports: [CommonModule, FormsModule, Dialog, ButtonDirective, TextareaModule, TranslatePipe],
   template: `
     <p-dialog
-      [header]="header()"
+      [header]="header() | translate"
       [(visible)]="visible"
       [modal]="true"
       [style]="{ width: '32rem' }"
@@ -51,7 +50,7 @@ import {
       <div class="mh-fu">
         @if (audiences().length > 1) {
           <div class="mh-fu__audience">
-            <span class="mh-fu__label">Send to</span>
+            <span class="mh-fu__label">{{ 'sessions.followUp.audienceLabel' | translate }}</span>
             <div class="mh-fu__opts">
               @for (a of audiences(); track a.value) {
                 <button
@@ -67,21 +66,21 @@ import {
 
         @if (quickTemplates().length > 0) {
           <div class="mh-fu__audience">
-            <span class="mh-fu__label">Quick templates</span>
+            <span class="mh-fu__label">{{ 'sessions.followUp.quickTemplates' | translate }}</span>
             <div class="mh-fu__opts">
               @for (q of quickTemplates(); track q.label) {
                 <button
                   type="button"
                   class="mh-fu__opt mh-fu__opt--template"
                   (click)="applyTemplate(q.body)"
-                >{{ q.label }}</button>
+                >{{ q.label | translate }}</button>
               }
             </div>
           </div>
         }
 
         <div class="mh-fu__field">
-          <label for="fuMsg">Message</label>
+          <label for="fuMsg">{{ 'sessions.followUp.messageLabel' | translate }}</label>
           <textarea
             id="fuMsg"
             pTextarea
@@ -89,19 +88,19 @@ import {
             fluid
             [ngModel]="message()"
             (ngModelChange)="message.set($event)"
-            [placeholder]="placeholder()"
+            [placeholder]="placeholder() | translate"
           ></textarea>
           <small class="mh-fu__hint">
-            Goes to each recipient as an in-app + email notification.
+            {{ 'sessions.followUp.hint' | translate }}
           </small>
         </div>
       </div>
 
       <ng-template #footer>
-        <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+        <button pButton type="button" severity="secondary" [text]="true" (click)="close()">{{ 'button.cancel' | translate }}</button>
         <button pButton type="button" [disabled]="(!message().trim()) || busy()" (click)="send()">
           <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-          Send
+          {{ 'button.send' | translate }}
         </button>
       </ng-template>
     </p-dialog>
@@ -140,11 +139,11 @@ import {
     }
     .mh-fu__hint { font-size: 11px; color: var(--p-text-muted-color); }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FollowUpDialog {
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly instanceId = input<string | null>(null);
@@ -157,14 +156,16 @@ export class FollowUpDialog {
   readonly message = signal('');
   readonly busy = signal(false);
 
+  /** Translation key for the header — also the success toast summary. */
   readonly header = computed(() =>
-    this.context() === 'pre' ? 'Message participants' : 'Send follow-up',
+    this.context() === 'pre' ? 'sessions.followUp.title.pre' : 'sessions.followUp.title.post',
   );
 
+  /** Translation key for the textarea placeholder. */
   readonly placeholder = computed(() =>
     this.context() === 'pre'
-      ? 'Running 10 min late — apologies! See you soon.'
-      : 'Thanks for joining! Here’s the recording link…',
+      ? 'sessions.followUp.placeholder.pre'
+      : 'sessions.followUp.placeholder.post',
   );
 
   // `userIds` audience isn't surfaced — the picker UX isn't worth the rare use case.
@@ -182,37 +183,18 @@ export class FollowUpDialog {
    * post-session covers "thanks / homework / next reminder". Clicking
    * replaces whatever's currently in the textarea — instructors who want
    * to keep their draft just don't touch the templates.
+   *
+   * `label` / `body` are translation keys; the body is translated when applied.
    */
   readonly quickTemplates = computed(() => {
-    return this.context() === 'pre'
-      ? [
-          {
-            label: 'Running late',
-            body: "Heads up — I'm running about 10 minutes behind. We'll start as soon as I'm there. Thanks for your patience!",
-          },
-          {
-            label: 'Venue update',
-            body: "Quick update on where we're meeting — same time, but a slightly different spot. I'll share the new address shortly.",
-          },
-          {
-            label: 'What to bring',
-            body: 'Bring a mat, water, and clothes you can move in. Looking forward to seeing you!',
-          },
-        ]
-      : [
-          {
-            label: 'Thank you',
-            body: 'Thanks for joining today — great work in there. Let me know how your body feels tomorrow.',
-          },
-          {
-            label: 'Homework',
-            body: "Here's what to practise before our next session — three sets of the breath work we covered, daily if you can.",
-          },
-          {
-            label: 'Next reminder',
-            body: "Our next session is on the books — don't forget to book in if it's a public class.",
-          },
-        ];
+    const names =
+      this.context() === 'pre'
+        ? ['runningLate', 'venueUpdate', 'whatToBring']
+        : ['thankYou', 'homework', 'nextReminder'];
+    return names.map((name) => ({
+      label: `sessions.followUp.template.${name}.label`,
+      body: `sessions.followUp.template.${name}.body`,
+    }));
   });
 
   constructor() {
@@ -225,8 +207,8 @@ export class FollowUpDialog {
   }
 
   /** Drop the templated copy into the textarea, replacing whatever's there. */
-  applyTemplate(body: string): void {
-    this.message.set(body);
+  applyTemplate(bodyKey: string): void {
+    this.message.set(this._translateService.instant(bodyKey));
   }
 
   close(): void {
@@ -239,26 +221,34 @@ export class FollowUpDialog {
     const m = this.message().trim();
     if (!m) return;
     this.busy.set(true);
-    this._svc
+    this._sessionService
       .followUp(id, { audience: this.audience(), message: m })
       .subscribe({
         next: (res) => {
           this.busy.set(false);
           this.visible.set(false);
-          this._msg.add({
+          this._messageService.add({
             severity: 'success',
-            summary: this.header(),
-            detail: `${res.notifiedUserIds.length} recipient(s) notified.`,
+            summary: this._translateService.instant(this.header()),
+            detail: this._translateService.instant('sessions.followUp.recipientsNotified', {
+              count: res.notifiedUserIds.length,
+            }),
           });
           this.sent.emit(res);
         },
         error: (err: unknown) => {
           this.busy.set(false);
-          const summary =
+          const summary = this._translateService.instant(
             this.context() === 'pre'
-              ? 'Could not send message'
-              : 'Could not send follow-up';
-          showApiError(this._msg, summary, 'Please try again.', err);
+              ? 'sessions.followUp.error.pre'
+              : 'sessions.followUp.error.post',
+          );
+          showApiError(
+            this._messageService,
+            summary,
+            this._translateService.instant('common.pleaseTryAgain'),
+            err,
+          );
         },
       });
   }

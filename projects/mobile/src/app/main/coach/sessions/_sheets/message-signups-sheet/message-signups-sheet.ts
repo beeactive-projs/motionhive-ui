@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, model, signal } from '@angular/core';
 import { IonNote, IonTextarea } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import { FollowUpAudience, SessionService } from 'core';
@@ -10,11 +11,14 @@ import { FeedbackService } from '../../../../../_shared/services/feedback.servic
 /** Matches the BE's cap on the follow-up body. */
 const MAX_LENGTH = 2000;
 
-/** One tap to fill the box, still editable before sending. */
+/**
+ * One tap to fill the box, still editable before sending. Translation keys —
+ * the template translates the chips and `use()` translates what it inserts.
+ */
 const SUGGESTIONS = [
-  'Running a few minutes late — see you shortly.',
-  "Don't forget water and a towel.",
-  'Change of plan for this one — details to follow.',
+  'sessions.messageSheet.suggestions.late',
+  'sessions.messageSheet.suggestions.bring',
+  'sessions.messageSheet.suggestions.change',
 ];
 
 /**
@@ -27,21 +31,25 @@ const SUGGESTIONS = [
  */
 @Component({
   selector: 'mh-message-signups-sheet',
-  imports: [IonNote, IonTextarea, SheetShell],
+  imports: [IonNote, IonTextarea, SheetShell, TranslatePipe],
   templateUrl: './message-signups-sheet.html',
   styleUrl: './message-signups-sheet.scss',
 })
 export class MessageSignupsSheet {
   private readonly _sessionService = inject(SessionService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly instanceId = input<string | null>(null);
   readonly audience = input<FollowUpAudience>('all');
   /** Required when `audience` is 'userIds'. */
   readonly userIds = input<string[]>([]);
-  /** Shown under the title so it is clear who receives this. */
-  readonly recipientLabel = input('everyone booked in');
+  /**
+   * The line under the title saying who receives this, as a full sentence —
+   * "Goes to everyone booked in." when the caller does not say otherwise.
+   */
+  readonly recipientNote = input<string | null>(null);
 
   readonly suggestions = SUGGESTIONS;
   readonly message = signal('');
@@ -63,7 +71,7 @@ export class MessageSignupsSheet {
   }
 
   use(suggestion: string): void {
-    this.message.set(suggestion);
+    this.message.set(this._translateService.instant(suggestion));
   }
 
   send(): void {
@@ -87,13 +95,16 @@ export class MessageSignupsSheet {
           const count = result.notifiedUserIds.length;
           void this._feedbackService.success(
             count === 0
-              ? 'Nobody to notify'
-              : `Sent to ${count} ${count === 1 ? 'person' : 'people'}`,
+              ? this._translateService.instant('sessions.toast.nobodyToNotify')
+              : this._translateService.instant('sessions.toast.messageSent', { count }),
           );
         },
         error: (error: unknown) => {
           this.sending.set(false);
-          void this._feedbackService.error(error, 'Could not send the message.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('sessions.toast.messageFailed'),
+          );
         },
       });
   }

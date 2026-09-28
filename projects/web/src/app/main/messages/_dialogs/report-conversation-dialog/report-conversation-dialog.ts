@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   input,
@@ -12,7 +11,8 @@ import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Textarea } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
-import { MessageReportCategory, MessagingStore } from 'core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MessageReportCategory, MessagingStore, translate } from 'core';
 
 const MAX_NOTES_LENGTH = 1000;
 
@@ -28,32 +28,32 @@ const MAX_NOTES_LENGTH = 1000;
  */
 @Component({
   selector: 'mh-report-conversation-dialog',
-  standalone: true,
-  imports: [FormsModule, ButtonDirective, Dialog, Textarea],
+  imports: [FormsModule, ButtonDirective, Dialog, Textarea, TranslatePipe],
   templateUrl: './report-conversation-dialog.html',
   styleUrl: './report-conversation-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReportConversationDialog {
   private readonly _store = inject(MessagingStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly conversationId = input<string | null>(null);
-  readonly displayName = input<string>('this conversation');
+  readonly displayName = input<string>(translate('messages.thisConversation'));
   readonly reported = output<void>();
 
   protected readonly submitting = signal(false);
   protected readonly category = signal<MessageReportCategory | null>(null);
   protected readonly notes = signal('');
 
-  protected readonly categories: { key: MessageReportCategory; label: string }[] = [
-    { key: 'SPAM', label: 'Spam' },
-    { key: 'SCAM', label: 'Scam / fraud' },
-    { key: 'HARASSMENT', label: 'Harassment' },
-    { key: 'IMPERSONATION', label: 'Impersonation' },
-    { key: 'SEXUAL', label: 'Sexual content' },
-    { key: 'OTHER', label: 'Other' },
+  /** Category chips in display order; labels come from `messages.reportCategory.<value>`. */
+  protected readonly categories: readonly MessageReportCategory[] = [
+    'SPAM',
+    'SCAM',
+    'HARASSMENT',
+    'IMPERSONATION',
+    'SEXUAL',
+    'OTHER',
   ];
 
   protected readonly maxNotes = MAX_NOTES_LENGTH;
@@ -92,16 +92,16 @@ export class ReportConversationDialog {
     if (ok) {
       this._messageService.add({
         severity: 'success',
-        summary: 'Report submitted',
-        detail: 'Our team will review it shortly. Thank you.',
+        summary: this._translateService.instant('messages.toast.reported'),
+        detail: this._translateService.instant('messages.toast.reportedDetail'),
       });
       this.visible.set(false);
       this.reported.emit();
     } else {
       this._messageService.add({
         severity: 'error',
-        summary: 'Could not submit',
-        detail: 'Please try again.',
+        summary: this._translateService.instant('messages.toast.reportFailed'),
+        detail: this._translateService.instant('common.pleaseTryAgain'),
       });
     }
   }

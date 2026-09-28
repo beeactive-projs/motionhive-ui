@@ -3,12 +3,12 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home/payments" />
     </ion-buttons>
-    <ion-title>New invoice</ion-title>
+    <ion-title>{{ 'payments.create.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="mh-section-label">Who</div>
+  <div class="mh-section-label">{{ 'payments.create.sections.who' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item button detail="true" lines="none" (click)="pickerOpen.set(true)">
       @if (selectedClient(); as client) {
@@ -20,25 +20,25 @@
           [color]="toneFor(client)"
         />
         <ion-label>
-          <p>Billing</p>
+          <p>{{ 'payments.create.billing' | translate }}</p>
           <h3>{{ selectedName() }}</h3>
         </ion-label>
       } @else {
         <ion-icon slot="start" name="person-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <h3>Choose a client</h3>
+          <h3>{{ 'payments.create.chooseClient' | translate }}</h3>
         </ion-label>
       }
     </ion-item>
   </ion-list>
 
-  <div class="mh-section-label">What for</div>
+  <div class="mh-section-label">{{ 'payments.create.sections.whatFor' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
     @for (item of items(); track $index) {
       <ion-item lines="full" class="line">
-        <ion-label position="stacked">Description</ion-label>
+        <ion-label position="stacked">{{ 'form.label.description' | translate }}</ion-label>
         <ion-input
-          placeholder="Personal training session"
+          [placeholder]="'payments.create.descriptionPlaceholder' | translate"
           [value]="item.description"
           (ionInput)="setDescription($index, $any($event.target).value)"
         />
@@ -54,12 +54,12 @@
           <!-- A stepper, not a number field: quantities here are 1–5, and a
                keyboard for that is a keyboard too many. -->
           <div class="stepper">
-            <button type="button" aria-label="Fewer" (click)="step($index, -1)">−</button>
+            <button type="button" [attr.aria-label]="'payments.create.fewer' | translate" (click)="step($index, -1)">−</button>
             <span>{{ item.quantity }}</span>
-            <button type="button" aria-label="More" (click)="step($index, 1)">+</button>
+            <button type="button" [attr.aria-label]="'payments.create.more' | translate" (click)="step($index, 1)">+</button>
           </div>
           @if (items().length > 1) {
-            <button type="button" class="remove" aria-label="Remove" (click)="removeItem($index)">
+            <button type="button" class="remove" [attr.aria-label]="'button.remove' | translate" (click)="removeItem($index)">
               ×
             </button>
           }
@@ -68,14 +68,14 @@
     }
     <ion-item button detail="false" lines="none" (click)="addItem()">
       <ion-icon slot="start" name="add-outline" color="primary" aria-hidden="true" />
-      <ion-label color="primary"><h3>Add another line</h3></ion-label>
+      <ion-label color="primary"><h3>{{ 'payments.create.addLine' | translate }}</h3></ion-label>
     </ion-item>
   </ion-list>
 
-  <div class="mh-section-label">When it's due</div>
+  <div class="mh-section-label">{{ 'payments.create.sections.due' | translate }}</div>
   <ion-list [inset]="true" class="mh-card-list">
     <ion-item lines="none">
-      <ion-label position="stacked">Due date (optional)</ion-label>
+      <ion-label position="stacked">{{ 'payments.create.dueDate' | translate }}</ion-label>
       <ion-input
         type="date"
         [value]="dueDate()"
@@ -85,7 +85,7 @@
   </ion-list>
 
   <div class="total-row">
-    <span>Total</span>
+    <span>{{ 'payments.create.total' | translate }}</span>
     <!-- Currency is the coach's settlement currency: shown, not chosen. -->
     <strong>{{ totalCents() | currencyRon: currency() : 'code' }}</strong>
   </div>
@@ -97,13 +97,13 @@
          irreversible choice the accidental one. -->
     <div class="pair">
       <ion-button fill="outline" expand="block" [disabled]="!canSave() || saving()" (click)="save(false)">
-        Save draft
+        {{ 'payments.create.saveDraft' | translate }}
       </ion-button>
       <ion-button expand="block" [disabled]="!canSave() || saving()" (click)="save(true)">
-        Create &amp; send
+        {{ 'payments.create.createAndSend' | translate }}
       </ion-button>
     </div>
-    <p class="note">Sending finalises the invoice and Stripe emails it to your client.</p>
+    <p class="note">{{ 'payments.create.sendNote' | translate }}</p>
   </ion-toolbar>
 </ion-footer>
 
@@ -128,7 +128,7 @@
     }
     @if (clients().length === 0) {
       <ion-note class="mh-note-block">
-        You have no active clients yet. Invoices go to people you already coach.
+        {{ 'payments.create.noClients' | translate }}
       </ion-note>
     }
   </ion-list>
@@ -136,7 +136,7 @@
 
 <mh-sheet-shell
   [(open)]="pickerOpen"
-  title="Choose a client"
+  [title]="'payments.create.chooseClient' | translate"
   [body]="picker"
   [showFooter]="false"
   [breakpoints]="[0, 0.75]"

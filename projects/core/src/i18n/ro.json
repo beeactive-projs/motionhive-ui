@@ -1,0 +1,484 @@
+{
+  "a11y": {
+    "back": "Înapoi",
+    "bottomSheet": "Panou de jos",
+    "close": "Închide",
+    "closePhoto": "Închide fotografia",
+    "closeSearch": "Închide căutarea",
+    "dismissNotification": "Închide notificarea",
+    "hidePassword": "Ascunde parola",
+    "loading": "Se încarcă",
+    "moreActions": "Mai multe acțiuni",
+    "nextMonth": "Luna următoare",
+    "notificationsUnread": "Notificări, {count} necitite",
+    "openMenu": "Deschide meniul",
+    "openNotifications": "Deschide notificările",
+    "playVideo": "Redă videoclipul",
+    "previousMonth": "Luna anterioară",
+    "showPassword": "Arată parola",
+    "unread": "Necitită"
+  },
+  "button": {
+    "accept": "Acceptă",
+    "add": "Adaugă",
+    "addToCalendar": "Adaugă în calendar",
+    "apply": "Aplică",
+    "approve": "Aprobă",
+    "archive": "Arhivează",
+    "back": "Înapoi",
+    "cancel": "Anulează",
+    "change": "Schimbă",
+    "clear": "Golește",
+    "clearFilter": "Șterge filtrul",
+    "clearFilters": "Șterge filtrele",
+    "close": "Închide",
+    "confirm": "Confirmă",
+    "continue": "Continuă",
+    "copyLink": "Copiază linkul",
+    "create": "Creează",
+    "decline": "Refuză",
+    "delete": "Șterge",
+    "discard": "Renunță",
+    "dismiss": "Închide",
+    "done": "Gata",
+    "duplicate": "Duplică",
+    "edit": "Editează",
+    "invite": "Invită",
+    "join": "Alătură-te",
+    "keep": "Păstrează",
+    "leave": "Părăsește",
+    "loadMore": "Încarcă mai multe",
+    "next": "Înainte",
+    "no": "Nu",
+    "ok": "OK",
+    "open": "Deschide",
+    "previous": "Înapoi",
+    "reject": "Respinge",
+    "remove": "Elimină",
+    "resend": "Retrimite",
+    "reset": "Resetează",
+    "restore": "Restaurează",
+    "retry": "Reîncearcă",
+    "save": "Salvează",
+    "saveChanges": "Salvează modificările",
+    "search": "Caută",
+    "seeAll": "Vezi tot",
+    "select": "Alege",
+    "send": "Trimite",
+    "share": "Distribuie",
+    "showLess": "Arată mai puțin",
+    "showMore": "Arată mai mult",
+    "signIn": "Autentifică-te",
+    "signOut": "Deconectează-te",
+    "signUp": "Creează cont",
+    "skip": "Sari peste",
+    "submit": "Trimite",
+    "tryAgain": "Încearcă din nou",
+    "unarchive": "Dezarhivează",
+    "update": "Actualizează",
+    "upload": "Încarcă",
+    "view": "Vezi",
+    "yes": "Da"
+  },
+  "common": {
+    "actions": "Acțiuni",
+    "all": "Toate",
+    "and": "și",
+    "filters": "Filtre",
+    "filtersCount": "Filtre · {count}",
+    "loading": "Se încarcă…",
+    "none": "Niciunul",
+    "oneOff": "Plată unică",
+    "or": "sau",
+    "paginator": "Afișezi {first} - {last} din {total}",
+    "pleaseTryAgain": "Încearcă din nou.",
+    "session": "Sesiune",
+    "someone": "Cineva",
+    "thisClient": "Acest client",
+    "unknown": "Necunoscut",
+    "you": "Tu"
+  },
+  "confirm": {
+    "discardChanges": {
+      "header": "Renunți la modificări?",
+      "message": "Ai modificări nesalvate. Dacă pleci acum, le vei pierde."
+    }
+  },
+  "count": {
+    "clients": "{count, plural, one {# client} few {# clienți} other {# de clienți}}",
+    "days": "{count, plural, one {# zi} few {# zile} other {# de zile}}",
+    "exercises": "{count, plural, one {# exercițiu} few {# exerciții} other {# de exerciții}}",
+    "groups": "{count, plural, one {# grup} few {# grupuri} other {# de grupuri}}",
+    "hours": "{count, plural, one {# oră} few {# ore} other {# de ore}}",
+    "members": "{count, plural, one {# membru} few {# membri} other {# de membri}}",
+    "minutes": "{count, plural, one {# minut} few {# minute} other {# de minute}}",
+    "programs": "{count, plural, one {# program} few {# programe} other {# de programe}}",
+    "sessions": "{count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}}",
+    "sets": "{count, plural, one {# serie} few {# serii} other {# de serii}}",
+    "weeks": "{count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
+    "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
+  },
+  "empty": {
+    "noMatches": "Nimic nu corespunde filtrelor",
+    "noResults": "Niciun rezultat",
+    "nothingMatches": "Nicio potrivire",
+    "nothingYet": "Nimic aici deocamdată"
+  },
+  "enum": {
+    "cancelScope": {
+      "series": "Toată seria",
+      "this": "Doar această sesiune",
+      "thisAndFuture": "Aceasta și toate cele viitoare"
+    },
+    "clientStatus": {
+      "ACTIVE": "Activ",
+      "ARCHIVED": "Arhivat",
+      "PENDING": "În așteptare"
+    },
+    "exerciseLevel": {
+      "ADVANCED": "Avansat",
+      "BEGINNER": "Începător",
+      "INTERMEDIATE": "Intermediar"
+    },
+    "fitnessLevel": {
+      "ADVANCED": "Avansat",
+      "BEGINNER": "Începător",
+      "INTERMEDIATE": "Intermediar"
+    },
+    "followUpAudience": {
+      "all": "Toată lumea",
+      "attended": "Doar cei prezenți",
+      "noshow": "Doar cei absenți",
+      "userIds": "Persoane selectate"
+    },
+    "gender": {
+      "FEMALE": "Feminin",
+      "MALE": "Masculin",
+      "OTHER": "Altul",
+      "PREFER_NOT_TO_SAY": "Prefer să nu spun"
+    },
+    "groupMemberRole": {
+      "MEMBER": "Membru",
+      "MODERATOR": "Moderator",
+      "OWNER": "Administrator"
+    },
+    "invoiceStatus": {
+      "draft": "Ciornă",
+      "open": "Deschisă",
+      "paid": "Plătită",
+      "uncollectible": "Irecuperabilă",
+      "void": "Anulată"
+    },
+    "joinPolicy": {
+      "APPROVAL": "Cu aprobare",
+      "INVITE_ONLY": "Doar cu invitație",
+      "OPEN": "Deschis"
+    },
+    "myTab": {
+      "cancelled": "Anulate",
+      "past": "Trecute",
+      "pendingApproval": "În așteptare",
+      "upcoming": "Viitoare",
+      "waitlisted": "Pe lista de așteptare"
+    },
+    "paymentStatus": {
+      "failed": "Eșuată",
+      "partially_refunded": "Rambursată parțial",
+      "pending": "În așteptare",
+      "refunded": "Rambursată",
+      "succeeded": "Reușită"
+    },
+    "pendingClient": {
+      "EMAIL_SENT": "Email trimis",
+      "INVITED": "Invitat",
+      "REQUEST": "Cerere"
+    },
+    "profilePrivacy": {
+      "COACHES_ONLY": "Doar antrenorii",
+      "ONLY_ME": "Doar eu",
+      "PUBLIC": "Public"
+    },
+    "programAssignmentStatus": {
+      "ACTIVE": "Activ",
+      "CANCELLED": "Anulat",
+      "COMPLETED": "Finalizat",
+      "PAUSED": "Pe pauză",
+      "PENDING": "În așteptare"
+    },
+    "refundReason": {
+      "duplicate": "Duplicat",
+      "fraudulent": "Fraudulos",
+      "requested_by_customer": "La cererea clientului"
+    },
+    "sessionAccess": {
+      "CLIENTS_ONLY": "Doar clienți",
+      "FREE": "Gratuit",
+      "GROUP_ONLY": "Membrii grupului",
+      "OPEN": "Plătit"
+    },
+    "sessionAccessHint": {
+      "CLIENTS_ONLY": "Doar clienții tăi activi pot rezerva.",
+      "FREE": "Listată public, fără preț.",
+      "GROUP_ONLY": "Doar membrii unui anumit grup.",
+      "OPEN": "Oricine are linkul poate rezerva."
+    },
+    "sessionInstanceStatus": {
+      "CANCELLED": "Anulată",
+      "COMPLETED": "Încheiată",
+      "IN_PROGRESS": "În desfășurare",
+      "SCHEDULED": "Programată"
+    },
+    "sessionLocationKind": {
+      "IN_PERSON": "Față în față",
+      "ONLINE": "Online"
+    },
+    "sessionParticipantStatus": {
+      "CANCELLED": "Anulat",
+      "CONFIRMED": "Confirmat",
+      "DECLINED": "Refuzat",
+      "PENDING_APPROVAL": "În așteptare",
+      "WAITLISTED": "Pe lista de așteptare"
+    },
+    "sessionReminderKind": {
+      "REMINDER_1H": "Cu o oră înainte",
+      "REMINDER_24H": "Cu 24 de ore înainte"
+    },
+    "sessionTemplateStatus": {
+      "ACTIVE": "Activă",
+      "CANCELLED": "Anulată",
+      "ENDED": "Încheiată"
+    },
+    "sessionType": {
+      "GROUP": "Grup",
+      "OPEN": "Deschisă",
+      "PRIVATE": "1 la 1"
+    },
+    "stripeAccountStatus": {
+      "ACTIVE": "Activ",
+      "DISCONNECTED": "Deconectat",
+      "NOT_STARTED": "Neînceput",
+      "PENDING": "În așteptare",
+      "RESTRICTED": "Restricționat"
+    },
+    "subscriptionStatus": {
+      "active": "Activ",
+      "canceled": "Anulat",
+      "incomplete": "Incomplet",
+      "incomplete_expired": "Incomplet, expirat",
+      "incomplete_payment_failed": "Plată eșuată",
+      "past_due": "Restant",
+      "paused": "În pauză",
+      "trialing": "Perioadă de probă",
+      "unpaid": "Neplătit"
+    },
+    "templateTab": {
+      "active": "Viitoare",
+      "cancelled": "Anulate",
+      "ended": "Trecute",
+      "recurring": "Șabloane recurente"
+    },
+    "userBlockReason": {
+      "HARASSMENT": "Hărțuire",
+      "IMPERSONATION": "Uzurpare de identitate",
+      "OTHER": "Altceva",
+      "SCAM": "Înșelătorie",
+      "SPAM": "Spam"
+    }
+  },
+  "error": {
+    "checkConnection": "Verifică-ți conexiunea și încearcă din nou.",
+    "dialog": {
+      "accessDenied": "Acces interzis",
+      "conflict": "Nu se poate acum",
+      "generic": "Ceva nu a mers bine",
+      "noConnection": "Fără conexiune",
+      "notFound": "Negăsit"
+    },
+    "generic": "Ceva nu a mers bine. Încearcă din nou.",
+    "http": {
+      "conflict": "Intră în conflict cu ceva ce există deja.",
+      "forbidden": "Nu ai permisiunea să faci asta.",
+      "notFound": "Ce ai căutat nu a fost găsit.",
+      "offline": "Se pare că nu ești conectat la internet. Verifică conexiunea și încearcă din nou.",
+      "server": "Ceva nu a mers bine la noi. Încearcă din nou.",
+      "timeout": "Serverul a răspuns prea greu. Încearcă din nou.",
+      "tooManyRequests": "Prea multe cereri deodată — așteaptă puțin și încearcă din nou.",
+      "tooManyRequestsSummary": "Mai încet puțin",
+      "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în câteva momente.",
+      "unexpected": "A apărut o eroare neașteptată. Încearcă din nou."
+    },
+    "messaging": {
+      "forbidden": "Nu poți trimite acest mesaj.",
+      "notDelivered": "Mesajul nu a putut fi livrat. Poate a părăsit conversația sau a blocat mesajele de la tine.",
+      "notSent": "Mesajul nu a putut fi trimis.",
+      "offline": "Nu ești conectat la internet. Verifică-ți conexiunea.",
+      "rateLimited": "Mai încet — prea multe mesaje.",
+      "rateLimitedRetry": "Mai încet — încearcă din nou în {seconds} s.",
+      "sendFailed": "Nu s-a putut trimite. Încearcă din nou."
+    },
+    "staleData": "Actualizarea a eșuat. Vezi ultimele date."
+  },
+  "form": {
+    "hint": {
+      "passwordMinLength": "Min. 8 caractere",
+      "reenterPassword": "Introdu parola din nou"
+    },
+    "label": {
+      "amount": "Sumă",
+      "city": "Oraș",
+      "confirmPassword": "Confirmă parola",
+      "country": "Țară",
+      "currency": "Monedă",
+      "date": "Dată",
+      "description": "Descriere",
+      "dueDate": "Scadență",
+      "duration": "Durată",
+      "email": "Email",
+      "endDate": "Data de sfârșit",
+      "firstName": "Prenume",
+      "fullName": "Nume complet",
+      "language": "Limbă",
+      "lastName": "Nume",
+      "location": "Locație",
+      "name": "Nume",
+      "newPassword": "Parolă nouă",
+      "notes": "Notițe",
+      "password": "Parolă",
+      "phone": "Telefon",
+      "price": "Preț",
+      "startDate": "Data de început",
+      "status": "Status",
+      "time": "Oră",
+      "timezone": "Fus orar",
+      "title": "Titlu",
+      "type": "Tip"
+    },
+    "placeholder": {
+      "email": "tu@exemplu.ro",
+      "notProvided": "Necompletat",
+      "notSet": "Nesetat",
+      "optional": "Opțional",
+      "pickDate": "Alege o dată",
+      "search": "Caută",
+      "select": "Alege"
+    }
+  },
+  "language": {
+    "en": "English",
+    "ro": "Română"
+  },
+  "nav": {
+    "account": "Cont",
+    "admin": "Admin",
+    "billing": "Facturare",
+    "clients": "Clienți",
+    "coach": "Antrenor",
+    "coaching": "Coaching",
+    "community": "Comunitate",
+    "content": "Conținut",
+    "dashboard": "Panou",
+    "discover": "Descoperă",
+    "exercises": "Exerciții",
+    "groups": "Grupuri",
+    "home": "Acasă",
+    "manageSessions": "Gestionează sesiunile",
+    "menu": "Meniu",
+    "messages": "Mesaje",
+    "myTraining": "Antrenamentele mele",
+    "notifications": "Notificări",
+    "payments": "Plăți",
+    "plans": "Planuri",
+    "posts": "Articole",
+    "profile": "Profil",
+    "programs": "Programe",
+    "requests": "Cereri",
+    "sessions": "Sesiuni",
+    "settings": "Setări",
+    "train": "Cursant",
+    "users": "Utilizatori",
+    "workouts": "Antrenamente"
+  },
+  "primeng": {
+    "accept": "Da",
+    "apply": "Aplică",
+    "cancel": "Anulează",
+    "choose": "Alege",
+    "clear": "Golește",
+    "emptyFilterMessage": "Niciun rezultat",
+    "emptyMessage": "Nicio opțiune disponibilă",
+    "emptySearchMessage": "Niciun rezultat",
+    "medium": "Medie",
+    "passwordPrompt": "Introdu o parolă",
+    "reject": "Nu",
+    "strong": "Puternică",
+    "today": "Azi",
+    "upload": "Încarcă",
+    "weak": "Slabă",
+    "weekHeader": "Săpt."
+  },
+  "time": {
+    "ago": {
+      "days": "acum {count} z",
+      "hours": "acum {count} h",
+      "justNow": "chiar acum",
+      "minutes": "acum {count} min",
+      "seconds": "acum {count} s",
+      "weeks": "acum {count} săpt."
+    },
+    "agoHours": "{hours} h",
+    "agoMinutes": "{minutes} min",
+    "bucket": {
+      "earlierThisWeek": "Mai devreme săptămâna asta",
+      "thisWeek": "Săptămâna asta"
+    },
+    "cadence": "{interval, select, day {{count, plural, one {zilnic} few {la fiecare # zile} other {la fiecare # de zile}}} week {{count, plural, one {săptămânal} few {la fiecare # săptămâni} other {la fiecare # de săptămâni}}} month {{count, plural, one {lunar} few {la fiecare # luni} other {la fiecare # de luni}}} year {{count, plural, one {anual} few {la fiecare # ani} other {la fiecare # de ani}}} other {}}",
+    "durationMinutes": "{minutes} min",
+    "inHours": "în {hours} h",
+    "inMinutes": "în {minutes} min",
+    "minutesShort": "{minutes} min",
+    "now": "acum",
+    "perInterval": "{interval, select, day {{count, plural, one {/ zi} few {/ # zile} other {/ # de zile}}} week {{count, plural, one {/ săptămână} few {/ # săptămâni} other {/ # de săptămâni}}} month {{count, plural, one {/ lună} few {/ # luni} other {/ # de luni}}} year {{count, plural, one {/ an} few {/ # ani} other {/ # de ani}}} other {}}",
+    "startingNow": "începe acum",
+    "today": "Azi",
+    "todayWithDate": "Azi · {date}",
+    "tomorrow": "Mâine",
+    "tomorrowWithDate": "Mâine · {date}",
+    "totalHours": "{hours} h",
+    "totalHoursMinutes": "{hours} h {minutes} min",
+    "totalMinutes": "{minutes} min",
+    "yesterday": "Ieri",
+    "yesterdayShort": "ieri"
+  },
+  "toast": {
+    "detail": {
+      "linkCopied": "Link copiat",
+      "noChanges": "Nicio modificare",
+      "saved": "Modificările au fost salvate.",
+      "somethingWentWrong": "Ceva nu a mers bine"
+    },
+    "summary": {
+      "copied": "Copiat",
+      "error": "Eroare",
+      "info": "Info",
+      "saved": "Salvat",
+      "success": "Gata",
+      "warning": "Atenție"
+    }
+  },
+  "validation": {
+    "email": "Introdu o adresă de email validă.",
+    "emailTooLong": "O adresă de email nu poate avea mai mult de {max} caractere.",
+    "emailWithExample": "Introdu o adresă de email validă, de exemplu client@exemplu.ro.",
+    "invalid": "Valoare invalidă.",
+    "max": "Trebuie să fie cel mult {max}.",
+    "maxLength": "Poate avea cel mult {max} caractere.",
+    "min": "Trebuie să fie cel puțin {min}.",
+    "minLength": "Trebuie să aibă cel puțin {min} caractere.",
+    "passwordMismatch": "Parolele nu se potrivesc.",
+    "passwordStrength": "Parola trebuie să aibă cel puțin 8 caractere și să conțină o literă mare, o literă mică, o cifră și un caracter special.",
+    "pattern": "Format invalid.",
+    "phone": "Introdu un număr de telefon valid.",
+    "required": "Câmpul este obligatoriu.",
+    "url": "Introdu un URL valid (ex. https://exemplu.ro)."
+  }
+}

@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { filter } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -35,6 +36,7 @@ import { InstallApp } from '../../_shared/components/install-app/install-app';
     SearchModal,
     InstallApp,
     Segmented,
+    TranslatePipe,
   ],
   templateUrl: './sidenav-layout.component.html',
   styleUrl: './sidenav-layout.component.scss',
@@ -45,6 +47,7 @@ export class SidenavLayoutComponent {
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _searchTrigger = inject(SearchTriggerService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _lgQuery = window.matchMedia('(min-width: 1024px)');
 
   readonly navSections = input.required<ReadonlyArray<NavSection>>();
@@ -57,9 +60,10 @@ export class SidenavLayoutComponent {
   /** Persisted sidebar mode; defaults to "coach" for instructors. */
   readonly mode = signal<NavMode>(this._loadMode());
 
+  // The segmented control renders `label` itself, so it gets text, not a key.
   readonly modeOptions = [
-    { value: 'coach', label: 'Coach' },
-    { value: 'train', label: 'Train' },
+    { value: 'coach', label: this._translateService.instant('nav.coach') },
+    { value: 'train', label: this._translateService.instant('nav.train') },
   ];
 
   /** Toggle only appears when the rail has both a coach and a train section. */

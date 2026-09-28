@@ -7,6 +7,7 @@ import {
   authInterceptor,
   errorInterceptor,
   loadingInterceptor,
+  provideAppI18n,
 } from 'core';
 
 import { routes } from './app.routes';
@@ -28,5 +29,6 @@ export const appConfig: ApplicationConfig = {
       withXhr(),
       withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor]),
     ),
+    provideAppI18n(),
   ],
 };

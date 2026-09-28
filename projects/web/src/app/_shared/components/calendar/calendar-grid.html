@@ -6,7 +6,7 @@
   [attr.aria-busy]="loading()"
 >
   @if (loading()) {
-    <div class="mh-calendar__loading" role="status">Loading…</div>
+    <div class="mh-calendar__loading" role="status">{{ 'common.loading' | translate }}</div>
   }
 
   @switch (view()) {
@@ -22,7 +22,7 @@
             [class.is-selected]="isSelected(day)"
           >
             <span class="mh-calendar__day-name">
-              {{ day | date: 'EEE' : '' : 'en-GB' }}
+              {{ day | date: 'EEE' }}
             </span>
             <span class="mh-calendar__day-num">{{ day.getDate() }}</span>
           </div>
@@ -71,11 +71,11 @@
               <div
                 class="mh-calendar__now-line"
                 [style.top.px]="nowOffsetPx()"
-                [attr.aria-label]="'Current time: ' + nowTimeLabel()"
-                [attr.title]="'Current time: ' + nowTimeLabel()"
+                [attr.aria-label]="'components.calendar.currentTime' | translate: { time: nowTimeLabel() }"
+                [attr.title]="'components.calendar.currentTime' | translate: { time: nowTimeLabel() }"
               >
                 <span class="mh-calendar__now-dot" aria-hidden="true"></span>
-                <span class="mh-calendar__now-label">Now · {{ nowTimeLabel() }}</span>
+                <span class="mh-calendar__now-label">{{ 'components.calendar.now' | translate: { time: nowTimeLabel() } }}</span>
               </div>
             }
 
@@ -108,8 +108,8 @@
                   type="button"
                   class="mh-calendar__overflow"
                   (click)="onOverflowClick(day, $event)"
-                  [attr.aria-label]="n + ' more sessions this day'"
-                >+{{ n }} more</button>
+                  [attr.aria-label]="'components.calendar.moreSessions' | translate: { count: n }"
+                >{{ 'components.calendar.moreCount' | translate: { count: n } }}</button>
               }
             }
           </div>

@@ -1,17 +1,19 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TooltipModule } from 'primeng/tooltip';
-import { escapeHtml } from 'core';
+import { appLocale, escapeHtml } from 'core';
 import type { CalendarEvent } from './calendar-event.model';
 
 /** One event block rendered inside `mh-calendar-grid` — pure presentation. */
 @Component({
   selector: 'mh-event-block',
-  imports: [TooltipModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TooltipModule, TranslatePipe],
   templateUrl: './event-block.html',
   styleUrl: './event-block.scss',
 })
 export class EventBlock {
+  private readonly _translateService = inject(TranslateService);
+
   readonly event = input.required<CalendarEvent>();
   readonly layout = input.required<{
     top: number;
@@ -27,7 +29,9 @@ export class EventBlock {
     const e = this.event();
     const parts = [`${this._timeLabel()} · ${e.title}`];
     if (e.subtitle) parts.push(e.subtitle);
-    if (e.badges?.includes('cancelled')) parts.push('Cancelled');
+    if (e.badges?.includes('cancelled')) {
+      parts.push(this._translateService.instant('enum.sessionInstanceStatus.CANCELLED'));
+    }
     return parts.join('\n');
   }
 
@@ -37,11 +41,12 @@ export class EventBlock {
     const title = escapeHtml(e.title);
     const sub = e.subtitle ? escapeHtml(e.subtitle) : '';
 
+    const t = (key: string) => escapeHtml(this._translateService.instant(key));
     const flags: string[] = [];
-    if (e.badges?.includes('online')) flags.push('Online');
-    if (e.badges?.includes('recurring')) flags.push('Recurring');
-    if (e.badges?.includes('cancelled')) flags.push('Cancelled');
-    if (e.ring === 'conflict') flags.push('Conflict');
+    if (e.badges?.includes('online')) flags.push(t('enum.sessionLocationKind.ONLINE'));
+    if (e.badges?.includes('recurring')) flags.push(t('components.calendar.recurring'));
+    if (e.badges?.includes('cancelled')) flags.push(t('enum.sessionInstanceStatus.CANCELLED'));
+    if (e.ring === 'conflict') flags.push(t('components.calendar.conflict'));
 
     return [
       `<div class="mh-evt-tt__title">${title}</div>`,
@@ -61,7 +66,8 @@ export class EventBlock {
       minute: '2-digit',
     };
     const e = this.event();
-    return `${e.start.toLocaleTimeString('en-GB', fmt)} – ${e.end.toLocaleTimeString('en-GB', fmt)}`;
+    const locale = appLocale();
+    return `${e.start.toLocaleTimeString(locale, fmt)} – ${e.end.toLocaleTimeString(locale, fmt)}`;
   }
 
   protected hasBadge(name: 'online' | 'recurring' | 'cancelled'): boolean {

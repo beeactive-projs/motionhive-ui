@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Tag } from 'primeng/tag';
 import { SESSION_ACCESS_LEVELS, SessionAccess } from 'core';
 import type { SessionAccessTone } from 'core';
@@ -25,11 +26,12 @@ const TONE_CLASSES: Record<SessionAccessTone, string> = {
 };
 @Component({
   selector: 'mh-access-chip',
-  imports: [Tag],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Tag, TranslatePipe],
   templateUrl: './access-chip.html',
 })
 export class AccessChip {
+  private readonly _translateService = inject(TranslateService);
+
   readonly access = input.required<SessionAccess>();
   readonly approvalRequired = input(false);
 
@@ -47,6 +49,8 @@ export class AccessChip {
   });
 
   protected readonly ariaLabel = computed<string>(() =>
-    this.approvalRequired() ? `${this.label()} · approval required` : this.label(),
+    this.approvalRequired()
+      ? this._translateService.instant('components.accessChip.withApproval', { label: this.label() })
+      : this.label(),
   );
 }

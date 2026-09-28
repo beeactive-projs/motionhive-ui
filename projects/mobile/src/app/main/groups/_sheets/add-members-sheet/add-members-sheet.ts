@@ -8,6 +8,7 @@ import {
   IonSearchbar,
   IonSkeletonText,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { forkJoin, take } from 'rxjs';
 
 import {
@@ -43,6 +44,7 @@ import { FeedbackService } from '../../../../_shared/services/feedback.service';
     IonSearchbar,
     IonSkeletonText,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './add-members-sheet.html',
   styleUrl: './add-members-sheet.scss',
@@ -51,6 +53,7 @@ export class AddMembersSheet {
   private readonly _clientService = inject(ClientService);
   private readonly _groupService = inject(GroupService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   readonly open = model(false);
@@ -85,7 +88,9 @@ export class AddMembersSheet {
 
   readonly saveLabel = computed(() => {
     const count = this.selectedCount();
-    return count > 0 ? `Add ${count}` : 'Add';
+    return count > 0
+      ? this._translateService.instant('groups.addMembers.save', { count })
+      : this._translateService.instant('button.add');
   });
 
   readonly isEmpty = computed(() => !this.loading() && this._addable().length === 0);
@@ -144,13 +149,16 @@ export class AddMembersSheet {
           // joined from a link between the list loading and this call.
           const count = members.length;
           void this._feedbackService.success(
-            count === 1 ? '1 member added' : `${count} members added`,
+            this._translateService.instant('groups.addMembers.toast.added', { count }),
           );
           this.added.emit();
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not add those members.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('groups.addMembers.toast.addFailed'),
+          );
         },
       });
   }
@@ -178,7 +186,10 @@ export class AddMembersSheet {
         },
         error: (error: unknown) => {
           this.loading.set(false);
-          void this._feedbackService.error(error, 'Could not load your clients.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('groups.addMembers.toast.loadFailed'),
+          );
           this.open.set(false);
         },
       });

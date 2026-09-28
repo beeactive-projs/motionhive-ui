@@ -22,7 +22,7 @@
           </ion-button>
           }
           @if (subtitle()) {
-          <ion-button class="close" shape="round" aria-label="Close" (click)="dismiss()">
+          <ion-button class="close" shape="round" [attr.aria-label]="'a11y.close' | translate" (click)="dismiss()">
             <ion-icon slot="icon-only" name="close" />
           </ion-button>
           }
@@ -32,7 +32,7 @@
           <span class="heading-title">{{ title() }}</span>
         </div>
         <ion-buttons slot="end">
-          <ion-button class="close" shape="round" aria-label="Close" (click)="dismiss()">
+          <ion-button class="close" shape="round" [attr.aria-label]="'a11y.close' | translate" (click)="dismiss()">
             <ion-icon slot="icon-only" name="close" />
           </ion-button>
         </ion-buttons>
@@ -58,14 +58,14 @@
                toolbar-button size. The sheet's commit is a full-width bar. -->
         <div class="actions">
           <ion-button fill="outline" color="medium" class="dismiss" [disabled]="saving()" (click)="dismiss()">
-            {{ dismissLabel() }}
+            {{ dismissLabel() || ('button.cancel' | translate) }}
           </ion-button>
           <ion-button fill="solid" class="confirm" [color]="saveColor()" [disabled]="!canSave() || saving()"
             (click)="save.emit()">
             @if (saving()) {
             <ion-spinner name="crescent" />
             } @else {
-            {{ saveLabel() }}
+            {{ saveLabel() || ('button.save' | translate) }}
             }
           </ion-button>
         </div>

@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { Badge } from 'primeng/badge';
 import { Tab, TabList, Tabs } from 'primeng/tabs';
@@ -10,18 +11,22 @@ import { filter, map, startWith } from 'rxjs';
   selector: 'mh-group-tabs',
   imports: [Tabs, TabList, Tab, Badge],
   templateUrl: './group-tabs.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupTabs {
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   readonly membersCount = input<number | null>(null);
 
   readonly tabs = computed<MenuItem[]>(() => [
-    { id: 'posts', label: 'Posts' },
-    { id: 'members', label: 'Members', badge: this.membersCount()?.toString() },
-    { id: 'about', label: 'About' },
+    { id: 'posts', label: this._translateService.instant('nav.posts') },
+    {
+      id: 'members',
+      label: this._translateService.instant('groups.common.members'),
+      badge: this.membersCount()?.toString(),
+    },
+    { id: 'about', label: this._translateService.instant('groups.about.title') },
   ]);
 
   readonly activeTab = toSignal(

@@ -5,11 +5,11 @@
       type="button"
       outlined
       rounded
-      pTooltip="Notifications"
+      [pTooltip]="'nav.notifications' | translate"
       tooltipPosition="bottom"
       size="small"
       (click)="toggle($event)"
-      aria-label="Open notifications"
+      [attr.aria-label]="'a11y.openNotifications' | translate"
       iconOnly
     >
       <i class="pi pi-bell"></i>
@@ -20,11 +20,11 @@
     type="button"
     outlined
     rounded
-    pTooltip="Notifications"
+    [pTooltip]="'nav.notifications' | translate"
     tooltipPosition="bottom"
     size="small"
     (click)="toggle($event)"
-    aria-label="Open notifications"
+    [attr.aria-label]="'a11y.openNotifications' | translate"
     iconOnly
   >
     <i class="pi pi-bell"></i>
@@ -36,9 +36,9 @@
   <div class="w-72 max-w-[calc(100vw-2rem)]">
     <!-- Header -->
     <div class="flex items-center justify-between mb-2">
-      <h3 class="text-sm font-semibold m-0">Notifications</h3>
+      <h3 class="text-sm font-semibold m-0">{{ 'nav.notifications' | translate }}</h3>
       @if (hasUnread()) {
-      <button pButton type="button" text size="small" (click)="markAllRead()" class="text-xs p-1 h-auto">Mark all read</button>
+      <button pButton type="button" text size="small" (click)="markAllRead()" class="text-xs p-1 h-auto">{{ 'components.notificationBell.markAllRead' | translate }}</button>
       }
     </div>
 
@@ -63,9 +63,9 @@
     @else if (notifications().length === 0) {
     <div class="flex flex-col items-center justify-center py-8 px-4 text-center">
       <i class="pi pi-bell-slash text-3xl text-surface-400 mb-2"></i>
-      <p class="text-sm text-muted-color m-0">You're all caught up</p>
+      <p class="text-sm text-muted-color m-0">{{ 'components.notificationBell.caughtUp' | translate }}</p>
       <p class="text-xs text-muted-color mt-1 m-0">
-        New notifications will show up here.
+        {{ 'components.notificationBell.emptyHint' | translate }}
       </p>
     </div>
     }
@@ -83,13 +83,13 @@
             <span class="text-sm leading-tight flex items-center gap-2 min-w-0"
               [class.font-semibold]="!item.readAt && !item.dismissedAt">
               @if (!item.readAt && !item.dismissedAt) {
-              <span class="notif-dot" aria-label="Unread"></span>
+              <span class="notif-dot" [attr.aria-label]="'a11y.unread' | translate"></span>
               }
               <span class="truncate">{{ item.title }}</span>
             </span>
             <button type="button" class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0
                          text-muted-color hover:text-surface-700 dark:hover:text-surface-200"
-              aria-label="Dismiss notification" (click)="dismiss(item, $event)">
+              [attr.aria-label]="'a11y.dismissNotification' | translate" (click)="dismiss(item, $event)">
               <i class="pi pi-times text-xs"></i>
             </button>
           </div>
@@ -113,7 +113,7 @@
 
       @if (!hasMore()) {
       <li class="text-center text-xs text-surface-400 py-2">
-        You're all caught up.
+        {{ 'components.notificationBell.endOfList' | translate }}
       </li>
       }
     </ul>

@@ -5,17 +5,17 @@
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
-    <a routerLink="/" class="brand-logo flex" aria-label="MotionHive home">
+    <a routerLink="/" class="brand-logo flex" [attr.aria-label]="'auth.common.homeLink' | translate">
       <mh-logo />
     </a>
 
     <div class="max-w-160">
       <h1 class="text-4xl sm:text-5xl 3xl:text-6xl font-heading font-extrabold leading-[1.1] mb-6">
-        Join the<br>
-        <span class="text-brand">movement.</span>
+        {{ 'auth.signUp.heroLine1' | translate }}<br>
+        <span class="text-brand">{{ 'auth.signUp.heroHighlight' | translate }}</span>
       </h1>
       <p class="text-base text-surface-600 dark:text-surface-400 leading-relaxed">
-        Create your account and start tracking workouts, connecting with trainers, and crushing your goals.
+        {{ 'auth.signUp.heroSubtitle' | translate }}
       </p>
     </div>
 
@@ -25,20 +25,20 @@
   <div class="form-panel w-1/2 overflow-y-auto">
     <div class="hex-decoration"></div>
     <mh-theme-toggle class="theme-toggle-btn"></mh-theme-toggle>
-    <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" aria-label="MotionHive home">
+    <a routerLink="/" class="brand-logo flex lg:hidden w-full mb-5" [attr.aria-label]="'auth.common.homeLink' | translate">
       <mh-logo />
     </a>
 
     <div class="header w-full">
       <div class="mb-4 animate-slide-down">
         <h1 class="font-heading text-3xl font-bold mb-2">
-          Create your account
+          {{ 'auth.signUp.title' | translate }}
         </h1>
         <p class="text-sm">
-          Already have an account?
+          {{ 'auth.common.haveAccount' | translate }}
           <a routerLink="/auth/login" [queryParams]="_route.snapshot.queryParams"
             class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
-            Sign in
+            {{ 'button.signIn' | translate }}
           </a>
         </p>
       </div>
@@ -50,10 +50,11 @@
       <div class="mb-4">
         <p-message severity="info" class="w-full">
           @if (invitationDetails()) {
-          You've been invited by <strong>{{ invitationDetails()!.instructor.firstName }} {{
-            invitationDetails()!.instructor.lastName }}</strong> to join as a client. Complete the form below to accept.
+          {{ 'auth.signUp.invitedByStart' | translate }}
+          <strong>{{ invitationDetails()!.instructor.firstName }} {{ invitationDetails()!.instructor.lastName }}</strong>
+          {{ 'auth.signUp.invitedByEnd' | translate }}
           } @else {
-          You've been invited to join as a client. Complete the form below to accept.
+          {{ 'auth.signUp.invited' | translate }}
           }
         </p-message>
       </div>
@@ -73,9 +74,10 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="flex flex-col gap-1">
             <label for="firstName" class="text-xs font-semibold  text-surface-900 dark:text-surface-100">
-              First name
+              {{ 'form.label.firstName' | translate }}
             </label>
-            <input pInputText id="firstName" type="text" formControlName="firstName" placeholder="John" fluid
+            <input pInputText id="firstName" type="text" formControlName="firstName"
+              [placeholder]="'auth.signUp.firstNamePlaceholder' | translate" fluid
               pSize="large" [class.ng-dirty]="isFieldInvalid('firstName')" autocomplete="given-name"
               [attr.aria-invalid]="isFieldInvalid('firstName')"
               [attr.aria-describedby]="isFieldInvalid('firstName') ? 'firstName-error' : null" />
@@ -88,9 +90,10 @@
 
           <div class="flex flex-col gap-1">
             <label for="lastName" class="text-xs font-semibold  text-surface-900 dark:text-surface-100">
-              Last name
+              {{ 'form.label.lastName' | translate }}
             </label>
-            <input pInputText id="lastName" type="text" formControlName="lastName" placeholder="Doe" fluid pSize="large"
+            <input pInputText id="lastName" type="text" formControlName="lastName"
+              [placeholder]="'auth.signUp.lastNamePlaceholder' | translate" fluid pSize="large"
               [class.ng-dirty]="isFieldInvalid('lastName')" autocomplete="family-name"
               [attr.aria-invalid]="isFieldInvalid('lastName')"
               [attr.aria-describedby]="isFieldInvalid('lastName') ? 'lastName-error' : null" />
@@ -105,9 +108,9 @@
         <!-- Email Field -->
         <div class="flex flex-col gap-1">
           <label for="email" class="text-xs font-semibold  text-surface-900 dark:text-surface-100">
-            Email address
+            {{ 'auth.common.emailAddress' | translate }}
           </label>
-          <input pInputText id="email" type="email" formControlName="email" placeholder="you@example.com" fluid
+          <input pInputText id="email" type="email" formControlName="email" [placeholder]="'form.placeholder.email' | translate" fluid
             pSize="large" [class.ng-dirty]="isFieldInvalid('email')" autocomplete="email"
             [attr.aria-invalid]="isFieldInvalid('email')"
             [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null" />
@@ -138,9 +141,9 @@
         <!-- Password Field -->
         <div class="flex flex-col gap-1">
           <label for="password" class="text-xs font-semibold  text-surface-900 dark:text-surface-100">
-            Password
+            {{ 'form.label.password' | translate }}
           </label>
-          <p-password formControlName="password" inputId="password" placeholder="Min. 8 characters" fluid size="large"
+          <p-password formControlName="password" inputId="password" [placeholder]="'form.hint.passwordMinLength' | translate" fluid size="large"
             [toggleMask]="true" [feedback]="true" [class]="isFieldInvalid('password') ? 'ng-invalid ng-dirty' : ''"
             autocomplete="new-password" [attr.aria-required]="true" [attr.aria-invalid]="isFieldInvalid('password')"
             [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null" />
@@ -154,9 +157,10 @@
         <!-- Confirm Password Field -->
         <div class="flex flex-col gap-1">
           <label for="confirmPassword" class="text-xs font-semibold  text-surface-900 dark:text-surface-100">
-            Confirm password
+            {{ 'form.label.confirmPassword' | translate }}
           </label>
-          <p-password formControlName="confirmPassword" inputId="confirmPassword" placeholder="Re-enter your password"
+          <p-password formControlName="confirmPassword" inputId="confirmPassword"
+            [placeholder]="'form.hint.reenterPassword' | translate"
             fluid size="large" [toggleMask]="true" [feedback]="false"
             [class]="isConfirmPasswordInvalid() ? 'ng-invalid ng-dirty' : ''" autocomplete="new-password"
             [attr.aria-required]="true" [attr.aria-invalid]="isConfirmPasswordInvalid()" />
@@ -172,9 +176,8 @@
         <div class="flex items-center gap-3">
           <p-checkbox inputId="isInstructor" formControlName="isInstructor" [binary]="true" />
           <div class="flex flex-col gap-0.5">
-            <label for="isInstructor" class="text-sm font-medium cursor-pointer">Register as coach</label>
-            <span class="text-xs text-surface-600 dark:text-surface-300">Coaches can create and manage sessions
-              and clients</span>
+            <label for="isInstructor" class="text-sm font-medium cursor-pointer">{{ 'auth.signUp.registerAsCoach' | translate }}</label>
+            <span class="text-xs text-surface-600 dark:text-surface-300">{{ 'auth.signUp.coachHint' | translate }}</span>
           </div>
         </div>
         }
@@ -182,12 +185,12 @@
         <!-- Submit Button -->
         <div class="flex flex-col">
           <button pButton type="submit" [disabled]="isLoading()" fluid size="large">
-            Create account
+            {{ 'auth.signUp.submit' | translate }}
             <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-user-plus'"></i>
           </button>
         </div>
         <p-divider [align]="'center'" type="solid">
-          or sign up with
+          {{ 'auth.signUp.orSignUpWith' | translate }}
         </p-divider>
         <div class="flex gap-3">
           <div class="social-btn-wrapper flex-1">
@@ -205,15 +208,15 @@
         </div>
         <div class="flex flex-col gap-2 text-center">
           <p class="text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
-            By signing up, you agree to our
+            {{ 'auth.signUp.termsIntro' | translate }}
             <a [href]="termsUrl" target="_blank" rel="noopener"
               class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
-              Terms of Service
+              {{ 'auth.common.termsOfService' | translate }}
             </a>
-            and
+            {{ 'common.and' | translate }}
             <a [href]="privacyUrl" target="_blank" rel="noopener"
               class="text-primary-600 hover:text-primary-700 font-medium transition-colors">
-              Privacy Policy
+              {{ 'auth.common.privacyPolicy' | translate }}
             </a>
           </p>
         </div>

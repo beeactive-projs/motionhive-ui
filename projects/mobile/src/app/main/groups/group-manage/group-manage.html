@@ -1,16 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" text="Group" />
+      <ion-back-button defaultHref="/tabs/groups" [text]="'groups.common.group' | translate" />
     </ion-buttons>
-    <ion-title>Manage</ion-title>
+    <ion-title>{{ 'groups.manage.title' | translate }}</ion-title>
   </ion-toolbar>
 
   <ion-toolbar>
     <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
       <ion-segment-button [value]="Tabs.Requests">
         <ion-label>
-          Requests
+          {{ 'groups.manage.requests.tab' | translate }}
           @if (store.requestCount() > 0) {
           <ion-badge data-tone="danger" class="count">{{ store.requestCount() }}</ion-badge>
           }
@@ -18,7 +18,7 @@
       </ion-segment-button>
       <ion-segment-button [value]="Tabs.Posts">
         <ion-label>
-          Posts
+          {{ 'groups.common.posts' | translate }}
           @if (store.postCount() > 0) {
           <ion-badge data-tone="danger" class="count">{{ store.postCount() }}</ion-badge>
           }
@@ -29,7 +29,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <h1 class="mh-visually-hidden">Manage group</h1>
+  <h1 class="mh-visually-hidden">{{ 'groups.manage.heading' | translate }}</h1>
 
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content />
@@ -38,11 +38,12 @@
   @if (store.forbidden()) {
   <!-- Both queues are owner-only on the server, so this is not a failure to
        retry — it is a screen that was never theirs. -->
-  <mh-empty-state icon="lock-closed-outline" heading="Only the owner can review these"
-    message="Join requests and pending posts are handled by the group's owner." />
+  <mh-empty-state icon="lock-closed-outline" [heading]="'groups.manage.forbidden.title' | translate"
+    [message]="'groups.manage.forbidden.message' | translate" />
   } @else if (store.showError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load these queues"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.manage.loadError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else if (store.showSkeleton()) {
   <div class="mh-page" aria-busy="true">
     <ion-list [inset]="true" class="mh-card-list">
@@ -60,8 +61,8 @@
   } @else if (isRequests()) {
   <div class="mh-page">
     @if (store.requests().length === 0) {
-    <mh-empty-state icon="checkmark-circle-outline" heading="No requests waiting"
-      message="People asking to join will show up here." />
+    <mh-empty-state icon="checkmark-circle-outline" [heading]="'groups.manage.requests.empty.title' | translate"
+      [message]="'groups.manage.requests.empty.message' | translate" />
     } @else {
     @for (request of store.requests(); track request.id) {
     <article class="queue-card">
@@ -70,7 +71,7 @@
           [imageUrl]="request.user?.avatarUrl ?? null" />
         <div class="lines">
           <h2>{{ requesterName(request) }}</h2>
-          <p>Asked {{ askedAt(request.createdAt) }}</p>
+          <p>{{ 'groups.manage.asked' | translate: { time: askedAt(request.createdAt) } }}</p>
         </div>
       </div>
 
@@ -81,17 +82,17 @@
       <div class="actions">
         <ion-button fill="outline" size="small" color="medium"
           [disabled]="store.isBusy(request.id)"
-          [attr.aria-label]="'Decline ' + requesterName(request)"
+          [attr.aria-label]="'groups.manage.a11y.decline' | translate: { name: requesterName(request) }"
           (click)="rejectRequest(request)">
-          Decline
+          {{ 'button.decline' | translate }}
         </ion-button>
         <ion-button size="small" [disabled]="store.isBusy(request.id)"
-          [attr.aria-label]="'Approve ' + requesterName(request)"
+          [attr.aria-label]="'groups.manage.a11y.approve' | translate: { name: requesterName(request) }"
           (click)="approveRequest(request)">
           @if (store.isBusy(request.id)) {
           <ion-spinner name="crescent" slot="start" />
           }
-          Approve
+          {{ 'button.approve' | translate }}
         </ion-button>
       </div>
     </article>
@@ -101,8 +102,8 @@
   } @else {
   <div class="mh-page">
     @if (store.posts().length === 0) {
-    <mh-empty-state icon="checkmark-circle-outline" heading="Nothing to review"
-      message="Posts waiting for approval will show up here." />
+    <mh-empty-state icon="checkmark-circle-outline" [heading]="'groups.manage.posts.empty.title' | translate"
+      [message]="'groups.manage.posts.empty.message' | translate" />
     } @else {
     @for (post of store.posts(); track post.id) {
     <article class="queue-card">
@@ -111,7 +112,7 @@
           [imageUrl]="post.author?.avatarUrl ?? null" />
         <div class="lines">
           <h2>{{ authorName(post) }}</h2>
-          <p>Written {{ askedAt(post.createdAt) }}</p>
+          <p>{{ 'groups.manage.written' | translate: { time: askedAt(post.createdAt) } }}</p>
         </div>
       </div>
 
@@ -121,15 +122,15 @@
 
       <div class="actions">
         <ion-button fill="outline" size="small" color="medium" [disabled]="store.isBusy(post.id)"
-          [attr.aria-label]="'Reject post by ' + authorName(post)" (click)="rejectPost(post)">
-          Reject
+          [attr.aria-label]="'groups.manage.a11y.reject' | translate: { name: authorName(post) }" (click)="rejectPost(post)">
+          {{ 'button.reject' | translate }}
         </ion-button>
         <ion-button size="small" [disabled]="store.isBusy(post.id)"
-          [attr.aria-label]="'Publish post by ' + authorName(post)" (click)="publishPost(post)">
+          [attr.aria-label]="'groups.manage.a11y.publish' | translate: { name: authorName(post) }" (click)="publishPost(post)">
           @if (store.isBusy(post.id)) {
           <ion-spinner name="crescent" slot="start" />
           }
-          Publish
+          {{ 'groups.manage.publish' | translate }}
         </ion-button>
       </div>
     </article>

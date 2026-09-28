@@ -10,6 +10,7 @@ import {
   IonSelect,
   IonSelectOption,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -59,12 +60,14 @@ export { NO_FILTERS, activeFilterCount };
     IonSelect,
     IonSelectOption,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './session-filter-sheet.html',
   styleUrl: './session-filter-sheet.scss',
 })
 export class SessionFilterSheet {
   private readonly _groupService = inject(GroupService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly filters = input<AgendaFilters>(NO_FILTERS);
@@ -117,8 +120,8 @@ export class SessionFilterSheet {
 
   readonly applyLabel = computed(() => {
     const count = this.count();
-    if (count === 0) return 'Apply';
-    return `Apply · ${count} ${count === 1 ? 'filter' : 'filters'}`;
+    if (count === 0) return this._translateService.instant('button.apply');
+    return this._translateService.instant('sessions.filterSheet.apply', { count });
   });
 
   /** Tapping the selected option clears it — the chips are toggles, not a radio. */

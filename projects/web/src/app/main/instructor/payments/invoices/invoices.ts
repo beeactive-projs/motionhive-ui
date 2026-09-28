@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -12,15 +11,18 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   CurrencyRonPipe,
   getInvoiceStatusSeverity,
-  InvoiceStatuses,
+  type Invoice,
   InvoiceService as PaymentInvoiceService,
+  type InvoiceStatus,
+  InvoiceStatuses,
+  enumLabel,
+  escapeHtml,
   showApiError,
   StatusLabelPipe,
-  type Invoice,
-  type InvoiceStatus,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -58,16 +60,17 @@ import { SendInvoiceEmailDialog } from '../../_dialogs/send-invoice-email-dialog
     ListCard,
     ListEmptyState,
     UserInfo,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './invoices.html',
   styleUrl: './invoices.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Invoices {
   private readonly _invoiceService = inject(PaymentInvoiceService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
 
   private readonly _scrollSentinel = viewChild<ElementRef>('scrollSentinel');
@@ -86,12 +89,14 @@ export class Invoices {
   readonly hasMore = computed(() => this.invoices().length < this.totalRecords());
 
   readonly statusFilter = signal<InvoiceStatus | undefined>(undefined);
-  readonly statusOptions = [
-    { label: 'All', value: undefined },
-    { label: 'Draft', value: InvoiceStatuses.Draft as InvoiceStatus },
-    { label: 'Open', value: InvoiceStatuses.Open as InvoiceStatus },
-    { label: 'Paid', value: InvoiceStatuses.Paid as InvoiceStatus },
-    { label: 'Void', value: InvoiceStatuses.Void as InvoiceStatus },
+  readonly statusOptions: { label: string; value: InvoiceStatus | undefined }[] = [
+    { label: this._translateService.instant('common.all'), value: undefined },
+    ...[
+      InvoiceStatuses.Draft,
+      InvoiceStatuses.Open,
+      InvoiceStatuses.Paid,
+      InvoiceStatuses.Void,
+    ].map((value) => ({ label: enumLabel('invoiceStatus', value), value })),
   ];
 
   readonly showCreateDialog = signal(false);
@@ -121,7 +126,12 @@ export class Invoices {
             })
             .pipe(
               catchError((err) => {
-                showApiError(this._messageService, 'Error', 'Failed to load invoices', err);
+                showApiError(
+                  this._messageService,
+                  this._translateService.instant('toast.summary.error'),
+                  this._translateService.instant('payments.invoices.toast.loadFailed'),
+                  err,
+                );
                 return of(null);
               }),
             );
@@ -229,7 +239,12 @@ export class Invoices {
         },
         error: (err) => {
           this.loadingMore.set(false);
-          showApiError(this._messageService, 'Error', 'Failed to load more invoices', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.invoices.toast.loadMoreFailed'),
+            err,
+          );
         },
       });
   }
@@ -241,8 +256,10 @@ export class Invoices {
 
   confirmVoid(invoice: Invoice): void {
     this._confirmationService.confirm({
-      message: `Are you sure you want to void invoice ${invoice.number ?? ''}? This cannot be undone.`,
-      header: 'Void invoice',
+      message: this._translateService.instant('payments.invoices.confirm.void.message', {
+        number: escapeHtml(invoice.number ?? ''),
+      }),
+      header: this._translateService.instant('payments.invoices.confirm.void.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.voidInvoice(invoice),
@@ -257,21 +274,28 @@ export class Invoices {
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: 'Invoice voided',
-            detail: `Invoice ${invoice.number ?? ''} has been voided`,
+            summary: this._translateService.instant('payments.invoices.toast.voided.summary'),
+            detail: this._translateService.instant('payments.invoices.toast.voided.detail', {
+              number: invoice.number ?? '',
+            }),
           });
           this.reload();
         },
         error: (err) => {
-          showApiError(this._messageService, 'Error', 'Failed to void invoice', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.invoices.toast.voidFailed'),
+            err,
+          );
         },
       });
   }
 
   confirmMarkPaid(invoice: Invoice): void {
     this._confirmationService.confirm({
-      message: `Mark this invoice as paid out of band (cash or bank transfer)? No Stripe fees will be charged.`,
-      header: 'Mark as paid',
+      message: this._translateService.instant('payments.invoices.confirm.markPaid.message'),
+      header: this._translateService.instant('payments.invoices.confirm.markPaid.header'),
       icon: 'pi pi-info-circle',
       accept: () => this.markPaid(invoice),
     });
@@ -285,13 +309,18 @@ export class Invoices {
         next: () => {
           this._messageService.add({
             severity: 'success',
-            summary: 'Invoice marked paid',
-            detail: 'Invoice has been marked as paid (out of band)',
+            summary: this._translateService.instant('payments.invoices.toast.markedPaid.summary'),
+            detail: this._translateService.instant('payments.invoices.toast.markedPaid.detail'),
           });
           this.reload();
         },
         error: (err) => {
-          showApiError(this._messageService, 'Error', 'Failed to mark invoice as paid', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('payments.invoices.toast.markPaidFailed'),
+            err,
+          );
         },
       });
   }
@@ -302,7 +331,26 @@ export class Invoices {
     if (invoice.client?.firstName && invoice.client?.lastName) {
       return `${invoice.client.firstName} ${invoice.client.lastName}`;
     }
-    return invoice.clientEmail ?? 'Unknown';
+    return invoice.clientEmail ?? this._translateService.instant('common.unknown');
+  }
+
+  /** Translated pill text for the mobile card — `mh-list-card` uppercases it. */
+  cardStatus(invoice: Invoice): string {
+    return this.isOverdue(invoice)
+      ? this._translateService.instant('payments.invoices.card.overdue')
+      : enumLabel('invoiceStatus', invoice.status);
+  }
+
+  /** Mobile card subtitle: "MH-0001 · Paid" / "MH-0001 · Due" / "MH-0001". */
+  cardSubtitle(invoice: Invoice): string {
+    const number = this.invoiceDisplayNumber(invoice);
+    if (invoice.status === InvoiceStatuses.Paid && invoice.paidAt) {
+      return this._translateService.instant('payments.invoices.card.paidSubtitle', { number });
+    }
+    if (invoice.dueDate) {
+      return this._translateService.instant('payments.invoices.card.dueSubtitle', { number });
+    }
+    return number;
   }
 
   clientInitials(invoice: Invoice): string {

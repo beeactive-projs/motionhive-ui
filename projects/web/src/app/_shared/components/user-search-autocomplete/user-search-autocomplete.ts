@@ -1,12 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, catchError, debounceTime, of, switchMap } from 'rxjs';
 import { UserRole, UserSearchResult, UserService } from 'core';
 import {
@@ -20,14 +14,14 @@ import { Avatar } from '../avatar/avatar';
 
 @Component({
   selector: 'mh-user-search-autocomplete',
-  imports: [AutoComplete, IconField, InputIcon, Avatar],
+  imports: [AutoComplete, IconField, InputIcon, Avatar, TranslatePipe],
   templateUrl: './user-search-autocomplete.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSearchAutocomplete {
   private readonly _userService = inject(UserService);
 
-  readonly placeholder = input<string>('Search by name or email…');
+  /** Translated text; empty falls back to the generic "Search by name or email…". */
+  readonly placeholder = input<string>('');
   readonly role = input<UserRole | undefined>(undefined);
   readonly excludeConnected = input<boolean>(false);
   readonly limit = input<number>(10);

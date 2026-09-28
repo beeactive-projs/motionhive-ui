@@ -1,16 +1,16 @@
 <div class="empty">
   <mh-hex-avatar
-    name="Nothing booked yet"
+    [name]="'mySessions.empty.title' | translate"
     icon="calendar-outline"
     size="xl"
     color="primary"
     tone="wash"
   />
 
-  <h2>Nothing booked yet</h2>
+  <h2>{{ 'mySessions.empty.title' | translate }}</h2>
   <p>{{ message() }}</p>
 
   <div class="actions">
-    <ion-button expand="block" (click)="browse.emit()">Browse Discover</ion-button>
+    <ion-button expand="block" (click)="browse.emit()">{{ 'mySessions.empty.browse' | translate }}</ion-button>
   </div>
 </div>

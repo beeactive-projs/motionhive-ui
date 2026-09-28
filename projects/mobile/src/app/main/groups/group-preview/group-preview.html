@@ -1,21 +1,22 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/groups" text="Groups" />
+      <ion-back-button defaultHref="/tabs/groups" [text]="'nav.groups' | translate" />
     </ion-buttons>
-    <ion-title>{{ group()?.name ?? 'Group' }}</ion-title>
+    <ion-title>{{ group()?.name ?? ('groups.common.group' | translate) }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <h1 class="mh-visually-hidden">{{ group()?.name ?? 'Group' }}</h1>
+  <h1 class="mh-visually-hidden">{{ group()?.name ?? ('groups.common.group' | translate) }}</h1>
 
   @if (store.notFound()) {
-  <mh-empty-state icon="lock-closed-outline" heading="This group is private"
-    message="Ask the owner for an invite, or look for another group." />
+  <mh-empty-state icon="lock-closed-outline" [heading]="'groups.preview.notFound.title' | translate"
+    [message]="'groups.preview.notFound.message' | translate" />
   } @else if (store.showError()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this group"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.common.loadGroupError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else if (store.showSkeleton()) {
   <div class="mh-page" aria-busy="true">
     <div class="hero">
@@ -47,7 +48,7 @@
 
     @if (group.description) {
     <section class="mh-section">
-      <h2 class="mh-kicker">About</h2>
+      <h2 class="mh-kicker">{{ 'groups.common.about' | translate }}</h2>
       <p class="description">{{ group.description }}</p>
     </section>
     }
@@ -57,7 +58,7 @@
       <ion-item lines="full">
         <ion-icon slot="start" name="person-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <p>Run by</p>
+          <p>{{ 'groups.preview.runBy' | translate }}</p>
           <h2>{{ instructor }}</h2>
         </ion-label>
       </ion-item>
@@ -66,7 +67,7 @@
       <ion-item lines="full">
         <ion-icon slot="start" name="location-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <p>Where</p>
+          <p>{{ 'groups.common.where' | translate }}</p>
           <h2>{{ where }}</h2>
         </ion-label>
       </ion-item>
@@ -74,14 +75,14 @@
       <ion-item lines="none">
         <ion-icon slot="start" name="people-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <p>Members</p>
+          <p>{{ 'groups.common.members' | translate }}</p>
           <h2>{{ memberCountLabel() }}</h2>
         </ion-label>
       </ion-item>
     </ion-list>
 
     @if (group.tags?.length) {
-    <div class="mh-chip-row" role="group" aria-label="Group tags">
+    <div class="mh-chip-row" role="group" [attr.aria-label]="'groups.common.groupTags' | translate">
       @for (tag of group.tags; track tag) {
       <ion-chip color="medium" class="tag">{{ tag }}</ion-chip>
       }
@@ -93,7 +94,7 @@
          the group has nothing in it. -->
     <p class="locked">
       <ion-icon name="lock-closed-outline" aria-hidden="true" />
-      <span>Posts and members are visible once you join.</span>
+      <span>{{ 'groups.preview.locked' | translate }}</span>
     </p>
   </div>
   }
@@ -108,7 +109,7 @@
     <div class="pending">
       <span>{{ cta.label }}</span>
       <ion-button fill="clear" size="small" [disabled]="joining()" (click)="cancelRequest()">
-        Withdraw
+        {{ 'groups.preview.withdraw' | translate }}
       </ion-button>
     </div>
     } @else {

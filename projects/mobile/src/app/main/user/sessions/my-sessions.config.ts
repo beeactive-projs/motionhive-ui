@@ -20,6 +20,7 @@ import {
   BlockedSessionInstance,
   JoinInfo,
   PublicSessionInstance,
+  SESSION_LOCATION_KINDS,
   SessionInstanceStatus,
   SessionInstructorRef,
   SessionLocationKind,
@@ -30,6 +31,8 @@ import {
   joinWindowFor,
   sessionLifecycle,
   sessionMinutes,
+  translate,
+  formatMinorUnits,
 } from 'core';
 
 /**
@@ -120,29 +123,37 @@ export interface BookingChip {
 export function bookingChip(p: SessionParticipant, now: number): BookingChip | null {
   switch (p.status) {
     case SessionParticipantStatus.PendingApproval:
-      return { label: 'Awaiting approval', tone: 'warn' };
+      return { label: translate('mySessions.chip.awaitingApproval'), tone: 'warn' };
     case SessionParticipantStatus.Waitlisted:
-      return { label: 'Waitlist', tone: 'info' };
+      return { label: translate('mySessions.chip.waitlist'), tone: 'info' };
     // The cancelled list is the only place these rows render, muted on
     // purpose — danger would shout about something already over.
     case SessionParticipantStatus.Cancelled:
-      return { label: 'Cancelled', tone: 'medium' };
+      return { label: translate('mySessions.chip.cancelled'), tone: 'medium' };
     case SessionParticipantStatus.Declined:
-      return { label: 'Declined', tone: 'medium' };
+      return { label: translate('mySessions.chip.declined'), tone: 'medium' };
     default:
       break;
   }
   // Confirmed: silent while upcoming, the attendance record once it is over.
   if (bookingLifecycle(p, now) !== 'past') return null;
-  if (p.attended === true) return { label: 'Attended', tone: 'success' };
-  if (p.attended === false) return { label: 'Missed', tone: 'medium' };
+  if (p.attended === true) {
+    return { label: translate('mySessions.chip.attended'), tone: 'success' };
+  }
+  if (p.attended === false) {
+    return { label: translate('mySessions.chip.missed'), tone: 'medium' };
+  }
   return null;
 }
 
 // ─── Accessors (guarding the eager-loaded refs) ────────────────────────────
 
 export function bookingTitle(p: SessionParticipant): string {
-  return p.instance?.titleOverride ?? p.instance?.template?.title ?? 'Session';
+  return (
+    p.instance?.titleOverride ??
+    p.instance?.template?.title ??
+    translate('common.session')
+  );
 }
 
 export function bookingLifecycle(
@@ -162,7 +173,7 @@ export function isOnlineBooking(p: SessionParticipant): boolean {
 
 /** "Online" or the venue's name — the snapshot text is the last resort. */
 export function bookingPlace(p: SessionParticipant): string {
-  if (isOnlineBooking(p)) return 'Online';
+  if (isOnlineBooking(p)) return SESSION_LOCATION_KINDS[SessionLocationKind.Online].label;
   return (
     p.instance?.venueOverride?.name ??
     p.instance?.template?.venue?.name ??
@@ -175,7 +186,9 @@ export function bookingPlace(p: SessionParticipant): string {
 export function bookingMeta(p: SessionParticipant): string {
   const first = bookingCoach(p)?.firstName?.trim();
   const place = bookingPlace(p);
-  return [first ? `with ${first}` : '', place].filter(Boolean).join(' · ');
+  return [first ? translate('mySessions.meta.withCoach', { name: first }) : '', place]
+    .filter(Boolean)
+    .join(' · ');
 }
 
 export function bookingDurationMinutes(p: SessionParticipant): number {
@@ -190,9 +203,8 @@ export function bookingDurationMinutes(p: SessionParticipant): number {
  * from the booking snapshot rather than being assumed.
  */
 export function bookingPriceLabel(cents: number, currency: string): string {
-  if (cents <= 0) return 'Free';
-  const amount = cents / 100;
-  const rendered = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+  if (cents <= 0) return translate('mySessions.price.free');
+  const rendered = formatMinorUnits(cents, { trimWholeNumbers: true });
   return `${rendered} ${currency.toUpperCase()}`;
 }
 
@@ -315,29 +327,52 @@ export interface CancelSheetVariant {
   successToast: string | null;
 }
 
+// Getters: translated when read, after the language file has loaded.
 const CANCEL_SHEET_VARIANTS: Partial<
   Record<SessionParticipantStatus, CancelSheetVariant>
 > = {
   [SessionParticipantStatus.Confirmed]: {
-    title: 'Cancel this booking?',
-    saveLabel: 'Cancel booking',
-    dismissLabel: 'Keep booking',
+    get title() {
+      return translate('mySessions.cancelSheet.confirmed.title');
+    },
+    get saveLabel() {
+      return translate('mySessions.cancelSheet.confirmed.save');
+    },
+    get dismissLabel() {
+      return translate('mySessions.cancelSheet.confirmed.dismiss');
+    },
     showTerms: true,
     successToast: null,
   },
   [SessionParticipantStatus.Waitlisted]: {
-    title: 'Leave the waitlist?',
-    saveLabel: 'Leave waitlist',
-    dismissLabel: 'Keep my spot',
+    get title() {
+      return translate('mySessions.cancelSheet.waitlisted.title');
+    },
+    get saveLabel() {
+      return translate('mySessions.cancelSheet.waitlisted.save');
+    },
+    get dismissLabel() {
+      return translate('mySessions.cancelSheet.waitlisted.dismiss');
+    },
     showTerms: false,
-    successToast: 'You left the waitlist.',
+    get successToast() {
+      return translate('mySessions.cancelSheet.waitlisted.success');
+    },
   },
   [SessionParticipantStatus.PendingApproval]: {
-    title: 'Withdraw request?',
-    saveLabel: 'Withdraw request',
-    dismissLabel: 'Keep request',
+    get title() {
+      return translate('mySessions.cancelSheet.pending.title');
+    },
+    get saveLabel() {
+      return translate('mySessions.cancelSheet.pending.save');
+    },
+    get dismissLabel() {
+      return translate('mySessions.cancelSheet.pending.dismiss');
+    },
     showTerms: false,
-    successToast: 'Request withdrawn.',
+    get successToast() {
+      return translate('mySessions.cancelSheet.pending.success');
+    },
   },
 };
 

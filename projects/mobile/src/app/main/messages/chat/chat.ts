@@ -16,6 +16,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { Keyboard } from '@capacitor/keyboard';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
@@ -59,6 +60,7 @@ const FOLLOW_THRESHOLD_PX = 120;
     IonTitle,
     IonToolbar,
     MessageBubble,
+    TranslatePipe,
   ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
@@ -68,6 +70,7 @@ export class Chat implements ViewWillLeave {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
   readonly store = inject(MessagingStore);
 
   private readonly _content = viewChild(IonContent);
@@ -93,7 +96,9 @@ export class Chat implements ViewWillLeave {
     // A draft carries the name in the query string, so the header is right
     // before any participant snapshot exists. A real thread whose inbox row
     // hasn't arrived yet gets nothing rather than someone else's name.
-    return this.isDraft() ? this._draftRecipientName() || 'New message' : '';
+    return this.isDraft()
+      ? this._draftRecipientName() || this._translateService.instant('messages.newMessage')
+      : '';
   });
 
   readonly tone = computed(() =>
@@ -153,7 +158,9 @@ export class Chat implements ViewWillLeave {
     const firstName = this.otherUser()
       ? this.title().split(' ')[0]
       : this._draftRecipientName().split(' ')[0];
-    return firstName ? `Message ${firstName}…` : 'Message…';
+    return firstName
+      ? this._translateService.instant('messages.chat.placeholder', { name: firstName })
+      : this._translateService.instant('messages.chat.placeholderGeneric');
   });
 
   constructor() {

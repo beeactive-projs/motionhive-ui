@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -10,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   GroupService,
   GroupsRefreshService,
@@ -17,7 +17,6 @@ import {
   JoinPolicies,
   PublicGroupProfile,
   TagSeverity,
-  joinPolicyLabel,
   joinPolicySeverity,
   showApiError,
 } from 'core';
@@ -50,11 +49,11 @@ import { HexAvatar } from '../../../_shared/components/hex-avatar/hex-avatar';
     ToastModule,
     TooltipModule,
     AboutTab,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './group-preview.html',
   styleUrl: './group-preview.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupPreview implements OnInit {
   private readonly _groupService = inject(GroupService);
@@ -63,9 +62,9 @@ export class GroupPreview implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _groupsRefreshService = inject(GroupsRefreshService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly JoinPolicies = JoinPolicies;
-  readonly joinPolicyLabel = joinPolicyLabel;
   readonly joinPolicySeverity = joinPolicySeverity;
 
   readonly profile = signal<PublicGroupProfile | null>(null);
@@ -80,7 +79,10 @@ export class GroupPreview implements OnInit {
 
   readonly breadcrumbItems = computed<MenuItem[]>(() => {
     const g = this.group();
-    return [{ label: 'Groups', routerLink: '/groups/discover' }, { label: g?.name ?? 'Preview' }];
+    return [
+      { label: this._translateService.instant('nav.groups'), routerLink: '/groups/discover' },
+      { label: g?.name ?? this._translateService.instant('groups.preview.breadcrumbFallback') },
+    ];
   });
 
   readonly avatarLabel = computed(() => {
@@ -89,12 +91,11 @@ export class GroupPreview implements OnInit {
     return parts.map((p) => p.charAt(0).toUpperCase()).join('') || 'G';
   });
 
-  readonly memberCountLabel = computed(() => {
-    const n = this.group()?.memberCount ?? 0;
-    return `${n} ${n === 1 ? 'member' : 'members'}`;
-  });
+  readonly memberCountLabel = computed(() =>
+    this._translateService.instant('count.members', { count: this.group()?.memberCount ?? 0 }),
+  );
 
-  readonly visibilityLabel = computed(() => 'Public');
+  readonly visibilityLabel = computed(() => this._translateService.instant('groups.visibility.public'));
 
   readonly instructorName = computed(() => {
     const i = this.instructor();
@@ -104,7 +105,7 @@ export class GroupPreview implements OnInit {
 
   readonly joinPolicyTagLabel = computed<string>(() => {
     const p = this.group()?.joinPolicy;
-    return p ? joinPolicyLabel(p) : '';
+    return p ? this._translateService.instant(`groups.joinPolicy.${p}`) : '';
   });
 
   readonly joinPolicyTagSeverity = computed<TagSeverity>(() => {
@@ -113,11 +114,11 @@ export class GroupPreview implements OnInit {
   });
 
   readonly joinButtonLabel = computed(() => {
-    if (this.joinRequestPending()) return 'Request pending';
+    if (this.joinRequestPending()) return this._translateService.instant('groups.join.requestPending');
     const policy = this.group()?.joinPolicy;
-    if (policy === JoinPolicies.Open) return 'Join group';
-    if (policy === JoinPolicies.Approval) return 'Request to join';
-    return 'Invite only';
+    if (policy === JoinPolicies.Open) return this._translateService.instant('groups.join.joinGroup');
+    if (policy === JoinPolicies.Approval) return this._translateService.instant('groups.join.requestToJoin');
+    return this._translateService.instant('groups.join.inviteOnly');
   });
 
   readonly joinButtonIcon = computed(() => {
@@ -165,7 +166,12 @@ export class GroupPreview implements OnInit {
           this.notFound.set(true);
           return;
         }
-        showApiError(this._messageService, 'Failed to load group', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.groupLoadFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -192,8 +198,8 @@ export class GroupPreview implements OnInit {
         if (result.status === 'JOINED') {
           this._messageService.add({
             severity: 'success',
-            summary: 'Joined',
-            detail: `You're now a member of "${g.name}".`,
+            summary: this._translateService.instant('groups.toast.joined.summary'),
+            detail: this._translateService.instant('groups.toast.joined.detail', { name: g.name }),
           });
           this._groupsRefreshService.notify();
           this._router.navigate(['/groups', g.id]);
@@ -201,14 +207,19 @@ export class GroupPreview implements OnInit {
           this.joinRequestPending.set(true);
           this._messageService.add({
             severity: 'info',
-            summary: 'Request sent',
-            detail: 'The owner will review your request to join.',
+            summary: this._translateService.instant('groups.toast.requestSent.summary'),
+            detail: this._translateService.instant('groups.toast.requestSent.detail'),
           });
         }
       },
       error: (err) => {
         this.joining.set(false);
-        showApiError(this._messageService, 'Could not join group', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.joinFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -224,13 +235,18 @@ export class GroupPreview implements OnInit {
         this.joinRequestPending.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Request cancelled',
+          summary: this._translateService.instant('groups.toast.requestCancelled'),
           detail: '',
         });
       },
       error: (err) => {
         this.joining.set(false);
-        showApiError(this._messageService, 'Could not cancel request', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('groups.toast.cancelRequestFailed'),
+          '',
+          err,
+        );
       },
     });
   }

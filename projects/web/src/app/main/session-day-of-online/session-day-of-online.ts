@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   OnInit,
@@ -9,7 +8,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { interval, switchMap } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
@@ -18,6 +18,7 @@ import {
   JoinInfo,
   PublicSessionInstance,
   SessionService,
+  appLocale,
   meetingProviderLabel,
   showApiError,
 } from 'core';
@@ -40,24 +41,24 @@ import {
 @Component({
   selector: 'mh-session-day-of-online',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonDirective, ToastModule],
+  imports: [CommonModule, RouterLink, ButtonDirective, ToastModule, TranslatePipe],
   providers: [MessageService],
   template: `
     <div class="mh-dof">
       @if (loading()) {
-        <p class="mh-dof__loading">Loading session…</p>
+        <p class="mh-dof__loading">{{ 'mySessions.common.loadingSession' | translate }}</p>
       } @else if (error()) {
         <div class="mh-dof__error">
           <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
           <span>{{ error() }}</span>
-          <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/user/sessions">Back to my sessions</button>
+          <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/user/sessions">{{ 'mySessions.dayOf.backToMySessions' | translate }}</button>
         </div>
       } @else if (info()) {
         <header class="mh-dof__hero" [class.is-active]="isActive()" [class.is-expired]="isExpired()">
           <span class="mh-dof__eyebrow">
-            @if (isExpired()) { Window expired }
-            @else if (isActive()) { Join now is active }
-            @else { Starts in }
+            @if (isExpired()) { {{ 'mySessions.dayOf.eyebrow.expired' | translate }} }
+            @else if (isActive()) { {{ 'mySessions.dayOf.eyebrow.active' | translate }} }
+            @else { {{ 'mySessions.dayOf.eyebrow.startsIn' | translate }} }
           </span>
 
           @if (!isActive() && !isExpired()) {
@@ -78,32 +79,30 @@ import {
           <div class="mh-dof__active-card">
             <span class="mh-dof__dot" aria-hidden="true"></span>
             <div>
-              <strong>You're good to join.</strong>
+              <strong>{{ 'mySessions.dayOf.goodToJoin' | translate }}</strong>
               <small>
                 @if (info()!.instructorJoined) {
-                  Your instructor is already in the room.
+                  {{ 'mySessions.dayOf.coachInRoom' | translate }}
                 } @else {
-                  We'll let your instructor know you're here.
+                  {{ 'mySessions.dayOf.coachNotified' | translate }}
                 }
               </small>
             </div>
           </div>
           <button pButton type="button" severity="primary" (click)="join()" class="mh-dof__join-btn">
-            {{ 'Join ' + providerLabel() }}
+            {{ joinLabel() }}
             <i class="pi pi-arrow-right"></i>
           </button>
         } @else if (isExpired()) {
           <p class="mh-dof__expired">
-            Late? The join link stayed valid for 15 minutes after the start.
-            After that it expires. Message your instructor if you still need access.
+            {{ 'mySessions.dayOf.expiredHint' | translate }}
           </p>
           <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/user/sessions" class="mh-dof__join-btn">
-            Back to my sessions
+            {{ 'mySessions.dayOf.backToMySessions' | translate }}
           </button>
         } @else {
           <p class="mh-dof__pre-hint">
-            The Join button activates 5 minutes before the start.
-            Keep this tab open — we'll flip it on automatically.
+            {{ 'mySessions.dayOf.preHint' | translate }}
           </p>
         }
       }
@@ -221,14 +220,13 @@ import {
       padding: 0 8px;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionDayOfOnline implements OnInit {
-  private readonly _route = inject(ActivatedRoute);
-  private readonly _router = inject(Router);
-  private readonly _service = inject(SessionService);
-  private readonly _msg = inject(MessageService);
-  private readonly _destroy = inject(DestroyRef);
+  private readonly _activatedRoute = inject(ActivatedRoute);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   /** Server's view of the join window — refreshed every 5s. */
   protected readonly info = signal<JoinInfo | null>(null);
@@ -265,66 +263,87 @@ export class SessionDayOfOnline implements OnInit {
 
   protected readonly titleLabel = computed(() => {
     const inst = this.instance();
-    return inst?.titleOverride ?? inst?.template?.title ?? 'Online session';
+    return (
+      inst?.titleOverride ??
+      inst?.template?.title ??
+      this._translateService.instant('mySessions.dayOf.fallbackTitle')
+    );
   });
 
   protected readonly subLabel = computed(() => {
     const inst = this.instance();
     if (!inst) return '';
-    const start = new Date(inst.startAt).toLocaleTimeString('en-GB', {
+    const time = new Date(inst.startAt).toLocaleTimeString(appLocale(), {
       hour: '2-digit', minute: '2-digit',
     });
-    return `Starts at ${start} · ${inst.template?.durationMinutes ?? '?'} min`;
+    return this._translateService.instant('mySessions.dayOf.subtitle', {
+      time,
+      minutes: inst.template?.durationMinutes ?? '?',
+    });
   });
 
-  protected readonly providerLabel = computed(() => {
+  protected readonly joinLabel = computed(() => {
     const provider = this.instance()?.template?.meetingProvider;
     // "Join the meeting" when unknown — a destination, not a place.
-    return provider ? meetingProviderLabel(provider) : 'the meeting';
+    return provider
+      ? this._translateService.instant('mySessions.dayOf.joinProvider', {
+          provider: meetingProviderLabel(provider),
+        })
+      : this._translateService.instant('mySessions.dayOf.joinMeeting');
   });
 
   ngOnInit(): void {
-    const id = this._route.snapshot.paramMap.get('id');
+    const id = this._activatedRoute.snapshot.paramMap.get('id');
     if (!id) {
-      this.error.set('Missing session id.');
+      this.error.set(this._translateService.instant('mySessions.error.missingId'));
       this.loading.set(false);
       return;
     }
     // Load instance once (for title / start time / provider label).
-    this._service.getPublicInstance(id).subscribe({
+    this._sessionService.getPublicInstance(id).subscribe({
       next: (inst) => {
         if ('isBlocked' in inst) {
-          this.error.set('This session is not visible to you.');
+          this.error.set(this._translateService.instant('mySessions.dayOf.notVisible'));
           this.loading.set(false);
           return;
         }
         this.instance.set(inst);
       },
       error: (err: unknown) => {
-        showApiError(this._msg, 'Could not load session', 'Try again.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('mySessions.toast.loadFailed'),
+          this._translateService.instant('mySessions.toast.tryAgain'),
+          err,
+        );
       },
     });
     // Tick the MM:SS counter every second.
     interval(1000)
-      .pipe(takeUntilDestroyed(this._destroy))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this._now.set(Date.now()));
     // Refresh join-info every 5s so the active window flip is timely
     // even if the user keeps the tab open across midnight or system sleep.
-    this._service.joinInfo(id).subscribe({
+    this._sessionService.joinInfo(id).subscribe({
       next: (j) => {
         this.info.set(j);
         this.loading.set(false);
       },
       error: (err: unknown) => {
-        this.error.set('Join info not available yet. Try again closer to the start.');
+        this.error.set(this._translateService.instant('mySessions.dayOf.joinUnavailable'));
         this.loading.set(false);
-        showApiError(this._msg, 'Join not available', 'Try again closer to start.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('mySessions.toast.joinUnavailable.summary'),
+          this._translateService.instant('mySessions.toast.joinUnavailable.detail'),
+          err,
+        );
       },
     });
     interval(5000)
       .pipe(
-        switchMap(() => this._service.joinInfo(id)),
-        takeUntilDestroyed(this._destroy),
+        switchMap(() => this._sessionService.joinInfo(id)),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe({
         next: (j) => this.info.set(j),

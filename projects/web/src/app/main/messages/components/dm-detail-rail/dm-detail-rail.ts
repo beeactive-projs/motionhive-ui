@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ConversationListItem, displayName, initialsOf } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
@@ -12,11 +13,9 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
  */
 @Component({
   selector: 'mh-dm-detail-rail',
-  standalone: true,
-  imports: [HexAvatar],
+  imports: [HexAvatar, TranslatePipe],
   templateUrl: './dm-detail-rail.html',
   styleUrl: './dm-detail-rail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DmDetailRail {
   readonly conversation = input.required<ConversationListItem>();

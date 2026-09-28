@@ -1,7 +1,12 @@
 @if (store.sendError(); as error) {
   <div class="error">
     <ion-note color="danger">{{ error }}</ion-note>
-    <ion-button fill="clear" size="small" aria-label="Dismiss" (click)="dismissError()">
+    <ion-button
+      fill="clear"
+      size="small"
+      [attr.aria-label]="'button.dismiss' | translate"
+      (click)="dismissError()"
+    >
       <ion-icon slot="icon-only" name="close" />
     </ion-button>
   </div>
@@ -9,7 +14,7 @@
 
 @if (isTooLong()) {
   <div class="error">
-    <ion-note color="danger">That message is too long. Trim it and try again.</ion-note>
+    <ion-note color="danger">{{ 'messages.composer.tooLong' | translate }}</ion-note>
   </div>
 }
 
@@ -30,7 +35,7 @@
     color="primary"
     shape="round"
     [disabled]="!canSend()"
-    [attr.aria-label]="isRateLimited() ? 'Sending paused' : 'Send'"
+    [attr.aria-label]="(isRateLimited() ? 'messages.composer.sendingPaused' : 'button.send') | translate"
     (click)="send()"
   >
     @if (isRateLimited()) {

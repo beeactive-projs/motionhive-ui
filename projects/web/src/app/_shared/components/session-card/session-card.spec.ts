@@ -1,6 +1,20 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
+import {
+  TranslateService,
+  provideTranslateCompiler,
+  provideTranslateService,
+} from '@ngx-translate/core';
+import { TranslateMessageFormatCompiler } from 'ngx-translate-messageformat-compiler';
+import { createMessageFormatTranslator, registerTranslator } from 'core';
+import sharedEn from '../../../../../../core/src/i18n/en.json';
+import appEn from '../../../../../public/i18n/en.json';
 import { SessionCard } from './session-card';
+
+// The web app has no global test setup: give this spec the real English copy
+// so it asserts what a user reads (pipe + TS `instant()` + core's `translate()`).
+const EN = { ...sharedEn, ...appEn };
+registerTranslator(createMessageFormatTranslator(EN));
 
 const futureIso = (days: number) =>
   new Date(Date.now() + days * 86_400_000).toISOString();
@@ -63,7 +77,17 @@ function makeInstance(o: Partial<{ access: string; approvalRequired: boolean; lo
 
 describe('SessionCard', () => {
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [SessionCard] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [SessionCard],
+      providers: [
+        provideTranslateService({
+          compiler: provideTranslateCompiler(TranslateMessageFormatCompiler),
+        }),
+      ],
+    }).compileComponents();
+    const translateService = TestBed.inject(TranslateService);
+    translateService.setTranslation('en', EN);
+    translateService.use('en');
   });
 
   it('renders OPEN session with "Book" CTA when caller is eligible', async () => {

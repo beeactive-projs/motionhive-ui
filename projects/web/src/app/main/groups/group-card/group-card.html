@@ -23,17 +23,17 @@
             {{ group().name }}
           </a>
           <div class="mt-0.5 text-xs text-surface-400">
-            {{ group().memberCount }} {{ group().memberCount === 1 ? 'member' : 'members' }}
+            {{ 'count.members' | translate: { count: group().memberCount } }}
             @if (locationLabel) { · {{ locationLabel }} }
           </div>
           <div class="gp-status-tags mt-1.5 flex flex-wrap items-center gap-1.5">
             <p-tag [value]="policyLabel" [severity]="policySeverity" [pTooltip]="policyTooltip" tooltipPosition="top" />
             @if (!group().isPublic) {
-            <p-tag value="Private" icon="pi pi-lock" severity="secondary" pTooltip="Not discoverable in search"
-              tooltipPosition="top" />
+            <p-tag [value]="'groups.visibility.private' | translate" icon="pi pi-lock" severity="secondary"
+              [pTooltip]="'groups.visibility.privateHint' | translate" tooltipPosition="top" />
             }
             @if (!group().isActive) {
-            <p-tag value="Inactive" severity="warn" />
+            <p-tag [value]="'groups.card.inactive' | translate" severity="warn" />
             }
           </div>
         </div>
@@ -47,7 +47,7 @@
           size="small"
           class="gp-kebab"
           (click)="onKebab($event)"
-          aria-label="Group actions"
+          [attr.aria-label]="'groups.card.actions' | translate"
           iconOnly
         >
           <i class="pi pi-ellipsis-v"></i>
@@ -91,7 +91,7 @@
         </p-avatar-group>
 
         <button pButton type="button" [link]="true" size="small" class="gp-visit" [routerLink]="cardLink">
-          Visit group
+          {{ 'groups.card.visit' | translate }}
           <i class="pi pi-arrow-right"></i>
         </button>
 
@@ -102,7 +102,7 @@
         <div class="flex items-center gap-2">
           <button pButton type="button" [outlined]="true" [disabled]="true" size="small">
             <i class="pi pi-clock"></i>
-            Request pending
+            {{ 'groups.join.requestPending' | translate }}
           </button>
           <button pButton
             type="button"
@@ -110,7 +110,8 @@
             [text]="true"
             severity="danger"
             size="small"
-            pTooltip="Cancel request"
+            [pTooltip]="'groups.join.cancelRequest' | translate"
+            [attr.aria-label]="'groups.join.cancelRequest' | translate"
             (click)="discoverAction.emit({ kind: 'cancel', group: group() })"
             [disabled]="isBusy()"
             iconOnly
@@ -121,17 +122,17 @@
         } @else if (group().joinPolicy === JoinPolicies.Open) {
         <button pButton type="button" size="small" (click)="discoverAction.emit({ kind: 'join', group: group() })" [disabled]="isBusy()">
           <i class="pi" [class]="isBusy() ? 'pi-spinner pi-spin' : 'pi-plus'"></i>
-          Join
+          {{ 'button.join' | translate }}
         </button>
         } @else if (group().joinPolicy === JoinPolicies.Approval) {
         <button pButton type="button" size="small" (click)="discoverAction.emit({ kind: 'join', group: group() })" [disabled]="isBusy()">
           <i class="pi" [class]="isBusy() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-          Request to join
+          {{ 'groups.join.requestToJoin' | translate }}
         </button>
         } @else {
         <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="true" size="small">
           <i class="pi pi-lock"></i>
-          Invite only
+          {{ 'groups.join.inviteOnly' | translate }}
         </button>
         }
         }

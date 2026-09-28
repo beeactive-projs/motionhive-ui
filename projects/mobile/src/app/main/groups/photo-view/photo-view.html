@@ -1,7 +1,7 @@
 <ion-header [translucent]="true" class="bar">
   <ion-toolbar class="bar">
     <ion-buttons slot="start">
-      <ion-button aria-label="Close photo" (click)="close()">
+      <ion-button [attr.aria-label]="'a11y.closePhoto' | translate" (click)="close()">
         <ion-icon slot="icon-only" name="close-outline" />
       </ion-button>
     </ion-buttons>
@@ -11,15 +11,16 @@
 
 <ion-content [fullscreen]="true" class="stage">
   @if (error()) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load these photos"
-    message="Check your connection and try again." actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'groups.photos.loadError' | translate"
+    [message]="'error.checkConnection' | translate" [actionLabel]="'button.tryAgain' | translate"
+    (action)="retry()" />
   } @else if (loading()) {
   <div class="centre" aria-busy="true">
     <ion-spinner name="crescent" />
   </div>
   } @else if (current(); as url) {
   <div class="centre">
-    <img [src]="url" [attr.alt]="'Photo ' + (index() + 1) + ' of ' + total()" />
+    <img [src]="url" [attr.alt]="'groups.photos.alt' | translate: { index: index() + 1, total: total() }" />
   </div>
 
   @if (total() > 1) {
@@ -27,18 +28,20 @@
        own back gesture, and losing the photo on a mis-swipe is worse than a
        pair of buttons. -->
   <div class="nav">
-    <ion-button fill="clear" class="arrow" [disabled]="!hasPrevious()" aria-label="Previous photo"
+    <ion-button fill="clear" class="arrow" [disabled]="!hasPrevious()"
+      [attr.aria-label]="'groups.photos.previous' | translate"
       (click)="previous()">
       <ion-icon slot="icon-only" name="chevron-back" />
     </ion-button>
-    <ion-button fill="clear" class="arrow" [disabled]="!hasNext()" aria-label="Next photo"
+    <ion-button fill="clear" class="arrow" [disabled]="!hasNext()"
+      [attr.aria-label]="'groups.photos.next' | translate"
       (click)="next()">
       <ion-icon slot="icon-only" name="chevron-forward" />
     </ion-button>
   </div>
   }
   } @else {
-  <mh-empty-state icon="image-outline" heading="No photos on this post"
-    message="It may have been edited since you opened it." />
+  <mh-empty-state icon="image-outline" [heading]="'groups.photos.empty.title' | translate"
+    [message]="'groups.photos.empty.message' | translate" />
   }
 </ion-content>

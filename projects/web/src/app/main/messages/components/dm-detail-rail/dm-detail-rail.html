@@ -11,7 +11,7 @@
     </div>
 
     <div class="mh-rail__section">
-      <div class="mh-rail__eyebrow">Quick actions</div>
+      <div class="mh-rail__eyebrow">{{ 'messages.rail.quickActions' | translate }}</div>
       <div class="mh-rail__actions">
         <button
           type="button"
@@ -20,7 +20,7 @@
           [attr.aria-pressed]="muted()"
         >
           <i class="pi pi-bell" aria-hidden="true"></i>
-          <span>{{ muted() ? 'Unmute notifications' : 'Mute notifications' }}</span>
+          <span>{{ (muted() ? 'messages.rail.unmute' : 'messages.rail.mute') | translate }}</span>
         </button>
         <button
           type="button"
@@ -28,7 +28,7 @@
           (click)="report.emit()"
         >
           <i class="pi pi-flag" aria-hidden="true"></i>
-          <span>Report conversation</span>
+          <span>{{ 'messages.rail.report' | translate }}</span>
         </button>
         <button
           type="button"
@@ -36,11 +36,11 @@
           (click)="block.emit()"
         >
           <i class="pi pi-ban" aria-hidden="true"></i>
-          <span>Block this user</span>
+          <span>{{ 'messages.rail.block' | translate }}</span>
         </button>
       </div>
     </div>
   } @else {
-    <div class="mh-rail__placeholder">No participant info</div>
+    <div class="mh-rail__placeholder">{{ 'messages.rail.noParticipant' | translate }}</div>
   }
 </aside>

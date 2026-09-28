@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -9,6 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Group } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -35,11 +35,11 @@ import { GroupDetailContext } from './group-detail.context';
     GroupFormDialog,
     GroupHero,
     GroupTabs,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService, GroupDetailContext],
   templateUrl: './group-detail.html',
   styleUrl: './group-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetail implements OnInit {
   readonly context = inject(GroupDetailContext);

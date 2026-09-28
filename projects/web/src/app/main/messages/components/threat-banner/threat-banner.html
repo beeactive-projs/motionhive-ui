@@ -2,17 +2,16 @@
   <div class="mh-threat" role="status" aria-live="polite">
     <i class="pi pi-exclamation-triangle mh-threat__icon" aria-hidden="true"></i>
     <div class="mh-threat__body">
-      <div class="mh-threat__title">Your last message contains {{ reasons().join(', ') }}.</div>
-      <div class="mh-threat__copy">
-        Keep payments and identity verification on MotionHive — we can't help recover
-        funds or accounts after off-platform exchanges.
+      <div class="mh-threat__title">
+        {{ 'messages.threat.title' | translate: { reasons: reasons().join(', ') } }}
       </div>
+      <div class="mh-threat__copy">{{ 'messages.threat.copy' | translate }}</div>
     </div>
     <button
       type="button"
       class="mh-threat__dismiss"
       (click)="dismiss()"
-      aria-label="Dismiss safety notice"
+      [attr.aria-label]="'messages.threat.dismiss' | translate"
     >
       <i class="pi pi-times" aria-hidden="true"></i>
     </button>

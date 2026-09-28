@@ -25,9 +25,10 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
-import { AuthStore, DiscoverGroup, Post, formatRelativeShort } from 'core';
+import { AuthStore, DiscoverGroup, Post, displayName, formatRelativeShort } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
@@ -77,6 +78,7 @@ import { GroupsStore } from './groups.store';
     NotificationBell,
     PostGallery,
     SearchbarAutofocusDirective,
+    TranslatePipe,
   ],
   templateUrl: './groups.html',
   styleUrl: './groups.scss',
@@ -85,7 +87,8 @@ import { GroupsStore } from './groups.store';
 export class Groups implements ViewWillEnter {
   readonly store = inject(GroupsStore);
   private readonly _router = inject(Router);
-  private readonly _auth = inject(AuthStore);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Segments = GroupsSegments;
   readonly minSearchLength = MIN_SEARCH_LENGTH;
@@ -111,7 +114,7 @@ export class Groups implements ViewWillEnter {
    * Only a coach is offered "create a group" — the API's create route carries
    * `@Roles('INSTRUCTOR')`, so the FAB would 403 for everyone else.
    */
-  readonly canCreate = computed(() => this._auth.isInstructor());
+  readonly canCreate = computed(() => this._authStore.isInstructor());
 
   /** The floor only bites on Discover, the one lens that searches the API. */
   readonly showSearchHint = computed(() => this.store.queryTooShort());
@@ -127,8 +130,8 @@ export class Groups implements ViewWillEnter {
     if (!this.store.searchSettled() || this.store.showSkeleton()) return '';
 
     const count = this.store.discover().length;
-    if (count === 0) return 'No groups match that.';
-    return `${count} ${count === 1 ? 'group' : 'groups'}.`;
+    if (count === 0) return this._translateService.instant('groups.list.announce.none');
+    return this._translateService.instant('groups.list.announce.count', { count });
   });
 
   /**
@@ -218,7 +221,7 @@ export class Groups implements ViewWillEnter {
   }
 
   authorNameOf(post: Post): string {
-    return post.author ? post.author.firstName + ' ' + post.author.lastName : 'Member';
+    return displayName(post.author, this._translateService.instant('groups.common.member'));
   }
 
   createGroup(): void {

@@ -18,6 +18,7 @@ import {
   endOfDay,
   startOfDay,
   weekStart,
+  formatMinorUnits,
 } from 'core';
 
 /**
@@ -119,10 +120,9 @@ export type SessionPriceParts =
  */
 export function sessionPriceParts(cents: number, currency: string): SessionPriceParts {
   if (cents <= 0) return { free: true };
-  const amount = cents / 100;
   return {
     free: false,
-    amount: Number.isInteger(amount) ? String(amount) : amount.toFixed(2),
+    amount: formatMinorUnits(cents, { trimWholeNumbers: true }),
     currency: currency.toUpperCase(),
   };
 }

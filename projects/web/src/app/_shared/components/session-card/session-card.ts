@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
   Output,
+  inject,
 } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   SESSION_LOCATION_KINDS,
   SessionAccess,
@@ -50,12 +51,13 @@ import { ProviderChip } from '../provider-chip/provider-chip';
 @Component({
   selector: 'mh-session-card',
   standalone: true,
-  imports: [CommonModule, AccessChip, TypeChip, ProviderChip, CapacityBar],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, AccessChip, TypeChip, ProviderChip, CapacityBar, TranslatePipe],
   templateUrl: './session-card.html',
   styleUrl: './session-card.scss',
 })
 export class SessionCard {
+  private readonly _translateService = inject(TranslateService);
+
   @Input({ required: true }) instance!:
     | SessionInstance
     | PublicSessionInstance
@@ -93,7 +95,7 @@ export class SessionCard {
       return (this.instance as BlockedSessionInstance).template.title;
     }
     const inst = this.instance as SessionInstance | PublicSessionInstance;
-    return inst.titleOverride ?? inst.template?.title ?? '(untitled)';
+    return inst.titleOverride ?? inst.template?.title ?? this._translateService.instant('components.sessionCard.untitled');
   }
 
   protected access(): SessionAccess {
@@ -107,7 +109,7 @@ export class SessionCard {
   protected isOnline(): boolean {
     if (this.isBlocked()) return false;
     const inst = this.instance as SessionInstance | PublicSessionInstance;
-    return inst.template?.locationKind === 'ONLINE';
+    return inst.template?.locationKind === SessionLocationKind.Online;
   }
 
   /**
@@ -171,12 +173,18 @@ export class SessionCard {
    */
   protected ctaText(): string {
     if (this.ctaLabel) return this.ctaLabel;
-    if (this.isBlocked()) return 'Members only';
+    if (this.isBlocked()) return this._cta('membersOnly');
     if (this.eligibility === 'not-eligible') {
-      return this.access() === SessionAccess.ClientsOnly ? 'Become a client' : 'Members only';
+      return this._cta(
+        this.access() === SessionAccess.ClientsOnly ? 'becomeClient' : 'membersOnly',
+      );
     }
-    if (this.approvalRequired()) return 'Request to book';
-    return 'Book';
+    if (this.approvalRequired()) return this._cta('requestToBook');
+    return this._cta('book');
+  }
+
+  private _cta(key: 'book' | 'becomeClient' | 'membersOnly' | 'requestToBook'): string {
+    return this._translateService.instant(`components.sessionCard.cta.${key}`);
   }
 
   protected ctaDisabled(): boolean {

@@ -34,11 +34,11 @@
             [disabled]="isBusy(p.id)"
           >
             <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-            Approve
+            {{ 'button.approve' | translate }}
           </button>
           <button pButton type="button" severity="danger" [text]="true" size="small" (click)="decline.emit(p.id)" [disabled]="isBusy(p.id)">
             <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-            Decline
+            {{ 'button.decline' | translate }}
           </button>
         </div>
       } @else if (mode() === 'attendance') {
@@ -52,7 +52,7 @@
             [disabled]="isBusy(p.id)"
           >
             <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-            Attended
+            {{ 'components.participantsTable.attended' | translate }}
           </button>
           <button pButton
             type="button"
@@ -64,13 +64,13 @@
             [disabled]="isBusy(p.id)"
           >
             <i class="pi" [class]="isBusy(p.id) ? 'pi-spinner pi-spin' : 'pi-times'"></i>
-            No-show
+            {{ 'components.participantsTable.noShow' | translate }}
           </button>
         </div>
       }
     </li>
   } @empty {
-    <li class="mh-pt-card mh-pt-card--empty">No participants yet.</li>
+    <li class="mh-pt-card mh-pt-card--empty">{{ 'components.participantsTable.empty' | translate }}</li>
   }
 </ul>
 
@@ -85,11 +85,11 @@
 >
   <ng-template #header>
     <tr>
-      <th>Name</th>
-      <th>Booked</th>
-      <th>Status</th>
+      <th>{{ 'form.label.name' | translate }}</th>
+      <th>{{ 'components.participantsTable.booked' | translate }}</th>
+      <th>{{ 'form.label.status' | translate }}</th>
       @if (mode() !== 'readonly') {
-        <th class="mh-pt__th-right">Actions</th>
+        <th class="mh-pt__th-right">{{ 'common.actions' | translate }}</th>
       }
     </tr>
   </ng-template>
@@ -129,7 +129,7 @@
               [outlined]="true"
               size="small"
               (click)="approve.emit(p.id)"
-              aria-label="Approve"
+              [attr.aria-label]="'button.approve' | translate"
               [disabled]="isBusy(p.id)"
               iconOnly
             >
@@ -141,7 +141,7 @@
               [text]="true"
               size="small"
               (click)="decline.emit(p.id)"
-              aria-label="Decline"
+              [attr.aria-label]="'button.decline' | translate"
               [disabled]="isBusy(p.id)"
               iconOnly
             >
@@ -157,7 +157,7 @@
             [outlined]="p.attended !== true"
             size="small"
             (click)="markAttended.emit({ id: p.id, attended: true })"
-            aria-label="Mark attended"
+            [attr.aria-label]="'components.participantsTable.markAttended' | translate"
             [disabled]="isBusy(p.id)"
             iconOnly
           >
@@ -170,7 +170,7 @@
             [text]="p.attended !== false"
             size="small"
             (click)="markAttended.emit({ id: p.id, attended: false })"
-            aria-label="Mark no-show"
+            [attr.aria-label]="'components.participantsTable.markNoShow' | translate"
             [disabled]="isBusy(p.id)"
             iconOnly
           >
@@ -184,7 +184,7 @@
   <ng-template #emptymessage>
     <tr>
       <td [attr.colspan]="mode() === 'readonly' ? 3 : 4" class="mh-pt__empty">
-        No participants yet.
+        {{ 'components.participantsTable.empty' | translate }}
       </td>
     </tr>
   </ng-template>

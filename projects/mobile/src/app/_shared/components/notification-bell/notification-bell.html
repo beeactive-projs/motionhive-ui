@@ -1,4 +1,4 @@
-<ion-button [attr.aria-label]="'Notifications, ' + unread() + ' unread'" [routerLink]="target()">
+<ion-button [attr.aria-label]="'a11y.notificationsUnread' | translate: { count: unread() }" [routerLink]="target()">
   <ion-icon slot="icon-only" name="notifications-outline" />
   @if (unread() > 0) {
     <ion-badge color="danger" class="dot" aria-hidden="true"></ion-badge>

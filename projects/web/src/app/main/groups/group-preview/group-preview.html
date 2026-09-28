@@ -6,13 +6,13 @@
 <div class="flex flex-col gap-3 max-w-400 mx-auto">
   <p-message severity="warn" icon="pi pi-exclamation-triangle">
     <div class="flex flex-col gap-2">
-      <h2 class="m-0 text-base font-semibold">Group not found</h2>
+      <h2 class="m-0 text-base font-semibold">{{ 'groups.common.notFound' | translate }}</h2>
       <p class="m-0 text-sm">
-        This group is private or no longer available.
+        {{ 'groups.preview.notFoundMessage' | translate }}
       </p>
     </div>
   </p-message>
-  <button pButton type="button" severity="secondary" text (click)="goBack()"><i class="pi pi-arrow-left"></i> Back to discover</button>
+  <button pButton type="button" severity="secondary" text (click)="goBack()"><i class="pi pi-arrow-left"></i> {{ 'groups.preview.backToDiscover' | translate }}</button>
 </div>
 } @else if (group(); as g) {
 <main class="flex flex-col gap-4 max-w-400 mx-auto">
@@ -51,14 +51,15 @@
           </div>
           <div class="flex md:justify-end items-center gap-2">
             @if (joinRequestPending()) {
-            <button pButton type="button" [outlined]="true" [disabled]="true"><i class="pi pi-clock"></i> Request pending</button>
+            <button pButton type="button" [outlined]="true" [disabled]="true"><i class="pi pi-clock"></i> {{ 'groups.join.requestPending' | translate }}</button>
             <button pButton
               type="button"
               rounded
               text
               severity="danger"
               size="small"
-              pTooltip="Cancel request"
+              [pTooltip]="'groups.join.cancelRequest' | translate"
+              [attr.aria-label]="'groups.join.cancelRequest' | translate"
               (click)="onCancelRequest()"
               [disabled]="joining()"
               iconOnly
@@ -90,7 +91,7 @@
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-user text-primary-600"></i>
-        <h2 class="text-base font-semibold m-0">Coach</h2>
+        <h2 class="text-base font-semibold m-0">{{ 'groups.preview.coach' | translate }}</h2>
       </div>
       <p-divider />
     </ng-template>
@@ -122,7 +123,7 @@
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-calendar text-primary-600"></i>
-        <h2 class="text-base font-semibold m-0">Upcoming sessions</h2>
+        <h2 class="text-base font-semibold m-0">{{ 'groups.preview.upcomingSessions' | translate }}</h2>
       </div>
       <p-divider />
     </ng-template>
@@ -133,7 +134,8 @@
         <div class="min-w-0">
           <p class="m-0 text-sm font-medium">{{ s.title }}</p>
           <p class="m-0 text-xs text-muted-color">
-            {{ s.scheduledAt | date: 'medium' }} · {{ s.durationMinutes }} min
+            {{ s.scheduledAt | date: 'medium' }} ·
+            {{ 'time.minutesShort' | translate: { minutes: s.durationMinutes } }}
           </p>
         </div>
         @if (s.price) {

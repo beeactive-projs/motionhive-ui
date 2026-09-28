@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingStore } from 'core';
 
 /**
@@ -18,12 +19,12 @@ import { MessagingStore } from 'core';
  */
 @Component({
   selector: 'mh-threat-banner',
-  standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './threat-banner.html',
   styleUrl: './threat-banner.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThreatBanner {
+  private readonly _translateService = inject(TranslateService);
   protected readonly store = inject(MessagingStore);
 
   protected readonly flags = this.store.activeThreatFlags;
@@ -32,14 +33,16 @@ export class ThreatBanner {
     const f = this.flags();
     if (!f) return [];
     const out: string[] = [];
-    if (f.hasOffPlatformContact) out.push('off-platform contact details');
-    if (f.hasPaymentHandle) out.push('payment handles');
-    if (f.hasShortenerUrl) out.push('shortened links');
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this._translateService.instant(`messages.threat.reason.${key}`, params);
+    if (f.hasOffPlatformContact) out.push(t('offPlatform'));
+    if (f.hasPaymentHandle) out.push(t('payment'));
+    if (f.hasShortenerUrl) out.push(t('shortener'));
     // BE flips `anyFlag` true for any URL — even a plain non-shortener
     // link. Surface that as a generic "links" reason so the banner
     // never reads "Your last message contains ." (empty list).
     if (out.length === 0 && f.urls.length > 0) {
-      out.push(f.urls.length === 1 ? 'a link' : 'links');
+      out.push(t('links', { count: f.urls.length }));
     }
     return out;
   });

@@ -1,10 +1,29 @@
 import { describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
+import {
+  TranslateService,
+  provideTranslateCompiler,
+  provideTranslateService,
+} from '@ngx-translate/core';
+import { TranslateMessageFormatCompiler } from 'ngx-translate-messageformat-compiler';
+import sharedEn from '../../../../../../core/src/i18n/en.json';
+import appEn from '../../../../../public/i18n/en.json';
 import { RecurrenceBuilder } from './recurrence-builder';
 import type { RecurrenceRule } from 'core';
 
 function setup(initial: RecurrenceRule): RecurrenceBuilder {
-  TestBed.configureTestingModule({ imports: [RecurrenceBuilder] });
+  TestBed.configureTestingModule({
+    imports: [RecurrenceBuilder],
+    providers: [
+      provideTranslateService({
+        compiler: provideTranslateCompiler(TranslateMessageFormatCompiler),
+      }),
+    ],
+  });
+  // The web app has no global test setup: load the real English copy.
+  const translateService = TestBed.inject(TranslateService);
+  translateService.setTranslation('en', { ...sharedEn, ...appEn });
+  translateService.use('en');
   const fixture = TestBed.createComponent(RecurrenceBuilder);
   fixture.componentRef.setInput('rule', initial);
   fixture.componentRef.setInput('firstStartAt', '2026-05-18T09:00:00Z'); // Monday
@@ -47,5 +66,11 @@ describe('RecurrenceBuilder', () => {
     expect(s.toLowerCase()).toContain('every 2 weeks');
     expect(s).toContain('Mon');
     expect(s).toContain('Wed');
+  });
+
+  it('plainEnglish: DAILY interval=1 with 1 occurrence reads "Every day · 1 occurrence"', () => {
+    const c = setup({ frequency: 'DAILY', interval: 1, endAfterOccurrences: 1 });
+    const s = (c as unknown as { plainEnglish: () => string }).plainEnglish();
+    expect(s).toBe('Every day · 1 occurrence');
   });
 });

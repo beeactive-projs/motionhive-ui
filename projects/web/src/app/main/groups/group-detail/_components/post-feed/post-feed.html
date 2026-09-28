@@ -1,10 +1,10 @@
 <div class="flex flex-col gap-3">
   <div class="flex items-center justify-between">
     <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100">
-      Posts ({{ total() }})
+      {{ 'groups.posts.title' | translate: { count: total() } }}
     </h2>
     @if (canPost()) {
-    <button pButton type="button" size="small" (click)="createRequested.emit()"><i class="pi pi-plus"></i> New post</button>
+    <button pButton type="button" size="small" (click)="createRequested.emit()"><i class="pi pi-plus"></i> {{ 'groups.posts.newPost' | translate }}</button>
     }
   </div>
 
@@ -31,7 +31,7 @@
     <ng-template #header>
       <div class="flex items-center gap-2 px-4 pt-4">
         <i class="pi pi-comments text-primary-600"></i>
-        <h2 class="text-base font-semibold m-0">No posts yet</h2>
+        <h2 class="text-base font-semibold m-0">{{ 'groups.posts.empty.title' | translate }}</h2>
       </div>
       <p-divider />
     </ng-template>
@@ -40,16 +40,16 @@
       <i class="pi pi-comments text-3xl text-primary-600"></i>
       <p class="text-sm text-muted-color-emphasis m-0 max-w-md">
         @if (canPost()) {
-        Be the first to share an update, ask a question, or kick off a conversation.
+        {{ 'groups.posts.empty.canPost' | translate }}
         } @else {
-        Once members start sharing updates, you'll see them here.
+        {{ 'groups.posts.empty.readOnly' | translate }}
         }
       </p>
       @if (canPost()) {
       <div class="flex flex-wrap gap-2 justify-center">
         <button pButton type="button" size="small" (click)="createRequested.emit()">
           <i class="pi pi-plus"></i>
-          Create the first post
+          {{ 'groups.posts.createFirst' | translate }}
         </button>
       </div>
       }

@@ -2,40 +2,41 @@
   <div class="flex flex-col gap-4">
     <!-- Name -->
     <div class="flex flex-col gap-2">
-      <label for="groupName" class="text-sm font-medium">Name *</label>
-      <input id="groupName" type="text" pInputText fluid [(ngModel)]="formName" placeholder="Enter group name" />
+      <label for="groupName" class="text-sm font-medium">{{ 'form.label.name' | translate }} *</label>
+      <input id="groupName" type="text" pInputText fluid [(ngModel)]="formName" [placeholder]="'groups.formDialog.namePlaceholder' | translate" />
     </div>
 
     <!-- Description -->
     <div class="flex flex-col gap-2">
-      <label for="groupDescription" class="text-sm font-medium">Description</label>
+      <label for="groupDescription" class="text-sm font-medium">{{ 'form.label.description' | translate }}</label>
       <textarea pTextarea id="groupDescription" fluid [(ngModel)]="formDescription" [rows]="3"
-        placeholder="Describe the purpose of this group..."></textarea>
+        [placeholder]="'groups.formDialog.descriptionPlaceholder' | translate"></textarea>
     </div>
 
     <!-- Join Policy -->
     <div class="flex flex-col gap-2">
-      <label for="joinPolicy" class="text-sm font-medium">Join policy</label>
+      <label for="joinPolicy" class="text-sm font-medium">{{ 'groups.common.joinPolicy' | translate }}</label>
       <p-select id="joinPolicy" [options]="joinPolicyOptions" [(ngModel)]="formJoinPolicy" optionLabel="label"
-        optionValue="value" placeholder="Select join policy" class="w-full" [appendTo]="'body'" />
+        optionValue="value" [placeholder]="'groups.formDialog.joinPolicyPlaceholder' | translate" class="w-full" [appendTo]="'body'" />
     </div>
 
     <!-- Public Toggle -->
     <div class="flex items-center justify-between rounded-lg bg-surface-50 dark:bg-surface-950 p-3">
       <div>
-        <span class="text-sm font-medium">Public group</span>
-        <p class="text-xs">Visible in group discovery</p>
+        <span class="text-sm font-medium">{{ 'groups.formDialog.publicLabel' | translate }}</span>
+        <p class="text-xs">{{ 'groups.formDialog.publicHint' | translate }}</p>
       </div>
       <p-toggleswitch [(ngModel)]="formIsPublic" />
     </div>
 
     <!-- Tags -->
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Tags</label>
+      <label class="text-sm font-medium">{{ 'groups.common.tags' | translate }}</label>
       <div class="flex gap-2">
-        <input type="text" pInputText fluid [(ngModel)]="formTagInput" placeholder="Add a tag and press Enter"
+        <input type="text" pInputText fluid [(ngModel)]="formTagInput" [placeholder]="'groups.formDialog.tagPlaceholder' | translate"
           (keydown)="onTagKeydown($event)" />
-        <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()" iconOnly>
+        <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()"
+          [attr.aria-label]="'groups.formDialog.addTag' | translate" iconOnly>
           <i class="pi pi-plus"></i>
         </button>
       </div>
@@ -50,10 +51,10 @@
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" text (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(!formName.trim()) || saving()" (click)="saveGroup()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      {{ group() ? 'Save changes' : 'Create group' }}
+      {{ (group() ? 'button.saveChanges' : 'groups.formDialog.create') | translate }}
     </button>
   </ng-template>
 </p-dialog>

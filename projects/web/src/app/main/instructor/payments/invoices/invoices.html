@@ -23,13 +23,13 @@
     [scrollable]="true" scrollHeight="flex" dataKey="id" stripedRows="true" rowHover="true">
     <ng-template #header>
       <tr>
-        <th style="width: 20%;">Invoice #</th>
-        <th>Client</th>
-        <th class="text-center" style="width: 1%;">Amount</th>
-        <th class="text-center" style="width: 10%;">Status</th>
-        <th class="text-center" style="width: 10%;">Due Date</th>
-        <th class="text-center" style="width: 10%;">Paid</th>
-        <th class="text-center" style="width: 1%;">Actions</th>
+        <th style="width: 20%;">{{ 'payments.invoices.table.invoiceNumber' | translate }}</th>
+        <th>{{ 'payments.common.client' | translate }}</th>
+        <th class="text-center" style="width: 1%;">{{ 'form.label.amount' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'form.label.status' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'form.label.dueDate' | translate }}</th>
+        <th class="text-center" style="width: 10%;">{{ 'payments.common.paid' | translate }}</th>
+        <th class="text-center" style="width: 1%;">{{ 'common.actions' | translate }}</th>
       </tr>
     </ng-template>
     <ng-template #body let-invoice>
@@ -39,7 +39,7 @@
             class="text-primary-500 hover:underline font-medium tabular-nums">
             {{ invoiceDisplayNumber(invoice) }}
             @if (invoice.status === Statuses.Draft) {
-            <span class="text-xs font-normal text-surface-500">(draft)</span>
+            <span class="text-xs font-normal text-surface-500">{{ 'payments.invoices.draftSuffix' | translate }}</span>
             }
           </a>
         </td>
@@ -48,10 +48,10 @@
         </td>
         <td class="text-end tabular-nums">{{ invoice.amountDueCents | currencyRon:invoice.currency }}</td>
         <td class="text-center">
-          <p-tag [value]="invoice.status | statusLabel" [severity]="statusSeverity(invoice.status)" class="w-full"
-            rounded />
+          <p-tag [value]="invoice.status | statusLabel: 'invoiceStatus'" [severity]="statusSeverity(invoice.status)"
+            class="w-full" rounded />
           @if (invoice.paidOutOfBand) {
-          <span class="text-xs text-muted-color ml-1">(manual)</span>
+          <span class="text-xs text-muted-color ml-1">{{ 'payments.invoices.manualSuffix' | translate }}</span>
           }
         </td>
         <td class="text-center">
@@ -74,7 +74,8 @@
               [text]="true"
               size="small"
               tooltipPosition="left"
-              pTooltip="Edit"
+              [pTooltip]="'button.edit' | translate"
+              [attr.aria-label]="'button.edit' | translate"
               (click)="openEdit(invoice)"
               iconOnly
             >
@@ -86,7 +87,8 @@
               [text]="true"
               size="small"
               tooltipPosition="left"
-              pTooltip="Send"
+              [pTooltip]="'button.send' | translate"
+              [attr.aria-label]="'button.send' | translate"
               (click)="openSendDialog(invoice)"
               iconOnly
             >
@@ -99,7 +101,8 @@
               size="small"
               severity="danger"
               tooltipPosition="left"
-              pTooltip="Void"
+              [pTooltip]="'payments.invoices.action.void' | translate"
+              [attr.aria-label]="'payments.invoices.action.void' | translate"
               (click)="confirmVoid(invoice)"
               iconOnly
             >
@@ -113,7 +116,8 @@
               [text]="true"
               size="small"
               tooltipPosition="left"
-              pTooltip="Resend email"
+              [pTooltip]="'payments.invoices.action.resendEmail' | translate"
+              [attr.aria-label]="'payments.invoices.action.resendEmail' | translate"
               (click)="openSendDialog(invoice)"
               iconOnly
             >
@@ -126,7 +130,8 @@
               size="small"
               severity="success"
               tooltipPosition="left"
-              pTooltip="Mark paid"
+              [pTooltip]="'payments.invoices.action.markPaid' | translate"
+              [attr.aria-label]="'payments.invoices.action.markPaid' | translate"
               (click)="confirmMarkPaid(invoice)"
               iconOnly
             >
@@ -139,7 +144,8 @@
               size="small"
               severity="danger"
               tooltipPosition="left"
-              pTooltip="Void"
+              [pTooltip]="'payments.invoices.action.void' | translate"
+              [attr.aria-label]="'payments.invoices.action.void' | translate"
               (click)="confirmVoid(invoice)"
               iconOnly
             >
@@ -155,7 +161,8 @@
                 [text]="true"
                 size="small"
                 tooltipPosition="left"
-                pTooltip="Download PDF"
+                [pTooltip]="'payments.invoices.action.downloadPdf' | translate"
+                [attr.aria-label]="'payments.invoices.action.downloadPdf' | translate"
                 iconOnly
               >
                 <i class="pi pi-download"></i>
@@ -172,7 +179,8 @@
                 [text]="true"
                 size="small"
                 tooltipPosition="left"
-                pTooltip="View hosted page"
+                [pTooltip]="'payments.invoices.action.viewHostedPage' | translate"
+                [attr.aria-label]="'payments.invoices.action.viewHostedPage' | translate"
                 iconOnly
               >
                 <i class="pi pi-external-link"></i>
@@ -213,17 +221,20 @@
     <ng-template #emptymessage>
       <tr>
         <td colspan="7">
-          <mh-list-empty-state icon="pi pi-file" title="No invoices yet"
-            message="Create your first invoice to start billing clients." actionLabel="Create invoice"
+          <mh-list-empty-state icon="pi pi-file" [title]="'payments.invoices.empty.title' | translate"
+            [message]="'payments.invoices.empty.message' | translate"
+            [actionLabel]="'payments.common.createInvoice' | translate"
             actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
         </td>
       </tr>
     </ng-template>
     <ng-template #paginatorleft let-state>
       <p-tag [rounded]="true">
-        View {{state.first+1}} -
-        {{state.first+state.rows>state.totalRecords?state.totalRecords:state.first+state.rows}} of
-        {{state.totalRecords}}
+        {{ 'common.paginator' | translate: {
+          first: state.first + 1,
+          last: state.first + state.rows > state.totalRecords ? state.totalRecords : state.first + state.rows,
+          total: state.totalRecords
+        } }}
       </p-tag>
     </ng-template>
   </p-table>
@@ -256,12 +267,10 @@
       <div class="flex flex-col gap-3 pt-1">
         @for (invoice of items; track trackById($index, invoice)) {
         <a [routerLink]="['/coaching/invoices', invoice.id]" class="no-underline text-inherit">
-          <mh-list-card [status]="isOverdue(invoice) ? 'overdue' : invoice.status"
+          <mh-list-card [status]="cardStatus(invoice)"
             [statusSeverity]="isOverdue(invoice) ? 'danger' : statusSeverity(invoice.status)"
-            [avatarImage]="invoice.client?.avatarUrl" [avatarInitials]="clientInitials(invoice)" [title]="clientDisplay(invoice)" [subtitle]="invoiceDisplayNumber(invoice) +
-                  (invoice.status === Statuses.Paid && invoice.paidAt
-                    ? ' · Paid'
-                    : invoice.dueDate ? ' · Due' : '')" [clickable]="true" [accent]="cardAccent(invoice)">
+            [avatarImage]="invoice.client?.avatarUrl" [avatarInitials]="clientInitials(invoice)" [title]="clientDisplay(invoice)"
+            [subtitle]="cardSubtitle(invoice)" [clickable]="true" [accent]="cardAccent(invoice)">
             <div amount class="flex flex-col items-end">
               <span class="font-heading text-lg font-semibold tabular-nums leading-tight">
                 {{ invoice.amountDueCents | currencyRon:invoice.currency }}
@@ -274,7 +283,7 @@
               <span [class.text-red-500]="isOverdue(invoice)">{{ invoice.dueDate | date:'dd MMM' }}</span>
               }
               @if (invoice.paidOutOfBand) {
-              <span>· manual</span>
+              <span>· {{ 'payments.invoices.card.manual' | translate }}</span>
               }
             </div>
           </mh-list-card>
@@ -298,8 +307,9 @@
       </div>
     </ng-template>
     <ng-template #empty>
-      <mh-list-empty-state icon="pi pi-file" title="No invoices yet"
-        message="Create your first invoice to start billing clients." actionLabel="Create invoice"
+      <mh-list-empty-state icon="pi pi-file" [title]="'payments.invoices.empty.title' | translate"
+        [message]="'payments.invoices.empty.message' | translate"
+        [actionLabel]="'payments.common.createInvoice' | translate"
         actionIcon="pi pi-plus" (action)="showCreateDialog.set(true)" />
     </ng-template>
   </p-dataview>

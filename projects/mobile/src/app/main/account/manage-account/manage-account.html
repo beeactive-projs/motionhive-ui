@@ -3,31 +3,39 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home/account" />
     </ion-buttons>
-    <ion-title>Manage account</ion-title>
+    <ion-title>{{ 'account.rows.manageAccount' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="mh-page">
     <section class="mh-section">
-      <ion-note class="mh-kicker" color="medium">Preferences</ion-note>
+      <ion-note class="mh-kicker" color="medium">{{ 'account.sections.preferences' | translate }}</ion-note>
       <!-- Plain items throughout: `mh-settings-row` owns its own divider keyed on
            `:last-of-type`, so mixing it with bare `ion-item`s in one list puts the
            last hairline in the wrong place. -->
       <ion-list [inset]="true" class="mh-card-list">
+        <!-- Picking reloads the app in that language (see LanguageService). -->
         <ion-item lines="full">
-          <ion-icon slot="start" name="language-outline" color="medium" aria-hidden="true" />
-          <ion-label>Language</ion-label>
-          <ion-note slot="end">{{ languageLabel() }}</ion-note>
+          <ion-select
+            [label]="'form.label.language' | translate"
+            [value]="currentLanguage"
+            interface="popover"
+            (ionChange)="onLanguageChange($event)"
+          >
+            @for (option of languageOptions; track option.value) {
+              <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+            }
+          </ion-select>
         </ion-item>
 
         <ion-item lines="none">
           <ion-select
-            label="Timezone"
+            [label]="'form.label.timezone' | translate"
             [value]="timezone()"
             [disabled]="savingTimezone()"
             interface="modal"
-            placeholder="Not set"
+            [placeholder]="'form.placeholder.notSet' | translate"
             (ionFocus)="timezonesMounted.set(true)"
             (ionChange)="onTimezoneChange($event)"
           >
@@ -42,42 +50,41 @@
     </section>
 
     <section class="mh-section">
-      <ion-note class="mh-kicker" color="medium">Appearance</ion-note>
+      <ion-note class="mh-kicker" color="medium">{{ 'account.rows.appearance' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-radio-group [value]="themePreference()" (ionChange)="onThemeChange($event.detail.value)">
           <ion-item lines="full">
-            <ion-radio [value]="ThemePreferences.System">System</ion-radio>
+            <ion-radio [value]="ThemePreferences.System">{{ 'account.theme.system' | translate }}</ion-radio>
           </ion-item>
           <ion-item lines="full">
-            <ion-radio [value]="ThemePreferences.Light">Light</ion-radio>
+            <ion-radio [value]="ThemePreferences.Light">{{ 'account.theme.light' | translate }}</ion-radio>
           </ion-item>
           <ion-item lines="none">
-            <ion-radio [value]="ThemePreferences.Dark">Dark</ion-radio>
+            <ion-radio [value]="ThemePreferences.Dark">{{ 'account.theme.dark' | translate }}</ion-radio>
           </ion-item>
         </ion-radio-group>
       </ion-list>
     </section>
 
     <section class="mh-section">
-      <ion-note class="mh-kicker" color="medium">Account</ion-note>
+      <ion-note class="mh-kicker" color="medium">{{ 'account.sections.account' | translate }}</ion-note>
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item button [detail]="false" [disabled]="signingOut()" lines="full" (click)="onSignOut()">
           <ion-icon slot="start" name="log-out-outline" color="danger" aria-hidden="true" />
-          <ion-label color="danger">Log out</ion-label>
+          <ion-label color="danger">{{ 'account.manage.logOut' | translate }}</ion-label>
         </ion-item>
         <!-- No delete-account endpoint exists yet. Disabled rather than hidden so
              the capability reads as coming rather than missing. -->
         <ion-item [detail]="false" [disabled]="true" lines="none">
           <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
-          <ion-label color="danger">Delete account</ion-label>
-          <ion-badge slot="end" color="medium">Soon</ion-badge>
+          <ion-label color="danger">{{ 'account.manage.deleteAccount' | translate }}</ion-label>
+          <ion-badge slot="end" color="medium">{{ 'account.manage.soon' | translate }}</ion-badge>
         </ion-item>
       </ion-list>
     </section>
 
     <ion-note class="mh-footnote" color="medium">
-      Deleting your account removes your profile, programs and messages permanently. This can't be
-      undone.
+      {{ 'account.manage.deleteNote' | translate }}
     </ion-note>
   </div>
 </ion-content>

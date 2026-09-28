@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -46,7 +46,6 @@ import {
  */
 @Component({
   selector: 'mh-cancel-session-dialog',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -55,14 +54,15 @@ import {
     TextareaModule,
     InputText,
     BottomSheet,
+    TranslatePipe,
   ],
   templateUrl: './cancel-session-dialog.html',
   styleUrl: './cancel-session-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelSessionDialog {
-  private readonly _svc = inject(SessionService);
-  private readonly _msg = inject(MessageService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   /**
    * Mobile breakpoint. When true, the template renders the sheet
@@ -91,26 +91,26 @@ export class CancelSessionDialog {
     return i.confirmedCount + i.pendingApprovalCount + i.waitlistedCount;
   });
 
-  /** Labels from core's `CANCEL_SCOPES`; the help copy is this dialog's own. */
+  /** Labels from core's `CANCEL_SCOPES`; the help copy is this dialog's own (translation keys). */
   readonly scopeOptions = computed(() => {
     const recurring = this.isRecurring();
     const opts: { value: CancelScope; label: string; help: string }[] = [
       {
         value: CancelScope.This,
         label: CANCEL_SCOPES[CancelScope.This].label,
-        help: 'Cancel the one occurrence below. The series continues.',
+        help: 'sessions.cancelDialog.help.this',
       },
     ];
     if (recurring) {
       opts.push({
         value: CancelScope.ThisAndFuture,
         label: CANCEL_SCOPES[CancelScope.ThisAndFuture].label,
-        help: 'Cancel this session and every later occurrence.',
+        help: 'sessions.cancelDialog.help.thisAndFuture',
       });
       opts.push({
         value: CancelScope.Series,
         label: CANCEL_SCOPES[CancelScope.Series].label,
-        help: 'Cancel every session in this series. The template is ended.',
+        help: 'sessions.cancelDialog.help.series',
       });
     }
     return opts;
@@ -132,7 +132,7 @@ export class CancelSessionDialog {
     const inst = this.instance();
     if (!inst) return;
     this.busy.set(true);
-    this._svc
+    this._sessionService
       .cancelInstance(inst.id, {
         scope: this.scope(),
         reason: this.reason().trim() || undefined,
@@ -142,16 +142,24 @@ export class CancelSessionDialog {
         next: (res) => {
           this.busy.set(false);
           this.visible.set(false);
-          this._msg.add({
+          this._messageService.add({
             severity: 'success',
-            summary: 'Session cancelled',
-            detail: `${res.cancelledInstanceIds.length} occurrence(s) cancelled · ${res.notifiedUserIds.length} attendee(s) notified.`,
+            summary: this._translateService.instant('sessions.common.sessionCancelled'),
+            detail: this._translateService.instant('sessions.common.cancelledNotified', {
+              cancelled: res.cancelledInstanceIds.length,
+              notified: res.notifiedUserIds.length,
+            }),
           });
           this.cancelled.emit(res);
         },
         error: (err: unknown) => {
           this.busy.set(false);
-          showApiError(this._msg, 'Could not cancel', 'Please try again.', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('sessions.cancelDialog.cancelFailed'),
+            this._translateService.instant('common.pleaseTryAgain'),
+            err,
+          );
         },
       });
   }
