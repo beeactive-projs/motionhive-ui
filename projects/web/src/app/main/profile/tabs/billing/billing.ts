@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MyInvoices } from '../../../user/payments/my-invoices/my-invoices';
 import { MySubscriptions } from '../../../user/payments/my-subscriptions/my-subscriptions';
 
@@ -15,9 +16,8 @@ type BillingView = 'invoices' | 'memberships';
  */
 @Component({
   selector: 'mh-profile-billing',
-  imports: [MyInvoices, MySubscriptions],
+  imports: [MyInvoices, MySubscriptions, TranslatePipe],
   templateUrl: './billing.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileBilling {
   readonly view = signal<BillingView>('invoices');

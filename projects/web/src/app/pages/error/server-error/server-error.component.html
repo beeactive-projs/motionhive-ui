@@ -8,13 +8,13 @@
 
   <div class="error-content text-center">
 
-    <a routerLink="/" aria-label="MotionHive home">
+    <a routerLink="/" [attr.aria-label]="'errorPages.homeLink' | translate">
       <mh-logo styleClass="ms-auto max-w-10" />
     </a>
 
-    <h1 class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 mt-12">
+    <p class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 mt-12">
       {{ errorCode() }}
-    </h1>
+    </p>
 
     <h1 class="font-heading text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-5">
       {{ errorTitle() }}
@@ -25,15 +25,15 @@
     </p>
 
     <div class="flex flex-wrap justify-center gap-3 mb-10">
-      <button pButton type="button" (click)="goHome()"><i class="pi pi-home"></i> Go Home</button>
-      <button pButton type="button" severity="secondary" outlined (click)="retry()"><i class="pi pi-refresh"></i> Try Again</button>
-      <button pButton type="button" severity="secondary" outlined (click)="goBack()"><i class="pi pi-arrow-left"></i> Go Back</button>
+      <button pButton type="button" (click)="goHome()"><i class="pi pi-home"></i> {{ 'errorPages.goHome' | translate }}</button>
+      <button pButton type="button" severity="secondary" outlined (click)="retry()"><i class="pi pi-refresh"></i> {{ 'button.tryAgain' | translate }}</button>
+      <button pButton type="button" severity="secondary" outlined (click)="goBack()"><i class="pi pi-arrow-left"></i> {{ 'errorPages.goBack' | translate }}</button>
     </div>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-surface-500">
       <div class="flex items-center gap-2">
         <i class="pi pi-clock"></i>
-        <span>24/7 Support Available</span>
+        <span>{{ 'errorPages.serverError.support' | translate }}</span>
       </div>
       <span class="hidden sm:inline">·</span>
       <div class="flex items-center gap-2">

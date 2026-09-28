@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -17,6 +16,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
@@ -38,7 +38,9 @@ import {
   ProgramService,
   ProgramWorkout,
   UpdatePrescribedSetPayload,
+  enumLabel,
   showApiError,
+  validationMessage,
 } from 'core';
 
 /** BE rejects any other shape (`Matches(/^\d-\d-\d-\d$/)` on the DTO). */
@@ -77,11 +79,11 @@ const repsRangeValidator: ValidatorFn = (
     Select,
     Textarea,
     Toast,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './set-form-dialog.html',
   styleUrl: './set-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SetFormDialog {
   readonly program = input.required<Program>();
@@ -96,6 +98,7 @@ export class SetFormDialog {
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
   private readonly _formBuilder = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
 
   readonly submitting = signal(false);
   readonly showAdvanced = signal(false);
@@ -126,27 +129,29 @@ export class SetFormDialog {
   // ── Options ──────────────────────────────────────────────────────
 
   readonly setTypeOptions: SelectItem<ExerciseSetType>[] = [
-    { value: ExerciseSetType.Normal, label: 'Normal' },
-    { value: ExerciseSetType.Warmup, label: 'Warm-up' },
-    { value: ExerciseSetType.Working, label: 'Working' },
-    { value: ExerciseSetType.Dropset, label: 'Drop set' },
-    { value: ExerciseSetType.Failure, label: 'To failure' },
-    { value: ExerciseSetType.Amrap, label: 'AMRAP' },
-    { value: ExerciseSetType.RestPause, label: 'Rest-pause' },
-    { value: ExerciseSetType.Cluster, label: 'Cluster' },
-  ];
+    ExerciseSetType.Normal,
+    ExerciseSetType.Warmup,
+    ExerciseSetType.Working,
+    ExerciseSetType.Dropset,
+    ExerciseSetType.Failure,
+    ExerciseSetType.Amrap,
+    ExerciseSetType.RestPause,
+    ExerciseSetType.Cluster,
+  ].map((value) => ({ value, label: enumLabel('exerciseSetType', value) }));
 
   // ── Derived ──────────────────────────────────────────────────────
 
   readonly isEdit = computed(() => this.set() !== null);
   readonly dialogHeader = computed(() =>
-    this.isEdit() ? 'Edit set' : 'Add set',
+    this._translateService.instant(
+      this.isEdit() ? 'programs.setForm.titleEdit' : 'programs.setForm.titleAdd',
+    ),
   );
 
   submitLabel(): string {
-    if (this.isEdit()) return 'Save changes';
+    if (this.isEdit()) return this._translateService.instant('button.saveChanges');
     const n = this.form.controls.numberOfSets.value ?? 1;
-    return n > 1 ? `Add ${n} sets` : 'Add set';
+    return this._translateService.instant('programs.setForm.submitAdd', { count: Math.max(1, n) });
   }
 
   // ── Validation ───────────────────────────────────────────────────
@@ -157,7 +162,7 @@ export class SetFormDialog {
   /** Cross-field: shown live — both fields filled is an intentional range. */
   repsRangeError(): string | null {
     return this.form.errors?.['repsRange']
-      ? "Min reps can't exceed max reps."
+      ? this._translateService.instant('programs.setForm.repsRangeError')
       : null;
   }
 
@@ -167,10 +172,9 @@ export class SetFormDialog {
   }
 
   getFieldError(field: 'tempo'): string {
-    const errors = this.form.controls[field].errors;
-    if (errors?.['pattern'])
-      return 'Tempo must be four dash-separated digits, e.g. 3-1-1-0.';
-    return '';
+    return validationMessage(this.form.controls[field].errors, {
+      pattern: 'programs.setForm.tempoPattern',
+    });
   }
 
   constructor() {
@@ -241,7 +245,7 @@ export class SetFormDialog {
             this.submitting.set(false);
             this._messageService.add({
               severity: 'success',
-              summary: 'Set updated',
+              summary: this._translateService.instant('programs.toast.setUpdated'),
               life: 2000,
             });
             this.saved.emit([s]);
@@ -251,8 +255,8 @@ export class SetFormDialog {
             this.submitting.set(false);
             showApiError(
               this._messageService,
-              "Couldn't save set",
-              'Please check the form and try again.',
+              this._translateService.instant('programs.toast.saveSetError'),
+              this._translateService.instant('programs.toast.checkForm'),
               err,
             );
           },
@@ -281,10 +285,9 @@ export class SetFormDialog {
           this.submitting.set(false);
           this._messageService.add({
             severity: 'success',
-            summary:
-              created.length === 1
-                ? 'Set added'
-                : `${created.length} sets added`,
+            summary: this._translateService.instant('programs.toast.setsAdded', {
+              count: created.length,
+            }),
             life: 2000,
           });
           this.saved.emit([...created]);
@@ -297,10 +300,13 @@ export class SetFormDialog {
           if (created.length > 0) this.saved.emit([...created]);
           showApiError(
             this._messageService,
-            "Couldn't add all sets",
+            this._translateService.instant('programs.toast.addSetsError'),
             created.length > 0
-              ? `${created.length} of ${count} sets were added before the error.`
-              : 'Please check the form and try again.',
+              ? this._translateService.instant('programs.toast.addSetsPartial', {
+                  added: created.length,
+                  total: count,
+                })
+              : this._translateService.instant('programs.toast.checkForm'),
             err,
           );
         },

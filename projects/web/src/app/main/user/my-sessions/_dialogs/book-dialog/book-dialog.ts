@@ -53,7 +53,7 @@ export class BookDialog {
     const tpl = this.instance()?.template;
     if (!tpl) return this._translateService.instant('mySessions.book.confirm');
     return this._translateService.instant(
-      tpl.approvalRequired ? 'mySessions.common.requestToJoin' : 'mySessions.book.confirmBooking',
+      tpl.approvalRequired ? 'button.requestToJoin' : 'mySessions.book.confirmBooking',
     );
   }
 

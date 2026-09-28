@@ -28,7 +28,7 @@
       slot="end"
       fill="clear"
       shape="round"
-      [attr.aria-label]="'Repeat ' + log().name"
+      [attr.aria-label]="'workouts.logRow.repeat' | translate: { name: log().name }"
       (click)="onRepeat($event)"
     >
       <ion-icon slot="icon-only" name="refresh-outline" aria-hidden="true" />

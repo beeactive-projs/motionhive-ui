@@ -3,7 +3,7 @@
     <div class="px-4 pt-4 flex items-center justify-between gap-2">
       <h3 class="m-0 text-base font-semibold leading-tight">{{ product().name }}</h3>
       @if (isPopular()) {
-      <p-tag value="Popular" severity="warn" rounded />
+      <p-tag [value]="'publicProfile.offerings.popular' | translate" severity="warn" rounded />
       }
     </div>
   </ng-template>
@@ -19,7 +19,7 @@
       </div>
       <div class="offering-cta shrink-0">
         <button pButton type="button" rounded size="small" (click)="choose.emit()">
-          {{ ctaLabel() }}
+          {{ ctaKey() | translate }}
           <i class="pi pi-arrow-right"></i>
         </button>
       </div>

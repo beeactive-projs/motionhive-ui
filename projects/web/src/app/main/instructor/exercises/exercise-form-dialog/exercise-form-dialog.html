@@ -6,9 +6,9 @@
       class="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-surface-700 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-surface-300">
       <i class="pi pi-info-circle mt-px shrink-0 text-amber-700"></i>
       <p class="m-0 text-2xs leading-relaxed">
-        <strong class="text-surface-900 dark:text-surface-100">{{ forkDivergenceCount() }} instructors have forked
-          this.</strong>
-        Their copies are independent — your edits won't change them.
+        <strong class="text-surface-900 dark:text-surface-100">{{ 'exercises.form.forkWarning.title' | translate: {
+          count: forkDivergenceCount() } }}</strong>
+        {{ 'exercises.form.forkWarning.message' | translate }}
       </p>
     </div>
     }
@@ -20,20 +20,19 @@
         <div class="flex flex-col gap-1.5">
           <label for="ex-name"
             class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Name <span class="text-red-500">*</span>
+            {{ 'form.label.name' | translate }} <span class="text-red-500">*</span>
             <span class="ml-auto text-3xs font-medium text-surface-400">{{ nameCharCount() }} / 200</span>
           </label>
           <input id="ex-name" pInputText type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"
-            maxlength="200" placeholder="e.g. Tempo goblet squat" fluid required />
+            maxlength="200" [placeholder]="'exercises.form.namePlaceholder' | translate" fluid required />
         </div>
 
         <!-- Kind -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Kind <span class="text-red-500">*</span>
+            {{ 'exercises.filters.kind' | translate }} <span class="text-red-500">*</span>
           </label>
-          <p class="m-0 text-2xs leading-relaxed text-surface-500">Determines what gets tracked when a client logs
-            this.</p>
+          <p class="m-0 text-2xs leading-relaxed text-surface-500">{{ 'exercises.form.kindHelp' | translate }}</p>
           <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
             @for (card of kindCards; track card.value) {
             <button pButton
@@ -51,7 +50,7 @@
                   <i class="pi pi-check-circle ml-auto text-primary"></i>
                   }
                 </span>
-                <span class="text-xs leading-snug text-surface-500">{{ card.hint }}</span>
+                <span class="text-xs leading-snug text-surface-500">{{ card.hintKey | translate }}</span>
               </span>
             </button>
             }
@@ -61,12 +60,12 @@
         <!-- Primary muscles -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Primary muscles <span class="text-red-500">*</span>
-            <span class="font-medium text-surface-400">— 1 to 3</span>
+            {{ 'exercises.form.primaryMuscles' | translate }} <span class="text-red-500">*</span>
+            <span class="font-medium text-surface-400">{{ 'exercises.form.primaryMusclesRange' | translate }}</span>
           </label>
           <p-multiselect [options]="taxonomy.muscles()" optionLabel="commonName" optionValue="id"
             [ngModel]="primaryMuscleIds()" (ngModelChange)="primaryMuscleIds.set($event)" name="primaryMuscles"
-            [selectionLimit]="3" placeholder="Pick at least one" display="chip" [appendTo]="'body'" [filter]="true"
+            [selectionLimit]="3" [placeholder]="'exercises.form.primaryMusclesPlaceholder' | translate" display="chip" [appendTo]="'body'" [filter]="true"
             fluid />
         </div>
 
@@ -74,48 +73,46 @@
         <div class="flex flex-col gap-1.5">
           <label for="ex-desc"
             class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Description <span class="font-medium text-surface-400">— optional</span>
+            {{ 'form.label.description' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
           </label>
           <textarea id="ex-desc" pTextarea rows="2" [ngModel]="description()" (ngModelChange)="description.set($event)"
-            name="description" maxlength="2000" placeholder="1–3 sentences about the movement…" fluid></textarea>
+            name="description" maxlength="2000" [placeholder]="'exercises.form.descriptionPlaceholder' | translate" fluid></textarea>
         </div>
 
         <!-- Instructions -->
         <div class="flex flex-col gap-1.5">
           <label for="ex-instr"
             class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Instructions <span class="font-medium text-surface-400">— optional</span>
+            {{ 'exercises.detail.instructions' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
           </label>
           <textarea id="ex-instr" pTextarea rows="2" [ngModel]="instructions()"
             (ngModelChange)="instructions.set($event)" name="instructions" maxlength="5000"
-            placeholder="Step-by-step form cues…" fluid></textarea>
+            [placeholder]="'exercises.form.instructionsPlaceholder' | translate" fluid></textarea>
         </div>
 
         <!-- YouTube URL -->
         <div class="flex flex-col gap-1.5">
           <label for="ex-yt"
             class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            YouTube demo <span class="font-medium text-surface-400">— optional</span>
+            {{ 'exercises.form.youtube.label' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
           </label>
           <input id="ex-yt" pInputText type="url" [ngModel]="youtubeUrl()" (ngModelChange)="youtubeUrl.set($event)"
             name="youtubeUrl" maxlength="500" placeholder="https://youtube.com/watch?v=…" fluid
             [class.!border-red-500]="youtubeUrl() && !youtubeValid()" />
           @if (youtubeUrl() && !youtubeValid()) {
-          <p class="m-0 text-2xs text-red-700">Paste a valid YouTube URL (youtube.com or youtu.be).</p>
+          <p class="m-0 text-2xs text-red-700">{{ 'exercises.form.youtube.invalid' | translate }}</p>
           } @else if (youtubeThumb(); as thumb) {
           <div
             class="mt-1 flex items-center gap-2.5 rounded-lg border border-surface-200 bg-surface-50 p-2 dark:border-surface-700 dark:bg-surface-800">
-            <img [src]="thumb" alt="YouTube thumbnail preview"
+            <img [src]="thumb" [alt]="'exercises.form.youtube.thumbnailAlt' | translate"
               class="aspect-video w-24 shrink-0 rounded-md object-cover" />
             <div>
-              <div class="text-2xs font-bold text-surface-900 dark:text-surface-100">Thumbnail loaded</div>
-              <div class="mt-0.5 text-3xs text-surface-500">Used in catalog cards</div>
+              <div class="text-2xs font-bold text-surface-900 dark:text-surface-100">{{ 'exercises.form.youtube.thumbnailLoaded' | translate }}</div>
+              <div class="mt-0.5 text-3xs text-surface-500">{{ 'exercises.form.youtube.thumbnailUsage' | translate }}</div>
             </div>
           </div>
           }
-          <p class="m-0 text-2xs leading-relaxed text-surface-500">Native upload comes in V2. Paste any YouTube URL
-            to
-            get a thumbnail.</p>
+          <p class="m-0 text-2xs leading-relaxed text-surface-500">{{ 'exercises.form.youtube.hint' | translate }}</p>
         </div>
 
       </div>
@@ -125,7 +122,7 @@
         <!-- Level -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Level <span class="text-red-500">*</span>
+            {{ 'exercises.filters.level' | translate }} <span class="text-red-500">*</span>
           </label>
           <div class="grid grid-cols-3 gap-2">
             @for (opt of levelOptions; track opt.value) {
@@ -150,7 +147,7 @@
         <!-- Secondary muscles -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Secondary muscles <span class="font-medium text-surface-400">— optional</span>
+            {{ 'exercises.form.secondaryMuscles' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
           </label>
           <p-multiselect [options]="taxonomy.muscles()" optionLabel="commonName" optionValue="id"
             [ngModel]="secondaryMuscleIds()" (ngModelChange)="secondaryMuscleIds.set($event)" name="secondaryMuscles"
@@ -160,7 +157,7 @@
         <!-- Stabilizer muscles -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Stabilizers <span class="font-medium text-surface-400">— optional</span>
+            {{ 'exercises.form.stabilizers' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
           </label>
           <p-multiselect [options]="taxonomy.muscles()" optionLabel="commonName" optionValue="id"
             [ngModel]="stabilizerMuscleIds()" (ngModelChange)="stabilizerMuscleIds.set($event)" name="stabilizerMuscles"
@@ -170,7 +167,8 @@
         <!-- Equipment -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Equipment <span class="font-medium text-surface-400">— Bodyweight if none</span>
+            {{ 'exercises.filters.equipment' | translate }} <span class="font-medium text-surface-400">{{
+              'exercises.form.equipmentHint' | translate }}</span>
           </label>
           <p-multiselect [options]="taxonomy.equipment()" optionLabel="name" optionValue="id" [ngModel]="equipmentIds()"
             (ngModelChange)="equipmentIds.set($event)" name="equipment" placeholder="—" display="chip"
@@ -180,23 +178,25 @@
         <!-- Classification (optional) -->
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">
-            Classification <span class="font-medium text-surface-400">— optional</span>
+            {{ 'exercises.form.classification' | translate }} <span class="font-medium text-surface-400">{{ 'exercises.form.optionalSuffix' | translate }}</span>
           </label>
           <div class="flex flex-col gap-2">
             <div class="flex items-center gap-2 text-xs">
-              <span class="w-20 shrink-0 text-surface-500">Pattern</span>
+              <span class="w-20 shrink-0 text-surface-500">{{ 'exercises.form.pattern' | translate }}</span>
               <p-select [options]="patternOptions" optionLabel="label" optionValue="value" [ngModel]="movementPattern()"
-                (ngModelChange)="movementPattern.set($event)" name="pattern" placeholder="Auto / pick"
+                (ngModelChange)="movementPattern.set($event)" name="pattern"
+                [placeholder]="'exercises.form.autoPick' | translate"
                 [showClear]="true" [appendTo]="'body'" class="w-full" />
             </div>
             <div class="flex items-center gap-2 text-xs">
-              <span class="w-20 shrink-0 text-surface-500">Mechanic</span>
+              <span class="w-20 shrink-0 text-surface-500">{{ 'exercises.form.mechanic' | translate }}</span>
               <p-select [options]="mechanicOptions" optionLabel="label" optionValue="value" [ngModel]="mechanic()"
-                (ngModelChange)="mechanic.set($event)" name="mechanic" placeholder="Auto / pick" [showClear]="true"
+                (ngModelChange)="mechanic.set($event)" name="mechanic"
+                [placeholder]="'exercises.form.autoPick' | translate" [showClear]="true"
                 [appendTo]="'body'" class="w-full" />
             </div>
             <div class="flex items-center gap-2 text-xs">
-              <span class="w-20 shrink-0 text-surface-500">Force</span>
+              <span class="w-20 shrink-0 text-surface-500">{{ 'exercises.form.force' | translate }}</span>
               <p-select [options]="forceOptions" optionLabel="label" optionValue="value" [ngModel]="force()"
                 (ngModelChange)="force.set($event)" name="force" placeholder="—" [showClear]="true" [appendTo]="'body'"
                 class="w-full" />
@@ -206,18 +206,18 @@
 
         <!-- Unilateral -->
         <div class="flex flex-row flex-wrap items-center gap-3">
-          <label for="ex-uni" class="flex-1 text-xs font-semibold text-surface-800 dark:text-surface-200">Unilateral
-            movement</label>
+          <label for="ex-uni" class="flex-1 text-xs font-semibold text-surface-800 dark:text-surface-200">{{
+            'exercises.form.unilateral' | translate }}</label>
           <p-toggleswitch inputId="ex-uni" [ngModel]="isUnilateral()" (ngModelChange)="isUnilateral.set($event)"
             name="unilateral" />
-          <p class="m-0 basis-full text-2xs leading-relaxed text-surface-500">Single-arm / single-leg — drives L vs R
-            tracking later.</p>
+          <p class="m-0 basis-full text-2xs leading-relaxed text-surface-500">{{ 'exercises.form.unilateralHint' |
+            translate }}</p>
         </div>
 
         <!-- Visibility -->
         <div class="flex flex-col gap-1.5">
           <label
-            class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">Visibility</label>
+            class="flex items-center gap-1.5 text-xs font-semibold text-surface-800 dark:text-surface-200">{{ 'exercises.form.visibility' | translate }}</label>
           <div
             class="flex items-center gap-3 rounded-lg border border-surface-200 bg-surface-50 px-3 py-2.5 dark:border-surface-700 dark:bg-surface-800">
             <i class="pi text-base text-surface-700 dark:text-surface-300"
@@ -225,13 +225,13 @@
               [class.pi-globe]="visibility() === Visibilities.Public"></i>
             <div class="flex-1">
               <div class="text-xs font-bold text-surface-900 dark:text-surface-100">
-                {{ visibility() === Visibilities.Public ? 'Public' : 'Private' }}
+                {{ (visibility() === Visibilities.Public ? 'exercises.badge.public' : 'exercises.badge.private') | translate }}
               </div>
               <div class="mt-0.5 text-2xs text-surface-600 dark:text-surface-400">
                 @if (visibility() === Visibilities.Public) {
-                Any instructor can view and fork this. You stay the only editor.
+                {{ 'exercises.form.publicHint' | translate }}
                 } @else {
-                Only you can see and use it.
+                {{ 'exercises.form.privateHint' | translate }}
                 }
               </div>
             </div>
@@ -244,10 +244,10 @@
   </form>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="!canSave() || saving()" (click)="save()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      {{ saving() ? (isEditMode() ? 'Saving…' : 'Creating…') : (isEditMode() ? 'Save changes' : 'Create exercise') }}
+      {{ (saving() ? (isEditMode() ? 'exercises.form.saving' : 'exercises.form.creating') : (isEditMode() ? 'button.saveChanges' : 'exercises.common.createExercise')) | translate }}
     </button>
   </ng-template>
 </p-dialog>

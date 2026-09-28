@@ -1,5 +1,6 @@
-import { Component, computed, effect, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { IonChip } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { SessionLocationKind, SessionType } from 'core';
 
@@ -25,11 +26,13 @@ import {
  */
 @Component({
   selector: 'mh-discover-filter-sheet',
-  imports: [IonChip, SheetShell],
+  imports: [IonChip, SheetShell, TranslatePipe],
   templateUrl: './discover-filter-sheet.html',
   styleUrl: './discover-filter-sheet.scss',
 })
 export class DiscoverFilterSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly filters = input<DiscoverSheetFilters>(NO_SHEET_FILTERS);
 
@@ -55,8 +58,8 @@ export class DiscoverFilterSheet {
 
   readonly applyLabel = computed(() => {
     const count = this.count();
-    if (count === 0) return 'Apply';
-    return `Apply · ${count} ${count === 1 ? 'filter' : 'filters'}`;
+    if (count === 0) return this._translateService.instant('button.apply');
+    return this._translateService.instant('discover.filterSheet.applyCount', { count });
   });
 
   setType(type: SessionType | null): void {

@@ -1,7 +1,7 @@
 <div class="ion-padding-horizontal ion-padding-top">
-  <h1>Good to see you, {{ greetingName() }}.</h1>
+  <h1>{{ greeting() }}</h1>
   <ion-text color="medium">
-    <p>A calm place to settle in and pick up where you left off.</p>
+    <p>{{ 'home.train.intro' | translate }}</p>
   </ion-text>
 </div>
 
@@ -13,11 +13,13 @@
 @if (store.resume(); as log) {
   <ion-card color="secondary">
     <ion-card-header>
-      <ion-card-subtitle color="primary">Pick up where you left off</ion-card-subtitle>
+      <ion-card-subtitle color="primary">{{ 'home.train.resume.kicker' | translate }}</ion-card-subtitle>
       <ion-card-title>{{ log.name }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-button expand="block" (click)="resumeWorkout()">Resume workout</ion-button>
+      <ion-button expand="block" (click)="resumeWorkout()">
+        {{ 'home.train.resume.button' | translate }}
+      </ion-button>
     </ion-card-content>
   </ion-card>
 }
@@ -29,8 +31,8 @@
     <ion-item button [detail]="true" class="bill-due" (click)="openBilling()">
       <ion-icon slot="start" name="card-outline" color="primary" aria-hidden="true" />
       <ion-label class="ion-text-wrap">
-        <h2>{{ store.openInvoices() === 1 ? 'You have an invoice to pay' : store.openInvoices() + ' invoices to pay' }}</h2>
-        <p>Tap to see what's owed and settle it.</p>
+        <h2>{{ 'home.train.billDue.title' | translate: { count: store.openInvoices() } }}</h2>
+        <p>{{ 'home.train.billDue.hint' | translate }}</p>
       </ion-label>
     </ion-item>
   </ion-list>
@@ -55,7 +57,10 @@
 
 @if (store.showSteps()) {
   <ion-list>
-    <mh-section-header eyebrow="Start here" title="Get set up" />
+    <mh-section-header
+      [eyebrow]="'home.train.steps.eyebrow' | translate"
+      [title]="'home.train.steps.title' | translate"
+    />
     @for (step of store.steps(); track step.id) {
       <ion-item
         [button]="!step.done"
@@ -79,8 +84,8 @@
 
 <ion-list>
   <mh-section-header
-    [title]="store.hasOwnCoaches() ? 'Your coaches' : 'Some of our coaches'"
-    [linkLabel]="store.hasOwnCoaches() ? 'See all' : 'Discover more'"
+    [title]="(store.hasOwnCoaches() ? 'home.train.coaches.titleOwn' : 'home.train.coaches.titleSuggested') | translate"
+    [linkLabel]="(store.hasOwnCoaches() ? 'button.seeAll' : 'home.train.coaches.discoverMore') | translate"
     (linkClick)="openCoaches()"
   />
 
@@ -97,8 +102,8 @@
   } @else if (store.coaches().length === 0) {
     <mh-empty-state
       icon="sparkles-outline"
-      heading="No coaches to show yet"
-      message="Once coaches join, they'll show up here."
+      [heading]="'home.train.coaches.empty.heading' | translate"
+      [message]="'home.train.coaches.empty.message' | translate"
     />
   } @else {
     @for (coach of store.coaches(); track coach.key) {
@@ -112,7 +117,7 @@
     }
     @if (!store.hasOwnCoaches()) {
       <ion-item lines="none">
-        <ion-note>More joining soon.</ion-note>
+        <ion-note>{{ 'home.train.coaches.moreSoon' | translate }}</ion-note>
       </ion-item>
     }
   }
@@ -120,9 +125,9 @@
 
 <ion-list>
   <mh-section-header
-    eyebrow="From the journal"
-    title="Reads from the hive"
-    linkLabel="Read all"
+    [eyebrow]="'home.train.posts.eyebrow' | translate"
+    [title]="'home.train.posts.title' | translate"
+    [linkLabel]="'home.train.posts.readAll' | translate"
     (linkClick)="openBlog()"
   />
 
@@ -138,7 +143,7 @@
   } @else if (store.posts().length === 0) {
     <ion-card>
       <ion-card-content>
-        No posts yet. Check back soon — our first reads are landing.
+        {{ 'home.train.posts.empty' | translate }}
       </ion-card-content>
     </ion-card>
   } @else {
@@ -147,7 +152,7 @@
         <ion-label class="ion-text-wrap">
           <ion-note color="primary">{{ post.category }}</ion-note>
           <h2>{{ post.title }}</h2>
-          <p>{{ post.authorName }} · {{ post.readTime }} min read</p>
+          <p>{{ 'home.train.posts.byline' | translate: { author: post.authorName, minutes: post.readTime } }}</p>
         </ion-label>
       </ion-item>
     }

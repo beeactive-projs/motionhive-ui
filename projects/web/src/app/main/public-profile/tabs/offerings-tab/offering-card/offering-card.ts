@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
-import { getProductBillingLabel } from 'core';
+import { appLocale, getProductBillingLabel, ProductTypes } from 'core';
 import type { Product } from 'core';
 
 interface ProductWithMeta extends Product {
@@ -16,10 +17,9 @@ interface ProductWithMeta extends Product {
  */
 @Component({
   selector: 'mh-offering-card',
-  imports: [ButtonDirective, Card, TagModule],
+  imports: [ButtonDirective, Card, TagModule, TranslatePipe],
   templateUrl: './offering-card.html',
   styleUrl: './offering-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfferingCard {
   readonly product = input.required<Product>();
@@ -27,14 +27,19 @@ export class OfferingCard {
   /** CTA clicked — the shell decides: guests register, clients contact the coach. */
   readonly choose = output<void>();
 
-  /** "Choose plan" for recurring offerings, "Get started" for one-offs. */
-  readonly ctaLabel = computed(() =>
-    this.product().type === 'SUBSCRIPTION' ? 'Choose plan' : 'Get started',
+  /** "Choose plan" for recurring offerings, "Get started" for one-offs (translation key). */
+  readonly ctaKey = computed(() =>
+    this.product().type === ProductTypes.Subscription
+      ? 'publicProfile.offerings.choosePlan'
+      : 'publicProfile.offerings.getStarted',
   );
 
   readonly priceLabel = computed(() => {
     const p = this.product();
-    const amount = (p.amountCents / 100).toFixed(0);
+    const amount = new Intl.NumberFormat(appLocale(), {
+      maximumFractionDigits: 0,
+      useGrouping: false,
+    }).format(p.amountCents / 100);
     return `${amount} ${p.currency.toUpperCase()}`;
   });
 

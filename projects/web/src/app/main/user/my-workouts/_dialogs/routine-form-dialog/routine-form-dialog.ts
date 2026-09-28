@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -21,16 +20,19 @@ import { MessageService } from 'primeng/api';
 import { TextareaModule } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   CreateRoutineExercisePayload,
   CreateRoutinePayload,
   Exercise,
+  ExerciseSetType,
   Routine,
   RoutineExercise,
   ProgramAssignmentService,
   RoutineService,
   showApiError,
+  weekdayNames,
 } from 'core';
 
 import { ExercisePickerDialog } from '../../../../instructor/programs/exercise-picker-dialog/exercise-picker-dialog';
@@ -95,14 +97,16 @@ interface DraftExercise {
     TextareaModule,
     Toast,
     TooltipModule,
+    TranslatePipe,
     ExercisePickerDialog,
   ],
   providers: [MessageService],
   templateUrl: './routine-form-dialog.html',
   styleUrl: './routine-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoutineFormDialog {
+  private readonly _translateService = inject(TranslateService);
+
   readonly routine = input<Routine | null>(null);
   readonly visible = model<boolean>(false);
   readonly saved = output<Routine>();
@@ -121,15 +125,10 @@ export class RoutineFormDialog {
   readonly repeatWeeks = signal(4);
 
   /** ISO 8601: 1 = Monday … 7 = Sunday, matching the recurrence engine. */
-  readonly weekdayOptions = [
-    { label: 'M', value: 1 },
-    { label: 'T', value: 2 },
-    { label: 'W', value: 3 },
-    { label: 'T', value: 4 },
-    { label: 'F', value: 5 },
-    { label: 'S', value: 6 },
-    { label: 'S', value: 7 },
-  ];
+  readonly weekdayOptions = weekdayNames('narrow').map((label, i) => ({
+    label,
+    value: i + 1,
+  }));
 
   private readonly _service = inject(RoutineService);
   private readonly _assignmentService = inject(ProgramAssignmentService);
@@ -141,10 +140,22 @@ export class RoutineFormDialog {
   readonly exercises = signal<DraftExercise[]>([]);
   /** The set types the simple editor exposes; the schema carries more. */
   readonly setTypeOptions = [
-    { label: 'Working', value: 'NORMAL' },
-    { label: 'Warm-up', value: 'WARMUP' },
-    { label: 'Drop', value: 'DROPSET' },
-    { label: 'Failure', value: 'FAILURE' },
+    {
+      label: this._translateService.instant('myWorkouts.routineForm.setType.working'),
+      value: ExerciseSetType.Normal,
+    },
+    {
+      label: this._translateService.instant('enum.exerciseSetType.WARMUP'),
+      value: ExerciseSetType.Warmup,
+    },
+    {
+      label: this._translateService.instant('myWorkouts.routineForm.setType.drop'),
+      value: ExerciseSetType.Dropset,
+    },
+    {
+      label: this._translateService.instant('myWorkouts.routineForm.setType.failure'),
+      value: ExerciseSetType.Failure,
+    },
   ];
   /**
    * Whether the exercise list was actually touched this session.
@@ -161,10 +172,14 @@ export class RoutineFormDialog {
 
   readonly isEdit = computed(() => this.routine() !== null);
   readonly dialogHeader = computed(() =>
-    this.isEdit() ? 'Edit routine' : 'New routine',
+    this._translateService.instant(
+      this.isEdit() ? 'myWorkouts.routineForm.editTitle' : 'myWorkouts.common.newRoutine',
+    ),
   );
   readonly submitLabel = computed(() =>
-    this.isEdit() ? 'Save changes' : 'Create routine',
+    this._translateService.instant(
+      this.isEdit() ? 'button.saveChanges' : 'myWorkouts.common.createRoutine',
+    ),
   );
   readonly canSubmit = computed(
     () => this.name().trim().length >= 1 && !this.submitting(),
@@ -242,7 +257,7 @@ export class RoutineFormDialog {
           ? e.sets
           : Array.from({ length: Math.max(1, e.defaultSets ?? 3) }, (_, i) => ({
               uiKey: `${e.uiKey}-new${i}`,
-              setType: 'NORMAL',
+              setType: ExerciseSetType.Normal,
               targetRepsMin: e.targetRepsMin,
               targetWeightKg: e.targetWeightKg,
               targetDurationSeconds: null,
@@ -264,7 +279,7 @@ export class RoutineFormDialog {
             ...e.sets,
             {
               uiKey: `${e.uiKey}-n${e.sets.length}-${e.sets.length}`,
-              setType: 'NORMAL',
+              setType: ExerciseSetType.Normal,
               // Copy the previous row, which is what you usually want.
               targetRepsMin: last?.targetRepsMin ?? null,
               targetWeightKg: last?.targetWeightKg ?? null,
@@ -334,8 +349,14 @@ export class RoutineFormDialog {
         this.submitting.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: existing ? 'Routine updated' : 'Routine created',
-          detail: `${saved.name} is ready to use.`,
+          summary: this._translateService.instant(
+            existing
+              ? 'myWorkouts.routineForm.toast.updated'
+              : 'myWorkouts.routineForm.toast.created',
+          ),
+          detail: this._translateService.instant('myWorkouts.routineForm.toast.readyToUse', {
+            name: saved.name,
+          }),
           life: 2500,
         });
         // Schedule after the routine exists — it needs the id, and a
@@ -350,8 +371,12 @@ export class RoutineFormDialog {
         this.submitting.set(false);
         showApiError(
           this._messageService,
-          existing ? "Couldn't save routine" : "Couldn't create routine",
-          'Please check the form and try again.',
+          this._translateService.instant(
+            existing
+              ? 'myWorkouts.common.saveRoutineFailed'
+              : 'myWorkouts.routineForm.toast.createFailed',
+          ),
+          this._translateService.instant('myWorkouts.routineForm.toast.checkForm'),
           err,
         );
       },
@@ -396,7 +421,7 @@ export class RoutineFormDialog {
         sets.some((s) => s.targetDurationSeconds != null),
       uiKey: re.id,
       exerciseId: re.exerciseId,
-      exerciseName: re.exercise?.name ?? 'Exercise',
+      exerciseName: re.exercise?.name ?? this._translateService.instant('myWorkouts.common.exercise'),
       exerciseThumbnailUrl: re.exercise?.thumbnailUrl ?? null,
       defaultSets: re.defaultSets,
       targetRepsMin: re.targetRepsMin,
@@ -458,15 +483,17 @@ export class RoutineFormDialog {
         next: () =>
           this._messageService.add({
             severity: 'success',
-            summary: 'Added to your week',
-            detail: `${saved.name} is on your schedule.`,
+            summary: this._translateService.instant('myWorkouts.common.addedToWeek'),
+            detail: this._translateService.instant('myWorkouts.common.onSchedule', {
+              name: saved.name,
+            }),
             life: 3000,
           }),
         error: (err) =>
           showApiError(
             this._messageService,
-            'Routine saved, but not scheduled',
-            'You can schedule it from the routine list.',
+            this._translateService.instant('myWorkouts.routineForm.toast.notScheduled'),
+            this._translateService.instant('myWorkouts.routineForm.toast.notScheduledDetail'),
             err,
           ),
       });

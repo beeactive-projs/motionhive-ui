@@ -1,3 +1,5 @@
+import { translate } from '../i18n/translator';
+
 /**
  * The social platforms an instructor profile can link out to.
  *
@@ -22,16 +24,31 @@ export type SocialPlatformKey = (typeof SOCIAL_PLATFORM_KEYS)[number];
 
 export interface SocialPlatform {
   key: SocialPlatformKey;
-  label: string;
-  placeholder: string;
+  /** Brand names stay as they are; only "Website" is translated. */
+  readonly label: string;
+  /** `form.placeholder.social.<key>`, translated when read. */
+  readonly placeholder: string;
 }
 
-export const SOCIAL_PLATFORMS: readonly SocialPlatform[] = [
-  { key: 'instagram', label: 'Instagram', placeholder: 'instagram.com/yourhandle' },
-  { key: 'youtube', label: 'YouTube', placeholder: 'youtube.com/@yourchannel' },
-  { key: 'tiktok', label: 'TikTok', placeholder: 'tiktok.com/@yourhandle' },
-  { key: 'facebook', label: 'Facebook', placeholder: 'facebook.com/yourpage' },
-  { key: 'twitter', label: 'X / Twitter', placeholder: 'x.com/yourhandle' },
-  { key: 'linkedin', label: 'LinkedIn', placeholder: 'linkedin.com/in/yourhandle' },
-  { key: 'website', label: 'Website', placeholder: 'yourwebsite.com' },
-];
+const BRAND_LABELS: Record<Exclude<SocialPlatformKey, 'website'>, string> = {
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  tiktok: 'TikTok',
+  facebook: 'Facebook',
+  twitter: 'X / Twitter',
+  linkedin: 'LinkedIn',
+};
+
+/**
+ * Getters, not values: this is a module constant, evaluated before the
+ * language file has loaded (same reason as `enumLabelMap`).
+ */
+export const SOCIAL_PLATFORMS: readonly SocialPlatform[] = SOCIAL_PLATFORM_KEYS.map((key) => ({
+  key,
+  get label() {
+    return key === 'website' ? translate('form.label.website') : BRAND_LABELS[key];
+  },
+  get placeholder() {
+    return translate(`form.placeholder.social.${key}`);
+  },
+}));

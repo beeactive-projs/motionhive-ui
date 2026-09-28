@@ -1,19 +1,21 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   output,
 } from '@angular/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   TrainingDay,
   TrainingDayWorkout,
   WorkoutLog,
   WorkoutLogStatus,
+  appLocale,
 } from 'core';
 
 import {
@@ -36,11 +38,12 @@ import {
 @Component({
   selector: 'mh-today-hero',
   standalone: true,
-  imports: [ButtonDirective, Card, Tag, WeekStrip],
+  imports: [ButtonDirective, Card, Tag, TranslatePipe, WeekStrip],
   templateUrl: './today-hero.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TodayHero {
+  private readonly _translateService = inject(TranslateService);
+
   readonly trainingDay = input<TrainingDay | null>(null);
   /** An unfinished log takes over the hero — resuming beats starting. */
   readonly inProgress = input<WorkoutLog | null>(null);
@@ -107,7 +110,9 @@ export class TodayHero {
 
   readonly estimateLabel = computed(() => {
     const m = this.today()?.estimatedDurationMinutes;
-    return m ? `about ${m} min` : null;
+    return m
+      ? this._translateService.instant('myWorkouts.todayHero.estimate', { minutes: m })
+      : null;
   });
 
   /** Next scheduled workout after today, for the rest-day line. */
@@ -176,8 +181,8 @@ export class TodayHero {
   /** "Today" only when it is; otherwise name the day you are looking at. */
   readonly dayLabel = computed(() =>
     this.isToday()
-      ? 'Today'
-      : this.selectedDate().toLocaleDateString(undefined, {
+      ? this._translateService.instant('time.today')
+      : this.selectedDate().toLocaleDateString(appLocale(), {
           weekday: 'long',
           day: 'numeric',
           month: 'short',

@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, model, signal, untracked } from '@angular/core';
 import { IonInput, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AsYouType,
   CountryCode,
@@ -8,7 +9,13 @@ import {
 } from 'libphonenumber-js';
 import { take } from 'rxjs';
 
-import { ProfileService, STRIPE_CONNECT_COUNTRIES, countryFlagEmoji } from 'core';
+import {
+  ProfileService,
+  STRIPE_CONNECT_COUNTRIES,
+  appLocale,
+  countryFlagEmoji,
+  countryNameFromCode,
+} from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
@@ -25,7 +32,7 @@ const DEFAULT_COUNTRY: CountryCode = 'RO';
  */
 @Component({
   selector: 'mh-phone-sheet',
-  imports: [IonInput, IonSelect, IonSelectOption, SheetShell],
+  imports: [IonInput, IonSelect, IonSelectOption, SheetShell, TranslatePipe],
   templateUrl: './phone-sheet.html',
   styleUrl: './phone-sheet.scss',
 })
@@ -33,16 +40,22 @@ export class PhoneSheet {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly country = signal<CountryCode>(DEFAULT_COUNTRY);
   readonly nationalNumber = signal('');
   readonly saving = signal(false);
 
-  readonly countries = STRIPE_CONNECT_COUNTRIES.map(({ code, name }) => ({
+  readonly countries = STRIPE_CONNECT_COUNTRIES.map(({ code }) => ({
     code: code as CountryCode,
-    label: `${countryFlagEmoji(code)}  ${name} (+${getCountryCallingCode(code as CountryCode)})`,
-  }));
+    name: countryNameFromCode(code) ?? code,
+  }))
+    .sort((a, b) => a.name.localeCompare(b.name, appLocale()))
+    .map(({ code, name }) => ({
+      code,
+      label: `${countryFlagEmoji(code)}  ${name} (+${getCountryCallingCode(code)})`,
+    }));
 
   /** `null` when the field is empty — that is a clear, not an error. */
   readonly e164 = computed(() => {
@@ -77,7 +90,7 @@ export class PhoneSheet {
 
     if (next === previous) {
       this.open.set(false);
-      void this._feedbackService.info('No changes');
+      void this._feedbackService.info(this._translateService.instant('toast.detail.noChanges'));
       return;
     }
 
@@ -91,12 +104,19 @@ export class PhoneSheet {
         next: () => {
           this.saving.set(false);
           this.open.set(false);
-          void this._feedbackService.success(next ? 'Phone updated' : 'Phone removed');
+          void this._feedbackService.success(
+            this._translateService.instant(
+              next ? 'accountSheets.phone.toast.updated' : 'accountSheets.phone.toast.removed',
+            ),
+          );
         },
         error: (error: unknown) => {
           this.saving.set(false);
           this._accountStore.patchAccount({ phone: previous });
-          void this._feedbackService.error(error, 'Could not update your phone number.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.phone.toast.failed'),
+          );
         },
       });
   }

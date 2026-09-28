@@ -1,10 +1,10 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   MyProfile,
   PrivacyControlledField,
@@ -26,9 +26,8 @@ import { ProfileFactRow } from '../../../../../../_shared/components/profile-fac
  */
 @Component({
   selector: 'mh-personal-details-card',
-  imports: [Card, Divider, ButtonDirective, TooltipModule, ProfileFactRow],
+  imports: [Card, Divider, ButtonDirective, TooltipModule, ProfileFactRow, TranslatePipe],
   templateUrl: './personal-details-card.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonalDetailsCard {
   readonly profile = input.required<MyProfile>();

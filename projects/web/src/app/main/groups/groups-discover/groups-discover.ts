@@ -209,7 +209,7 @@ export class GroupsDiscover implements OnInit {
           );
           this._messageService.add({
             severity: 'info',
-            summary: this._translateService.instant('groups.toast.requestSent.summary'),
+            summary: this._translateService.instant('toast.summary.requestSent'),
             detail: this._translateService.instant('groups.toast.requestSent.detail'),
           });
         }
@@ -239,7 +239,7 @@ export class GroupsDiscover implements OnInit {
         );
         this._messageService.add({
           severity: 'success',
-          summary: this._translateService.instant('groups.toast.requestCancelled'),
+          summary: this._translateService.instant('toast.summary.requestCancelled'),
           detail: '',
         });
       },

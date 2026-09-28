@@ -3,9 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="builderUrl()" />
     </ion-buttons>
-    <ion-title>{{ name() || 'Day' }}</ion-title>
+    <ion-title>{{ name() || ('programs.dayEditor.titleFallback' | translate) }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="saving()" (click)="done()">Done</ion-button>
+      <ion-button [disabled]="saving()" (click)="done()">{{ 'button.done' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -14,9 +14,9 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this day"
-      message="It may have been cleared from the program. Go back and try again."
-      actionLabel="Try again"
+      [heading]="'programs.dayEditor.error.heading' | translate"
+      [message]="'programs.dayEditor.error.message' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
@@ -39,9 +39,9 @@
 
       <ion-input
         fill="outline"
-        label="Day name"
+        [label]="'programs.dayEditor.dayName' | translate"
         labelPlacement="stacked"
-        placeholder="Push day"
+        [placeholder]="'programs.dayEditor.dayNamePlaceholder' | translate"
         [value]="name()"
         (ionInput)="name.set($any($event).detail.value ?? '')"
         (ionBlur)="saveFields()"
@@ -49,10 +49,10 @@
 
       <ion-textarea
         fill="outline"
-        label="Note for the client"
+        [label]="'programs.dayEditor.noteLabel' | translate"
         labelPlacement="stacked"
         [autoGrow]="true"
-        placeholder="Anything they should know before starting."
+        [placeholder]="'programs.common.notePlaceholder' | translate"
         [value]="note()"
         (ionInput)="note.set($any($event).detail.value ?? '')"
         (ionBlur)="saveFields()"
@@ -60,7 +60,7 @@
 
       <section class="mh-section">
         <div class="mh-section-head">
-          <span class="mh-kicker">Exercises</span>
+          <span class="mh-kicker">{{ 'programs.dayEditor.exercises' | translate }}</span>
           @if (exercises().length) {
             <ion-note>{{ exercises().length }}</ion-note>
           }
@@ -73,7 +73,7 @@
                 class="mh-remove"
                 fill="outline"
                 color="danger"
-                [attr.aria-label]="'Remove ' + exerciseName(row)"
+                [attr.aria-label]="'a11y.removeItem' | translate: { name: exerciseName(row) }"
                 (click)="askRemove(row)"
               >
                 <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
@@ -83,13 +83,13 @@
         }
 
         @if (!exercises().length) {
-          <ion-note class="mh-note-block">No exercises yet — add the movements in the order they should be done.</ion-note>
+          <ion-note class="mh-note-block">{{ 'programs.dayEditor.empty' | translate }}</ion-note>
         }
       </section>
 
       <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="pickerOpen.set(true)">
         <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-        Add exercises
+        {{ 'programs.dayEditor.addExercises' | translate }}
       </ion-button>
     </div>
   }
@@ -97,18 +97,18 @@
 
 <mh-exercise-picker-sheet
   [(open)]="pickerOpen"
-  title="Add exercises"
-  [context]="name() || 'this day'"
+  [title]="'programs.dayEditor.addExercises' | translate"
+  [context]="name() || ('programs.dayEditor.contextFallback' | translate)"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
 />
 
 <mh-confirm-sheet
   [(open)]="removeOpen"
-  title="Remove exercise"
+  [title]="'programs.dayEditor.remove.title' | translate"
   [body]="removeBody()"
-  confirmLabel="Remove"
-  cancelLabel="Keep it"
+  [confirmLabel]="'button.remove' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   (confirm)="confirmRemove()"
 />

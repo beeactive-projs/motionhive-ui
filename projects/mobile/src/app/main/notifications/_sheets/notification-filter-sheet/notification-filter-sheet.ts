@@ -1,14 +1,17 @@
-import { Component, computed, effect, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
 import { IonChip, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { NotificationCategory } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
+import { FILTERABLE_CATEGORIES } from '../../../../_shared/config/notification-categories.config';
 import {
-  FILTERABLE_CATEGORIES,
-  categoryStyle,
-} from '../../../../_shared/config/notification-categories.config';
-import { NO_FILTERS, NotificationFilters, activeFilterCount } from '../../notifications.config';
+  NO_FILTERS,
+  NotificationFilters,
+  activeFilterCount,
+  categoryLabel,
+} from '../../notifications.config';
 
 /**
  * Narrow the centre.
@@ -24,11 +27,13 @@ import { NO_FILTERS, NotificationFilters, activeFilterCount } from '../../notifi
  */
 @Component({
   selector: 'mh-notification-filter-sheet',
-  imports: [IonChip, IonNote, SheetShell],
+  imports: [IonChip, IonNote, SheetShell, TranslatePipe],
   templateUrl: './notification-filter-sheet.html',
   styleUrl: './notification-filter-sheet.scss',
 })
 export class NotificationFilterSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly filters = input<NotificationFilters>(NO_FILTERS);
 
@@ -37,7 +42,7 @@ export class NotificationFilterSheet {
   /** Label only — the chips are text, like the agenda's; the glyph belongs to the rows. */
   readonly categoryOptions = FILTERABLE_CATEGORIES.map((value) => ({
     value,
-    label: categoryStyle(value).label,
+    label: categoryLabel(value),
   }));
 
   readonly draft = signal<NotificationFilters>(NO_FILTERS);
@@ -55,8 +60,8 @@ export class NotificationFilterSheet {
 
   readonly applyLabel = computed(() => {
     const count = this.count();
-    if (count === 0) return 'Apply';
-    return `Apply · ${count} ${count === 1 ? 'filter' : 'filters'}`;
+    if (count === 0) return this._translateService.instant('button.apply');
+    return this._translateService.instant('notifications.filter.applyCount', { count });
   });
 
   /** All / Unread — a pair, so this one is a radio rather than a toggle. */

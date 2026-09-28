@@ -6,14 +6,14 @@
     }
   </span>
 
-  <span class="prev" [attr.title]="'Last time: ' + previousLabel()">{{ previousLabel() }}</span>
+  <span class="prev" [attr.title]="'workouts.setRow.lastTime' | translate: { value: previousLabel() }">{{ previousLabel() }}</span>
 
   @for (field of fields(); track field) {
     <button
       class="cell"
       type="button"
       [class.active]="editing() === field"
-      [attr.aria-label]="field + ' for set ' + (index() + 1)"
+      [attr.aria-label]="'workouts.setRow.cellLabel' | translate: { field: field, number: index() + 1 }"
       (click)="edit.emit(field)"
     >
       {{ cellValue(field) || '–' }}
@@ -26,7 +26,7 @@
     class="tick"
     type="button"
     [attr.aria-pressed]="set().isCompleted"
-    [attr.aria-label]="'Set ' + (index() + 1) + ' complete'"
+    [attr.aria-label]="'workouts.setRow.complete' | translate: { number: index() + 1 }"
     (click)="toggle.emit()"
   >
     <ion-icon name="checkmark-outline" aria-hidden="true" />

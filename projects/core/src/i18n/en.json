@@ -15,6 +15,7 @@
     "openNotifications": "Open notifications",
     "playVideo": "Play video",
     "previousMonth": "Previous month",
+    "removeItem": "Remove {name}",
     "showPassword": "Show password",
     "unread": "Unread"
   },
@@ -27,25 +28,31 @@
     "archive": "Archive",
     "back": "Back",
     "cancel": "Cancel",
+    "cancelRequest": "Cancel request",
     "change": "Change",
     "clear": "Clear",
     "clearFilter": "Clear filter",
     "clearFilters": "Clear filters",
+    "clearSearch": "Clear search",
     "close": "Close",
     "confirm": "Confirm",
     "continue": "Continue",
+    "copy": "Copy",
     "copyLink": "Copy link",
     "create": "Create",
     "decline": "Decline",
     "delete": "Delete",
     "discard": "Discard",
+    "discoverCoaches": "Discover coaches",
     "dismiss": "Dismiss",
     "done": "Done",
     "duplicate": "Duplicate",
     "edit": "Edit",
     "invite": "Invite",
     "join": "Join",
+    "joinGroup": "Join group",
     "keep": "Keep",
+    "keepIt": "Keep it",
     "leave": "Leave",
     "loadMore": "Load more",
     "next": "Next",
@@ -55,9 +62,11 @@
     "previous": "Previous",
     "reject": "Reject",
     "remove": "Remove",
+    "requestToJoin": "Request to join",
     "resend": "Resend",
     "reset": "Reset",
     "restore": "Restore",
+    "resume": "Resume",
     "retry": "Retry",
     "save": "Save",
     "saveChanges": "Save changes",
@@ -65,6 +74,7 @@
     "seeAll": "See all",
     "select": "Select",
     "send": "Send",
+    "sendRequest": "Send request",
     "share": "Share",
     "showLess": "Show less",
     "showMore": "Show more",
@@ -72,24 +82,28 @@
     "signOut": "Sign out",
     "signUp": "Sign up",
     "skip": "Skip",
+    "start": "Start",
     "submit": "Submit",
     "tryAgain": "Try again",
     "unarchive": "Unarchive",
     "update": "Update",
     "upload": "Upload",
     "view": "View",
+    "viewProfile": "View profile",
     "yes": "Yes"
   },
   "common": {
     "actions": "Actions",
     "all": "All",
     "and": "and",
+    "appName": "MotionHive",
     "filters": "Filters",
     "filtersCount": "Filters · {count}",
     "loading": "Loading…",
     "none": "None",
     "oneOff": "One-off",
     "or": "or",
+    "pageTitle": "{page} - MotionHive",
     "paginator": "View {first} - {last} of {total}",
     "pleaseTryAgain": "Please try again.",
     "session": "Session",
@@ -113,10 +127,12 @@
     "members": "{count, plural, one {# member} other {# members}}",
     "minutes": "{count, plural, one {# minute} other {# minutes}}",
     "programs": "{count, plural, one {# program} other {# programs}}",
+    "reps": "{count, plural, one {# rep} other {# reps}}",
     "sessions": "{count, plural, one {# session} other {# sessions}}",
     "sets": "{count, plural, one {# set} other {# sets}}",
     "weeks": "{count, plural, one {# week} other {# weeks}}",
-    "workouts": "{count, plural, one {# workout} other {# workouts}}"
+    "workouts": "{count, plural, one {# workout} other {# workouts}}",
+    "years": "{count, plural, one {# year} other {# years}}"
   },
   "empty": {
     "noMatches": "Nothing matches your filters",
@@ -125,6 +141,12 @@
     "nothingYet": "Nothing here yet"
   },
   "enum": {
+    "blogCategory": {
+      "Guide": "Guide",
+      "Nutrition": "Nutrition",
+      "Science": "Science",
+      "Wellness": "Wellness"
+    },
     "cancelScope": {
       "series": "The whole series",
       "this": "Only this session",
@@ -135,10 +157,45 @@
       "ARCHIVED": "Archived",
       "PENDING": "Pending"
     },
+    "exerciseBlockKind": {
+      "AMRAP": "AMRAP",
+      "CIRCUIT": "Circuit",
+      "EMOM": "EMOM",
+      "NONE": "None",
+      "SUPERSET": "Superset",
+      "TABATA": "Tabata"
+    },
+    "exerciseForce": {
+      "PULL": "Pull",
+      "PUSH": "Push",
+      "STATIC": "Static"
+    },
+    "exerciseKind": {
+      "BODYWEIGHT": "Bodyweight",
+      "CARDIO": "Cardio",
+      "DISTANCE": "Distance",
+      "DURATION": "Duration",
+      "MOBILITY": "Mobility",
+      "STRENGTH": "Strength"
+    },
     "exerciseLevel": {
       "ADVANCED": "Advanced",
       "BEGINNER": "Beginner",
       "INTERMEDIATE": "Intermediate"
+    },
+    "exerciseMechanic": {
+      "COMPOUND": "Compound",
+      "ISOLATION": "Isolation"
+    },
+    "exerciseSetType": {
+      "AMRAP": "AMRAP",
+      "CLUSTER": "Cluster",
+      "DROPSET": "Drop set",
+      "FAILURE": "To failure",
+      "NORMAL": "Normal",
+      "REST_PAUSE": "Rest-pause",
+      "WARMUP": "Warm-up",
+      "WORKING": "Working"
     },
     "fitnessLevel": {
       "ADVANCED": "Advanced",
@@ -174,12 +231,51 @@
       "INVITE_ONLY": "Invite only",
       "OPEN": "Open"
     },
+    "movementPattern": {
+      "ANTI_ROTATION": "Anti-rotation",
+      "CARRY": "Carry",
+      "HINGE": "Hinge",
+      "ISOLATION": "Isolation",
+      "LOCOMOTION": "Locomotion",
+      "LUNGE": "Lunge",
+      "PULL_HORIZONTAL": "Horizontal pull",
+      "PULL_VERTICAL": "Vertical pull",
+      "PUSH_HORIZONTAL": "Horizontal push",
+      "PUSH_VERTICAL": "Vertical push",
+      "ROTATION": "Rotation",
+      "SQUAT": "Squat"
+    },
+    "muscleRole": {
+      "PRIMARY": "Primary",
+      "SECONDARY": "Secondary",
+      "STABILIZER": "Stabilizer"
+    },
     "myTab": {
       "cancelled": "Cancelled",
       "past": "Past",
       "pendingApproval": "Pending",
       "upcoming": "Upcoming",
       "waitlisted": "Waitlisted"
+    },
+    "notificationCategory": {
+      "ACCOUNT": "Account & security",
+      "COACHING": "Coaching",
+      "GROUPS": "Groups",
+      "MESSAGING": "Direct messages",
+      "PAYMENTS": "Payments & invoices",
+      "POSTS": "Posts & comments",
+      "SESSIONS": "Sessions",
+      "WORKOUTS": "Workouts & exercises"
+    },
+    "notificationCategoryHint": {
+      "ACCOUNT": "Stripe account status changes that need your attention.",
+      "COACHING": "Client requests, coach invitations, and coaching relationship updates.",
+      "GROUPS": "Invitations, member changes, and group ownership updates.",
+      "MESSAGING": "New messages from your clients and coaches. We coalesce email alerts so you only get one per conversation per hour.",
+      "PAYMENTS": "Invoices, payments, subscriptions, refunds, payouts, and disputes.",
+      "POSTS": "Comments on your posts, approvals, and moderation outcomes.",
+      "SESSIONS": "Reminders, cancellations, reschedules, and roster changes.",
+      "WORKOUTS": "Fork notifications on your public exercises, program assignment updates, and workout-completion alerts from your clients."
     },
     "paymentStatus": {
       "failed": "Failed",
@@ -204,6 +300,17 @@
       "COMPLETED": "Completed",
       "PAUSED": "Paused",
       "PENDING": "Pending"
+    },
+    "programKind": {
+      "HABIT": "Habit",
+      "HYBRID": "Hybrid",
+      "MEAL": "Meal",
+      "WORKOUT": "Workout"
+    },
+    "programStatus": {
+      "ARCHIVED": "Archived",
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published"
     },
     "refundReason": {
       "duplicate": "Duplicate",
@@ -283,6 +390,19 @@
       "OTHER": "Other",
       "SCAM": "Scam",
       "SPAM": "Spam"
+    },
+    "userRole": {
+      "ADMIN": "Admin",
+      "INSTRUCTOR": "Coach",
+      "SUPER_ADMIN": "Super admin",
+      "SUPPORT": "Support",
+      "WRITER": "Writer"
+    },
+    "workoutLogStatus": {
+      "ABANDONED": "Abandoned",
+      "COMPLETED": "Completed",
+      "IN_PROGRESS": "In progress",
+      "SKIPPED": "Skipped"
     }
   },
   "error": {
@@ -307,6 +427,7 @@
       "unavailable": "The service is temporarily unavailable. Please try again in a moment.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
+    "mayBeRemoved": "It may have been removed or you may not have access.",
     "messaging": {
       "forbidden": "You can’t send this message.",
       "notDelivered": "Message couldn’t be delivered. They may have left or blocked messages from you.",
@@ -320,38 +441,47 @@
   },
   "form": {
     "hint": {
+      "optional": "(optional)",
       "passwordMinLength": "Min. 8 characters",
       "reenterPassword": "Re-enter your password"
     },
     "label": {
       "amount": "Amount",
+      "bio": "Bio",
       "city": "City",
       "confirmPassword": "Confirm password",
       "country": "Country",
       "currency": "Currency",
       "date": "Date",
       "description": "Description",
+      "displayName": "Display name",
       "dueDate": "Due date",
       "duration": "Duration",
       "email": "Email",
       "endDate": "End date",
       "firstName": "First name",
       "fullName": "Full name",
+      "handle": "Handle",
       "language": "Language",
       "lastName": "Last name",
       "location": "Location",
+      "memberSince": "Member since",
       "name": "Name",
       "newPassword": "New password",
       "notes": "Notes",
       "password": "Password",
       "phone": "Phone",
       "price": "Price",
+      "socialLinks": "Social links",
+      "specializations": "Specializations",
       "startDate": "Start date",
       "status": "Status",
       "time": "Time",
       "timezone": "Timezone",
       "title": "Title",
-      "type": "Type"
+      "type": "Type",
+      "website": "Website",
+      "yearsOfExperience": "Years of experience"
     },
     "placeholder": {
       "email": "you@example.com",
@@ -360,7 +490,16 @@
       "optional": "Optional",
       "pickDate": "Pick a date",
       "search": "Search",
-      "select": "Select"
+      "select": "Select",
+      "social": {
+        "facebook": "facebook.com/yourpage",
+        "instagram": "instagram.com/yourhandle",
+        "linkedin": "linkedin.com/in/yourhandle",
+        "tiktok": "tiktok.com/@yourhandle",
+        "twitter": "x.com/yourhandle",
+        "website": "yourwebsite.com",
+        "youtube": "youtube.com/@yourchannel"
+      }
     }
   },
   "language": {
@@ -438,6 +577,7 @@
     "minutesShort": "{minutes} min",
     "now": "now",
     "perInterval": "{interval, select, day {{count, plural, one {/ day} other {/ # days}}} week {{count, plural, one {/ week} other {/ # weeks}}} month {{count, plural, one {/ month} other {/ # months}}} year {{count, plural, one {/ year} other {/ # years}}} other {}}",
+    "secondsShort": "{seconds}s",
     "startingNow": "starting now",
     "today": "Today",
     "todayWithDate": "Today · {date}",
@@ -460,6 +600,8 @@
       "copied": "Copied",
       "error": "Error",
       "info": "Info",
+      "requestCancelled": "Request cancelled",
+      "requestSent": "Request sent",
       "saved": "Saved",
       "success": "Success",
       "warning": "Warning"

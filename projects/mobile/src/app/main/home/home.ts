@@ -1,5 +1,6 @@
 import { Component, computed, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonButton,
   IonButtons,
@@ -53,6 +54,7 @@ import { TrainHome } from './train-home/train-home';
     Logo,
     NotificationBell,
     TrainHome,
+    TranslatePipe,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',

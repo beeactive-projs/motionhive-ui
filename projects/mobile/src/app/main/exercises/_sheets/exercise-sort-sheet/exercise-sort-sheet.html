@@ -7,7 +7,8 @@
           <p>{{ option.hint }}</p>
         </ion-label>
         @if (sort() === option.value) {
-          <ion-icon slot="end" name="checkmark-circle" color="primary" aria-label="Selected" />
+          <ion-icon slot="end" name="checkmark-circle" color="primary"
+            [attr.aria-label]="'exercises.sort.selected' | translate" />
         }
       </ion-item>
     }
@@ -18,7 +19,7 @@
      a step to a decision that is already made by the time you lift a finger. -->
 <mh-sheet-shell
   [(open)]="open"
-  title="Sort by"
+  [title]="'exercises.sort.title' | translate"
   [body]="body"
   [showFooter]="false"
   [flushBody]="true"

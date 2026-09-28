@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { GestureController, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { closeOutline, notificationsOutline } from 'ionicons/icons';
 import { catchError, EMPTY, take } from 'rxjs';
@@ -46,7 +47,7 @@ const DISMISS_VELOCITY = 0.3;
  */
 @Component({
   selector: 'mh-notification-banner',
-  imports: [HexAvatar, IonButton, IonIcon],
+  imports: [HexAvatar, IonButton, IonIcon, TranslatePipe],
   templateUrl: './notification-banner.html',
   styleUrl: './notification-banner.scss',
 })

@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
@@ -8,10 +7,13 @@ import {
   viewChild,
   ElementRef,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   AvatarUser,
+  EnumLabelPipe,
   MyProfile,
   TagSeverity,
+  UserRole,
   UserRoles,
   countryNameFromCode,
 } from 'core';
@@ -32,10 +34,9 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
  */
 @Component({
   selector: 'mh-profile-hero-card',
-  imports: [Card, Avatar, ButtonDirective, TagModule, TooltipModule, DatePipe],
+  imports: [Card, Avatar, ButtonDirective, TagModule, TooltipModule, DatePipe, TranslatePipe, EnumLabelPipe],
   templateUrl: './profile-hero-card.html',
   styleUrl: './profile-hero-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileHeroCard {
   readonly profile = input.required<MyProfile>();
@@ -95,24 +96,24 @@ export class ProfileHeroCard {
    * leak our RBAC names. Surfaces staff roles first.
    */
   readonly displayBadges = computed<
-    { label: string; severity: TagSeverity }[]
+    { role: UserRole; severity: TagSeverity }[]
   >(() => {
     const roles = new Set(this.profile().roles);
-    const out: { label: string; severity: TagSeverity }[] = [];
+    const out: { role: UserRole; severity: TagSeverity }[] = [];
 
     if (roles.has(UserRoles.SuperAdmin)) {
-      out.push({ label: 'Super admin', severity: TagSeverity.Danger });
+      out.push({ role: UserRoles.SuperAdmin, severity: TagSeverity.Danger });
     } else if (roles.has(UserRoles.Admin)) {
-      out.push({ label: 'Admin', severity: TagSeverity.Warn });
+      out.push({ role: UserRoles.Admin, severity: TagSeverity.Warn });
     } else if (roles.has(UserRoles.Support)) {
-      out.push({ label: 'Support', severity: TagSeverity.Contrast });
+      out.push({ role: UserRoles.Support, severity: TagSeverity.Contrast });
     }
 
     if (roles.has(UserRoles.Writer)) {
-      out.push({ label: 'Writer', severity: TagSeverity.Info });
+      out.push({ role: UserRoles.Writer, severity: TagSeverity.Info });
     }
     if (roles.has(UserRoles.Instructor)) {
-      out.push({ label: 'Coach', severity: TagSeverity.Info });
+      out.push({ role: UserRoles.Instructor, severity: TagSeverity.Info });
     }
     return out;
   });

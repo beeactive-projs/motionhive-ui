@@ -1,9 +1,10 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { LoggedSet, SetField, SetFields, setFieldsFor } from 'core';
 
-import { secondsToClock, setTypeMark } from '../../workouts.config';
+import { formatMeasure, secondsToClock, setTypeMark } from '../../workouts.config';
 
 /**
  * One set: what was planned, what happened, and the tick that says it did.
@@ -21,7 +22,7 @@ import { secondsToClock, setTypeMark } from '../../workouts.config';
  */
 @Component({
   selector: 'mh-set-row',
-  imports: [IonIcon],
+  imports: [IonIcon, TranslatePipe],
   templateUrl: './set-row.html',
   styleUrl: './set-row.scss',
 })
@@ -62,8 +63,8 @@ export class SetRow {
     const prev = this.previous();
     if (!prev) return '—';
     const bits: string[] = [];
-    if (prev.weightKg != null) bits.push(`${prev.weightKg}`);
-    if (prev.reps != null) bits.push(`${prev.reps}`);
+    if (prev.weightKg != null) bits.push(formatMeasure(prev.weightKg));
+    if (prev.reps != null) bits.push(formatMeasure(prev.reps));
     if (prev.durationSeconds != null) bits.push(secondsToClock(prev.durationSeconds));
     return bits.length ? bits.join(' × ') : '—';
   });
@@ -72,14 +73,14 @@ export class SetRow {
     const set = this.set();
     switch (field) {
       case SetFields.Weight:
-        return set.weightKg == null ? '' : String(set.weightKg);
+        return set.weightKg == null ? '' : formatMeasure(set.weightKg);
       case SetFields.Reps:
         return set.reps == null ? '' : String(set.reps);
       case SetFields.Duration:
         // A hold reads as a clock, not as a count of seconds: 90 is "1:30".
         return set.durationSeconds == null ? '' : secondsToClock(set.durationSeconds);
       case SetFields.Distance:
-        return set.distanceMeters == null ? '' : String(set.distanceMeters);
+        return set.distanceMeters == null ? '' : formatMeasure(set.distanceMeters);
     }
   }
 }

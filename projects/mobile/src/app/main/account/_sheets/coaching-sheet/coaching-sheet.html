@@ -1,6 +1,6 @@
 <ng-template #body>
   <ion-input
-    label="Display name"
+    [label]="'form.label.displayName' | translate"
     labelPlacement="stacked"
     fill="outline"
     [maxlength]="displayNameMaxLength"
@@ -10,7 +10,7 @@
 
   <ion-input
     class="field"
-    label="Years of experience"
+    [label]="'form.label.yearsOfExperience' | translate"
     labelPlacement="stacked"
     fill="outline"
     type="number"
@@ -23,7 +23,7 @@
 
   <ion-textarea
     class="field"
-    label="Bio"
+    [label]="'form.label.bio' | translate"
     labelPlacement="stacked"
     fill="outline"
     [rows]="4"
@@ -35,14 +35,14 @@
 
   <ion-input
     class="field"
-    label="Specializations"
+    [label]="'form.label.specializations' | translate"
     labelPlacement="stacked"
     fill="outline"
     placeholder="strength_training, hiit, yoga"
     [value]="specializations()"
     (ionInput)="specializations.set($event.detail.value ?? '')"
   />
-  <p class="mh-helper">Separate each one with a comma.</p>
+  <p class="mh-helper">{{ 'accountSheets.coaching.specializationsHint' | translate }}</p>
 
   <ion-list [inset]="true" class="mh-card-list field">
     <ion-item lines="full">
@@ -51,8 +51,8 @@
         (ionChange)="isAcceptingClients.set($event.detail.checked)"
       >
         <ion-label class="ion-text-wrap">
-          Accepting clients
-          <p>Shows on your public profile so people know they can reach out.</p>
+          {{ 'accountSheets.coaching.accepting' | translate }}
+          <p>{{ 'accountSheets.coaching.acceptingHint' | translate }}</p>
         </ion-label>
       </ion-toggle>
     </ion-item>
@@ -62,8 +62,8 @@
         (ionChange)="showSocialLinks.set($event.detail.checked)"
       >
         <ion-label class="ion-text-wrap">
-          Show social links
-          <p>Your links stay hidden while this is off.</p>
+          {{ 'accountSheets.coaching.showSocialLinks' | translate }}
+          <p>{{ 'accountSheets.coaching.showSocialLinksHint' | translate }}</p>
         </ion-label>
       </ion-toggle>
     </ion-item>
@@ -76,7 +76,7 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Coaching profile"
+  [title]="'accountSheets.coaching.title' | translate"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

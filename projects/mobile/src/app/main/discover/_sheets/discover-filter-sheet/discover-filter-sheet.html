@@ -1,12 +1,12 @@
 <ng-template #body>
-  <div class="mh-section-label">Type</div>
+  <div class="mh-section-label">{{ 'form.label.type' | translate }}</div>
   <div class="chips">
     <ion-chip
       [class.selected]="draft().type === null"
       [attr.aria-pressed]="draft().type === null"
       (click)="setType(null)"
     >
-      Any
+      {{ 'discover.filterSheet.anyType' | translate }}
     </ion-chip>
     @for (option of typeOptions; track option.value) {
       <ion-chip
@@ -19,14 +19,14 @@
     }
   </div>
 
-  <div class="mh-section-label">Location</div>
+  <div class="mh-section-label">{{ 'form.label.location' | translate }}</div>
   <div class="chips">
     <ion-chip
       [class.selected]="draft().locationKind === null"
       [attr.aria-pressed]="draft().locationKind === null"
       (click)="setLocation(null)"
     >
-      Anywhere
+      {{ 'discover.filterSheet.anywhere' | translate }}
     </ion-chip>
     @for (option of locationOptions; track option.value) {
       <ion-chip
@@ -39,7 +39,7 @@
     }
   </div>
 
-  <div class="mh-section-label">Dates</div>
+  <div class="mh-section-label">{{ 'discover.filterSheet.dates' | translate }}</div>
   <div class="chips">
     @for (option of presetOptions; track option.value) {
       <ion-chip
@@ -47,7 +47,7 @@
         [attr.aria-pressed]="draft().datePreset === option.value"
         (click)="setPreset(option.value)"
       >
-        {{ option.label }}
+        {{ option.label | translate }}
       </ion-chip>
     }
   </div>
@@ -55,8 +55,8 @@
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Filter sessions"
-  actionLabel="Reset"
+  [title]="'discover.filterSheet.title' | translate"
+  [actionLabel]="'button.reset' | translate"
   [actionDisabled]="count() === 0"
   [saveLabel]="applyLabel()"
   [body]="body"

@@ -1,4 +1,4 @@
-import { NotificationData } from 'core';
+import { NotificationData, translate } from 'core';
 
 /**
  * Where a notification opens on mobile.
@@ -86,7 +86,7 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
 };
 
 /**
- * Everything else the server can point at, and what to call it.
+ * Everything else the server can point at, and the key for what to call it.
  *
  * Kept explicit rather than inferred so the detail sheet can name the real
  * destination — and so an unrecognised screen stays visibly different from a
@@ -94,11 +94,11 @@ const SCREEN_ROUTES: Record<string, (data: NotificationData) => DeepLink> = {
  * every screen the API emits.
  */
 const NOT_ON_MOBILE: Record<string, string> = {
-  'user/plans': 'My plans',
-  'coaching/exercises': 'Exercises',
+  'user/plans': 'notifications.webOnlyPlace.myPlans',
+  'coaching/exercises': 'nav.exercises',
   // Subscriptions a coach *sells* stay on the web; the client's own
   // memberships are a segment on their billing screen.
-  'coaching/subscriptions': 'Memberships',
+  'coaching/subscriptions': 'notifications.webOnlyPlace.memberships',
 };
 
 /**
@@ -107,7 +107,7 @@ const NOT_ON_MOBILE: Record<string, string> = {
  * three.
  */
 const PROFILE_TABS: Record<string, string> = {
-  coaches: 'Coaches',
+  coaches: 'notifications.webOnlyPlace.coaches',
 };
 
 /**
@@ -147,10 +147,11 @@ export function queryParamsFor(data: NotificationData | null): Params | null {
  */
 export function webOnlyLabel(data: NotificationData | null): string | null {
   if (!data?.screen) return null;
-  if (data.screen === 'profile') {
-    return PROFILE_TABS[data.queryParams?.['tab'] ?? ''] ?? null;
-  }
-  return NOT_ON_MOBILE[data.screen] ?? null;
+  const key =
+    data.screen === 'profile'
+      ? PROFILE_TABS[data.queryParams?.['tab'] ?? '']
+      : NOT_ON_MOBILE[data.screen];
+  return key ? translate(key) : null;
 }
 
 /**

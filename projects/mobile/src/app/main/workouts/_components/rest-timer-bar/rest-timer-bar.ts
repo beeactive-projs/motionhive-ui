@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** How much a nudge moves the finish line. */
 const NUDGE_SECONDS = 10;
@@ -28,7 +29,7 @@ const NUDGE_SECONDS = 10;
  */
 @Component({
   selector: 'mh-rest-timer-bar',
-  imports: [IonButton, IonIcon],
+  imports: [IonButton, IonIcon, TranslatePipe],
   templateUrl: './rest-timer-bar.html',
   styleUrl: './rest-timer-bar.scss',
 })

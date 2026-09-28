@@ -15,6 +15,7 @@
     "openNotifications": "Deschide notificările",
     "playVideo": "Redă videoclipul",
     "previousMonth": "Luna anterioară",
+    "removeItem": "Elimină {name}",
     "showPassword": "Arată parola",
     "unread": "Necitită"
   },
@@ -27,25 +28,31 @@
     "archive": "Arhivează",
     "back": "Înapoi",
     "cancel": "Anulează",
+    "cancelRequest": "Anulează cererea",
     "change": "Schimbă",
     "clear": "Golește",
     "clearFilter": "Șterge filtrul",
     "clearFilters": "Șterge filtrele",
+    "clearSearch": "Șterge căutarea",
     "close": "Închide",
     "confirm": "Confirmă",
     "continue": "Continuă",
+    "copy": "Copiază",
     "copyLink": "Copiază linkul",
     "create": "Creează",
     "decline": "Refuză",
     "delete": "Șterge",
     "discard": "Renunță",
+    "discoverCoaches": "Descoperă antrenori",
     "dismiss": "Închide",
     "done": "Gata",
     "duplicate": "Duplică",
     "edit": "Editează",
     "invite": "Invită",
     "join": "Alătură-te",
+    "joinGroup": "Alătură-te grupului",
     "keep": "Păstrează",
+    "keepIt": "Păstrează",
     "leave": "Părăsește",
     "loadMore": "Încarcă mai multe",
     "next": "Înainte",
@@ -55,9 +62,11 @@
     "previous": "Înapoi",
     "reject": "Respinge",
     "remove": "Elimină",
+    "requestToJoin": "Cere să te alături",
     "resend": "Retrimite",
     "reset": "Resetează",
     "restore": "Restaurează",
+    "resume": "Reia",
     "retry": "Reîncearcă",
     "save": "Salvează",
     "saveChanges": "Salvează modificările",
@@ -65,6 +74,7 @@
     "seeAll": "Vezi tot",
     "select": "Alege",
     "send": "Trimite",
+    "sendRequest": "Trimite cererea",
     "share": "Distribuie",
     "showLess": "Arată mai puțin",
     "showMore": "Arată mai mult",
@@ -72,24 +82,28 @@
     "signOut": "Deconectează-te",
     "signUp": "Creează cont",
     "skip": "Sari peste",
+    "start": "Începe",
     "submit": "Trimite",
     "tryAgain": "Încearcă din nou",
     "unarchive": "Dezarhivează",
     "update": "Actualizează",
     "upload": "Încarcă",
     "view": "Vezi",
+    "viewProfile": "Vezi profilul",
     "yes": "Da"
   },
   "common": {
     "actions": "Acțiuni",
     "all": "Toate",
     "and": "și",
+    "appName": "MotionHive",
     "filters": "Filtre",
     "filtersCount": "Filtre · {count}",
     "loading": "Se încarcă…",
     "none": "Niciunul",
     "oneOff": "Plată unică",
     "or": "sau",
+    "pageTitle": "{page} - MotionHive",
     "paginator": "Afișezi {first} - {last} din {total}",
     "pleaseTryAgain": "Încearcă din nou.",
     "session": "Sesiune",
@@ -113,10 +127,12 @@
     "members": "{count, plural, one {# membru} few {# membri} other {# de membri}}",
     "minutes": "{count, plural, one {# minut} few {# minute} other {# de minute}}",
     "programs": "{count, plural, one {# program} few {# programe} other {# de programe}}",
+    "reps": "{count, plural, one {# repetare} few {# repetări} other {# de repetări}}",
     "sessions": "{count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}}",
     "sets": "{count, plural, one {# serie} few {# serii} other {# de serii}}",
     "weeks": "{count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
-    "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
+    "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}",
+    "years": "{count, plural, one {# an} few {# ani} other {# de ani}}"
   },
   "empty": {
     "noMatches": "Nimic nu corespunde filtrelor",
@@ -125,6 +141,12 @@
     "nothingYet": "Nimic aici deocamdată"
   },
   "enum": {
+    "blogCategory": {
+      "Guide": "Ghid",
+      "Nutrition": "Nutriție",
+      "Science": "Știință",
+      "Wellness": "Stare de bine"
+    },
     "cancelScope": {
       "series": "Toată seria",
       "this": "Doar această sesiune",
@@ -135,10 +157,45 @@
       "ARCHIVED": "Arhivat",
       "PENDING": "În așteptare"
     },
+    "exerciseBlockKind": {
+      "AMRAP": "AMRAP",
+      "CIRCUIT": "Circuit",
+      "EMOM": "EMOM",
+      "NONE": "Niciunul",
+      "SUPERSET": "Superset",
+      "TABATA": "Tabata"
+    },
+    "exerciseForce": {
+      "PULL": "Tracțiune",
+      "PUSH": "Împingere",
+      "STATIC": "Static"
+    },
+    "exerciseKind": {
+      "BODYWEIGHT": "Greutatea corpului",
+      "CARDIO": "Cardio",
+      "DISTANCE": "Distanță",
+      "DURATION": "Durată",
+      "MOBILITY": "Mobilitate",
+      "STRENGTH": "Forță"
+    },
     "exerciseLevel": {
       "ADVANCED": "Avansat",
       "BEGINNER": "Începător",
       "INTERMEDIATE": "Intermediar"
+    },
+    "exerciseMechanic": {
+      "COMPOUND": "Compus",
+      "ISOLATION": "Izolare"
+    },
+    "exerciseSetType": {
+      "AMRAP": "AMRAP",
+      "CLUSTER": "Cluster",
+      "DROPSET": "Drop set",
+      "FAILURE": "Până la epuizare",
+      "NORMAL": "Normală",
+      "REST_PAUSE": "Rest-pause",
+      "WARMUP": "Încălzire",
+      "WORKING": "De lucru"
     },
     "fitnessLevel": {
       "ADVANCED": "Avansat",
@@ -174,12 +231,51 @@
       "INVITE_ONLY": "Doar cu invitație",
       "OPEN": "Deschis"
     },
+    "movementPattern": {
+      "ANTI_ROTATION": "Anti-rotație",
+      "CARRY": "Transport",
+      "HINGE": "Flexie din șold",
+      "ISOLATION": "Izolare",
+      "LOCOMOTION": "Locomoție",
+      "LUNGE": "Fandare",
+      "PULL_HORIZONTAL": "Tracțiune orizontală",
+      "PULL_VERTICAL": "Tracțiune verticală",
+      "PUSH_HORIZONTAL": "Împingere orizontală",
+      "PUSH_VERTICAL": "Împingere verticală",
+      "ROTATION": "Rotație",
+      "SQUAT": "Genuflexiune"
+    },
+    "muscleRole": {
+      "PRIMARY": "Principal",
+      "SECONDARY": "Secundar",
+      "STABILIZER": "Stabilizator"
+    },
     "myTab": {
       "cancelled": "Anulate",
       "past": "Trecute",
       "pendingApproval": "În așteptare",
       "upcoming": "Viitoare",
       "waitlisted": "Pe lista de așteptare"
+    },
+    "notificationCategory": {
+      "ACCOUNT": "Cont și securitate",
+      "COACHING": "Coaching",
+      "GROUPS": "Grupuri",
+      "MESSAGING": "Mesaje directe",
+      "PAYMENTS": "Plăți și facturi",
+      "POSTS": "Postări și comentarii",
+      "SESSIONS": "Sesiuni",
+      "WORKOUTS": "Antrenamente și exerciții"
+    },
+    "notificationCategoryHint": {
+      "ACCOUNT": "Schimbări ale stării contului Stripe care necesită atenția ta.",
+      "COACHING": "Cereri de la clienți, invitații de la antrenori și noutăți despre colaborările de coaching.",
+      "GROUPS": "Invitații, schimbări de membri și actualizări despre proprietarul grupului.",
+      "MESSAGING": "Mesaje noi de la clienții și antrenorii tăi. Grupăm alertele pe email, ca să primești cel mult unul pe conversație pe oră.",
+      "PAYMENTS": "Facturi, plăți, abonamente, rambursări, transferuri și dispute.",
+      "POSTS": "Comentarii la postările tale, aprobări și rezultatele moderării.",
+      "SESSIONS": "Mementouri, anulări, reprogramări și schimbări în lista participanților.",
+      "WORKOUTS": "Notificări când cineva copiază exercițiile tale publice, noutăți despre programele atribuite și alerte când clienții tăi termină un antrenament."
     },
     "paymentStatus": {
       "failed": "Eșuată",
@@ -204,6 +300,17 @@
       "COMPLETED": "Finalizat",
       "PAUSED": "Pe pauză",
       "PENDING": "În așteptare"
+    },
+    "programKind": {
+      "HABIT": "Obicei",
+      "HYBRID": "Hibrid",
+      "MEAL": "Alimentație",
+      "WORKOUT": "Antrenament"
+    },
+    "programStatus": {
+      "ARCHIVED": "Arhivat",
+      "DRAFT": "Ciornă",
+      "PUBLISHED": "Publicat"
     },
     "refundReason": {
       "duplicate": "Duplicat",
@@ -283,6 +390,19 @@
       "OTHER": "Altceva",
       "SCAM": "Înșelătorie",
       "SPAM": "Spam"
+    },
+    "userRole": {
+      "ADMIN": "Admin",
+      "INSTRUCTOR": "Antrenor",
+      "SUPER_ADMIN": "Super admin",
+      "SUPPORT": "Suport",
+      "WRITER": "Autor"
+    },
+    "workoutLogStatus": {
+      "ABANDONED": "Abandonat",
+      "COMPLETED": "Finalizat",
+      "IN_PROGRESS": "În desfășurare",
+      "SKIPPED": "Sărit"
     }
   },
   "error": {
@@ -307,6 +427,7 @@
       "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în câteva momente.",
       "unexpected": "A apărut o eroare neașteptată. Încearcă din nou."
     },
+    "mayBeRemoved": "Poate a fost șters sau nu ai acces la el.",
     "messaging": {
       "forbidden": "Nu poți trimite acest mesaj.",
       "notDelivered": "Mesajul nu a putut fi livrat. Poate a părăsit conversația sau a blocat mesajele de la tine.",
@@ -320,38 +441,47 @@
   },
   "form": {
     "hint": {
+      "optional": "(opțional)",
       "passwordMinLength": "Min. 8 caractere",
       "reenterPassword": "Introdu parola din nou"
     },
     "label": {
       "amount": "Sumă",
+      "bio": "Descriere",
       "city": "Oraș",
       "confirmPassword": "Confirmă parola",
       "country": "Țară",
       "currency": "Monedă",
       "date": "Dată",
       "description": "Descriere",
+      "displayName": "Nume afișat",
       "dueDate": "Scadență",
       "duration": "Durată",
       "email": "Email",
       "endDate": "Data de sfârșit",
       "firstName": "Prenume",
       "fullName": "Nume complet",
+      "handle": "Handle",
       "language": "Limbă",
       "lastName": "Nume",
       "location": "Locație",
+      "memberSince": "Membru din",
       "name": "Nume",
       "newPassword": "Parolă nouă",
       "notes": "Notițe",
       "password": "Parolă",
       "phone": "Telefon",
       "price": "Preț",
+      "socialLinks": "Linkuri sociale",
+      "specializations": "Specializări",
       "startDate": "Data de început",
       "status": "Status",
       "time": "Oră",
       "timezone": "Fus orar",
       "title": "Titlu",
-      "type": "Tip"
+      "type": "Tip",
+      "website": "Site web",
+      "yearsOfExperience": "Ani de experiență"
     },
     "placeholder": {
       "email": "tu@exemplu.ro",
@@ -360,7 +490,16 @@
       "optional": "Opțional",
       "pickDate": "Alege o dată",
       "search": "Caută",
-      "select": "Alege"
+      "select": "Alege",
+      "social": {
+        "facebook": "facebook.com/paginata",
+        "instagram": "instagram.com/numeletau",
+        "linkedin": "linkedin.com/in/numeletau",
+        "tiktok": "tiktok.com/@numeletau",
+        "twitter": "x.com/numeletau",
+        "website": "site-ultau.ro",
+        "youtube": "youtube.com/@canalultau"
+      }
     }
   },
   "language": {
@@ -438,6 +577,7 @@
     "minutesShort": "{minutes} min",
     "now": "acum",
     "perInterval": "{interval, select, day {{count, plural, one {/ zi} few {/ # zile} other {/ # de zile}}} week {{count, plural, one {/ săptămână} few {/ # săptămâni} other {/ # de săptămâni}}} month {{count, plural, one {/ lună} few {/ # luni} other {/ # de luni}}} year {{count, plural, one {/ an} few {/ # ani} other {/ # de ani}}} other {}}",
+    "secondsShort": "{seconds} s",
     "startingNow": "începe acum",
     "today": "Azi",
     "todayWithDate": "Azi · {date}",
@@ -460,6 +600,8 @@
       "copied": "Copiat",
       "error": "Eroare",
       "info": "Info",
+      "requestCancelled": "Cerere anulată",
+      "requestSent": "Cerere trimisă",
       "saved": "Salvat",
       "success": "Gata",
       "warning": "Atenție"

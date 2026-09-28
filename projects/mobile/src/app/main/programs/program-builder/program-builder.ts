@@ -17,6 +17,7 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -28,8 +29,8 @@ import { FeedbackService } from '../../../_shared/services/feedback.service';
 import { CopyDaySheet } from '../_sheets/copy-day-sheet/copy-day-sheet';
 import { CopyWeekSheet } from '../_sheets/copy-week-sheet/copy-week-sheet';
 import {
-  DAY_LABELS,
   DEFAULT_PROGRAM_WEEKS,
+  dayLabels,
   PROGRAM_ICONS,
   weekLabel,
   weeksToDays,
@@ -40,11 +41,13 @@ import { ProgramBuilderStore, WeekCard } from './program-builder.store';
 const NEW = 'new';
 
 /**
- * The name a fresh draft is born with. Matched on leave to tell an untouched
- * draft from one the coach actually started — renaming it is the first thing
- * anyone does, so it is a reliable signal.
+ * Translation key for the name a fresh draft is born with. Matched on leave
+ * to tell an untouched draft from one the coach actually started — renaming
+ * it is the first thing anyone does, so it is a reliable signal. The
+ * language is fixed per page load, so the name born here is the name
+ * compared against on the way out.
  */
-const UNTOUCHED_DRAFT_NAME = 'Untitled program';
+const UNTOUCHED_DRAFT_NAME_KEY = 'programs.builder.untitledProgram';
 
 /**
  * The program builder — vertical weeks.
@@ -78,6 +81,7 @@ const UNTOUCHED_DRAFT_NAME = 'Untitled program';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   providers: [ProgramBuilderStore],
   templateUrl: './program-builder.html',
@@ -89,8 +93,9 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
-  readonly dayLabels = DAY_LABELS;
+  readonly dayLabels = dayLabels();
   readonly weekLabel = weekLabel;
   readonly skeletonWeeks = [1, 2];
   readonly skeletonRows = [1, 2, 3];
@@ -102,19 +107,20 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
 
   private _id: string | null = null;
 
-  readonly title = computed(() => this.store.program()?.name ?? 'Program');
+  readonly title = computed(
+    () => this.store.program()?.name ?? this._translateService.instant('programs.builder.titleFallback'),
+  );
 
-  readonly subtitle = computed(() => {
-    const weeks = this.store.weekCount();
-    const days = this.store.filledDays();
-    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} · ${days} ${days === 1 ? 'day' : 'days'} of work`;
-  });
+  readonly subtitle = computed(() =>
+    this._translateService.instant('programs.builder.subtitle', {
+      weeks: this.store.weekCount(),
+      days: this.store.filledDays(),
+    }),
+  );
 
   readonly clearBody = computed(() => {
     const day = this.clearTarget();
-    return day
-      ? `Clear ${day.name}? The day becomes a rest day and its exercises are removed.`
-      : '';
+    return day ? this._translateService.instant('programs.builder.clear.body', { name: day.name }) : '';
   });
 
   constructor() {
@@ -133,7 +139,7 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   ionViewWillLeave(): void {
     const program = this.store.program();
     if (!program || !this._id || this._id === NEW) return;
-    if (program.name !== UNTOUCHED_DRAFT_NAME) return;
+    if (program.name !== this._translateService.instant(UNTOUCHED_DRAFT_NAME_KEY)) return;
     if (this.store.workouts().length > 0) return;
 
     const id = this._id;
@@ -166,7 +172,10 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   // ─── Grid ─────────────────────────────────────────────────────
 
   daysLabel(week: WeekCard): string {
-    return `${week.filled} of ${week.days.length} days`;
+    return this._translateService.instant('programs.builder.daysFilled', {
+      filled: week.filled,
+      total: week.days.length,
+    });
   }
 
   openDay(week: WeekCard, dayIndex: number): void {
@@ -259,21 +268,34 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
       choice.toDayIndex,
       (error) => {
         if (error) {
-          void this._feedbackService.error(error, 'Could not copy the day');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('programs.builder.toast.copyDayFailed'),
+          );
           return;
         }
         // Naming the day when it changed: "copied to week 2" would hide the
         // part the coach deliberately chose.
         if (movedDay) {
           void this._feedbackService.success(
-            `${name} copied to ${this.dayLabels[choice.toDayIndex!]}, week ${targets[0] + 1}`,
+            this._translateService.instant('programs.builder.toast.dayCopiedToDay', {
+              name,
+              day: this.dayLabels[choice.toDayIndex!],
+              week: targets[0] + 1,
+            }),
           );
           return;
         }
         void this._feedbackService.success(
           targets.length === 1
-            ? `${name} copied to week ${targets[0] + 1}`
-            : `${name} copied to ${targets.length} weeks`,
+            ? this._translateService.instant('programs.builder.toast.dayCopiedToWeek', {
+                name,
+                week: targets[0] + 1,
+              })
+            : this._translateService.instant('programs.builder.toast.dayCopiedToWeeks', {
+                name,
+                count: targets.length,
+              }),
         );
       },
     );
@@ -305,14 +327,23 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
       if (i >= targets.length) {
         void this._feedbackService.success(
           targets.length === 1
-            ? `Week ${from + 1} copied to week ${targets[0] + 1}`
-            : `Week ${from + 1} copied to ${targets.length} weeks`,
+            ? this._translateService.instant('programs.builder.toast.weekCopiedToWeek', {
+                from: from + 1,
+                week: targets[0] + 1,
+              })
+            : this._translateService.instant('programs.builder.toast.weekCopiedToWeeks', {
+                from: from + 1,
+                count: targets.length,
+              }),
         );
         return;
       }
       this.store.copyWeek(from, targets[i], (error) => {
         if (error) {
-          void this._feedbackService.error(error, 'Could not copy the week');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('programs.builder.toast.copyWeekFailed'),
+          );
           return;
         }
         next(i + 1);
@@ -344,7 +375,7 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
   private _createDraft(): void {
     this._programService
       .create({
-        name: UNTOUCHED_DRAFT_NAME,
+        name: this._translateService.instant(UNTOUCHED_DRAFT_NAME_KEY),
         durationDays: weeksToDays(DEFAULT_PROGRAM_WEEKS),
       })
       .pipe(take(1))
@@ -357,7 +388,10 @@ export class ProgramBuilder implements ViewWillEnter, ViewWillLeave {
           });
         },
         error: (err) => {
-          void this._feedbackService.error(err, 'Could not start the program');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('programs.builder.toast.startFailed'),
+          );
           void this._router.navigate(['/tabs/programs']);
         },
       });

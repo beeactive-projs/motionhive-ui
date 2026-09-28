@@ -1,25 +1,10 @@
-import { inject } from '@angular/core';
-import { Router, Routes, UrlTree } from '@angular/router';
+import { Routes } from '@angular/router';
 
 export const userRoutes: Routes = [
   {
-    path: 'dashboard',
-    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
-    title: 'Dashboard - MotionHive',
-  },
-  {
-    // Legacy path. Coaches now live in the profile "Coaches" tab.
-    path: 'instructors',
-    canActivate: [
-      (): UrlTree =>
-        inject(Router).createUrlTree(['/profile'], { queryParams: { tab: 'coaches' } }),
-    ],
-    children: [],
-  },
-  {
     path: 'sessions',
     loadComponent: () => import('./my-sessions/my-sessions').then((m) => m.MySessions),
-    title: 'Sessions - MotionHive',
+    title: 'pageTitle.mySessions',
   },
   {
     path: 'workouts',
@@ -32,12 +17,12 @@ export const userRoutes: Routes = [
       import('./my-workouts/routine-detail/routine-detail').then(
         (m) => m.RoutineDetail,
       ),
-    title: 'Routine - MotionHive',
+    title: 'pageTitle.routine',
   },
   {
     path: 'training',
     loadComponent: () => import('./training/training').then((m) => m.Training),
-    title: 'Workouts - MotionHive',
+    title: 'pageTitle.workouts',
   },
   {
     path: 'progress',
@@ -52,7 +37,7 @@ export const userRoutes: Routes = [
       import('./progress/exercise-progress/exercise-progress').then(
         (m) => m.ExerciseProgressPage,
       ),
-    title: 'Exercise progress - MotionHive',
+    title: 'pageTitle.exerciseProgress',
   },
   {
     path: 'plans',
@@ -63,7 +48,7 @@ export const userRoutes: Routes = [
     // so this is one component in two mount points, not two copies.
     loadComponent: () =>
       import('./my-plans/my-plans').then((m) => m.MyPlans),
-    title: 'My plans - MotionHive',
+    title: 'pageTitle.myPlans',
   },
   {
     path: 'plans/:id',
@@ -71,7 +56,7 @@ export const userRoutes: Routes = [
       import('./my-plans/client-plan-detail/client-plan-detail').then(
         (m) => m.ClientPlanDetail,
       ),
-    title: 'My plan - MotionHive',
+    title: 'pageTitle.myPlan',
   },
   {
     // Active workout logger (live session).
@@ -80,7 +65,7 @@ export const userRoutes: Routes = [
       import('./my-workouts/workout-log-active/workout-log-active').then(
         (m) => m.WorkoutLogActive,
       ),
-    title: 'Workout - MotionHive',
+    title: 'pageTitle.workout',
   },
   {
     // Read-only workout replay — used by client history + coach (with ?coach=1).
@@ -89,7 +74,7 @@ export const userRoutes: Routes = [
       import('./my-workouts/workout-log-replay/workout-log-replay').then(
         (m) => m.WorkoutLogReplay,
       ),
-    title: 'Workout replay - MotionHive',
+    title: 'pageTitle.workoutReplay',
   },
   {
     // Post-workout summary + feedback.
@@ -98,7 +83,7 @@ export const userRoutes: Routes = [
       import('./my-workouts/workout-complete/workout-complete').then(
         (m) => m.WorkoutComplete,
       ),
-    title: 'Workout complete - MotionHive',
+    title: 'pageTitle.workoutComplete',
   },
   {
     path: 'sessions/discover',
@@ -106,7 +91,7 @@ export const userRoutes: Routes = [
       import('./my-sessions/sessions-discover/sessions-discover').then(
         (m) => m.SessionsDiscover,
       ),
-    title: 'Discover sessions - MotionHive',
+    title: 'pageTitle.discoverSessions',
   },
   {
     // Day-of online countdown. Declared before `sessions/:id` so the
@@ -116,7 +101,7 @@ export const userRoutes: Routes = [
       import('../session-day-of-online/session-day-of-online').then(
         (m) => m.SessionDayOfOnline,
       ),
-    title: 'Join session - MotionHive',
+    title: 'pageTitle.joinSession',
   },
   {
     // Public session showcase (reached from Discover, share links, reminders).
@@ -125,6 +110,6 @@ export const userRoutes: Routes = [
       import('./my-sessions/session-showcase/session-showcase').then(
         (m) => m.SessionShowcase,
       ),
-    title: 'Session - MotionHive',
+    title: 'pageTitle.session',
   },
 ];

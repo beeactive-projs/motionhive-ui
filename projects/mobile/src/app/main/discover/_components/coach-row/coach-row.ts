@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { InstructorSearchResult } from 'core';
 
@@ -17,7 +18,7 @@ import { coachMeta, coachName, coachSpecializations } from '../../discover.confi
  */
 @Component({
   selector: 'mh-coach-row',
-  imports: [HexAvatar, IonBadge, IonItem, IonLabel, IonNote],
+  imports: [HexAvatar, IonBadge, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './coach-row.html',
   styleUrl: './coach-row.scss',
 })

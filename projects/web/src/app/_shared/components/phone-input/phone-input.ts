@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -8,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   AsYouType,
   getCountryCallingCode,
@@ -16,7 +16,7 @@ import {
 } from 'libphonenumber-js';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { STRIPE_CONNECT_COUNTRIES } from 'core';
+import { STRIPE_CONNECT_COUNTRIES, appLocale, countryNameFromCode } from 'core';
 
 /**
  * Option shape for the country select. Pre-built once at module load
@@ -36,14 +36,15 @@ interface CountryOption {
 
 const COUNTRY_OPTIONS: CountryOption[] = STRIPE_CONNECT_COUNTRIES.map((c) => {
   const callingCode = `+${getCountryCallingCode(c.code as CountryCode)}`;
+  const name = countryNameFromCode(c.code) ?? c.name;
   return {
     code: c.code as CountryCode,
-    name: c.name,
+    name,
     flagClass: `fi fi-${c.code.toLowerCase()}`,
     callingCode,
-    searchLabel: `${c.name} ${callingCode}`,
+    searchLabel: `${name} ${callingCode}`,
   };
-}).sort((a, b) => a.name.localeCompare(b.name));
+}).sort((a, b) => a.name.localeCompare(b.name, appLocale()));
 
 const DEFAULT_COUNTRY: CountryCode = 'RO';
 
@@ -67,10 +68,9 @@ const DEFAULT_COUNTRY: CountryCode = 'RO';
  */
 @Component({
   selector: 'mh-phone-input',
-  imports: [FormsModule, Select, InputText],
+  imports: [FormsModule, Select, InputText, TranslatePipe],
   templateUrl: './phone-input.html',
   styleUrl: './phone-input.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhoneInput {
   /**
@@ -78,7 +78,8 @@ export class PhoneInput {
    * Parents should bind via `[(value)]` or `[value]+(valueChange)`.
    */
   readonly value = model<string | null>(null);
-  readonly placeholder = input<string>('Phone number');
+  /** Defaults to "Phone number" (`components.phoneInput.placeholder`). */
+  readonly placeholder = input<string>();
   readonly disabled = input<boolean>(false);
   readonly inputId = input<string>('mh-phone-input');
 

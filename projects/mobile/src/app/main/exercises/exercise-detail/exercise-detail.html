@@ -9,8 +9,8 @@
 
 <ion-content [fullscreen]="true">
   @if (error(); as message) {
-  <mh-empty-state icon="alert-circle-outline" heading="Couldn't load this exercise" [message]="message"
-    actionLabel="Try again" (action)="retry()" />
+  <mh-empty-state icon="alert-circle-outline" [heading]="'exercises.detail.loadError.title' | translate"
+    [message]="message" [actionLabel]="'button.tryAgain' | translate" (action)="retry()" />
   } @else if (loading() && !exercise()) {
   <div class="hero skeleton">
     <ion-skeleton-text [animated]="true" />
@@ -56,7 +56,8 @@
   </div>
   } @else {
   <div class="hero placeholder">
-    <mh-hex-avatar size="xl" tone="wash" [color]="kindTone()" [icon]="kindIcon()" [name]="kindLabel() + ' exercise'" />
+    <mh-hex-avatar size="xl" tone="wash" [color]="kindTone()" [icon]="kindIcon()"
+      [name]="'exercises.detail.kindTile' | translate: { kind: kindLabel() }" />
   </div>
   }
 
@@ -66,7 +67,7 @@
          Grouped the way the create form asks for them, in the card a
          session reads its price and policy in. -->
     <section class="mh-section">
-      <span class="mh-kicker">Details</span>
+      <span class="mh-kicker">{{ 'exercises.detail.sections.details' | translate }}</span>
       <ion-list [inset]="true" class="mh-card-list">
         @for (row of detailRows(); track row.label; let last = $last) {
         <ion-item [lines]="last && !description() ? 'none' : 'full'">
@@ -96,7 +97,7 @@
         <ion-item lines="none">
           <mh-hex-avatar slot="start" size="sm" icon="information-circle-outline" color="medium" aria-hidden="true" />
           <ion-label class="ion-text-wrap">
-            <h3>About</h3>
+            <h3>{{ 'exercises.detail.about' | translate }}</h3>
             <p class="prose">{{ text }}</p>
           </ion-label>
         </ion-item>
@@ -105,11 +106,11 @@
     </section>
 
     @if (forkedFromName(); as source) {
-    <ion-note class="mh-footnote">Forked from {{ source }}</ion-note>
+    <ion-note class="mh-footnote">{{ 'exercises.detail.forkedFrom' | translate: { name: source } }}</ion-note>
     }
 
     <section class="mh-section">
-      <span class="mh-kicker">Muscles &amp; equipment</span>
+      <span class="mh-kicker">{{ 'exercises.fields.musclesEquipment' | translate }}</span>
       <ion-list [inset]="true" class="mh-card-list">
         <!-- Red, orange, light blue: the muscle chart's convention, most work
              first. The row names the role, so the colours need no legend. -->
@@ -137,7 +138,7 @@
 
     @if (steps().length > 0) {
     <section class="mh-section">
-      <span class="mh-kicker">Instructions</span>
+      <span class="mh-kicker">{{ 'exercises.fields.instructions' | translate }}</span>
       <ol class="steps">
         @for (step of steps(); track $index) {
         <li>
@@ -155,8 +156,8 @@
       <ion-item button detail lines="none" (click)="edit()">
         <ion-icon slot="start" name="create-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <h3>Edit exercise</h3>
-          <p>Change anything, or remove it from your library</p>
+          <h3>{{ 'exercises.detail.editAction' | translate }}</h3>
+          <p>{{ 'exercises.detail.editHint' | translate }}</p>
         </ion-label>
       </ion-item>
       }
@@ -166,8 +167,8 @@
       <ion-item button detail lines="none" (click)="confirmFork()">
         <ion-icon slot="start" name="git-network-outline" color="medium" aria-hidden="true" />
         <ion-label>
-          <h3>Fork to my exercises</h3>
-          <p>Copy it, then edit your version freely</p>
+          <h3>{{ 'exercises.detail.forkAction' | translate }}</h3>
+          <p>{{ 'exercises.detail.forkHint' | translate }}</p>
         </ion-label>
       </ion-item>
       }
@@ -180,6 +181,7 @@
 </ion-content>
 
 <mh-confirm-sheet [(open)]="forkOpen" [title]="forkTitle()"
-  body="A copy lands in your exercises. Edit anything — name, cues, media — without touching the original. Your version will say it was forked from this one."
-  irreversible="You can keep one live fork of each exercise. If you already have one, we'll take you to it instead."
-  confirmLabel="Fork exercise" cancelLabel="Cancel" [saving]="forking()" (confirm)="fork()" />
+  [body]="'exercises.detail.forkConfirm.body' | translate"
+  [irreversible]="'exercises.detail.forkConfirm.irreversible' | translate"
+  [confirmLabel]="'exercises.detail.forkConfirm.confirm' | translate"
+  [cancelLabel]="'button.cancel' | translate" [saving]="forking()" (confirm)="fork()" />

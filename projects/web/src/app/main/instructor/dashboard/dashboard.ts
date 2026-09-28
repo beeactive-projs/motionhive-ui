@@ -1,8 +1,10 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
+import { SelectItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { Avatar } from '../../../_shared/components/avatar/avatar';
 import { CardModule } from 'primeng/card';
@@ -14,6 +16,8 @@ import { TagModule } from 'primeng/tag';
 import {
   AuthStore,
   CurrencyRonPipe,
+  EnumLabelPipe,
+  monthNames,
   TagSeverity,
   InstructorClientStatuses,
   ClientStatusLabels,
@@ -45,7 +49,6 @@ interface RecentActivity {
     DatePipe,
     FormsModule,
     NgTemplateOutlet,
-    TitleCasePipe,
     AvatarModule,
     Avatar,
     CardModule,
@@ -54,13 +57,15 @@ interface RecentActivity {
     Select,
     TagModule,
     CurrencyRonPipe,
+    EnumLabelPipe,
+    TranslatePipe,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
   protected readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly ClientStatuses = InstructorClientStatuses;
   readonly ClientStatusLabels = ClientStatusLabels;
@@ -71,73 +76,66 @@ export class Dashboard {
   selectedEvent = 'all';
   selectedFilter = 'none';
 
-  readonly locationOptions = [{ label: 'All locations', value: 'all' }];
-  readonly eventOptions = [{ label: 'All events', value: 'all' }];
-  readonly filterOptions = [{ label: 'No filter', value: 'none' }];
+  readonly locationOptions: SelectItem[] = [
+    { label: this._translateService.instant('coachDashboard.activity.allLocations'), value: 'all' },
+  ];
+  readonly eventOptions: SelectItem[] = [
+    { label: this._translateService.instant('coachDashboard.activity.allEvents'), value: 'all' },
+  ];
+  readonly filterOptions: SelectItem[] = [
+    { label: this._translateService.instant('coachDashboard.activity.noFilter'), value: 'none' },
+  ];
 
   readonly recentActivities = signal<RecentActivity[]>([
     {
       id: '1',
       userName: 'Bogdan test Daniel test',
       initials: 'BD',
-      description: 'signed in for the first time and completed their app setup.',
-      timeAgo: '1 minute ago',
+      description: this._translateService.instant('coachDashboard.activity.completedSetup'),
+      timeAgo: this._translateService.instant('coachDashboard.activity.minutesAgo', { count: 1 }),
     },
     {
       id: '2',
       userName: 'Bogdan Daniel',
       initials: 'BD',
-      description: 'signed in for the first time and completed their app setup.',
-      timeAgo: '1 hour ago',
+      description: this._translateService.instant('coachDashboard.activity.completedSetup'),
+      timeAgo: this._translateService.instant('coachDashboard.activity.hoursAgo', { count: 1 }),
     },
     {
       id: '5',
       userName: 'Bogdan Daniel',
       initials: 'BD',
-      description: 'signed in for the first time and completed their app setup.',
-      timeAgo: '1 hour ago',
+      description: this._translateService.instant('coachDashboard.activity.completedSetup'),
+      timeAgo: this._translateService.instant('coachDashboard.activity.hoursAgo', { count: 1 }),
     },
     {
       id: '4',
       userName: 'Bogdan test Daniel test',
       initials: 'BD',
-      description: 'signed in for the first time and completed their app setup.',
-      timeAgo: '1 minute ago',
+      description: this._translateService.instant('coachDashboard.activity.completedSetup'),
+      timeAgo: this._translateService.instant('coachDashboard.activity.minutesAgo', { count: 1 }),
     },
     {
       id: '5',
       userName: 'Bogdan Daniel',
       initials: 'BD',
-      description: 'signed in for the first time and completed their app setup.',
-      timeAgo: '1 hour ago',
+      description: this._translateService.instant('coachDashboard.activity.completedSetup'),
+      timeAgo: this._translateService.instant('coachDashboard.activity.hoursAgo', { count: 1 }),
     },
     {
       id: '6',
       userName: 'Bogdan Daniel',
       initials: 'BD',
-      description: 'signed in for the first time and completed their app setup.',
-      timeAgo: '1 hour ago',
+      description: this._translateService.instant('coachDashboard.activity.completedSetup'),
+      timeAgo: this._translateService.instant('coachDashboard.activity.hoursAgo', { count: 1 }),
     },
   ]);
 
   readonly businessGrowthData = {
-    labels: [
-      "May '25",
-      "Jun '25",
-      "Jul '25",
-      "Aug '25",
-      "Sep '25",
-      "Oct '25",
-      "Nov '25",
-      "Dec '25",
-      "Jan '26",
-      "Feb '26",
-      "Mar '26",
-      "Apr '26",
-    ],
+    labels: this.growthMonthLabels(),
     datasets: [
       {
-        label: 'Clients',
+        label: this._translateService.instant('nav.clients'),
         data: [0, 5, 0, 0, 2, 0, 0, 0, 0, 1, 2, 3],
         fill: true,
         borderColor: '#3b82f6',
@@ -426,17 +424,17 @@ export class Dashboard {
     }
   }
 
-  joinPolicyLabel(policy: JoinPolicy): string {
-    switch (policy) {
-      case JoinPolicies.Open:
-        return 'Open';
-      case JoinPolicies.Approval:
-        return 'Approval';
-      case JoinPolicies.InviteOnly:
-        return 'Invite only';
-      default:
-        return policy;
-    }
+  /**
+   * "May '25" … "Apr '26" — the (mock) 12-month window the growth chart
+   * covers, with month names in the UI language.
+   */
+  private growthMonthLabels(): string[] {
+    const months = monthNames('short');
+    return Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(2025, 4 + i, 1);
+      const year = String(date.getFullYear()).slice(-2);
+      return `${months[date.getMonth()]} '${year}`;
+    });
   }
 
   clientInitials(client: User): string {

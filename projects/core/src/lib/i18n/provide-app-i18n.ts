@@ -8,6 +8,7 @@ import {
   makeEnvironmentProviders,
   provideAppInitializer,
 } from '@angular/core';
+import { TitleStrategy } from '@angular/router';
 import {
   TranslateService,
   provideMissingTranslationHandler,
@@ -21,6 +22,7 @@ import { firstValueFrom, forkJoin } from 'rxjs';
 import { DEFAULT_LANGUAGE } from '../constants/languages.const';
 import { LANGUAGE_SYNC_ENABLED } from '../services/i18n/language.service';
 import { appLanguage, appLocale } from './app-language';
+import { AppTitleStrategy } from './app-title.strategy';
 import { DevMissingTranslationHandler } from './dev-missing-translation.handler';
 import { MergedTranslateLoader } from './merged-translate.loader';
 import { registerTranslator } from './translator';
@@ -34,6 +36,7 @@ import { registerTranslator } from './translator';
  *   template changes.
  * - Bootstrap waits for the language file, so `instant()` is safe anywhere
  *   after it (TS-built menus, the plain-function `translate()`).
+ * - Route `title`s are keys, rendered in the UI language (`AppTitleStrategy`).
  */
 export function provideAppI18n(): EnvironmentProviders {
   registerLocaleData(localeEnGb);
@@ -49,6 +52,7 @@ export function provideAppI18n(): EnvironmentProviders {
     }),
     { provide: LOCALE_ID, useValue: appLocale() },
     { provide: LANGUAGE_SYNC_ENABLED, useValue: true },
+    { provide: TitleStrategy, useClass: AppTitleStrategy },
     provideAppInitializer(() => {
       const translateService = inject(TranslateService);
       inject(DOCUMENT).documentElement.lang = language;

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" />
     </ion-buttons>
-    <ion-title>Switch role</ion-title>
+    <ion-title>{{ 'role.switch' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,7 +11,7 @@
   <div class="mh-page">
     <div>
       <ion-text color="medium">
-        <p>Changes your home, tabs and notifications.</p>
+        <p>{{ 'home.switchRole.intro' | translate }}</p>
       </ion-text>
     </div>
 
@@ -42,7 +42,7 @@
         <ion-label class="ion-text-wrap">
           <h2>
             {{ role.label }}
-            <ion-badge color="medium">Coming soon</ion-badge>
+            <ion-badge color="medium">{{ 'home.switchRole.comingSoon' | translate }}</ion-badge>
           </h2>
           <p>{{ role.description }}</p>
         </ion-label>
@@ -52,7 +52,7 @@
 
     <div class="ion-text-center">
       <ion-text color="medium">
-        <p>Your data stays in one account — switching only changes what you see.</p>
+        <p>{{ 'home.switchRole.footnote' | translate }}</p>
       </ion-text>
     </div>
   </div>

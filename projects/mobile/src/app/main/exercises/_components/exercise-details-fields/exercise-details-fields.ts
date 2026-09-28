@@ -11,6 +11,7 @@ import {
   IonTextarea,
   IonToggle,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { ExerciseDraftForm } from '../../exercise-draft';
@@ -43,6 +44,7 @@ import {
     IonSelectOption,
     IonTextarea,
     IonToggle,
+    TranslatePipe,
   ],
   templateUrl: './exercise-details-fields.html',
   styleUrl: './exercise-details-fields.scss',

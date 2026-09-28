@@ -1,4 +1,5 @@
 import { Component, effect, inject, model, signal, untracked } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import { ProfileService, normalizeUrl } from 'core';
@@ -11,7 +12,7 @@ import { AccountStore } from '../../account.store';
 /** The instructor profile's `socialLinks` — coach accounts only. */
 @Component({
   selector: 'mh-links-sheet',
-  imports: [SheetShell, SocialLinksFields],
+  imports: [SheetShell, SocialLinksFields, TranslatePipe],
   templateUrl: './links-sheet.html',
   styleUrl: './links-sheet.scss',
 })
@@ -19,6 +20,7 @@ export class LinksSheet {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly links = signal<Record<string, string>>({});
@@ -39,7 +41,7 @@ export class LinksSheet {
 
     if (sameLinks(previous, next)) {
       this.open.set(false);
-      void this._feedbackService.info('No changes');
+      void this._feedbackService.info(this._translateService.instant('toast.detail.noChanges'));
       return;
     }
 
@@ -54,12 +56,17 @@ export class LinksSheet {
           this.saving.set(false);
           this._accountStore.patchInstructor(profile);
           this.open.set(false);
-          void this._feedbackService.success('Links updated');
+          void this._feedbackService.success(
+            this._translateService.instant('accountSheets.links.toast.updated'),
+          );
         },
         error: (error: unknown) => {
           this.saving.set(false);
           this._accountStore.patchInstructor({ socialLinks: previous });
-          void this._feedbackService.error(error, 'Could not update your links.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.links.toast.failed'),
+          );
         },
       });
   }

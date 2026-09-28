@@ -14,13 +14,13 @@ export const clientsRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./clients').then((m) => m.Clients),
-    title: 'Clients - MotionHive',
+    title: 'pageTitle.clients',
   },
   {
     // Before `:clientId`, or the parameterised route swallows the word.
     path: 'requests',
     loadComponent: () => import('./requests/requests').then((m) => m.Requests),
-    title: 'Requests - MotionHive',
+    title: 'pageTitle.requests',
   },
   {
     // A client's training and one logged workout. Mounted here rather than
@@ -34,13 +34,13 @@ export const clientsRoutes: Routes = [
     path: ':clientId/training',
     loadComponent: () =>
       import('../programs/client-training/client-training').then((m) => m.ClientTraining),
-    title: 'Training - MotionHive',
+    title: 'pageTitle.training',
   },
   {
     path: 'log/:id',
     loadComponent: () =>
       import('../programs/log-review/log-review').then((m) => m.LogReview),
-    title: 'Workout - MotionHive',
+    title: 'pageTitle.workout',
   },
   {
     // The client's user id, not the relationship id — it is what every
@@ -48,6 +48,6 @@ export const clientsRoutes: Routes = [
     path: ':clientId',
     loadComponent: () =>
       import('./client-detail/client-detail').then((m) => m.ClientDetail),
-    title: 'Client - MotionHive',
+    title: 'pageTitle.client',
   },
 ];

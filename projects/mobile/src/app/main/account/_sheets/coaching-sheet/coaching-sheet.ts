@@ -7,6 +7,7 @@ import {
   IonTextarea,
   IonToggle,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import { InstructorProfile, ProfileService, UpdateInstructorProfilePayload, normalizeUrl } from 'core';
@@ -38,6 +39,7 @@ const MAX_YEARS_OF_EXPERIENCE = 50;
     IonToggle,
     SheetShell,
     SocialLinksFields,
+    TranslatePipe,
   ],
   templateUrl: './coaching-sheet.html',
   styleUrl: './coaching-sheet.scss',
@@ -46,6 +48,7 @@ export class CoachingSheet {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
 
@@ -86,7 +89,7 @@ export class CoachingSheet {
     const patch = this._diff(profile);
     if (Object.keys(patch).length === 0) {
       this.open.set(false);
-      void this._feedbackService.info('No changes');
+      void this._feedbackService.info(this._translateService.instant('toast.detail.noChanges'));
       return;
     }
 
@@ -101,12 +104,17 @@ export class CoachingSheet {
           this.saving.set(false);
           this._accountStore.patchInstructor(updated);
           this.open.set(false);
-          void this._feedbackService.success('Coaching profile updated');
+          void this._feedbackService.success(
+            this._translateService.instant('accountSheets.coaching.toast.updated'),
+          );
         },
         error: (error: unknown) => {
           this.saving.set(false);
           this._accountStore.patchInstructor(profile);
-          void this._feedbackService.error(error, 'Could not update your coaching profile.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.coaching.toast.failed'),
+          );
         },
       });
   }

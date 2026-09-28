@@ -6,7 +6,7 @@
     <ion-title>{{ title() }}</ion-title>
     @if (!readOnly()) {
       <ion-buttons slot="end">
-        <ion-button [disabled]="!canSave() || saving()" (click)="save()">Save</ion-button>
+        <ion-button [disabled]="!canSave() || saving()" (click)="save()">{{ 'button.save' | translate }}</ion-button>
       </ion-buttons>
     }
   </ion-toolbar>
@@ -16,9 +16,9 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this routine"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.routine' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
@@ -37,14 +37,14 @@
     <div class="mh-page">
       @if (readOnly()) {
         <ion-note class="mh-note-block">
-          A MotionHive starter. Start it and it becomes yours to edit.
+          {{ 'workouts.routineBuilder.starterNote' | translate }}
         </ion-note>
       } @else {
         <ion-input
           fill="outline"
-          label="Routine name"
+          [label]="'workouts.routineBuilder.name.label' | translate"
           labelPlacement="stacked"
-          placeholder="Push day"
+          [placeholder]="'workouts.routineBuilder.name.placeholder' | translate"
           [value]="name()"
           (ionInput)="name.set($any($event).detail.value ?? '')"
         />
@@ -52,7 +52,7 @@
 
       <section class="mh-section">
         <div class="mh-section-head">
-          <span class="mh-kicker">Exercises</span>
+          <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
           @if (exercises().length) {
             <ion-note>{{ exercises().length }}</ion-note>
           }
@@ -82,30 +82,30 @@
                   type="button"
                   class="target"
                   [class.active]="isEditing(i, Targets.Reps)"
-                  [attr.aria-label]="'Target reps for ' + row.name"
+                  [attr.aria-label]="'workouts.routineBuilder.targets.repsFor' | translate: { name: row.name }"
                   (click)="editTarget(i, Targets.Reps)"
                 >
-                  <span class="mh-kicker">Reps</span>
+                  <span class="mh-kicker">{{ 'workouts.routineBuilder.targets.reps' | translate }}</span>
                   <strong>{{ targetLabel(row, Targets.Reps) }}</strong>
                 </button>
                 <button
                   type="button"
                   class="target"
                   [class.active]="isEditing(i, Targets.Weight)"
-                  [attr.aria-label]="'Target weight for ' + row.name"
+                  [attr.aria-label]="'workouts.routineBuilder.targets.weightFor' | translate: { name: row.name }"
                   (click)="editTarget(i, Targets.Weight)"
                 >
-                  <span class="mh-kicker">Weight</span>
-                  <strong>{{ targetLabel(row, Targets.Weight) }}<em>kg</em></strong>
+                  <span class="mh-kicker">{{ 'workouts.routineBuilder.targets.weight' | translate }}</span>
+                  <strong>{{ targetLabel(row, Targets.Weight) }}<em>{{ 'workouts.units.kgShort' | translate }}</em></strong>
                 </button>
               </div>
 
               <div class="controls">
-                <div class="mh-stepper" role="group" [attr.aria-label]="'Sets for ' + row.name">
+                <div class="mh-stepper" role="group" [attr.aria-label]="'workouts.routineBuilder.stepper.group' | translate: { name: row.name }">
                   <ion-button
                     fill="clear"
                     [disabled]="row.sets <= 1"
-                    [attr.aria-label]="'One set fewer for ' + row.name"
+                    [attr.aria-label]="'workouts.routineBuilder.stepper.fewer' | translate: { name: row.name }"
                     (click)="setCount(i, -1)"
                   >
                     <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
@@ -114,12 +114,12 @@
                   <!-- The number says what it is. "3" alone between two circles
                        told the user nothing. -->
                   <span class="value" aria-live="polite">
-                    {{ row.sets }} <em>{{ row.sets === 1 ? 'set' : 'sets' }}</em>
+                    {{ row.sets }} <em>{{ 'workouts.routineBuilder.stepper.unit' | translate: { count: row.sets } }}</em>
                   </span>
 
                   <ion-button
                     fill="clear"
-                    [attr.aria-label]="'One set more for ' + row.name"
+                    [attr.aria-label]="'workouts.routineBuilder.stepper.more' | translate: { name: row.name }"
                     (click)="setCount(i, 1)"
                   >
                     <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
@@ -130,7 +130,7 @@
                   class="mh-remove"
                   fill="outline"
                   color="danger"
-                  [attr.aria-label]="'Remove ' + row.name"
+                  [attr.aria-label]="'a11y.removeItem' | translate: { name: row.name }"
                   (click)="remove(i)"
                 >
                   <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
@@ -140,7 +140,7 @@
           }
 
           @if (!exercises().length) {
-            <ion-note class="mh-note-block">No exercises yet — add the movements in the order you do them.</ion-note>
+            <ion-note class="mh-note-block">{{ 'workouts.routineBuilder.noExercises' | translate }}</ion-note>
           }
         }
       </section>
@@ -148,7 +148,7 @@
       @if (!readOnly()) {
         <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="pickerOpen.set(true)">
           <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-          Add exercises
+          {{ 'workouts.common.addExercises' | translate }}
         </ion-button>
 
         @if (!isNew()) {
@@ -156,7 +156,7 @@
           <ion-list [inset]="true" class="mh-card-list">
             <ion-item button detail="false" lines="none" (click)="deleteOpen.set(true)">
               <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
-              <ion-label color="danger">Delete routine…</ion-label>
+              <ion-label color="danger">{{ 'workouts.routineBuilder.deleteRow' | translate }}</ion-label>
             </ion-item>
           </ion-list>
         }
@@ -179,7 +179,7 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
-        <ion-button expand="block" [disabled]="starting()" (click)="start()">Start workout</ion-button>
+        <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
       </div>
     </ion-toolbar>
   </ion-footer>
@@ -187,18 +187,18 @@
 
 <mh-exercise-picker-sheet
   [(open)]="pickerOpen"
-  title="Add exercises"
-  [context]="name() || 'this routine'"
+  [title]="'workouts.common.addExercises' | translate"
+  [context]="name() || ('workouts.routineBuilder.thisRoutine' | translate)"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
 />
 
 <mh-confirm-sheet
   [(open)]="deleteOpen"
-  title="Delete routine"
+  [title]="'workouts.routineBuilder.delete.title' | translate"
   [body]="deleteBody()"
-  confirmLabel="Delete"
-  cancelLabel="Keep it"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   [saving]="deleting()"
   (confirm)="confirmDelete()"

@@ -4,7 +4,7 @@
     <ion-item-option
       color="primary"
       [expandable]="true"
-      [attr.aria-label]="isUnread() ? 'Mark read' : 'Mark unread'"
+      [attr.aria-label]="(isUnread() ? 'notifications.markRead' : 'notifications.markUnread') | translate"
       (click)="emitAndClose(sliding, toggleRead)"
     >
       <ion-icon slot="icon-only" name="checkmark-done-outline" />
@@ -24,7 +24,7 @@
     <ion-label>
       <div class="head">
         @if (isUnread()) {
-        <span class="dot" aria-label="Unread"></span>
+        <span class="dot" [attr.aria-label]="'a11y.unread' | translate"></span>
         }
         <span class="title">{{ notification().title }}</span>
         <ion-note>{{ time() }}</ion-note>
@@ -42,11 +42,11 @@
        it lives there in the DOM too and never jumps. Delete is never
        expandable: a full swipe must not reach an action you cannot undo. -->
   <ion-item-options side="end" (ionSwipe)="emitAndClose(sliding, dismiss)">
-    <ion-item-option color="danger" aria-label="Delete" (click)="emitAndClose(sliding, remove)">
+    <ion-item-option color="danger" [attr.aria-label]="'button.delete' | translate" (click)="emitAndClose(sliding, remove)">
       <ion-icon slot="icon-only" name="trash-outline" />
     </ion-item-option>
     <ion-item-option color="medium" [expandable]="true" (click)="emitAndClose(sliding, dismiss)">
-      Dismiss
+      {{ 'button.dismiss' | translate }}
     </ion-item-option>
   </ion-item-options>
 </ion-item-sliding>

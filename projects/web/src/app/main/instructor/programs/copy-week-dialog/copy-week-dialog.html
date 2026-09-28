@@ -1,15 +1,15 @@
 <p-dialog [(visible)]="visible" [modal]="true" [appendTo]="'body'" [style]="{ width: '26rem' }"
-  [breakpoints]="{ '640px': '95vw' }" header="Copy week">
+  [breakpoints]="{ '640px': '95vw' }" [header]="'programs.copyWeek.title' | translate">
   <div class="flex flex-col gap-3.5 pt-1">
     <p class="m-0 text-sm text-muted-color">
-      Copy every workout of
-      <strong class="text-color">Week {{ sourceWeekIndex() + 1 }}</strong>
-      — exercises and prescribed sets included — into another week.
+      {{ 'programs.copyWeek.intro.before' | translate }}
+      <strong class="text-color">{{ 'programs.common.week' | translate: { week: sourceWeekIndex() + 1 } }}</strong>
+      {{ 'programs.copyWeek.intro.after' | translate }}
     </p>
 
     <div class="flex flex-col gap-1.5">
       <label for="copyWeekTarget" class="text-xs font-semibold text-surface-800 dark:text-surface-200">
-        Copy into
+        {{ 'programs.common.copyInto' | translate }}
       </label>
       <p-select inputId="copyWeekTarget" [options]="weekOptions()" [ngModel]="targetWeek()"
         (ngModelChange)="targetWeek.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled"
@@ -18,17 +18,17 @@
 
     @if (targetOccupancy() > 0) {
     <p class="m-0 text-2xs text-warning-color">
-      Week {{ targetWeek() + 1 }} already has
-      {{ targetOccupancy() === 1 ? '1 workout' : targetOccupancy() + ' workouts' }}.
-      They will be replaced.
+      {{ 'programs.copyWeek.occupied' | translate: { week: targetWeek() + 1, count: targetOccupancy() } }}
     </p>
     } @else {
-    <p class="m-0 text-2xs text-muted-color">Week {{ targetWeek() + 1 }} is empty — nothing to overwrite.</p>
+    <p class="m-0 text-2xs text-muted-color">
+      {{ 'programs.copyWeek.empty' | translate: { week: targetWeek() + 1 } }}
+    </p>
     }
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="!canSubmit()" (click)="submit()">
       <i class="pi pi-copy"></i>
       {{ submitLabel() }}

@@ -3,15 +3,15 @@
 <div class="flex flex-col gap-3 lg:gap-4 flex-1 min-h-0 w-full max-w-285 mx-auto">
   <header class="flex items-center gap-2 md:gap-3 min-w-0">
     <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="back()"
-      aria-label="Back to progress" iconOnly>
+      [attr.aria-label]="'training.exerciseProgress.backAria' | translate" iconOnly>
       <i class="pi pi-arrow-left"></i>
     </button>
     <div class="space-y-1 min-w-0">
       <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">
-        {{ d?.exercise?.name ?? 'Exercise' }}
+        {{ d?.exercise?.name ?? ('exercises.common.exercise' | translate) }}
       </h1>
       <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-        {{ sessions().length }} session{{ sessions().length === 1 ? '' : 's' }} logged
+        {{ 'training.exerciseProgress.sessionsLogged' | translate: { count: sessions().length } }}
       </p>
     </div>
   </header>
@@ -22,8 +22,8 @@
 
   @else if (d) {
   @if (!sessions().length) {
-  <mh-list-empty-state icon="pi pi-chart-line" title="Nothing logged yet"
-    message="Once you log a set of this exercise, its history shows up here." />
+  <mh-list-empty-state icon="pi pi-chart-line" [title]="'training.exerciseProgress.empty.title' | translate"
+    [message]="'training.exerciseProgress.empty.message' | translate" />
   } @else {
 
   <!-- Estimated 1RM, with the sparkline in the same block. -->
@@ -32,15 +32,17 @@
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <div class="flex items-baseline gap-2">
-          <span class="font-heading text-2xl font-semibold tabular-nums">{{ best() }} kg</span>
+          <span class="font-heading text-2xl font-semibold tabular-nums">{{ 'training.common.weightKg' | translate: {
+            weight: formatNumber(best() ?? 0) } }}</span>
           @if (trendKg() !== null && (trendKg() ?? 0) !== 0) {
           <span class="text-xs font-semibold"
             [class.text-green-600]="(trendKg() ?? 0) > 0" [class.text-muted-color]="(trendKg() ?? 0) < 0">
-            {{ (trendKg() ?? 0) > 0 ? '+' : '' }}{{ trendKg() }} kg
+            {{ (trendKg() ?? 0) > 0 ? '+' : '' }}{{ 'training.common.weightKg' | translate: {
+            weight: formatNumber(trendKg() ?? 0) } }}
           </span>
           }
         </div>
-        <div class="mt-0.5 text-[11.5px] text-muted-color">Best estimated 1RM</div>
+        <div class="mt-0.5 text-[11.5px] text-muted-color">{{ 'training.exerciseProgress.bestEstimated' | translate }}</div>
       </div>
 
       @if (sparkline()) {
@@ -55,7 +57,7 @@
 
   <!-- Session history, newest first. -->
   <p-card>
-    <div class="mb-1 text-sm font-semibold">Sessions</div>
+    <div class="mb-1 text-sm font-semibold">{{ 'training.exerciseProgress.sessions' | translate }}</div>
     <div class="flex flex-col">
       @for (s of sessions(); track s.workoutLogId) {
       <button type="button"
@@ -67,7 +69,7 @@
         <span class="min-w-0 flex-1">
           <span class="block truncate text-[13px] font-semibold">{{ s.workoutName }}</span>
           <span class="block text-[11px] text-muted-color">
-            {{ s.setCount }} set{{ s.setCount === 1 ? '' : 's' }}
+            {{ 'count.sets' | translate: { count: s.setCount } }}
           </span>
         </span>
         <span class="shrink-0 font-heading text-sm font-semibold tabular-nums">

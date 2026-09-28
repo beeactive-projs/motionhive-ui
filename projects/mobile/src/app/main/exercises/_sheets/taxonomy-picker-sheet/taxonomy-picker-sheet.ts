@@ -7,6 +7,7 @@ import {
   IonNote,
   IonSearchbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { SearchbarAutofocusDirective } from '../../../../_shared/directives/searchbar-autofocus.directive';
@@ -37,6 +38,7 @@ import { TaxonomyOption, selectionCounter } from '../../exercises.config';
     IonSearchbar,
     SearchbarAutofocusDirective,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './taxonomy-picker-sheet.html',
   styleUrl: './taxonomy-picker-sheet.scss',
@@ -48,7 +50,8 @@ export class TaxonomyPickerSheet {
   readonly selectedIds = input<readonly string[]>([]);
   /** Null for the uncapped lists (secondary, stabilizers, equipment). */
   readonly max = input<number | null>(null);
-  readonly searchPlaceholder = input('Search');
+  /** Empty falls back to the generic "Search". */
+  readonly searchPlaceholder = input('');
   /** Shown under the search field — why the cap exists, where there is one. */
   readonly hint = input('');
 

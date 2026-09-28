@@ -1,10 +1,10 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   OnInit,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PublicProfileStore, type Product } from 'core';
 import { AvatarModule } from 'primeng/avatar';
 import { Card } from 'primeng/card';
@@ -13,9 +13,8 @@ import { OfferingCard } from './offering-card/offering-card';
 
 @Component({
   selector: 'mh-public-profile-offerings-tab',
-  imports: [AvatarModule, Card, SkeletonModule, OfferingCard],
+  imports: [AvatarModule, Card, SkeletonModule, OfferingCard, TranslatePipe],
   templateUrl: './offerings-tab.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfferingsTab implements OnInit {
   private readonly _store = inject(PublicProfileStore);

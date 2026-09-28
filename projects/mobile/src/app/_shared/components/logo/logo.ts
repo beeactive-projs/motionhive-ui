@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonButton } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * The MotionHive hex mark as the tab-root header's leading action — it goes
@@ -19,7 +20,7 @@ import { IonButton } from '@ionic/angular/standalone';
  */
 @Component({
   selector: 'mh-logo',
-  imports: [IonButton, RouterLink],
+  imports: [IonButton, RouterLink, TranslatePipe],
   templateUrl: './logo.html',
   styleUrl: './logo.scss',
 })

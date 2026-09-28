@@ -3,15 +3,14 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home/account" />
     </ion-buttons>
-    <ion-title>Blocked users</ion-title>
+    <ion-title>{{ 'account.rows.blockedUsers' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="mh-page">
     <ion-note class="mh-note-block" color="medium">
-      People you block can't message you, see your conversation history, or appear in your message
-      list.
+      {{ 'account.blockedUsers.intro' | translate }}
     </ion-note>
 
     @if (loading()) {
@@ -29,16 +28,16 @@
     } @else if (loadFailed()) {
       <mh-empty-state
         icon="alert-circle-outline"
-        heading="Couldn't load your blocked list"
-        message="Check your connection and try again."
-        actionLabel="Try again"
+        [heading]="'account.blockedUsers.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
         (action)="load()"
       />
     } @else if (blocks().length === 0) {
       <mh-empty-state
         icon="shield-checkmark-outline"
-        heading="No blocked users"
-        message="When you block someone from a conversation, they'll appear here so you can unblock them later."
+        [heading]="'account.blockedUsers.empty.heading' | translate"
+        [message]="'account.blockedUsers.empty.message' | translate"
       />
     } @else {
       <ion-list [inset]="true" class="mh-card-list">
@@ -51,7 +50,7 @@
             />
             <ion-label class="ion-text-wrap">
               <h3>{{ nameOf(block) }}</h3>
-              <p>Blocked {{ block.createdAt | date: 'd MMM yyyy' }}</p>
+              <p>{{ 'account.blockedUsers.blockedOn' | translate: { date: (block.createdAt | date: 'd MMM yyyy') } }}</p>
             </ion-label>
             <ion-button
               slot="end"
@@ -60,7 +59,7 @@
               [disabled]="isUnblocking(block.blockedId)"
               (click)="unblock(block)"
             >
-              Unblock
+              {{ 'account.blockedUsers.unblock' | translate }}
             </ion-button>
           </ion-item>
         }

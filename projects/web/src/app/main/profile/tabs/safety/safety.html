@@ -3,11 +3,9 @@
 <p-card class="shadow-md">
   <div class="mh-safety">
     <header class="mh-safety__header">
-      <h2 class="mh-safety__title">Blocked users</h2>
+      <h2 class="mh-safety__title">{{ 'profileTabs.safety.title' | translate }}</h2>
       <p class="mh-safety__lead">
-        People you block can't send you messages, see your conversation history
-        with them, or appear in your message list. Unblocking only restores
-        their ability to contact you — old messages stay removed from your inbox.
+        {{ 'profileTabs.safety.lead' | translate }}
       </p>
     </header>
 
@@ -27,10 +25,9 @@
     } @else if (blocks().length === 0) {
     <div class="mh-safety__empty">
       <i class="pi pi-shield mh-safety__empty-icon" aria-hidden="true"></i>
-      <p class="mh-safety__empty-title">No blocked users</p>
+      <p class="mh-safety__empty-title">{{ 'profileTabs.safety.empty.title' | translate }}</p>
       <p class="mh-safety__empty-sub">
-        When you block someone from a conversation, they'll appear here so you
-        can unblock them later if you change your mind.
+        {{ 'profileTabs.safety.empty.message' | translate }}
       </p>
     </div>
     } @else {
@@ -45,13 +42,13 @@
             @if (reasonLabel(row); as r) {
             <span class="mh-safety__chip">{{ r }}</span>
             }
-            <span class="mh-safety__date">Blocked {{ formattedDate(row.createdAt) }}</span>
+            <span class="mh-safety__date">{{ 'profileTabs.safety.blockedOn' | translate: { date: formattedDate(row.createdAt) } }}</span>
           </div>
         </div>
         <!-- TODO action-system: role? Unblock is restorative, treated as Secondary -->
         <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="isUnblocking(row)" (click)="unblock(row)">
           <i class="pi" [class]="isUnblocking(row) ? 'pi-spinner pi-spin' : 'pi-check-circle'"></i>
-          Unblock
+          {{ 'profileTabs.safety.unblock' | translate }}
         </button>
       </li>
       }

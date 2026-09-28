@@ -1,7 +1,7 @@
 <!-- Header -->
 <header class="mb-6 space-y-1">
-  <h1 class="font-heading font-semibold text-xl md:text-2xl">Welcome back, {{ _authStore.userName() }}</h1>
-  <p class="text-sm text-muted-color">Here's your coaching overview.</p>
+  <h1 class="font-heading font-semibold text-xl md:text-2xl">{{ 'coachDashboard.header.title' | translate: { name: _authStore.userName() } }}</h1>
+  <p class="text-sm text-muted-color">{{ 'coachDashboard.header.subtitle' | translate }}</p>
 </header>
 
 <!-- KPI stats -->
@@ -12,10 +12,10 @@
       <p-avatar icon="pi pi-users" shape="circle" size="normal"
         [style]="{ background: 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
       <div class="min-w-0">
-        <div class="text-xs text-surface-500 leading-tight">Active clients</div>
+        <div class="text-xs text-surface-500 leading-tight">{{ 'coachDashboard.kpi.activeClients' | translate }}</div>
         <div class="font-semibold text-lg leading-tight">{{ activeClientCount() }}</div>
         @if (pendingClientCount() > 0) {
-        <div class="text-xs text-orange-500 leading-tight">{{ pendingClientCount() }} pending</div>
+        <div class="text-xs text-orange-500 leading-tight">{{ 'coachDashboard.kpi.pending' | translate: { count: pendingClientCount() } }}</div>
         }
       </div>
     </div>
@@ -26,9 +26,9 @@
       <p-avatar icon="pi pi-sitemap" shape="circle" size="normal"
         [style]="{ background: 'var(--p-green-100)', color: 'var(--p-green-600)' }" />
       <div class="min-w-0">
-        <div class="text-xs text-surface-500 leading-tight">Groups</div>
+        <div class="text-xs text-surface-500 leading-tight">{{ 'nav.groups' | translate }}</div>
         <div class="font-semibold text-lg leading-tight">{{ groups().length }}</div>
-        <div class="text-xs text-surface-400 leading-tight">{{ totalMembers() }} members</div>
+        <div class="text-xs text-surface-400 leading-tight">{{ 'count.members' | translate: { count: totalMembers() } }}</div>
       </div>
     </div>
   </p-card>
@@ -38,7 +38,7 @@
       <p-avatar icon="pi pi-chart-line" shape="circle" size="normal"
         [style]="{ background: 'var(--p-teal-100)', color: 'var(--p-teal-600)' }" />
       <div class="min-w-0">
-        <div class="text-xs text-surface-500 leading-tight">Revenue this month</div>
+        <div class="text-xs text-surface-500 leading-tight">{{ 'coachDashboard.kpi.revenueThisMonth' | translate }}</div>
         <div class="font-semibold text-lg leading-tight text-primary-600">
           {{ earnings().monthToDateRevenueCents | currencyRon: earnings().currency }}
         </div>
@@ -51,12 +51,12 @@
       <p-avatar icon="pi pi-receipt" shape="circle" size="normal"
         [style]="{ background: 'var(--p-orange-100)', color: 'var(--p-orange-600)' }" />
       <div class="min-w-0">
-        <div class="text-xs text-surface-500 leading-tight">Outstanding</div>
+        <div class="text-xs text-surface-500 leading-tight">{{ 'coachDashboard.kpi.outstanding' | translate }}</div>
         <div class="font-semibold text-lg leading-tight text-orange-500">
           {{ earnings().outstandingInvoicesCents | currencyRon: earnings().currency }}
         </div>
         @if (earnings().overdueInvoiceCount > 0) {
-        <div class="text-xs text-red-500 leading-tight">{{ earnings().overdueInvoiceCount }} overdue</div>
+        <div class="text-xs text-red-500 leading-tight">{{ 'coachDashboard.kpi.overdue' | translate: { count: earnings().overdueInvoiceCount } }}</div>
         }
       </div>
     </div>
@@ -70,7 +70,7 @@
   <p-card class="lg:col-span-3 shadow-md">
     <ng-template #header>
       <div class="px-4 pt-4 pb-3">
-        <h2 class="text-xs font-bold uppercase tracking-widest text-surface-500 m-0 mb-3">Recent activities</h2>
+        <h2 class="text-xs font-bold uppercase tracking-widest text-surface-500 m-0 mb-3">{{ 'coachDashboard.activity.title' | translate }}</h2>
         <div class="flex flex-wrap items-center gap-2">
           <p-select [options]="locationOptions" [(ngModel)]="selectedLocation" [appendTo]="'body'" size="small" />
           <p-select [options]="eventOptions" [(ngModel)]="selectedEvent" [appendTo]="'body'" size="small" />
@@ -83,7 +83,7 @@
     @if (recentActivities().length === 0) {
     <div class="flex flex-col items-center justify-center py-10 text-center">
       <i class="pi pi-bell text-3xl text-surface-300 mb-2"></i>
-      <p class="text-sm text-surface-400 m-0">No recent activities.</p>
+      <p class="text-sm text-surface-400 m-0">{{ 'coachDashboard.activity.empty' | translate }}</p>
     </div>
     } @else {
     <div>
@@ -108,8 +108,8 @@
   <p-card class="lg:col-span-2 shadow-md">
     <ng-template #header>
       <div class="flex items-center justify-between px-4 pt-4">
-        <h2 class="text-base font-semibold m-0">Recent clients</h2>
-        <a routerLink="/coaching/clients" class="text-sm text-primary-600 hover:underline no-underline">View all</a>
+        <h2 class="text-base font-semibold m-0">{{ 'coachDashboard.clients.title' | translate }}</h2>
+        <a routerLink="/coaching/clients" class="text-sm text-primary-600 hover:underline no-underline">{{ 'coachDashboard.viewAll' | translate }}</a>
       </div>
       <p-divider />
     </ng-template>
@@ -117,7 +117,7 @@
     @if (clients().length === 0) {
     <div class="flex flex-col items-center justify-center py-6 text-center">
       <i class="pi pi-users text-3xl mb-2 text-surface-400"></i>
-      <p class="text-surface-500 text-sm m-0">No clients yet. Start by inviting someone.</p>
+      <p class="text-surface-500 text-sm m-0">{{ 'coachDashboard.clients.empty' | translate }}</p>
     </div>
     } @else {
     <div class="flex flex-col gap-3">
@@ -143,7 +143,7 @@
 <p-card class="mb-4 shadow-md">
   <ng-template #header>
     <div class="px-4 pt-4">
-      <h2 class="text-base font-semibold m-0">Business growth (past 12 months)</h2>
+      <h2 class="text-base font-semibold m-0">{{ 'coachDashboard.growth.title' | translate }}</h2>
     </div>
     <p-divider />
   </ng-template>
@@ -155,59 +155,56 @@
 
   <p-card class="shadow-md">
     <div class="flex items-center gap-1.5 mb-4">
-      <h2 class="text-sm font-semibold m-0">Average client sign-ins per week</h2>
+      <h2 class="text-sm font-semibold m-0">{{ 'coachDashboard.stats.signIns.title' | translate }}</h2>
       <i class="pi pi-question-circle text-surface-400 text-xs"></i>
     </div>
     <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
       <ng-container *ngTemplateOutlet="statsEmptyIcon" />
-      <p class="font-medium text-sm m-0">Weekly snapshot coming soon</p>
+      <p class="font-medium text-sm m-0">{{ 'coachDashboard.stats.signIns.emptyTitle' | translate }}</p>
       <p class="text-xs text-surface-400 m-0 max-w-xs">
-        Your weekly business metrics is calculated every week on Sunday night.
+        {{ 'coachDashboard.stats.signIns.emptyHint' | translate }}
       </p>
     </div>
   </p-card>
 
   <p-card class="shadow-md">
     <div class="flex items-center gap-1.5 mb-4">
-      <h2 class="text-sm font-semibold m-0">Average workouts per week</h2>
+      <h2 class="text-sm font-semibold m-0">{{ 'coachDashboard.stats.workouts.title' | translate }}</h2>
       <i class="pi pi-question-circle text-surface-400 text-xs"></i>
     </div>
     <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
       <ng-container *ngTemplateOutlet="statsEmptyIcon" />
-      <p class="font-medium text-sm m-0">Hmmm... we can't find any stats to graph yet</p>
+      <p class="font-medium text-sm m-0">{{ 'coachDashboard.stats.noStatsYet' | translate }}</p>
       <p class="text-xs text-surface-400 m-0 max-w-xs">
-        Make sure you've added clients and scheduled some workouts for them. Weekly snapshots are
-        calculated every Sunday night.
+        {{ 'coachDashboard.stats.workouts.emptyHint' | translate }}
       </p>
     </div>
   </p-card>
 
   <p-card class="shadow-md">
     <div class="flex items-center gap-1.5 mb-4">
-      <h2 class="text-sm font-semibold m-0">Average exercise compliance</h2>
+      <h2 class="text-sm font-semibold m-0">{{ 'coachDashboard.stats.exercise.title' | translate }}</h2>
       <i class="pi pi-question-circle text-surface-400 text-xs"></i>
     </div>
     <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
       <ng-container *ngTemplateOutlet="statsEmptyIcon" />
-      <p class="font-medium text-sm m-0">Hmmm... we can't find any stats to graph yet</p>
+      <p class="font-medium text-sm m-0">{{ 'coachDashboard.stats.noStatsYet' | translate }}</p>
       <p class="text-xs text-surface-400 m-0 max-w-xs">
-        Make sure you've added clients and set up their exercise plans. Weekly snapshots are
-        calculated every Sunday night.
+        {{ 'coachDashboard.stats.exercise.emptyHint' | translate }}
       </p>
     </div>
   </p-card>
 
   <p-card class="shadow-md">
     <div class="flex items-center gap-1.5 mb-4">
-      <h2 class="text-sm font-semibold m-0">Average nutrition compliance</h2>
+      <h2 class="text-sm font-semibold m-0">{{ 'coachDashboard.stats.nutrition.title' | translate }}</h2>
       <i class="pi pi-question-circle text-surface-400 text-xs"></i>
     </div>
     <div class="flex flex-col items-center justify-center py-8 text-center gap-2">
       <ng-container *ngTemplateOutlet="statsEmptyIcon" />
-      <p class="font-medium text-sm m-0">Hmmm... we can't find any stats to graph yet</p>
+      <p class="font-medium text-sm m-0">{{ 'coachDashboard.stats.noStatsYet' | translate }}</p>
       <p class="text-xs text-surface-400 m-0 max-w-xs">
-        Make sure you've added clients and set up their nutrition goals and meal tracking. Weekly
-        snapshots are calculated every Sunday night.
+        {{ 'coachDashboard.stats.nutrition.emptyHint' | translate }}
       </p>
     </div>
   </p-card>
@@ -221,8 +218,8 @@
   <p-card class="shadow-md">
     <ng-template #header>
       <div class="flex items-center justify-between px-4 pt-4">
-        <h2 class="text-base font-semibold m-0">Groups</h2>
-        <a routerLink="/groups" class="text-sm text-primary-600 hover:underline no-underline">View all</a>
+        <h2 class="text-base font-semibold m-0">{{ 'nav.groups' | translate }}</h2>
+        <a routerLink="/groups" class="text-sm text-primary-600 hover:underline no-underline">{{ 'coachDashboard.viewAll' | translate }}</a>
       </div>
       <p-divider />
     </ng-template>
@@ -230,7 +227,7 @@
     @if (groups().length === 0) {
     <div class="flex flex-col items-center justify-center py-6 text-center">
       <i class="pi pi-sitemap text-3xl mb-2 text-surface-400"></i>
-      <p class="text-surface-500 text-sm m-0">No groups yet.</p>
+      <p class="text-surface-500 text-sm m-0">{{ 'coachDashboard.groups.empty' | translate }}</p>
     </div>
     } @else {
     <div class="flex flex-col gap-3">
@@ -240,9 +237,9 @@
           [style]="{ background: 'var(--p-green-100)', color: 'var(--p-green-600)' }" />
         <div class="flex-1 min-w-0">
           <div class="font-medium text-sm truncate">{{ group.name }}</div>
-          <div class="text-xs text-surface-500">{{ group.memberCount }} members</div>
+          <div class="text-xs text-surface-500">{{ 'count.members' | translate: { count: group.memberCount } }}</div>
         </div>
-        <p-tag [value]="joinPolicyLabel(group.joinPolicy)" [severity]="joinPolicySeverity(group.joinPolicy)" />
+        <p-tag [value]="group.joinPolicy | enumLabel: 'joinPolicy'" [severity]="joinPolicySeverity(group.joinPolicy)" />
       </div>
       }
     </div>
@@ -253,8 +250,8 @@
   <p-card class="shadow-md">
     <ng-template #header>
       <div class="flex items-center justify-between px-4 pt-4">
-        <h2 class="text-base font-semibold m-0">Recent invoices</h2>
-        <a routerLink="/coaching/payments" class="text-sm text-primary-600 hover:underline no-underline">View all</a>
+        <h2 class="text-base font-semibold m-0">{{ 'coachDashboard.invoices.title' | translate }}</h2>
+        <a routerLink="/coaching/payments" class="text-sm text-primary-600 hover:underline no-underline">{{ 'coachDashboard.viewAll' | translate }}</a>
       </div>
       <p-divider />
     </ng-template>
@@ -262,7 +259,7 @@
     @if (recentInvoices().length === 0) {
     <div class="flex flex-col items-center justify-center py-6 text-center">
       <i class="pi pi-file-invoice text-3xl mb-2 text-surface-400"></i>
-      <p class="text-surface-500 text-sm m-0">No invoices yet.</p>
+      <p class="text-surface-500 text-sm m-0">{{ 'coachDashboard.invoices.empty' | translate }}</p>
     </div>
     } @else {
     <div class="flex flex-col gap-3">
@@ -272,9 +269,9 @@
           <div class="font-medium text-sm truncate">{{ invoice.clientEmail }}</div>
           <div class="text-xs text-surface-500">
             @if (invoice.dueDate) {
-            Due {{ invoice.dueDate | date:'dd MMM' }}
+            {{ 'coachDashboard.invoices.due' | translate: { date: invoice.dueDate | date: 'dd MMM' } }}
             } @else {
-            No due date
+            {{ 'coachDashboard.invoices.noDueDate' | translate }}
             }
           </div>
         </div>
@@ -282,7 +279,7 @@
           <div class="font-semibold text-sm mb-1">
             {{ invoiceAmount(invoice) | currencyRon: invoice.currency }}
           </div>
-          <p-tag [value]="invoice.status | titlecase" [severity]="invoiceStatusSeverity(invoice.status)" />
+          <p-tag [value]="invoice.status | enumLabel: 'invoiceStatus'" [severity]="invoiceStatusSeverity(invoice.status)" />
         </div>
       </div>
       }

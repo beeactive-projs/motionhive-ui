@@ -6,7 +6,7 @@
       <span class="mh-fact-row__value">{{ value() }}</span>
     } @else {
       <span class="mh-fact-row__value mh-fact-row__value--placeholder">
-        {{ placeholder() }}
+        {{ placeholder() ?? ('form.placeholder.notSet' | translate) }}
       </span>
     }
   </div>
@@ -15,7 +15,7 @@
       class="mh-fact-row__chooser"
       [level]="privacyLevel()!"
       [locked]="lockedPrivacy()"
-      [lockedTooltip]="lockedTooltip() ?? 'This setting is managed by the system.'"
+      [lockedTooltip]="lockedTooltip()"
       (levelChange)="privacyChange.emit($event)"
     />
   }

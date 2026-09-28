@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -15,11 +14,13 @@ import { MessageService } from 'primeng/api';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   ProgressOverview,
   ProgressRange,
   ProgressService,
+  appLocale,
   showApiError,
 } from 'core';
 
@@ -44,7 +45,6 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
  */
 @Component({
   selector: 'mh-user-progress',
-  standalone: true,
   imports: [
     DatePipe,
     FormsModule,
@@ -54,14 +54,21 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
     ListEmptyState,
     SelectButton,
     Skeleton,
+    TranslatePipe,
   ],
   templateUrl: './progress.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Progress implements OnInit {
   private readonly _service = inject(ProgressService);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
+
+  /** Kilos, hours and averages — locale decimals, no grouping (as before). */
+  private readonly _numberFormat = new Intl.NumberFormat(appLocale(), {
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  });
 
   readonly data = signal<ProgressOverview | null>(null);
   readonly loading = signal(false);
@@ -76,9 +83,18 @@ export class Progress implements OnInit {
   readonly startWorkout = output<void>();
 
   readonly rangeOptions = [
-    { label: '4 weeks', value: '4w' as ProgressRange },
-    { label: '12 weeks', value: '12w' as ProgressRange },
-    { label: '1 year', value: '1y' as ProgressRange },
+    {
+      label: this._translateService.instant('count.weeks', { count: 4 }),
+      value: '4w' as ProgressRange,
+    },
+    {
+      label: this._translateService.instant('count.weeks', { count: 12 }),
+      value: '12w' as ProgressRange,
+    },
+    {
+      label: this._translateService.instant('training.progress.rangeOneYear'),
+      value: '1y' as ProgressRange,
+    },
   ];
 
   // ── Which version of the surface to render ───────────────────────
@@ -108,8 +124,12 @@ export class Progress implements OnInit {
   /** Compact for a stat tile: 61200 reads as "61.2k". */
   readonly volumeLabel = computed(() => {
     const v = this.volumeKg();
-    if (v >= 1000) return `${Math.round(v / 100) / 10}k`;
-    return String(v);
+    if (v >= 1000) {
+      return this._translateService.instant('training.progress.thousands', {
+        value: this.formatNumber(Math.round(v / 100) / 10),
+      });
+    }
+    return this.formatNumber(v);
   });
 
   readonly trainingHours = computed(() => {
@@ -126,8 +146,10 @@ export class Progress implements OnInit {
     const d = this.data();
     if (!d || d.previous.workouts === 0) return undefined;
     const delta = d.totals.workouts - d.previous.workouts;
-    if (delta === 0) return 'same as previous';
-    return `${delta > 0 ? '+' : ''}${delta} vs previous`;
+    if (delta === 0) return this._translateService.instant('training.progress.delta.same');
+    return this._translateService.instant('training.progress.delta.count', {
+      delta: `${delta > 0 ? '+' : ''}${delta}`,
+    });
   });
 
   readonly volumeDeltaLabel = computed(() => {
@@ -136,18 +158,22 @@ export class Progress implements OnInit {
     const pct = Math.round(
       ((d.totals.volumeKg - d.previous.volumeKg) / d.previous.volumeKg) * 100,
     );
-    if (pct === 0) return 'same as previous';
-    return `${pct > 0 ? '+' : ''}${pct}% vs previous`;
+    if (pct === 0) return this._translateService.instant('training.progress.delta.same');
+    return this._translateService.instant('training.progress.delta.percent', {
+      delta: `${pct > 0 ? '+' : ''}${pct}`,
+    });
   });
 
   readonly streakLabel = computed(() => {
     const w = this.data()?.streak.currentWeeks ?? 0;
-    return w === 1 ? '1 wk' : `${w} wks`;
+    return this._translateService.instant('training.progress.streakWeeks', { count: w });
   });
 
   readonly bestStreakLabel = computed(() => {
     const best = this.data()?.streak.bestWeeks ?? 0;
-    return best > 0 ? `best ${best}` : undefined;
+    return best > 0
+      ? this._translateService.instant('training.progress.bestStreak', { count: best })
+      : undefined;
   });
 
   readonly weeklyPerWeek = computed(() => {
@@ -209,12 +235,17 @@ export class Progress implements OnInit {
         this.loading.set(false);
         showApiError(
           this._messageService,
-          "Couldn't load your progress",
-          'Please try again.',
+          this._translateService.instant('training.progress.loadFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },
     });
+  }
+
+  /** Locale decimal separator, no grouping — `61.2` / `61,2`. */
+  formatNumber(value: number): string {
+    return this._numberFormat.format(value);
   }
 
   goToWorkouts(): void {

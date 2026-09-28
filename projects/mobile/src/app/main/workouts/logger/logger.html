@@ -1,12 +1,12 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="finish()">Finish</ion-button>
+      <ion-button (click)="finish()">{{ 'workouts.logger.finish' | translate }}</ion-button>
     </ion-buttons>
-    <ion-title>{{ store.log()?.name ?? 'Workout' }}</ion-title>
+    <ion-title>{{ store.log()?.name ?? ('workouts.common.workout' | translate) }}</ion-title>
     <ion-buttons slot="end">
       <ion-note class="progress">{{ store.progress().done }}/{{ store.progress().total }}</ion-note>
-      <ion-button aria-label="Discard workout" (click)="discardConfirmOpen.set(true)">
+      <ion-button [attr.aria-label]="'workouts.logger.discard.title' | translate" (click)="discardConfirmOpen.set(true)">
         <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
       </ion-button>
     </ion-buttons>
@@ -17,9 +17,9 @@
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this workout"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.workout' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.showSkeleton()) {
@@ -50,8 +50,8 @@
           @if (!exercise.isSkipped) {
             <!-- Column labels, once per exercise — the set rows stay wordless. -->
             <div class="grid-head">
-              <span class="num">Set</span>
-              <span class="prev">Prev</span>
+              <span class="num">{{ 'workouts.logger.gridHead.set' | translate }}</span>
+              <span class="prev">{{ 'workouts.logger.gridHead.prev' | translate }}</span>
               @for (column of columnsFor(exercise); track column) {
                 <span class="col">{{ column }}</span>
               }
@@ -75,7 +75,7 @@
             <div class="ex-actions">
               <ion-button fill="clear" size="small" (click)="addSet(exercise)">
                 <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                Add set
+                {{ 'workouts.logger.addSet' | translate }}
               </ion-button>
 
               <!-- Weighted pull-ups and dips still deserve a volume number, and
@@ -83,7 +83,7 @@
               @if (canAddWeight(exercise)) {
                 <ion-button fill="clear" size="small" (click)="addWeight(exercise)">
                   <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-                  Add weight
+                  {{ 'workouts.logger.addWeight' | translate }}
                 </ion-button>
               }
             </div>
@@ -94,7 +94,7 @@
       @if (store.exercises().length) {
         <ion-button class="mh-add-dashed" expand="block" fill="outline" (click)="addExercise()">
           <ion-icon slot="start" name="add-outline" aria-hidden="true" />
-          Add exercise
+          {{ 'workouts.logger.addExercise' | translate }}
         </ion-button>
       } @else {
         <!-- An empty workout is the freestyle on-ramp: the whole screen is one
@@ -102,9 +102,9 @@
              here yet. -->
         <mh-empty-state
           icon="barbell-outline"
-          heading="Add your first exercise"
-          message="Pick the movements as you go — nothing has to be planned up front."
-          actionLabel="Add exercise"
+          [heading]="'workouts.logger.empty.title' | translate"
+          [message]="'workouts.logger.empty.message' | translate"
+          [actionLabel]="'workouts.logger.addExercise' | translate"
           (action)="addExercise()"
         />
       }
@@ -144,7 +144,7 @@
   [(open)]="pickerOpen"
   [title]="pickerTitle()"
   [context]="pickerContext()"
-  [confirmVerb]="swapTarget() ? 'Swap for' : 'Add'"
+  [confirmVerb]="(swapTarget() ? 'workouts.logger.picker.swapFor' : 'button.add') | translate"
   [single]="swapTarget() !== null"
   [alreadyAdded]="addedIds()"
   (picked)="onPicked($event)"
@@ -152,10 +152,10 @@
 
 <mh-confirm-sheet
   [(open)]="removeConfirmOpen"
-  title="Remove exercise"
+  [title]="'workouts.logger.remove.title' | translate"
   [body]="removeBody()"
-  confirmLabel="Remove"
-  cancelLabel="Keep it"
+  [confirmLabel]="'button.remove' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   (confirm)="confirmRemove()"
 />
@@ -163,12 +163,12 @@
 <mh-confirm-sheet
   #discardSheet
   [(open)]="discardConfirmOpen"
-  title="Discard workout"
-  body="Everything logged in this session is deleted. Skipping a planned workout is a different thing — that keeps the record."
-  confirmLabel="Discard"
-  cancelLabel="Keep going"
+  [title]="'workouts.logger.discard.title' | translate"
+  [body]="'workouts.logger.discard.message' | translate"
+  [confirmLabel]="'button.discard' | translate"
+  [cancelLabel]="'workouts.common.keepGoing' | translate"
   tone="danger"
-  irreversible="This cannot be undone"
+  [irreversible]="'workouts.logger.discard.irreversible' | translate"
   [saving]="discarding()"
   (confirm)="confirmDiscard()"
 />
@@ -176,9 +176,9 @@
 <mh-confirm-sheet
   #finishSheet
   [(open)]="finishConfirmOpen"
-  title="Finish workout"
+  [title]="'workouts.logger.finishConfirm.title' | translate"
   [body]="finishBody()"
-  confirmLabel="Finish"
-  cancelLabel="Keep going"
+  [confirmLabel]="'workouts.logger.finish' | translate"
+  [cancelLabel]="'workouts.common.keepGoing' | translate"
   (confirm)="confirmFinish()"
 />

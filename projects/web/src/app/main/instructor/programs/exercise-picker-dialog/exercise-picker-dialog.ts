@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,6 +10,7 @@ import {
 } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { IconField } from 'primeng/iconfield';
@@ -24,6 +24,7 @@ import { concatMap, map, tap } from 'rxjs/operators';
 
 import {
   CreatePrescribedExercisePayload,
+  EnumLabelPipe,
   Exercise,
   ExerciseService,
   PrescribedExercise,
@@ -51,6 +52,8 @@ import {
   selector: 'mh-exercise-picker-dialog',
   imports: [
     LowerCasePipe,
+    EnumLabelPipe,
+    TranslatePipe,
     FormsModule,
     ButtonDirective,
     Dialog,
@@ -63,7 +66,6 @@ import {
   providers: [MessageService],
   templateUrl: './exercise-picker-dialog.html',
   styleUrl: './exercise-picker-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExercisePickerDialog {
   readonly program = input.required<Program>();
@@ -86,6 +88,7 @@ export class ExercisePickerDialog {
   private readonly _programService = inject(ProgramService);
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly query = signal('');
   readonly debouncedQuery = signal('');
@@ -110,10 +113,10 @@ export class ExercisePickerDialog {
   );
 
   readonly submitLabel = computed(() => {
-    if (this.emitOnly()) return 'Add to workout';
-    const n = this.selectedCount();
-    if (n <= 1) return 'Add exercise';
-    return `Add ${n} exercises`;
+    if (this.emitOnly()) return this._translateService.instant('programs.picker.addToWorkout');
+    return this._translateService.instant('programs.picker.submitAdd', {
+      count: Math.max(1, this.selectedCount()),
+    });
   });
 
   constructor() {
@@ -210,11 +213,19 @@ export class ExercisePickerDialog {
           this.submitting.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: saved.length === 1 ? 'Exercise added' : 'Exercises added',
+            summary: this._translateService.instant('programs.toast.exercisesAdded.summary', {
+              count: saved.length,
+            }),
             detail:
               saved.length === 1
-                ? `${picks[0].name} added to ${this.workout().name}.`
-                : `${saved.length} exercises added to ${this.workout().name}.`,
+                ? this._translateService.instant('programs.toast.exercisesAdded.detailOne', {
+                    name: picks[0].name,
+                    workout: this.workout().name,
+                  })
+                : this._translateService.instant('programs.toast.exercisesAdded.detailMany', {
+                    count: saved.length,
+                    workout: this.workout().name,
+                  }),
             life: 2500,
           });
           this.added.emit([...saved]);
@@ -234,10 +245,12 @@ export class ExercisePickerDialog {
           }
           showApiError(
             this._messageService,
-            "Couldn't add all exercises",
+            this._translateService.instant('programs.toast.addExercisesError.summary'),
             saved.length > 0
-              ? `${saved.length} added before the error — the rest are still selected.`
-              : 'Please try again.',
+              ? this._translateService.instant('programs.toast.addExercisesError.partial', {
+                  count: saved.length,
+                })
+              : this._translateService.instant('common.pleaseTryAgain'),
             err,
           );
         },
@@ -263,8 +276,8 @@ export class ExercisePickerDialog {
           this.loading.set(false);
           showApiError(
             this._messageService,
-            "Couldn't load exercises",
-            'Please refresh and try again.',
+            this._translateService.instant('programs.toast.loadExercisesError.summary'),
+            this._translateService.instant('programs.toast.loadExercisesError.detail'),
             err,
           );
         },

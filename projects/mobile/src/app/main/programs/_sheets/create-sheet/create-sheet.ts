@@ -1,5 +1,6 @@
 import { Component, model, output } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { CREATE_OPTIONS, CreateChoice } from '../../programs.config';
@@ -15,7 +16,7 @@ import { CREATE_OPTIONS, CreateChoice } from '../../programs.config';
  */
 @Component({
   selector: 'mh-create-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './create-sheet.html',
   styleUrl: './create-sheet.scss',
 })

@@ -1,4 +1,4 @@
-<ion-segment aria-label="Level" [value]="level()" (ionChange)="onChange($event.detail.value)">
+<ion-segment [attr.aria-label]="'exercises.fields.level' | translate" [value]="level()" (ionChange)="onChange($event.detail.value)">
   @for (option of levels; track option) {
     <ion-segment-button [value]="option">
       <ion-label>{{ levelLabel(option) }}</ion-label>

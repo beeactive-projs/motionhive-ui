@@ -1,12 +1,13 @@
 import { DatePipe } from '@angular/common';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
+  LanguageNamePipe,
   MyProfile,
   PrivacyControlledField,
   ProfilePrivacy,
@@ -24,9 +25,8 @@ import { ProfileFactRow } from '../../../../../../_shared/components/profile-fac
  */
 @Component({
   selector: 'mh-intro-card',
-  imports: [DatePipe, Card, Divider, ProfileFactRow],
+  imports: [DatePipe, Card, Divider, ProfileFactRow, TranslatePipe, LanguageNamePipe],
   templateUrl: './intro-card.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IntroCard {
   readonly profile = input.required<MyProfile>();

@@ -11,6 +11,7 @@ import {
   IonNote,
   IonTextarea,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
@@ -20,7 +21,9 @@ import {
   InstructorClientStatuses,
   Program,
   ProgramWorkout,
+  appLocale,
   displayName,
+  weekdayNames,
 } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
@@ -59,16 +62,11 @@ const PREVIEW_ROWS = 6;
  * day lands on which real date. A plan whose "Day 1" falls on a Saturday is
  * a mistake worth catching here rather than in a message three days later.
  */
-/** ISO 1=Mon..7=Sun, which is what the API takes. */
-const WEEKDAYS: readonly { iso: number; label: string }[] = [
-  { iso: 1, label: 'Mon' },
-  { iso: 2, label: 'Tue' },
-  { iso: 3, label: 'Wed' },
-  { iso: 4, label: 'Thu' },
-  { iso: 5, label: 'Fri' },
-  { iso: 6, label: 'Sat' },
-  { iso: 7, label: 'Sun' },
-];
+/** ISO 1=Mon..7=Sun, which is what the API takes; labels in the UI locale. */
+const WEEKDAYS: readonly { iso: number; label: string }[] = weekdayNames('short').map((label, i) => ({
+  iso: i + 1,
+  label,
+}));
 
 @Component({
   selector: 'mh-assign-sheet',
@@ -85,6 +83,7 @@ const WEEKDAYS: readonly { iso: number; label: string }[] = [
     IonNote,
     IonTextarea,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './assign-sheet.html',
   styleUrl: './assign-sheet.scss',
@@ -96,6 +95,7 @@ export class AssignSheet {
   readonly assign = output<AssignRequest>();
 
   private readonly _clientService = inject(ClientService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly clients = signal<InstructorClient[]>([]);
   readonly loading = signal(false);
@@ -190,11 +190,10 @@ export class AssignSheet {
       .map(({ workout, date }) => ({
         name: workout.name,
         week: weekLabel(workout.weekIndex),
-        date: date.toLocaleDateString(undefined, {
-          weekday: 'short',
-          day: 'numeric',
-          month: 'short',
-        }),
+        date: scheduledDateFor(start, workout.weekIndex, workout.dayIndex).toLocaleDateString(
+          appLocale(),
+          { weekday: 'short', day: 'numeric', month: 'short' },
+        ),
       }));
   });
 
@@ -228,7 +227,10 @@ export class AssignSheet {
   }
 
   name(row: InstructorClient): string {
-    return displayName(row.client ?? null, 'Client');
+    return displayName(
+      row.client ?? null,
+      this._translateService.instant('programs.common.clientFallback'),
+    );
   }
 
   tone(row: InstructorClient): string {

@@ -10,6 +10,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { SOCIAL_PLATFORMS } from 'core';
@@ -55,6 +56,7 @@ import { PhotoSheet } from '../_sheets/photo-sheet/photo-sheet';
     PhoneSheet,
     PhotoSheet,
     SettingsRow,
+    TranslatePipe,
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',

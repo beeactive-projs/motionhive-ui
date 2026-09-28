@@ -1,23 +1,23 @@
 <ng-template #body>
   <ion-textarea
-    label="About"
+    [label]="'accountSheets.about.label' | translate"
     labelPlacement="stacked"
     fill="outline"
     [rows]="5"
     [autoGrow]="true"
     [counter]="true"
     [maxlength]="maxLength"
-    placeholder="What should people know about how you coach?"
+    [placeholder]="'accountSheets.about.placeholder' | translate"
     [value]="bio()"
     (ionInput)="bio.set($event.detail.value ?? '')"
   />
 
-  <p class="mh-helper">A short bio shown on your public profile.</p>
+  <p class="mh-helper">{{ 'accountSheets.about.hint' | translate }}</p>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="About"
+  [title]="'accountSheets.about.title' | translate"
   [body]="body"
   [saving]="saving()"
   [breakpoints]="[0, 0.55, 0.95]"

@@ -5,8 +5,8 @@
     pInputText
     type="text"
     fluid
-    placeholder="Search this program"
-    aria-label="Search this program"
+    [placeholder]="'programs.rail.searchPlaceholder' | translate"
+    [attr.aria-label]="'programs.rail.searchPlaceholder' | translate"
     autocomplete="off"
     [ngModel]="searchQuery()"
     (ngModelChange)="onSearchChange($event)"
@@ -18,7 +18,7 @@
       class="pi pi-times-circle cursor-pointer"
       role="button"
       tabindex="0"
-      aria-label="Clear search"
+      [attr.aria-label]="'button.clearSearch' | translate"
       (click)="clearSearch()"
       (keydown.enter)="clearSearch()"
     />
@@ -26,11 +26,11 @@
 </p-iconfield>
 
 <!-- Outline -->
-<nav class="mt-2 min-h-0 flex-1 overflow-y-auto pr-1" aria-label="Program outline" cdkScrollable>
+<nav class="mt-2 min-h-0 flex-1 overflow-y-auto pr-1" [attr.aria-label]="'programs.rail.outline' | translate" cdkScrollable>
   @if (searchActive() && visibleWeeks().length === 0) {
     <div class="flex flex-col items-center gap-2 py-6 text-center text-xs text-muted-color">
-      <span>No workouts match “{{ searchQuery().trim() }}”.</span>
-      <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="clearSearch()">Clear search</button>
+      <span>{{ 'programs.rail.noMatches' | translate: { query: searchQuery().trim() } }}</span>
+      <button pButton type="button" size="small" severity="secondary" [text]="true" (click)="clearSearch()">{{ 'button.clearSearch' | translate }}</button>
     </div>
   }
 
@@ -56,8 +56,8 @@
           *cdkDragPreview
           class="mh-rail__weekpreview px-3 py-2 text-xs font-bold uppercase tracking-wide"
         >
-          Week {{ g.week + 1 }} · {{ g.workouts.length }}
-          {{ g.workouts.length === 1 ? 'workout' : 'workouts' }}
+          {{ 'programs.common.week' | translate: { week: g.week + 1 } }} ·
+          {{ 'count.workouts' | translate: { count: g.workouts.length } }}
         </div>
 
         <div class="flex items-center gap-0.5">
@@ -66,7 +66,7 @@
               cdkDragHandle
               class="mh-rail__grip pi pi-bars inline-flex shrink-0 items-center justify-center p-1 text-xs pointer-coarse:min-h-11 pointer-coarse:min-w-11"
               aria-hidden="true"
-              pTooltip="Drag to reorder week"
+              [pTooltip]="'programs.rail.dragWeek' | translate"
               tooltipPosition="right"
             ></i>
           }
@@ -85,7 +85,7 @@
               [class.pi-chevron-right]="!isWeekOpen(g.week)"
               aria-hidden="true"
             ></i>
-            <span class="text-xs font-bold uppercase tracking-wide">Week {{ g.week + 1 }}</span>
+            <span class="text-xs font-bold uppercase tracking-wide">{{ 'programs.common.week' | translate: { week: g.week + 1 } }}</span>
             <span class="ml-auto text-xs tabular-nums">{{ g.workouts.length }}</span>
           </button>
           <button pButton
@@ -94,10 +94,10 @@
             severity="secondary"
             [text]="true"
             [rounded]="true"
-            pTooltip="Add workout"
+            [pTooltip]="'programs.rail.addWorkout' | translate"
             tooltipPosition="right"
             (click)="addWorkout.emit(g.week)"
-            [attr.aria-label]="'Add workout to week ' + (g.week + 1)"
+            [attr.aria-label]="'programs.rail.addWorkoutToWeek' | translate: { week: g.week + 1 }"
             iconOnly
           >
             <i class="pi pi-plus"></i>
@@ -111,10 +111,10 @@
               severity="secondary"
               [text]="true"
               [rounded]="true"
-              pTooltip="Copy this week"
+              [pTooltip]="'programs.rail.copyWeek' | translate"
               tooltipPosition="right"
               (click)="copyWeek.emit(g.week)"
-              [attr.aria-label]="'Copy week ' + (g.week + 1) + ' into another week'"
+              [attr.aria-label]="'programs.rail.copyWeekAria' | translate: { week: g.week + 1 }"
               iconOnly
             >
               <i class="pi pi-copy"></i>
@@ -171,7 +171,7 @@
                     <span class="min-w-0 flex-1 truncate text-left text-sm font-semibold">{{
                       w.name
                     }}</span>
-                    <p-tag [value]="'Day ' + (w.dayIndex + 1)" severity="secondary" />
+                    <p-tag [value]="'programs.common.day' | translate: { day: w.dayIndex + 1 }" severity="secondary" />
                   </span>
                   <span class="mt-0.5 block w-full text-left text-xs text-muted-color">{{
                     workoutMeta(w)
@@ -179,7 +179,7 @@
                 </button>
               </li>
             } @empty {
-              <li class="m-0 px-2.5 py-1 text-xs italic text-muted-color">No workouts yet.</li>
+              <li class="m-0 px-2.5 py-1 text-xs italic text-muted-color">{{ 'programs.rail.noWorkouts' | translate }}</li>
             }
           }
         </ul>
@@ -200,13 +200,13 @@
     class="mh-dashed-btn"
   >
     <i class="pi pi-plus"></i>
-    {{ totalWorkouts() === 0 ? 'Add workout' : 'Add workout in another week' }}
+    {{ (totalWorkouts() === 0 ? 'programs.rail.addWorkout' : 'programs.rail.addWorkoutAnotherWeek') | translate }}
   </button>
   <div class="mh-rail__summary flex items-center gap-2 px-3 py-2 text-xs font-semibold">
     <i class="pi pi-calendar text-xs" aria-hidden="true"></i>
     <span>
-      {{ weeks().length }} {{ weeks().length === 1 ? 'week' : 'weeks' }} · {{ totalWorkouts() }}
-      {{ totalWorkouts() === 1 ? 'workout' : 'workouts' }}
+      {{ 'count.weeks' | translate: { count: weeks().length } }} ·
+      {{ 'count.workouts' | translate: { count: totalWorkouts() } }}
     </span>
   </div>
 </div>

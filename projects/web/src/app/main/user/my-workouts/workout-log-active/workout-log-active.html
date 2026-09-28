@@ -10,18 +10,18 @@
         rounded
         severity="secondary"
         size="small"
-        pTooltip="Finish & exit"
+        [pTooltip]="'myWorkouts.logger.finishAndExit' | translate"
         (click)="confirmComplete()"
-        aria-label="Finish & exit"
+        [attr.aria-label]="'myWorkouts.logger.finishAndExit' | translate"
         iconOnly
       >
         <i class="pi pi-times"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ l?.name ?? 'Workout' }}</h1>
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ l?.name ?? ('myWorkouts.common.workout' | translate) }}</h1>
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
-          {{ isFreestyle() ? 'Freestyle session' : 'Assigned session' }}
-          @if (!isComplete()) { <span class="opacity-40">·</span> {{ elapsedLabel() }} elapsed }
+          {{ (isFreestyle() ? 'myWorkouts.logger.freestyleSession' : 'myWorkouts.logger.assignedSession') | translate }}
+          @if (!isComplete()) { <span class="opacity-40">·</span> {{ 'myWorkouts.logger.elapsed' | translate: { time: elapsedLabel() } }} }
         </p>
       </div>
     </div>
@@ -57,9 +57,9 @@
     <!-- Left · exercise cards -->
     <div class="lg:col-span-2 flex flex-col gap-3 lg:gap-4 min-w-0">
       @if (exercises().length === 0) {
-      <mh-list-empty-state icon="pi pi-bolt" title="Build your workout"
-        message="Add exercises from the catalog, log your sets as you go, and finish when you're done."
-        actionLabel="Add exercise" actionIcon="pi pi-plus" (action)="openAddExercise()" />
+      <mh-list-empty-state icon="pi pi-bolt" [title]="'myWorkouts.logger.empty.title' | translate"
+        [message]="'myWorkouts.logger.empty.message' | translate"
+        [actionLabel]="'myWorkouts.common.addExercise' | translate" actionIcon="pi pi-plus" (action)="openAddExercise()" />
       } @else {
       @for (ex of exercises(); track ex.id) {
       <div class="rounded-lg border border-surface overflow-hidden transition-colors"
@@ -83,22 +83,22 @@
               class="block w-full text-left truncate text-sm font-semibold text-surface-900 dark:text-surface-100 cursor-pointer underline decoration-transparent hover:decoration-current underline-offset-2"
               [class.line-through]="ex.isSkipped"
               (click)="openExerciseInfo(ex.exerciseId)"
-              [attr.aria-label]="'View ' + ex.exerciseNameSnapshot + ' details'">
+              [attr.aria-label]="'myWorkouts.common.viewExerciseDetails' | translate: { name: ex.exerciseNameSnapshot }">
               {{ ex.exerciseNameSnapshot }}
             </button>
             <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]">
               @if (ex.isSkipped) {
-              <p-tag value="Skipped" icon="pi pi-ban" severity="secondary" rounded class="text-xs!" />
-              <span class="text-muted-color">not counted</span>
+              <p-tag [value]="'enum.workoutLogStatus.SKIPPED' | translate" icon="pi pi-ban" severity="secondary" rounded class="text-xs!" />
+              <span class="text-muted-color">{{ 'myWorkouts.logger.notCounted' | translate }}</span>
               } @else {
               <span class="inline-flex items-center gap-1"
                 [class.text-green-600]="isExerciseDone(ex)" [class.text-muted-color]="!isExerciseDone(ex)">
                 @if (isExerciseDone(ex)) { <i class="pi pi-check-circle text-[10px]"></i> }
-                {{ exerciseProgressLabel(ex) }}{{ isExerciseDone(ex) ? ' done' : '' }}
+                {{ exerciseProgressLabel(ex) }}
               </span>
               }
               @if (ex.swappedFromExerciseId) {
-              <p-tag value="Swapped in" icon="pi pi-sync" severity="info" rounded class="text-xs!" />
+              <p-tag [value]="'myWorkouts.common.swappedIn' | translate" icon="pi pi-sync" severity="info" rounded class="text-xs!" />
               }
             </div>
           </div>
@@ -107,7 +107,7 @@
             @if (ex.isSkipped) {
             <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="undoSkip(ex)">
               <i class="pi pi-undo"></i>
-              Undo
+              {{ 'myWorkouts.logger.undo' | translate }}
             </button>
             } @else {
             <button pButton
@@ -116,9 +116,9 @@
               [text]="true"
               rounded
               size="small"
-              pTooltip="Swap exercise"
+              [pTooltip]="'myWorkouts.logger.swapExercise' | translate"
               (click)="openSwapExercise(ex)"
-              aria-label="Swap exercise"
+              [attr.aria-label]="'myWorkouts.logger.swapExercise' | translate"
               iconOnly
             >
               <i class="pi pi-sync"></i>
@@ -130,9 +130,9 @@
               [text]="true"
               rounded
               size="small"
-              pTooltip="Remove exercise"
+              [pTooltip]="'myWorkouts.logger.removeExercise' | translate"
               (click)="confirmRemoveExercise(ex)"
-              aria-label="Remove exercise"
+              [attr.aria-label]="'myWorkouts.logger.removeExercise' | translate"
               iconOnly
             >
               <i class="pi pi-trash"></i>
@@ -144,9 +144,9 @@
               [text]="true"
               rounded
               size="small"
-              pTooltip="Skip exercise"
+              [pTooltip]="'myWorkouts.logger.skipExercise' | translate"
               (click)="skipExercise(ex)"
-              aria-label="Skip exercise"
+              [attr.aria-label]="'myWorkouts.logger.skipExercise' | translate"
               iconOnly
             >
               <i class="pi pi-times-circle"></i>
@@ -160,7 +160,7 @@
         @if (isCurrentExercise(ex) && !isComplete() && lastTimeSummary(ex)) {
         <div class="flex items-center gap-1.5 border-b border-surface bg-surface-50 px-2.5 py-1.5 text-[11.5px] text-muted-color dark:bg-surface-800">
           <i class="pi pi-history text-[10px] text-primary"></i>
-          <span><strong class="text-color">Last time</strong> · {{ lastTimeSummary(ex) }}</span>
+          <span><strong class="text-color">{{ 'myWorkouts.logger.lastTime' | translate }}</strong> · {{ lastTimeSummary(ex) }}</span>
         </div>
         }
 
@@ -170,13 +170,13 @@
           <ng-template #header>
             <tr>
               <th class="w-10 text-center">#</th>
-              <th class="w-1/4">Target</th>
+              <th class="w-1/4">{{ 'myWorkouts.logger.table.target' | translate }}</th>
               @if (isWeightVisible(ex)) { <th class="text-center">kg</th> }
-              @if (showsField(ex, 'reps')) { <th class="text-center">Reps</th> }
-              @if (showsField(ex, 'distance')) { <th class="text-center">km</th> }
-              @if (showsField(ex, 'duration')) { <th class="text-center">Time</th> }
-              @if (showsField(ex, 'distance')) { <th class="text-center">Pace</th> }
-              <th class="w-14 text-center">Done</th>
+              @if (showsField(ex, Fields.Reps)) { <th class="text-center">{{ 'myWorkouts.common.reps' | translate }}</th> }
+              @if (showsField(ex, Fields.Distance)) { <th class="text-center">km</th> }
+              @if (showsField(ex, Fields.Duration)) { <th class="text-center">{{ 'myWorkouts.logger.table.time' | translate }}</th> }
+              @if (showsField(ex, Fields.Distance)) { <th class="text-center">{{ 'myWorkouts.logger.table.pace' | translate }}</th> }
+              <th class="w-14 text-center">{{ 'myWorkouts.common.done' | translate }}</th>
             </tr>
           </ng-template>
           <ng-template #body let-s>
@@ -193,16 +193,16 @@
               </td>
               }
 
-              @if (showsField(ex, 'reps')) {
+              @if (showsField(ex, Fields.Reps)) {
               <td class="text-center">
                 <input pInputText type="text" inputmode="numeric" class="w-16 text-center tabular-nums font-semibold"
                   [value]="s.reps ?? ''"
-                  [placeholder]="$any((s.assignedSet?.targetRepsMin ?? 'reps') + repsSuffix(ex))"
+                  [placeholder]="repsPlaceholder(ex, s)"
                   [disabled]="isComplete()" (blur)="onRepsBlur(ex, s, $any($event.target).value)" />
               </td>
               }
 
-              @if (showsField(ex, 'distance')) {
+              @if (showsField(ex, Fields.Distance)) {
               <td class="text-center">
                 <input pInputText type="text" inputmode="decimal" class="w-16 text-center tabular-nums font-semibold"
                   [value]="distanceKm(s)" placeholder="km" [disabled]="isComplete()"
@@ -210,7 +210,7 @@
               </td>
               }
 
-              @if (showsField(ex, 'duration')) {
+              @if (showsField(ex, Fields.Duration)) {
               <td class="text-center">
                 <input pInputText type="text" inputmode="numeric" class="w-16 text-center tabular-nums font-semibold"
                   [value]="secondsToClock(s.durationSeconds)" placeholder="0:00" [disabled]="isComplete()"
@@ -218,7 +218,7 @@
               </td>
               }
 
-              @if (showsField(ex, 'distance')) {
+              @if (showsField(ex, Fields.Distance)) {
               <!-- Derived, never typed. -->
               <td class="text-center tabular-nums text-muted-color text-[12px]">{{ paceLabel(s) || '—' }}</td>
               }
@@ -232,7 +232,7 @@
                   [outlined]="!s.isCompleted"
                   [disabled]="isComplete() || isSetPending(s)"
                   (click)="toggleComplete(ex, s)"
-                  [attr.aria-label]="s.isCompleted ? 'Mark set incomplete' : 'Mark set done'"
+                  [attr.aria-label]="(s.isCompleted ? 'myWorkouts.logger.markSetIncomplete' : 'myWorkouts.logger.markSetDone') | translate"
                   iconOnly
                 >
                   <i [class]="isSetPending(s) ? 'pi pi-spinner pi-spin' : (s.isCompleted ? 'pi pi-check' : 'pi pi-circle')"></i>
@@ -246,13 +246,13 @@
         <div class="flex gap-2 p-2">
           <button pButton type="button" severity="secondary" [text]="true" size="small" fluid (click)="addSet(ex)">
             <i class="pi pi-plus"></i>
-            Add set
+            {{ 'myWorkouts.common.addSet' | translate }}
           </button>
           @if (canRevealWeight(ex)) {
           <button pButton type="button" severity="secondary" [text]="true" size="small"
             class="shrink-0 whitespace-nowrap" (click)="revealWeight(ex)">
             <i class="pi pi-plus"></i>
-            Add weight
+            {{ 'myWorkouts.logger.addWeight' | translate }}
           </button>
           }
         </div>
@@ -264,7 +264,7 @@
       @if (!isComplete()) {
       <button pButton type="button" severity="secondary" [outlined]="true" fluid (click)="openAddExercise()">
         <i class="pi pi-plus"></i>
-        Add exercise
+        {{ 'myWorkouts.common.addExercise' | translate }}
       </button>
       }
       }
@@ -276,11 +276,11 @@
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-2">
             <div class="flex items-baseline justify-between">
-              <span class="text-sm text-surface-500">Progress</span>
+              <span class="text-sm text-surface-500">{{ 'myWorkouts.logger.progress' | translate }}</span>
               <span class="font-heading text-lg font-semibold tabular-nums">{{ progressPercent() }}%</span>
             </div>
             <p-progressbar [value]="progressPercent()" [showValue]="false" class="[&_.p-progressbar]:h-2" />
-            <small class="text-surface-500">{{ setsDone() }} / {{ totalSets() }} sets done</small>
+            <small class="text-surface-500">{{ 'myWorkouts.logger.setsDoneOfTotal' | translate: { done: setsDone(), total: totalSets() } }}</small>
           </div>
 
           <ng-container *ngTemplateOutlet="restTimer" />
@@ -289,7 +289,7 @@
           <ng-container *ngTemplateOutlet="completeAction" />
           } @else {
           <div class="flex items-center justify-center gap-2 text-sm font-semibold text-green-600">
-            <i class="pi pi-check-circle"></i> Workout completed
+            <i class="pi pi-check-circle"></i> {{ 'myWorkouts.logger.workoutCompleted' | translate }}
           </div>
           }
         </div>
@@ -329,7 +329,7 @@
     <div class="mx-auto flex w-full max-w-285 flex-col gap-2">
       <div class="flex items-center gap-2.5 text-[11px] font-semibold text-muted-color">
         <p-progressbar [value]="progressPercent()" [showValue]="false" class="flex-1 [&_.p-progressbar]:h-1.5" />
-        <span class="whitespace-nowrap tabular-nums">{{ setsDone() }} / {{ totalSets() }} sets</span>
+        <span class="whitespace-nowrap tabular-nums">{{ 'myWorkouts.common.setsOfTotal' | translate: { done: setsDone(), total: totalSets() } }}</span>
       </div>
       <ng-container *ngTemplateOutlet="completeAction" />
     </div>
@@ -346,26 +346,28 @@
         <div class="font-heading text-2xl font-semibold leading-none tabular-nums text-primary">{{ restLabel() }}</div>
         @if (restNextSet(); as next) {
         <div class="mt-1 text-[11.5px] text-muted-color">
-          Next · <strong class="text-color">{{ restNextExerciseName() }}</strong>
-          @if (next.assignedSet?.targetWeightKg ?? next.assignedSet?.resolvedWeightKg; as kg) { · {{ kg }} kg }
+          {{ 'myWorkouts.logger.rest.next' | translate }} · <strong class="text-color">{{ restNextExerciseName() }}</strong>
+          @if (next.assignedSet?.targetWeightKg ?? next.assignedSet?.resolvedWeightKg; as kg) { · {{ formatNumber(kg) }} kg }
           @if (next.assignedSet?.targetRepsMin; as reps) { × {{ reps }} }
         </div>
         } @else {
-        <div class="mt-1 text-[11.5px] text-muted-color">All sets complete · tap finish</div>
+        <div class="mt-1 text-[11.5px] text-muted-color">{{ 'myWorkouts.logger.rest.allDone' | translate }}</div>
         }
       </div>
       <div class="flex shrink-0 items-center gap-0.5">
-        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="restMinus()">−10</button>
-        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="restPlus()">+10</button>
+        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="restMinus()"
+          [attr.aria-label]="'myWorkouts.logger.rest.minus10' | translate">−10</button>
+        <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="restPlus()"
+          [attr.aria-label]="'myWorkouts.logger.rest.plus10' | translate">+10</button>
         <button pButton
           type="button"
           severity="secondary"
           [text]="true"
           rounded
           size="small"
-          pTooltip="Skip rest"
+          [pTooltip]="'myWorkouts.logger.rest.skip' | translate"
           (click)="restSkip()"
-          aria-label="Skip rest"
+          [attr.aria-label]="'myWorkouts.logger.rest.skip' | translate"
           iconOnly
         >
           <i class="pi pi-forward"></i>
@@ -380,7 +382,7 @@
   <div class="flex flex-col gap-1">
     <button pButton type="button" severity="success" fluid (click)="confirmComplete()" [disabled]="completing()">
       <i class="pi" [class]="completing() ? 'pi-spinner pi-spin' : 'pi-flag-fill'"></i>
-      {{ isFreestyle() ? 'Finish & save' : 'Complete workout' }}
+      {{ (isFreestyle() ? 'myWorkouts.logger.finishAndSave' : 'myWorkouts.logger.completeWorkout') | translate }}
     </button>
     <!--
       The way out for "I changed my mind". Skipping is a statement that
@@ -390,7 +392,7 @@
     <button pButton type="button" severity="danger" [text]="true" size="small" fluid (click)="confirmDiscard()"
       [disabled]="discarding()">
       <i class="pi" [class]="discarding() ? 'pi-spinner pi-spin' : 'pi-trash'"></i>
-      Cancel workout
+      {{ 'myWorkouts.logger.cancelWorkout' | translate }}
     </button>
   </div>
 </ng-template>
@@ -420,7 +422,7 @@
     <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 w-full">
       <button pButton type="button" severity="secondary" [text]="true" (click)="onFinishKeepGoing()"
         [disabled]="completing() || discarding()">
-        Keep going
+        {{ 'myWorkouts.logger.keepGoing' | translate }}
       </button>
       <button pButton type="button" [severity]="setsDone() === 0 ? 'secondary' : 'success'"
         (click)="onFinishPrimary()" [disabled]="completing() || discarding()">

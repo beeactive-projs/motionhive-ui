@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,10 +7,12 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   apiErrorMessage,
   AuthService,
   BillingCountsStore,
+  ClientRequestTypes,
   ClientService,
   countryNameFromCode,
   MyProfile,
@@ -91,11 +92,11 @@ const LEGACY_TAB_ALIASES: Record<string, ProfileTab> = {
     EditPersonalInfo,
     EditHandle,
     ShareDialog,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Profile implements OnInit {
   private readonly _profileService = inject(ProfileService);
@@ -107,6 +108,7 @@ export class Profile implements OnInit {
   private readonly _messageService = inject(MessageService);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Tabs = ProfileTabs;
 
@@ -210,8 +212,8 @@ export class Profile implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load profile data',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('profile.toast.loadFailed'),
         });
       },
     });
@@ -273,7 +275,9 @@ export class Profile implements OnInit {
     else if (city) parts.push(city);
     else if (country) parts.push(country);
     const years = p.instructorProfile?.yearsOfExperience;
-    if (years && years > 0) parts.push(`${years} yrs experience`);
+    if (years && years > 0) {
+      parts.push(this._translateService.instant('profile.share.experience', { count: years }));
+    }
     return parts.join(' · ');
   });
 
@@ -285,7 +289,7 @@ export class Profile implements OnInit {
         this.uploadingAvatar.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Profile picture updated',
+          summary: this._translateService.instant('profile.toast.avatarUpdated'),
         });
         this.loadProfile();
       },
@@ -293,8 +297,8 @@ export class Profile implements OnInit {
         this.uploadingAvatar.set(false);
         showApiError(
           this._messageService,
-          'Upload failed',
-          'Could not upload the picture.',
+          this._translateService.instant('profile.toast.avatarFailed.summary'),
+          this._translateService.instant('profile.toast.avatarFailed.detail'),
           err,
         );
       },
@@ -315,18 +319,18 @@ export class Profile implements OnInit {
         this.resendingVerification.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Verification email sent',
-          detail: `Check ${email}.`,
+          summary: this._translateService.instant('profile.toast.verificationSent.summary'),
+          detail: this._translateService.instant('profile.toast.verificationSent.detail', { email }),
         });
       },
       error: (err: unknown) => {
         this.resendingVerification.set(false);
         this._messageService.add({
           severity: 'info',
-          summary: 'Could not resend',
+          summary: this._translateService.instant('profile.toast.verificationFailed.summary'),
           detail: apiErrorMessage(
             err,
-            'If the email is already verified or you recently asked, please try again later.',
+            this._translateService.instant('profile.toast.verificationFailed.detail'),
           ),
         });
       },
@@ -357,8 +361,8 @@ export class Profile implements OnInit {
         this._privacyOverride.set(baseline);
         showApiError(
           this._messageService,
-          'Error',
-          'Could not update visibility.',
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profile.toast.privacyFailed'),
           err,
         );
       },
@@ -373,7 +377,7 @@ export class Profile implements OnInit {
     this._clientService.getPendingRequests().subscribe({
       next: (requests) =>
         this.incomingRequestsCount.set(
-          requests.filter((r) => r.type === 'INSTRUCTOR_TO_CLIENT').length,
+          requests.filter((r) => r.type === ClientRequestTypes.InstructorToClient).length,
         ),
       error: () => this.incomingRequestsCount.set(0),
     });

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -7,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   AuthStore,
   type AvatarUser,
@@ -26,10 +26,9 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 @Component({
   selector: 'mh-public-profile-groups-tab',
-  imports: [Avatar, PrimeAvatar, ButtonDirective, Card, SkeletonModule, TagModule],
+  imports: [Avatar, PrimeAvatar, ButtonDirective, Card, SkeletonModule, TagModule, TranslatePipe],
   templateUrl: './groups-tab.html',
   styleUrl: './groups-tab.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupsTab implements OnInit {
   private readonly _store = inject(PublicProfileStore);

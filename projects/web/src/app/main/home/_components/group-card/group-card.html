@@ -10,10 +10,10 @@
   @if (group().description) {
     <p class="group-card__desc">{{ group().description }}</p>
   } @else {
-    <p class="group-card__desc group-card__desc--muted">No description yet.</p>
+    <p class="group-card__desc group-card__desc--muted">{{ 'home.groupCard.noDescription' | translate }}</p>
   }
 
   <div class="group-card__footer">
-    <button pButton type="button" size="small" [outlined]="!joined()" (click)="onAction()">{{ joined() ? 'Open' : 'Join' }}</button>
+    <button pButton type="button" size="small" [outlined]="!joined()" (click)="onAction()">{{ (joined() ? 'button.open' : 'button.join') | translate }}</button>
   </div>
 </article>

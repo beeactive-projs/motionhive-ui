@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
+import { Component, computed, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Card } from 'primeng/card';
 import { Tag } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
   EXERCISE_EQUIPMENT_TAG_CLASS,
+  EnumLabelPipe,
   Exercise,
   ExerciseSource,
   ExerciseVisibility,
@@ -28,11 +29,9 @@ import {
  */
 @Component({
   selector: 'mh-exercise-card',
-  standalone: true,
-  imports: [TooltipModule, TitleCasePipe, Tag, Card],
+  imports: [TooltipModule, EnumLabelPipe, Tag, Card, TranslatePipe],
   templateUrl: './exercise-card.html',
   styleUrl: './exercise-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExerciseCard {
   readonly exercise = input.required<Exercise>();
@@ -42,7 +41,7 @@ export class ExerciseCard {
   readonly select = output<Exercise>();
 
   readonly primaryMuscle = computed(() => {
-    const role = this.exercise().muscleRoles?.find((m) => m.role === 'PRIMARY');
+    const role = this.exercise().muscleRoles?.find((m) => m.role === MuscleRole.Primary);
     return role?.muscle?.commonName ?? null;
   });
 

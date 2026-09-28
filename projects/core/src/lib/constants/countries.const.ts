@@ -1,8 +1,13 @@
+import { appLocale } from '../i18n/app-language';
+
 /**
  * ISO 3166-1 alpha-2 country codes supported by Stripe Connect
  * Express (kept in sync with the backend list in
  * `src/common/constants/countries.ts`). If the backend list changes,
  * update here too.
+ *
+ * `name` is the English name, kept as a fallback. Display a country with
+ * `countryNameFromCode()`, which names it in the UI language.
  */
 export const STRIPE_CONNECT_COUNTRIES: ReadonlyArray<{
   code: string;
@@ -60,8 +65,23 @@ export function isStripeSupportedCountry(code: string | null | undefined): boole
   return !!code && SUPPORTED_SET.has(code);
 }
 
+let _regionNames: Intl.DisplayNames | null | undefined;
+
+/**
+ * A country's name in the UI language — 'RO' is "Romania" / "România".
+ * Falls back to the English list name, then to the code itself.
+ */
 export function countryNameFromCode(code: string | null | undefined): string | null {
   if (!code) return null;
+  if (_regionNames === undefined) {
+    try {
+      _regionNames = new Intl.DisplayNames([appLocale()], { type: 'region' });
+    } catch {
+      _regionNames = null;
+    }
+  }
+  const localized = _regionNames?.of(code.toUpperCase());
+  if (localized && localized !== code.toUpperCase()) return localized;
   return STRIPE_CONNECT_COUNTRIES.find((c) => c.code === code)?.name ?? code;
 }
 

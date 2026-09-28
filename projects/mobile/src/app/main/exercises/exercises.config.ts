@@ -34,6 +34,9 @@ import {
   ExerciseVisibility,
   MovementPattern,
   MuscleRole,
+  enumLabelMap,
+  translate,
+  withEnumLabels,
 } from 'core';
 
 import {
@@ -105,6 +108,19 @@ export interface LabelledOption<T> {
   label: string;
 }
 
+/**
+ * An option whose label is a translation key, read when the label is — these
+ * lists are module constants, evaluated before the language file has loaded.
+ */
+function keyedOption<T>(value: T, key: string): LabelledOption<T> {
+  return {
+    value,
+    get label() {
+      return translate(key);
+    },
+  };
+}
+
 // ── Kind ────────────────────────────────────────────────────────────────────
 
 /**
@@ -124,44 +140,25 @@ export interface KindMeta {
   tracking: string;
 }
 
-export const KIND_META: Record<ExerciseKind, KindMeta> = {
-  [ExerciseKind.Strength]: {
-    label: 'Strength',
-    icon: 'flash-outline',
-    tone: 'warning',
-    tracking: 'Reps + weight',
-  },
-  [ExerciseKind.Cardio]: {
-    label: 'Cardio',
-    icon: 'heart-outline',
-    tone: 'coral',
-    tracking: 'Duration + distance + HR',
-  },
-  [ExerciseKind.Duration]: {
-    label: 'Duration',
-    icon: 'time-outline',
-    tone: 'info',
-    tracking: 'Time only — e.g. plank',
-  },
-  [ExerciseKind.Distance]: {
-    label: 'Distance',
-    icon: 'map-outline',
-    tone: 'violet',
-    tracking: 'Distance only',
-  },
-  [ExerciseKind.Bodyweight]: {
-    label: 'Bodyweight',
-    icon: 'body-outline',
-    tone: 'medium',
-    tracking: 'Reps, no load',
-  },
-  [ExerciseKind.Mobility]: {
-    label: 'Mobility',
-    icon: 'sync-outline',
-    tone: 'teal',
-    tracking: 'Time / reps, mobility',
-  },
-};
+export const KIND_META: Record<ExerciseKind, KindMeta> = withEnumLabels('exerciseKind', {
+  [ExerciseKind.Strength]: kindMeta(ExerciseKind.Strength, 'flash-outline', 'warning'),
+  [ExerciseKind.Cardio]: kindMeta(ExerciseKind.Cardio, 'heart-outline', 'coral'),
+  [ExerciseKind.Duration]: kindMeta(ExerciseKind.Duration, 'time-outline', 'info'),
+  [ExerciseKind.Distance]: kindMeta(ExerciseKind.Distance, 'map-outline', 'violet'),
+  [ExerciseKind.Bodyweight]: kindMeta(ExerciseKind.Bodyweight, 'body-outline', 'medium'),
+  [ExerciseKind.Mobility]: kindMeta(ExerciseKind.Mobility, 'sync-outline', 'teal'),
+});
+
+/** Icon and tone as values; the tracking promise translated when read. */
+function kindMeta(kind: ExerciseKind, icon: string, tone: string): Omit<KindMeta, 'label'> {
+  return {
+    icon,
+    tone,
+    get tracking() {
+      return translate(`exercises.kindTracking.${kind}`);
+    },
+  };
+}
 
 /** Grid order for the create form and the filter sheet — most used first. */
 export const KIND_ORDER: readonly ExerciseKind[] = [
@@ -198,11 +195,11 @@ export interface LevelMeta {
   tone: BadgeTone;
 }
 
-export const LEVEL_META: Record<ExerciseLevel, LevelMeta> = {
-  [ExerciseLevel.Beginner]: { label: 'Beginner', tone: BadgeTones.Success },
-  [ExerciseLevel.Intermediate]: { label: 'Intermediate', tone: BadgeTones.Warn },
-  [ExerciseLevel.Advanced]: { label: 'Advanced', tone: BadgeTones.Danger },
-};
+export const LEVEL_META: Record<ExerciseLevel, LevelMeta> = withEnumLabels('exerciseLevel', {
+  [ExerciseLevel.Beginner]: { tone: BadgeTones.Success },
+  [ExerciseLevel.Intermediate]: { tone: BadgeTones.Warn },
+  [ExerciseLevel.Advanced]: { tone: BadgeTones.Danger },
+});
 
 export const LEVEL_ORDER: readonly ExerciseLevel[] = [
   ExerciseLevel.Beginner,
@@ -220,43 +217,33 @@ export function levelTone(level: ExerciseLevel): BadgeTone {
 
 // ── Classification (meta chips + the create form's optional selects) ─────────
 
-export const MECHANIC_LABELS: Record<ExerciseMechanic, string> = {
-  [ExerciseMechanic.Compound]: 'Compound',
-  [ExerciseMechanic.Isolation]: 'Isolation',
-};
+// Getter maps over the shared `enum.*` labels: translated when read.
+export const MECHANIC_LABELS: Record<ExerciseMechanic, string> = enumLabelMap(
+  'exerciseMechanic',
+  Object.values(ExerciseMechanic),
+);
 
-export const FORCE_LABELS: Record<ExerciseForce, string> = {
-  [ExerciseForce.Push]: 'Push',
-  [ExerciseForce.Pull]: 'Pull',
-  [ExerciseForce.Static]: 'Static',
-};
+export const FORCE_LABELS: Record<ExerciseForce, string> = enumLabelMap(
+  'exerciseForce',
+  Object.values(ExerciseForce),
+);
 
-export const PATTERN_LABELS: Record<MovementPattern, string> = {
-  [MovementPattern.Squat]: 'Squat',
-  [MovementPattern.Hinge]: 'Hinge',
-  [MovementPattern.Lunge]: 'Lunge',
-  [MovementPattern.PushHorizontal]: 'Horizontal push',
-  [MovementPattern.PushVertical]: 'Vertical push',
-  [MovementPattern.PullHorizontal]: 'Horizontal pull',
-  [MovementPattern.PullVertical]: 'Vertical pull',
-  [MovementPattern.Carry]: 'Carry',
-  [MovementPattern.Rotation]: 'Rotation',
-  [MovementPattern.AntiRotation]: 'Anti-rotation',
-  [MovementPattern.Locomotion]: 'Locomotion',
-  [MovementPattern.Isolation]: 'Isolation',
-};
+export const PATTERN_LABELS: Record<MovementPattern, string> = enumLabelMap(
+  'movementPattern',
+  Object.values(MovementPattern),
+);
 
 export const PATTERN_OPTIONS: readonly LabelledOption<MovementPattern>[] = Object.values(
   MovementPattern,
-).map((value) => ({ value, label: PATTERN_LABELS[value] }));
+).map((value) => keyedOption(value, `enum.movementPattern.${value}`));
 
 export const MECHANIC_OPTIONS: readonly LabelledOption<ExerciseMechanic>[] = Object.values(
   ExerciseMechanic,
-).map((value) => ({ value, label: MECHANIC_LABELS[value] }));
+).map((value) => keyedOption(value, `enum.exerciseMechanic.${value}`));
 
 export const FORCE_OPTIONS: readonly LabelledOption<ExerciseForce>[] = Object.values(
   ExerciseForce,
-).map((value) => ({ value, label: FORCE_LABELS[value] }));
+).map((value) => keyedOption(value, `enum.exerciseForce.${value}`));
 
 // ── Ownership pills ─────────────────────────────────────────────────────────
 
@@ -272,16 +259,16 @@ export type OwnershipPill = LabelledOption<ExerciseOwnershipFilter>;
  * that is what the pills say.
  */
 export const COACH_OWNERSHIP_PILLS: readonly OwnershipPill[] = [
-  { value: ExerciseOwnershipFilter.All, label: 'All' },
-  { value: ExerciseOwnershipFilter.System, label: 'System' },
-  { value: ExerciseOwnershipFilter.Mine, label: 'My exercises' },
-  { value: ExerciseOwnershipFilter.PublicOthers, label: 'Public · others' },
+  keyedOption(ExerciseOwnershipFilter.All, 'common.all'),
+  keyedOption(ExerciseOwnershipFilter.System, 'exercises.ownership.system'),
+  keyedOption(ExerciseOwnershipFilter.Mine, 'exercises.ownership.mine'),
+  keyedOption(ExerciseOwnershipFilter.PublicOthers, 'exercises.ownership.publicOthers'),
 ];
 
 export const TRAINEE_OWNERSHIP_PILLS: readonly OwnershipPill[] = [
-  { value: ExerciseOwnershipFilter.All, label: 'All' },
-  { value: ExerciseOwnershipFilter.System, label: 'System' },
-  { value: ExerciseOwnershipFilter.PublicOthers, label: 'From coaches' },
+  keyedOption(ExerciseOwnershipFilter.All, 'common.all'),
+  keyedOption(ExerciseOwnershipFilter.System, 'exercises.ownership.system'),
+  keyedOption(ExerciseOwnershipFilter.PublicOthers, 'exercises.ownership.fromCoaches'),
 ];
 
 // ── Sort ────────────────────────────────────────────────────────────────────
@@ -290,19 +277,39 @@ export interface SortOption extends LabelledOption<ExerciseSortKey> {
   hint: string;
 }
 
+/** Each sort key's segment under `exercises.sort.*`. */
+const SORT_KEYS: Record<ExerciseSortKey, string> = {
+  [ExerciseSortKey.Name]: 'name',
+  [ExerciseSortKey.Newest]: 'newest',
+  [ExerciseSortKey.MostForked]: 'mostForked',
+};
+
+function sortKey(sort: ExerciseSortKey): string {
+  return `exercises.sort.${SORT_KEYS[sort] ?? SORT_KEYS[ExerciseSortKey.Name]}`;
+}
+
+function sortOption(value: ExerciseSortKey): SortOption {
+  const key = sortKey(value);
+  return {
+    value,
+    get label() {
+      return translate(`${key}.label`);
+    },
+    get hint() {
+      return translate(`${key}.hint`);
+    },
+  };
+}
+
 /** The three keys the BE can order by — nothing invented on top. */
 export const SORT_OPTIONS: readonly SortOption[] = [
-  { value: ExerciseSortKey.Name, label: 'Name', hint: 'A to Z' },
-  { value: ExerciseSortKey.Newest, label: 'Newest', hint: 'Recently added first' },
-  {
-    value: ExerciseSortKey.MostForked,
-    label: 'Most forked',
-    hint: 'Popular with other coaches',
-  },
+  sortOption(ExerciseSortKey.Name),
+  sortOption(ExerciseSortKey.Newest),
+  sortOption(ExerciseSortKey.MostForked),
 ];
 
 export function sortLabel(sort: ExerciseSortKey): string {
-  return SORT_OPTIONS.find((option) => option.value === sort)?.label ?? 'Name';
+  return translate(`${sortKey(sort)}.label`);
 }
 
 // ── Row copy ────────────────────────────────────────────────────────────────
@@ -323,7 +330,10 @@ export function exerciseSubline(exercise: Exercise): string {
       ? null
       : equipment.length === 1
         ? equipment[0]!.name
-        : `${equipment[0]!.name} +${equipment.length - 1}`;
+        : translate('exercises.row.equipmentMore', {
+            name: equipment[0]!.name,
+            count: equipment.length - 1,
+          });
 
   return [muscle, gear].filter(Boolean).join(' · ') || kindLabel(exercise.kind);
 }
@@ -348,14 +358,18 @@ export interface OwnershipChip {
 
 export function ownershipChip(exercise: Exercise, myUserId: string | null): OwnershipChip | null {
   if (exercise.source === ExerciseSource.System) return null;
-  if (myUserId && exercise.ownerId === myUserId) return { label: 'Mine', tone: BadgeTones.Honey };
-  return { label: 'Public', tone: BadgeTones.Info };
+  if (myUserId && exercise.ownerId === myUserId) {
+    return { label: translate('exercises.row.mine'), tone: BadgeTones.Honey };
+  }
+  return { label: translate('exercises.fields.public'), tone: BadgeTones.Info };
 }
 
 /** "887 exercises · sorted by name" — the meta line above the list. */
 export function resultMetaLabel(total: number, sort: ExerciseSortKey): string {
-  const noun = total === 1 ? 'exercise' : 'exercises';
-  return `${total} ${noun} · sorted by ${sortLabel(sort).toLowerCase()}`;
+  return translate('exercises.library.meta', {
+    count: total,
+    sort: translate(`${sortKey(sort)}.inline`),
+  });
 }
 
 // ── Detail copy ─────────────────────────────────────────────────────────────
@@ -390,14 +404,13 @@ export function instructionSteps(instructions: string | null): string[] {
 export function attributionLine(exercise: Exercise, ownerName: string | null): string {
   const origin =
     exercise.source === ExerciseSource.System
-      ? 'System exercise · MotionHive library'
+      ? translate('exercises.attribution.system')
       : ownerName
-        ? `Custom exercise · by ${ownerName}`
-        : 'Custom exercise';
+        ? translate('exercises.attribution.customBy', { name: ownerName })
+        : translate('exercises.attribution.custom');
 
   if (exercise.forkCount <= 0) return origin;
-  const times = exercise.forkCount === 1 ? 'once' : `${exercise.forkCount} times`;
-  return `${origin} · forked ${times}`;
+  return translate('exercises.attribution.withForks', { origin, count: exercise.forkCount });
 }
 
 // ── Taxonomy picker ─────────────────────────────────────────────────────────
@@ -407,15 +420,24 @@ export type TaxonomyOption = LabelledOption<string>;
 
 /** "2 of 3" — the mono counter that enforces the primary-muscle cap. */
 export function selectionCounter(selected: number, max: number | null): string {
-  return max === null ? `${selected} selected` : `${selected} of ${max}`;
+  return max === null
+    ? translate('exercises.taxonomyPicker.selected', { count: selected })
+    : translate('exercises.taxonomyPicker.counter', { count: selected, max });
 }
 
 // ── Muscle role slots on the form ───────────────────────────────────────────
 
+/** "Primary muscles", not the bare enum word — getters, translated when read. */
 export const MUSCLE_ROLE_LABELS: Record<MuscleRole, string> = {
-  [MuscleRole.Primary]: 'Primary muscles',
-  [MuscleRole.Secondary]: 'Secondary muscles',
-  [MuscleRole.Stabilizer]: 'Stabilizers',
+  get [MuscleRole.Primary]() {
+    return translate(`exercises.muscleRoles.${MuscleRole.Primary}`);
+  },
+  get [MuscleRole.Secondary]() {
+    return translate(`exercises.muscleRoles.${MuscleRole.Secondary}`);
+  },
+  get [MuscleRole.Stabilizer]() {
+    return translate(`exercises.muscleRoles.${MuscleRole.Stabilizer}`);
+  },
 };
 
 /** The BE takes one to three primary muscles; the picker inerts rows at the cap. */
@@ -507,10 +529,19 @@ export interface MuscleRoleMeta {
  * red → orange → blue does, and the row label spells the role out anyway.
  */
 export const MUSCLE_ROLE_META: Record<MuscleRole, MuscleRoleMeta> = {
-  [MuscleRole.Primary]: { color: 'danger', hint: 'Does most of the work' },
-  [MuscleRole.Secondary]: { color: 'coral', hint: 'Assists the movement' },
-  [MuscleRole.Stabilizer]: { color: 'info', hint: 'Holds you steady' },
+  [MuscleRole.Primary]: muscleRoleMeta(MuscleRole.Primary, 'danger'),
+  [MuscleRole.Secondary]: muscleRoleMeta(MuscleRole.Secondary, 'coral'),
+  [MuscleRole.Stabilizer]: muscleRoleMeta(MuscleRole.Stabilizer, 'info'),
 };
+
+function muscleRoleMeta(role: MuscleRole, color: string): MuscleRoleMeta {
+  return {
+    color,
+    get hint() {
+      return translate(`exercises.muscleRoleHints.${role}`);
+    },
+  };
+}
 
 /**
  * The Details card, grouped the way the create form asks for these things:
@@ -528,7 +559,7 @@ export function exerciseDetailRows(exercise: Exercise, mine: boolean): ExerciseC
       icon: kindIcon(exercise.kind),
       color: kind,
       tone: tileTone(kind),
-      label: 'Kind & level',
+      label: translate('exercises.detailRows.kindLevel'),
       chips: [
         { label: kindLabel(exercise.kind), tone: badgeTone(kind) },
         { label: levelLabel(exercise.level), tone: levelTone(exercise.level) },
@@ -552,14 +583,17 @@ export function exerciseDetailRows(exercise: Exercise, mine: boolean): ExerciseC
     classification.push({ label: FORCE_LABELS[exercise.force], tone: BadgeTones.Info });
   }
   if (exercise.isUnilateral) {
-    classification.push({ label: 'Unilateral', tone: BadgeTones.Navy });
+    classification.push({
+      label: translate('exercises.detailRows.unilateral'),
+      tone: BadgeTones.Navy,
+    });
   }
   if (classification.length > 0) {
     rows.push({
       icon: 'move-outline',
       color: 'violet',
       tone: HexAvatarTones.Base,
-      label: 'Classification',
+      label: translate('exercises.fields.classification'),
       chips: classification,
       hint: null,
     });
@@ -573,17 +607,29 @@ export function exerciseDetailRows(exercise: Exercise, mine: boolean): ExerciseC
             icon: 'lock-closed-outline',
             color: 'dark',
             tone: HexAvatarTones.Base,
-            label: 'Visibility',
-            chips: [{ label: 'Private', tone: BadgeTones.Medium, icon: 'lock-closed-outline' }],
-            hint: 'Only you can see it',
+            label: translate('exercises.fields.visibility'),
+            chips: [
+              {
+                label: translate('exercises.fields.private'),
+                tone: BadgeTones.Medium,
+                icon: 'lock-closed-outline',
+              },
+            ],
+            hint: translate('exercises.detailRows.privateHint'),
           }
         : {
             icon: 'globe-outline',
             color: 'info',
             tone: HexAvatarTones.Shade,
-            label: 'Visibility',
-            chips: [{ label: 'Public', tone: BadgeTones.Info, icon: 'globe-outline' }],
-            hint: 'Other coaches can find and fork it',
+            label: translate('exercises.fields.visibility'),
+            chips: [
+              {
+                label: translate('exercises.fields.public'),
+                tone: BadgeTones.Info,
+                icon: 'globe-outline',
+              },
+            ],
+            hint: translate('exercises.detailRows.publicHint'),
           },
     );
   }
@@ -622,7 +668,7 @@ export function muscleEquipmentRows(exercise: Exercise): ExerciseChipRow[] {
           icon: 'barbell-outline',
           color: 'secondary',
           tone: HexAvatarTones.Base,
-          label: 'Equipment',
+          label: translate('exercises.fields.equipment'),
           chips: equipment.map((label) => ({ label, tone: BadgeTones.Navy })),
           hint: null,
         }
@@ -630,9 +676,9 @@ export function muscleEquipmentRows(exercise: Exercise): ExerciseChipRow[] {
           icon: 'barbell-outline',
           color: 'medium',
           tone: HexAvatarTones.Base,
-          label: 'Equipment',
+          label: translate('exercises.fields.equipment'),
           chips: [],
-          hint: 'None needed',
+          hint: translate('exercises.detailRows.noEquipment'),
         },
   );
 

@@ -1,6 +1,6 @@
 <ng-template #body>
   <ion-input
-    label="Handle"
+    [label]="'form.label.handle' | translate"
     labelPlacement="stacked"
     fill="outline"
     autocapitalize="off"
@@ -18,15 +18,12 @@
 
   <ion-note class="preview">{{ preview() }}</ion-note>
 
-  <p class="mh-helper">
-    Your handle is the short link to your profile. If people saved the old one, it stops working
-    when you change it.
-  </p>
+  <p class="mh-helper">{{ 'accountSheets.handle.hint' | translate }}</p>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Handle"
+  [title]="'accountSheets.handle.title' | translate"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

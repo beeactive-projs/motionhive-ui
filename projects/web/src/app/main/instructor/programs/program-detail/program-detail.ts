@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -7,9 +6,10 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Location, TitleCasePipe } from '@angular/common';
+import { Location } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { ButtonDirective } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -25,6 +25,7 @@ import {
   ActionList,
   BottomSheet,
   CreatePrescribedSetPayload,
+  EnumLabelPipe,
   PrescribedExercise,
   PrescribedSet,
   Program,
@@ -33,10 +34,12 @@ import {
   ProgramWorkout,
   STORAGE_KEYS,
   TagSeverity,
+  escapeHtml,
   getProgramStatusSeverity,
   injectIsMobile,
   injectIsTablet,
   showApiError,
+  weekdayNames,
 } from 'core';
 
 import { ListEmptyState } from '../../../../_shared/components/list-empty-state/list-empty-state';
@@ -47,6 +50,7 @@ import { CopyWeekDialog } from '../copy-week-dialog/copy-week-dialog';
 import { ExercisePickerDialog } from '../exercise-picker-dialog/exercise-picker-dialog';
 import { MoveTargetChoice, MoveTargetDialog } from '../move-target-dialog/move-target-dialog';
 import { ProgramFormDialog } from '../program-form-dialog/program-form-dialog';
+import { periodizationLabel } from '../program-labels';
 import { SetFormDialog } from '../set-form-dialog/set-form-dialog';
 import { WorkoutFormDialog } from '../workout-form-dialog/workout-form-dialog';
 import {
@@ -67,24 +71,11 @@ import { WorkoutEditor } from './_components/workout-editor/workout-editor';
  * so we don't gate roles here — the BE 404s cross-instructor probes.
  * All mutations update the tree optimistically and resync on failure.
  */
-/**
- * Day names for the copy-day toast. The dialog has its own copy for its
- * labels; this is only for saying which day a copy landed on.
- */
-const DAY_LABELS = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
-
 @Component({
   selector: 'mh-program-detail',
   imports: [
-    TitleCasePipe,
+    EnumLabelPipe,
+    TranslatePipe,
     ButtonDirective,
     ConfirmDialog,
     Toast,
@@ -108,7 +99,6 @@ const DAY_LABELS = [
   providers: [MessageService, ConfirmationService],
   templateUrl: './program-detail.html',
   styleUrl: './program-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
@@ -117,6 +107,7 @@ export class ProgramDetail implements OnInit {
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
   private readonly _location = inject(Location);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
   protected readonly isTablet = injectIsTablet();
@@ -263,9 +254,14 @@ export class ProgramDetail implements OnInit {
 
   /** Action-sheet rows for the mobile ⋮ menu — mirror the desktop header buttons. */
   readonly detailActions: ActionItem[] = [
-    { id: 'edit', icon: 'pi pi-pencil', label: 'Edit program' },
-    { id: 'assign', icon: 'pi pi-user-plus', label: 'Assign to client' },
-    { id: 'delete', icon: 'pi pi-trash', label: 'Delete program…', danger: true },
+    { id: 'edit', icon: 'pi pi-pencil', label: this._translateService.instant('programs.detail.actions.edit') },
+    { id: 'assign', icon: 'pi pi-user-plus', label: this._translateService.instant('programs.detail.actions.assign') },
+    {
+      id: 'delete',
+      icon: 'pi pi-trash',
+      label: this._translateService.instant('programs.detail.actions.delete'),
+      danger: true,
+    },
   ];
 
   /** Reveal key already handled — `id:weekIndex`, so a cross-week move re-reveals. */
@@ -492,8 +488,8 @@ export class ProgramDetail implements OnInit {
       // covers a stale layout (e.g. another session filled the week).
       this._messageService.add({
         severity: 'warn',
-        summary: 'Week is full',
-        detail: 'A week holds at most 7 workouts.',
+        summary: this._translateService.instant('programs.toast.weekFull.summary'),
+        detail: this._translateService.instant('programs.toast.weekFull.detail'),
         life: 2500,
       });
       return;
@@ -503,8 +499,12 @@ export class ProgramDetail implements OnInit {
     if (this.collapsedWeeks().has(e.toWeek)) this.toggleWeekCollapsed(e.toWeek);
 
     this._persistSlots([{ id: workout.id, weekIndex: e.toWeek, dayIndex: day }], {
-      summary: 'Workout moved',
-      detail: `${workout.name} → week ${e.toWeek + 1}, day ${day + 1}.`,
+      summary: this._translateService.instant('programs.toast.workoutMoved.summary'),
+      detail: this._translateService.instant('programs.toast.workoutMoved.detail', {
+        name: workout.name,
+        week: e.toWeek + 1,
+        day: day + 1,
+      }),
     });
   }
 
@@ -581,7 +581,7 @@ export class ProgramDetail implements OnInit {
         if (success) this._messageService.add({ severity: 'success', life: 2500, ...success });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
+        this._apiError('programs.toast.reorderError', err);
         this._refetch();
       },
     });
@@ -590,12 +590,16 @@ export class ProgramDetail implements OnInit {
   confirmDeleteWorkout(workout: ProgramWorkout): void {
     const p = this.program();
     if (!p) return;
+    const message = this._translateService.instant('programs.confirm.deleteWorkout.message', {
+      name: `<strong>${escapeHtml(workout.name)}</strong>`,
+    });
+    const note = this._translateService.instant('programs.confirm.clientCopiesNote');
     this._confirmationService.confirm({
-      header: 'Delete workout?',
-      message: `<strong>${workout.name}</strong> and its exercises will be removed from this program.<br /> Client copies of already-assigned programs keep their data.`,
-      acceptLabel: 'Delete',
+      header: this._translateService.instant('programs.confirm.deleteWorkout.header'),
+      message: `${message}<br /> ${note}`,
+      acceptLabel: this._translateService.instant('button.delete'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._deleteWorkout(workout),
     });
@@ -619,12 +623,12 @@ export class ProgramDetail implements OnInit {
         }
         this._messageService.add({
           severity: 'success',
-          summary: 'Workout deleted',
+          summary: this._translateService.instant('programs.toast.workoutDeleted'),
           life: 2000,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't delete workout", 'Please try again.', err);
+        this._apiError('programs.toast.deleteWorkoutError', err);
       },
     });
   }
@@ -687,7 +691,7 @@ export class ProgramDetail implements OnInit {
       }),
     ).subscribe({
       error: (err) => {
-        showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
+        this._apiError('programs.toast.reorderError', err);
         this._refetch();
       },
     });
@@ -696,13 +700,19 @@ export class ProgramDetail implements OnInit {
   confirmDeleteExercise(workout: ProgramWorkout, ex: PrescribedExercise): void {
     const p = this.program();
     if (!p) return;
-    const name = ex.exercise?.name ?? 'this exercise';
+    const name =
+      ex.exercise?.name ?? this._translateService.instant('programs.confirm.removeExercise.fallbackName');
+    const message = this._translateService.instant('programs.confirm.removeExercise.message', {
+      name: `<strong>${escapeHtml(name)}</strong>`,
+      workout: escapeHtml(workout.name),
+    });
+    const note = this._translateService.instant('programs.confirm.clientCopiesNote');
     this._confirmationService.confirm({
-      header: 'Remove exercise?',
-      message: `Remove <strong>${name}</strong> and its prescribed sets from ${workout.name}?<br /> Client copies of already-assigned programs keep their data.`,
-      acceptLabel: 'Remove',
+      header: this._translateService.instant('programs.confirm.removeExercise.header'),
+      message: `${message}<br /> ${note}`,
+      acceptLabel: this._translateService.instant('button.remove'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._deleteExercise(workout, ex),
     });
@@ -724,12 +734,12 @@ export class ProgramDetail implements OnInit {
         this.program.set({ ...p, workouts: next });
         this._messageService.add({
           severity: 'success',
-          summary: 'Exercise removed',
+          summary: this._translateService.instant('programs.toast.exerciseRemoved'),
           life: 2000,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't remove exercise", 'Please try again.', err);
+        this._apiError('programs.toast.removeExerciseError', err);
       },
     });
   }
@@ -820,12 +830,12 @@ export class ProgramDetail implements OnInit {
         this.program.set({ ...cur, workouts: next });
         this._messageService.add({
           severity: 'success',
-          summary: 'Set duplicated',
+          summary: this._translateService.instant('programs.toast.setDuplicated'),
           life: 2000,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't duplicate set", 'Please try again.', err);
+        this._apiError('programs.toast.duplicateSetError', err);
       },
     });
   }
@@ -870,7 +880,7 @@ export class ProgramDetail implements OnInit {
       }),
     ).subscribe({
       error: (err) => {
-        showApiError(this._messageService, "Couldn't save the new order", 'Please try again.', err);
+        this._apiError('programs.toast.reorderError', err);
         this._refetch();
       },
     });
@@ -886,12 +896,14 @@ export class ProgramDetail implements OnInit {
 
   confirmDeleteSet(workout: ProgramWorkout, ex: PrescribedExercise, set: PrescribedSet): void {
     this._confirmationService.confirm({
-      header: 'Remove set?',
-      message: `Remove set ${set.orderIndex + 1}? This can't be undone — but client copies of already-assigned programs keep their data.`,
+      header: this._translateService.instant('programs.confirm.removeSet.header'),
+      message: this._translateService.instant('programs.confirm.removeSet.message', {
+        number: set.orderIndex + 1,
+      }),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Remove',
+      acceptLabel: this._translateService.instant('button.remove'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._deleteSet(workout, ex, set),
     });
@@ -920,12 +932,12 @@ export class ProgramDetail implements OnInit {
         this.program.set({ ...p, workouts: next });
         this._messageService.add({
           severity: 'success',
-          summary: 'Set removed',
+          summary: this._translateService.instant('programs.toast.setRemoved'),
           life: 2000,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't remove set", 'Please try again.', err);
+        this._apiError('programs.toast.removeSetError', err);
       },
     });
   }
@@ -973,20 +985,15 @@ export class ProgramDetail implements OnInit {
         this.duplicating.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Program duplicated',
-          detail: 'Opened the copy — the original is unchanged.',
+          summary: this._translateService.instant('programs.toast.programDuplicated.summary'),
+          detail: this._translateService.instant('programs.toast.programDuplicated.detail'),
           life: 2500,
         });
         void this._router.navigate(['/coaching/programs', copy.id]);
       },
       error: (err) => {
         this.duplicating.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't duplicate the program",
-          'Please try again.',
-          err,
-        );
+        this._apiError('programs.toast.programDuplicated.error', err);
       },
     });
   }
@@ -1028,12 +1035,14 @@ export class ProgramDetail implements OnInit {
         this._messageService.add({
           severity: 'success',
           summary: movedDay
-            ? `${source.name} copied to ${DAY_LABELS[choice.toDayIndex!]}`
-            : `${source.name} copied`,
-          detail:
-            copied.length === 1
-              ? 'Copied into 1 week.'
-              : `Copied into ${copied.length} weeks.`,
+            ? this._translateService.instant('programs.toast.dayCopied.summaryToDay', {
+                name: source.name,
+                day: weekdayNames('long')[choice.toDayIndex!],
+              })
+            : this._translateService.instant('programs.toast.dayCopied.summary', { name: source.name }),
+          detail: this._translateService.instant('programs.toast.dayCopied.detail', {
+            count: copied.length,
+          }),
           life: 2500,
         });
         // Reveal each destination so the copies are visible.
@@ -1043,7 +1052,7 @@ export class ProgramDetail implements OnInit {
         this._refetch();
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't copy the day", 'Please try again.', err);
+        this._apiError('programs.toast.copyDayError', err);
       },
     });
   }
@@ -1071,11 +1080,13 @@ export class ProgramDetail implements OnInit {
       next: (copied) => {
         this._messageService.add({
           severity: 'success',
-          summary: `Week ${source + 1} copied into week ${targetWeek + 1}`,
-          detail:
-            copied.length === 1
-              ? '1 workout copied.'
-              : `${copied.length} workouts copied.`,
+          summary: this._translateService.instant('programs.toast.weekCopied.summary', {
+            source: source + 1,
+            target: targetWeek + 1,
+          }),
+          detail: this._translateService.instant('programs.toast.weekCopied.detail', {
+            count: copied.length,
+          }),
           life: 2500,
         });
         // Reveal the destination so the newly copied workouts are visible.
@@ -1085,7 +1096,7 @@ export class ProgramDetail implements OnInit {
         this._refetch();
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't copy the week", 'Please try again.', err);
+        this._apiError('programs.toast.copyWeekError', err);
       },
     });
   }
@@ -1108,13 +1119,17 @@ export class ProgramDetail implements OnInit {
         });
         this._messageService.add({
           severity: 'success',
-          summary: 'Workout moved',
-          detail: `${updated.name} → week ${weekIndex + 1}, day ${dayIndex + 1}.`,
+          summary: this._translateService.instant('programs.toast.workoutMoved.summary'),
+          detail: this._translateService.instant('programs.toast.workoutMoved.detail', {
+            name: updated.name,
+            week: weekIndex + 1,
+            day: dayIndex + 1,
+          }),
           life: 2500,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't move workout", 'Please try again.', err);
+        this._apiError('programs.toast.moveWorkoutError', err);
       },
     });
   }
@@ -1192,13 +1207,13 @@ export class ProgramDetail implements OnInit {
         });
         this._messageService.add({
           severity: 'success',
-          summary: 'Exercise moved',
+          summary: this._translateService.instant('programs.toast.exerciseMoved'),
           detail: ex.exercise?.name ?? undefined,
           life: 2500,
         });
       },
       error: (err) => {
-        showApiError(this._messageService, "Couldn't move exercise", 'Please try again.', err);
+        this._apiError('programs.toast.moveExerciseError', err);
         this._refetch();
       },
     });
@@ -1220,12 +1235,16 @@ export class ProgramDetail implements OnInit {
   confirmDelete(): void {
     const p = this.program();
     if (!p) return;
+    const message = this._translateService.instant('programs.confirm.deleteProgram.message', {
+      name: `<strong>${escapeHtml(p.name)}</strong>`,
+    });
+    const note = this._translateService.instant('programs.confirm.deleteProgram.note');
     this._confirmationService.confirm({
-      header: 'Delete program?',
-      message: `<strong>${p.name}</strong> will be removed from your library.<br /> Existing client assignments keep their copy, but you won't be able to assign it to new clients.`,
-      acceptLabel: 'Delete',
+      header: this._translateService.instant('programs.confirm.deleteProgram.header'),
+      message: `${message}<br /> ${note}`,
+      acceptLabel: this._translateService.instant('button.delete'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._deleteProgram(p.id),
     });
@@ -1238,14 +1257,14 @@ export class ProgramDetail implements OnInit {
         this.deleting.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Program deleted',
+          summary: this._translateService.instant('programs.toast.deleted'),
           life: 2500,
         });
         this._router.navigate(['/coaching/programs']);
       },
       error: (err) => {
         this.deleting.set(false);
-        showApiError(this._messageService, "Couldn't delete program", 'Please try again.', err);
+        this._apiError('programs.toast.deleteError', err);
       },
     });
   }
@@ -1287,7 +1306,22 @@ export class ProgramDetail implements OnInit {
     return getProgramStatusSeverity(s);
   }
 
+  /** Known periodization models translate; anything else is shown as authored. */
+  periodizationLabel(model: string): string {
+    return periodizationLabel(model);
+  }
+
   // ── Internals ────────────────────────────────────────────────────
+
+  /** Error toast: translated summary, the server's message or a translated fallback. */
+  private _apiError(summaryKey: string, err: unknown, fallbackKey = 'common.pleaseTryAgain'): void {
+    showApiError(
+      this._messageService,
+      this._translateService.instant(summaryKey),
+      this._translateService.instant(fallbackKey),
+      err,
+    );
+  }
 
   /** Count a container-initiated mutation for the header saving pill. */
   private _track<T>(source: Observable<T>): Observable<T> {
@@ -1314,12 +1348,7 @@ export class ProgramDetail implements OnInit {
       error: (err) => {
         // Always release loading — RxJS `complete` doesn't fire after `error`.
         this.loading.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't load program",
-          'It may have been removed or you may not have access.',
-          err,
-        );
+        this._apiError('programs.toast.loadError.summary', err, 'error.mayBeRemoved');
         this._router.navigate(['/coaching/programs']);
       },
     });

@@ -1,3 +1,5 @@
+import { PublicProfileAudience } from './profile.enums';
+
 /**
  * Response shape for `GET /profile/users/by-handle/:handle`.
  *
@@ -11,8 +13,6 @@
  * whether to also fetch the richer instructor public payload (offerings,
  * reviews, …) from the existing instructor-by-handle endpoint.
  */
-export type PublicProfileAudience = 'OWNER' | 'COACH' | 'PUBLIC';
-
 export interface PublicUserProfile {
   userId: string;
   handle: string;

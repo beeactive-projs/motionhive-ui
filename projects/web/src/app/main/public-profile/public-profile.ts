@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -9,6 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AuthStore,
   LockedAction,
@@ -71,11 +71,11 @@ import { ShareDialog } from '../../_shared/components/share-dialog/share-dialog'
     ContactInstructorDialog,
     SignupPromptDialog,
     ShareDialog,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './public-profile.html',
   styleUrl: './public-profile.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicProfile implements OnInit {
   private readonly _store = inject(PublicProfileStore);
@@ -84,6 +84,7 @@ export class PublicProfile implements OnInit {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Actions = LockedAction;
 
@@ -141,7 +142,11 @@ export class PublicProfile implements OnInit {
     if (city && country) parts.push(`${city}, ${country}`);
     else if (city) parts.push(city);
     if (p?.yearsOfExperience && p.yearsOfExperience > 0) {
-      parts.push(`${p.yearsOfExperience} yrs experience`);
+      parts.push(
+        this._translateService.instant('publicProfile.page.shareExperience', {
+          years: p.yearsOfExperience,
+        }),
+      );
     }
     return parts.join(' · ');
   });
@@ -231,19 +236,21 @@ export class PublicProfile implements OnInit {
     if (p.yearsOfExperience != null && p.yearsOfExperience > 0) {
       stats.push({
         value: `${p.yearsOfExperience}+`,
-        label: 'Years coaching',
+        label: this._translateService.instant('publicProfile.page.stat.yearsCoaching'),
       });
     }
     if (p.certifications && p.certifications.length > 0) {
       stats.push({
         value: String(p.certifications.length),
-        label: p.certifications.length === 1 ? 'Certification' : 'Certifications',
+        label: this._translateService.instant('publicProfile.page.stat.certifications', {
+          count: p.certifications.length,
+        }),
       });
     }
     if (p.specializations && p.specializations.length > 0) {
       stats.push({
         value: String(p.specializations.length),
-        label: 'Specialties',
+        label: this._translateService.instant('publicProfile.page.stat.specialties'),
       });
     }
     return stats;
@@ -308,8 +315,8 @@ export class PublicProfile implements OnInit {
     }
     this._messageService.add({
       severity: 'info',
-      summary: 'Saved',
-      detail: 'Bookmarking is coming soon.',
+      summary: this._translateService.instant('toast.summary.saved'),
+      detail: this._translateService.instant('publicProfile.page.toast.bookmarkSoon'),
       life: 2000,
     });
   }
@@ -359,7 +366,7 @@ export class PublicProfile implements OnInit {
     }
     if (this.viewerMode() === ViewerMode.Owner) return;
     this.contactPrefill.set(
-      `Hi, I'm interested in "${product.name}". Could you tell me how to get started?`,
+      this._translateService.instant('publicProfile.page.offeringPrefill', { name: product.name }),
     );
     this.contactDialogVisible.set(true);
   }

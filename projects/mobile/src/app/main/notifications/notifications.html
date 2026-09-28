@@ -3,10 +3,10 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" />
     </ion-buttons>
-    <ion-title>Notifications</ion-title>
+    <ion-title>{{ 'nav.notifications' | translate }}</ion-title>
     <ion-buttons slot="end">
       @if (store.hasUnread()) {
-        <ion-button (click)="markAllRead()">Mark all read</ion-button>
+        <ion-button (click)="markAllRead()">{{ 'notifications.markAllRead' | translate }}</ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
@@ -20,7 +20,7 @@
   -->
   @if (!isEmpty() || hasFilter()) {
     <ion-toolbar class="filter-bar">
-      <div class="mh-chip-row" role="group" aria-label="Filter notifications">
+      <div class="mh-chip-row" role="group" [attr.aria-label]="'notifications.filterBar' | translate">
         <ion-button
           class="filters"
           fill="clear"
@@ -31,7 +31,11 @@
           (click)="openFilters()"
         >
           <ion-icon slot="start" name="funnel-outline" aria-hidden="true" />
-          Filters@if (filterCount() > 0) { · {{ filterCount() }} }
+          @if (filterCount() > 0) {
+            {{ 'common.filtersCount' | translate: { count: filterCount() } }}
+          } @else {
+            {{ 'common.filters' | translate }}
+          }
         </ion-button>
 
         <ion-chip
@@ -39,7 +43,7 @@
           [attr.aria-pressed]="!store.unreadOnly()"
           (click)="setUnreadOnly(false)"
         >
-          All
+          {{ 'common.all' | translate }}
         </ion-chip>
 
         <ion-chip
@@ -47,7 +51,7 @@
           [attr.aria-pressed]="store.unreadOnly()"
           (click)="setUnreadOnly(true)"
         >
-          Unread
+          {{ 'notifications.filter.unread' | translate }}
           @if (store.unreadCount(); as count) {
             <span class="count">{{ count }}</span>
           }
@@ -65,9 +69,9 @@
   @if (showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load notifications"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'notifications.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
@@ -139,7 +143,9 @@
           <div class="filter-summary">
             <span>{{ summary }}</span>
             <span aria-hidden="true">·</span>
-            <ion-button fill="clear" size="small" (click)="clearCategories()">Clear filter</ion-button>
+            <ion-button fill="clear" size="small" (click)="clearCategories()">
+              {{ 'button.clearFilter' | translate }}
+            </ion-button>
           </div>
         }
       }

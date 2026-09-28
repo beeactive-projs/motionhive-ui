@@ -8,11 +8,12 @@
   <header
     class="sticky -top-4 z-30 flex flex-wrap gap-3 items-center justify-between -mx-4 px-4 pt-4 pb-3 bg-surface-0 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-800">
     <div class="space-y-1 min-w-0">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">Workouts</h1>
-      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">{{ subtitle() }}</p>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ 'nav.workouts' | translate }}</h1>
+      <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">{{ subtitleKey() | translate }}</p>
     </div>
     <p-selectbutton [options]="lensOptions()" [ngModel]="lens()" (ngModelChange)="setLens($event)" optionLabel="label"
-      optionValue="value" [allowEmpty]="false" size="small" aria-label="Training view" />
+      optionValue="value" [allowEmpty]="false" size="small"
+      [attr.aria-label]="'training.hub.lensAria' | translate" />
   </header>
 
   <!--
@@ -53,7 +54,7 @@
         <p-accordion [value]="statsOpen() ? '0' : null" (valueChange)="onStatsToggle($event)">
           <p-accordion-panel value="0">
             <p-accordion-header>
-              <span class="font-heading text-sm font-semibold">How it is adding up</span>
+              <span class="font-heading text-sm font-semibold">{{ 'training.hub.statsTitle' | translate }}</span>
             </p-accordion-header>
             <p-accordion-content>
               <mh-user-progress (startWorkout)="today.openStartFreestyle()" />
@@ -62,7 +63,7 @@
         </p-accordion>
 
         <section class="flex flex-col gap-2">
-          <h2 class="font-heading text-sm font-semibold">Every workout</h2>
+          <h2 class="font-heading text-sm font-semibold">{{ 'training.hub.everyWorkout' | translate }}</h2>
           <mh-workout-history (startWorkout)="today.openStartFreestyle()" />
         </section>
       </div>

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/clients" />
     </ion-buttons>
-    <ion-title>Workout</ion-title>
+    <ion-title>{{ 'programs.logReview.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,9 +11,9 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this workout"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'programs.logReview.error' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
@@ -35,7 +35,7 @@
     <div class="mh-page">
       <ion-card class="hero">
         <ion-card-content>
-          <span class="mh-kicker logged">Logged</span>
+          <span class="mh-kicker logged">{{ 'programs.logReview.logged' | translate }}</span>
           <h2>{{ log.name }}</h2>
           <p class="duration">{{ durationLabel() }}</p>
         </ion-card-content>
@@ -49,16 +49,16 @@
 
       @if (hasFeedback()) {
         <section class="mh-section">
-          <span class="mh-kicker">How it went</span>
+          <span class="mh-kicker">{{ 'programs.logReview.howItWent' | translate }}</span>
           <ion-list [inset]="true" class="mh-card-list">
             <ion-item lines="none">
               <ion-label class="ion-text-wrap">
                 @if (log.feelingRating) {
-                  <h2>Felt {{ log.feelingRating }} out of 5</h2>
+                  <h2>{{ 'programs.logReview.felt' | translate: { rating: log.feelingRating } }}</h2>
                 }
                 @if (log.notes) {
                   <!-- Their words, quoted — this is a record, not a field. -->
-                  <p class="note">“{{ log.notes }}”</p>
+                  <p class="note">{{ 'programs.logReview.quotedNote' | translate: { note: log.notes } }}</p>
                 }
               </ion-label>
             </ion-item>
@@ -67,7 +67,7 @@
       }
 
       <section class="mh-section">
-        <span class="mh-kicker">What they did</span>
+        <span class="mh-kicker">{{ 'programs.logReview.whatTheyDid' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
           @for (exercise of exercises(); track exercise.id; let last = $last) {
             <ion-item [lines]="last ? 'none' : 'full'" [class.skipped]="exercise.isSkipped">

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/workouts" />
     </ion-buttons>
-    <ion-title>Workout</ion-title>
+    <ion-title>{{ 'workouts.common.workout' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,9 +11,9 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this workout"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'workouts.loadError.workout' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
@@ -40,8 +40,8 @@
   } @else if (isEmptyPlan()) {
     <mh-empty-state
       icon="barbell-outline"
-      heading="Nothing to do yet"
-      message="This plan has no workouts in it. Your coach may still be building it."
+      [heading]="'workouts.preview.empty.title' | translate"
+      [message]="'workouts.preview.empty.message' | translate"
     />
   } @else if (workout(); as workout) {
     <div class="mh-page">
@@ -66,7 +66,7 @@
         <ion-list [inset]="true" class="mh-card-list note">
           <ion-item button detail="false" lines="none" (click)="toggleNote()">
             <ion-label class="ion-text-wrap">
-              <span class="mh-kicker">Note from your coach</span>
+              <span class="mh-kicker">{{ 'workouts.preview.noteFromCoach' | translate }}</span>
               @if (noteOpen()) {
                 <p>{{ note }}</p>
               }
@@ -82,7 +82,7 @@
       }
 
       <section class="mh-section">
-        <span class="mh-kicker">Exercises</span>
+        <span class="mh-kicker">{{ 'workouts.common.exercises' | translate }}</span>
         <ion-list [inset]="true" class="mh-card-list">
           @for (exercise of workout.exercises ?? []; track exercise.id; let last = $last) {
             <ion-item [lines]="last ? 'none' : 'full'">
@@ -111,11 +111,11 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <div class="mh-cta-bar">
-        <ion-button expand="block" [disabled]="starting()" (click)="start()">Start workout</ion-button>
+        <ion-button expand="block" [disabled]="starting()" (click)="start()">{{ 'workouts.common.startWorkout' | translate }}</ion-button>
         <!-- Quiet: skipping keeps the day visible in history as skipped, and
              it is a decision, not the thing we are asking for. -->
         <ion-button expand="block" fill="clear" color="medium" size="small" (click)="skip()">
-          Skip today
+          {{ 'workouts.preview.skipToday' | translate }}
         </ion-button>
       </div>
     </ion-toolbar>

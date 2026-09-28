@@ -1,35 +1,26 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
+  inject,
   input,
   model,
   output,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { SelectItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 
-import { PrescribedExercise, Program, ProgramWorkout } from 'core';
+import { PrescribedExercise, Program, ProgramWorkout, weekdayNames } from 'core';
 
 /** What the picker resolved to — the parent performs the actual move. */
 export type MoveTargetChoice =
   | { kind: 'slot'; weekIndex: number; dayIndex: number }
   | { kind: 'workout'; workoutId: string };
-
-const DAY_NAMES = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
 
 /**
  * Cross-container "Move to…" picker for the program builder.
@@ -43,12 +34,15 @@ const DAY_NAMES = [
  */
 @Component({
   selector: 'mh-move-target-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, Select],
+  imports: [FormsModule, TranslatePipe, ButtonDirective, Dialog, Select],
   templateUrl: './move-target-dialog.html',
   styleUrl: './move-target-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoveTargetDialog {
+  private readonly _translateService = inject(TranslateService);
+  /** Monday-first, matching the BE's 0..6 `dayIndex`. */
+  private readonly _dayNames = weekdayNames('long');
+
   readonly program = input.required<Program>();
   readonly mode = input.required<'workout' | 'exercise'>();
   /** Workout being moved (workout mode) / source workout (exercise mode). */
@@ -62,13 +56,16 @@ export class MoveTargetDialog {
   readonly targetWorkoutId = signal<string | null>(null);
 
   readonly dialogHeader = computed(() =>
-    this.mode() === 'workout' ? 'Move workout' : 'Move exercise',
+    this._translateService.instant(
+      this.mode() === 'workout' ? 'programs.moveDialog.titleWorkout' : 'programs.moveDialog.titleExercise',
+    ),
   );
 
   readonly itemLabel = computed(() =>
     this.mode() === 'workout'
       ? this.sourceWorkout().name
-      : (this.exercise()?.exercise?.name ?? 'Exercise'),
+      : (this.exercise()?.exercise?.name ??
+        this._translateService.instant('programs.moveDialog.exerciseFallback')),
   );
 
   readonly weekOptions = computed<SelectItem<number>[]>(() => {
@@ -76,7 +73,7 @@ export class MoveTargetDialog {
     const dur = Math.max(1, Math.ceil(days / 7));
     return Array.from({ length: dur }, (_, i) => ({
       value: i,
-      label: `Week ${i + 1}`,
+      label: this._translateService.instant('programs.common.week', { week: i + 1 }),
     }));
   });
 
@@ -89,7 +86,7 @@ export class MoveTargetDialog {
         .filter((w) => w.weekIndex === week && w.id !== moving.id)
         .map((w) => w.dayIndex),
     );
-    return DAY_NAMES.map((label, day) => ({
+    return this._dayNames.map((label, day) => ({
       value: day,
       label,
       disabled: occupied.has(day),
@@ -104,7 +101,11 @@ export class MoveTargetDialog {
       .sort((a, b) => a.weekIndex - b.weekIndex || a.dayIndex - b.dayIndex)
       .map((w) => ({
         value: w.id,
-        label: `Week ${w.weekIndex + 1} · ${DAY_NAMES[w.dayIndex]} — ${w.name}`,
+        label: this._translateService.instant('programs.moveDialog.workoutOption', {
+          week: w.weekIndex + 1,
+          day: this._dayNames[w.dayIndex],
+          name: w.name,
+        }),
       }));
   });
 

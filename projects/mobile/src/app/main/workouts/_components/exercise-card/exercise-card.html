@@ -15,7 +15,7 @@
         fill="clear"
         shape="round"
         color="medium"
-        [attr.aria-label]="'Actions for ' + name()"
+        [attr.aria-label]="'workouts.exerciseCard.actionsFor' | translate: { name: name() }"
         (click)="onActions($event)"
       >
         <ion-icon slot="icon-only" name="ellipsis-horizontal" aria-hidden="true" />

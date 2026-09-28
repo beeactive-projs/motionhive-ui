@@ -17,7 +17,7 @@
       <span class="text-sm font-semibold truncate" [pTooltip]="v.name" tooltipPosition="top">{{ v.name }}</span>
       <p-tag [value]="m.label" severity="secondary" class="text-[10px]! shrink-0 hidden sm:inline-flex" />
       @if (!v.isActive) {
-        <p-tag value="Archived" severity="contrast" class="text-[10px]! shrink-0" />
+        <p-tag [value]="'venues.archived' | translate" severity="contrast" class="text-[10px]! shrink-0" />
       }
     </div>
 
@@ -41,8 +41,9 @@
         [text]="true"
         [rounded]="true"
         size="small"
-        pTooltip="Edit"
+        [pTooltip]="'button.edit' | translate"
         tooltipPosition="top"
+        [attr.aria-label]="'button.edit' | translate"
         (click)="onEdit()"
         iconOnly
       >
@@ -55,8 +56,9 @@
           [text]="true"
           [rounded]="true"
           size="small"
-          pTooltip="Archive"
+          [pTooltip]="'button.archive' | translate"
           tooltipPosition="top"
+          [attr.aria-label]="'button.archive' | translate"
           (click)="onArchive()"
           iconOnly
         >
@@ -69,8 +71,9 @@
           [text]="true"
           [rounded]="true"
           size="small"
-          pTooltip="Restore"
+          [pTooltip]="'button.restore' | translate"
           tooltipPosition="top"
+          [attr.aria-label]="'button.restore' | translate"
           (click)="onRestore()"
           iconOnly
         >
@@ -83,8 +86,9 @@
         [text]="true"
         [rounded]="true"
         size="small"
-        pTooltip="Delete"
+        [pTooltip]="'button.delete' | translate"
         tooltipPosition="top"
+        [attr.aria-label]="'button.delete' | translate"
         (click)="onRemove()"
         iconOnly
       >

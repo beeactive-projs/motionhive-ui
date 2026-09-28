@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import type { ButtonSeverity } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -25,19 +26,21 @@ import { FeedbackService, AuthStore, FeedbackCategory, FeedbackCategories } from
     MessageModule,
     ToastModule,
     AutoFocusModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './feedback-dialog.html',
   styleUrl: './feedback-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackDialog {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _authStore = inject(AuthStore);
 
   protected readonly visible = this._feedbackService.isOpen;
 
+  /** `label` is a translation key; the template translates it. */
   protected readonly types: {
     key: FeedbackCategory;
     label: string;
@@ -46,13 +49,23 @@ export class FeedbackDialog {
   }[] = [
     {
       key: FeedbackCategories.Suggestion,
-      label: 'Suggestion',
+      label: 'components.feedbackDialog.type.SUGGESTION',
       icon: 'lightbulb',
       severity: 'warn',
     },
-    { key: FeedbackCategories.Bug, label: 'Bug report', icon: 'bug_report', severity: 'danger' },
+    {
+      key: FeedbackCategories.Bug,
+      label: 'components.feedbackDialog.type.BUG',
+      icon: 'bug_report',
+      severity: 'danger',
+    },
 
-    { key: FeedbackCategories.Other, label: 'Other', icon: 'chat', severity: 'info' },
+    {
+      key: FeedbackCategories.Other,
+      label: 'components.feedbackDialog.type.OTHER',
+      icon: 'chat',
+      severity: 'info',
+    },
   ];
 
   protected readonly form = new FormGroup({
@@ -65,25 +78,24 @@ export class FeedbackDialog {
     initialValue: FeedbackCategories.Suggestion,
   });
 
+  /** Translation keys for the title / message placeholders of the selected type. */
   protected readonly placeholders = computed(() => {
     const type = this._selectedType();
     switch (type) {
       case FeedbackCategories.Bug:
         return {
-          title: 'e.g. Session attendance not saving correctly',
-          message:
-            'What were you doing when it happened? What did you expect vs. what actually occurred?',
+          title: 'components.feedbackDialog.placeholder.BUG.title',
+          message: 'components.feedbackDialog.placeholder.BUG.message',
         };
       case FeedbackCategories.Suggestion:
         return {
-          title: 'e.g. Show progress charts per client',
-          message:
-            'Describe the feature and how it would improve your workflow as a trainer or organizer...',
+          title: 'components.feedbackDialog.placeholder.SUGGESTION.title',
+          message: 'components.feedbackDialog.placeholder.SUGGESTION.message',
         };
       default:
         return {
-          title: 'e.g. Question about managing group sessions',
-          message: "What's on your mind? We're happy to help.",
+          title: 'components.feedbackDialog.placeholder.OTHER.title',
+          message: 'components.feedbackDialog.placeholder.OTHER.message',
         };
     }
   });
@@ -125,8 +137,8 @@ export class FeedbackDialog {
           this.isLoading.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Something went wrong',
-            detail: 'Could not send feedback. Please try again.',
+            summary: this._translateService.instant('toast.detail.somethingWentWrong'),
+            detail: this._translateService.instant('components.feedbackDialog.toast.sendFailed'),
             life: 5000,
           });
         },

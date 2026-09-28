@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   ElementRef,
   computed,
@@ -13,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
@@ -31,6 +31,8 @@ import {
   UpdateProgramWorkoutPayload,
   noWhitespaceValidator,
   showApiError,
+  validationMessage,
+  weekdayNames,
 } from 'core';
 
 /**
@@ -55,11 +57,11 @@ import {
     Select,
     Textarea,
     Toast,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './workout-form-dialog.html',
   styleUrl: './workout-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkoutFormDialog {
   readonly program = input.required<Program>();
@@ -73,6 +75,7 @@ export class WorkoutFormDialog {
   private readonly _programService = inject(ProgramService);
   private readonly _messageService = inject(MessageService);
   private readonly _formBuilder = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _nameInput =
     viewChild<ElementRef<HTMLInputElement>>('nameInput');
@@ -92,22 +95,18 @@ export class WorkoutFormDialog {
 
   // ── Options ──────────────────────────────────────────────────────
 
-  readonly dayOptions: SelectItem<number>[] = [
-    { value: 0, label: 'Monday' },
-    { value: 1, label: 'Tuesday' },
-    { value: 2, label: 'Wednesday' },
-    { value: 3, label: 'Thursday' },
-    { value: 4, label: 'Friday' },
-    { value: 5, label: 'Saturday' },
-    { value: 6, label: 'Sunday' },
-  ];
+  /** Monday-first, matching the BE's 0..6 `dayIndex`. */
+  readonly dayOptions: SelectItem<number>[] = weekdayNames('long').map((label, value) => ({
+    value,
+    label,
+  }));
 
   readonly weekOptions = computed<SelectItem<number>[]>(() => {
     const days = this.program().durationDays ?? 84; // 12 weeks default
     const dur = Math.max(1, Math.ceil(days / 7));
     return Array.from({ length: dur }, (_, i) => ({
       value: i,
-      label: `Week ${i + 1}`,
+      label: this._translateService.instant('programs.common.week', { week: i + 1 }),
     }));
   });
 
@@ -115,10 +114,14 @@ export class WorkoutFormDialog {
 
   readonly isEdit = computed(() => this.workout() !== null);
   readonly dialogHeader = computed(() =>
-    this.isEdit() ? 'Edit workout' : 'New workout',
+    this._translateService.instant(
+      this.isEdit() ? 'programs.workoutForm.titleEdit' : 'programs.workoutForm.titleNew',
+    ),
   );
   readonly submitLabel = computed(() =>
-    this.isEdit() ? 'Save changes' : 'Add workout',
+    this._translateService.instant(
+      this.isEdit() ? 'button.saveChanges' : 'programs.workoutForm.submitAdd',
+    ),
   );
 
   // ── Validation ───────────────────────────────────────────────────
@@ -139,9 +142,9 @@ export class WorkoutFormDialog {
   }
 
   getFieldError(field: 'name'): string {
-    const errors = this.form.controls[field].errors;
-    if (errors?.['required']) return 'Workout name is required.';
-    return '';
+    return validationMessage(this.form.controls[field].errors, {
+      required: 'programs.workoutForm.nameRequired',
+    });
   }
 
   constructor() {
@@ -197,7 +200,9 @@ export class WorkoutFormDialog {
         this.submitting.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: existing ? 'Workout updated' : 'Workout added',
+          summary: this._translateService.instant(
+            existing ? 'programs.toast.workoutUpdated' : 'programs.toast.workoutAdded',
+          ),
           detail: w.name,
           life: 2500,
         });
@@ -208,8 +213,10 @@ export class WorkoutFormDialog {
         this.submitting.set(false);
         showApiError(
           this._messageService,
-          existing ? "Couldn't save workout" : "Couldn't add workout",
-          'Please check the form and try again.',
+          this._translateService.instant(
+            existing ? 'programs.toast.saveWorkoutError' : 'programs.toast.addWorkoutError',
+          ),
+          this._translateService.instant('programs.toast.checkForm'),
           err,
         );
       },

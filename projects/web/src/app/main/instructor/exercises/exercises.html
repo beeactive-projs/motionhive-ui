@@ -4,16 +4,15 @@
     <div class="space-y-1">
       <!-- Title comes from whichever shell hosts this (Training, or the coach route). -->
       @if (isTabletDown()) {
-      <p class="text-xs text-surface-700 dark:text-surface-400">Build your movement library.</p>
+      <p class="text-xs text-surface-700 dark:text-surface-400">{{ 'exercises.catalog.subtitleShort' | translate }}</p>
       } @else {
-      <p class="text-sm text-surface-700 dark:text-surface-400">Browse and build the movement library your programs
-        draw from.</p>
+      <p class="text-sm text-surface-700 dark:text-surface-400">{{ 'exercises.catalog.subtitle' | translate }}</p>
       }
     </div>
     @if (isInstructor() && !isMobile()) {
     <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openCreate()">
       <i class="pi pi-plus"></i>
-      Create exercise
+      {{ 'exercises.common.createExercise' | translate }}
     </button>
     }
   </header>
@@ -25,7 +24,7 @@
   <div class="flex-1 min-h-0 flex items-start gap-4" [class.overflow-y-auto]="!isMobile()">
     <!-- Desktop rail · tablet-down folds the same panel into the drawer. -->
     @if (!isTabletDown()) {
-    <aside class="w-56 shrink-0 h-full" aria-label="Filters">
+    <aside class="w-56 shrink-0 h-full" [attr.aria-label]="'common.filters' | translate">
       <p-card class="h-full overflow-auto">
         <mh-exercise-filter-panel [kindOptions]="kindOptions" [levelOptions]="levelOptions"
           [muscles]="taxonomy.muscles()" [equipment]="taxonomy.equipment()" [facets]="facets()"
@@ -36,7 +35,7 @@
 
         @if (activeFilterCount() > 0) {
         <div class="pt-2">
-          <button pButton type="button" severity="secondary" size="small" [text]="true" (click)="clearFilters()">Clear filters</button>
+          <button pButton type="button" severity="secondary" size="small" [text]="true" (click)="clearFilters()">{{ 'button.clearFilters' | translate }}</button>
         </div>
         }
       </p-card>
@@ -63,16 +62,16 @@
           class="flex h-16 w-16 items-center justify-center rounded-2xl border border-(--p-primary-200) bg-(--p-primary-50) text-(--p-primary-500) text-[26px]">
           <i class="pi pi-bolt"></i>
         </div>
-        <h3 class="m-0 font-heading text-base font-semibold text-surface-900 dark:text-surface-100">No custom exercises
-          yet</h3>
+        <h3 class="m-0 font-heading text-base font-semibold text-surface-900 dark:text-surface-100">
+          {{ 'exercises.catalog.emptyMine.title' | translate }}</h3>
         <p class="m-0 max-w-sm text-sm text-surface-600 dark:text-surface-400">
-          Build movements specific to your coaching style, or fork a public one to make it your own.
+          {{ 'exercises.catalog.emptyMine.message' | translate }}
         </p>
         <div class="mt-1 flex flex-col items-center gap-2">
-          <button pButton type="button" (click)="openCreate()"><i class="pi pi-plus"></i> Create your first exercise</button>
+          <button pButton type="button" (click)="openCreate()"><i class="pi pi-plus"></i> {{ 'exercises.catalog.emptyMine.create' | translate }}</button>
           <button pButton type="button" severity="secondary" [outlined]="true" (click)="setOwnership(Ownership.PublicOthers)">
             <i class="pi pi-compass"></i>
-            Browse the catalog to fork
+            {{ 'exercises.catalog.emptyMine.browse' | translate }}
           </button>
         </div>
       </div>
@@ -82,12 +81,12 @@
           class="flex h-14 w-14 items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800 text-surface-400 text-2xl">
           <i class="pi pi-filter-slash"></i>
         </div>
-        <h3 class="m-0 font-heading text-base font-semibold text-surface-900 dark:text-surface-100">No exercises match
-        </h3>
-        <p class="m-0 max-w-sm text-sm text-surface-600 dark:text-surface-400">Loosen a filter or search differently to
-          see more.</p>
+        <h3 class="m-0 font-heading text-base font-semibold text-surface-900 dark:text-surface-100">
+          {{ 'exercises.catalog.emptyFiltered.title' | translate }}</h3>
+        <p class="m-0 max-w-sm text-sm text-surface-600 dark:text-surface-400">
+          {{ 'exercises.catalog.emptyFiltered.message' | translate }}</p>
         @if (activeFilterCount() > 0) {
-        <button pButton type="button" severity="secondary" [text]="true" (click)="clearFilters()">Clear all filters</button>
+        <button pButton type="button" severity="secondary" [text]="true" (click)="clearFilters()">{{ 'exercises.catalog.clearAllFilters' | translate }}</button>
         }
       </div>
       }
@@ -102,7 +101,7 @@
       <div class="flex justify-center pt-4">
         <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
           @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
-          {{ loadingMore() ? 'Loading…' : 'Load more' }}
+          {{ (loadingMore() ? 'common.loading' : 'button.loadMore') | translate }}
         </button>
       </div>
       }
@@ -113,7 +112,7 @@
 
 @if (isInstructor() && isMobile()) {
 <!-- Mobile FAB (single primary action). -->
-<mh-mobile-fab icon="pi pi-plus" label="New exercise" (tap)="openCreate()" />
+<mh-mobile-fab icon="pi pi-plus" [label]="'exercises.catalog.newExercise' | translate" (tap)="openCreate()" />
 }
 
 <!--
@@ -134,7 +133,7 @@
          can't create exercises, so "Mine" is always empty and "System"
          is redundant with "All" from their perspective (which is
          system + coaches' public exercises). -->
-    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Ownership filter">
+    <div class="flex flex-wrap items-center gap-1.5" role="group" [attr.aria-label]="'exercises.catalog.ownership.aria' | translate">
       @for (tab of ownershipTabs(); track tab.value) {
       <button pButton
         type="button"
@@ -154,7 +153,8 @@
     <div class="flex flex-1 items-center gap-2 md:justify-end">
       <p-iconfield class="flex-1 md:flex-[0_1_280px]">
         <p-inputicon class="pi pi-search" />
-        <input pInputText type="text" fluid placeholder="Search by name…" aria-label="Search exercises"
+        <input pInputText type="text" fluid [placeholder]="'exercises.catalog.searchPlaceholder' | translate"
+          [attr.aria-label]="'exercises.catalog.searchAria' | translate"
           [ngModel]="searchInput()" (ngModelChange)="onSearchChange($event)" />
         @if (searchInput() !== '') {
         <p-inputicon class="pi pi-times cursor-pointer" (click)="onSearchChange('')" />
@@ -170,7 +170,7 @@
       @if (isTabletDown()) {
       <button pButton type="button" severity="secondary" [text]="true" size="small" (click)="filterDrawerVisible.set(true)">
         <i class="pi pi-sliders-h"></i>
-        {{ activeFilterCount() > 0 ? 'Filters · ' + activeFilterCount() : 'Filters' }}
+        {{ activeFilterCount() > 0 ? ('common.filtersCount' | translate: { count: activeFilterCount() }) : ('common.filters' | translate) }}
       </button>
       }
     </div>
@@ -178,7 +178,7 @@
 </ng-template>
 
 <p-drawer [(visible)]="filterDrawerVisible" position="right" [appendTo]="'body'" [style]="{ width: 'min(420px, 90vw)' }"
-  header="Filters">
+  [header]="'common.filters' | translate">
   <mh-exercise-filter-panel [kindOptions]="kindOptions" [levelOptions]="levelOptions" [muscles]="taxonomy.muscles()"
     [equipment]="taxonomy.equipment()" [facets]="facets()" [selectedKinds]="selectedKinds()"
     [selectedLevels]="selectedLevels()" [selectedMuscleIds]="selectedMuscleIds()"
@@ -196,11 +196,11 @@
         class="w-auto"
         (click)="clearFilters()"
       >
-        Clear all
+        {{ 'exercises.catalog.clearAll' | translate }}
       </button>
       <button pButton type="button" fluid class="flex-1" (click)="filterDrawerVisible.set(false)">
         <i class="pi pi-check"></i>
-        {{ loading() ? 'Loading…' : 'Show ' + total() + ' results' }}
+        {{ loading() ? ('common.loading' | translate) : ('exercises.catalog.showResults' | translate: { count: total() }) }}
       </button>
     </div>
   </ng-template>

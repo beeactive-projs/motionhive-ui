@@ -1,15 +1,15 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
-import { Venue, VenueService, showApiError } from 'core';
+import { Venue, VenueService, escapeHtml, showApiError } from 'core';
 import { VenueCard } from '../../../../instructor/venues/venue-card/venue-card';
 import { VenueFormDialog } from '../../../../instructor/venues/venue-form-dialog/venue-form-dialog';
 
@@ -28,16 +28,17 @@ import { VenueFormDialog } from '../../../../instructor/venues/venue-form-dialog
     SkeletonModule,
     VenueCard,
     VenueFormDialog,
+    TranslatePipe,
   ],
   providers: [ConfirmationService],
   templateUrl: './venues-section.html',
   styleUrl: './venues-section.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VenuesSection implements OnInit {
   private readonly _venueService = inject(VenueService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly venues = signal<Venue[]>([]);
   readonly venuesLoading = signal(false);
@@ -66,8 +67,8 @@ export class VenuesSection implements OnInit {
         this.venuesLoading.set(false);
         showApiError(
           this._messageService,
-          'Could not load venues',
-          'Please try again.',
+          this._translateService.instant('venues.toast.loadFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },
@@ -96,11 +97,13 @@ export class VenuesSection implements OnInit {
 
   confirmVenueArchive(venue: Venue): void {
     this._confirmationService.confirm({
-      header: 'Archive venue?',
-      message: `"${venue.name}" will be hidden from new sessions but existing sessions keep showing it. You can restore it later.`,
+      header: this._translateService.instant('venues.confirm.archive.header'),
+      message: this._translateService.instant('venues.confirm.archive.message', {
+        name: escapeHtml(venue.name),
+      }),
       icon: 'pi pi-inbox',
-      acceptLabel: 'Archive',
-      rejectLabel: 'Cancel',
+      acceptLabel: this._translateService.instant('button.archive'),
+      rejectLabel: this._translateService.instant('button.cancel'),
       acceptButtonStyleClass: 'p-button-sm',
       rejectButtonStyleClass: 'p-button-sm p-button-text',
       accept: () => this.archiveVenue(venue),
@@ -115,14 +118,14 @@ export class VenuesSection implements OnInit {
         );
         this._messageService.add({
           severity: 'success',
-          summary: 'Venue archived',
+          summary: this._translateService.instant('venues.toast.archived'),
         });
       },
       error: (err: unknown) => {
         showApiError(
           this._messageService,
-          'Could not archive venue',
-          'Please try again.',
+          this._translateService.instant('venues.toast.archiveFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },
@@ -131,11 +134,13 @@ export class VenuesSection implements OnInit {
 
   confirmVenueRestore(venue: Venue): void {
     this._confirmationService.confirm({
-      header: 'Restore venue?',
-      message: `"${venue.name}" will be visible again and selectable when you create new sessions.`,
+      header: this._translateService.instant('venues.confirm.restore.header'),
+      message: this._translateService.instant('venues.confirm.restore.message', {
+        name: escapeHtml(venue.name),
+      }),
       icon: 'pi pi-refresh',
-      acceptLabel: 'Restore',
-      rejectLabel: 'Cancel',
+      acceptLabel: this._translateService.instant('button.restore'),
+      rejectLabel: this._translateService.instant('button.cancel'),
       acceptButtonStyleClass: 'p-button-sm',
       rejectButtonStyleClass: 'p-button-sm p-button-text',
       accept: () => this.restoreVenue(venue),
@@ -150,14 +155,14 @@ export class VenuesSection implements OnInit {
         );
         this._messageService.add({
           severity: 'success',
-          summary: 'Venue restored',
+          summary: this._translateService.instant('venues.toast.restored'),
         });
       },
       error: (err: unknown) => {
         showApiError(
           this._messageService,
-          'Could not restore venue',
-          'Please try again.',
+          this._translateService.instant('venues.toast.restoreFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },
@@ -166,11 +171,13 @@ export class VenuesSection implements OnInit {
 
   confirmVenueRemove(venue: Venue): void {
     this._confirmationService.confirm({
-      header: 'Delete venue?',
-      message: `"${venue.name}" will be removed. Historical sessions keep their details.`,
+      header: this._translateService.instant('venues.confirm.delete.header'),
+      message: this._translateService.instant('venues.confirm.delete.message', {
+        name: escapeHtml(venue.name),
+      }),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
+      acceptLabel: this._translateService.instant('button.delete'),
+      rejectLabel: this._translateService.instant('button.cancel'),
       acceptButtonStyleClass: 'p-button-sm p-button-danger',
       rejectButtonStyleClass: 'p-button-sm p-button-text',
       accept: () => this.removeVenue(venue),
@@ -183,14 +190,14 @@ export class VenuesSection implements OnInit {
         this.venues.update((list) => list.filter((v) => v.id !== venue.id));
         this._messageService.add({
           severity: 'success',
-          summary: 'Venue deleted',
+          summary: this._translateService.instant('venues.toast.deleted'),
         });
       },
       error: (err: unknown) => {
         showApiError(
           this._messageService,
-          'Could not delete venue',
-          'Please try again.',
+          this._translateService.instant('venues.toast.deleteFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },

@@ -1,14 +1,15 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
+  inject,
   input,
   model,
   output,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { SelectItem } from 'primeng/api';
@@ -28,11 +29,12 @@ import { Program } from 'core';
  */
 @Component({
   selector: 'mh-copy-week-dialog',
-  imports: [FormsModule, ButtonDirective, Dialog, Select],
+  imports: [FormsModule, TranslatePipe, ButtonDirective, Dialog, Select],
   templateUrl: './copy-week-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CopyWeekDialog {
+  private readonly _translateService = inject(TranslateService);
+
   readonly program = input.required<Program>();
   /** 0-based source week — the one whose content will be copied. */
   readonly sourceWeekIndex = input.required<number>();
@@ -52,15 +54,12 @@ export class CopyWeekDialog {
     }
     return Array.from({ length: totalWeeks }, (_, i) => {
       const count = workoutsByWeek.get(i) ?? 0;
-      const suffix =
-        count === 0
-          ? ' (empty)'
-          : count === 1
-            ? ' · 1 workout will be replaced'
-            : ` · ${count} workouts will be replaced`;
       return {
         value: i,
-        label: `Week ${i + 1}${suffix}`,
+        label: this._translateService.instant(
+          count === 0 ? 'programs.copyWeek.optionEmpty' : 'programs.copyWeek.optionReplaced',
+          { week: i + 1, count },
+        ),
         disabled: i === source,
       };
     });
@@ -72,7 +71,9 @@ export class CopyWeekDialog {
   });
 
   readonly submitLabel = computed(() =>
-    this.targetOccupancy() > 0 ? `Replace week ${this.targetWeek() + 1}` : 'Copy',
+    this.targetOccupancy() > 0
+      ? this._translateService.instant('programs.copyWeek.submitReplace', { week: this.targetWeek() + 1 })
+      : this._translateService.instant('button.copy'),
   );
 
   readonly canSubmit = computed(

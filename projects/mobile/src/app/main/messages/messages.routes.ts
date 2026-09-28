@@ -17,31 +17,31 @@ export const messagesRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./messages').then((m) => m.Messages),
-    title: 'Messages - MotionHive',
+    title: 'pageTitle.messages',
   },
   {
     // The composer owns the bottom edge — the keyboard opens straight onto it,
     // and a tab bar wedged between the two costs a message of visible thread.
     path: 'new',
     loadComponent: () => import('./chat/chat').then((m) => m.Chat),
-    title: 'New message - MotionHive',
+    title: 'pageTitle.newMessage',
     data: { hideTabBar: true },
   },
   {
     // Before `:id`, or the parameterised route swallows "person".
     path: 'person/:handle',
     loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'Profile - MotionHive',
+    title: 'pageTitle.profile',
   },
   {
     path: ':id',
     loadComponent: () => import('./chat/chat').then((m) => m.Chat),
-    title: 'Chat - MotionHive',
+    title: 'pageTitle.chat',
     data: { hideTabBar: true },
   },
   {
     path: ':id/details',
     loadComponent: () => import('./chat-details/chat-details').then((m) => m.ChatDetails),
-    title: 'Details - MotionHive',
+    title: 'pageTitle.details',
   },
 ];

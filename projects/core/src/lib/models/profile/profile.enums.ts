@@ -99,3 +99,12 @@ export const ProfilePrivacyOptions: readonly ProfilePrivacy[] = [
   ProfilePrivacy.CoachesOnly,
   ProfilePrivacy.OnlyMe,
 ] as const;
+
+/** Who is viewing a public profile, as resolved by the server (`GET /profile/users/by-handle/:handle`). */
+export const PublicProfileAudiences = {
+  Owner: 'OWNER',
+  Coach: 'COACH',
+  Public: 'PUBLIC',
+} as const;
+
+export type PublicProfileAudience = (typeof PublicProfileAudiences)[keyof typeof PublicProfileAudiences];

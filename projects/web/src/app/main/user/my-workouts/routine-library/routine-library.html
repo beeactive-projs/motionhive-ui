@@ -26,7 +26,8 @@
       role="search">
       <p-iconfield class="flex-1 md:flex-[0_1_320px]">
         <p-inputicon class="pi pi-search" />
-        <input pInputText type="text" fluid placeholder="Search routines…" aria-label="Search routines"
+        <input pInputText type="text" fluid [placeholder]="'myWorkouts.library.searchPlaceholder' | translate"
+          [attr.aria-label]="'myWorkouts.library.search' | translate"
           [ngModel]="routineSearch()" (ngModelChange)="onRoutineSearch($event)" />
         @if (routineSearch() !== '') {
         <p-inputicon class="pi pi-times cursor-pointer" (click)="clearRoutineSearch()" />
@@ -39,10 +40,10 @@
           something you infer from a badge halfway down the list.
         -->
         <p-selectbutton [options]="libraryOptions" [ngModel]="library()" (ngModelChange)="setLibrary($event)"
-          optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" aria-label="Routine library" />
+          optionLabel="label" optionValue="value" [allowEmpty]="false" size="small" [attr.aria-label]="'myWorkouts.library.libraryFilter' | translate" />
         <button pButton type="button" severity="secondary" [text]="true" (click)="openCreateRoutine()">
           <i class="pi pi-plus"></i>
-          New routine
+          {{ 'myWorkouts.common.newRoutine' | translate }}
         </button>
       </div>
     </div>
@@ -55,18 +56,19 @@
       only leave by navigating away.
     -->
     @if (routineSearch().trim()) {
-    <mh-list-empty-state icon="pi pi-search" title="No routines match your search"
-      message="Try a different name or folder, or clear the search to see everything." actionLabel="Clear search"
+    <mh-list-empty-state icon="pi pi-search" [title]="'myWorkouts.library.empty.search.title' | translate"
+      [message]="'myWorkouts.library.empty.search.message' | translate"
+      [actionLabel]="'button.clearSearch' | translate"
       actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearRoutineSearch()" />
-    } @else if (library() === 'mine') {
-    <mh-list-empty-state icon="pi pi-clone" title="You haven't saved a routine yet"
-      message="Start from one of the MotionHive routines and save a copy, or build your own from scratch."
-      actionLabel="Browse MotionHive routines" actionIcon="pi pi-verified" actionSeverity="secondary"
-      [actionOutlined]="true" (action)="setLibrary('system')" />
+    } @else if (library() === Libraries.Mine) {
+    <mh-list-empty-state icon="pi pi-clone" [title]="'myWorkouts.library.empty.mine.title' | translate"
+      [message]="'myWorkouts.library.empty.mine.message' | translate"
+      [actionLabel]="'myWorkouts.library.empty.mine.action' | translate" actionIcon="pi pi-verified" actionSeverity="secondary"
+      [actionOutlined]="true" (action)="setLibrary(Libraries.System)" />
     } @else {
-    <mh-list-empty-state icon="pi pi-clone" title="No routines yet"
-      message="Save a workout shape — name, exercises, default sets — and start it again with one tap."
-      actionLabel="Create routine" actionIcon="pi pi-plus" (action)="openCreateRoutine()" />
+    <mh-list-empty-state icon="pi pi-clone" [title]="'myWorkouts.library.empty.none.title' | translate"
+      [message]="'myWorkouts.library.empty.none.message' | translate"
+      [actionLabel]="'myWorkouts.common.createRoutine' | translate" actionIcon="pi pi-plus" (action)="openCreateRoutine()" />
     }
     } @else {
     <div class="flex flex-col gap-2 md:gap-4.5">
@@ -85,7 +87,7 @@
     <button pButton type="button" severity="secondary" [text]="true" fluid size="small" class="mt-3"
       [disabled]="routinesLoading()" (click)="loadMoreRoutines()">
       <i class="pi" [class]="routinesLoading() ? 'pi-spinner pi-spin' : 'pi-chevron-down'"></i>
-      Load more ({{ routines().length }} of {{ routinesTotal() }})
+      {{ 'myWorkouts.library.loadMore' | translate: { loaded: routines().length, total: routinesTotal() } }}
     </button>
     }
     }

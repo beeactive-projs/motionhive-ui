@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -7,9 +6,10 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { DatePipe, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -25,6 +25,7 @@ import { Toast } from 'primeng/toast';
 
 import { MobileFab } from '../../../_shared/components/mobile-fab/mobile-fab';
 import {
+  EnumLabelPipe,
   ListProgramsQuery,
   PaginatedPrograms,
   Program,
@@ -34,6 +35,7 @@ import {
   TagSeverity,
   UpdateProgramPayload,
   apiErrorMessage,
+  escapeHtml,
   getProgramStatusSeverity,
   injectIsMobile,
   injectIsTablet,
@@ -42,6 +44,7 @@ import {
 } from 'core';
 
 import { ListEmptyState } from '../../../_shared/components/list-empty-state/list-empty-state';
+import { periodizationLabel } from './program-labels';
 import { ProgramFormDialog } from './program-form-dialog/program-form-dialog';
 
 /**
@@ -64,7 +67,7 @@ type ProgramOrigin = 'all' | 'mine' | 'starters';
   imports: [
     DatePipe,
     NgTemplateOutlet,
-    TitleCasePipe,
+    EnumLabelPipe,
     FormsModule,
     RouterLink,
     ButtonDirective,
@@ -81,17 +84,18 @@ type ProgramOrigin = 'all' | 'mine' | 'starters';
     ListEmptyState,
     MobileFab,
     ProgramFormDialog,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './programs.html',
   styleUrl: './programs.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Programs {
   private readonly _programService = inject(ProgramService);
   private readonly _router = inject(Router);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   // ── Responsive ───────────────────────────────────────────────────
   protected readonly isMobile = injectIsMobile();
@@ -168,53 +172,57 @@ export class Programs {
     );
   });
 
-  readonly originTabs: { value: ProgramOrigin; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'mine', label: 'Mine' },
-    { value: 'starters', label: 'MotionHive' },
+  /** `labelKey` is translated in the template. */
+  readonly originTabs: { value: ProgramOrigin; labelKey: string }[] = [
+    { value: 'all', labelKey: 'common.all' },
+    { value: 'mine', labelKey: 'programs.list.origin.mine' },
+    { value: 'starters', labelKey: 'programs.list.origin.starters' },
   ];
 
   setOrigin(value: ProgramOrigin): void {
     this.originFilter.set(value);
   }
 
-  readonly statusTabs: { status: ProgramStatus | null; label: string }[] = [
-    { status: null, label: 'All' },
-    { status: ProgramStatus.Draft, label: 'Draft' },
-    { status: ProgramStatus.Published, label: 'Published' },
-    { status: ProgramStatus.Archived, label: 'Archived' },
+  /** `labelKey` is translated in the template. */
+  readonly statusTabs: { status: ProgramStatus | null; labelKey: string }[] = [
+    { status: null, labelKey: 'common.all' },
+    { status: ProgramStatus.Draft, labelKey: `enum.programStatus.${ProgramStatus.Draft}` },
+    { status: ProgramStatus.Published, labelKey: `enum.programStatus.${ProgramStatus.Published}` },
+    { status: ProgramStatus.Archived, labelKey: `enum.programStatus.${ProgramStatus.Archived}` },
   ];
 
-  /** Status-aware empty-state copy. Only All/Draft offer a create CTA. */
+  /**
+   * Status-aware empty-state copy. Only All/Draft offer a create CTA.
+   * `titleKey` / `messageKey` are translated in the template.
+   */
   readonly emptyState = computed(() => {
     switch (this.statusFilter()) {
       case ProgramStatus.Draft:
         return {
           icon: 'pi pi-pencil',
-          title: 'No draft programs',
-          message: "Programs you're still authoring show up here.",
+          titleKey: 'programs.list.empty.draft.title',
+          messageKey: 'programs.list.empty.draft.message',
           action: true,
         };
       case ProgramStatus.Published:
         return {
           icon: 'pi pi-check-circle',
-          title: 'No published programs',
-          message: 'Publish a program to make it assignable to clients.',
+          titleKey: 'programs.list.empty.published.title',
+          messageKey: 'programs.list.empty.published.message',
           action: false,
         };
       case ProgramStatus.Archived:
         return {
           icon: 'pi pi-inbox',
-          title: 'No archived programs',
-          message: 'Archived programs are hidden but not deleted.',
+          titleKey: 'programs.list.empty.archived.title',
+          messageKey: 'programs.list.empty.archived.message',
           action: false,
         };
       default:
         return {
           icon: 'pi pi-objects-column',
-          title: 'No programs yet',
-          message:
-            'Programs are how you author your coaching plans — workouts, exercises, and sets your clients follow. Create your first one to get started.',
+          titleKey: 'programs.list.empty.all.title',
+          messageKey: 'programs.list.empty.all.message',
           action: true,
         };
     }
@@ -296,34 +304,40 @@ export class Programs {
 
   /** Draft → publish. Non-destructive, no confirm. */
   publish(program: Program): void {
-    this._setStatus(program, ProgramStatus.Published, 'Program published');
+    this._setStatus(program, ProgramStatus.Published, 'programs.toast.published');
   }
 
   /** Archived → restore to draft. Non-destructive, no confirm. */
   restore(program: Program): void {
-    this._setStatus(program, ProgramStatus.Draft, 'Program restored to draft');
+    this._setStatus(program, ProgramStatus.Draft, 'programs.toast.restored');
   }
 
   confirmArchive(program: Program): void {
     this._confirmationService.confirm({
-      header: 'Archive program?',
-      message: `"${program.name}" will be hidden from your active list. Existing client assignments keep their copy — you just won't be able to assign it to new clients until you restore it.`,
+      header: this._translateService.instant('programs.confirm.archiveProgram.header'),
+      message: this._translateService.instant('programs.confirm.archiveProgram.message', {
+        name: escapeHtml(program.name),
+      }),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Archive',
+      acceptLabel: this._translateService.instant('button.archive'),
       acceptButtonProps: { severity: 'warn' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
-      accept: () => this._setStatus(program, ProgramStatus.Archived, 'Program archived'),
+      accept: () => this._setStatus(program, ProgramStatus.Archived, 'programs.toast.archived'),
     });
   }
 
   confirmDelete(program: Program): void {
+    const message = this._translateService.instant('programs.confirm.deleteProgram.message', {
+      name: `<strong>${escapeHtml(program.name)}</strong>`,
+    });
+    const note = this._translateService.instant('programs.confirm.deleteProgram.note');
     this._confirmationService.confirm({
-      header: 'Delete program?',
-      message: `<strong>${program.name}</strong> will be removed from your library.<br /> Existing client assignments keep their copy, but you won't be able to assign it to new clients.`,
-      acceptLabel: 'Delete',
+      header: this._translateService.instant('programs.confirm.deleteProgram.header'),
+      message: `${message}<br /> ${note}`,
+      acceptLabel: this._translateService.instant('button.delete'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Cancel',
+      rejectLabel: this._translateService.instant('button.cancel'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._deleteProgram(program),
     });
@@ -335,38 +349,42 @@ export class Programs {
 
   /** Human duration label — weeks when the day count divides evenly. */
   durationLabel(days: number): string {
-    if (days % 7 === 0) {
-      const weeks = days / 7;
-      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
-    }
-    return `${days} ${days === 1 ? 'day' : 'days'}`;
+    return days % 7 === 0
+      ? this._translateService.instant('count.weeks', { count: days / 7 })
+      : this._translateService.instant('count.days', { count: days });
+  }
+
+  /** Known periodization models translate; anything else is shown as authored. */
+  periodizationLabel(model: string): string {
+    return periodizationLabel(model);
   }
 
   // ── Internals ────────────────────────────────────────────────────
 
   /** Status-aware menu model. Edit + one status transition + delete. */
   private _buildMenu(p: Program): MenuItem[] {
+    const t = (key: string): string => this._translateService.instant(key);
     const items: MenuItem[] = [
-      { label: 'Edit', icon: 'pi pi-pencil', command: () => this.openEdit(p) },
+      { label: t('button.edit'), icon: 'pi pi-pencil', command: () => this.openEdit(p) },
     ];
     switch (p.status) {
       case ProgramStatus.Draft:
         items.push({
-          label: 'Publish',
+          label: t('programs.list.menu.publish'),
           icon: 'pi pi-check-circle',
           command: () => this.publish(p),
         });
         break;
       case ProgramStatus.Published:
         items.push({
-          label: 'Archive…',
+          label: t('programs.list.menu.archive'),
           icon: 'pi pi-inbox',
           command: () => this.confirmArchive(p),
         });
         break;
       case ProgramStatus.Archived:
         items.push({
-          label: 'Restore to draft',
+          label: t('programs.list.menu.restore'),
           icon: 'pi pi-replay',
           command: () => this.restore(p),
         });
@@ -375,7 +393,7 @@ export class Programs {
     items.push(
       { separator: true },
       {
-        label: 'Delete…',
+        label: t('programs.list.menu.delete'),
         icon: 'pi pi-trash',
         command: () => this.confirmDelete(p),
       },
@@ -383,7 +401,8 @@ export class Programs {
     return items;
   }
 
-  private _setStatus(program: Program, status: ProgramStatus, successSummary: string): void {
+  /** `successKey` — translation key for the success toast summary. */
+  private _setStatus(program: Program, status: ProgramStatus, successKey: string): void {
     if (this.mutatingIds().has(program.id)) return;
     this._setMutating(program.id, true);
     const payload: UpdateProgramPayload = { status };
@@ -393,14 +412,19 @@ export class Programs {
         this._applyStatusUpdate(updated);
         this._messageService.add({
           severity: 'success',
-          summary: successSummary,
+          summary: this._translateService.instant(successKey),
           detail: updated.name,
           life: 2500,
         });
       },
       error: (err) => {
         this._setMutating(program.id, false);
-        showApiError(this._messageService, "Couldn't update program", 'Please try again.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('programs.toast.updateError'),
+          this._translateService.instant('common.pleaseTryAgain'),
+          err,
+        );
       },
     });
   }
@@ -430,14 +454,19 @@ export class Programs {
         this.total.update((t) => Math.max(0, t - 1));
         this._messageService.add({
           severity: 'success',
-          summary: 'Program deleted',
+          summary: this._translateService.instant('programs.toast.deleted'),
           detail: program.name,
           life: 2500,
         });
       },
       error: (err) => {
         this._setMutating(program.id, false);
-        showApiError(this._messageService, "Couldn't delete program", 'Please try again.', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('programs.toast.deleteError'),
+          this._translateService.instant('common.pleaseTryAgain'),
+          err,
+        );
       },
     });
   }
@@ -482,7 +511,7 @@ export class Programs {
         settle();
       },
       error: (err) => {
-        this.error.set(apiErrorMessage(err, 'Check your connection and try again.'));
+        this.error.set(apiErrorMessage(err, this._translateService.instant('error.checkConnection')));
         settle();
       },
     });

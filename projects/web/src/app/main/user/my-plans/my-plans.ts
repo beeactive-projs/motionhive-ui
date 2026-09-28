@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,6 +9,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { IconField } from 'primeng/iconfield';
@@ -27,6 +27,7 @@ import {
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
+  enumLabel,
   injectIsMobile,
   injectIsTabletDown,
   showApiError,
@@ -39,7 +40,8 @@ import { MyPlanRow } from './_components/my-plan-row/my-plan-row';
 interface StatusTab {
   /** Tab value: the status string, or 'all' for the unfiltered view. */
   key: string;
-  label: string;
+  /** Translation key; the template translates it. */
+  labelKey: string;
   icon: string;
 }
 
@@ -62,7 +64,6 @@ interface PlanGroup {
  */
 @Component({
   selector: 'mh-my-plans',
-  standalone: true,
   imports: [
     NgTemplateOutlet,
     FormsModule,
@@ -83,6 +84,7 @@ interface PlanGroup {
     Tab,
     TabPanels,
     TabPanel,
+    TranslatePipe,
   ],
   // Provided here (not just in a parent) so this component can mount
   // as a standalone route — the Plans nav entry loads it directly at
@@ -91,12 +93,12 @@ interface PlanGroup {
   providers: [MessageService],
   templateUrl: './my-plans.html',
   styleUrl: './my-plans.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyPlans {
   private readonly _service = inject(ProgramAssignmentService);
   private readonly _messageService = inject(MessageService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
   protected readonly isTabletDown = injectIsTabletDown();
@@ -118,20 +120,26 @@ export class MyPlans {
   readonly hasMore = computed(() => this.items().length < this.total());
 
   readonly tabs: StatusTab[] = [
-    { key: 'all', label: 'All', icon: 'pi pi-list' },
-    { key: ProgramAssignmentStatus.Active, label: 'Active', icon: 'pi pi-bolt' },
-    { key: ProgramAssignmentStatus.Pending, label: 'Pending', icon: 'pi pi-clock' },
-    { key: ProgramAssignmentStatus.Completed, label: 'Completed', icon: 'pi pi-check-circle' },
-    { key: ProgramAssignmentStatus.Paused, label: 'Paused', icon: 'pi pi-pause-circle' },
+    { key: 'all', labelKey: 'common.all', icon: 'pi pi-list' },
+    ...[
+      { status: ProgramAssignmentStatus.Active, icon: 'pi pi-bolt' },
+      { status: ProgramAssignmentStatus.Pending, icon: 'pi pi-clock' },
+      { status: ProgramAssignmentStatus.Completed, icon: 'pi pi-check-circle' },
+      { status: ProgramAssignmentStatus.Paused, icon: 'pi pi-pause-circle' },
+    ].map(({ status, icon }) => ({
+      key: status,
+      labelKey: `enum.programAssignmentStatus.${status}`,
+      icon,
+    })),
   ];
 
   /** Status display order for the "All" tab section grouping. */
-  private readonly _groupOrder: { status: ProgramAssignmentStatus; label: string }[] = [
-    { status: ProgramAssignmentStatus.Active, label: 'Active' },
-    { status: ProgramAssignmentStatus.Pending, label: 'Pending' },
-    { status: ProgramAssignmentStatus.Paused, label: 'Paused' },
-    { status: ProgramAssignmentStatus.Completed, label: 'Completed' },
-    { status: ProgramAssignmentStatus.Cancelled, label: 'Cancelled' },
+  private readonly _groupOrder: ProgramAssignmentStatus[] = [
+    ProgramAssignmentStatus.Active,
+    ProgramAssignmentStatus.Pending,
+    ProgramAssignmentStatus.Paused,
+    ProgramAssignmentStatus.Completed,
+    ProgramAssignmentStatus.Cancelled,
   ];
 
   /**
@@ -151,9 +159,9 @@ export class MyPlans {
       return all.length ? [{ status: null, label: '', items: all }] : [];
     }
     return this._groupOrder
-      .map(({ status, label }) => ({
+      .map((status) => ({
         status,
-        label,
+        label: enumLabel('programAssignmentStatus', status),
         items: all.filter((a) => a.status === status),
       }))
       .filter((g) => g.items.length > 0);
@@ -249,8 +257,8 @@ export class MyPlans {
         settle();
         showApiError(
           this._messageService,
-          "Couldn't load your plans",
-          'Check your connection and try again.',
+          this._translateService.instant('training.myPlans.loadFailed'),
+          this._translateService.instant('error.checkConnection'),
           err,
         );
       },

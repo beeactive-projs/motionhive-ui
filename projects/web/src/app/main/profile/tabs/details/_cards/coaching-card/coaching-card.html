@@ -3,11 +3,11 @@
     <div class="flex items-center justify-between px-4 pt-4">
       <div class="flex items-center gap-2">
         <i class="pi pi-graduation-cap text-primary-600"></i>
-        <h2 class="text-base font-semibold m-0">Coaching profile</h2>
+        <h2 class="text-base font-semibold m-0">{{ 'profile.coaching.title' | translate }}</h2>
         @if (profile().instructorProfile?.isAcceptingClients) {
-        <p-tag rounded value="Accepting clients" severity="success" icon="pi pi-check" class="text-xs!" />
+        <p-tag rounded [value]="'profile.coaching.accepting' | translate" severity="success" icon="pi pi-check" class="text-xs!" />
         } @else {
-        <p-tag rounded value="Not accepting" severity="secondary" class="text-xs!" />
+        <p-tag rounded [value]="'profile.coaching.notAccepting' | translate" severity="secondary" class="text-xs!" />
         }
       </div>
       <button pButton
@@ -16,10 +16,10 @@
         [rounded]="true"
         size="small"
         severity="secondary"
-        pTooltip="Edit coaching profile"
+        [pTooltip]="'profile.coaching.edit' | translate"
         tooltipPosition="left"
         (click)="showEditInstructor.set(true)"
-        aria-label="Edit coaching profile"
+        [attr.aria-label]="'profile.coaching.edit' | translate"
         iconOnly
       >
         <i class="pi pi-pencil"></i>
@@ -31,21 +31,25 @@
   @if (profile().instructorProfile; as ip) {
   <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     <div>
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Display name</dt>
-      <dd class="mt-1 text-sm font-medium">{{ ip.displayName || 'Not set' }}</dd>
+      <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.displayName' | translate }}</dt>
+      <dd class="mt-1 text-sm font-medium">{{ ip.displayName || ('form.placeholder.notSet' | translate) }}</dd>
     </div>
     <div>
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Years of experience</dt>
+      <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.yearsOfExperience' | translate }}</dt>
       <dd class="mt-1 text-sm font-medium">
-        {{ ip.yearsOfExperience != null ? ip.yearsOfExperience + ' years' : 'Not set' }}
+        @if (ip.yearsOfExperience != null) {
+        {{ 'count.years' | translate: { count: ip.yearsOfExperience } }}
+        } @else {
+        {{ 'form.placeholder.notSet' | translate }}
+        }
       </dd>
     </div>
     <div class="sm:col-span-2 lg:col-span-3">
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Bio</dt>
-      <dd class="mt-1 text-sm font-medium whitespace-pre-line">{{ ip.bio || 'No bio added yet.' }}</dd>
+      <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.bio' | translate }}</dt>
+      <dd class="mt-1 text-sm font-medium whitespace-pre-line">{{ ip.bio || ('profile.coaching.noBio' | translate) }}</dd>
     </div>
     <div class="sm:col-span-2 lg:col-span-3">
-      <dt class="text-xs uppercase tracking-wide text-surface-500">Specializations</dt>
+      <dt class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.specializations' | translate }}</dt>
       <dd class="mt-1">
         @if (ip.specializations?.length) {
         <div class="flex flex-wrap gap-1">
@@ -54,18 +58,18 @@
           }
         </div>
         } @else {
-        <span class="text-sm font-medium">Not set</span>
+        <span class="text-sm font-medium">{{ 'form.placeholder.notSet' | translate }}</span>
         }
       </dd>
     </div>
     <div class="sm:col-span-2 lg:col-span-3">
       <dt class="text-xs uppercase tracking-wide text-surface-500 flex items-center gap-2">
-        <span>Social links</span>
+        <span>{{ 'form.label.socialLinks' | translate }}</span>
         @if (socialLinks().length > 0) {
         @if (ip.showSocialLinks) {
-        <p-tag value="Public" severity="success" class="text-xs!" />
+        <p-tag [value]="'profile.coaching.socialLinks.public' | translate" severity="success" class="text-xs!" />
         } @else {
-        <p-tag value="Hidden" severity="secondary" class="text-xs!" />
+        <p-tag [value]="'profile.coaching.socialLinks.hidden' | translate" severity="secondary" class="text-xs!" />
         }
         }
       </dt>
@@ -83,7 +87,7 @@
           }
         </ul>
         } @else {
-        <span class="text-sm font-medium">Not set</span>
+        <span class="text-sm font-medium">{{ 'form.placeholder.notSet' | translate }}</span>
         }
       </dd>
     </div>
@@ -96,21 +100,21 @@
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold uppercase tracking-wide text-surface-500 m-0">
-        Services on your public profile
+        {{ 'profile.coaching.services.title' | translate }}
       </h3>
       <a routerLink="/coaching/payments" [queryParams]="{ tab: 'pricing' }"
         class="text-sm text-primary-600 hover:underline">
-        Manage all pricing →
+        {{ 'profile.coaching.services.manageAll' | translate }}
       </a>
     </div>
 
     @if (coachingProductsLoading()) {
-    <p class="text-sm text-surface-500 m-0">Loading…</p>
+    <p class="text-sm text-surface-500 m-0">{{ 'common.loading' | translate }}</p>
     } @else if (coachingProducts().length === 0) {
     <p class="text-sm text-surface-500 m-0">
-      You don't have any products yet. Add them in
+      {{ 'profile.coaching.services.emptyBefore' | translate }}
       <a routerLink="/coaching/payments" [queryParams]="{ tab: 'pricing' }"
-        class="text-primary-600 hover:underline">Pricing</a>.
+        class="text-primary-600 hover:underline">{{ 'profile.coaching.services.emptyLink' | translate }}</a>.
     </p>
     } @else {
     <div class="flex flex-col gap-2">
@@ -125,7 +129,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs text-surface-500">
-            {{ product.showOnProfile ? 'Visible' : 'Hidden' }}
+            {{ (product.showOnProfile ? 'profile.coaching.services.visible' : 'profile.coaching.services.hidden') | translate }}
           </span>
           <p-toggleswitch [ngModel]="product.showOnProfile" [disabled]="isToggling(product.id)"
             (ngModelChange)="toggleProductVisibility(product, $event)" />

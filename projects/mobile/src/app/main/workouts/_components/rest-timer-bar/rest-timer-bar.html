@@ -1,23 +1,23 @@
 <div class="bar" [class.done]="done()" role="timer" aria-live="polite">
   <div class="count">
-    <span class="mh-kicker">{{ done() ? 'Rest over' : 'Rest' }}</span>
+    <span class="mh-kicker">{{ (done() ? 'workouts.restTimer.restOver' : 'workouts.restTimer.rest') | translate }}</span>
     <strong>{{ display() }}</strong>
   </div>
 
   @if (nextTarget()) {
-    <span class="next">Next: {{ nextTarget() }}</span>
+    <span class="next">{{ 'workouts.restTimer.next' | translate: { target: nextTarget() } }}</span>
   }
 
   <div class="actions">
-    <ion-button size="small" shape="round" fill="outline" color="medium" aria-label="Minus 10 seconds" (click)="subtract()">
+    <ion-button size="small" shape="round" fill="outline" color="medium" [attr.aria-label]="'workouts.restTimer.minusSeconds' | translate: { seconds: 10 }" (click)="subtract()">
       −10
     </ion-button>
-    <ion-button size="small" shape="round" fill="outline" color="medium" aria-label="Plus 10 seconds" (click)="add()">
+    <ion-button size="small" shape="round" fill="outline" color="medium" [attr.aria-label]="'workouts.restTimer.plusSeconds' | translate: { seconds: 10 }" (click)="add()">
       +10
     </ion-button>
     <ion-button size="small" shape="round" class="skip" (click)="skip.emit()">
       <ion-icon slot="start" name="play-skip-forward-outline" aria-hidden="true" />
-      Skip
+      {{ 'button.skip' | translate }}
     </ion-button>
   </div>
 </div>

@@ -53,7 +53,7 @@
       @for (image of images(); track image.previewUrl) {
       <div class="thumb">
         <img [src]="image.previewUrl" alt="" />
-        <button type="button" class="drop" [attr.aria-label]="'groups.compose.removePhoto' | translate: { name: image.file.name }"
+        <button type="button" class="drop" [attr.aria-label]="'a11y.removeItem' | translate: { name: image.file.name }"
           (click)="removeImage(image)">
           <ion-icon name="close-outline" aria-hidden="true" />
         </button>

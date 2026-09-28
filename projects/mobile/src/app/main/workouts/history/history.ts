@@ -16,6 +16,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { WorkoutLog } from 'core';
@@ -51,6 +52,7 @@ import { HistoryStore } from './history.store';
     IonToolbar,
     LogRow,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './history.html',
   styleUrl: './history.scss',

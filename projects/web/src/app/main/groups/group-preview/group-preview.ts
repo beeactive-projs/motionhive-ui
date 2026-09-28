@@ -116,8 +116,8 @@ export class GroupPreview implements OnInit {
   readonly joinButtonLabel = computed(() => {
     if (this.joinRequestPending()) return this._translateService.instant('groups.join.requestPending');
     const policy = this.group()?.joinPolicy;
-    if (policy === JoinPolicies.Open) return this._translateService.instant('groups.join.joinGroup');
-    if (policy === JoinPolicies.Approval) return this._translateService.instant('groups.join.requestToJoin');
+    if (policy === JoinPolicies.Open) return this._translateService.instant('button.joinGroup');
+    if (policy === JoinPolicies.Approval) return this._translateService.instant('button.requestToJoin');
     return this._translateService.instant('groups.join.inviteOnly');
   });
 
@@ -207,7 +207,7 @@ export class GroupPreview implements OnInit {
           this.joinRequestPending.set(true);
           this._messageService.add({
             severity: 'info',
-            summary: this._translateService.instant('groups.toast.requestSent.summary'),
+            summary: this._translateService.instant('toast.summary.requestSent'),
             detail: this._translateService.instant('groups.toast.requestSent.detail'),
           });
         }
@@ -235,7 +235,7 @@ export class GroupPreview implements OnInit {
         this.joinRequestPending.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: this._translateService.instant('groups.toast.requestCancelled'),
+          summary: this._translateService.instant('toast.summary.requestCancelled'),
           detail: '',
         });
       },

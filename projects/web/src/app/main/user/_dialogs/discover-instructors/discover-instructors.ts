@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, effect, model, inject, signal } from '@angular/core';
+import { Component, effect, model, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -7,7 +8,13 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
-import { AuthStore, InstructorSearchResult, ClientService, ProfileService } from 'core';
+import {
+  AuthStore,
+  InstructorSearchResult,
+  ClientService,
+  ProfileService,
+  showApiError,
+} from 'core';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 @Component({
@@ -21,17 +28,18 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
     SkeletonModule,
     ToastModule,
     TextareaModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './discover-instructors.html',
   styleUrl: './discover-instructors.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscoverInstructors {
   private readonly _profileService = inject(ProfileService);
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
 
@@ -69,8 +77,8 @@ export class DiscoverInstructors {
         this.searched.set(true);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to search instructors',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('userDialogs.discoverCoaches.toast.searchFailed'),
         });
       },
     });
@@ -95,17 +103,20 @@ export class DiscoverInstructors {
           this.showRequestDialog.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: 'Request Sent',
-            detail: `Your request to join ${this.instructorName(instructor)} was sent successfully`,
+            summary: this._translateService.instant('toast.summary.requestSent'),
+            detail: this._translateService.instant('userDialogs.discoverCoaches.toast.requestSent.detail', {
+              name: this.instructorName(instructor),
+            }),
           });
         },
         error: (err) => {
           this.requestingId.set(null);
-          this._messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Failed to send request',
-          });
+          showApiError(
+            this._messageService,
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('userDialogs.discoverCoaches.toast.requestFailed'),
+            err,
+          );
         },
       });
   }

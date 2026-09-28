@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,7 +9,15 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ClientRequest, ClientService, MyInstructor } from 'core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  ClientRequest,
+  ClientRequestTypes,
+  ClientService,
+  escapeHtml,
+  MyInstructor,
+  showApiError,
+} from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -31,18 +38,19 @@ import { Avatar } from '../../../../_shared/components/avatar/avatar';
     SkeletonModule,
     ToastModule,
     TooltipModule,
+    TranslatePipe,
     DiscoverInstructors,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './coaches.html',
   styleUrl: './coaches.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCoaches implements OnInit {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _route = inject(ActivatedRoute);
+  private readonly _translateService = inject(TranslateService);
 
   readonly active = input(false);
 
@@ -92,8 +100,8 @@ export class ProfileCoaches implements OnInit {
         this.loadingInstructors.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load coaches',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('profileTabs.coaches.toast.loadFailed'),
         });
       },
     });
@@ -104,10 +112,10 @@ export class ProfileCoaches implements OnInit {
     this._clientService.getPendingRequests().subscribe({
       next: (requests) => {
         this.incomingRequests.set(
-          requests.filter((r) => r.type === 'INSTRUCTOR_TO_CLIENT'),
+          requests.filter((r) => r.type === ClientRequestTypes.InstructorToClient),
         );
         this.outgoingRequests.set(
-          requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR'),
+          requests.filter((r) => r.type === ClientRequestTypes.ClientToInstructor),
         );
         this.loadingRequests.set(false);
       },
@@ -122,27 +130,27 @@ export class ProfileCoaches implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Request accepted',
-          detail: 'You are now working with this coach.',
+          summary: this._translateService.instant('profileTabs.coaches.toast.accepted.summary'),
+          detail: this._translateService.instant('profileTabs.coaches.toast.accepted.detail'),
         });
         this.loadPendingRequests();
         this.loadInstructors();
       },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to accept request',
-        });
-      },
+      error: (err) =>
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profileTabs.coaches.toast.acceptFailed'),
+          err,
+        ),
     });
   }
 
   confirmDecline(request: ClientRequest): void {
-    const name = this.requestFromName(request);
+    const name = escapeHtml(this.requestFromName(request));
     this._confirmationService.confirm({
-      message: `Decline the request from ${name}?`,
-      header: 'Decline request',
+      message: this._translateService.instant('profileTabs.coaches.confirm.decline.message', { name }),
+      header: this._translateService.instant('profileTabs.coaches.confirm.decline.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.declineRequest(request),
@@ -154,25 +162,25 @@ export class ProfileCoaches implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'info',
-          summary: 'Request declined',
+          summary: this._translateService.instant('profileTabs.coaches.toast.declined'),
         });
         this.loadPendingRequests();
       },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to decline request',
-        });
-      },
+      error: (err) =>
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profileTabs.coaches.toast.declineFailed'),
+          err,
+        ),
     });
   }
 
   confirmCancelOutgoing(request: ClientRequest): void {
-    const name = this.requestToName(request);
+    const name = escapeHtml(this.requestToName(request));
     this._confirmationService.confirm({
-      message: `Cancel your request to ${name}?`,
-      header: 'Cancel request',
+      message: this._translateService.instant('profileTabs.coaches.confirm.cancel.message', { name }),
+      header: this._translateService.instant('profileTabs.coaches.confirm.cancel.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.cancelOutgoing(request),
@@ -184,25 +192,25 @@ export class ProfileCoaches implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'info',
-          summary: 'Request cancelled',
+          summary: this._translateService.instant('toast.summary.requestCancelled'),
         });
         this.loadPendingRequests();
       },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to cancel request',
-        });
-      },
+      error: (err) =>
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profileTabs.coaches.toast.cancelFailed'),
+          err,
+        ),
     });
   }
 
   confirmLeave(item: MyInstructor): void {
-    const name = `${item.instructor.firstName} ${item.instructor.lastName}`;
+    const name = escapeHtml(`${item.instructor.firstName} ${item.instructor.lastName}`);
     this._confirmationService.confirm({
-      message: `End your collaboration with ${name}? You can send a new request later if you change your mind. Active memberships continue until you cancel them from the Memberships tab.`,
-      header: 'End collaboration',
+      message: this._translateService.instant('profileTabs.coaches.confirm.leave.message', { name }),
+      header: this._translateService.instant('profileTabs.coaches.confirm.leave.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.leaveInstructor(item),
@@ -214,17 +222,17 @@ export class ProfileCoaches implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Collaboration ended',
+          summary: this._translateService.instant('profileTabs.coaches.toast.ended'),
         });
         this.loadInstructors();
       },
-      error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to end relationship',
-        });
-      },
+      error: (err) =>
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profileTabs.coaches.toast.endFailed'),
+          err,
+        ),
     });
   }
 
@@ -242,12 +250,12 @@ export class ProfileCoaches implements OnInit {
   }
 
   requestFromName(request: ClientRequest): string {
-    if (!request.fromUser) return 'A coach';
+    if (!request.fromUser) return this._translateService.instant('profileTabs.coaches.aCoach');
     return `${request.fromUser.firstName} ${request.fromUser.lastName}`;
   }
 
   requestToName(request: ClientRequest): string {
-    if (!request.toUser) return 'Unknown';
+    if (!request.toUser) return this._translateService.instant('common.unknown');
     return `${request.toUser.firstName} ${request.toUser.lastName}`;
   }
 

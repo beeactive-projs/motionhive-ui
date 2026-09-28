@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   IonBackButton,
   IonBadge,
@@ -47,6 +48,7 @@ import { ROLE_ICONS, ROLE_LIST, UPCOMING_ROLES } from '../../../_shared/config/r
     IonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './switch-role.html',
   styleUrl: './switch-role.scss',

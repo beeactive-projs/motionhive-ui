@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-2 w-full">
       <span class="font-semibold">{{ message.summary }}</span>
       <span class="text-sm">{{ message.detail }}</span>
-      <button pButton type="button" size="small" (click)="reload()">Reload</button>
+      <button pButton type="button" size="small" (click)="reload()">{{ 'components.pwaUpdate.reload' | translate }}</button>
     </div>
   </ng-template>
 </p-toast>

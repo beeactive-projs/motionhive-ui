@@ -4,18 +4,18 @@ export const activityRoutes: Routes = [
   {
     path: 'schedule',
     loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule),
-    title: 'My Schedule - MotionHive',
+    title: 'pageTitle.mySchedule',
   },
   {
     path: 'progress',
     loadComponent: () => import('./progress/progress').then((m) => m.Progress),
-    title: 'My Progress - MotionHive',
+    title: 'pageTitle.myProgress',
   },
   {
     path: 'checkout/return',
     loadComponent: () =>
       import('./payments/checkout-return/checkout-return').then((m) => m.CheckoutReturn),
-    title: 'Payment - MotionHive',
+    title: 'pageTitle.payment',
   },
   // Legacy — redirect personal billing pages to the profile hub
   { path: 'invoices', redirectTo: '/profile', pathMatch: 'full' },

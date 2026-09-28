@@ -1,7 +1,7 @@
 @if (locked()) {
-<span class="privacy-chooser-locked" [pTooltip]="lockedTooltip()" tooltipPosition="top">
+<span class="privacy-chooser-locked" [pTooltip]="lockedTooltip() ?? ('components.privacyChooser.managedBySystem' | translate)" tooltipPosition="top">
   <i [class]="currentIcon()" aria-hidden="true"></i>
-  <span class="sr-only">{{ currentLabel() }} (locked)</span>
+  <span class="sr-only">{{ 'components.privacyChooser.locked' | translate: { level: currentLabel() } }}</span>
 </span>
 } @else {
 <button pButton
@@ -14,13 +14,13 @@
   [pTooltip]="currentLabel()"
   tooltipPosition="top"
   (click)="toggle($event)"
-  [attr.aria-label]="'Visibility: ' + currentLabel() + '. Change.'"
+  [attr.aria-label]="'components.privacyChooser.change' | translate: { level: currentLabel() }"
   iconOnly
 >
   <i [class]="currentIcon()"></i>
 </button>
 
-<p-popover #popover appendTo="body">
+<p-popover #popover [appendTo]="'body'">
   <div class="privacy-chooser-options" role="listbox">
     @for (opt of options; track opt) {
     <button type="button" role="option" class="privacy-chooser-option" [class.is-selected]="opt === level()"

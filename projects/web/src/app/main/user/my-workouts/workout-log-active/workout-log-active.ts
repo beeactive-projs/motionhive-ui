@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnDestroy,
   OnInit,
@@ -22,17 +21,22 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
   Exercise,
+  ExerciseKind,
   ExerciseService,
   LogSetPayload,
   LoggedExercise,
   LoggedSet,
   SetField,
+  SetFields,
   WorkoutLog,
   WorkoutLogService,
   WorkoutLogStatus,
+  appLocale,
+  escapeHtml,
   setFieldsFor,
   showApiError,
 } from 'core';
@@ -80,13 +84,13 @@ import { ListEmptyState } from '../../../../_shared/components/list-empty-state/
     Tag,
     Toast,
     TooltipModule,
+    TranslatePipe,
     ExerciseDetailDialog,
     ExercisePickerDialog,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './workout-log-active.html',
   styleUrl: './workout-log-active.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkoutLogActive implements OnInit, OnDestroy {
   private readonly _route = inject(ActivatedRoute);
@@ -95,6 +99,16 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   private readonly _exerciseService = inject(ExerciseService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
+
+  /** Set-field names for template comparisons. */
+  readonly Fields = SetFields;
+
+  /** Plain numbers in the UI locale ("82.5" / "82,5"), no grouping. */
+  private readonly _numberFormat = new Intl.NumberFormat(appLocale(), {
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  });
 
   readonly log = signal<WorkoutLog | null>(null);
   readonly loading = signal(false);
@@ -222,14 +236,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     if (!cur || this.isComplete()) return;
     this._service.logSet(cur.id, set.id, patch).subscribe({
       next: (saved) => this._mergeSet(ex.id, saved),
-      error: (err) => {
-        showApiError(
-          this._messageService,
-          "Couldn't save set",
-          'Please retry.',
-          err,
-        );
-      },
+      error: (err) => this._apiError('myWorkouts.logger.toast.saveSetFailed', err),
     });
   }
 
@@ -288,12 +295,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
           isCompleted: wasCompleted,
         } as LoggedSet);
         this._clearPending(set.id);
-        showApiError(
-          this._messageService,
-          "Couldn't save set",
-          'Please retry.',
-          err,
-        );
+        this._apiError('myWorkouts.logger.toast.saveSetFailed', err);
       },
     });
   }
@@ -334,13 +336,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         );
         this.log.set({ ...cur, exercises: next });
       },
-      error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't add set",
-          'Please retry.',
-          err,
-        ),
+      error: (err) => this._apiError('myWorkouts.logger.toast.addSetFailed', err),
     });
   }
 
@@ -353,8 +349,10 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     this._setSkipped(ex, true, () => {
       this._messageService.add({
         severity: 'info',
-        summary: `Skipped ${ex.exerciseNameSnapshot}`,
-        detail: 'It stays on your log, just not counted.',
+        summary: this._translateService.instant('myWorkouts.logger.toast.skipped', {
+          name: ex.exerciseNameSnapshot,
+        }),
+        detail: this._translateService.instant('myWorkouts.logger.toast.skippedDetail'),
         life: 6000,
         data: { undoExerciseId: ex.id },
       });
@@ -383,12 +381,14 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     const cur = this.log();
     if (!cur || this.isComplete()) return;
     this._confirmationService.confirm({
-      header: 'Remove this exercise?',
-      message: `"${ex.exerciseNameSnapshot}" and its empty sets come off this workout.`,
+      header: this._translateService.instant('myWorkouts.logger.confirm.removeExercise.header'),
+      message: this._translateService.instant('myWorkouts.logger.confirm.removeExercise.message', {
+        name: escapeHtml(ex.exerciseNameSnapshot),
+      }),
       icon: 'pi pi-trash',
-      acceptLabel: 'Remove',
+      acceptLabel: this._translateService.instant('button.remove'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Keep',
+      rejectLabel: this._translateService.instant('button.keep'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._removeExercise(ex),
     });
@@ -407,10 +407,10 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         onDone?.();
       },
       error: (err) =>
-        showApiError(
-          this._messageService,
-          skipped ? "Couldn't skip that" : "Couldn't undo the skip",
-          'Please retry.',
+        this._apiError(
+          skipped
+            ? 'myWorkouts.logger.toast.skipFailed'
+            : 'myWorkouts.logger.toast.undoSkipFailed',
           err,
         ),
     });
@@ -466,18 +466,14 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         this.swapTargetExerciseId.set(null);
         this._messageService.add({
           severity: 'success',
-          summary: `Swapped to ${saved.exerciseNameSnapshot}`,
-          detail: 'Your logged sets carried over.',
+          summary: this._translateService.instant('myWorkouts.logger.toast.swapped', {
+            name: saved.exerciseNameSnapshot,
+          }),
+          detail: this._translateService.instant('myWorkouts.logger.toast.swappedDetail'),
           life: 3000,
         });
       },
-      error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't swap exercise",
-          'Please retry.',
-          err,
-        ),
+      error: (err) => this._apiError('myWorkouts.logger.toast.swapFailed', err),
     });
   }
 
@@ -496,13 +492,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         this.pickerOpen.set(false);
         this.swapTargetExerciseId.set(null);
       },
-      error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't add exercise",
-          'Please retry.',
-          err,
-        ),
+      error: (err) => this._apiError('myWorkouts.logger.toast.addExerciseFailed', err),
     });
   }
 
@@ -516,16 +506,19 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   confirmDiscard(): void {
     const cur = this.log();
     if (!cur || this.isComplete()) return;
+    const done = this.setsDone();
     this._confirmationService.confirm({
-      header: 'Cancel this workout?',
+      header: this._translateService.instant('myWorkouts.logger.confirm.discard.header'),
       message:
-        this.setsDone() > 0
-          ? `This deletes the workout and the ${this.setsDone()} set${this.setsDone() === 1 ? '' : 's'} you logged. It won't show as skipped — it will be as if you never started.`
-          : "This deletes the workout. It won't show as skipped — it will be as if you never started.",
+        done > 0
+          ? this._translateService.instant('myWorkouts.logger.confirm.discard.messageWithSets', {
+              count: done,
+            })
+          : this._translateService.instant('myWorkouts.logger.confirm.discard.message'),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Cancel workout',
+      acceptLabel: this._translateService.instant('myWorkouts.logger.cancelWorkout'),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Keep going',
+      rejectLabel: this._translateService.instant('myWorkouts.logger.keepGoing'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._discardWorkout(),
     });
@@ -543,12 +536,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.discarding.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't cancel workout",
-          'Please retry.',
-          err,
-        );
+        this._apiError('myWorkouts.logger.toast.cancelFailed', err);
       },
     });
   }
@@ -579,19 +567,29 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   }
 
   readonly finishPrimaryLabel = computed(() =>
-    this.setsDone() === 0 ? 'Mark as skipped' : 'Complete workout',
+    this._translateService.instant(
+      this.setsDone() === 0
+        ? 'myWorkouts.logger.finish.markSkipped'
+        : 'myWorkouts.logger.completeWorkout',
+    ),
   );
   readonly finishHeader = computed(() =>
-    this.setsDone() === 0 ? 'Nothing logged yet' : 'Finish this workout?',
+    this._translateService.instant(
+      this.setsDone() === 0
+        ? 'myWorkouts.logger.finish.nothingLogged'
+        : 'myWorkouts.logger.finish.header',
+    ),
   );
   readonly finishMessage = computed(() => {
     if (this.setsDone() === 0) {
-      return "You haven't logged any sets yet. Mark it as skipped, or keep going.";
+      return this._translateService.instant('myWorkouts.logger.finish.messageEmpty');
     }
     const remaining = this.totalSets() - this.setsDone();
     return remaining > 0
-      ? `You have ${remaining} unchecked ${remaining === 1 ? 'set' : 'sets'}. Finish the workout?`
-      : 'Every set is checked off. Mark it complete?';
+      ? this._translateService.instant('myWorkouts.logger.finish.messageRemaining', {
+          count: remaining,
+        })
+      : this._translateService.instant('myWorkouts.logger.finish.messageAllDone');
   });
 
   private _completeWorkout(_allowEmpty: boolean): void {
@@ -606,12 +604,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.completing.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't complete workout",
-          'Please retry.',
-          err,
-        );
+        this._apiError('myWorkouts.logger.toast.completeFailed', err);
       },
     });
   }
@@ -655,7 +648,8 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
    */
   canRevealWeight(ex: LoggedExercise): boolean {
     return (
-      ex.exercise?.kind === 'BODYWEIGHT' && !this.showsField(ex, 'weight')
+      ex.exercise?.kind === ExerciseKind.Bodyweight &&
+      !this.showsField(ex, SetFields.Weight)
     );
   }
 
@@ -664,12 +658,29 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
   }
 
   isWeightVisible(ex: LoggedExercise): boolean {
-    return this.showsField(ex, 'weight') || this.weightRevealed().has(ex.id);
+    return (
+      this.showsField(ex, SetFields.Weight) || this.weightRevealed().has(ex.id)
+    );
   }
 
-  /** Reps on split squats and single-arm work read as per-side. */
-  repsSuffix(ex: LoggedExercise): string {
-    return ex.exercise?.isUnilateral ? ' each' : '';
+  /**
+   * Reps input placeholder: the target, or the word "reps". Reps on split
+   * squats and single-arm work read as per-side ("8 each").
+   */
+  repsPlaceholder(ex: LoggedExercise, set: LoggedSet): string {
+    const target = set.assignedSet?.targetRepsMin;
+    const reps =
+      target != null
+        ? String(target)
+        : this._translateService.instant('myWorkouts.logger.set.repsPlaceholder');
+    return ex.exercise?.isUnilateral
+      ? this._translateService.instant('myWorkouts.logger.set.repsEach', { reps })
+      : reps;
+  }
+
+  /** A weight/number in the UI locale, without grouping. */
+  formatNumber(v: number): string {
+    return this._numberFormat.format(v);
   }
 
   /** mm:ss for display; the API stores plain seconds. */
@@ -748,16 +759,22 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
       parts.push(`${a.targetRepsMin}+`);
     }
     const w = a.targetWeightKg ?? a.resolvedWeightKg;
-    if (w != null) parts.push(`× ${w} kg`);
+    if (w != null) parts.push(`× ${this.formatNumber(w)} kg`);
     else if (a.targetWeightPercent1rm != null)
-      parts.push(`× ${a.targetWeightPercent1rm}% 1RM`);
+      parts.push(`× ${this.formatNumber(a.targetWeightPercent1rm)}% 1RM`);
     return parts.join(' ');
   }
 
+  /** "2 of 4 sets", or "4 of 4 sets done" once every set is checked. */
   exerciseProgressLabel(ex: LoggedExercise): string {
     const sets = ex.sets ?? [];
     const done = sets.filter((s) => s.isCompleted).length;
-    return `${done} of ${sets.length} ${sets.length === 1 ? 'set' : 'sets'}`;
+    return this._translateService.instant(
+      this.isExerciseDone(ex)
+        ? 'myWorkouts.logger.exerciseProgressDone'
+        : 'myWorkouts.logger.exerciseProgress',
+      { done, total: sets.length },
+    );
   }
 
   isExerciseDone(ex: LoggedExercise): boolean {
@@ -806,7 +823,7 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
     return sets
       .map((s) => {
         const r = s.reps ?? '?';
-        const w = s.weightKg != null ? ` × ${s.weightKg}kg` : '';
+        const w = s.weightKg != null ? ` × ${this.formatNumber(s.weightKg)}kg` : '';
         return `${r}${w}`;
       })
       .join(' · ');
@@ -831,11 +848,10 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.loading.set(false);
-        showApiError(
-          this._messageService,
-          "Couldn't load this workout",
-          'It may have been removed or you may not have access.',
+        this._apiError(
+          'myWorkouts.logger.toast.loadFailed',
           err,
+          'error.mayBeRemoved',
         );
         this._router.navigate(['/user/workouts']);
       },
@@ -867,18 +883,26 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         this.log.set({ ...cur, exercises: next });
         this._messageService.add({
           severity: 'success',
-          summary: 'Exercise removed',
+          summary: this._translateService.instant('myWorkouts.logger.toast.exerciseRemoved'),
           life: 2000,
         });
       },
-      error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't remove exercise",
-          'Please retry.',
-          err,
-        ),
+      error: (err) => this._apiError('myWorkouts.logger.toast.removeExerciseFailed', err),
     });
+  }
+
+  /** Error toast with a translated summary; the detail defaults to "Please retry." */
+  private _apiError(
+    summaryKey: string,
+    err: unknown,
+    detailKey = 'myWorkouts.common.pleaseRetry',
+  ): void {
+    showApiError(
+      this._messageService,
+      this._translateService.instant(summaryKey),
+      this._translateService.instant(detailKey),
+      err,
+    );
   }
 
   private _startElapsed(): void {
@@ -960,9 +984,8 @@ export class WorkoutLogActive implements OnInit, OnDestroy {
         this._stopRest();
         this._messageService.add({
           severity: 'info',
-          summary: 'Welcome back',
-          detail:
-            "You've been away a while — your rest timer was dismissed. Pick up where you left off.",
+          summary: this._translateService.instant('myWorkouts.logger.toast.welcomeBack'),
+          detail: this._translateService.instant('myWorkouts.logger.toast.welcomeBackDetail'),
           life: 4000,
         });
       }

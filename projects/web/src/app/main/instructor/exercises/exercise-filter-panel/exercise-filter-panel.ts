@@ -1,11 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Checkbox } from 'primeng/checkbox';
 
 import {
@@ -41,11 +36,9 @@ export interface LevelFilterOption {
  */
 @Component({
   selector: 'mh-exercise-filter-panel',
-  standalone: true,
-  imports: [FormsModule, Checkbox],
+  imports: [FormsModule, Checkbox, TranslatePipe],
   templateUrl: './exercise-filter-panel.html',
   styleUrl: './exercise-filter-panel.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExerciseFilterPanel {
   readonly kindOptions = input.required<KindFilterOption[]>();

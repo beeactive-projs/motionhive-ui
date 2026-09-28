@@ -26,6 +26,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { Subject, debounceTime } from 'rxjs';
 
@@ -95,6 +96,7 @@ const SEARCH_DEBOUNCE_MS = 300;
     IonTitle,
     IonToolbar,
     SearchbarAutofocusDirective,
+    TranslatePipe,
   ],
   templateUrl: './exercises.html',
   styleUrl: './exercises.scss',
@@ -104,7 +106,7 @@ export class Exercises implements ViewWillEnter {
   readonly store = inject(ExercisesStore);
   private readonly _authStore = inject(AuthStore);
   private readonly _appModeStore = inject(AppModeStore);
-  private readonly _taxonomy = inject(ExerciseTaxonomyStore);
+  private readonly _exerciseTaxonomyStore = inject(ExerciseTaxonomyStore);
   private readonly _router = inject(Router);
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6];
@@ -149,7 +151,7 @@ export class Exercises implements ViewWillEnter {
     addIcons(EXERCISE_ICONS);
     // The filter sheet renders muscle and equipment names, and the create
     // form picks from the same lists. Cached after the first screen.
-    this._taxonomy.ensureLoaded();
+    this._exerciseTaxonomyStore.ensureLoaded();
 
     // The field tracks every letter; the request waits for the typist to
     // pause. Same shape as the picker and the filter sheet's recount.

@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
@@ -26,6 +27,7 @@ const PAGE_SIZE = 100;
 export class AssignmentsStore {
   private readonly _programAssignmentService = inject(ProgramAssignmentService);
   private readonly _programService = inject(ProgramService);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _program = signal<Program | null>(null);
   private readonly _rows = signal<ProgramAssignment[]>([]);
@@ -50,8 +52,9 @@ export class AssignmentsStore {
   /** "12-week strength block · 5 clients" — the line under the title. */
   readonly subtitle = computed(() => {
     const name = this._program()?.name;
-    const n = this._rows().length;
-    const clients = `${n} ${n === 1 ? 'client' : 'clients'}`;
+    const clients = this._translateService.instant('count.clients', {
+      count: this._rows().length,
+    });
     return name ? `${name} · ${clients}` : clients;
   });
 

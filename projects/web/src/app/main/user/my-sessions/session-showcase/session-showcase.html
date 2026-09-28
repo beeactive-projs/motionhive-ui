@@ -206,7 +206,7 @@
         } @else {
         <button pButton type="button" [disabled]="!canBook()" fluid (click)="bookOpen.set(true)">
           <i class="pi pi-bookmark"></i>
-          {{ (t.approvalRequired ? 'mySessions.common.requestToJoin' : 'mySessions.common.book') | translate }}
+          {{ (t.approvalRequired ? 'button.requestToJoin' : 'mySessions.common.book') | translate }}
         </button>
         }
 

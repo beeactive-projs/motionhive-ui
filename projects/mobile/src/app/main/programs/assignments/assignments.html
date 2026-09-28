@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/programs" />
     </ion-buttons>
-    <ion-title>Assignments</ion-title>
+    <ion-title>{{ 'programs.assignments.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,9 +15,9 @@
   @if (store.showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load the assignments"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'programs.assignments.error' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (store.showSkeleton()) {
@@ -41,9 +41,9 @@
   } @else if (store.isEmpty()) {
     <mh-empty-state
       icon="people-outline"
-      heading="Nobody on this yet"
-      message="Assign it to a client and they will show up here."
-      actionLabel="Assign to a client"
+      [heading]="'programs.assignments.empty.heading' | translate"
+      [message]="'programs.assignments.empty.message' | translate"
+      [actionLabel]="'programs.assignments.assignToClient' | translate"
       (action)="openAssign()"
     />
   } @else {
@@ -63,7 +63,7 @@
   }
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button aria-label="Assign to a client" (click)="openAssign()">
+    <ion-fab-button [attr.aria-label]="'programs.assignments.assignToClient' | translate" (click)="openAssign()">
       <ion-icon name="person-add-outline" aria-hidden="true" />
     </ion-fab-button>
   </ion-fab>

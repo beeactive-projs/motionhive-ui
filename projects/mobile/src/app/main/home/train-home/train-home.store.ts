@@ -1,5 +1,6 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, of, take } from 'rxjs';
 
 import {
@@ -12,8 +13,11 @@ import {
   MyProfile,
   ProfileService,
   SessionService,
+  UserRoles,
   WorkoutLog,
   WorkoutLogService,
+  enumLabel,
+  translate,
 } from 'core';
 
 /** One row of the "Start here" checklist. */
@@ -45,6 +49,7 @@ export class TrainHomeStore {
   private readonly _sessionService = inject(SessionService);
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _profile = signal<MyProfile | null>(null);
   private readonly _resume = signal<WorkoutLog | null>(null);
@@ -81,8 +86,8 @@ export class TrainHomeStore {
     return [
       {
         id: 'profile',
-        title: 'Finish your profile',
-        sub: 'So coaches and clients know who you are.',
+        title: this._translateService.instant('home.train.steps.profile.title'),
+        sub: this._translateService.instant('home.train.steps.profile.sub'),
         // Both, deliberately: an avatar without a claimed handle leaves the
         // profile unreachable by name.
         done: !!account?.avatarUrl && !!account?.handle,
@@ -90,8 +95,8 @@ export class TrainHomeStore {
       },
       {
         id: 'coach',
-        title: 'Find a coach for yourself',
-        sub: 'Book time with someone you rate.',
+        title: this._translateService.instant('home.train.steps.coach.title'),
+        sub: this._translateService.instant('home.train.steps.coach.sub'),
         done: this.hasOwnCoaches(),
         route: '/tabs/discover',
       },
@@ -239,12 +244,17 @@ export interface CoachRow {
   readonly handle: string | null;
 }
 
+/** "Coach" — the role's own name, for a row with nothing better to show. */
+function coachFallback(): string {
+  return enumLabel('userRole', UserRoles.Instructor);
+}
+
 function fromMyInstructor(item: MyInstructor): CoachRow {
   const user = item.instructor;
   return {
     key: item.id,
-    name: `${user.firstName} ${user.lastName}`.trim() || 'Coach',
-    tag: item.instructorProfile?.specializations?.slice(0, 2).join(' · ') || 'Coach',
+    name: `${user.firstName} ${user.lastName}`.trim() || coachFallback(),
+    tag: item.instructorProfile?.specializations?.slice(0, 2).join(' · ') || coachFallback(),
     avatarUrl: user.avatarUrl ?? null,
     handle: user.handle ?? null,
   };
@@ -253,8 +263,11 @@ function fromMyInstructor(item: MyInstructor): CoachRow {
 function fromSearchResult(item: InstructorSearchResult): CoachRow {
   return {
     key: item.id,
-    name: `${item.firstName} ${item.lastName}`.trim() || item.displayName || 'Coach',
-    tag: item.specializations?.slice(0, 2).join(' · ') || item.city || 'Open to new clients',
+    name: `${item.firstName} ${item.lastName}`.trim() || item.displayName || coachFallback(),
+    tag:
+      item.specializations?.slice(0, 2).join(' · ') ||
+      item.city ||
+      translate('home.train.coaches.openToClients'),
     avatarUrl: item.avatarUrl ?? null,
     handle: item.handle ?? null,
   };

@@ -25,6 +25,8 @@ import {
   ProgramSize,
   ProgramSizes,
   ProgramStatus,
+  translate,
+  weekdayNames,
 } from 'core';
 
 import { SpineTone, SpineTones } from '../../_shared/models/spine-tone.model';
@@ -57,7 +59,7 @@ export const PROGRAM_ICONS = {
 };
 
 /** Days per week, for turning a stored `durationDays` back into weeks. */
-const DAYS_PER_WEEK = 7;
+export const DAYS_PER_WEEK = 7;
 
 /** How many weeks a program starts with before the coach sets its length. */
 export const DEFAULT_PROGRAM_WEEKS = 4;
@@ -65,15 +67,20 @@ export const DEFAULT_PROGRAM_WEEKS = 4;
 /** The BE caps `durationDays` at 728 — 104 weeks. */
 export const MAX_PROGRAM_WEEKS = 104;
 
-/** Monday-first labels for the seven day rows of a week card. */
-export const DAY_LABELS: readonly string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+/**
+ * Monday-first labels for the seven day rows of a week card, in the UI
+ * locale. A function, not a constant: the locale is only known at runtime.
+ */
+export function dayLabels(): string[] {
+  return weekdayNames('short');
+}
 
 export function dayLabel(dayIndex: number): string {
-  return DAY_LABELS[dayIndex] ?? `Day ${dayIndex + 1}`;
+  return dayLabels()[dayIndex] ?? translate('programs.common.day', { number: dayIndex + 1 });
 }
 
 export function weekLabel(weekIndex: number): string {
-  return `Week ${weekIndex + 1}`;
+  return translate('programs.common.week', { number: weekIndex + 1 });
 }
 
 // ─── Library ──────────────────────────────────────────────────────────────
@@ -98,18 +105,19 @@ export type ProgramOrigin = (typeof ProgramOrigins)[keyof typeof ProgramOrigins]
 
 /**
  * The origin row. Shown only when there is something to separate — a coach
- * with no starters in view gets one axis of pills, not two.
+ * with no starters in view gets one axis of pills, not two. Labels are
+ * translation keys; the templates translate them.
  */
 export const ORIGIN_PILLS: readonly { value: ProgramOrigin; label: string }[] = [
-  { value: ProgramOrigins.All, label: 'All' },
-  { value: ProgramOrigins.Mine, label: 'Mine' },
-  { value: ProgramOrigins.Starters, label: 'MotionHive' },
+  { value: ProgramOrigins.All, label: 'common.all' },
+  { value: ProgramOrigins.Mine, label: 'programs.library.origin.mine' },
+  { value: ProgramOrigins.Starters, label: 'programs.library.origin.starters' },
 ];
 
 export const LIBRARY_PILLS: readonly { value: ProgramSize; label: string }[] = [
-  { value: ProgramSizes.All, label: 'All' },
-  { value: ProgramSizes.Program, label: 'Programs' },
-  { value: ProgramSizes.Routine, label: 'Routines' },
+  { value: ProgramSizes.All, label: 'common.all' },
+  { value: ProgramSizes.Program, label: 'programs.library.size.programs' },
+  { value: ProgramSizes.Routine, label: 'programs.library.size.routines' },
 ];
 
 /**
@@ -128,13 +136,15 @@ export function programMeta(program: Program, exerciseCount?: number): string {
     const n = exerciseCount ?? 0;
     // Silent when the count is unknown: the row already wears a Routine
     // badge, and saying it twice tells you nothing the second time.
-    return n ? `${n} ${n === 1 ? 'exercise' : 'exercises'}` : '';
+    return n ? translate('count.exercises', { count: n }) : '';
   }
   const weeks = weeksOf(program);
   const days = (program.workouts ?? []).length;
   const parts: string[] = [];
-  if (weeks) parts.push(`${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
-  if (weeks && days) parts.push(`${Math.round(days / weeks)} days/week`);
+  if (weeks) parts.push(translate('count.weeks', { count: weeks }));
+  if (weeks && days) {
+    parts.push(translate('programs.row.daysPerWeek', { count: Math.round(days / weeks) }));
+  }
   return parts.join(' · ');
 }
 
@@ -162,6 +172,7 @@ export const CreateChoices = {
 
 export type CreateChoice = (typeof CreateChoices)[keyof typeof CreateChoices];
 
+/** `label` and `hint` are translation keys; the sheet's template translates them. */
 export const CREATE_OPTIONS: readonly {
   id: CreateChoice;
   label: string;
@@ -170,20 +181,20 @@ export const CREATE_OPTIONS: readonly {
 }[] = [
   {
     id: CreateChoices.Program,
-    label: 'New program',
-    hint: 'Multi-week, several days each',
+    label: 'programs.create.newProgram',
+    hint: 'programs.create.newProgramHint',
     icon: 'albums-outline',
   },
   {
     id: CreateChoices.Routine,
-    label: 'New routine',
-    hint: 'One session you repeat',
+    label: 'programs.create.newRoutine',
+    hint: 'programs.create.newRoutineHint',
     icon: 'repeat-outline',
   },
   {
     id: CreateChoices.Starters,
-    label: 'Browse starters',
-    hint: 'Start from one of ours',
+    label: 'programs.create.browseStarters',
+    hint: 'programs.create.browseStartersHint',
     icon: 'flash-outline',
   },
 ];
@@ -197,18 +208,32 @@ export const CREATE_OPTIONS: readonly {
  * a chip on every row is a chip that says nothing. Only the exceptions speak.
  * Neutral or semantic washes, never honey — a state is not a thing to press.
  */
-const ASSIGNMENT_CHIPS: Record<ProgramAssignmentStatus, { label: string; tone: BadgeTone } | null> = {
+const ASSIGNMENT_CHIPS: Record<ProgramAssignmentStatus, { key: string; tone: BadgeTone } | null> = {
   [ProgramAssignmentStatus.Active]: null,
-  [ProgramAssignmentStatus.Pending]: { label: 'Not started', tone: BadgeTones.Warn },
-  [ProgramAssignmentStatus.Paused]: { label: 'Paused', tone: BadgeTones.Medium },
-  [ProgramAssignmentStatus.Completed]: { label: 'Completed', tone: BadgeTones.Teal },
-  [ProgramAssignmentStatus.Cancelled]: { label: 'Cancelled', tone: BadgeTones.Danger },
+  [ProgramAssignmentStatus.Pending]: {
+    key: 'programs.assignment.notStarted',
+    tone: BadgeTones.Warn,
+  },
+  [ProgramAssignmentStatus.Paused]: {
+    key: 'enum.programAssignmentStatus.PAUSED',
+    tone: BadgeTones.Medium,
+  },
+  [ProgramAssignmentStatus.Completed]: {
+    key: 'enum.programAssignmentStatus.COMPLETED',
+    tone: BadgeTones.Teal,
+  },
+  [ProgramAssignmentStatus.Cancelled]: {
+    key: 'enum.programAssignmentStatus.CANCELLED',
+    tone: BadgeTones.Danger,
+  },
 };
 
+/** Translated at call time — the table above holds keys, never copy. */
 export function assignmentChip(
   status: ProgramAssignmentStatus,
 ): { label: string; tone: BadgeTone } | null {
-  return ASSIGNMENT_CHIPS[status] ?? null;
+  const chip = ASSIGNMENT_CHIPS[status];
+  return chip ? { label: translate(chip.key), tone: chip.tone } : null;
 }
 
 /**
@@ -237,12 +262,12 @@ export function assignmentTone(status: ProgramAssignmentStatus): SpineTone {
 export function assignmentSubline(row: ProgramAssignment): string {
   switch (row.status) {
     case ProgramAssignmentStatus.Paused:
-      return 'Paused — resuming shifts the remaining schedule forward';
+      return translate('programs.assignment.pausedSubline');
     case ProgramAssignmentStatus.Pending:
-      return `Starts ${shortDayLabel(row.startDate)}`;
+      return translate('programs.assignment.starts', { date: shortDayLabel(row.startDate) });
     case ProgramAssignmentStatus.Active:
     case ProgramAssignmentStatus.Completed:
-      return `${row.completionPercent}% done`;
+      return translate('programs.assignment.percentDone', { percent: row.completionPercent });
     default:
       return '';
   }

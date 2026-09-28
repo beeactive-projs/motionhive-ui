@@ -110,8 +110,8 @@
             [text]="true"
             severity="danger"
             size="small"
-            [pTooltip]="'groups.join.cancelRequest' | translate"
-            [attr.aria-label]="'groups.join.cancelRequest' | translate"
+            [pTooltip]="'button.cancelRequest' | translate"
+            [attr.aria-label]="'button.cancelRequest' | translate"
             (click)="discoverAction.emit({ kind: 'cancel', group: group() })"
             [disabled]="isBusy()"
             iconOnly
@@ -127,7 +127,7 @@
         } @else if (group().joinPolicy === JoinPolicies.Approval) {
         <button pButton type="button" size="small" (click)="discoverAction.emit({ kind: 'join', group: group() })" [disabled]="isBusy()">
           <i class="pi" [class]="isBusy() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-          {{ 'groups.join.requestToJoin' | translate }}
+          {{ 'button.requestToJoin' | translate }}
         </button>
         } @else {
         <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="true" size="small">

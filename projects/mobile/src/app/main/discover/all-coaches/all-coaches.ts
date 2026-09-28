@@ -16,6 +16,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { InstructorSearchResult } from 'core';
@@ -56,6 +57,7 @@ import { DiscoverCoachesStore } from '../discover.store';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './all-coaches.html',
   styleUrl: './all-coaches.scss',

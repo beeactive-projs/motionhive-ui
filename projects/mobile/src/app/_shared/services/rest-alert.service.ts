@@ -2,6 +2,7 @@ import { DestroyRef, Service, inject, signal } from '@angular/core';
 import { App as CapacitorApp } from '@capacitor/app';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { TranslateService } from '@ngx-translate/core';
 
 /** One fixed id: there is only ever one rest running, so a new one replaces it. */
 const REST_NOTIFICATION_ID = 1;
@@ -31,6 +32,7 @@ const REST_NOTIFICATION_ID = 1;
 @Service()
 export class RestAlertService {
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   /** Epoch ms the current rest ends, or null when nothing is resting. */
   private endsAt: number | null = null;
@@ -80,8 +82,8 @@ export class RestAlertService {
         notifications: [
           {
             id: REST_NOTIFICATION_ID,
-            title: 'Rest over',
-            body: 'Time for your next set.',
+            title: this._translateService.instant('workouts.restAlert.title'),
+            body: this._translateService.instant('workouts.restAlert.body'),
             schedule: {
               at: new Date(endsAt),
               // Android throttles inexact alarms into batches, which for a

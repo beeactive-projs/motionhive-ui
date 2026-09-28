@@ -1,8 +1,8 @@
 <p-dialog [(visible)]="visible" [modal]="true" [appendTo]="'body'" [draggable]="false" [resizable]="false"
-  [dismissableMask]="true" [closeOnEscape]="true" [style]="{ width: '50vw' }" [header]="exercise()?.name ?? 'Exercise'">
+  [dismissableMask]="true" [closeOnEscape]="true" [style]="{ width: '50vw' }" [header]="exercise()?.name ?? ('exercises.common.exercise' | translate)">
   @if (loading()) {
   <div class="flex items-center justify-center gap-2 p-8 text-sm text-surface-500">
-    <i class="pi pi-spin pi-spinner text-lg"></i> Loading…
+    <i class="pi pi-spin pi-spinner text-lg"></i> {{ 'common.loading' | translate }}
   </div>
   } @else if (exercise(); as e) {
   <div class="flex flex-col gap-5">
@@ -40,27 +40,27 @@
 
     <!-- Meta chips -->
     <div class="flex flex-wrap items-center gap-2">
-      <p-tag [value]="e.kind | titlecase" [class]="metaClass" rounded />
+      <p-tag [value]="e.kind | enumLabel: 'exerciseKind'" [class]="metaClass" rounded />
       <p-tag [value]="levelTag(e.level).text" [class]="levelTag(e.level).class" rounded />
       @if (e.movementPattern) {
-      <p-tag [value]="e.movementPattern | titlecase" [class]="metaClass" rounded />
+      <p-tag [value]="e.movementPattern | enumLabel: 'movementPattern'" [class]="metaClass" rounded />
       }
       @if (e.mechanic) {
-      <p-tag [value]="e.mechanic | titlecase" [class]="metaClass" rounded />
+      <p-tag [value]="e.mechanic | enumLabel: 'exerciseMechanic'" [class]="metaClass" rounded />
       }
       @if (e.force) {
-      <p-tag [value]="e.force | titlecase" [class]="metaClass" rounded />
+      <p-tag [value]="e.force | enumLabel: 'exerciseForce'" [class]="metaClass" rounded />
       }
       @if (e.isUnilateral) {
-      <p-tag value="Unilateral" [class]="metaClass" rounded />
+      <p-tag [value]="'exercises.detail.unilateral' | translate" [class]="metaClass" rounded />
       }
       @if (e.source === Sources.System) {
-      <p-tag value="System" icon="pi pi-verified" severity="secondary" rounded />
+      <p-tag [value]="'exercises.badge.system' | translate" icon="pi pi-verified" severity="secondary" rounded />
       }
       @if (e.visibility === Visibilities.Public) {
-      <p-tag value="Public" icon="pi pi-globe" severity="info" rounded />
+      <p-tag [value]="'exercises.badge.public' | translate" icon="pi pi-globe" severity="info" rounded />
       } @else if (e.visibility === Visibilities.Private) {
-      <p-tag value="Private" icon="pi pi-lock" class="bg-teal-100 text-teal-800" rounded />
+      <p-tag [value]="'exercises.badge.private' | translate" icon="pi pi-lock" class="bg-teal-100 text-teal-800" rounded />
       }
     </div>
 
@@ -68,7 +68,7 @@
     @if (primaryMuscles().length || secondaryMuscles().length || stabilizerMuscles().length) {
     <section>
       <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
-        Muscles worked
+        {{ 'exercises.detail.musclesWorked' | translate }}
       </h4>
       <div class="flex flex-wrap gap-2">
         @for (m of primaryMuscles(); track m) {
@@ -88,7 +88,7 @@
     @if (equipmentList().length) {
     <section>
       <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
-        Equipment
+        {{ 'exercises.filters.equipment' | translate }}
       </h4>
       <div class="flex flex-wrap gap-2">
         @for (eq of equipmentList(); track eq) {
@@ -102,7 +102,7 @@
     @if (e.description) {
     <section>
       <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
-        Description
+        {{ 'form.label.description' | translate }}
       </h4>
       <p class="m-0 text-[13px] leading-relaxed text-surface-800 dark:text-surface-200">{{ e.description }}</p>
     </section>
@@ -112,7 +112,7 @@
     @if (e.instructions) {
     <section>
       <h4 class="mb-2 font-['Poppins'] text-[11px] font-bold uppercase tracking-wider text-surface-500">
-        Instructions
+        {{ 'exercises.detail.instructions' | translate }}
       </h4>
       <p class="m-0 whitespace-pre-wrap text-[13px] leading-relaxed text-surface-800 dark:text-surface-200">
         {{ e.instructions }}
@@ -125,15 +125,14 @@
     <section
       class="flex items-center justify-between gap-4 rounded-lg border border-surface-200 bg-surface-50 p-3 dark:border-surface-700 dark:bg-surface-800">
       <div>
-        <div class="text-[10px] font-bold uppercase tracking-wider text-surface-500">Created by</div>
+        <div class="text-[10px] font-bold uppercase tracking-wider text-surface-500">{{ 'exercises.detail.createdBy' | translate }}</div>
         <div class="mt-0.5 text-[13px] font-semibold text-surface-900 dark:text-surface-100">
           {{ owner.firstName }} {{ owner.lastName }}
         </div>
       </div>
       @if (e.forkCount > 0) {
       <div class="inline-flex items-center gap-1.5 text-xs text-surface-600 dark:text-surface-400">
-        <i class="pi pi-share-alt"></i> Forked by {{ e.forkCount }}
-        {{ e.forkCount === 1 ? 'instructor' : 'instructors' }}
+        <i class="pi pi-share-alt"></i> {{ 'exercises.common.forkedBy' | translate: { count: e.forkCount } }}
       </div>
       }
     </section>
@@ -149,7 +148,7 @@
         @if (canEdit()) {
         <button pButton type="button" severity="danger" [text]="true" [disabled]="busy()" (click)="confirmDelete()">
           <i class="pi pi-trash"></i>
-          Delete
+          {{ 'button.delete' | translate }}
         </button>
         }
       </div>
@@ -159,17 +158,17 @@
         @if (canEdit()) {
         <button pButton type="button" severity="secondary" [outlined]="true" (click)="toggleVisibility()" [disabled]="busy()">
           <i [class]="busy() ? 'pi pi-spinner pi-spin' : (e.visibility === Visibilities.Public ? 'pi pi-lock' : 'pi pi-globe')"></i>
-          {{ e.visibility === Visibilities.Public ? 'Make private' : 'Make public' }}
+          {{ (e.visibility === Visibilities.Public ? 'exercises.detail.makePrivate' : 'exercises.detail.makePublic') | translate }}
         </button>
         <button pButton type="button" severity="secondary" [outlined]="true" [disabled]="busy()" (click)="requestEdit()">
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'button.edit' | translate }}
         </button>
         }
         @if (canFork()) {
         <button pButton type="button" (click)="fork()" [disabled]="busy()">
           <i class="pi" [class]="busy() ? 'pi-spinner pi-spin' : 'pi-clone'"></i>
-          Fork to my library
+          {{ 'exercises.detail.fork' | translate }}
         </button>
         }
       </div>

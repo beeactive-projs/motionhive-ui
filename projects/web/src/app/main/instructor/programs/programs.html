@@ -2,19 +2,18 @@
   <!-- Header · shared across desktop + mobile -->
   <header class="flex gap-4 items-center justify-between">
     <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">Programs</h1>
+      <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl">{{ 'programs.list.title' | translate }}</h1>
       @if (isTabletDown()) {
-      <p class="text-xs text-surface-700 dark:text-surface-400">Author the coaching plans clients follow.</p>
+      <p class="text-xs text-surface-700 dark:text-surface-400">{{ 'programs.list.subtitleShort' | translate }}</p>
       } @else {
-      <p class="text-sm text-surface-700 dark:text-surface-400">Author the workouts, exercises, and sets your clients
-        follow.</p>
+      <p class="text-sm text-surface-700 dark:text-surface-400">{{ 'programs.list.subtitle' | translate }}</p>
       }
     </div>
 
     <!-- Only when the library actually mixes the two: a coach whose list is
          entirely their own does not need a filter for it. -->
     @if (showOriginFilter()) {
-    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Author filter">
+    <div class="flex flex-wrap items-center gap-1.5" role="group" [attr.aria-label]="'programs.list.originFilter' | translate">
       @for (tab of originTabs; track tab.value) {
       <button pButton
         type="button"
@@ -25,7 +24,7 @@
         (click)="setOrigin(tab.value)"
         class="py-0.5 min-w-10"
       >
-        {{ tab.label }}
+        {{ tab.labelKey | translate }}
       </button>
       }
     </div>
@@ -33,7 +32,7 @@
     @if (!isMobile()) {
     <button pButton type="button" [size]="isTablet() ? 'small' : undefined" (click)="openCreate()">
       <i class="pi pi-plus"></i>
-      Create program
+      {{ 'programs.list.create' | translate }}
     </button>
     }
   </header>
@@ -49,7 +48,7 @@
 
 @if (isMobile()) {
 <!-- Mobile FAB (single primary action). -->
-<mh-mobile-fab icon="pi pi-plus" label="New program" (tap)="openCreate()" />
+<mh-mobile-fab icon="pi pi-plus" [label]="'programs.list.newProgram' | translate" (tap)="openCreate()" />
 }
 
 <!--
@@ -60,8 +59,8 @@
 -->
 <ng-template #filtersRow>
   <div class="flex flex-wrap items-center justify-between gap-3" role="search">
-    <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Status filter">
-      @for (tab of statusTabs; track tab.label) {
+    <div class="flex flex-wrap items-center gap-1.5" role="group" [attr.aria-label]="'programs.list.statusFilter' | translate">
+      @for (tab of statusTabs; track tab.labelKey) {
       <button pButton
         type="button"
         size="small"
@@ -71,7 +70,7 @@
         (click)="setStatus(tab.status)"
         class="py-0.5 min-w-10"
       >
-        {{ tab.label }}
+        {{ tab.labelKey | translate }}
       </button>
       }
     </div>
@@ -80,10 +79,11 @@
       <!-- Swap the glass for a spinner while a fetch is pending so a
            refining search gives feedback even when old cards stay up. -->
       <p-inputicon [class]="loading() ? 'pi pi-spinner pi-spin' : 'pi pi-search'" />
-      <input pInputText type="text" fluid placeholder="Search programs…" aria-label="Search programs"
+      <input pInputText type="text" fluid [placeholder]="'programs.list.searchPlaceholder' | translate"
+        [attr.aria-label]="'programs.list.searchAria' | translate"
         [ngModel]="searchInput()" (ngModelChange)="onSearchChange($event)" />
       @if (searchInput() !== '') {
-      <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" aria-label="Clear search"
+      <p-inputicon class="pi pi-times-circle cursor-pointer" role="button" tabindex="0" [attr.aria-label]="'button.clearSearch' | translate"
         (click)="onSearchChange('')" (keydown.enter)="onSearchChange('')" />
       }
     </p-iconfield>
@@ -94,8 +94,8 @@
 <ng-template #panelBody>
   @if (error()) {
   <p-message severity="error" [closable]="false" class="flex items-center justify-between gap-3">
-    <span class="text-(--p-red-700)">Couldn't load programs: {{ error() }}</span>
-    <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="retry()">Retry</button>
+    <span class="text-(--p-red-700)">{{ 'programs.list.loadError' | translate: { error: error() } }}</span>
+    <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="retry()">{{ 'button.retry' | translate }}</button>
   </p-message>
   } @else if (loading() && !items().length) {
   <div class="grid gap-3.5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
@@ -108,8 +108,9 @@
     }
   </div>
   } @else if (items().length === 0) {
-  <mh-list-empty-state [icon]="emptyState().icon" [title]="emptyState().title" [message]="emptyState().message"
-    [actionLabel]="emptyState().action ? 'Create program' : undefined" actionIcon="pi pi-plus"
+  <mh-list-empty-state [icon]="emptyState().icon" [title]="emptyState().titleKey | translate"
+    [message]="emptyState().messageKey | translate"
+    [actionLabel]="emptyState().action ? ('programs.list.create' | translate) : undefined" actionIcon="pi pi-plus"
     (action)="openCreate()" />
   } @else {
   <div class="flex flex-col gap-4">
@@ -125,7 +126,7 @@
               @if (isStarter(p)) {
               <p-tag value="MotionHive" severity="info" />
               }
-              <p-tag [value]="p.status | titlecase" [severity]="statusSeverity(p.status)" />
+              <p-tag [value]="p.status | enumLabel: 'programStatus'" [severity]="statusSeverity(p.status)" />
               <button pButton
                 type="button"
                 severity="secondary"
@@ -133,7 +134,7 @@
                 [rounded]="true"
                 size="small"
                 (click)="openCardMenu($event, p)"
-                aria-label="Program actions"
+                [attr.aria-label]="'programs.list.cardActions' | translate"
                 [disabled]="mutatingIds().has(p.id)"
                 iconOnly
               >
@@ -151,7 +152,7 @@
               <p-tag icon="pi pi-calendar" [value]="durationLabel(p.durationDays)" severity="secondary" />
               }
               @if (p.periodizationModel) {
-              <p-tag [value]="p.periodizationModel | titlecase" severity="secondary" />
+              <p-tag [value]="periodizationLabel(p.periodizationModel)" severity="secondary" />
               }
               @for (tag of p.goalTags ?? []; track tag) {
               <p-tag [value]="tag" severity="info" />
@@ -159,7 +160,7 @@
             </div>
             }
 
-            <span class="mt-1 text-[11px] text-muted-color">Updated {{ p.updatedAt | date: 'mediumDate' }}</span>
+            <span class="mt-1 text-[11px] text-muted-color">{{ 'programs.list.updated' | translate: { date: (p.updatedAt | date: 'mediumDate') } }}</span>
           </div>
         </p-card>
       </a>
@@ -170,7 +171,7 @@
     <div class="flex justify-center pt-1">
       <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
         @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
-        {{ loadingMore() ? 'Loading…' : 'Load more' }}
+        {{ (loadingMore() ? 'common.loading' : 'button.loadMore') | translate }}
       </button>
     </div>
     }

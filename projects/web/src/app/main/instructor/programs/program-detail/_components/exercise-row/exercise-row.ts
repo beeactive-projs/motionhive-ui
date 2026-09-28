@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 // No standalone export for Table + its reorder directives — module fallback.
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
 
-import { PrescribedExercise, PrescribedSet } from 'core';
+import { EnumLabelPipe, PrescribedExercise, PrescribedSet } from 'core';
 
 import {
   commonRestSeconds,
@@ -23,12 +23,13 @@ import {
  */
 @Component({
   selector: 'mh-exercise-row',
-  imports: [TitleCasePipe, ButtonDirective, TableModule, Tag, Tooltip],
+  imports: [EnumLabelPipe, TranslatePipe, ButtonDirective, TableModule, Tag, Tooltip],
   templateUrl: './exercise-row.html',
   styleUrl: './exercise-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExerciseRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly exercise = input.required<PrescribedExercise>();
   readonly index = input.required<number>();
   readonly count = input.required<number>();
@@ -52,7 +53,9 @@ export class ExerciseRow {
   /** "75s rest" when every set shares the same rest, else nothing. */
   readonly restLabel = computed(() => {
     const rest = commonRestSeconds(this.exercise());
-    return rest != null ? `${rest}s rest` : null;
+    return rest != null
+      ? this._translateService.instant('programs.exerciseRow.restLabel', { seconds: rest })
+      : null;
   });
 
   protected readonly setSummary = setSummary;

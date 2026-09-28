@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="isEdit() ? 'Edit venue' : 'Add a venue'"
+  [header]="(isEdit() ? 'venues.form.editTitle' : 'venues.form.addTitle') | translate"
   [(visible)]="visible"
   [modal]="true"
   [style]="{ width: '36rem' }"
@@ -7,14 +7,14 @@
 >
   <div class="flex flex-col gap-4 pt-2">
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Type</label>
+      <label class="text-sm font-medium">{{ 'form.label.type' | translate }}</label>
       <p-select
         [options]="kindOptions"
         [ngModel]="form().kind"
         (ngModelChange)="updateField('kind', $event)"
         optionLabel="label"
         optionValue="value"
-        appendTo="body"
+        [appendTo]="'body'"
         fluid
       >
         <ng-template #selectedItem let-selected>
@@ -38,7 +38,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label for="vfName" class="text-sm font-medium">Name</label>
+      <label for="vfName" class="text-sm font-medium">{{ 'form.label.name' | translate }}</label>
       <input
         id="vfName"
         type="text"
@@ -46,24 +46,24 @@
         fluid
         [ngModel]="form().name"
         (ngModelChange)="updateField('name', $event)"
-        placeholder="e.g. FitZone Cluj — Downtown"
+        [placeholder]="'venues.form.namePlaceholder' | translate"
       />
     </div>
 
     @if (needsAddress()) {
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium">Address</label>
+        <label class="text-sm font-medium">{{ 'venues.form.address' | translate }}</label>
         <mh-location-picker
           [location]="form().location"
           (locationChange)="updateField('location', $event)"
         />
-        <span class="text-xs text-surface-400">Pick the place from the suggestions.</span>
+        <span class="text-xs text-surface-400">{{ 'venues.form.addressHint' | translate }}</span>
       </div>
     }
 
     @if (isOnline()) {
       <div class="flex flex-col gap-2">
-        <label for="vfMeetingUrl" class="text-sm font-medium">Meeting URL</label>
+        <label for="vfMeetingUrl" class="text-sm font-medium">{{ 'venues.form.meetingUrl' | translate }}</label>
         <input
           id="vfMeetingUrl"
           type="text"
@@ -75,15 +75,15 @@
         />
       </div>
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium">Meeting provider</label>
+        <label class="text-sm font-medium">{{ 'venues.form.meetingProvider' | translate }}</label>
         <p-select
           [options]="meetingProviderOptions"
           [ngModel]="form().meetingProvider"
           (ngModelChange)="updateField('meetingProvider', $event)"
           optionLabel="label"
           optionValue="value"
-          placeholder="Choose a provider"
-          appendTo="body"
+          [placeholder]="'venues.form.meetingProviderPlaceholder' | translate"
+          [appendTo]="'body'"
           fluid
         />
       </div>
@@ -91,38 +91,38 @@
 
     @if (isClientHome()) {
       <div class="flex flex-col gap-2">
-        <label for="vfRadius" class="text-sm font-medium">Travel radius (km)</label>
+        <label for="vfRadius" class="text-sm font-medium">{{ 'venues.form.travelRadius' | translate }}</label>
         <p-inputnumber
           inputId="vfRadius"
           [ngModel]="form().travelRadiusKm"
           (ngModelChange)="updateField('travelRadiusKm', $event)"
           [min]="0"
           [max]="500"
-          placeholder="e.g. 15"
+          [placeholder]="'venues.form.travelRadiusPlaceholder' | translate"
           class="w-full"
         />
-        <span class="text-xs text-surface-400">How far you're willing to travel to the client.</span>
+        <span class="text-xs text-surface-400">{{ 'venues.form.travelRadiusHint' | translate }}</span>
       </div>
     }
 
     <div class="flex flex-col gap-2">
-      <label for="vfNotes" class="text-sm font-medium">Notes</label>
+      <label for="vfNotes" class="text-sm font-medium">{{ 'form.label.notes' | translate }}</label>
       <textarea
         id="vfNotes"
         pTextarea
         rows="3"
         [ngModel]="form().notes"
         (ngModelChange)="updateField('notes', $event)"
-        placeholder="Meet at the main entrance…"
+        [placeholder]="'venues.form.notesPlaceholder' | translate"
       ></textarea>
     </div>
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="close()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" (click)="save()" [disabled]="saving()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      {{ isEdit() ? 'Save changes' : 'Add venue' }}
+      {{ (isEdit() ? 'button.saveChanges' : 'venues.section.add') | translate }}
     </button>
   </ng-template>
 </p-dialog>

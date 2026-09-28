@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { API_ENDPOINTS } from '../../constants/api-endpoints.const';
 import { silentRequest } from '../../interceptors/silent-request.context';
@@ -14,6 +14,7 @@ import {
   RegisterDevicePayload,
   UpdatePreferencesPayload,
 } from '../../models/notification';
+import { localizeCategoryPreference } from '../../utils/notification.utils';
 
 /**
  * NotificationService — thin HTTP wrapper over the BE notification
@@ -125,12 +126,13 @@ export class NotificationService {
 
   /**
    * Returns ~6 category rows in display order. Each row has the
-   * merged effective channel state for that category.
+   * merged effective channel state for that category. Labels and
+   * descriptions arrive in English and are swapped for the UI language.
    */
   getSettings(): Observable<CategoryPreferenceView[]> {
-    return this._http.get<CategoryPreferenceView[]>(
-      this.baseUrl + API_ENDPOINTS.NOTIFICATION_SETTINGS.BASE,
-    );
+    return this._http
+      .get<CategoryPreferenceView[]>(this.baseUrl + API_ENDPOINTS.NOTIFICATION_SETTINGS.BASE)
+      .pipe(map((rows) => rows.map(localizeCategoryPreference)));
   }
 
   /**

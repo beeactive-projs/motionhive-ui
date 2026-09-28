@@ -17,6 +17,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { AssignedWorkout } from 'core';
@@ -56,6 +57,7 @@ import { PlanStore } from './plan.store';
     IonTitle,
     IonToolbar,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './plan.html',
   styleUrl: './plan.scss',
@@ -65,27 +67,40 @@ export class Plan implements ViewWillEnter {
   readonly store = inject(PlanStore);
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3];
 
-  readonly title = computed(() => this.store.assignment()?.programNameSnapshot ?? 'Plan');
+  readonly title = computed(
+    () =>
+      this.store.assignment()?.programNameSnapshot ??
+      this._translateService.instant('workouts.plan.title'),
+  );
 
   /** "From Alex Dima · Started Mon 1 Sep" — who set it and when it began. */
   readonly fromLine = computed(() => {
     const assignment = this.store.assignment();
     if (!assignment) return '';
-    const parts: string[] = [];
     const coach = this.store.coachName();
-    if (coach) parts.push(`From ${coach}`);
-    parts.push(`Started ${shortDayLabel(assignment.startDate)}`);
-    return parts.join(' · ');
+    const date = shortDayLabel(assignment.startDate);
+    return coach
+      ? this._translateService.instant('workouts.plan.fromCoachStarted', { coach, date })
+      : this._translateService.instant('workouts.plan.started', { date });
   });
 
-  readonly positionLabel = computed(
-    () => `Week ${this.store.currentWeek() + 1} of ${this.store.weeks().length}`,
+  readonly positionLabel = computed(() =>
+    this._translateService.instant('workouts.plan.position', {
+      week: this.store.currentWeek() + 1,
+      total: this.store.weeks().length,
+    }),
   );
 
-  readonly doneLabel = computed(() => `${this.store.doneCount()} / ${this.store.totalCount()} done`);
+  readonly doneLabel = computed(() =>
+    this._translateService.instant('workouts.plan.doneCount', {
+      done: this.store.doneCount(),
+      total: this.store.totalCount(),
+    }),
+  );
 
   /**
    * Today normally sits inside the current week's rows, where it wears the

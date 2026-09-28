@@ -1,10 +1,10 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { TooltipModule } from 'primeng/tooltip';
 import type { PrivacyControlledField, ProfilePrivacy } from 'core';
 import { PrivacyChooser } from '../privacy-chooser/privacy-chooser';
@@ -25,16 +25,16 @@ import { PrivacyChooser } from '../privacy-chooser/privacy-chooser';
  */
 @Component({
   selector: 'mh-profile-fact-row',
-  imports: [TooltipModule, PrivacyChooser],
+  imports: [TooltipModule, PrivacyChooser, TranslatePipe],
   templateUrl: './profile-fact-row.html',
   styleUrl: './profile-fact-row.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileFactRow {
   readonly icon = input.required<string>();
   readonly label = input.required<string>();
   readonly value = input<string | null | undefined>(null);
-  readonly placeholder = input<string>('Not set');
+  /** Defaults to "Not set" (`form.placeholder.notSet`). */
+  readonly placeholder = input<string | undefined>(undefined);
 
   readonly privacyField = input<PrivacyControlledField | null>(null);
   readonly privacyLevel = input<ProfilePrivacy | null>(null);

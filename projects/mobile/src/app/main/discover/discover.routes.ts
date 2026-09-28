@@ -13,18 +13,18 @@ export const discoverRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./discover').then((m) => m.Discover),
-    title: 'Discover - MotionHive',
+    title: 'pageTitle.discover',
   },
   {
     // Before `:id`, or the parameterised route swallows the word.
     path: 'coaches',
     loadComponent: () => import('./all-coaches/all-coaches').then((m) => m.AllCoaches),
-    title: 'Coaches - MotionHive',
+    title: 'pageTitle.coaches',
   },
   {
     path: 'person/:handle',
     loadComponent: () => import('../person/person').then((m) => m.Person),
-    title: 'Profile - MotionHive',
+    title: 'pageTitle.profile',
   },
   {
     path: ':id',
@@ -32,6 +32,6 @@ export const discoverRoutes: Routes = [
       import('../user/sessions/booking-detail/booking-detail').then(
         (m) => m.BookingDetail,
       ),
-    title: 'Session - MotionHive',
+    title: 'pageTitle.session',
   },
 ];

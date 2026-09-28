@@ -2,17 +2,17 @@
   <!-- Header · back button + title + subtitle (mirrors the session showcase header) -->
   <header class="flex gap-3 md:gap-4 items-center justify-between">
     <div class="flex items-center gap-2 md:gap-3 min-w-0">
-      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" aria-label="Back" iconOnly>
+      <button pButton type="button" outlined rounded severity="secondary" size="small" (click)="goBack()" [attr.aria-label]="'a11y.back' | translate" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1 min-w-0">
-        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ log()?.name ?? 'Workout' }}
+        <h1 class="font-heading font-semibold text-lg md:text-xl lg:text-2xl truncate">{{ log()?.name ?? ('myWorkouts.common.workout' | translate) }}
         </h1>
         @if (log(); as l) {
         <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
           {{ l.startedAt | date: 'EEE d MMM y, HH:mm' }}
           @if (isCoachView()) {
-          · <span class="italic">read-only · client view</span>
+          · <span class="italic">{{ 'myWorkouts.replay.readOnlyClientView' | translate }}</span>
           }
         </p>
         }
@@ -46,25 +46,25 @@
     </div>
     } @else if (log(); as l) {
     <!-- Stats -->
-    <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3 md:grid-cols-4" aria-label="Workout overview">
-      <mh-kpi-card icon="pi pi-stopwatch" label="Duration" [value]="durationLabel()" />
-      <mh-kpi-card icon="pi pi-check-circle" label="Sets done" [value]="setsDone() + '/' + setsPlanned()" />
+    <section class="grid grid-cols-2 gap-2 md:gap-3 sm:grid-cols-3 md:grid-cols-4" [attr.aria-label]="'myWorkouts.replay.overview' | translate">
+      <mh-kpi-card icon="pi pi-stopwatch" [label]="'form.label.duration' | translate" [value]="durationLabel()" />
+      <mh-kpi-card icon="pi pi-check-circle" [label]="'myWorkouts.common.setsDone' | translate" [value]="setsDone() + '/' + setsPlanned()" />
       @if (hasVolume()) {
-      <mh-kpi-card icon="pi pi-chart-bar" label="Total volume" [value]="(totalVolumeKg() | number) + ' kg'" />
+      <mh-kpi-card icon="pi pi-chart-bar" [label]="'myWorkouts.common.totalVolume' | translate" [value]="(totalVolumeKg() | number) + ' kg'" />
       }
       @if (prCount() > 0) {
-      <mh-kpi-card icon="pi pi-trophy" label="New 1RM {{ prCount() === 1 ? 'PR' : 'PRs' }}" [value]="prCount()"
+      <mh-kpi-card icon="pi pi-trophy" [label]="'myWorkouts.common.newPrs' | translate: { count: prCount() }" [value]="prCount()"
         severity="warn" />
       }
       @if (feelingGlyph(); as glyph) {
-      <mh-kpi-card icon="pi pi-heart" label="Feeling" [value]="glyph" />
+      <mh-kpi-card icon="pi pi-heart" [label]="'myWorkouts.replay.feeling' | translate" [value]="glyph" />
       }
     </section>
 
     @if (l.notes) {
     <p-card class="shadow-md">
       <h4 class="m-0 mb-1 font-heading text-xs font-semibold uppercase tracking-wide text-muted-color">
-        {{ isCoachView() ? 'What they noted' : 'What you noted' }}
+        {{ (isCoachView() ? 'myWorkouts.replay.theyNoted' : 'myWorkouts.replay.youNoted') | translate }}
       </h4>
       <p class="m-0 whitespace-pre-line text-sm leading-relaxed">{{ l.notes }}</p>
     </p-card>
@@ -72,8 +72,8 @@
 
     <!-- Exercise blocks -->
     @if (exercises().length === 0) {
-    <mh-list-empty-state icon="pi pi-bolt" title="No exercises logged"
-      message="This workout was completed without any exercises recorded." />
+    <mh-list-empty-state icon="pi pi-bolt" [title]="'myWorkouts.replay.empty.title' | translate"
+      [message]="'myWorkouts.replay.empty.message' | translate" />
     } @else {
     <div class="flex flex-col gap-3 lg:gap-4">
       @for (ex of exercises(); track ex.id) {
@@ -94,17 +94,17 @@
               class="block w-full text-left truncate text-sm font-semibold text-surface-900 dark:text-surface-100 cursor-pointer underline decoration-transparent hover:decoration-current underline-offset-2"
               [class.line-through]="ex.isSkipped"
               (click)="openExerciseInfo(ex.exerciseId)"
-              [attr.aria-label]="'View ' + ex.exerciseNameSnapshot + ' details'">
+              [attr.aria-label]="'myWorkouts.common.viewExerciseDetails' | translate: { name: ex.exerciseNameSnapshot }">
               {{ ex.exerciseNameSnapshot }}
             </button>
             <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-muted-color">
               @if (ex.isSkipped) {
               <!-- Without this a declined exercise reads exactly like one
                    that was never in the workout. -->
-              <p-tag severity="secondary" icon="pi pi-ban" value="Skipped"
+              <p-tag severity="secondary" icon="pi pi-ban" [value]="'enum.workoutLogStatus.SKIPPED' | translate"
                 class="[&_.p-tag]:text-[10px]! [&_.p-tag]:py-0! [&_.p-tag]:px-1.5!" />
               } @else {
-              <span>{{ exerciseSetsDone(ex) }} / {{ exerciseTotal(ex) }} sets</span>
+              <span>{{ 'myWorkouts.common.setsOfTotal' | translate: { done: exerciseSetsDone(ex), total: exerciseTotal(ex) } }}</span>
               }
               @if (ex.swappedFromExerciseId) {
               <p-tag severity="info" icon="pi pi-sync" [value]="swapLabel(ex)"
@@ -123,15 +123,15 @@
           <ng-template #header>
             <tr>
               <th class="w-15 text-center">#</th>
-              <th class="w-1/5">Type</th>
-              <th>Result</th>
-              <th class="w-12 text-center">Done</th>
+              <th class="w-1/5">{{ 'form.label.type' | translate }}</th>
+              <th>{{ 'myWorkouts.replay.table.result' | translate }}</th>
+              <th class="w-12 text-center">{{ 'myWorkouts.common.done' | translate }}</th>
             </tr>
           </ng-template>
           <ng-template #body let-s let-i="rowIndex">
             <tr [class.opacity-55]="!s.isCompleted">
               <td class="text-center font-semibold text-muted-color">{{ i + 1 }}</td>
-              <td class="font-bold uppercase tracking-wide text-muted-color">{{ s.setType }}</td>
+              <td class="font-bold uppercase tracking-wide text-muted-color">{{ s.setType | enumLabel: 'exerciseSetType' }}</td>
               <td class="tabular-nums">{{ setActualLabel(s) }}</td>
               <td class="text-center">
                 @if (s.isCompleted) {

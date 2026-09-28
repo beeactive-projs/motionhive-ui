@@ -3,9 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/programs" />
     </ion-buttons>
-    <ion-title>Program settings</ion-title>
+    <ion-title>{{ 'programs.settings.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="!canSave()" (click)="save()">Save</ion-button>
+      <ion-button [disabled]="!canSave()" (click)="save()">{{ 'button.save' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -14,9 +14,9 @@
   @if (showError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't open this program"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'programs.builder.error' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="load()"
     />
   } @else if (showSkeleton()) {
@@ -29,19 +29,19 @@
     <div class="mh-page">
       <ion-input
         fill="outline"
-        label="Name"
+        [label]="'form.label.name' | translate"
         labelPlacement="stacked"
-        placeholder="12-week strength block"
+        [placeholder]="'programs.settings.namePlaceholder' | translate"
         [value]="name()"
         (ionInput)="name.set($any($event).detail.value ?? '')"
       />
 
       <ion-textarea
         fill="outline"
-        label="Description"
+        [label]="'form.label.description' | translate"
         labelPlacement="stacked"
         [autoGrow]="true"
-        placeholder="Who it is for, and what it builds."
+        [placeholder]="'programs.settings.descriptionPlaceholder' | translate"
         [value]="description()"
         (ionInput)="description.set($any($event).detail.value ?? '')"
       />
@@ -49,13 +49,13 @@
       <!-- Authored in weeks because that is how a block is planned; stored as
            days, so an open-ended or day-counted plan needs no migration. -->
       <section class="mh-section">
-        <span class="mh-kicker">Length</span>
-        <div class="mh-stepper" role="group" aria-label="Program length in weeks">
-          <ion-button fill="clear" [disabled]="weeks() <= 1" aria-label="One week fewer" (click)="stepWeeks(-1)">
+        <span class="mh-kicker">{{ 'programs.settings.length' | translate }}</span>
+        <div class="mh-stepper" role="group" [attr.aria-label]="'programs.settings.lengthAria' | translate">
+          <ion-button fill="clear" [disabled]="weeks() <= 1" [attr.aria-label]="'programs.settings.weekFewer' | translate" (click)="stepWeeks(-1)">
             <ion-icon slot="icon-only" name="remove-outline" aria-hidden="true" />
           </ion-button>
           <span class="value" aria-live="polite">{{ weeks() }} <em>{{ weeksLabel() }}</em></span>
-          <ion-button fill="clear" aria-label="One week more" (click)="stepWeeks(1)">
+          <ion-button fill="clear" [attr.aria-label]="'programs.settings.weekMore' | translate" (click)="stepWeeks(1)">
             <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
           </ion-button>
         </div>
@@ -71,15 +71,17 @@
            fact about the plan rather than a warning without a cause. -->
       <ion-card class="status" [class.ready]="isPublished()">
         <ion-card-content>
-          <span class="mh-kicker">{{ isPublished() ? 'Published' : 'Draft' }}</span>
+          <span class="mh-kicker">{{ (isPublished() ? 'enum.programStatus.PUBLISHED' : 'enum.programStatus.DRAFT') | translate }}</span>
 
           @if (isPublished()) {
-            <p>Clients can be assigned to this program.</p>
-            <ion-button fill="clear" size="small" (click)="openAssignments()">View assignments</ion-button>
+            <p>{{ 'programs.settings.publishedNote' | translate }}</p>
+            <ion-button fill="clear" size="small" (click)="openAssignments()">
+              {{ 'programs.settings.viewAssignments' | translate }}
+            </ion-button>
           } @else {
             <p>{{ dayCountLabel() }} {{ blockersLabel() }}</p>
             <ion-button expand="block" [disabled]="!canPublish() || saving()" (click)="publish()">
-              Publish
+              {{ 'programs.settings.publish' | translate }}
             </ion-button>
           }
         </ion-card-content>
@@ -95,7 +97,7 @@
           } @else {
             <ion-icon slot="start" name="copy-outline" color="medium" aria-hidden="true" />
           }
-          <ion-label>Duplicate program</ion-label>
+          <ion-label>{{ 'programs.settings.duplicate' | translate }}</ion-label>
         </ion-item>
       </ion-list>
 
@@ -103,7 +105,7 @@
       <ion-list [inset]="true" class="mh-card-list">
         <ion-item button detail="false" lines="none" (click)="deleteOpen.set(true)">
           <ion-icon slot="start" name="trash-outline" color="danger" aria-hidden="true" />
-          <ion-label color="danger">Delete program…</ion-label>
+          <ion-label color="danger">{{ 'programs.settings.delete.row' | translate }}</ion-label>
         </ion-item>
       </ion-list>
     </div>
@@ -112,10 +114,10 @@
 
 <mh-confirm-sheet
   [(open)]="deleteOpen"
-  title="Delete program"
+  [title]="'programs.settings.delete.title' | translate"
   [body]="deleteBody()"
-  confirmLabel="Delete"
-  cancelLabel="Keep it"
+  [confirmLabel]="'button.delete' | translate"
+  [cancelLabel]="'button.keepIt' | translate"
   tone="danger"
   [saving]="deleting()"
   (confirm)="confirmDelete()"

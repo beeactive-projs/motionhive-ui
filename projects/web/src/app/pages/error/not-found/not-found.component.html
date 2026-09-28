@@ -8,30 +8,30 @@
 
   <div class="error-content text-center">
 
-    <a routerLink="/" aria-label="MotionHive home">
+    <a routerLink="/" [attr.aria-label]="'errorPages.homeLink' | translate">
       <mh-logo styleClass="ms-auto max-w-10" />
     </a>
 
-    <h1 class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 mt-12">
+    <p class="text-4xl sm:text-6xl 3xl:text-8xl font-heading font-extrabold leading-[1.1] mb-6 mt-12" aria-hidden="true">
       4<span class="text-brand">0</span>4
-    </h1>
+    </p>
 
     <h1 class="font-heading text-4xl sm:text-5xl font-extrabold leading-[1.1] mb-5 mt-12">
-      Off the beaten track.
+      {{ 'errorPages.notFound.title' | translate }}
     </h1>
 
     <p class="text-lg text-surface-600 dark:text-surface-400 leading-relaxed mb-10 max-w-sm mx-auto">
-      This page doesn't exist — but your next workout does. Let's get you back on track.
+      {{ 'errorPages.notFound.message' | translate }}
     </p>
 
     <div class="flex flex-wrap justify-center gap-2 mb-10">
-      <button pButton type="button" routerLink="/auth/login"><i class="pi pi-sign-in"></i> Sign In</button>
-      <button pButton type="button" routerLink="/auth/signup" severity="secondary" outlined><i class="pi pi-user-plus"></i> Sign Up</button>
+      <button pButton type="button" routerLink="/auth/login"><i class="pi pi-sign-in"></i> {{ 'button.signIn' | translate }}</button>
+      <button pButton type="button" routerLink="/auth/signup" severity="secondary" outlined><i class="pi pi-user-plus"></i> {{ 'button.signUp' | translate }}</button>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-3 justify-center">
-      <button pButton type="button" severity="secondary" outlined (click)="goHome()"><i class="pi pi-home"></i> Back to Homepage</button>
-      <button pButton type="button" severity="secondary" outlined (click)="goBack()"><i class="pi pi-arrow-left"></i> Go Back</button>
+      <button pButton type="button" severity="secondary" outlined (click)="goHome()"><i class="pi pi-home"></i> {{ 'errorPages.backToHomepage' | translate }}</button>
+      <button pButton type="button" severity="secondary" outlined (click)="goBack()"><i class="pi pi-arrow-left"></i> {{ 'errorPages.goBack' | translate }}</button>
     </div>
 
   </div>

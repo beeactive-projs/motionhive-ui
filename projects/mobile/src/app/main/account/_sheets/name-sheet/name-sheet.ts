@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, model, signal, untracked } from '@angular/core';
 import { IonInput } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import { ProfileService } from 'core';
@@ -10,7 +11,7 @@ import { AccountStore } from '../../account.store';
 
 @Component({
   selector: 'mh-name-sheet',
-  imports: [IonInput, SheetShell],
+  imports: [IonInput, SheetShell, TranslatePipe],
   templateUrl: './name-sheet.html',
   styleUrl: './name-sheet.scss',
 })
@@ -18,6 +19,7 @@ export class NameSheet {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
 
@@ -55,7 +57,7 @@ export class NameSheet {
 
     if (Object.keys(patch).length === 0) {
       this.open.set(false);
-      void this._feedbackService.info('No changes');
+      void this._feedbackService.info(this._translateService.instant('toast.detail.noChanges'));
       return;
     }
 
@@ -71,12 +73,17 @@ export class NameSheet {
           this.saving.set(false);
           this._accountStore.syncAuthUser();
           this.open.set(false);
-          void this._feedbackService.success('Name updated');
+          void this._feedbackService.success(
+            this._translateService.instant('accountSheets.name.toast.updated'),
+          );
         },
         error: (error: unknown) => {
           this.saving.set(false);
           this._accountStore.patchAccount(previous);
-          void this._feedbackService.error(error, 'Could not update your name.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.name.toast.failed'),
+          );
         },
       });
   }

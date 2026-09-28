@@ -1,16 +1,23 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   output,
 } from '@angular/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
 import { BadgeStrip } from '../badge-strip/badge-strip';
-import { type AvatarUser, countryNameFromCode, type ProfileBadge, ViewerMode } from 'core';
+import {
+  type AvatarUser,
+  countryNameFromCode,
+  EnumLabelPipe,
+  type ProfileBadge,
+  ViewerMode,
+} from 'core';
 
 /**
  * Minimal shape ProfileHero needs to render. Both
@@ -51,12 +58,13 @@ export interface PublicProfileHero {
 
 @Component({
   selector: 'mh-profile-hero',
-  imports: [Avatar, ButtonDirective, Card, BadgeStrip, RouterLink],
+  imports: [Avatar, ButtonDirective, Card, BadgeStrip, RouterLink, TranslatePipe, EnumLabelPipe],
   templateUrl: './profile-hero.html',
   styleUrl: './profile-hero.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileHero {
+  private readonly _translateService = inject(TranslateService);
+
   readonly profile = input.required<PublicProfileHero>();
   readonly viewerMode = input.required<ViewerMode>();
 
@@ -78,7 +86,11 @@ export class ProfileHero {
   readonly displayName = computed(() => {
     const p = this.profile();
     const full = `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim();
-    return p.displayName || full || (p.handle ? `@${p.handle}` : 'Member');
+    return (
+      p.displayName ||
+      full ||
+      (p.handle ? `@${p.handle}` : this._translateService.instant('publicProfile.hero.member'))
+    );
   });
 
   readonly firstName = computed(() => this.profile().firstName?.trim() || null);
@@ -91,13 +103,15 @@ export class ProfileHero {
   readonly yearsLabel = computed(() => {
     const yrs = this.profile().yearsOfExperience;
     if (yrs == null || yrs <= 0) return null;
-    return `${yrs} yrs coaching`;
+    return this._translateService.instant('publicProfile.hero.yearsCoaching', { count: yrs });
   });
 
   /** Personalises the primary CTA, e.g. `Contact Maya`. */
   readonly contactLabel = computed(() => {
     const name = this.firstName();
-    return name ? `Contact ${name}` : 'Contact';
+    return name
+      ? this._translateService.instant('publicProfile.common.contactName', { name })
+      : this._translateService.instant('publicProfile.common.contact');
   });
 
   readonly badges = computed<readonly ProfileBadge[]>(

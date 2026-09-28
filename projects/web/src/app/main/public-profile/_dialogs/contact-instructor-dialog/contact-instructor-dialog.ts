@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -9,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
@@ -24,14 +23,25 @@ import {
   PRIVACY_POLICY_URL,
   type AvatarUser,
   type InstructorLeadPayload,
+  validationMessage,
 } from 'core';
 import { PhoneInput } from '../../../../_shared/components/phone-input/phone-input';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
 interface PillOption<T extends string> {
+  /** Translation key. */
   label: string;
   value: T;
 }
+
+/** Per-field wording for the `required` error. */
+const REQUIRED_KEYS: Record<'name' | 'email' | 'goal' | 'level' | 'format', string> = {
+  name: 'publicProfile.contactDialog.error.nameRequired',
+  email: 'publicProfile.contactDialog.error.emailRequired',
+  goal: 'publicProfile.contactDialog.error.goalRequired',
+  level: 'publicProfile.contactDialog.error.levelRequired',
+  format: 'publicProfile.contactDialog.error.formatRequired',
+};
 
 /**
  * Public lead-capture dialog — the only "contact" action on the
@@ -47,23 +57,33 @@ interface PillOption<T extends string> {
  */
 @Component({
   selector: 'mh-contact-instructor-dialog',
-  imports: [ReactiveFormsModule, Dialog, ButtonDirective, InputText, Message, Textarea, Avatar, PhoneInput],
+  imports: [
+    ReactiveFormsModule,
+    Dialog,
+    ButtonDirective,
+    InputText,
+    Message,
+    Textarea,
+    Avatar,
+    PhoneInput,
+    TranslatePipe,
+  ],
   providers: [MessageService],
   templateUrl: './contact-instructor-dialog.html',
   styleUrl: './contact-instructor-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactInstructorDialog {
-  private readonly _fb = inject(FormBuilder);
+  private readonly _formBuilder = inject(FormBuilder);
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly privacyUrl = PRIVACY_POLICY_URL;
 
   readonly visible = model<boolean>(false);
   readonly instructorUserId = input.required<string>();
   /** Shown in the header. First-name preferred; falls back to full name. */
-  readonly instructorName = input<string>('this instructor');
+  readonly instructorName = input<string>('');
   readonly instructorAvatar = input<AvatarUser | null>(null);
   /** Optional seed for the message field (e.g. when opened from an offering). */
   readonly prefillMessage = input<string>('');
@@ -73,34 +93,34 @@ export class ContactInstructorDialog {
   /** First name for the header copy + privacy line. */
   readonly firstName = computed(() => {
     const name = this.instructorName().trim();
-    if (!name) return 'them';
+    if (!name) return this._translateService.instant('publicProfile.common.them');
     return name.split(/\s+/)[0];
   });
 
   readonly goals: PillOption<LeadGoal>[] = [
-    { label: 'Lose fat', value: LeadGoal.FatLoss },
-    { label: 'Build muscle', value: LeadGoal.Muscle },
-    { label: 'Mobility', value: LeadGoal.Mobility },
-    { label: 'Endurance', value: LeadGoal.Endurance },
-    { label: 'Pre / post-natal', value: LeadGoal.PrePostNatal },
-    { label: 'Just feel better', value: LeadGoal.FeelBetter },
+    { label: 'publicProfile.contactDialog.goal.fatLoss', value: LeadGoal.FatLoss },
+    { label: 'publicProfile.contactDialog.goal.muscle', value: LeadGoal.Muscle },
+    { label: 'publicProfile.contactDialog.goal.mobility', value: LeadGoal.Mobility },
+    { label: 'publicProfile.contactDialog.goal.endurance', value: LeadGoal.Endurance },
+    { label: 'publicProfile.contactDialog.goal.prePostNatal', value: LeadGoal.PrePostNatal },
+    { label: 'publicProfile.contactDialog.goal.feelBetter', value: LeadGoal.FeelBetter },
   ];
 
   readonly levels: PillOption<LeadLevel>[] = [
-    { label: 'Brand new', value: LeadLevel.New },
-    { label: 'Casual', value: LeadLevel.Casual },
-    { label: 'Consistent', value: LeadLevel.Consistent },
-    { label: 'Athlete', value: LeadLevel.Athlete },
+    { label: 'publicProfile.contactDialog.level.new', value: LeadLevel.New },
+    { label: 'publicProfile.contactDialog.level.casual', value: LeadLevel.Casual },
+    { label: 'publicProfile.contactDialog.level.consistent', value: LeadLevel.Consistent },
+    { label: 'publicProfile.contactDialog.level.athlete', value: LeadLevel.Athlete },
   ];
 
   readonly formats: PillOption<LeadFormat>[] = [
-    { label: 'Online', value: LeadFormat.Online },
-    { label: 'In-person', value: LeadFormat.InPerson },
-    { label: 'Hybrid', value: LeadFormat.Hybrid },
-    { label: 'Open to either', value: LeadFormat.Either },
+    { label: 'publicProfile.contactDialog.format.online', value: LeadFormat.Online },
+    { label: 'publicProfile.contactDialog.format.inPerson', value: LeadFormat.InPerson },
+    { label: 'publicProfile.contactDialog.format.hybrid', value: LeadFormat.Hybrid },
+    { label: 'publicProfile.contactDialog.format.either', value: LeadFormat.Either },
   ];
 
-  readonly form = this._fb.nonNullable.group({
+  readonly form = this._formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     phone: [''],
@@ -131,11 +151,6 @@ export class ContactInstructorDialog {
     });
   }
 
-  /** Privacy + header sub-copy use the same first-name string. */
-  readonly headerSubcopy = computed(
-    () => `No account needed — your message lands straight in ${this.firstName()}'s inbox.`,
-  );
-
   onSubmit(): void {
     if (this.form.invalid || this.submitting()) {
       this.form.markAllAsTouched();
@@ -165,8 +180,10 @@ export class ContactInstructorDialog {
       this.submitting.set(false);
       this._messageService.add({
         severity: 'success',
-        summary: 'Message sent',
-        detail: `${this.firstName()} will get back to you. We've sent a copy to your email.`,
+        summary: this._translateService.instant('publicProfile.contactDialog.toast.sentSummary'),
+        detail: this._translateService.instant('publicProfile.contactDialog.toast.sentDetail', {
+          name: this.firstName(),
+        }),
         life: 4000,
       });
       this.visible.set(false);
@@ -186,24 +203,9 @@ export class ContactInstructorDialog {
   }
 
   getFieldError(name: 'name' | 'email' | 'goal' | 'level' | 'format'): string {
-    const errors = this.form.controls[name].errors;
-    if (!errors) return '';
-    if (errors['required']) {
-      switch (name) {
-        case 'name':
-          return 'Your name is required.';
-        case 'email':
-          return 'Email address is required.';
-        case 'goal':
-          return 'Pick a goal so the instructor can tailor their reply.';
-        case 'level':
-          return 'Let them know where you’re starting from.';
-        case 'format':
-          return 'Pick how you’d like to train.';
-      }
-    }
-    if (errors['email']) return 'Please enter a valid email address.';
-    if (errors['minlength']) return 'Please enter your full name.';
-    return '';
+    return validationMessage(this.form.controls[name].errors, {
+      required: REQUIRED_KEYS[name],
+      minlength: 'publicProfile.contactDialog.error.fullName',
+    });
   }
 }

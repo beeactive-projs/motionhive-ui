@@ -2,18 +2,18 @@
   <!-- Header -->
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="space-y-1">
-      <h1 class="font-heading font-semibold text-xl md:text-2xl">Posts</h1>
-      <p class="text-sm text-surface-700 dark:text-surface-400">Manage and publish blog posts.</p>
+      <h1 class="font-heading font-semibold text-xl md:text-2xl">{{ 'writer.posts.title' | translate }}</h1>
+      <p class="text-sm text-surface-700 dark:text-surface-400">{{ 'writer.posts.subtitle' | translate }}</p>
     </div>
     <div class="flex flex-wrap">
-      <button pButton type="button" rounded (click)="navigateToNew()"><i class="pi pi-plus"></i> New post</button>
+      <button pButton type="button" rounded (click)="navigateToNew()"><i class="pi pi-plus"></i> {{ 'writer.posts.newPost' | translate }}</button>
     </div>
   </header>
 
   <!-- Filters -->
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div class="flex items-center gap-3">
-      <span class="text-sm font-medium">Category:</span>
+      <span class="text-sm font-medium">{{ 'writer.posts.filterCategory' | translate }}</span>
       @for (option of categoryOptions; track option.label) {
       <button pButton
         type="button"
@@ -29,7 +29,7 @@
     </div>
     <div class="relative">
       <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 text-sm"></i>
-      <input pInputText class="pl-9 text-sm" placeholder="Search posts..." [value]="searchQuery()"
+      <input pInputText class="pl-9 text-sm" [placeholder]="'writer.posts.searchPlaceholder' | translate" [value]="searchQuery()"
         (input)="onSearch($event)" />
     </div>
   </div>
@@ -42,12 +42,12 @@
 
       <ng-template #header>
         <tr>
-          <th>Title</th>
-          <th>Category</th>
-          <th>Status</th>
-          <th>Read time</th>
-          <th>Created</th>
-          <th class="w-28 text-center">Actions</th>
+          <th>{{ 'form.label.title' | translate }}</th>
+          <th>{{ 'writer.posts.table.category' | translate }}</th>
+          <th>{{ 'form.label.status' | translate }}</th>
+          <th>{{ 'writer.posts.table.readTime' | translate }}</th>
+          <th>{{ 'writer.posts.table.created' | translate }}</th>
+          <th class="w-28 text-center">{{ 'common.actions' | translate }}</th>
         </tr>
       </ng-template>
 
@@ -71,16 +71,16 @@
             </div>
           </td>
           <td>
-            <p-tag [value]="post.category" severity="info" />
+            <p-tag [value]="categoryLabel(post.category)" severity="info" />
           </td>
           <td>
-            <p-tag [value]="post.isPublished ? 'Published' : 'Draft'"
+            <p-tag [value]="(post.isPublished ? 'writer.status.published' : 'writer.status.draft') | translate"
               [severity]="publishedSeverity(post.isPublished)" />
           </td>
           <td>
             <span class="flex items-center gap-1 text-sm text-surface-600 dark:text-surface-400">
               <i class="pi pi-clock text-xs"></i>
-              {{ post.readTime }} min
+              {{ 'time.minutesShort' | translate: { minutes: post.readTime } }}
             </span>
           </td>
           <td>{{ post.createdAt | date: 'mediumDate' }}</td>
@@ -91,7 +91,8 @@
                 [rounded]="true"
                 [text]="true"
                 severity="secondary"
-                pTooltip="Edit post"
+                [pTooltip]="'writer.posts.editPost' | translate"
+                [attr.aria-label]="'writer.posts.editPost' | translate"
                 (click)="navigateToEdit(post)"
                 iconOnly
               >
@@ -102,7 +103,8 @@
                 [rounded]="true"
                 [text]="true"
                 severity="danger"
-                pTooltip="Delete post"
+                [pTooltip]="'writer.posts.deletePost' | translate"
+                [attr.aria-label]="'writer.posts.deletePost' | translate"
                 (click)="confirmDelete(post)"
                 iconOnly
               >
@@ -135,8 +137,8 @@
       <ng-template #emptymessage>
         <tr>
           <td colspan="6">
-            <mh-list-empty-state icon="pi pi-file-edit" title="No posts yet"
-              message="Create your first post to start publishing content." actionLabel="Write your first post"
+            <mh-list-empty-state icon="pi pi-file-edit" [title]="'writer.posts.empty.title' | translate"
+              [message]="'writer.posts.empty.message' | translate" [actionLabel]="'writer.posts.empty.action' | translate"
               actionIcon="pi pi-plus" (action)="navigateToNew()" />
           </td>
         </tr>

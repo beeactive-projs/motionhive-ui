@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -9,9 +8,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import {
+  DiscoverFilters,
   DiscoverGroup,
   GroupService,
   InstructorSearchResult,
@@ -20,7 +21,9 @@ import {
   Hex,
   HexTone,
   PublicSessionInstance,
+  SessionLocationKind,
   SessionsDiscoverStore,
+  SessionType,
   showApiError,
 } from 'core';
 import { SessionCard } from '../../_shared/components/session-card/session-card';
@@ -28,6 +31,60 @@ import { SessionCard } from '../../_shared/components/session-card/session-card'
 type DiscoverTab = 'coaches' | 'sessions' | 'groups';
 
 const TONES: HexTone[] = ['amber', 'teal', 'navySolid', 'coral'];
+
+/** Coach refine chip. `value` is matched against the (free-text, English)
+ *  specializations, so it stays untranslated; `labelKey` is what's shown. */
+interface CoachChip {
+  value: string;
+  labelKey: string;
+}
+
+/** Session refine chip — `filters` is what the chip applies to the store. */
+interface SessionChip {
+  id: string;
+  labelKey: string;
+  filters: Pick<DiscoverFilters, 'type' | 'locationKind'>;
+}
+
+const ALL_CHIP = 'all';
+
+const COACH_CHIPS: CoachChip[] = [
+  { value: ALL_CHIP, labelKey: 'common.all' },
+  { value: 'Strength', labelKey: 'discover.coaches.chips.strength' },
+  { value: 'Mobility', labelKey: 'discover.coaches.chips.mobility' },
+  { value: 'Boxing', labelKey: 'discover.coaches.chips.boxing' },
+  { value: 'Yoga', labelKey: 'discover.coaches.chips.yoga' },
+  { value: 'HIIT', labelKey: 'discover.coaches.chips.hiit' },
+  { value: 'Pilates', labelKey: 'discover.coaches.chips.pilates' },
+];
+
+const SESSION_CHIPS: SessionChip[] = [
+  {
+    id: ALL_CHIP,
+    labelKey: 'common.all',
+    filters: { type: undefined, locationKind: undefined },
+  },
+  {
+    id: 'online',
+    labelKey: 'enum.sessionLocationKind.ONLINE',
+    filters: { locationKind: SessionLocationKind.Online, type: undefined },
+  },
+  {
+    id: 'inPerson',
+    labelKey: 'enum.sessionLocationKind.IN_PERSON',
+    filters: { locationKind: SessionLocationKind.InPerson, type: undefined },
+  },
+  {
+    id: 'group',
+    labelKey: 'enum.sessionType.GROUP',
+    filters: { type: SessionType.Group, locationKind: undefined },
+  },
+  {
+    id: 'private',
+    labelKey: 'enum.sessionType.PRIVATE',
+    filters: { type: SessionType.Private, locationKind: undefined },
+  },
+];
 
 /**
  * Discover — one hub for finding coaches, sessions and groups (Claude
@@ -39,16 +96,16 @@ const TONES: HexTone[] = ['amber', 'teal', 'navySolid', 'coral'];
  */
 @Component({
   selector: 'mh-discover',
-  imports: [FormsModule, Toast, Hex, SessionCard],
+  imports: [FormsModule, Toast, Hex, SessionCard, TranslatePipe],
   providers: [MessageService, SessionsDiscoverStore],
   templateUrl: './discover.html',
   styleUrl: './discover.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Discover implements OnInit {
   private readonly _profileService = inject(ProfileService);
   private readonly _groupService = inject(GroupService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _router = inject(Router);
   private readonly _activatedRoute = inject(ActivatedRoute);
@@ -59,10 +116,10 @@ export class Discover implements OnInit {
   readonly query = signal('');
 
   // Per-tab refine chips.
-  readonly coachChip = signal('All');
-  readonly sessionChip = signal('All');
-  readonly coachChips = ['All', 'Strength', 'Mobility', 'Boxing', 'Yoga', 'HIIT', 'Pilates'];
-  readonly sessionChips = ['All', 'Online', 'In-person', 'Group', '1-on-1'];
+  readonly coachChip = signal(ALL_CHIP);
+  readonly sessionChip = signal(ALL_CHIP);
+  readonly coachChips = COACH_CHIPS;
+  readonly sessionChips = SESSION_CHIPS;
 
   readonly coaches = signal<InstructorSearchResult[]>([]);
   readonly groups = signal<DiscoverGroup[]>([]);
@@ -79,7 +136,7 @@ export class Discover implements OnInit {
   readonly visibleCoaches = computed(() => {
     const chip = this.coachChip();
     const list = this.coaches();
-    if (chip === 'All') return list;
+    if (chip === ALL_CHIP) return list;
     const needle = chip.toLowerCase();
     return list.filter((c) =>
       (c.specializations ?? []).some((s) => s.toLowerCase().includes(needle)),
@@ -130,7 +187,12 @@ export class Discover implements OnInit {
       },
       error: (err) => {
         this.loadingCoaches.set(false);
-        showApiError(this._messageService, 'Could not load coaches', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('discover.toast.loadCoachesFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -144,12 +206,17 @@ export class Discover implements OnInit {
   }
 
   coachLocation(c: InstructorSearchResult): string {
-    return [c.city, c.country].filter(Boolean).join(', ') || 'Online';
+    return (
+      [c.city, c.country].filter(Boolean).join(', ') ||
+      this._translateService.instant('discover.coaches.online')
+    );
   }
 
   coachExperience(c: InstructorSearchResult): string {
-    const y = c.yearsOfExperience ?? 0;
-    return y > 0 ? `${y} yr${y === 1 ? '' : 's'} experience` : 'New coach';
+    const count = c.yearsOfExperience ?? 0;
+    return count > 0
+      ? this._translateService.instant('discover.coaches.experience', { count })
+      : this._translateService.instant('discover.coaches.newCoach');
   }
 
   toneFor(i: number): HexTone {
@@ -161,24 +228,9 @@ export class Discover implements OnInit {
   }
 
   // ── Sessions ─────────────────────────────────────────────────────
-  onSessionChip(chip: string): void {
-    this.sessionChip.set(chip);
-    switch (chip) {
-      case 'Online':
-        this.sessionsStore.setFilters({ locationKind: 'ONLINE', type: undefined });
-        break;
-      case 'In-person':
-        this.sessionsStore.setFilters({ locationKind: 'IN_PERSON', type: undefined });
-        break;
-      case 'Group':
-        this.sessionsStore.setFilters({ type: 'GROUP', locationKind: undefined });
-        break;
-      case '1-on-1':
-        this.sessionsStore.setFilters({ type: 'PRIVATE', locationKind: undefined });
-        break;
-      default:
-        this.sessionsStore.setFilters({ type: undefined, locationKind: undefined });
-    }
+  onSessionChip(chip: SessionChip): void {
+    this.sessionChip.set(chip.id);
+    this.sessionsStore.setFilters(chip.filters);
   }
 
   openSession(instance: PublicSessionInstance): void {
@@ -197,7 +249,12 @@ export class Discover implements OnInit {
         },
         error: (err) => {
           this.loadingGroups.set(false);
-          showApiError(this._messageService, 'Could not load groups', '', err);
+          showApiError(
+            this._messageService,
+            this._translateService.instant('discover.toast.loadGroupsFailed'),
+            '',
+            err,
+          );
         },
       });
   }
@@ -231,8 +288,10 @@ export class Discover implements OnInit {
           this.groups.update((list) => list.filter((x) => x.id !== g.id));
           this._messageService.add({
             severity: 'success',
-            summary: 'Joined',
-            detail: `You're now a member of "${g.name}".`,
+            summary: this._translateService.instant('discover.toast.joined.summary'),
+            detail: this._translateService.instant('discover.toast.joined.detail', {
+              name: g.name,
+            }),
           });
         } else {
           this.groups.update((list) =>
@@ -242,14 +301,19 @@ export class Discover implements OnInit {
           );
           this._messageService.add({
             severity: 'info',
-            summary: 'Request sent',
-            detail: 'The owner will review your request to join.',
+            summary: this._translateService.instant('toast.summary.requestSent'),
+            detail: this._translateService.instant('discover.toast.requestSent.detail'),
           });
         }
       },
       error: (err) => {
         this.setGroupBusy(g.id, false);
-        showApiError(this._messageService, 'Could not join group', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('discover.toast.joinFailed'),
+          '',
+          err,
+        );
       },
     });
   }
@@ -265,11 +329,19 @@ export class Discover implements OnInit {
             x.id === g.id ? { ...x, myJoinRequestStatus: null } : x,
           ),
         );
-        this._messageService.add({ severity: 'success', summary: 'Request cancelled' });
+        this._messageService.add({
+          severity: 'success',
+          summary: this._translateService.instant('toast.summary.requestCancelled'),
+        });
       },
       error: (err) => {
         this.setGroupBusy(g.id, false);
-        showApiError(this._messageService, 'Could not cancel request', '', err);
+        showApiError(
+          this._messageService,
+          this._translateService.instant('discover.toast.cancelFailed'),
+          '',
+          err,
+        );
       },
     });
   }

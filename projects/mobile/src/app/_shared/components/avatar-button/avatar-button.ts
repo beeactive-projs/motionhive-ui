@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonButton } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthStore } from 'core';
 
@@ -16,7 +17,7 @@ import { HexAvatar } from '../hex-avatar/hex-avatar';
  */
 @Component({
   selector: 'mh-avatar-button',
-  imports: [HexAvatar, IonButton, RouterLink],
+  imports: [HexAvatar, IonButton, RouterLink, TranslatePipe],
   templateUrl: './avatar-button.html',
 })
 export class AvatarButton {

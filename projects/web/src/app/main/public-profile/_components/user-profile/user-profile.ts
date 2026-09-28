@@ -1,13 +1,13 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Card } from 'primeng/card';
 import { Divider } from 'primeng/divider';
-import { countryNameFromCode } from 'core';
+import { countryNameFromCode, LanguageNamePipe } from 'core';
 import type { PublicUserProfile, ViewerMode } from 'core';
 import { ProfileFactRow } from '../../../../_shared/components/profile-fact-row/profile-fact-row';
 
@@ -22,10 +22,9 @@ import { ProfileFactRow } from '../../../../_shared/components/profile-fact-row/
  */
 @Component({
   selector: 'mh-user-profile',
-  imports: [DatePipe, Card, Divider, ProfileFactRow],
+  imports: [DatePipe, Card, Divider, ProfileFactRow, TranslatePipe, LanguageNamePipe],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfile {
   readonly profile = input.required<PublicUserProfile>();

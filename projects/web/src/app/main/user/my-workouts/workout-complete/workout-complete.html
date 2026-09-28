@@ -12,30 +12,30 @@
       class="flex size-14 items-center justify-center rounded-full bg-green-100 text-2xl text-green-600 dark:bg-green-500/15">
       <i class="pi pi-check"></i>
     </span>
-    <h1 class="m-0 font-heading text-2xl font-semibold">Workout complete</h1>
+    <h1 class="m-0 font-heading text-2xl font-semibold">{{ 'myWorkouts.complete.title' | translate }}</h1>
     <p class="m-0 text-sm text-muted-color">
       {{ l.name }}
       @if (l.completedAt) {
-      · finished {{ l.completedAt | date: 'shortTime' }}
+      · {{ 'myWorkouts.complete.finishedAt' | translate: { time: (l.completedAt | date: 'shortTime') } }}
       }
     </p>
   </div>
 
   <!-- Stat tiles — conditional per modality -->
   <section class="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-    <mh-kpi-card icon="pi pi-stopwatch" label="Duration" [value]="durationLabel()" />
-    <mh-kpi-card icon="pi pi-check-circle" label="Sets done" [value]="setsDone() + ' / ' + setsPlanned()" />
+    <mh-kpi-card icon="pi pi-stopwatch" [label]="'form.label.duration' | translate" [value]="durationLabel()" />
+    <mh-kpi-card icon="pi pi-check-circle" [label]="'myWorkouts.common.setsDone' | translate" [value]="setsDone() + ' / ' + setsPlanned()" />
     @if (hasVolume()) {
-    <mh-kpi-card icon="pi pi-chart-bar" label="Total volume" [value]="(totalVolumeKg() | number) + ' kg'" />
+    <mh-kpi-card icon="pi pi-chart-bar" [label]="'myWorkouts.common.totalVolume' | translate" [value]="(totalVolumeKg() | number) + ' kg'" />
     }
     @if (hasReps()) {
-    <mh-kpi-card icon="pi pi-replay" label="Total reps" [value]="totalReps()" />
+    <mh-kpi-card icon="pi pi-replay" [label]="'myWorkouts.complete.totalReps' | translate" [value]="totalReps()" />
     }
     @if (hasDistance()) {
-    <mh-kpi-card icon="pi pi-map" label="Distance" [value]="(totalDistanceM() | number) + ' m'" />
+    <mh-kpi-card icon="pi pi-map" [label]="'myWorkouts.complete.distance' | translate" [value]="(totalDistanceM() | number) + ' m'" />
     }
     @if (prCount() > 0) {
-    <mh-kpi-card icon="pi pi-trophy" label="New 1RM {{ prCount() === 1 ? 'PR' : 'PRs' }}" [value]="prCount()"
+    <mh-kpi-card icon="pi pi-trophy" [label]="'myWorkouts.common.newPrs' | translate: { count: prCount() }" [value]="prCount()"
       severity="warn" />
     }
   </section>
@@ -43,7 +43,7 @@
   @if (prCount() > 0) {
   <p-card>
     <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-600">
-      <i class="pi pi-trophy"></i> Personal records
+      <i class="pi pi-trophy"></i> {{ 'myWorkouts.complete.personalRecords' | translate }}
     </div>
     <div class="flex flex-col">
       @for (pr of personalRecords(); track pr.id) {
@@ -63,7 +63,7 @@
 
   <!-- Feeling + notes -->
   <p-card>
-    <h3 class="m-0 mb-3 font-heading text-sm font-semibold">How did that feel?</h3>
+    <h3 class="m-0 mb-3 font-heading text-sm font-semibold">{{ 'myWorkouts.complete.howDidItFeel' | translate }}</h3>
     <p-selectbutton [options]="feelingOptions" [ngModel]="feelingRating()" (ngModelChange)="feelingRating.set($event)"
       optionValue="value" [allowEmpty]="true" ariaLabelledBy="feeling" styleClass="w-full [&_.p-togglebutton]:flex-1">
       <ng-template #item let-opt>
@@ -84,7 +84,7 @@
   <footer class="flex flex-col gap-2">
     <button pButton type="button" size="large" fluid (click)="saveFeedback()" [disabled]="saving()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      {{ hasFeedback() ? 'Save and finish' : 'Finish' }}
+      {{ (hasFeedback() ? 'myWorkouts.complete.saveAndFinish' : 'myWorkouts.complete.finish') | translate }}
     </button>
 
     <!--
@@ -95,7 +95,7 @@
     @if (hasFeedback()) {
     <button pButton type="button" severity="secondary" size="large" [text]="true" fluid
       [disabled]="saving()" (click)="skipFeedback()">
-      Skip, don't save this
+      {{ 'myWorkouts.complete.skipFeedback' | translate }}
     </button>
     }
 
@@ -103,15 +103,15 @@
     @if (savedRoutineId()) {
     <button pButton type="button" severity="success" size="large" [text]="true" fluid (click)="goToRoutines()">
       <i class="pi pi-check"></i>
-      Routine saved · view
+      {{ 'myWorkouts.complete.routineSavedView' | translate }}
     </button>
     } @else {
     <button pButton type="button" severity="secondary" size="large" [text]="true" fluid (click)="openSaveAsRoutineDialog()">
       <i class="pi pi-clone"></i>
-      Save as routine
+      {{ 'myWorkouts.complete.saveAsRoutine' | translate }}
     </button>
     <small class="text-center text-xs text-muted-color">
-      Save this shape so you can run it again with one tap.
+      {{ 'myWorkouts.complete.saveAsRoutineHint' | translate }}
     </small>
     }
     }
@@ -123,38 +123,38 @@
 <!-- Save-as-routine dialog -->
 <p-dialog [(visible)]="saveAsRoutineOpen" [modal]="true" [closable]="!savingRoutine()" [closeOnEscape]="!savingRoutine()"
   [dismissableMask]="!savingRoutine()" [appendTo]="'body'" [style]="{ width: '440px' }"
-  [breakpoints]="{ '540px': '95vw' }" header="Save as routine">
+  [breakpoints]="{ '540px': '95vw' }" [header]="'myWorkouts.complete.saveAsRoutine' | translate">
   <div class="flex flex-col gap-2.5">
     <p class="m-0 text-sm leading-relaxed text-muted-color">
-      Keep this workout so you can run it again in one tap. You can edit it later from the routines tab.
+      {{ 'myWorkouts.complete.saveRoutine.intro' | translate }}
     </p>
-    <label for="rname" class="text-xs font-semibold">Routine name *</label>
+    <label for="rname" class="text-xs font-semibold">{{ 'myWorkouts.common.routineNameRequired' | translate }}</label>
     <input pInputText id="rname" fluid [ngModel]="routineName()" (ngModelChange)="routineName.set($event)"
-      maxlength="200" placeholder="e.g. Push day A" autocomplete="off" />
+      maxlength="200" [placeholder]="'myWorkouts.common.routineNamePlaceholder' | translate" autocomplete="off" />
     <label for="rfolder" class="text-xs font-semibold">
-      Folder <span class="font-normal text-muted-color">(optional)</span>
+      {{ 'myWorkouts.common.folder' | translate }} <span class="font-normal text-muted-color">{{ 'form.hint.optional' | translate }}</span>
     </label>
     <input pInputText id="rfolder" fluid [ngModel]="routineFolder()" (ngModelChange)="routineFolder.set($event)"
-      maxlength="100" placeholder="e.g. PPL split" autocomplete="off" />
+      maxlength="100" [placeholder]="'myWorkouts.common.folderPlaceholder' | translate" autocomplete="off" />
 
     <!-- The one decision that changes what you see next time. -->
-    <span class="mt-1 text-xs font-semibold">What to save</span>
+    <span class="mt-1 text-xs font-semibold">{{ 'myWorkouts.complete.saveRoutine.whatToSave' | translate }}</span>
     <p-selectbutton [options]="routineModeOptions" [ngModel]="routineMode()"
       (ngModelChange)="routineMode.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false"
-      size="small" aria-label="What to save" />
+      size="small" [attr.aria-label]="'myWorkouts.complete.saveRoutine.whatToSave' | translate" />
     <small class="text-xs text-muted-color">
-      {{ routineMode() === 'TARGETS'
-        ? "Today's reps and weights become next time's targets."
-        : 'Same exercises and set counts, no weights carried over.' }}
+      {{ (routineMode() === 'TARGETS'
+        ? 'myWorkouts.complete.saveRoutine.hintTargets'
+        : 'myWorkouts.complete.saveRoutine.hintStructure') | translate }}
     </small>
   </div>
   <ng-template #footer>
     <button pButton type="button" severity="secondary" [text]="true" [disabled]="savingRoutine()" (click)="saveAsRoutineOpen.set(false)">
-      Cancel
+      {{ 'button.cancel' | translate }}
     </button>
     <button pButton type="button" [disabled]="(!routineName().trim()) || savingRoutine()" (click)="saveAsRoutine()">
       <i class="pi" [class]="savingRoutine() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      Save routine
+      {{ 'myWorkouts.complete.saveRoutine.submit' | translate }}
     </button>
   </ng-template>
 </p-dialog>

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -19,11 +18,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import {
+  ProgramLibrary,
   Routine,
   RoutineLibrary as RoutineScope,
   RoutineService,
+  escapeHtml,
   injectIsMobile,
   showApiError,
 } from 'core';
@@ -68,6 +70,7 @@ interface RoutineGroup {
     SelectButton,
     Skeleton,
     TooltipModule,
+    TranslatePipe,
     ListEmptyState,
     SectionLabel,
     RoutineRow,
@@ -75,15 +78,18 @@ interface RoutineGroup {
     ScheduleRoutineDialog,
   ],
   templateUrl: './routine-library.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoutineLibrary implements OnInit {
   private readonly _routineService = inject(RoutineService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly isMobile = injectIsMobile();
+
+  /** Library scopes for template comparisons. */
+  readonly Libraries = ProgramLibrary;
 
   readonly routines = signal<Routine[]>([]);
   readonly routinesLoading = signal(false);
@@ -99,11 +105,15 @@ export class RoutineLibrary implements OnInit {
    * no routines, and starting on "Mine" would greet them with an empty
    * list while the starters sat behind a filter, unseen.
    */
-  readonly library = signal<RoutineScope>('all');
+  readonly library = signal<RoutineScope>(ProgramLibrary.All);
   readonly libraryOptions: { label: string; value: RoutineScope }[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Mine', value: 'mine' },
-    { label: 'MotionHive', value: 'system' },
+    { label: this._translateService.instant('common.all'), value: ProgramLibrary.All },
+    {
+      label: this._translateService.instant('myWorkouts.library.mine'),
+      value: ProgramLibrary.Mine,
+    },
+    // Brand name — not translated.
+    { label: 'MotionHive', value: ProgramLibrary.System },
   ];
 
   readonly routineDialogOpen = signal(false);
@@ -143,7 +153,11 @@ export class RoutineLibrary implements OnInit {
       .map(([folder, items]) => ({ folder, label: folder, items }));
     const ungrouped = map.get('') ?? [];
     if (ungrouped.length) {
-      groups.push({ folder: null, label: 'No folder', items: ungrouped });
+      groups.push({
+        folder: null,
+        label: this._translateService.instant('myWorkouts.library.noFolder'),
+        items: ungrouped,
+      });
     }
     return groups;
   });
@@ -197,12 +211,7 @@ export class RoutineLibrary implements OnInit {
         this.routineDialogOpen.set(true);
       },
       error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't open routine",
-          'Please retry.',
-          err,
-        ),
+        this._apiError('myWorkouts.library.toast.openFailed', err),
     });
   }
 
@@ -229,12 +238,7 @@ export class RoutineLibrary implements OnInit {
       },
       error: (err) => {
         this.startingRoutineId.set(null);
-        showApiError(
-          this._messageService,
-          "Couldn't start routine",
-          'Please retry.',
-          err,
-        );
+        this._apiError('myWorkouts.common.startRoutineFailed', err);
       },
     });
   }
@@ -245,22 +249,19 @@ export class RoutineLibrary implements OnInit {
       next: (copy) => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Saved to your routines',
-          detail: `"${copy.name}" is yours to change.`,
+          summary: this._translateService.instant('myWorkouts.common.copySaved'),
+          detail: this._translateService.instant('myWorkouts.common.copySavedDetail', {
+            name: copy.name,
+          }),
           life: 3000,
         });
         // Show it straight away: the copy lands in "Mine", and leaving
         // the filter on "MotionHive" would look like nothing happened.
-        this.library.set('all');
+        this.library.set(ProgramLibrary.All);
         this._loadRoutines();
       },
       error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't save a copy",
-          'Please try again.',
-          err,
-        ),
+        this._apiError('myWorkouts.common.copyFailed', err, 'common.pleaseTryAgain'),
     });
   }
 
@@ -294,16 +295,21 @@ export class RoutineLibrary implements OnInit {
   }
 
   private _askDelete(r: Routine, scheduled: number): void {
-    const sessions = scheduled === 1 ? '1 scheduled session' : `${scheduled} scheduled sessions`;
+    const name = escapeHtml(r.name);
     this._confirmationService.confirm({
-      header: 'Delete routine?',
+      header: this._translateService.instant('myWorkouts.library.confirm.delete.header'),
       message: scheduled
-        ? `"${r.name}" has ${sessions} on your calendar. Deleting the routine cancels those too. Workouts you already logged from it stay in your history.`
-        : `Delete "${r.name}"? Workouts you already logged from it stay in your history.`,
+        ? this._translateService.instant('myWorkouts.library.confirm.delete.messageScheduled', {
+            name,
+            count: scheduled,
+          })
+        : this._translateService.instant('myWorkouts.library.confirm.delete.message', { name }),
       icon: 'pi pi-trash',
-      acceptLabel: scheduled ? 'Delete and cancel' : 'Delete',
+      acceptLabel: this._translateService.instant(
+        scheduled ? 'myWorkouts.library.confirm.delete.acceptAndCancel' : 'button.delete',
+      ),
       acceptButtonProps: { severity: 'danger' },
-      rejectLabel: 'Keep it',
+      rejectLabel: this._translateService.instant('button.keepIt'),
       rejectButtonProps: { severity: 'secondary', text: true },
       accept: () => this._deleteRoutine(r, scheduled > 0),
     });
@@ -331,12 +337,7 @@ export class RoutineLibrary implements OnInit {
         },
         error: (err) => {
           this.routinesLoading.set(false);
-          showApiError(
-            this._messageService,
-            "Couldn't load routines",
-            'Please retry.',
-            err,
-          );
+          this._apiError('myWorkouts.library.toast.loadFailed', err);
         },
       });
   }
@@ -347,17 +348,25 @@ export class RoutineLibrary implements OnInit {
         this.routines.update((cur) => cur.filter((x) => x.id !== r.id));
         this._messageService.add({
           severity: 'success',
-          summary: 'Routine deleted',
+          summary: this._translateService.instant('myWorkouts.library.toast.deleted'),
           life: 2000,
         });
       },
-      error: (err) =>
-        showApiError(
-          this._messageService,
-          "Couldn't delete routine",
-          'Please retry.',
-          err,
-        ),
+      error: (err) => this._apiError('myWorkouts.library.toast.deleteFailed', err),
     });
+  }
+
+  /** Error toast with a translated summary; the detail defaults to "Please retry." */
+  private _apiError(
+    summaryKey: string,
+    err: unknown,
+    detailKey = 'myWorkouts.common.pleaseRetry',
+  ): void {
+    showApiError(
+      this._messageService,
+      this._translateService.instant(summaryKey),
+      this._translateService.instant(detailKey),
+      err,
+    );
   }
 }

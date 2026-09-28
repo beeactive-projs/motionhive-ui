@@ -3,7 +3,8 @@
 <div class="mb-3" role="search">
   <p-iconfield>
     <p-inputicon class="pi pi-search" />
-    <input pInputText type="search" fluid placeholder="Search your workouts…" aria-label="Search workouts"
+    <input pInputText type="search" fluid [placeholder]="'training.history.searchPlaceholder' | translate"
+      [attr.aria-label]="'training.history.searchAria' | translate"
       [ngModel]="search()" (ngModelChange)="onSearch($event)" />
     @if (search() !== '') {
     <p-inputicon class="pi pi-times cursor-pointer" (click)="clearSearch()" />
@@ -18,17 +19,18 @@
   }
 </div>
 } @else if (items().length === 0 && search().trim()) {
-<mh-list-empty-state icon="pi pi-search" title="No workouts match that"
-  message="Try a different name, or clear the search to see everything." actionLabel="Clear search"
+<mh-list-empty-state icon="pi pi-search" [title]="'training.history.emptySearchTitle' | translate"
+  [message]="'training.common.emptySearchMessage' | translate"
+  [actionLabel]="'button.clearSearch' | translate"
   actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearSearch()" />
 } @else if (items().length === 0) {
 <!--
   Points at training, not at hiring a coach. Plenty of people here never
   have one, and the summary above has already said how the week is going.
 -->
-<mh-list-empty-state icon="pi pi-history" title="No workouts yet"
-  message="Log your first one and it shows up here, with your sets, records and how it felt."
-  actionLabel="Start a workout" actionIcon="pi pi-bolt" (action)="startWorkout.emit()" />
+<mh-list-empty-state icon="pi pi-history" [title]="'training.history.empty.title' | translate"
+  [message]="'training.history.empty.message' | translate"
+  [actionLabel]="'training.common.startWorkout' | translate" actionIcon="pi pi-bolt" (action)="startWorkout.emit()" />
 } @else {
 <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
   @for (group of historyGroups(); track group.label) {
@@ -45,13 +47,13 @@
     <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()"
       [disabled]="loadingMore()">
       @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
-      Load more
+      {{ 'button.loadMore' | translate }}
     </button>
   </div>
   } @else {
   <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
     role="status">
-    That's everything — {{ total() }} workout{{ total() === 1 ? '' : 's' }} total.
+    {{ 'training.history.endOfList' | translate: { count: total() } }}
   </div>
   }
 </div>

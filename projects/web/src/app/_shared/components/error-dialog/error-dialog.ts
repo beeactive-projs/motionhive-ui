@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 
@@ -6,10 +7,9 @@ import { ErrorDialogService } from 'core';
 
 @Component({
   selector: 'mh-error-dialog',
-  imports: [DialogModule, ButtonDirective],
+  imports: [DialogModule, ButtonDirective, TranslatePipe],
   templateUrl: './error-dialog.html',
   styleUrl: './error-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorDialog {
   private readonly _errorDialogService = inject(ErrorDialogService);

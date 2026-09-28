@@ -9,7 +9,7 @@
           severity="secondary"
           size="small"
           (click)="back.emit()"
-          aria-label="Back to program outline"
+          [attr.aria-label]="'programs.editor.back' | translate"
           iconOnly
         >
           <i class="pi pi-arrow-left"></i>
@@ -17,15 +17,15 @@
       }
       <div class="min-w-0">
         <p class="m-0 text-[11px] font-bold uppercase tracking-wide text-muted-color">
-          Week {{ weekNumber() }}
+          {{ 'programs.common.week' | translate: { week: weekNumber() } }}
         </p>
         <div class="mt-1 flex min-w-0 items-center gap-2.5">
-          <p-tag [value]="'Day ' + (workout().dayIndex + 1)" />
+          <p-tag [value]="'programs.common.day' | translate: { day: workout().dayIndex + 1 }" />
           <h2 class="m-0 truncate font-heading text-lg font-semibold">{{ workout().name }}</h2>
         </div>
         <p class="m-0 mt-1 text-xs text-muted-color">
-          {{ exercises().length }} {{ exercises().length === 1 ? 'exercise' : 'exercises' }} ·
-          {{ setCount() }} {{ setCount() === 1 ? 'set' : 'sets' }}
+          {{ 'count.exercises' | translate: { count: exercises().length } }} ·
+          {{ 'count.sets' | translate: { count: setCount() } }}
         </p>
       </div>
     </div>
@@ -35,7 +35,7 @@
         <p-chip [label]="phase | titlecase" />
       }
       @if (durationEstimate(); as minutes) {
-        <p-chip [label]="'~' + minutes + 'm'" icon="pi pi-clock" />
+        <p-chip [label]="'programs.common.approxMinutes' | translate: { minutes: minutes }" icon="pi pi-clock" />
       }
       <button pButton
         type="button"
@@ -44,11 +44,11 @@
         [text]="true"
         [rounded]="true"
         [disabled]="indexInWeek() === 0"
-        pTooltip="Move up in week"
+        [pTooltip]="'programs.editor.moveUp' | translate"
         tooltipPosition="left"
         (click)="moveUp.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Move ' + workout().name + ' up in week ' + weekNumber()"
+        [attr.aria-label]="'programs.editor.moveUpAria' | translate: { name: workout().name, week: weekNumber() }"
         iconOnly
       >
         <i class="pi pi-arrow-up"></i>
@@ -60,11 +60,11 @@
         [text]="true"
         [rounded]="true"
         [disabled]="indexInWeek() === weekWorkoutCount() - 1"
-        pTooltip="Move down in week"
+        [pTooltip]="'programs.editor.moveDown' | translate"
         tooltipPosition="left"
         (click)="moveDown.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Move ' + workout().name + ' down in week ' + weekNumber()"
+        [attr.aria-label]="'programs.editor.moveDownAria' | translate: { name: workout().name, week: weekNumber() }"
         iconOnly
       >
         <i class="pi pi-arrow-down"></i>
@@ -75,11 +75,11 @@
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        pTooltip="Move to another week/day"
+        [pTooltip]="'programs.editor.moveTo' | translate"
         tooltipPosition="left"
         (click)="moveToWeek.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Move ' + workout().name + ' to another week or day'"
+        [attr.aria-label]="'programs.editor.moveToAria' | translate: { name: workout().name }"
         iconOnly
       >
         <i class="pi pi-calendar"></i>
@@ -93,11 +93,11 @@
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        pTooltip="Copy this day into other weeks"
+        [pTooltip]="'programs.editor.copyDay' | translate"
         tooltipPosition="left"
         (click)="copyDay.emit()"
         class="mh-reorder-btn"
-        [attr.aria-label]="'Copy ' + workout().name + ' into other weeks'"
+        [attr.aria-label]="'programs.editor.copyDayAria' | translate: { name: workout().name }"
         iconOnly
       >
         <i class="pi pi-copy"></i>
@@ -108,10 +108,10 @@
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        pTooltip="Edit workout"
+        [pTooltip]="'programs.editor.edit' | translate"
         tooltipPosition="left"
         (click)="edit.emit()"
-        [attr.aria-label]="'Edit ' + workout().name"
+        [attr.aria-label]="'programs.editor.editAria' | translate: { name: workout().name }"
         iconOnly
       >
         <i class="pi pi-pencil"></i>
@@ -122,10 +122,10 @@
         severity="danger"
         [text]="true"
         [rounded]="true"
-        pTooltip="Delete workout"
+        [pTooltip]="'programs.editor.delete' | translate"
         tooltipPosition="left"
         (click)="remove.emit()"
-        [attr.aria-label]="'Delete ' + workout().name"
+        [attr.aria-label]="'programs.editor.deleteAria' | translate: { name: workout().name }"
         iconOnly
       >
         <i class="pi pi-trash"></i>
@@ -141,9 +141,9 @@
     <div class="rounded-xl border border-surface bg-(--p-content-background)">
       <mh-list-empty-state
         icon="pi pi-list"
-        title="No exercises in this workout yet"
-        message="Add exercises and prescribe their sets to build this workout."
-        actionLabel="Add exercise"
+        [title]="'programs.editor.empty.title' | translate"
+        [message]="'programs.editor.empty.message' | translate"
+        [actionLabel]="'programs.editor.addExercise' | translate"
         actionIcon="pi pi-plus"
         actionSeverity="secondary"
         [actionOutlined]="true"
@@ -184,7 +184,7 @@
           class="mh-dashed-btn"
         >
           <i class="pi pi-plus"></i>
-          Add exercise
+          {{ 'programs.editor.addExercise' | translate }}
         </button>
       </div>
     </div>

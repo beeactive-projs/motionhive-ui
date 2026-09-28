@@ -1,36 +1,34 @@
 <ng-template #body>
   @if (url(); as link) {
-    <ion-note class="subtitle">
-      Drop this link in your Instagram bio, your story, or anywhere people can find you.
-    </ion-note>
+    <ion-note class="subtitle">{{ 'accountSheets.share.subtitle' | translate }}</ion-note>
 
     <div class="link-box">
       <span class="link-text">{{ link }}</span>
-      <ion-button size="small" (click)="copyLink()">Copy</ion-button>
+      <ion-button size="small" (click)="copyLink()">{{ 'button.copy' | translate }}</ion-button>
     </div>
 
     <ion-list [inset]="true" class="mh-card-list">
       <ion-item button [detail]="false" lines="full" (click)="share()">
         <ion-icon slot="start" name="share-social-outline" aria-hidden="true" />
-        <ion-label>Share via…</ion-label>
+        <ion-label>{{ 'accountSheets.share.shareVia' | translate }}</ion-label>
       </ion-item>
       <ion-item button [detail]="false" lines="none" (click)="openLink()">
         <ion-icon slot="start" name="open-outline" aria-hidden="true" />
-        <ion-label>Open profile</ion-label>
+        <ion-label>{{ 'accountSheets.share.openProfile' | translate }}</ion-label>
       </ion-item>
     </ion-list>
   } @else {
     <mh-empty-state
       icon="at-outline"
-      heading="Claim a handle first"
-      message="Your handle is the short link people use to find you. Pick one on your profile and you can share it from here."
+      [heading]="'accountSheets.share.empty.title' | translate"
+      [message]="'accountSheets.share.empty.message' | translate"
     />
   }
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Share this profile"
+  [title]="'accountSheets.share.title' | translate"
   [body]="body"
   [showFooter]="false"
   [breakpoints]="[0, 0.5]"

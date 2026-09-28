@@ -16,6 +16,7 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
@@ -28,6 +29,7 @@ import {
   SetField,
   SetFields,
   WorkoutLogService,
+  appLocale,
   setFieldsFor,
 } from 'core';
 
@@ -74,12 +76,20 @@ const KEYPAD_FIELD: Record<SetField, KeypadField> = {
   [SetFields.Distance]: KeypadFields.Distance,
 };
 
-/** What the keypad's context line calls each field. */
+/** What the keypad's context line calls each field — translation keys. */
 const FIELD_LABELS: Record<SetField, string> = {
-  [SetFields.Weight]: 'Weight (kg)',
-  [SetFields.Reps]: 'Reps',
-  [SetFields.Duration]: 'Time (mm:ss)',
-  [SetFields.Distance]: 'Distance (m)',
+  [SetFields.Weight]: 'workouts.logger.fieldLabel.weight',
+  [SetFields.Reps]: 'workouts.logger.fieldLabel.reps',
+  [SetFields.Duration]: 'workouts.logger.fieldLabel.duration',
+  [SetFields.Distance]: 'workouts.logger.fieldLabel.distance',
+};
+
+/** The set grid's column heading for each field — translation keys. */
+const COLUMN_LABELS: Record<SetField, string> = {
+  [SetFields.Weight]: 'workouts.logger.columns.weight',
+  [SetFields.Reps]: 'workouts.logger.columns.reps',
+  [SetFields.Duration]: 'workouts.logger.columns.time',
+  [SetFields.Distance]: 'workouts.logger.columns.distance',
 };
 
 /**
@@ -116,6 +126,7 @@ const FIELD_LABELS: Record<SetField, string> = {
     NumericKeypad,
     RestTimerBar,
     SetRow,
+    TranslatePipe,
   ],
   providers: [LoggerStore],
   templateUrl: './logger.html',
@@ -127,7 +138,8 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private readonly _router = inject(Router);
   private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _feedbackService = inject(FeedbackService);
-  private readonly _restAlert = inject(RestAlertService);
+  private readonly _restAlertService = inject(RestAlertService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonCards = [1, 2];
 
@@ -181,17 +193,21 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
 
   readonly keypadLabel = computed(() => {
     const target = this.editing();
-    return target ? FIELD_LABELS[target.field] : '';
+    return target ? this._translateService.instant(FIELD_LABELS[target.field]) : '';
   });
 
   readonly pickerTitle = computed(() =>
-    this.swapTarget() ? 'Swap exercise' : 'Add exercises',
+    this._translateService.instant(
+      this.swapTarget() ? 'workouts.exerciseActions.swap' : 'workouts.common.addExercises',
+    ),
   );
 
   readonly pickerContext = computed(() => {
     const target = this.swapTarget();
     return target
-      ? `Replacing ${target.exerciseNameSnapshot}`
+      ? this._translateService.instant('workouts.logger.picker.replacing', {
+          name: target.exerciseNameSnapshot,
+        })
       : (this.store.log()?.name ?? '');
   });
 
@@ -208,15 +224,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     const exercise = this.actionsFor();
     if (!exercise) return '';
     const done = (exercise.sets ?? []).filter((s) => s.isCompleted).length;
+    const name = exercise.exerciseNameSnapshot;
     return done > 0
-      ? `${exercise.exerciseNameSnapshot} has ${done} completed ${done === 1 ? 'set' : 'sets'}. Removing it deletes them.`
-      : `Remove ${exercise.exerciseNameSnapshot} from this workout?`;
+      ? this._translateService.instant('workouts.logger.remove.messageWithSets', { name, count: done })
+      : this._translateService.instant('workouts.logger.remove.message', { name });
   });
 
   readonly finishBody = computed(() => {
     const { done, total } = this.store.progress();
-    const left = total - done;
-    return `${left} ${left === 1 ? 'set is' : 'sets are'} still unticked. Finishing now records the workout as it stands.`;
+    return this._translateService.instant('workouts.logger.finishConfirm.message', {
+      count: total - done,
+    });
   });
 
   readonly showKeypad = computed(() => this.editing() !== null);
@@ -229,7 +247,7 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     // extends, skips or abandons rest already routes through `restEndsAt`,
     // so the alert follows it without a call at each of those sites. The
     // service only reaches the OS once the app is backgrounded.
-    effect(() => this._restAlert.track(this.restEndsAt()));
+    effect(() => this._restAlertService.track(this.restEndsAt()));
   }
 
   ionViewWillEnter(): void {
@@ -325,12 +343,13 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
       this.hasAddedWeight(exercise) && !fields.includes(SetFields.Weight)
         ? [SetFields.Weight, ...fields]
         : fields;
-    return all.map((field) => {
-      if (field === SetFields.Reps) return this.isUnilateral(exercise) ? 'reps each' : 'reps';
-      if (field === SetFields.Duration) return 'time';
-      if (field === SetFields.Distance) return 'distance';
-      return 'kg';
-    });
+    return all.map((field) =>
+      this._translateService.instant(
+        field === SetFields.Reps && this.isUnilateral(exercise)
+          ? 'workouts.logger.columns.repsEach'
+          : COLUMN_LABELS[field],
+      ),
+    );
   }
 
   /** "2 of 4 sets" under the name — the whole-workout state at a glance. */
@@ -366,7 +385,9 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   }
 
   onRestFinished(): void {
-    void this._feedbackService.success('Rest over');
+    void this._feedbackService.success(
+      this._translateService.instant('workouts.restTimer.restOver'),
+    );
   }
 
   // ─── Exercises ────────────────────────────────────────────────
@@ -403,7 +424,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
     this.actionsFor.set(null);
     if (!exercise) return;
     this.store.removeExercise(exercise.id);
-    void this._feedbackService.success(`Removed ${exercise.exerciseNameSnapshot}`);
+    void this._feedbackService.success(
+      this._translateService.instant('workouts.logger.toast.removed', {
+        name: exercise.exerciseNameSnapshot,
+      }),
+    );
   }
 
   /** Abandon the whole session — the "changed my mind" path, not a skip. */
@@ -418,12 +443,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
         next: async () => {
           this.discarding.set(false);
           await this._discardSheet()?.close();
-          void this._feedbackService.success('Workout discarded');
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.logger.toast.discarded'),
+          );
           void this._router.navigate(['/tabs/workouts'], { replaceUrl: true });
         },
         error: (err) => {
           this.discarding.set(false);
-          void this._feedbackService.error(err, 'Could not discard the workout');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.logger.toast.discardFailed'),
+          );
         },
       });
   }
@@ -487,11 +517,13 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
   private _startFreestyle(): void {
     // `from` is a Repeat off the history list: same movements, new session.
     const from = this._route.snapshot.queryParamMap.get('from');
-    const name = `Workout — ${new Date().toLocaleDateString(undefined, {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'short',
-    })}`;
+    const name = this._translateService.instant('workouts.logger.defaultName', {
+      date: new Date().toLocaleDateString(appLocale(), {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'short',
+      }),
+    });
 
     this._workoutLogService
       .start({ name })
@@ -505,7 +537,11 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
           });
           if (from) this._carryOver(from);
         },
-        error: (err) => void this._feedbackService.error(err, 'Could not start the workout'),
+        error: (err) =>
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.common.startFailed'),
+          ),
       });
   }
 
@@ -549,12 +585,17 @@ export class Logger implements ViewWillEnter, ViewWillLeave {
             .map((e) => e.exerciseId)
             .filter((id): id is string => !!id);
           if (!ids.length) {
-            void this._feedbackService.info('That workout had no exercises to repeat');
+            void this._feedbackService.info(
+              this._translateService.instant('workouts.logger.toast.nothingToRepeat'),
+            );
             return;
           }
           this.store.addExercises(ids);
         },
-        error: () => void this._feedbackService.info('Could not load that workout to repeat'),
+        error: () =>
+          void this._feedbackService.info(
+            this._translateService.instant('workouts.logger.toast.repeatFailed'),
+          ),
       });
   }
 }

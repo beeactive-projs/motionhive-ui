@@ -12,28 +12,28 @@
 
 @if (isMobile()) {
 <!-- Mobile FAB (single primary action). -->
-<mh-mobile-fab icon="pi pi-bolt" label="Start workout" (tap)="openStartFreestyle()" />
+<mh-mobile-fab icon="pi pi-bolt" [label]="'myWorkouts.common.startWorkout' | translate" (tap)="openStartFreestyle()" />
 }
 
 <!-- Freestyle start dialog -->
 <p-dialog [(visible)]="startDialogOpen" [modal]="true" [closable]="!starting()" [closeOnEscape]="!starting()"
   [dismissableMask]="!starting()" [appendTo]="'body'" [style]="{ width: '440px' }" [breakpoints]="{ '540px': '95vw' }"
-  header="Start a workout">
+  [header]="'myWorkouts.todayPanel.dialog.title' | translate">
   <div class="flex flex-col gap-2.5">
     <p class="m-0 text-sm text-muted-color leading-relaxed">
-      No assigned plan today? Start a freestyle session. You'll add exercises as you go.
+      {{ 'myWorkouts.todayPanel.dialog.intro' | translate }}
     </p>
-    <label for="name" class="text-xs font-semibold">Workout name</label>
+    <label for="name" class="text-xs font-semibold">{{ 'myWorkouts.todayPanel.dialog.nameLabel' | translate }}</label>
     <input pInputText id="name" fluid [ngModel]="newWorkoutName()" (ngModelChange)="newWorkoutName.set($event)"
-      maxlength="200" placeholder="e.g. Saturday session" autocomplete="off" />
+      maxlength="200" [placeholder]="'myWorkouts.todayPanel.dialog.namePlaceholder' | translate" autocomplete="off" />
   </div>
   <ng-template #footer>
     <button pButton type="button" severity="secondary" [text]="true" [disabled]="starting()" (click)="startDialogOpen.set(false)">
-      Cancel
+      {{ 'button.cancel' | translate }}
     </button>
     <button pButton type="button" [disabled]="(!newWorkoutName().trim()) || starting()" (click)="startFreestyle()">
       <i class="pi" [class]="starting() ? 'pi-spinner pi-spin' : 'pi-bolt'"></i>
-      Start
+      {{ 'button.start' | translate }}
     </button>
   </ng-template>
 </p-dialog>

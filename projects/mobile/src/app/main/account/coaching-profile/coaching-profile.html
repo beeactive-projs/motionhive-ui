@@ -3,9 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home/account" />
     </ion-buttons>
-    <ion-title>Coaching profile</ion-title>
+    <ion-title>{{ 'account.rows.coachingProfile' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="!profile()" (click)="editSheetOpen.set(true)">Edit</ion-button>
+      <ion-button [disabled]="!profile()" (click)="editSheetOpen.set(true)">{{ 'button.edit' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -17,10 +17,10 @@
         @if (coach.isAcceptingClients) {
           <ion-badge color="success">
             <ion-icon name="checkmark-circle" aria-hidden="true" />
-            Accepting clients
+            {{ 'account.coachingProfile.status.accepting' | translate }}
           </ion-badge>
         } @else {
-          <ion-badge color="medium">Not accepting clients</ion-badge>
+          <ion-badge color="medium">{{ 'account.coachingProfile.status.notAccepting' | translate }}</ion-badge>
         }
       </div>
 
@@ -28,23 +28,27 @@
         <ion-card-content>
           <div class="pair-row">
             <div>
-              <ion-note class="mh-kicker" color="medium">Display name</ion-note>
+              <ion-note class="mh-kicker" color="medium">{{ 'form.label.displayName' | translate }}</ion-note>
               <p class="fact">{{ coach.displayName || '—' }}</p>
             </div>
             <div>
-              <ion-note class="mh-kicker" color="medium">Experience</ion-note>
+              <ion-note class="mh-kicker" color="medium">{{ 'account.coachingProfile.experience' | translate }}</ion-note>
               <p class="fact">
-                {{ coach.yearsOfExperience !== null ? coach.yearsOfExperience + ' years' : '—' }}
+                @if (coach.yearsOfExperience !== null) {
+                  {{ 'count.years' | translate: { count: coach.yearsOfExperience } }}
+                } @else {
+                  —
+                }
               </p>
             </div>
           </div>
 
-          <ion-note class="mh-kicker block" color="medium">Bio</ion-note>
-          <p class="bio">{{ coach.bio || 'No bio yet.' }}</p>
+          <ion-note class="mh-kicker block" color="medium">{{ 'form.label.bio' | translate }}</ion-note>
+          <p class="bio">{{ coach.bio || ('account.coachingProfile.noBio' | translate) }}</p>
 
           @if (specializations().length) {
             <ion-note class="mh-kicker block" color="medium">
-              Specializations
+              {{ 'form.label.specializations' | translate }}
             </ion-note>
             <div class="chips">
               @for (item of specializations(); track item) {
@@ -55,9 +59,9 @@
 
           @if (socialLinks().length) {
             <div class="links-head">
-              <ion-note class="mh-kicker" color="medium">Social links</ion-note>
+              <ion-note class="mh-kicker" color="medium">{{ 'form.label.socialLinks' | translate }}</ion-note>
               <ion-badge [color]="coach.showSocialLinks ? 'success' : 'medium'">
-                {{ coach.showSocialLinks ? 'Public' : 'Hidden' }}
+                {{ (coach.showSocialLinks ? 'account.coachingProfile.socialLinks.public' : 'account.coachingProfile.socialLinks.hidden') | translate }}
               </ion-badge>
             </div>
             @for (link of socialLinks(); track link.key) {
@@ -71,7 +75,7 @@
       </ion-card>
 
       <section class="mh-section">
-        <mh-section-header title="Services on your public profile" />
+        <mh-section-header [title]="'account.coachingProfile.services.title' | translate" />
         @if (loadingProducts()) {
           <ion-list [inset]="true" class="mh-card-list">
             @for (_ of [1, 2]; track $index) {
@@ -85,7 +89,7 @@
           </ion-list>
         } @else if (products().length === 0) {
           <ion-note class="mh-footnote" color="medium">
-            No services yet. Pricing is managed on the web app.
+            {{ 'account.coachingProfile.services.empty' | translate }}
           </ion-note>
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
@@ -94,21 +98,21 @@
                 <ion-label class="ion-text-wrap">
                   <h3>{{ product.name }}</h3>
                   <p>
-                    {{ product.amountCents / 100 | currencyRon }} · {{ billingLabel(product) }}
+                    {{ product.amountCents | currencyRon: product.currency }} · {{ billingLabel(product) }}
                   </p>
                 </ion-label>
                 <ion-badge slot="end" [color]="product.showOnProfile ? 'success' : 'medium'">
-                  {{ product.showOnProfile ? 'Visible' : 'Hidden' }}
+                  {{ (product.showOnProfile ? 'account.coachingProfile.services.visible' : 'account.coachingProfile.services.hidden') | translate }}
                 </ion-badge>
               </ion-item>
             }
           </ion-list>
-          <ion-note class="mh-footnote" color="medium">Pricing is managed on the web app.</ion-note>
+          <ion-note class="mh-footnote" color="medium">{{ 'account.coachingProfile.services.managedOnWeb' | translate }}</ion-note>
         }
       </section>
 
       <section class="mh-section">
-        <mh-section-header title="Venues" />
+        <mh-section-header [title]="'account.coachingProfile.venues.title' | translate" />
         @if (loadingVenues()) {
           <ion-list [inset]="true" class="mh-card-list">
             <ion-item lines="none">
@@ -119,7 +123,7 @@
           </ion-list>
         } @else if (venues().length === 0) {
           <ion-note class="mh-footnote" color="medium">
-            No venues yet. Venues are managed on the web app.
+            {{ 'account.coachingProfile.venues.empty' | translate }}
           </ion-note>
         } @else {
           <ion-list [inset]="true" class="mh-card-list">
@@ -134,12 +138,12 @@
                 />
                 <ion-label class="ion-text-wrap">
                   <h3>{{ venue.name }}</h3>
-                  <p>{{ venue.city ?? 'Online' }}</p>
+                  <p>{{ venue.city ?? ('account.coachingProfile.venues.online' | translate) }}</p>
                 </ion-label>
               </ion-item>
             }
           </ion-list>
-          <ion-note class="mh-footnote" color="medium">Venues are managed on the web app.</ion-note>
+          <ion-note class="mh-footnote" color="medium">{{ 'account.coachingProfile.venues.managedOnWeb' | translate }}</ion-note>
         }
       </section>
 

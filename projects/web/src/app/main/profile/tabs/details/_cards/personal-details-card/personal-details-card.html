@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between px-4 pt-4">
       <div class="flex items-center gap-2">
         <i class="pi pi-id-card text-primary-600"></i>
-        <h2 class="text-base font-semibold m-0">Personal details</h2>
+        <h2 class="text-base font-semibold m-0">{{ 'profile.personalDetails.title' | translate }}</h2>
       </div>
       <button pButton
         type="button"
@@ -11,10 +11,10 @@
         [rounded]="true"
         size="small"
         severity="secondary"
-        pTooltip="Edit personal details"
+        [pTooltip]="'profile.personalDetails.edit' | translate"
         tooltipPosition="left"
         (click)="edit.emit()"
-        aria-label="Edit personal details"
+        [attr.aria-label]="'profile.personalDetails.edit' | translate"
         iconOnly
       >
         <i class="pi pi-pencil"></i>
@@ -24,15 +24,20 @@
   </ng-template>
 
   <div class="flex flex-col gap-1">
-    <mh-profile-fact-row icon="pi pi-user" label="First name" [value]="profile().account.firstName"
-      [privacyLevel]="LockedPublic" [lockedPrivacy]="true" lockedTooltip="Always public — shown to everyone." />
-    <mh-profile-fact-row icon="pi pi-user" label="Last name" [value]="profile().account.lastName"
-      [privacyLevel]="LockedPublic" [lockedPrivacy]="true" lockedTooltip="Always public — shown to everyone." />
-    <mh-profile-fact-row icon="pi pi-envelope" label="Email" [value]="profile().account.email" [privacyField]="'email'"
+    <mh-profile-fact-row icon="pi pi-user" [label]="'form.label.firstName' | translate" [value]="profile().account.firstName"
+      [placeholder]="'form.placeholder.notSet' | translate"
+      [privacyLevel]="LockedPublic" [lockedPrivacy]="true" [lockedTooltip]="'profile.lockedPublic' | translate" />
+    <mh-profile-fact-row icon="pi pi-user" [label]="'form.label.lastName' | translate" [value]="profile().account.lastName"
+      [placeholder]="'form.placeholder.notSet' | translate"
+      [privacyLevel]="LockedPublic" [lockedPrivacy]="true" [lockedTooltip]="'profile.lockedPublic' | translate" />
+    <mh-profile-fact-row icon="pi pi-envelope" [label]="'form.label.email' | translate" [value]="profile().account.email"
+      [placeholder]="'form.placeholder.notSet' | translate" [privacyField]="'email'"
       [privacyLevel]="privacyLevel('email')" (privacyChange)="emit('email', $event)" />
-    <mh-profile-fact-row icon="pi pi-phone" label="Phone" [value]="profile().account.phone" placeholder="Not provided"
+    <mh-profile-fact-row icon="pi pi-phone" [label]="'form.label.phone' | translate" [value]="profile().account.phone"
+      [placeholder]="'form.placeholder.notProvided' | translate"
       [privacyField]="'phone'" [privacyLevel]="privacyLevel('phone')" (privacyChange)="emit('phone', $event)" />
-    <mh-profile-fact-row icon="pi pi-map-marker" label="Location" [value]="locationDisplay()" placeholder="Not provided"
+    <mh-profile-fact-row icon="pi pi-map-marker" [label]="'form.label.location' | translate" [value]="locationDisplay()"
+      [placeholder]="'form.placeholder.notProvided' | translate"
       [privacyField]="'city'" [privacyLevel]="privacyLevel('city')" (privacyChange)="emit('city', $event)" />
   </div>
 </p-card>

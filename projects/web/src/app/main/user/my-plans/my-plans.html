@@ -4,11 +4,9 @@
     <div class="space-y-1 min-w-0">
       <p class="text-xs md:text-sm text-surface-700 dark:text-surface-400 truncate">
         @if (total() === 0 && !loading()) {
-          What you are working through, whether a coach set it or you scheduled it yourself.
-        } @else if (total() === 1) {
-          1 plan on your calendar.
+          {{ 'training.myPlans.subtitleEmpty' | translate }}
         } @else {
-          {{ total() }} plans on your calendar.
+          {{ 'training.myPlans.subtitleCount' | translate: { count: total() } }}
         }
       </p>
     </div>
@@ -21,8 +19,8 @@
         confusing in the first place.
       -->
       <button pButton type="button" severity="secondary" [text]="true" rounded size="small"
-        aria-label="What is the difference between a plan and a routine?"
-        pTooltip="A routine is one workout you saved, ready whenever you are. A plan is training with dates on it — either what a coach set for you, or a routine of yours set to repeat."
+        [attr.aria-label]="'training.myPlans.help.aria' | translate"
+        [pTooltip]="'training.myPlans.help.tooltip' | translate"
         tooltipPosition="bottom" iconOnly>
         <i class="pi pi-question-circle"></i>
       </button>
@@ -42,7 +40,7 @@
       @for (t of tabs; track t.key) {
       <p-tab [value]="t.key">
         <i class="text-md" [class]="t.icon" [class.text-xs]="isTabletDown()"></i>
-        <span class="ml-2 text-md" [class.text-xs]="isTabletDown()">{{ t.label }}</span>
+        <span class="ml-2 text-md" [class.text-xs]="isTabletDown()">{{ t.labelKey | translate }}</span>
       </p-tab>
       }
     </p-tablist>
@@ -51,7 +49,8 @@
     <div class="flex flex-wrap items-center justify-end gap-3" role="search">
       <p-iconfield class="flex-1 md:flex-[0_1_320px]">
         <p-inputicon class="pi pi-search" />
-        <input pInputText type="text" fluid placeholder="Search plans…" aria-label="Search plans"
+        <input pInputText type="text" fluid [placeholder]="'training.myPlans.searchPlaceholder' | translate"
+          [attr.aria-label]="'training.myPlans.searchAria' | translate"
           [ngModel]="searchInput()" (ngModelChange)="onSearchInput($event)" />
         @if (searchInput() !== '') {
         <p-inputicon class="pi pi-times cursor-pointer" (click)="clearSearch()" />
@@ -91,13 +90,14 @@
   </div>
   } @else if (filteredItems().length === 0) {
   @if (items().length === 0) {
-  <mh-list-empty-state icon="pi pi-bookmark" title="No plans yet"
-    message="Plans are training with dates on it, spanning weeks. A coach can set one for you, or you can repeat one of your routines from the Routines tab."
-    actionLabel="Schedule a routine" actionIcon="pi pi-calendar-plus" (action)="goToRoutines()" />
+  <mh-list-empty-state icon="pi pi-bookmark" [title]="'training.myPlans.empty.title' | translate"
+    [message]="'training.myPlans.empty.message' | translate"
+    [actionLabel]="'training.myPlans.empty.action' | translate" actionIcon="pi pi-calendar-plus"
+    (action)="goToRoutines()" />
   } @else {
-  <mh-list-empty-state icon="pi pi-search" title="No plans match your search"
-    message="Try a different name, or clear the search to see everything." actionLabel="Clear search"
-    actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearSearch()" />
+  <mh-list-empty-state icon="pi pi-search" [title]="'training.myPlans.emptySearchTitle' | translate"
+    [message]="'training.common.emptySearchMessage' | translate"
+    [actionLabel]="'button.clearSearch' | translate" actionIcon="pi pi-times" actionSeverity="secondary" [actionOutlined]="true" (action)="clearSearch()" />
   }
   } @else {
   <div class="flex flex-col gap-2 md:gap-4.5 pb-24 md:pb-0">
@@ -121,13 +121,13 @@
     <div class="flex justify-center p-4">
       <button pButton type="button" severity="secondary" [outlined]="true" (click)="loadMore()" [disabled]="loadingMore()">
         @if (loadingMore()) {<i class="pi pi-spinner pi-spin"></i>}
-        Load more
+        {{ 'button.loadMore' | translate }}
       </button>
     </div>
     } @else if (items().length > 0) {
     <div class="flex items-center justify-center gap-2 p-4 text-center text-[13px] text-muted-color opacity-60"
       role="status">
-      That's everything — {{ total() }} plan{{ total() === 1 ? '' : 's' }} total.
+      {{ 'training.myPlans.endOfList' | translate: { count: total() } }}
     </div>
     }
   </div>

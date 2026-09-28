@@ -24,7 +24,7 @@
             slot="end"
             [checked]="row.checked"
             [disabled]="row.locked || saving()"
-            [attr.aria-label]="row.label + ' for ' + pref.label"
+            [attr.aria-label]="'account.notifications.channels.toggleLabel' | translate: { channel: row.label, category: pref.label }"
             (ionChange)="onToggle(row, $event)"
           />
         </ion-item>
@@ -38,7 +38,7 @@
       [disabled]="resetting() || saving()"
       (click)="reset.emit()"
     >
-      Reset this category to default
+      {{ 'account.notifications.resetCategory' | translate }}
     </ion-button>
   }
 </ng-template>

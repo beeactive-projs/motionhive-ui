@@ -30,7 +30,6 @@ export const CATEGORY_ICONS = {
 };
 
 export interface CategoryStyle {
-  label: string;
   icon: string;
   /** Ionic palette name — rendered as a `tone="wash"` hexagon. */
   color: string;
@@ -49,42 +48,34 @@ export interface CategoryStyle {
  */
 export const CATEGORY_STYLES: Record<NotificationCategory, CategoryStyle> = {
   [NotificationCategory.Messaging]: {
-    label: 'Messaging',
     icon: 'chatbubble-ellipses-outline',
     color: 'teal',
   },
   [NotificationCategory.Sessions]: {
-    label: 'Sessions',
     icon: 'calendar-outline',
     color: 'info',
   },
   [NotificationCategory.Coaching]: {
-    label: 'Coaching',
     icon: 'ribbon-outline',
     color: 'warning',
   },
   [NotificationCategory.Workouts]: {
-    label: 'Workouts',
     icon: 'barbell-outline',
     color: 'coral',
   },
   [NotificationCategory.Groups]: {
-    label: 'Groups',
     icon: 'people-outline',
     color: 'violet',
   },
   [NotificationCategory.Payments]: {
-    label: 'Payments',
     icon: 'card-outline',
     color: 'success',
   },
   [NotificationCategory.Posts]: {
-    label: 'Posts',
     icon: 'chatbubbles-outline',
     color: 'medium',
   },
   [NotificationCategory.Account]: {
-    label: 'Account',
     icon: 'shield-checkmark-outline',
     color: 'dark',
   },
@@ -118,7 +109,6 @@ export const FILTERABLE_CATEGORIES: NotificationCategory[] = CATEGORY_ORDER.filt
 );
 
 const FALLBACK: CategoryStyle = {
-  label: 'Notification',
   icon: 'notifications-outline',
   color: 'medium',
 };

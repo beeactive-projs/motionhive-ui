@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { GroupService, AuthStore } from 'core';
+import { GroupService } from 'core';
 
 @Component({
   selector: 'mh-join-group',
@@ -22,8 +22,8 @@ import { GroupService, AuthStore } from 'core';
             <i class="pi pi-times-circle text-5xl text-red-500" aria-hidden="true"></i>
             <h2 class="text-xl font-semibold">{{ 'groups.joinLink.errorTitle' | translate }}</h2>
             <p class="text-surface-500">{{ error() }}</p>
-            <button pButton type="button" (click)="goToDashboard()">
-              {{ 'groups.joinLink.goToDashboard' | translate }}
+            <button pButton type="button" (click)="goHome()">
+              {{ 'groups.joinLink.goHome' | translate }}
             </button>
           </div>
         } @else {
@@ -31,8 +31,8 @@ import { GroupService, AuthStore } from 'core';
             <i class="pi pi-check-circle text-5xl text-green-500" aria-hidden="true"></i>
             <h2 class="text-xl font-semibold">{{ 'groups.joinLink.successTitle' | translate }}</h2>
             <p class="text-surface-500">{{ 'groups.joinLink.successMessage' | translate }}</p>
-            <button pButton type="button" (click)="goToDashboard()">
-              {{ 'groups.joinLink.goToDashboard' | translate }}
+            <button pButton type="button" (click)="openGroup()">
+              {{ 'groups.joinLink.openGroup' | translate }}
             </button>
           </div>
         }
@@ -44,11 +44,11 @@ export class JoinGroup implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _groupService = inject(GroupService);
-  private readonly _authStore = inject(AuthStore);
   private readonly _translateService = inject(TranslateService);
 
   loading = signal(true);
   error = signal<string | null>(null);
+  private readonly _joinedGroupId = signal<string | null>(null);
 
   ngOnInit(): void {
     const token = this._route.snapshot.paramMap.get('token');
@@ -59,7 +59,8 @@ export class JoinGroup implements OnInit {
     }
 
     this._groupService.joinViaLink(token).subscribe({
-      next: () => {
+      next: (member) => {
+        this._joinedGroupId.set(member.groupId);
         this.loading.set(false);
       },
       error: (err) => {
@@ -71,11 +72,12 @@ export class JoinGroup implements OnInit {
     });
   }
 
-  goToDashboard(): void {
-    if (this._authStore.isUser()) {
-      this._router.navigate(['/user/dashboard']);
-    } else {
-      this._router.navigate(['/dashboard']);
-    }
+  goHome(): void {
+    this._router.navigate(['/home']);
+  }
+
+  openGroup(): void {
+    const groupId = this._joinedGroupId();
+    this._router.navigate(groupId ? ['/groups', groupId] : ['/groups']);
   }
 }

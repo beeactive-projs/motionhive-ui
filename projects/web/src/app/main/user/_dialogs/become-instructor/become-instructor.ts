@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, model, inject, signal } from '@angular/core';
+import { Component, model, inject, signal } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonDirective } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -12,6 +13,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { MessageModule } from 'primeng/message';
 import { StepperModule } from 'primeng/stepper';
 import {
+  apiErrorMessage,
   AuthStore,
   CreateInstructorProfilePayload,
   ProfileService,
@@ -33,10 +35,10 @@ import {
     StepperModule,
     ToggleSwitchModule,
     ReactiveFormsModule,
+    TranslatePipe,
   ],
   templateUrl: './become-instructor.html',
   styleUrl: './become-instructor.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BecomeInstructor {
   private readonly _formBuilder = inject(FormBuilder);
@@ -44,6 +46,7 @@ export class BecomeInstructor {
   private readonly _tokenService = inject(TokenService);
   private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly isLoading = signal(false);
@@ -176,7 +179,9 @@ export class BecomeInstructor {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'Something went wrong. Please try again.');
+        this.errorMessage.set(
+          apiErrorMessage(err, this._translateService.instant('error.generic')),
+        );
       },
     });
   }

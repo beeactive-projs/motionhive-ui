@@ -13,23 +13,23 @@ export const accountRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./account').then((m) => m.Account),
-    title: 'Account - MotionHive',
+    title: 'pageTitle.account',
   },
   {
     path: 'profile',
     loadComponent: () => import('./profile/profile').then((m) => m.Profile),
-    title: 'Profile - MotionHive',
+    title: 'pageTitle.profile',
   },
   {
     path: 'notifications',
     loadComponent: () =>
       import('./notifications/notifications').then((m) => m.AccountNotifications),
-    title: 'Notifications - MotionHive',
+    title: 'pageTitle.notifications',
   },
   {
     path: 'blocked',
     loadComponent: () => import('./blocked-users/blocked-users').then((m) => m.BlockedUsers),
-    title: 'Blocked users - MotionHive',
+    title: 'pageTitle.blockedUsers',
   },
   {
     // Only a coach has a coaching profile to look at.
@@ -37,11 +37,11 @@ export const accountRoutes: Routes = [
     canActivate: [coachGuard],
     loadComponent: () =>
       import('./coaching-profile/coaching-profile').then((m) => m.CoachingProfile),
-    title: 'Coaching profile - MotionHive',
+    title: 'pageTitle.coachingProfile',
   },
   {
     path: 'manage',
     loadComponent: () => import('./manage-account/manage-account').then((m) => m.ManageAccount),
-    title: 'Manage account - MotionHive',
+    title: 'pageTitle.manageAccount',
   },
 ];

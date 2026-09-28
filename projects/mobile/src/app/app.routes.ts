@@ -19,7 +19,7 @@ const notificationRoutes: Routes = Object.values(TabIds).map((tab) => ({
   path: `${tab}/notifications`,
   loadComponent: () =>
     import('./main/notifications/notifications').then((m) => m.Notifications),
-  title: 'Notifications - MotionHive',
+  title: 'pageTitle.notifications',
 }));
 
 /**
@@ -123,7 +123,7 @@ export const routes: Routes = [
         path: 'u/:handle',
         loadComponent: () =>
           import('./main/profile-view/profile-view').then((m) => m.ProfileView),
-        title: 'Profile - MotionHive',
+        title: 'pageTitle.profile',
       },
       {
         path: 'programs',

@@ -1,3 +1,4 @@
+import { enumLabel } from 'core';
 import {
   alertCircleOutline,
   callOutline,
@@ -20,3 +21,12 @@ export const PERSON_ICONS = {
   starOutline,
   timeOutline,
 };
+
+/**
+ * A role as the profile screens name it — `INSTRUCTOR` is "Coach".
+ * `displayRoles` arrives as raw role names, with USER already filtered out
+ * server-side.
+ */
+export function roleLabel(role: string): string {
+  return enumLabel('userRole', role);
+}

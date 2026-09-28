@@ -56,7 +56,7 @@ export const routes: Routes = [
         path: 'photo/:postId',
         loadComponent: () =>
           import('./photo-viewer/photo-viewer').then((m) => m.PhotoViewer),
-        title: 'Photo - MotionHive',
+        title: 'pageTitle.photo',
       },
       {
         path: '',

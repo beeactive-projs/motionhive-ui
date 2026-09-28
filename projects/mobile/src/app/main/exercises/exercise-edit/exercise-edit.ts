@@ -21,6 +21,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -75,6 +76,7 @@ import { EXERCISE_ICONS, KIND_ORDER, kindLabel } from '../exercises.config';
     IonToolbar,
     LevelSegment,
     MuscleEquipmentFields,
+    TranslatePipe,
   ],
   templateUrl: './exercise-edit.html',
   styleUrl: './exercise-edit.scss',
@@ -85,6 +87,7 @@ export class ExerciseEdit {
   private readonly _router = inject(Router);
   private readonly _route = inject(ActivatedRoute);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   readonly exerciseId = signal('');
   readonly exercise = signal<Exercise | null>(null);
@@ -110,18 +113,24 @@ export class ExerciseEdit {
 
   readonly backHref = computed(() => `/tabs/exercises/${this.exerciseId()}`);
 
-  readonly deleteTitle = computed(() => `Delete ${this.form.draft().name || 'this exercise'}?`);
+  readonly deleteTitle = computed<string>(() => {
+    const name = this.form.draft().name;
+    return name
+      ? this._translateService.instant('exercises.edit.deleteConfirm.title', { name })
+      : this._translateService.instant('exercises.edit.deleteConfirm.titleFallback');
+  });
 
   /**
    * Published work has readers. A public exercise other coaches have forked
    * is theirs now — their copies survive, and saying so is kinder than
    * letting them wonder what they just broke.
    */
-  readonly forkNote = computed(() => {
+  readonly forkNote = computed<string | null>(() => {
     const exercise = this.exercise();
     if (!exercise || exercise.forkCount <= 0) return null;
-    const copies = exercise.forkCount === 1 ? '1 coach has' : `${exercise.forkCount} coaches have`;
-    return `${copies} forked this. Their copies keep what they have — your changes do not reach them.`;
+    return this._translateService.instant('exercises.edit.forkNote', {
+      count: exercise.forkCount,
+    });
   });
 
   constructor() {
@@ -146,7 +155,9 @@ export class ExerciseEdit {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          void this._feedbackService.success('Exercise updated');
+          void this._feedbackService.success(
+            this._translateService.instant('exercises.edit.toast.updated'),
+          );
           // The detail page is the one under this in the stack; `replaceUrl`
           // drops this form and lands back on it, and it re-reads on entry.
           void this._router.navigate(['/tabs/exercises', this.exerciseId()], {
@@ -155,7 +166,10 @@ export class ExerciseEdit {
         },
         error: (error: unknown) => {
           this.saving.set(false);
-          void this._feedbackService.error(error, 'Could not save this exercise.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('exercises.edit.toast.saveFailed'),
+          );
         },
       });
   }
@@ -178,7 +192,10 @@ export class ExerciseEdit {
         },
         error: (error: unknown) => {
           this.deleting.set(false);
-          void this._feedbackService.error(error, 'Could not delete this exercise.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('exercises.edit.toast.deleteFailed'),
+          );
         },
       });
   }
@@ -190,7 +207,9 @@ export class ExerciseEdit {
 
   private async _leaveAfterDelete(): Promise<void> {
     await this._deleteSheet()?.close();
-    await this._feedbackService.success('Exercise deleted');
+    await this._feedbackService.success(
+      this._translateService.instant('exercises.edit.toast.deleted'),
+    );
     // `replaceUrl`, so Back cannot return to the detail page of a row that
     // no longer exists.
     await this._router.navigateByUrl('/tabs/exercises', { replaceUrl: true });
@@ -210,7 +229,7 @@ export class ExerciseEdit {
           this.loading.set(false);
         },
         error: () => {
-          this.loadError.set('This exercise is not available to edit.');
+          this.loadError.set(this._translateService.instant('exercises.edit.loadError.message'));
           this.loading.set(false);
         },
       });

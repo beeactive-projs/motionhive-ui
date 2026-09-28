@@ -18,22 +18,25 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
 import {
   AuthStore,
   ProfileService,
-  countryNameFromCode,
   PublicInstructorProfile,
   PublicUserProfile,
+  appLocale,
+  countryNameFromCode,
+  translate,
 } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { avatarToneFor } from '../../_shared/utils/avatar-tone.utils';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
-import { PERSON_ICONS } from './person.config';
+import { PERSON_ICONS, roleLabel } from './person.config';
 
 /**
  * Someone else's profile, reached from anywhere a person is named.
@@ -66,6 +69,7 @@ import { PERSON_ICONS } from './person.config';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './person.html',
   styleUrl: './person.scss',
@@ -105,10 +109,14 @@ export class Person {
   readonly name = computed(() => {
     const profile = this.profile();
     if (!profile) return '';
-    return [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim() || 'Someone';
+    return (
+      [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim() ||
+      translate('common.someone')
+    );
   });
 
-  readonly firstName = computed(() => this.profile()?.firstName?.trim() || 'They');
+  /** Null when the name is hidden — the template then says "They" instead. */
+  readonly firstName = computed(() => this.profile()?.firstName?.trim() || null);
 
   readonly tone = computed(() => avatarToneFor(this.profile()?.userId));
 
@@ -118,7 +126,7 @@ export class Person {
   );
 
   /** USER is filtered out server-side, so anything left is worth showing. */
-  readonly roles = computed(() => this.profile()?.displayRoles ?? []);
+  readonly roles = computed(() => (this.profile()?.displayRoles ?? []).map(roleLabel));
 
   readonly location = computed(() => {
     const profile = this.profile();
@@ -131,7 +139,7 @@ export class Person {
   readonly memberSince = computed(() => {
     const iso = this.profile()?.memberSince;
     if (!iso) return null;
-    return new Date(iso).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    return new Date(iso).toLocaleDateString(appLocale(), { month: 'long', year: 'numeric' });
   });
 
   /** Contact rows only exist when the viewer's tier includes them. */
@@ -147,13 +155,17 @@ export class Person {
   readonly experience = computed(() => {
     const years = this.coachProfile()?.yearsOfExperience;
     if (!years) return null;
-    return `${years} ${years === 1 ? 'year' : 'years'} of experience`;
+    return translate('person.experience', { count: years });
   });
 
   readonly rating = computed(() => {
     const rating = this.coachProfile()?.rating;
     if (!rating || rating.total === 0) return null;
-    return `${rating.average.toFixed(1)} · ${rating.total} ${rating.total === 1 ? 'review' : 'reviews'}`;
+    const average = new Intl.NumberFormat(appLocale(), {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(rating.average);
+    return translate('person.rating', { average, count: rating.total });
   });
 
   /**

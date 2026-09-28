@@ -25,15 +25,15 @@
     <p-tablist>
       <p-tab [value]="Tabs.Details">
         <i class="pi pi-user"></i>
-        <span class="ml-2">Profile details</span>
+        <span class="ml-2">{{ 'profile.tabs.details' | translate }}</span>
       </p-tab>
 
       <p-tab [value]="Tabs.Coaches">
         <i class="pi pi-star"></i>
         <span class="ml-2">
-          Coaches
+          {{ 'profile.tabs.coaches' | translate }}
           @if (incomingRequestsCount() > 0) {
-          <span class="ml-1 text-xs text-primary-600 font-semibold">· {{ incomingRequestsCount() }} new</span>
+          <span class="ml-1 text-xs text-primary-600 font-semibold">{{ 'profile.tabs.newCount' | translate: { count: incomingRequestsCount() } }}</span>
           }
         </span>
       </p-tab>
@@ -42,7 +42,7 @@
       <p-tab [value]="Tabs.Billing">
         <i class="pi pi-credit-card"></i>
         <span class="ml-2">
-          Billing
+          {{ 'nav.billing' | translate }}
           @if (billingBadge() > 0) {
           <span class="ml-1 text-xs text-surface-500">· {{ billingBadge() }}</span>
           }
@@ -52,12 +52,12 @@
 
       <p-tab [value]="Tabs.Notifications">
         <i class="pi pi-bell"></i>
-        <span class="ml-2">Notifications</span>
+        <span class="ml-2">{{ 'nav.notifications' | translate }}</span>
       </p-tab>
 
       <p-tab [value]="Tabs.Safety">
         <i class="pi pi-shield"></i>
-        <span class="ml-2">Safety</span>
+        <span class="ml-2">{{ 'profile.tabs.safety' | translate }}</span>
       </p-tab>
     </p-tablist>
 
@@ -103,9 +103,9 @@
   <p-card class="shadow-md">
     <div class="flex flex-col items-center gap-3 py-12 text-center">
       <i class="pi pi-user text-4xl text-surface-300"></i>
-      <h2 class="text-lg font-semibold">No profile data available</h2>
-      <p class="text-sm text-surface-500 m-0">We couldn't load your profile. Please try again.</p>
-      <button pButton type="button" (click)="loadProfile()"><i class="pi pi-refresh"></i> Retry</button>
+      <h2 class="text-lg font-semibold">{{ 'profile.page.empty.title' | translate }}</h2>
+      <p class="text-sm text-surface-500 m-0">{{ 'profile.page.empty.message' | translate }}</p>
+      <button pButton type="button" (click)="loadProfile()"><i class="pi pi-refresh"></i> {{ 'button.retry' | translate }}</button>
     </div>
   </p-card>
   }

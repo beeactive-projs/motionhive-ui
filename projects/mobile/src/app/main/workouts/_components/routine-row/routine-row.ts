@@ -1,5 +1,6 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { Routine, dayDividerLabel, localDayKey } from 'core';
 
@@ -15,11 +16,13 @@ import { SpineTone, SpineTones } from '../../../../_shared/models/spine-tone.mod
  */
 @Component({
   selector: 'mh-routine-row',
-  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './routine-row.html',
   styleUrl: './routine-row.scss',
 })
 export class RoutineRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly routine = input.required<Routine>();
   /** Spine colour, rotated by list position — see `routineTone`. */
   readonly tone = input<SpineTone>(SpineTones.Honey);
@@ -28,10 +31,9 @@ export class RoutineRow {
 
   readonly select = output<void>();
 
-  readonly exerciseCount = computed(() => {
-    const n = this.routine().exerciseCount;
-    return `${n} ${n === 1 ? 'exercise' : 'exercises'}`;
-  });
+  readonly exerciseCount = computed(() =>
+    this._translateService.instant('count.exercises', { count: this.routine().exerciseCount }),
+  );
 
   /**
    * "Last done Tuesday" — the one fact that sorts a library in a user's head.
@@ -39,6 +41,10 @@ export class RoutineRow {
    */
   readonly lastDone = computed(() => {
     const at = this.routine().lastPerformedAt;
-    return at ? `Last done ${dayDividerLabel(localDayKey(new Date(at)))}` : '';
+    return at
+      ? this._translateService.instant('workouts.routineRow.lastDone', {
+          day: dayDividerLabel(localDayKey(new Date(at))),
+        })
+      : '';
   });
 }

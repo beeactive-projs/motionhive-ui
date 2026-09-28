@@ -1,6 +1,6 @@
 <ng-template #body>
   <ion-select
-    label="Country"
+    [label]="'form.label.country' | translate"
     labelPlacement="stacked"
     fill="outline"
     interface="modal"
@@ -14,25 +14,25 @@
 
   <ion-input
     class="ion-margin-top"
-    label="Phone number"
+    [label]="'accountSheets.phone.phoneNumber' | translate"
     labelPlacement="stacked"
     fill="outline"
     type="tel"
     inputmode="tel"
-    placeholder="Leave empty to remove"
+    [placeholder]="'accountSheets.phone.placeholder' | translate"
     [value]="nationalNumber()"
     [class.ion-invalid]="invalid()"
     [class.ion-touched]="invalid()"
-    errorText="That doesn't look like a valid number for the selected country."
+    [errorText]="'accountSheets.phone.invalid' | translate"
     (ionInput)="onNumberInput($event.detail.value ?? '')"
   />
 
-  <p class="mh-helper">Your phone number stays private — it's only used for account security.</p>
+  <p class="mh-helper">{{ 'accountSheets.phone.hint' | translate }}</p>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Phone number"
+  [title]="'accountSheets.phone.phoneNumber' | translate"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

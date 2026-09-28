@@ -20,6 +20,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs/operators';
 
@@ -68,6 +69,7 @@ import {
     IonTitle,
     IonToolbar,
     StatTile,
+    TranslatePipe,
   ],
   templateUrl: './finish.html',
   styleUrl: './finish.scss',
@@ -77,6 +79,7 @@ export class Finish implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly feelings = FEELINGS;
   readonly skeletonTiles = [1, 2, 3];
@@ -165,12 +168,17 @@ export class Finish implements ViewWillEnter {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          void this._feedbackService.success('Workout saved');
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.finish.toast.saved'),
+          );
           void this._router.navigate(['/tabs/workouts']);
         },
         error: (err) => {
           this.saving.set(false);
-          void this._feedbackService.error(err, 'Could not save the workout');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.finish.toast.saveFailed'),
+          );
         },
       });
   }
@@ -187,11 +195,16 @@ export class Finish implements ViewWillEnter {
       .subscribe({
         next: () => {
           this.savingRoutine.set(false);
-          void this._feedbackService.success(`Saved "${name}"`);
+          void this._feedbackService.success(
+            this._translateService.instant('workouts.finish.toast.routineSaved', { name }),
+          );
         },
         error: (err) => {
           this.savingRoutine.set(false);
-          void this._feedbackService.error(err, 'Could not save that routine');
+          void this._feedbackService.error(
+            err,
+            this._translateService.instant('workouts.finish.toast.routineSaveFailed'),
+          );
         },
       });
   }
@@ -199,6 +212,8 @@ export class Finish implements ViewWillEnter {
   /** "Bench press day" — the first exercise is what people call a session. */
   private _suggestName(log: WorkoutLog): string {
     const first = log.exercises?.[0]?.exerciseNameSnapshot;
-    return first ? `${first} day` : log.name;
+    return first
+      ? this._translateService.instant('workouts.finish.suggestedName', { name: first })
+      : log.name;
   }
 }

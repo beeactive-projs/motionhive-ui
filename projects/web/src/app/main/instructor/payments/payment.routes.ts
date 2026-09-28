@@ -4,13 +4,13 @@ export const paymentsRoutes: Routes = [
   {
     path: 'payments',
     loadComponent: () => import('./payments').then((m) => m.Payments),
-    title: 'Payments - MotionHive',
+    title: 'pageTitle.payments',
   },
   {
     path: 'invoices/:id',
     loadComponent: () =>
       import('./invoices/invoice-detail/invoice-detail').then((m) => m.InvoiceDetail),
-    title: 'Invoice Details - MotionHive',
+    title: 'pageTitle.invoiceDetails',
   },
   {
     path: 'subscriptions/:id',
@@ -18,18 +18,18 @@ export const paymentsRoutes: Routes = [
       import('./subscriptions/subscription-detail/subscription-detail').then(
         (m) => m.SubscriptionDetail,
       ),
-    title: 'Membership Details - MotionHive',
+    title: 'pageTitle.membershipDetails',
   },
   {
     path: 'onboarding/return',
     loadComponent: () =>
       import('./onboarding-return/onboarding-return').then((m) => m.OnboardingReturn),
-    title: 'Onboarding - MotionHive',
+    title: 'pageTitle.onboarding',
   },
   {
     path: 'onboarding/refresh',
     loadComponent: () =>
       import('./onboarding-refresh/onboarding-refresh').then((m) => m.OnboardingRefresh),
-    title: 'Onboarding - MotionHive',
+    title: 'pageTitle.onboarding',
   },
 ];

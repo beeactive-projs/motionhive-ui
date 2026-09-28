@@ -1,23 +1,23 @@
 <ng-template #body>
-  <div class="mh-section-label">Status</div>
+  <div class="mh-section-label">{{ 'form.label.status' | translate }}</div>
   <div class="chips">
     <ion-chip
       [class.selected]="!draft().unreadOnly"
       [attr.aria-pressed]="!draft().unreadOnly"
       (click)="setUnreadOnly(false)"
     >
-      All
+      {{ 'common.all' | translate }}
     </ion-chip>
     <ion-chip
       [class.selected]="draft().unreadOnly"
       [attr.aria-pressed]="draft().unreadOnly"
       (click)="setUnreadOnly(true)"
     >
-      Unread
+      {{ 'notifications.filter.unread' | translate }}
     </ion-chip>
   </div>
 
-  <div class="mh-section-label">Category</div>
+  <div class="mh-section-label">{{ 'notifications.filter.category' | translate }}</div>
   <div class="chips">
     @for (option of categoryOptions; track option.value) {
       <ion-chip
@@ -31,15 +31,14 @@
   </div>
 
   <ion-note class="mh-note-block">
-    Pick as many categories as you like. New messages never land here — the
-    Messages tab is that inbox.
+    {{ 'notifications.filter.note' | translate }}
   </ion-note>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Filters"
-  actionLabel="Reset"
+  [title]="'common.filters' | translate"
+  [actionLabel]="'button.reset' | translate"
   [actionDisabled]="count() === 0"
   [saveLabel]="applyLabel()"
   [body]="body"

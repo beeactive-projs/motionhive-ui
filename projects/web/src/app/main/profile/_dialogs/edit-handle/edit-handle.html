@@ -1,5 +1,5 @@
 <p-dialog
-  header="Edit profile handle"
+  [header]="'profile.editHandle.title' | translate"
   [(visible)]="visible"
   [modal]="true"
   [draggable]="false"
@@ -10,12 +10,12 @@
 >
   <div class="flex flex-col gap-3">
     <p class="text-sm text-muted-color m-0">
-      Your handle is the short URL for your profile. People can find you at
-      <span class="font-semibold">/@your-handle</span>.
+      {{ 'profile.editHandle.intro' | translate }}
+      <span class="font-semibold">{{ 'profile.editHandle.introExample' | translate }}</span>.
     </p>
 
     <label class="flex flex-col gap-1.5">
-      <span class="text-sm font-medium">Handle</span>
+      <span class="text-sm font-medium">{{ 'form.label.handle' | translate }}</span>
       <span class="p-inputgroup">
         <span class="p-inputgroup-addon">{{ '@' }}</span>
         <input
@@ -25,28 +25,28 @@
           spellcheck="false"
           [ngModel]="handle()"
           (ngModelChange)="handle.set($event)"
-          [maxlength]="40"
-          placeholder="jane-doe"
+          [maxlength]="maxLength"
+          [placeholder]="'profile.editHandle.placeholder' | translate"
         />
       </span>
     </label>
 
     @if (validationError(); as err) {
       <p-message severity="error" size="small" variant="simple">
-        {{ err }}
+        {{ err.key | translate: err.params }}
       </p-message>
     } @else if (!unchanged()) {
       <p class="text-xs text-muted-color m-0">
-        Preview: <span class="font-semibold">/@{{ normalized() }}</span>
+        {{ 'profile.editHandle.preview' | translate }} <span class="font-semibold">/@{{ normalized() }}</span>
       </p>
     }
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" [disabled]="saving()" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="saving()" (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="!!validationError() || unchanged() || saving()" (click)="save()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      Save
+      {{ 'button.save' | translate }}
     </button>
   </ng-template>
 </p-dialog>

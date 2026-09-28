@@ -1,10 +1,11 @@
 import { Component, ElementRef, inject, model, viewChild } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { cameraOutline, imageOutline, trashOutline } from 'ionicons/icons';
 import { take } from 'rxjs';
 
-import { AVATAR_ACCEPT, UserService, avatarRejectionReason } from 'core';
+import { AVATAR_ACCEPT, AVATAR_MAX_BYTES, UserService, avatarRejectionReason } from 'core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { FeedbackService } from '../../../../_shared/services/feedback.service';
@@ -20,7 +21,7 @@ import { AccountStore } from '../../account.store';
  */
 @Component({
   selector: 'mh-photo-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, SheetShell, TranslatePipe],
   templateUrl: './photo-sheet.html',
   styleUrl: './photo-sheet.scss',
 })
@@ -28,6 +29,7 @@ export class PhotoSheet {
   private readonly _userService = inject(UserService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _cameraInput = viewChild<ElementRef<HTMLInputElement>>('cameraInput');
   private readonly _galleryInput = viewChild<ElementRef<HTMLInputElement>>('galleryInput');
@@ -54,8 +56,14 @@ export class PhotoSheet {
     input.value = '';
     if (!file) return;
 
-    const rejection = avatarRejectionReason(file);
-    if (rejection) {
+    // Core decides whether the file is usable; its reason text is English
+    // only, so the message is picked here from the same two rules.
+    if (avatarRejectionReason(file)) {
+      const rejection = file.type.startsWith('image/')
+        ? this._translateService.instant('accountSheets.photo.tooLarge', {
+            size: Math.floor(AVATAR_MAX_BYTES / (1024 * 1024)),
+          })
+        : this._translateService.instant('accountSheets.photo.notImage');
       void this._feedbackService.error(null, rejection);
       return;
     }
@@ -75,12 +83,17 @@ export class PhotoSheet {
           this._accountStore.syncAuthUser();
           this._accountStore.setSaving(false);
           this.open.set(false);
-          void this._feedbackService.success('Photo updated');
+          void this._feedbackService.success(
+            this._translateService.instant('accountSheets.photo.toast.updated'),
+          );
           this._accountStore.refresh();
         },
         error: (error: unknown) => {
           this._accountStore.setSaving(false);
-          void this._feedbackService.error(error, 'Could not upload the picture.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.photo.toast.failed'),
+          );
         },
       });
   }

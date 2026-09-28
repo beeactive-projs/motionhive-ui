@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -9,7 +8,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Dialog } from 'primeng/dialog';
@@ -21,6 +20,7 @@ import {
   AuthStore,
   EXERCISE_EQUIPMENT_TAG_CLASS,
   EXERCISE_META_TAG_CLASS,
+  EnumLabelPipe,
   Exercise,
   ExerciseMedia,
   ExerciseMediaKind,
@@ -30,6 +30,7 @@ import {
   exerciseLevelTag,
   exerciseMuscleTagClass,
   MuscleRole,
+  escapeHtml,
   showApiError,
   YoutubeEmbed,
 } from 'core';
@@ -51,12 +52,19 @@ import {
  */
 @Component({
   selector: 'mh-exercise-detail-dialog',
-  standalone: true,
-  imports: [ButtonDirective, ConfirmDialog, Dialog, Tag, TooltipModule, TitleCasePipe, YoutubeEmbed],
+  imports: [
+    ButtonDirective,
+    ConfirmDialog,
+    Dialog,
+    Tag,
+    TooltipModule,
+    EnumLabelPipe,
+    TranslatePipe,
+    YoutubeEmbed,
+  ],
   providers: [ConfirmationService],
   templateUrl: './exercise-detail-dialog.html',
   styleUrl: './exercise-detail-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExerciseDetailDialog {
   readonly visible = model(false);
@@ -80,6 +88,7 @@ export class ExerciseDetailDialog {
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _authStore = inject(AuthStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Sources = ExerciseSource;
   readonly Visibilities = ExerciseVisibility;
@@ -216,13 +225,14 @@ export class ExerciseDetailDialog {
     this._exerciseService.update(ex.id, { visibility: next }).subscribe({
       next: (updated) => {
         this.exercise.set(updated);
+        const toastKey =
+          next === ExerciseVisibility.Public
+            ? 'exercises.toast.madePublic'
+            : 'exercises.toast.madePrivate';
         this._messageService.add({
           severity: 'success',
-          summary: next === 'PUBLIC' ? 'Now public' : 'Now private',
-          detail:
-            next === 'PUBLIC'
-              ? 'Other instructors can view and fork it.'
-              : 'Only you can see it. Existing program references stay intact.',
+          summary: this._translateService.instant(`${toastKey}.summary`),
+          detail: this._translateService.instant(`${toastKey}.detail`),
           life: 4000,
         });
         this.visibilityChanged.emit(updated);
@@ -230,8 +240,8 @@ export class ExerciseDetailDialog {
       error: (err) =>
         showApiError(
           this._messageService,
-          'Visibility change failed',
-          'Could not update the exercise. Try again in a moment.',
+          this._translateService.instant('exercises.toast.visibilityFailed.summary'),
+          this._translateService.instant('exercises.toast.visibilityFailed.detail'),
           err,
         ),
       complete: () => this.busy.set(false),
@@ -241,17 +251,25 @@ export class ExerciseDetailDialog {
   confirmDelete(): void {
     const ex = this.exercise();
     if (!ex) return;
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this._translateService.instant(key, params);
     const forkCopy =
       ex.forkCount > 0
-        ? ` It's already been forked by ${ex.forkCount} ${ex.forkCount === 1 ? 'instructor' : 'instructors'} — their copies are independent and won't be affected.`
+        ? ` ${t('exercises.confirm.delete.forked', { count: ex.forkCount })}`
         : '';
     this._confirmationService.confirm({
-      header: `Delete "${ex.name}"?`,
-      message: `This permanently removes "${ex.name}" from your exercise library.</br> You won't be able to recover it, and you'll need to recreate it from scratch if you want it back later.${forkCopy}`,
-      acceptButtonProps: { severity: 'danger', label: 'Yes, delete', icon: 'pi pi-trash' },
+      header: t('exercises.confirm.delete.header', { name: ex.name }),
+      message:
+        `${t('exercises.confirm.delete.message', { name: escapeHtml(ex.name) })}<br />` +
+        ` ${t('exercises.confirm.delete.irreversible')}${forkCopy}`,
+      acceptButtonProps: {
+        severity: 'danger',
+        label: t('exercises.confirm.delete.accept'),
+        icon: 'pi pi-trash',
+      },
       rejectButtonProps: {
         severity: 'secondary',
-        label: 'No',
+        label: t('button.no'),
         icon: 'pi pi-times',
         outlined: true,
       },
@@ -267,8 +285,10 @@ export class ExerciseDetailDialog {
       next: (forkEx) => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Forked to your library',
-          detail: `"${forkEx.name}" is now private — edit anytime.`,
+          summary: this._translateService.instant('exercises.toast.forked.summary'),
+          detail: this._translateService.instant('exercises.toast.forked.detail', {
+            name: forkEx.name,
+          }),
           life: 4000,
         });
         // Close the detail and let the parent open the new fork.
@@ -278,8 +298,8 @@ export class ExerciseDetailDialog {
       error: (err) =>
         showApiError(
           this._messageService,
-          'Fork failed',
-          'You may already have a fork of this exercise.',
+          this._translateService.instant('exercises.toast.forkFailed.summary'),
+          this._translateService.instant('exercises.toast.forkFailed.detail'),
           err,
         ),
       complete: () => this.busy.set(false),
@@ -300,8 +320,8 @@ export class ExerciseDetailDialog {
         this.visible.set(false);
         showApiError(
           this._messageService,
-          "Couldn't load exercise",
-          'It may have been removed or set to private.',
+          this._translateService.instant('exercises.toast.loadOneFailed.summary'),
+          this._translateService.instant('exercises.toast.loadOneFailed.detail'),
           err,
         );
       },
@@ -315,7 +335,7 @@ export class ExerciseDetailDialog {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Exercise deleted',
+          summary: this._translateService.instant('exercises.toast.deleted'),
           life: 3000,
         });
         this.visible.set(false);
@@ -324,8 +344,8 @@ export class ExerciseDetailDialog {
       error: (err) =>
         showApiError(
           this._messageService,
-          'Delete failed',
-          'Could not delete the exercise. Try again in a moment.',
+          this._translateService.instant('exercises.toast.deleteFailed.summary'),
+          this._translateService.instant('exercises.toast.deleteFailed.detail'),
           err,
         ),
       complete: () => this.busy.set(false),

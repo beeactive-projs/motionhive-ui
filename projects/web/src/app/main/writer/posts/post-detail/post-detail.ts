@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -10,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AuthStore,
   BLOG_CATEGORY_OPTIONS,
@@ -20,6 +20,9 @@ import {
   BlogPost,
   BlogService,
   CreateBlogPostPayload,
+  languageName,
+  UserRoles,
+  validationMessage,
   withCloudinaryTransform,
 } from 'core';
 import { MessageService } from 'primeng/api';
@@ -63,11 +66,11 @@ const SUGGESTED_TAGS = [
     Chip,
     EditorModule,
     AutoComplete,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostDetail implements OnInit {
   private readonly _blogService = inject(BlogService);
@@ -77,6 +80,7 @@ export class PostDetail implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _formBuilder = inject(FormBuilder);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   loading = signal(true);
   saving = signal(false);
@@ -85,7 +89,7 @@ export class PostDetail implements OnInit {
 
   private _postId = signal<string | null>(null);
   mode = computed<'create' | 'edit'>(() => (this._postId() ? 'edit' : 'create'));
-  postTitle = signal('New post');
+  postTitle = signal('');
 
   private _slugTouched = false;
 
@@ -96,7 +100,12 @@ export class PostDetail implements OnInit {
   categorySuggestions = signal<string[]>([]);
   private readonly _allCategories = BLOG_CATEGORY_OPTIONS.map((o) => o.value as string);
 
-  readonly languageOptions = BLOG_LANGUAGE_OPTIONS;
+  /** The language the post is written in (not the UI language): each
+   *  option is labelled with the language's own name, values unchanged. */
+  readonly languageOptions = BLOG_LANGUAGE_OPTIONS.map((option) => ({
+    ...option,
+    label: languageName(option.value),
+  }));
 
   /**
    * Whether the current user can publish under a guest byline.
@@ -105,7 +114,7 @@ export class PostDetail implements OnInit {
    */
   readonly canSetGuestByline = computed(() => {
     const roles = this._authStore.user()?.roles ?? [];
-    return roles.includes('ADMIN') || roles.includes('SUPER_ADMIN');
+    return roles.includes(UserRoles.Admin) || roles.includes(UserRoles.SuperAdmin);
   });
 
   form = this._formBuilder.group({
@@ -185,11 +194,14 @@ export class PostDetail implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        const detail =
-          err?.status === 403
-            ? 'You can only edit your own posts'
-            : 'Failed to load post';
-        this._messageService.add({ severity: 'error', summary: 'Error', detail });
+        const detail = this._translateService.instant(
+          err?.status === 403 ? 'writer.toast.ownPostsOnly' : 'writer.toast.loadFailed',
+        );
+        this._messageService.add({
+          severity: 'error',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail,
+        });
       },
     });
   }
@@ -264,13 +276,11 @@ export class PostDetail implements OnInit {
     request$.subscribe({
       next: (post) => {
         this.saving.set(false);
+        const toastKey = this.mode() === 'create' ? 'writer.toast.created' : 'writer.toast.updated';
         this._messageService.add({
           severity: 'success',
-          summary: this.mode() === 'create' ? 'Post created' : 'Post updated',
-          detail:
-            this.mode() === 'create'
-              ? 'Your post has been created successfully'
-              : 'Your post has been updated successfully',
+          summary: this._translateService.instant(`${toastKey}.summary`),
+          detail: this._translateService.instant(`${toastKey}.detail`),
         });
         if (this.mode() === 'create') {
           this._postId.set(post.id);
@@ -281,11 +291,14 @@ export class PostDetail implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        const detail =
-          err?.status === 403
-            ? 'You can only edit your own posts'
-            : 'Failed to save post';
-        this._messageService.add({ severity: 'error', summary: 'Error', detail });
+        const detail = this._translateService.instant(
+          err?.status === 403 ? 'writer.toast.ownPostsOnly' : 'writer.toast.saveFailed',
+        );
+        this._messageService.add({
+          severity: 'error',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail,
+        });
       },
     });
   }
@@ -304,8 +317,8 @@ export class PostDetail implements OnInit {
         this.uploading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Upload failed',
-          detail: 'Failed to upload image',
+          summary: this._translateService.instant('writer.toast.uploadFailed.summary'),
+          detail: this._translateService.instant('writer.toast.uploadFailed.detail'),
         });
       },
     });
@@ -350,16 +363,9 @@ export class PostDetail implements OnInit {
   }
 
   getFieldError(field: string): string {
-    const control = this.form.get(field);
-    if (!control?.errors) return '';
-    if (control.errors['required']) return 'This field is required.';
-    if (control.errors['minlength'])
-      return `Minimum ${control.errors['minlength'].requiredLength} characters required.`;
-    if (control.errors['maxlength'])
-      return `Maximum ${control.errors['maxlength'].requiredLength} characters allowed.`;
-    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}.`;
-    if (control.errors['pattern']) return 'Use lowercase letters, numbers, and hyphens only.';
-    return 'Invalid value.';
+    return validationMessage(this.form.get(field)?.errors, {
+      pattern: 'writer.postDetail.validation.slugPattern',
+    });
   }
 
   private generateSlug(title: string): string {

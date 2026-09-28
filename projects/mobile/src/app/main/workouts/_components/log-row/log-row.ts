@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { WorkoutLog } from 'core';
 
@@ -17,7 +18,7 @@ import { dateRail, logChip, logMeta, logTone } from '../../workouts.config';
  */
 @Component({
   selector: 'mh-log-row',
-  imports: [IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [IonBadge, IonButton, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './log-row.html',
   styleUrl: './log-row.scss',
 })

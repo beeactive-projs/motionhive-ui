@@ -14,6 +14,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -48,6 +49,7 @@ import { ACCOUNT_ICONS } from '../account.config';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    TranslatePipe,
   ],
   templateUrl: './blocked-users.html',
   styleUrl: './blocked-users.scss',
@@ -55,6 +57,7 @@ import { ACCOUNT_ICONS } from '../account.config';
 export class BlockedUsers implements OnInit {
   private readonly _messagingService = inject(MessagingService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly blocks = signal<UserBlock[]>([]);
   readonly loading = signal(false);
@@ -89,9 +92,8 @@ export class BlockedUsers implements OnInit {
 
   nameOf(block: UserBlock): string {
     const blocked = block.blocked;
-    if (!blocked) return 'Someone';
-    const name = `${blocked.firstName ?? ''} ${blocked.lastName ?? ''}`.trim();
-    return name || 'Someone';
+    const name = blocked ? `${blocked.firstName ?? ''} ${blocked.lastName ?? ''}`.trim() : '';
+    return name || this._translateService.instant('common.someone');
   }
 
   isUnblocking(blockedId: string): boolean {
@@ -112,12 +114,19 @@ export class BlockedUsers implements OnInit {
       .subscribe({
         next: () => {
           this._markUnblocking(blockedId, false);
-          void this._feedbackService.success(`${this.nameOf(block)} unblocked`);
+          void this._feedbackService.success(
+            this._translateService.instant('account.blockedUsers.toast.unblocked', {
+              name: this.nameOf(block),
+            }),
+          );
         },
         error: (error: unknown) => {
           this._markUnblocking(blockedId, false);
           this.blocks.set(previous);
-          void this._feedbackService.error(error, 'Could not unblock them.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.blockedUsers.toast.failed'),
+          );
         },
       });
   }

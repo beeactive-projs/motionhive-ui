@@ -1,9 +1,9 @@
-import { Component, computed, input, model, output, signal } from '@angular/core';
+import { Component, computed, inject, input, model, output, signal } from '@angular/core';
 import { IonIcon, IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { toggleValue } from '../../../../_shared/utils/list.utils';
-import { weekLabel } from '../../programs.config';
 
 /**
  * Copy one week onto others — the single biggest time-saver in authoring,
@@ -14,11 +14,13 @@ import { weekLabel } from '../../programs.config';
  */
 @Component({
   selector: 'mh-copy-week-sheet',
-  imports: [IonIcon, IonItem, IonLabel, IonList, IonNote, SheetShell],
+  imports: [IonIcon, IonItem, IonLabel, IonList, IonNote, SheetShell, TranslatePipe],
   templateUrl: './copy-week-sheet.html',
   styleUrl: './copy-week-sheet.scss',
 })
 export class CopyWeekSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly fromWeek = input.required<number>();
   readonly weekCount = input.required<number>();
@@ -34,12 +36,14 @@ export class CopyWeekSheet {
     ),
   );
 
-  readonly title = computed(() => `Copy ${weekLabel(this.fromWeek()).toLowerCase()}`);
+  readonly title = computed(() =>
+    this._translateService.instant('programs.copyWeek.title', { number: this.fromWeek() + 1 }),
+  );
 
   readonly confirmLabel = computed(() => {
     const n = this.selected().length;
-    if (n === 0) return 'Copy to…';
-    return `Copy to ${n} ${n === 1 ? 'week' : 'weeks'}`;
+    if (n === 0) return this._translateService.instant('programs.copy.toEllipsis');
+    return this._translateService.instant('programs.copy.toWeeks', { count: n });
   });
 
   isOn(index: number): boolean {
