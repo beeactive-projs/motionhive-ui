@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Hex } from 'core';
 
 /**
@@ -10,9 +11,8 @@ import { Hex } from 'core';
  */
 @Component({
   selector: 'mh-messages-empty-state',
-  imports: [Hex],
+  imports: [Hex, TranslatePipe],
   templateUrl: './empty-state.html',
   styleUrl: './empty-state.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmptyState {}

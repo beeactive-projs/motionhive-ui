@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConversationListItem, displayName, initialsOf } from 'core';
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 
@@ -12,13 +13,13 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
  */
 @Component({
   selector: 'mh-chat-header',
-  standalone: true,
-  imports: [HexAvatar],
+  imports: [HexAvatar, TranslatePipe],
   templateUrl: './chat-header.html',
   styleUrl: './chat-header.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatHeader {
+  private readonly _translateService = inject(TranslateService);
+
   readonly conversation = input.required<ConversationListItem>();
 
   readonly back = output<void>();
@@ -28,7 +29,7 @@ export class ChatHeader {
 
   protected readonly title = computed(() => {
     const c = this.conversation();
-    if (c.type === 'GROUP') return c.name ?? 'Untitled group';
+    if (c.type === 'GROUP') return c.name ?? this._translateService.instant('messages.untitledGroup');
     return displayName(c.otherUser);
   });
 

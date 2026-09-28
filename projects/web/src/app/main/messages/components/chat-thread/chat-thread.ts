@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
   Component,
   ElementRef,
   HostListener,
@@ -12,6 +11,7 @@ import {
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   ConversationListItem,
   dayDividerLabel,
@@ -48,11 +48,9 @@ const NEAR_BOTTOM_PX = 100;
 
 @Component({
   selector: 'mh-chat-thread',
-  standalone: true,
-  imports: [DayDivider, MessageBubble, SystemEvent],
+  imports: [DayDivider, MessageBubble, SystemEvent, TranslatePipe],
   templateUrl: './chat-thread.html',
   styleUrl: './chat-thread.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatThread implements AfterViewInit, OnChanges {
   readonly conversation = input.required<ConversationListItem>();

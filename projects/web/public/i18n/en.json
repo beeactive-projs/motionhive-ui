@@ -483,6 +483,30 @@
         "withEndDate": "{rule} · until {date}"
       }
     },
+    "searchModal": {
+      "category": {
+        "coaches": "Coaches",
+        "groups": "Groups",
+        "people": "People",
+        "sessions": "Sessions",
+        "tags": "Tags"
+      },
+      "clear": "Clear search",
+      "navigate": "Navigate",
+      "noMatchesBody": "Try a different word, fewer letters, or a category filter.",
+      "noMatchesTitle": "No matches for \"{query}\"",
+      "placeholder": "Search coaches, groups, sessions, tags…",
+      "recent": "Recent",
+      "resultCount": "{categories, plural, one {# category} other {# categories}} · {results, plural, one {# result} other {# results}}",
+      "seeAll": "See all {count}",
+      "trending": "Trending",
+      "trendingTopic": {
+        "pilates": "Pilates",
+        "running": "Running",
+        "strength": "Strength",
+        "yoga": "Yoga"
+      }
+    },
     "sessionCard": {
       "blockedHint": "Description and signup hidden — members only",
       "cta": {
@@ -876,6 +900,136 @@
       "subtitleMember": "Groups you belong to.",
       "title": "Your groups"
     }
+  },
+  "messages": {
+    "blockDialog": {
+      "block": "Block",
+      "header": "Block this user?",
+      "leadAfterName": "won't be able to message you or see your conversation history with them. You can unblock them later from your safety settings.",
+      "reason": "Reason (optional)"
+    },
+    "bubble": {
+      "deleted": "[deleted]",
+      "read": "Read",
+      "sent": "Sent"
+    },
+    "composer": {
+      "dismissError": "Dismiss error",
+      "maxLength": "Messages are capped at {max} characters.",
+      "placeholder": "Message…",
+      "placeholderNamed": "Message {name}…",
+      "placeholderPick": "Pick someone to message…",
+      "placeholderThem": "Message them…",
+      "rateLimited": "Slow down — try again in {seconds}s",
+      "sendMessage": "Send message"
+    },
+    "emptyState": {
+      "sub": "Pick a conversation, or start a new one.",
+      "title": "Your messages"
+    },
+    "filters": {
+      "label": "Inbox filters",
+      "unread": "Unread"
+    },
+    "header": {
+      "back": "Back to inbox",
+      "info": "Conversation info",
+      "toggleInfo": "Toggle conversation info"
+    },
+    "inbox": {
+      "reconnecting": "Reconnecting…",
+      "unread": "{count, plural, one {# unread} other {# unread}}"
+    },
+    "list": {
+      "emptySub": "Start a new message to begin one.",
+      "emptyTitle": "No conversations yet",
+      "noMatchesSub": "Try a different search or filter.",
+      "noMatchesTitle": "No matches"
+    },
+    "newMessage": "New message",
+    "pane": {
+      "closeInfo": "Close info panel",
+      "emptySub": "Send the first message to start the conversation.",
+      "emptyTitle": "No messages yet",
+      "loadingConversation": "Loading conversation…",
+      "loadingMessages": "Loading messages…",
+      "unavailableSub": "It may have been removed, or you no longer have access. Pick another conversation from the list.",
+      "unavailableTitle": "Conversation not available"
+    },
+    "picker": {
+      "cancel": "Cancel new message",
+      "noMatches": "No people match.",
+      "removeRecipient": "Remove recipient",
+      "searchLabel": "Search people",
+      "searchPlaceholder": "Search people…",
+      "searching": "Searching…",
+      "to": "To:"
+    },
+    "rail": {
+      "block": "Block this user",
+      "mute": "Mute notifications",
+      "noParticipant": "No participant info",
+      "quickActions": "Quick actions",
+      "report": "Report conversation",
+      "unmute": "Unmute notifications"
+    },
+    "reportCategory": {
+      "HARASSMENT": "Harassment",
+      "IMPERSONATION": "Impersonation",
+      "OTHER": "Other",
+      "SCAM": "Scam / fraud",
+      "SEXUAL": "Sexual content",
+      "SPAM": "Spam"
+    },
+    "reportDialog": {
+      "header": "Report conversation",
+      "issue": "What's the issue?",
+      "leadAfter": "go to MotionHive's safety team. They review every report — please pick the closest category and add any details that help.",
+      "leadBefore": "Reports about",
+      "notes": "Additional details (optional)",
+      "notesPlaceholder": "What happened? Include message snippets or context if it helps.",
+      "submit": "Submit report"
+    },
+    "row": {
+      "ariaUnread": "{name}, {count, plural, one {# unread} other {# unread}}",
+      "noMessages": "No messages yet"
+    },
+    "search": {
+      "label": "Search messages and people",
+      "placeholder": "Search messages and people…"
+    },
+    "thisConversation": "this conversation",
+    "thisUser": "this user",
+    "thread": {
+      "label": "Conversation messages",
+      "loadEarlier": "Load earlier",
+      "loadingEarlier": "Loading earlier messages…"
+    },
+    "threat": {
+      "copy": "Keep payments and identity verification on MotionHive — we can't help recover funds or accounts after off-platform exchanges.",
+      "dismiss": "Dismiss safety notice",
+      "reason": {
+        "links": "{count, plural, one {a link} other {links}}",
+        "offPlatform": "off-platform contact details",
+        "payment": "payment handles",
+        "shortener": "shortened links"
+      },
+      "title": "Your last message contains {reasons}."
+    },
+    "toast": {
+      "blockFailed": "Could not block",
+      "blocked": "User blocked",
+      "blockedDetail": "{name} can no longer message you.",
+      "muteFailed": "Could not update notifications",
+      "muted": "Notifications muted",
+      "mutedDetail": "You won’t get notifications for this conversation.",
+      "reportFailed": "Could not submit",
+      "reported": "Report submitted",
+      "reportedDetail": "Our team will review it shortly. Thank you.",
+      "unmuted": "Notifications on",
+      "unmutedDetail": "You will be notified about new messages again."
+    },
+    "untitledGroup": "Untitled group"
   },
   "mySessions": {
     "book": {

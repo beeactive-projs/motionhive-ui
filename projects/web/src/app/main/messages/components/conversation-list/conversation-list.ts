@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MessagingStore, InboxFilter } from 'core';
 import { ConversationRow } from '../conversation-row/conversation-row';
 import { InboxFilters } from '../inbox-filters/inbox-filters';
@@ -16,11 +17,9 @@ import { InboxSearchBar } from '../inbox-search-bar/inbox-search-bar';
  */
 @Component({
   selector: 'mh-conversation-list',
-  standalone: true,
-  imports: [ConversationRow, InboxFilters, InboxSearchBar],
+  imports: [ConversationRow, InboxFilters, InboxSearchBar, TranslatePipe],
   templateUrl: './conversation-list.html',
   styleUrl: './conversation-list.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConversationList {
   protected readonly store = inject(MessagingStore);

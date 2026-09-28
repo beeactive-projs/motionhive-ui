@@ -8,12 +8,12 @@
 
     @if (loading() && messages().length === 0) {
       <div class="mh-pane__initial-load">
-        <span class="mh-pane__pill">Loading messages…</span>
+        <span class="mh-pane__pill">{{ 'messages.pane.loadingMessages' | translate }}</span>
       </div>
     } @else if (messages().length === 0) {
       <div class="mh-pane__empty">
-        <p class="mh-pane__empty-title">No messages yet</p>
-        <p class="mh-pane__empty-sub">Send the first message to start the conversation.</p>
+        <p class="mh-pane__empty-title">{{ 'messages.pane.emptyTitle' | translate }}</p>
+        <p class="mh-pane__empty-sub">{{ 'messages.pane.emptySub' | translate }}</p>
       </div>
     } @else {
       <mh-chat-thread
@@ -31,7 +31,7 @@
     <mh-chat-composer
       [conversationId]="conv.id"
       [recipientId]="conv.otherUser?.id ?? null"
-      [placeholder]="conv.otherUser ? 'Message ' + (conv.otherUser.firstName || 'them') + '…' : 'Message…'"
+      [placeholder]="composerPlaceholder()"
     />
   </div>
 
@@ -53,7 +53,7 @@
     <div
       class="mh-pane__backdrop"
       (click)="onToggleInfo()"
-      aria-label="Close info panel"
+      [attr.aria-label]="'messages.pane.closeInfo' | translate"
     ></div>
   }
 } @else if (!store.hasLoaded()) {
@@ -64,7 +64,7 @@
     real pane.
   -->
   <div class="mh-pane__empty">
-    <p class="mh-pane__empty-title">Loading conversation…</p>
+    <p class="mh-pane__empty-title">{{ 'messages.pane.loadingConversation' | translate }}</p>
   </div>
 } @else {
   <!--
@@ -74,8 +74,8 @@
     pick another row.
   -->
   <div class="mh-pane__empty">
-    <p class="mh-pane__empty-title">Conversation not available</p>
-    <p class="mh-pane__empty-sub">It may have been removed, or you no longer have access. Pick another conversation from the list.</p>
+    <p class="mh-pane__empty-title">{{ 'messages.pane.unavailableTitle' | translate }}</p>
+    <p class="mh-pane__empty-sub">{{ 'messages.pane.unavailableSub' | translate }}</p>
   </div>
 }
 

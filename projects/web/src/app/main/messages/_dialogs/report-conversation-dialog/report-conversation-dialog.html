@@ -5,35 +5,35 @@
   [dismissableMask]="!submitting()"
   [draggable]="false"
   [resizable]="false"
-  header="Report conversation"
+  [header]="'messages.reportDialog.header' | translate"
   styleClass="mh-report-dialog"
   [style]="{ width: '480px', maxWidth: '94vw' }"
   (onHide)="onHide()"
 >
   <p class="mh-report__lead">
-    Reports about <strong>{{ displayName() }}</strong> go to MotionHive's
-    safety team. They review every report — please pick the closest
-    category and add any details that help.
+    {{ 'messages.reportDialog.leadBefore' | translate }}
+    <strong>{{ displayName() }}</strong>
+    {{ 'messages.reportDialog.leadAfter' | translate }}
   </p>
 
   <div class="mh-report__group">
-    <div class="mh-report__eyebrow">What's the issue?</div>
+    <div class="mh-report__eyebrow">{{ 'messages.reportDialog.issue' | translate }}</div>
     <div class="mh-report__chips">
-      @for (c of categories; track c.key) {
+      @for (c of categories; track c) {
         <button
           type="button"
           class="mh-report__chip"
-          [class.mh-report__chip--active]="category() === c.key"
-          (click)="selectCategory(c.key)"
+          [class.mh-report__chip--active]="category() === c"
+          (click)="selectCategory(c)"
         >
-          {{ c.label }}
+          {{ 'messages.reportCategory.' + c | translate }}
         </button>
       }
     </div>
   </div>
 
   <div class="mh-report__group">
-    <label for="mh-report-notes" class="mh-report__eyebrow">Additional details (optional)</label>
+    <label for="mh-report-notes" class="mh-report__eyebrow">{{ 'messages.reportDialog.notes' | translate }}</label>
     <textarea
       pTextarea
       id="mh-report-notes"
@@ -42,16 +42,16 @@
       [ngModel]="notes()"
       (ngModelChange)="onNotesChange($event)"
       [maxlength]="maxNotes"
-      placeholder="What happened? Include message snippets or context if it helps."
+      [placeholder]="'messages.reportDialog.notesPlaceholder' | translate"
     ></textarea>
     <div class="mh-report__counter">{{ notes().length }}/{{ maxNotes }}</div>
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" [disabled]="submitting()" (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(!canSubmit()) || submitting()" (click)="submit()">
       <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-flag'"></i>
-      Submit report
+      {{ 'messages.reportDialog.submit' | translate }}
     </button>
   </ng-template>
 </p-dialog>

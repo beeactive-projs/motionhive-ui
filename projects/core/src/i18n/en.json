@@ -235,6 +235,13 @@
       "cancelled": "Cancelled",
       "ended": "Past",
       "recurring": "Recurring templates"
+    },
+    "userBlockReason": {
+      "HARASSMENT": "Harassment",
+      "IMPERSONATION": "Impersonation",
+      "OTHER": "Other",
+      "SCAM": "Scam",
+      "SPAM": "Spam"
     }
   },
   "error": {
@@ -258,6 +265,15 @@
       "tooManyRequestsSummary": "Slow down a moment",
       "unavailable": "The service is temporarily unavailable. Please try again in a moment.",
       "unexpected": "An unexpected error occurred. Please try again."
+    },
+    "messaging": {
+      "forbidden": "You can’t send this message.",
+      "notDelivered": "Message couldn’t be delivered. They may have left or blocked messages from you.",
+      "notSent": "Message couldn’t be sent.",
+      "offline": "You’re offline. Check your connection.",
+      "rateLimited": "Slow down — too many messages.",
+      "rateLimitedRetry": "Slow down — try again in {seconds}s.",
+      "sendFailed": "Couldn’t send. Try again."
     },
     "staleData": "Couldn't refresh. Showing the last update."
   },

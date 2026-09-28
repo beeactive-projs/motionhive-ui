@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import {
@@ -36,16 +36,15 @@ import { MessageBubble } from '../message-bubble/message-bubble';
  */
 @Component({
   selector: 'mh-new-message-picker',
-  standalone: true,
-  imports: [FormsModule, HexAvatar, ChatComposer, MessageBubble],
+  imports: [FormsModule, HexAvatar, ChatComposer, MessageBubble, TranslatePipe],
   templateUrl: './new-message-picker.html',
   styleUrl: './new-message-picker.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewMessagePicker {
   protected readonly store = inject(MessagingStore);
-  private readonly _users = inject(UserService);
+  private readonly _userService = inject(UserService);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _translateService = inject(TranslateService);
 
   /** Bottom-sheet presentation on phones; right-pane panel on larger screens. */
   protected readonly isMobile = injectIsMobile();
@@ -82,8 +81,10 @@ export class NewMessagePicker {
 
   protected readonly placeholder = computed(() => {
     const u = this.selected();
-    if (!u) return 'Pick someone to message…';
-    return `Message ${u.firstName ?? u.email}…`;
+    if (!u) return this._translateService.instant('messages.composer.placeholderPick');
+    return this._translateService.instant('messages.composer.placeholderNamed', {
+      name: u.firstName ?? u.email,
+    });
   });
 
   constructor() {
@@ -98,7 +99,7 @@ export class NewMessagePicker {
             return [];
           }
           this.searching.set(true);
-          return this._users.search({ q: trimmed, limit: 10 });
+          return this._userService.search({ q: trimmed, limit: 10 });
         }),
         takeUntilDestroyed(this._destroyRef),
       )

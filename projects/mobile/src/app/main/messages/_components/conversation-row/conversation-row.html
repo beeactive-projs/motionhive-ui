@@ -22,7 +22,10 @@
     <div class="meta" slot="end">
       <ion-note>{{ time() }}</ion-note>
       @if (isUnread()) {
-        <ion-badge color="danger" [attr.aria-label]="unreadLabel() + ' unread'">
+        <ion-badge
+          color="danger"
+          [attr.aria-label]="'messages.row.unreadAria' | translate: { count: unreadLabel() }"
+        >
           {{ unreadLabel() }}
         </ion-badge>
       }
@@ -32,7 +35,11 @@
   <ion-item-options side="end">
     @if (isUnread()) {
       <ion-item-option color="primary" (click)="emitAndClose(sliding, markRead)">
-        <ion-icon slot="icon-only" name="checkmark-done" aria-label="Mark read" />
+        <ion-icon
+          slot="icon-only"
+          name="checkmark-done"
+          [attr.aria-label]="'messages.row.markRead' | translate"
+        />
       </ion-item-option>
     }
     <ion-item-option
@@ -42,7 +49,7 @@
       <ion-icon
         slot="icon-only"
         [name]="isMuted() ? 'notifications-outline' : 'notifications-off-outline'"
-        [attr.aria-label]="isMuted() ? 'Unmute' : 'Mute'"
+        [attr.aria-label]="(isMuted() ? 'messages.row.unmute' : 'messages.row.mute') | translate"
       />
     </ion-item-option>
   </ion-item-options>

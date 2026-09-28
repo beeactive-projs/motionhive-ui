@@ -483,6 +483,30 @@
         "withEndDate": "{rule} · până la {date}"
       }
     },
+    "searchModal": {
+      "category": {
+        "coaches": "Antrenori",
+        "groups": "Grupuri",
+        "people": "Persoane",
+        "sessions": "Sesiuni",
+        "tags": "Etichete"
+      },
+      "clear": "Șterge căutarea",
+      "navigate": "Navighează",
+      "noMatchesBody": "Încearcă alt cuvânt, mai puține litere sau un filtru de categorie.",
+      "noMatchesTitle": "Niciun rezultat pentru „{query}”",
+      "placeholder": "Caută antrenori, grupuri, sesiuni, etichete…",
+      "recent": "Recente",
+      "resultCount": "{categories, plural, one {# categorie} few {# categorii} other {# de categorii}} · {results, plural, one {# rezultat} few {# rezultate} other {# de rezultate}}",
+      "seeAll": "Vezi toate ({count})",
+      "trending": "Populare",
+      "trendingTopic": {
+        "pilates": "Pilates",
+        "running": "Alergare",
+        "strength": "Forță",
+        "yoga": "Yoga"
+      }
+    },
     "sessionCard": {
       "blockedHint": "Descrierea și înscrierea sunt ascunse — doar pentru membri",
       "cta": {
@@ -876,6 +900,136 @@
       "subtitleMember": "Grupurile din care faci parte.",
       "title": "Grupurile tale"
     }
+  },
+  "messages": {
+    "blockDialog": {
+      "block": "Blochează",
+      "header": "Blochezi acest utilizator?",
+      "leadAfterName": "nu îți va mai putea trimite mesaje și nu va mai vedea istoricul conversației voastre. Îl poți debloca oricând din setările de siguranță.",
+      "reason": "Motiv (opțional)"
+    },
+    "bubble": {
+      "deleted": "[șters]",
+      "read": "Văzut",
+      "sent": "Trimis"
+    },
+    "composer": {
+      "dismissError": "Închide eroarea",
+      "maxLength": "Mesajele pot avea cel mult {max} de caractere.",
+      "placeholder": "Mesaj…",
+      "placeholderNamed": "Mesaj către {name}…",
+      "placeholderPick": "Alege cui vrei să scrii…",
+      "placeholderThem": "Scrie un mesaj…",
+      "rateLimited": "Mai încet — încearcă din nou în {seconds} s",
+      "sendMessage": "Trimite mesajul"
+    },
+    "emptyState": {
+      "sub": "Alege o conversație sau începe una nouă.",
+      "title": "Mesajele tale"
+    },
+    "filters": {
+      "label": "Filtre mesaje",
+      "unread": "Necitite"
+    },
+    "header": {
+      "back": "Înapoi la mesaje",
+      "info": "Detalii conversație",
+      "toggleInfo": "Afișează sau ascunde detaliile conversației"
+    },
+    "inbox": {
+      "reconnecting": "Se reconectează…",
+      "unread": "{count, plural, one {# necitit} few {# necitite} other {# de necitite}}"
+    },
+    "list": {
+      "emptySub": "Scrie un mesaj nou ca să începi una.",
+      "emptyTitle": "Nicio conversație încă",
+      "noMatchesSub": "Încearcă altă căutare sau alt filtru.",
+      "noMatchesTitle": "Niciun rezultat"
+    },
+    "newMessage": "Mesaj nou",
+    "pane": {
+      "closeInfo": "Închide panoul de detalii",
+      "emptySub": "Trimite primul mesaj ca să începi conversația.",
+      "emptyTitle": "Niciun mesaj încă",
+      "loadingConversation": "Se încarcă conversația…",
+      "loadingMessages": "Se încarcă mesajele…",
+      "unavailableSub": "Poate a fost ștearsă sau nu mai ai acces la ea. Alege altă conversație din listă.",
+      "unavailableTitle": "Conversația nu e disponibilă"
+    },
+    "picker": {
+      "cancel": "Renunță la mesajul nou",
+      "noMatches": "Nu am găsit pe nimeni.",
+      "removeRecipient": "Elimină destinatarul",
+      "searchLabel": "Caută persoane",
+      "searchPlaceholder": "Caută persoane…",
+      "searching": "Se caută…",
+      "to": "Către:"
+    },
+    "rail": {
+      "block": "Blochează acest utilizator",
+      "mute": "Oprește notificările",
+      "noParticipant": "Nu există detalii despre participant",
+      "quickActions": "Acțiuni rapide",
+      "report": "Raportează conversația",
+      "unmute": "Pornește notificările"
+    },
+    "reportCategory": {
+      "HARASSMENT": "Hărțuire",
+      "IMPERSONATION": "Uzurpare de identitate",
+      "OTHER": "Altceva",
+      "SCAM": "Înșelătorie / fraudă",
+      "SEXUAL": "Conținut sexual",
+      "SPAM": "Spam"
+    },
+    "reportDialog": {
+      "header": "Raportează conversația",
+      "issue": "Care e problema?",
+      "leadAfter": "ajung la echipa de siguranță MotionHive. Fiecare raport e analizat — alege categoria cea mai potrivită și adaugă orice detalii care ne pot ajuta.",
+      "leadBefore": "Rapoartele despre",
+      "notes": "Detalii suplimentare (opțional)",
+      "notesPlaceholder": "Ce s-a întâmplat? Adaugă fragmente din mesaje sau context, dacă ajută.",
+      "submit": "Trimite raportul"
+    },
+    "row": {
+      "ariaUnread": "{name}, {count, plural, one {# mesaj necitit} few {# mesaje necitite} other {# de mesaje necitite}}",
+      "noMessages": "Niciun mesaj încă"
+    },
+    "search": {
+      "label": "Caută mesaje și persoane",
+      "placeholder": "Caută mesaje și persoane…"
+    },
+    "thisConversation": "această conversație",
+    "thisUser": "acest utilizator",
+    "thread": {
+      "label": "Mesajele conversației",
+      "loadEarlier": "Încarcă mesajele mai vechi",
+      "loadingEarlier": "Se încarcă mesajele mai vechi…"
+    },
+    "threat": {
+      "copy": "Păstrează plățile și verificarea identității pe MotionHive — nu te putem ajuta să recuperezi bani sau conturi după schimburi făcute în afara platformei.",
+      "dismiss": "Închide avertismentul de siguranță",
+      "reason": {
+        "links": "{count, plural, one {un link} few {linkuri} other {linkuri}}",
+        "offPlatform": "date de contact din afara platformei",
+        "payment": "date de plată",
+        "shortener": "linkuri scurtate"
+      },
+      "title": "Ultimul tău mesaj conține {reasons}."
+    },
+    "toast": {
+      "blockFailed": "Nu am putut bloca",
+      "blocked": "Utilizator blocat",
+      "blockedDetail": "{name} nu îți mai poate trimite mesaje.",
+      "muteFailed": "Nu am putut actualiza notificările",
+      "muted": "Notificări oprite",
+      "mutedDetail": "Nu vei mai primi notificări pentru această conversație.",
+      "reportFailed": "Nu am putut trimite",
+      "reported": "Raport trimis",
+      "reportedDetail": "Echipa noastră îl va analiza în curând. Mulțumim.",
+      "unmuted": "Notificări pornite",
+      "unmutedDetail": "Vei primi din nou notificări pentru mesajele noi."
+    },
+    "untitledGroup": "Grup fără nume"
   },
   "mySessions": {
     "book": {

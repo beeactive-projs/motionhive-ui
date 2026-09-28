@@ -672,6 +672,82 @@
       "withdraw": "Withdraw"
     }
   },
+  "messages": {
+    "blockSheet": {
+      "body": "They will not be able to message you, and you will not see this conversation.",
+      "title": "Block {name}?"
+    },
+    "bubble": {
+      "deleted": "[deleted]",
+      "read": "Read",
+      "sent": "Sent"
+    },
+    "chat": {
+      "detailsAria": "Conversation details",
+      "draftStart": "This is the start of your conversation with {name}.",
+      "empty": "No messages yet. Say hello.",
+      "loadEarlier": "Load earlier messages",
+      "placeholder": "Message {name}…",
+      "placeholderGeneric": "Message…"
+    },
+    "composer": {
+      "dismissError": "Dismiss",
+      "sendingPaused": "Sending paused",
+      "tooLong": "That message is too long. Trim it and try again."
+    },
+    "details": {
+      "block": "Block {name}",
+      "blockManageNote": "Manage blocked people in Account → Blocked users.",
+      "blockNote": "Blocking stops messages both ways.",
+      "mute": "Mute notifications",
+      "muteHint": "You'll still see the unread badge.",
+      "sectionConversation": "Conversation",
+      "sectionPrivacy": "Privacy",
+      "thisPerson": "this person",
+      "title": "Details",
+      "viewProfile": "View profile"
+    },
+    "inbox": {
+      "caughtUp": {
+        "heading": "All caught up",
+        "message": "You have no unread messages."
+      },
+      "empty": {
+        "heading": "No messages yet",
+        "message": "Conversations with your coaches and clients will show up here."
+      },
+      "filterUnread": "Unread",
+      "loadError": "Couldn't load your messages",
+      "noResultsMessage": "Nothing matched that. Try a different name or word.",
+      "reconnecting": "Reconnecting…",
+      "searchAria": "Search messages",
+      "searchPlaceholder": "Search messages & people",
+      "sectionPeople": "People"
+    },
+    "newMessage": "New message",
+    "newMessageSheet": {
+      "intro": "Search for a coach, a client or anyone else on MotionHive to start a conversation.",
+      "noneHeading": "Nobody found",
+      "noneMessage": "Check the spelling, or try their last name.",
+      "searchPlaceholder": "Search people"
+    },
+    "row": {
+      "markRead": "Mark read",
+      "mute": "Mute",
+      "noPreview": "No messages yet",
+      "unmute": "Unmute",
+      "unreadAria": "{count} unread"
+    },
+    "toast": {
+      "blockFailed": "Could not block them.",
+      "blocked": "{name} blocked",
+      "muteFailed": "Could not update notifications.",
+      "muted": "Muted",
+      "notificationsMuted": "Notifications muted",
+      "notificationsOn": "Notifications on",
+      "unmuted": "Unmuted"
+    }
+  },
   "mySessions": {
     "cancelSheet": {
       "agreed": "Agreed when you booked on {date}",

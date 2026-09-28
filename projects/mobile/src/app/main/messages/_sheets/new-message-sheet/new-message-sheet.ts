@@ -8,6 +8,7 @@ import {
   IonSearchbar,
   IonSkeletonText,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { MessagingStore, UserSearchResult, displayName } from 'core';
@@ -43,6 +44,7 @@ import { MESSAGING_ICONS } from '../../messages.config';
     IonSkeletonText,
     SearchbarAutofocusDirective,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './new-message-sheet.html',
   styleUrl: './new-message-sheet.scss',

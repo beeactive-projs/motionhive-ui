@@ -20,13 +20,13 @@
       }
     } @else if (noConversationsAtAll()) {
       <div class="mh-list__empty">
-        <p class="mh-list__empty-title">No conversations yet</p>
-        <p class="mh-list__empty-sub">Start a new message to begin one.</p>
+        <p class="mh-list__empty-title">{{ 'messages.list.emptyTitle' | translate }}</p>
+        <p class="mh-list__empty-sub">{{ 'messages.list.emptySub' | translate }}</p>
       </div>
     } @else if (noResults()) {
       <div class="mh-list__empty">
-        <p class="mh-list__empty-title">No matches</p>
-        <p class="mh-list__empty-sub">Try a different search or filter.</p>
+        <p class="mh-list__empty-title">{{ 'messages.list.noMatchesTitle' | translate }}</p>
+        <p class="mh-list__empty-sub">{{ 'messages.list.noMatchesSub' | translate }}</p>
       </div>
     } @else {
       @for (conversation of visible(); track conversation.id) {

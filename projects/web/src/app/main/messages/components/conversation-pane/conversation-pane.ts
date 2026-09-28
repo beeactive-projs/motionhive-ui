@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { AuthStore, displayName, MessagingStore } from 'core';
@@ -33,7 +33,6 @@ import { ThreatBanner } from '../threat-banner/threat-banner';
  */
 @Component({
   selector: 'mh-conversation-pane',
-  standalone: true,
   imports: [
     BlockConfirmDialog,
     ChatComposer,
@@ -43,21 +42,22 @@ import { ThreatBanner } from '../threat-banner/threat-banner';
     ReportConversationDialog,
     ThreatBanner,
     Toast,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './conversation-pane.html',
   styleUrl: './conversation-pane.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConversationPane {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly _auth = inject(AuthStore);
+  private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
   protected readonly store = inject(MessagingStore);
 
-  protected readonly currentUserId = computed(() => this._auth.user()?.id ?? null);
+  protected readonly currentUserId = computed(() => this._authStore.user()?.id ?? null);
 
   protected readonly conversation = this.store.activeConversation;
 
@@ -78,8 +78,22 @@ export class ConversationPane {
 
   /** Display name of the other participant for the dialog headings. */
   protected readonly otherName = computed(() =>
-    displayName(this.conversation()?.otherUser, 'this user'),
+    displayName(
+      this.conversation()?.otherUser,
+      this._translateService.instant('messages.thisUser'),
+    ),
   );
+
+  /** "Message Ana…" — falls back to a generic prompt when the name is missing. */
+  protected readonly composerPlaceholder = computed(() => {
+    const other = this.conversation()?.otherUser;
+    if (!other) return this._translateService.instant('messages.composer.placeholder');
+    return other.firstName
+      ? this._translateService.instant('messages.composer.placeholderNamed', {
+          name: other.firstName,
+        })
+      : this._translateService.instant('messages.composer.placeholderThem');
+  });
 
   protected readonly otherId = computed(() => this.conversation()?.otherUser?.id ?? null);
 
@@ -145,17 +159,19 @@ export class ConversationPane {
     if (!ok) {
       this._messageService.add({
         severity: 'error',
-        summary: 'Could not update notifications',
-        detail: 'Please try again.',
+        summary: this._translateService.instant('messages.toast.muteFailed'),
+        detail: this._translateService.instant('common.pleaseTryAgain'),
       });
       return;
     }
     this._messageService.add({
       severity: 'success',
-      summary: wasMuted ? 'Notifications on' : 'Notifications muted',
-      detail: wasMuted
-        ? 'You will be notified about new messages again.'
-        : 'You won’t get notifications for this conversation.',
+      summary: this._translateService.instant(
+        wasMuted ? 'messages.toast.unmuted' : 'messages.toast.muted',
+      ),
+      detail: this._translateService.instant(
+        wasMuted ? 'messages.toast.unmutedDetail' : 'messages.toast.mutedDetail',
+      ),
     });
   }
 }

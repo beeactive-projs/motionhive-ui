@@ -672,6 +672,82 @@
       "withdraw": "Retrage"
     }
   },
+  "messages": {
+    "blockSheet": {
+      "body": "Nu îți va mai putea trimite mesaje, iar tu nu vei mai vedea această conversație.",
+      "title": "Blochezi {name}?"
+    },
+    "bubble": {
+      "deleted": "[șters]",
+      "read": "Văzut",
+      "sent": "Trimis"
+    },
+    "chat": {
+      "detailsAria": "Detaliile conversației",
+      "draftStart": "Acesta este începutul conversației tale cu {name}.",
+      "empty": "Încă nu există mesaje. Spune salut.",
+      "loadEarlier": "Încarcă mesajele anterioare",
+      "placeholder": "Mesaj pentru {name}…",
+      "placeholderGeneric": "Mesaj…"
+    },
+    "composer": {
+      "dismissError": "Închide",
+      "sendingPaused": "Trimitere în pauză",
+      "tooLong": "Mesajul e prea lung. Scurtează-l și încearcă din nou."
+    },
+    "details": {
+      "block": "Blochează {name}",
+      "blockManageNote": "Gestionează persoanele blocate din Cont → Utilizatori blocați.",
+      "blockNote": "Blocarea oprește mesajele în ambele sensuri.",
+      "mute": "Dezactivează notificările",
+      "muteHint": "Vei vedea în continuare numărul de mesaje necitite.",
+      "sectionConversation": "Conversație",
+      "sectionPrivacy": "Confidențialitate",
+      "thisPerson": "această persoană",
+      "title": "Detalii",
+      "viewProfile": "Vezi profilul"
+    },
+    "inbox": {
+      "caughtUp": {
+        "heading": "Ești la zi",
+        "message": "Nu ai mesaje necitite."
+      },
+      "empty": {
+        "heading": "Niciun mesaj încă",
+        "message": "Conversațiile cu antrenorii și clienții tăi vor apărea aici."
+      },
+      "filterUnread": "Necitite",
+      "loadError": "Mesajele nu au putut fi încărcate",
+      "noResultsMessage": "Nimic nu se potrivește. Încearcă alt nume sau alt cuvânt.",
+      "reconnecting": "Se reconectează…",
+      "searchAria": "Caută în mesaje",
+      "searchPlaceholder": "Caută mesaje și persoane",
+      "sectionPeople": "Persoane"
+    },
+    "newMessage": "Mesaj nou",
+    "newMessageSheet": {
+      "intro": "Caută un antrenor, un client sau pe oricine altcineva de pe MotionHive ca să începi o conversație.",
+      "noneHeading": "N-am găsit pe nimeni",
+      "noneMessage": "Verifică ortografia sau încearcă numele de familie.",
+      "searchPlaceholder": "Caută persoane"
+    },
+    "row": {
+      "markRead": "Marchează ca citit",
+      "mute": "Dezactivează notificările",
+      "noPreview": "Niciun mesaj încă",
+      "unmute": "Activează notificările",
+      "unreadAria": "{count} necitite"
+    },
+    "toast": {
+      "blockFailed": "Nu am putut bloca persoana.",
+      "blocked": "Blocat: {name}",
+      "muteFailed": "Notificările nu au putut fi actualizate.",
+      "muted": "Notificări dezactivate",
+      "notificationsMuted": "Notificări dezactivate",
+      "notificationsOn": "Notificări activate",
+      "unmuted": "Notificări activate"
+    }
+  },
   "mySessions": {
     "cancelSheet": {
       "agreed": "Stabilite când ai rezervat, pe {date}",

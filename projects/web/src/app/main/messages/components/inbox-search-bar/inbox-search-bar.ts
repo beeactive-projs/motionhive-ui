@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * Pill-shaped search field at the top of the conversation list.
@@ -10,18 +11,17 @@ import { FormsModule } from '@angular/forms';
  */
 @Component({
   selector: 'mh-inbox-search-bar',
-  standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   template: `
     <label class="mh-search">
       <i class="pi pi-search mh-search__icon" aria-hidden="true"></i>
       <input
         type="search"
         class="mh-search__input"
-        placeholder="Search messages and people…"
+        [placeholder]="'messages.search.placeholder' | translate"
         [ngModel]="value()"
         (ngModelChange)="valueChange.emit($event)"
-        aria-label="Search messages and people"
+        [attr.aria-label]="'messages.search.label' | translate"
       />
     </label>
   `,
@@ -67,7 +67,6 @@ import { FormsModule } from '@angular/forms';
       color: var(--p-surface-50, #f1f5f9);
     }
   `],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InboxSearchBar {
   readonly value = input<string>('');

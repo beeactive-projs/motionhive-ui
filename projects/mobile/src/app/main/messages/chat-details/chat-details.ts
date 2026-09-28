@@ -14,6 +14,7 @@ import {
   IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import { MessagingStore, UserBlockReason, displayName } from 'core';
@@ -47,6 +48,7 @@ import { MESSAGING_ICONS } from '../messages.config';
     IonToggle,
     IonToolbar,
     SettingsRow,
+    TranslatePipe,
   ],
   templateUrl: './chat-details.html',
   styleUrl: './chat-details.scss',
@@ -56,6 +58,7 @@ export class ChatDetails {
   private readonly _router = inject(Router);
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
   readonly store = inject(MessagingStore);
 
   readonly conversationId = signal<string | null>(null);
@@ -70,7 +73,9 @@ export class ChatDetails {
 
   readonly otherUser = computed(() => this.conversation()?.otherUser ?? null);
 
-  readonly name = computed(() => displayName(this.otherUser(), 'this person'));
+  readonly name = computed(() =>
+    displayName(this.otherUser(), this._translateService.instant('messages.details.thisPerson')),
+  );
 
   readonly tone = computed(() => avatarToneFor(this.otherUser()?.id));
 
@@ -107,12 +112,17 @@ export class ChatDetails {
     this.muting.set(false);
 
     if (!ok) {
-      void this._feedbackService.error(null, 'Could not update notifications.');
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.muteFailed'),
+      );
       return;
     }
 
     void this._feedbackService.success(
-      wasMuted ? 'Notifications on' : 'Notifications muted',
+      this._translateService.instant(
+        wasMuted ? 'messages.toast.notificationsOn' : 'messages.toast.notificationsMuted',
+      ),
     );
   }
 
@@ -130,11 +140,16 @@ export class ChatDetails {
     });
 
     if (!ok) {
-      void this._feedbackService.error(null, 'Could not block them.');
+      void this._feedbackService.error(
+        null,
+        this._translateService.instant('messages.toast.blockFailed'),
+      );
       return;
     }
 
     // The store drops the conversation and routes back to the inbox itself.
-    void this._feedbackService.success(`${this.name()} blocked`);
+    void this._feedbackService.success(
+      this._translateService.instant('messages.toast.blocked', { name: this.name() }),
+    );
   }
 }

@@ -12,17 +12,17 @@
       type="button"
       class="mh-picker__cancel"
       (click)="onCancel()"
-      aria-label="Cancel new message"
+      [attr.aria-label]="'messages.picker.cancel' | translate"
     >
       <i class="pi pi-times" aria-hidden="true"></i>
-      <span>Cancel</span>
+      <span>{{ 'button.cancel' | translate }}</span>
     </button>
-    <h2 class="mh-picker__title">New message</h2>
+    <h2 class="mh-picker__title">{{ 'messages.newMessage' | translate }}</h2>
     <span class="mh-picker__spacer"></span>
   </header>
 
   <div class="mh-picker__to">
-    <span class="mh-picker__to-label">To:</span>
+    <span class="mh-picker__to-label">{{ 'messages.picker.to' | translate }}</span>
     @if (selected(); as picked) {
       <span class="mh-picker__chip">
         <mh-hex-avatar
@@ -36,7 +36,7 @@
           type="button"
           class="mh-picker__chip-remove"
           (click)="clearSelection()"
-          aria-label="Remove recipient"
+          [attr.aria-label]="'messages.picker.removeRecipient' | translate"
         >
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>
@@ -45,10 +45,10 @@
       <input
         type="search"
         class="mh-picker__search"
-        placeholder="Search people…"
+        [placeholder]="'messages.picker.searchPlaceholder' | translate"
         [ngModel]="query()"
         (ngModelChange)="onQueryChange($event)"
-        aria-label="Search people"
+        [attr.aria-label]="'messages.picker.searchLabel' | translate"
       />
     }
   </div>
@@ -56,9 +56,9 @@
   @if (canShowResults()) {
     <div class="mh-picker__results">
       @if (searching()) {
-        <div class="mh-picker__result-placeholder">Searching…</div>
+        <div class="mh-picker__result-placeholder">{{ 'messages.picker.searching' | translate }}</div>
       } @else if (results().length === 0) {
-        <div class="mh-picker__result-placeholder">No people match.</div>
+        <div class="mh-picker__result-placeholder">{{ 'messages.picker.noMatches' | translate }}</div>
       } @else {
         @for (user of results(); track user.id) {
           <button

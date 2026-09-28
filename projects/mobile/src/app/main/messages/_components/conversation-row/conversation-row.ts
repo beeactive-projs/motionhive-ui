@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import {
   IonBadge,
   IonIcon,
@@ -9,6 +9,7 @@ import {
   IonLabel,
   IonNote,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ConversationListItem, displayName, formatRelativeShort } from 'core';
 
@@ -35,6 +36,7 @@ import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
     IonItemSliding,
     IonLabel,
     IonNote,
+    TranslatePipe,
   ],
   templateUrl: './conversation-row.html',
   styleUrl: './conversation-row.scss',
@@ -43,6 +45,8 @@ import { avatarToneFor } from '../../../../_shared/utils/avatar-tone.utils';
   },
 })
 export class ConversationRow {
+  private readonly _translateService = inject(TranslateService);
+
   readonly conversation = input.required<ConversationListItem>();
 
   readonly select = output<void>();
@@ -60,7 +64,9 @@ export class ConversationRow {
   readonly tone = computed(() => avatarToneFor(this.conversation().otherUser?.id));
 
   readonly preview = computed(
-    () => this.conversation().lastMessagePreview ?? 'No messages yet',
+    () =>
+      this.conversation().lastMessagePreview ??
+      this._translateService.instant('messages.row.noPreview'),
   );
 
   readonly time = computed(() => {

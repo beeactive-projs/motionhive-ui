@@ -24,7 +24,7 @@
 
     @if (!isDraft()) {
       <ion-buttons slot="end">
-        <ion-button aria-label="Conversation details" (click)="openDetails()">
+        <ion-button [attr.aria-label]="'messages.chat.detailsAria' | translate" (click)="openDetails()">
           <ion-icon slot="icon-only" name="information-circle-outline" />
         </ion-button>
       </ion-buttons>
@@ -39,7 +39,7 @@
         @if (loading()) {
           <ion-spinner name="crescent" />
         } @else {
-          Load earlier messages
+          {{ 'messages.chat.loadEarlier' | translate }}
         }
       </ion-button>
     </div>
@@ -53,10 +53,10 @@
 
   @if (isDraft()) {
     <ion-note class="mh-note-block ion-text-center">
-      This is the start of your conversation with {{ title() }}.
+      {{ 'messages.chat.draftStart' | translate: { name: title() } }}
     </ion-note>
   } @else if (isEmpty()) {
-    <ion-note class="mh-note-block ion-text-center">No messages yet. Say hello.</ion-note>
+    <ion-note class="mh-note-block ion-text-center">{{ 'messages.chat.empty' | translate }}</ion-note>
   }
 
   @for (bubble of bubbles(); track bubble.message.id) {

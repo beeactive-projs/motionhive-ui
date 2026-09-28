@@ -235,6 +235,13 @@
       "cancelled": "Anulate",
       "ended": "Trecute",
       "recurring": "Șabloane recurente"
+    },
+    "userBlockReason": {
+      "HARASSMENT": "Hărțuire",
+      "IMPERSONATION": "Uzurpare de identitate",
+      "OTHER": "Altceva",
+      "SCAM": "Înșelătorie",
+      "SPAM": "Spam"
     }
   },
   "error": {
@@ -258,6 +265,15 @@
       "tooManyRequestsSummary": "Mai încet puțin",
       "unavailable": "Serviciul este temporar indisponibil. Încearcă din nou în câteva momente.",
       "unexpected": "A apărut o eroare neașteptată. Încearcă din nou."
+    },
+    "messaging": {
+      "forbidden": "Nu poți trimite acest mesaj.",
+      "notDelivered": "Mesajul nu a putut fi livrat. Poate a părăsit conversația sau a blocat mesajele de la tine.",
+      "notSent": "Mesajul nu a putut fi trimis.",
+      "offline": "Nu ești conectat la internet. Verifică-ți conexiunea.",
+      "rateLimited": "Mai încet — prea multe mesaje.",
+      "rateLimitedRetry": "Mai încet — încearcă din nou în {seconds} s.",
+      "sendFailed": "Nu s-a putut trimite. Încearcă din nou."
     },
     "staleData": "Actualizarea a eșuat. Vezi ultimele date."
   },
