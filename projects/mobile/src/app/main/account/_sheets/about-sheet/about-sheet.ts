@@ -1,5 +1,6 @@
 import { Component, effect, inject, model, signal, untracked } from '@angular/core';
 import { IonTextarea } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 
 import { ProfileService } from 'core';
@@ -13,7 +14,7 @@ const BIO_MAX_LENGTH = 4000;
 /** The instructor profile's `bio` — coach accounts only. */
 @Component({
   selector: 'mh-about-sheet',
-  imports: [IonTextarea, SheetShell],
+  imports: [IonTextarea, SheetShell, TranslatePipe],
   templateUrl: './about-sheet.html',
   styleUrl: './about-sheet.scss',
 })
@@ -21,6 +22,7 @@ export class AboutSheet {
   private readonly _profileService = inject(ProfileService);
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly bio = signal('');
@@ -41,7 +43,7 @@ export class AboutSheet {
 
     if (bio === previous) {
       this.open.set(false);
-      void this._feedbackService.info('No changes');
+      void this._feedbackService.info(this._translateService.instant('toast.detail.noChanges'));
       return;
     }
 
@@ -56,12 +58,17 @@ export class AboutSheet {
           this.saving.set(false);
           this._accountStore.patchInstructor(profile);
           this.open.set(false);
-          void this._feedbackService.success('About updated');
+          void this._feedbackService.success(
+            this._translateService.instant('accountSheets.about.toast.updated'),
+          );
         },
         error: (error: unknown) => {
           this.saving.set(false);
           this._accountStore.patchInstructor({ bio: previous });
-          void this._feedbackService.error(error, 'Could not update your bio.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.about.toast.failed'),
+          );
         },
       });
   }

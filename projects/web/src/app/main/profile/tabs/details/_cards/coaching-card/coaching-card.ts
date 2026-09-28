@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -10,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   CurrencyRonPipe,
   MyProfile,
@@ -48,15 +48,16 @@ import { VenuesSection } from '../../venues-section/venues-section';
     CurrencyRonPipe,
     EditInstructorProfile,
     VenuesSection,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './coaching-card.html',
   styleUrl: './coaching-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CoachingCard implements OnInit {
   private readonly _productService = inject(ProductService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly profile = input.required<MyProfile>();
   readonly refresh = output<void>();
@@ -70,7 +71,7 @@ export class CoachingCard implements OnInit {
     { key: 'facebook', label: 'Facebook', icon: 'pi pi-facebook' },
     { key: 'twitter', label: 'X / Twitter', icon: 'pi pi-twitter' },
     { key: 'linkedin', label: 'LinkedIn', icon: 'pi pi-linkedin' },
-    { key: 'website', label: 'Website', icon: 'pi pi-globe' },
+    { key: 'website', label: this._translateService.instant('form.label.website'), icon: 'pi pi-globe' },
   ];
 
   readonly socialLinks = computed(() => {
@@ -113,12 +114,13 @@ export class CoachingCard implements OnInit {
           list.map((p) => (p.id === updated.id ? updated : p)),
         );
         this._clearToggling(product.id);
+        const toastKey = nextValue
+          ? 'profile.coaching.toast.productVisible'
+          : 'profile.coaching.toast.productHidden';
         this._messageService.add({
           severity: 'success',
-          summary: nextValue ? 'Product visible' : 'Product hidden',
-          detail: nextValue
-            ? `"${product.name}" now shows on your public profile.`
-            : `"${product.name}" is hidden from your public profile.`,
+          summary: this._translateService.instant(`${toastKey}.summary`),
+          detail: this._translateService.instant(`${toastKey}.detail`, { name: product.name }),
         });
       },
       error: (err: unknown) => {
@@ -126,8 +128,8 @@ export class CoachingCard implements OnInit {
         this._clearToggling(product.id);
         showApiError(
           this._messageService,
-          'Error',
-          'Failed to update visibility.',
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profile.coaching.toast.visibilityFailed'),
           err,
         );
       },

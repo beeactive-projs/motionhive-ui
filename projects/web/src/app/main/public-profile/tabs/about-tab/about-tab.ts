@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PublicProfileStore, type PublicVenue, type PublicVenueKind } from 'core';
 import { Avatar } from 'primeng/avatar';
 import { Card } from 'primeng/card';
@@ -10,10 +11,9 @@ import { TagModule } from 'primeng/tag';
  */
 @Component({
   selector: 'mh-public-profile-about-tab',
-  imports: [Avatar, Card, TagModule],
+  imports: [Avatar, Card, TagModule, TranslatePipe],
   templateUrl: './about-tab.html',
   styleUrl: './about-tab.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutTab {
   private readonly _store = inject(PublicProfileStore);
@@ -41,19 +41,19 @@ export class AboutTab {
     );
   });
 
-  /** Human label for a venue's type badge. */
-  private static readonly KIND_LABELS: Record<PublicVenueKind, string> = {
-    GYM: 'Gym',
-    STUDIO: 'Studio',
-    PARK: 'Park',
-    OUTDOOR: 'Outdoor',
-    CLIENT_HOME: 'At your place',
-    ONLINE: 'Online',
-    OTHER: 'Venue',
+  /** Translation key for a venue's type badge. */
+  private static readonly KIND_KEYS: Record<PublicVenueKind, string> = {
+    GYM: 'publicProfile.about.venueKind.GYM',
+    STUDIO: 'publicProfile.about.venueKind.STUDIO',
+    PARK: 'publicProfile.about.venueKind.PARK',
+    OUTDOOR: 'publicProfile.about.venueKind.OUTDOOR',
+    CLIENT_HOME: 'publicProfile.about.venueKind.CLIENT_HOME',
+    ONLINE: 'publicProfile.about.venueKind.ONLINE',
+    OTHER: 'publicProfile.about.venueKind.OTHER',
   };
 
-  venueKindLabel(v: PublicVenue): string {
-    return AboutTab.KIND_LABELS[v.kind] ?? 'Venue';
+  venueKindKey(v: PublicVenue): string {
+    return AboutTab.KIND_KEYS[v.kind] ?? AboutTab.KIND_KEYS.OTHER;
   }
 
   /** City · region line for physical venues; null for online (badge says it all). */

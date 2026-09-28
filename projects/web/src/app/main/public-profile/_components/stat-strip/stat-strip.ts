@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { Card } from 'primeng/card';
 import type { ProfileStat } from 'core';
 
@@ -16,7 +16,6 @@ import type { ProfileStat } from 'core';
   imports: [Card],
   templateUrl: './stat-strip.html',
   styleUrl: './stat-strip.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatStrip {
   readonly stats = input.required<readonly ProfileStat[]>();

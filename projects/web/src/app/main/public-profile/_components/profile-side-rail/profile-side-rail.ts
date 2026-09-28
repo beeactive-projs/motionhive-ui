@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -7,11 +6,12 @@ import {
   output,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Card } from 'primeng/card';
 import { ButtonDirective } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import type { PublicInstructorProfile, ViewerMode } from 'core';
-import { countryNameFromCode, ViewerMode as ViewerModes } from 'core';
+import { countryNameFromCode, languageName, ViewerMode as ViewerModes } from 'core';
 
 interface SocialLink {
   key: string;
@@ -39,13 +39,13 @@ interface GlanceRow {
  */
 @Component({
   selector: 'mh-profile-side-rail',
-  imports: [DatePipe, Card, ButtonDirective],
+  imports: [DatePipe, Card, ButtonDirective, TranslatePipe],
   templateUrl: './profile-side-rail.html',
   styleUrl: './profile-side-rail.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileSideRail {
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly profile = input.required<PublicInstructorProfile>();
   readonly viewerMode = input.required<ViewerMode>();
@@ -58,27 +58,40 @@ export class ProfileSideRail {
 
   readonly isOwner = computed(() => this.viewerMode() === ViewerModes.Owner);
 
-  readonly firstName = computed(() => this.profile().firstName?.trim() || 'them');
+  readonly firstName = computed(
+    () =>
+      this.profile().firstName?.trim() ||
+      this._translateService.instant('publicProfile.common.them'),
+  );
 
-  readonly contactLabel = computed(() => `Contact ${this.firstName()}`);
+  readonly contactLabel = computed(() =>
+    this._translateService.instant('publicProfile.common.contactName', { name: this.firstName() }),
+  );
 
   readonly glanceRows = computed<GlanceRow[]>(() => {
     const p = this.profile();
     const rows: GlanceRow[] = [];
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this._translateService.instant(key, params);
     const location = [p.city, countryNameFromCode(p.countryCode)].filter(Boolean).join(', ');
-    if (location) rows.push({ icon: 'pi pi-map-marker', label: 'Based in', value: location });
+    if (location) {
+      rows.push({ icon: 'pi pi-map-marker', label: t('publicProfile.sideRail.basedIn'), value: location });
+    }
     if (p.yearsOfExperience != null && p.yearsOfExperience > 0) {
-      const yrs = p.yearsOfExperience;
       rows.push({
         icon: 'pi pi-briefcase',
-        label: 'Experience',
-        value: `${yrs} ${yrs === 1 ? 'year' : 'years'}`,
+        label: t('publicProfile.sideRail.experience'),
+        value: t('count.years', { count: p.yearsOfExperience }),
       });
     }
-    if (p.email) rows.push({ icon: 'pi pi-envelope', label: 'Email', value: p.email });
-    if (p.phone) rows.push({ icon: 'pi pi-phone', label: 'Phone', value: p.phone });
-    if (p.language) rows.push({ icon: 'pi pi-globe', label: 'Language', value: p.language });
-    if (p.timezone) rows.push({ icon: 'pi pi-clock', label: 'Timezone', value: p.timezone });
+    if (p.email) rows.push({ icon: 'pi pi-envelope', label: t('form.label.email'), value: p.email });
+    if (p.phone) rows.push({ icon: 'pi pi-phone', label: t('form.label.phone'), value: p.phone });
+    if (p.language) {
+      rows.push({ icon: 'pi pi-globe', label: t('form.label.language'), value: languageName(p.language) });
+    }
+    if (p.timezone) {
+      rows.push({ icon: 'pi pi-clock', label: t('form.label.timezone'), value: p.timezone });
+    }
     return rows;
   });
 
@@ -95,7 +108,12 @@ export class ProfileSideRail {
     push('facebook', 'Facebook', 'pi pi-facebook', links['facebook']);
     push('twitter', 'X / Twitter', 'pi pi-twitter', links['twitter']);
     push('linkedin', 'LinkedIn', 'pi pi-linkedin', links['linkedin']);
-    push('website', 'Website', 'pi pi-globe', links['website']);
+    push(
+      'website',
+      this._translateService.instant('form.label.website'),
+      'pi pi-globe',
+      links['website'],
+    );
     return out;
   });
 
@@ -142,15 +160,15 @@ export class ProfileSideRail {
       () =>
         this._messageService.add({
           severity: 'success',
-          summary: 'Link copied',
+          summary: this._translateService.instant('toast.detail.linkCopied'),
           detail: url,
           life: 2000,
         }),
       () =>
         this._messageService.add({
           severity: 'warn',
-          summary: 'Copy failed',
-          detail: 'Couldn\'t copy the link. Long-press to copy manually.',
+          summary: this._translateService.instant('publicProfile.sideRail.toast.copyFailed.summary'),
+          detail: this._translateService.instant('publicProfile.sideRail.toast.copyFailed.detail'),
           life: 2500,
         }),
     );

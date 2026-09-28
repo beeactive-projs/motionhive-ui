@@ -2,15 +2,28 @@ import {
   CategoryPreferenceView,
   ConfigurableChannelPreferences,
   NotificationCategory,
+  translate,
 } from 'core';
 
 export type ConfigurableChannel = keyof ConfigurableChannelPreferences;
 
-/** The channels a person can set, by the key the API uses for them. */
-export const CHANNEL_LABELS: Record<string, string> = {
-  email: 'Email',
-  push: 'Push',
+/**
+ * The channels a person can set, by the key the API uses for them, mapped to
+ * translation keys — module-level, so the label is resolved at read time.
+ */
+export const CHANNEL_LABEL_KEYS: Record<string, string> = {
+  email: 'account.notifications.channels.email',
+  push: 'account.notifications.channels.push',
 };
+
+function channelLabel(channel: ConfigurableChannel): string {
+  const key = CHANNEL_LABEL_KEYS[channel];
+  return key ? translate(key) : channel;
+}
+
+function isMessaging(category: NotificationCategory): boolean {
+  return category === NotificationCategory.Messaging;
+}
 
 /**
  * Where the always-on copy of a category lands. Everything goes to the bell
@@ -19,23 +32,29 @@ export const CHANNEL_LABELS: Record<string, string> = {
  * would point at a screen they never reach.
  */
 export function inAppLabel(category: NotificationCategory): string {
-  return category === NotificationCategory.Messaging ? 'Messages' : 'In-app';
+  return isMessaging(category)
+    ? translate('nav.messages')
+    : translate('account.notifications.channels.inApp');
 }
 
 /** Why the in-app row cannot be turned off, in the sheet. */
 export function inAppNote(category: NotificationCategory): string {
-  return category === NotificationCategory.Messaging
-    ? 'Always on — the Messages tab is that inbox.'
-    : 'Always on — the bell is your inbox.';
+  return isMessaging(category)
+    ? translate('account.notifications.channels.messagesNote')
+    : translate('account.notifications.channels.inAppNote');
 }
 
 /** The row's second line: "In-app · Email", or "In-app only" when nothing else is on. */
 export function channelSummary(view: CategoryPreferenceView): string {
-  const base = inAppLabel(view.category);
   const on = configurableChannels(view.channels)
     .filter((channel) => view.channels[channel])
-    .map((channel) => CHANNEL_LABELS[channel] ?? channel);
-  return on.length > 0 ? [base, ...on].join(' · ') : `${base} only`;
+    .map(channelLabel);
+  if (on.length === 0) {
+    return isMessaging(view.category)
+      ? translate('account.notifications.channels.messagesOnly')
+      : translate('account.notifications.channels.inAppOnly');
+  }
+  return [inAppLabel(view.category), ...on].join(' · ');
 }
 
 /** One toggle row in the per-category sheet. */
@@ -65,7 +84,7 @@ export function channelRows(view: CategoryPreferenceView): ChannelRow[] {
     },
     ...configurableChannels(view.channels).map((channel) => ({
       key: channel,
-      label: CHANNEL_LABELS[channel] ?? channel,
+      label: channelLabel(channel),
       note: null,
       locked: false,
       checked: view.channels[channel],
@@ -75,7 +94,7 @@ export function channelRows(view: CategoryPreferenceView): ChannelRow[] {
 
 /** The keys on the preference object that have a label — in the label order. */
 function configurableChannels(channels: ConfigurableChannelPreferences): ConfigurableChannel[] {
-  return (Object.keys(CHANNEL_LABELS) as ConfigurableChannel[]).filter(
+  return (Object.keys(CHANNEL_LABEL_KEYS) as ConfigurableChannel[]).filter(
     (channel) => channel in channels,
   );
 }

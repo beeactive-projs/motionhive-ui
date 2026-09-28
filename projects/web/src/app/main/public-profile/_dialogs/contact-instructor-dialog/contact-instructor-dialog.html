@@ -9,10 +9,10 @@
       }
       <div class="min-w-0">
         <h2 class="m-0 text-xl md:text-2xl font-semibold leading-tight">
-          Reach out to {{ firstName() }}
+          {{ 'publicProfile.common.reachOut' | translate: { name: firstName() } }}
         </h2>
         <p class="m-0 mt-1 text-sm text-muted-color">
-          {{ headerSubcopy() }}
+          {{ 'publicProfile.contactDialog.subtitle' | translate: { name: firstName() } }}
         </p>
       </div>
     </div>
@@ -21,17 +21,18 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5 pt-2">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="flex flex-col gap-1.5">
-        <label for="lead-name" class="text-sm font-medium">Your name</label>
+        <label for="lead-name" class="text-sm font-medium">{{ 'publicProfile.contactDialog.yourName' | translate }}</label>
         <input pInputText id="lead-name" formControlName="name" fluid autocomplete="name"
-          [class.ng-invalid]="invalid('name')" [class.ng-dirty]="invalid('name')" placeholder="Your name" />
+          [class.ng-invalid]="invalid('name')" [class.ng-dirty]="invalid('name')" [placeholder]="'publicProfile.contactDialog.yourName' | translate" />
         @if (invalid('name')) {
         <p-message severity="error" size="small" variant="simple">{{ getFieldError('name') }}</p-message>
         }
       </div>
       <div class="flex flex-col gap-1.5">
-        <label for="lead-email" class="text-sm font-medium">Email</label>
+        <label for="lead-email" class="text-sm font-medium">{{ 'form.label.email' | translate }}</label>
         <input pInputText id="lead-email" type="email" formControlName="email" fluid autocomplete="email"
-          [class.ng-invalid]="invalid('email')" [class.ng-dirty]="invalid('email')" placeholder="your@email.com" />
+          [class.ng-invalid]="invalid('email')" [class.ng-dirty]="invalid('email')"
+          [placeholder]="'publicProfile.contactDialog.emailPlaceholder' | translate" />
         @if (invalid('email')) {
         <p-message severity="error" size="small" variant="simple">{{ getFieldError('email') }}</p-message>
         }
@@ -40,15 +41,15 @@
 
     <div class="flex flex-col gap-1.5">
       <label for="lead-phone" class="text-sm font-medium">
-        Phone / WhatsApp
-        <span class="text-muted-color font-normal">optional</span>
+        {{ 'publicProfile.contactDialog.phone' | translate }}
+        <span class="text-muted-color font-normal">{{ 'publicProfile.contactDialog.optional' | translate }}</span>
       </label>
       <mh-phone-input inputId="lead-phone" [value]="form.controls.phone.value"
         (valueChange)="form.controls.phone.setValue($event ?? '')" />
     </div>
 
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">What's your main goal?</label>
+      <label class="text-sm font-medium">{{ 'publicProfile.contactDialog.goal.label' | translate }}</label>
       <div class="flex flex-wrap items-center gap-2">
         @for (option of goals; track option.value) {
         <button pButton
@@ -60,7 +61,7 @@
           (click)="form.controls.goal.setValue(option.value)"
           class="py-0.5"
         >
-          {{ option.label }}
+          {{ option.label | translate }}
         </button>
         }
       </div>
@@ -70,7 +71,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Where are you starting from?</label>
+      <label class="text-sm font-medium">{{ 'publicProfile.contactDialog.level.label' | translate }}</label>
       <div class="flex flex-wrap items-center gap-2">
         @for (option of levels; track option.value) {
         <button pButton
@@ -82,7 +83,7 @@
           (click)="form.controls.level.setValue(option.value)"
           class="py-0.5"
         >
-          {{ option.label }}
+          {{ option.label | translate }}
         </button>
         }
       </div>
@@ -92,7 +93,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">How would you like to train?</label>
+      <label class="text-sm font-medium">{{ 'publicProfile.contactDialog.format.label' | translate }}</label>
       <div class="flex flex-wrap items-center gap-2">
         @for (option of formats; track option.value) {
         <button pButton
@@ -104,7 +105,7 @@
           (click)="form.controls.format.setValue(option.value)"
           class="py-0.5"
         >
-          {{ option.label }}
+          {{ option.label | translate }}
         </button>
         }
       </div>
@@ -115,11 +116,11 @@
 
     <div class="flex flex-col gap-1.5">
       <label for="lead-message" class="text-sm font-medium">
-        Anything else?
-        <span class="text-muted-color font-normal">optional</span>
+        {{ 'publicProfile.contactDialog.message.label' | translate }}
+        <span class="text-muted-color font-normal">{{ 'publicProfile.contactDialog.optional' | translate }}</span>
       </label>
       <textarea pTextarea id="lead-message" formControlName="message" rows="3" autoResize
-        placeholder="Hey! I've been on/off the gym for 2 years and want to commit. Free weekday evenings."></textarea>
+        [placeholder]="'publicProfile.contactDialog.message.placeholder' | translate"></textarea>
     </div>
   </form>
 
@@ -128,13 +129,13 @@
       <p class="m-0 text-xs text-muted-color flex items-center gap-1.5 min-w-0">
         <i class="pi pi-shield"></i>
         <span class="truncate">
-          {{ firstName() }} only sees your name, email and message.
+          {{ 'publicProfile.contactDialog.privacyNote' | translate: { name: firstName() } }}
           <a [href]="privacyUrl" target="_blank" rel="noopener"
-            class="text-primary-600 hover:underline">Privacy</a>
+            class="text-primary-600 hover:underline">{{ 'publicProfile.contactDialog.privacy' | translate }}</a>
         </span>
       </p>
       <button pButton type="submit" [disabled]="(form.invalid) || submitting()" (click)="onSubmit()">
-        Send message
+        {{ 'publicProfile.contactDialog.send' | translate }}
         <i class="pi" [class]="submitting() ? 'pi-spinner pi-spin' : 'pi-arrow-right'"></i>
       </button>
     </div>

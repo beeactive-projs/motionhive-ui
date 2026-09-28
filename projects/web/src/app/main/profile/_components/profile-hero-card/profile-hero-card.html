@@ -16,9 +16,9 @@
         type="button"
         class="mh-profile-hero__camera"
         [disabled]="uploadingAvatar()"
-        pTooltip="Change photo"
+        [pTooltip]="'profile.hero.changePhoto' | translate"
         tooltipPosition="top"
-        aria-label="Change photo"
+        [attr.aria-label]="'profile.hero.changePhoto' | translate"
         (click)="openFilePicker()"
       >
         @if (uploadingAvatar()) {
@@ -45,7 +45,7 @@
         @if (hasHandle()) {
           <span class="font-mono">&#64;{{ handle() }}</span>
         } @else {
-          <span class="italic">No handle yet</span>
+          <span class="italic">{{ 'profile.hero.noHandle' | translate }}</span>
         }
         @if (locationLabel(); as loc) {
           <span aria-hidden="true">·</span>
@@ -56,28 +56,28 @@
         <span aria-hidden="true">·</span>
         <span class="inline-flex items-center gap-1">
           <i class="pi pi-calendar text-xs" aria-hidden="true"></i>
-          Joined {{ memberSince() | date: 'MMM y' }}
+          {{ 'profile.hero.joined' | translate: { date: (memberSince() | date: 'MMM y') } }}
         </span>
       </div>
 
       <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
-        @for (badge of displayBadges(); track badge.label) {
-          <p-tag rounded [value]="badge.label" [severity]="badge.severity" class="text-xs!" />
+        @for (badge of displayBadges(); track badge.role) {
+          <p-tag rounded [value]="badge.role | enumLabel: 'userRole'" [severity]="badge.severity" class="text-xs!" />
         }
         @if (profile().account.isEmailVerified) {
-          <p-tag rounded value="Verified" severity="success" icon="pi pi-check" class="text-xs!" />
+          <p-tag rounded [value]="'profile.hero.verified' | translate" severity="success" icon="pi pi-check" class="text-xs!" />
         } @else {
           <span class="inline-flex items-center gap-1">
-            <p-tag rounded value="Unverified" severity="warn" icon="pi pi-exclamation-triangle" class="text-xs!" />
+            <p-tag rounded [value]="'profile.hero.unverified' | translate" severity="warn" icon="pi pi-exclamation-triangle" class="text-xs!" />
             <button pButton
               type="button"
               severity="secondary"
               [text]="true"
               [rounded]="true"
               size="small"
-              pTooltip="Resend verification email"
+              [pTooltip]="'profile.hero.resendVerification' | translate"
               tooltipPosition="top"
-              aria-label="Resend verification email"
+              [attr.aria-label]="'profile.hero.resendVerification' | translate"
               (click)="resendVerification.emit()"
               [disabled]="resendingVerification()"
               iconOnly
@@ -93,11 +93,11 @@
     <div class="flex flex-wrap items-center justify-center gap-2 md:self-start md:justify-end">
       <button pButton type="button" severity="secondary" outlined size="small" (click)="editPersonalInfo.emit()">
         <i class="pi pi-pencil"></i>
-        Edit profile
+        {{ 'profile.hero.editProfile' | translate }}
       </button>
       <button pButton type="button" severity="secondary" outlined size="small" (click)="editHandle.emit()">
         <i class="pi pi-at"></i>
-        {{ hasHandle() ? 'Edit handle' : 'Pick a handle' }}
+        {{ (hasHandle() ? 'profile.hero.editHandle' : 'profile.hero.pickHandle') | translate }}
       </button>
       <button pButton
         type="button"
@@ -105,12 +105,12 @@
         outlined
         size="small"
         [disabled]="!hasHandle()"
-        [pTooltip]="hasHandle() ? '' : 'Pick a handle first'"
+        [pTooltip]="hasHandle() ? '' : ('profile.hero.pickHandleFirst' | translate)"
         tooltipPosition="top"
         (click)="viewAsPublic.emit()"
       >
         <i class="pi pi-external-link"></i>
-        View as public
+        {{ 'profile.hero.viewAsPublic' | translate }}
       </button>
       <button pButton
         type="button"
@@ -118,12 +118,12 @@
         outlined
         size="small"
         [disabled]="!hasHandle()"
-        [pTooltip]="hasHandle() ? '' : 'Pick a handle first'"
+        [pTooltip]="hasHandle() ? '' : ('profile.hero.pickHandleFirst' | translate)"
         tooltipPosition="top"
         (click)="share.emit()"
       >
         <i class="pi pi-share-alt"></i>
-        Share
+        {{ 'button.share' | translate }}
       </button>
     </div>
   </div>

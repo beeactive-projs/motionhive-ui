@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,7 +9,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ProfileService, apiErrorMessage } from 'core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ProfileService, TranslateParams, apiErrorMessage } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -25,16 +25,26 @@ import { Message } from 'primeng/message';
  * friendly toast).
  */
 const HANDLE_REGEX = /^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
+const HANDLE_MIN_LENGTH = 3;
+const HANDLE_MAX_LENGTH = 40;
+
+/** A validation message as a translation key plus its params. */
+interface HandleError {
+  key: string;
+  params?: TranslateParams;
+}
 
 @Component({
   selector: 'mh-edit-handle',
-  imports: [FormsModule, ButtonDirective, Dialog, InputText, Message],
+  imports: [FormsModule, ButtonDirective, Dialog, InputText, Message, TranslatePipe],
   templateUrl: './edit-handle.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditHandle {
   private readonly _profileService = inject(ProfileService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
+
+  readonly maxLength = HANDLE_MAX_LENGTH;
 
   readonly visible = model(false);
   readonly currentHandle = input<string | null>(null);
@@ -49,13 +59,17 @@ export class EditHandle {
    * Inline validation message — `null` means valid, anything else
    * blocks submit and renders under the input.
    */
-  readonly validationError = computed<string | null>(() => {
+  readonly validationError = computed<HandleError | null>(() => {
     const value = this.normalized();
-    if (!value) return 'Pick a handle.';
-    if (value.length < 3) return 'At least 3 characters.';
-    if (value.length > 40) return 'At most 40 characters.';
+    if (!value) return { key: 'profile.editHandle.validation.required' };
+    if (value.length < HANDLE_MIN_LENGTH) {
+      return { key: 'profile.editHandle.validation.minLength', params: { min: HANDLE_MIN_LENGTH } };
+    }
+    if (value.length > HANDLE_MAX_LENGTH) {
+      return { key: 'profile.editHandle.validation.maxLength', params: { max: HANDLE_MAX_LENGTH } };
+    }
     if (!HANDLE_REGEX.test(value)) {
-      return 'Use lowercase letters, digits, "_" or "-". Must start and end with a letter or digit.';
+      return { key: 'profile.editHandle.validation.pattern' };
     }
     return null;
   });
@@ -80,8 +94,8 @@ export class EditHandle {
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Handle updated',
-          detail: `Your profile is now at @${handle}.`,
+          summary: this._translateService.instant('profile.editHandle.toast.updated.summary'),
+          detail: this._translateService.instant('profile.editHandle.toast.updated.detail', { handle }),
         });
         this.saved.emit(handle);
       },
@@ -89,10 +103,10 @@ export class EditHandle {
         this.saving.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Could not update handle',
+          summary: this._translateService.instant('profile.editHandle.toast.failed.summary'),
           detail: apiErrorMessage(
             err,
-            'That handle is unavailable. Try a different one.',
+            this._translateService.instant('profile.editHandle.toast.failed.detail'),
           ),
         });
       },

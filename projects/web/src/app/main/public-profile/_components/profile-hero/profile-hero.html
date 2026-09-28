@@ -34,13 +34,13 @@
         </span>
         }
         @if (profile().isAcceptingClients) {
-        <span class="pulse-pill" aria-label="Currently accepting new clients">
+        <span class="pulse-pill" [attr.aria-label]="'publicProfile.hero.acceptingClientsAria' | translate">
           <span class="pulse-dot" aria-hidden="true"></span>
-          Accepting clients
+          {{ 'publicProfile.hero.acceptingClients' | translate }}
         </span>
         }
         @for (role of profile().displayRoles ?? []; track role) {
-        <span class="inline-flex items-center gap-1.5">{{ role }}</span>
+        <span class="inline-flex items-center gap-1.5">{{ role | enumLabel: 'userRole' }}</span>
         }
       </div>
 
@@ -50,23 +50,23 @@
 
       <div class="cta-row flex flex-wrap items-center gap-2 mt-1">
         @if (isOwner()) {
-        <button pButton type="button" (click)="share.emit()"><i class="pi pi-share-alt"></i> Share my profile</button>
-        <button pButton type="button" severity="secondary" outlined routerLink="/profile"><i class="pi pi-pencil"></i> Edit profile</button>
+        <button pButton type="button" (click)="share.emit()"><i class="pi pi-share-alt"></i> {{ 'publicProfile.hero.shareMyProfile' | translate }}</button>
+        <button pButton type="button" severity="secondary" outlined routerLink="/profile"><i class="pi pi-pencil"></i> {{ 'publicProfile.hero.editProfile' | translate }}</button>
         } @else if (showInstructorCtas()) {
         <button pButton type="button" (click)="message.emit()"><i class="pi pi-envelope"></i> {{ contactLabel() }}</button>
         <button pButton type="button" severity="secondary" outlined (click)="book.emit()">
           <i class="pi pi-calendar"></i>
-          Book a session
+          {{ 'publicProfile.common.bookSession' | translate }}
         </button>
-        <button pButton type="button" severity="secondary" text (click)="save.emit()" aria-label="Save profile" iconOnly>
+        <button pButton type="button" severity="secondary" text (click)="save.emit()" [attr.aria-label]="'publicProfile.hero.saveProfile' | translate" iconOnly>
           <i class="pi pi-bookmark"></i>
         </button>
-        <button pButton type="button" severity="secondary" text (click)="share.emit()" aria-label="Share profile" iconOnly>
+        <button pButton type="button" severity="secondary" text (click)="share.emit()" [attr.aria-label]="'publicProfile.common.shareProfile' | translate" iconOnly>
           <i class="pi pi-share-alt"></i>
         </button>
         } @else if (showUserCtas()) {
-        <button pButton type="button" (click)="message.emit()"><i class="pi pi-envelope"></i> Message</button>
-        <button pButton type="button" severity="secondary" text (click)="share.emit()" aria-label="Share profile" iconOnly>
+        <button pButton type="button" (click)="message.emit()"><i class="pi pi-envelope"></i> {{ 'publicProfile.hero.message' | translate }}</button>
+        <button pButton type="button" severity="secondary" text (click)="share.emit()" [attr.aria-label]="'publicProfile.common.shareProfile' | translate" iconOnly>
           <i class="pi pi-share-alt"></i>
         </button>
         }

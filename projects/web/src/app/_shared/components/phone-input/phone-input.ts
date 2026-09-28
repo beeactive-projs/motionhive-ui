@@ -16,7 +16,7 @@ import {
 } from 'libphonenumber-js';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { STRIPE_CONNECT_COUNTRIES } from 'core';
+import { STRIPE_CONNECT_COUNTRIES, appLocale, countryNameFromCode } from 'core';
 
 /**
  * Option shape for the country select. Pre-built once at module load
@@ -36,14 +36,15 @@ interface CountryOption {
 
 const COUNTRY_OPTIONS: CountryOption[] = STRIPE_CONNECT_COUNTRIES.map((c) => {
   const callingCode = `+${getCountryCallingCode(c.code as CountryCode)}`;
+  const name = countryNameFromCode(c.code) ?? c.name;
   return {
     code: c.code as CountryCode,
-    name: c.name,
+    name,
     flagClass: `fi fi-${c.code.toLowerCase()}`,
     callingCode,
-    searchLabel: `${c.name} ${callingCode}`,
+    searchLabel: `${name} ${callingCode}`,
   };
-}).sort((a, b) => a.name.localeCompare(b.name));
+}).sort((a, b) => a.name.localeCompare(b.name, appLocale()));
 
 const DEFAULT_COUNTRY: CountryCode = 'RO';
 

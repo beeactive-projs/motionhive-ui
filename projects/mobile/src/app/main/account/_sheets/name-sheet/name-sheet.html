@@ -1,6 +1,6 @@
 <ng-template #body>
   <ion-input
-    label="First name"
+    [label]="'form.label.firstName' | translate"
     labelPlacement="stacked"
     fill="outline"
     autocapitalize="words"
@@ -10,7 +10,7 @@
 
   <ion-input
     class="ion-margin-top"
-    label="Last name"
+    [label]="'form.label.lastName' | translate"
     labelPlacement="stacked"
     fill="outline"
     autocapitalize="words"
@@ -18,12 +18,12 @@
     (ionInput)="lastName.set($event.detail.value ?? '')"
   />
 
-  <p class="mh-helper">This is how your name appears on your profile and in messages.</p>
+  <p class="mh-helper">{{ 'accountSheets.name.hint' | translate }}</p>
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Name"
+  [title]="'form.label.name' | translate"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

@@ -10,11 +10,11 @@
   <div class="flex flex-col gap-3 max-w-400 mx-auto w-full">
     <p-message severity="warn" icon="pi pi-exclamation-triangle">
       <div class="flex flex-col gap-2">
-        <h2 class="m-0 text-base font-semibold">Profile not found</h2>
+        <h2 class="m-0 text-base font-semibold">{{ 'publicProfile.page.notFound' | translate }}</h2>
         <p class="m-0 text-sm">{{ err }}</p>
       </div>
     </p-message>
-    <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> Back to explore</button>
+    <button pButton type="button" (click)="goBack()"><i class="pi pi-arrow-left"></i> {{ 'publicProfile.page.backToExplore' | translate }}</button>
   </div>
 } @else if (heroProfile(); as hero) {
   <!-- Shell-level 2-column layout: hero + content on the left, sticky

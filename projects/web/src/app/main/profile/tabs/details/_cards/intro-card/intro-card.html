@@ -2,19 +2,22 @@
   <ng-template #header>
     <div class="flex items-center gap-2 px-4 pt-4">
       <i class="pi pi-info-circle text-primary-600"></i>
-      <h2 class="text-base font-semibold m-0">Intro</h2>
+      <h2 class="text-base font-semibold m-0">{{ 'profile.intro.title' | translate }}</h2>
     </div>
     <p-divider />
   </ng-template>
 
   <div class="flex flex-col gap-1">
-    <mh-profile-fact-row icon="pi pi-globe" label="Language" [value]="profile().account.language"
+    <mh-profile-fact-row icon="pi pi-globe" [label]="'form.label.language' | translate"
+      [value]="profile().account.language | languageName" [placeholder]="'form.placeholder.notSet' | translate"
       [privacyField]="'language'" [privacyLevel]="privacyLevel('language')"
       (privacyChange)="emit('language', $event)" />
-    <mh-profile-fact-row icon="pi pi-clock" label="Timezone" [value]="profile().account.timezone"
+    <mh-profile-fact-row icon="pi pi-clock" [label]="'form.label.timezone' | translate" [value]="profile().account.timezone"
+      [placeholder]="'form.placeholder.notSet' | translate"
       [privacyField]="'timezone'" [privacyLevel]="privacyLevel('timezone')"
       (privacyChange)="emit('timezone', $event)" />
-    <mh-profile-fact-row icon="pi pi-calendar" label="Member since" [value]="memberSince() | date: 'mediumDate'"
-      [privacyLevel]="LockedPublic" [lockedPrivacy]="true" lockedTooltip="Always public — shown to everyone." />
+    <mh-profile-fact-row icon="pi pi-calendar" [label]="'form.label.memberSince' | translate"
+      [value]="memberSince() | date: 'mediumDate'" [placeholder]="'form.placeholder.notSet' | translate"
+      [privacyLevel]="LockedPublic" [lockedPrivacy]="true" [lockedTooltip]="'profile.lockedPublic' | translate" />
   </div>
 </p-card>

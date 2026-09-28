@@ -1,7 +1,8 @@
 <ng-template #body>
   <ion-searchbar
     mhAutofocus
-    placeholder="Search for a place"
+    [placeholder]="'accountSheets.location.searchPlaceholder' | translate"
+    [attr.aria-label]="'accountSheets.location.searchPlaceholder' | translate"
     [debounce]="0"
     (ionInput)="onSearch($event.detail.value ?? '')"
   />
@@ -25,22 +26,24 @@
   }
 
   @if (selected(); as place) {
-    <p class="selected">Selected: {{ place.city ?? place.displayName }}, {{ place.country }}</p>
+    <p class="selected">
+      {{
+        'accountSheets.location.selected'
+          | translate: { place: place.city ?? place.displayName, country: place.country }
+      }}
+    </p>
   }
 
   @if (blockedByCountryLock()) {
-    <p class="mh-helper locked">
-      You can update your city, but your country is locked because payments are set up on your
-      account.
-    </p>
+    <p class="mh-helper locked">{{ 'accountSheets.location.countryLocked' | translate }}</p>
   } @else {
-    <p class="mh-helper">Your city shows on your public profile. Your exact address never does.</p>
+    <p class="mh-helper">{{ 'accountSheets.location.hint' | translate }}</p>
   }
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Location"
+  [title]="'form.label.location' | translate"
   [body]="body"
   [canSave]="canSave()"
   [saving]="saving()"

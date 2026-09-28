@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, model } from '@angular/core';
 import { IonButton, IonIcon, IonItem, IonLabel, IonList, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { copyOutline, openOutline, shareSocialOutline } from 'ionicons/icons';
 
@@ -31,12 +32,14 @@ import { ShareOutcomes, copyToClipboard, shareOrCopy } from '../../../../_shared
     IonList,
     IonNote,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './share-sheet.html',
   styleUrl: './share-sheet.scss',
 })
 export class ShareSheet {
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly open = model(false);
   readonly handle = input<string | null>(null);
@@ -54,9 +57,12 @@ export class ShareSheet {
     const url = this.url();
     if (!url) return;
     if (await copyToClipboard(url)) {
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(this._translateService.instant('toast.detail.linkCopied'));
     } else {
-      await this._feedbackService.error(null, 'Could not copy the link.');
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('accountSheets.share.toast.copyFailed'),
+      );
     }
   }
 
@@ -64,12 +70,18 @@ export class ShareSheet {
     const url = this.url();
     if (!url) return;
 
-    const outcome = await shareOrCopy({ title: 'My MotionHive profile', url });
+    const outcome = await shareOrCopy({
+      title: this._translateService.instant('accountSheets.share.shareTitle'),
+      url,
+    });
     // Shared: the OS already gave feedback. Cancelled: the user said no.
     if (outcome === ShareOutcomes.Copied) {
-      await this._feedbackService.success('Link copied');
+      await this._feedbackService.success(this._translateService.instant('toast.detail.linkCopied'));
     } else if (outcome === ShareOutcomes.Failed) {
-      await this._feedbackService.error(null, 'Could not share the link.');
+      await this._feedbackService.error(
+        null,
+        this._translateService.instant('accountSheets.share.toast.shareFailed'),
+      );
     }
   }
 

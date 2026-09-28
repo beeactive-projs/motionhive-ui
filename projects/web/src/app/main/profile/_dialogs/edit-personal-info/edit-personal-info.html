@@ -1,22 +1,22 @@
-<p-dialog header="Edit personal information" [(visible)]="visible" [modal]="true" [style]="{ width: '36rem' }"
+<p-dialog [header]="'profile.editPersonalInfo.title' | translate" [(visible)]="visible" [modal]="true" [style]="{ width: '36rem' }"
   [closable]="true">
   <div class="flex flex-col gap-4 pt-2">
 
     <div class="grid gap-4 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
-        <label for="epiFirstName" class="text-sm font-medium">First name</label>
+        <label for="epiFirstName" class="text-sm font-medium">{{ 'form.label.firstName' | translate }}</label>
         <input id="epiFirstName" type="text" pInputText fluid [ngModel]="form().firstName"
-          (ngModelChange)="updateField('firstName', $event)" placeholder="First name" />
+          (ngModelChange)="updateField('firstName', $event)" [placeholder]="'form.label.firstName' | translate" />
       </div>
       <div class="flex flex-col gap-2">
-        <label for="epiLastName" class="text-sm font-medium">Last name</label>
+        <label for="epiLastName" class="text-sm font-medium">{{ 'form.label.lastName' | translate }}</label>
         <input id="epiLastName" type="text" pInputText fluid [ngModel]="form().lastName"
-          (ngModelChange)="updateField('lastName', $event)" placeholder="Last name" />
+          (ngModelChange)="updateField('lastName', $event)" [placeholder]="'form.label.lastName' | translate" />
       </div>
     </div>
 
     <div class="flex flex-col gap-2">
-      <label for="epiPhone" class="text-sm font-medium">Phone</label>
+      <label for="epiPhone" class="text-sm font-medium">{{ 'form.label.phone' | translate }}</label>
       <mh-phone-input
         inputId="epiPhone"
         [value]="form().phone"
@@ -25,26 +25,23 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium">Location</label>
+      <label class="text-sm font-medium">{{ 'form.label.location' | translate }}</label>
       <mh-location-picker [location]="form().location"
         (locationChange)="updateField('location', $event)" />
       @if (countryLocked()) {
-        <span class="text-xs text-surface-400">
-          You can update your city, but your country is locked because payments
-          are set up on your account. Contact support if you need to migrate.
-        </span>
+        <span class="text-xs text-surface-400">{{ 'profile.editPersonalInfo.countryLockedHint' | translate }}</span>
       } @else {
-        <span class="text-xs text-surface-400">Used to suggest nearby coaches.</span>
+        <span class="text-xs text-surface-400">{{ 'profile.editPersonalInfo.locationHint' | translate }}</span>
       }
     </div>
 
   </div>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" (click)="save()" [disabled]="saving()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      Save changes
+      {{ 'button.saveChanges' | translate }}
     </button>
   </ng-template>
 </p-dialog>

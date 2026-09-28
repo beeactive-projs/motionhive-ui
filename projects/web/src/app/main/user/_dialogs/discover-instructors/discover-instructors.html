@@ -1,10 +1,11 @@
-<p-dialog header="Discover Instructors" [visible]="visible()" (visibleChange)="visible.set($event)" [modal]="true"
+<p-dialog [header]="'userDialogs.discoverCoaches.title' | translate" [visible]="visible()" (visibleChange)="visible.set($event)" [modal]="true"
   [style]="{ width: '36rem' }" [closable]="true" (onHide)="onHide()">
   <!-- Search bar -->
   <div class="flex gap-2 mb-4">
-    <input pInputText type="text" class="flex-1" placeholder="Search by name, specialization, or city..."
+    <input pInputText type="text" class="flex-1" [placeholder]="'userDialogs.discoverCoaches.searchPlaceholder' | translate"
       [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" (keyup.enter)="search()" />
-    <button pButton type="button" (click)="search()" [disabled]="searching()" iconOnly>
+    <button pButton type="button" (click)="search()" [disabled]="searching()" iconOnly
+      [attr.aria-label]="'button.search' | translate">
       <i class="pi" [class]="searching() ? 'pi-spinner pi-spin' : 'pi-search'"></i>
     </button>
   </div>
@@ -26,7 +27,7 @@
   } @else if (searched() && results().length === 0) {
   <div class="flex flex-col items-center gap-2 py-8 text-center">
     <i class="pi pi-search text-3xl text-secondary-300"></i>
-    <p class="text-sm text-secondary-500">No instructors found. Try a different search.</p>
+    <p class="text-sm text-secondary-500">{{ 'userDialogs.discoverCoaches.empty.noResults' | translate }}</p>
   </div>
   } @else if (results().length > 0) {
   <div class="flex flex-col gap-2">
@@ -50,7 +51,7 @@
         [disabled]="requestingId() === instructor.userId"
       >
         <i class="pi" [class]="requestingId() === instructor.userId ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-        Request
+        {{ 'userDialogs.discoverCoaches.request' | translate }}
       </button>
     </div>
     }
@@ -58,13 +59,13 @@
   } @else {
   <div class="flex flex-col items-center gap-2 py-8 text-center">
     <i class="pi pi-users text-3xl text-secondary-300"></i>
-    <p class="text-sm text-secondary-500">Search for instructors to get started.</p>
+    <p class="text-sm text-secondary-500">{{ 'userDialogs.discoverCoaches.empty.prompt' | translate }}</p>
   </div>
   }
 </p-dialog>
 
 <!-- Request message dialog -->
-<p-dialog header="Send Request" [visible]="showRequestDialog()" (visibleChange)="showRequestDialog.set($event)"
+<p-dialog [header]="'userDialogs.discoverCoaches.requestDialog.title' | translate" [visible]="showRequestDialog()" (visibleChange)="showRequestDialog.set($event)"
   [modal]="true" [style]="{ width: '28rem' }" [closable]="true">
   @if (selectedInstructor(); as instructor) {
   <div class="flex flex-col gap-4">
@@ -73,18 +74,20 @@
       <span class="font-medium text-secondary-900">{{ instructorName(instructor) }}</span>
     </div>
     <div class="flex flex-col gap-2">
-      <label class="text-sm font-medium text-secondary-700">Message (optional)</label>
+      <label class="text-sm font-medium text-secondary-700">{{ 'userDialogs.discoverCoaches.requestDialog.messageLabel' | translate }}</label>
       <textarea pTextarea [rows]="3"
-        placeholder="Introduce yourself or explain why you'd like to train with this instructor..."
+        [placeholder]="'userDialogs.discoverCoaches.requestDialog.messagePlaceholder' | translate"
         [ngModel]="requestMessage()" (ngModelChange)="requestMessage.set($event)"></textarea>
     </div>
   </div>
   }
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" text (click)="showRequestDialog.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" text (click)="showRequestDialog.set(false)">
+      {{ 'button.cancel' | translate }}
+    </button>
     <button pButton type="button" (click)="sendRequest()" [disabled]="requestingId() !== null">
       <i class="pi" [class]="requestingId() !== null ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-      Send Request
+      {{ 'userDialogs.discoverCoaches.requestDialog.send' | translate }}
     </button>
   </ng-template>
 </p-dialog>

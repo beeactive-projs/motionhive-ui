@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -17,10 +18,9 @@ import { VENUE_KIND_META } from '../venue-kind.utils';
  */
 @Component({
   selector: 'mh-venue-card',
-  imports: [ButtonDirective, Tag, TooltipModule],
+  imports: [ButtonDirective, Tag, TooltipModule, TranslatePipe],
   templateUrl: './venue-card.html',
   styleUrl: './venue-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VenueCard {
   readonly venue = input.required<Venue>();

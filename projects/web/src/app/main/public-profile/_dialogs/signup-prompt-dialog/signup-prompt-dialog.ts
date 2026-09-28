@@ -1,38 +1,40 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { Component, computed, inject, input, model } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { LockedAction, type AvatarUser } from 'core';
 import { Avatar } from '../../../../_shared/components/avatar/avatar';
 
+/** Icon + translation keys for the prompt's title and subtitle. */
 interface PromptCopy {
   icon: string;
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
 }
 
 const COPY: Partial<Record<LockedAction, PromptCopy>> = {
   [LockedAction.Book]: {
     icon: 'pi-calendar',
-    title: 'Create a free account to book sessions',
-    subtitle: "Takes 30 seconds. We'll save this session for you while you sign up.",
+    titleKey: 'publicProfile.signupPrompt.book.title',
+    subtitleKey: 'publicProfile.signupPrompt.book.subtitle',
   },
   [LockedAction.Save]: {
     icon: 'pi-bookmark',
-    title: 'Save this coach to your shortlist',
-    subtitle: 'Sign up free to bookmark coaches, follow workouts, and message.',
+    titleKey: 'publicProfile.signupPrompt.save.title',
+    subtitleKey: 'publicProfile.signupPrompt.save.subtitle',
   },
   [LockedAction.Group]: {
     icon: 'pi-users',
-    title: 'Join the community',
-    subtitle: 'Sign up free to join groups, chat with members, and RSVP to events.',
+    titleKey: 'publicProfile.signupPrompt.group.title',
+    subtitleKey: 'publicProfile.signupPrompt.group.subtitle',
   },
 };
 
 const FALLBACK_COPY: PromptCopy = {
   icon: 'pi-user-plus',
-  title: 'Create a free account to continue',
-  subtitle: "Takes 30 seconds. We'll save your place while you sign up.",
+  titleKey: 'publicProfile.signupPrompt.fallback.title',
+  subtitleKey: 'publicProfile.signupPrompt.fallback.subtitle',
 };
 
 /**
@@ -48,13 +50,13 @@ const FALLBACK_COPY: PromptCopy = {
  */
 @Component({
   selector: 'mh-signup-prompt-dialog',
-  imports: [Dialog, ButtonDirective, Avatar],
+  imports: [Dialog, ButtonDirective, Avatar, TranslatePipe],
   templateUrl: './signup-prompt-dialog.html',
   styleUrl: './signup-prompt-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignupPromptDialog {
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly Actions = LockedAction;
 
@@ -63,7 +65,7 @@ export class SignupPromptDialog {
   /** Path to come back to after sign-up — usually `/@handle`. */
   readonly next = input<string>('/');
   /** Instructor whose profile triggered the prompt — shown in the header. */
-  readonly instructorName = input<string>('this instructor');
+  readonly instructorName = input<string>('');
   readonly instructorAvatar = input<AvatarUser | null>(null);
 
   readonly copy = computed<PromptCopy>(() => COPY[this.action()] ?? FALLBACK_COPY);
@@ -71,7 +73,7 @@ export class SignupPromptDialog {
   /** First name for the header copy. */
   readonly firstName = computed(() => {
     const name = this.instructorName().trim();
-    if (!name) return 'them';
+    if (!name) return this._translateService.instant('publicProfile.common.them');
     return name.split(/\s+/)[0];
   });
 

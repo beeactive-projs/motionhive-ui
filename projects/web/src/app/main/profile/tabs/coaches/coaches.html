@@ -19,7 +19,7 @@
       <div class="flex items-center gap-2">
         <i class="pi pi-inbox text-primary-600"></i>
         <h3 class="text-base font-semibold">
-          Client requests from coaches ({{ incomingCount() }})
+          {{ 'profileTabs.coaches.incoming.title' | translate: { count: incomingCount() } }}
         </h3>
       </div>
       <div class="space-y-3">
@@ -32,7 +32,7 @@
             <mh-avatar [user]="request.fromUser" styleClass="bg-primary-100 text-primary-700" />
             <div class="flex flex-col">
               <span class="font-medium">{{ requestFromName(request) }}</span>
-              <span class="text-sm text-surface-500">wants to add you as a client</span>
+              <span class="text-sm text-surface-500">{{ 'profileTabs.coaches.incoming.wantsToAdd' | translate }}</span>
               @if (request.message) {
               <p class="mt-1 text-xs text-surface-500 italic">"{{ request.message }}"</p>
               }
@@ -40,11 +40,11 @@
           </div>
           <div class="flex gap-2 md:self-center">
             <button pButton type="button" severity="danger" [outlined]="true" size="small" (click)="confirmDecline(request)">
-              Decline
+              {{ 'button.decline' | translate }}
             </button>
             <button pButton type="button" severity="success" size="small" (click)="acceptRequest(request)">
               <i class="pi pi-check"></i>
-              Accept
+              {{ 'button.accept' | translate }}
             </button>
           </div>
         </div>
@@ -61,7 +61,7 @@
       <div class="flex items-center gap-2">
         <i class="pi pi-clock text-yellow-600"></i>
         <h3 class="text-base font-semibold">
-          Your pending requests ({{ outgoingCount() }})
+          {{ 'profileTabs.coaches.outgoing.title' | translate: { count: outgoingCount() } }}
         </h3>
       </div>
       <div class="space-y-3">
@@ -71,7 +71,7 @@
             <mh-avatar [user]="request.toUser" styleClass="bg-yellow-100 text-yellow-700" />
             <div class="flex flex-col">
               <span class="font-medium">{{ requestToName(request) }}</span>
-              <span class="text-sm text-surface-500">— waiting for response</span>
+              <span class="text-sm text-surface-500">{{ 'profileTabs.coaches.outgoing.waiting' | translate }}</span>
               @if (request.message) {
               <p class="mt-1 text-xs text-surface-500 italic">"{{ request.message }}"</p>
               }
@@ -82,7 +82,8 @@
             severity="danger"
             [rounded]="true"
             [text]="true"
-            pTooltip="Cancel request"
+            [pTooltip]="'profileTabs.coaches.outgoing.cancel' | translate"
+            [attr.aria-label]="'profileTabs.coaches.outgoing.cancel' | translate"
             (click)="confirmCancelOutgoing(request)"
             iconOnly
           >
@@ -100,10 +101,10 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <div class="flex flex-col">
-          <h2 class="text-lg font-semibold">My coaches</h2>
-          <p class="text-sm text-surface-500 m-0">Coaches you're currently working with.</p>
+          <h2 class="text-lg font-semibold">{{ 'profileTabs.coaches.list.title' | translate }}</h2>
+          <p class="text-sm text-surface-500 m-0">{{ 'profileTabs.coaches.list.subtitle' | translate }}</p>
         </div>
-        <button pButton type="button" (click)="discoverVisible.set(true)"><i class="pi pi-search"></i> Discover coaches</button>
+        <button pButton type="button" (click)="discoverVisible.set(true)"><i class="pi pi-search"></i> {{ 'profileTabs.coaches.list.discover' | translate }}</button>
       </div>
 
       @if (loadingInstructors()) {
@@ -121,8 +122,8 @@
       } @else if (instructors().length === 0) {
       <div class="flex flex-col items-center gap-3 py-10 text-center">
         <i class="pi pi-users text-4xl text-surface-300"></i>
-        <h3 class="text-base font-semibold m-0">You don't have a coach yet</h3>
-        <p class="text-sm text-surface-500 m-0">Find someone who can help you reach your goals.</p>
+        <h3 class="text-base font-semibold m-0">{{ 'profileTabs.coaches.empty.title' | translate }}</h3>
+        <p class="text-sm text-surface-500 m-0">{{ 'profileTabs.coaches.empty.message' | translate }}</p>
       </div>
       } @else {
       <div class="flex flex-col gap-3">
@@ -146,7 +147,7 @@
           <div class="flex gap-2 md:self-center">
             <button pButton type="button" severity="danger" [text]="true" size="small" (click)="confirmLeave(item)">
               <i class="pi pi-sign-out"></i>
-              End collaboration
+              {{ 'profileTabs.coaches.list.endCollaboration' | translate }}
             </button>
           </div>
         </div>

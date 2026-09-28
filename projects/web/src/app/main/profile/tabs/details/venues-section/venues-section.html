@@ -1,14 +1,14 @@
 <div class="flex flex-col gap-3">
   <div class="flex items-center justify-between">
     <h3 class="text-sm font-semibold uppercase tracking-wide text-surface-500 m-0">
-      Venues
+      {{ 'venues.section.title' | translate }}
     </h3>
     <button
       type="button"
       class="text-sm text-primary-600 hover:underline inline-flex items-center gap-1"
       (click)="openVenueCreate()"
     >
-      <i class="pi pi-plus text-xs"></i>Add venue
+      <i class="pi pi-plus text-xs"></i>{{ 'venues.section.add' | translate }}
     </button>
   </div>
 
@@ -19,8 +19,7 @@
     </div>
   } @else if (venues().length === 0) {
     <p class="text-sm text-surface-500 m-0">
-      Gyms, parks, online or client locations where you hold sessions. Add one
-      to get started.
+      {{ 'venues.section.empty' | translate }}
     </p>
   } @else {
     @if (activeVenues().length > 0) {
@@ -38,7 +37,7 @@
     @if (archivedVenues().length > 0) {
       <div class="flex flex-col gap-2 mt-2">
         <span class="text-xs font-semibold text-surface-500 uppercase tracking-wide">
-          Archived
+          {{ 'venues.archived' | translate }}
         </span>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
           @for (v of archivedVenues(); track v.id) {

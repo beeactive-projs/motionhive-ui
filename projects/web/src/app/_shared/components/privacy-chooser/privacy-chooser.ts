@@ -1,11 +1,11 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   input,
   output,
   viewChild,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { TooltipModule } from 'primeng/tooltip';
@@ -25,19 +25,19 @@ import {
  */
 @Component({
   selector: 'mh-privacy-chooser',
-  imports: [ButtonDirective, PopoverModule, TooltipModule],
+  imports: [ButtonDirective, PopoverModule, TooltipModule, TranslatePipe],
   templateUrl: './privacy-chooser.html',
   styleUrl: './privacy-chooser.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrivacyChooser {
   readonly level = input.required<ProfilePrivacy>();
   readonly locked = input<boolean>(false);
   readonly disabled = input<boolean>(false);
-  /** Optional tooltip override for the locked / disabled variant. */
-  readonly lockedTooltip = input<string>(
-    'This setting is managed by the system.',
-  );
+  /**
+   * Optional tooltip override for the locked / disabled variant. Defaults to
+   * "This setting is managed by the system."
+   */
+  readonly lockedTooltip = input<string | undefined>(undefined);
 
   readonly levelChange = output<ProfilePrivacy>();
 

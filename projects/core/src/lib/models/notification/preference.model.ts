@@ -34,9 +34,10 @@ export interface ConfigurableChannelPreferences {
  * GET /users/me/notification-settings, in display order, with the
  * effective channel state already merged.
  *
- * `label` and `description` come from the BE so the user-facing
- * copy stays consistent with the underlying catalog and we don't
- * have to re-implement it on the FE.
+ * `label` and `description` come from the BE in English;
+ * `NotificationService.getSettings()` swaps them for the UI-language
+ * copy (`enum.notificationCategory*`), keeping the BE text for a
+ * category the FE doesn't know yet.
  */
 export interface CategoryPreferenceView {
   category: NotificationCategory;

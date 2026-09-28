@@ -1,5 +1,44 @@
 {
   "account": {
+    "blockedUsers": {
+      "blockedOn": "Blocked {date}",
+      "empty": {
+        "heading": "No blocked users",
+        "message": "When you block someone from a conversation, they'll appear here so you can unblock them later."
+      },
+      "intro": "People you block can't message you, see your conversation history, or appear in your message list.",
+      "loadError": "Couldn't load your blocked list",
+      "toast": {
+        "failed": "Could not unblock them.",
+        "unblocked": "{name} unblocked"
+      },
+      "unblock": "Unblock"
+    },
+    "coachingProfile": {
+      "experience": "Experience",
+      "noBio": "No bio yet.",
+      "services": {
+        "empty": "No services yet. Pricing is managed on the web app.",
+        "hidden": "Hidden",
+        "managedOnWeb": "Pricing is managed on the web app.",
+        "title": "Services on your public profile",
+        "visible": "Visible"
+      },
+      "socialLinks": {
+        "hidden": "Hidden",
+        "public": "Public"
+      },
+      "status": {
+        "accepting": "Accepting clients",
+        "notAccepting": "Not accepting clients"
+      },
+      "venues": {
+        "empty": "No venues yet. Venues are managed on the web app.",
+        "managedOnWeb": "Venues are managed on the web app.",
+        "online": "Online",
+        "title": "Venues"
+      }
+    },
     "hero": {
       "changePhoto": "Change your photo",
       "copyLink": "Copy profile link",
@@ -13,6 +52,42 @@
       "soon": "Soon"
     },
     "memberSince": "Member since {date}",
+    "notifications": {
+      "channels": {
+        "email": "Email",
+        "inApp": "In-app",
+        "inAppNote": "Always on — the bell is your inbox.",
+        "inAppOnly": "In-app only",
+        "messagesNote": "Always on — the Messages tab is that inbox.",
+        "messagesOnly": "Messages only",
+        "push": "Push",
+        "toggleLabel": "{channel} for {category}"
+      },
+      "empty": {
+        "heading": "Nothing to configure",
+        "message": "There are no notification categories on your account yet."
+      },
+      "intro": "You always see these in the app. Choose which categories also reach you by email.",
+      "loadError": "Couldn't load your preferences",
+      "resetAll": "Reset all to default",
+      "resetCategory": "Reset this category to default",
+      "toast": {
+        "refreshFailed": "Could not refresh your preferences.",
+        "resetAllDone": "Reset to defaults",
+        "resetAllFailed": "Could not reset your preferences.",
+        "resetDone": "Reset to default",
+        "resetFailed": "Could not reset this category.",
+        "saveFailed": "Could not save that preference."
+      }
+    },
+    "profile": {
+      "about": "About",
+      "editPhoto": "Edit photo",
+      "footnoteCoach": "Your name, handle, about and links are visible on your public profile. Phone and email stay private.",
+      "footnoteTrainee": "Your name, handle and photo are visible on your public profile. Phone and email stay private.",
+      "links": "Links",
+      "noneAdded": "None added"
+    },
     "rows": {
       "accepting": "Accepting",
       "appearance": "Appearance",
@@ -38,6 +113,109 @@
       "copyFailed": "Could not copy the link.",
       "timezoneFailed": "Could not update your timezone.",
       "timezoneUpdated": "Timezone updated"
+    }
+  },
+  "accountSheets": {
+    "about": {
+      "hint": "A short bio shown on your public profile.",
+      "label": "About",
+      "placeholder": "What should people know about how you coach?",
+      "title": "About",
+      "toast": {
+        "failed": "Could not update your bio.",
+        "updated": "About updated"
+      }
+    },
+    "coaching": {
+      "accepting": "Accepting clients",
+      "acceptingHint": "Shows on your public profile so people know they can reach out.",
+      "showSocialLinks": "Show social links",
+      "showSocialLinksHint": "Your links stay hidden while this is off.",
+      "specializationsHint": "Separate each one with a comma.",
+      "title": "Coaching profile",
+      "toast": {
+        "failed": "Could not update your coaching profile.",
+        "updated": "Coaching profile updated"
+      }
+    },
+    "handle": {
+      "hint": "Your handle is the short link to your profile. If people saved the old one, it stops working when you change it.",
+      "previewPlaceholder": "your-handle",
+      "title": "Handle",
+      "toast": {
+        "failed": "That handle is unavailable. Try a different one.",
+        "updated": "Your handle is now @{handle}"
+      },
+      "validation": {
+        "maxLength": "Use at most {max} characters.",
+        "minLength": "Use at least {min} characters.",
+        "pattern": "Use lowercase letters, numbers, hyphens and underscores. Start and end with a letter or number.",
+        "required": "Pick a handle."
+      }
+    },
+    "links": {
+      "hint": "Links show on your public profile when social links are set to public.",
+      "title": "Links",
+      "toast": {
+        "failed": "Could not update your links.",
+        "updated": "Links updated"
+      }
+    },
+    "location": {
+      "countryLocked": "You can update your city, but your country is locked because payments are set up on your account.",
+      "hint": "Your city shows on your public profile. Your exact address never does.",
+      "searchPlaceholder": "Search for a place",
+      "selected": "Selected: {place}, {country}",
+      "toast": {
+        "failed": "Could not update your location.",
+        "updated": "Location updated"
+      }
+    },
+    "name": {
+      "hint": "This is how your name appears on your profile and in messages.",
+      "toast": {
+        "failed": "Could not update your name.",
+        "updated": "Name updated"
+      }
+    },
+    "phone": {
+      "hint": "Your phone number stays private — it's only used for account security.",
+      "invalid": "That doesn't look like a valid number for the selected country.",
+      "phoneNumber": "Phone number",
+      "placeholder": "Leave empty to remove",
+      "toast": {
+        "failed": "Could not update your phone number.",
+        "removed": "Phone removed",
+        "updated": "Phone updated"
+      }
+    },
+    "photo": {
+      "choose": "Choose photo",
+      "comingSoon": "Coming soon",
+      "notImage": "Pick an image file.",
+      "remove": "Remove photo",
+      "take": "Take photo",
+      "title": "Edit profile picture",
+      "toast": {
+        "failed": "Could not upload the picture.",
+        "updated": "Photo updated"
+      },
+      "tooLarge": "Images must be under {size} MB."
+    },
+    "share": {
+      "empty": {
+        "message": "Your handle is the short link people use to find you. Pick one on your profile and you can share it from here.",
+        "title": "Claim a handle first"
+      },
+      "openProfile": "Open profile",
+      "shareTitle": "My MotionHive profile",
+      "shareVia": "Share via…",
+      "subtitle": "Drop this link in your Instagram bio, your story, or anywhere people can find you.",
+      "title": "Share this profile",
+      "toast": {
+        "copyFailed": "Could not copy the link.",
+        "shareFailed": "Could not share the link."
+      }
     }
   },
   "auth": {
@@ -1304,6 +1482,32 @@
       "sent": "Sent to the client",
       "voided": "Invoice voided"
     }
+  },
+  "person": {
+    "about": "About",
+    "coaching": "Coaching",
+    "details": "Details",
+    "experience": "{count, plural, one {# year of experience} other {# years of experience}}",
+    "memberSince": "On MotionHive since {date}.",
+    "message": "Message",
+    "noDetails": "{name} hasn't added any profile details yet.",
+    "noDetailsAnonymous": "They haven't added any profile details yet.",
+    "rating": "{average} · {count, plural, one {# review} other {# reviews}}",
+    "specialisesIn": "Specialises in",
+    "unavailable": {
+      "message": "This person may have changed their handle or closed their account.",
+      "title": "Profile unavailable"
+    }
+  },
+  "profileView": {
+    "loadFailed": "Couldn't load this profile",
+    "message": "Message",
+    "notFound": {
+      "message": "This person may have changed their handle or left MotionHive.",
+      "title": "Profile not found"
+    },
+    "privateNote": "{name} keeps the rest of their profile private.",
+    "privateNoteAnonymous": "This person keeps the rest of their profile private."
   },
   "programs": {
     "assign": {

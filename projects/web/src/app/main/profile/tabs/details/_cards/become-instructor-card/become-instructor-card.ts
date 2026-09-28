@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -12,9 +13,8 @@ import { BecomeInstructor } from '../../../../../user/_dialogs/become-instructor
  */
 @Component({
   selector: 'mh-become-instructor-card',
-  imports: [Card, Divider, ButtonDirective, AvatarModule, BecomeInstructor],
+  imports: [Card, Divider, ButtonDirective, AvatarModule, BecomeInstructor, TranslatePipe],
   templateUrl: './become-instructor-card.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BecomeInstructorCard {
   readonly visible = signal(false);

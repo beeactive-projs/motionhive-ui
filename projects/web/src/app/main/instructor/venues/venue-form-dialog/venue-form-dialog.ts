@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -10,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -83,14 +83,15 @@ const BLANK_FORM: VenueForm = {
     Select,
     InputNumberModule,
     LocationPicker,
+    TranslatePipe,
   ],
   templateUrl: './venue-form-dialog.html',
   styleUrl: './venue-form-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VenueFormDialog {
   private readonly _venueService = inject(VenueService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   /** Null = create mode. */
@@ -102,7 +103,9 @@ export class VenueFormDialog {
 
   readonly kindOptions = VENUE_KINDS_ORDERED.map((k) => ({
     value: k,
-    ...VENUE_KIND_META[k],
+    label: VENUE_KIND_META[k].label,
+    icon: VENUE_KIND_META[k].icon,
+    description: VENUE_KIND_META[k].description,
   }));
 
   readonly meetingProviderOptions = Object.values(MeetingProvider).map((p) => ({
@@ -176,39 +179,23 @@ export class VenueFormDialog {
   save(): void {
     const f = this.form();
     if (!f.name.trim()) {
-      this._messageService.add({
-        severity: 'warn',
-        summary: 'Name required',
-        detail: 'Give this venue a short name.',
-      });
+      this._warn('venues.toast.nameRequired');
       return;
     }
     let normalizedMeetingUrl: string | null = null;
     if (f.kind === VenueKind.ONLINE) {
       if (!f.meetingUrl.trim()) {
-        this._messageService.add({
-          severity: 'warn',
-          summary: 'Meeting link required',
-          detail: 'Paste the meeting URL for online venues.',
-        });
+        this._warn('venues.toast.meetingUrlRequired');
         return;
       }
       normalizedMeetingUrl = normalizeUrl(f.meetingUrl);
       if (!normalizedMeetingUrl) {
-        this._messageService.add({
-          severity: 'warn',
-          summary: 'Meeting link looks invalid',
-          detail: 'Use something like zoom.us/j/123 or https://meet.google.com/...',
-        });
+        this._warn('venues.toast.meetingUrlInvalid');
         return;
       }
     }
     if (this.needsAddress() && !f.location?.city) {
-      this._messageService.add({
-        severity: 'warn',
-        summary: 'City required',
-        detail: 'Pick a location for physical venues.',
-      });
+      this._warn('venues.toast.cityRequired');
       return;
     }
 
@@ -249,7 +236,9 @@ export class VenueFormDialog {
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: existing ? 'Venue updated' : 'Venue added',
+          summary: this._translateService.instant(
+            existing ? 'venues.toast.updated' : 'venues.toast.added',
+          ),
         });
         this.saved.emit(v);
       },
@@ -257,11 +246,20 @@ export class VenueFormDialog {
         this.saving.set(false);
         showApiError(
           this._messageService,
-          'Could not save venue',
-          'Please try again.',
+          this._translateService.instant('venues.toast.saveFailed'),
+          this._translateService.instant('common.pleaseTryAgain'),
           err,
         );
       },
+    });
+  }
+
+  /** Validation toast — `key` is a `{ summary, detail }` block. */
+  private _warn(key: string): void {
+    this._messageService.add({
+      severity: 'warn',
+      summary: this._translateService.instant(`${key}.summary`),
+      detail: this._translateService.instant(`${key}.detail`),
     });
   }
 }

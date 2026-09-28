@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { ProfileBadge } from 'core';
 
 /**
@@ -15,7 +15,6 @@ import type { ProfileBadge } from 'core';
   imports: [],
   templateUrl: './badge-strip.html',
   styleUrl: './badge-strip.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BadgeStrip {
   readonly badges = input.required<readonly ProfileBadge[]>();

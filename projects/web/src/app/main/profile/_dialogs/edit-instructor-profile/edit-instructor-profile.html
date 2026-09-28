@@ -1,12 +1,12 @@
-<p-dialog header="Edit coaching profile" [(visible)]="visible" [modal]="true"
+<p-dialog [header]="'profile.editCoaching.title' | translate" [(visible)]="visible" [modal]="true"
   [style]="{ width: '40rem' }" [closable]="true">
 
   <form [formGroup]="form" class="flex flex-col gap-4 pt-2">
 
     <div class="flex flex-col gap-2">
-      <label for="epDisplayName" class="text-sm font-medium">Display name</label>
+      <label for="epDisplayName" class="text-sm font-medium">{{ 'form.label.displayName' | translate }}</label>
       <input id="epDisplayName" type="text" pInputText fluid formControlName="displayName"
-        placeholder="Name shown to clients"
+        [placeholder]="'profile.editCoaching.placeholder.displayName' | translate"
         [class.ng-invalid]="isFieldInvalid('displayName')"
         [class.ng-dirty]="isFieldInvalid('displayName')" />
       @if (isFieldInvalid('displayName')) {
@@ -15,9 +15,9 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label for="epBio" class="text-sm font-medium">Bio</label>
+      <label for="epBio" class="text-sm font-medium">{{ 'form.label.bio' | translate }}</label>
       <textarea id="epBio" pTextarea fluid formControlName="bio" [rows]="4"
-        placeholder="Tell clients about yourself..."
+        [placeholder]="'profile.editCoaching.placeholder.bio' | translate"
         [class.ng-invalid]="isFieldInvalid('bio')"
         [class.ng-dirty]="isFieldInvalid('bio')"></textarea>
       @if (isFieldInvalid('bio')) {
@@ -27,14 +27,15 @@
 
     <div class="grid gap-4 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
-        <label for="epSpecializations" class="text-sm font-medium">Specializations</label>
+        <label for="epSpecializations" class="text-sm font-medium">{{ 'form.label.specializations' | translate }}</label>
         <input id="epSpecializations" type="text" pInputText fluid formControlName="specializations"
-          placeholder="e.g. Yoga, HIIT, Pilates" />
-        <span class="text-xs text-surface-400">Separate with commas.</span>
+          [placeholder]="'profile.editCoaching.placeholder.specializations' | translate" />
+        <span class="text-xs text-surface-400">{{ 'profile.editCoaching.specializationsHint' | translate }}</span>
       </div>
       <div class="flex flex-col gap-2">
-        <label for="epYears" class="text-sm font-medium">Years of experience</label>
-        <p-inputnumber inputId="epYears" formControlName="yearsOfExperience" placeholder="e.g. 5"
+        <label for="epYears" class="text-sm font-medium">{{ 'form.label.yearsOfExperience' | translate }}</label>
+        <p-inputnumber inputId="epYears" formControlName="yearsOfExperience"
+          [placeholder]="'profile.editCoaching.placeholder.yearsOfExperience' | translate"
           [min]="0" [max]="50" class="w-full"
           [class.ng-invalid]="isFieldInvalid('yearsOfExperience')"
           [class.ng-dirty]="isFieldInvalid('yearsOfExperience')" />
@@ -45,28 +46,30 @@
     </div>
 
     <div class="rounded-lg border border-dashed border-surface-300 dark:border-surface-700 p-3 text-xs text-surface-500">
-      Your country and city live on your personal information — edit them from the
-      <strong>Edit personal information</strong> dialog. Where you actually hold sessions (gyms, parks, online) is managed from the
-      <strong>Venues</strong> section on your profile.
+      {{ 'profile.editCoaching.locationNote.before' | translate }}
+      <strong>{{ 'profile.editPersonalInfo.title' | translate }}</strong>
+      {{ 'profile.editCoaching.locationNote.middle' | translate }}
+      <strong>{{ 'venues.section.title' | translate }}</strong>
+      {{ 'profile.editCoaching.locationNote.after' | translate }}
     </div>
 
     <div class="flex items-center gap-3 rounded-lg bg-surface-50 dark:bg-surface-800 p-4">
       <p-toggleswitch formControlName="isAcceptingClients" inputId="epAccepting" />
       <div>
-        <label for="epAccepting" class="text-sm font-medium cursor-pointer">Accepting new clients</label>
-        <p class="text-xs text-surface-500 m-0">Allow clients to send you requests.</p>
+        <label for="epAccepting" class="text-sm font-medium cursor-pointer">{{ 'profile.editCoaching.accepting.label' | translate }}</label>
+        <p class="text-xs text-surface-500 m-0">{{ 'profile.editCoaching.accepting.hint' | translate }}</p>
       </div>
     </div>
 
     <div class="flex flex-col gap-3">
       <div class="flex items-center justify-between">
         <div>
-          <h3 class="text-sm font-semibold m-0">Social links</h3>
-          <p class="text-xs text-surface-500 m-0">Help clients find you elsewhere.</p>
+          <h3 class="text-sm font-semibold m-0">{{ 'form.label.socialLinks' | translate }}</h3>
+          <p class="text-xs text-surface-500 m-0">{{ 'profile.editCoaching.socialLinksHint' | translate }}</p>
         </div>
         <div class="flex items-center gap-2">
           <p-toggleswitch formControlName="showSocialLinks" inputId="epShowSocials" />
-          <label for="epShowSocials" class="text-xs text-surface-500 cursor-pointer">Show on profile</label>
+          <label for="epShowSocials" class="text-xs text-surface-500 cursor-pointer">{{ 'profile.editCoaching.showOnProfile' | translate }}</label>
         </div>
       </div>
 
@@ -97,10 +100,10 @@
   </form>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">Cancel</button>
+    <button pButton type="button" severity="secondary" [text]="true" (click)="visible.set(false)">{{ 'button.cancel' | translate }}</button>
     <button pButton type="button" [disabled]="(!canSubmit()) || saving()" (click)="save()">
       <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-check'"></i>
-      Save changes
+      {{ 'button.saveChanges' | translate }}
     </button>
   </ng-template>
 </p-dialog>

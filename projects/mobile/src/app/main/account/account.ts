@@ -23,7 +23,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
-import { AppModeStore, AuthService, LanguageService, WEB_APP_URL, appLocale } from 'core';
+import {
+  AppModeStore,
+  AuthService,
+  LanguageService,
+  WEB_APP_URL,
+  appLocale,
+  languageName,
+} from 'core';
 
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { SettingsRow } from '../../_shared/components/settings-row/settings-row';
@@ -124,7 +131,7 @@ export class Account implements OnInit, ViewWillEnter {
   });
 
   /** The UI language — what this device renders in, which the account mirrors. */
-  readonly languageLabel = this._translateService.instant(`language.${this._languageService.current}`);
+  readonly languageLabel = languageName(this._languageService.current);
 
   readonly timezoneLabel = computed(
     () => this.account()?.timezone ?? this._translateService.instant('form.placeholder.notSet'),

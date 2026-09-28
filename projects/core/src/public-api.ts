@@ -191,6 +191,7 @@ export * from './lib/utils/messaging.utils';
 export * from './lib/utils/client.utils';
 export * from './lib/utils/email.utils';
 export * from './lib/utils/money.utils';
+export * from './lib/utils/notification.utils';
 
 // i18n
 export * from './lib/i18n/app-language';
@@ -199,6 +200,7 @@ export * from './lib/i18n/provide-app-i18n';
 export * from './lib/i18n/merged-translate.loader';
 export * from './lib/i18n/validation-message';
 export * from './lib/i18n/enum-label';
+export * from './lib/i18n/language-name';
 export * from './lib/i18n/message-format-translator';
 
 // Services
@@ -245,6 +247,7 @@ export * from './lib/pipes/currency-ron.pipe';
 export * from './lib/pipes/status-label.pipe';
 export * from './lib/pipes/field-error.pipe';
 export * from './lib/pipes/enum-label.pipe';
+export * from './lib/pipes/language-name.pipe';
 
 // Directives
 export * from './lib/directives/stripe-iframe.directive';

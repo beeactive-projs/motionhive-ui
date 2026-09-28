@@ -1,10 +1,10 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   input,
   output,
 } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { PublicProfileStore } from 'core';
 import type { PublicInstructorProfile } from 'core';
@@ -15,10 +15,9 @@ import type { PublicInstructorProfile } from 'core';
  */
 @Component({
   selector: 'mh-mobile-cta-bar',
-  imports: [ButtonDirective],
+  imports: [ButtonDirective, TranslatePipe],
   templateUrl: './mobile-cta-bar.html',
   styleUrl: './mobile-cta-bar.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MobileCtaBar {
   private readonly _store = inject(PublicProfileStore);

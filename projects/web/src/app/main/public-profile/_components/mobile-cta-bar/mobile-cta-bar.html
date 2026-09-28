@@ -1,12 +1,12 @@
 <div
   class="cta-bar lg:hidden fixed bottom-0 inset-x-0 z-40 flex gap-2 px-4 py-3"
   role="region"
-  aria-label="Quick actions">
+  [attr.aria-label]="'publicProfile.mobileCta.quickActions' | translate">
   <button pButton type="button" fluid [disabled]="!offerings()?.length" (click)="book.emit()">
     <i class="pi pi-calendar"></i>
-    Book a session
+    {{ 'publicProfile.common.bookSession' | translate }}
   </button>
-  <button pButton type="button" severity="secondary" outlined (click)="message.emit()" aria-label="Message coach" iconOnly>
+  <button pButton type="button" severity="secondary" outlined (click)="message.emit()" [attr.aria-label]="'publicProfile.mobileCta.messageCoach' | translate" iconOnly>
     <i class="pi pi-envelope"></i>
   </button>
 </div>

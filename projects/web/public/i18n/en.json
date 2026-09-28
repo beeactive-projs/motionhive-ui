@@ -557,6 +557,11 @@
       "member": "Member",
       "noShow": "No-show"
     },
+    "privacyChooser": {
+      "change": "Visibility: {level}. Change.",
+      "locked": "{level} (locked)",
+      "managedBySystem": "This setting is managed by the system."
+    },
     "recurrenceBuilder": {
       "afterCount": "After N times",
       "daysOfWeek": "Days of week",
@@ -628,6 +633,39 @@
     },
     "weekStrip": {
       "navigator": "Week navigator"
+    }
+  },
+  "errorPages": {
+    "backToHomepage": "Back to homepage",
+    "goBack": "Go back",
+    "goHome": "Go home",
+    "homeLink": "MotionHive home",
+    "notFound": {
+      "message": "This page doesn't exist — but your next workout does. Let's get you back on track.",
+      "title": "Off the beaten track."
+    },
+    "serverError": {
+      "500": {
+        "message": "Something went wrong on our end. Our team has been notified and is working on it.",
+        "title": "Internal server error"
+      },
+      "502": {
+        "message": "We are experiencing connectivity issues with our servers. Please try again in a moment.",
+        "title": "Bad gateway"
+      },
+      "503": {
+        "message": "Our service is temporarily unavailable. We are working to restore it as soon as possible.",
+        "title": "Service unavailable"
+      },
+      "504": {
+        "message": "The request took too long to complete. Please check your connection and try again.",
+        "title": "Gateway timeout"
+      },
+      "default": {
+        "message": "Something went wrong on our end. Please try again later.",
+        "title": "Server error"
+      },
+      "support": "24/7 support available"
     }
   },
   "exercises": {
@@ -2403,6 +2441,260 @@
       "viewDetails": "View details"
     }
   },
+  "profile": {
+    "becomeCoach": {
+      "body": "Share your expertise and start training clients on MotionHive.",
+      "cta": "Become a coach"
+    },
+    "coaching": {
+      "accepting": "Accepting clients",
+      "edit": "Edit coaching profile",
+      "noBio": "No bio added yet.",
+      "notAccepting": "Not accepting",
+      "services": {
+        "emptyBefore": "You don't have any products yet. Add them in",
+        "emptyLink": "Pricing",
+        "hidden": "Hidden",
+        "manageAll": "Manage all pricing →",
+        "title": "Services on your public profile",
+        "visible": "Visible"
+      },
+      "socialLinks": {
+        "hidden": "Hidden",
+        "public": "Public"
+      },
+      "title": "Coaching profile",
+      "toast": {
+        "productHidden": {
+          "detail": "\"{name}\" is hidden from your public profile.",
+          "summary": "Product hidden"
+        },
+        "productVisible": {
+          "detail": "\"{name}\" now shows on your public profile.",
+          "summary": "Product visible"
+        },
+        "visibilityFailed": "Failed to update visibility."
+      }
+    },
+    "editCoaching": {
+      "accepting": {
+        "hint": "Allow clients to send you requests.",
+        "label": "Accepting new clients"
+      },
+      "locationNote": {
+        "after": "section on your profile.",
+        "before": "Your country and city live on your personal information — edit them from the",
+        "middle": "dialog. Where you actually hold sessions (gyms, parks, online) is managed from the"
+      },
+      "placeholder": {
+        "bio": "Tell clients about yourself...",
+        "displayName": "Name shown to clients",
+        "specializations": "e.g. Yoga, HIIT, Pilates",
+        "yearsOfExperience": "e.g. 5"
+      },
+      "showOnProfile": "Show on profile",
+      "socialLinksHint": "Help clients find you elsewhere.",
+      "specializationsHint": "Separate with commas.",
+      "title": "Edit coaching profile",
+      "toast": {
+        "failed": "Failed to update coaching profile.",
+        "updated": "Coaching profile updated successfully."
+      }
+    },
+    "editHandle": {
+      "intro": "Your handle is the short URL for your profile. People can find you at",
+      "introExample": "/@your-handle",
+      "placeholder": "jane-doe",
+      "preview": "Preview:",
+      "title": "Edit profile handle",
+      "toast": {
+        "failed": {
+          "detail": "That handle is unavailable. Try a different one.",
+          "summary": "Could not update handle"
+        },
+        "updated": {
+          "detail": "Your profile is now at @{handle}.",
+          "summary": "Handle updated"
+        }
+      },
+      "validation": {
+        "maxLength": "At most {max} characters.",
+        "minLength": "At least {min} characters.",
+        "pattern": "Use lowercase letters, digits, \"_\" or \"-\". Must start and end with a letter or digit.",
+        "required": "Pick a handle."
+      }
+    },
+    "editPersonalInfo": {
+      "countryLockedHint": "You can update your city, but your country is locked because payments are set up on your account. Contact support if you need to migrate.",
+      "locationHint": "Used to suggest nearby coaches.",
+      "title": "Edit personal information",
+      "toast": {
+        "countryLocked": {
+          "detail": "Your country cannot be changed because payments are set up. Contact support if you need to migrate.",
+          "summary": "Country is locked"
+        },
+        "failed": "Failed to update profile.",
+        "invalidPhone": {
+          "detail": "Enter a valid phone number or clear the field before saving.",
+          "summary": "Phone number invalid"
+        },
+        "updated": "Personal information updated successfully."
+      }
+    },
+    "hero": {
+      "changePhoto": "Change photo",
+      "editHandle": "Edit handle",
+      "editProfile": "Edit profile",
+      "joined": "Joined {date}",
+      "noHandle": "No handle yet",
+      "pickHandle": "Pick a handle",
+      "pickHandleFirst": "Pick a handle first",
+      "resendVerification": "Resend verification email",
+      "unverified": "Unverified",
+      "verified": "Verified",
+      "viewAsPublic": "View as public"
+    },
+    "intro": {
+      "title": "Intro"
+    },
+    "lockedPublic": "Always public — shown to everyone.",
+    "page": {
+      "empty": {
+        "message": "We couldn't load your profile. Please try again.",
+        "title": "No profile data available"
+      }
+    },
+    "personalDetails": {
+      "edit": "Edit personal details",
+      "title": "Personal details"
+    },
+    "share": {
+      "experience": "{count, plural, one {# yr experience} other {# yrs experience}}"
+    },
+    "tabs": {
+      "coaches": "Coaches",
+      "details": "Profile details",
+      "newCount": "· {count} new",
+      "safety": "Safety"
+    },
+    "toast": {
+      "avatarFailed": {
+        "detail": "Could not upload the picture.",
+        "summary": "Upload failed"
+      },
+      "avatarUpdated": "Profile picture updated",
+      "loadFailed": "Failed to load profile data",
+      "noChanges": "No changes were made.",
+      "privacyFailed": "Could not update visibility.",
+      "profileUpdated": "Profile updated",
+      "verificationFailed": {
+        "detail": "If the email is already verified or you recently asked, please try again later.",
+        "summary": "Could not resend"
+      },
+      "verificationSent": {
+        "detail": "Check {email}.",
+        "summary": "Verification email sent"
+      }
+    }
+  },
+  "profileTabs": {
+    "billing": {
+      "invoices": "Invoices",
+      "memberships": "Memberships",
+      "viewAriaLabel": "Billing view"
+    },
+    "coaches": {
+      "aCoach": "A coach",
+      "confirm": {
+        "cancel": {
+          "header": "Cancel request",
+          "message": "Cancel your request to {name}?"
+        },
+        "decline": {
+          "header": "Decline request",
+          "message": "Decline the request from {name}?"
+        },
+        "leave": {
+          "header": "End collaboration",
+          "message": "End your collaboration with {name}? You can send a new request later if you change your mind. Active memberships continue until you cancel them from the Memberships tab."
+        }
+      },
+      "empty": {
+        "message": "Find someone who can help you reach your goals.",
+        "title": "You don't have a coach yet"
+      },
+      "incoming": {
+        "title": "Client requests from coaches ({count})",
+        "wantsToAdd": "wants to add you as a client"
+      },
+      "list": {
+        "discover": "Discover coaches",
+        "endCollaboration": "End collaboration",
+        "subtitle": "Coaches you're currently working with.",
+        "title": "My coaches"
+      },
+      "outgoing": {
+        "cancel": "Cancel request",
+        "title": "Your pending requests ({count})",
+        "waiting": "— waiting for response"
+      },
+      "toast": {
+        "acceptFailed": "Failed to accept request",
+        "accepted": {
+          "detail": "You are now working with this coach.",
+          "summary": "Request accepted"
+        },
+        "cancelFailed": "Failed to cancel request",
+        "cancelled": "Request cancelled",
+        "declineFailed": "Failed to decline request",
+        "declined": "Request declined",
+        "endFailed": "Failed to end relationship",
+        "ended": "Collaboration ended",
+        "loadFailed": "Failed to load coaches"
+      }
+    },
+    "notifications": {
+      "comingSoon": {
+        "message": "Browser push and the mobile app are on the way. When they ship, you'll be able to choose how each category reaches you on each device.",
+        "title": "More delivery channels coming soon"
+      },
+      "custom": "custom",
+      "customTooltip": "You've changed this from the default",
+      "emailToggleAria": "{category} — email",
+      "resetAll": "Reset all to default",
+      "subtitle": "You'll always see these in the bell. Choose which categories also send you an email.",
+      "title": "Notification preferences",
+      "toast": {
+        "allReset": "All notification preferences reset to defaults.",
+        "allResetFailed": "Could not reset preferences. Please try again.",
+        "categoryReset": "Reset to default for this category.",
+        "categoryResetFailed": "Could not reset category. Please try again.",
+        "loadFailed": "Failed to load notification settings",
+        "resetSummary": "Reset",
+        "saveFailed": "Failed to save preferences. Please try again.",
+        "saved": "Your notification preferences have been updated"
+      }
+    },
+    "safety": {
+      "blockedOn": "Blocked {date}",
+      "blockedUserFallback": "A blocked user",
+      "empty": {
+        "message": "When you block someone from a conversation, they'll appear here so you can unblock them later if you change your mind.",
+        "title": "No blocked users"
+      },
+      "lead": "People you block can't send you messages, see your conversation history with them, or appear in your message list. Unblocking only restores their ability to contact you — old messages stay removed from your inbox.",
+      "title": "Blocked users",
+      "toast": {
+        "loadFailed": "Could not load blocked users",
+        "unblockFailed": "Could not unblock",
+        "unblocked": {
+          "detail": "{name} can message you again.",
+          "summary": "Unblocked"
+        }
+      },
+      "unblock": "Unblock"
+    }
+  },
   "programs": {
     "assignDialog": {
       "client": "Client",
@@ -2812,6 +3104,174 @@
       "submitAdd": "Add workout",
       "titleEdit": "Edit workout",
       "titleNew": "New workout"
+    }
+  },
+  "publicProfile": {
+    "about": {
+      "certifications": "Certifications",
+      "empty": "No bio yet — check back soon.",
+      "specializeIn": "I specialize in",
+      "title": "About",
+      "venueKind": {
+        "CLIENT_HOME": "At your place",
+        "GYM": "Gym",
+        "ONLINE": "Online",
+        "OTHER": "Venue",
+        "OUTDOOR": "Outdoor",
+        "PARK": "Park",
+        "STUDIO": "Studio"
+      },
+      "whereICoach": "Where I coach"
+    },
+    "common": {
+      "atAGlance": "At a glance",
+      "bookSession": "Book a session",
+      "contact": "Contact",
+      "contactName": "Contact {name}",
+      "likingProfile": "Liking this profile?",
+      "reachOut": "Reach out to {name}",
+      "shareProfile": "Share profile",
+      "them": "them"
+    },
+    "contactDialog": {
+      "emailPlaceholder": "your@email.com",
+      "error": {
+        "emailRequired": "Email address is required.",
+        "formatRequired": "Pick how you’d like to train.",
+        "fullName": "Please enter your full name.",
+        "goalRequired": "Pick a goal so the coach can tailor their reply.",
+        "levelRequired": "Let them know where you’re starting from.",
+        "nameRequired": "Your name is required."
+      },
+      "format": {
+        "either": "Open to either",
+        "hybrid": "Hybrid",
+        "inPerson": "In-person",
+        "label": "How would you like to train?",
+        "online": "Online"
+      },
+      "goal": {
+        "endurance": "Endurance",
+        "fatLoss": "Lose fat",
+        "feelBetter": "Just feel better",
+        "label": "What's your main goal?",
+        "mobility": "Mobility",
+        "muscle": "Build muscle",
+        "prePostNatal": "Pre / post-natal"
+      },
+      "level": {
+        "athlete": "Athlete",
+        "casual": "Casual",
+        "consistent": "Consistent",
+        "label": "Where are you starting from?",
+        "new": "Brand new"
+      },
+      "message": {
+        "label": "Anything else?",
+        "placeholder": "Hey! I've been on/off the gym for 2 years and want to commit. Free weekday evenings."
+      },
+      "optional": "optional",
+      "phone": "Phone / WhatsApp",
+      "privacy": "Privacy",
+      "privacyNote": "{name} only sees your name, email and message.",
+      "send": "Send message",
+      "subtitle": "No account needed — your message lands straight in {name}'s inbox.",
+      "toast": {
+        "sentDetail": "{name} will get back to you. We've sent a copy to your email.",
+        "sentSummary": "Message sent"
+      },
+      "yourName": "Your name"
+    },
+    "groups": {
+      "empty": "No public groups yet.",
+      "joinAria": "Join {name}",
+      "subtitle": "Train with people on the same path",
+      "title": "Communities I run"
+    },
+    "hero": {
+      "acceptingClients": "Accepting clients",
+      "acceptingClientsAria": "Currently accepting new clients",
+      "editProfile": "Edit profile",
+      "member": "Member",
+      "message": "Message",
+      "saveProfile": "Save profile",
+      "shareMyProfile": "Share my profile",
+      "yearsCoaching": "{count} yrs coaching"
+    },
+    "mobileCta": {
+      "messageCoach": "Message coach",
+      "quickActions": "Quick actions"
+    },
+    "offerings": {
+      "choosePlan": "Choose plan",
+      "empty": "No offerings yet.",
+      "getStarted": "Get started",
+      "popular": "Popular",
+      "subtitle": "Pick a way to train together",
+      "title": "Work with me"
+    },
+    "page": {
+      "backToExplore": "Back to explore",
+      "notFound": "Profile not found",
+      "offeringPrefill": "Hi, I'm interested in \"{name}\". Could you tell me how to get started?",
+      "shareExperience": "{years} yrs experience",
+      "stat": {
+        "certifications": "{count, plural, one {Certification} other {Certifications}}",
+        "specialties": "Specialties",
+        "yearsCoaching": "Years coaching"
+      },
+      "toast": {
+        "bookmarkSoon": "Bookmarking is coming soon."
+      }
+    },
+    "sideRail": {
+      "acceptingNewClients": "Accepting new clients",
+      "basedIn": "Based in",
+      "experience": "Experience",
+      "findMeElsewhere": "Find me elsewhere",
+      "onMotionHive": "On MotionHive",
+      "repliesWithinDay": "Usually replies within a day.",
+      "since": "Since {date}",
+      "toast": {
+        "copyFailed": {
+          "detail": "Couldn't copy the link. Long-press to copy manually.",
+          "summary": "Copy failed"
+        }
+      },
+      "trainWith": "Train with {name}"
+    },
+    "signupPrompt": {
+      "book": {
+        "subtitle": "Takes 30 seconds. We'll save this session for you while you sign up.",
+        "title": "Create a free account to book sessions"
+      },
+      "createAccount": "Create account",
+      "fallback": {
+        "subtitle": "Takes 30 seconds. We'll save your place while you sign up.",
+        "title": "Create a free account to continue"
+      },
+      "group": {
+        "subtitle": "Sign up free to join groups, chat with members, and RSVP to events.",
+        "title": "Join the community"
+      },
+      "logIn": "Log in",
+      "perk": {
+        "bookMessageSave": "Book, message, save coaches",
+        "freeForever": "Free forever for clients",
+        "joinGroups": "Join groups & try workouts"
+      },
+      "save": {
+        "subtitle": "Sign up free to bookmark coaches, follow workouts, and message.",
+        "title": "Save this coach to your shortlist"
+      }
+    },
+    "userProfile": {
+      "intro": "Intro",
+      "personalDetails": "Personal details"
+    },
+    "userSidePanel": {
+      "joined": "Joined {date}",
+      "sendMessage": "Send a message"
     }
   },
   "sessions": {
@@ -3474,6 +3934,159 @@
         "caption": "Workouts per week below each bar.",
         "title": "Weekly volume"
       }
+    }
+  },
+  "userDialogs": {
+    "becomeCoach": {
+      "acceptingClients": {
+        "hint": "Allow clients to send you requests",
+        "label": "Accepting new clients"
+      },
+      "bio": {
+        "placeholder": "Tell clients about yourself, your experience, and training style..."
+      },
+      "certifications": {
+        "empty": "No certifications added yet",
+        "issuer": "Issuer",
+        "issuerPlaceholder": "e.g. ACE",
+        "namePlaceholder": "e.g. ACE CPT",
+        "title": "Certifications",
+        "year": "Year"
+      },
+      "displayName": {
+        "placeholder": "Name shown to clients"
+      },
+      "showOnProfile": "Show on profile",
+      "social": {
+        "channelPlaceholder": "channel name",
+        "profilePlaceholder": "profile name",
+        "usernamePlaceholder": "@username"
+      },
+      "specializations": {
+        "hint": "Press Enter to add each one",
+        "placeholder": "e.g. Yoga, HIIT, Pilates"
+      },
+      "step": {
+        "about": "About you",
+        "locationCertifications": "Location & certifications",
+        "social": "Social"
+      },
+      "submit": "Become a coach",
+      "title": "Become a coach",
+      "visibility": {
+        "private": "Private",
+        "public": "Public",
+        "title": "Profile visibility"
+      },
+      "yearsOfExperience": {
+        "placeholder": "e.g. 5"
+      }
+    },
+    "discoverCoaches": {
+      "empty": {
+        "noResults": "No coaches found. Try a different search.",
+        "prompt": "Search for coaches to get started."
+      },
+      "request": "Request",
+      "requestDialog": {
+        "messageLabel": "Message (optional)",
+        "messagePlaceholder": "Introduce yourself or explain why you'd like to train with this coach...",
+        "send": "Send request",
+        "title": "Send request"
+      },
+      "searchPlaceholder": "Search by name, specialization, or city...",
+      "title": "Discover coaches",
+      "toast": {
+        "requestFailed": "Failed to send request",
+        "requestSent": {
+          "detail": "Your request to join {name} was sent successfully",
+          "summary": "Request sent"
+        },
+        "searchFailed": "Failed to search coaches"
+      }
+    }
+  },
+  "venues": {
+    "archived": "Archived",
+    "confirm": {
+      "archive": {
+        "header": "Archive venue?",
+        "message": "\"{name}\" will be hidden from new sessions but existing sessions keep showing it. You can restore it later."
+      },
+      "delete": {
+        "header": "Delete venue?",
+        "message": "\"{name}\" will be removed. Historical sessions keep their details."
+      },
+      "restore": {
+        "header": "Restore venue?",
+        "message": "\"{name}\" will be visible again and selectable when you create new sessions."
+      }
+    },
+    "form": {
+      "addTitle": "Add a venue",
+      "address": "Address",
+      "addressHint": "Pick the place from the suggestions.",
+      "editTitle": "Edit venue",
+      "meetingProvider": "Meeting provider",
+      "meetingProviderPlaceholder": "Choose a provider",
+      "meetingUrl": "Meeting URL",
+      "namePlaceholder": "e.g. FitZone Cluj — Downtown",
+      "notesPlaceholder": "Meet at the main entrance…",
+      "providerOther": "Other",
+      "travelRadius": "Travel radius (km)",
+      "travelRadiusHint": "How far you're willing to travel to the client.",
+      "travelRadiusPlaceholder": "e.g. 15"
+    },
+    "kind": {
+      "CLIENT_HOME": "Client's place",
+      "GYM": "Gym",
+      "ONLINE": "Online",
+      "OTHER": "Other",
+      "OUTDOOR": "Outdoor",
+      "PARK": "Park",
+      "STUDIO": "Studio"
+    },
+    "kindHint": {
+      "CLIENT_HOME": "You travel to the client's location.",
+      "GYM": "A gym or fitness club you work out of.",
+      "ONLINE": "Video call via Zoom, Meet, etc.",
+      "OTHER": "Something else.",
+      "OUTDOOR": "Other outdoor location (beach, trail, etc).",
+      "PARK": "An outdoor park location.",
+      "STUDIO": "A private studio space."
+    },
+    "section": {
+      "add": "Add venue",
+      "empty": "Gyms, parks, online or client locations where you hold sessions. Add one to get started.",
+      "title": "Venues"
+    },
+    "toast": {
+      "added": "Venue added",
+      "archiveFailed": "Could not archive venue",
+      "archived": "Venue archived",
+      "cityRequired": {
+        "detail": "Pick a location for physical venues.",
+        "summary": "City required"
+      },
+      "deleteFailed": "Could not delete venue",
+      "deleted": "Venue deleted",
+      "loadFailed": "Could not load venues",
+      "meetingUrlInvalid": {
+        "detail": "Use something like zoom.us/j/123 or https://meet.google.com/...",
+        "summary": "Meeting link looks invalid"
+      },
+      "meetingUrlRequired": {
+        "detail": "Paste the meeting URL for online venues.",
+        "summary": "Meeting link required"
+      },
+      "nameRequired": {
+        "detail": "Give this venue a short name.",
+        "summary": "Name required"
+      },
+      "restoreFailed": "Could not restore venue",
+      "restored": "Venue restored",
+      "saveFailed": "Could not save venue",
+      "updated": "Venue updated"
     }
   }
 }

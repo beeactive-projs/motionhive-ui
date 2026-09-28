@@ -18,6 +18,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -69,6 +70,7 @@ import { CoachingSheet } from '../_sheets/coaching-sheet/coaching-sheet';
     IonTitle,
     IonToolbar,
     SectionHeader,
+    TranslatePipe,
   ],
   templateUrl: './coaching-profile.html',
   styleUrl: './coaching-profile.scss',

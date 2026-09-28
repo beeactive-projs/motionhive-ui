@@ -1,4 +1,4 @@
-<p-dialog [(visible)]="visible" header="Become a coach" [modal]="true" [draggable]="false" [resizable]="false"
+<p-dialog [(visible)]="visible" [header]="'userDialogs.becomeCoach.title' | translate" [modal]="true" [draggable]="false" [resizable]="false"
   styleClass="become-instructor-dialog" [contentStyle]="{ 'overflow-y': 'auto', 'height': '65vh' }">
   <form [formGroup]="form" (ngSubmit)="submit()">
 
@@ -8,9 +8,9 @@
 
     <p-stepper [value]="activeStep()" (valueChange)="$event !== undefined && activeStep.set($event)" [linear]="false">
       <p-step-list>
-        <p-step [value]="1">About You</p-step>
-        <p-step [value]="2">Location & Certifications</p-step>
-        <p-step [value]="3">Social</p-step>
+        <p-step [value]="1">{{ 'userDialogs.becomeCoach.step.about' | translate }}</p-step>
+        <p-step [value]="2">{{ 'userDialogs.becomeCoach.step.locationCertifications' | translate }}</p-step>
+        <p-step [value]="3">{{ 'userDialogs.becomeCoach.step.social' | translate }}</p-step>
       </p-step-list>
 
       <p-step-panels>
@@ -21,39 +21,42 @@
             <div class="flex flex-col gap-4 pt-4">
 
               <div class="flex flex-col gap-2">
-                <label for="displayName" class="text-sm font-medium text-secondary-700">Display Name</label>
-                <input pInputText id="displayName" formControlName="displayName" placeholder="Name shown to clients"
-                  fluid />
+                <label for="displayName" class="text-sm font-medium text-secondary-700">
+                  {{ 'form.label.displayName' | translate }}
+                </label>
+                <input pInputText id="displayName" formControlName="displayName"
+                  [placeholder]="'userDialogs.becomeCoach.displayName.placeholder' | translate" fluid />
               </div>
 
               <div class="flex flex-col gap-2">
-                <label for="bio" class="text-sm font-medium text-secondary-700">Bio</label>
+                <label for="bio" class="text-sm font-medium text-secondary-700">{{ 'form.label.bio' | translate }}</label>
                 <textarea pTextarea id="bio" formControlName="bio" rows="4"
-                  placeholder="Tell clients about yourself, your experience, and training style..."
+                  [placeholder]="'userDialogs.becomeCoach.bio.placeholder' | translate"
                   class="w-full"></textarea>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-2">
-                  <label class="text-sm font-medium text-secondary-700">Specializations</label>
+                  <label class="text-sm font-medium text-secondary-700">{{ 'form.label.specializations' | translate }}</label>
                   <p-autocomplete formControlName="specializations" [multiple]="true"
                     [suggestions]="specializationSuggestions()" (completeMethod)="filterSpecializations($event)"
-                    placeholder="e.g. Yoga, HIIT, Pilates" fluid />
-                  <span class="text-xs text-secondary-400">Press Enter to add each one</span>
+                    [placeholder]="'userDialogs.becomeCoach.specializations.placeholder' | translate" fluid />
+                  <span class="text-xs text-secondary-400">{{ 'userDialogs.becomeCoach.specializations.hint' | translate }}</span>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <label for="yearsOfExperience" class="text-sm font-medium text-secondary-700">Years of
-                    Experience</label>
+                  <label for="yearsOfExperience" class="text-sm font-medium text-secondary-700">
+                    {{ 'form.label.yearsOfExperience' | translate }}
+                  </label>
                   <p-inputnumber inputId="yearsOfExperience" formControlName="yearsOfExperience" [min]="0" [max]="50"
-                    placeholder="e.g. 5" fluid />
+                    [placeholder]="'userDialogs.becomeCoach.yearsOfExperience.placeholder' | translate" fluid />
                 </div>
               </div>
 
               <div class="flex items-center gap-3 rounded-lg p-4">
                 <p-toggleswitch formControlName="isAcceptingClients" inputId="isAcceptingClients" />
                 <div>
-                  <span class="text-sm font-medium text-secondary-900">Accepting New Clients</span>
-                  <p class="text-xs text-secondary-500">Allow clients to send you requests</p>
+                  <span class="text-sm font-medium text-secondary-900">{{ 'userDialogs.becomeCoach.acceptingClients.label' | translate }}</span>
+                  <p class="text-xs text-secondary-500">{{ 'userDialogs.becomeCoach.acceptingClients.hint' | translate }}</p>
                 </div>
               </div>
 
@@ -68,8 +71,10 @@
 
               <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-semibold text-secondary-700">Certifications</span>
-                  <button pButton type="button" size="small" outlined (click)="addCertification()"><i class="pi pi-plus"></i> Add</button>
+                  <span class="text-sm font-semibold text-secondary-700">{{ 'userDialogs.becomeCoach.certifications.title' | translate }}</span>
+                  <button pButton type="button" size="small" outlined (click)="addCertification()">
+                    <i class="pi pi-plus"></i> {{ 'button.add' | translate }}
+                  </button>
                 </div>
 
                 <div formArrayName="certifications" class="flex flex-col gap-3">
@@ -77,15 +82,17 @@
                   <div [formGroupName]="$index" class="cert-item">
                     <div class="grid grid-cols-[1fr_1fr_6rem] gap-3 flex-1">
                       <div class="flex flex-col gap-2">
-                        <label class="text-sm font-medium text-secondary-700">Name</label>
-                        <input pInputText formControlName="name" placeholder="e.g. ACE CPT" fluid />
+                        <label class="text-sm font-medium text-secondary-700">{{ 'form.label.name' | translate }}</label>
+                        <input pInputText formControlName="name"
+                          [placeholder]="'userDialogs.becomeCoach.certifications.namePlaceholder' | translate" fluid />
                       </div>
                       <div class="flex flex-col gap-2">
-                        <label class="text-sm font-medium text-secondary-700">Issuer</label>
-                        <input pInputText formControlName="issuer" placeholder="e.g. ACE" fluid />
+                        <label class="text-sm font-medium text-secondary-700">{{ 'userDialogs.becomeCoach.certifications.issuer' | translate }}</label>
+                        <input pInputText formControlName="issuer"
+                          [placeholder]="'userDialogs.becomeCoach.certifications.issuerPlaceholder' | translate" fluid />
                       </div>
                       <div class="flex flex-col gap-2">
-                        <label class="text-sm font-medium text-secondary-700">Year</label>
+                        <label class="text-sm font-medium text-secondary-700">{{ 'userDialogs.becomeCoach.certifications.year' | translate }}</label>
                         <p-inputnumber formControlName="year" [min]="1900" [max]="currentYear" [useGrouping]="false"
                           placeholder="2020" fluid />
                       </div>
@@ -96,7 +103,7 @@
                       text
                       size="small"
                       (click)="removeCertification($index)"
-                      aria-label="Remove"
+                      [attr.aria-label]="'button.remove' | translate"
                       iconOnly
                     >
                       <i class="pi pi-trash"></i>
@@ -104,7 +111,7 @@
                   </div>
                   }
                   @if (certifications.length === 0) {
-                  <p class="text-xs text-secondary-400 text-center py-2">No certifications added yet</p>
+                  <p class="text-xs text-secondary-400 text-center py-2">{{ 'userDialogs.becomeCoach.certifications.empty' | translate }}</p>
                   }
                 </div>
               </div>
@@ -119,7 +126,7 @@
             <div class="flex flex-col gap-5 pt-4">
 
               <div class="flex flex-col gap-3">
-                <span class="text-sm font-semibold text-secondary-700">Profile Visibility</span>
+                <span class="text-sm font-semibold text-secondary-700">{{ 'userDialogs.becomeCoach.visibility.title' | translate }}</span>
                 <div class="flex gap-2">
                   <button pButton
                     type="button"
@@ -131,7 +138,7 @@
                     (click)="form.controls.profileVisibility.setValue('public')"
                   >
                     <i class="pi pi-globe"></i>
-                    Public
+                    {{ 'userDialogs.becomeCoach.visibility.public' | translate }}
                   </button>
                   <button pButton
                     type="button"
@@ -143,47 +150,53 @@
                     (click)="form.controls.profileVisibility.setValue('private')"
                   >
                     <i class="pi pi-lock"></i>
-                    Private
+                    {{ 'userDialogs.becomeCoach.visibility.private' | translate }}
                   </button>
                 </div>
               </div>
 
               <div class="flex flex-col gap-2">
-                <span class="text-sm font-semibold text-secondary-700">Show on Profile</span>
+                <span class="text-sm font-semibold text-secondary-700">{{ 'userDialogs.becomeCoach.showOnProfile' | translate }}</span>
                 <div class="flex gap-6">
                   <div class="flex items-center gap-2">
                     <p-checkbox inputId="showEmail" formControlName="showEmail" [binary]="true" />
-                    <label for="showEmail" class="text-sm cursor-pointer">Email</label>
+                    <label for="showEmail" class="text-sm cursor-pointer">{{ 'form.label.email' | translate }}</label>
                   </div>
                   <div class="flex items-center gap-2">
                     <p-checkbox inputId="showPhone" formControlName="showPhone" [binary]="true" />
-                    <label for="showPhone" class="text-sm cursor-pointer">Phone</label>
+                    <label for="showPhone" class="text-sm cursor-pointer">{{ 'form.label.phone' | translate }}</label>
                   </div>
                   <div class="flex items-center gap-2">
                     <p-checkbox inputId="showSocialLinks" formControlName="showSocialLinks" [binary]="true" />
-                    <label for="showSocialLinks" class="text-sm cursor-pointer">Social links</label>
+                    <label for="showSocialLinks" class="text-sm cursor-pointer">
+                      {{ 'form.label.socialLinks' | translate }}
+                    </label>
                   </div>
                 </div>
               </div>
 
               <div formGroupName="socialLinks" class="flex flex-col gap-3">
-                <span class="text-sm font-semibold text-secondary-700">Social Links</span>
+                <span class="text-sm font-semibold text-secondary-700">{{ 'form.label.socialLinks' | translate }}</span>
                 <div class="grid grid-cols-2 gap-4">
                   <div class="flex flex-col gap-2">
                     <label for="instagram" class="text-sm font-medium text-secondary-700">Instagram</label>
-                    <input pInputText id="instagram" formControlName="instagram" placeholder="@username" fluid />
+                    <input pInputText id="instagram" formControlName="instagram"
+                      [placeholder]="'userDialogs.becomeCoach.social.usernamePlaceholder' | translate" fluid />
                   </div>
                   <div class="flex flex-col gap-2">
                     <label for="facebook" class="text-sm font-medium text-secondary-700">Facebook</label>
-                    <input pInputText id="facebook" formControlName="facebook" placeholder="profile name" fluid />
+                    <input pInputText id="facebook" formControlName="facebook"
+                      [placeholder]="'userDialogs.becomeCoach.social.profilePlaceholder' | translate" fluid />
                   </div>
                   <div class="flex flex-col gap-2">
                     <label for="youtube" class="text-sm font-medium text-secondary-700">YouTube</label>
-                    <input pInputText id="youtube" formControlName="youtube" placeholder="channel name" fluid />
+                    <input pInputText id="youtube" formControlName="youtube"
+                      [placeholder]="'userDialogs.becomeCoach.social.channelPlaceholder' | translate" fluid />
                   </div>
                   <div class="flex flex-col gap-2">
                     <label for="linkedin" class="text-sm font-medium text-secondary-700">LinkedIn</label>
-                    <input pInputText id="linkedin" formControlName="linkedin" placeholder="profile name" fluid />
+                    <input pInputText id="linkedin" formControlName="linkedin"
+                      [placeholder]="'userDialogs.becomeCoach.social.profilePlaceholder' | translate" fluid />
                   </div>
                 </div>
               </div>
@@ -198,20 +211,22 @@
   </form>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" text (click)="cancel()">Cancel</button>
+    <button pButton type="button" severity="secondary" text (click)="cancel()">{{ 'button.cancel' | translate }}</button>
     @if (activeStep() > 1) {
     <button pButton type="button" severity="secondary" outlined (click)="activeStep.set(activeStep() - 1)">
       <i class="pi pi-arrow-left"></i>
-      Back
+      {{ 'button.back' | translate }}
     </button>
     }
-    @if (activeStep()
-    < 3) { <button pButton type="button" (click)="activeStep.set(activeStep() + 1)">Next <i class="pi pi-arrow-right"></i></button>
+    @if (activeStep() < 3) {
+    <button pButton type="button" (click)="activeStep.set(activeStep() + 1)">
+      {{ 'button.next' | translate }} <i class="pi pi-arrow-right"></i>
+    </button>
     }
     @if (activeStep() === 3) {
     <button pButton type="button" (click)="submit()" [disabled]="isLoading()">
       <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-graduation-cap'"></i>
-      Become a coach
+      {{ 'userDialogs.becomeCoach.submit' | translate }}
     </button>
     }
   </ng-template>

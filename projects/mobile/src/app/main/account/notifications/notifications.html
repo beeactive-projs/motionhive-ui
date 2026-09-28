@@ -3,14 +3,14 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home/account" />
     </ion-buttons>
-    <ion-title>Notifications</ion-title>
+    <ion-title>{{ 'nav.notifications' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="mh-page">
     <ion-note class="mh-note-block" color="medium">
-      You always see these in the app. Choose which categories also reach you by email.
+      {{ 'account.notifications.intro' | translate }}
     </ion-note>
 
     @if (loading()) {
@@ -28,16 +28,16 @@
     } @else if (loadFailed()) {
       <mh-empty-state
         icon="alert-circle-outline"
-        heading="Couldn't load your preferences"
-        message="Check your connection and try again."
-        actionLabel="Try again"
+        [heading]="'account.notifications.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
         (action)="load()"
       />
     } @else if (categories().length === 0) {
       <mh-empty-state
         icon="notifications-outline"
-        heading="Nothing to configure"
-        message="There are no notification categories on your account yet."
+        [heading]="'account.notifications.empty.heading' | translate"
+        [message]="'account.notifications.empty.message' | translate"
       />
     } @else {
       <ion-list [inset]="true" class="mh-card-list">
@@ -60,7 +60,7 @@
         [disabled]="resetting()"
         (click)="resetAll()"
       >
-        Reset all to default
+        {{ 'account.notifications.resetAll' | translate }}
       </ion-button>
     }
   </div>

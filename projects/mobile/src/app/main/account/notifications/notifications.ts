@@ -13,6 +13,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { take } from 'rxjs';
 
@@ -65,6 +66,7 @@ import { channelSummary } from './notification-preferences.config';
     IonTitle,
     IonToolbar,
     SettingsRow,
+    TranslatePipe,
   ],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss',
@@ -72,6 +74,7 @@ import { channelSummary } from './notification-preferences.config';
 export class AccountNotifications implements OnInit {
   private readonly _notificationService = inject(NotificationService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -127,7 +130,10 @@ export class AccountNotifications implements OnInit {
         error: (error: unknown) => {
           this.loading.set(false);
           if (quiet) {
-            void this._feedbackService.error(error, 'Could not refresh your preferences.');
+            void this._feedbackService.error(
+              error,
+              this._translateService.instant('account.notifications.toast.refreshFailed'),
+            );
           } else {
             this.loadFailed.set(true);
           }
@@ -166,7 +172,10 @@ export class AccountNotifications implements OnInit {
         error: (error: unknown) => {
           this._markPending(category, false);
           this._setChannels(category, previous);
-          void this._feedbackService.error(error, 'Could not save that preference.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.notifications.toast.saveFailed'),
+          );
         },
       });
   }
@@ -181,13 +190,18 @@ export class AccountNotifications implements OnInit {
       .subscribe({
         next: () => {
           this.resetting.set(false);
-          void this._feedbackService.success('Reset to default');
+          void this._feedbackService.success(
+            this._translateService.instant('account.notifications.toast.resetDone'),
+          );
           // The response only counts rows; the effective state needs a reload.
           this.load();
         },
         error: (error: unknown) => {
           this.resetting.set(false);
-          void this._feedbackService.error(error, 'Could not reset this category.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.notifications.toast.resetFailed'),
+          );
         },
       });
   }
@@ -201,12 +215,17 @@ export class AccountNotifications implements OnInit {
       .subscribe({
         next: () => {
           this.resetting.set(false);
-          void this._feedbackService.success('Reset to defaults');
+          void this._feedbackService.success(
+            this._translateService.instant('account.notifications.toast.resetAllDone'),
+          );
           this.load();
         },
         error: (error: unknown) => {
           this.resetting.set(false);
-          void this._feedbackService.error(error, 'Could not reset your preferences.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('account.notifications.toast.resetAllFailed'),
+          );
         },
       });
   }

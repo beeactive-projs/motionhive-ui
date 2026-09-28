@@ -1,5 +1,44 @@
 {
   "account": {
+    "blockedUsers": {
+      "blockedOn": "Blocat pe {date}",
+      "empty": {
+        "heading": "Niciun utilizator blocat",
+        "message": "Când blochezi pe cineva dintr-o conversație, apare aici ca să-l poți debloca mai târziu."
+      },
+      "intro": "Persoanele pe care le blochezi nu îți pot trimite mesaje, nu îți pot vedea istoricul conversațiilor și nu apar în lista ta de mesaje.",
+      "loadError": "Lista de persoane blocate nu a putut fi încărcată",
+      "toast": {
+        "failed": "Persoana nu a putut fi deblocată.",
+        "unblocked": "{name} a fost deblocat"
+      },
+      "unblock": "Deblochează"
+    },
+    "coachingProfile": {
+      "experience": "Experiență",
+      "noBio": "Încă nu ai o descriere.",
+      "services": {
+        "empty": "Încă nu ai servicii. Prețurile se gestionează în aplicația web.",
+        "hidden": "Ascuns",
+        "managedOnWeb": "Prețurile se gestionează în aplicația web.",
+        "title": "Servicii pe profilul tău public",
+        "visible": "Vizibil"
+      },
+      "socialLinks": {
+        "hidden": "Ascunse",
+        "public": "Publice"
+      },
+      "status": {
+        "accepting": "Acceptă clienți",
+        "notAccepting": "Nu acceptă clienți"
+      },
+      "venues": {
+        "empty": "Încă nu ai locații. Locațiile se gestionează în aplicația web.",
+        "managedOnWeb": "Locațiile se gestionează în aplicația web.",
+        "online": "Online",
+        "title": "Locații"
+      }
+    },
     "hero": {
       "changePhoto": "Schimbă fotografia",
       "copyLink": "Copiază linkul profilului",
@@ -13,6 +52,42 @@
       "soon": "În curând"
     },
     "memberSince": "Membru din {date}",
+    "notifications": {
+      "channels": {
+        "email": "Email",
+        "inApp": "În aplicație",
+        "inAppNote": "Mereu activ — clopoțelul e inboxul tău.",
+        "inAppOnly": "Doar în aplicație",
+        "messagesNote": "Mereu activ — fila Mesaje ține loc de inbox.",
+        "messagesOnly": "Doar în Mesaje",
+        "push": "Push",
+        "toggleLabel": "{channel} pentru {category}"
+      },
+      "empty": {
+        "heading": "Nimic de configurat",
+        "message": "Contul tău nu are încă nicio categorie de notificări."
+      },
+      "intro": "Le vezi mereu în aplicație. Alege ce categorii îți ajung și pe email.",
+      "loadError": "Preferințele nu au putut fi încărcate",
+      "resetAll": "Resetează tot la implicit",
+      "resetCategory": "Resetează categoria la implicit",
+      "toast": {
+        "refreshFailed": "Preferințele nu au putut fi reîmprospătate.",
+        "resetAllDone": "Setările implicite au fost restabilite",
+        "resetAllFailed": "Preferințele nu au putut fi resetate.",
+        "resetDone": "Setarea implicită a fost restabilită",
+        "resetFailed": "Categoria nu a putut fi resetată.",
+        "saveFailed": "Preferința nu a putut fi salvată."
+      }
+    },
+    "profile": {
+      "about": "Despre",
+      "editPhoto": "Editează fotografia",
+      "footnoteCoach": "Numele, handle-ul, descrierea și linkurile tale sunt vizibile pe profilul public. Telefonul și emailul rămân private.",
+      "footnoteTrainee": "Numele, handle-ul și fotografia ta sunt vizibile pe profilul public. Telefonul și emailul rămân private.",
+      "links": "Linkuri",
+      "noneAdded": "Niciunul adăugat"
+    },
     "rows": {
       "accepting": "Acceptă clienți",
       "appearance": "Aspect",
@@ -38,6 +113,109 @@
       "copyFailed": "Linkul nu a putut fi copiat.",
       "timezoneFailed": "Fusul orar nu a putut fi actualizat.",
       "timezoneUpdated": "Fus orar actualizat"
+    }
+  },
+  "accountSheets": {
+    "about": {
+      "hint": "O scurtă descriere afișată pe profilul tău public.",
+      "label": "Despre",
+      "placeholder": "Ce ar trebui să știe oamenii despre felul în care antrenezi?",
+      "title": "Despre",
+      "toast": {
+        "failed": "Descrierea nu a putut fi actualizată.",
+        "updated": "Descriere actualizată"
+      }
+    },
+    "coaching": {
+      "accepting": "Accepți clienți",
+      "acceptingHint": "Apare pe profilul tău public, ca oamenii să știe că te pot contacta.",
+      "showSocialLinks": "Arată linkurile sociale",
+      "showSocialLinksHint": "Linkurile tale rămân ascunse cât timp opțiunea e oprită.",
+      "specializationsHint": "Separă-le prin virgulă.",
+      "title": "Profil de antrenor",
+      "toast": {
+        "failed": "Profilul de antrenor nu a putut fi actualizat.",
+        "updated": "Profil de antrenor actualizat"
+      }
+    },
+    "handle": {
+      "hint": "Handle-ul e linkul scurt către profilul tău. Dacă cineva l-a salvat pe cel vechi, nu va mai funcționa după ce îl schimbi.",
+      "previewPlaceholder": "handle-ul-tau",
+      "title": "Handle",
+      "toast": {
+        "failed": "Handle-ul nu e disponibil. Încearcă altul.",
+        "updated": "Handle-ul tău e acum @{handle}"
+      },
+      "validation": {
+        "maxLength": "Folosește cel mult {max} caractere.",
+        "minLength": "Folosește cel puțin {min} caractere.",
+        "pattern": "Folosește litere mici, cifre, cratime și underscore. Începe și termină cu o literă sau o cifră.",
+        "required": "Alege un handle."
+      }
+    },
+    "links": {
+      "hint": "Linkurile apar pe profilul tău public când linkurile sociale sunt setate ca publice.",
+      "title": "Linkuri",
+      "toast": {
+        "failed": "Linkurile nu au putut fi actualizate.",
+        "updated": "Linkuri actualizate"
+      }
+    },
+    "location": {
+      "countryLocked": "Poți schimba orașul, dar țara e blocată pentru că ai plățile configurate în cont.",
+      "hint": "Orașul tău apare pe profilul public. Adresa exactă nu apare niciodată.",
+      "searchPlaceholder": "Caută un loc",
+      "selected": "Ales: {place}, {country}",
+      "toast": {
+        "failed": "Locația nu a putut fi actualizată.",
+        "updated": "Locație actualizată"
+      }
+    },
+    "name": {
+      "hint": "Așa apare numele tău pe profil și în mesaje.",
+      "toast": {
+        "failed": "Numele nu a putut fi actualizat.",
+        "updated": "Nume actualizat"
+      }
+    },
+    "phone": {
+      "hint": "Numărul tău de telefon rămâne privat — e folosit doar pentru securitatea contului.",
+      "invalid": "Nu pare un număr valid pentru țara aleasă.",
+      "phoneNumber": "Număr de telefon",
+      "placeholder": "Lasă gol ca să-l ștergi",
+      "toast": {
+        "failed": "Numărul de telefon nu a putut fi actualizat.",
+        "removed": "Telefon șters",
+        "updated": "Telefon actualizat"
+      }
+    },
+    "photo": {
+      "choose": "Alege o poză",
+      "comingSoon": "În curând",
+      "notImage": "Alege un fișier imagine.",
+      "remove": "Șterge poza",
+      "take": "Fă o poză",
+      "title": "Editează poza de profil",
+      "toast": {
+        "failed": "Poza nu a putut fi încărcată.",
+        "updated": "Poză actualizată"
+      },
+      "tooLarge": "Imaginile trebuie să aibă sub {size} MB."
+    },
+    "share": {
+      "empty": {
+        "message": "Handle-ul e linkul scurt după care te găsesc oamenii. Alege unul din profil și îl poți distribui de aici.",
+        "title": "Alege mai întâi un handle"
+      },
+      "openProfile": "Deschide profilul",
+      "shareTitle": "Profilul meu MotionHive",
+      "shareVia": "Distribuie prin…",
+      "subtitle": "Pune linkul în bio-ul de Instagram, în story sau oriunde te pot găsi oamenii.",
+      "title": "Distribuie profilul",
+      "toast": {
+        "copyFailed": "Linkul nu a putut fi copiat.",
+        "shareFailed": "Linkul nu a putut fi distribuit."
+      }
     }
   },
   "auth": {
@@ -1304,6 +1482,32 @@
       "sent": "Trimisă clientului",
       "voided": "Factură anulată"
     }
+  },
+  "person": {
+    "about": "Despre",
+    "coaching": "Ca antrenor",
+    "details": "Detalii",
+    "experience": "{count, plural, one {# an de experiență} few {# ani de experiență} other {# de ani de experiență}}",
+    "memberSince": "Pe MotionHive din {date}.",
+    "message": "Mesaj",
+    "noDetails": "{name} nu a adăugat încă detalii în profil.",
+    "noDetailsAnonymous": "Nu a adăugat încă detalii în profil.",
+    "rating": "{average} · {count, plural, one {# recenzie} few {# recenzii} other {# de recenzii}}",
+    "specialisesIn": "Specializat în",
+    "unavailable": {
+      "message": "Poate și-a schimbat handle-ul sau și-a închis contul.",
+      "title": "Profil indisponibil"
+    }
+  },
+  "profileView": {
+    "loadFailed": "Profilul nu a putut fi încărcat",
+    "message": "Mesaj",
+    "notFound": {
+      "message": "Poate și-a schimbat handle-ul sau a părăsit MotionHive.",
+      "title": "Profil negăsit"
+    },
+    "privateNote": "{name} își păstrează restul profilului privat.",
+    "privateNoteAnonymous": "Această persoană își păstrează restul profilului privat."
   },
   "programs": {
     "assign": {

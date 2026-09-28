@@ -1,11 +1,18 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
-import { displayName, initialsOf, MessagingService, UserBlock } from 'core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  appLocale,
+  displayName,
+  enumLabel,
+  initialsOf,
+  MessagingService,
+  UserBlock,
+} from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -34,22 +41,22 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
  */
 @Component({
   selector: 'mh-profile-safety',
-  standalone: true,
   imports: [
     ButtonDirective,
     CardModule,
     SkeletonModule,
     ToastModule,
+    TranslatePipe,
     HexAvatar,
   ],
   providers: [MessageService],
   templateUrl: './safety.html',
   styleUrl: './safety.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileSafety implements OnInit {
-  private readonly _messaging = inject(MessagingService);
+  private readonly _messagingService = inject(MessagingService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   protected readonly loading = signal(true);
   protected readonly blocks = signal<UserBlock[]>([]);
@@ -65,7 +72,7 @@ export class ProfileSafety implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this._messaging.listBlocks().subscribe({
+    this._messagingService.listBlocks().subscribe({
       next: (rows) => {
         this.blocks.set(rows);
         this.loading.set(false);
@@ -74,8 +81,8 @@ export class ProfileSafety implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Could not load blocked users',
-          detail: 'Please try again.',
+          summary: this._translateService.instant('profileTabs.safety.toast.loadFailed'),
+          detail: this._translateService.instant('common.pleaseTryAgain'),
         });
       },
     });
@@ -88,7 +95,7 @@ export class ProfileSafety implements OnInit {
     // Mark this row as in-flight.
     this.unblocking.update((s) => new Set(s).add(targetId));
 
-    this._messaging.unblock(targetId).subscribe({
+    this._messagingService.unblock(targetId).subscribe({
       next: () => {
         // Drop the row locally — the BE has already removed the
         // user_block entry. We don't reload the whole list to keep
@@ -103,8 +110,10 @@ export class ProfileSafety implements OnInit {
         });
         this._messageService.add({
           severity: 'success',
-          summary: 'Unblocked',
-          detail: `${this.nameOf(row)} can message you again.`,
+          summary: this._translateService.instant('profileTabs.safety.toast.unblocked.summary'),
+          detail: this._translateService.instant('profileTabs.safety.toast.unblocked.detail', {
+            name: this.nameOf(row),
+          }),
         });
       },
       error: () => {
@@ -115,8 +124,8 @@ export class ProfileSafety implements OnInit {
         });
         this._messageService.add({
           severity: 'error',
-          summary: 'Could not unblock',
-          detail: 'Please try again.',
+          summary: this._translateService.instant('profileTabs.safety.toast.unblockFailed'),
+          detail: this._translateService.instant('common.pleaseTryAgain'),
         });
         // Reload to resync — the row may have been removed BE-side
         // anyway (e.g. by the blocked user deleting their account).
@@ -130,7 +139,10 @@ export class ProfileSafety implements OnInit {
   }
 
   protected nameOf(row: UserBlock): string {
-    return displayName(row.blocked, 'A blocked user');
+    return displayName(
+      row.blocked,
+      this._translateService.instant('profileTabs.safety.blockedUserFallback'),
+    );
   }
 
   protected initialsOf(row: UserBlock): string {
@@ -138,24 +150,11 @@ export class ProfileSafety implements OnInit {
   }
 
   protected reasonLabel(row: UserBlock): string | null {
-    switch (row.reason) {
-      case 'SPAM':
-        return 'Spam';
-      case 'HARASSMENT':
-        return 'Harassment';
-      case 'SCAM':
-        return 'Scam';
-      case 'IMPERSONATION':
-        return 'Impersonation';
-      case 'OTHER':
-        return 'Other';
-      default:
-        return null;
-    }
+    return enumLabel('userBlockReason', row.reason) || null;
   }
 
   protected formattedDate(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString(appLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

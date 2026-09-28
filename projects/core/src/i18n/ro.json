@@ -123,7 +123,8 @@
     "sessions": "{count, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}}",
     "sets": "{count, plural, one {# serie} few {# serii} other {# de serii}}",
     "weeks": "{count, plural, one {# săptămână} few {# săptămâni} other {# de săptămâni}}",
-    "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}"
+    "workouts": "{count, plural, one {# antrenament} few {# antrenamente} other {# de antrenamente}}",
+    "years": "{count, plural, one {# an} few {# ani} other {# de ani}}"
   },
   "empty": {
     "noMatches": "Nimic nu corespunde filtrelor",
@@ -242,6 +243,26 @@
       "upcoming": "Viitoare",
       "waitlisted": "Pe lista de așteptare"
     },
+    "notificationCategory": {
+      "ACCOUNT": "Cont și securitate",
+      "COACHING": "Coaching",
+      "GROUPS": "Grupuri",
+      "MESSAGING": "Mesaje directe",
+      "PAYMENTS": "Plăți și facturi",
+      "POSTS": "Postări și comentarii",
+      "SESSIONS": "Sesiuni",
+      "WORKOUTS": "Antrenamente și exerciții"
+    },
+    "notificationCategoryHint": {
+      "ACCOUNT": "Schimbări ale stării contului Stripe care necesită atenția ta.",
+      "COACHING": "Cereri de la clienți, invitații de la antrenori și noutăți despre colaborările de coaching.",
+      "GROUPS": "Invitații, schimbări de membri și actualizări despre proprietarul grupului.",
+      "MESSAGING": "Mesaje noi de la clienții și antrenorii tăi. Grupăm alertele pe email, ca să primești cel mult unul pe conversație pe oră.",
+      "PAYMENTS": "Facturi, plăți, abonamente, rambursări, transferuri și dispute.",
+      "POSTS": "Comentarii la postările tale, aprobări și rezultatele moderării.",
+      "SESSIONS": "Mementouri, anulări, reprogramări și schimbări în lista participanților.",
+      "WORKOUTS": "Notificări când cineva copiază exercițiile tale publice, noutăți despre programele atribuite și alerte când clienții tăi termină un antrenament."
+    },
     "paymentStatus": {
       "failed": "Eșuată",
       "partially_refunded": "Rambursată parțial",
@@ -356,6 +377,13 @@
       "SCAM": "Înșelătorie",
       "SPAM": "Spam"
     },
+    "userRole": {
+      "ADMIN": "Admin",
+      "INSTRUCTOR": "Antrenor",
+      "SUPER_ADMIN": "Super admin",
+      "SUPPORT": "Suport",
+      "WRITER": "Autor"
+    },
     "workoutLogStatus": {
       "ABANDONED": "Abandonat",
       "COMPLETED": "Finalizat",
@@ -404,33 +432,41 @@
     },
     "label": {
       "amount": "Sumă",
+      "bio": "Descriere",
       "city": "Oraș",
       "confirmPassword": "Confirmă parola",
       "country": "Țară",
       "currency": "Monedă",
       "date": "Dată",
       "description": "Descriere",
+      "displayName": "Nume afișat",
       "dueDate": "Scadență",
       "duration": "Durată",
       "email": "Email",
       "endDate": "Data de sfârșit",
       "firstName": "Prenume",
       "fullName": "Nume complet",
+      "handle": "Handle",
       "language": "Limbă",
       "lastName": "Nume",
       "location": "Locație",
+      "memberSince": "Membru din",
       "name": "Nume",
       "newPassword": "Parolă nouă",
       "notes": "Notițe",
       "password": "Parolă",
       "phone": "Telefon",
       "price": "Preț",
+      "socialLinks": "Linkuri sociale",
+      "specializations": "Specializări",
       "startDate": "Data de început",
       "status": "Status",
       "time": "Oră",
       "timezone": "Fus orar",
       "title": "Titlu",
-      "type": "Tip"
+      "type": "Tip",
+      "website": "Site web",
+      "yearsOfExperience": "Ani de experiență"
     },
     "placeholder": {
       "email": "tu@exemplu.ro",
@@ -439,7 +475,16 @@
       "optional": "Opțional",
       "pickDate": "Alege o dată",
       "search": "Caută",
-      "select": "Alege"
+      "select": "Alege",
+      "social": {
+        "facebook": "facebook.com/paginata",
+        "instagram": "instagram.com/numeletau",
+        "linkedin": "linkedin.com/in/numeletau",
+        "tiktok": "tiktok.com/@numeletau",
+        "twitter": "x.com/numeletau",
+        "website": "site-ultau.ro",
+        "youtube": "youtube.com/@canalultau"
+      }
     }
   },
   "language": {

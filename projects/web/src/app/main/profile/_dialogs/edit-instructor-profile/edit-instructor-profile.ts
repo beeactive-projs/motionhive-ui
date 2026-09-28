@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -17,12 +16,15 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   MyProfile,
   ProfileService,
   UpdateInstructorProfilePayload,
   normalizeUrl,
   showApiError,
+  translate,
+  validationMessage,
 } from 'core';
 import { MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -51,19 +53,39 @@ type FormField =
   | 'showSocialLinks'
   | SocialKey;
 
-const SOCIAL_PLATFORMS: readonly {
-  key: SocialKey;
-  label: string;
-  icon: string;
-  placeholder: string;
-}[] = [
-  { key: 'instagram', label: 'Instagram', icon: 'pi pi-instagram', placeholder: 'instagram.com/yourhandle' },
-  { key: 'youtube', label: 'YouTube', icon: 'pi pi-youtube', placeholder: 'youtube.com/@yourchannel' },
-  { key: 'tiktok', label: 'TikTok', icon: 'pi pi-tiktok', placeholder: 'tiktok.com/@yourhandle' },
-  { key: 'facebook', label: 'Facebook', icon: 'pi pi-facebook', placeholder: 'facebook.com/yourpage' },
-  { key: 'twitter', label: 'X / Twitter', icon: 'pi pi-twitter', placeholder: 'x.com/yourhandle' },
-  { key: 'linkedin', label: 'LinkedIn', icon: 'pi pi-linkedin', placeholder: 'linkedin.com/in/yourhandle' },
-  { key: 'website', label: 'Website', icon: 'pi pi-globe', placeholder: 'yourwebsite.com' },
+interface SocialPlatform {
+  readonly key: SocialKey;
+  readonly label: string;
+  readonly icon: string;
+  readonly placeholder: string;
+}
+
+/**
+ * Brand names stay as-is; the generic "Website" label and the example
+ * URLs are translated. Getters, because this is a module constant
+ * evaluated before the language file loads.
+ */
+function socialPlatform(key: SocialKey, icon: string, brand?: string): SocialPlatform {
+  return {
+    key,
+    icon,
+    get label() {
+      return brand ?? translate('form.label.website');
+    },
+    get placeholder() {
+      return translate(`form.placeholder.social.${key}`);
+    },
+  };
+}
+
+const SOCIAL_PLATFORMS: readonly SocialPlatform[] = [
+  socialPlatform('instagram', 'pi pi-instagram', 'Instagram'),
+  socialPlatform('youtube', 'pi pi-youtube', 'YouTube'),
+  socialPlatform('tiktok', 'pi pi-tiktok', 'TikTok'),
+  socialPlatform('facebook', 'pi pi-facebook', 'Facebook'),
+  socialPlatform('twitter', 'pi pi-twitter', 'X / Twitter'),
+  socialPlatform('linkedin', 'pi pi-linkedin', 'LinkedIn'),
+  socialPlatform('website', 'pi pi-globe'),
 ];
 
 function optionalUrl(control: AbstractControl): ValidationErrors | null {
@@ -83,15 +105,16 @@ function optionalUrl(control: AbstractControl): ValidationErrors | null {
     Message,
     TextareaModule,
     ToggleSwitch,
+    TranslatePipe,
   ],
   templateUrl: './edit-instructor-profile.html',
   styleUrl: './edit-instructor-profile.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditInstructorProfile {
   private readonly _profileService = inject(ProfileService);
   private readonly _messageService = inject(MessageService);
   private readonly _formBuilder = inject(FormBuilder);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly profile = input.required<MyProfile>();
@@ -156,16 +179,7 @@ export class EditInstructorProfile {
   }
 
   getFieldError(field: FormField): string {
-    const errors = this.form.get(field)?.errors;
-    if (!errors) return '';
-    if (errors['required']) return 'This field is required.';
-    if (errors['url']) return 'Enter a valid URL (e.g. https://example.com).';
-    if (errors['min']) return `Must be at least ${errors['min'].min}.`;
-    if (errors['max']) return `Must be at most ${errors['max'].max}.`;
-    if (errors['maxlength']) {
-      return `Must be ${errors['maxlength'].requiredLength} characters or fewer.`;
-    }
-    return 'Invalid value.';
+    return validationMessage(this.form.get(field)?.errors);
   }
 
   save(): void {
@@ -215,8 +229,8 @@ export class EditInstructorProfile {
       this.visible.set(false);
       this._messageService.add({
         severity: 'info',
-        summary: 'No changes',
-        detail: 'No changes were made.',
+        summary: this._translateService.instant('toast.detail.noChanges'),
+        detail: this._translateService.instant('profile.toast.noChanges'),
       });
       return;
     }
@@ -228,8 +242,8 @@ export class EditInstructorProfile {
         this.visible.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Profile updated',
-          detail: 'Coaching profile updated successfully.',
+          summary: this._translateService.instant('profile.toast.profileUpdated'),
+          detail: this._translateService.instant('profile.editCoaching.toast.updated'),
         });
         this.saved.emit();
       },
@@ -237,8 +251,8 @@ export class EditInstructorProfile {
         this.saving.set(false);
         showApiError(
           this._messageService,
-          'Error',
-          'Failed to update instructor profile.',
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profile.editCoaching.toast.failed'),
           err,
         );
       },

@@ -2,7 +2,7 @@
   <ng-template #header>
     <div class="flex items-center gap-2 px-4 pt-4">
       <i class="pi pi-graduation-cap text-primary-600"></i>
-      <h2 class="text-base font-semibold m-0">Coaching profile</h2>
+      <h2 class="text-base font-semibold m-0">{{ 'profile.coaching.title' | translate }}</h2>
     </div>
     <p-divider />
   </ng-template>
@@ -11,12 +11,12 @@
     <p-avatar icon="pi pi-graduation-cap" size="large" shape="circle"
       [style]="{ 'background-color': 'var(--p-primary-100)', color: 'var(--p-primary-600)' }" />
     <div>
-      <h3 class="text-lg font-semibold m-0">Become a coach</h3>
+      <h3 class="text-lg font-semibold m-0">{{ 'profile.becomeCoach.cta' | translate }}</h3>
       <p class="text-surface-500 text-sm mt-1 mb-0">
-        Share your expertise and start training clients on MotionHive.
+        {{ 'profile.becomeCoach.body' | translate }}
       </p>
     </div>
-    <button pButton type="button" (click)="visible.set(true)"><i class="pi pi-graduation-cap"></i> Become a coach</button>
+    <button pButton type="button" (click)="visible.set(true)"><i class="pi pi-graduation-cap"></i> {{ 'profile.becomeCoach.cta' | translate }}</button>
   </div>
 </p-card>
 

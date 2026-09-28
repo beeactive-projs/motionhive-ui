@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -11,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AuthStore,
   MyProfile,
@@ -67,16 +67,16 @@ function locationFromAccount(
 
 @Component({
   selector: 'mh-edit-personal-info',
-  imports: [FormsModule, ButtonDirective, Dialog, InputText, LocationPicker, PhoneInput],
+  imports: [FormsModule, ButtonDirective, Dialog, InputText, LocationPicker, PhoneInput, TranslatePipe],
   templateUrl: './edit-personal-info.html',
   styleUrl: './edit-personal-info.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditPersonalInfo {
   private readonly _profileService = inject(ProfileService);
   private readonly _onboardingStore = inject(StripeOnboardingStore);
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model(false);
   readonly profile = input.required<MyProfile>();
@@ -137,9 +137,8 @@ export class EditPersonalInfo {
     if (this._phoneInput()?.invalid()) {
       this._messageService.add({
         severity: 'warn',
-        summary: 'Phone number invalid',
-        detail:
-          'Enter a valid phone number or clear the field before saving.',
+        summary: this._translateService.instant('profile.editPersonalInfo.toast.invalidPhone.summary'),
+        detail: this._translateService.instant('profile.editPersonalInfo.toast.invalidPhone.detail'),
       });
       return;
     }
@@ -169,9 +168,8 @@ export class EditPersonalInfo {
     ) {
       this._messageService.add({
         severity: 'warn',
-        summary: 'Country is locked',
-        detail:
-          'Your country cannot be changed because payments are set up. Contact support if you need to migrate.',
+        summary: this._translateService.instant('profile.editPersonalInfo.toast.countryLocked.summary'),
+        detail: this._translateService.instant('profile.editPersonalInfo.toast.countryLocked.detail'),
       });
       return;
     }
@@ -185,8 +183,8 @@ export class EditPersonalInfo {
       this.visible.set(false);
       this._messageService.add({
         severity: 'info',
-        summary: 'No changes',
-        detail: 'No changes were made.',
+        summary: this._translateService.instant('toast.detail.noChanges'),
+        detail: this._translateService.instant('profile.toast.noChanges'),
       });
       return;
     }
@@ -210,8 +208,8 @@ export class EditPersonalInfo {
 
         this._messageService.add({
           severity: 'success',
-          summary: 'Profile updated',
-          detail: 'Personal information updated successfully.',
+          summary: this._translateService.instant('profile.toast.profileUpdated'),
+          detail: this._translateService.instant('profile.editPersonalInfo.toast.updated'),
         });
         this.saved.emit();
       },
@@ -219,8 +217,8 @@ export class EditPersonalInfo {
         this.saving.set(false);
         showApiError(
           this._messageService,
-          'Error',
-          'Failed to update profile.',
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('profile.editPersonalInfo.toast.failed'),
           err,
         );
       },

@@ -8,6 +8,7 @@ import {
   IonSearchbar,
   IonSpinner,
 } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { locationOutline } from 'ionicons/icons';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, take, tap } from 'rxjs';
@@ -39,6 +40,7 @@ const SEARCH_DEBOUNCE_MS = 400;
     IonSpinner,
     SearchbarAutofocusDirective,
     SheetShell,
+    TranslatePipe,
   ],
   templateUrl: './location-sheet.html',
   styleUrl: './location-sheet.scss',
@@ -49,6 +51,7 @@ export class LocationSheet {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _accountStore = inject(AccountStore);
   private readonly _stripeOnboardingStore = inject(StripeOnboardingStore);
+  private readonly _translateService = inject(TranslateService);
 
   private readonly _query$ = new Subject<string>();
 
@@ -111,7 +114,7 @@ export class LocationSheet {
     const patch = { city: picked.city, countryCode: picked.countryCode };
     if (patch.city === account.city && patch.countryCode === account.countryCode) {
       this.open.set(false);
-      void this._feedbackService.info('No changes');
+      void this._feedbackService.info(this._translateService.instant('toast.detail.noChanges'));
       return;
     }
 
@@ -127,12 +130,17 @@ export class LocationSheet {
           this.saving.set(false);
           this._accountStore.syncAuthUser();
           this.open.set(false);
-          void this._feedbackService.success('Location updated');
+          void this._feedbackService.success(
+            this._translateService.instant('accountSheets.location.toast.updated'),
+          );
         },
         error: (error: unknown) => {
           this.saving.set(false);
           this._accountStore.patchAccount(previous);
-          void this._feedbackService.error(error, 'Could not update your location.');
+          void this._feedbackService.error(
+            error,
+            this._translateService.instant('accountSheets.location.toast.failed'),
+          );
         },
       });
   }

@@ -123,7 +123,8 @@
     "sessions": "{count, plural, one {# session} other {# sessions}}",
     "sets": "{count, plural, one {# set} other {# sets}}",
     "weeks": "{count, plural, one {# week} other {# weeks}}",
-    "workouts": "{count, plural, one {# workout} other {# workouts}}"
+    "workouts": "{count, plural, one {# workout} other {# workouts}}",
+    "years": "{count, plural, one {# year} other {# years}}"
   },
   "empty": {
     "noMatches": "Nothing matches your filters",
@@ -242,6 +243,26 @@
       "upcoming": "Upcoming",
       "waitlisted": "Waitlisted"
     },
+    "notificationCategory": {
+      "ACCOUNT": "Account & security",
+      "COACHING": "Coaching",
+      "GROUPS": "Groups",
+      "MESSAGING": "Direct messages",
+      "PAYMENTS": "Payments & invoices",
+      "POSTS": "Posts & comments",
+      "SESSIONS": "Sessions",
+      "WORKOUTS": "Workouts & exercises"
+    },
+    "notificationCategoryHint": {
+      "ACCOUNT": "Stripe account status changes that need your attention.",
+      "COACHING": "Client requests, coach invitations, and coaching relationship updates.",
+      "GROUPS": "Invitations, member changes, and group ownership updates.",
+      "MESSAGING": "New messages from your clients and coaches. We coalesce email alerts so you only get one per conversation per hour.",
+      "PAYMENTS": "Invoices, payments, subscriptions, refunds, payouts, and disputes.",
+      "POSTS": "Comments on your posts, approvals, and moderation outcomes.",
+      "SESSIONS": "Reminders, cancellations, reschedules, and roster changes.",
+      "WORKOUTS": "Fork notifications on your public exercises, program assignment updates, and workout-completion alerts from your clients."
+    },
     "paymentStatus": {
       "failed": "Failed",
       "partially_refunded": "Partially refunded",
@@ -356,6 +377,13 @@
       "SCAM": "Scam",
       "SPAM": "Spam"
     },
+    "userRole": {
+      "ADMIN": "Admin",
+      "INSTRUCTOR": "Coach",
+      "SUPER_ADMIN": "Super admin",
+      "SUPPORT": "Support",
+      "WRITER": "Writer"
+    },
     "workoutLogStatus": {
       "ABANDONED": "Abandoned",
       "COMPLETED": "Completed",
@@ -404,33 +432,41 @@
     },
     "label": {
       "amount": "Amount",
+      "bio": "Bio",
       "city": "City",
       "confirmPassword": "Confirm password",
       "country": "Country",
       "currency": "Currency",
       "date": "Date",
       "description": "Description",
+      "displayName": "Display name",
       "dueDate": "Due date",
       "duration": "Duration",
       "email": "Email",
       "endDate": "End date",
       "firstName": "First name",
       "fullName": "Full name",
+      "handle": "Handle",
       "language": "Language",
       "lastName": "Last name",
       "location": "Location",
+      "memberSince": "Member since",
       "name": "Name",
       "newPassword": "New password",
       "notes": "Notes",
       "password": "Password",
       "phone": "Phone",
       "price": "Price",
+      "socialLinks": "Social links",
+      "specializations": "Specializations",
       "startDate": "Start date",
       "status": "Status",
       "time": "Time",
       "timezone": "Timezone",
       "title": "Title",
-      "type": "Type"
+      "type": "Type",
+      "website": "Website",
+      "yearsOfExperience": "Years of experience"
     },
     "placeholder": {
       "email": "you@example.com",
@@ -439,7 +475,16 @@
       "optional": "Optional",
       "pickDate": "Pick a date",
       "search": "Search",
-      "select": "Select"
+      "select": "Select",
+      "social": {
+        "facebook": "facebook.com/yourpage",
+        "instagram": "instagram.com/yourhandle",
+        "linkedin": "linkedin.com/in/yourhandle",
+        "tiktok": "tiktok.com/@yourhandle",
+        "twitter": "x.com/yourhandle",
+        "website": "yourwebsite.com",
+        "youtube": "youtube.com/@yourchannel"
+      }
     }
   },
   "language": {

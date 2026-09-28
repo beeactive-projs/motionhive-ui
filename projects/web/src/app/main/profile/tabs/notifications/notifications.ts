@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -7,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   CategoryPreferenceView,
   ConfigurableChannelPreferences,
@@ -43,15 +43,16 @@ import { Tooltip } from 'primeng/tooltip';
     ToastModule,
     Tooltip,
     FormsModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileNotifications implements OnInit {
-  private readonly _service = inject(NotificationService);
+  private readonly _notificationService = inject(NotificationService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -87,7 +88,7 @@ export class ProfileNotifications implements OnInit {
 
   loadPreferences(): void {
     this.loading.set(true);
-    this._service.getSettings().subscribe({
+    this._notificationService.getSettings().subscribe({
       next: (data) => {
         this.preferences.set(data);
         this.editsSignal.set(new Map());
@@ -97,8 +98,8 @@ export class ProfileNotifications implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load notification settings',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.loadFailed'),
         });
       },
     });
@@ -136,13 +137,13 @@ export class ProfileNotifications implements OnInit {
       })),
     };
 
-    this._service.updateSettings(payload).subscribe({
+    this._notificationService.updateSettings(payload).subscribe({
       next: () => {
         this.saving.set(false);
         this._messageService.add({
           severity: 'success',
-          summary: 'Saved',
-          detail: 'Your notification preferences have been updated',
+          summary: this._translateService.instant('toast.summary.saved'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.saved'),
         });
         // Reload from server so `isCustomized` flags refresh.
         this.loadPreferences();
@@ -151,8 +152,8 @@ export class ProfileNotifications implements OnInit {
         this.saving.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save preferences. Please try again.',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.saveFailed'),
         });
       },
     });
@@ -163,40 +164,40 @@ export class ProfileNotifications implements OnInit {
   }
 
   resetCategory(category: NotificationCategory): void {
-    this._service.resetCategoryToDefault(category).subscribe({
+    this._notificationService.resetCategoryToDefault(category).subscribe({
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Reset',
-          detail: 'Reset to default for this category.',
+          summary: this._translateService.instant('profileTabs.notifications.toast.resetSummary'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.categoryReset'),
         });
         this.loadPreferences();
       },
       error: () => {
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Could not reset category. Please try again.',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.categoryResetFailed'),
         });
       },
     });
   }
 
   resetAll(): void {
-    this._service.resetAllToDefault().subscribe({
+    this._notificationService.resetAllToDefault().subscribe({
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Reset',
-          detail: 'All notification preferences reset to defaults.',
+          summary: this._translateService.instant('profileTabs.notifications.toast.resetSummary'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.allReset'),
         });
         this.loadPreferences();
       },
       error: () => {
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Could not reset preferences. Please try again.',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('profileTabs.notifications.toast.allResetFailed'),
         });
       },
     });

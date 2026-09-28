@@ -17,6 +17,7 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
@@ -32,11 +33,12 @@ import {
   timeOutline,
 } from 'ionicons/icons';
 
-import { PublicUserProfile } from 'core';
+import { LanguageNamePipe, PublicProfileAudiences, PublicUserProfile, appLocale } from 'core';
 
 import { EmptyState } from '../../_shared/components/empty-state/empty-state';
 import { HexAvatar } from '../../_shared/components/hex-avatar/hex-avatar';
 import { injectOpenDirectMessage } from '../../_shared/utils/direct-message';
+import { roleLabel } from '../person/person.config';
 import { ProfileViewStore } from './profile-view.store';
 
 /**
@@ -66,6 +68,8 @@ import { ProfileViewStore } from './profile-view.store';
     IonSkeletonText,
     IonTitle,
     IonToolbar,
+    LanguageNamePipe,
+    TranslatePipe,
   ],
   templateUrl: './profile-view.html',
   styleUrl: './profile-view.scss',
@@ -96,7 +100,7 @@ export class ProfileView implements ViewWillEnter {
   readonly memberSince = computed(() => {
     const p = this.store.profile();
     if (!p?.memberSince) return '';
-    return new Date(p.memberSince).toLocaleDateString(undefined, {
+    return new Date(p.memberSince).toLocaleDateString(appLocale(), {
       month: 'long',
       year: 'numeric',
     });
@@ -111,7 +115,7 @@ export class ProfileView implements ViewWillEnter {
   );
 
   /** No point offering to message yourself. */
-  readonly canMessage = computed(() => this.store.profile()?.audience !== 'OWNER');
+  readonly canMessage = computed(() => this.store.profile()?.audience !== PublicProfileAudiences.Owner);
 
   constructor() {
     addIcons({
@@ -152,5 +156,10 @@ export class ProfileView implements ViewWillEnter {
 
   retry(): void {
     this.store.retry();
+  }
+
+  /** `INSTRUCTOR` → "Coach". */
+  roleLabel(role: string): string {
+    return roleLabel(role);
   }
 }

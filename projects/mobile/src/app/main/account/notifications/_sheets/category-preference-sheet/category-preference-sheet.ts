@@ -1,4 +1,5 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonButton,
   IonItem,
@@ -34,11 +35,22 @@ export interface ChannelChange {
  */
 @Component({
   selector: 'mh-category-preference-sheet',
-  imports: [HexAvatar, IonButton, IonItem, IonLabel, IonList, IonToggle, SheetShell],
+  imports: [
+    HexAvatar,
+    IonButton,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonToggle,
+    SheetShell,
+    TranslatePipe,
+  ],
   templateUrl: './category-preference-sheet.html',
   styleUrl: './category-preference-sheet.scss',
 })
 export class CategoryPreferenceSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly preference = input<CategoryPreferenceView | null>(null);
   /** A write for this category is in flight — no double flips meanwhile. */
@@ -58,7 +70,9 @@ export class CategoryPreferenceSheet {
     return preference ? channelRows(preference) : [];
   });
 
-  readonly title = computed(() => this.preference()?.label ?? 'Notifications');
+  readonly title = computed(
+    () => this.preference()?.label ?? this._translateService.instant('nav.notifications'),
+  );
 
   onToggle(row: ChannelRow, event: ToggleCustomEvent): void {
     if (row.locked || row.key === 'in_app') return;

@@ -32,6 +32,7 @@ import {
   ProgramAssignment,
   ProgramAssignmentService,
   showApiError,
+  weekdayNames,
 } from 'core';
 
 type ClientOption = SelectItem<string> & {
@@ -50,16 +51,11 @@ type ClientOption = SelectItem<string> & {
  * (PENDING/DECLINED/etc. would 404 server-side anyway since the
  * deep-copy tx asserts an ACTIVE instructor_client row exists).
  */
-/** ISO 1=Mon..7=Sun, which is what the API takes. */
-const WEEKDAYS: readonly { iso: number; label: string }[] = [
-  { iso: 1, label: 'Mon' },
-  { iso: 2, label: 'Tue' },
-  { iso: 3, label: 'Wed' },
-  { iso: 4, label: 'Thu' },
-  { iso: 5, label: 'Fri' },
-  { iso: 6, label: 'Sat' },
-  { iso: 7, label: 'Sun' },
-];
+/** ISO 1=Mon..7=Sun, which is what the API takes; labels in the UI locale. */
+const WEEKDAYS: readonly { iso: number; label: string }[] = weekdayNames('short').map((label, i) => ({
+  iso: i + 1,
+  label,
+}));
 
 @Component({
   selector: 'mh-assign-program-dialog',

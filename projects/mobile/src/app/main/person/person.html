@@ -12,8 +12,8 @@
     @if (notFound()) {
       <mh-empty-state
         icon="alert-circle-outline"
-        heading="Profile unavailable"
-        message="This person may have changed their handle or closed their account."
+        [heading]="'person.unavailable.title' | translate"
+        [message]="'person.unavailable.message' | translate"
       />
     } @else if (loading() && !profile()) {
       <div class="hero">
@@ -44,20 +44,24 @@
 
       @if (hasNothingToShow()) {
         <ion-note class="mh-note-block empty">
-          {{ firstName() }} hasn't added any profile details yet.
+          @if (firstName(); as first) {
+            {{ 'person.noDetails' | translate: { name: first } }}
+          } @else {
+            {{ 'person.noDetailsAnonymous' | translate }}
+          }
         </ion-note>
       }
 
       @if (bio(); as about) {
         <section class="mh-section">
-          <div class="mh-section-label">About</div>
+          <div class="mh-section-label">{{ 'person.about' | translate }}</div>
           <ion-note class="about">{{ about }}</ion-note>
         </section>
       }
 
       @if (specializations().length > 0) {
         <section class="mh-section">
-          <div class="mh-section-label">Specialises in</div>
+          <div class="mh-section-label">{{ 'person.specialisesIn' | translate }}</div>
           <div class="tags">
             @for (item of specializations(); track item) {
               <ion-chip [outline]="true" color="medium">{{ item }}</ion-chip>
@@ -68,7 +72,7 @@
 
       @if (experience() || rating()) {
         <section class="mh-section">
-          <div class="mh-section-label">Coaching</div>
+          <div class="mh-section-label">{{ 'person.coaching' | translate }}</div>
           <ion-list [inset]="true" class="mh-card-list">
             @if (experience(); as years) {
               <ion-item [lines]="rating() ? 'full' : 'none'">
@@ -88,7 +92,7 @@
 
       @if (hasContactDetails()) {
         <section class="mh-section">
-          <div class="mh-section-label">Details</div>
+          <div class="mh-section-label">{{ 'person.details' | translate }}</div>
           <ion-list [inset]="true" class="mh-card-list">
             @if (location(); as place) {
               <ion-item lines="full">
@@ -113,7 +117,7 @@
       }
 
       @if (memberSince(); as since) {
-        <ion-note class="mh-note-block">On MotionHive since {{ since }}.</ion-note>
+        <ion-note class="mh-note-block">{{ 'person.memberSince' | translate: { date: since } }}</ion-note>
       }
     }
   </div>
@@ -123,8 +127,8 @@
   <ion-footer [translucent]="true">
     <ion-toolbar>
       <ion-button expand="block" class="cta" (click)="message()">
-        <ion-icon slot="start" name="chatbubble-ellipses-outline" />
-        Message
+        <ion-icon slot="start" name="chatbubble-ellipses-outline" aria-hidden="true" />
+        {{ 'person.message' | translate }}
       </ion-button>
     </ion-toolbar>
   </ion-footer>
