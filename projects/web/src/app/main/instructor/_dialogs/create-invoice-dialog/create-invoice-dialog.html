@@ -19,7 +19,7 @@
       @if (isEditMode()) {
         <section class="flex flex-col gap-2">
           <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.billTo' | translate }}</span>
-          @if (_editRecipient(); as r) {
+          @if (editRecipient(); as r) {
             <div class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/40 px-3 py-2.5">
               <i class="pi pi-user text-surface-500"></i>
               <div class="flex flex-col min-w-0">
@@ -38,26 +38,18 @@
       @if (!isEditMode()) {
       <section class="flex flex-col gap-2">
         <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'paymentDialogs.createInvoice.billTo' | translate }}</span>
-        <div class="inline-flex rounded-md bg-surface-100 dark:bg-surface-800 p-1 w-fit">
-          <button
-            type="button"
-            class="px-3 py-1.5 text-sm rounded-sm transition-colors"
-            [class.bg-surface-0]="!useManualEmail()"
-            [class.dark:bg-surface-900]="!useManualEmail()"
-            [class.font-semibold]="!useManualEmail()"
-            [class.text-surface-500]="useManualEmail()"
-            (click)="onRecipientModeChange(false)"
-          >{{ 'paymentDialogs.createInvoice.existingClient' | translate }}</button>
-          <button
-            type="button"
-            class="px-3 py-1.5 text-sm rounded-sm transition-colors"
-            [class.bg-surface-0]="useManualEmail()"
-            [class.dark:bg-surface-900]="useManualEmail()"
-            [class.font-semibold]="useManualEmail()"
-            [class.text-surface-500]="!useManualEmail()"
-            (click)="onRecipientModeChange(true)"
-          >{{ 'paymentDialogs.createInvoice.newRecipient' | translate }}</button>
-        </div>
+        <p-selectbutton
+          class="w-fit"
+          size="small"
+          [options]="recipientModeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          [ngModel]="useManualEmail()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onRecipientModeChange($event)"
+          [ariaLabel]="'paymentDialogs.createInvoice.billTo' | translate"
+        />
 
         @if (!useManualEmail()) {
           @if (selectedClient(); as sc) {
@@ -79,11 +71,9 @@
                   <span class="text-xs text-surface-500 truncate">{{ sc.email }}</span>
                 </div>
               </div>
-              <button
-                type="button"
-                class="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline underline-offset-2 shrink-0"
-                (click)="clearSelectedClient()"
-              >{{ 'button.change' | translate }}</button>
+              <button pButton type="button" link size="small" class="shrink-0" (click)="clearSelectedClient()">
+                {{ 'button.change' | translate }}
+              </button>
             </div>
             <span class="text-xs text-surface-500">
               {{ 'paymentDialogs.createInvoice.billingClientHint' | translate }}
@@ -191,18 +181,20 @@
                         [text]="true"
                         size="small"
                         (click)="decQuantity(i)"
+                        [attr.aria-label]="'paymentDialogs.createInvoice.decreaseQuantity' | translate"
                         iconOnly
                       >
                         <i class="pi pi-minus"></i>
                       </button>
-                      <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        inputmode="numeric"
-                        class="flex-1 text-center px-2 py-2 rounded-md bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 text-sm tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60"
-                        [value]="item.get('quantity')?.value ?? 1"
-                        (input)="onQuantityChange(i, +($any($event.target).value))"
+                      <p-inputnumber
+                        class="flex-1"
+                        inputStyleClass="w-full text-center tabular-nums"
+                        [ngModel]="item.get('quantity')?.value ?? 1"
+                        [ngModelOptions]="{ standalone: true }"
+                        (ngModelChange)="onQuantityChange(i, $event)"
+                        [min]="1"
+                        [useGrouping]="false"
+                        [ariaLabel]="'paymentDialogs.createInvoice.quantity' | translate"
                       />
                       <button pButton
                         type="button"
@@ -211,6 +203,7 @@
                         [text]="true"
                         size="small"
                         (click)="incQuantity(i)"
+                        [attr.aria-label]="'paymentDialogs.createInvoice.increaseQuantity' | translate"
                         iconOnly
                       >
                         <i class="pi pi-plus"></i>
@@ -312,18 +305,20 @@
                         [text]="true"
                         size="small"
                         (click)="decQuantity(i)"
+                        [attr.aria-label]="'paymentDialogs.createInvoice.decreaseQuantity' | translate"
                         iconOnly
                       >
                         <i class="pi pi-minus"></i>
                       </button>
-                      <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        inputmode="numeric"
-                        class="flex-1 text-center px-2 py-2 rounded-md bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 text-sm tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60"
-                        [value]="item.get('quantity')?.value ?? 1"
-                        (input)="onQuantityChange(i, +($any($event.target).value))"
+                      <p-inputnumber
+                        class="flex-1"
+                        inputStyleClass="w-full text-center tabular-nums"
+                        [ngModel]="item.get('quantity')?.value ?? 1"
+                        [ngModelOptions]="{ standalone: true }"
+                        (ngModelChange)="onQuantityChange(i, $event)"
+                        [min]="1"
+                        [useGrouping]="false"
+                        [ariaLabel]="'paymentDialogs.createInvoice.quantity' | translate"
                       />
                       <button pButton
                         type="button"
@@ -332,6 +327,7 @@
                         [text]="true"
                         size="small"
                         (click)="incQuantity(i)"
+                        [attr.aria-label]="'paymentDialogs.createInvoice.increaseQuantity' | translate"
                         iconOnly
                       >
                         <i class="pi pi-plus"></i>
@@ -387,20 +383,18 @@
       <!-- Due date chips -->
       <section class="flex flex-col gap-2">
         <span class="text-xs uppercase tracking-wide text-surface-500">{{ 'form.label.dueDate' | translate }}</span>
-        <div class="flex flex-wrap gap-2">
-          @for (chip of dueChipOptions; track chip.value) {
-            <button
-              type="button"
-              class="px-3 py-1.5 text-sm rounded-full border border-surface-300 dark:border-surface-600 transition-colors"
-              [class.text-surface-600]="duePreset() !== chip.value"
-              [class.dark:text-surface-300]="duePreset() !== chip.value"
-              [class.bg-surface-100]="duePreset() === chip.value"
-              [class.dark:bg-surface-700]="duePreset() === chip.value"
-              [class.font-semibold]="duePreset() === chip.value"
-              (click)="onDuePresetChange(chip.value)"
-            >{{ chip.labelKey | translate: { count: chip.value } }}</button>
-          }
-        </div>
+        <p-selectbutton
+          size="small"
+          styleClass="flex-wrap"
+          [options]="dueChipOptions"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          [ngModel]="duePreset()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onDuePresetChange($event)"
+          [ariaLabel]="'form.label.dueDate' | translate"
+        />
         @if (duePreset() === 'custom') {
           <p-datepicker
             formControlName="customDueDate"

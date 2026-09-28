@@ -23,6 +23,7 @@ import {
   injectIsTablet,
   injectIsTabletDown,
   InstructorClient,
+  escapeHtml,
   showApiError,
 } from 'core';
 import { MobileFab } from '../../../../_shared/components/mobile-fab/mobile-fab';
@@ -287,7 +288,7 @@ export class PendingRequests {
     this._confirmationService.confirm({
       header: this._translateService.instant('clients.confirm.cancelInvitation.header'),
       message: this._translateService.instant('clients.confirm.cancelInvitation.message', {
-        name: `<strong>${this.clientName(row)}</strong>`,
+        name: `<strong>${escapeHtml(this.clientName(row))}</strong>`,
       }),
       acceptIcon: 'pi pi-times',
       acceptButtonProps: {
@@ -319,7 +320,7 @@ export class PendingRequests {
     this._confirmationService.confirm({
       header: this._translateService.instant('clients.confirm.resendInvitation.header'),
       message: this._translateService.instant('clients.confirm.resendInvitation.message', {
-        name: `<strong>${this.clientName(row)}</strong>`,
+        name: `<strong>${escapeHtml(this.clientName(row))}</strong>`,
       }),
       acceptIcon: 'pi pi-send',
       acceptButtonProps: {

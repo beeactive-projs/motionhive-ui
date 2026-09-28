@@ -23,15 +23,16 @@ import {
   ProgramAssignment,
   ProgramAssignmentService,
   ProgramAssignmentStatus,
+  escapeHtml,
   SESSION_PARTICIPANT_STATUSES,
   SessionInstance,
   SessionInstanceStatus,
   SessionParticipantStatus,
   SessionService,
+  showApiError,
   TagSeverity,
   WorkoutLog,
   WorkoutLogService,
-  showApiError,
 } from 'core';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -526,8 +527,8 @@ export class ClientProfile {
     this._confirmationService.confirm({
       header: this._translateService.instant('clients.confirm.cancelProgram.header'),
       message: this._translateService.instant('clients.confirm.cancelProgram.message', {
-        program: a.programNameSnapshot,
-        name: this.clientName(),
+        program: escapeHtml(a.programNameSnapshot),
+        name: escapeHtml(this.clientName()),
       }),
       icon: 'pi pi-times-circle',
       acceptLabel: this._translateService.instant('clients.confirm.cancelProgram.accept'),
@@ -682,7 +683,7 @@ export class ClientProfile {
   confirmArchive(): void {
     this._confirmationService.confirm({
       message: this._translateService.instant('clients.confirm.archive.message', {
-        name: this.clientName(),
+        name: escapeHtml(this.clientName()),
       }),
       header: this._translateService.instant('clients.confirm.archive.header'),
       icon: 'pi pi-exclamation-triangle',
@@ -718,7 +719,7 @@ export class ClientProfile {
   confirmUnarchive(): void {
     this._confirmationService.confirm({
       message: this._translateService.instant('clients.confirm.unarchive.message', {
-        name: this.clientName(),
+        name: escapeHtml(this.clientName()),
       }),
       header: this._translateService.instant('clients.confirm.unarchive.header'),
       icon: 'pi pi-exclamation-triangle',

@@ -748,6 +748,7 @@
       "title": "Flux"
     },
     "formDialog": {
+      "addTag": "Adaugă eticheta",
       "create": "Creează grupul",
       "descriptionPlaceholder": "Descrie scopul acestui grup...",
       "joinPolicyPlaceholder": "Alege politica de alăturare",
@@ -1287,6 +1288,7 @@
       "billingClientHint": "Factura va fi trimisă pe emailul acestui client.",
       "closeTooltip": "Modificările rămân salvate ca ciornă",
       "createButton": "Creează factura",
+      "decreaseQuantity": "Scade cantitatea",
       "delivery": "Trimitere",
       "deliveryHint": "Lasă nebifat ca s-o păstrezi ca ciornă — o poți verifica și trimite mai târziu din listă.",
       "descriptionOptional": "Descriere (opțional)",
@@ -1304,6 +1306,7 @@
       "existingClient": "Client existent",
       "fromPricing": "Din prețuri · {name}",
       "guestEmailPlaceholder": "client@exemplu.ro",
+      "increaseQuantity": "Crește cantitatea",
       "issueDate": "Data emiterii",
       "itemNumber": "Articolul {number}",
       "itemsCount": "{count, plural, one {# articol} few {# articole} other {# de articole}}",

@@ -10,6 +10,7 @@ import {
   GroupService,
   GroupsRefreshService,
   Post,
+  escapeHtml,
   showApiError,
   UpdateMemberRolePayload,
 } from 'core';
@@ -234,7 +235,9 @@ export class GroupDetailContext {
     if (!group) return;
 
     this._confirmationService.confirm({
-      message: this._translateService.instant('groups.confirm.leave.message', { name: group.name }),
+      message: this._translateService.instant('groups.confirm.leave.message', {
+        name: escapeHtml(group.name),
+      }),
       header: this._translateService.instant('groups.confirm.leave.header'),
       icon: 'pi pi-sign-out',
       acceptButtonStyleClass: 'p-button-danger',
@@ -273,7 +276,7 @@ export class GroupDetailContext {
   confirmRemoveMember(member: GroupMember): void {
     const message = member.user
       ? this._translateService.instant('groups.confirm.removeMember.message', {
-          name: `${member.user.firstName} ${member.user.lastName}`,
+          name: escapeHtml(`${member.user.firstName} ${member.user.lastName}`),
         })
       : this._translateService.instant('groups.confirm.removeMember.messageUnknown');
     this._confirmationService.confirm({

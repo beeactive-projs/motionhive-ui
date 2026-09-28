@@ -190,6 +190,7 @@ export * from './lib/utils/form.utils';
 export * from './lib/utils/messaging.utils';
 export * from './lib/utils/client.utils';
 export * from './lib/utils/email.utils';
+export * from './lib/utils/money.utils';
 
 // i18n
 export * from './lib/i18n/app-language';

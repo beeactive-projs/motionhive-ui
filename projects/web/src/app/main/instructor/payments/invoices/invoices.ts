@@ -14,14 +14,15 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   CurrencyRonPipe,
-  enumLabel,
   getInvoiceStatusSeverity,
-  InvoiceStatuses,
+  type Invoice,
   InvoiceService as PaymentInvoiceService,
+  type InvoiceStatus,
+  InvoiceStatuses,
+  enumLabel,
+  escapeHtml,
   showApiError,
   StatusLabelPipe,
-  type Invoice,
-  type InvoiceStatus,
 } from 'core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
@@ -256,7 +257,7 @@ export class Invoices {
   confirmVoid(invoice: Invoice): void {
     this._confirmationService.confirm({
       message: this._translateService.instant('payments.invoices.confirm.void.message', {
-        number: invoice.number ?? '',
+        number: escapeHtml(invoice.number ?? ''),
       }),
       header: this._translateService.instant('payments.invoices.confirm.void.header'),
       icon: 'pi pi-exclamation-triangle',

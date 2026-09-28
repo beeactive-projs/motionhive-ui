@@ -5,7 +5,13 @@ import { Toast } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ButtonDirective } from 'primeng/button';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { AuthStore, Group, GroupService, GroupsRefreshService } from 'core';
+import {
+  AuthStore,
+  Group,
+  GroupService,
+  GroupsRefreshService,
+  escapeHtml,
+} from 'core';
 import { GroupFormDialog } from '../_dialogs/group-form-dialog/group-form-dialog';
 import { AddMembersDialog } from '../_dialogs/add-members-dialog/add-members-dialog';
 import { GroupCard } from '../group-card/group-card';
@@ -127,7 +133,9 @@ export class YourGroups implements OnInit {
   private _confirmDelete(group: Group): void {
     this._confirmationService.confirm({
       header: this._translateService.instant('groups.confirm.deleteGroup.header'),
-      message: this._translateService.instant('groups.confirm.deleteGroup.message', { name: group.name }),
+      message: this._translateService.instant('groups.confirm.deleteGroup.message', {
+        name: escapeHtml(group.name),
+      }),
       acceptButtonProps: {
         severity: 'danger',
         label: this._translateService.instant('groups.confirm.deleteGroup.accept'),

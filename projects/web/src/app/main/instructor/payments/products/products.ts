@@ -22,14 +22,15 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import {
-  ProductService,
-  ProductTypes,
-  TagSeverity,
   CurrencyRonPipe,
-  StatusLabelPipe,
-  showApiError,
   type Product,
+  ProductService,
   type ProductType,
+  ProductTypes,
+  escapeHtml,
+  showApiError,
+  StatusLabelPipe,
+  TagSeverity,
 } from 'core';
 import { catchError, of, startWith, Subject, switchMap, take } from 'rxjs';
 import { ProductFormDialog } from '../../_dialogs/product-form-dialog/product-form-dialog';
@@ -261,7 +262,7 @@ export class Products {
   confirmDeactivate(product: Product): void {
     this._confirmationService.confirm({
       message: this._translateService.instant('payments.products.confirm.deactivate.message', {
-        name: product.name,
+        name: escapeHtml(product.name),
       }),
       header: this._translateService.instant('payments.products.confirm.deactivate.header'),
       icon: 'pi pi-exclamation-triangle',

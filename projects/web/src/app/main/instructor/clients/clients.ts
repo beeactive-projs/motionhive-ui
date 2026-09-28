@@ -24,6 +24,7 @@ import {
   InstructorClientStatus,
   InstructorClientStatuses,
   isOpenableClient,
+  escapeHtml,
   showApiError,
   TagSeverity,
 } from 'core';
@@ -306,7 +307,7 @@ export class Clients implements OnInit {
     this._confirmationService.confirm({
       header: this._translateService.instant('clients.confirm.archive.header'),
       message: this._translateService.instant('clients.confirm.archive.message', {
-        name: `<strong>${this.clientName(client)}</strong>`,
+        name: `<strong>${escapeHtml(this.clientName(client))}</strong>`,
       }),
       acceptIcon: 'pi pi-inbox',
       acceptButtonProps: {
@@ -346,7 +347,7 @@ export class Clients implements OnInit {
     this._confirmationService.confirm({
       header: this._translateService.instant('clients.confirm.unarchive.header'),
       message: this._translateService.instant('clients.confirm.unarchive.message', {
-        name: `<strong>${this.clientName(client)}</strong>`,
+        name: `<strong>${escapeHtml(this.clientName(client))}</strong>`,
       }),
       acceptIcon: 'pi pi-inbox',
       acceptButtonProps: {

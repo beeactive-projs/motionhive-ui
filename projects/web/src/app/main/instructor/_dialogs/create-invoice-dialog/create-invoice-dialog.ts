@@ -13,9 +13,16 @@ import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { debounceTime, Subject, Subscription, startWith } from 'rxjs';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { MessageService } from 'primeng/api';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ButtonDirective } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { DatePicker } from 'primeng/datepicker';
@@ -23,6 +30,7 @@ import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 import { Tooltip } from 'primeng/tooltip';
 import {
@@ -86,6 +94,7 @@ interface StoredDraft {
 @Component({
   selector: 'mh-create-invoice-dialog',
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     TranslatePipe,
     DatePipe,
@@ -98,6 +107,7 @@ interface StoredDraft {
     InputText,
     InputNumber,
     Select,
+    SelectButton,
     TextareaModule,
     Tooltip,
   ],
@@ -116,6 +126,7 @@ export class CreateInvoiceDialog {
   // hydrates the form with `emitEvent: false`. Without this, the
   // template stays bound to the empty initial state.
   private readonly _cdr = inject(ChangeDetectorRef);
+  private readonly _currencyPipe = new CurrencyRonPipe();
 
   readonly visible = model(false);
   readonly saved = output<void>();
@@ -141,7 +152,7 @@ export class CreateInvoiceDialog {
    * exists on Stripe; this signal lets us render a small read-only
    * "Bill to: <name>" header instead of leaving the section empty.
    */
-  readonly _editRecipient = signal<{ name: string; email: string | null } | null>(
+  readonly editRecipient = signal<{ name: string; email: string | null } | null>(
     null,
   );
   readonly clientOptions = signal<ClientOption[]>([]);
@@ -156,13 +167,19 @@ export class CreateInvoiceDialog {
    *  BE picks the real currency from the account, this is cosmetic. */
   readonly displayCurrency = signal<string>('USD');
 
-  /** `labelKey` is translated in the template with `{ count: value }`. */
-  readonly dueChipOptions: { labelKey: string; value: DuePreset }[] = [
-    { labelKey: 'paymentDialogs.createInvoice.due.onReceipt', value: 0 },
-    { labelKey: 'count.days', value: 7 },
-    { labelKey: 'count.days', value: 14 },
-    { labelKey: 'count.days', value: 30 },
-    { labelKey: 'paymentDialogs.createInvoice.due.custom', value: 'custom' },
+  /** Bill-to mode: an existing client, or a new recipient typed in by hand. */
+  readonly recipientModeOptions: SelectItem<boolean>[] = [
+    { label: this._translateService.instant('paymentDialogs.createInvoice.existingClient'), value: false },
+    { label: this._translateService.instant('paymentDialogs.createInvoice.newRecipient'), value: true },
+  ];
+
+  readonly dueChipOptions: SelectItem<DuePreset>[] = [
+    { label: this._translateService.instant('paymentDialogs.createInvoice.due.onReceipt'), value: 0 },
+    ...([7, 14, 30] as const).map((days) => ({
+      label: this._translateService.instant('count.days', { count: days }),
+      value: days,
+    })),
+    { label: this._translateService.instant('paymentDialogs.createInvoice.due.custom'), value: 'custom' },
   ];
 
   // NOTE: the following fields are ordered carefully.
@@ -481,7 +498,8 @@ export class CreateInvoiceDialog {
       next: (response) => {
         this.productOptions.set(
           response.items.map((p) => ({
-            label: `${p.name} — ${(p.amountCents / 100).toFixed(2)} RON`,
+            // The product's own currency — not a hardcoded RON.
+            label: `${p.name} — ${this._currencyPipe.transform(p.amountCents, p.currency, 'code')}`,
             value: p.id,
             product: p,
           })),
@@ -589,7 +607,7 @@ export class CreateInvoiceDialog {
         this.draftSavedAt.set(null);
         // Stash the recipient name so the locked summary in edit mode
         // can render it without re-fetching the client list.
-        this._editRecipient.set({
+        this.editRecipient.set({
           name: this.formatRecipientName(invoice.client),
           email: invoice.client?.email ?? null,
         });

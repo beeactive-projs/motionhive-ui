@@ -32,6 +32,7 @@ import {
   sessionLifecycle,
   sessionMinutes,
   translate,
+  formatMinorUnits,
 } from 'core';
 
 /**
@@ -203,8 +204,7 @@ export function bookingDurationMinutes(p: SessionParticipant): number {
  */
 export function bookingPriceLabel(cents: number, currency: string): string {
   if (cents <= 0) return translate('mySessions.price.free');
-  const amount = cents / 100;
-  const rendered = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+  const rendered = formatMinorUnits(cents, { trimWholeNumbers: true });
   return `${rendered} ${currency.toUpperCase()}`;
 }
 

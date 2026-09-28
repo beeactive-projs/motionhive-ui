@@ -14,6 +14,8 @@ import {
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
 
+import { formatMinorUnits } from 'core';
+
 import { StatTile } from '../../../_shared/components/stat-tile/stat-tile';
 import { CoachHomeStore } from './coach-home.store';
 
@@ -60,7 +62,7 @@ export class CoachHome implements OnInit, ViewWillEnter {
   outstanding(): string {
     const summary = this.store.earnings();
     if (!summary) return '—';
-    const amount = (summary.outstandingInvoicesCents / 100).toFixed(2);
+    const amount = formatMinorUnits(summary.outstandingInvoicesCents);
     return `${amount} ${summary.currency.toUpperCase()}`;
   }
 

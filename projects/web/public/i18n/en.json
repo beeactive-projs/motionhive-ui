@@ -748,6 +748,7 @@
       "title": "Feed"
     },
     "formDialog": {
+      "addTag": "Add tag",
       "create": "Create group",
       "descriptionPlaceholder": "Describe the purpose of this group...",
       "joinPolicyPlaceholder": "Select join policy",
@@ -1287,6 +1288,7 @@
       "billingClientHint": "Billing this client will send the invoice to their email.",
       "closeTooltip": "Changes are kept as a draft",
       "createButton": "Create invoice",
+      "decreaseQuantity": "Decrease quantity",
       "delivery": "Delivery",
       "deliveryHint": "Leave unchecked to keep it as a draft — you can review it and send it from the list later.",
       "descriptionOptional": "Description (optional)",
@@ -1304,6 +1306,7 @@
       "existingClient": "Existing client",
       "fromPricing": "From pricing · {name}",
       "guestEmailPlaceholder": "client@example.com",
+      "increaseQuantity": "Increase quantity",
       "issueDate": "Issue date",
       "itemNumber": "Item {number}",
       "itemsCount": "{count, plural, one {# item} other {# items}}",

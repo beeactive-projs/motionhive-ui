@@ -35,7 +35,8 @@
       <div class="flex gap-2">
         <input type="text" pInputText fluid [(ngModel)]="formTagInput" [placeholder]="'groups.formDialog.tagPlaceholder' | translate"
           (keydown)="onTagKeydown($event)" />
-        <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()" iconOnly>
+        <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()"
+          [attr.aria-label]="'groups.formDialog.addTag' | translate" iconOnly>
           <i class="pi pi-plus"></i>
         </button>
       </div>
