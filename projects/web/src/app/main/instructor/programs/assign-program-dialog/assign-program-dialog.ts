@@ -50,6 +50,17 @@ type ClientOption = SelectItem<string> & {
  * (PENDING/DECLINED/etc. would 404 server-side anyway since the
  * deep-copy tx asserts an ACTIVE instructor_client row exists).
  */
+/** ISO 1=Mon..7=Sun, which is what the API takes. */
+const WEEKDAYS: readonly { iso: number; label: string }[] = [
+  { iso: 1, label: 'Mon' },
+  { iso: 2, label: 'Tue' },
+  { iso: 3, label: 'Wed' },
+  { iso: 4, label: 'Thu' },
+  { iso: 5, label: 'Fri' },
+  { iso: 6, label: 'Sat' },
+  { iso: 7, label: 'Sun' },
+];
+
 @Component({
   selector: 'mh-assign-program-dialog',
   imports: [
@@ -86,13 +97,70 @@ export class AssignProgramDialog {
 
   readonly clientId = signal<string | null>(null);
   readonly startDate = signal<Date>(this._today());
+
+  /**
+   * The weekdays the program's training days land on, ISO 1=Mon..7=Sun.
+   *
+   * Empty means "leave it alone" — days fall by counting forward from the
+   * start date, which is what every assignment did before this existed.
+   */
+  readonly chosenDays = signal<number[]>([]);
+
+  /** The program's own day slots, 0=Mon..6=Sun, in order. */
+  readonly programDays = computed(() => {
+    const workouts = this.program().workouts ?? [];
+    return [...new Set(workouts.map((w) => w.dayIndex))].sort((a, b) => a - b);
+  });
+
+  readonly weekdayOptions = WEEKDAYS;
+
+  /**
+   * How many weekdays still need picking. The API refuses a mismatch, so
+   * the dialog says so rather than letting the request fail.
+   */
+  readonly daysRemaining = computed(
+    () => this.programDays().length - this.chosenDays().length,
+  );
+
+  /** Nothing chosen is valid; a partial choice is not. */
+  readonly daysValid = computed(
+    () => this.chosenDays().length === 0 || this.daysRemaining() === 0,
+  );
+
+  /** Worth asking only when the program actually has days to place. */
+  readonly canChooseDays = computed(() => this.programDays().length > 0);
+
+  readonly dayHint = computed(() => {
+    const n = this.programDays().length;
+    if (this.chosenDays().length === 0) {
+      return `This program trains ${n} ${n === 1 ? 'day' : 'days'} a week. Leave empty to count forward from the start date.`;
+    }
+    if (this.daysRemaining() > 0) {
+      return `Pick ${this.daysRemaining()} more.`;
+    }
+    return 'Each training day moves to the weekday you picked, in order.';
+  });
+
+  toggleDay(iso: number): void {
+    this.chosenDays.update((days) =>
+      days.includes(iso) ? days.filter((d) => d !== iso) : [...days, iso].sort((a, b) => a - b),
+    );
+  }
+
+  isDayOn(iso: number): boolean {
+    return this.chosenDays().includes(iso);
+  }
   readonly notes = signal<string>('');
 
   /** Min selectable start date — today. */
   readonly minDate = this._today();
 
   readonly canSubmit = computed(
-    () => !!this.clientId() && !!this.startDate() && !this.submitting(),
+    () =>
+      !!this.clientId() &&
+      !!this.startDate() &&
+      this.daysValid() &&
+      !this.submitting(),
   );
 
   /**
@@ -117,6 +185,7 @@ export class AssignProgramDialog {
           // Reset form so the next open starts fresh.
           this.clientId.set(null);
           this.startDate.set(this._today());
+          this.chosenDays.set([]);
           this.notes.set('');
         }
       });
@@ -143,6 +212,7 @@ export class AssignProgramDialog {
       programId: this.program().id,
       clientId,
       startDate: this._toISODate(start),
+      ...(this.chosenDays().length ? { daysOfWeek: this.chosenDays() } : {}),
       ...(this.notes().trim() ? { notes: this.notes().trim() } : {}),
     };
 

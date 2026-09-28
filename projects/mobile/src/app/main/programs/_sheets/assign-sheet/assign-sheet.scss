@@ -16,3 +16,23 @@ ion-item ion-icon {
   width: 100%;
   text-align: center;
 }
+
+/* The weekday picker. Wraps rather than scrolling: seven short chips fit a
+   phone, and a horizontal scroll would hide the end of the week. */
+.mh-chip-row.days {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.day-hint {
+  display: block;
+  padding: 0.375rem 0.25rem 0;
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}
+
+/* An incomplete pick is refused by the API, so it reads as a warning rather
+   than help text. */
+.day-hint.warn {
+  color: var(--ion-color-warning-wash-contrast);
+}

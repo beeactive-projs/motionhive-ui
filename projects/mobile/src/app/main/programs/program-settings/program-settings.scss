@@ -40,3 +40,12 @@
   --padding-start: 0;
   --padding-end: 0;
 }
+
+/* Shortening deletes the weeks that fall outside the new length, so the
+   count reads as a warning rather than help text. */
+.shrink-warning {
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-warning-wash-contrast);
+  font-size: var(--mh-text-sm);
+  line-height: var(--mh-leading-body);
+}

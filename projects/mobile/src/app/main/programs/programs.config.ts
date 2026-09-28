@@ -292,6 +292,30 @@ export function scheduledDateFor(
   return start;
 }
 
+/**
+ * Which date a week/day lands on when the coach has remapped the program's
+ * days onto chosen weekdays.
+ *
+ * Anchored on the Monday of the start date's week, so `dayIndex` names a
+ * weekday rather than an offset — the same grid the server builds. Week 0
+ * can therefore begin a few days before the start date, which is the
+ * program's own shape rather than a back-fill.
+ */
+export function scheduledDateFromMonday(
+  startDate: string,
+  weekIndex: number,
+  dayIndex: number,
+): Date {
+  const [y, m, d] = startDate.split('-').map(Number);
+  const start = new Date(y, m - 1, d);
+  // 0=Mon..6=Sun, matching `dayIndex`.
+  const daysSinceMonday = (start.getDay() + 6) % 7;
+  const monday = new Date(start);
+  monday.setDate(start.getDate() - daysSinceMonday);
+  monday.setDate(monday.getDate() + weekIndex * DAYS_PER_WEEK + dayIndex);
+  return monday;
+}
+
 /** Local calendar day, not UTC — a start date is a day, not an instant. */
 export function todayIso(): string {
   const now = new Date();

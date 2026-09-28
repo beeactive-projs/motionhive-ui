@@ -60,6 +60,24 @@
     </ng-template>
   </ion-modal>
 
+  <!-- Which weekdays the program's days land on. Optional: left alone, the
+       plan counts forward from the start date as it always has. -->
+  @if (canChooseDays()) {
+    <div class="mh-section-label">Training days</div>
+    <div class="mh-chip-row days">
+      @for (day of weekdayOptions; track day.iso) {
+        <ion-chip
+          [class.selected]="isDayOn(day.iso)"
+          [attr.aria-pressed]="isDayOn(day.iso)"
+          (click)="toggleDay(day.iso)"
+        >
+          {{ day.label }}
+        </ion-chip>
+      }
+    </div>
+    <ion-note class="day-hint" [class.warn]="!daysValid()">{{ dayHint() }}</ion-note>
+  }
+
   <!-- The real work of this sheet: which day lands on which date. A plan that
        puts Day 1 on a Saturday is caught here, not in chat on Wednesday. -->
   @if (preview().length) {

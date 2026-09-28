@@ -59,6 +59,12 @@
             <ion-icon slot="icon-only" name="add-outline" aria-hidden="true" />
           </ion-button>
         </div>
+        @if (doomedDays() > 0) {
+          <p class="shrink-warning">
+            {{ doomedDays() === 1 ? '1 day falls' : doomedDays() + ' days fall' }}
+            outside this length and will be deleted.
+          </p>
+        }
       </section>
 
       <!-- The status card counts what is actually built, so "not ready" is a

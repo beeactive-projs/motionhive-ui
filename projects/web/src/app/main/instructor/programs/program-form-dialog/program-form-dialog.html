@@ -60,6 +60,14 @@
           <p-selectbutton [options]="unitOptions" formControlName="durationUnit" [allowEmpty]="false"
             optionLabel="label" optionValue="value" />
         </div>
+        <!-- Shortening drops the weeks that no longer fit. Said before the
+             save, the way copy-week names what it is about to replace. -->
+        @if (doomedDays() > 0) {
+        <p class="m-0 text-2xs text-warning-color">
+          {{ doomedDays() === 1 ? '1 day falls' : doomedDays() + ' days fall' }}
+          outside this length and will be deleted.
+        </p>
+        }
       </div>
       <div class="flex flex-col gap-1.5">
         <label for="periodization"
