@@ -1292,11 +1292,12 @@
     },
     "joinLink": {
       "errorTitle": "Unable to join",
-      "goToDashboard": "Go to dashboard",
+      "goHome": "Go to home",
       "invalidOrExpired": "This join link is invalid or has expired.",
       "joining": "Joining group...",
       "joiningA11y": "Joining group",
       "missingToken": "Invalid join link. No token provided.",
+      "openGroup": "Open group",
       "successMessage": "You have successfully joined the group.",
       "successTitle": "You're in!"
     },
@@ -1810,34 +1811,6 @@
     },
     "untitledGroup": "Untitled group"
   },
-  "myCoaches": {
-    "confirm": {
-      "cancel": {
-        "header": "Cancel request",
-        "message": "Are you sure you want to cancel your request to {name}?",
-        "thisCoach": "this coach"
-      }
-    },
-    "empty": {
-      "message": "Find and connect with a coach to get started.",
-      "title": "No coaches yet"
-    },
-    "header": {
-      "subtitle": "Manage your coach relationships and requests.",
-      "title": "My coaches"
-    },
-    "pending": {
-      "status": "— request pending",
-      "title": "Pending requests ({count})"
-    },
-    "toast": {
-      "cancelFailed": "Failed to cancel request",
-      "cancelled": {
-        "detail": "Your request has been cancelled"
-      },
-      "loadFailed": "Failed to load coaches"
-    }
-  },
   "mySessions": {
     "book": {
       "approval": "Approval",
@@ -2327,7 +2300,6 @@
     "clients": "Clients",
     "conversation": "Conversation",
     "createAccount": "Create account",
-    "dashboard": "Dashboard",
     "discover": "Discover",
     "discoverGroups": "Discover groups",
     "discoverSessions": "Discover sessions",

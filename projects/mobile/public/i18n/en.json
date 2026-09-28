@@ -2351,6 +2351,7 @@
     "keypad": {
       "backspace": "Backspace",
       "close": "Close number pad",
+      "decimal": "Decimal point",
       "minus": "Minus {step}",
       "numberPad": "Number pad",
       "plus": "Plus {step}",

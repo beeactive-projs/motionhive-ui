@@ -2351,6 +2351,7 @@
     "keypad": {
       "backspace": "Șterge",
       "close": "Închide tastatura numerică",
+      "decimal": "Virgulă zecimală",
       "minus": "Minus {step}",
       "numberPad": "Tastatură numerică",
       "plus": "Plus {step}",

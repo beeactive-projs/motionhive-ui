@@ -1,21 +1,6 @@
-import { inject } from '@angular/core';
-import { Router, Routes, UrlTree } from '@angular/router';
+import { Routes } from '@angular/router';
 
 export const userRoutes: Routes = [
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
-    title: 'pageTitle.dashboard',
-  },
-  {
-    // Legacy path. Coaches now live in the profile "Coaches" tab.
-    path: 'instructors',
-    canActivate: [
-      (): UrlTree =>
-        inject(Router).createUrlTree(['/profile'], { queryParams: { tab: 'coaches' } }),
-    ],
-    children: [],
-  },
   {
     path: 'sessions',
     loadComponent: () => import('./my-sessions/my-sessions').then((m) => m.MySessions),

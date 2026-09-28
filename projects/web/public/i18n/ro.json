@@ -1292,11 +1292,12 @@
     },
     "joinLink": {
       "errorTitle": "Nu te-ai putut alătura",
-      "goToDashboard": "Mergi la panou",
+      "goHome": "Mergi la pagina principală",
       "invalidOrExpired": "Acest link de alăturare este invalid sau a expirat.",
       "joining": "Te alături grupului...",
       "joiningA11y": "Alăturare la grup",
       "missingToken": "Link de alăturare invalid. Lipsește tokenul.",
+      "openGroup": "Deschide grupul",
       "successMessage": "Te-ai alăturat grupului cu succes.",
       "successTitle": "Ai intrat!"
     },
@@ -1810,34 +1811,6 @@
     },
     "untitledGroup": "Grup fără nume"
   },
-  "myCoaches": {
-    "confirm": {
-      "cancel": {
-        "header": "Anulează cererea",
-        "message": "Sigur vrei să anulezi cererea către {name}?",
-        "thisCoach": "acest antrenor"
-      }
-    },
-    "empty": {
-      "message": "Găsește un antrenor și conectează-te cu el ca să începi.",
-      "title": "Încă nu ai antrenori"
-    },
-    "header": {
-      "subtitle": "Gestionează relațiile și cererile cu antrenorii tăi.",
-      "title": "Antrenorii mei"
-    },
-    "pending": {
-      "status": "— cerere în așteptare",
-      "title": "Cereri în așteptare ({count})"
-    },
-    "toast": {
-      "cancelFailed": "Nu am putut anula cererea",
-      "cancelled": {
-        "detail": "Cererea ta a fost anulată"
-      },
-      "loadFailed": "Nu am putut încărca antrenorii"
-    }
-  },
   "mySessions": {
     "book": {
       "approval": "Aprobare",
@@ -2327,7 +2300,6 @@
     "clients": "Clienți",
     "conversation": "Conversație",
     "createAccount": "Creează cont",
-    "dashboard": "Panou",
     "discover": "Descoperă",
     "discoverGroups": "Descoperă grupuri",
     "discoverSessions": "Descoperă sesiuni",

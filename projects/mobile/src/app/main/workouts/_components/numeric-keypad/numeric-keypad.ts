@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { decimalSeparator, localizeTypedNumber } from 'core';
 
 import {
   KeypadField,
@@ -47,7 +48,10 @@ const ALLOWS_DECIMAL: Record<KeypadField, boolean> = {
  * back once, on commit.
  *
  * Held as a string so a trailing decimal point survives typing ("82." on the
- * way to "82.5"); the parent parses on commit.
+ * way to "82.5"); the parent parses on commit. The buffer always uses "." —
+ * that is what the parent seeds and parses — and only what the pad *shows*
+ * (buffer, decimal key, steppers) uses the UI locale's mark, so Romanian
+ * types "82,5" exactly as the set rows display it.
  */
 @Component({
   selector: 'mh-numeric-keypad',
@@ -69,6 +73,9 @@ export class NumericKeypad {
 
   readonly keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
+  /** The decimal key's face: "." in English, "," in Romanian. */
+  readonly decimalMark = decimalSeparator();
+
   /** What the user has typed so far. Seeded from `value` when the cell changes. */
   readonly draft = signal('');
 
@@ -85,7 +92,7 @@ export class NumericKeypad {
     const step = STEP[this.field()];
     return this.isClock()
       ? this._translateService.instant('workouts.keypad.stepSeconds', { step })
-      : `${step}`;
+      : localizeTypedNumber(String(step));
   });
 
   /**
@@ -97,7 +104,7 @@ export class NumericKeypad {
 
   /** What the pad shows back — the clock being built, or the raw number. */
   readonly display = computed(() =>
-    this.isClock() ? clockDigitsToDisplay(this.draft()) : this.draft() || '0',
+    this.isClock() ? clockDigitsToDisplay(this.draft()) : localizeTypedNumber(this.draft() || '0'),
   );
 
   constructor() {
