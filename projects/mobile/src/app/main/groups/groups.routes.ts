@@ -19,7 +19,7 @@ export const groupsRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./groups').then((m) => m.Groups),
-    title: 'Groups - MotionHive',
+    title: 'pageTitle.groups',
   },
   {
     // One post and its comments. Declared before `:groupId`, or that route
@@ -27,23 +27,23 @@ export const groupsRoutes: Routes = [
     // it, because this is where a comment notification lands.
     path: 'post/:postId',
     loadComponent: () => import('./post-detail/post-detail').then((m) => m.PostDetail),
-    title: 'Post - MotionHive',
+    title: 'pageTitle.post',
   },
   {
     // Creating. Before `:groupId`, or that route swallows the word.
     path: 'create',
     loadComponent: () => import('./group-edit/group-edit').then((m) => m.GroupEdit),
-    title: 'New group - MotionHive',
+    title: 'pageTitle.newGroup',
   },
   {
     path: ':groupId/edit',
     loadComponent: () => import('./group-edit/group-edit').then((m) => m.GroupEdit),
-    title: 'Edit group - MotionHive',
+    title: 'pageTitle.editGroup',
   },
   {
     path: ':groupId/compose',
     loadComponent: () => import('./post-compose/post-compose').then((m) => m.PostCompose),
-    title: 'New post - MotionHive',
+    title: 'pageTitle.newPost',
   },
   {
     // The owner's two queues: join requests and posts awaiting review. Its
@@ -51,14 +51,14 @@ export const groupsRoutes: Routes = [
     // notification as often as from the group.
     path: ':groupId/manage',
     loadComponent: () => import('./group-manage/group-manage').then((m) => m.GroupManage),
-    title: 'Manage group - MotionHive',
+    title: 'pageTitle.manageGroup',
   },
   {
     // A post's photos, full screen. Under `post/` so it pushes over the post
     // it came from and the back gesture closes it.
     path: 'post/:postId/photos',
     loadComponent: () => import('./photo-view/photo-view').then((m) => m.PhotoView),
-    title: 'Photos - MotionHive',
+    title: 'pageTitle.photos',
   },
   {
     // A group seen from outside, with the way in. Its own route because the
@@ -67,7 +67,7 @@ export const groupsRoutes: Routes = [
     path: 'preview/:groupId',
     loadComponent: () =>
       import('./group-preview/group-preview').then((m) => m.GroupPreview),
-    title: 'Group - MotionHive',
+    title: 'pageTitle.group',
   },
   {
     // One group: posts, members and about. Which controls appear is decided
@@ -75,6 +75,6 @@ export const groupsRoutes: Routes = [
     path: ':groupId',
     loadComponent: () =>
       import('./group-detail/group-detail').then((m) => m.GroupDetail),
-    title: 'Group - MotionHive',
+    title: 'pageTitle.group',
   },
 ];

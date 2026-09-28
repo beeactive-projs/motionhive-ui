@@ -87,7 +87,7 @@
     </button>
     <button pButton type="button" (click)="sendRequest()" [disabled]="requestingId() !== null">
       <i class="pi" [class]="requestingId() !== null ? 'pi-spinner pi-spin' : 'pi-send'"></i>
-      {{ 'userDialogs.discoverCoaches.requestDialog.send' | translate }}
+      {{ 'button.sendRequest' | translate }}
     </button>
   </ng-template>
 </p-dialog>

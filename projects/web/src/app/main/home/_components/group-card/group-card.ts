@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Group } from 'core';
 import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
@@ -10,12 +11,13 @@ import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
  */
 @Component({
   selector: 'mh-group-card',
-  imports: [ButtonDirective, Hex],
+  imports: [ButtonDirective, Hex, TranslatePipe],
   templateUrl: './group-card.html',
   styleUrl: './group-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupCard {
+  private readonly _translateService = inject(TranslateService);
+
   readonly group = input.required<Group>();
   /** When true, render the "Open" CTA (user is in the group); else render "Join". */
   readonly joined = input<boolean>(false);
@@ -41,7 +43,7 @@ export class GroupCard {
 
   readonly memberSummary = computed(() => {
     const count = this.group().memberCount ?? 0;
-    return `${count} ${count === 1 ? 'member' : 'members'}`;
+    return this._translateService.instant('count.members', { count });
   });
 
   onAction(): void {

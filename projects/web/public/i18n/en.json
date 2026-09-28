@@ -1,4 +1,116 @@
 {
+  "writer": {
+    "confirm": {
+      "delete": {
+        "accept": "Yes, delete",
+        "header": "Delete post",
+        "message": "Are you sure you want to delete \"{title}\"? This action cannot be undone."
+      }
+    },
+    "postDetail": {
+      "addTag": "Add tag",
+      "author": "Author",
+      "backToPosts": "Back to posts",
+      "category": "Category",
+      "categoryPlaceholder": "Select or type a category",
+      "content": "Content",
+      "contentPlaceholder": "Write your post content here...",
+      "coverImage": "Cover image",
+      "coverPreviewAlt": "Cover image preview",
+      "createPost": "Create post",
+      "draftHint": "Draft — only you can see it",
+      "editSlug": "Edit slug",
+      "excerpt": "Excerpt",
+      "excerptPlaceholder": "A short summary shown in post listings...",
+      "guestByline": "Guest byline (optional)",
+      "guestBylineHint": "Leave blank to publish under your own user. Fill in to attribute the post to a guest contributor without a MotionHive account.",
+      "guestBylinePlaceholder": "e.g. Sarah Johnson",
+      "imageTips": {
+        "format": "JPG for photos, PNG only for graphics with hard edges or transparency.",
+        "landscape": {
+          "after": "photo (wider than tall).",
+          "before": "Use a",
+          "emphasis": "landscape"
+        },
+        "minimum": "Minimum: 1200 × 675px. Smaller images look soft on retina screens.",
+        "portrait": "Tall portrait photos will be center-cropped — the top and bottom won't show.",
+        "recommended": {
+          "after": "for sharpest results.",
+          "before": "Recommended:"
+        },
+        "title": "Image tips"
+      },
+      "imageUrl": "Image URL",
+      "kicker": {
+        "editPost": "Edit post",
+        "newPost": "New post"
+      },
+      "languagePlaceholder": "Select a language",
+      "ownBylineNote": "This post will be published under your account. Admins can change the byline.",
+      "postSettings": "Post settings",
+      "published": "Published",
+      "publishedHint": "Visible on the public blog",
+      "publishing": "Publishing",
+      "readTime": "Read time (minutes)",
+      "slug": "Slug",
+      "slugPlaceholder": "post-url-slug",
+      "suggestions": "Suggestions:",
+      "tagPlaceholder": "Add a tag and press Enter",
+      "tags": "Tags",
+      "titlePlaceholder": "Enter post title...",
+      "uploadImage": "Upload image",
+      "urlLabel": "URL:",
+      "validation": {
+        "slugPattern": "Use lowercase letters, numbers, and hyphens only."
+      }
+    },
+    "posts": {
+      "deletePost": "Delete post",
+      "editPost": "Edit post",
+      "empty": {
+        "action": "Write your first post",
+        "message": "Create your first post to start publishing content.",
+        "title": "No posts yet"
+      },
+      "filterCategory": "Category:",
+      "newPost": "New post",
+      "searchPlaceholder": "Search posts...",
+      "subtitle": "Manage and publish blog posts.",
+      "table": {
+        "category": "Category",
+        "created": "Created",
+        "readTime": "Read time"
+      },
+      "title": "Posts"
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published"
+    },
+    "toast": {
+      "created": {
+        "detail": "Your post has been created successfully",
+        "summary": "Post created"
+      },
+      "deleteFailed": "Failed to delete post",
+      "deleted": {
+        "detail": "\"{title}\" has been deleted",
+        "summary": "Post deleted"
+      },
+      "loadFailed": "Failed to load post",
+      "loadListFailed": "Failed to load posts",
+      "ownPostsOnly": "You can only edit your own posts",
+      "saveFailed": "Failed to save post",
+      "updated": {
+        "detail": "Your post has been updated successfully",
+        "summary": "Post updated"
+      },
+      "uploadFailed": {
+        "detail": "Failed to upload image",
+        "summary": "Upload failed"
+      }
+    }
+  },
   "auth": {
     "common": {
       "confirmPasswordRequired": "Please confirm your password",
@@ -523,6 +635,66 @@
       }
     }
   },
+  "coachDashboard": {
+    "activity": {
+      "allEvents": "All events",
+      "allLocations": "All locations",
+      "completedSetup": "signed in for the first time and completed their app setup.",
+      "empty": "No recent activities.",
+      "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
+      "minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
+      "noFilter": "No filter",
+      "title": "Recent activities"
+    },
+    "clients": {
+      "empty": "No clients yet. Start by inviting someone.",
+      "title": "Recent clients"
+    },
+    "groups": {
+      "empty": "No groups yet."
+    },
+    "growth": {
+      "title": "Business growth (past 12 months)"
+    },
+    "header": {
+      "subtitle": "Here's your coaching overview.",
+      "title": "Welcome back, {name}"
+    },
+    "invoices": {
+      "due": "Due {date}",
+      "empty": "No invoices yet.",
+      "noDueDate": "No due date",
+      "title": "Recent invoices"
+    },
+    "kpi": {
+      "activeClients": "Active clients",
+      "outstanding": "Outstanding",
+      "overdue": "{count} overdue",
+      "pending": "{count} pending",
+      "revenueThisMonth": "Revenue this month"
+    },
+    "stats": {
+      "exercise": {
+        "emptyHint": "Make sure you've added clients and set up their exercise plans. Weekly snapshots are calculated every Sunday night.",
+        "title": "Average exercise compliance"
+      },
+      "noStatsYet": "Hmmm... we can't find any stats to graph yet",
+      "nutrition": {
+        "emptyHint": "Make sure you've added clients and set up their nutrition goals and meal tracking. Weekly snapshots are calculated every Sunday night.",
+        "title": "Average nutrition compliance"
+      },
+      "signIns": {
+        "emptyHint": "Your weekly business metrics are calculated every week on Sunday night.",
+        "emptyTitle": "Weekly snapshot coming soon",
+        "title": "Average client sign-ins per week"
+      },
+      "workouts": {
+        "emptyHint": "Make sure you've added clients and scheduled some workouts for them. Weekly snapshots are calculated every Sunday night.",
+        "title": "Average workouts per week"
+      }
+    },
+    "viewAll": "View all"
+  },
   "components": {
     "accessChip": {
       "approvalRequired": "Approval required",
@@ -542,6 +714,54 @@
       "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
       "uncapped": "{count} going · no capacity limit"
     },
+    "errorDialog": {
+      "status": "Error {status}"
+    },
+    "feedbackDialog": {
+      "minLength": "Please write at least {min} characters.",
+      "placeholder": {
+        "BUG": {
+          "message": "What were you doing when it happened? What did you expect vs. what actually occurred?",
+          "title": "e.g. Session attendance not saving correctly"
+        },
+        "OTHER": {
+          "message": "What's on your mind? We're happy to help.",
+          "title": "e.g. Question about managing group sessions"
+        },
+        "SUGGESTION": {
+          "message": "Describe the feature and how it would improve your workflow as a trainer or organizer...",
+          "title": "e.g. Show progress charts per client"
+        }
+      },
+      "send": "Send feedback",
+      "subtitle": "Help us improve MotionHive",
+      "success": {
+        "message": "Your feedback helps us make MotionHive better for everyone.",
+        "title": "Thank you!"
+      },
+      "title": "Share feedback",
+      "toast": {
+        "sendFailed": "Could not send feedback. Please try again."
+      },
+      "type": {
+        "BUG": "Bug report",
+        "OTHER": "Other",
+        "SUGGESTION": "Suggestion"
+      }
+    },
+    "impersonationBanner": {
+      "exit": "Exit impersonation",
+      "message": "You are impersonating a user (admin session)."
+    },
+    "installApp": {
+      "install": "Install app"
+    },
+    "locationPicker": {
+      "hint": "Start typing to search — select a suggestion to confirm.",
+      "locked": "Locked",
+      "noLocationLocked": "No location — locked",
+      "placeholder": "Search for a place..."
+    },
     "notificationBell": {
       "caughtUp": "You're all caught up",
       "emptyHint": "New notifications will show up here.",
@@ -557,10 +777,20 @@
       "member": "Member",
       "noShow": "No-show"
     },
+    "phoneInput": {
+      "countryCode": "Country code",
+      "invalid": "That doesn't look like a valid {country} number.",
+      "placeholder": "Phone number"
+    },
     "privacyChooser": {
       "change": "Visibility: {level}. Change.",
       "locked": "{level} (locked)",
       "managedBySystem": "This setting is managed by the system."
+    },
+    "pwaUpdate": {
+      "message": "A new version of MotionHive is ready.",
+      "reload": "Reload",
+      "title": "Update available"
     },
     "recurrenceBuilder": {
       "afterCount": "After N times",
@@ -589,6 +819,20 @@
         "weeklyNoDays": "Weekly",
         "withCount": "{rule} · {count, plural, one {# occurrence} other {# occurrences}}",
         "withEndDate": "{rule} · until {date}"
+      }
+    },
+    "requestToBeClientDialog": {
+      "header": "Send a request",
+      "intro": "Tell {name} a bit about you and what you're looking for. A short note helps them respond faster — but it's optional.",
+      "introNoName": "Tell this coach a bit about you and what you're looking for. A short note helps them respond faster — but it's optional.",
+      "messageLabel": "Message",
+      "placeholder": "Hi! I'd love to train with you.",
+      "toast": {
+        "sendFailed": "Failed to send request",
+        "sent": {
+          "detail": "Your request to join {name} was sent.",
+          "detailNoName": "Your request to join this coach was sent."
+        }
       }
     },
     "searchModal": {
@@ -627,12 +871,96 @@
       "select": "Select {title}",
       "untitled": "(untitled)"
     },
+    "shareDialog": {
+      "anywhere": "Anywhere",
+      "copied": "Copied",
+      "defaultHeadline": "Share this profile",
+      "defaultShareText": "Check this out on MotionHive",
+      "defaultSubcopy": "Drop this link in your Instagram bio, your story, or anywhere people can find you.",
+      "previewLabel": "Preview · How it looks when shared",
+      "toast": {
+        "anywhereHint": "Paste it anywhere you want to share.",
+        "instagramHint": "Paste it in your Instagram bio, story, or DM."
+      }
+    },
+    "themeToggle": {
+      "switchToDark": "Switch to dark mode",
+      "switchToLight": "Switch to light mode"
+    },
     "userSearch": {
       "empty": "No matching users. Try inviting by email instead.",
       "placeholder": "Search by name or email…"
     },
+    "waitlistDialog": {
+      "emailPlaceholder": "your@email.com",
+      "intro": "We're building something special. Drop your email and we'll notify you the moment we're live.",
+      "maybeLater": "Maybe later",
+      "namePlaceholder": "Your name",
+      "notifyMe": "Notify me",
+      "role": {
+        "instructor": "I lead activities",
+        "user": "I join activities"
+      },
+      "roleLabel": "How will you MotionHive?",
+      "subtitle": "Be the first to know when MotionHive launches",
+      "success": {
+        "message": "We'll reach out as soon as MotionHive is ready. Thanks for believing in what we're building.",
+        "title": "You're in!"
+      },
+      "title": "Stay in the loop",
+      "toast": {
+        "joinFailed": "Could not join the waitlist. Please try again."
+      }
+    },
     "weekStrip": {
       "navigator": "Week navigator"
+    }
+  },
+  "discover": {
+    "coaches": {
+      "chips": {
+        "boxing": "Boxing",
+        "hiit": "HIIT",
+        "mobility": "Mobility",
+        "pilates": "Pilates",
+        "strength": "Strength",
+        "yoga": "Yoga"
+      },
+      "empty": "No coaches match yet — try a different search.",
+      "experience": "{count, plural, one {# yr experience} other {# yrs experience}}",
+      "newCoach": "New coach",
+      "online": "Online"
+    },
+    "groups": {
+      "empty": "No groups found — try a different search."
+    },
+    "head": {
+      "subtitle": "Coaches, sessions, and groups — all in one place. Use ⌘K up top when you already know what you want.",
+      "title": "Find your people in the hive"
+    },
+    "search": {
+      "placeholder": "Search coaches, sessions, venues…"
+    },
+    "sessions": {
+      "empty": "No sessions found — try a different search or filter."
+    },
+    "tabs": {
+      "coaches": "Coaches",
+      "groups": "Groups",
+      "sessions": "Sessions"
+    },
+    "toast": {
+      "cancelFailed": "Could not cancel request",
+      "joinFailed": "Could not join group",
+      "joined": {
+        "detail": "You're now a member of \"{name}\".",
+        "summary": "Joined"
+      },
+      "loadCoachesFailed": "Could not load coaches",
+      "loadGroupsFailed": "Could not load groups",
+      "requestSent": {
+        "detail": "The owner will review your request to join."
+      }
     }
   },
   "errorPages": {
@@ -959,11 +1287,8 @@
       "tagPlaceholder": "Add a tag and press Enter"
     },
     "join": {
-      "cancelRequest": "Cancel request",
       "inviteOnly": "Invite only",
-      "joinGroup": "Join group",
-      "requestPending": "Request pending",
-      "requestToJoin": "Request to join"
+      "requestPending": "Request pending"
     },
     "joinLink": {
       "errorTitle": "Unable to join",
@@ -1180,11 +1505,9 @@
       "removeMemberFailed": "Failed to remove member",
       "replyPostFailed": "Could not post reply",
       "requestApproved": "Request approved",
-      "requestCancelled": "Request cancelled",
       "requestRejected": "Request rejected",
       "requestSent": {
-        "detail": "The owner will review your request to join.",
-        "summary": "Request sent"
+        "detail": "The owner will review your request to join."
       },
       "requestUpdateFailed": "Could not update request",
       "revokeLinkFailed": "Failed to revoke join link",
@@ -1205,6 +1528,156 @@
       "subtitleCoach": "Organize your clients into groups for sessions and communication.",
       "subtitleMember": "Groups you belong to.",
       "title": "Your groups"
+    }
+  },
+  "home": {
+    "blogCard": {
+      "quickRead": "Quick read",
+      "readMore": "Read more"
+    },
+    "coaches": {
+      "discoverMore": "Discover more",
+      "empty": {
+        "sub": "Know one who'd be a great fit? Suggest them",
+        "title": "No coaches to show yet"
+      },
+      "loading": "Loading coaches",
+      "moreSoon": "More joining soon.",
+      "openToNewClients": "Open to new clients",
+      "some": "Some of our coaches",
+      "yours": "Your coaches"
+    },
+    "field": {
+      "namePlaceholder": "e.g. Mia Petrescu",
+      "sendInvite": "Send invite",
+      "theirEmail": "Their email",
+      "theirName": "Their name"
+    },
+    "groupCard": {
+      "noDescription": "No description yet."
+    },
+    "hero": {
+      "body": "A few coaches, a growing set of sessions, and a community just finding its feet. Here's a calm place to settle in and pick up where you left off.",
+      "fallbackName": "there",
+      "title": "Good to see you,",
+      "titleName": "{name}."
+    },
+    "instructorCard": {
+      "roleWithYears": "{specialization} · {count, plural, one {# yr} other {# yrs}}"
+    },
+    "inviteBand": {
+      "body": "The hive grows by word of mouth. MotionHive is free to join — bring someone you'd actually train with.",
+      "invite": "Invite a friend",
+      "suggestCoach": "Suggest a coach",
+      "title": "Know someone who'd love it here?"
+    },
+    "inviteFriend": {
+      "body": "MotionHive is free to join. Share the link with someone you'd actually train with.",
+      "emailHint": "We'll send them a friendly note with your invite link.",
+      "emailPlaceholder": "friend@example.com",
+      "linkFootnote": "The link drops them straight on sign-up.",
+      "linkHint": "Share this link anywhere — WhatsApp, Slack, a text message.",
+      "messageLabel": "Personal message",
+      "messagePlaceholder": "Hey — come train with me on MotionHive.",
+      "share": {
+        "text": "Come train with me on MotionHive — your first session's on us.",
+        "title": "Train with me on MotionHive"
+      },
+      "success": {
+        "body": "We'll email them and let them know you sent the invite.",
+        "title": "On its way."
+      },
+      "tab": {
+        "email": "Send an email",
+        "link": "Get a link"
+      },
+      "title": "Bring a friend, train together.",
+      "toast": {
+        "copied": "Send it to your friend — first session is on us.",
+        "copyFailed": {
+          "detail": "Select the link and copy it manually.",
+          "summary": "Couldn't copy"
+        },
+        "sendFailed": {
+          "detail": "Try again in a moment, or copy the link from the other tab.",
+          "summary": "Couldn't send the invite"
+        }
+      },
+      "validation": {
+        "emailInvalid": "Hmm, that doesn't look like an email.",
+        "emailRequired": "What's your friend's email?"
+      }
+    },
+    "journal": {
+      "empty": "No posts yet. Check back soon — our first reads are landing.",
+      "eyebrow": "From the journal",
+      "loading": "Loading articles",
+      "minRead": "{minutes} min read",
+      "readAll": "Read all",
+      "title": "Reads from the hive"
+    },
+    "resume": {
+      "label": "Pick up where you left off"
+    },
+    "steps": {
+      "coach": {
+        "sub": "Book time with someone you rate.",
+        "title": "Find a coach for yourself"
+      },
+      "eyebrow": "Start here",
+      "profile": {
+        "sub": "So coaches and clients know who you are.",
+        "title": "Finish your profile"
+      },
+      "session": {
+        "sub": "Online or in person, group or 1-on-1.",
+        "title": "Create your first session"
+      }
+    },
+    "suggestCoach": {
+      "body": "Email them directly, or tell us about them and we'll reach out for you.",
+      "direct": {
+        "emailError": "We need a valid email to reach them.",
+        "emailPlaceholder": "coach@example.com",
+        "hint": "We'll send them a friendly invite — and let them know you sent it.",
+        "nameError": "Their name helps us address the email.",
+        "noteLabel": "A line about you",
+        "notePlaceholder": "Hey Mia — your spin classes are the best, you'd love this platform."
+      },
+      "success": {
+        "directBody": "We've emailed them with your name on it. Suggest as many as you like.",
+        "directTitle": "On its way to them.",
+        "teamBody": "We'll reach out and let you know what they say. Suggest as many as you like.",
+        "teamTitle": "Thanks — we'll take it from here."
+      },
+      "tab": {
+        "direct": "Email the coach",
+        "team": "Tell us about them"
+      },
+      "team": {
+        "contactError": "A bit more detail, please.",
+        "contactLabel": "How to reach them",
+        "contactPlaceholder": "email, Instagram handle, phone…",
+        "hint": "Don't have their email? Send us anything — Instagram, phone, a name. We'll find them.",
+        "nameError": "Their name helps us find them.",
+        "noteLabel": "What makes them great?",
+        "notePlaceholder": "A line or two — we'll mention you when we reach out.",
+        "submit": "Send suggestion"
+      },
+      "title": "Know a great coach?",
+      "toast": {
+        "sendFailed": {
+          "detail": "Try again in a moment, or use the other tab.",
+          "summary": "Couldn't send the suggestion"
+        },
+        "teamFailed": {
+          "detail": "Try again in a moment.",
+          "summary": "Couldn't send"
+        }
+      }
+    },
+    "toast": {
+      "rateLimited": "You've sent a lot recently — try again in an hour."
     }
   },
   "messages": {
@@ -1337,6 +1810,34 @@
     },
     "untitledGroup": "Untitled group"
   },
+  "myCoaches": {
+    "confirm": {
+      "cancel": {
+        "header": "Cancel request",
+        "message": "Are you sure you want to cancel your request to {name}?",
+        "thisCoach": "this coach"
+      }
+    },
+    "empty": {
+      "message": "Find and connect with a coach to get started.",
+      "title": "No coaches yet"
+    },
+    "header": {
+      "subtitle": "Manage your coach relationships and requests.",
+      "title": "My coaches"
+    },
+    "pending": {
+      "status": "— request pending",
+      "title": "Pending requests ({count})"
+    },
+    "toast": {
+      "cancelFailed": "Failed to cancel request",
+      "cancelled": {
+        "detail": "Your request has been cancelled"
+      },
+      "loadFailed": "Failed to load coaches"
+    }
+  },
   "mySessions": {
     "book": {
       "approval": "Approval",
@@ -1381,7 +1882,6 @@
       "free": "Free",
       "goToSessions": "Go to Sessions",
       "loadingSession": "Loading session…",
-      "requestToJoin": "Request to join",
       "untitled": "(Session)"
     },
     "dayOf": {
@@ -1498,7 +1998,6 @@
       "newPrs": "{count, plural, one {New 1RM PR} other {New 1RM PRs}}",
       "newRoutine": "New routine",
       "onSchedule": "{name} is on your schedule.",
-      "optional": "(optional)",
       "pleaseRetry": "Please retry.",
       "reps": "Reps",
       "routineNamePlaceholder": "e.g. Push day A",
@@ -1820,6 +2319,65 @@
       "prs": "{count, plural, one {PR} other {# PRs}}",
       "setsPartial": "{done}/{total, plural, one {# set} other {# sets}}"
     }
+  },
+  "pageTitle": {
+    "approvals": "Approvals",
+    "attendance": "Attendance",
+    "clientProfile": "Client profile",
+    "clients": "Clients",
+    "conversation": "Conversation",
+    "createAccount": "Create account",
+    "dashboard": "Dashboard",
+    "discover": "Discover",
+    "discoverGroups": "Discover groups",
+    "discoverSessions": "Discover sessions",
+    "editPost": "Edit post",
+    "exerciseProgress": "Exercise progress",
+    "exercises": "Exercises",
+    "facebookSignIn": "Facebook sign in",
+    "feed": "Feed",
+    "groupDetails": "Group details",
+    "groupPreview": "Group preview",
+    "groups": "Groups",
+    "home": "Home",
+    "invoice": "Invoice",
+    "invoiceDetails": "Invoice details",
+    "joinGroup": "Join group",
+    "joinSession": "Join session",
+    "manageSessions": "Manage sessions",
+    "membershipDetails": "Membership details",
+    "messages": "Messages",
+    "myPlan": "My plan",
+    "myPlans": "My plans",
+    "myProfile": "My profile",
+    "myProgress": "My progress",
+    "mySchedule": "My schedule",
+    "mySessions": "My sessions",
+    "newPassword": "New password",
+    "newPost": "New post",
+    "onboarding": "Onboarding",
+    "overview": "Overview",
+    "pageNotFound": "Page not found",
+    "payment": "Payment",
+    "payments": "Payments",
+    "pendingRequests": "Pending requests",
+    "photo": "Photo",
+    "posts": "Posts",
+    "programDetail": "Program detail",
+    "programs": "Programs",
+    "recurringSession": "Recurring session",
+    "resetPassword": "Reset password",
+    "routine": "Routine",
+    "serverError": "Server error",
+    "session": "Session",
+    "sessionsCalendar": "Sessions calendar",
+    "signIn": "Sign in",
+    "verifyEmail": "Verify email",
+    "workout": "Workout",
+    "workoutComplete": "Workout complete",
+    "workoutReplay": "Workout replay",
+    "workouts": "Workouts",
+    "yourGroups": "Your groups"
   },
   "paymentDialogs": {
     "createInvoice": {
@@ -2628,13 +3186,11 @@
         "wantsToAdd": "wants to add you as a client"
       },
       "list": {
-        "discover": "Discover coaches",
         "endCollaboration": "End collaboration",
         "subtitle": "Coaches you're currently working with.",
         "title": "My coaches"
       },
       "outgoing": {
-        "cancel": "Cancel request",
         "title": "Your pending requests ({count})",
         "waiting": "— waiting for response"
       },
@@ -2645,7 +3201,6 @@
           "summary": "Request accepted"
         },
         "cancelFailed": "Failed to cancel request",
-        "cancelled": "Request cancelled",
         "declineFailed": "Failed to decline request",
         "declined": "Request declined",
         "endFailed": "Failed to end relationship",
@@ -3991,7 +4546,6 @@
       "requestDialog": {
         "messageLabel": "Message (optional)",
         "messagePlaceholder": "Introduce yourself or explain why you'd like to train with this coach...",
-        "send": "Send request",
         "title": "Send request"
       },
       "searchPlaceholder": "Search by name, specialization, or city...",
@@ -3999,8 +4553,7 @@
       "toast": {
         "requestFailed": "Failed to send request",
         "requestSent": {
-          "detail": "Your request to join {name} was sent successfully",
-          "summary": "Request sent"
+          "detail": "Your request to join {name} was sent successfully"
         },
         "searchFailed": "Failed to search coaches"
       }

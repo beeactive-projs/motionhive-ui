@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   input,
@@ -7,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ClientService, showApiError } from 'core';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -24,18 +24,19 @@ import { TextareaModule } from 'primeng/textarea';
  */
 @Component({
   selector: 'mh-request-to-be-client-dialog',
-  imports: [FormsModule, Dialog, ButtonDirective, TextareaModule],
+  imports: [FormsModule, Dialog, ButtonDirective, TextareaModule, TranslatePipe],
   providers: [MessageService],
   templateUrl: './request-to-be-client-dialog.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RequestToBeClientDialog {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model<boolean>(false);
   readonly instructorUserId = input.required<string>();
-  readonly instructorName = input<string>('this instructor');
+  /** Coach's display name. When absent the copy falls back to "this coach". */
+  readonly instructorName = input<string>();
 
   readonly message = signal('');
   readonly submitting = signal(false);
@@ -50,18 +51,28 @@ export class RequestToBeClientDialog {
           this.submitting.set(false);
           this.visible.set(false);
           this.message.set('');
+          const name = this.instructorName();
           this._messageService.add({
             severity: 'success',
-            summary: 'Request sent',
-            detail: `Your request to join ${this.instructorName()} was sent.`,
+            summary: this._translateService.instant(
+              'toast.summary.requestSent',
+            ),
+            detail: name
+              ? this._translateService.instant(
+                  'components.requestToBeClientDialog.toast.sent.detail',
+                  { name },
+                )
+              : this._translateService.instant(
+                  'components.requestToBeClientDialog.toast.sent.detailNoName',
+                ),
           });
         },
         error: (err: unknown) => {
           this.submitting.set(false);
           showApiError(
             this._messageService,
-            'Error',
-            'Failed to send request',
+            this._translateService.instant('toast.summary.error'),
+            this._translateService.instant('components.requestToBeClientDialog.toast.sendFailed'),
             err,
           );
         },

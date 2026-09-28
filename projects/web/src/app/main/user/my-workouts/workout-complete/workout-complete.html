@@ -132,7 +132,7 @@
     <input pInputText id="rname" fluid [ngModel]="routineName()" (ngModelChange)="routineName.set($event)"
       maxlength="200" [placeholder]="'myWorkouts.common.routineNamePlaceholder' | translate" autocomplete="off" />
     <label for="rfolder" class="text-xs font-semibold">
-      {{ 'myWorkouts.common.folder' | translate }} <span class="font-normal text-muted-color">{{ 'myWorkouts.common.optional' | translate }}</span>
+      {{ 'myWorkouts.common.folder' | translate }} <span class="font-normal text-muted-color">{{ 'form.hint.optional' | translate }}</span>
     </label>
     <input pInputText id="rfolder" fluid [ngModel]="routineFolder()" (ngModelChange)="routineFolder.set($event)"
       maxlength="100" [placeholder]="'myWorkouts.common.folderPlaceholder' | translate" autocomplete="off" />

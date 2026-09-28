@@ -4,16 +4,16 @@ export const writerRoutes: Routes = [
   {
     path: 'posts',
     loadComponent: () => import('./posts/posts').then((m) => m.Posts),
-    title: 'Posts - MotionHive',
+    title: 'pageTitle.posts',
   },
   {
     path: 'posts/new',
     loadComponent: () => import('./posts/post-detail/post-detail').then((m) => m.PostDetail),
-    title: 'New Post - MotionHive',
+    title: 'pageTitle.newPost',
   },
   {
     path: 'posts/:slug',
     loadComponent: () => import('./posts/post-detail/post-detail').then((m) => m.PostDetail),
-    title: 'Edit Post - MotionHive',
+    title: 'pageTitle.editPost',
   },
 ];

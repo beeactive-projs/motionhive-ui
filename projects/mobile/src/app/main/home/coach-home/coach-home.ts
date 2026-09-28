@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonButton,
   IonCard,
@@ -31,6 +32,7 @@ import { CoachHomeStore } from './coach-home.store';
     IonNote,
     IonSkeletonText,
     StatTile,
+    TranslatePipe,
   ],
   templateUrl: './coach-home.html',
   styleUrl: './coach-home.scss',
@@ -38,6 +40,7 @@ import { CoachHomeStore } from './coach-home.store';
 })
 export class CoachHome implements OnInit, ViewWillEnter {
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly store = inject(CoachHomeStore);
 
@@ -72,13 +75,14 @@ export class CoachHome implements OnInit, ViewWillEnter {
 
   outstandingHint(): string {
     const overdue = this.store.earnings()?.overdueInvoiceCount ?? 0;
-    if (overdue === 0) return 'Nothing overdue';
-    return overdue === 1 ? '1 overdue invoice' : `${overdue} overdue invoices`;
+    if (overdue === 0) return this._translateService.instant('home.coach.outstanding.nothingOverdue');
+    return this._translateService.instant('home.coach.outstanding.overdue', { count: overdue });
   }
 
   requestsSummary(): string {
-    const count = this.store.pendingRequests();
-    return count === 1 ? '1 client request waiting' : `${count} client requests waiting`;
+    return this._translateService.instant('home.coach.requests.summary', {
+      count: this.store.pendingRequests(),
+    });
   }
 
   openRequests(): void {

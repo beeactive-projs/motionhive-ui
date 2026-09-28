@@ -1,9 +1,9 @@
 <div class="mh-page">
   <div>
     <ion-note class="mh-kicker" color="medium">
-      {{ today() | date: 'EEEE, MMM d' }}
+      {{ today() | date: 'EEEE, d MMM' }}
     </ion-note>
-    <h1>Your coaching day</h1>
+    <h1>{{ 'home.coach.title' | translate }}</h1>
   </div>
 
   <!--
@@ -15,10 +15,12 @@
     <ion-item lines="none">
       <ion-label>
         <ion-note class="mh-kicker" color="medium">
-          Agenda · {{ today() | date: 'MMM d' }}
+          {{ 'home.coach.agenda.kicker' | translate: { date: (today() | date: 'd MMM') } }}
         </ion-note>
       </ion-label>
-      <ion-button slot="end" fill="clear" size="small" (click)="openSessions()">Calendar</ion-button>
+      <ion-button slot="end" fill="clear" size="small" (click)="openSessions()">
+        {{ 'home.coach.agenda.calendar' | translate }}
+      </ion-button>
     </ion-item>
 
     @if (store.agendaLoading()) {
@@ -38,10 +40,12 @@
       -->
       <ion-item class="agenda-row" lines="none">
         <ion-note slot="start" aria-hidden="true">—</ion-note>
-        <ion-label color="medium" class="ion-text-wrap">No sessions scheduled today.</ion-label>
+        <ion-label color="medium" class="ion-text-wrap">
+          {{ 'home.coach.agenda.empty' | translate }}
+        </ion-label>
         <ion-button slot="end" size="small" (click)="openSessions()">
           <ion-icon slot="start" name="add" aria-hidden="true" />
-          New
+          {{ 'home.coach.agenda.new' | translate }}
         </ion-button>
       </ion-item>
     } @else {
@@ -65,25 +69,25 @@
       <ion-item lines="none">
         <ion-label class="ion-text-wrap">
           <h2>{{ requestsSummary() }}</h2>
-          <p>Waiting for your approval.</p>
+          <p>{{ 'home.coach.requests.hint' | translate }}</p>
         </ion-label>
-        <ion-note slot="end">Review</ion-note>
+        <ion-note slot="end">{{ 'home.coach.requests.review' | translate }}</ion-note>
       </ion-item>
     </ion-card>
   }
 
   <div class="tiles">
     <mh-stat-tile
-      label="Outstanding"
+      [label]="'home.coach.outstanding.label' | translate"
       [value]="outstanding()"
       [hint]="outstandingHint()"
       [hintColor]="hasOverdue() ? 'danger' : null"
       [loading]="store.earningsLoading()"
     />
     <mh-stat-tile
-      label="Active clients"
+      [label]="'home.coach.activeClients.label' | translate"
       [value]="'' + store.activeClients()"
-      hint="Currently training with you"
+      [hint]="'home.coach.activeClients.hint' | translate"
       [loading]="store.clientsLoading()"
     />
   </div>

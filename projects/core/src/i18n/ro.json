@@ -28,6 +28,7 @@
     "archive": "Arhivează",
     "back": "Înapoi",
     "cancel": "Anulează",
+    "cancelRequest": "Anulează cererea",
     "change": "Schimbă",
     "clear": "Golește",
     "clearFilter": "Șterge filtrul",
@@ -42,12 +43,14 @@
     "decline": "Refuză",
     "delete": "Șterge",
     "discard": "Renunță",
+    "discoverCoaches": "Descoperă antrenori",
     "dismiss": "Închide",
     "done": "Gata",
     "duplicate": "Duplică",
     "edit": "Editează",
     "invite": "Invită",
     "join": "Alătură-te",
+    "joinGroup": "Alătură-te grupului",
     "keep": "Păstrează",
     "keepIt": "Păstrează",
     "leave": "Părăsește",
@@ -59,6 +62,7 @@
     "previous": "Înapoi",
     "reject": "Respinge",
     "remove": "Elimină",
+    "requestToJoin": "Cere să te alături",
     "resend": "Retrimite",
     "reset": "Resetează",
     "restore": "Restaurează",
@@ -70,6 +74,7 @@
     "seeAll": "Vezi tot",
     "select": "Alege",
     "send": "Trimite",
+    "sendRequest": "Trimite cererea",
     "share": "Distribuie",
     "showLess": "Arată mai puțin",
     "showMore": "Arată mai mult",
@@ -84,18 +89,21 @@
     "update": "Actualizează",
     "upload": "Încarcă",
     "view": "Vezi",
+    "viewProfile": "Vezi profilul",
     "yes": "Da"
   },
   "common": {
     "actions": "Acțiuni",
     "all": "Toate",
     "and": "și",
+    "appName": "MotionHive",
     "filters": "Filtre",
     "filtersCount": "Filtre · {count}",
     "loading": "Se încarcă…",
     "none": "Niciunul",
     "oneOff": "Plată unică",
     "or": "sau",
+    "pageTitle": "{page} - MotionHive",
     "paginator": "Afișezi {first} - {last} din {total}",
     "pleaseTryAgain": "Încearcă din nou.",
     "session": "Sesiune",
@@ -133,6 +141,12 @@
     "nothingYet": "Nimic aici deocamdată"
   },
   "enum": {
+    "blogCategory": {
+      "Guide": "Ghid",
+      "Nutrition": "Nutriție",
+      "Science": "Știință",
+      "Wellness": "Stare de bine"
+    },
     "cancelScope": {
       "series": "Toată seria",
       "this": "Doar această sesiune",
@@ -427,6 +441,7 @@
   },
   "form": {
     "hint": {
+      "optional": "(opțional)",
       "passwordMinLength": "Min. 8 caractere",
       "reenterPassword": "Introdu parola din nou"
     },
@@ -585,6 +600,8 @@
       "copied": "Copiat",
       "error": "Eroare",
       "info": "Info",
+      "requestCancelled": "Cerere anulată",
+      "requestSent": "Cerere trimisă",
       "saved": "Salvat",
       "success": "Gata",
       "warning": "Atenție"

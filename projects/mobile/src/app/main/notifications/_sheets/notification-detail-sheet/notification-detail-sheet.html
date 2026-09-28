@@ -17,24 +17,24 @@
   <div class="actions">
     <ion-button fill="outline" color="medium" expand="block" (click)="toggleRead.emit()">
       <ion-icon slot="start" name="checkmark-done-outline" />
-      {{ isUnread() ? 'Mark read' : 'Mark unread' }}
+      {{ (isUnread() ? 'notifications.markRead' : 'notifications.markUnread') | translate }}
     </ion-button>
     <ion-button fill="outline" color="danger" expand="block" (click)="remove.emit()">
       <ion-icon slot="start" name="trash-outline" />
-      Delete
+      {{ 'button.delete' | translate }}
     </ion-button>
   </div>
 
   @if (elsewhere(); as place) {
   <ion-note class="footnote">
-    {{ place }} lives on the web for now. This will open in the app once it ships here.
+    {{ 'notifications.detail.webOnly' | translate: { place: place } }}
   </ion-note>
   } }
 </ng-template>
 
 <mh-sheet-shell
   [(open)]="open"
-  title="Notification"
+  [title]="'notifications.detail.title' | translate"
   [body]="body"
   [showFooter]="false"
   [breakpoints]="[0, 0.6]"

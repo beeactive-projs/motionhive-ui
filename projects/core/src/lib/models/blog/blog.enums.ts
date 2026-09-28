@@ -1,5 +1,8 @@
 import { SelectItem } from 'primeng/api';
 
+import { languageName } from '../../i18n/language-name';
+import { translate } from '../../i18n/translator';
+
 export const BlogCategories = {
   Guide: 'Guide',
   Nutrition: 'Nutrition',
@@ -9,12 +12,26 @@ export const BlogCategories = {
 
 export type BlogCategory = (typeof BlogCategories)[keyof typeof BlogCategories];
 
-export const BLOG_CATEGORY_OPTIONS: SelectItem<BlogCategory>[] = [
-  { label: 'Guide', value: BlogCategories.Guide },
-  { label: 'Nutrition', value: BlogCategories.Nutrition },
-  { label: 'Science', value: BlogCategories.Science },
-  { label: 'Wellness', value: BlogCategories.Wellness },
-];
+/**
+ * A post's category in the UI language (`enum.blogCategory`). The built-in
+ * categories are copy; any other one a writer typed is data, shown as stored.
+ */
+export function blogCategoryLabel(category: string | null | undefined): string {
+  if (!category) return '';
+  const key = `enum.blogCategory.${category}`;
+  const label = translate(key);
+  return label === key ? category : label;
+}
+
+/** Labels are getters — this is a module constant, read after translations load. */
+export const BLOG_CATEGORY_OPTIONS: SelectItem<BlogCategory>[] = Object.values(BlogCategories).map(
+  (value) => ({
+    value,
+    get label() {
+      return blogCategoryLabel(value);
+    },
+  }),
+);
 
 export const BlogLanguages = {
   English: 'en',
@@ -23,7 +40,12 @@ export const BlogLanguages = {
 
 export type BlogLanguage = (typeof BlogLanguages)[keyof typeof BlogLanguages];
 
-export const BLOG_LANGUAGE_OPTIONS: SelectItem<BlogLanguage>[] = [
-  { label: 'English', value: BlogLanguages.English },
-  { label: 'Romanian', value: BlogLanguages.Romanian },
-];
+/** The language a post is written in, named in its own language ("Română"). */
+export const BLOG_LANGUAGE_OPTIONS: SelectItem<BlogLanguage>[] = Object.values(BlogLanguages).map(
+  (value) => ({
+    value,
+    get label() {
+      return languageName(value);
+    },
+  }),
+);

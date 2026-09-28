@@ -21,7 +21,7 @@
       }
       <ion-note>{{ meta() }}</ion-note>
       @if (booked()) {
-        <ion-badge data-tone="success">Booked</ion-badge>
+        <ion-badge data-tone="success">{{ 'discover.row.booked' | translate }}</ion-badge>
       }
     </div>
     @if (chip(); as chip) {
@@ -35,7 +35,7 @@
 
   <div class="price" slot="end">
     @if (isFree()) {
-      <span class="amount free">Free</span>
+      <span class="amount free">{{ 'discover.row.free' | translate }}</span>
     } @else {
       <span class="amount">{{ priceAmount() }}</span>
       <span class="currency">{{ priceCurrency() }}</span>

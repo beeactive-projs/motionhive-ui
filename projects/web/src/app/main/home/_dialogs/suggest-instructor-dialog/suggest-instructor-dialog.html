@@ -15,20 +15,20 @@
 >
   <div class="suggest-instructor">
     @if (sent() === null) {
-      <h2 class="suggest-instructor__title">Know a great coach?</h2>
+      <h2 class="suggest-instructor__title">{{ 'home.suggestCoach.title' | translate }}</h2>
       <p class="suggest-instructor__body">
-        Email them directly, or tell us about them and we'll reach out for you.
+        {{ 'home.suggestCoach.body' | translate }}
       </p>
 
       <p-tabs value="direct">
         <p-tablist>
           <p-tab value="direct">
             <i class="pi pi-envelope"></i>
-            <span class="ml-2">Email the coach</span>
+            <span class="ml-2">{{ 'home.suggestCoach.tab.direct' | translate }}</span>
           </p-tab>
           <p-tab value="team">
             <i class="pi pi-users"></i>
-            <span class="ml-2">Tell us about them</span>
+            <span class="ml-2">{{ 'home.suggestCoach.tab.team' | translate }}</span>
           </p-tab>
         </p-tablist>
 
@@ -36,57 +36,57 @@
           <p-tabpanel value="direct">
             <div class="suggest-instructor__panel">
               <p class="suggest-instructor__hint">
-                We'll send them a friendly invite — and let them know you sent it.
+                {{ 'home.suggestCoach.direct.hint' | translate }}
               </p>
               <form [formGroup]="directForm" (ngSubmit)="onSendDirect()">
                 <div class="suggest-instructor__field">
-                  <label for="direct-name" class="suggest-instructor__label">Their name</label>
+                  <label for="direct-name" class="suggest-instructor__label">{{ 'home.field.theirName' | translate }}</label>
                   <input
                     id="direct-name"
                     pInputText
                     type="text"
                     formControlName="coachName"
-                    placeholder="e.g. Mia Petrescu"
+                    [placeholder]="'home.field.namePlaceholder' | translate"
                     fluid
                     autocomplete="off"
                   />
                   @if (isFieldInvalid(directForm, 'coachName')) {
-                    <p-message severity="error" size="small" variant="simple">Their name helps us address the email.</p-message>
+                    <p-message severity="error" size="small" variant="simple">{{ 'home.suggestCoach.direct.nameError' | translate }}</p-message>
                   }
                 </div>
 
                 <div class="suggest-instructor__field">
-                  <label for="direct-email" class="suggest-instructor__label">Their email</label>
+                  <label for="direct-email" class="suggest-instructor__label">{{ 'home.field.theirEmail' | translate }}</label>
                   <input
                     id="direct-email"
                     pInputText
                     type="email"
                     formControlName="email"
-                    placeholder="coach@example.com"
+                    [placeholder]="'home.suggestCoach.direct.emailPlaceholder' | translate"
                     fluid
                     autocomplete="off"
                   />
                   @if (isFieldInvalid(directForm, 'email')) {
-                    <p-message severity="error" size="small" variant="simple">We need a valid email to reach them.</p-message>
+                    <p-message severity="error" size="small" variant="simple">{{ 'home.suggestCoach.direct.emailError' | translate }}</p-message>
                   }
                 </div>
 
                 <div class="suggest-instructor__field">
                   <label for="direct-note" class="suggest-instructor__label">
-                    A line about you <span class="suggest-instructor__optional">(optional)</span>
+                    {{ 'home.suggestCoach.direct.noteLabel' | translate }} <span class="suggest-instructor__optional">{{ 'form.hint.optional' | translate }}</span>
                   </label>
                   <textarea
                     id="direct-note"
                     pTextarea
                     rows="3"
                     formControlName="note"
-                    placeholder="Hey Mia — your spin classes are the best, you'd love this platform."
+                    [placeholder]="'home.suggestCoach.direct.notePlaceholder' | translate"
                     fluid
                   ></textarea>
                 </div>
 
                 <button pButton type="submit" fluid [disabled]="directForm.invalid || isSending()">
-                  Send invite
+                  {{ 'home.field.sendInvite' | translate }}
                   <i class="pi" [class]="isSending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
                 </button>
               </form>
@@ -96,57 +96,57 @@
           <p-tabpanel value="team">
             <div class="suggest-instructor__panel">
               <p class="suggest-instructor__hint">
-                Don't have their email? Send us anything — Instagram, phone, a name. We'll find them.
+                {{ 'home.suggestCoach.team.hint' | translate }}
               </p>
               <form [formGroup]="tellTeamForm" (ngSubmit)="onSendToTeam()">
                 <div class="suggest-instructor__field">
-                  <label for="team-name" class="suggest-instructor__label">Their name</label>
+                  <label for="team-name" class="suggest-instructor__label">{{ 'home.field.theirName' | translate }}</label>
                   <input
                     id="team-name"
                     pInputText
                     type="text"
                     formControlName="coachName"
-                    placeholder="e.g. Mia Petrescu"
+                    [placeholder]="'home.field.namePlaceholder' | translate"
                     fluid
                     autocomplete="off"
                   />
                   @if (isFieldInvalid(tellTeamForm, 'coachName')) {
-                    <p-message severity="error" size="small" variant="simple">Their name helps us find them.</p-message>
+                    <p-message severity="error" size="small" variant="simple">{{ 'home.suggestCoach.team.nameError' | translate }}</p-message>
                   }
                 </div>
 
                 <div class="suggest-instructor__field">
-                  <label for="team-contact" class="suggest-instructor__label">How to reach them</label>
+                  <label for="team-contact" class="suggest-instructor__label">{{ 'home.suggestCoach.team.contactLabel' | translate }}</label>
                   <input
                     id="team-contact"
                     pInputText
                     type="text"
                     formControlName="contact"
-                    placeholder="email, Instagram handle, phone…"
+                    [placeholder]="'home.suggestCoach.team.contactPlaceholder' | translate"
                     fluid
                     autocomplete="off"
                   />
                   @if (isFieldInvalid(tellTeamForm, 'contact')) {
-                    <p-message severity="error" size="small" variant="simple">A bit more detail, please.</p-message>
+                    <p-message severity="error" size="small" variant="simple">{{ 'home.suggestCoach.team.contactError' | translate }}</p-message>
                   }
                 </div>
 
                 <div class="suggest-instructor__field">
                   <label for="team-note" class="suggest-instructor__label">
-                    What makes them great? <span class="suggest-instructor__optional">(optional)</span>
+                    {{ 'home.suggestCoach.team.noteLabel' | translate }} <span class="suggest-instructor__optional">{{ 'form.hint.optional' | translate }}</span>
                   </label>
                   <textarea
                     id="team-note"
                     pTextarea
                     rows="3"
                     formControlName="note"
-                    placeholder="A line or two — we'll mention you when we reach out."
+                    [placeholder]="'home.suggestCoach.team.notePlaceholder' | translate"
                     fluid
                   ></textarea>
                 </div>
 
                 <button pButton type="submit" fluid [disabled]="tellTeamForm.invalid || isSending()">
-                  Send suggestion
+                  {{ 'home.suggestCoach.team.submit' | translate }}
                   <i class="pi" [class]="isSending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
                 </button>
               </form>
@@ -161,19 +161,19 @@
         </div>
         <h2 class="suggest-instructor__title">
           @if (sent() === 'direct') {
-            On its way to them.
+            {{ 'home.suggestCoach.success.directTitle' | translate }}
           } @else {
-            Thanks — we'll take it from here.
+            {{ 'home.suggestCoach.success.teamTitle' | translate }}
           }
         </h2>
         <p class="suggest-instructor__body">
           @if (sent() === 'direct') {
-            We've emailed them with your name on it. Suggest as many as you like.
+            {{ 'home.suggestCoach.success.directBody' | translate }}
           } @else {
-            We'll reach out and let you know what they say. Suggest as many as you like.
+            {{ 'home.suggestCoach.success.teamBody' | translate }}
           }
         </p>
-        <button pButton type="button" severity="secondary" text fluid (click)="onClose()">Done</button>
+        <button pButton type="button" severity="secondary" text fluid (click)="onClose()">{{ 'button.done' | translate }}</button>
       </div>
     }
   </div>

@@ -18,24 +18,24 @@ export const exercisesRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./exercises').then((m) => m.Exercises),
-    title: 'Exercises - MotionHive',
+    title: 'pageTitle.exercises',
   },
   {
     // Before `:exerciseId`, or the parameterised route swallows the word.
     path: 'new',
     canActivate: [coachGuard],
     loadComponent: () => import('./exercise-create/exercise-create').then((m) => m.ExerciseCreate),
-    title: 'New exercise - MotionHive',
+    title: 'pageTitle.newExercise',
   },
   {
     path: ':exerciseId',
     loadComponent: () => import('./exercise-detail/exercise-detail').then((m) => m.ExerciseDetail),
-    title: 'Exercise - MotionHive',
+    title: 'pageTitle.exercise',
   },
   {
     path: ':exerciseId/edit',
     canActivate: [coachGuard],
     loadComponent: () => import('./exercise-edit/exercise-edit').then((m) => m.ExerciseEdit),
-    title: 'Edit exercise - MotionHive',
+    title: 'pageTitle.editExercise',
   },
 ];

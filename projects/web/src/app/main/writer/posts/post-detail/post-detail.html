@@ -25,22 +25,23 @@
   <!-- Header -->
   <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div class="flex items-center gap-3">
-      <button pButton type="button" rounded text severity="secondary" pTooltip="Back to posts" (click)="goBack()" iconOnly>
+      <button pButton type="button" rounded text severity="secondary" [pTooltip]="'writer.postDetail.backToPosts' | translate"
+        [attr.aria-label]="'writer.postDetail.backToPosts' | translate" (click)="goBack()" iconOnly>
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="space-y-1">
         <p class="text-xs uppercase text-surface-700 dark:text-surface-400">
-          {{ mode() === 'create' ? 'New post' : 'Edit post' }}
+          {{ (mode() === 'create' ? 'writer.postDetail.kicker.newPost' : 'writer.postDetail.kicker.editPost') | translate }}
         </p>
         <h1 class="font-heading font-semibold text-xl md:text-2xl">
-          {{ mode() === 'create' ? 'Create post' : postTitle() }}
+          {{ mode() === 'create' ? ('writer.postDetail.createPost' | translate) : postTitle() }}
         </h1>
       </div>
     </div>
     <div class="flex gap-2">
       <button pButton type="button" rounded (click)="save()" [disabled]="saving()">
         <i class="pi" [class]="saving() ? 'pi-spinner pi-spin' : 'pi-save'"></i>
-        Save
+        {{ 'button.save' | translate }}
       </button>
     </div>
   </header>
@@ -55,8 +56,8 @@
       <p-card class="shadow-md">
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5">
-            <label for="title" class="text-sm font-medium">Title <span class="text-red-500">*</span></label>
-            <input pInputText id="title" formControlName="title" fluid placeholder="Enter post title..."
+            <label for="title" class="text-sm font-medium">{{ 'form.label.title' | translate }} <span class="text-red-500">*</span></label>
+            <input pInputText id="title" formControlName="title" fluid [placeholder]="'writer.postDetail.titlePlaceholder' | translate"
               [class.ng-invalid]="isFieldInvalid('title')" [class.ng-dirty]="isFieldInvalid('title')" />
             @if (isFieldInvalid('title')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('title') }}</p-message>
@@ -66,14 +67,15 @@
           <!-- Slug preview — collapsed by default, expandable -->
           @if (form.controls.slug.value) {
           <div class="flex items-center gap-2">
-            <span class="text-xs text-surface-500">URL:</span>
+            <span class="text-xs text-surface-500">{{ 'writer.postDetail.urlLabel' | translate }}</span>
             <span class="text-xs text-surface-600 font-mono">/blog/{{ form.controls.slug.value }}</span>
             <button pButton
               type="button"
               [text]="true"
               size="small"
               severity="secondary"
-              pTooltip="Edit slug"
+              [pTooltip]="'writer.postDetail.editSlug' | translate"
+              [attr.aria-label]="'writer.postDetail.editSlug' | translate"
               (click)="toggleSlug()"
               iconOnly
             >
@@ -83,8 +85,8 @@
           }
           @if (showSlug()) {
           <div class="flex flex-col gap-1.5">
-            <label for="slug" class="text-sm font-medium">Slug</label>
-            <input pInputText id="slug" formControlName="slug" fluid placeholder="post-url-slug" (input)="onSlugInput()"
+            <label for="slug" class="text-sm font-medium">{{ 'writer.postDetail.slug' | translate }}</label>
+            <input pInputText id="slug" formControlName="slug" fluid [placeholder]="'writer.postDetail.slugPlaceholder' | translate" (input)="onSlugInput()"
               [class.ng-invalid]="isFieldInvalid('slug')" [class.ng-dirty]="isFieldInvalid('slug')" />
             @if (isFieldInvalid('slug')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('slug') }}</p-message>
@@ -97,9 +99,9 @@
       <!-- Excerpt -->
       <p-card class="shadow-md">
         <div class="flex flex-col gap-1.5">
-          <label for="excerpt" class="text-sm font-medium">Excerpt <span class="text-red-500">*</span></label>
+          <label for="excerpt" class="text-sm font-medium">{{ 'writer.postDetail.excerpt' | translate }} <span class="text-red-500">*</span></label>
           <textarea pTextarea id="excerpt" formControlName="excerpt" fluid [rows]="3"
-            placeholder="A short summary shown in post listings..." [class.ng-invalid]="isFieldInvalid('excerpt')"
+            [placeholder]="'writer.postDetail.excerptPlaceholder' | translate" [class.ng-invalid]="isFieldInvalid('excerpt')"
             [class.ng-dirty]="isFieldInvalid('excerpt')"></textarea>
           @if (isFieldInvalid('excerpt')) {
           <p-message severity="error" size="small" variant="simple">{{ getFieldError('excerpt') }}</p-message>
@@ -110,9 +112,9 @@
       <!-- Content -->
       <p-card class="flex-1 shadow-md">
         <div class="flex flex-col gap-1.5 h-full">
-          <label for="content" class="text-sm font-medium">Content <span class="text-red-500">*</span></label>
+          <label for="content" class="text-sm font-medium">{{ 'writer.postDetail.content' | translate }} <span class="text-red-500">*</span></label>
           <p-editor id="content" formControlName="content" [invalid]="isFieldInvalid('content')"
-            placeholder="Write your post content here..." [style]="{ 'min-height': '320px', height: '100%' }" />
+            [placeholder]="'writer.postDetail.contentPlaceholder' | translate" [style]="{ 'min-height': '320px', height: '100%' }" />
           @if (isFieldInvalid('content')) {
           <p-message severity="error" size="small" variant="simple">{{ getFieldError('content') }}</p-message>
           }
@@ -124,12 +126,12 @@
     <div class="flex flex-col gap-4">
 
       <!-- Publishing -->
-      <p-card header="Publishing" class="shadow-md">
+      <p-card [header]="'writer.postDetail.publishing' | translate" class="shadow-md">
         <div class="flex items-center justify-between gap-3">
           <div class="flex flex-col">
-            <span class="text-sm font-medium">Published</span>
+            <span class="text-sm font-medium">{{ 'writer.postDetail.published' | translate }}</span>
             <span class="text-xs text-surface-500">
-              {{ form.controls.isPublished.value ? 'Visible on the public blog' : 'Draft — only you can see it' }}
+              {{ (form.controls.isPublished.value ? 'writer.postDetail.publishedHint' : 'writer.postDetail.draftHint') | translate }}
             </span>
           </div>
           <p-toggleswitch formControlName="isPublished" />
@@ -137,14 +139,14 @@
       </p-card>
 
       <!-- Post settings -->
-      <p-card header="Post settings" class="shadow-md">
+      <p-card [header]="'writer.postDetail.postSettings' | translate" class="shadow-md">
         <div class="flex flex-col gap-4">
           <!-- Category (autocomplete — pick existing or type new) -->
           <div class="flex flex-col gap-1.5">
-            <label for="category" class="text-sm font-medium">Category <span class="text-red-500">*</span></label>
+            <label for="category" class="text-sm font-medium">{{ 'writer.postDetail.category' | translate }} <span class="text-red-500">*</span></label>
             <p-autocomplete id="category" formControlName="category" [suggestions]="categorySuggestions()"
               (completeMethod)="onCategorySearch($event)" [forceSelection]="false" [dropdown]="true"
-              placeholder="Select or type a category" class="w-full" [appendTo]="'body'" />
+              [placeholder]="'writer.postDetail.categoryPlaceholder' | translate" class="w-full" [appendTo]="'body'" />
             @if (isFieldInvalid('category')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('category') }}</p-message>
             }
@@ -152,7 +154,7 @@
 
           <!-- Read time -->
           <div class="flex flex-col gap-1.5">
-            <label for="readTime" class="text-sm font-medium">Read time (minutes) <span
+            <label for="readTime" class="text-sm font-medium">{{ 'writer.postDetail.readTime' | translate }} <span
                 class="text-red-500">*</span></label>
             <p-inputnumber id="readTime" formControlName="readTime" fluid [min]="1" [max]="120" [showButtons]="true"
               [class.ng-invalid]="isFieldInvalid('readTime')" [class.ng-dirty]="isFieldInvalid('readTime')" />
@@ -163,9 +165,9 @@
 
           <!-- Language -->
           <div class="flex flex-col gap-1.5">
-            <label for="language" class="text-sm font-medium">Language <span class="text-red-500">*</span></label>
+            <label for="language" class="text-sm font-medium">{{ 'form.label.language' | translate }} <span class="text-red-500">*</span></label>
             <p-select id="language" formControlName="language" [options]="languageOptions" optionLabel="label"
-              optionValue="value" placeholder="Select a language" fluid [appendTo]="'body'"
+              optionValue="value" [placeholder]="'writer.postDetail.languagePlaceholder' | translate" fluid [appendTo]="'body'"
               [class.ng-invalid]="isFieldInvalid('language')" [class.ng-dirty]="isFieldInvalid('language')" />
             @if (isFieldInvalid('language')) {
             <p-message severity="error" size="small" variant="simple">{{ getFieldError('language') }}</p-message>
@@ -174,11 +176,12 @@
 
           <!-- Tags -->
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium">Tags</label>
+            <label class="text-sm font-medium">{{ 'writer.postDetail.tags' | translate }}</label>
             <div class="flex gap-2">
               <input pInputText fluid [(ngModel)]="formTagInput" [ngModelOptions]="{standalone: true}"
-                placeholder="Add a tag and press Enter" (keydown)="onTagKeydown($event)" />
-              <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()" iconOnly>
+                [placeholder]="'writer.postDetail.tagPlaceholder' | translate" (keydown)="onTagKeydown($event)" />
+              <button pButton type="button" severity="secondary" [disabled]="!formTagInput.trim()" (click)="addTag()" iconOnly
+                [attr.aria-label]="'writer.postDetail.addTag' | translate">
                 <i class="pi pi-plus"></i>
               </button>
             </div>
@@ -192,7 +195,7 @@
             <!-- Suggested tags -->
             @if (availableSuggestions.length > 0) {
             <div class="flex flex-col gap-1.5 mt-1">
-              <span class="text-xs text-surface-500">Suggestions:</span>
+              <span class="text-xs text-surface-500">{{ 'writer.postDetail.suggestions' | translate }}</span>
               <div class="flex flex-wrap gap-1">
                 @for (tag of availableSuggestions; track tag) {
                 <button type="button"
@@ -209,18 +212,18 @@
       </p-card>
 
       <!-- Cover image -->
-      <p-card header="Cover image" class="shadow-md">
+      <p-card [header]="'writer.postDetail.coverImage' | translate" class="shadow-md">
         <div class="flex flex-col gap-3">
           @if (form.controls.coverImage.value) {
           <!-- Aspect-locked preview matches what readers actually see in carousels and the article hero. -->
           <div class="w-full aspect-video rounded overflow-hidden bg-surface-100 dark:bg-surface-800 relative">
-            <img [src]="coverPreviewUrl(form.controls.coverImage.value)" alt="Cover image preview"
+            <img [src]="coverPreviewUrl(form.controls.coverImage.value)" [alt]="'writer.postDetail.coverPreviewAlt' | translate"
               class="absolute inset-0 w-full h-full object-cover" />
           </div>
           }
 
           <div class="flex flex-col gap-1.5">
-            <label for="coverImage" class="text-sm font-medium">Image URL <span class="text-red-500">*</span></label>
+            <label for="coverImage" class="text-sm font-medium">{{ 'writer.postDetail.imageUrl' | translate }} <span class="text-red-500">*</span></label>
             <input pInputText id="coverImage" formControlName="coverImage" fluid placeholder="https://..."
               [class.ng-invalid]="isFieldInvalid('coverImage')" [class.ng-dirty]="isFieldInvalid('coverImage')" />
             @if (isFieldInvalid('coverImage')) {
@@ -229,12 +232,12 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <span class="text-xs text-surface-500">or</span>
+            <span class="text-xs text-surface-500">{{ 'common.or' | translate }}</span>
             <label>
               <input #fileInput type="file" accept="image/*" class="hidden" (change)="onImageUpload($event)" />
               <button pButton type="button" severity="secondary" size="small" (click)="fileInput.click()" [disabled]="uploading()">
                 <i class="pi" [class]="uploading() ? 'pi-spinner pi-spin' : 'pi-upload'"></i>
-                Upload image
+                {{ 'writer.postDetail.uploadImage' | translate }}
               </button>
             </label>
           </div>
@@ -242,13 +245,13 @@
           <!-- Writer guidance — what to upload for best results. -->
           <div
             class="rounded-md border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 p-3 text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
-            <p class="font-medium text-surface-800 dark:text-surface-100 mb-1">Image tips</p>
+            <p class="font-medium text-surface-800 dark:text-surface-100 mb-1">{{ 'writer.postDetail.imageTips.title' | translate }}</p>
             <ul class="list-disc list-inside space-y-0.5">
-              <li>Use a <span class="font-medium">landscape</span> photo (wider than tall).</li>
-              <li>Recommended: <span class="font-medium">1600 × 900px (16:9)</span> for sharpest results.</li>
-              <li>Minimum: 1200 × 675px. Smaller images look soft on retina screens.</li>
-              <li>Tall portrait photos will be center-cropped — the top and bottom won't show.</li>
-              <li>JPG for photos, PNG only for graphics with hard edges or transparency.</li>
+              <li>{{ 'writer.postDetail.imageTips.landscape.before' | translate }} <span class="font-medium">{{ 'writer.postDetail.imageTips.landscape.emphasis' | translate }}</span> {{ 'writer.postDetail.imageTips.landscape.after' | translate }}</li>
+              <li>{{ 'writer.postDetail.imageTips.recommended.before' | translate }} <span class="font-medium">1600 × 900px (16:9)</span> {{ 'writer.postDetail.imageTips.recommended.after' | translate }}</li>
+              <li>{{ 'writer.postDetail.imageTips.minimum' | translate }}</li>
+              <li>{{ 'writer.postDetail.imageTips.portrait' | translate }}</li>
+              <li>{{ 'writer.postDetail.imageTips.format' | translate }}</li>
             </ul>
           </div>
         </div>
@@ -260,21 +263,20 @@
         (the BE uses the JWT). Admins can override the byline for guest
         contributors by typing a name here. Writers see the read-only note.
       -->
-      <p-card header="Author" class="shadow-md">
+      <p-card [header]="'writer.postDetail.author' | translate" class="shadow-md">
         <div class="flex flex-col gap-4">
           @if (canSetGuestByline()) {
           <div class="flex flex-col gap-1.5">
-            <label for="guestAuthorName" class="text-sm font-medium">Guest byline (optional)</label>
+            <label for="guestAuthorName" class="text-sm font-medium">{{ 'writer.postDetail.guestByline' | translate }}</label>
             <input pInputText id="guestAuthorName" formControlName="guestAuthorName" fluid
-              placeholder="e.g. Sarah Johnson" />
+              [placeholder]="'writer.postDetail.guestBylinePlaceholder' | translate" />
             <small class="text-surface-500 text-xs">
-              Leave blank to publish under your own user. Fill in to attribute the post to a guest contributor
-              without a MotionHive account.
+              {{ 'writer.postDetail.guestBylineHint' | translate }}
             </small>
           </div>
           } @else {
           <p class="text-sm text-surface-500">
-            This post will be published under your account. Admins can change the byline.
+            {{ 'writer.postDetail.ownBylineNote' | translate }}
           </p>
           }
         </div>

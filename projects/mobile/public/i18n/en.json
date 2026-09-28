@@ -42,8 +42,7 @@
     "hero": {
       "changePhoto": "Change your photo",
       "copyLink": "Copy profile link",
-      "verified": "Verified",
-      "viewProfile": "View profile"
+      "verified": "Verified"
     },
     "manage": {
       "deleteAccount": "Delete account",
@@ -503,6 +502,72 @@
       "thisWeek": "This week"
     }
   },
+  "discover": {
+    "allCoaches": {
+      "empty": {
+        "heading": "No coaches to show",
+        "message": "When coaches publish a public profile, they show up here."
+      },
+      "loadError": "Couldn't load coaches",
+      "noMatches": "No coaches list that specialization.",
+      "title": "Coaches"
+    },
+    "coach": {
+      "experience": "{count, plural, one {# yr experience} other {# yrs experience}}",
+      "newCoach": "New coach"
+    },
+    "coachRow": {
+      "takingClients": "Taking clients"
+    },
+    "feed": {
+      "dates": "Dates",
+      "empty": {
+        "heading": "Nothing coming up yet",
+        "message": "When coaches publish sessions, they show up here."
+      },
+      "loadError": "Couldn't load sessions",
+      "noMatches": "No upcoming sessions match these filters.",
+      "title": "Coming up"
+    },
+    "filterSheet": {
+      "anyType": "Any",
+      "anywhere": "Anywhere",
+      "applyCount": "{count, plural, one {Apply · # filter} other {Apply · # filters}}",
+      "datePreset": {
+        "any": "Any time",
+        "thisWeek": "This week",
+        "twoWeeks": "Next two weeks",
+        "weekend": "This weekend"
+      },
+      "dates": "Dates",
+      "title": "Filter sessions"
+    },
+    "hero": {
+      "title": "Find your people in the hive"
+    },
+    "rail": {
+      "allCoaches": "All coaches",
+      "title": "Taking new clients"
+    },
+    "row": {
+      "booked": "Booked",
+      "free": "Free",
+      "full": "Full",
+      "fullWaitlist": "Full · waitlist",
+      "spots": "{confirmed} of {capacity} spots"
+    },
+    "search": {
+      "coaches": "Coaches",
+      "empty": "No coaches or sessions match that — try fewer words.",
+      "error": {
+        "heading": "Couldn't search",
+        "message": "Check your connection and try typing again."
+      },
+      "hint": "Keep typing — search starts at two letters and looks across coaches and sessions.",
+      "placeholder": "Search coaches and sessions",
+      "sessions": "Sessions"
+    }
+  },
   "exercises": {
     "attribution": {
       "custom": "Custom exercise",
@@ -844,9 +909,7 @@
     },
     "join": {
       "closed": "Invite only",
-      "join": "Join group",
-      "pending": "Request pending",
-      "request": "Request to join"
+      "pending": "Request pending"
     },
     "joinLink": {
       "create": "Create invite link",
@@ -1042,11 +1105,90 @@
       "toast": {
         "joinFailed": "Could not join this group.",
         "joined": "You joined the group",
-        "requestSent": "Request sent",
         "withdrawFailed": "Could not withdraw that request.",
         "withdrawn": "Request withdrawn"
       },
       "withdraw": "Withdraw"
+    }
+  },
+  "home": {
+    "coach": {
+      "activeClients": {
+        "hint": "Currently training with you",
+        "label": "Active clients"
+      },
+      "agenda": {
+        "calendar": "Calendar",
+        "empty": "No sessions scheduled today.",
+        "kicker": "Agenda · {date}",
+        "new": "New"
+      },
+      "outstanding": {
+        "label": "Outstanding",
+        "nothingOverdue": "Nothing overdue",
+        "overdue": "{count, plural, one {# overdue invoice} other {# overdue invoices}}"
+      },
+      "requests": {
+        "hint": "Waiting for your approval.",
+        "review": "Review",
+        "summary": "{count, plural, one {# client request waiting} other {# client requests waiting}}"
+      },
+      "title": "Your coaching day"
+    },
+    "switchRole": {
+      "comingSoon": "Coming soon",
+      "footnote": "Your data stays in one account — switching only changes what you see.",
+      "intro": "Changes your home, tabs and notifications."
+    },
+    "switchRoleLabel": "Switch role, currently {role}",
+    "train": {
+      "billDue": {
+        "hint": "Tap to see what's owed and settle it.",
+        "title": "{count, plural, one {You have an invoice to pay} other {# invoices to pay}}"
+      },
+      "coaches": {
+        "discoverMore": "Discover more",
+        "empty": {
+          "heading": "No coaches to show yet",
+          "message": "Once coaches join, they'll show up here."
+        },
+        "moreSoon": "More joining soon.",
+        "openToClients": "Open to new clients",
+        "titleOwn": "Your coaches",
+        "titleSuggested": "Some of our coaches"
+      },
+      "greeting": "Good to see you, {name}.",
+      "greetingNoName": "Good to see you, there.",
+      "intro": "A calm place to settle in and pick up where you left off.",
+      "posts": {
+        "byline": "{author} · {minutes} min read",
+        "empty": "No posts yet. Check back soon — our first reads are landing.",
+        "eyebrow": "From the journal",
+        "readAll": "Read all",
+        "title": "Reads from the hive"
+      },
+      "resume": {
+        "button": "Resume workout",
+        "kicker": "Pick up where you left off"
+      },
+      "sessions": {
+        "booked": "{count, plural, one {# session booked} other {# sessions booked}}",
+        "hintBrowse": "Browse what else is open to join.",
+        "hintNone": "Find a coach and book your first one.",
+        "none": "No sessions booked"
+      },
+      "steps": {
+        "coach": {
+          "sub": "Book time with someone you rate.",
+          "title": "Find a coach for yourself"
+        },
+        "eyebrow": "Start here",
+        "profile": {
+          "sub": "So coaches and clients know who you are.",
+          "title": "Finish your profile"
+        },
+        "title": "Get set up"
+      }
     }
   },
   "messages": {
@@ -1080,8 +1222,7 @@
       "sectionConversation": "Conversation",
       "sectionPrivacy": "Privacy",
       "thisPerson": "this person",
-      "title": "Details",
-      "viewProfile": "View profile"
+      "title": "Details"
     },
     "inbox": {
       "caughtUp": {
@@ -1286,6 +1427,108 @@
       "copyFailed": "Couldn't copy the link.",
       "linkFailed": "Couldn't get the meeting link."
     }
+  },
+  "notifications": {
+    "category": {
+      "ACCOUNT": "Account",
+      "COACHING": "Coaching",
+      "GROUPS": "Groups",
+      "MESSAGING": "Messaging",
+      "PAYMENTS": "Payments",
+      "POSTS": "Posts",
+      "SESSIONS": "Sessions",
+      "WORKOUTS": "Workouts"
+    },
+    "categoryFallback": "Notification",
+    "detail": {
+      "eyebrow": "{category} · {when}",
+      "title": "Notification",
+      "webOnly": "{place} lives on the web for now. This will open in the app once it ships here."
+    },
+    "empty": {
+      "caughtUp": "All caught up",
+      "filteredMessage": "Nothing to show with this filter on.",
+      "message": "Session reminders, client requests and payment updates show up here as they happen.",
+      "nothingIn": "Nothing in {categories}",
+      "settings": "Notification settings",
+      "unreadMessage": "You have no unread notifications."
+    },
+    "filter": {
+      "applyCount": "{count, plural, one {Apply · # filter} other {Apply · # filters}}",
+      "category": "Category",
+      "note": "Pick as many categories as you like. New messages never land here — the Messages tab is that inbox.",
+      "unread": "Unread"
+    },
+    "filterBar": "Filter notifications",
+    "filterSummary": "{shown} of {total} in {categories}",
+    "loadError": "Couldn't load notifications",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark read",
+    "markUnread": "Mark unread",
+    "toast": {
+      "deleted": "Deleted"
+    },
+    "webOnlyPlace": {
+      "coaches": "Coaches",
+      "memberships": "Memberships",
+      "myPlans": "My plans"
+    }
+  },
+  "pageTitle": {
+    "account": "Account",
+    "assignments": "Assignments",
+    "billing": "Billing",
+    "blockedUsers": "Blocked users",
+    "cancelledDeclined": "Cancelled & declined",
+    "chat": "Chat",
+    "client": "Client",
+    "clients": "Clients",
+    "coaches": "Coaches",
+    "coachingProfile": "Coaching profile",
+    "createAccount": "Create account",
+    "day": "Day",
+    "details": "Details",
+    "discover": "Discover",
+    "editExercise": "Edit exercise",
+    "editGroup": "Edit group",
+    "exercise": "Exercise",
+    "exercises": "Exercises",
+    "group": "Group",
+    "groups": "Groups",
+    "history": "History",
+    "invoice": "Invoice",
+    "manageAccount": "Manage account",
+    "manageGroup": "Manage group",
+    "manageSessions": "Manage sessions",
+    "messages": "Messages",
+    "mySessions": "My sessions",
+    "newExercise": "New exercise",
+    "newGroup": "New group",
+    "newInvoice": "New invoice",
+    "newMessage": "New message",
+    "newPassword": "New password",
+    "newPost": "New post",
+    "notifications": "Notifications",
+    "payments": "Payments",
+    "photos": "Photos",
+    "plan": "Plan",
+    "post": "Post",
+    "profile": "Profile",
+    "program": "Program",
+    "programSettings": "Program settings",
+    "programs": "Programs",
+    "progress": "Progress",
+    "requests": "Requests",
+    "resetPassword": "Reset password",
+    "routine": "Routine",
+    "session": "Session",
+    "signIn": "Sign in",
+    "starterRoutines": "Starter routines",
+    "training": "Training",
+    "verifyEmail": "Verify email",
+    "workout": "Workout",
+    "workoutComplete": "Workout complete",
+    "workouts": "Workouts"
   },
   "payments": {
     "badge": {
@@ -2028,6 +2271,9 @@
     }
   },
   "shell": {
+    "avatarButton": {
+      "label": "Your profile"
+    },
     "menuDot": {
       "billDue": "You have a bill due",
       "requestsWaiting": "You have client requests waiting"

@@ -5,23 +5,23 @@
     <ion-toolbar>
       <ion-searchbar
         mhAutofocus
-        placeholder="Search coaches and sessions"
+        [placeholder]="'discover.search.placeholder' | translate"
         inputmode="search"
         [debounce]="0"
         [value]="search.query()"
         (ionInput)="onQueryChange($event.detail.value ?? '')"
       />
       <ion-buttons slot="end">
-        <ion-button (click)="closeSearch()">Cancel</ion-button>
+        <ion-button (click)="closeSearch()">{{ 'button.cancel' | translate }}</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
 } @else {
   <ion-header [translucent]="true">
     <ion-toolbar>
-      <ion-title>Discover</ion-title>
+      <ion-title>{{ 'nav.discover' | translate }}</ion-title>
       <ion-buttons slot="end">
-        <ion-button aria-label="Search coaches and sessions" (click)="openSearch()">
+        <ion-button [attr.aria-label]="'discover.search.placeholder' | translate" (click)="openSearch()">
           <ion-icon slot="icon-only" name="search-outline" />
         </ion-button>
         <mh-notification-bell />
@@ -41,7 +41,7 @@
          in the toolbar like every other tab root. -->
     <div class="lead">
       <div class="hero">
-        <h1>Find your people in the hive</h1>
+        <h1>{{ 'discover.hero.title' | translate }}</h1>
         <div class="hero-hexes" aria-hidden="true">
           <mh-hex-avatar size="dot" color="coral" />
           <mh-hex-avatar size="sm" color="primary" />
@@ -50,7 +50,7 @@
       </div>
       <ion-button class="search-entry" expand="block" (click)="openSearch()">
         <ion-icon slot="start" name="search-outline" aria-hidden="true" />
-        Search coaches and sessions
+        {{ 'discover.search.placeholder' | translate }}
       </ion-button>
     </div>
 
@@ -58,7 +58,7 @@
          has the door open — an empty rail is a claim about the catalogue. -->
     @if (coachesStore.loading() && !coachesStore.loaded()) {
       <div class="rail-head">
-        <span class="mh-kicker">Taking new clients</span>
+        <span class="mh-kicker">{{ 'discover.rail.title' | translate }}</span>
       </div>
       <div class="rail">
         @for (_ of railSkeleton; track $index) {
@@ -73,9 +73,9 @@
       </div>
     } @else if (coachesStore.acceptingCoaches().length > 0) {
       <div class="rail-head">
-        <span class="mh-kicker">Taking new clients</span>
+        <span class="mh-kicker">{{ 'discover.rail.title' | translate }}</span>
         <ion-button class="rail-link" fill="clear" size="small" (click)="openAllCoaches()">
-          All coaches
+          {{ 'discover.rail.allCoaches' | translate }}
         </ion-button>
       </div>
       <div class="rail">
@@ -100,14 +100,14 @@
         }
         <button type="button" class="rail-item" (click)="openAllCoaches()">
           <mh-hex-avatar size="lg" icon="arrow-forward" color="medium" tone="wash" />
-          <span class="rail-name muted">All coaches</span>
+          <span class="rail-name muted">{{ 'discover.rail.allCoaches' | translate }}</span>
         </button>
       </div>
     }
 
     <!-- The feed: quick filters, then chronological buckets. -->
     <div class="feed-head">
-      <span class="mh-kicker">Coming up</span>
+      <span class="mh-kicker">{{ 'discover.feed.title' | translate }}</span>
     </div>
     <div class="mh-chip-row">
       @for (chip of quickFilters; track chip.id) {
@@ -128,16 +128,16 @@
         (click)="openFilters()"
       >
         <ion-icon slot="start" name="calendar-outline" aria-hidden="true" />
-        Dates
+        {{ 'discover.feed.dates' | translate }}
       </ion-button>
     </div>
 
     @if (showLoadError()) {
       <mh-empty-state
         icon="alert-circle-outline"
-        heading="Couldn't load sessions"
-        message="Check your connection and try again."
-        actionLabel="Try again"
+        [heading]="'discover.feed.loadError' | translate"
+        [message]="'error.checkConnection' | translate"
+        [actionLabel]="'button.tryAgain' | translate"
         (action)="retry()"
       />
     } @else if (showSkeleton()) {
@@ -156,17 +156,17 @@
       @if (hasActiveFilters()) {
         <mh-empty-state
           icon="calendar-outline"
-          heading="Nothing matches"
-          message="No upcoming sessions match these filters."
-          actionLabel="Clear filters"
+          [heading]="'empty.nothingMatches' | translate"
+          [message]="'discover.feed.noMatches' | translate"
+          [actionLabel]="'button.clearFilters' | translate"
           actionFill="outline"
           (action)="clearFilters()"
         />
       } @else {
         <mh-empty-state
           icon="compass-outline"
-          heading="Nothing coming up yet"
-          message="When coaches publish sessions, they show up here."
+          [heading]="'discover.feed.empty.heading' | translate"
+          [message]="'discover.feed.empty.message' | translate"
         />
       }
     } @else {
@@ -194,13 +194,13 @@
     @if (!search.isActive()) {
       <div class="search-hint">
         <ion-icon name="search-outline" aria-hidden="true" />
-        <p>Keep typing — search starts at two letters and looks across coaches and sessions.</p>
+        <p>{{ 'discover.search.hint' | translate }}</p>
       </div>
     } @else if (search.isSearching()) {
       <!-- Skeletons mirror the real row geometry — the frame of the answer
            arrives before the answer. -->
       <div class="search-results">
-        <div class="mh-section-label">Coaches</div>
+        <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
         <ion-item lines="none" class="coach-skeleton mh-list-row">
           <mh-hex-avatar slot="start" size="md" color="medium" tone="wash" />
           <ion-label>
@@ -208,7 +208,7 @@
             <p><ion-skeleton-text [animated]="true" style="width: 60%" /></p>
           </ion-label>
         </ion-item>
-        <div class="mh-section-label">Sessions</div>
+        <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
         @for (_ of [1, 2]; track $index) {
           <mh-session-row-skeleton />
         }
@@ -216,28 +216,28 @@
     } @else if (search.hasError()) {
       <mh-empty-state
         icon="alert-circle-outline"
-        heading="Couldn't search"
-        message="Check your connection and try typing again."
+        [heading]="'discover.search.error.heading' | translate"
+        [message]="'discover.search.error.message' | translate"
       />
     } @else if (search.isEmpty()) {
       <mh-empty-state
         icon="search-outline"
-        heading="No results"
-        message="No coaches or sessions match that — try fewer words."
-        actionLabel="Clear search"
+        [heading]="'empty.noResults' | translate"
+        [message]="'discover.search.empty' | translate"
+        [actionLabel]="'button.clearSearch' | translate"
         actionFill="outline"
         (action)="clearSearch()"
       />
     } @else {
       <div class="search-results">
         @if (search.coaches().length > 0) {
-          <div class="mh-section-label">Coaches</div>
+          <div class="mh-section-label">{{ 'discover.search.coaches' | translate }}</div>
           @for (coach of search.coaches(); track coach.id) {
             <mh-coach-row [coach]="coach" (select)="openCoach(coach)" />
           }
         }
         @if (search.sessions().length > 0) {
-          <div class="mh-section-label">Sessions</div>
+          <div class="mh-section-label">{{ 'discover.search.sessions' | translate }}</div>
           @for (instance of search.sessions(); track instance.id) {
             <mh-discover-session-row
               [instance]="instance"

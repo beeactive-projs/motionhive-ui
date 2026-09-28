@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter, interval } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ButtonDirective } from 'primeng/button';
@@ -14,10 +15,9 @@ import { ButtonDirective } from 'primeng/button';
  */
 @Component({
   selector: 'mh-pwa-update',
-  imports: [Toast, ButtonDirective],
+  imports: [Toast, ButtonDirective, TranslatePipe],
   templateUrl: './pwa-update.html',
   styleUrl: './pwa-update.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [MessageService],
 })
 export class PwaUpdate {
@@ -25,6 +25,7 @@ export class PwaUpdate {
 
   private readonly _swUpdate = inject(SwUpdate);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
   private readonly _document = inject(DOCUMENT);
   private readonly _destroyRef = inject(DestroyRef);
 
@@ -56,8 +57,8 @@ export class PwaUpdate {
     this._messageService.add({
       key: this.toastKey,
       severity: 'info',
-      summary: 'Update available',
-      detail: 'A new version of MotionHive is ready.',
+      summary: this._translateService.instant('components.pwaUpdate.title'),
+      detail: this._translateService.instant('components.pwaUpdate.message'),
       sticky: true,
       closable: true,
     });

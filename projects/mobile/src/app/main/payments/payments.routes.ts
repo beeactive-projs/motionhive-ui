@@ -16,7 +16,7 @@ export const paymentsRoutes: Routes = [
     path: '',
     canActivate: [coachGuard],
     loadComponent: () => import('./coach/coach-payments').then((m) => m.CoachPayments),
-    title: 'Payments - MotionHive',
+    title: 'pageTitle.payments',
   },
   {
     // Before `:id`, or the parameterised route swallows "new".
@@ -24,7 +24,7 @@ export const paymentsRoutes: Routes = [
     canActivate: [coachGuard],
     loadComponent: () =>
       import('./coach/create-invoice/create-invoice').then((m) => m.CreateInvoice),
-    title: 'New invoice - MotionHive',
+    title: 'pageTitle.newInvoice',
   },
   {
     path: ':id',
@@ -33,7 +33,7 @@ export const paymentsRoutes: Routes = [
       import('./coach/invoice-detail/coach-invoice-detail').then(
         (m) => m.CoachInvoiceDetail,
       ),
-    title: 'Invoice - MotionHive',
+    title: 'pageTitle.invoice',
   },
 ];
 
@@ -42,7 +42,7 @@ export const billingRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./client/client-payments').then((m) => m.ClientPayments),
-    title: 'Billing - MotionHive',
+    title: 'pageTitle.billing',
   },
   {
     path: ':id',
@@ -50,6 +50,6 @@ export const billingRoutes: Routes = [
       import('./client/invoice-detail/client-invoice-detail').then(
         (m) => m.ClientInvoiceDetail,
       ),
-    title: 'Invoice - MotionHive',
+    title: 'pageTitle.invoice',
   },
 ];

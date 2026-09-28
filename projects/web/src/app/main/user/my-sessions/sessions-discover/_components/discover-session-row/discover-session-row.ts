@@ -166,7 +166,7 @@ export class DiscoverSessionRow {
   protected readonly bookLabel = computed(() =>
     this._translateService.instant(
       this.instance().template?.approvalRequired
-        ? 'mySessions.common.requestToJoin'
+        ? 'button.requestToJoin'
         : 'mySessions.common.book',
     ),
   );

@@ -13,7 +13,7 @@ export const userSessionsRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./my-sessions/my-sessions').then((m) => m.MySessions),
-    title: 'My sessions - MotionHive',
+    title: 'pageTitle.mySessions',
   },
   {
     // Before `:id`, or the parameterised route swallows the word.
@@ -22,17 +22,17 @@ export const userSessionsRoutes: Routes = [
       import('./cancelled-bookings/cancelled-bookings').then(
         (m) => m.CancelledBookings,
       ),
-    title: 'Cancelled & declined - MotionHive',
+    title: 'pageTitle.cancelledDeclined',
   },
   {
     path: 'person/:handle',
     loadComponent: () => import('../../person/person').then((m) => m.Person),
-    title: 'Profile - MotionHive',
+    title: 'pageTitle.profile',
   },
   {
     path: ':id',
     loadComponent: () =>
       import('./booking-detail/booking-detail').then((m) => m.BookingDetail),
-    title: 'Session - MotionHive',
+    title: 'pageTitle.session',
   },
 ];

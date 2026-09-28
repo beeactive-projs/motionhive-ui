@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { BLOG_COVER_PRESETS, BlogPost, withCloudinaryTransform } from 'core';
 
@@ -10,19 +11,22 @@ import { BLOG_COVER_PRESETS, BlogPost, withCloudinaryTransform } from 'core';
  */
 @Component({
   selector: 'mh-blog-card',
-  imports: [ButtonDirective],
+  imports: [ButtonDirective, TranslatePipe],
   templateUrl: './blog-card.html',
   styleUrl: './blog-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogCard {
+  private readonly _translateService = inject(TranslateService);
+
   readonly post = input.required<BlogPost>();
 
   readonly readClick = output<BlogPost>();
 
   readonly readTimeLabel = computed(() => {
     const r = this.post().readTime ?? 0;
-    return r > 0 ? `${r} min read` : 'Quick read';
+    return r > 0
+      ? this._translateService.instant('home.journal.minRead', { minutes: r })
+      : this._translateService.instant('home.blogCard.quickRead');
   });
 
   /** Cover URL piped through Cloudinary so a tall portrait upload

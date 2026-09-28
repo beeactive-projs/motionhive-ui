@@ -1,4 +1,5 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { IonButton } from '@ionic/angular/standalone';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
@@ -19,6 +20,8 @@ import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar'
   styleUrl: './notifications-empty.scss',
 })
 export class NotificationsEmpty {
+  private readonly _translateService = inject(TranslateService);
+
   /** True while Unread or a category filter is on — swaps copy and action. */
   readonly filtered = input(false);
   /** The active category's label, when the filter is a category. */
@@ -32,19 +35,25 @@ export class NotificationsEmpty {
 
   readonly heading = computed(() => {
     const label = this.filterLabel();
-    if (label) return `Nothing in ${label}`;
-    return this.filtered() ? 'All caught up' : 'Nothing here yet';
+    if (label) {
+      return this._translateService.instant('notifications.empty.nothingIn', { categories: label });
+    }
+    return this._translateService.instant(
+      this.filtered() ? 'notifications.empty.caughtUp' : 'empty.nothingYet',
+    );
   });
 
   // Messages are deliberately absent from the promise: a new message never
   // reaches the bell, the Messages tab is that inbox.
   readonly message = computed(() => {
-    if (this.filterLabel()) return 'Nothing to show with this filter on.';
-    if (this.filtered()) return 'You have no unread notifications.';
-    return 'Session reminders, client requests and payment updates show up here as they happen.';
+    if (this.filterLabel()) return this._translateService.instant('notifications.empty.filteredMessage');
+    if (this.filtered()) return this._translateService.instant('notifications.empty.unreadMessage');
+    return this._translateService.instant('notifications.empty.message');
   });
 
   readonly actionLabel = computed(() =>
-    this.filtered() ? 'Clear filters' : 'Notification settings',
+    this._translateService.instant(
+      this.filtered() ? 'button.clearFilters' : 'notifications.empty.settings',
+    ),
   );
 }

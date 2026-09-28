@@ -7,10 +7,10 @@
         <i class="pi pi-play-circle"></i>
       </span>
       <span class="resume__text">
-        <span class="resume__lbl">Pick up where you left off</span>
+        <span class="resume__lbl">{{ 'home.resume.label' | translate }}</span>
         <span class="resume__name">{{ r.name }}</span>
       </span>
-      <span class="resume__go">Resume →</span>
+      <span class="resume__go">{{ 'button.resume' | translate }} →</span>
     </button>
   }
 
@@ -19,12 +19,10 @@
     <div class="hp-hero__honey" aria-hidden="true"></div>
     <div class="hp-hero__content">
       <h1 class="hp-hero__title">
-        Good to see you, <span>{{ firstName() }}.</span>
+        {{ 'home.hero.title' | translate }} <span>{{ 'home.hero.titleName' | translate: { name: firstName() } }}</span>
       </h1>
       <p class="hp-hero__body">
-        A few coaches, a growing set of sessions, and a community just
-        finding its feet. Here's a calm place to settle in and pick up
-        where you left off.
+        {{ 'home.hero.body' | translate }}
       </p>
     </div>
   </section>
@@ -36,16 +34,16 @@
     <section class="ed-main">
       <header class="hp-sechead">
         <div>
-          <p class="hp-eyebrow">From the journal</p>
-          <h2 class="hp-title">Reads from the hive</h2>
+          <p class="hp-eyebrow">{{ 'home.journal.eyebrow' | translate }}</p>
+          <h2 class="hp-title">{{ 'home.journal.title' | translate }}</h2>
         </div>
         <button type="button" class="hp-textlink" (click)="goToBlog()">
-          Read all →
+          {{ 'home.journal.readAll' | translate }} →
         </button>
       </header>
 
       @if (postsLoading()) {
-        <div class="jr-list" aria-busy="true" aria-label="Loading articles">
+        <div class="jr-list" aria-busy="true" [attr.aria-label]="'home.journal.loading' | translate">
           @for (sk of [1, 2, 3]; track sk) {
             <div class="jr-row jr-row--skel">
               <div class="jr-row__main">
@@ -65,7 +63,7 @@
         </div>
       } @else if (posts().length === 0) {
         <div class="empty-card">
-          <p>No posts yet. Check back soon — our first reads are landing.</p>
+          <p>{{ 'home.journal.empty' | translate }}</p>
         </div>
       } @else {
         <div class="jr-list">
@@ -76,7 +74,7 @@
                   <span
                     class="jr-cat"
                     [attr.data-tone]="categoryTone(p.category)"
-                  >{{ p.category }}</span>
+                  >{{ categoryLabel(p.category) }}</span>
                 </div>
                 <h3 class="jr-row__title">{{ p.title }}</h3>
                 <p class="jr-row__ex">{{ p.excerpt }}</p>
@@ -93,7 +91,7 @@
                     </mh-hex>
                     <span class="jr-author__name">{{ p.authorName }}</span>
                     <span class="jr-author__dot"></span>
-                    <span class="jr-author__time">{{ p.readTime }} min read</span>
+                    <span class="jr-author__time">{{ 'home.journal.minRead' | translate: { minutes: p.readTime } }}</span>
                   </div>
                 </div>
               </div>
@@ -125,7 +123,7 @@
 
       @if (showStepsPanel()) {
         <div class="ed-panel">
-          <p class="hp-eyebrow">Start here</p>
+          <p class="hp-eyebrow">{{ 'home.steps.eyebrow' | translate }}</p>
           <div class="ed-steps">
             @for (s of steps(); track s.id; let i = $index) {
               <button
@@ -150,8 +148,8 @@
                   }
                 </mh-hex>
                 <div class="hp-step__text">
-                  <h3>{{ s.title }}</h3>
-                  <p>{{ s.sub }}</p>
+                  <h3>{{ s.titleKey | translate }}</h3>
+                  <p>{{ s.subKey | translate }}</p>
                 </div>
                 @if (!s.done) {
                   <span class="hp-step__go">→</span>
@@ -165,19 +163,19 @@
       <div class="ed-panel">
         <div class="ed-panel__head">
           <p class="hp-eyebrow">
-            {{ hasOwnCoaches() ? 'Your coaches' : 'Some of our coaches' }}
+            {{ (hasOwnCoaches() ? 'home.coaches.yours' : 'home.coaches.some') | translate }}
           </p>
           <button
             type="button"
             class="hp-textlink"
             (click)="hasOwnCoaches() ? goToMyCoaches() : goToDiscoverCoaches()"
           >
-            {{ hasOwnCoaches() ? 'See all' : 'Discover more' }} →
+            {{ (hasOwnCoaches() ? 'button.seeAll' : 'home.coaches.discoverMore') | translate }} →
           </button>
         </div>
 
         @if (coachesLoading()) {
-          <div class="ed-coachrows" aria-busy="true" aria-label="Loading coaches">
+          <div class="ed-coachrows" aria-busy="true" [attr.aria-label]="'home.coaches.loading' | translate">
             @for (sk of [1, 2, 3]; track sk) {
               <div class="ed-coachrow ed-coachrow--skel">
                 <p-skeleton shape="circle" size="40px" />
@@ -212,13 +210,13 @@
               </button>
             }
             @if (!hasOwnCoaches() && rows.length > 0) {
-              <div class="ed-coach-note">More joining soon.</div>
+              <div class="ed-coach-note">{{ 'home.coaches.moreSoon' | translate }}</div>
             }
             @if (rows.length === 0) {
               <button type="button" class="ed-coach-empty" (click)="suggestOpen.set(true)">
-                <div class="ed-coach-empty__title">No coaches to show yet</div>
+                <div class="ed-coach-empty__title">{{ 'home.coaches.empty.title' | translate }}</div>
                 <div class="ed-coach-empty__sub">
-                  Know one who'd be a great fit? Suggest them →
+                  {{ 'home.coaches.empty.sub' | translate }} →
                 </div>
               </button>
             }
@@ -232,16 +230,15 @@
   <section class="hp-invite">
     <div class="hp-invite__honey" aria-hidden="true"></div>
     <div class="hp-invite__text">
-      <h3>Know someone who'd love it here?</h3>
+      <h3>{{ 'home.inviteBand.title' | translate }}</h3>
       <p>
-        The hive grows by word of mouth. MotionHive is free to join —
-        bring someone you'd actually train with.
+        {{ 'home.inviteBand.body' | translate }}
       </p>
     </div>
     <div class="hp-invite__actions">
-      <button pButton type="button" size="large" (click)="inviteOpen.set(true)"><i class="pi pi-send"></i> Invite a friend</button>
+      <button pButton type="button" size="large" (click)="inviteOpen.set(true)"><i class="pi pi-send"></i> {{ 'home.inviteBand.invite' | translate }}</button>
       <button type="button" class="hp-textlink" (click)="suggestOpen.set(true)">
-        Suggest an instructor →
+        {{ 'home.inviteBand.suggestCoach' | translate }} →
       </button>
     </div>
   </section>

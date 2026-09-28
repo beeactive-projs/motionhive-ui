@@ -8,6 +8,7 @@ import {
   IonLabel,
   IonNote,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { BellNotification, formatCalendarShort } from 'core';
 
@@ -37,6 +38,7 @@ import { routeFor } from '../../../../_shared/config/notification-deep-link';
     IonItemSliding,
     IonLabel,
     IonNote,
+    TranslatePipe,
   ],
   templateUrl: './notification-row.html',
   styleUrl: './notification-row.scss',

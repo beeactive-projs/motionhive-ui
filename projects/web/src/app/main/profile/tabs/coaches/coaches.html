@@ -82,8 +82,8 @@
             severity="danger"
             [rounded]="true"
             [text]="true"
-            [pTooltip]="'profileTabs.coaches.outgoing.cancel' | translate"
-            [attr.aria-label]="'profileTabs.coaches.outgoing.cancel' | translate"
+            [pTooltip]="'button.cancelRequest' | translate"
+            [attr.aria-label]="'button.cancelRequest' | translate"
             (click)="confirmCancelOutgoing(request)"
             iconOnly
           >
@@ -104,7 +104,7 @@
           <h2 class="text-lg font-semibold">{{ 'profileTabs.coaches.list.title' | translate }}</h2>
           <p class="text-sm text-surface-500 m-0">{{ 'profileTabs.coaches.list.subtitle' | translate }}</p>
         </div>
-        <button pButton type="button" (click)="discoverVisible.set(true)"><i class="pi pi-search"></i> {{ 'profileTabs.coaches.list.discover' | translate }}</button>
+        <button pButton type="button" (click)="discoverVisible.set(true)"><i class="pi pi-search"></i> {{ 'button.discoverCoaches' | translate }}</button>
       </div>
 
       @if (loadingInstructors()) {

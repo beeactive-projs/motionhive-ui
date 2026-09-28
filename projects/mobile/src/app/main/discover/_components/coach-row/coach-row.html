@@ -17,7 +17,7 @@
     <div class="name-line">
       <h2>{{ name() }}</h2>
       @if (coach().isAcceptingClients) {
-        <ion-badge class="accepting">Taking clients</ion-badge>
+        <ion-badge class="accepting">{{ 'discover.coachRow.takingClients' | translate }}</ion-badge>
       }
     </div>
     @if (specializations()) {

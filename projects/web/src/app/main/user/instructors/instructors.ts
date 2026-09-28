@@ -1,11 +1,11 @@
 import {
   Component,
-  ChangeDetectionStrategy,
   inject,
   OnInit,
   signal,
   computed,
 } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CardModule } from 'primeng/card';
 import { ButtonDirective } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -14,7 +14,14 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { MyInstructor, ClientRequest, ClientService } from 'core';
+import {
+  MyInstructor,
+  ClientRequest,
+  ClientRequestTypes,
+  ClientService,
+  escapeHtml,
+  showApiError,
+} from 'core';
 import { DiscoverInstructors } from '../_dialogs/discover-instructors/discover-instructors';
 import { Avatar } from '../../../_shared/components/avatar/avatar';
 import { UserInfo } from '../../../_shared/components/user-info/user-info';
@@ -34,16 +41,17 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
     ConfirmDialogModule,
     DiscoverInstructors,
     ListEmptyState,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './instructors.html',
   styleUrl: './instructors.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Instructors implements OnInit {
   private readonly _clientService = inject(ClientService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly instructors = signal<MyInstructor[]>([]);
   readonly totalRecords = signal(0);
@@ -73,8 +81,8 @@ export class Instructors implements OnInit {
         this.loading.set(false);
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load instructors',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('myCoaches.toast.loadFailed'),
         });
       },
     });
@@ -83,7 +91,7 @@ export class Instructors implements OnInit {
   loadPendingRequests(): void {
     this._clientService.getPendingRequests().subscribe({
       next: (requests) =>
-        this.pendingRequests.set(requests.filter((r) => r.type === 'CLIENT_TO_INSTRUCTOR')),
+        this.pendingRequests.set(requests.filter((r) => r.type === ClientRequestTypes.ClientToInstructor)),
       error: () => {},
     });
   }
@@ -98,10 +106,12 @@ export class Instructors implements OnInit {
   confirmCancel(request: ClientRequest): void {
     const name = request.toUser
       ? `${request.toUser.firstName} ${request.toUser.lastName}`
-      : 'this instructor';
+      : this._translateService.instant('myCoaches.confirm.cancel.thisCoach');
     this._confirmationService.confirm({
-      message: `Are you sure you want to cancel your request to ${name}?`,
-      header: 'Cancel Request',
+      message: this._translateService.instant('myCoaches.confirm.cancel.message', {
+        name: escapeHtml(name),
+      }),
+      header: this._translateService.instant('myCoaches.confirm.cancel.header'),
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.cancelRequest(request),
@@ -113,17 +123,18 @@ export class Instructors implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'info',
-          summary: 'Request Cancelled',
-          detail: 'Your request has been cancelled',
+          summary: this._translateService.instant('toast.summary.requestCancelled'),
+          detail: this._translateService.instant('myCoaches.toast.cancelled.detail'),
         });
         this.loadPendingRequests();
       },
       error: (err) => {
-        this._messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err.error?.message || 'Failed to cancel request',
-        });
+        showApiError(
+          this._messageService,
+          this._translateService.instant('toast.summary.error'),
+          this._translateService.instant('myCoaches.toast.cancelFailed'),
+          err,
+        );
       },
     });
   }
@@ -133,7 +144,7 @@ export class Instructors implements OnInit {
   }
 
   requestToName(request: ClientRequest): string {
-    if (!request.toUser) return 'Unknown';
+    if (!request.toUser) return this._translateService.instant('common.unknown');
     return `${request.toUser.firstName} ${request.toUser.lastName}`;
   }
 

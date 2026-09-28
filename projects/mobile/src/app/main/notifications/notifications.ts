@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonBackButton,
   IonButton,
@@ -86,6 +87,7 @@ interface NotificationDay {
     NotificationFilterSheet,
     NotificationRow,
     NotificationsEmpty,
+    TranslatePipe,
   ],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss',
@@ -95,6 +97,7 @@ export class Notifications implements ViewWillEnter {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7];
 
@@ -144,7 +147,11 @@ export class Notifications implements ViewWillEnter {
   readonly filterSummary = computed(() => {
     const label = this.categoryLabel();
     if (!label || !this.store.hasLoadedList()) return null;
-    return `${this.store.notifications().length} of ${this.store.total()} in ${label}`;
+    return this._translateService.instant('notifications.filterSummary', {
+      shown: this.store.notifications().length,
+      total: this.store.total(),
+      categories: label,
+    });
   });
 
   /** First load only. A refresh happens under the rows already on screen. */
@@ -232,7 +239,7 @@ export class Notifications implements ViewWillEnter {
 
   remove(item: BellNotification): void {
     this.store.remove(item.id);
-    void this._feedbackService.success('Deleted');
+    void this._feedbackService.success(this._translateService.instant('notifications.toast.deleted'));
   }
 
   markAllRead(): void {

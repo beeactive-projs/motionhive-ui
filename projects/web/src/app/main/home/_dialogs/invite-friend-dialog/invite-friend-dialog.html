@@ -14,21 +14,20 @@
   header=" "
 >
   <div class="invite-friend">
-    <h2 class="invite-friend__title">Bring a friend, train together.</h2>
+    <h2 class="invite-friend__title">{{ 'home.inviteFriend.title' | translate }}</h2>
     <p class="invite-friend__body">
-      MotionHive is free to join. Share the link with someone you'd
-      actually train with.
+      {{ 'home.inviteFriend.body' | translate }}
     </p>
 
     <p-tabs value="link">
       <p-tablist>
         <p-tab value="link">
           <i class="pi pi-link"></i>
-          <span class="ml-2">Get a link</span>
+          <span class="ml-2">{{ 'home.inviteFriend.tab.link' | translate }}</span>
         </p-tab>
         <p-tab value="email">
           <i class="pi pi-envelope"></i>
-          <span class="ml-2">Send an email</span>
+          <span class="ml-2">{{ 'home.inviteFriend.tab.email' | translate }}</span>
         </p-tab>
       </p-tablist>
 
@@ -36,7 +35,7 @@
         <p-tabpanel value="link">
           <div class="invite-friend__panel">
             <p class="invite-friend__hint">
-              Share this link anywhere — WhatsApp, Slack, a text message.
+              {{ 'home.inviteFriend.linkHint' | translate }}
             </p>
             <input
               pInputText
@@ -50,17 +49,17 @@
             <div class="invite-friend__actions">
               <button pButton type="button" severity="secondary" [outlined]="true" fluid (click)="onCopy()">
                 <i class="pi pi-copy"></i>
-                Copy link
+                {{ 'button.copyLink' | translate }}
               </button>
               @if (canShare()) {
                 <button pButton type="button" severity="secondary" [outlined]="true" fluid (click)="onShare()">
                   <i class="pi pi-share-alt"></i>
-                  Share
+                  {{ 'button.share' | translate }}
                 </button>
               }
             </div>
             <p class="invite-friend__footnote">
-              The link drops them straight on sign-up.
+              {{ 'home.inviteFriend.linkFootnote' | translate }}
             </p>
           </div>
         </p-tabpanel>
@@ -69,17 +68,17 @@
           <div class="invite-friend__panel">
             @if (!emailSent()) {
               <p class="invite-friend__hint">
-                We'll send them a friendly note with your invite link.
+                {{ 'home.inviteFriend.emailHint' | translate }}
               </p>
               <form [formGroup]="form" (ngSubmit)="onSendEmail()">
                 <div class="invite-friend__field">
-                  <label for="friend-email" class="invite-friend__label">Their email</label>
+                  <label for="friend-email" class="invite-friend__label">{{ 'home.field.theirEmail' | translate }}</label>
                   <input
                     id="friend-email"
                     pInputText
                     type="email"
                     formControlName="email"
-                    placeholder="friend@example.com"
+                    [placeholder]="'home.inviteFriend.emailPlaceholder' | translate"
                     fluid
                     autocomplete="off"
                   />
@@ -90,20 +89,20 @@
 
                 <div class="invite-friend__field">
                   <label for="friend-msg" class="invite-friend__label">
-                    Personal message <span class="invite-friend__optional">(optional)</span>
+                    {{ 'home.inviteFriend.messageLabel' | translate }} <span class="invite-friend__optional">{{ 'form.hint.optional' | translate }}</span>
                   </label>
                   <textarea
                     id="friend-msg"
                     pTextarea
                     rows="3"
                     formControlName="personalMessage"
-                    placeholder="Hey — come train with me on MotionHive."
+                    [placeholder]="'home.inviteFriend.messagePlaceholder' | translate"
                     fluid
                   ></textarea>
                 </div>
 
                 <button pButton type="submit" fluid [disabled]="form.invalid || isSending()">
-                  Send invite
+                  {{ 'home.field.sendInvite' | translate }}
                   <i class="pi" [class]="isSending() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
                 </button>
               </form>
@@ -112,11 +111,11 @@
                 <div class="invite-friend__success-hex">
                   <i class="pi pi-check"></i>
                 </div>
-                <h3 class="invite-friend__success-title">On its way.</h3>
+                <h3 class="invite-friend__success-title">{{ 'home.inviteFriend.success.title' | translate }}</h3>
                 <p class="invite-friend__success-body">
-                  We'll email them and let them know you sent the invite.
+                  {{ 'home.inviteFriend.success.body' | translate }}
                 </p>
-                <button pButton type="button" severity="secondary" text fluid (click)="onClose()">Done</button>
+                <button pButton type="button" severity="secondary" text fluid (click)="onClose()">{{ 'button.done' | translate }}</button>
               </div>
             }
           </div>

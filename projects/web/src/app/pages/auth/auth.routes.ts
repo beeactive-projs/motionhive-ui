@@ -4,30 +4,30 @@ export const authRoutes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
-    title: 'Sign In - MotionHive',
+    title: 'pageTitle.signIn',
   },
   {
     path: 'signup',
     loadComponent: () => import('./sign-up/sign-up.component').then((m) => m.SignUpComponent),
-    title: 'Create Account - MotionHive',
+    title: 'pageTitle.createAccount',
   },
   {
     path: 'reset-password',
     loadComponent: () =>
       import('./reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
-    title: 'Reset Password - MotionHive',
+    title: 'pageTitle.resetPassword',
   },
   {
     path: 'new-password',
     loadComponent: () =>
       import('./new-password/new-password.component').then((m) => m.NewPasswordComponent),
-    title: 'New Password - MotionHive',
+    title: 'pageTitle.newPassword',
   },
   {
     path: 'verify-email',
     loadComponent: () =>
       import('./verify-email/verify-email.component').then((m) => m.VerifyEmailComponent),
-    title: 'Verify Email - MotionHive',
+    title: 'pageTitle.verifyEmail',
   },
   {
     path: 'facebook-callback',
@@ -35,7 +35,7 @@ export const authRoutes: Routes = [
       import('./facebook-callback/facebook-callback.component').then(
         (m) => m.FacebookCallbackComponent,
       ),
-    title: 'Facebook Sign In - MotionHive',
+    title: 'pageTitle.facebookSignIn',
   },
   {
     path: '',

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { take } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -16,7 +16,7 @@ import { MessageModule } from 'primeng/message';
 import { TabsModule } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { AuthStore, InvitationService, environment } from 'core';
+import { AuthStore, InvitationService, environment, validationMessage } from 'core';
 
 /**
  * Invite-a-friend dialog. Two paths:
@@ -42,16 +42,17 @@ import { AuthStore, InvitationService, environment } from 'core';
     MessageModule,
     TabsModule,
     ToastModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './invite-friend-dialog.html',
   styleUrl: './invite-friend-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InviteFriendDialog {
   private readonly _authStore = inject(AuthStore);
   private readonly _invitationService = inject(InvitationService);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model<boolean>(false);
 
@@ -86,10 +87,10 @@ export class InviteFriendDialog {
   }
 
   protected emailError(): string {
-    const c = this.form.controls.email;
-    if (c.hasError('required')) return "What's your friend's email?";
-    if (c.hasError('email')) return "Hmm, that doesn't look like an email.";
-    return '';
+    return validationMessage(this.form.controls.email.errors, {
+      required: 'home.inviteFriend.validation.emailRequired',
+      email: 'home.inviteFriend.validation.emailInvalid',
+    });
   }
 
   protected onCopy(): void {
@@ -99,16 +100,16 @@ export class InviteFriendDialog {
       .then(() =>
         this._messageService.add({
           severity: 'success',
-          summary: 'Link copied',
-          detail: 'Send it to your friend — first session is on us.',
+          summary: this._translateService.instant('toast.detail.linkCopied'),
+          detail: this._translateService.instant('home.inviteFriend.toast.copied'),
           life: 3500,
         }),
       )
       .catch(() =>
         this._messageService.add({
           severity: 'error',
-          summary: "Couldn't copy",
-          detail: 'Select the link and copy it manually.',
+          summary: this._translateService.instant('home.inviteFriend.toast.copyFailed.summary'),
+          detail: this._translateService.instant('home.inviteFriend.toast.copyFailed.detail'),
           life: 4000,
         }),
       );
@@ -117,8 +118,8 @@ export class InviteFriendDialog {
   protected onShare(): void {
     navigator
       .share({
-        title: 'Train with me on MotionHive',
-        text: "Come train with me on MotionHive — your first session's on us.",
+        title: this._translateService.instant('home.inviteFriend.share.title'),
+        text: this._translateService.instant('home.inviteFriend.share.text'),
         url: this.inviteLink(),
       })
       .catch(() => {});
@@ -144,12 +145,12 @@ export class InviteFriendDialog {
           this.isSending.set(false);
           const detail =
             err.status === 429
-              ? "You've sent a lot recently — try again in an hour."
+              ? this._translateService.instant('home.toast.rateLimited')
               : err.error?.message ||
-                'Try again in a moment, or copy the link from the other tab.';
+                this._translateService.instant('home.inviteFriend.toast.sendFailed.detail');
           this._messageService.add({
             severity: 'error',
-            summary: "Couldn't send the invite",
+            summary: this._translateService.instant('home.inviteFriend.toast.sendFailed.summary'),
             detail,
             life: 5000,
           });

@@ -103,7 +103,7 @@ export class DiscoverInstructors {
           this.showRequestDialog.set(false);
           this._messageService.add({
             severity: 'success',
-            summary: this._translateService.instant('userDialogs.discoverCoaches.toast.requestSent.summary'),
+            summary: this._translateService.instant('toast.summary.requestSent'),
             detail: this._translateService.instant('userDialogs.discoverCoaches.toast.requestSent.detail', {
               name: this.instructorName(instructor),
             }),

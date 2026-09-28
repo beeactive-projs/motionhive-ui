@@ -12,13 +12,18 @@ import {
   DiscoverFilters,
   InstructorSearchResult,
   PublicSessionInstance,
+  SESSION_LOCATION_KINDS,
+  SESSION_TYPES,
   SessionInstructorRef,
   SessionLocationKind,
   SessionType,
+  UserRoles,
   endOfDay,
+  enumLabel,
   startOfDay,
   weekStart,
   formatMinorUnits,
+  translate,
 } from 'core';
 
 /**
@@ -79,7 +84,7 @@ export function discoverTone(type: SessionType | undefined): DiscoverTone | null
 // ─── Accessors (guarding the eager-loaded refs) ────────────────────────────
 
 export function discoverTitle(i: PublicSessionInstance): string {
-  return i.titleOverride ?? i.template?.title ?? 'Session';
+  return i.titleOverride ?? i.template?.title ?? translate('common.session');
 }
 
 export function discoverCoach(i: PublicSessionInstance): SessionInstructorRef | null {
@@ -92,7 +97,7 @@ export function isOnlineSession(i: PublicSessionInstance): boolean {
 
 /** "Online" or the venue's name. */
 export function discoverPlace(i: PublicSessionInstance): string {
-  if (isOnlineSession(i)) return 'Online';
+  if (isOnlineSession(i)) return SESSION_LOCATION_KINDS[SessionLocationKind.Online].label;
   return i.venueOverride?.name ?? i.template?.venue?.name ?? '';
 }
 
@@ -149,7 +154,10 @@ export function spotsLabel(i: PublicSessionInstance): string | null {
   if (!capacity || capacity <= 0) return null;
   if (i.template?.type === SessionType.Private) return null;
   if (isSessionFull(i)) return null;
-  return `${Math.min(i.confirmedCount, capacity)} of ${capacity} spots`;
+  return translate('discover.row.spots', {
+    confirmed: Math.min(i.confirmedCount, capacity),
+    capacity,
+  });
 }
 
 /** Wash tone names — the badge SCSS maps each to an `--ion-color-*-wash`. */
@@ -164,8 +172,8 @@ export interface DiscoverRowChip {
 export function fullChip(i: PublicSessionInstance): DiscoverRowChip | null {
   if (!isSessionFull(i)) return null;
   return i.template?.waitlistEnabled
-    ? { label: 'Full · waitlist', tone: 'info' }
-    : { label: 'Full', tone: 'medium' };
+    ? { label: translate('discover.row.fullWaitlist'), tone: 'info' }
+    : { label: translate('discover.row.full'), tone: 'medium' };
 }
 
 // ─── Date presets ──────────────────────────────────────────────────────────
@@ -180,11 +188,12 @@ export const DiscoverDatePresets = {
 export type DiscoverDatePreset =
   (typeof DiscoverDatePresets)[keyof typeof DiscoverDatePresets];
 
+/** `label` is a translation key — the sheet's template translates it. */
 export const DATE_PRESET_OPTIONS: { label: string; value: DiscoverDatePreset }[] = [
-  { label: 'Any time', value: DiscoverDatePresets.Any },
-  { label: 'This week', value: DiscoverDatePresets.ThisWeek },
-  { label: 'This weekend', value: DiscoverDatePresets.Weekend },
-  { label: 'Next two weeks', value: DiscoverDatePresets.TwoWeeks },
+  { label: 'discover.filterSheet.datePreset.any', value: DiscoverDatePresets.Any },
+  { label: 'discover.filterSheet.datePreset.thisWeek', value: DiscoverDatePresets.ThisWeek },
+  { label: 'discover.filterSheet.datePreset.weekend', value: DiscoverDatePresets.Weekend },
+  { label: 'discover.filterSheet.datePreset.twoWeeks', value: DiscoverDatePresets.TwoWeeks },
 ];
 
 function addDays(d: Date, days: number): Date {
@@ -251,19 +260,27 @@ export function sheetFilterCount(filters: DiscoverSheetFilters): number {
   return count;
 }
 
-export const DISCOVER_TYPE_OPTIONS: { label: string; value: SessionType }[] = [
-  { label: 'Group', value: SessionType.Group },
-  { label: '1-on-1', value: SessionType.Private },
-  { label: 'Open', value: SessionType.Open },
-];
+/** Labels are core's session-type metadata getters — translated on read. */
+export const DISCOVER_TYPE_OPTIONS: { readonly label: string; value: SessionType }[] = [
+  SessionType.Group,
+  SessionType.Private,
+  SessionType.Open,
+].map((value) => ({
+  value,
+  get label() {
+    return SESSION_TYPES[value].label;
+  },
+}));
 
 export const DISCOVER_LOCATION_OPTIONS: {
-  label: string;
+  readonly label: string;
   value: SessionLocationKind;
-}[] = [
-  { label: 'Online', value: SessionLocationKind.Online },
-  { label: 'In-person', value: SessionLocationKind.InPerson },
-];
+}[] = [SessionLocationKind.Online, SessionLocationKind.InPerson].map((value) => ({
+  value,
+  get label() {
+    return SESSION_LOCATION_KINDS[value].label;
+  },
+}));
 
 // ─── Quick filters (the chip row) ──────────────────────────────────────────
 
@@ -279,7 +296,8 @@ export type QuickFilterId = (typeof QuickFilterIds)[keyof typeof QuickFilterIds]
 
 export interface DiscoverQuickFilter {
   id: QuickFilterId;
-  label: string;
+  /** Translated on read (a getter), so the module can build it at load time. */
+  readonly label: string;
   /** What tapping the chip writes into the store — explicit undefineds so
       the patch clears the dimension it does not set. */
   patch: Partial<DiscoverFilters>;
@@ -288,27 +306,37 @@ export interface DiscoverQuickFilter {
 export const QUICK_FILTERS: DiscoverQuickFilter[] = [
   {
     id: QuickFilterIds.All,
-    label: 'All',
+    get label() {
+      return translate('common.all');
+    },
     patch: { type: undefined, locationKind: undefined },
   },
   {
     id: QuickFilterIds.Online,
-    label: 'Online',
+    get label() {
+      return SESSION_LOCATION_KINDS[SessionLocationKind.Online].label;
+    },
     patch: { locationKind: SessionLocationKind.Online, type: undefined },
   },
   {
     id: QuickFilterIds.InPerson,
-    label: 'In-person',
+    get label() {
+      return SESSION_LOCATION_KINDS[SessionLocationKind.InPerson].label;
+    },
     patch: { locationKind: SessionLocationKind.InPerson, type: undefined },
   },
   {
     id: QuickFilterIds.Group,
-    label: 'Group',
+    get label() {
+      return SESSION_TYPES[SessionType.Group].label;
+    },
     patch: { type: SessionType.Group, locationKind: undefined },
   },
   {
     id: QuickFilterIds.OneOnOne,
-    label: '1-on-1',
+    get label() {
+      return SESSION_TYPES[SessionType.Private].label;
+    },
     patch: { type: SessionType.Private, locationKind: undefined },
   },
 ];
@@ -340,7 +368,7 @@ export function coachName(c: InstructorSearchResult): string {
   return (
     c.displayName?.trim() ||
     [c.firstName, c.lastName].filter(Boolean).join(' ').trim() ||
-    'Coach'
+    enumLabel('userRole', UserRoles.Instructor)
   );
 }
 
@@ -350,7 +378,9 @@ export function coachMeta(c: InstructorSearchResult): string {
   const location = [c.city, c.country].filter(Boolean).join(', ');
   const years = c.yearsOfExperience;
   const experience =
-    years && years > 0 ? `${years} yrs experience` : 'New coach';
+    years && years > 0
+      ? translate('discover.coach.experience', { count: years })
+      : translate('discover.coach.newCoach');
   return [location, experience].filter(Boolean).join(' · ');
 }
 

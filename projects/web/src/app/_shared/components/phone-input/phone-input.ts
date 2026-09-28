@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -8,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   AsYouType,
   getCountryCallingCode,
@@ -68,10 +68,9 @@ const DEFAULT_COUNTRY: CountryCode = 'RO';
  */
 @Component({
   selector: 'mh-phone-input',
-  imports: [FormsModule, Select, InputText],
+  imports: [FormsModule, Select, InputText, TranslatePipe],
   templateUrl: './phone-input.html',
   styleUrl: './phone-input.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PhoneInput {
   /**
@@ -79,7 +78,8 @@ export class PhoneInput {
    * Parents should bind via `[(value)]` or `[value]+(valueChange)`.
    */
   readonly value = model<string | null>(null);
-  readonly placeholder = input<string>('Phone number');
+  /** Defaults to "Phone number" (`components.phoneInput.placeholder`). */
+  readonly placeholder = input<string>();
   readonly disabled = input<boolean>(false);
   readonly inputId = input<string>('mh-phone-input');
 

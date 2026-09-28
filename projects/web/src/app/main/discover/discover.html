@@ -3,10 +3,10 @@
 <div class="disc">
   <!-- Head -->
   <header class="disc__head">
-    <p class="disc__eyebrow">Discover</p>
-    <h1 class="disc__h1">Find your people in the hive</h1>
+    <p class="disc__eyebrow">{{ 'nav.discover' | translate }}</p>
+    <h1 class="disc__h1">{{ 'discover.head.title' | translate }}</h1>
     <p class="disc__sub">
-      Coaches, sessions, and groups — all in one place. Use ⌘K up top when you already know what you want.
+      {{ 'discover.head.subtitle' | translate }}
     </p>
   </header>
 
@@ -14,24 +14,24 @@
   <div class="disc__search">
     <i class="pi pi-search disc__search-ic"></i>
     <input class="disc__search-in" type="text" [ngModel]="query()" (ngModelChange)="onSearch($event)"
-      placeholder="Search coaches, sessions, venues…" aria-label="Search" />
+      [placeholder]="'discover.search.placeholder' | translate" [attr.aria-label]="'button.search' | translate" />
   </div>
 
   <!-- Tabs -->
-  <nav class="disc__tabs" role="tablist" aria-label="Discover">
+  <nav class="disc__tabs" role="tablist" [attr.aria-label]="'nav.discover' | translate">
     <button role="tab" [attr.aria-selected]="tab() === 'coaches'" class="disc__tab"
-      [class.is-active]="tab() === 'coaches'" (click)="setTab('coaches')">Coaches</button>
+      [class.is-active]="tab() === 'coaches'" (click)="setTab('coaches')">{{ 'discover.tabs.coaches' | translate }}</button>
     <button role="tab" [attr.aria-selected]="tab() === 'sessions'" class="disc__tab"
-      [class.is-active]="tab() === 'sessions'" (click)="setTab('sessions')">Sessions</button>
+      [class.is-active]="tab() === 'sessions'" (click)="setTab('sessions')">{{ 'discover.tabs.sessions' | translate }}</button>
     <button role="tab" [attr.aria-selected]="tab() === 'groups'" class="disc__tab"
-      [class.is-active]="tab() === 'groups'" (click)="setTab('groups')">Groups</button>
+      [class.is-active]="tab() === 'groups'" (click)="setTab('groups')">{{ 'discover.tabs.groups' | translate }}</button>
   </nav>
 
   <!-- ── Coaches ── -->
   @if (tab() === 'coaches') {
   <div class="disc__chips">
-    @for (c of coachChips; track c) {
-    <button class="disc__chip" [class.is-active]="coachChip() === c" (click)="coachChip.set(c)">{{ c }}</button>
+    @for (c of coachChips; track c.value) {
+    <button class="disc__chip" [class.is-active]="coachChip() === c.value" (click)="coachChip.set(c.value)">{{ c.labelKey | translate }}</button>
     }
   </div>
 
@@ -40,7 +40,7 @@
     @for (i of [1,2,3]; track i) { <div class="disc__card disc__card--skeleton"></div> }
   </div>
   } @else if (visibleCoaches().length === 0) {
-  <div class="disc__empty">No coaches match yet — try a different search.</div>
+  <div class="disc__empty">{{ 'discover.coaches.empty' | translate }}</div>
   } @else {
   <div class="disc__grid">
     @for (c of visibleCoaches(); track c.id; let i = $index) {
@@ -65,7 +65,7 @@
       <div class="disc__coach-foot">
         <span class="disc__coach-meta">{{ coachExperience(c) }}</span>
         <button class="disc__btn disc__btn--soft" [disabled]="!c.handle" (click)="viewCoach(c)">
-          View profile
+          {{ 'button.viewProfile' | translate }}
         </button>
       </div>
     </article>
@@ -77,8 +77,8 @@
   <!-- ── Sessions ── -->
   @if (tab() === 'sessions') {
   <div class="disc__chips">
-    @for (c of sessionChips; track c) {
-    <button class="disc__chip" [class.is-active]="sessionChip() === c" (click)="onSessionChip(c)">{{ c }}</button>
+    @for (c of sessionChips; track c.id) {
+    <button class="disc__chip" [class.is-active]="sessionChip() === c.id" (click)="onSessionChip(c)">{{ c.labelKey | translate }}</button>
     }
   </div>
 
@@ -87,7 +87,7 @@
     @for (i of [1,2,3,4]; track i) { <div class="disc__card disc__card--skeleton"></div> }
   </div>
   } @else if (sessionsStore.items().length === 0) {
-  <div class="disc__empty">No sessions found — try a different search or filter.</div>
+  <div class="disc__empty">{{ 'discover.sessions.empty' | translate }}</div>
   } @else {
   <div class="disc__grid disc__grid--2">
     @for (s of sessionsStore.items(); track s.id) {
@@ -104,7 +104,7 @@
     @for (i of [1,2,3]; track i) { <div class="disc__card disc__card--skeleton"></div> }
   </div>
   } @else if (groups().length === 0) {
-  <div class="disc__empty">No groups found — try a different search.</div>
+  <div class="disc__empty">{{ 'discover.groups.empty' | translate }}</div>
   } @else {
   <div class="disc__grid">
     @for (g of groups(); track g.id; let i = $index) {
@@ -121,22 +121,22 @@
       @if (g.tags?.length) {
       <p class="disc__coach-tag">{{ g.tags!.join(' · ') }}</p>
       }
-      <p class="disc__group-members">{{ g.memberCount }} member{{ g.memberCount === 1 ? '' : 's' }}</p>
+      <p class="disc__group-members">{{ 'count.members' | translate: { count: g.memberCount } }}</p>
       <div class="disc__group-actions">
         @if (g.myJoinRequestStatus === 'PENDING') {
         <button class="disc__btn disc__btn--soft" [disabled]="isGroupBusy(g.id)" (click)="cancelGroupRequest(g)">
-          Cancel request
+          {{ 'button.cancelRequest' | translate }}
         </button>
         } @else if (g.joinPolicy === JoinPolicies.Approval) {
         <button class="disc__btn disc__btn--primary" [disabled]="isGroupBusy(g.id)" (click)="joinOrRequest(g)">
-          Request to join
+          {{ 'button.requestToJoin' | translate }}
         </button>
         } @else {
         <button class="disc__btn disc__btn--primary" [disabled]="isGroupBusy(g.id)" (click)="joinOrRequest(g)">
-          Join group
+          {{ 'button.joinGroup' | translate }}
         </button>
         }
-        <button class="disc__btn disc__btn--soft" (click)="viewGroup(g)">View</button>
+        <button class="disc__btn disc__btn--soft" (click)="viewGroup(g)">{{ 'button.view' | translate }}</button>
       </div>
     </article>
     }

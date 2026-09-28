@@ -6,12 +6,12 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 
-import { NotificationCategory } from 'core';
+import { NotificationCategory, appLocale, translate } from 'core';
 
 import {
   CATEGORY_ICONS,
   CATEGORY_ORDER,
-  categoryStyle,
+  CATEGORY_STYLES,
 } from '../../_shared/config/notification-categories.config';
 
 /**
@@ -64,6 +64,17 @@ export function sameFilters(a: NotificationFilters, b: NotificationFilters): boo
 }
 
 /**
+ * The short name the centre gives a category — "Payments", not the settings
+ * page's "Payments & invoices". A category the server added after this build
+ * reads as a plain "Notification", matching `categoryStyle`'s neutral bell.
+ */
+export function categoryLabel(category: NotificationCategory): string {
+  return category in CATEGORY_STYLES
+    ? translate(`notifications.category.${category}`)
+    : translate('notifications.categoryFallback');
+}
+
+/**
  * "Payments", "Sessions and Payments", "Sessions, Groups and Payments" — for
  * the empty state's heading and the line under a filtered list. Display order
  * rather than tap order, so the same pick always reads the same way. Null with
@@ -73,7 +84,6 @@ export function categoryListLabel(categories: readonly NotificationCategory[]): 
   if (categories.length === 0) return null;
   const labels = [...categories]
     .sort((a, b) => CATEGORY_ORDER.indexOf(a) - CATEGORY_ORDER.indexOf(b))
-    .map((category) => categoryStyle(category).label);
-  if (labels.length === 1) return labels[0];
-  return `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
+    .map(categoryLabel);
+  return new Intl.ListFormat(appLocale(), { type: 'conjunction' }).format(labels);
 }

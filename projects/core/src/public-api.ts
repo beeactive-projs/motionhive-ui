@@ -197,6 +197,7 @@ export * from './lib/utils/notification.utils';
 export * from './lib/i18n/app-language';
 export * from './lib/i18n/translator';
 export * from './lib/i18n/provide-app-i18n';
+export * from './lib/i18n/app-title.strategy';
 export * from './lib/i18n/merged-translate.loader';
 export * from './lib/i18n/validation-message';
 export * from './lib/i18n/enum-label';

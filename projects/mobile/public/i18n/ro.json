@@ -42,8 +42,7 @@
     "hero": {
       "changePhoto": "Schimbă fotografia",
       "copyLink": "Copiază linkul profilului",
-      "verified": "Verificat",
-      "viewProfile": "Vezi profilul"
+      "verified": "Verificat"
     },
     "manage": {
       "deleteAccount": "Șterge contul",
@@ -503,6 +502,72 @@
       "thisWeek": "Săptămâna aceasta"
     }
   },
+  "discover": {
+    "allCoaches": {
+      "empty": {
+        "heading": "Niciun antrenor de afișat",
+        "message": "Când antrenorii își publică profilul public, apar aici."
+      },
+      "loadError": "Nu am putut încărca antrenorii",
+      "noMatches": "Niciun antrenor nu are această specializare.",
+      "title": "Antrenori"
+    },
+    "coach": {
+      "experience": "{count, plural, one {# an de experiență} few {# ani de experiență} other {# de ani de experiență}}",
+      "newCoach": "Antrenor nou"
+    },
+    "coachRow": {
+      "takingClients": "Primește clienți"
+    },
+    "feed": {
+      "dates": "Perioadă",
+      "empty": {
+        "heading": "Nimic programat încă",
+        "message": "Când antrenorii publică sesiuni, apar aici."
+      },
+      "loadError": "Nu am putut încărca sesiunile",
+      "noMatches": "Nicio sesiune viitoare nu se potrivește acestor filtre.",
+      "title": "Urmează"
+    },
+    "filterSheet": {
+      "anyType": "Oricare",
+      "anywhere": "Oriunde",
+      "applyCount": "{count, plural, one {Aplică · # filtru} few {Aplică · # filtre} other {Aplică · # de filtre}}",
+      "datePreset": {
+        "any": "Oricând",
+        "thisWeek": "Săptămâna asta",
+        "twoWeeks": "Următoarele două săptămâni",
+        "weekend": "Weekendul acesta"
+      },
+      "dates": "Perioadă",
+      "title": "Filtrează sesiunile"
+    },
+    "hero": {
+      "title": "Găsește-ți oamenii în stup"
+    },
+    "rail": {
+      "allCoaches": "Toți antrenorii",
+      "title": "Primesc clienți noi"
+    },
+    "row": {
+      "booked": "Rezervat",
+      "free": "Gratuit",
+      "full": "Complet",
+      "fullWaitlist": "Complet · listă de așteptare",
+      "spots": "{capacity, plural, one {{confirmed} din # loc} few {{confirmed} din # locuri} other {{confirmed} din # de locuri}}"
+    },
+    "search": {
+      "coaches": "Antrenori",
+      "empty": "Niciun antrenor sau sesiune nu se potrivește — încearcă mai puține cuvinte.",
+      "error": {
+        "heading": "Nu am putut căuta",
+        "message": "Verifică-ți conexiunea și încearcă să scrii din nou."
+      },
+      "hint": "Continuă să scrii — căutarea pornește de la două litere și acoperă antrenori și sesiuni.",
+      "placeholder": "Caută antrenori și sesiuni",
+      "sessions": "Sesiuni"
+    }
+  },
   "exercises": {
     "attribution": {
       "custom": "Exercițiu personalizat",
@@ -844,9 +909,7 @@
     },
     "join": {
       "closed": "Doar cu invitație",
-      "join": "Alătură-te grupului",
-      "pending": "Cerere în așteptare",
-      "request": "Cere să te alături"
+      "pending": "Cerere în așteptare"
     },
     "joinLink": {
       "create": "Creează un link de invitație",
@@ -1042,11 +1105,90 @@
       "toast": {
         "joinFailed": "Nu te-ai putut alătura grupului.",
         "joined": "Te-ai alăturat grupului",
-        "requestSent": "Cerere trimisă",
         "withdrawFailed": "Cererea nu a putut fi retrasă.",
         "withdrawn": "Cerere retrasă"
       },
       "withdraw": "Retrage"
+    }
+  },
+  "home": {
+    "coach": {
+      "activeClients": {
+        "hint": "Se antrenează acum cu tine",
+        "label": "Clienți activi"
+      },
+      "agenda": {
+        "calendar": "Calendar",
+        "empty": "Nicio sesiune programată azi.",
+        "kicker": "Agendă · {date}",
+        "new": "Nouă"
+      },
+      "outstanding": {
+        "label": "De încasat",
+        "nothingOverdue": "Nimic restant",
+        "overdue": "{count, plural, one {# factură restantă} few {# facturi restante} other {# de facturi restante}}"
+      },
+      "requests": {
+        "hint": "Așteaptă aprobarea ta.",
+        "review": "Verifică",
+        "summary": "{count, plural, one {# cerere de la un client în așteptare} few {# cereri de la clienți în așteptare} other {# de cereri de la clienți în așteptare}}"
+      },
+      "title": "Ziua ta de antrenor"
+    },
+    "switchRole": {
+      "comingSoon": "În curând",
+      "footnote": "Datele tale rămân într-un singur cont — schimbarea rolului modifică doar ce vezi.",
+      "intro": "Schimbă pagina principală, taburile și notificările."
+    },
+    "switchRoleLabel": "Schimbă rolul, rol curent: {role}",
+    "train": {
+      "billDue": {
+        "hint": "Atinge ca să vezi ce ai de plătit și să achiți.",
+        "title": "{count, plural, one {Ai o factură de plătit} few {# facturi de plătit} other {# de facturi de plătit}}"
+      },
+      "coaches": {
+        "discoverMore": "Descoperă mai mulți",
+        "empty": {
+          "heading": "Încă nu avem antrenori de arătat",
+          "message": "Când se alătură antrenori, îi vei vedea aici."
+        },
+        "moreSoon": "Vin și alții în curând.",
+        "openToClients": "Primește clienți noi",
+        "titleOwn": "Antrenorii tăi",
+        "titleSuggested": "Câțiva dintre antrenorii noștri"
+      },
+      "greeting": "Mă bucur să te văd, {name}.",
+      "greetingNoName": "Mă bucur să te văd.",
+      "intro": "Un loc liniștit în care să te așezi și să continui de unde ai rămas.",
+      "posts": {
+        "byline": "{author} · {minutes} min de citit",
+        "empty": "Încă nu sunt articole. Revino curând — primele sunt pe drum.",
+        "eyebrow": "Din jurnal",
+        "readAll": "Citește tot",
+        "title": "Lecturi din stup"
+      },
+      "resume": {
+        "button": "Reia antrenamentul",
+        "kicker": "Continuă de unde ai rămas"
+      },
+      "sessions": {
+        "booked": "{count, plural, one {# sesiune rezervată} few {# sesiuni rezervate} other {# de sesiuni rezervate}}",
+        "hintBrowse": "Vezi ce altceva e deschis pentru înscrieri.",
+        "hintNone": "Găsește un antrenor și rezervă prima sesiune.",
+        "none": "Nicio sesiune rezervată"
+      },
+      "steps": {
+        "coach": {
+          "sub": "Rezervă timp cu cineva în care ai încredere.",
+          "title": "Găsește-ți un antrenor"
+        },
+        "eyebrow": "Începe aici",
+        "profile": {
+          "sub": "Ca antrenorii și clienții să știe cine ești.",
+          "title": "Completează-ți profilul"
+        },
+        "title": "Primii pași"
+      }
     }
   },
   "messages": {
@@ -1080,8 +1222,7 @@
       "sectionConversation": "Conversație",
       "sectionPrivacy": "Confidențialitate",
       "thisPerson": "această persoană",
-      "title": "Detalii",
-      "viewProfile": "Vezi profilul"
+      "title": "Detalii"
     },
     "inbox": {
       "caughtUp": {
@@ -1286,6 +1427,108 @@
       "copyFailed": "Linkul nu a putut fi copiat.",
       "linkFailed": "Linkul întâlnirii nu a putut fi obținut."
     }
+  },
+  "notifications": {
+    "category": {
+      "ACCOUNT": "Cont",
+      "COACHING": "Coaching",
+      "GROUPS": "Grupuri",
+      "MESSAGING": "Mesaje",
+      "PAYMENTS": "Plăți",
+      "POSTS": "Postări",
+      "SESSIONS": "Sesiuni",
+      "WORKOUTS": "Antrenamente"
+    },
+    "categoryFallback": "Notificare",
+    "detail": {
+      "eyebrow": "{category} · {when}",
+      "title": "Notificare",
+      "webOnly": "{place}: deocamdată doar pe web. Se va deschide în aplicație imediat ce ajunge și aici."
+    },
+    "empty": {
+      "caughtUp": "Ești la zi",
+      "filteredMessage": "Nimic de afișat cu acest filtru activ.",
+      "message": "Mementourile pentru sesiuni, cererile clienților și noutățile despre plăți apar aici pe măsură ce au loc.",
+      "nothingIn": "Nimic în {categories}",
+      "settings": "Setări notificări",
+      "unreadMessage": "Nu ai notificări necitite."
+    },
+    "filter": {
+      "applyCount": "{count, plural, one {Aplică · # filtru} few {Aplică · # filtre} other {Aplică · # de filtre}}",
+      "category": "Categorie",
+      "note": "Alege oricâte categorii vrei. Mesajele noi nu ajung aici — tabul Mesaje e inboxul lor.",
+      "unread": "Necitite"
+    },
+    "filterBar": "Filtrează notificările",
+    "filterSummary": "{shown} din {total} în {categories}",
+    "loadError": "Nu am putut încărca notificările",
+    "markAllRead": "Marchează tot ca citit",
+    "markRead": "Marchează ca citită",
+    "markUnread": "Marchează ca necitită",
+    "toast": {
+      "deleted": "Notificare ștearsă"
+    },
+    "webOnlyPlace": {
+      "coaches": "Antrenori",
+      "memberships": "Abonamente",
+      "myPlans": "Planurile mele"
+    }
+  },
+  "pageTitle": {
+    "account": "Cont",
+    "assignments": "Atribuiri",
+    "billing": "Facturare",
+    "blockedUsers": "Utilizatori blocați",
+    "cancelledDeclined": "Anulate și refuzate",
+    "chat": "Conversație",
+    "client": "Client",
+    "clients": "Clienți",
+    "coaches": "Antrenori",
+    "coachingProfile": "Profil de antrenor",
+    "createAccount": "Creează cont",
+    "day": "Zi",
+    "details": "Detalii",
+    "discover": "Descoperă",
+    "editExercise": "Editează exercițiul",
+    "editGroup": "Editează grupul",
+    "exercise": "Exercițiu",
+    "exercises": "Exerciții",
+    "group": "Grup",
+    "groups": "Grupuri",
+    "history": "Istoric",
+    "invoice": "Factură",
+    "manageAccount": "Gestionează contul",
+    "manageGroup": "Gestionează grupul",
+    "manageSessions": "Gestionează sesiunile",
+    "messages": "Mesaje",
+    "mySessions": "Sesiunile mele",
+    "newExercise": "Exercițiu nou",
+    "newGroup": "Grup nou",
+    "newInvoice": "Factură nouă",
+    "newMessage": "Mesaj nou",
+    "newPassword": "Parolă nouă",
+    "newPost": "Postare nouă",
+    "notifications": "Notificări",
+    "payments": "Plăți",
+    "photos": "Fotografii",
+    "plan": "Plan",
+    "post": "Postare",
+    "profile": "Profil",
+    "program": "Program",
+    "programSettings": "Setări program",
+    "programs": "Programe",
+    "progress": "Progres",
+    "requests": "Cereri",
+    "resetPassword": "Resetează parola",
+    "routine": "Rutină",
+    "session": "Sesiune",
+    "signIn": "Autentificare",
+    "starterRoutines": "Rutine de început",
+    "training": "Antrenament",
+    "verifyEmail": "Verifică emailul",
+    "workout": "Antrenament",
+    "workoutComplete": "Antrenament încheiat",
+    "workouts": "Antrenamente"
   },
   "payments": {
     "badge": {
@@ -2028,6 +2271,9 @@
     }
   },
   "shell": {
+    "avatarButton": {
+      "label": "Profilul tău"
+    },
     "menuDot": {
       "billDue": "Ai o factură de plată",
       "requestsWaiting": "Ai cereri de la clienți în așteptare"

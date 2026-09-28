@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonIcon, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { PublicSessionInstance, formatSessionDuration, formatSessionTime } from 'core';
 
@@ -21,7 +22,7 @@ import {
  */
 @Component({
   selector: 'mh-discover-session-row',
-  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote],
+  imports: [IonBadge, IonIcon, IonItem, IonLabel, IonNote, TranslatePipe],
   templateUrl: './discover-session-row.html',
   styleUrl: './discover-session-row.scss',
 })

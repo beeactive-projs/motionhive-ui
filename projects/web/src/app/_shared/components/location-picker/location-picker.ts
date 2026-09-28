@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   input,
@@ -8,6 +7,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PickedLocation } from 'core';
 import { Subject, debounceTime, switchMap, catchError, of } from 'rxjs';
 import {
@@ -57,10 +57,9 @@ const NOMINATIM_EMAIL = 'contact@motionhive.fit';
 
 @Component({
   selector: 'mh-location-picker',
-  imports: [AutoComplete, ButtonDirective, IconField, InputIcon],
+  imports: [AutoComplete, ButtonDirective, IconField, InputIcon, TranslatePipe],
   templateUrl: './location-picker.html',
   styleUrl: './location-picker.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LocationPicker {
   private readonly _http = inject(HttpClient);

@@ -9,8 +9,8 @@
         <i class="pi pi-comment"></i>
       </div>
       <div>
-        <p class="font-heading font-bold text-base leading-tight">Share feedback</p>
-        <p class="text-xs mt-0.5">Help us improve MotionHive</p>
+        <p class="font-heading font-bold text-base leading-tight">{{ 'components.feedbackDialog.title' | translate }}</p>
+        <p class="text-xs mt-0.5">{{ 'components.feedbackDialog.subtitle' | translate }}</p>
       </div>
     </div>
   </ng-template>
@@ -32,7 +32,7 @@
       >
         <span class="flex flex-col md:flex-row items-center gap-1">
           <span class="material-symbols-outlined" style="font-size: 1.1rem; line-height: 1;">{{ t.icon }}</span>
-          <span class="text-xs font-semibold">{{ t.label }}</span>
+          <span class="text-xs font-semibold">{{ t.label | translate }}</span>
         </span>
       </button>
       }
@@ -40,24 +40,24 @@
 
     <!-- Title -->
     <div class="flex flex-col gap-1.5">
-      <label for="fb-title" class="text-xs font-semibold">Title</label>
-      <input pInputText id="fb-title" formControlName="title" [placeholder]="placeholders().title" fluid
+      <label for="fb-title" class="text-xs font-semibold">{{ 'form.label.title' | translate }}</label>
+      <input pInputText id="fb-title" formControlName="title" [placeholder]="placeholders().title | translate" fluid
         [pAutoFocus]="true" />
       @if (form.controls.title.invalid && form.controls.title.touched) {
       <p-message variant="simple" severity="error" size="small">
-        <span>Please write at least 3 characters.</span>
+        <span>{{ 'components.feedbackDialog.minLength' | translate: { min: 3 } }}</span>
       </p-message>
       }
     </div>
 
     <!-- Description -->
     <div class="flex flex-col gap-1.5">
-      <label for="fb-message" class="text-xs font-semibold">Description</label>
-      <textarea pInputTextarea id="fb-message" formControlName="message" rows="4" [placeholder]="placeholders().message"
+      <label for="fb-message" class="text-xs font-semibold">{{ 'form.label.description' | translate }}</label>
+      <textarea pInputTextarea id="fb-message" formControlName="message" rows="4" [placeholder]="placeholders().message | translate"
         fluid class="resize-none"></textarea>
       @if (form.controls.message.invalid && form.controls.message.touched) {
       <p-message variant="simple" severity="error" size="small">
-        <span>Please write at least 10 characters.</span>
+        <span>{{ 'components.feedbackDialog.minLength' | translate: { min: 10 } }}</span>
       </p-message>
       }
     </div>
@@ -68,9 +68,9 @@
     <div class="success-icon">
       <i class="pi pi-check text-2xl"></i>
     </div>
-    <h4 class="font-heading font-bold text-xl mb-2">Thank you!</h4>
+    <h4 class="font-heading font-bold text-xl mb-2">{{ 'components.feedbackDialog.success.title' | translate }}</h4>
     <p class="text-sm leading-relaxed">
-      Your feedback helps us make MotionHive better for everyone.
+      {{ 'components.feedbackDialog.success.message' | translate }}
     </p>
   </div>
   }
@@ -84,15 +84,15 @@
         class="order-1 sm:order-2 w-full sm:w-auto"
         (click)="onSubmit()"
       >
-        Send feedback
+        {{ 'components.feedbackDialog.send' | translate }}
         <i class="pi" [class]="isLoading() ? 'pi-spinner pi-spin' : 'pi-send'"></i>
       </button>
       <button pButton type="button" text severity="secondary" class="order-2 sm:order-1 w-full sm:w-auto" (click)="onClose()">
-        Cancel
+        {{ 'button.cancel' | translate }}
       </button>
     </div>
     } @else {
-    <button pButton type="button" severity="secondary" text (click)="onClose()">Close</button>
+    <button pButton type="button" severity="secondary" text (click)="onClose()">{{ 'button.close' | translate }}</button>
     }
   </ng-template>
 

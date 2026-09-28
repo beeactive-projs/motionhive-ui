@@ -192,7 +192,7 @@ export class ProfileCoaches implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'info',
-          summary: this._translateService.instant('profileTabs.coaches.toast.cancelled'),
+          summary: this._translateService.instant('toast.summary.requestCancelled'),
         });
         this.loadPendingRequests();
       },

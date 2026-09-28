@@ -56,7 +56,7 @@ describe('CATEGORY_STYLES', () => {
 
   it('maps every category to a palette colour that has a wash step', () => {
     for (const style of Object.values(CATEGORY_STYLES)) {
-      expect(PALETTE, `${style.label} uses ${style.color}`).toContain(style.color);
+      expect(PALETTE, `${style.icon} uses ${style.color}`).toContain(style.color);
     }
     expect(PALETTE).toContain(categoryStyle('unknown' as NotificationCategory).color);
   });

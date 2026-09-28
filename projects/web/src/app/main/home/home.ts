@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit,
   computed,
@@ -7,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import {
@@ -21,8 +21,10 @@ import {
   MyInstructor,
   ProfileService,
   SessionService,
+  UserRoles,
   WorkoutLog,
   WorkoutLogService,
+  blogCategoryLabel,
   type BlogCategory,
   type MyProfile,
 } from 'core';
@@ -31,8 +33,10 @@ import { SuggestInstructorDialog } from './_dialogs/suggest-instructor-dialog/su
 
 interface StartStep {
   id: 'profile' | 'session' | 'coach';
-  title: string;
-  sub: string;
+  /** Translation key — the template translates. */
+  titleKey: string;
+  /** Translation key — the template translates. */
+  subKey: string;
   done: boolean;
   /** Only shown when relevant — e.g. "Create your first session" hides for non-instructors. */
   show: boolean;
@@ -89,31 +93,33 @@ const CATEGORY_TONES: Record<BlogCategory, CategoryTone> = {
  */
 @Component({
   selector: 'mh-home',
-  standalone: true,
   imports: [
     ButtonDirective,
     SkeletonModule,
     Hex,
     InviteFriendDialog,
     SuggestInstructorDialog,
+    TranslatePipe,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
-  private readonly _auth = inject(AuthStore);
-  private readonly _profileSvc = inject(ProfileService);
-  private readonly _clientSvc = inject(ClientService);
-  private readonly _blogSvc = inject(BlogService);
-  private readonly _sessionSvc = inject(SessionService);
-  private readonly _workoutLogSvc = inject(WorkoutLogService);
+  private readonly _authStore = inject(AuthStore);
+  private readonly _profileService = inject(ProfileService);
+  private readonly _clientService = inject(ClientService);
+  private readonly _blogService = inject(BlogService);
+  private readonly _sessionService = inject(SessionService);
+  private readonly _workoutLogService = inject(WorkoutLogService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   // ── Source signals ────────────────────────────────────────────────
 
-  readonly user = computed(() => this._auth.user());
-  readonly firstName = computed(() => this.user()?.firstName?.trim() || 'there');
+  readonly user = computed(() => this._authStore.user());
+  readonly firstName = computed(
+    () => this.user()?.firstName?.trim() || this._translateService.instant('home.hero.fallbackName'),
+  );
 
   private readonly _profile = signal<MyProfile | null>(null);
   private readonly _resume = signal<WorkoutLog | null>(null);
@@ -139,7 +145,7 @@ export class Home implements OnInit {
   readonly isInstructor = computed(
     () =>
       !!this._profile()?.instructorProfile ||
-      this._profile()?.roles?.includes('INSTRUCTOR') === true ||
+      this._profile()?.roles?.includes(UserRoles.Instructor) === true ||
       this._instructorTemplatesTotal() > 0,
   );
 
@@ -177,24 +183,24 @@ export class Home implements OnInit {
     const all: StartStep[] = [
       {
         id: 'profile',
-        title: 'Finish your profile',
-        sub: 'So coaches and clients know who you are.',
+        titleKey: 'home.steps.profile.title',
+        subKey: 'home.steps.profile.sub',
         done: profileDone,
         show: true,
         go: () => this._router.navigate(['/profile']),
       },
       {
         id: 'session',
-        title: 'Create your first session',
-        sub: 'Online or in person, group or 1-on-1.',
+        titleKey: 'home.steps.session.title',
+        subKey: 'home.steps.session.sub',
         done: sessionDone,
         show: this.isInstructor(),
         go: () => this._router.navigate(['/coaching/sessions']),
       },
       {
         id: 'coach',
-        title: 'Find a coach for yourself',
-        sub: 'Book time with someone you rate.',
+        titleKey: 'home.steps.coach.title',
+        subKey: 'home.steps.coach.sub',
         done: coachDone,
         show: true,
         go: () =>
@@ -270,10 +276,14 @@ export class Home implements OnInit {
     return CATEGORY_TONES[cat] ?? 'honey';
   }
 
+  categoryLabel(cat: BlogCategory): string {
+    return blogCategoryLabel(cat);
+  }
+
   // ── Loaders ──────────────────────────────────────────────────────
 
   private _loadProfile(): void {
-    this._profileSvc.getMyProfile().subscribe({
+    this._profileService.getMyProfile().subscribe({
       next: (p) => {
         this._profile.set(p);
         this._profileLoaded.set(true);
@@ -298,7 +308,7 @@ export class Home implements OnInit {
   }
 
   private _loadResume(): void {
-    this._workoutLogSvc.getInProgress().subscribe({
+    this._workoutLogService.getInProgress().subscribe({
       next: (log) => this._resume.set(log),
       error: () => this._resume.set(null),
     });
@@ -306,11 +316,11 @@ export class Home implements OnInit {
 
   private _loadCoaches(): void {
     this.coachesLoading.set(true);
-    this._clientSvc.getMyInstructors().subscribe({
+    this._clientService.getMyInstructors().subscribe({
       next: (rows) => {
         this._myCoaches.set(rows ?? []);
         if ((rows?.length ?? 0) === 0) {
-          this._profileSvc.discoverInstructors().subscribe({
+          this._profileService.discoverInstructors().subscribe({
             next: (sr) => {
               this._suggestedCoaches.set(sr ?? []);
               this.coachesLoading.set(false);
@@ -333,7 +343,7 @@ export class Home implements OnInit {
 
   private _loadPosts(): void {
     this.postsLoading.set(true);
-    this._blogSvc.getPosts({ page: 1, limit: BLOG_LIMIT }).subscribe({
+    this._blogService.getPosts({ page: 1, limit: BLOG_LIMIT }).subscribe({
       next: (res) => {
         this._posts.set(res.items ?? []);
         this.postsLoading.set(false);
@@ -346,7 +356,7 @@ export class Home implements OnInit {
   }
 
   private _loadInstructorTemplatesCount(): void {
-    this._sessionSvc.listTemplates({ page: 1, limit: 1 }).subscribe({
+    this._sessionService.listTemplates({ page: 1, limit: 1 }).subscribe({
       next: (res) => {
         this._instructorTemplatesTotal.set(res.total ?? 0);
         this._templatesLoaded.set(true);
@@ -362,10 +372,11 @@ export class Home implements OnInit {
 
   private _coachFromMine(mi: MyInstructor, i: number): CoachRow {
     const u = mi.instructor;
-    const name = `${u.firstName} ${u.lastName}`.trim() || 'Coach';
+    const coach = this._translateService.instant('enum.userRole.INSTRUCTOR');
+    const name = `${u.firstName} ${u.lastName}`.trim() || coach;
     const initials = ((u.firstName?.[0] ?? '') + (u.lastName?.[0] ?? '')).toUpperCase() || 'C';
     const tag =
-      mi.instructorProfile?.specializations?.slice(0, 2).join(' · ') || 'Coach';
+      mi.instructorProfile?.specializations?.slice(0, 2).join(' · ') || coach;
     return {
       name,
       tag,
@@ -377,11 +388,14 @@ export class Home implements OnInit {
   }
 
   private _coachFromSuggested(s: InstructorSearchResult, i: number): CoachRow {
-    const name = `${s.firstName} ${s.lastName}`.trim() || s.displayName || 'Coach';
+    const name =
+      `${s.firstName} ${s.lastName}`.trim() ||
+      s.displayName ||
+      this._translateService.instant('enum.userRole.INSTRUCTOR');
     const initials = ((s.firstName?.[0] ?? '') + (s.lastName?.[0] ?? '')).toUpperCase() || 'C';
     const tag =
       s.specializations?.slice(0, 2).join(' · ') ||
-      (s.city ? s.city : 'Open to new clients');
+      (s.city ? s.city : this._translateService.instant('home.coaches.openToNewClients'));
     return {
       name,
       tag,

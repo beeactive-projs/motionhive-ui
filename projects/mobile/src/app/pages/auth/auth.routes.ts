@@ -4,27 +4,27 @@ export const authRoutes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./login/login').then((m) => m.Login),
-    title: 'Sign in - MotionHive',
+    title: 'pageTitle.signIn',
   },
   {
     path: 'signup',
     loadComponent: () => import('./sign-up/sign-up').then((m) => m.SignUp),
-    title: 'Create account - MotionHive',
+    title: 'pageTitle.createAccount',
   },
   {
     path: 'reset-password',
     loadComponent: () => import('./reset-password/reset-password').then((m) => m.ResetPassword),
-    title: 'Reset password - MotionHive',
+    title: 'pageTitle.resetPassword',
   },
   {
     path: 'new-password',
     loadComponent: () => import('./new-password/new-password').then((m) => m.NewPassword),
-    title: 'New password - MotionHive',
+    title: 'pageTitle.newPassword',
   },
   {
     path: 'verify-email',
     loadComponent: () => import('./verify-email/verify-email').then((m) => m.VerifyEmail),
-    title: 'Verify email - MotionHive',
+    title: 'pageTitle.verifyEmail',
   },
   {
     path: '',

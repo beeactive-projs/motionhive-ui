@@ -153,11 +153,11 @@ export function joinCta(policy: JoinPolicy, hasPendingRequest: boolean): JoinCta
   }
   switch (policy) {
     case JoinPolicies.Open:
-      return { action: JoinActions.Join, label: translate('groups.join.join'), enabled: true };
+      return { action: JoinActions.Join, label: translate('button.joinGroup'), enabled: true };
     case JoinPolicies.Approval:
       return {
         action: JoinActions.Request,
-        label: translate('groups.join.request'),
+        label: translate('button.requestToJoin'),
         enabled: true,
       };
     case JoinPolicies.InviteOnly:

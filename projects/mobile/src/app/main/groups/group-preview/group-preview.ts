@@ -153,7 +153,7 @@ export class GroupPreview {
           return;
         }
         void this._feedbackService.success(
-          this._translateService.instant('groups.preview.toast.requestSent'),
+          this._translateService.instant('toast.summary.requestSent'),
         );
       },
       error: (error: unknown) => {

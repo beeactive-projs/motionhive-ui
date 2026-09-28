@@ -15,7 +15,7 @@
       </span>
     </ion-button>
 
-    <ion-button class="close" fill="clear" shape="round" aria-label="Dismiss" (click)="dismiss()">
+    <ion-button class="close" fill="clear" shape="round" [attr.aria-label]="'button.dismiss' | translate" (click)="dismiss()">
       <ion-icon slot="icon-only" name="close-outline" />
     </ion-button>
   </div>

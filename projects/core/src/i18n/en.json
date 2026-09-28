@@ -28,6 +28,7 @@
     "archive": "Archive",
     "back": "Back",
     "cancel": "Cancel",
+    "cancelRequest": "Cancel request",
     "change": "Change",
     "clear": "Clear",
     "clearFilter": "Clear filter",
@@ -42,12 +43,14 @@
     "decline": "Decline",
     "delete": "Delete",
     "discard": "Discard",
+    "discoverCoaches": "Discover coaches",
     "dismiss": "Dismiss",
     "done": "Done",
     "duplicate": "Duplicate",
     "edit": "Edit",
     "invite": "Invite",
     "join": "Join",
+    "joinGroup": "Join group",
     "keep": "Keep",
     "keepIt": "Keep it",
     "leave": "Leave",
@@ -59,6 +62,7 @@
     "previous": "Previous",
     "reject": "Reject",
     "remove": "Remove",
+    "requestToJoin": "Request to join",
     "resend": "Resend",
     "reset": "Reset",
     "restore": "Restore",
@@ -70,6 +74,7 @@
     "seeAll": "See all",
     "select": "Select",
     "send": "Send",
+    "sendRequest": "Send request",
     "share": "Share",
     "showLess": "Show less",
     "showMore": "Show more",
@@ -84,18 +89,21 @@
     "update": "Update",
     "upload": "Upload",
     "view": "View",
+    "viewProfile": "View profile",
     "yes": "Yes"
   },
   "common": {
     "actions": "Actions",
     "all": "All",
     "and": "and",
+    "appName": "MotionHive",
     "filters": "Filters",
     "filtersCount": "Filters · {count}",
     "loading": "Loading…",
     "none": "None",
     "oneOff": "One-off",
     "or": "or",
+    "pageTitle": "{page} - MotionHive",
     "paginator": "View {first} - {last} of {total}",
     "pleaseTryAgain": "Please try again.",
     "session": "Session",
@@ -133,6 +141,12 @@
     "nothingYet": "Nothing here yet"
   },
   "enum": {
+    "blogCategory": {
+      "Guide": "Guide",
+      "Nutrition": "Nutrition",
+      "Science": "Science",
+      "Wellness": "Wellness"
+    },
     "cancelScope": {
       "series": "The whole series",
       "this": "Only this session",
@@ -427,6 +441,7 @@
   },
   "form": {
     "hint": {
+      "optional": "(optional)",
       "passwordMinLength": "Min. 8 characters",
       "reenterPassword": "Re-enter your password"
     },
@@ -585,6 +600,8 @@
       "copied": "Copied",
       "error": "Error",
       "info": "Info",
+      "requestCancelled": "Request cancelled",
+      "requestSent": "Request sent",
       "saved": "Saved",
       "success": "Success",
       "warning": "Warning"

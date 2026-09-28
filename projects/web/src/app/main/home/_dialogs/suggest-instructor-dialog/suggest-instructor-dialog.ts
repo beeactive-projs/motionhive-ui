@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
+import { Component, inject, model, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { take } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -39,17 +40,18 @@ import {
     MessageModule,
     TabsModule,
     ToastModule,
+    TranslatePipe,
   ],
   providers: [MessageService],
   templateUrl: './suggest-instructor-dialog.html',
   styleUrl: './suggest-instructor-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SuggestInstructorDialog {
   private readonly _feedbackService = inject(FeedbackService);
   private readonly _invitationService = inject(InvitationService);
   private readonly _authStore = inject(AuthStore);
   private readonly _messageService = inject(MessageService);
+  private readonly _translateService = inject(TranslateService);
 
   readonly visible = model<boolean>(false);
 
@@ -99,12 +101,12 @@ export class SuggestInstructorDialog {
           this.isSending.set(false);
           const detail =
             err.status === 429
-              ? "You've sent a lot recently — try again in an hour."
+              ? this._translateService.instant('home.toast.rateLimited')
               : err.error?.message ||
-                'Try again in a moment, or use the other tab.';
+                this._translateService.instant('home.suggestCoach.toast.sendFailed.detail');
           this._messageService.add({
             severity: 'error',
-            summary: "Couldn't send the suggestion",
+            summary: this._translateService.instant('home.suggestCoach.toast.sendFailed.summary'),
             detail,
             life: 5000,
           });
@@ -145,8 +147,8 @@ export class SuggestInstructorDialog {
           this.isSending.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: "Couldn't send",
-            detail: 'Try again in a moment.',
+            summary: this._translateService.instant('home.suggestCoach.toast.teamFailed.summary'),
+            detail: this._translateService.instant('home.suggestCoach.toast.teamFailed.detail'),
             life: 4000,
           });
         },

@@ -5,7 +5,7 @@ export const instructorRoutes: Routes = [
   {
     path: 'overview',
     loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
-    title: 'Overview - MotionHive',
+    title: 'pageTitle.overview',
   },
   // The roster is a lens on /coaching/clients now, not a page. Kept as a
   // redirect so existing links and bookmarks still land somewhere useful.
@@ -17,63 +17,63 @@ export const instructorRoutes: Routes = [
   {
     path: 'clients',
     loadComponent: () => import('./clients/clients').then((m) => m.Clients),
-    title: 'Clients - MotionHive',
+    title: 'pageTitle.clients',
   },
   {
     path: 'clients/:id',
     loadComponent: () =>
       import('./clients/client-profile/client-profile').then((m) => m.ClientProfile),
-    title: 'Client profile - MotionHive',
+    title: 'pageTitle.clientProfile',
   },
   {
     path: 'pending-requests',
     loadComponent: () =>
       import('./clients/pending-requests/pending-requests').then((m) => m.PendingRequests),
-    title: 'Pending requests - MotionHive',
+    title: 'pageTitle.pendingRequests',
   },
   {
     path: 'sessions',
     loadComponent: () => import('./sessions/sessions').then((m) => m.Sessions),
-    title: 'Sessions - MotionHive',
+    title: 'pageTitle.manageSessions',
   },
   {
     path: 'sessions/calendar',
     loadComponent: () => import('./sessions/calendar/calendar').then((m) => m.SessionsCalendar),
-    title: 'Sessions calendar - MotionHive',
+    title: 'pageTitle.sessionsCalendar',
   },
   {
     path: 'sessions/approvals',
     loadComponent: () =>
       import('./sessions/approvals/approvals').then((m) => m.InstructorApprovals),
-    title: 'Approvals - MotionHive',
+    title: 'pageTitle.approvals',
   },
   {
     path: 'sessions/templates/:id',
     loadComponent: () =>
       import('./sessions/template-detail/template-detail').then((m) => m.InstructorTemplateDetail),
-    title: 'Recurring session - MotionHive',
+    title: 'pageTitle.recurringSession',
   },
   {
     path: 'sessions/:id/attendance',
     loadComponent: () =>
       import('./sessions/attendance/attendance').then((m) => m.InstructorAttendance),
-    title: 'Attendance - MotionHive',
+    title: 'pageTitle.attendance',
   },
   {
     path: 'sessions/:id',
     loadComponent: () =>
       import('./sessions/session-detail/session-detail').then((m) => m.InstructorSessionDetail),
-    title: 'Session - MotionHive',
+    title: 'pageTitle.session',
   },
   {
     path: 'exercises',
     loadComponent: () => import('./exercises/exercises').then((m) => m.Exercises),
-    title: 'Exercises - MotionHive',
+    title: 'pageTitle.exercises',
   },
   {
     path: 'programs',
     loadComponent: () => import('./programs/programs').then((m) => m.Programs),
-    title: 'Programs - MotionHive',
+    title: 'pageTitle.programs',
   },
   {
     path: 'programs/:id',
@@ -81,7 +81,7 @@ export const instructorRoutes: Routes = [
       import('./programs/program-detail/program-detail').then(
         (m) => m.ProgramDetail,
       ),
-    title: 'Program detail - MotionHive',
+    title: 'pageTitle.programDetail',
   },
   // Groups now live at the shared /groups path so all roles can access them.
   // Keep redirects so existing /coaching/groups bookmarks and in-app links still resolve.
@@ -91,7 +91,7 @@ export const instructorRoutes: Routes = [
   // {
   //   path: 'payments',
   //   loadComponent: () => import('./payments/payments').then((m) => m.Payments),
-  //   title: 'Payments - MotionHive',
+  //   title: 'pageTitle.payments',
   // },
 
   {
@@ -103,19 +103,19 @@ export const instructorRoutes: Routes = [
   //   path: 'invoices/:id',
   //   loadComponent: () =>
   //     import('./payments/invoices/invoice-detail/invoice-detail').then((m) => m.InvoiceDetail),
-  //   title: 'Invoice Details - MotionHive',
+  //   title: 'pageTitle.invoiceDetails',
   // },
   // {
   //   path: 'onboarding/return',
   //   loadComponent: () =>
   //     import('./payments/onboarding-return/onboarding-return').then((m) => m.OnboardingReturn),
-  //   title: 'Onboarding - MotionHive',
+  //   title: 'pageTitle.onboarding',
   // },
   // {
   //   path: 'onboarding/refresh',
   //   loadComponent: () =>
   //     import('./payments/onboarding-refresh/onboarding-refresh').then((m) => m.OnboardingRefresh),
-  //   title: 'Onboarding - MotionHive',
+  //   title: 'pageTitle.onboarding',
   // },
   // Legacy redirects — simple path redirects to the hub.
   // The hub defaults to the Invoices tab. Query-param redirects

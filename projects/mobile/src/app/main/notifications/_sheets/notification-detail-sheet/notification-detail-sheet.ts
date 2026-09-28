@@ -1,12 +1,14 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import { IonButton, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { BellNotification } from 'core';
+import { BellNotification, appLocale } from 'core';
 
 import { HexAvatar } from '../../../../_shared/components/hex-avatar/hex-avatar';
 import { SheetShell } from '../../../../_shared/components/sheet-shell/sheet-shell';
 import { categoryStyle } from '../../../../_shared/config/notification-categories.config';
 import { webOnlyLabel } from '../../../../_shared/config/notification-deep-link';
+import { categoryLabel } from '../../notifications.config';
 
 /**
  * What a notification opens into when it has nowhere to go.
@@ -21,11 +23,13 @@ import { webOnlyLabel } from '../../../../_shared/config/notification-deep-link'
  */
 @Component({
   selector: 'mh-notification-detail-sheet',
-  imports: [HexAvatar, IonButton, IonIcon, IonNote, SheetShell],
+  imports: [HexAvatar, IonButton, IonIcon, IonNote, SheetShell, TranslatePipe],
   templateUrl: './notification-detail-sheet.html',
   styleUrl: './notification-detail-sheet.scss',
 })
 export class NotificationDetailSheet {
+  private readonly _translateService = inject(TranslateService);
+
   readonly open = model(false);
   readonly notification = input<BellNotification | null>(null);
 
@@ -44,16 +48,18 @@ export class NotificationDetailSheet {
 
   readonly eyebrow = computed(() => {
     const item = this.notification();
-    const style = this.style();
-    if (!item || !style) return '';
-    const when = new Date(item.createdAt).toLocaleString(undefined, {
+    if (!item) return '';
+    const when = new Date(item.createdAt).toLocaleString(appLocale(), {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
       minute: '2-digit',
     });
-    return `${style.label} · ${when}`;
+    return this._translateService.instant('notifications.detail.eyebrow', {
+      category: categoryLabel(item.category),
+      when,
+    });
   });
 
   /** Names where this lives instead; null when we cannot say honestly. */

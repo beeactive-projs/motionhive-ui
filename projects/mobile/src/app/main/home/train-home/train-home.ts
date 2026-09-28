@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   IonButton,
   IonCard,
@@ -50,6 +51,7 @@ import { StartStep, TrainHomeStore } from './train-home.store';
     IonSkeletonText,
     IonText,
     SectionHeader,
+    TranslatePipe,
   ],
   templateUrl: './train-home.html',
   styleUrl: './train-home.scss',
@@ -58,6 +60,7 @@ import { StartStep, TrainHomeStore } from './train-home.store';
 export class TrainHome implements OnInit, ViewWillEnter {
   private readonly _authStore = inject(AuthStore);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   readonly store = inject(TrainHomeStore);
 
@@ -80,20 +83,23 @@ export class TrainHome implements OnInit, ViewWillEnter {
     this.store.refresh();
   }
 
-  greetingName(): string {
-    return this.firstName()?.firstName?.trim() || 'there';
+  greeting(): string {
+    const name = this.firstName()?.firstName?.trim();
+    return name
+      ? this._translateService.instant('home.train.greeting', { name })
+      : this._translateService.instant('home.train.greetingNoName');
   }
 
   sessionsSummary(): string {
     const count = this.store.upcomingSessions();
-    if (count === 0) return 'No sessions booked';
-    return count === 1 ? '1 session booked' : `${count} sessions booked`;
+    if (count === 0) return this._translateService.instant('home.train.sessions.none');
+    return this._translateService.instant('home.train.sessions.booked', { count });
   }
 
   sessionsHint(): string {
     return this.store.upcomingSessions() === 0
-      ? 'Find a coach and book your first one.'
-      : 'Browse what else is open to join.';
+      ? this._translateService.instant('home.train.sessions.hintNone')
+      : this._translateService.instant('home.train.sessions.hintBrowse');
   }
 
   resumeWorkout(): void {

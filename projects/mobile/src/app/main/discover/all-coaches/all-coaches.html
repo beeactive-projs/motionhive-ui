@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/discover" />
     </ion-buttons>
-    <ion-title>Coaches</ion-title>
+    <ion-title>{{ 'discover.allCoaches.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,9 +15,9 @@
   @if (showLoadError()) {
     <mh-empty-state
       icon="alert-circle-outline"
-      heading="Couldn't load coaches"
-      message="Check your connection and try again."
-      actionLabel="Try again"
+      [heading]="'discover.allCoaches.loadError' | translate"
+      [message]="'error.checkConnection' | translate"
+      [actionLabel]="'button.tryAgain' | translate"
       (action)="retry()"
     />
   } @else if (showSkeleton()) {
@@ -36,8 +36,8 @@
   } @else if (isEmpty()) {
     <mh-empty-state
       icon="people-outline"
-      heading="No coaches to show"
-      message="When coaches publish a public profile, they show up here."
+      [heading]="'discover.allCoaches.empty.heading' | translate"
+      [message]="'discover.allCoaches.empty.message' | translate"
     />
   } @else {
     @if (chips().length > 0) {
@@ -47,7 +47,7 @@
           [attr.aria-pressed]="specialization() === null"
           (click)="clearFilter()"
         >
-          All
+          {{ 'common.all' | translate }}
         </ion-chip>
         @for (chip of chips(); track chip) {
           <ion-chip
@@ -64,9 +64,9 @@
     @if (isFilteredEmpty()) {
       <mh-empty-state
         icon="people-outline"
-        heading="Nothing matches"
-        message="No coaches list that specialization."
-        actionLabel="Clear filter"
+        [heading]="'empty.nothingMatches' | translate"
+        [message]="'discover.allCoaches.noMatches' | translate"
+        [actionLabel]="'button.clearFilter' | translate"
         actionFill="outline"
         (action)="clearFilter()"
       />

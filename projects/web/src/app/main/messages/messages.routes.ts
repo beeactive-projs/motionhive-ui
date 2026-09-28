@@ -17,7 +17,7 @@ export const messagesRoutes: Routes = [
         path: '',
         loadComponent: () =>
           import('./pages/empty-state/empty-state').then((m) => m.EmptyState),
-        title: 'Messages - MotionHive',
+        title: 'pageTitle.messages',
       },
       {
         path: ':id',
@@ -25,7 +25,7 @@ export const messagesRoutes: Routes = [
           import('./components/conversation-pane/conversation-pane').then(
             (m) => m.ConversationPane,
           ),
-        title: 'Conversation - MotionHive',
+        title: 'pageTitle.conversation',
       },
     ],
   },

@@ -21,6 +21,7 @@ import {
   RefresherCustomEvent,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 
 import {
@@ -95,6 +96,7 @@ import { DiscoverCoachesStore } from './discover.store';
     NotificationBell,
     SearchbarAutofocusDirective,
     SessionRowSkeleton,
+    TranslatePipe,
   ],
   templateUrl: './discover.html',
   styleUrl: './discover.scss',

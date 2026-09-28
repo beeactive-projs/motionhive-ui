@@ -1,6 +1,6 @@
 @if (canInstall()) {
   <button pButton type="button" size="small" severity="secondary" outlined (click)="install()">
     <i class="pi pi-download"></i>
-    Install app
+    {{ 'components.installApp.install' | translate }}
   </button>
 }

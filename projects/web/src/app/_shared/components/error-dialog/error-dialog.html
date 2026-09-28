@@ -15,7 +15,7 @@
       <div>
         <p class="font-heading font-bold text-base leading-tight">{{ error()?.title }}</p>
         @if (error()?.status) {
-          <p class="text-xs text-surface-400 mt-0.5">Error {{ error()?.status }}</p>
+          <p class="text-xs text-surface-400 mt-0.5">{{ 'components.errorDialog.status' | translate: { status: error()?.status } }}</p>
         }
       </div>
     </div>
@@ -24,7 +24,7 @@
   <p class="text-sm text-surface-600 dark:text-surface-300 leading-relaxed m-0">{{ error()?.message }}</p>
 
   <ng-template #footer>
-    <button pButton type="button" severity="secondary" text (click)="close()">Close</button>
+    <button pButton type="button" severity="secondary" text (click)="close()">{{ 'button.close' | translate }}</button>
   </ng-template>
 
 </p-dialog>

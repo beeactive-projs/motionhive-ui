@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonDirective } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -16,12 +17,13 @@ import { Hex, HexTone } from '../../../../_shared/components/hex/hex';
  */
 @Component({
   selector: 'mh-instructor-card',
-  imports: [RouterLink, ButtonDirective, Card, TagModule, Hex],
+  imports: [RouterLink, ButtonDirective, Card, TagModule, Hex, TranslatePipe],
   templateUrl: './instructor-card.html',
   styleUrl: './instructor-card.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InstructorCard {
+  private readonly _translateService = inject(TranslateService);
+
   readonly instructor = input.required<InstructorSearchResult>();
   /** Picks a hex tone from the instructor id so cards visually vary across the grid. */
   readonly tone = input<HexTone | null>(null);
@@ -33,17 +35,26 @@ export class InstructorCard {
 
   readonly displayName = computed(() => {
     const i = this.instructor();
-    return i.displayName?.trim() || `${i.firstName ?? ''} ${i.lastName ?? ''}`.trim() || 'Instructor';
+    return (
+      i.displayName?.trim() ||
+      `${i.firstName ?? ''} ${i.lastName ?? ''}`.trim() ||
+      this._translateService.instant('enum.userRole.INSTRUCTOR')
+    );
   });
 
   readonly role = computed(() => {
     const i = this.instructor();
     const yrs = i.yearsOfExperience;
     const spec = i.specializations?.[0];
-    if (spec && yrs) return `${spec} · ${yrs} ${yrs === 1 ? 'yr' : 'yrs'}`;
+    if (spec && yrs) {
+      return this._translateService.instant('home.instructorCard.roleWithYears', {
+        specialization: spec,
+        count: yrs,
+      });
+    }
     if (spec) return spec;
     if (i.bio) return i.bio.slice(0, 40);
-    return 'Instructor';
+    return this._translateService.instant('enum.userRole.INSTRUCTOR');
   });
 
   readonly tags = computed(() => {

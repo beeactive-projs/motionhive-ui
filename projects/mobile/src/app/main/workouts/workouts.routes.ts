@@ -15,30 +15,30 @@ export const workoutRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./workouts').then((m) => m.Workouts),
-    title: 'Workouts - MotionHive',
+    title: 'pageTitle.workouts',
   },
   {
     // Before `:id` routes, or the parameterised paths swallow the words.
     path: 'starters',
     loadComponent: () => import('./starters/starters').then((m) => m.Starters),
-    title: 'Starter routines - MotionHive',
+    title: 'pageTitle.starterRoutines',
   },
   {
     path: 'history',
     loadComponent: () => import('./history/history').then((m) => m.History),
-    title: 'History - MotionHive',
+    title: 'pageTitle.history',
   },
   {
     path: 'progress',
     loadComponent: () => import('./progress/progress').then((m) => m.Progress),
-    title: 'Progress - MotionHive',
+    title: 'pageTitle.progress',
   },
   {
     // The catalog list, in this stack too — reachable from the training
     // surface without a detour through the menu or a tab switch.
     path: 'exercises',
     loadComponent: () => import('../exercises/exercises').then((m) => m.Exercises),
-    title: 'Exercises - MotionHive',
+    title: 'pageTitle.exercises',
   },
   {
     // The catalog page, pushed onto THIS stack rather than the exercises tab:
@@ -47,33 +47,33 @@ export const workoutRoutes: Routes = [
     path: 'exercise/:exerciseId',
     loadComponent: () =>
       import('../exercises/exercise-detail/exercise-detail').then((m) => m.ExerciseDetail),
-    title: 'Exercise - MotionHive',
+    title: 'pageTitle.exercise',
   },
   {
     path: 'routine/:id',
     loadComponent: () =>
       import('./routine-builder/routine-builder').then((m) => m.RoutineBuilder),
-    title: 'Routine - MotionHive',
+    title: 'pageTitle.routine',
   },
   {
     // The trainee's view of a multi-week plan.
     path: 'plan/:id',
     loadComponent: () => import('./plan/plan').then((m) => m.Plan),
-    title: 'Plan - MotionHive',
+    title: 'pageTitle.plan',
   },
   {
     path: 'preview/:assignmentId',
     loadComponent: () => import('./preview/preview').then((m) => m.Preview),
-    title: 'Workout - MotionHive',
+    title: 'pageTitle.workout',
   },
   {
     path: 'log/:id',
     loadComponent: () => import('./logger/logger').then((m) => m.Logger),
-    title: 'Workout - MotionHive',
+    title: 'pageTitle.workout',
   },
   {
     path: 'finish/:id',
     loadComponent: () => import('./finish/finish').then((m) => m.Finish),
-    title: 'Workout complete - MotionHive',
+    title: 'pageTitle.workoutComplete',
   },
 ];

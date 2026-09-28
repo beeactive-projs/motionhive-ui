@@ -16,35 +16,35 @@ export const programRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./programs').then((m) => m.Programs),
-    title: 'Programs - MotionHive',
+    title: 'pageTitle.programs',
   },
   {
     path: 'routine/:id',
     loadComponent: () =>
       import('../workouts/routine-builder/routine-builder').then((m) => m.RoutineBuilder),
-    title: 'Routine - MotionHive',
+    title: 'pageTitle.routine',
   },
   {
     path: 'program/:id',
     loadComponent: () =>
       import('./program-builder/program-builder').then((m) => m.ProgramBuilder),
-    title: 'Program - MotionHive',
+    title: 'pageTitle.program',
   },
   {
     path: 'program/:id/settings',
     loadComponent: () =>
       import('./program-settings/program-settings').then((m) => m.ProgramSettings),
-    title: 'Program settings - MotionHive',
+    title: 'pageTitle.programSettings',
   },
   {
     path: 'program/:id/day/:workoutId',
     loadComponent: () => import('./day-editor/day-editor').then((m) => m.DayEditor),
-    title: 'Day - MotionHive',
+    title: 'pageTitle.day',
   },
   {
     path: 'program/:id/assignments',
     loadComponent: () =>
       import('./assignments/assignments').then((m) => m.Assignments),
-    title: 'Assignments - MotionHive',
+    title: 'pageTitle.assignments',
   },
 ];

@@ -14,18 +14,18 @@ export const sessionsRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./sessions').then((m) => m.Sessions),
-    title: 'Sessions - MotionHive',
+    title: 'pageTitle.manageSessions',
   },
   {
     // Before `:id`, or the parameterised route swallows "person".
     path: 'person/:handle',
     loadComponent: () => import('../../person/person').then((m) => m.Person),
-    title: 'Profile - MotionHive',
+    title: 'pageTitle.profile',
   },
   {
     path: ':id',
     loadComponent: () =>
       import('./session-detail/session-detail').then((m) => m.SessionDetail),
-    title: 'Session - MotionHive',
+    title: 'pageTitle.session',
   },
 ];

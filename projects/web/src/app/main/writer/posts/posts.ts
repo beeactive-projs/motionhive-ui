@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -10,12 +10,15 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   BLOG_CATEGORY_OPTIONS,
   BLOG_COVER_PRESETS,
   BlogCategory,
   BlogPost,
   BlogService,
+  blogCategoryLabel,
+  escapeHtml,
   TagSeverity,
   withCloudinaryTransform,
 } from 'core';
@@ -35,17 +38,18 @@ import { ListEmptyState } from '../../../_shared/components/list-empty-state/lis
     TooltipModule,
     InputTextModule,
     ListEmptyState,
+    TranslatePipe,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './posts.html',
   styleUrl: './posts.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Posts implements OnInit {
   private readonly _blogService = inject(BlogService);
   private readonly _messageService = inject(MessageService);
   private readonly _confirmationService = inject(ConfirmationService);
   private readonly _router = inject(Router);
+  private readonly _translateService = inject(TranslateService);
 
   posts = signal<BlogPost[]>([]);
   totalRecords = signal(0);
@@ -57,8 +61,11 @@ export class Posts implements OnInit {
   categoryFilter = signal<BlogCategory | undefined>(undefined);
 
   readonly categoryOptions: SelectItem<BlogCategory | undefined>[] = [
-    { label: 'All', value: undefined },
-    ...BLOG_CATEGORY_OPTIONS,
+    { label: this._translateService.instant('common.all'), value: undefined },
+    ...BLOG_CATEGORY_OPTIONS.map((option) => ({
+      ...option,
+      label: this.categoryLabel(option.value),
+    })),
   ];
 
   ngOnInit(): void {
@@ -84,8 +91,8 @@ export class Posts implements OnInit {
           this.loading.set(false);
           this._messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load posts',
+            summary: this._translateService.instant('toast.summary.error'),
+            detail: this._translateService.instant('writer.toast.loadListFailed'),
           });
         },
       });
@@ -120,12 +127,14 @@ export class Posts implements OnInit {
 
   confirmDelete(post: BlogPost): void {
     this._confirmationService.confirm({
-      header: 'Delete post',
-      message: `Are you sure you want to delete "${post.title}"? This action cannot be undone.`,
+      header: this._translateService.instant('writer.confirm.delete.header'),
+      message: this._translateService.instant('writer.confirm.delete.message', {
+        title: escapeHtml(post.title),
+      }),
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-secondary',
-      acceptLabel: 'Yes, delete',
-      rejectLabel: 'No',
+      acceptLabel: this._translateService.instant('writer.confirm.delete.accept'),
+      rejectLabel: this._translateService.instant('button.no'),
       acceptIcon: 'pi pi-trash',
       rejectIcon: 'pi pi-times',
       accept: () => this.deletePost(post),
@@ -137,16 +146,18 @@ export class Posts implements OnInit {
       next: () => {
         this._messageService.add({
           severity: 'success',
-          summary: 'Post deleted',
-          detail: `"${post.title}" has been deleted`,
+          summary: this._translateService.instant('writer.toast.deleted.summary'),
+          detail: this._translateService.instant('writer.toast.deleted.detail', {
+            title: post.title,
+          }),
         });
         this.loadPosts();
       },
       error: () => {
         this._messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to delete post',
+          summary: this._translateService.instant('toast.summary.error'),
+          detail: this._translateService.instant('writer.toast.deleteFailed'),
         });
       },
     });
@@ -154,6 +165,10 @@ export class Posts implements OnInit {
 
   publishedSeverity(isPublished: boolean): TagSeverity {
     return isPublished ? TagSeverity.Success : TagSeverity.Secondary;
+  }
+
+  categoryLabel(category: string | null | undefined): string {
+    return blogCategoryLabel(category);
   }
 
   trackById = (_: number, item: { id: string }) => item.id;

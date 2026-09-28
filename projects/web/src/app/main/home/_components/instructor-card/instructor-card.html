@@ -18,11 +18,11 @@
     <div class="mt-auto">
       @if (profileLink(); as link) {
         <button pButton type="button" size="small" severity="secondary" [outlined]="true" fluid [routerLink]="link">
-          View profile
+          {{ 'button.viewProfile' | translate }}
           <i class="pi pi-arrow-right"></i>
         </button>
       } @else {
-        <button pButton type="button" size="small" severity="secondary" [outlined]="true" fluid [disabled]="true">View profile</button>
+        <button pButton type="button" size="small" severity="secondary" [outlined]="true" fluid [disabled]="true">{{ 'button.viewProfile' | translate }}</button>
       }
     </div>
   </div>

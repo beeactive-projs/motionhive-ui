@@ -1,4 +1,4 @@
-/* Text roles â€” the brand type rules and the handful of named text utilities
+/* Text roles — the brand type rules and the handful of named text utilities
    every screen shares. Skin and type rhythm only; where a block of text sits
    on a page is the page layout's job. */
 
@@ -8,7 +8,7 @@ h3 {
   font-family: var(--mh-font-heading);
 }
 
-/* Page title â€” tight to the kicker above it. Ionic's default h1 is a 1.5rem
+/* Page title — tight to the kicker above it. Ionic's default h1 is a 1.5rem
    heading with 1rem of margin on both sides of it. */
 h1 {
   margin: 0.125rem 0 0;
@@ -51,7 +51,7 @@ h1 {
 /* The mono label that titles a group of rows ("PEOPLE", "CONVERSATION").
    Every list screen has a few; ion-list-header is a row with its own type
    scale, not a standalone label. Inside `.mh-section` the block padding is
-   neutralized â€” the section owns the spacing there (see layout.css). */
+   neutralized — the section owns the spacing there (see layout.css). */
 .mh-section-label {
   padding: 1rem 0.375rem 0.375rem;
   color: var(--ion-color-medium);
@@ -83,7 +83,7 @@ h1 {
   color: var(--mh-color-honey-deep);
 }
 
-/* The fine print that closes a screen â€” "Member since", deletion warnings,
+/* The fine print that closes a screen — "Member since", deletion warnings,
    visibility captions. Smaller than `.mh-note-block`, margin-free: the page
    layout places it. */
 .mh-footnote {
